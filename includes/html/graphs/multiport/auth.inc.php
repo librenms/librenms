@@ -9,4 +9,4 @@ if (! $auth) {
     }
 }
 
-$title = 'Multi Port :: ';
+$title = 'Multi Port';

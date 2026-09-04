@@ -48,15 +48,7 @@ if (isset($vars['id'])) {
         /*
          * Build title with breadcrumbs for module's main subpage
          */
-        $link_array = [
-            'page' => 'device',
-            'device' => $device['device_id'],
-            'tab' => 'health',
-        ];
-        $title = generate_device_link($device);
-        $title .= ' :: ' . generate_link('QFP', $link_array, ['metric' => 'qfp']);
-        $title .= ' :: ' . $components['name'];
-
+        $title = ' :: QFP :: ' . $components['name'];
         $auth = true;
     }
 }
