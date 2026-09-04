@@ -261,16 +261,117 @@ class RoutingTabTest extends TestCase
             ->get(route('device.routing.bgp', ['device' => $device]))
             ->assertOk()
             ->assertSee('Local AS : 65000 BGP')
-            ->assertSee('Prefixes:')
+            ->assertDontSee('Prefixes:')
             ->assertDontSee('Traffic:')
-            ->assertSee('IPv4 Ucast')
-            ->assertSee('VPNv4 Ucast')
-            ->assertSee('IPv6 Ucast')
-            ->assertSee('VPNv6 Ucast')
+            ->assertSee('Basic')
+            ->assertSee('Updates')
             ->assertSee('192.0.2.1')
             ->assertSee('65001')
             ->assertSee('Core-Peer-1')
             ->assertSee('established');
+    }
+
+    public function testAuthorizedUserCanSeeBgpAfiPrefixesMenuWhenAvailable(): void
+    {
+        $device = Device::factory()->create(['bgpLocalAs' => 65000]);
+        $peer = \App\Models\BgpPeer::factory()->for($device)->create([
+            'bgpPeerIdentifier' => '192.0.2.1',
+            'bgpPeerRemoteAs' => 65001,
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('bgpPeers_cbgp')->insert([
+            [
+                'device_id' => $device->device_id,
+                'bgpPeerIdentifier' => '192.0.2.1',
+                'afi' => 'ipv4',
+                'safi' => 'unicast',
+                'AcceptedPrefixes' => 10,
+                'DeniedPrefixes' => 0,
+                'PrefixAdminLimit' => 100,
+                'PrefixThreshold' => 80,
+                'PrefixClearThreshold' => 60,
+                'AdvertisedPrefixes' => 5,
+                'SuppressedPrefixes' => 0,
+                'WithdrawnPrefixes' => 0,
+                'AcceptedPrefixes_delta' => 0,
+                'AcceptedPrefixes_prev' => 0,
+                'DeniedPrefixes_delta' => 0,
+                'DeniedPrefixes_prev' => 0,
+                'AdvertisedPrefixes_delta' => 0,
+                'AdvertisedPrefixes_prev' => 0,
+                'SuppressedPrefixes_delta' => 0,
+                'SuppressedPrefixes_prev' => 0,
+                'WithdrawnPrefixes_delta' => 0,
+                'WithdrawnPrefixes_prev' => 0,
+            ],
+            [
+                'device_id' => $device->device_id,
+                'bgpPeerIdentifier' => '192.0.2.1',
+                'afi' => 'ipv6',
+                'safi' => 'unicast',
+                'AcceptedPrefixes' => 20,
+                'DeniedPrefixes' => 0,
+                'PrefixAdminLimit' => 200,
+                'PrefixThreshold' => 80,
+                'PrefixClearThreshold' => 60,
+                'AdvertisedPrefixes' => 10,
+                'SuppressedPrefixes' => 0,
+                'WithdrawnPrefixes' => 0,
+                'AcceptedPrefixes_delta' => 0,
+                'AcceptedPrefixes_prev' => 0,
+                'DeniedPrefixes_delta' => 0,
+                'DeniedPrefixes_prev' => 0,
+                'AdvertisedPrefixes_delta' => 0,
+                'AdvertisedPrefixes_prev' => 0,
+                'SuppressedPrefixes_delta' => 0,
+                'SuppressedPrefixes_prev' => 0,
+                'WithdrawnPrefixes_delta' => 0,
+                'WithdrawnPrefixes_prev' => 0,
+            ],
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.routing.bgp', ['device' => $device]))
+            ->assertOk()
+            ->assertSee('Prefixes:')
+            ->assertSee('IPv4 Ucast')
+            ->assertSee('IPv6 Ucast')
+            ->assertDontSee('VPNv4 Ucast')
+            ->assertDontSee('VPNv6 Ucast');
+    }
+
+    public function testAuthorizedUserCanSeeBgpMacAccountingTrafficMenuWhenAvailable(): void
+    {
+        $device = Device::factory()->create(['bgpLocalAs' => 65000]);
+        $peer = \App\Models\BgpPeer::factory()->for($device)->create([
+            'bgpPeerIdentifier' => '192.0.2.1',
+            'bgpPeerRemoteAs' => 65001,
+        ]);
+        $port = \App\Models\Port::factory()->for($device)->create();
+
+        \Illuminate\Support\Facades\DB::table('ipv4_mac')->insert([
+            'port_id' => $port->port_id,
+            'mac_address' => '001122334455',
+            'ipv4_address' => '192.0.2.1',
+            'device_id' => $device->device_id,
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('mac_accounting')->insert([
+            'port_id' => $port->port_id,
+            'ifIndex' => $port->ifIndex,
+            'mac' => '001122334455',
+            'vlan' => 1,
+            'bps_in' => 0,
+            'bps_out' => 0,
+            'device_id' => $device->device_id,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.routing.bgp', ['device' => $device]))
+            ->assertOk()
+            ->assertSee('Traffic:')
+            ->assertSee('Bits')
+            ->assertSee('Packets');
     }
 
     public function testAuthorizedUserCanRenderRoutingMplsTab(): void

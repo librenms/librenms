@@ -5,7 +5,7 @@
         <x-device.routing-tabs :device="$device" tab="bgp" />
 
         <x-submenu
-            :title="__('Local AS') . ' : ' . ($local_as ?? __('N/A')) . ' ' . __('BGP')"
+            :title="__('Local AS') . ': ' . ($local_as ?? __('N/A')) . ' :: ' . __('BGP')"
             :menu="$bgp_menu"
             :selected="$view"
             :device-id="$device->device_id"

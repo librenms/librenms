@@ -77,29 +77,48 @@ class BgpController extends Controller
                     'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'updates']),
                 ],
             ],
-            __('Prefixes') => [
-                [
-                    'name' => __('IPv4 Ucast'),
-                    'url' => 'prefixes_ipv4unicast',
-                    'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv4unicast']),
-                ],
-                [
-                    'name' => __('VPNv4 Ucast'),
-                    'url' => 'prefixes_ipv4vpn',
-                    'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv4vpn']),
-                ],
-                [
-                    'name' => __('IPv6 Ucast'),
-                    'url' => 'prefixes_ipv6unicast',
-                    'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv6unicast']),
-                ],
-                [
-                    'name' => __('VPNv6 Ucast'),
-                    'url' => 'prefixes_ipv6vpn',
-                    'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv6vpn']),
-                ],
+        ];
+
+        $availablePrefixViews = [
+            'ipv4unicast' => [
+                'name' => __('IPv4 Ucast'),
+                'url' => 'prefixes_ipv4unicast',
+                'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv4unicast']),
+            ],
+            'ipv4vpn' => [
+                'name' => __('VPNv4 Ucast'),
+                'url' => 'prefixes_ipv4vpn',
+                'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv4vpn']),
+            ],
+            'ipv6unicast' => [
+                'name' => __('IPv6 Ucast'),
+                'url' => 'prefixes_ipv6unicast',
+                'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv6unicast']),
+            ],
+            'ipv6vpn' => [
+                'name' => __('VPNv6 Ucast'),
+                'url' => 'prefixes_ipv6vpn',
+                'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv6vpn']),
             ],
         ];
+
+        $activeAfis = DB::table('bgpPeers_cbgp')
+            ->where('device_id', $device->device_id)
+            ->selectRaw('CONCAT(afi, safi) as afisafi')
+            ->distinct()
+            ->pluck('afisafi')
+            ->toArray();
+
+        $prefixMenu = [];
+        foreach ($availablePrefixViews as $afisafi => $item) {
+            if (in_array($afisafi, $activeAfis, true)) {
+                $prefixMenu[] = $item;
+            }
+        }
+
+        if (! empty($prefixMenu)) {
+            $bgpMenu[__('Prefixes')] = $prefixMenu;
+        }
 
         $hasMacAccounting = DB::table('ipv4_mac')
             ->join('mac_accounting', 'mac_accounting.mac', '=', 'ipv4_mac.mac_address')
