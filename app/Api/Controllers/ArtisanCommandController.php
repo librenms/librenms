@@ -33,6 +33,7 @@ use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
+use Monolog\Level;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ArtisanCommandController extends Controller
@@ -63,8 +64,10 @@ class ArtisanCommandController extends Controller
         $args = ['device spec' => $device->device_id];
         if ($validated['quiet']) {
             $args['-q'] = true;
+            $this->setLogLevel(Level::Emergency);
         } elseif ($validated['verbose']) {
             $args['-vv'] = true;
+            $this->setLogLevel(Level::Debug);
         }
 
         return $this->stream(function () use ($cmd, $args): void {

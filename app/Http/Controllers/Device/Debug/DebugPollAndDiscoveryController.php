@@ -34,6 +34,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\Rule;
+use Monolog\Level;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DebugPollAndDiscoveryController extends Controller
@@ -49,6 +50,7 @@ class DebugPollAndDiscoveryController extends Controller
             'type' => ['required', Rule::in(['poller', 'discovery'])],
         ]);
 
+        $this->setLogLevel(Level::Debug);
         if ($validated['format'] == 'download') {
             $this->enableDownload($validated['type'] . '-' . $device->hostname . '.txt');
         }
