@@ -137,7 +137,7 @@ class ServiceConfig(DBConfig):
             "service_master_timeout", ServiceConfig.master_timeout
         )
         self.apikey = config.get(
-            "service_poller_api_key", ""
+            "service_api_key", ""
         )
         self.poller.enabled = (
             config.get("service_poller_enabled", True)

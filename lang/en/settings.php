@@ -2133,10 +2133,6 @@ return [
             'description' => 'Ping Frequency',
             'help' => 'How often to run fast ping on all devices.',
         ],
-        'service_poller_api_key' => [
-            'description' => 'Poller API Key',
-            'help' => 'Use a connection to localhost to poll devices (requires additional setup).',
-        ],
         'service_poller_workers' => [
             'description' => 'Poller Workers',
             'help' => 'Number of poller workers to spawn. Sets the default value for all nodes.',
@@ -2188,6 +2184,10 @@ return [
         'service_loglevel' => [
             'description' => 'Log Level',
             'help' => 'Log level of the dispatch service. Sets the default value for all nodes.',
+        ],
+        'service_api_key' => [
+            'description' => 'Dispatcher Service API Key',
+            'help' => 'Use a connection to localhost to poll and discover devices (requires additional setup).',
         ],
         'service_watchdog_enabled' => [
             'description' => 'Watchdog Enabled',
