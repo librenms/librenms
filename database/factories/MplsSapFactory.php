@@ -14,7 +14,7 @@ class MplsSapFactory extends Factory
         return [
             'device_id' => Device::factory(),
             'svc_id' => MplsService::factory(),
-            'svc_oid' => fn (array $attributes) => MplsService::find($attributes['svc_id'])?->svc_oid ?? $this->faker->numberBetween(1, 1000),
+            'svc_oid' => fn (array $attributes) => MplsService::find($attributes['svc_id'])->svc_oid ?? $this->faker->numberBetween(1, 1000),
             'sapPortId' => $this->faker->numberBetween(1, 100),
             'ifName' => '0/' . $this->faker->numberBetween(1, 24),
             'sapEncapValue' => (string) $this->faker->numberBetween(1, 4094),
