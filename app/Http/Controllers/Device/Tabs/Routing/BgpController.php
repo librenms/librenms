@@ -99,7 +99,17 @@ class BgpController extends Controller
                     'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv6vpn']),
                 ],
             ],
-            __('Traffic') => [
+        ];
+
+        $hasMacAccounting = DB::table('ipv4_mac')
+            ->join('mac_accounting', 'mac_accounting.mac', '=', 'ipv4_mac.mac_address')
+            ->join('ports', 'ports.port_id', '=', 'mac_accounting.port_id')
+            ->where('ports.device_id', $device->device_id)
+            ->whereIn('ipv4_mac.ipv4_address', $device->bgppeers()->select('bgpPeerIdentifier'))
+            ->exists();
+
+        if ($hasMacAccounting) {
+            $bgpMenu[__('Traffic')] = [
                 [
                     'name' => __('Bits'),
                     'url' => 'macaccounting_bits',
@@ -110,8 +120,8 @@ class BgpController extends Controller
                     'url' => 'macaccounting_pkts',
                     'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'macaccounting_pkts']),
                 ],
-            ],
-        ];
+            ];
+        }
 
         return view('device.tabs.routing.bgp', [
             'device' => $device,

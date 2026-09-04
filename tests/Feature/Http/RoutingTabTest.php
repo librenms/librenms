@@ -262,13 +262,11 @@ class RoutingTabTest extends TestCase
             ->assertOk()
             ->assertSee('Local AS : 65000 BGP')
             ->assertSee('Prefixes:')
-            ->assertSee('Traffic:')
+            ->assertDontSee('Traffic:')
             ->assertSee('IPv4 Ucast')
             ->assertSee('VPNv4 Ucast')
             ->assertSee('IPv6 Ucast')
             ->assertSee('VPNv6 Ucast')
-            ->assertSee('Bits')
-            ->assertSee('Packets')
             ->assertSee('192.0.2.1')
             ->assertSee('65001')
             ->assertSee('Core-Peer-1')
@@ -434,6 +432,47 @@ class RoutingTabTest extends TestCase
             ->assertSee('192.0.2.10')
             ->assertSee('peer-device.local')
             ->assertSee('ipv4.unicast');
+    }
+
+    public function testAuthorizedUserCanRenderRoutingBgpWithMacAccounting(): void
+    {
+        $device = Device::factory()->create(['bgpLocalAs' => 65000]);
+        \App\Models\BgpPeer::factory()->for($device)->create([
+            'bgpPeerIdentifier' => '192.0.2.10',
+        ]);
+        $port = \App\Models\Port::factory()->for($device)->create();
+
+        \DB::table('ipv4_mac')->insert([
+            'device_id' => $device->device_id,
+            'port_id' => $port->port_id,
+            'ipv4_address' => '192.0.2.10',
+            'mac_address' => '001122334455',
+        ]);
+
+        \DB::table('mac_accounting')->insert([
+            'device_id' => $device->device_id,
+            'port_id' => $port->port_id,
+            'ifIndex' => $port->ifIndex ?? 1,
+            'mac' => '001122334455',
+            'bps_in' => 100,
+            'bps_out' => 200,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.routing.bgp', ['device' => $device, 'view' => 'macaccounting_bits']))
+            ->assertOk()
+            ->assertSee('Traffic:')
+            ->assertSee('Bits')
+            ->assertSee('Packets')
+            ->assertSee('macaccounting_bits');
+
+        $this->actingAs($this->admin())
+            ->get(route('device.routing.bgp', ['device' => $device, 'view' => 'macaccounting_pkts']))
+            ->assertOk()
+            ->assertSee('Traffic:')
+            ->assertSee('Bits')
+            ->assertSee('Packets')
+            ->assertSee('macaccounting_pkts');
     }
 
     public function testAuthorizedUserCanRenderRoutingOspfAreaPortCountsAndNeighbors(): void
