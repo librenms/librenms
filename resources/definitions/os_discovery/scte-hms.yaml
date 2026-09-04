@@ -5,156 +5,39 @@ modules:
         version: SCTE-HMS-COMMON-MIB::commonVendorInfo.0
 
     sensors:
-        count:
-            data:
-                -
-                    oid: SCTE-HMS-PS-MIB::psMonitored
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.1.{{ $index }}'
-                    descr: 'Monitored Power Supplies'
-                    index: 'sctePsMonitored.{{ $index }}'
-                    group: 'SCTE Power Supply'
-
-        current:
-            data:
-                -
-                    oid: SCTE-HMS-PS-MIB::psDeviceTable
-                    value: SCTE-HMS-PS-MIB::psRMSCurrentIn
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.2.1.32.{{ $index }}'
-                    descr: 'SCTE Input Current PSU {{ $index }}'
-                    index: 'sctePsInputCurrent.{{ $index }}'
-                    group: 'SCTE Power Supply'
-                    divisor: 100
-                -
-                    oid: SCTE-HMS-PS-MIB::psOutputTable
-                    value: SCTE-HMS-PS-MIB::psOutputCurrent
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.5.1.3.{{ $index }}'
-                    descr: 'SCTE Output Current PSU {{ $subindex0 }} Output {{ $subindex1 }}'
-                    index: 'sctePsOutputCurrent.{{ $subindex0 }}.{{ $subindex1 }}'
-                    group: 'SCTE Power Supply'
-                    divisor: 100
-                -
-                    oid: SCTE-HMS-PS-MIB::psStringTable
-                    value: SCTE-HMS-PS-MIB::psStringChargeCurrent
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.3.1.3.{{ $index }}'
-                    descr: 'SCTE Charge Current PSU {{ $subindex0 }} String {{ $subindex1 }}'
-                    index: 'sctePsChargeCurrent.{{ $subindex0 }}.{{ $subindex1 }}'
-                    group: 'SCTE Battery'
-                    divisor: 100
-                -
-                    oid: SCTE-HMS-PS-MIB::psStringTable
-                    value: SCTE-HMS-PS-MIB::psStringDischargeCurrent
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.3.1.4.{{ $index }}'
-                    descr: 'SCTE Discharge Current PSU {{ $subindex0 }} String {{ $subindex1 }}'
-                    index: 'sctePsDischargeCurrent.{{ $subindex0 }}.{{ $subindex1 }}'
-                    group: 'SCTE Battery'
-                    divisor: 100
-                -
-                    oid: SCTE-HMS-PS-MIB::psStringTable
-                    value: SCTE-HMS-PS-MIB::psStringFloat
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.3.1.5.{{ $index }}'
-                    descr: 'SCTE Float Current PSU {{ $subindex0 }} String {{ $subindex1 }}'
-                    index: 'sctePsFloatCurrent.{{ $subindex0 }}.{{ $subindex1 }}'
-                    group: 'SCTE Battery'
-                    divisor: 100
-
         frequency:
             data:
                 -
                     oid: SCTE-HMS-COMMON-MIB::commonReturnPathFrequency
                     num_oid: '.1.3.6.1.4.1.5591.1.3.5.1.{{ $index }}'
-                    descr: 'SCTE Return Path Frequency'
+                    descr: 'Return Path Frequency'
                     index: 'scteCommonReturnPathFrequency.{{ $index }}'
-                    group: 'SCTE Transponder RF'
+                    group: 'Transponder RF'
                 -
                     oid: SCTE-HMS-COMMON-MIB::commonForwardPathFrequency
                     num_oid: '.1.3.6.1.4.1.5591.1.3.5.2.{{ $index }}'
-                    descr: 'SCTE Forward Path Frequency'
+                    descr: 'Forward Path Frequency'
                     index: 'scteCommonForwardPathFrequency.{{ $index }}'
-                    group: 'SCTE Transponder RF'
+                    group: 'Transponder RF'
 
-        power:
+        tv_signal:
             data:
                 -
-                    oid: SCTE-HMS-PS-MIB::psDeviceTable
-                    value: SCTE-HMS-PS-MIB::psPowerOut
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.2.1.30.{{ $index }}'
-                    descr: 'SCTE Output Power PSU {{ $index }}'
-                    index: 'sctePsOutputPower.{{ $index }}'
-                    group: 'SCTE Power Supply'
-                -
-                    oid: SCTE-HMS-PS-MIB::psDeviceTable
-                    value: SCTE-HMS-PS-MIB::psPowerIn
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.2.1.33.{{ $index }}'
-                    descr: 'SCTE Input Power PSU {{ $index }}'
-                    index: 'sctePsInputPower.{{ $index }}'
-                    group: 'SCTE Power Supply'
+                    oid: SCTE-HMS-COMMON-MIB::commonForwardPathReceiveLevel
+                    num_oid: '.1.3.6.1.4.1.5591.1.3.5.4.{{ $index }}'
+                    descr: 'Forward Path Receive Level'
+                    index: 'scteCommonForwardPathReceiveLevel.{{ $index }}'
+                    group: 'Transponder RF'
+                    divisor: 10
 
         state:
             data:
                 -
-                    oid: SCTE-HMS-PS-MIB::psDeviceTable
-                    value: SCTE-HMS-PS-MIB::psInverterStatus
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.2.1.24.{{ $index }}'
-                    descr: 'SCTE Inverter Status PSU {{ $index }}'
-                    index: 'sctePsInverterStatus.{{ $index }}'
-                    group: 'SCTE Status'
-                    state_name: sctePsInverterStatus
-                    states:
-                        - { value: 1, generic: 0, descr: 'Off' }
-                        - { value: 2, generic: 2, descr: 'AC Line Fail' }
-                        - { value: 3, generic: 1, descr: 'Local Test Cycle' }
-                        - { value: 4, generic: 1, descr: 'Remote Test Started' }
-                        - { value: 5, generic: 2, descr: 'Last Test Failed' }
-                -
-                    oid: SCTE-HMS-PS-MIB::psDeviceTable
-                    value: SCTE-HMS-PS-MIB::psMajorAlarm
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.2.1.25.{{ $index }}'
-                    descr: 'SCTE Major Alarm PSU {{ $index }}'
-                    index: 'sctePsMajorAlarm.{{ $index }}'
-                    group: 'SCTE Status'
-                    state_name: sctePsMajorAlarm
-                    states:
-                        - { value: 1, generic: 0, descr: 'OK' }
-                        - { value: 2, generic: 2, descr: 'Alarm' }
-                -
-                    oid: SCTE-HMS-PS-MIB::psDeviceTable
-                    value: SCTE-HMS-PS-MIB::psMinorAlarm
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.2.1.26.{{ $index }}'
-                    descr: 'SCTE Minor Alarm PSU {{ $index }}'
-                    index: 'sctePsMinorAlarm.{{ $index }}'
-                    group: 'SCTE Status'
-                    state_name: sctePsMinorAlarm
-                    states:
-                        - { value: 1, generic: 0, descr: 'OK' }
-                        - { value: 2, generic: 1, descr: 'Alarm' }
-                -
-                    oid: SCTE-HMS-PS-MIB::psDeviceTable
-                    value: SCTE-HMS-PS-MIB::psTamper
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.2.1.27.{{ $index }}'
-                    descr: 'SCTE Enclosure Tamper PSU {{ $index }}'
-                    index: 'sctePsTamper.{{ $index }}'
-                    group: 'SCTE Status'
-                    state_name: sctePsTamper
-                    states:
-                        - { value: 1, generic: 0, descr: 'Closed' }
-                        - { value: 2, generic: 1, descr: 'Open' }
-                -
-                    oid: SCTE-HMS-PS-MIB::psDeviceTable
-                    value: SCTE-HMS-PS-MIB::psInputVoltagePresence
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.2.1.34.{{ $index }}'
-                    descr: 'SCTE AC Input PSU {{ $index }}'
-                    index: 'sctePsInputVoltagePresence.{{ $index }}'
-                    group: 'SCTE Status'
-                    state_name: sctePsInputVoltagePresence
-                    states:
-                        - { value: 1, generic: 2, descr: 'Lost' }
-                        - { value: 2, generic: 0, descr: 'OK' }
-                -
                     oid: SCTE-HMS-COMMON-MIB::commonCraftStatus
                     num_oid: '.1.3.6.1.4.1.5591.1.3.1.17.{{ $index }}'
-                    descr: 'SCTE Craft Interface'
+                    descr: 'Craft Interface'
                     index: 'scteCommonCraftStatus.{{ $index }}'
-                    group: 'SCTE Transponder Status'
+                    group: 'Transponder Status'
                     state_name: scteCommonCraftStatus
                     states:
                         - { value: 1, generic: 0, descr: 'Disconnected' }
@@ -162,9 +45,9 @@ modules:
                 -
                     oid: SCTE-HMS-COMMON-MIB::commonResetCause
                     num_oid: '.1.3.6.1.4.1.5591.1.3.1.16.{{ $index }}'
-                    descr: 'SCTE Last Reset Cause'
+                    descr: 'Last Reset Cause'
                     index: 'scteCommonResetCause.{{ $index }}'
-                    group: 'SCTE Transponder Status'
+                    group: 'Transponder Status'
                     state_name: scteCommonResetCause
                     states:
                         - { value: 1, generic: 0, descr: 'Other' }
@@ -172,50 +55,3 @@ modules:
                         - { value: 3, generic: 0, descr: 'Command' }
                         - { value: 4, generic: 0, descr: 'Watchdog' }
                         - { value: 5, generic: 0, descr: 'Craft' }
-
-        temperature:
-            data:
-                -
-                    oid: SCTE-HMS-PS-MIB::psTemperatureSensorTable
-                    value: SCTE-HMS-PS-MIB::psTemperature
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.6.1.3.{{ $index }}'
-                    descr: 'SCTE Temperature PSU {{ $subindex0 }} Sensor {{ $subindex1 }}'
-                    index: 'sctePsTemperature.{{ $subindex0 }}.{{ $subindex1 }}'
-                    group: 'SCTE Power Supply'
-
-        tv_signal:
-            data:
-                -
-                    oid: SCTE-HMS-COMMON-MIB::commonForwardPathReceiveLevel
-                    num_oid: '.1.3.6.1.4.1.5591.1.3.5.4.{{ $index }}'
-                    descr: 'SCTE Forward Path Receive Level'
-                    index: 'scteCommonForwardPathReceiveLevel.{{ $index }}'
-                    group: 'SCTE Transponder RF'
-                    divisor: 10
-
-        voltage:
-            data:
-                -
-                    oid: SCTE-HMS-PS-MIB::psDeviceTable
-                    value: SCTE-HMS-PS-MIB::psInputVoltage
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.2.1.23.{{ $index }}'
-                    descr: 'SCTE Input Voltage PSU {{ $index }}'
-                    index: 'sctePsInputVoltage.{{ $index }}'
-                    group: 'SCTE Power Supply'
-                    divisor: 100
-                -
-                    oid: SCTE-HMS-PS-MIB::psDeviceTable
-                    value: SCTE-HMS-PS-MIB::psOutputVoltage
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.2.1.22.{{ $index }}'
-                    descr: 'SCTE Output Voltage PSU {{ $index }}'
-                    index: 'sctePsOutputVoltage.{{ $index }}'
-                    group: 'SCTE Power Supply'
-                    divisor: 100
-                -
-                    oid: SCTE-HMS-PS-MIB::psBatteryTable
-                    value: SCTE-HMS-PS-MIB::psBatteryVoltage
-                    num_oid: '.1.3.6.1.4.1.5591.1.4.4.1.4.{{ $index }}'
-                    descr: 'SCTE Battery Voltage PSU {{ $subindex0 }} String {{ $subindex1 }} Battery {{ $subindex2 }}'
-                    index: 'sctePsBatteryVoltage.{{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}'
-                    group: 'SCTE Battery'
-                    divisor: 100
