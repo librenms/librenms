@@ -770,6 +770,14 @@ class Device extends BaseModel
     }
 
     /**
+     * @return HasMany<BgpPeerCbgp, $this>
+     */
+    public function bgpPeersCbgp(): HasMany
+    {
+        return $this->hasMany(BgpPeerCbgp::class, 'device_id');
+    }
+
+    /**
      * @return HasMany<CefSwitching, $this>
      */
     public function cefSwitching(): HasMany

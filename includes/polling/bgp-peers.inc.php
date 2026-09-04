@@ -7,6 +7,7 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
+use LibreNMS\Util\Rewrite;
 
 $peers = dbFetchRows('SELECT * FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
 
@@ -597,11 +598,13 @@ if (! empty($peers)) {
                     || $peer_data['bgpPeerState'] != $peer['bgpPeerState'])
             ) {
                 if ($peer['bgpPeerState'] == $peer_data['bgpPeerState']) {
-                    Eventlog::log('BGP Session Flap: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . '), last error: ' . describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device['device_id'], 'bgpPeer', Severity::Warning, $peer_ip);
+                    Eventlog::log('BGP Session Flap: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . '), last error: ' . Rewrite::bgpErrorCode($peer['bgpPeerLastErrorCode'],
+                        $peer['bgpPeerLastErrorSubCode']), $device['device_id'], 'bgpPeer', Severity::Warning, $peer_ip);
                 } elseif ($peer_data['bgpPeerState'] == 'established') {
                     Eventlog::log('BGP Session Up: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . ')', $device['device_id'], 'bgpPeer', Severity::Ok, $peer_ip);
                 } elseif ($peer['bgpPeerState'] == 'established') {
-                    Eventlog::log('BGP Session Down: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . '), last error: ' . describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device['device_id'], 'bgpPeer', Severity::Error, $peer_ip);
+                    Eventlog::log('BGP Session Down: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . '), last error: ' . Rewrite::bgpErrorCode($peer['bgpPeerLastErrorCode'],
+                        $peer['bgpPeerLastErrorSubCode']), $device['device_id'], 'bgpPeer', Severity::Error, $peer_ip);
                 }
             }
         }

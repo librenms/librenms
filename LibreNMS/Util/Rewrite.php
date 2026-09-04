@@ -438,4 +438,23 @@ class Rewrite
     {
         return round($celsius * 1.8 + 32, 2);
     }
+
+    /**
+     * Take a BGP error code and subcode to return a string representation of it
+     * https://www.iana.org/assignments/bgp-parameters/bgp-parameters.xhtml#bgp-parameters-3
+     */
+    public static function bgpErrorCode(int|string $code, int|string $subcode): string
+    {
+        $codeKey = "bgp.error_codes.$code";
+        $subcodeKey = "bgp.error_subcodes.$code.$subcode";
+
+        $codeMessage = __($codeKey);
+        $subcodeMessage = __($subcodeKey);
+
+        if ($subcodeMessage !== $subcodeKey) {
+            return "$codeMessage - $subcodeMessage";
+        }
+
+        return $codeMessage !== $codeKey ? $codeMessage : 'Unknown';
+    }
 }
