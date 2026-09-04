@@ -697,28 +697,28 @@ class PollerQueueManager(QueueManager):
             )
 
             if self.config.apikey:
-                url = f'http://localhost/api/v0/cmd/{device_id}/poll'
-                params = {'colour': 1, 'buffer': 1}
-                headers = {'X-Auth-Token': self.config.apikey}
+                url = f"http://localhost/api/v0/cmd/{device_id}/poll"
+                params = {"colour": 1, "buffer": 1}
+                headers = {"X-Auth-Token": self.config.apikey}
                 if self.config.debug:
-                    params['verbose']=1
+                    params["verbose"] = 1
                 elif self.config.log_output is LibreNMS.LogOutput.NONE:
-                    params['quiet']=1
+                    params["quiet"] = 1
 
                 response = requests.get(url, params=params, headers=headers)
 
                 output = response.content.decode().rstrip()
                 if response.ok:
-                    lastline_pos = output.rfind('\n')
+                    lastline_pos = output.rfind("\n")
                     if lastline_pos < 0:
-                       exit_code = 0
+                        exit_code = 0
                     else:
-                       lastline = output[lastline_pos:]
-                       if lastline.startswith('exit_status:'):
-                           exit_code = int(lastline.split(':')[1])
-                           output = output[:lastline_pos]
-                       else:
-                           exit_code = 0
+                        lastline = output[lastline_pos:]
+                        if lastline.startswith("exit_status:"):
+                            exit_code = int(lastline.split(":")[1])
+                            output = output[:lastline_pos]
+                        else:
+                            exit_code = 0
                 else:
                     exit_code = 1
             else:
@@ -793,28 +793,28 @@ class DiscoveryQueueManager(TimedQueueManager):
             )
 
             if self.config.apikey:
-                url = f'http://localhost/api/v0/cmd/{device_id}/discover'
-                params = {'colour': 1, 'buffer': 1}
-                headers = {'X-Auth-Token': self.config.apikey}
+                url = f"http://localhost/api/v0/cmd/{device_id}/discover"
+                params = {"colour": 1, "buffer": 1}
+                headers = {"X-Auth-Token": self.config.apikey}
                 if self.config.debug:
-                    params['verbose']=1
+                    params["verbose"] = 1
                 elif self.config.log_output is LibreNMS.LogOutput.NONE:
-                    params['quiet']=1
+                    params["quiet"] = 1
 
                 response = requests.get(url, params=params, headers=headers)
 
                 output = response.content.decode().rstrip()
                 if response.ok:
-                    lastline_pos = output.rfind('\n')
+                    lastline_pos = output.rfind("\n")
                     if lastline_pos < 0:
-                       exit_code = 0
+                        exit_code = 0
                     else:
-                       lastline = output[lastline_pos:]
-                       if lastline.startswith('exit_status:'):
-                           exit_code = int(lastline.split(':')[1])
-                           output = output[:lastline_pos]
-                       else:
-                           exit_code = 0
+                        lastline = output[lastline_pos:]
+                        if lastline.startswith("exit_status:"):
+                            exit_code = int(lastline.split(":")[1])
+                            output = output[:lastline_pos]
+                        else:
+                            exit_code = 0
                 else:
                     exit_code = 1
             else:
