@@ -48,6 +48,13 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
         $this->console ??= app()->runningInConsole();
     }
 
+    public function forceColor(bool $val): CliColorFormatter
+    {
+        $this->console = $val ?: app()->runningInConsole();
+
+        return $this;
+    }
+
     public function format(\Monolog\LogRecord $record): string
     {
         // if no line break is specified, just output the raw message (maybe colored)

@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Traits;
 
+use App\Logging\CliColorFormatter;
 use App\Logging\NoColorFormatter;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Support\Facades\Log;
@@ -38,6 +39,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 trait StreamsOutputToBrowser
 {
+    private bool $bufferedOutput = false;
+    private bool $colour = false;
     private ?string $downloadFile = null;
     private ?OutputStyle $outputBuffer = null;
 
@@ -46,13 +49,25 @@ trait StreamsOutputToBrowser
         return new StreamedResponse(function () use ($function): void {
             $this->setupLogger();
 
-            while (ob_get_level() > 0) {
-                ob_end_flush();
+            if (! $this->bufferedOutput) {
+                while (ob_get_level() > 0) {
+                    ob_end_flush();
+                }
+                ob_implicit_flush();
             }
-            ob_implicit_flush();
 
             $function();
         }, 200, $this->headers());
+    }
+
+    protected function enableBufferedOutput(): void
+    {
+        $this->bufferedOutput = true;
+    }
+
+    protected function enableColour(): void
+    {
+        $this->colour = true;
     }
 
     protected function enableDownload(string $downloadFile): void
@@ -97,10 +112,11 @@ trait StreamsOutputToBrowser
 
     private function setupLogger(): void
     {
+        $formatter = $this->colour ? (new CliColorFormatter())->forceColor(true) : new NoColorFormatter();
         config(['logging.channels.stream' => [
             'driver' => 'custom',
             'via' => fn (): Logger => new Logger('stream', [
-                (new StreamHandler('php://output', Level::Debug))->setFormatter(new NoColorFormatter()),
+                (new StreamHandler('php://output', Level::Debug))->setFormatter($formatter),
             ]),
             'level' => 'debug',
         ]]);
