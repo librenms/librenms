@@ -84,13 +84,13 @@ class Xpand extends OS implements WirelessPowerDiscovery, WirelessSnrDiscovery
      */
     private function discoverMeasurements(WirelessSensorType $type, array $wanted): array
     {
-        $names = $this->walkMeasurementColumn(self::MEAS_NAME);
+        $names = SnmpQuery::walk(self::MEAS_NAME)->pluck();
         if (empty($names)) {
             return [];
         }
 
-        $entities = $this->walkMeasurementColumn(self::MEAS_ENTITY);
-        $values = $this->walkMeasurementColumn(self::MEAS_VALUE);
+        $entities = SnmpQuery::walk(self::MEAS_ENTITY)->pluck();
+        $values = SnmpQuery::walk(self::MEAS_VALUE)->pluck();
 
         $sensors = [];
         foreach ($names as $index => $name) {
@@ -114,19 +114,6 @@ class Xpand extends OS implements WirelessPowerDiscovery, WirelessSnrDiscovery
         }
 
         return $sensors;
-    }
-
-    /**
-     * Numeric walk of a single measurements column, keyed by the measurement index.
-     *
-     * @return array<string, string>
-     */
-    private function walkMeasurementColumn(string $oid): array
-    {
-        return array_map(
-            fn ($row) => trim((string) reset($row)),
-            SnmpQuery::numeric()->walk($oid)->groupByIndex(1)
-        );
     }
 
     /**
