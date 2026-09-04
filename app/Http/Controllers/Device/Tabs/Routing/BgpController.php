@@ -64,38 +64,52 @@ class BgpController extends Controller
 
         $view = $request->query('view', 'basic');
 
-        $bgpOptions = [
-            'basic' => [
-                'text' => __('Basic'),
-                'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'basic']),
+        $bgpMenu = [
+            [
+                [
+                    'name' => __('Basic'),
+                    'url' => 'basic',
+                    'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'basic']),
+                ],
+                [
+                    'name' => __('Updates'),
+                    'url' => 'updates',
+                    'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'updates']),
+                ],
             ],
-            'updates' => [
-                'text' => __('Updates'),
-                'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'updates']),
+            __('Prefixes') => [
+                [
+                    'name' => __('IPv4 Ucast'),
+                    'url' => 'prefixes_ipv4unicast',
+                    'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv4unicast']),
+                ],
+                [
+                    'name' => __('VPNv4 Ucast'),
+                    'url' => 'prefixes_ipv4vpn',
+                    'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv4vpn']),
+                ],
+                [
+                    'name' => __('IPv6 Ucast'),
+                    'url' => 'prefixes_ipv6unicast',
+                    'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv6unicast']),
+                ],
+                [
+                    'name' => __('VPNv6 Ucast'),
+                    'url' => 'prefixes_ipv6vpn',
+                    'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv6vpn']),
+                ],
             ],
-            'prefixes_ipv4unicast' => [
-                'text' => __('IPv4 Ucast'),
-                'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv4unicast']),
-            ],
-            'prefixes_ipv4vpn' => [
-                'text' => __('VPNv4 Ucast'),
-                'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv4vpn']),
-            ],
-            'prefixes_ipv6unicast' => [
-                'text' => __('IPv6 Ucast'),
-                'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv6unicast']),
-            ],
-            'prefixes_ipv6vpn' => [
-                'text' => __('VPNv6 Ucast'),
-                'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'prefixes_ipv6vpn']),
-            ],
-            'macaccounting_bits' => [
-                'text' => __('Bits'),
-                'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'macaccounting_bits']),
-            ],
-            'macaccounting_pkts' => [
-                'text' => __('Packets'),
-                'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'macaccounting_pkts']),
+            __('Traffic') => [
+                [
+                    'name' => __('Bits'),
+                    'url' => 'macaccounting_bits',
+                    'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'macaccounting_bits']),
+                ],
+                [
+                    'name' => __('Packets'),
+                    'url' => 'macaccounting_pkts',
+                    'link' => route('device.routing.bgp', ['device' => $device, 'view' => 'macaccounting_pkts']),
+                ],
             ],
         ];
 
@@ -103,7 +117,7 @@ class BgpController extends Controller
             'device' => $device,
             'view' => $view,
             'local_as' => $device->bgpLocalAs,
-            'bgp_options' => $bgpOptions,
+            'bgp_menu' => $bgpMenu,
             'peers' => $this->getPeers($device, $view),
         ]);
     }

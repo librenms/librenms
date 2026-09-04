@@ -4,7 +4,12 @@
     <x-device.page :device="$device" :subtitle="__('BGP')">
         <x-device.routing-tabs :device="$device" tab="bgp" />
 
-        <x-option-bar name="{{ __('BGP') }} ({{ __('Local AS') }}: {{ $local_as ?? __('N/A') }})" :options="$bgp_options" :selected="$view" />
+        <x-submenu
+            :title="__('Local AS') . ' : ' . ($local_as ?? __('N/A')) . ' ' . __('BGP')"
+            :menu="$bgp_menu"
+            :selected="$view"
+            :device-id="$device->device_id"
+        />
 
         <x-panel>
             <div class="table-responsive">
@@ -69,11 +74,11 @@
                                 <td colspan="8" class="tw:bg-[#fdfdfd] dark:tw:bg-dark-gray-300 tw:p-4">
                                     <div class="row">
                                         <div class="col-md-12 text-center">
-                                            <x-graph
+                                            <x-graph-row columns="4"
                                                 :device="$device"
                                                 :type="$peerData['graph_type']"
-                                                :id="$peerData['graph_id']"
                                                 :height="120"
+                                                :vars="['id' => $peerData['graph_id']]"
                                             />
                                         </div>
                                     </div>

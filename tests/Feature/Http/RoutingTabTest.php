@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Role;
 
-class RoutingCefTabTest extends TestCase
+class RoutingTabTest extends TestCase
 {
     use DatabaseTransactions;
 
@@ -260,7 +260,15 @@ class RoutingCefTabTest extends TestCase
         $this->actingAs($this->admin())
             ->get(route('device.routing.bgp', ['device' => $device]))
             ->assertOk()
-            ->assertSee('65000')
+            ->assertSee('Local AS : 65000 BGP')
+            ->assertSee('Prefixes:')
+            ->assertSee('Traffic:')
+            ->assertSee('IPv4 Ucast')
+            ->assertSee('VPNv4 Ucast')
+            ->assertSee('IPv6 Ucast')
+            ->assertSee('VPNv6 Ucast')
+            ->assertSee('Bits')
+            ->assertSee('Packets')
             ->assertSee('192.0.2.1')
             ->assertSee('65001')
             ->assertSee('Core-Peer-1')
