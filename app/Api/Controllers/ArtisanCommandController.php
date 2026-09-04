@@ -50,6 +50,8 @@ class ArtisanCommandController extends Controller
             'verbose' => 'sometimes|boolean',
         ]);
 
+        $this->enableLogfile();
+
         if ($validated['buffer']) {
             $this->enableBufferedOutput();
         }
