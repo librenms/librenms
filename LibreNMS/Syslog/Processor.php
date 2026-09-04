@@ -307,11 +307,12 @@ class Processor
         }
 
         $ip = IP::parse($host, true);
-        /** @var Device|null $deviceInfo */
+        /** @var object{device_id: int, hostname: string, os: ?string, version: ?string}|null $deviceInfo */
         $deviceInfo = Device::query()
             ->where('hostname', $host)
             ->orWhere('sysName', $host)
             ->when($ip, fn (Builder $q) => $q->orWhere(fn (Builder $q) => $q->hasIp($ip)))
+            ->toBase()
             ->first(['device_id', 'hostname', 'os', 'version']);
 
         if ($deviceInfo === null) {
