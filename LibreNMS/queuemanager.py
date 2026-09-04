@@ -698,7 +698,7 @@ class PollerQueueManager(QueueManager):
 
             if self.config.apikey:
                 url = f'http://localhost/api/v0/cmd/{device_id}/poll'
-                params = {'colour': 1}
+                params = {'colour': 1, 'buffer': 1}
                 headers = {'X-Auth-Token': self.config.apikey}
                 if self.config.debug:
                     params['verbose']=1
@@ -794,7 +794,7 @@ class DiscoveryQueueManager(TimedQueueManager):
 
             if self.config.apikey:
                 url = f'http://localhost/api/v0/cmd/{device_id}/discover'
-                params = {'colour': 1}
+                params = {'colour': 1, 'buffer': 1}
                 headers = {'X-Auth-Token': self.config.apikey}
                 if self.config.debug:
                     params['verbose']=1
