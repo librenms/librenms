@@ -11515,10 +11515,10 @@
                     "entPhysicalIsFRU": null,
                     "entPhysicalModelName": "MX5",
                     "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "S/N CAAG0822",
+                    "entPhysicalSerialNum": "F8223",
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": null,
+                    "entPhysicalMfgName": "Juniper",
                     "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
@@ -11538,7 +11538,7 @@
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": null,
+                    "entPhysicalMfgName": "Juniper",
                     "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
@@ -11558,7 +11558,7 @@
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": null,
+                    "entPhysicalMfgName": "Juniper",
                     "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
@@ -11578,7 +11578,7 @@
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": null,
+                    "entPhysicalMfgName": "Juniper",
                     "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
@@ -11598,7 +11598,7 @@
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": null,
+                    "entPhysicalMfgName": "Juniper",
                     "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
@@ -11618,7 +11618,7 @@
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 7,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": null,
+                    "entPhysicalMfgName": "Juniper",
                     "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
@@ -11638,7 +11638,7 @@
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": null,
+                    "entPhysicalMfgName": "Juniper",
                     "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
@@ -11658,7 +11658,7 @@
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": null,
+                    "entPhysicalMfgName": "Juniper",
                     "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
@@ -11678,7 +11678,7 @@
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": null,
+                    "entPhysicalMfgName": "Juniper",
                     "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
@@ -11698,7 +11698,27 @@
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 7,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": null,
+                    "entPhysicalMfgName": "Juniper",
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 1000001,
+                    "entPhysicalDescr": "midplane",
+                    "entPhysicalClass": null,
+                    "entPhysicalName": null,
+                    "entPhysicalHardwareRev": "REV 08",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "711-038215",
+                    "entPhysicalVendorType": "Midplane MX5",
+                    "entPhysicalSerialNum": "S/N CAAG0822",
+                    "entPhysicalContainedIn": 1,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Juniper",
                     "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
