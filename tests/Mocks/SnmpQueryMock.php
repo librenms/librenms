@@ -273,7 +273,11 @@ class SnmpQueryMock implements SnmpQueryInterface
 
         if ($type == 6) {
             $mib = $oidObj->getMib();
-            $data = $this->numeric ? ".$data" : NetSnmpQuery::make()->mibs($mib ? [$mib] : [])->translate($data);
+            $data = $this->numeric ? ".$data" : NetSnmpQuery::make()
+                ->mibDir($this->mibDir)
+                ->mibs(array_merge($this->mibs, $mib ? [$mib] : []))
+                ->options($this->options)
+                ->translate($data);
         }
 
         if ($this->numeric) {
@@ -281,7 +285,11 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
 
         if (! empty($oidObj->oid) && $oidObj->isNumeric()) {
-            $oid = NetSnmpQuery::make()->translate($oidObj);
+            $oid = NetSnmpQuery::make()
+                ->mibDir($this->mibDir)
+                ->mibs($this->mibs)
+                ->options($this->options)
+                ->translate($oidObj);
         }
 
         if ($this->hideMib) {
