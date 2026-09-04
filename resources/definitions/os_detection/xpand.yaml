@@ -1,7 +1,6 @@
 os: xpand
 text: 'XPAND IP'
 type: wireless
-icon: xpand
 over:
     - { graph: device_wireless_power, text: 'Wireless Power' }
     - { graph: device_wireless_snr, text: 'SNR' }
