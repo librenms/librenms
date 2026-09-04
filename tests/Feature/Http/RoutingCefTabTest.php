@@ -516,13 +516,31 @@ class RoutingCefTabTest extends TestCase
             ->assertRedirect(route('device.routing.bgp', ['device' => $device]));
     }
 
-    public function testRoutingIndexRedirectsWithLegacyProtoParameter(): void
+    public function testRoutingIndexRedirectsWithLegacyProtoPath(): void
     {
         $device = Device::factory()->create();
 
         $this->actingAs($this->admin())
-            ->get(route('device.routing.index', ['device' => $device, 'proto' => 'ospf']))
+            ->get('/device/' . $device->device_id . '/routing/proto=ospf/')
             ->assertRedirect(route('device.routing.ospf', ['device' => $device]));
+    }
+
+    public function testRoutingIndexRedirectsWithLegacyPathAndQueryVars(): void
+    {
+        $device = Device::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->get('/device/' . $device->device_id . '/routing/proto=mpls/view=paths/')
+            ->assertRedirect(route('device.routing.mpls', ['device' => $device, 'view' => 'paths']));
+    }
+
+    public function testRoutingIndexRedirectsWithUnderscoredProto(): void
+    {
+        $device = Device::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->get('/device/' . $device->device_id . '/routing/proto=ipsec_tunnels/')
+            ->assertRedirect(route('device.routing.ipsec-tunnels', ['device' => $device]));
     }
 
     public function testUserWithoutRoutingPermissionGetsForbidden(): void

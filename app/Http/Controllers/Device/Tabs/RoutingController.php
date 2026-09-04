@@ -29,7 +29,10 @@ use App\Models\Device;
 use App\View\Components\Device\RoutingTabs;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Route;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Util\Url;
 
 class RoutingController extends Controller implements DeviceTab
 {
@@ -37,21 +40,23 @@ class RoutingController extends Controller implements DeviceTab
     {
         $this->authorize('view', $device);
 
+        $options = Url::parseOptions();
+
         $routingTabs = RoutingTabs::getRoutingTabs($device);
         $tabKeys = array_keys($routingTabs);
 
-        $proto = $request->query('proto') ?? $request->query('section') ?? $tabKeys[0] ?? 'cef';
+        $proto = $options['proto'] ?? $options['section'] ?? $tabKeys[0] ?? 'cef';
 
         // Map any legacy names if needed (e.g. ipsec_tunnels -> ipsec-tunnels)
         $protoNormalized = str_replace('_', '-', $proto);
 
-        $queryParams = $request->except(['proto', 'section']);
+        $queryParams = Arr::except($options, ['proto', 'section', 'tab', 'device']);
 
-        if (\Route::has('device.routing.' . $protoNormalized)) {
+        if (Route::has('device.routing.' . $protoNormalized)) {
             return redirect()->route('device.routing.' . $protoNormalized, array_merge(['device' => $device], $queryParams));
         }
 
-        if (! empty($tabKeys) && \Route::has('device.routing.' . $tabKeys[0])) {
+        if (! empty($tabKeys) && Route::has('device.routing.' . $tabKeys[0])) {
             return redirect()->route('device.routing.' . $tabKeys[0], array_merge(['device' => $device], $queryParams));
         }
 
