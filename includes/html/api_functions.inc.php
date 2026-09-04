@@ -1338,6 +1338,54 @@ function update_port_description(Illuminate\Http\Request $request)
     }
 }
 
+function update_port_speed(Illuminate\Http\Request $request): JsonResponse
+{
+    $port_id = $request->route('portid');
+    $port = Port::hasAccess(Auth::user())
+        ->where('port_id', $port_id)
+        ->first();
+
+    if (empty($port)) {
+        return api_error(400, 'Invalid port ID.');
+    }
+
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $validator = Validator::make($data, [
+        'speed' => 'required|integer|min:0',
+    ]);
+    if ($validator->fails()) {
+        return api_error(422, $validator->messages());
+    }
+
+    $speed = (int) $data['speed'];
+    $port->ifSpeed = $speed;
+    $port->save();
+
+    $device = DeviceCache::get($port->device_id);
+    if ($speed === 0) {
+        $device->forgetAttrib('ifSpeed:' . $port->ifName);
+        Eventlog::log("$port->ifName Port speed override cleared via API", $port->device_id, 'interface', Severity::Notice, $port->port_id);
+
+        return api_success_noresult(200, 'Port speed override cleared.');
+    }
+
+    $device->setAttrib('ifSpeed:' . $port->ifName, $speed);
+    $port_tune = $device->getAttrib('ifName_tune:' . $port->ifName);
+    $device_tune = $device->getAttrib('override_rrdtool_tune');
+    if ($port_tune == 'true' ||
+        ($device_tune == 'true' && $port_tune != 'false') ||
+        (LibrenmsConfig::get('rrdtool_tune') == 'true' && $port_tune != 'false' && $device_tune != 'false')) {
+        Rrd::tune('port', get_port_rrdfile_path($device->hostname, $port->port_id), $speed);
+    }
+    Eventlog::log("$port->ifName Port speed set via API: $speed", $port->device_id, 'interface', Severity::Notice, $port->port_id);
+
+    return api_success_noresult(200, 'Port speed updated.');
+}
+
 function get_port_description(Illuminate\Http\Request $request)
 {
     $port_id = $request->route('portid');
