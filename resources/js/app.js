@@ -29,12 +29,14 @@ import filterBarComponent from "./components/alpine/filterBarComponent.js";
 import remoteDropdown from "./components/alpine/remoteDropdown.js";
 import LibreNMSDate from "./datetime.js";
 import LibreNMSUrl from './url.js';
+import SimpleTemplate from './simpleTemplate.js';
 
 window.GridStack = GridStack;
 
 window.LibreNMS = window.LibreNMS || {};
 window.LibreNMS.Date = LibreNMSDate;
 window.LibreNMS.Url = LibreNMSUrl;
+window.LibreNMS.SimpleTemplate = SimpleTemplate;
 
 /**
  * The following block of code may be used to automatically register your
