@@ -73,6 +73,17 @@ function junos_nat_family_label(int $addr_type): string
     };
 }
 
+// Scope: this table only covers pool-based source NAT (rules with a
+// named pool object) -- jnxJsSrcNatStatsEntry is indexed on
+// jnxJsNatSrcPoolName, so a rule with no pool to key on produces no row
+// here at all. Interface-based NAT ("Action: interface", translating
+// out the egress interface's own address, no pool involved) is
+// therefore invisible to this poller by MIB design, not a bug in this
+// script -- confirmed against a real production SRX where an
+// interface-NAT rule handling 14.6M+ translation hits never appeared
+// in the walk. Covering interface-NAT would need a different table
+// entirely and is deferred (see librenms-backlog.md); no mechanism for
+// it exists here.
 d_echo("Polling jnxJsSrcNatStatsTable ($base_oid)\n");
 
 $response = \SnmpQuery::numeric()->walk($base_oid);
