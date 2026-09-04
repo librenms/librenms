@@ -79,24 +79,6 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
-    public function translate(string $oid): string
-    {
-        // call real snmptranslate
-        $options = $this->options;
-        if ($this->numeric) {
-            $options[] = '-On';
-        }
-        if ($this->hideMib) {
-            $options[] = '-Os';
-        }
-
-        return NetSnmpQuery::make()
-            ->mibDir($this->mibDir)
-            ->mibs($this->mibs)
-            ->options($options)
-            ->translate($oid);
-    }
-
     public function abortOnFailure(): SnmpQueryInterface
     {
         $this->abort = true;
@@ -291,7 +273,7 @@ class SnmpQueryMock implements SnmpQueryInterface
 
         if ($type == 6) {
             $mib = $oidObj->getMib();
-            $data = $this->numeric ? ".$data" : $this->mibs($mib ? [$mib] : [])->translate($data);
+            $data = $this->numeric ? ".$data" : NetSnmpQuery::make()->mibs($mib ? [$mib] : [])->translate($data);
         }
 
         if ($this->numeric) {
@@ -299,7 +281,7 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
 
         if (! empty($oidObj->oid) && $oidObj->isNumeric()) {
-            $oid = $this->translate($oidObj);
+            $oid = NetSnmpQuery::make()->translate($oidObj);
         }
 
         return "$oid$indexSuffix = $data\n";

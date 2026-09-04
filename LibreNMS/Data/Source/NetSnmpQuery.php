@@ -64,7 +64,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * Easy way to start a new instance
      */
-    public static function make(): SnmpQueryInterface
+    public static function make(): static
     {
         return new static;
     }
@@ -73,14 +73,14 @@ class NetSnmpQuery implements SnmpQueryInterface
      * Specify a device to make the snmp query against.
      * By default the query will use the primary device.
      */
-    public function device(Device $device): SnmpQueryInterface
+    public function device(Device $device): static
     {
         $this->device = $device;
 
         return $this;
     }
 
-    public function cache(): SnmpQueryInterface
+    public function cache(): static
     {
         $this->cache = true;
 
@@ -93,9 +93,8 @@ class NetSnmpQuery implements SnmpQueryInterface
      *
      * @param  string  $context  Version 2/3 context name
      * @param  string|null  $v3_prefix  Optional context prefix to prepend for Version 3 queries
-     * @return SnmpQueryInterface
      */
-    public function context(string $context, ?string $v3_prefix = null): SnmpQueryInterface
+    public function context(string $context, ?string $v3_prefix = null): static
     {
         if ($context && $this->device->snmpver === 'v3') {
             $context = $v3_prefix . $context;
@@ -110,7 +109,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      * Set an additional MIB directory to search for MIBs.
      * You do not need to specify the base and os directories, they are already included.
      */
-    public function mibDir(?string $dir): SnmpQueryInterface
+    public function mibDir(?string $dir): static
     {
         $this->mibDirs[] = $dir;
 
@@ -121,7 +120,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      * Set MIBs to use for this query. Base mibs are included by default.
      * They will be appended to existing mibs unless $append is set to false.
      */
-    public function mibs(array $mibs, bool $append = true): SnmpQueryInterface
+    public function mibs(array $mibs, bool $append = true): static
     {
         $this->mibs = $append ? array_merge($this->mibs, $mibs) : $mibs;
 
@@ -132,7 +131,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      * When walking multiple OIDs, stop if one fails. Used when the first OID indicates if the rest are supported.
      * OIDs will be walked in order, so you may want to put your OIDs in a specific order.
      */
-    public function abortOnFailure(): SnmpQueryInterface
+    public function abortOnFailure(): static
     {
         $this->abort = true;
 
@@ -143,7 +142,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      * Do not error on out of order indexes.
      * Use with caution as we could get stuck in an infinite loop.
      */
-    public function allowUnordered(): SnmpQueryInterface
+    public function allowUnordered(): static
     {
         $this->options = array_merge($this->options, ['-Cc']);
 
@@ -153,7 +152,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * Output all OIDs numerically
      */
-    public function numeric(bool $numeric = true): SnmpQueryInterface
+    public function numeric(bool $numeric = true): static
     {
         $this->options = $numeric
             ? array_merge($this->options, ['-On'])
@@ -165,7 +164,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * Output all OIDs numerically
      */
-    public function numericIndex(bool $numericIndex = true): SnmpQueryInterface
+    public function numericIndex(bool $numericIndex = true): static
     {
         $this->options = $numericIndex
             ? array_merge($this->options, ['-Ob'])
@@ -177,7 +176,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * Hide MIB in output
      */
-    public function hideMib(): SnmpQueryInterface
+    public function hideMib(): static
     {
         $this->options = array_merge($this->options, ['-Os']);
 
@@ -187,7 +186,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * Output enum values as strings instead of values. This could affect index output.
      */
-    public function enumStrings(): SnmpQueryInterface
+    public function enumStrings(): static
     {
         // remove -Oe from the default flags
         if (isset($this->options[0]) && Str::contains($this->options[0], 'e')) {
@@ -207,7 +206,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      * @param  array|string|null  $options
      * @return $this
      */
-    public function options($options = []): SnmpQueryInterface
+    public function options($options = []): static
     {
         $this->options = $options !== null
             ? Arr::wrap($options)

@@ -5,8 +5,8 @@ namespace App\Console\Commands;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Collection;
+use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Data\Source\SnmpResponse;
-use SnmpQuery;
 
 class SnmpTranslate extends SnmpFetch
 {
@@ -55,8 +55,8 @@ class SnmpTranslate extends SnmpFetch
         $res = new SnmpResponse('');
         // translate does not support multiple oids (should it?)
         foreach ($this->oids as $oid) {
-            $textual = SnmpQuery::numeric(false)->device($device)->mibs(['ALL'])->translate($oid);
-            $numeric = SnmpQuery::numeric(true)->device($device)->mibs(['ALL'])->translate($oid);
+            $textual = NetSnmpQuery::make()->numeric(false)->device($device)->mibs(['ALL'])->translate($oid);
+            $numeric = NetSnmpQuery::make()->numeric(true)->device($device)->mibs(['ALL'])->translate($oid);
 
             $response = new SnmpResponse("$textual = $numeric\n");
             $res = $res->append($response);
