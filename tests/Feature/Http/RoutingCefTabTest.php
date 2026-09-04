@@ -506,17 +506,17 @@ class RoutingCefTabTest extends TestCase
             ->assertJsonFragment(['inetCidrRouteDest' => '192.168.50.0']);
     }
 
-    public function testRoutingIndexRedirectsToDefaultProtocol(): void
+    public function testRoutingTabRedirectsToDefaultProtocol(): void
     {
         $device = Device::factory()->create();
         \App\Models\BgpPeer::factory()->for($device)->create();
 
         $this->actingAs($this->admin())
-            ->get(route('device.routing.index', ['device' => $device]))
+            ->get(route('device', ['device' => $device, 'tab' => 'routing']))
             ->assertRedirect(route('device.routing.bgp', ['device' => $device]));
     }
 
-    public function testRoutingIndexRedirectsWithLegacyProtoPath(): void
+    public function testRoutingTabRedirectsWithLegacyProtoPath(): void
     {
         $device = Device::factory()->create();
 
@@ -525,7 +525,7 @@ class RoutingCefTabTest extends TestCase
             ->assertRedirect(route('device.routing.ospf', ['device' => $device]));
     }
 
-    public function testRoutingIndexRedirectsWithLegacyPathAndQueryVars(): void
+    public function testRoutingTabRedirectsWithLegacyPathAndQueryVars(): void
     {
         $device = Device::factory()->create();
 
@@ -534,13 +534,26 @@ class RoutingCefTabTest extends TestCase
             ->assertRedirect(route('device.routing.mpls', ['device' => $device, 'view' => 'paths']));
     }
 
-    public function testRoutingIndexRedirectsWithUnderscoredProto(): void
+    public function testRoutingTabRedirectsWithUnderscoredProto(): void
     {
         $device = Device::factory()->create();
 
         $this->actingAs($this->admin())
             ->get('/device/' . $device->device_id . '/routing/proto=ipsec_tunnels/')
             ->assertRedirect(route('device.routing.ipsec-tunnels', ['device' => $device]));
+    }
+
+    public function testRoutingTabRedirectsWithLegacyDeviceAndTabUrl(): void
+    {
+        $device = Device::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->get('/device/device=' . $device->device_id . '/tab=routing/proto=cisco-otv/')
+            ->assertRedirect(route('device.routing.cisco-otv', ['device' => $device]));
+
+        $this->actingAs($this->admin())
+            ->get('/device/' . $device->device_id . '/tab=routing/section=vrf/')
+            ->assertRedirect(route('device.routing.vrf', ['device' => $device]));
     }
 
     public function testUserWithoutRoutingPermissionGetsForbidden(): void

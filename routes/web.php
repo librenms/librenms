@@ -202,7 +202,6 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('ospfv3', Device\Tabs\Routing\Ospfv3Controller::class)->name('ospfv3');
             Route::get('routes', Device\Tabs\Routing\RoutesController::class)->name('routes');
             Route::get('vrf', Device\Tabs\Routing\VrfController::class)->name('vrf');
-            Route::get('{vars?}', Device\Tabs\RoutingController::class)->name('index')->where('vars', '.*');
         });
         Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
