@@ -2120,6 +2120,10 @@ return [
                 ],
             ],
         ],
+        'service_api_key' => [
+            'description' => 'Dispatcher Service API Key',
+            'help' => 'Use a connection to localhost to poll and discover devices (requires additional setup).',
+        ],
         'sensors' => [
             'guess_limits' => [
                 'description' => 'Guess sensor limits',
@@ -2185,10 +2189,6 @@ return [
         'service_loglevel' => [
             'description' => 'Log Level',
             'help' => 'Log level of the dispatch service. Sets the default value for all nodes.',
-        ],
-        'service_api_key' => [
-            'description' => 'Dispatcher Service API Key',
-            'help' => 'Use a connection to localhost to poll and discover devices (requires additional setup).',
         ],
         'service_watchdog_enabled' => [
             'description' => 'Watchdog Enabled',
