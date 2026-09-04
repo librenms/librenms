@@ -37,8 +37,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use LibreNMS\Util\IP;
-use LibreNMS\Util\IPv4;
-use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 
@@ -82,8 +80,8 @@ class BgpController extends Controller
         }
 
         $peers = match ($view) {
-            'prefixes_ipv4unicast' => $allPeers->reject(fn ($p) => str_contains($p->bgpPeerIdentifier, ':')),
-            'prefixes_ipv6unicast', 'prefixes_ipv6vpn' => $allPeers->filter(fn ($p) => str_contains($p->bgpPeerIdentifier, ':')),
+            'prefixes_ipv4unicast' => $allPeers->reject(fn (BgpPeer $p) => str_contains($p->bgpPeerIdentifier, ':')),
+            'prefixes_ipv6unicast', 'prefixes_ipv6vpn' => $allPeers->filter(fn (BgpPeer $p) => str_contains($p->bgpPeerIdentifier, ':')),
             default => $allPeers,
         };
 
@@ -96,16 +94,13 @@ class BgpController extends Controller
             ->values()
             ->all();
 
-        $macAccountingIds = [];
-        if (! empty($ipv4Identifiers)) {
-            $macAccountingIds = DB::table('ipv4_mac')
-                ->join('mac_accounting', 'mac_accounting.mac', '=', 'ipv4_mac.mac_address')
-                ->join('ports', 'ports.port_id', '=', 'mac_accounting.port_id')
-                ->where('ports.device_id', $device->device_id)
-                ->whereIn('ipv4_mac.ipv4_address', $ipv4Identifiers)
-                ->pluck('mac_accounting.ma_id', 'ipv4_mac.ipv4_address')
-                ->all();
-        }
+        $macAccountingIds = empty($ipv4Identifiers) ? [] : DB::table('ipv4_mac')
+            ->join('mac_accounting', 'mac_accounting.mac', '=', 'ipv4_mac.mac_address')
+            ->join('ports', 'ports.port_id', '=', 'mac_accounting.port_id')
+            ->where('ports.device_id', $device->device_id)
+            ->whereIn('ipv4_mac.ipv4_address', $ipv4Identifiers)
+            ->pluck('mac_accounting.ma_id', 'ipv4_mac.ipv4_address')
+            ->all();
 
         return view('device.tabs.routing.bgp', [
             'device' => $device,
@@ -234,42 +229,39 @@ class BgpController extends Controller
      */
     private function resolveLinkedPorts(Collection $peers): array
     {
-        $ipv4s = [];
-        $ipv6s = [];
-
-        foreach ($peers as $peer) {
-            $ip = IP::parse($peer->bgpPeerIdentifier, true);
-            if ($ip instanceof IPv4) {
-                $ipv4s[$peer->bgpPeerIdentifier] = $peer->bgpPeerIdentifier;
-            } elseif ($ip instanceof IPv6) {
-                $ipv6s[$peer->bgpPeerIdentifier] = $ip->uncompressed();
-            }
-        }
-
         $ports = [];
 
-        if (! empty($ipv4s)) {
-            $ipv4Ports = Ipv4Address::whereIn('ipv4_address', array_values($ipv4s))
-                ->with('port.device')
-                ->get()
-                ->keyBy('ipv4_address');
+        $ipv4s = $peers->pluck('bgpPeerIdentifier')
+            ->filter(fn ($ip) => ! str_contains($ip, ':'))
+            ->all();
 
-            foreach ($ipv4s as $identifier => $ipStr) {
-                if ($port = $ipv4Ports->get($ipStr)?->port) {
-                    $ports[$identifier] = $port;
+        if (! empty($ipv4s)) {
+            $ipv4Addresses = Ipv4Address::whereIn('ipv4_address', $ipv4s)
+                ->with('port.device')
+                ->get();
+
+            foreach ($ipv4Addresses as $ip) {
+                if ($ip->port) {
+                    $ports[$ip->ipv4_address] = $ip->port;
                 }
             }
         }
 
-        if (! empty($ipv6s)) {
-            $ipv6Ports = Ipv6Address::whereIn('ipv6_address', array_values($ipv6s))
-                ->with('port.device')
-                ->get()
-                ->keyBy('ipv6_address');
+        $ipv6s = [];
+        foreach ($peers as $peer) {
+            if (str_contains($peer->bgpPeerIdentifier, ':') && $parsed = IP::parse($peer->bgpPeerIdentifier, true)) {
+                $ipv6s[$parsed->uncompressed()] = $peer->bgpPeerIdentifier;
+            }
+        }
 
-            foreach ($ipv6s as $identifier => $uncompressed) {
-                if ($port = $ipv6Ports->get($uncompressed)?->port) {
-                    $ports[$identifier] = $port;
+        if (! empty($ipv6s)) {
+            $ipv6Addresses = Ipv6Address::whereIn('ipv6_address', array_keys($ipv6s))
+                ->with('port.device')
+                ->get();
+
+            foreach ($ipv6Addresses as $ip) {
+                if ($ip->port && isset($ipv6s[$ip->ipv6_address])) {
+                    $ports[$ipv6s[$ip->ipv6_address]] = $ip->port;
                 }
             }
         }
@@ -287,11 +279,9 @@ class BgpController extends Controller
         }
 
         $as = (int) $remoteAs;
-        if (($as >= 64512 && $as <= 65534) || ($as >= 4200000000 && $as <= 4294967294)) {
-            return ['Priv eBGP', 'text-info'];
-        }
+        $isPrivate = ($as >= 64512 && $as <= 65534) || ($as >= 4200000000 && $as <= 4294967294);
 
-        return ['eBGP', 'text-success'];
+        return $isPrivate ? ['Priv eBGP', 'text-info'] : ['eBGP', 'text-success'];
     }
 
     private function formatLastError(BgpPeer $peer): string
@@ -315,7 +305,7 @@ class BgpController extends Controller
         }
 
         if (str_starts_with($view, 'prefixes_')) {
-            $afisafi = substr($view, strlen('prefixes_'));
+            $afisafi = substr($view, 9);
             if (! empty($afisafiMap[$afisafi])) {
                 return ['show_graph' => true, 'graph_type' => "bgp_$view", 'graph_id' => $peer->bgpPeer_id];
             }
