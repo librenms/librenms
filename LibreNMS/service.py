@@ -136,9 +136,7 @@ class ServiceConfig(DBConfig):
         self.master_timeout = config.get(
             "service_master_timeout", ServiceConfig.master_timeout
         )
-        self.apikey = config.get(
-            "service_api_key", ""
-        )
+        self.apikey = config.get("service_api_key", "")
         self.poller.enabled = (
             config.get("service_poller_enabled", True)
             if config.get("schedule_type").get("poller", "legacy") == "legacy"
