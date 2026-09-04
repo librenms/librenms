@@ -126,11 +126,11 @@ trait StreamsOutputToBrowser
             ]),
             'level' => 'debug',
         ]]);
-        if($this->logfile) {
+        if ($this->logfile) {
             config(['logging.channels.stream_and_log' => [
-               'driver' => 'stack',
-               'channels' => ['log_file', 'stream'],
-               'ignore_exceptions' => false,
+                'driver' => 'stack',
+                'channels' => ['log_file', 'stream'],
+                'ignore_exceptions' => false,
             ]]);
             Log::setDefaultDriver('stream_and_log');
         } else {
