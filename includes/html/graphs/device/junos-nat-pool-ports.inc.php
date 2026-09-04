@@ -4,11 +4,15 @@
  * junos-nat-pool-ports.inc.php
  *
  * Graphs port usage for a single Junos SRX NAT pool (withPAT pools).
- * Requires ?pool=<pool name> in the graph URL.
+ * Requires ?pool=<pool name>&addr_type=<raw addr_type index value> in the
+ * graph URL -- addr_type must match the raw value the poller saw for this
+ * pool (see junos-nat-pool.inc.php), since a pool name is only unique
+ * within one address family, not across the whole device.
  */
 
 $pool_name = $vars['pool'] ?? '';
-if ($pool_name === '') {
+$addr_type = $vars['addr_type'] ?? '';
+if ($pool_name === '' || $addr_type === '') {
     return;
 }
 
@@ -19,7 +23,7 @@ require 'includes/html/graphs/common.inc.php';
 $graph_params->scale_min = 0;
 
 $rrd_safe_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', $pool_name);
-$rrd_filename = Rrd::name($device['hostname'], ['junos', 'nat-pool', $rrd_safe_name]);
+$rrd_filename = Rrd::name($device['hostname'], ['junos', 'nat-pool', $rrd_safe_name, (string) $addr_type]);
 
 $rrd_options = [];
 

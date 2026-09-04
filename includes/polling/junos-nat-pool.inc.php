@@ -26,10 +26,17 @@ $col_addr_inuse     = 9;
 
 /**
  * Decode a jnxJsSrcNatStatsTable index suffix (everything after the column
- * number) into the pool name. Index format is:
+ * number) into the pool name and raw address-type index value. Index
+ * format is:
  *   <name_len>.<name ascii octets...>.<addr_type>.<address octets...>
+ *
+ * addr_type is carried through as the raw integer from the index rather
+ * than mapped to a meaning (MIB declares ipv4(1)/ipv6(2), but a real walk
+ * of a production SRX showed 0 for an IPv4 entry -- unconfirmed why, so
+ * this only relies on the value being consistent per address family, not on
+ * knowing what it means).
  */
-function junos_nat_decode_pool_name(string $index): ?string
+function junos_nat_decode_index(string $index): ?array
 {
     $parts = explode('.', $index);
     if (count($parts) < 2) {
@@ -37,18 +44,36 @@ function junos_nat_decode_pool_name(string $index): ?string
     }
 
     $name_len = (int) array_shift($parts);
-    if ($name_len <= 0 || count($parts) < $name_len) {
+    if ($name_len <= 0 || count($parts) < $name_len + 1) {
         return null;
     }
 
     $name_octets = array_splice($parts, 0, $name_len);
+    $name = implode('', array_map('chr', $name_octets));
 
-    return implode('', array_map('chr', $name_octets));
+    $addr_type = (int) array_shift($parts);
+
+    return ['name' => $name, 'addr_type' => $addr_type];
 }
 
 function junos_nat_rrd_name(string $pool_name): string
 {
     return preg_replace('/[^a-zA-Z0-9_-]/', '_', $pool_name);
+}
+
+/**
+ * Human-readable label only -- for debug output and graph titles.
+ * Never used for the RRD filename or aggregation key, since the raw
+ * addr_type value observed on real hardware doesn't match the MIB's
+ * documented ipv4(1)/ipv6(2) enum (see junos_nat_decode_index()).
+ */
+function junos_nat_family_label(int $addr_type): string
+{
+    return match ($addr_type) {
+        1 => 'v4',
+        2 => 'v6',
+        default => "family$addr_type",
+    };
 }
 
 d_echo("Polling jnxJsSrcNatStatsTable ($base_oid)\n");
@@ -79,12 +104,22 @@ foreach ($response->values() as $oid => $value) {
     $col = (int) substr($suffix, 0, $dot);
     $index = substr($suffix, $dot + 1);
 
-    $pool_name = junos_nat_decode_pool_name($index);
-    if ($pool_name === null) {
+    $decoded = junos_nat_decode_index($index);
+    if ($decoded === null) {
         continue;
     }
 
-    $pools[$pool_name] ??= [
+    // Pool names are only guaranteed unique within one address family on
+    // a given device (and this table has no routing-instance/logical-
+    // system index component at all, so same-name pools in different
+    // RIs are indistinguishable here regardless -- a MIB limitation, not
+    // fixable in this script). Key on name + addr_type so at least a v4
+    // and v6 pool sharing a name don't get merged into one RRD.
+    $pool_key = $decoded['name'] . '|' . $decoded['addr_type'];
+
+    $pools[$pool_key] ??= [
+        'name' => $decoded['name'],
+        'addr_type' => $decoded['addr_type'],
         'ports_inuse' => 0,
         'sessions_inuse' => 0,
         'addr_avail' => 0,
@@ -97,22 +132,22 @@ foreach ($response->values() as $oid => $value) {
 
     switch ($col) {
         case $col_pool_type:
-            $pools[$pool_name]['pool_type'] ??= $int_val;
+            $pools[$pool_key]['pool_type'] ??= $int_val;
             break;
         case $col_ports_inuse:
-            $pools[$pool_name]['ports_inuse'] += $int_val;
+            $pools[$pool_key]['ports_inuse'] += $int_val;
             break;
         case $col_sessions_inuse:
-            $pools[$pool_name]['sessions_inuse'] += $int_val;
+            $pools[$pool_key]['sessions_inuse'] += $int_val;
             break;
         case $col_ports_avail:
-            $pools[$pool_name]['ports_avail'] = max($pools[$pool_name]['ports_avail'], $int_val);
+            $pools[$pool_key]['ports_avail'] = max($pools[$pool_key]['ports_avail'], $int_val);
             break;
         case $col_addr_avail:
-            $pools[$pool_name]['addr_avail'] = max($pools[$pool_name]['addr_avail'], $int_val);
+            $pools[$pool_key]['addr_avail'] = max($pools[$pool_key]['addr_avail'], $int_val);
             break;
         case $col_addr_inuse:
-            $pools[$pool_name]['addr_inuse'] += $int_val;
+            $pools[$pool_key]['addr_inuse'] += $int_val;
             break;
     }
 }
@@ -123,10 +158,14 @@ if (empty($pools)) {
     return;
 }
 
-d_echo('Found ' . count($pools) . ' NAT pool(s): ' . implode(', ', array_keys($pools)) . "\n");
+d_echo('Found ' . count($pools) . ' NAT pool(s): ' . implode(', ', array_map(
+    fn ($data) => $data['name'] . ' (' . junos_nat_family_label($data['addr_type']) . ')',
+    $pools
+)) . "\n");
 
-foreach ($pools as $pool_name => $data) {
-    $rrd_name = ['junos', 'nat-pool', junos_nat_rrd_name($pool_name)];
+foreach ($pools as $data) {
+    $pool_name = $data['name'];
+    $rrd_name = ['junos', 'nat-pool', junos_nat_rrd_name($pool_name), (string) $data['addr_type']];
 
     $rrd_def = RrdDefinition::make()
         ->addDataset('ports_inuse', 'GAUGE', 0, 125000000)
@@ -151,8 +190,9 @@ foreach ($pools as $pool_name => $data) {
     app('Datastore')->put($device, 'junos-nat-pool', $tags, $fields);
 
     d_echo(sprintf(
-        "  %-32s ports_inuse=%-6d sessions_inuse=%-6d addr_inuse=%d/%d\n",
+        "  %-32s (%s) ports_inuse=%-6d sessions_inuse=%-6d addr_inuse=%d/%d\n",
         $pool_name,
+        junos_nat_family_label($data['addr_type']),
         $data['ports_inuse'],
         $data['sessions_inuse'],
         $data['addr_inuse'],
