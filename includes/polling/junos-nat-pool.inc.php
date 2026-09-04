@@ -17,6 +17,7 @@ if ($device['os'] !== 'junos') {
 
 $base_oid = '.1.3.6.1.4.1.2636.3.39.1.7.1.1.4.1';
 
+$col_addr_type      = 2;
 $col_pool_type      = 4;
 $col_ports_inuse    = 5;
 $col_sessions_inuse = 6;
@@ -26,17 +27,17 @@ $col_addr_inuse     = 9;
 
 /**
  * Decode a jnxJsSrcNatStatsTable index suffix (everything after the column
- * number) into the pool name and raw address-type index value. Index
- * format is:
+ * number) into the pool name. Index format is:
  *   <name_len>.<name ascii octets...>.<addr_type>.<address octets...>
  *
- * addr_type is carried through as the raw integer from the index rather
- * than mapped to a meaning (MIB declares ipv4(1)/ipv6(2), but a real walk
- * of a production SRX showed 0 for an IPv4 entry -- unconfirmed why, so
- * this only relies on the value being consistent per address family, not on
- * knowing what it means).
+ * Only the name is extracted here. The <addr_type> segment embedded in
+ * the index is NOT used for address family -- a real walk of a
+ * production SRX showed it as 0 on every single row regardless of
+ * family, while the jnxJsNatSrcXlatedAddrType column (2) correctly
+ * reported 1 (ipv4) for those same rows. The column value is the only
+ * reliable source of family; see the two-pass aggregation below.
  */
-function junos_nat_decode_index(string $index): ?array
+function junos_nat_decode_pool_name(string $index): ?string
 {
     $parts = explode('.', $index);
     if (count($parts) < 2) {
@@ -49,11 +50,8 @@ function junos_nat_decode_index(string $index): ?array
     }
 
     $name_octets = array_splice($parts, 0, $name_len);
-    $name = implode('', array_map('chr', $name_octets));
 
-    $addr_type = (int) array_shift($parts);
-
-    return ['name' => $name, 'addr_type' => $addr_type];
+    return implode('', array_map('chr', $name_octets));
 }
 
 function junos_nat_rrd_name(string $pool_name): string
@@ -63,9 +61,8 @@ function junos_nat_rrd_name(string $pool_name): string
 
 /**
  * Human-readable label only -- for debug output and graph titles.
- * Never used for the RRD filename or aggregation key, since the raw
- * addr_type value observed on real hardware doesn't match the MIB's
- * documented ipv4(1)/ipv6(2) enum (see junos_nat_decode_index()).
+ * Matches the jnxJsNatSrcXlatedAddrType column's documented enum
+ * (ipv4(1)/ipv6(2)); anything else is passed through as "familyN".
  */
 function junos_nat_family_label(int $addr_type): string
 {
@@ -86,7 +83,13 @@ if (! $response->isValid(true)) {
     return;
 }
 
-$pools = [];
+// First pass: bucket every column value by its raw per-row index string,
+// so all columns for the same (pool, address) row end up together
+// before we look at column 2 to find the real address family. Table
+// walks are column-major (all rows of column 1, then all of column 2,
+// etc.), so column 2 for a row isn't necessarily seen before column 5/6
+// for that same row -- can't determine family and aggregate in one pass.
+$rows = [];
 $prefix = $base_oid . '.';
 $prefix_len = strlen($prefix);
 
@@ -104,22 +107,42 @@ foreach ($response->values() as $oid => $value) {
     $col = (int) substr($suffix, 0, $dot);
     $index = substr($suffix, $dot + 1);
 
-    $decoded = junos_nat_decode_index($index);
-    if ($decoded === null) {
+    $rows[$index][$col] = $value;
+}
+
+if (empty($rows)) {
+    d_echo("No NAT pool rows decoded\n");
+
+    return;
+}
+
+// Second pass: decode the pool name, read the true address family from
+// column 2, and aggregate into per (name, addr_type) pools. Pool names
+// are only guaranteed unique within one address family on a given device
+// -- and this table has no routing-instance/logical-system index
+// component at all, so same-name pools in different RIs are
+// indistinguishable here regardless, a MIB limitation not fixable in
+// this script.
+$pools = [];
+
+foreach ($rows as $index => $row) {
+    $pool_name = junos_nat_decode_pool_name($index);
+    if ($pool_name === null) {
         continue;
     }
 
-    // Pool names are only guaranteed unique within one address family on
-    // a given device (and this table has no routing-instance/logical-
-    // system index component at all, so same-name pools in different
-    // RIs are indistinguishable here regardless -- a MIB limitation, not
-    // fixable in this script). Key on name + addr_type so at least a v4
-    // and v6 pool sharing a name don't get merged into one RRD.
-    $pool_key = $decoded['name'] . '|' . $decoded['addr_type'];
+    if (! isset($row[$col_addr_type])) {
+        d_echo("Skipping row for pool '$pool_name': no address-type (column 2) value\n");
+
+        continue;
+    }
+    $addr_type = (int) $row[$col_addr_type];
+
+    $pool_key = $pool_name . '|' . $addr_type;
 
     $pools[$pool_key] ??= [
-        'name' => $decoded['name'],
-        'addr_type' => $decoded['addr_type'],
+        'name' => $pool_name,
+        'addr_type' => $addr_type,
         'ports_inuse' => 0,
         'sessions_inuse' => 0,
         'addr_avail' => 0,
@@ -128,27 +151,23 @@ foreach ($response->values() as $oid => $value) {
         'pool_type' => null,
     ];
 
-    $int_val = (int) $value;
-
-    switch ($col) {
-        case $col_pool_type:
-            $pools[$pool_key]['pool_type'] ??= $int_val;
-            break;
-        case $col_ports_inuse:
-            $pools[$pool_key]['ports_inuse'] += $int_val;
-            break;
-        case $col_sessions_inuse:
-            $pools[$pool_key]['sessions_inuse'] += $int_val;
-            break;
-        case $col_ports_avail:
-            $pools[$pool_key]['ports_avail'] = max($pools[$pool_key]['ports_avail'], $int_val);
-            break;
-        case $col_addr_avail:
-            $pools[$pool_key]['addr_avail'] = max($pools[$pool_key]['addr_avail'], $int_val);
-            break;
-        case $col_addr_inuse:
-            $pools[$pool_key]['addr_inuse'] += $int_val;
-            break;
+    if (isset($row[$col_pool_type])) {
+        $pools[$pool_key]['pool_type'] ??= (int) $row[$col_pool_type];
+    }
+    if (isset($row[$col_ports_inuse])) {
+        $pools[$pool_key]['ports_inuse'] += (int) $row[$col_ports_inuse];
+    }
+    if (isset($row[$col_sessions_inuse])) {
+        $pools[$pool_key]['sessions_inuse'] += (int) $row[$col_sessions_inuse];
+    }
+    if (isset($row[$col_ports_avail])) {
+        $pools[$pool_key]['ports_avail'] = max($pools[$pool_key]['ports_avail'], (int) $row[$col_ports_avail]);
+    }
+    if (isset($row[$col_addr_avail])) {
+        $pools[$pool_key]['addr_avail'] = max($pools[$pool_key]['addr_avail'], (int) $row[$col_addr_avail]);
+    }
+    if (isset($row[$col_addr_inuse])) {
+        $pools[$pool_key]['addr_inuse'] += (int) $row[$col_addr_inuse];
     }
 }
 
