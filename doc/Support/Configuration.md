@@ -767,6 +767,9 @@ The MTU check does not test whether the packets cross the network
 without fragmentation. It tests two-way communication. The packets can
 still need fragmentation at any point on the path.
 
+If you have many devices that require fragmentation with the chosen MTU setting and start getting false
+positives, you should change your system to use the ping command for MTU checks.
+
 ## Auto discovery settings
 
 Read [Auto-Discovery](../Extensions/Auto-Discovery.md).
