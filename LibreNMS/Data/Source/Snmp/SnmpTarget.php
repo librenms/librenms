@@ -1,6 +1,6 @@
 <?php
 /**
- * SnmpQueryOptions.php
+ * SnmpTarget.php
  *
  * -Description-
  *
@@ -23,21 +23,14 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Polling\Method\Config;
+namespace LibreNMS\Data\Source\Snmp;
 
-final readonly class SnmpQueryOptions
+use LibreNMS\Polling\Method\Config\SnmpConfig;
+
+final readonly class SnmpTarget
 {
     public function __construct(
-        public array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB',],
-        public array $mibDirs = [],
-
-        // Query behavior
-        public bool $tolerateUnorderedIndexes = false,
-
-        // Output formatting
-        public bool $outputOidsNumerically = false,
-        public bool $outputIndexesNumerically = false,
-        public bool $outputMibNames = true,
-        public bool $outputEnumsAsStrings = false,
+        public string $hostname,
+        public SnmpConfig $config,
     ) {}
 }

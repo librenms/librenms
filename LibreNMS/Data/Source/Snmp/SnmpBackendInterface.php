@@ -23,13 +23,13 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Data\Source;
+namespace LibreNMS\Data\Source\Snmp;
 
-use App\Models\Device;
+use LibreNMS\Data\Source\SnmpResponse;
 
 interface SnmpBackendInterface
 {
-    public function get(Device $device, array $oids, SnmpQueryOptions $options, string $context): SnmpResponse;
-    public function walk(Device $device, array $oids, SnmpQueryOptions $options, string $context): SnmpResponse;
-    public function next(Device $device, array $oids, SnmpQueryOptions $options, string $context): SnmpResponse;
+    public function get(SnmpTarget $target, array $oids, SnmpQueryOptions $options, string $context): SnmpResponse;
+    public function walk(SnmpTarget $target, string $oid, SnmpQueryOptions $options, string $context): SnmpResponse;
+    public function next(SnmpTarget $target, array $oids, SnmpQueryOptions $options, string $context): SnmpResponse;
 }

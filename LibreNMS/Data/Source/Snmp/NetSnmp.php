@@ -1,6 +1,6 @@
 <?php
 /**
- * SnmpOptions.php
+ * NetSnmp.php
  *
  * -Description-
  *
@@ -23,20 +23,25 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Data\Source;
+namespace LibreNMS\Data\Source\Snmp;
 
-class SnmpQueryOptions
+use LibreNMS\Data\Source\SnmpResponse;
+
+class NetSnmp implements SnmpBackendInterface
 {
-    public function __construct(
-        public readonly bool $numeric = false,
-        public readonly bool $numericIndex = false,
-        public readonly bool $hideMib = false,
-        public readonly bool $enumStrings = true,
-        public readonly bool $allowUnordered = false,
-        public readonly ?int $maxRepeaters = null,
-        public readonly ?int $timeout = null,
-        public readonly ?int $retries = null,
-        public readonly array $mibs = [],
-        public readonly array $mibDirs = [],
-    ) {}
+
+    public function get(SnmpTarget $target, array $oids, SnmpQueryOptions $options, string $context): SnmpResponse
+    {
+        // TODO: Implement get() method.
+    }
+
+    public function walk(SnmpTarget $target, string $oid, SnmpQueryOptions $options, string $context): SnmpResponse
+    {
+        // TODO: Implement walk() method.
+    }
+
+    public function next(SnmpTarget $target, array $oids, SnmpQueryOptions $options, string $context): SnmpResponse
+    {
+        // TODO: Implement next() method.
+    }
 }
