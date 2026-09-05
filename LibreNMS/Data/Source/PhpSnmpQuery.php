@@ -26,11 +26,13 @@
 
 namespace LibreNMS\Data\Source;
 
+use App\Events\SnmpQueryExecuted;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use DeviceCache;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Mib;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 use Log;
@@ -50,8 +52,8 @@ class PhpSnmpQuery implements SnmpQueryInterface
         'dont_print_units' => true,
         'escape_quotes' => false,
         'print_hex_text' => false,
-        'string_output_format' => SNMP_STRING_OUTPUT_GUESS, /** @phpstan-ignore constant.notFound */
-        'oid_output_format' => SNMP_OID_OUTPUT_MODULE,
+        'string_output_format' => \Snmp\StringOutput::Guess, /** @phpstan-ignore class.notFound */
+        'oid_output_format' => \Snmp\OidOutput::Module, /** @phpstan-ignore class.notFound */
     ];
 
     private const LIBRARY_DEFAULT_OPTIONS = [
@@ -64,26 +66,23 @@ class PhpSnmpQuery implements SnmpQueryInterface
         'dont_print_units' => false,
         'escape_quotes' => false,
         'print_hex_text' => false,
-        'string_output_format' => SNMP_STRING_OUTPUT_GUESS, /** @phpstan-ignore constant.notFound */
-        'oid_output_format' => SNMP_OID_OUTPUT_MODULE,
+        'string_output_format' => \Snmp\StringOutput::Guess, /** @phpstan-ignore class.notFound */
+        'oid_output_format' => \Snmp\OidOutput::Module, /** @phpstan-ignore class.notFound */
     ];
 
-    /**
-     * @var string[]
-     */
+    /** @var string[] */
     private array $mibDirs = [];
-    private array $options = self::DEFAULT_OPTIONS;
+    private array $options = self::DEFAULT_OPTIONS; /** @phpstan-ignore missingType.iterableValue */
+    /** @var string[] */
     private array $mibs = [];
     private Device $device;
     private bool $abort = false;
     private \SNMP $snmp;
     private bool $mibinit = false;
-    private readonly NetSnmpQuery $netsnmp;
+    private bool $cache = false;
 
     public function __construct()
     {
-        $this->netsnmp = new NetSnmpQuery();
-
         $this->device(DeviceCache::getPrimary());
     }
 
@@ -101,15 +100,12 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function device(Device $device): SnmpQueryInterface
     {
-        // Update NetSnmp object in case we need to pivot to it
-        $this->netsnmp->device($device);
+        $this->device = $device;
 
         // Fall back to NetSnmp if new device is incompatible with PhpSnmp
         if (! self::worksFor($device)) {
-            return $this->netsnmp;
+            return $this->netsnmp();
         }
-
-        $this->device = $device;
 
         $snmpver = match ($this->device->snmpver) {
             'v1' => \SNMP::VERSION_1,
@@ -139,8 +135,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
     public function cache(): SnmpQueryInterface
     {
-        // Update NetSnmp object in case we need to switch
-        $this->netsnmp->cache();
+        $this->cache = true;
 
         return $this;
     }
@@ -155,19 +150,51 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function context(string $context, ?string $v3_prefix = null): SnmpQueryInterface
     {
-        // Update NetSnmp object in case we need to switch
-        $this->netsnmp->context($context, $v3_prefix);
-
         if ($context) {
             if ($this->device->snmpver === 'v3') {
                 $this->snmp->setSecurity(...self::getSecurityOptions($this->device, $v3_prefix . $context));
             } else {
-                // php-snmp doesn't support changing community.  Fall back to NetSnmp
-                return $this->netsnmp;
+                $hostname = Rewrite::addIpv6Brackets((string) ($this->device->overwrite_ip ?: $this->device->hostname));
+                $snmpver = match ($this->device->snmpver) {
+                    'v1' => \SNMP::VERSION_1,
+                    'v2c' => \SNMP::VERSION_2c,
+                    'v3' => \SNMP::VERSION_3,
+                    default => null,
+                };
+
+                $this->snmp = new \SNMP(
+                    snmpver,
+                    ($hostname ?: 'localhost') . ':' . $this->device->port,
+                    "{$this->device->community}@$context",
+                    ($this->device->timeout ?? LibrenmsConfig::get('snmp.timeout')) * 1000000,
+                    $this->device->retries ?? LibrenmsConfig::get('snmp.retries'),
+                );
+
+                // Set SNMP options for the new SNMP object
+                $this->setOptions();
             }
         } else {
             if ($this->device->snmpver === 'v3') {
                 $this->snmp->setSecurity(...self::getSecurityOptions($this->device, null));
+            } else {
+                $hostname = Rewrite::addIpv6Brackets((string) ($this->device->overwrite_ip ?: $this->device->hostname));
+                $snmpver = match ($this->device->snmpver) {
+                    'v1' => \SNMP::VERSION_1,
+                    'v2c' => \SNMP::VERSION_2c,
+                    'v3' => \SNMP::VERSION_3,
+                    default => null,
+                };
+
+                $this->snmp = new \SNMP(
+                    snmpver,
+                    ($hostname ?: 'localhost') . ':' . $this->device->port,
+                    ($this->device->community ?: 'public'),
+                    ($this->device->timeout ?? LibrenmsConfig::get('snmp.timeout')) * 1000000,
+                    $this->device->retries ?? LibrenmsConfig::get('snmp.retries'),
+                );
+
+                // Set SNMP options for the new SNMP object
+                $this->setOptions();
             }
         }
 
@@ -180,9 +207,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function mibDir(?string $dir): SnmpQueryInterface
     {
-        // Update NetSnmp object in case we need to switch
-        $this->netsnmp->mibDir($dir);
-
         $this->mibDirs[] = $dir;
         $this->mibinit = false;
 
@@ -192,12 +216,11 @@ class PhpSnmpQuery implements SnmpQueryInterface
     /**
      * Set MIBs to use for this query. Base mibs are included by default.
      * They will be appended to existing mibs unless $append is set to false.
+     *
+     * @param  string[]  $mibs
      */
     public function mibs(array $mibs, bool $append = true): SnmpQueryInterface
     {
-        // Update NetSnmp object in case we need to switch
-        $this->netsnmp->mibs($mibs, $append);
-
         $this->mibs = array_merge($this->mibs, $mibs);
 
         if ($this->mibinit) {
@@ -219,7 +242,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
     private function readMibs(array $mibs): void
     {
         foreach ($mibs as $mib) {
-            foreach ($this->mibDirectories() as $dir) {
+            foreach (explode(':', Mib::mibDirectories($this->device, $this->mibDirs)) as $dir) {
                 $mibfile = "$dir/$mib";
                 if (file_exists($mibfile)) {
                     snmp_read_mib($mibfile);
@@ -236,9 +259,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function abortOnFailure(): SnmpQueryInterface
     {
-        // Update NetSnmp object in case we need to switch
-        $this->netsnmp->abortOnFailure();
-
         $this->abort = true;
 
         return $this;
@@ -250,9 +270,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function allowUnordered(): SnmpQueryInterface
     {
-        // Update NetSnmp object in case we need to switch
-        $this->netsnmp->allowUnordered();
-
         $this->options['oid_increasing_check'] = false;
         $this->snmp->oid_increasing_check = false;
 
@@ -264,11 +281,8 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function numeric(bool $numeric = true): SnmpQueryInterface
     {
-        // Update NetSnmp object in case we need to switch
-        $this->netsnmp->numeric();
-
-        $this->options['oid_output_format'] = ($numeric ? SNMP_OID_OUTPUT_NUMERIC : SNMP_OID_OUTPUT_MODULE);
-        $this->snmp->oid_output_format = ($numeric ? SNMP_OID_OUTPUT_NUMERIC : SNMP_OID_OUTPUT_MODULE);
+        $this->options['oid_output_format'] = ($numeric ? \Snmp\OidOutput::Numeric : \Snmp\OidOutput::Module); /** @phpstan-ignore class.notFound */
+        $this->snmp->setOidOutputFormat($numeric ? \Snmp\OidOutput::Numeric : \Snmp\OidOutput::Module); /** @phpstan-ignore class.notFound */
 
         return $this;
     }
@@ -278,9 +292,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function numericIndex(bool $numericIndex = true): SnmpQueryInterface
     {
-        // Update NetSnmp object in case we need to switch
-        $this->netsnmp->numericIndex();
-
         $this->options['numeric_index'] = true;
         $this->snmp->numeric_index = true;  /** @phpstan-ignore property.notFound */
 
@@ -292,11 +303,8 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function hideMib(): SnmpQueryInterface
     {
-        // Update NetSnmp object in case we need to switch
-        $this->netsnmp->hideMib();
-
-        $this->options['oid_output_format'] = SNMP_OID_OUTPUT_SUFFIX;
-        $this->snmp->oid_output_format = SNMP_OID_OUTPUT_SUFFIX;
+        $this->options['oid_output_format'] = \Snmp\OidOutput::Suffix; /** @phpstan-ignore class.notFound */
+        $this->snmp->setOidOutputFormat(\Snmp\OidOutput::Suffix); /** @phpstan-ignore class.notFound */
 
         return $this;
     }
@@ -306,9 +314,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function enumStrings(): SnmpQueryInterface
     {
-        // Update NetSnmp object in case we need to switch
-        $this->netsnmp->enumStrings();
-
         $this->options['enum_print'] = false;
         $this->snmp->enum_print = false;
 
@@ -322,8 +327,8 @@ class PhpSnmpQuery implements SnmpQueryInterface
             return;
         }
 
-        snmp_set_mib_option(SNMP_MIB_ALLOW_UNDERSCORES, true); /** @phpstan-ignore function.notFound, constant.notFound */
-        snmp_init_mib(implode(':', $this->mibDirectories())); /** @phpstan-ignore function.notFound */
+        snmp_set_mib_option(\Snmp\Mib::AllowUnderscores, true); /** @phpstan-ignore function.notFound, class.notFound */
+        snmp_init_mib(Mib::mibDirectories($this->device, $this->mibDirs)); /** @phpstan-ignore function.notFound */
         $this->readMibs($this->mibs);
 
         $this->mibinit = true;
@@ -340,9 +345,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function options($options = []): SnmpQueryInterface
     {
-        // Update NetSnmp object
-        $this->netsnmp->options($options);
-
         if (is_null($options)) {
             $this->options = self::DEFAULT_OPTIONS;
 
@@ -368,25 +370,25 @@ class PhpSnmpQuery implements SnmpQueryInterface
                 foreach (str_split(substr((string) $option, 2)) as $outopt) {
                     switch ($outopt) {
                         case 'a':
-                            $this->options['string_output_format'] = SNMP_STRING_OUTPUT_ASCII; /** @phpstan-ignore constant.notFound */
+                            $this->options['string_output_format'] = \Snmp\StringOutput::Ascii; /** @phpstan-ignore class.notFound */
                             break;
                         case 'x':
-                            $this->options['string_output_format'] = SNMP_STRING_OUTPUT_HEX; /** @phpstan-ignore constant.notFound */
+                            $this->options['string_output_format'] = \Snmp\StringOutput::Hex; /** @phpstan-ignore class.notFound */
                             break;
                         case 'f':
-                            $this->options['oid_output_format'] = SNMP_OID_OUTPUT_FULL;
+                            $this->options['oid_output_format'] = \Snmp\OidOutput::Full; /** @phpstan-ignore class.notFound */
                             break;
                         case 's':
-                            $this->options['oid_output_format'] = SNMP_OID_OUTPUT_SUFFIX;
+                            $this->options['oid_output_format'] = \Snmp\OidOutput::Suffix; /** @phpstan-ignore class.notFound */
                             break;
                         case 'S':
-                            $this->options['oid_output_format'] = SNMP_OID_OUTPUT_MODULE;
+                            $this->options['oid_output_format'] = \Snmp\OidOutput::Module; /** @phpstan-ignore class.notFound */
                             break;
                         case 'u':
-                            $this->options['oid_output_format'] = SNMP_OID_OUTPUT_UCD;
+                            $this->options['oid_output_format'] = \Snmp\OidOutput::Ucd; /** @phpstan-ignore class.notFound */
                             break;
                         case 'n':
-                            $this->options['oid_output_format'] = SNMP_OID_OUTPUT_NUMERIC;
+                            $this->options['oid_output_format'] = \Snmp\OidOutput::Numeric; /** @phpstan-ignore class.notFound */
                             break;
                         case 'b':
                             $this->options['numeric_index'] = true;
@@ -413,17 +415,11 @@ class PhpSnmpQuery implements SnmpQueryInterface
                             $this->options['extended_index'] = true;
                             break;
                         default:
-                            // We do not know how to parse this option - return the NetSnmp object
-                            Log::debug("Unknown option -C$outopt : Falling back to NetSnmp");
-
-                            return $this->netsnmp;
+                            throw new \Exception("Unknown option -C$outopt");
                     }
                 }
             } else {
-                Log::debug("Unknown option $option : Falling back to NetSnmp");
-
-                // We do not know how to parse this option - return the NetSnmp object
-                return $this->netsnmp;
+                throw new \Exception("Unknown option $option");
             }
         }
 
@@ -436,8 +432,13 @@ class PhpSnmpQuery implements SnmpQueryInterface
     private function setOptions(): SnmpQueryInterface
     {
         foreach ($this->options as $prop => $val) {
-            $this->snmp->$prop = $val;
+            if (\is_bool($val)) {
+                $this->snmp->$prop = $val;
+            }
         }
+
+        $this->snmp->setStringOutputFormat($this->options['string_output_format']);
+        $this->snmp->setOidOutputFormat($this->options['oid_output_format']);
 
         return $this;
     }
@@ -563,47 +564,19 @@ class PhpSnmpQuery implements SnmpQueryInterface
             $res_str .= "$k = $v\n";
         }
 
-        $this->logOutput($res_str, '');
+        $this_response = new SnmpResponse($res_str, $errors, $errors ? 1 : 0);
 
-        return $response->append(new SnmpResponse($res_str, $errors, $errors ? 1 : 0));
-    }
+        event(new SnmpQueryExecuted(
+            method: $cmd,
+            oids: (is_array($oids) ? $oids : [$oids]),
+            cliCommand: [],
+            response: $this_response,
+            device: $this->device,
+            mibs: $this->mibs,
+            mibDir: implode(':', $this->mibDirs),
+        ));
 
-    /**
-     * Translate an OID using NetSnmp class.
-     */
-    public function translate(string $oid): string
-    {
-        return $this->netsnmp->translate($oid);
-    }
-
-    private function mibDirectories(): array
-    {
-        $base = LibrenmsConfig::get('mib_dir');
-        $dirs = [$base];
-
-        // os group
-        if ($os_group = LibrenmsConfig::getOsSetting($this->device->os, 'group')) {
-            if (file_exists("$base/$os_group")) {
-                $dirs[] = "$base/$os_group";
-            }
-        }
-
-        // os directory
-        $os_mibdir = LibrenmsConfig::getOsSetting($this->device->os, 'mib_dir');
-        if ($os_mibdir && is_string($os_mibdir)) {
-            $dirs[] = "$base/$os_mibdir";
-        } elseif (file_exists($base . '/' . $this->device->os)) {
-            $dirs[] = $base . '/' . $this->device->os;
-        }
-
-        foreach ($this->mibDirs as $mibDir) {
-            $dirs[] = "$base/$mibDir";
-        }
-
-        // remove trailing /, remove empty dirs, and remove duplicates
-        $dirs = array_unique(array_filter(array_map(fn ($dir) => rtrim((string) $dir, '/'), $dirs)));
-
-        return $dirs;
+        return $response->append($this_response);
     }
 
     private function limitOids(array $oids): array
@@ -697,5 +670,17 @@ class PhpSnmpQuery implements SnmpQueryInterface
         }
 
         return true;
+    }
+
+    private function netsnmp(): NetSnmpQuery
+    {
+        // TODO: set options, etc
+        $ret = (new NetSnmpQuery())->device($this->device);
+
+        if($this->cache) {
+            $ret->cache();
+        }
+
+        return $ret;
     }
 }
