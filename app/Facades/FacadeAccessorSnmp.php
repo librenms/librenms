@@ -35,7 +35,7 @@ class FacadeAccessorSnmp extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        if (LibrenmsConfig::get('snmp.engine', 'netsnmp') === 'phpsnmp') {
+        if (LibrenmsConfig::get('snmp.engine', 'netsnmp') === 'phpsnmp' && function_exists('snmp_init_mib')) {
             // always resolve a new instance
             self::clearResolvedInstance(PhpSnmpQuery::class);
 
