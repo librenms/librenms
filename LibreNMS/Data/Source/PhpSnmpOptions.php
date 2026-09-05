@@ -37,16 +37,17 @@ class PhpSnmpOptions
     public bool $dont_print_units = true;
     public bool $escape_quotes = true;
     public bool $print_hex_text = true;
-    /** @phpstan-ignore class.notFound */
-    public \Snmp\StringOutput $string_output_format = \Snmp\StringOutput::Guess;
-    /** @phpstan-ignore class.notFound */
-    public \Snmp\OidOutput $oid_output_format = \Snmp\OidOutput::Module;
+    public \Snmp\StringOutput $string_output_format = \Snmp\StringOutput::Guess; /** @phpstan-ignore class.notFound */
+    public \Snmp\OidOutput $oid_output_format = \Snmp\OidOutput::Module; /** @phpstan-ignore class.notFound */
 
+    /**
+     * Constructor
+     */
     public function __construct()
     {
     }
 
-    public function defaults(): PhpSnmpConfig
+    public function defaults(): PhpSnmpOptions
     {
         $this->oid_increasing_check = true;
         $this->quick_print = true;
@@ -63,7 +64,7 @@ class PhpSnmpOptions
         return $this;
     }
 
-    public function library_defaults(): PhpSnmpConfig
+    public function library_defaults(): PhpSnmpOptions
     {
         $this->oid_increasing_check = false;
         $this->quick_print = false;
@@ -85,7 +86,7 @@ class PhpSnmpOptions
      *
      * @param  string[]|string|null  $options
      */
-    public function parse_options($options = []): PhpSnmpConfig
+    public function parse_options($options = []): PhpSnmpOptions
     {
         if (is_null($options)) {
             return $this->defaults();
@@ -174,12 +175,12 @@ class PhpSnmpOptions
         $snmp->oid_increasing_check = $this->oid_increasing_check;
         $snmp->quick_print = $this->quick_print;
         $snmp->enum_print = $this->enum_print;
-        $snmp->numeric_index = $this->numeric_index;
-        $snmp->numeric_timeticks = $this->numeric_timeticks;
-        $snmp->extended_index = $this->extended_index;
-        $snmp->dont_print_units = $this->dont_print_units;
-        $snmp->escape_quotes = $this->escape_quotes;
-        $snmp->print_hex_text = $this->print_hex_text;
+        $snmp->numeric_index = $this->numeric_index; /** @phpstan-ignore property.notFound */
+        $snmp->numeric_timeticks = $this->numeric_timeticks; /** @phpstan-ignore property.notFound */
+        $snmp->extended_index = $this->extended_index; /** @phpstan-ignore property.notFound */
+        $snmp->dont_print_units = $this->dont_print_units; /** @phpstan-ignore property.notFound */
+        $snmp->escape_quotes = $this->escape_quotes; /** @phpstan-ignore property.notFound */
+        $snmp->print_hex_text = $this->print_hex_text; /** @phpstan-ignore property.notFound */
 
         $snmp->setStringOutputFormat($this->string_output_format); /** @phpstan-ignore method.notFound */
         $snmp->setOidOutputFormat($this->oid_output_format); /** @phpstan-ignore method.notFound */

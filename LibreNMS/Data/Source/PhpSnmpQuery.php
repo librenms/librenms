@@ -420,7 +420,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         event(new SnmpQueryExecuted(
             method: $cmd,
             oids: (is_array($oids) ? $oids : [$oids]),
-            cliCommand: [],
+            cliCommand: ["php-snmp-$cmd", ...(is_array($oids) ? $oids : [$oids])],
             response: $this_response,
             device: $this->device,
             mibs: $this->mibs,
