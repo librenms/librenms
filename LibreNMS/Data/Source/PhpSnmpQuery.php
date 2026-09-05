@@ -31,7 +31,6 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use DeviceCache;
-use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mib;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
@@ -39,9 +38,6 @@ use Log;
 
 class PhpSnmpQuery implements SnmpQueryInterface
 {
-    private string $output_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
-    private string $output_replacement = '*';
-
     private const DEFAULT_OPTIONS = [
         'oid_increasing_check' => true,
         'quick_print' => true,
@@ -72,7 +68,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
     /** @var string[] */
     private array $mibDirs = [];
-    private array $options = self::DEFAULT_OPTIONS; /** @phpstan-ignore missingType.iterableValue */
+    private array $options = self::DEFAULT_OPTIONS;
     /** @var string[] */
     private array $mibs = [];
     private Device $device;
@@ -107,17 +103,9 @@ class PhpSnmpQuery implements SnmpQueryInterface
             return $this->netsnmp();
         }
 
-        $snmpver = match ($this->device->snmpver) {
-            'v1' => \SNMP::VERSION_1,
-            'v2c' => \SNMP::VERSION_2c,
-            'v3' => \SNMP::VERSION_3,
-            default => null,
-        };
-        $hostname = Rewrite::addIpv6Brackets((string) ($this->device->overwrite_ip ?: $this->device->hostname));
-
         $this->snmp = new \SNMP(
-            $snmpver,
-            ($hostname ?: 'localhost') . ':' . $this->device->port,
+            $this->snmpver(),
+            $this->hostname() . ':' . $this->device->port,
             $this->device->snmpver === 'v3' ? ($this->device->authname ?: 'root') : ($this->device->community ?: 'public'),
             ($this->device->timeout ?? LibrenmsConfig::get('snmp.timeout')) * 1000000,
             $this->device->retries ?? LibrenmsConfig::get('snmp.retries'),
@@ -154,17 +142,9 @@ class PhpSnmpQuery implements SnmpQueryInterface
             if ($this->device->snmpver === 'v3') {
                 $this->snmp->setSecurity(...self::getSecurityOptions($this->device, $v3_prefix . $context));
             } else {
-                $hostname = Rewrite::addIpv6Brackets((string) ($this->device->overwrite_ip ?: $this->device->hostname));
-                $snmpver = match ($this->device->snmpver) {
-                    'v1' => \SNMP::VERSION_1,
-                    'v2c' => \SNMP::VERSION_2c,
-                    'v3' => \SNMP::VERSION_3,
-                    default => null,
-                };
-
                 $this->snmp = new \SNMP(
-                    snmpver,
-                    ($hostname ?: 'localhost') . ':' . $this->device->port,
+                    $this->snmpver(),
+                    $this->hostname() . ':' . $this->device->port,
                     "{$this->device->community}@$context",
                     ($this->device->timeout ?? LibrenmsConfig::get('snmp.timeout')) * 1000000,
                     $this->device->retries ?? LibrenmsConfig::get('snmp.retries'),
@@ -177,18 +157,10 @@ class PhpSnmpQuery implements SnmpQueryInterface
             if ($this->device->snmpver === 'v3') {
                 $this->snmp->setSecurity(...self::getSecurityOptions($this->device, null));
             } else {
-                $hostname = Rewrite::addIpv6Brackets((string) ($this->device->overwrite_ip ?: $this->device->hostname));
-                $snmpver = match ($this->device->snmpver) {
-                    'v1' => \SNMP::VERSION_1,
-                    'v2c' => \SNMP::VERSION_2c,
-                    'v3' => \SNMP::VERSION_3,
-                    default => null,
-                };
-
                 $this->snmp = new \SNMP(
-                    snmpver,
-                    ($hostname ?: 'localhost') . ':' . $this->device->port,
-                    ($this->device->community ?: 'public'),
+                    $this->snmpver(),
+                    $this->hostname() . ':' . $this->device->port,
+                    $this->device->community ?: 'public',
                     ($this->device->timeout ?? LibrenmsConfig::get('snmp.timeout')) * 1000000,
                     $this->device->retries ?? LibrenmsConfig::get('snmp.retries'),
                 );
@@ -238,6 +210,8 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
     /**
      * Read in a group of MIB files
+     *
+     * @param  string[]  $mibs
      */
     private function readMibs(array $mibs): void
     {
@@ -281,8 +255,8 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function numeric(bool $numeric = true): SnmpQueryInterface
     {
-        $this->options['oid_output_format'] = ($numeric ? \Snmp\OidOutput::Numeric : \Snmp\OidOutput::Module); /** @phpstan-ignore class.notFound */
-        $this->snmp->setOidOutputFormat($numeric ? \Snmp\OidOutput::Numeric : \Snmp\OidOutput::Module); /** @phpstan-ignore class.notFound */
+        $this->options['oid_output_format'] = ($numeric ? \Snmp\OidOutput::Numeric : \Snmp\OidOutput::Module); /** @phpstan-ignore class.notFound, class.notFound */
+        $this->snmp->setOidOutputFormat($numeric ? \Snmp\OidOutput::Numeric : \Snmp\OidOutput::Module); /** @phpstan-ignore method.notFound, class.notFound, class.notFound */
 
         return $this;
     }
@@ -304,7 +278,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
     public function hideMib(): SnmpQueryInterface
     {
         $this->options['oid_output_format'] = \Snmp\OidOutput::Suffix; /** @phpstan-ignore class.notFound */
-        $this->snmp->setOidOutputFormat(\Snmp\OidOutput::Suffix); /** @phpstan-ignore class.notFound */
+        $this->snmp->setOidOutputFormat(\Snmp\OidOutput::Suffix); /** @phpstan-ignore method.notFound, class.notFound */
 
         return $this;
     }
@@ -341,7 +315,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      * Calling with null will reset to the default options (-OQXUte).
      * Try to avoid setting options this way to keep the API generic.
      *
-     * @param  array|string|null  $options
+     * @param  string[]|string|null  $options
      */
     public function options($options = []): SnmpQueryInterface
     {
@@ -437,8 +411,8 @@ class PhpSnmpQuery implements SnmpQueryInterface
             }
         }
 
-        $this->snmp->setStringOutputFormat($this->options['string_output_format']);
-        $this->snmp->setOidOutputFormat($this->options['oid_output_format']);
+        $this->snmp->setStringOutputFormat($this->options['string_output_format']); /** @phpstan-ignore method.notFound */
+        $this->snmp->setOidOutputFormat($this->options['oid_output_format']); /** @phpstan-ignore method.notFound */
 
         return $this;
     }
@@ -447,7 +421,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      * snmpget an OID
      * Commonly used to fetch a single or multiple explicit values.
      *
-     * @param  array|string  $oid
+     * @param  string[]|string  $oid
      * @return SnmpResponse
      */
     public function get($oid): SnmpResponse
@@ -472,7 +446,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      * snmpwalk an OID
      * Fetches all OIDs under a given OID, commonly used with tables.
      *
-     * @param  array|string  $oid
+     * @param  string[]|string  $oid
      * @return SnmpResponse
      */
     public function walk($oid): SnmpResponse
@@ -500,7 +474,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      * snmpnext for the given oid
      * snmpnext retrieves the first oid after the given oid.
      *
-     * @param  array|string  $oid
+     * @param  string[]|string  $oid
      * @return SnmpResponse
      */
     public function next($oid): SnmpResponse
@@ -521,6 +495,9 @@ class PhpSnmpQuery implements SnmpQueryInterface
         return $response;
     }
 
+    /**
+     * @param  string[]|string  $oids
+     */
     public function cmd(string $cmd, array|string $oids, SnmpResponse $response): SnmpResponse
     {
         $this->initMibs();
@@ -542,7 +519,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
             return true;
         }, E_WARNING);
 
-        $this->logSnmpCmd($cmd, is_array($oids) ? $oids : [$oids]);
         $measure = Measurement::start('php' . $cmd);
         $res = match ($cmd) {
             'get' => $this->snmp->get($oids),
@@ -579,6 +555,10 @@ class PhpSnmpQuery implements SnmpQueryInterface
         return $response->append($this_response);
     }
 
+    /**
+     * @param  string[]  $oids
+     * @return list<list<string>>
+     */
     private function limitOids(array $oids): array
     {
         // get max oids per query device attrib > os setting > global setting
@@ -592,11 +572,18 @@ class PhpSnmpQuery implements SnmpQueryInterface
         return [$oids]; // wrap in array for execMultiple so they are all done at once
     }
 
+    /**
+     * @param  string[]|string  $oids
+     * @return string[]
+     */
     private function parseOid(array|string $oids): array
     {
         return is_string($oids) ? explode(' ', $oids) : $oids;
     }
 
+    /**
+     * @return string[]
+     */
     private static function getSecurityOptions(Device $device, ?string $context): array
     {
         if ($device->authlevel === 'authpriv') {
@@ -623,25 +610,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
         }
 
         return $options;
-    }
-
-    private function logSnmpCmd(string $cmd, array $oids): void
-    {
-        if (Debug::isVerbose()) {
-            Log::debug("SNMP $cmd - MIBS: " . implode(':', array_keys($this->mibs)) . ' OIDS: ' . implode(' ', $oids));
-        } else {
-            Log::debug("SNMP $cmd - OIDS: " . implode(' ', $oids));
-        }
-    }
-
-    private function logOutput(string $output, string $error): void
-    {
-        if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            Log::debug(preg_replace($this->output_regex, $this->output_replacement, $output));
-        } elseif (Debug::isVerbose()) {
-            Log::debug($output);
-        }
-        Log::debug($error);
     }
 
     public static function worksFor(Device $device): bool
@@ -672,12 +640,27 @@ class PhpSnmpQuery implements SnmpQueryInterface
         return true;
     }
 
-    private function netsnmp(): NetSnmpQuery
+    private function hostname(): string
+    {
+        return Rewrite::addIpv6Brackets((string) ($this->device->overwrite_ip ?: $this->device->hostname)) ?: 'localhost';
+    }
+
+    private function snmpver(): int
+    {
+        return match ($this->device->snmpver) {
+            'v1' => \SNMP::VERSION_1,
+            'v2c' => \SNMP::VERSION_2c,
+            'v3' => \SNMP::VERSION_3,
+            default => null,
+        };
+    }
+
+    private function netsnmp(): SnmpQueryInterface
     {
         // TODO: set options, etc
         $ret = (new NetSnmpQuery())->device($this->device);
 
-        if($this->cache) {
+        if ($this->cache) {
             $ret->cache();
         }
 
