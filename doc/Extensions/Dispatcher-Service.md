@@ -67,7 +67,7 @@ Nodes appear automatically after running for a few minutes.
     lnms config:set service_poller_workers 24
     lnms config:set service_services_workers 8
     lnms config:set service_discovery_workers 16
-    lnms config:set service_poller_frequency 300
+    lnms config:set service_poller_frequency null
     lnms config:set service_services_frequency 300
     lnms config:set service_discovery_frequency 21600
     lnms config:set service_billing_frequency 300
@@ -76,6 +76,25 @@ Nodes appear automatically after running for a few minutes.
     lnms config:set service_loglevel INFO
     lnms config:set service_update_frequency 86400
     ```
+
+### Memory Pressure
+
+Optionally pause a dispatcher's intake when it is under memory pressure, to avoid
+OOM kills (for example during a thundering-herd startup of many workers). When
+usage reaches the configured percent the dispatcher stops taking new work, and
+resumes once it drops below (percent - 10). Unset (the default) disables it.
+
+Usage is read from the process's cgroup memory limit when available (cgroup v2 or
+v1), otherwise from host memory. If usage cannot be determined the gate does
+nothing and polling behaves as normal.
+
+This is set per dispatcher via an environment variable (there is no global config
+setting, as dispatchers sharing one LibreNMS install commonly have different
+memory limits):
+
+```bash
+export DISPATCHER_MEMORY_PRESSURE_PERCENT=85
+```
 
 ### Restrict Processing to Dispatcher
 
