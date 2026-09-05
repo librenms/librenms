@@ -37,8 +37,8 @@ class PhpSnmpOptions
     public bool $dont_print_units = true;
     public bool $escape_quotes = true;
     public bool $print_hex_text = true;
-    public \Snmp\StringOutput $string_output_format = \Snmp\StringOutput::Guess; /** @phpstan-ignore class.notFound */
-    public \Snmp\OidOutput $oid_output_format = \Snmp\OidOutput::Module; /** @phpstan-ignore class.notFound */
+    public \Snmp\StringOutput $string_output_format = \Snmp\StringOutput::Guess; /** @phpstan-ignore class.notFound, class.notFound */
+    public \Snmp\OidOutput $oid_output_format = \Snmp\OidOutput::Module; /** @phpstan-ignore class.notFound, class.notFound */
 
     /**
      * Constructor
