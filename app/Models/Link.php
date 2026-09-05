@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Facades\Permissions;
+use App\Models\Traits\DeletesDeviceOrphans;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Gate;
 
 class Link extends Model
 {
+    use DeletesDeviceOrphans;
     use HasFactory;
 
     public $timestamps = false;
@@ -30,6 +32,11 @@ class Link extends Model
             ->orWhereIntegerInRaw('links.local_device_id', Permissions::devicesForUser($user)))->where(fn (Builder $query) => $query->where('links.remote_device_id', 0)
             ->orWhereIntegerInRaw('links.remote_port_id', Permissions::portsForUser($user))
             ->orWhereIntegerInRaw('links.remote_device_id', Permissions::devicesForUser($user)));
+    }
+
+    protected static function deviceForeignKey(): string
+    {
+        return 'local_device_id';
     }
 
     // ---- Define Relationships ----

@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Traits\DeletesDeviceOrphans;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Processor extends DeviceRelatedModel
 {
+    use DeletesDeviceOrphans;
     use HasFactory;
 
     public $timestamps = false;
