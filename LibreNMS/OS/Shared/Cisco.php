@@ -34,6 +34,7 @@ use App\Facades\PortCache;
 use App\Models\Component;
 use App\Models\Device;
 use App\Models\EntPhysical;
+use App\Models\Link;
 use App\Models\MacAccounting;
 use App\Models\Mempool;
 use App\Models\PortsNac;
@@ -46,7 +47,9 @@ use App\Models\Vlan;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Config;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Discovery\LinkDiscovery;
 use LibreNMS\Interfaces\Discovery\MacAccountingDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -85,7 +88,8 @@ class Cisco extends OS implements
     StorageDiscovery,
     TransceiverDiscovery,
     VlanDiscovery,
-    VlanPortDiscovery
+    VlanPortDiscovery,
+    LinkDiscovery
 {
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
@@ -1181,5 +1185,49 @@ class Cisco extends OS implements
         }
 
         return $macs;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function discoverLinks(): Collection
+    {
+        $links = new Collection;
+
+        $cdp_array = SnmpQuery::hideMib()->walk('CISCO-CDP-MIB::cdpCache')->table(2);
+        $data = [];
+        $remote_device_id = 0;
+
+        foreach ($cdp_array as $key => $cdp_if_array) {
+            $interface = \App\Facades\PortCache::getByIfIndex($key, $this->getDeviceId());
+
+            foreach ($cdp_if_array as $data) {
+                $data['cdpCacheDeviceId'] = StringHelpers::linksRemSysName($data['cdpCacheDeviceId'] ?? '');
+                if (empty($data['cdpCacheDeviceId'])) {
+                    continue;
+                }
+
+                $cdp_ip = (isset($data['cdpCacheAddress'])) ? IP::fromHexString($data['cdpCacheAddress'], true) : null;
+                $remote_device_id = find_device_id($data['cdpCacheDeviceId'], $cdp_ip);
+            }
+
+            if (! empty($interface['port_id']) && $data['cdpCacheDeviceId'] && $data['cdpCacheDevicePort']) {
+                $remote_port_id = find_port_id($data['cdpCacheDevicePort'], '', $remote_device_id);
+                $sufix = (! empty($cdp_ip)) ? '#' . $cdp_ip : '';
+                $links->push(new Link([
+                    'local_port_id' => $interface['port_id'],
+                    'remote_hostname' => $data['cdpCacheDeviceId'] ?? '',
+                    'remote_device_id' => $remote_device_id,
+                    'remote_port_id' => $remote_port_id,
+                    'active' => 1,
+                    'protocol' => 'cdp' . $sufix,
+                    'remote_port' => $data['cdpCacheDevicePort'] ?? '',
+                    'remote_platform' => $data['cdpCachePlatform'] ?? '',
+                    'remote_version' => $data['cdpCacheVersion'] ?? '',
+                ]));
+            }
+        }
+
+        return $links;
     }
 }

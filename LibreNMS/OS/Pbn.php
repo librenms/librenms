@@ -26,11 +26,17 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
+use App\Models\Link;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Discovery\LinkDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
-class Pbn extends OS implements ProcessorDiscovery
+class Pbn extends OS implements ProcessorDiscovery, LinkDiscovery
 {
     public function __construct(&$device)
     {
@@ -59,5 +65,35 @@ class Pbn extends OS implements ProcessorDiscovery
                 0
             ),
         ];
+    }
+
+    public function discoverLinks(): Collection
+    {
+        $links = new Collection;
+
+        Log::info('NMS-LLDP-MIB:');
+        $lldp_array = SnmpQuery::hideMib()->walk('NMS-LLDP-MIB::lldpRemoteSystemsData')->table(2);
+        foreach ($lldp_array as $lldp_array_inner) {
+            foreach ($lldp_array_inner as $lldp) {
+                $interface = PortCache::getByIfIndex($lldp['lldpRemLocalPortNum'] ?? null, $this->getDeviceId());
+                $remote_device_id = find_device_id($lldp['lldpRemSysName'] ?? null);
+                if ($interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
+                    $remote_port_id = find_port_id($lldp['lldpRemPortDesc'], $lldp['lldpRemPortId'], $remote_device_id);
+                    $links->push(new Link([
+                        'local_port_id' => $interface['port_id'],
+                        'remote_hostname' => $lldp['lldpRemSysName'],
+                        'remote_device_id' => $remote_device_id,
+                        'remote_port_id' => $remote_port_id,
+                        'active' => 1,
+                        'protocol' => 'lldp',
+                        'remote_port' => $lldp['lldpRemPortId'] ?? '',
+                        'remote_platform' => null,
+                        'remote_version' => $lldp['lldpRemSysDesc'] ?? '',
+                    ]));
+                }
+            }
+        }
+
+        return $links->filter();
     }
 }
