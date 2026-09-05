@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Util;
 
+use App\Events\SnmpQueryExecuted;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Polling\Measure\Measurement;
@@ -33,7 +34,6 @@ use DeviceCache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\SnmpResponse;
-use Log;
 use Symfony\Component\Process\Process;
 
 class NetSnmpTranslate
@@ -181,23 +181,31 @@ class NetSnmpTranslate
     private function exec(string $command, array $oids): SnmpResponse
     {
         $measure = Measurement::start($command);
-        $proc = new Process($this->buildCli($command, $oids));
+        $cliCommand = $this->buildCli($command, $oids);
+        $proc = new Process($cliCommand);
         $proc->setTimeout(LibrenmsConfig::get('snmp.exec_timeout', 1200));
 
-        $this->logCommand($proc->getCommandLine());
-
         $proc->run();
-        $exitCode = $proc->getExitCode();
-        $output = $proc->getOutput();
-        $stderr = $proc->getErrorOutput();
 
-        // check exit code and log errors
-        $this->checkExitCode($exitCode, $stderr);
-        $this->logOutput($output, $stderr);
+        $response = new SnmpResponse(
+            $proc->getOutput(),
+            $proc->getErrorOutput(),
+            $proc->getExitCode(),
+        );
+
+        event(new SnmpQueryExecuted(
+            method: $command,
+            oids: $oids,
+            cliCommand: $cliCommand,
+            response: $response,
+            device: $this->device,
+            mibs: $this->mibs,
+            mibDir: implode(':', $this->mibDirs),
+        ));
 
         $measure->manager()->recordSnmp($measure->end());
 
-        return new SnmpResponse($output, $stderr, $exitCode);
+        return $response;
     }
 
     private function mibDirectories(): string
@@ -228,27 +236,5 @@ class NetSnmpTranslate
         $dirs = array_unique(array_filter(array_map(fn ($dir) => rtrim((string) $dir, '/'), $dirs)));
 
         return implode(':', $dirs);
-    }
-
-    private function checkExitCode(int $code, string $error): void
-    {
-        if ($code) {
-            Log::debug('Exitcode: ' . $code, [$error]);
-        }
-    }
-
-    private function logCommand(string $command): void
-    {
-        if (Debug::isEnabled() || Debug::isVerbose()) {
-            Log::debug('SNMP[%c' . $command . '%n]', ['color' => true]);
-        }
-    }
-
-    private function logOutput(string $output, string $error): void
-    {
-        if (Debug::isEnabled() || Debug::isVerbose()) {
-            Log::debug($output);
-        }
-        Log::debug($error);
     }
 }
