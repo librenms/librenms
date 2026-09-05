@@ -27,7 +27,7 @@ class DeviceMtuTest
         }
 
         if (LibrenmsConfig::get('mtu_options.command', 'fping') == 'ping') {
-            return (new Ping())->testMtu($device->pollerTarget(), $this->bytes);
+            return (new Ping())->testMtu($device->pollerTarget(), $this->bytes, $device->ipFamily());
         }
 
         return (new Fping())->testMtu($device->pollerTarget(), $this->bytes, $device->ipFamily());

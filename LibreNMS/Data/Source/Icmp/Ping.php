@@ -27,6 +27,7 @@
 namespace LibreNMS\Data\Source\Icmp;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Enum\AddressFamily;
 use Log;
 use Symfony\Component\Process\Process;
 
@@ -45,18 +46,18 @@ class Ping
      * @param  string  $host  hostname or ip
      * @param  int  $size  packet size in bytes (headers included)
      */
-    public function testMtu(string $host, int $size): bool
+    public function testMtu(string $host, int $size, AddressFamily $address_family = AddressFamily::IPv4): bool
     {
         $bytes = $size > 28 ? $size - 28 : $size;
 
-        $cmd = [
-            $this->ping_bin,
+        $args = [
             '-c', '1',
             '-M', 'dont',
             '-s', (string) $bytes,
             '-w', '4',
             $host,
         ];
+        $cmd = array_merge($this->pingCommand($address_family), $args);
 
         Log::debug('[MTU] ' . implode(' ', $cmd) . PHP_EOL);
 
@@ -65,5 +66,19 @@ class Ping
         $process->run();
 
         return $process->isSuccessful();
+    }
+
+    /**
+     * Get the fping command for a given address family
+     *
+     * @return string[]
+     */
+    private function pingCommand(?AddressFamily $af = null): array
+    {
+        return match ($af) {
+            AddressFamily::IPv4 => [$this->ping_bin, '-4'],
+            AddressFamily::IPv6 => [$this->ping_bin, '-6'],
+            default => [$this->ping_bin],
+        };
     }
 }
