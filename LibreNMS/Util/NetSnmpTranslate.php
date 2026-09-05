@@ -169,7 +169,7 @@ class NetSnmpTranslate
     {
         $cmd = [LibrenmsConfig::get($command, $command)];
 
-        array_push($cmd, '-M', $this->mibDirectories());
+        array_push($cmd, '-M', Mib::mibDirectories($this->device, $this->mibDirs));
         array_push($cmd, '-m', implode(':', $this->mibs));
 
         return array_merge($cmd, $this->options, $oids);
@@ -206,35 +206,5 @@ class NetSnmpTranslate
         $measure->manager()->recordSnmp($measure->end());
 
         return $response;
-    }
-
-    private function mibDirectories(): string
-    {
-        $base = LibrenmsConfig::get('mib_dir');
-        $dirs = [$base];
-
-        // os group
-        if ($os_group = LibrenmsConfig::getOsSetting($this->device->os, 'group')) {
-            if (file_exists("$base/$os_group")) {
-                $dirs[] = "$base/$os_group";
-            }
-        }
-
-        // os directory
-        $os_mibdir = LibrenmsConfig::getOsSetting($this->device->os, 'mib_dir');
-        if ($os_mibdir && is_string($os_mibdir)) {
-            $dirs[] = "$base/$os_mibdir";
-        } elseif (file_exists($base . '/' . $this->device->os)) {
-            $dirs[] = $base . '/' . $this->device->os;
-        }
-
-        foreach ($this->mibDirs as $mibDir) {
-            $dirs[] = "$base/$mibDir";
-        }
-
-        // remove trailing /, remove empty dirs, and remove duplicates
-        $dirs = array_unique(array_filter(array_map(fn ($dir) => rtrim((string) $dir, '/'), $dirs)));
-
-        return implode(':', $dirs);
     }
 }
