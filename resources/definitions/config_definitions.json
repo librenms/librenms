@@ -5374,6 +5374,17 @@
                 "value": "int|nullable|between:9,65535"
             }
         },
+        "mtu_options.command": {
+            "default": "fping",
+            "group": "poller",
+            "section": "mtu",
+            "order": 2,
+            "type": "select",
+            "options": {
+                "fping": "FPing",
+                "ping": "Ping"
+            }
+        },
         "mydomain": {
             "type": "text",
             "group": "discovery",
@@ -5954,6 +5965,13 @@
         },
         "php_memory_limit": {
             "type": "integer"
+        },
+        "ping": {
+            "default": "ping",
+            "group": "external",
+            "section": "binaries",
+            "order": 1,
+            "type": "executable"
         },
         "plugin_dir": {
             "type": "directory"

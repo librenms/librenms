@@ -5,15 +5,14 @@ namespace App\Actions\Device;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use LibreNMS\Data\Source\Icmp\Fping;
+use LibreNMS\Data\Source\Icmp\Ping;
 use LibreNMS\Polling\ConnectivityHelper;
 
 class DeviceMtuTest
 {
     private readonly ?int $bytes;
 
-    public function __construct(
-        private readonly Fping $fping,
-    ) {
+    public function __construct() {
         $this->bytes = LibrenmsConfig::get('mtu_options.bytes');
     }
 
@@ -27,6 +26,10 @@ class DeviceMtuTest
             return true;
         }
 
-        return $this->fping->testMtu($device->pollerTarget(), $this->bytes, $device->ipFamily());
+        if (LibrenmsConfig::get('mtu_options.command', 'fping') == 'ping') {
+            return (new Ping())->testMtu($device->pollerTarget(), $this->bytes);
+        }
+
+        return (new Fping())->testMtu($device->pollerTarget(), $this->bytes, $device->ipFamily());
     }
 }

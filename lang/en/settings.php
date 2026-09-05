@@ -1532,6 +1532,10 @@ return [
                 'description' => 'MTU test packet size',
                 'help' => 'Size of packets for MTU test in bytes (blank to disable MTU tests)',
             ],
+            'command' => [
+                'description' => 'MTU test command',
+                'help' => 'FPing is good for many systems.  Ping will set the -M dont flag to prevent PMTU discovery, which is not supported by fping.',
+            ],
         ],
         'mydomain' => [
             'description' => 'Primary Domain',
@@ -1694,6 +1698,9 @@ return [
                     'description' => 'Enable user access via dynamic Device Groups',
                 ],
             ],
+        ],
+        'ping' => [
+            'description' => 'Path to ping',
         ],
         'bad_if' => [
             'description' => 'Bad Interface ifDescr',

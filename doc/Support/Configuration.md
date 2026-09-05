@@ -768,21 +768,7 @@ without fragmentation. It tests two-way communication. The packets can
 still need fragmentation at any point on the path.
 
 If you have many devices that require fragmentation with the chosen MTU setting and start getting false
-positives, you may need to disable PMTU discovery.  The standard Linux ping can do this with the "-M dont"
-command argument, but fping does not support this.
-
-One option to resolve the false positive alerts is to disable PMTU discovery as follows:
-
-```bash
-echo 1 > /proc/sys/net/ipv4/ip_no_pmtu_disc
-```
-
-You will need to add the following line to `/etc/sysctl.conf` or `/etc/sysctl.d/librenms.conf` to keep the
-setting across reboots.
-
-```
-net.ipv4.ip_no_pmtu_disc = 1
-```
+positives, you should change your system to use the ping command for MTU checks.
 
 ## Auto discovery settings
 
