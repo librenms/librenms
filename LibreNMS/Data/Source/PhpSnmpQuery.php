@@ -217,8 +217,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function allowUnordered(): SnmpQueryInterface
     {
-        $this->options->oid_increasing_check = false;
-        $this->snmp->oid_increasing_check = false;
+        $this->options->oid_increasing_check = $this->snmp->oid_increasing_check = false;
 
         return $this;
     }
@@ -287,7 +286,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function options($options = []): SnmpQueryInterface
     {
-        $this->options->setOptions($options);
+        $this->options->parseOptions($options)->setOptions($this->snmp);
 
         return $this;
     }

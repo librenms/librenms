@@ -64,7 +64,7 @@ class PhpSnmpOptions
         return $this;
     }
 
-    public function library_defaults(): PhpSnmpOptions
+    public function libraryDefaults(): PhpSnmpOptions
     {
         $this->oid_increasing_check = false;
         $this->quick_print = false;
@@ -86,7 +86,7 @@ class PhpSnmpOptions
      *
      * @param  string[]|string|null  $options
      */
-    public function parse_options($options = []): PhpSnmpOptions
+    public function parseOptions($options = []): PhpSnmpOptions
     {
         if (is_null($options)) {
             return $this->defaults();
@@ -97,7 +97,7 @@ class PhpSnmpOptions
         }
 
         // Reset all options to library defaults
-        $this->library_defaults();
+        $this->libraryDefaults();
 
         // Parse options, returning the NetSnmp object if we come across an unknown option
         foreach ($options as $option) {
