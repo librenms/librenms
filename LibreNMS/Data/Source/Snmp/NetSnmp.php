@@ -43,7 +43,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslateBackendInterface
 
     public function walk(SnmpTarget $target, string $oid, SnmpQueryOptions $options, string $context): SnmpResponse
     {
-        $command = ($target->config->version !== 'v1' && $options->bulk) ? 'snmpbulkwalk' : 'snmpwalk';
+        $command = $options->bulk ? 'snmpbulkwalk' : 'snmpwalk';
         $cliCommand = $this->buildCli($command, $target, [$oid], $options, $context);
 
         return $this->runCommand($cliCommand);
@@ -60,7 +60,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslateBackendInterface
     {
         $oidObj = new Oid($oid);
         $cmd = [LibrenmsConfig::get('snmptranslate', 'snmptranslate')];
-        array_push($cmd, '-M', $this->formatMibDirs($options));
+        array_push($cmd, '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]));
         array_push($cmd, '-m', implode(':', $options->mibs));
 
         if ($options->outputOidsNumerically) {
@@ -92,7 +92,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslateBackendInterface
     {
         $cmd = $this->initCommand($command, $target, $options);
 
-        array_push($cmd, '-M', $this->formatMibDirs($options));
+        array_push($cmd, '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]));
         array_push($cmd, '-m', implode(':', $options->mibs));
 
         $this->buildAuth($cmd, $target, $context);
@@ -184,14 +184,6 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslateBackendInterface
         return $flags;
     }
 
-    private function formatMibDirs(SnmpQueryOptions $options): string
-    {
-        $dirs = $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')];
-        $dirs = array_unique(array_filter(array_map(fn ($dir) => rtrim((string) $dir, '/'), $dirs)));
-
-        return implode(':', $dirs);
-    }
-
     private function runCommand(array $cliCommand): SnmpResponse
     {
         $proc = new Process($cliCommand);
@@ -203,6 +195,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslateBackendInterface
             $proc->getOutput(),
             $proc->getErrorOutput(),
             $proc->getExitCode(),
+            $cliCommand,
         );
     }
 }

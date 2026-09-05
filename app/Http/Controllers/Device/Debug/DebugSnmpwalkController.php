@@ -32,8 +32,10 @@ use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Validation\Rule;
-use LibreNMS\Data\Source\SnmpQuery;
-use ReflectionMethod;
+use LibreNMS\Data\Source\Snmp\NetSnmp;
+use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
+use LibreNMS\Data\Source\Snmp\SnmpTarget;
+use LibreNMS\Util\Mib;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DebugSnmpwalkController extends Controller
@@ -66,15 +68,13 @@ class DebugSnmpwalkController extends Controller
 
     /**
      * @return array<int, string>
-     *
-     * @throws \ReflectionException
      */
     private function buildCommandLine(Device $device): array
     {
-        $query = SnmpQuery::make()->device($device)->options(['-OUneb']);
+        $target = SnmpTarget::fromDevice($device);
+        $options = SnmpQueryOptions::fromCli(['-OUneb']);
+        $options->mibDirs = Mib::directories($device);
 
-        $buildCli = new ReflectionMethod($query, 'buildCli'); // FIXME
-
-        return $buildCli->invoke($query, 'snmpwalk', ['.']);
+        return app(NetSnmp::class)->buildCli('snmpwalk', $target, ['.'], $options, $device->context ?? '');
     }
 }

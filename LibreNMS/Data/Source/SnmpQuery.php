@@ -33,12 +33,12 @@ use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Source\Snmp\NetSnmp;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpTarget;
 use LibreNMS\Data\Source\Snmp\SnmpTranslateBackendInterface;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Mib;
 use LibreNMS\Util\Oid;
 use Log;
 
@@ -318,7 +318,7 @@ class SnmpQuery implements SnmpQueryInterface
         }
 
         $options = clone $this->options;
-        $options->mibDirs = $this->mibDirectories();
+        $options->mibDirs = Mib::directories($this->device, $this->options->mibDirs);
 
         return $this->translateBackend->translate((string) $oid, $options);
     }
@@ -331,7 +331,7 @@ class SnmpQuery implements SnmpQueryInterface
     private function prepareOptions(array $oids, bool $walk = false): SnmpQueryOptions
     {
         $options = clone $this->options;
-        $options->mibDirs = $this->mibDirectories();
+        $options->mibDirs = Mib::directories($this->device, $this->options->mibDirs);
 
         if ($walk) {
             if (! empty(array_intersect($oids, LibrenmsConfig::getCombined($this->device->os, 'oids.unordered', 'snmp.')))) {
@@ -356,21 +356,11 @@ class SnmpQuery implements SnmpQueryInterface
 
             $response = $callback();
 
-            $cliCommand = $this->backend instanceof NetSnmp
-                ? $this->backend->buildCli(
-                    ($command === 'snmpwalk' && $this->device->snmpver !== 'v1' && $options->bulk) ? 'snmpbulkwalk' : $command,
-                    $this->getTarget(),
-                    $oids,
-                    $options,
-                    $this->context
-                )
-                : [];
-
             event(new SnmpQueryExecuted(
                 method: $command,
                 oids: $oids,
-                cliCommand: $cliCommand,
                 response: $response,
+                cliCommand: $response->command,
                 device: $this->device,
                 context: $this->context,
                 mibs: $options->mibs,
@@ -405,33 +395,6 @@ class SnmpQuery implements SnmpQueryInterface
         }
 
         return Cache::driver($driver)->rememberForever($key, $execute);
-    }
-
-    private function mibDirectories(): array
-    {
-        $base = LibrenmsConfig::get('mib_dir');
-        $dirs = [$base];
-
-        // os group
-        if ($os_group = LibrenmsConfig::getOsSetting($this->device->os, 'group')) {
-            if (file_exists("$base/$os_group")) {
-                $dirs[] = "$base/$os_group";
-            }
-        }
-
-        // os directory
-        $os_mibdir = LibrenmsConfig::getOsSetting($this->device->os, 'mib_dir');
-        if ($os_mibdir && is_string($os_mibdir)) {
-            $dirs[] = "$base/$os_mibdir";
-        } elseif (file_exists($base . '/' . $this->device->os)) {
-            $dirs[] = $base . '/' . $this->device->os;
-        }
-
-        foreach ($this->options->mibDirs as $mibDir) {
-            $dirs[] = "$base/$mibDir";
-        }
-
-        return array_values(array_unique(array_filter(array_map(fn ($dir) => rtrim((string) $dir, '/'), $dirs))));
     }
 
     private function limitOids(array $oids, SnmpTarget $target): array
