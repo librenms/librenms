@@ -73,9 +73,9 @@ final class SyslogLostConnectionTest extends DBTestCase
         try {
             $killed = $this->killCurrentConnection();
 
-            $entry = $this->processor->process($this->message($device->hostname), false);
+            $entry = $this->processor->process($this->message($device->hostname));
 
-            $this->assertEquals($device->device_id, $entry['device_id'], 'Expected the lookup to survive the lost connection.');
+            $this->assertEquals($device->device_id, $entry->device_id, 'Expected the lookup to survive the lost connection.');
             $this->assertNotSame($killed, $this->connectionId(), 'Expected a new connection, not the killed one.');
         } finally {
             $device->delete();
@@ -100,21 +100,9 @@ final class SyslogLostConnectionTest extends DBTestCase
         }
     }
 
-    /**
-     * @return array<string, string>
-     */
-    private function message(string $host): array
+    private function message(string $host): string
     {
-        return [
-            'host' => $host,
-            'facility' => 'local7',
-            'priority' => 'info',
-            'level' => 'info',
-            'tag' => '0e',
-            'timestamp' => '2024-01-01 00:00:00',
-            'msg' => 'lost connection test',
-            'program' => 'TEST',
-        ];
+        return "$host||local7||info||info||0e||2024-01-01 00:00:00||lost connection test||TEST";
     }
 
     /**
