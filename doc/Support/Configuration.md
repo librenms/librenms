@@ -763,26 +763,20 @@ pings enabled. The setting below enables the MTU check:
 
 To disable the MTU test, set the packet size to null (the default).
 
-The MTU check does not test whether the packets cross the network
-without fragmentation. It tests two-way communication. The packets can
-still need fragmentation at any point on the path.
+The MTU check has 3 options regarding fragmentation.
+- Allow: Will allow any router on the path to fragment the packets as needed
+- PMTU: Will allow routers to signal the poller to fragment the packets
+- Not Allowed: Will prevent any frgmentation
 
-If you have many devices that require fragmentation with the chosen MTU setting and start getting false
-positives, you may need to disable PMTU discovery.  The standard Linux ping can do this with the "-M dont"
-command argument, but fping does not support this.
+Select the appropriate setting for your network.  The first 2 will make
+sure that packets of the chosen size can traverse the network even if
+fragmentation is required, and will pick up instances where a layer 2
+MTU is dropping packets.  The third option will make sure that the chosen
+packet size can traverse your network end to end.
 
-One option to resolve the false positive alerts is to disable PMTU discovery as follows:
-
-```bash
-echo 1 > /proc/sys/net/ipv4/ip_no_pmtu_disc
-```
-
-You will need to add the following line to `/etc/sysctl.conf` or `/etc/sysctl.d/librenms.conf` to keep the
-setting across reboots.
-
-```
-net.ipv4.ip_no_pmtu_disc = 1
-```
+If you get a lot of intermittent false alerts with PMTU, it is possible
+that you are hitting a rate limit on a router sending the need to fragment
+packets, and you should switch to Allow to resolve the issues.
 
 ## Auto discovery settings
 
