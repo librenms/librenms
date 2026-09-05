@@ -35,7 +35,6 @@ use Illuminate\Validation\Rule;
 use LibreNMS\Data\Source\Snmp\NetSnmp;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpTarget;
-use LibreNMS\Util\Mib;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DebugSnmpwalkController extends Controller
@@ -71,10 +70,9 @@ class DebugSnmpwalkController extends Controller
      */
     private function buildCommandLine(Device $device): array
     {
-        $target = SnmpTarget::fromDevice($device);
-        $options = SnmpQueryOptions::fromCli(['-OUneb']);
-        $options->mibDirs = Mib::directories($device);
-
-        return app(NetSnmp::class)->buildCli('snmpwalk', $target, ['.'], $options, $device->context ?? '');
+        return app(NetSnmp::class)->buildCli('snmpwalk', SnmpTarget::fromDevice($device), ['.'], new SnmpQueryOptions(
+            outputOidsNumerically: true,
+            outputIndexesNumerically: true,
+        ), $device->context ?? '');
     }
 }

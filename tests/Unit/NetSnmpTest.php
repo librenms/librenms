@@ -312,9 +312,5 @@ class NetSnmpTest extends TestCase
         $this->assertContains('-On', $cmd);
         $this->assertContains('-Ob', $cmd);
         $this->assertContains('.', $cmd);
-
-        $mIndex = array_search('-M', $cmd, true);
-        $this->assertNotFalse($mIndex);
-        $this->assertStringContainsString('cisco', $cmd[$mIndex + 1]);
     }
 }
