@@ -1,7 +1,7 @@
 <?php
 
 /*
- * SNMP.php
+ * PhpSnmpQuery.php
  *
  * -Description-
  *
@@ -20,8 +20,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2021 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2026 Steven Wilton
+ * @author     Steven Wilton <swilton@fluentit.au>
  */
 
 namespace LibreNMS\Data\Source;
@@ -38,37 +38,9 @@ use Log;
 
 class PhpSnmpQuery implements SnmpQueryInterface
 {
-    private const DEFAULT_OPTIONS = [
-        'oid_increasing_check' => true,
-        'quick_print' => true,
-        'enum_print' => true,
-        'numeric_index' => false,
-        'numeric_timeticks' => true,
-        'extended_index' => true,
-        'dont_print_units' => true,
-        'escape_quotes' => false,
-        'print_hex_text' => false,
-        'string_output_format' => \Snmp\StringOutput::Guess, /** @phpstan-ignore class.notFound */
-        'oid_output_format' => \Snmp\OidOutput::Module, /** @phpstan-ignore class.notFound */
-    ];
-
-    private const LIBRARY_DEFAULT_OPTIONS = [
-        'oid_increasing_check' => false,
-        'quick_print' => false,
-        'enum_print' => false,
-        'numeric_index' => false,
-        'numeric_timeticks' => false,
-        'extended_index' => false,
-        'dont_print_units' => false,
-        'escape_quotes' => false,
-        'print_hex_text' => false,
-        'string_output_format' => \Snmp\StringOutput::Guess, /** @phpstan-ignore class.notFound */
-        'oid_output_format' => \Snmp\OidOutput::Module, /** @phpstan-ignore class.notFound */
-    ];
-
     /** @var string[] */
     private array $mibDirs = [];
-    private array $options = self::DEFAULT_OPTIONS;
+    private PhpSnmpOptions $options;
     /** @var string[] */
     private array $mibs = [];
     private Device $device;
@@ -79,6 +51,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
     public function __construct()
     {
+        $this->options = new PhpSnmpOptions();
         $this->device(DeviceCache::getPrimary());
     }
 
@@ -116,7 +89,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         }
 
         // Set SNMP options for the new SNMP object
-        $this->setOptions();
+        $this->options->setOptions($this->snmp);
 
         return $this;
     }
@@ -151,7 +124,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
                 );
 
                 // Set SNMP options for the new SNMP object
-                $this->setOptions();
+                $this->options->setOptions($this->snmp);
             }
         } else {
             if ($this->device->snmpver === 'v3') {
@@ -166,7 +139,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
                 );
 
                 // Set SNMP options for the new SNMP object
-                $this->setOptions();
+                $this->options->setOptions($this->snmp);
             }
         }
 
@@ -244,7 +217,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function allowUnordered(): SnmpQueryInterface
     {
-        $this->options['oid_increasing_check'] = false;
+        $this->options->oid_increasing_check = false;
         $this->snmp->oid_increasing_check = false;
 
         return $this;
@@ -255,7 +228,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function numeric(bool $numeric = true): SnmpQueryInterface
     {
-        $this->options['oid_output_format'] = ($numeric ? \Snmp\OidOutput::Numeric : \Snmp\OidOutput::Module); /** @phpstan-ignore class.notFound, class.notFound */
+        $this->options->oid_output_format = ($numeric ? \Snmp\OidOutput::Numeric : \Snmp\OidOutput::Module); /** @phpstan-ignore class.notFound, class.notFound */
         $this->snmp->setOidOutputFormat($numeric ? \Snmp\OidOutput::Numeric : \Snmp\OidOutput::Module); /** @phpstan-ignore method.notFound, class.notFound, class.notFound */
 
         return $this;
@@ -266,8 +239,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function numericIndex(bool $numericIndex = true): SnmpQueryInterface
     {
-        $this->options['numeric_index'] = true;
-        $this->snmp->numeric_index = true;  /** @phpstan-ignore property.notFound */
+        $this->options->numeric_index = $this->snmp->numeric_index = true;  /** @phpstan-ignore property.notFound */
 
         return $this;
     }
@@ -277,7 +249,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function hideMib(): SnmpQueryInterface
     {
-        $this->options['oid_output_format'] = \Snmp\OidOutput::Suffix; /** @phpstan-ignore class.notFound */
+        $this->options->oid_output_format = \Snmp\OidOutput::Suffix; /** @phpstan-ignore class.notFound */
         $this->snmp->setOidOutputFormat(\Snmp\OidOutput::Suffix); /** @phpstan-ignore method.notFound, class.notFound */
 
         return $this;
@@ -288,8 +260,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function enumStrings(): SnmpQueryInterface
     {
-        $this->options['enum_print'] = false;
-        $this->snmp->enum_print = false;
+        $this->options->enum_print = $this->snmp->enum_print = false;
 
         return $this;
     }
@@ -309,110 +280,14 @@ class PhpSnmpQuery implements SnmpQueryInterface
     }
 
     /**
-     * Set option(s) for net-snmp command line. Overrides the default options.
-     * Some options may break parsing, but you can manually parse the raw output if needed.
-     * This will override other options set such as setting numeric.
-     * Calling with null will reset to the default options (-OQXUte).
+     * Set option(s) based on net-snmp command line options. Overrides the default options.
      * Try to avoid setting options this way to keep the API generic.
      *
      * @param  string[]|string|null  $options
      */
     public function options($options = []): SnmpQueryInterface
     {
-        if (is_null($options)) {
-            $this->options = self::DEFAULT_OPTIONS;
-
-            return $this->setOptions();
-        }
-
-        if (is_string($options)) {
-            $options = [$options];
-        }
-
-        // Reset all options to library defaults
-        $this->options = self::LIBRARY_DEFAULT_OPTIONS;
-
-        // Parse options, returning the NetSnmp object if we come across an unknown option
-        foreach ($options as $option) {
-            if ($option === '-Ci') {
-                $this->options['oid_increasing_check'] = false;
-            } elseif ($option === '-Pu') {
-                // Do nothing - we always accept underscores in MIBs
-            } elseif ($option === '-Ih') {
-                // Ignore input options for GET requests
-            } elseif (str_starts_with((string) $option, '-O')) {
-                foreach (str_split(substr((string) $option, 2)) as $outopt) {
-                    switch ($outopt) {
-                        case 'a':
-                            $this->options['string_output_format'] = \Snmp\StringOutput::Ascii; /** @phpstan-ignore class.notFound */
-                            break;
-                        case 'x':
-                            $this->options['string_output_format'] = \Snmp\StringOutput::Hex; /** @phpstan-ignore class.notFound */
-                            break;
-                        case 'f':
-                            $this->options['oid_output_format'] = \Snmp\OidOutput::Full; /** @phpstan-ignore class.notFound */
-                            break;
-                        case 's':
-                            $this->options['oid_output_format'] = \Snmp\OidOutput::Suffix; /** @phpstan-ignore class.notFound */
-                            break;
-                        case 'S':
-                            $this->options['oid_output_format'] = \Snmp\OidOutput::Module; /** @phpstan-ignore class.notFound */
-                            break;
-                        case 'u':
-                            $this->options['oid_output_format'] = \Snmp\OidOutput::Ucd; /** @phpstan-ignore class.notFound */
-                            break;
-                        case 'n':
-                            $this->options['oid_output_format'] = \Snmp\OidOutput::Numeric; /** @phpstan-ignore class.notFound */
-                            break;
-                        case 'b':
-                            $this->options['numeric_index'] = true;
-                            break;
-                        case 'e':
-                            $this->options['enum_print'] = true;
-                            break;
-                        case 'E':
-                            $this->options['escape_quotes'] = true;
-                            break;
-                        case 'Q':
-                            $this->options['quick_print'] = true;
-                            break;
-                        case 't':
-                            $this->options['numeric_timeticks'] = true;
-                            break;
-                        case 'T':
-                            $this->options['print_hex_text'] = true;
-                            break;
-                        case 'U':
-                            $this->options['dont_print_units'] = true;
-                            break;
-                        case 'X':
-                            $this->options['extended_index'] = true;
-                            break;
-                        default:
-                            throw new \Exception("Unknown option -C$outopt");
-                    }
-                }
-            } else {
-                throw new \Exception("Unknown option $option");
-            }
-        }
-
-        return $this->setOptions();
-    }
-
-    /**
-     * Set the SNMP object to the configured options
-     */
-    private function setOptions(): SnmpQueryInterface
-    {
-        foreach ($this->options as $prop => $val) {
-            if (\is_bool($val)) {
-                $this->snmp->$prop = $val;
-            }
-        }
-
-        $this->snmp->setStringOutputFormat($this->options['string_output_format']); /** @phpstan-ignore method.notFound */
-        $this->snmp->setOidOutputFormat($this->options['oid_output_format']); /** @phpstan-ignore method.notFound */
+        $this->options->setOptions($options);
 
         return $this;
     }
