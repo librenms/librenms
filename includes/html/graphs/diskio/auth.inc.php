@@ -8,8 +8,7 @@ if (is_numeric($vars['id'])) {
 
         $rrd_filename = Rrd::name($disk['hostname'], ['ucd_diskio', $disk['diskio_descr']]);
 
-        $title = generate_device_link($device);
-        $title .= ' :: Disk :: ' . htmlentities((string) $disk['diskio_descr']);
+        $title = ' :: Disk :: ' . $disk['diskio_descr'];
         $auth = true;
     }
 }
