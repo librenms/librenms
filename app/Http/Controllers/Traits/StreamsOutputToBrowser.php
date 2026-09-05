@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Traits;
 
+use App\Logging\CliColorFormatter;
 use App\Logging\NoColorFormatter;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Support\Facades\Log;
@@ -38,7 +39,11 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 trait StreamsOutputToBrowser
 {
+    private bool $bufferedOutput = false;
+    private bool $colour = false;
     private ?string $downloadFile = null;
+    private bool $logfile = false;
+    private Level $loglevel = Level::Info;
     private ?OutputStyle $outputBuffer = null;
 
     protected function stream(callable $function): StreamedResponse
@@ -46,13 +51,35 @@ trait StreamsOutputToBrowser
         return new StreamedResponse(function () use ($function): void {
             $this->setupLogger();
 
-            while (ob_get_level() > 0) {
-                ob_end_flush();
+            if (! $this->bufferedOutput) {
+                while (ob_get_level() > 0) {
+                    ob_end_flush();
+                }
+                ob_implicit_flush();
             }
-            ob_implicit_flush();
 
             $function();
         }, 200, $this->headers());
+    }
+
+    protected function enableBufferedOutput(): void
+    {
+        $this->bufferedOutput = true;
+    }
+
+    protected function enableColour(): void
+    {
+        $this->colour = true;
+    }
+
+    protected function enableLogFile(): void
+    {
+        $this->logfile = true;
+    }
+
+    protected function setLogLevel(Level $level): void
+    {
+        $this->loglevel = $level;
     }
 
     protected function enableDownload(string $downloadFile): void
@@ -97,13 +124,22 @@ trait StreamsOutputToBrowser
 
     private function setupLogger(): void
     {
+        $formatter = $this->colour ? (new CliColorFormatter())->forceColor(true) : new NoColorFormatter();
         config(['logging.channels.stream' => [
             'driver' => 'custom',
             'via' => fn (): Logger => new Logger('stream', [
-                (new StreamHandler('php://output', Level::Debug))->setFormatter(new NoColorFormatter()),
+                (new StreamHandler('php://output', $this->loglevel))->setFormatter($formatter),
             ]),
-            'level' => 'debug',
         ]]);
-        Log::setDefaultDriver('stream');
+        if ($this->logfile) {
+            config(['logging.channels.stream_and_log' => [
+                'driver' => 'stack',
+                'channels' => ['log_file', 'stream'],
+                'ignore_exceptions' => false,
+            ]]);
+            Log::setDefaultDriver('stream_and_log');
+        } else {
+            Log::setDefaultDriver('stream');
+        }
     }
 }

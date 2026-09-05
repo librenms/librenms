@@ -119,6 +119,11 @@ Route::prefix('v0')->group(function (): void {
     // Poller Groups
     Route::get('poller_group/{poller_group_id_or_name?}', [App\Api\Controllers\LegacyApiController::class, 'get_poller_group'])->name('get_poller_group')->middleware('can:viewAny,App\Models\PollerGroup');
 
+    Route::prefix('cmd')->group(function (): void {
+        Route::get('{device}/discover', [App\Api\Controllers\ArtisanCommandController::class, 'discover'])->name('discover_device');
+        Route::get('{device}/poll', [App\Api\Controllers\ArtisanCommandController::class, 'poll'])->name('poll_device');
+    });
+
     // Device actions / details (restricted by access)
     Route::prefix('devices')->group(function (): void {
         Route::middleware('can:viewAny,App\Models\Device')->group(function (): void {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * DebugProcessController.php
+ * ArtisanCommandController.php
  *
  * -Description-
  *
@@ -24,7 +24,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Controllers\Device\Debug;
+namespace App\Api\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\StreamsOutputToBrowser;
@@ -33,41 +33,59 @@ use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Validation\Rule;
 use Monolog\Level;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class DebugPollAndDiscoveryController extends Controller
+class ArtisanCommandController extends Controller
 {
     use StreamsOutputToBrowser;
 
-    public function __invoke(Device $device, Request $request): StreamedResponse
+    private function run(Device $device, string $cmd, Request $request): StreamedResponse
     {
         $this->authorize('debug', $device);
 
         $validated = $request->validate([
-            'format' => ['required', Rule::in(['text', 'download'])],
-            'type' => ['required', Rule::in(['poller', 'discovery'])],
+            'buffer' => 'sometimes|boolean',
+            'colour' => 'sometimes|boolean',
+            'quiet' => 'sometimes|boolean',
+            'verbose' => 'sometimes|boolean',
         ]);
 
-        $this->setLogLevel(Level::Debug);
-        if ($validated['format'] == 'download') {
-            $this->enableDownload($validated['type'] . '-' . $device->hostname . '.txt');
+        $this->enableLogFile();
+
+        if ($validated['buffer']) {
+            $this->enableBufferedOutput();
         }
 
-        [$cmd, $args] = match ($validated['type']) {
-            'poller' => ['device:poll', ['device spec' => $device->device_id, '-vv' => true, '--no-data' => true]],
-            default => ['device:discover', ['device spec' => $device->device_id, '-vv' => true]],
-        };
+        if ($validated['colour']) {
+            $this->enableColour();
+        }
+
+        $args = ['device spec' => $device->device_id];
+        if ($validated['quiet']) {
+            $args['-q'] = true;
+            $this->setLogLevel(Level::Emergency);
+        } elseif ($validated['verbose']) {
+            $args['-vv'] = true;
+            $this->setLogLevel(Level::Debug);
+        }
 
         return $this->stream(function () use ($cmd, $args): void {
             Event::forget(CommandStarting::class); // prevent normal cli setup and checks
 
             $exitCode = Artisan::call($cmd, $args, $this->getCliStreamOutput());
 
-            if ($exitCode) {
-                echo PHP_EOL . 'exit_status:' . $exitCode . PHP_EOL;
-            }
+            echo PHP_EOL . 'exit_status:' . $exitCode . PHP_EOL;
         });
+    }
+
+    public function poll(Device $device, Request $request): StreamedResponse
+    {
+        return $this->run($device, 'device:poll', $request);
+    }
+
+    public function discover(Device $device, Request $request): StreamedResponse
+    {
+        return $this->run($device, 'device:discover', $request);
     }
 }

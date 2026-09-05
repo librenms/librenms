@@ -6748,6 +6748,13 @@
             "section": "sensors",
             "order": 4
         },
+        "service_api_key": {
+            "default": null,
+            "group": "poller",
+            "section": "dispatcherservice",
+            "order": 27,
+            "type": "text"
+        },
         "service_poller_workers": {
             "default": 24,
             "group": "poller",

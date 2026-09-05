@@ -1,5 +1,6 @@
 import logging
 import os
+import requests
 import threading
 import time
 import traceback
@@ -695,14 +696,40 @@ class PollerQueueManager(QueueManager):
                 else self.config.log_output
             )
 
-            args_list = ["device:poll", device_id]
-            if self.config.debug:
-                args_list.append("-vv")
-            elif self.config.log_output is LibreNMS.LogOutput.NONE:
-                args_list.append("-q")
-            args = tuple(args_list)
+            if self.config.apikey:
+                url = f"http://localhost/api/v0/cmd/{device_id}/poll"
+                params = {"colour": 1, "buffer": 1}
+                headers = {"X-Auth-Token": self.config.apikey, "Accept-Encoding": ""}
+                if self.config.debug:
+                    params["verbose"] = 1
+                elif self.config.log_output is LibreNMS.LogOutput.NONE:
+                    params["quiet"] = 1
 
-            exit_code, output = LibreNMS.call_script("lnms", args, output)
+                response = requests.get(url, params=params, headers=headers)
+
+                output = response.content.decode().rstrip()
+                if response.ok:
+                    lastline_pos = output.rfind("\n")
+                    if lastline_pos < 0:
+                        exit_code = 0
+                    else:
+                        lastline = output[lastline_pos:]
+                        if lastline.startswith("exit_status:"):
+                            exit_code = int(lastline.split(":")[1])
+                            output = output[:lastline_pos]
+                        else:
+                            exit_code = 0
+                else:
+                    exit_code = 1
+            else:
+                args_list = ["device:poll", device_id]
+                if self.config.debug:
+                    args_list.append("-vv")
+                elif self.config.log_output is LibreNMS.LogOutput.NONE:
+                    args_list.append("-q")
+                args = tuple(args_list)
+
+                exit_code, output = LibreNMS.call_script("lnms", args, output)
 
             if exit_code == 0:
                 self.unlock(device_id)
@@ -765,14 +792,40 @@ class DiscoveryQueueManager(TimedQueueManager):
                 else self.config.log_output
             )
 
-            args_list = ["device:discover", device_id]
-            if self.config.debug:
-                args_list.append("-vv")
-            elif self.config.log_output is LibreNMS.LogOutput.NONE:
-                args_list.append("-q")
-            args = tuple(args_list)
+            if self.config.apikey:
+                url = f"http://localhost/api/v0/cmd/{device_id}/discover"
+                params = {"colour": 1, "buffer": 1}
+                headers = {"X-Auth-Token": self.config.apikey, "Accept-Encoding": ""}
+                if self.config.debug:
+                    params["verbose"] = 1
+                elif self.config.log_output is LibreNMS.LogOutput.NONE:
+                    params["quiet"] = 1
 
-            exit_code, output = LibreNMS.call_script("lnms", args, output)
+                response = requests.get(url, params=params, headers=headers)
+
+                output = response.content.decode().rstrip()
+                if response.ok:
+                    lastline_pos = output.rfind("\n")
+                    if lastline_pos < 0:
+                        exit_code = 0
+                    else:
+                        lastline = output[lastline_pos:]
+                        if lastline.startswith("exit_status:"):
+                            exit_code = int(lastline.split(":")[1])
+                            output = output[:lastline_pos]
+                        else:
+                            exit_code = 0
+                else:
+                    exit_code = 1
+            else:
+                args_list = ["device:discover", device_id]
+                if self.config.debug:
+                    args_list.append("-vv")
+                elif self.config.log_output is LibreNMS.LogOutput.NONE:
+                    args_list.append("-q")
+                args = tuple(args_list)
+
+                exit_code, output = LibreNMS.call_script("lnms", args, output)
 
             if exit_code == 0:
                 self.unlock(device_id)
