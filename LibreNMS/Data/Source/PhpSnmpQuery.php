@@ -40,7 +40,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
 {
     /** @var string[] */
     private array $mibDirs = [];
-    private PhpSnmpOptions $options;
+    private readonly PhpSnmpOptions $options;
     /** @var string[] */
     private array $mibs = [];
     private Device $device;
@@ -283,6 +283,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      * Try to avoid setting options this way to keep the API generic.
      *
      * @param  string[]|string|null  $options
+     * @return $this
      */
     public function options($options = []): SnmpQueryInterface
     {
@@ -531,6 +532,8 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
     private function netsnmp(): SnmpQueryInterface
     {
+        Log::warning('PhpSnmp is falling through to NetSnmp');
+
         // TODO: set options, etc
         $ret = (new NetSnmpQuery())->device($this->device);
 
