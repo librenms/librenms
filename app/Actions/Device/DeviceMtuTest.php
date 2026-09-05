@@ -11,9 +11,16 @@ use LibreNMS\Polling\ConnectivityHelper;
 class DeviceMtuTest
 {
     private readonly ?int $bytes;
+    private Ping|Fping $tester;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->bytes = LibrenmsConfig::get('mtu_options.bytes');
+
+        $this->tester = match (LibrenmsConfig::get('mtu_options.command', 'fping')) {
+            'ping' => new Ping(),
+            default => new Fping(),
+        };
     }
 
     public function execute(Device $device): bool
@@ -26,10 +33,6 @@ class DeviceMtuTest
             return true;
         }
 
-        if (LibrenmsConfig::get('mtu_options.command', 'fping') == 'ping') {
-            return (new Ping())->testMtu($device->pollerTarget(), $this->bytes, $device->ipFamily());
-        }
-
-        return (new Fping())->testMtu($device->pollerTarget(), $this->bytes, $device->ipFamily());
+        return $this->tester->testMtu($device->pollerTarget(), $this->bytes, $device->ipFamily());
     }
 }
