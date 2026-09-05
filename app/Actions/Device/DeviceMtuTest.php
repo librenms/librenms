@@ -11,7 +11,7 @@ use LibreNMS\Polling\ConnectivityHelper;
 class DeviceMtuTest
 {
     private readonly ?int $bytes;
-    private Ping|Fping $tester;
+    private readonly Ping|Fping $tester;
 
     public function __construct()
     {
