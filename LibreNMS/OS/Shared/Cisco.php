@@ -67,6 +67,7 @@ use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\NetSnmpTranslate;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
@@ -169,7 +170,7 @@ class Cisco extends OS implements
 
         $device->hardware = $hardware;
         if (empty($device->hardware) && $device->sysObjectID) {
-            $device->hardware = SnmpQuery::mibDir('cisco')->mibs(['SNMPv2-MIB', 'CISCO-PRODUCTS-MIB'])->hideMib()->translate($device->sysObjectID);
+            $device->hardware = NetSnmpTranslate::make()->mibDir('cisco')->mibs(['SNMPv2-MIB', 'CISCO-PRODUCTS-MIB'])->hideMib()->translate($device->sysObjectID);
         }
     }
 

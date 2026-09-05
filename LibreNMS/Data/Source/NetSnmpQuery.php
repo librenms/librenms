@@ -35,6 +35,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Mib;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 use Log;
@@ -252,37 +253,11 @@ class NetSnmpQuery implements SnmpQueryInterface
         return $this->execMultiple('snmpgetnext', $this->limitOids($this->parseOid($oid)));
     }
 
-    /**
-     * Translate an OID.
-     * call numeric() on the query to output numeric OID
-     */
-    public function translate(string $oid): string
-    {
-        $oid = new Oid($oid);
-        $this->options = array_diff($this->options, [self::DEFAULT_FLAGS]); // remove default options
-
-        // user did not specify numeric, output full text
-        if (! in_array('-On', $this->options)) {
-            if (! in_array('-Os', $this->options)) {
-                $this->options[] = '-OS'; // show full oid, unless hideMib is set
-            }
-        } elseif ($oid->isNumeric()) {
-            return Str::start($oid, '.'); // numeric to numeric optimization
-        }
-
-        // if mib is not directly specified and it doesn't have a numeric root
-        if (! $oid->hasMib() && ! $oid->hasNumericRoot()) {
-            $this->options[] = '-IR'; // search for mib
-        }
-
-        return $this->exec('snmptranslate', [$oid])->value();
-    }
-
     private function buildCli(string $command, array $oids): array
     {
         $cmd = $this->initCommand($command, $oids);
 
-        array_push($cmd, '-M', $this->mibDirectories());
+        array_push($cmd, '-M', Mib::mibDirectories($this->device, $this->mibDirs));
         array_push($cmd, '-m', implode(':', $this->mibs));
 
         if ($command === 'snmptranslate') {
@@ -439,36 +414,6 @@ class NetSnmpQuery implements SnmpQueryInterface
         }
 
         return [LibrenmsConfig::get($binary, $binary)];
-    }
-
-    private function mibDirectories(): string
-    {
-        $base = LibrenmsConfig::get('mib_dir');
-        $dirs = [$base];
-
-        // os group
-        if ($os_group = LibrenmsConfig::getOsSetting($this->device->os, 'group')) {
-            if (file_exists("$base/$os_group")) {
-                $dirs[] = "$base/$os_group";
-            }
-        }
-
-        // os directory
-        $os_mibdir = LibrenmsConfig::getOsSetting($this->device->os, 'mib_dir');
-        if ($os_mibdir && is_string($os_mibdir)) {
-            $dirs[] = "$base/$os_mibdir";
-        } elseif (file_exists($base . '/' . $this->device->os)) {
-            $dirs[] = $base . '/' . $this->device->os;
-        }
-
-        foreach ($this->mibDirs as $mibDir) {
-            $dirs[] = "$base/$mibDir";
-        }
-
-        // remove trailing /, remove empty dirs, and remove duplicates
-        $dirs = array_unique(array_filter(array_map(fn ($dir) => rtrim((string) $dir, '/'), $dirs)));
-
-        return implode(':', $dirs);
     }
 
     private function limitOids(array $oids): array

@@ -31,10 +31,10 @@ use DeviceCache;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Data\Source\SnmpQueryInterface;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\NetSnmpTranslate;
 use LibreNMS\Util\Oid;
 use Log;
 
@@ -77,24 +77,6 @@ class SnmpQueryMock implements SnmpQueryInterface
         $this->context = $context;
 
         return $this;
-    }
-
-    public function translate(string $oid): string
-    {
-        // call real snmptranslate
-        $options = $this->options;
-        if ($this->numeric) {
-            $options[] = '-On';
-        }
-        if ($this->hideMib) {
-            $options[] = '-Os';
-        }
-
-        return NetSnmpQuery::make()
-            ->mibDir($this->mibDir)
-            ->mibs($this->mibs)
-            ->options($options)
-            ->translate($oid);
     }
 
     public function abortOnFailure(): SnmpQueryInterface
@@ -291,7 +273,7 @@ class SnmpQueryMock implements SnmpQueryInterface
 
         if ($type == 6) {
             $mib = $oidObj->getMib();
-            $data = $this->numeric ? ".$data" : $this->mibs($mib ? [$mib] : [])->translate($data);
+            $data = $this->numeric ? ".$data" : NetSnmpTranslate::make()->mibs($mib ? [$mib] : [])->translate($data);
         }
 
         if ($this->numeric) {
@@ -299,7 +281,15 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
 
         if (! empty($oidObj->oid) && $oidObj->isNumeric()) {
-            $oid = $this->translate($oidObj);
+            $oid = NetSnmpTranslate::make()
+                 ->mibDir($this->mibDir)
+                 ->mibs($this->mibs)
+                 ->options($this->options)
+                 ->translate($oidObj);
+        }
+
+        if ($this->hideMib) {
+            $oid = Str::after($oid, '::');
         }
 
         return "$oid$indexSuffix = $data\n";
@@ -340,7 +330,7 @@ class SnmpQueryMock implements SnmpQueryInterface
 
         $options = ['-IR'];
 
-        $number = NetSnmpQuery::make()->mibDir($this->mibDir)
+        $number = NetSnmpTranslate::make()->mibDir($this->mibDir)
             ->mibs($this->mibs)
             ->options(array_merge($options, $this->options))->numeric()->translate($oid);
 
