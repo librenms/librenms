@@ -25,27 +25,56 @@
 
 namespace LibreNMS\Polling\Method\Config;
 
+use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+
 final readonly class SnmpConfig
 {
     public function __construct(
         // Secrets
-        public string $version,
-        public ?string $community,
-        public ?string $authname,
-        public ?string $authpass,
-        public string $authlevel,
-        public string $authalgo,
-        public ?string $cryptopass,
-        public string $cryptoalgo,
-        public ?string $context,
+        public string $version = 'v2c',
+        public ?string $community = null,
+        public ?string $authname = null,
+        public ?string $authpass = null,
+        public ?string $authlevel = null,
+        public ?string $authalgo = null,
+        public ?string $cryptopass = null,
+        public ?string $cryptoalgo = null,
+        public ?string $context = null,
 
         // Settings
-        public string $transport,
-        public int $port,
-        public int $timeout,
-        public int $retries,
-        public int $maxRepeaters,
-        public int $maxOid,
+        public string $transport = 'udp',
+        public int $port = 161,
+        public int $timeout = 1,
+        public int $retries = 5,
+        public int $maxRepeaters = 0,
+        public int $maxOid = 10,
     ) {
+    }
+
+    public static function fromDevice(Device $device): self
+    {
+        $timeout = $device->timeout ?? LibrenmsConfig::get('snmp.timeout', 1);
+        $retries = $device->retries ?? LibrenmsConfig::get('snmp.retries', 5);
+        $maxRepeaters = (int) ($device->getAttrib('snmp_max_repeaters') ?: LibrenmsConfig::getOsSetting($device->os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0)));
+        $configuredMaxOid = $device->getAttrib('snmp_max_oid') ?: LibrenmsConfig::getOsSetting($device->os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10));
+
+        return new self(
+            version: $device->snmpver ?? 'v2c',
+            community: $device->community,
+            authname: $device->authname,
+            authpass: $device->authpass,
+            authlevel: $device->authlevel,
+            authalgo: $device->authalgo,
+            cryptopass: $device->cryptopass,
+            cryptoalgo: $device->cryptoalgo,
+            context: $device->context ?? null,
+            transport: $device->transport ?? 'udp',
+            port: (int) ($device->port ?? 161),
+            timeout: (int) ($timeout ?: 1),
+            retries: (int) ($retries ?: 5),
+            maxRepeaters: max(0, $maxRepeaters),
+            maxOid: max(1, (int) $configuredMaxOid),
+        );
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * SnmpTarget.php
+ * SnmpTranslateBackendInterface.php
  *
  * -Description-
  *
@@ -25,23 +25,7 @@
 
 namespace LibreNMS\Data\Source\Snmp;
 
-use App\Models\Device;
-use LibreNMS\Polling\Method\Config\SnmpConfig;
-
-final readonly class SnmpTarget
+interface SnmpTranslateBackendInterface
 {
-    public function __construct(
-        public string $hostname,
-        public SnmpConfig $config,
-        public ?Device $device = null,
-    ) {}
-
-    public static function fromDevice(Device $device): self
-    {
-        return new self(
-            hostname: (string) ($device->overwrite_ip ?: $device->hostname),
-            config: SnmpConfig::fromDevice($device),
-            device: $device,
-        );
-    }
+    public function translate(string $oid, SnmpQueryOptions $options): string;
 }

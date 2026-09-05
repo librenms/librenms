@@ -34,7 +34,7 @@ namespace LibreNMS\Tests\Unit\Mocks;
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use Illuminate\Database\Eloquent\Collection;
-use LibreNMS\Data\Source\NetSnmpQuery;
+use LibreNMS\Data\Source\SnmpQuery;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
 use LibreNMS\Tests\SnmpsimHelpers;
 use LibreNMS\Tests\TestCase;
@@ -104,7 +104,7 @@ final class SnmpQueryMockTest extends TestCase
         $this->requireSnmpsim();
 
         $mock = $this->makeMock();
-        $real = NetSnmpQuery::make()->device($this->snmpsimDevice())->numeric();
+        $real = SnmpQuery::make()->device($this->snmpsimDevice())->numeric();
 
         $this->assertSame(
             $real->walk(self::BASE_OID)->raw,

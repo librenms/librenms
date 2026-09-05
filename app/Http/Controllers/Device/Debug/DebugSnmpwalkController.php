@@ -32,7 +32,7 @@ use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Validation\Rule;
-use LibreNMS\Data\Source\NetSnmpQuery;
+use LibreNMS\Data\Source\SnmpQuery;
 use ReflectionMethod;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -71,9 +71,9 @@ class DebugSnmpwalkController extends Controller
      */
     private function buildCommandLine(Device $device): array
     {
-        $query = NetSnmpQuery::make()->device($device)->options(['-OUneb']);
+        $query = SnmpQuery::make()->device($device)->options(['-OUneb']);
 
-        $buildCli = new ReflectionMethod($query, 'buildCli');
+        $buildCli = new ReflectionMethod($query, 'buildCli'); // FIXME
 
         return $buildCli->invoke($query, 'snmpwalk', ['.']);
     }

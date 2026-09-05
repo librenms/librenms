@@ -31,7 +31,7 @@ use DeviceCache;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Source\NetSnmpQuery;
+use LibreNMS\Data\Source\SnmpQuery;
 use LibreNMS\Data\Source\SnmpQueryInterface;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Util\Mac;
@@ -90,7 +90,7 @@ class SnmpQueryMock implements SnmpQueryInterface
             $options[] = '-Os';
         }
 
-        return NetSnmpQuery::make()
+        return SnmpQuery::make()
             ->mibDir($this->mibDir)
             ->mibs($this->mibs)
             ->options($options)
@@ -340,7 +340,7 @@ class SnmpQueryMock implements SnmpQueryInterface
 
         $options = ['-IR'];
 
-        $number = NetSnmpQuery::make()->mibDir($this->mibDir)
+        $number = SnmpQuery::make()->mibDir($this->mibDir)
             ->mibs($this->mibs)
             ->options(array_merge($options, $this->options))->numeric()->translate($oid);
 

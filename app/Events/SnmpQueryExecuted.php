@@ -23,8 +23,8 @@ class SnmpQueryExecuted
     public function __construct(
         public readonly string $method,
         public readonly array $oids,
-        public readonly array $cliCommand,
         public readonly SnmpResponse $response,
+        public readonly array $cliCommand = [],
         public readonly ?Device $device = null,
         public readonly string $context = '',
         public readonly array $mibs = [],

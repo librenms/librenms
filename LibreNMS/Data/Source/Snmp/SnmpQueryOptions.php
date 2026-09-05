@@ -25,14 +25,17 @@
 
 namespace LibreNMS\Data\Source\Snmp;
 
-final readonly class SnmpQueryOptions
+use Illuminate\Support\Arr;
+
+class SnmpQueryOptions
 {
     public function __construct(
-        public array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB',],
+        public array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'],
         public array $mibDirs = [],
 
         // Query behavior
         public bool $tolerateUnorderedIndexes = false,
+        public bool $bulk = true,
 
         // Output formatting
         public bool $outputOidsNumerically = false,
@@ -40,4 +43,57 @@ final readonly class SnmpQueryOptions
         public bool $outputMibNames = true,
         public bool $outputEnumsAsStrings = false,
     ) {}
+
+    public static function fromCli(array|string|null $flags): self
+    {
+        return (new self())->parseCli($flags);
+    }
+
+    public function parseCli(array|string|null $flags): self
+    {
+        if ($flags === null) {
+            $this->outputOidsNumerically = false;
+            $this->outputIndexesNumerically = false;
+            $this->outputMibNames = true;
+            $this->outputEnumsAsStrings = false;
+            $this->tolerateUnorderedIndexes = false;
+            $this->bulk = true;
+
+            return $this;
+        }
+
+        foreach (Arr::wrap($flags) as $flag) {
+            if (! is_string($flag)) {
+                continue;
+            }
+
+            if (str_starts_with($flag, '-O')) {
+                $opts = substr($flag, 2);
+                if (str_contains($opts, 'n')) {
+                    $this->outputOidsNumerically = true;
+                }
+                if (str_contains($opts, 'b')) {
+                    $this->outputIndexesNumerically = true;
+                }
+                if (str_contains($opts, 's')) {
+                    $this->outputMibNames = false;
+                }
+                if (str_contains($opts, 'S')) {
+                    $this->outputMibNames = true;
+                }
+                if (str_contains($opts, 'e')) {
+                    $this->outputEnumsAsStrings = false;
+                } else {
+                    $this->outputEnumsAsStrings = true;
+                }
+            } elseif (str_starts_with($flag, '-C')) {
+                $opts = substr($flag, 2);
+                if (str_contains($opts, 'c') || str_contains($opts, 'i')) {
+                    $this->tolerateUnorderedIndexes = true;
+                }
+            }
+        }
+
+        return $this;
+    }
 }
