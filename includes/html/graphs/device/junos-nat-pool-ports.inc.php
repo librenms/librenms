@@ -9,7 +9,6 @@
  * pool (see junos-nat-pool.inc.php), since a pool name is only unique
  * within one address family, not across the whole device.
  */
-
 $pool_name = $vars['pool'] ?? '';
 $addr_type = $vars['addr_type'] ?? '';
 if ($pool_name === '' || $addr_type === '') {

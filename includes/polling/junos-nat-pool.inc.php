@@ -17,13 +17,13 @@ if ($device['os'] !== 'junos') {
 
 $base_oid = '.1.3.6.1.4.1.2636.3.39.1.7.1.1.4.1';
 
-$col_addr_type      = 2;
-$col_pool_type      = 4;
-$col_ports_inuse    = 5;
+$col_addr_type = 2;
+$col_pool_type = 4;
+$col_ports_inuse = 5;
 $col_sessions_inuse = 6;
-$col_ports_avail    = 7;
-$col_addr_avail     = 8;
-$col_addr_inuse     = 9;
+$col_ports_avail = 7;
+$col_addr_avail = 8;
+$col_addr_inuse = 9;
 
 /**
  * Decode a jnxJsSrcNatStatsTable index suffix (everything after the column
@@ -51,7 +51,7 @@ function junos_nat_decode_pool_name(string $index): ?string
 
     $name_octets = array_splice($parts, 0, $name_len);
 
-    return implode('', array_map('chr', $name_octets));
+    return implode('', array_map(chr(...), $name_octets));
 }
 
 function junos_nat_rrd_name(string $pool_name): string
