@@ -1,0 +1,57 @@
+modules:
+    os:
+        hardware: SCTE-HMS-COMMON-MIB::commonModelNumber.0
+        serial: SCTE-HMS-COMMON-MIB::commonSerialNumber.0
+        version: SCTE-HMS-COMMON-MIB::commonVendorInfo.0
+
+    sensors:
+        frequency:
+            data:
+                -
+                    oid: SCTE-HMS-COMMON-MIB::commonReturnPathFrequency
+                    num_oid: '.1.3.6.1.4.1.5591.1.3.5.1.{{ $index }}'
+                    descr: 'Return Path Frequency'
+                    index: 'scteCommonReturnPathFrequency.{{ $index }}'
+                    group: 'Transponder RF'
+                -
+                    oid: SCTE-HMS-COMMON-MIB::commonForwardPathFrequency
+                    num_oid: '.1.3.6.1.4.1.5591.1.3.5.2.{{ $index }}'
+                    descr: 'Forward Path Frequency'
+                    index: 'scteCommonForwardPathFrequency.{{ $index }}'
+                    group: 'Transponder RF'
+
+        tv_signal:
+            data:
+                -
+                    oid: SCTE-HMS-COMMON-MIB::commonForwardPathReceiveLevel
+                    num_oid: '.1.3.6.1.4.1.5591.1.3.5.4.{{ $index }}'
+                    descr: 'Forward Path Receive Level'
+                    index: 'scteCommonForwardPathReceiveLevel.{{ $index }}'
+                    group: 'Transponder RF'
+                    divisor: 10
+
+        state:
+            data:
+                -
+                    oid: SCTE-HMS-COMMON-MIB::commonCraftStatus
+                    num_oid: '.1.3.6.1.4.1.5591.1.3.1.17.{{ $index }}'
+                    descr: 'Craft Interface'
+                    index: 'scteCommonCraftStatus.{{ $index }}'
+                    group: 'Transponder Status'
+                    state_name: scteCommonCraftStatus
+                    states:
+                        - { value: 1, generic: 0, descr: 'Disconnected' }
+                        - { value: 2, generic: 0, descr: 'Connected' }
+                -
+                    oid: SCTE-HMS-COMMON-MIB::commonResetCause
+                    num_oid: '.1.3.6.1.4.1.5591.1.3.1.16.{{ $index }}'
+                    descr: 'Last Reset Cause'
+                    index: 'scteCommonResetCause.{{ $index }}'
+                    group: 'Transponder Status'
+                    state_name: scteCommonResetCause
+                    states:
+                        - { value: 1, generic: 0, descr: 'Other' }
+                        - { value: 2, generic: 0, descr: 'Power Up' }
+                        - { value: 3, generic: 0, descr: 'Command' }
+                        - { value: 4, generic: 0, descr: 'Watchdog' }
+                        - { value: 5, generic: 0, descr: 'Craft' }
