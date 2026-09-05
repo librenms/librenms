@@ -31,10 +31,15 @@ use Illuminate\Support\Collection;
 interface EntityPhysicalDiscovery
 {
     /**
-     * Discover a Collection of IsIsAdjacency models.
-     * Will be keyed by ifIndex
+     * Discover a Collection of EntPhysical models.
+     *
+     * An empty Collection means the device has no entities, and existing rows will be
+     * pruned. Throw instead if the data could not be collected, so the caller can tell
+     * the two apart.
      *
      * @return \Illuminate\Support\Collection<\App\Models\EntPhysical>
+     *
+     * @throws \LibreNMS\Exceptions\EntityPhysicalCollectionException if the data could not be collected
      */
     public function discoverEntityPhysical(): Collection;
 }
