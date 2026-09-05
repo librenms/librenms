@@ -46,7 +46,7 @@ class SnmpQueryMock implements SnmpQueryInterface
     private ?string $mibDir = null;
     private array $mibs = [];
     private bool $numeric = false;
-    // Unused: private bool $hideMib = false;
+    private bool $hideMib = false;
     private array $options = [];
     private bool $abort = false;
 
@@ -108,7 +108,7 @@ class SnmpQueryMock implements SnmpQueryInterface
 
     public function hideMib(): SnmpQueryInterface
     {
-        // Unused: $this->hideMib = true;
+        $this->hideMib = true;
 
         return $this;
     }
@@ -281,7 +281,15 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
 
         if (! empty($oidObj->oid) && $oidObj->isNumeric()) {
-            $oid = NetSnmpTranslate::make()->translate($oidObj);
+           $oid = NetSnmpQuery::make()
+                ->mibDir($this->mibDir)
+                ->mibs($this->mibs)
+                ->options($this->options)
+                ->translate($oidObj);
+        }
+
+        if ($this->hideMib) {
+            $oid = Str::after($oid, '::');
         }
 
         return "$oid$indexSuffix = $data\n";
