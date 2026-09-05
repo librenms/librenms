@@ -1,7 +1,7 @@
 os: scte-hms
 text: 'SCTE HMS'
 type: network
-icon: scte
+icon: generic
 mib_dir: scte
 
 discovery:
