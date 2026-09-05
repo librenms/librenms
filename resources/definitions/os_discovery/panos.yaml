@@ -11,6 +11,7 @@ modules:
                         - PAN-COMMON-MIB::panSessionMax
                         - PAN-COMMON-MIB::panVsysName
                         - PAN-COMMON-MIB::panVsysMaxSessions
+                        - PAN-COMMON-MIB::panGPGWUtilizationMaxTunnels
         state:
             data:
                 -
@@ -179,8 +180,20 @@ modules:
                     descr: GlobalProtect VPN Active Sessions
                     group: VPN
                     high_limit: PAN-COMMON-MIB::panGPGWUtilizationMaxTunnels
-                    low_limit: 0
-                    low_warn_limit: 0
+                    skip_values:
+                        - oid: PAN-COMMON-MIB::panGPGWUtilizationMaxTunnels
+                          op: '='
+                          value: 0
+                -
+                    oid: PAN-COMMON-MIB::panGPGWUtilizationActiveTunnels
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.5.1.3.{{ $index }}'
+                    index: 'panGPGWUtilizationActiveTunnels.{{ $index }}'
+                    descr: GlobalProtect VPN Active Sessions
+                    group: VPN
+                    skip_values:
+                        - oid: PAN-COMMON-MIB::panGPGWUtilizationMaxTunnels
+                          op: '!='
+                          value: 0
         load:
             data:
                 -
