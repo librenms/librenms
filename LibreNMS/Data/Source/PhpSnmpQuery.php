@@ -532,10 +532,16 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
     private function netsnmp(): SnmpQueryInterface
     {
-        Log::warning('PhpSnmp is falling through to NetSnmp');
+        Log::info('PhpSnmp is falling through to NetSnmp');
 
-        // TODO: set options, etc
-        $ret = (new NetSnmpQuery())->device($this->device);
+        $ret = (new NetSnmpQuery())
+            ->device($this->device)
+            ->mibs($this->mibs)
+            ->options($this->options->getOptionString());
+
+        foreach ($this->mibDirs as $dir) {
+            $ret->mibDir($dir);
+        }
 
         if ($this->cache) {
             $ret->cache();

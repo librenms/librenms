@@ -184,4 +184,63 @@ class PhpSnmpOptions
         $snmp->setStringOutputFormat($this->string_output_format); /** @phpstan-ignore method.notFound */
         $snmp->setOidOutputFormat($this->oid_output_format); /** @phpstan-ignore method.notFound */
     }
+
+    /**
+     * Get NetSNMP options from PhpSnmpOptions
+     */
+    public function getOptionString(): string
+    {
+        // Always accept underscores in MIBs
+        $ret = ['-Pu'];
+
+        if (! $this->oid_increasing_check) {
+            $ret[] = '-Ci';
+        }
+
+        $outputOptions = '';
+        $outputOptions .= match ($this->string_output_format) {
+            \Snmp\StringOutput::Ascii => 'a', /** @phpstan-ignore class.notFound */
+            \Snmp\StringOutput::Hex => 'x', /** @phpstan-ignore class.notFound */
+            default => '',
+        };
+
+        $outputOptions .= match ($this->oid_output_format) {
+            \Snmp\OidOutput::Full => 'f', /** @phpstan-ignore class.notFound */
+            \Snmp\OidOutput::Suffix => 's', /** @phpstan-ignore class.notFound */
+            \Snmp\OidOutput::Ucd => 'u', /** @phpstan-ignore class.notFound */
+            \Snmp\OidOutput::Numeric => 'n', /** @phpstan-ignore class.notFound */
+            default => '',
+        };
+
+        if ($this->numeric_index) {
+            $outputOptions .= 'b';
+        }
+        if ($this->enum_print) {
+            $outputOptions .= 'e';
+        }
+        if ($this->escape_quotes) {
+            $outputOptions .= 'E';
+        }
+        if ($this->quick_print) {
+            $outputOptions .= 'Q';
+        }
+        if ($this->numeric_timeticks) {
+            $outputOptions .= 't';
+        }
+        if ($this->print_hex_text) {
+            $outputOptions .= 'T';
+        }
+        if ($this->dont_print_units) {
+            $outputOptions .= 'U';
+        }
+        if ($this->extended_index) {
+            $outputOptions .= 'X';
+        }
+
+        if ($outputOptions) {
+            $ret[] = "-O$outputOptions";
+        }
+
+        return implode(' ', $ret);
+    }
 }
