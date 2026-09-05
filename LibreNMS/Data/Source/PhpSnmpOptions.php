@@ -181,7 +181,6 @@ class PhpSnmpOptions
         $snmp->dont_print_units = $this->dont_print_units; /** @phpstan-ignore property.notFound */
         $snmp->escape_quotes = $this->escape_quotes; /** @phpstan-ignore property.notFound */
         $snmp->print_hex_text = $this->print_hex_text; /** @phpstan-ignore property.notFound */
-
         $snmp->setStringOutputFormat($this->string_output_format); /** @phpstan-ignore method.notFound */
         $snmp->setOidOutputFormat($this->oid_output_format); /** @phpstan-ignore method.notFound */
     }
