@@ -14,7 +14,7 @@
                     "os": "scte-hms",
                     "type": "network",
                     "serial": "165F75",
-                    "icon": "scte.svg"
+                    "icon": "generic.svg"
                 }
             ]
         },
