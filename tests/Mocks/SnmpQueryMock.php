@@ -79,24 +79,6 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
-    public function translate(string $oid): string
-    {
-        // call real snmptranslate
-        $options = $this->options;
-        if ($this->numeric) {
-            $options[] = '-On';
-        }
-        if ($this->hideMib) {
-            $options[] = '-Os';
-        }
-
-        return NetSnmpQuery::make()
-            ->mibDir($this->mibDir)
-            ->mibs($this->mibs)
-            ->options($options)
-            ->translate($oid);
-    }
-
     public function abortOnFailure(): SnmpQueryInterface
     {
         $this->abort = true;
@@ -291,7 +273,11 @@ class SnmpQueryMock implements SnmpQueryInterface
 
         if ($type == 6) {
             $mib = $oidObj->getMib();
-            $data = $this->numeric ? ".$data" : $this->mibs($mib ? [$mib] : [])->translate($data);
+            $data = $this->numeric ? ".$data" : NetSnmpQuery::make()
+                ->mibDir($this->mibDir)
+                ->mibs(array_merge($this->mibs, $mib ? [$mib] : []))
+                ->options($this->options)
+                ->translate($data);
         }
 
         if ($this->numeric) {
@@ -299,7 +285,15 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
 
         if (! empty($oidObj->oid) && $oidObj->isNumeric()) {
-            $oid = $this->translate($oidObj);
+            $oid = NetSnmpQuery::make()
+                ->mibDir($this->mibDir)
+                ->mibs($this->mibs)
+                ->options($this->options)
+                ->translate($oidObj);
+        }
+
+        if ($this->hideMib) {
+            $oid = Str::after($oid, '::');
         }
 
         return "$oid$indexSuffix = $data\n";

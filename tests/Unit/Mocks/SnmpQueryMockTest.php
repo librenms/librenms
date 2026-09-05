@@ -99,6 +99,21 @@ final class SnmpQueryMockTest extends TestCase
         $this->assertStringEndsWith("\n", $output);
     }
 
+    public function test_hide_mib_strips_mib_prefix(): void
+    {
+        $device = new Device(['community' => self::FIXTURE]);
+        $device->device_id = 1;
+        DeviceCache::fake($device);
+        DeviceCache::setPrimary($device->device_id);
+
+        $mock = new SnmpQueryMock();
+        $mock->hideMib();
+
+        $output = $mock->walk('IF-MIB::ifDescr')->raw;
+        $this->assertStringContainsString("ifDescr.1 = eth0\n", $output);
+        $this->assertStringNotContainsString('IF-MIB::', $output);
+    }
+
     public function test_numeric_output_matches_real_net_snmp(): void
     {
         $this->requireSnmpsim();

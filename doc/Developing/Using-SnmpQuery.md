@@ -8,12 +8,15 @@ several formats for an OID. We prefer the full textual form, such as
 At an action, the query runs and returns an SnmpResponse with the data.
 SnmpResponse has many options to process and index this data.
 
-SnmpQuery has 4 primary actions:
+SnmpQuery has 3 primary actions:
 
  - get - it gets one or more full OIDs from the device
  - walk - it walks an OID. It is most useful for a table or a column of a table
  - next - it gets the OID after the given OID
- - translate - it converts an OID between the textual form and the numeric form. It returns a string
+
+To translate an OID, use NetSnmpQuery directly:
+ - `NetSnmpQuery::make()->translate($oid)` - converts an OID between the textual form and the numeric form. It returns a string.
+
 
 ### Fetch Options
 
