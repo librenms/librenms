@@ -20,6 +20,7 @@ class ServiceFactory extends Factory
             'service_ignore' => 0,
             'service_status' => 0,
             'service_changed' => 0,
+            'service_checked' => 0,
             'service_message' => '',
             'service_disabled' => 0,
             'service_ds' => '',

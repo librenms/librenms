@@ -24,6 +24,7 @@ class Service extends DeviceRelatedModel
         'service_ignore',
         'service_status',
         'service_changed',
+        'service_checked',
         'service_message',
         'service_disabled',
         'service_ds',
