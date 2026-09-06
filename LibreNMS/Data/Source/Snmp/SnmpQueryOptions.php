@@ -104,10 +104,22 @@ class SnmpQueryOptions
                 $this->extendedIndex = str_contains($opts, 'X');
                 $this->printUnits = ! str_contains($opts, 'U');
                 $this->numericTimeticks = str_contains($opts, 't');
-                $this->numericOids = str_contains($opts, 'n');
                 $this->numericIndexes = str_contains($opts, 'b');
-                $this->outputMibNames = ! str_contains($opts, 's');
                 $this->numericEnums = str_contains($opts, 'e');
+
+                $posN = strrpos($opts, 'n');
+                $posS = strrpos($opts, 's');
+                $posUpperS = strrpos($opts, 'S');
+                $lastSymbolicPos = max($posS !== false ? $posS : -1, $posUpperS !== false ? $posUpperS : -1);
+
+                if ($posN !== false && $posN > $lastSymbolicPos) {
+                    $this->numericOids = true;
+                } elseif ($lastSymbolicPos !== -1 && $lastSymbolicPos > ($posN !== false ? $posN : -1)) {
+                    $this->numericOids = false;
+                    $this->outputMibNames = $posUpperS !== false && ($posS === false || $posUpperS > $posS);
+                } elseif ($posS !== false) {
+                    $this->outputMibNames = false;
+                }
 
                 $posA = strrpos($opts, 'a');
                 $posX = strrpos($opts, 'x');

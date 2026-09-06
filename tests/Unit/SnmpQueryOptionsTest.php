@@ -122,6 +122,23 @@ class SnmpQueryOptionsTest extends TestCase
         $this->assertFalse($optionsOnlyX->asciiStrings);
     }
 
+    public function testParseCliNumericAndSymbolicPrecedence(): void
+    {
+        // When 's' comes after 'n', symbolic without MIB wins
+        $optionsS = (new SnmpQueryOptions)->parseCli(['-Ons']);
+        $this->assertFalse($optionsS->numericOids);
+        $this->assertFalse($optionsS->outputMibNames);
+
+        // When 'n' comes after 's', numeric wins
+        $optionsN = (new SnmpQueryOptions)->parseCli(['-Osn']);
+        $this->assertTrue($optionsN->numericOids);
+
+        // When 'S' comes after 'n', symbolic with MIB wins
+        $optionsUpperS = (new SnmpQueryOptions)->parseCli(['-OnS']);
+        $this->assertFalse($optionsUpperS->numericOids);
+        $this->assertTrue($optionsUpperS->outputMibNames);
+    }
+
     public function testParseCliDisplayHints(): void
     {
         $options = (new SnmpQueryOptions)->parseCli(['-OUneb', '-Ih']);

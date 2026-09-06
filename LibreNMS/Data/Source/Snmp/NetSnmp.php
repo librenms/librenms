@@ -159,7 +159,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
             $opts .= 'b';
         }
 
-        if (! $options->outputMibNames) {
+        if (! $options->numericOids && ! $options->outputMibNames) {
             $opts .= 's';
         }
 
