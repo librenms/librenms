@@ -7,6 +7,8 @@ use LibreNMS\Data\Source\Snmp\NetSnmp;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpTarget;
+use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Enum\SnmpStringOutput;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Tests\TestCase;
 
@@ -273,7 +275,7 @@ class NetSnmpTest extends TestCase
 
         $options = new SnmpQueryOptions(
             tolerateUnorderedIndexes: true,
-            numericOids: true,
+            oidFormat: SnmpOidOutput::Numeric,
             numericIndexes: true,
             outputMibNames: false,
             numericEnums: false,
@@ -298,7 +300,7 @@ class NetSnmpTest extends TestCase
             config: new SnmpConfig(version: 'v2c', community: 'public'),
         );
 
-        $options = new SnmpQueryOptions(asciiStrings: true);
+        $options = new SnmpQueryOptions(stringFormat: SnmpStringOutput::Ascii);
         $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
         $this->assertContains('-OQXUtea', $cli);
 
@@ -316,7 +318,7 @@ class NetSnmpTest extends TestCase
             config: new SnmpConfig(version: 'v2c', community: 'public'),
         );
 
-        $options = new SnmpQueryOptions(hexStrings: true);
+        $options = new SnmpQueryOptions(stringFormat: SnmpStringOutput::Hex);
         $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
         $this->assertContains('-OQXUtex', $cli);
 
@@ -418,7 +420,7 @@ class NetSnmpTest extends TestCase
 
     public function testTranslateAlreadyNumericOidReturnsImmediately(): void
     {
-        $options = new SnmpQueryOptions(numericOids: true);
+        $options = new SnmpQueryOptions(oidFormat: SnmpOidOutput::Numeric);
         $result = $this->backend->translate('.1.3.6.1.2.1.1.1.0', $options);
         $this->assertSame('.1.3.6.1.2.1.1.1.0', $result);
 

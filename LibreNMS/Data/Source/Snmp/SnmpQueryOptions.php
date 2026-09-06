@@ -121,7 +121,7 @@ class SnmpQueryOptions
 
             if (str_starts_with($flag, '-O')) {
                 $hasCustomOutputFlags = true;
-                foreach (str_split(substr((string) $option, 2)) as $outopt) {
+                foreach (str_split(substr((string) $flag, 2)) as $outopt) {
                     switch ($outopt) {
                         case 'a':
                             $this->stringFormat = SnmpStringOutput::Ascii;

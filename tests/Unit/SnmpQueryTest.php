@@ -10,6 +10,7 @@ use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpTarget;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
+use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 
@@ -44,7 +45,7 @@ class SnmpQueryTest extends TestCase
             ->withArgs(fn (SnmpTarget $target, array $oids, SnmpQueryOptions $options) => $target->hostname === '10.1.2.3'
                 && $target->config->community === 'test-community'
                 && $oids === ['sysDescr.0']
-                && $options->numericOids === true
+                && $options->oidFormat === SnmpOidOutput::Numeric
                 && $options->context === '')
             ->andReturn(new SnmpResponse("sysDescr.0 = Linux 6.0\n"));
 
