@@ -17,10 +17,14 @@ class DeviceMtuTest
     {
         $this->bytes = LibrenmsConfig::get('mtu_options.bytes');
 
-        $this->tester = match (LibrenmsConfig::get('mtu_options.command', 'fping')) {
-            'ping' => new Ping(),
-            default => new Fping(),
-        };
+        if (LibrenmsConfig::get('mtu_options.fragmentation', 'pmtu') == 'allow') {
+            $this->tester = new Ping();
+        } else {
+            $this->tester = match (LibrenmsConfig::get('mtu_options.command', 'fping')) {
+                'ping' => new Ping(),
+                default => new Fping(),
+            };
+        }
     }
 
     public function execute(Device $device): bool

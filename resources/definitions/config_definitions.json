@@ -5378,11 +5378,31 @@
             "default": "fping",
             "group": "poller",
             "section": "mtu",
-            "order": 2,
+            "order": 3,
             "type": "select",
             "options": {
                 "fping": "FPing",
                 "ping": "Ping"
+            },
+            "when": {
+                "setting": "mtu_options.fragmentation",
+                "operator": "in",
+                "value": [
+                    "pmtu",
+                    "deny"
+                ]
+            }
+        },
+        "mtu_options.fragmentation": {
+            "default": "pmtu",
+            "group": "poller",
+            "section": "mtu",
+            "order": 2,
+            "type": "select",
+            "options": {
+                "pmtu": "Allow with PMTU",
+                "allow": "Allow",
+                "deny": "Not Allowed"
             }
         },
         "mydomain": {
