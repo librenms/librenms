@@ -3,7 +3,8 @@ modules:
         hardware: ASROCKRACK-AM5D4ID-MIB::MBModelName.0
         version: ASROCKRACK-AM5D4ID-MIB::BMCVersion.0
         features: ASROCKRACK-AM5D4ID-MIB::BIOSVersion.0
-        serial: ASROCKRACK-AM5D4ID-MIB::PSerialNumber.0
+        # board (per-node) serial: multi-node chassis share one product serial
+        serial: ASROCKRACK-AM5D4ID-MIB::BSerialNumber.0
     sensors:
         current:
             options:
