@@ -282,7 +282,7 @@ class NetSnmpTest extends TestCase
 
         $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
 
-        $this->assertContains('-OQXUtnb', $cli); // numericOids suppresses 's', no 'e' because numericEnums = false
+        $this->assertContains('-OQXUtbn', $cli); // numericOids suppresses 's', no 'e' because numericEnums = false
         $this->assertContains('-Pu', $cli);
         $this->assertContains('-Cc', $cli);
 
