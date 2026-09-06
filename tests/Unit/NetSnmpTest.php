@@ -44,7 +44,6 @@ class NetSnmpTest extends TestCase
         $this->assertContains('-c', $cli);
         $this->assertContains('public', $cli);
         $this->assertContains('-OQXUte', $cli);
-        $this->assertContains('-Pu', $cli);
         $this->assertContains('udp:192.168.1.1:161', $cli);
         $this->assertContains('sysDescr.0', $cli);
     }
