@@ -8,7 +8,6 @@ use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\StoreDeviceRequest;
 use App\Models\Device;
 use App\Models\PollerGroup;
-use App\Models\Secret;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -45,7 +44,6 @@ class AddDeviceController
         $pollerGroups = PollerGroup::orderBy('group_name')->get();
         $defaultPortAssocMode = LibrenmsConfig::get('default_port_association_mode', 'ifIndex');
         $portAssocModes = PortAssociationMode::getModes();
-        $secrets = Secret::all();
 
         $oldActiveMethods = old('active_methods', [PollingMethodType::Icmp->value, PollingMethodType::Snmp->value]);
         $defaultDisplayTemplate = LibrenmsConfig::get('device_display_default', '{{ $hostname }}');
@@ -85,7 +83,6 @@ class AddDeviceController
             'poller_groups' => $pollerGroups,
             'default_port_association_mode' => $defaultPortAssocMode,
             'port_association_modes' => $portAssocModes,
-            'secrets' => $secrets,
             'oldActiveMethods' => $oldActiveMethods,
             'default_display_template' => $defaultDisplayTemplate,
             'add_device_config' => $addDeviceConfig,

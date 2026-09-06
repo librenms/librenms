@@ -183,7 +183,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
     }
     array_push($cmd, '-M', mibdir($mibdir, $device));
 
-    $timeout = prep_snmp_setting($device, 'timeout');
+    $timeout = $snmpMethod;
     if ($timeout && $timeout !== 1) {
         array_push($cmd, '-t', $timeout);
     }

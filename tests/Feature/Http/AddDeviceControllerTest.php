@@ -269,7 +269,9 @@ class AddDeviceControllerTest extends TestCase
         $response->assertOk();
         $response->assertViewHas('default_display_template', '{{ $hostname }} - {{ $sysName }}');
         $response->assertSee('name="display_template"', false);
-        $response->assertSee('x-html="computedDisplayNameHtml"', false);
+        $response->assertSee('id="secret-select-snmp"', false);
+        $response->assertSee('name="polling_methods[snmp][secret_id]"', false);
+        $response->assertSee('id="os-select"', false);
     }
 
     public function testStoreDeviceWithDisplayTemplate(): void

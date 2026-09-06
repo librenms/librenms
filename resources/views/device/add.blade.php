@@ -289,21 +289,18 @@
                                                     </div>
 
                                                     {{-- Existing secret picker --}}
-                                                    <template x-if="methods['{{ $method['type'] }}'].credential_mode === 'existing'">
-                                                        <div class="form-group tw:max-w-md tw:mb-0">
-                                                            <label class="control-label">{{ __('Select Secret') }}</label>
-                                                            <select name="polling_methods[{{ $method['type'] }}][secret_id]"
-                                                                    x-model="methods['{{ $method['type'] }}'].secret_id"
-                                                                    class="form-control">
-                                                                <option value="">{{ __('Select an existing secret...') }}</option>
-                                                                @foreach($availableSecrets[$method['type']] ?? [] as $secret)
-                                                                    <option value="{{ $secret->id }}">
-                                                                        {{ $secret->description }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </template>
+                                                    <x-select2
+                                                        :id="'secret-select-' . $method['type']"
+                                                        :name="'polling_methods[' . $method['type'] . '][secret_id]'"
+                                                        :label="__('Select Secret')"
+                                                        type="secret"
+                                                        :data="['secret_type' => $method['type']]"
+                                                        :placeholder="__('Select an existing secret...')"
+                                                        x-show="methods['{{ $method['type'] }}'].credential_mode === 'existing'"
+                                                        x-cloak
+                                                        x-model="methods['{{ $method['type'] }}'].secret_id"
+                                                        class="tw:max-w-md"
+                                                    />
 
                                                     {{-- New secret form --}}
                                                     <template x-if="methods['{{ $method['type'] }}'].credential_mode === 'new'">
@@ -394,10 +391,14 @@
                                 <label for="hardware" class="control-label">{{ __('Hardware') }} <span class="text-muted">({{ __('optional') }})</span></label>
                                 <input type="text" id="hardware" name="hardware" class="form-control" x-model="hardware">
                             </div>
-                            <div class="form-group tw:mb-0" x-init="setTimeout(() => init_select2('#os-select', 'os', {}, null, '{{ __('OS (optional)') }}'), 100)">
-                                <label for="os-select" class="control-label">{{ __('OS') }} <span class="text-muted">({{ __('optional') }})</span></label>
-                                <select id="os-select" name="os" class="form-control"></select>
-                            </div>
+                            <x-select2
+                                id="os-select"
+                                name="os"
+                                type="os"
+                                :label="__('OS')"
+                                :help="__('optional')"
+                                :placeholder="__('OS (optional)')"
+                            />
                         </div>
                     </div>
                 </div>
