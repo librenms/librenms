@@ -34,7 +34,7 @@ class NetSnmpTest extends TestCase
             ),
         );
 
-        $options = new SnmpQueryOptions();
+        $options = SnmpQueryOptions::quickPrint();
         $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
 
         $this->assertStringEndsWith('snmpget', $cli[0]);
@@ -46,6 +46,28 @@ class NetSnmpTest extends TestCase
         $this->assertContains('-OQXUte', $cli);
         $this->assertContains('udp:192.168.1.1:161', $cli);
         $this->assertContains('sysDescr.0', $cli);
+    }
+
+    public function testBuildCliNetSnmpLibraryDefaults(): void
+    {
+        $target = new SnmpTarget(
+            hostname: '192.168.1.1',
+            config: new SnmpConfig(
+                version: 'v2c',
+                community: 'public',
+                transport: 'udp',
+                port: 161,
+            ),
+        );
+
+        $options = new SnmpQueryOptions();
+        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
+
+        $this->assertStringEndsWith('snmpget', $cli[0]);
+        $this->assertNotContains('-OQXUte', $cli);
+        foreach ($cli as $arg) {
+            $this->assertStringStartsNotWith('-O', $arg);
+        }
     }
 
     public function testBuildCliV1(): void
@@ -272,13 +294,12 @@ class NetSnmpTest extends TestCase
             config: new SnmpConfig(version: 'v2c', community: 'public'),
         );
 
-        $options = new SnmpQueryOptions(
-            tolerateUnorderedIndexes: true,
-            oidFormat: SnmpOidOutput::Numeric,
-            numericIndexes: true,
-            outputMibNames: false,
-            numericEnums: false,
-        );
+        $options = SnmpQueryOptions::quickPrint();
+        $options->tolerateUnorderedIndexes = true;
+        $options->oidFormat = SnmpOidOutput::Numeric;
+        $options->numericIndexes = true;
+        $options->outputMibNames = false;
+        $options->numericEnums = false;
 
         $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
 
@@ -286,7 +307,9 @@ class NetSnmpTest extends TestCase
         $this->assertContains('-Cc', $cli);
 
         // When numericOids is false and outputMibNames is false, 's' is emitted
-        $optionsSymbolic = new SnmpQueryOptions(outputMibNames: false);
+        $optionsSymbolic = SnmpQueryOptions::quickPrint();
+        $optionsSymbolic->outputMibNames = false;
+        $optionsSymbolic->oidFormat = SnmpOidOutput::Suffix;
         $cliSymbolic = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $optionsSymbolic);
         $this->assertContains('-OQXUtes', $cliSymbolic);
     }
@@ -298,7 +321,8 @@ class NetSnmpTest extends TestCase
             config: new SnmpConfig(version: 'v2c', community: 'public'),
         );
 
-        $options = new SnmpQueryOptions(stringFormat: SnmpStringOutput::Ascii);
+        $options = SnmpQueryOptions::quickPrint();
+        $options->stringFormat = SnmpStringOutput::Ascii;
         $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
         $this->assertContains('-OQXUtea', $cli);
 
@@ -316,7 +340,8 @@ class NetSnmpTest extends TestCase
             config: new SnmpConfig(version: 'v2c', community: 'public'),
         );
 
-        $options = new SnmpQueryOptions(stringFormat: SnmpStringOutput::Hex);
+        $options = SnmpQueryOptions::quickPrint();
+        $options->stringFormat = SnmpStringOutput::Hex;
         $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
         $this->assertContains('-OQXUtex', $cli);
 
@@ -410,7 +435,7 @@ class NetSnmpTest extends TestCase
 
         $this->assertStringContainsString('snmp', $cmd[0]);
         $this->assertContains('udp:debug.device.local:161', $cmd);
-        $this->assertContains('-OUneb', $cmd);
+        $this->assertContains('-OUebn', $cmd);
         $this->assertNotContains('-Pu', $cmd);
         $this->assertNotContains('-OQXUte', $cmd);
         $this->assertContains('.', $cmd);

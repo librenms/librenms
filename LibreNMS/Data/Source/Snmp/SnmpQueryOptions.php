@@ -53,18 +53,23 @@ class SnmpQueryOptions
 
         // Value formatting
         public bool $escapeQuotes = false,
-        public bool $numericEnums = true,
-        public bool $numericTimeticks = true,
+        public bool $numericEnums = false,
+        public bool $numericTimeticks = false,
         public bool $printHexText = false,
-        public bool $printUnits = false,
+        public bool $printUnits = true,
         public bool $applyDisplayHints = true,
         public SnmpStringOutput $stringFormat = SnmpStringOutput::Guess,
 
         // Output presentation
-        public bool $quickPrint = true,
-        public bool $extendedIndex = true,
+        public bool $quickPrint = false,
+        public bool $extendedIndex = false,
         public bool $allowUnderscores = false,
     ) {
+    }
+
+    public static function quickPrint(): self
+    {
+        return (new self())->applyQuickPrintDefaults();
     }
 
     /**
@@ -106,6 +111,8 @@ class SnmpQueryOptions
                         'X' => $this->extendedIndex = true,
                         default => throw new \Exception("Unknown option -O$outopt"),
                     };
+
+                    $this->outputMibNames = $this->oidFormat !== SnmpOidOutput::Suffix;
                 }
             } elseif (str_starts_with($arg, '-C')) {
                 $opts = substr($arg, 2);
@@ -134,11 +141,12 @@ class SnmpQueryOptions
         return $this;
     }
 
-    private function applyQuickPrintDefaults(): self
+    public function applyQuickPrintDefaults(): self
     {
         $this->context = '';
         $this->allowBulk = true;
         $this->tolerateUnorderedIndexes = false;
+        $this->includeGivenOid = false;
         $this->escapeQuotes = false;
         $this->numericIndexes = false;
         $this->outputMibNames = true;
@@ -156,23 +164,27 @@ class SnmpQueryOptions
         return $this;
     }
 
-    private function applySnmpLibraryDefaults(): void
+    public function applySnmpLibraryDefaults(): self
     {
         $this->context = '';
         $this->allowBulk = true;
         $this->tolerateUnorderedIndexes = false;
+        $this->includeGivenOid = false;
+        $this->escapeQuotes = false;
         $this->numericIndexes = false;
-        $this->outputMibNames = false;
+        $this->outputMibNames = true;
         $this->numericEnums = false;
         $this->numericTimeticks = false;
         $this->printHexText = false;
         $this->printUnits = true;
-        $this->applyDisplayHints = false;
+        $this->applyDisplayHints = true;
         $this->quickPrint = false;
         $this->extendedIndex = false;
         $this->allowUnderscores = false;
         $this->stringFormat = SnmpStringOutput::Guess;
         $this->oidFormat = SnmpOidOutput::Module;
+
+        return $this;
     }
 
     private function addMibs(?string $mib): void

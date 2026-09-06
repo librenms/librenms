@@ -24,6 +24,31 @@ class SnmpQueryOptionsTest extends TestCase
         $this->assertTrue($options->outputMibNames);
 
         $this->assertSame(SnmpStringOutput::Guess, $options->stringFormat);
+        $this->assertFalse($options->numericEnums);
+        $this->assertFalse($options->numericTimeticks);
+        $this->assertTrue($options->printUnits);
+        $this->assertTrue($options->applyDisplayHints);
+
+        $this->assertFalse($options->quickPrint);
+        $this->assertFalse($options->extendedIndex);
+        $this->assertFalse($options->allowUnderscores);
+    }
+
+    public function testQuickPrintDefaults(): void
+    {
+        $options = SnmpQueryOptions::quickPrint();
+
+        $this->assertSame('', $options->context);
+        $this->assertContains('SNMPv2-MIB', $options->mibs);
+        $this->assertSame([], $options->mibDirs);
+        $this->assertTrue($options->allowBulk);
+        $this->assertFalse($options->tolerateUnorderedIndexes);
+
+        $this->assertSame(SnmpOidOutput::Module, $options->oidFormat);
+        $this->assertFalse($options->numericIndexes);
+        $this->assertTrue($options->outputMibNames);
+
+        $this->assertSame(SnmpStringOutput::Guess, $options->stringFormat);
         $this->assertTrue($options->numericEnums);
         $this->assertTrue($options->numericTimeticks);
         $this->assertFalse($options->printUnits);
@@ -120,15 +145,17 @@ class SnmpQueryOptionsTest extends TestCase
     {
         // When 's' comes after 'n', symbolic without MIB wins
         $optionsS = (new SnmpQueryOptions)->parseCli(['-Ons']);
-        $this->assertSame(SnmpOidOutput::Numeric, $optionsS->oidFormat);
+        $this->assertSame(SnmpOidOutput::Suffix, $optionsS->oidFormat);
+        $this->assertFalse($optionsS->outputMibNames);
 
         // When 'n' comes after 's', numeric wins
         $optionsN = (new SnmpQueryOptions)->parseCli(['-Osn']);
-        $this->assertSame(SnmpOidOutput::Suffix, $optionsN->oidFormat);
+        $this->assertSame(SnmpOidOutput::Numeric, $optionsN->oidFormat);
 
         // When 'S' comes after 'n', symbolic with MIB wins
         $optionsUpperS = (new SnmpQueryOptions)->parseCli(['-OnS']);
         $this->assertSame(SnmpOidOutput::Module, $optionsUpperS->oidFormat);
+        $this->assertTrue($optionsUpperS->outputMibNames);
     }
 
     public function testParseCliDisplayHints(): void

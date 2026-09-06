@@ -239,4 +239,37 @@ class SnmpQueryTest extends TestCase
             && $event->device === $this->device
             && $event->response->raw === "sysDescr.0 = Linux 6.0\n");
     }
+
+    public function testSnmpQueryDefaultsToQuickPrintOptions(): void
+    {
+        $mockBackend = $this->mockBackend();
+        $mockBackend->shouldReceive('get')
+            ->once()
+            ->withArgs(function (SnmpTarget $target, array $oids, SnmpQueryOptions $options) {
+                return $options->quickPrint === true
+                    && $options->extendedIndex === true
+                    && $options->printUnits === false
+                    && $options->numericEnums === true
+                    && $options->numericTimeticks === true;
+            })
+            ->andReturn(new SnmpResponse("sysDescr.0 = Linux\n"));
+
+        $query = (new SnmpQuery($mockBackend))->device($this->device);
+        $query->get('sysDescr.0');
+    }
+
+    public function testHideMibSetsSuffixAndOidFormat(): void
+    {
+        $mockBackend = $this->mockBackend();
+        $mockBackend->shouldReceive('get')
+            ->once()
+            ->withArgs(function (SnmpTarget $target, array $oids, SnmpQueryOptions $options) {
+                return $options->outputMibNames === false
+                    && $options->oidFormat === SnmpOidOutput::Suffix;
+            })
+            ->andReturn(new SnmpResponse("sysDescr.0 = Linux\n"));
+
+        $query = (new SnmpQuery($mockBackend))->device($this->device)->hideMib();
+        $query->get('sysDescr.0');
+    }
 }

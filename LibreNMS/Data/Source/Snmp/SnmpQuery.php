@@ -43,11 +43,11 @@ class SnmpQuery implements SnmpQueryInterface
 {
     private Device $device;
     private string $context = '';
-    private readonly SnmpQueryOptions $options;
+    private SnmpQueryOptions $options;
     private bool $abort = false;
     private bool $cache = false;
     private readonly SnmpBackendInterface $backend;
-    private SnmpTranslatorInterface $translateBackend;
+    private readonly SnmpTranslatorInterface $translateBackend;
 
     public function __construct(
         ?SnmpBackendInterface $backend = null,
@@ -64,7 +64,7 @@ class SnmpQuery implements SnmpQueryInterface
             $this->translateBackend = resolve(SnmpTranslatorInterface::class);
         }
 
-        $this->options = $options ?? new SnmpQueryOptions();
+        $this->options = $options ?? SnmpQueryOptions::quickPrint();
         $this->device = DeviceCache::getPrimary();
     }
 
@@ -187,6 +187,7 @@ class SnmpQuery implements SnmpQueryInterface
     public function hideMib(): SnmpQueryInterface
     {
         $this->options->outputMibNames = false;
+        $this->options->oidFormat = SnmpOidOutput::Suffix;
 
         return $this;
     }
@@ -204,12 +205,16 @@ class SnmpQuery implements SnmpQueryInterface
     /**
      * Set option(s) for net-snmp command line. Converts net-snmp flags to SnmpQueryOptions.
      *
-     * @param  string[]|string|null  $options
+     * @param  string[]|string|SnmpQueryOptions|null  $options
      * @return $this
      */
-    public function options($options = []): SnmpQueryInterface
+    public function options(SnmpQueryOptions|array|string|null $options = []): SnmpQueryInterface
     {
-        $this->options->parseCli($options ?: null);
+        if ($options instanceof SnmpQueryOptions) {
+            $this->options = $options;
+        } else {
+            $this->options->parseCli($options ?: null);
+        }
 
         return $this;
     }
