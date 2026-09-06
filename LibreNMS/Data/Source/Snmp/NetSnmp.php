@@ -29,7 +29,6 @@ namespace LibreNMS\Data\Source\Snmp;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 use Symfony\Component\Process\Process;

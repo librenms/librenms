@@ -5,8 +5,8 @@ namespace LibreNMS\Tests\Unit;
 use App\Models\Device;
 use LibreNMS\Data\Source\Snmp\NetSnmp;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpTarget;
-use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Tests\TestCase;
 

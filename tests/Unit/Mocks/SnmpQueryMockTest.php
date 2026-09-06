@@ -34,7 +34,7 @@ namespace LibreNMS\Tests\Unit\Mocks;
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use Illuminate\Database\Eloquent\Collection;
-use LibreNMS\Data\Source\SnmpQuery;
+use LibreNMS\Data\Source\Snmp\SnmpQuery;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
 use LibreNMS\Tests\SnmpsimHelpers;
 use LibreNMS\Tests\TestCase;

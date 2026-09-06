@@ -56,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpBackendInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
-        $this->app->bind(\LibreNMS\Data\Source\SnmpQueryInterface::class, \LibreNMS\Data\Source\SnmpQuery::class);
+        $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpQueryInterface::class, \LibreNMS\Data\Source\Snmp\SnmpQuery::class);
     }
 
     /**

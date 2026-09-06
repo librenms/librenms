@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Collection;
-use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use SnmpQuery;
 
 class SnmpTranslate extends SnmpFetch

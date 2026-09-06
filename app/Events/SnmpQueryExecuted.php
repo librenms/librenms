@@ -4,7 +4,7 @@ namespace App\Events;
 
 use App\Models\Device;
 use Illuminate\Foundation\Events\Dispatchable;
-use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 
 class SnmpQueryExecuted
 {

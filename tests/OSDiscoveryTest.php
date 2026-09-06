@@ -30,7 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Source\SnmpQuery;
+use LibreNMS\Data\Source\Snmp\SnmpQuery;
 use LibreNMS\Modules\Core;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
 use LibreNMS\Util\Debug;

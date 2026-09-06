@@ -24,7 +24,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Data\Source;
+namespace LibreNMS\Data\Source\Snmp;
 
 use App\Events\SnmpQueryExecuted;
 use App\Facades\LibrenmsConfig;
@@ -33,10 +33,6 @@ use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
-use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
-use LibreNMS\Data\Source\Snmp\SnmpTarget;
-use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mib;
 use LibreNMS\Util\Oid;

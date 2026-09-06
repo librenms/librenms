@@ -24,7 +24,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Data\Source;
+namespace LibreNMS\Data\Source\Snmp;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;

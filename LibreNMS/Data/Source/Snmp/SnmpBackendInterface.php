@@ -26,8 +26,6 @@
 
 namespace LibreNMS\Data\Source\Snmp;
 
-use LibreNMS\Data\Source\SnmpResponse;
-
 /**
  * Executes SNMP requests against a device over the wire.
  *

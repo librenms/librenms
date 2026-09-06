@@ -5,11 +5,11 @@ namespace LibreNMS\Tests\Unit;
 use App\Models\Device;
 use Illuminate\Support\Facades\Cache;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
+use LibreNMS\Data\Source\Snmp\SnmpQuery;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpTarget;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
-use LibreNMS\Data\Source\SnmpQuery;
-use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 

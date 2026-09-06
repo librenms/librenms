@@ -8,7 +8,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
-use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 use SnmpQuery;
