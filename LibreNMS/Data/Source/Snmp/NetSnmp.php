@@ -29,8 +29,8 @@ namespace LibreNMS\Data\Source\Snmp;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Enum\SnmpStringOutput;
 use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Enum\SnmpStringOutput;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 use Symfony\Component\Process\Process;
@@ -169,13 +169,13 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
             $opts .= 'T';
         }
 
-        $opts .= match($options->stringFormat) {
+        $opts .= match ($options->stringFormat) {
             SnmpStringOutput::Ascii => 'a',
             SnmpStringOutput::Hex => 'x',
             default => '',
         };
 
-        $opts .= match($options->oidFormat) {
+        $opts .= match ($options->oidFormat) {
             SnmpOidOutput::Full => 'f',
             SnmpOidOutput::Suffix => 's',
             SnmpOidOutput::Module => 'S',

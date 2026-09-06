@@ -27,8 +27,8 @@
 namespace LibreNMS\Data\Source\Snmp;
 
 use Illuminate\Support\Arr;
-use LibreNMS\Enum\SnmpStringOutput;
 use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Enum\SnmpStringOutput;
 
 class SnmpQueryOptions
 {
