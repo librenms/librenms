@@ -1,13 +1,15 @@
 os: asrockrack
 text: 'ASRock Rack BMC'
 type: appliance
+icon: asrockrack
 mib_dir: asrockrack
 snmp_bulk: false
+over:
+    - { graph: device_temperature, text: 'Temperatures' }
+    - { graph: device_fanspeed, text: 'Fan Speed' }
 discovery:
     -   sysObjectID: .1.3.6.1.4.1.8072.
-        snmpwalk:
-            # snmpwalk instead of snmpget: some ASRock/AMI BMC firmwares answer
-            # GETNEXT but not direct GET on the vendor tree
-            oid: .1.3.6.1.4.1.49622.1
-            op: 'contains'
-            value: '49622.1.1.0'
+        snmpget:
+            oid: ASROCKRACK-AM5D4ID-MIB::MBModelName.0
+            op: '!='
+            value: false
