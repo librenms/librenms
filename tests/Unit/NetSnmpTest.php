@@ -286,6 +286,24 @@ class NetSnmpTest extends TestCase
         $this->assertContains('-Cc', $cli);
     }
 
+    public function testBuildCliAsciiStrings(): void
+    {
+        $target = new SnmpTarget(
+            hostname: '192.168.1.1',
+            config: new SnmpConfig(version: 'v2c', community: 'public'),
+        );
+
+        $options = new SnmpQueryOptions(asciiStrings: true);
+        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
+        $this->assertContains('-OQXUtea', $cli);
+
+        $optionsFromCli = (new SnmpQueryOptions)->parseCli(['-OteQUSab', '-Pu', '-Ih']);
+        $cliFromCli = $this->backend->buildCli('snmpwalk', $target, ['.1.3.6.1.4.1.2356.100'], $optionsFromCli);
+        $this->assertContains('-OQUteba', $cliFromCli);
+        $this->assertContains('-Pu', $cliFromCli);
+        $this->assertContains('-Ih', $cliFromCli);
+    }
+
     public function testSnmpTargetFromDevice(): void
     {
         $device = new Device([

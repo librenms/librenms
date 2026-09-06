@@ -23,6 +23,7 @@ class SnmpQueryOptionsTest extends TestCase
 
         $this->assertTrue($options->numericEnums);
         $this->assertTrue($options->numericTimeticks);
+        $this->assertFalse($options->asciiStrings);
         $this->assertFalse($options->printUnits);
         $this->assertTrue($options->applyDisplayHints);
 
@@ -42,6 +43,7 @@ class SnmpQueryOptionsTest extends TestCase
             outputMibNames: false,
             numericEnums: false,
             numericTimeticks: false,
+            asciiStrings: true,
             printUnits: true,
             applyDisplayHints: false,
             quickPrint: false,
@@ -59,6 +61,7 @@ class SnmpQueryOptionsTest extends TestCase
         $this->assertTrue($options->outputMibNames);
         $this->assertTrue($options->numericEnums);
         $this->assertTrue($options->numericTimeticks);
+        $this->assertFalse($options->asciiStrings);
         $this->assertFalse($options->printUnits);
         $this->assertTrue($options->applyDisplayHints);
         $this->assertTrue($options->quickPrint);
@@ -73,6 +76,7 @@ class SnmpQueryOptionsTest extends TestCase
         $this->assertTrue($options->numericOids);
         $this->assertTrue($options->numericIndexes);
         $this->assertTrue($options->numericEnums);
+        $this->assertFalse($options->asciiStrings);
         $this->assertFalse($options->printUnits);
         $this->assertFalse($options->quickPrint);
         $this->assertFalse($options->extendedIndex);
@@ -92,6 +96,7 @@ class SnmpQueryOptionsTest extends TestCase
         $this->assertFalse($options->printUnits);
         $this->assertFalse($options->outputMibNames);
         $this->assertTrue($options->numericIndexes);
+        $this->assertTrue($options->asciiStrings);
     }
 
     public function testParseCliDisplayHints(): void

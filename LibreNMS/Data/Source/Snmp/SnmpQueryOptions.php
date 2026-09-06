@@ -51,6 +51,7 @@ class SnmpQueryOptions
         // Value formatting
         public bool $numericEnums = true,
         public bool $numericTimeticks = true,
+        public bool $asciiStrings = false,
         public bool $printUnits = false,
         public bool $applyDisplayHints = true,
 
@@ -75,6 +76,7 @@ class SnmpQueryOptions
             $this->outputMibNames = true;
             $this->numericEnums = true;
             $this->numericTimeticks = true;
+            $this->asciiStrings = false;
             $this->printUnits = false;
             $this->applyDisplayHints = true;
             $this->quickPrint = true;
@@ -104,6 +106,7 @@ class SnmpQueryOptions
                 $this->numericIndexes = str_contains($opts, 'b');
                 $this->outputMibNames = ! str_contains($opts, 's');
                 $this->numericEnums = str_contains($opts, 'e');
+                $this->asciiStrings = str_contains($opts, 'a');
             } elseif (str_starts_with($flag, '-C')) {
                 $opts = substr($flag, 2);
                 if (str_contains($opts, 'c') || str_contains($opts, 'i')) {
