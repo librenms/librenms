@@ -50,7 +50,7 @@ class Ping
     {
         $bytes = $size > 28 ? $size - 28 : $size;
 
-        $frag = match(LibrenmsConfig::get('mtu_options.fragmentation', 'pmtu')) {
+        $frag = match (LibrenmsConfig::get('mtu_options.fragmentation', 'pmtu')) {
             'allow' => 'dont',
             'deny' => 'do',
             default => 'want',

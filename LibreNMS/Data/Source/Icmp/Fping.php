@@ -176,9 +176,9 @@ class Fping
             '-b', (string) $bytes,
         ];
 
-        if(LibrenmsConfig::get('mtu_options.fragmentation', 'pmtu') == 'deny') {
+        if (LibrenmsConfig::get('mtu_options.fragmentation', 'pmtu') == 'deny') {
             $args[] = '-M';
-        };
+        }
 
         $args[] = $host;
 
