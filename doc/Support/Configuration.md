@@ -768,7 +768,7 @@ without fragmentation. It tests two-way communication. The packets can
 still need fragmentation at any point on the path.
 
 If you have many devices that require fragmentation with the chosen MTU setting and start getting false
-positives, you should change your system to use the ping command for MTU checks.
+positives, you should change the fragmentation setting to Allow (which will use the ping instead of fping)
 
 ## Auto discovery settings
 
