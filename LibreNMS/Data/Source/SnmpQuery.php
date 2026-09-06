@@ -36,7 +36,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpTarget;
-use LibreNMS\Data\Source\Snmp\SnmpTranslateBackendInterface;
+use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mib;
 use LibreNMS\Util\Oid;
@@ -50,21 +50,21 @@ class SnmpQuery implements SnmpQueryInterface
     private bool $abort = false;
     private bool $cache = false;
     private SnmpBackendInterface $backend;
-    private SnmpTranslateBackendInterface $translateBackend;
+    private SnmpTranslatorInterface $translateBackend;
 
     public function __construct(
         ?SnmpBackendInterface $backend = null,
-        ?SnmpTranslateBackendInterface $translateBackend = null,
+        ?SnmpTranslatorInterface $translateBackend = null,
         ?SnmpQueryOptions $options = null,
     ) {
         $this->backend = $backend ?? resolve(SnmpBackendInterface::class);
 
         if ($translateBackend !== null) {
             $this->translateBackend = $translateBackend;
-        } elseif ($this->backend instanceof SnmpTranslateBackendInterface) {
+        } elseif ($this->backend instanceof SnmpTranslatorInterface) {
             $this->translateBackend = $this->backend;
         } else {
-            $this->translateBackend = resolve(SnmpTranslateBackendInterface::class);
+            $this->translateBackend = resolve(SnmpTranslatorInterface::class);
         }
 
         $this->options = $options ?? new SnmpQueryOptions();

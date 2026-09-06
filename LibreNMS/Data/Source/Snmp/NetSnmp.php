@@ -33,7 +33,7 @@ use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 use Symfony\Component\Process\Process;
 
-class NetSnmp implements SnmpBackendInterface, SnmpTranslateBackendInterface
+class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
 {
     public function get(SnmpTarget $target, array $oids, SnmpQueryOptions $options): SnmpResponse
     {
@@ -117,7 +117,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslateBackendInterface
             $cmd[] = '-Cc';
         }
 
-        if ($config->timeout !== 1) {
+        if ($config->timeout > 0 && $config->timeout != 1) {
             array_push($cmd, '-t', (string) $config->timeout);
         }
 

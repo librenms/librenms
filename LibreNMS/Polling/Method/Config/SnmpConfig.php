@@ -45,7 +45,7 @@ final readonly class SnmpConfig
         // Settings
         public string $transport = 'udp',
         public int $port = 161,
-        public int $timeout = 1,
+        public int|float $timeout = 1,
         public int $retries = 5,
         public int $maxRepeaters = 0,
         public int $maxOid = 10,
@@ -54,8 +54,22 @@ final readonly class SnmpConfig
 
     public static function fromDevice(Device $device): self
     {
-        $timeout = $device->timeout ?? LibrenmsConfig::get('snmp.timeout', 1);
-        $retries = $device->retries ?? LibrenmsConfig::get('snmp.retries', 5);
+        $rawTimeout = (is_numeric($device->timeout) && $device->timeout > 0)
+            ? $device->timeout
+            : LibrenmsConfig::get('snmp.timeout', 1);
+
+        $timeout = is_numeric($rawTimeout) && (float) $rawTimeout > 0
+            ? ((float) $rawTimeout == (int) $rawTimeout ? (int) $rawTimeout : (float) $rawTimeout)
+            : 1;
+
+        $rawRetries = (is_numeric($device->retries) && $device->retries >= 0)
+            ? $device->retries
+            : LibrenmsConfig::get('snmp.retries', 5);
+
+        $retries = is_numeric($rawRetries) && (int) $rawRetries >= 0
+            ? (int) $rawRetries
+            : 5;
+
         $maxRepeaters = (int) ($device->getAttrib('snmp_max_repeaters') ?: LibrenmsConfig::getOsSetting($device->os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0)));
         $configuredMaxOid = $device->getAttrib('snmp_max_oid') ?: LibrenmsConfig::getOsSetting($device->os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10));
 
@@ -71,8 +85,8 @@ final readonly class SnmpConfig
             context: $device->context ?? null,
             transport: $device->transport ?? 'udp',
             port: (int) ($device->port ?? 161),
-            timeout: (int) ($timeout ?: 1),
-            retries: (int) ($retries ?: 5),
+            timeout: $timeout,
+            retries: max(0, $retries),
             maxRepeaters: max(0, $maxRepeaters),
             maxOid: max(1, (int) $configuredMaxOid),
         );

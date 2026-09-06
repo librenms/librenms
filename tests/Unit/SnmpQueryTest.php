@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpTarget;
-use LibreNMS\Data\Source\Snmp\SnmpTranslateBackendInterface;
+use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
 use LibreNMS\Data\Source\SnmpQuery;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Tests\TestCase;
@@ -167,7 +167,7 @@ class SnmpQueryTest extends TestCase
     public function testTranslateDelegatesToTranslateBackend(): void
     {
         $mockBackend = $this->mockBackend();
-        $mockTranslate = Mockery::mock(SnmpTranslateBackendInterface::class);
+        $mockTranslate = Mockery::mock(SnmpTranslatorInterface::class);
         $mockTranslate->shouldReceive('translate')
             ->once()
             ->withArgs(fn (string $oid, SnmpQueryOptions $options) => $oid === 'IF-MIB::ifTable')

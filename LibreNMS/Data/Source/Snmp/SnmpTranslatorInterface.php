@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Data\Source\Snmp;
 
-interface SnmpTranslateBackendInterface
+interface SnmpTranslatorInterface
 {
     public function translate(string $oid, SnmpQueryOptions $options): string;
 }

@@ -207,6 +207,39 @@ class NetSnmpTest extends TestCase
         $this->assertContains('0', $cli);
     }
 
+    public function testBuildCliFloatTimeout(): void
+    {
+        $target = new SnmpTarget(
+            hostname: '192.168.1.1',
+            config: new SnmpConfig(
+                version: 'v2c',
+                community: 'public',
+                timeout: 0.2,
+            ),
+        );
+
+        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], new SnmpQueryOptions());
+
+        $this->assertContains('-t', $cli);
+        $this->assertContains('0.2', $cli);
+    }
+
+    public function testBuildCliZeroOrNegativeTimeoutDoesNotEmitFlag(): void
+    {
+        $target = new SnmpTarget(
+            hostname: '192.168.1.1',
+            config: new SnmpConfig(
+                version: 'v2c',
+                community: 'public',
+                timeout: 0,
+            ),
+        );
+
+        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], new SnmpQueryOptions());
+
+        $this->assertNotContains('-t', $cli);
+    }
+
     public function testBuildCliFormattingOptions(): void
     {
         $target = new SnmpTarget(
@@ -233,7 +266,7 @@ class NetSnmpTest extends TestCase
 
     public function testSnmpQueryOptionsFromCli(): void
     {
-        $options = (new SnmpQueryOptions)::parseCli(['-OUneb', '-Cc']);
+        $options = (new SnmpQueryOptions)->parseCli(['-OUneb', '-Cc']);
 
         $this->assertTrue($options->outputOidsNumerically);
         $this->assertTrue($options->outputIndexesNumerically);
@@ -241,7 +274,7 @@ class NetSnmpTest extends TestCase
         $this->assertTrue($options->tolerateUnorderedIndexes);
         $this->assertTrue($options->outputMibNames);
 
-        $optionsHideMib = (new SnmpQueryOptions)::parseCli('-OQUs');
+        $optionsHideMib = (new SnmpQueryOptions)->parseCli('-OQUs');
         $this->assertFalse($optionsHideMib->outputMibNames);
         $this->assertTrue($optionsHideMib->outputEnumsAsStrings);
     }
@@ -266,6 +299,27 @@ class NetSnmpTest extends TestCase
         $this->assertSame(2, $target->config->timeout);
         $this->assertSame(3, $target->config->retries);
         $this->assertSame($device, $target->device);
+    }
+
+    public function testSnmpTargetFromDeviceFloatTimeout(): void
+    {
+        $device = new Device([
+            'hostname' => 'router1.example.com',
+            'snmpver' => 'v2c',
+            'community' => 'test-comm',
+            'timeout' => 0.5,
+        ]);
+
+        $target = SnmpTarget::fromDevice($device);
+        $this->assertSame(0.5, $target->config->timeout);
+
+        // A timeout <= 0 falls back to configured snmp.timeout
+        $deviceZero = new Device([
+            'hostname' => 'router1.example.com',
+            'timeout' => 0,
+        ]);
+        $targetZero = SnmpTarget::fromDevice($deviceZero);
+        $this->assertSame(\App\Facades\LibrenmsConfig::get('snmp.timeout', 1), $targetZero->config->timeout);
     }
 
     public function testSnmpResponseStoresCommand(): void
