@@ -73,27 +73,91 @@ class SnmpQueryOptions
     public function parseCli(array|string|null $flags): self
     {
         if ($flags === null) {
-            $this->context = '';
-            $this->allowBulk = true;
-            $this->tolerateUnorderedIndexes = false;
-            $this->escapeQuotes = false;
-            $this->numericIndexes = false;
-            $this->outputMibNames = true;
-            $this->numericEnums = true;
-            $this->numericTimeticks = true;
-            $this->printHexText = false;
-            $this->printUnits = false;
-            $this->applyDisplayHints = true;
-            $this->quickPrint = true;
-            $this->extendedIndex = true;
-            $this->allowUnderscores = false;
-            $this->stringFormat = SnmpStringOutput::Guess;
-            $this->oidFormat = SnmpOidOutput::Module;
-
-            return $this;
+            return $this->applyQuickPrintDefaults();
         }
 
-        // Reset to SNMP library defaults
+        $this->applySnmpLibraryDefaults();
+
+        $flagsArray = Arr::wrap($flags);
+
+        for ($i = 0; $i < count($flagsArray); $i++) {
+            $flag = $flagsArray[$i];
+            if (! is_string($flag)) {
+                continue;
+            }
+
+            if (str_starts_with($flag, '-O')) {
+                foreach (str_split(substr($flag, 2)) as $outopt) {
+                    match ($outopt) {
+                        'a' => $this->stringFormat = SnmpStringOutput::Ascii,
+                        'x' => $this->stringFormat = SnmpStringOutput::Hex,
+                        'f' => $this->oidFormat = SnmpOidOutput::Full,
+                        's' => $this->oidFormat = SnmpOidOutput::Suffix,
+                        'S' => $this->oidFormat = SnmpOidOutput::Module,
+                        'u' => $this->oidFormat = SnmpOidOutput::Ucd,
+                        'n' => $this->oidFormat = SnmpOidOutput::Numeric,
+                        'b' => $this->numericIndexes = true,
+                        'e' => $this->numericEnums = true,
+                        'E' => $this->escapeQuotes = true,
+                        'Q' => $this->quickPrint = true,
+                        't' => $this->numericTimeticks = true,
+                        'T' => $this->printHexText = true,
+                        'U' => $this->printUnits = false,
+                        'X' => $this->extendedIndex = true,
+                        default => throw new \Exception("Unknown option -O$outopt"),
+                    };
+                }
+            } elseif (str_starts_with($flag, '-C')) {
+                $opts = substr($flag, 2);
+                if (str_contains($opts, 'c')) {
+                    $this->tolerateUnorderedIndexes = true;
+                }
+                if (str_contains($opts, 'i')) {
+                    $this->includeGivenOid = true;
+                }
+            } elseif (str_starts_with($flag, '-P')) {
+                $this->allowUnderscores = str_contains(substr($flag, 2), 'u');
+            } elseif (str_starts_with($flag, '-I')) {
+                if (str_contains(substr($flag, 2), 'h')) {
+                    $this->applyDisplayHints = false;
+                }
+            } elseif ($flag === '-m' || (str_starts_with($flag, '-m') && strlen($flag) > 2)) {
+                $this->addMibs($flag === '-m' ? $this->nextArg($flagsArray, $i) : substr($flag, 2));
+            } elseif ($flag === '-M' || (str_starts_with($flag, '-M') && strlen($flag) > 2)) {
+                $mibDir = $flag === '-M' ? $this->nextArg($flagsArray, $i) : substr($flag, 2);
+                if ($mibDir !== null) {
+                    $this->mibDirs = explode(':', $mibDir);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    private function applyQuickPrintDefaults(): self
+    {
+        $this->context = '';
+        $this->allowBulk = true;
+        $this->tolerateUnorderedIndexes = false;
+        $this->escapeQuotes = false;
+        $this->numericIndexes = false;
+        $this->outputMibNames = true;
+        $this->numericEnums = true;
+        $this->numericTimeticks = true;
+        $this->printHexText = false;
+        $this->printUnits = false;
+        $this->applyDisplayHints = true;
+        $this->quickPrint = true;
+        $this->extendedIndex = true;
+        $this->allowUnderscores = false;
+        $this->stringFormat = SnmpStringOutput::Guess;
+        $this->oidFormat = SnmpOidOutput::Module;
+
+        return $this;
+    }
+
+    private function applySnmpLibraryDefaults(): void
+    {
         $this->context = '';
         $this->allowBulk = true;
         $this->tolerateUnorderedIndexes = false;
@@ -109,113 +173,24 @@ class SnmpQueryOptions
         $this->allowUnderscores = false;
         $this->stringFormat = SnmpStringOutput::Guess;
         $this->oidFormat = SnmpOidOutput::Module;
+    }
 
-        $wrapped = Arr::wrap($flags);
-        $hasCustomOutputFlags = false;
-
-        for ($i = 0; $i < count($wrapped); $i++) {
-            $flag = $wrapped[$i];
-            if (! is_string($flag)) {
-                continue;
-            }
-
-            if (str_starts_with($flag, '-O')) {
-                $hasCustomOutputFlags = true;
-                foreach (str_split(substr((string) $flag, 2)) as $outopt) {
-                    switch ($outopt) {
-                        case 'a':
-                            $this->stringFormat = SnmpStringOutput::Ascii;
-                            break;
-                        case 'x':
-                            $this->stringFormat = SnmpStringOutput::Hex;
-                            break;
-                        case 'f':
-                            $this->oidFormat = SnmpOidOutput::Full;
-                            break;
-                        case 's':
-                            $this->oidFormat = SnmpOidOutput::Suffix;
-                            break;
-                        case 'S':
-                            $this->oidFormat = SnmpOidOutput::Module;
-                            break;
-                        case 'u':
-                            $this->oidFormat = SnmpOidOutput::Ucd;
-                            break;
-                        case 'n':
-                            $this->oidFormat = SnmpOidOutput::Numeric;
-                            break;
-                        case 'b':
-                            $this->numericIndexes = true;
-                            break;
-                        case 'e':
-                            $this->numericEnums = true;
-                            break;
-                        case 'E':
-                            $this->escapeQuotes = true;
-                            break;
-                        case 'Q':
-                            $this->quickPrint = true;
-                            break;
-                        case 't':
-                            $this->numericTimeticks = true;
-                            break;
-                        case 'T':
-                            $this->printHexText = true;
-                            break;
-                        case 'U':
-                            $this->printUnits = false;
-                            break;
-                        case 'X':
-                            $this->extendedIndex = true;
-                            break;
-                        default:
-                            throw new \Exception("Unknown option -O$outopt");
-                    }
-                }
-            } elseif (str_starts_with($flag, '-C')) {
-                $opts = substr($flag, 2);
-                if (str_contains($opts, 'c')) {
-                    $this->tolerateUnorderedIndexes = true;
-                }
-                if (str_contains($opts, 'i')) {
-                    $this->includeGivenOid = true;
-                }
-            } elseif (str_starts_with($flag, '-P')) {
-                $opts = substr($flag, 2);
-                $this->allowUnderscores = str_contains($opts, 'u');
-            } elseif (str_starts_with($flag, '-I')) {
-                $opts = substr($flag, 2);
-                if (str_contains($opts, 'h')) {
-                    $this->applyDisplayHints = false;
-                }
-            } elseif ($flag === '-m' && isset($wrapped[$i + 1])) {
-                $mib = $wrapped[++$i];
-                if (is_string($mib)) {
-                    if (str_starts_with($mib, '+')) {
-                        $this->mibs[] = substr($mib, 1);
-                        $this->mibs = array_values(array_unique($this->mibs));
-                    } else {
-                        $this->mibs = explode(':', $mib);
-                    }
-                }
-            } elseif (str_starts_with($flag, '-m') && strlen($flag) > 2) {
-                $mib = substr($flag, 2);
-                if (str_starts_with($mib, '+')) {
-                    $this->mibs[] = substr($mib, 1);
-                    $this->mibs = array_values(array_unique($this->mibs));
-                } else {
-                    $this->mibs = explode(':', $mib);
-                }
-            } elseif ($flag === '-M' && isset($wrapped[$i + 1])) {
-                $mibDir = $wrapped[++$i];
-                if (is_string($mibDir)) {
-                    $this->mibDirs = explode(':', $mibDir);
-                }
-            } elseif (str_starts_with($flag, '-M') && strlen($flag) > 2) {
-                $this->mibDirs = explode(':', substr($flag, 2));
-            }
+    private function addMibs(?string $mib): void
+    {
+        if ($mib === null) {
+            return;
         }
 
-        return $this;
+        if (str_starts_with($mib, '+')) {
+            $this->mibs[] = substr($mib, 1);
+            $this->mibs = array_values(array_unique($this->mibs));
+        } else {
+            $this->mibs = explode(':', $mib);
+        }
+    }
+
+    private function nextArg(array $wrapped, int &$i): ?string
+    {
+        return isset($wrapped[$i + 1]) && is_string($wrapped[$i + 1]) ? $wrapped[++$i] : null;
     }
 }
