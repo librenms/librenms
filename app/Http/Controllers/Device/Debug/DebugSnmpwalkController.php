@@ -36,6 +36,7 @@ use Illuminate\Validation\Rule;
 use LibreNMS\Data\Source\Snmp\NetSnmp;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpTarget;
+use LibreNMS\Enum\SnmpOidOutput;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DebugSnmpwalkController extends Controller
@@ -73,7 +74,7 @@ class DebugSnmpwalkController extends Controller
     {
         $options = new SnmpQueryOptions(
             allowBulk: LibrenmsConfig::getOsSetting($device->os, 'snmp_bulk', true),
-            numericOids: true,
+            oidFormat: SnmpOidOutput::Numeric,
             numericIndexes: true,
             numericTimeticks: false,
             quickPrint: false,

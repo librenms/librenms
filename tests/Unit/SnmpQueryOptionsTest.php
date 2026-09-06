@@ -3,6 +3,8 @@
 namespace LibreNMS\Tests\Unit;
 
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
+use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Enum\SnmpStringOutput;
 use LibreNMS\Tests\TestCase;
 
 class SnmpQueryOptionsTest extends TestCase
@@ -17,14 +19,13 @@ class SnmpQueryOptionsTest extends TestCase
         $this->assertTrue($options->allowBulk);
         $this->assertFalse($options->tolerateUnorderedIndexes);
 
-        $this->assertFalse($options->numericOids);
+        $this->assertSame(SnmpOidOutput::Module, $options->oidFormat);
         $this->assertFalse($options->numericIndexes);
         $this->assertTrue($options->outputMibNames);
 
+        $this->assertSame(SnmpStringOutput::Guess, $options->stringFormat);
         $this->assertTrue($options->numericEnums);
         $this->assertTrue($options->numericTimeticks);
-        $this->assertFalse($options->asciiStrings);
-        $this->assertFalse($options->hexStrings);
         $this->assertFalse($options->printUnits);
         $this->assertTrue($options->applyDisplayHints);
 
@@ -39,13 +40,12 @@ class SnmpQueryOptionsTest extends TestCase
             context: 'custom-ctx',
             allowBulk: false,
             tolerateUnorderedIndexes: true,
-            numericOids: true,
+            oidFormat: SnmpOidOutput::Ucd,
             numericIndexes: true,
             outputMibNames: false,
             numericEnums: false,
             numericTimeticks: false,
-            asciiStrings: true,
-            hexStrings: true,
+            stringFormat: SnmpStringOutput::Ascii,
             printUnits: true,
             applyDisplayHints: false,
             quickPrint: false,
@@ -58,13 +58,12 @@ class SnmpQueryOptionsTest extends TestCase
         $this->assertSame('', $options->context);
         $this->assertTrue($options->allowBulk);
         $this->assertFalse($options->tolerateUnorderedIndexes);
-        $this->assertFalse($options->numericOids);
+        $this->assertSame(SnmpOidOutput::Module, $options->oidFormat);
         $this->assertFalse($options->numericIndexes);
         $this->assertTrue($options->outputMibNames);
         $this->assertTrue($options->numericEnums);
         $this->assertTrue($options->numericTimeticks);
-        $this->assertFalse($options->asciiStrings);
-        $this->assertFalse($options->hexStrings);
+        $this->assertSame(SnmpStringOutput::Guess, $options->stringFormat);
         $this->assertFalse($options->printUnits);
         $this->assertTrue($options->applyDisplayHints);
         $this->assertTrue($options->quickPrint);
@@ -76,16 +75,15 @@ class SnmpQueryOptionsTest extends TestCase
     {
         $options = (new SnmpQueryOptions)->parseCli(['-OUneb']);
 
-        $this->assertTrue($options->numericOids);
+        $this->assertSame(SnmpOidOutput::Numeric, $options->oidFormat);
         $this->assertTrue($options->numericIndexes);
         $this->assertTrue($options->numericEnums);
-        $this->assertFalse($options->asciiStrings);
-        $this->assertFalse($options->hexStrings);
+        $this->assertSame(SnmpStringOutput::Guess, $options->stringFormat);
         $this->assertFalse($options->printUnits);
         $this->assertFalse($options->quickPrint);
         $this->assertFalse($options->extendedIndex);
         $this->assertFalse($options->numericTimeticks);
-        $this->assertTrue($options->allowUnderscores);
+        $this->assertFalse($options->allowUnderscores);
         $this->assertTrue($options->outputMibNames);
     }
 
@@ -93,50 +91,44 @@ class SnmpQueryOptionsTest extends TestCase
     {
         $options = (new SnmpQueryOptions)->parseCli(['-OteQUsab', '-Pu']);
 
-        $this->assertFalse($options->allowUnderscores);
+        $this->assertTrue($options->allowUnderscores);
         $this->assertTrue($options->numericTimeticks);
         $this->assertTrue($options->numericEnums);
         $this->assertTrue($options->quickPrint);
         $this->assertFalse($options->printUnits);
         $this->assertFalse($options->outputMibNames);
         $this->assertTrue($options->numericIndexes);
-        $this->assertTrue($options->asciiStrings);
-        $this->assertFalse($options->hexStrings);
+        $this->assertSame(SnmpStringOutput::Ascii, $options->stringFormat);
     }
 
     public function testParseCliHexStringsPrecedence(): void
     {
         // When 'x' comes after 'a', hexStrings wins
         $optionsX = (new SnmpQueryOptions)->parseCli(['-OteQUax']);
-        $this->assertTrue($optionsX->hexStrings);
-        $this->assertFalse($optionsX->asciiStrings);
+        $this->assertSame(SnmpStringOutput::Hex, $optionsX->stringFormat);
 
         // When 'a' comes after 'x', asciiStrings wins
         $optionsA = (new SnmpQueryOptions)->parseCli(['-OteQUxa']);
-        $this->assertTrue($optionsA->asciiStrings);
-        $this->assertFalse($optionsA->hexStrings);
+        $this->assertSame(SnmpStringOutput::Ascii, $optionsA->stringFormat);
 
         // Standard -OQUsx
         $optionsOnlyX = (new SnmpQueryOptions)->parseCli(['-OQUsx']);
-        $this->assertTrue($optionsOnlyX->hexStrings);
-        $this->assertFalse($optionsOnlyX->asciiStrings);
+        $this->assertSame(SnmpStringOutput::Hex, $optionsOnlyX->stringFormat);
     }
 
     public function testParseCliNumericAndSymbolicPrecedence(): void
     {
         // When 's' comes after 'n', symbolic without MIB wins
         $optionsS = (new SnmpQueryOptions)->parseCli(['-Ons']);
-        $this->assertFalse($optionsS->numericOids);
-        $this->assertFalse($optionsS->outputMibNames);
+        $this->assertSame(SnmpOidOutput::Numeric, $optionsS->oidFormat);
 
         // When 'n' comes after 's', numeric wins
         $optionsN = (new SnmpQueryOptions)->parseCli(['-Osn']);
-        $this->assertTrue($optionsN->numericOids);
+        $this->assertSame(SnmpOidOutput::Suffix, $optionsN->oidFormat);
 
         // When 'S' comes after 'n', symbolic with MIB wins
         $optionsUpperS = (new SnmpQueryOptions)->parseCli(['-OnS']);
-        $this->assertFalse($optionsUpperS->numericOids);
-        $this->assertTrue($optionsUpperS->outputMibNames);
+        $this->assertSame(SnmpOidOutput::Module, $optionsUpperS->oidFormat);
     }
 
     public function testParseCliDisplayHints(): void
@@ -154,7 +146,7 @@ class SnmpQueryOptionsTest extends TestCase
         $this->assertTrue($optionsC->tolerateUnorderedIndexes);
 
         $optionsI = (new SnmpQueryOptions)->parseCli(['-Ci']);
-        $this->assertTrue($optionsI->tolerateUnorderedIndexes);
+        $this->assertTrue($optionsI->includeGivenOid);
     }
 
     public function testParseCliMibVisibility(): void
@@ -198,7 +190,7 @@ class SnmpQueryOptionsTest extends TestCase
     public function testParseCliAcceptsSingleString(): void
     {
         $options = (new SnmpQueryOptions)->parseCli('-OUneb');
-        $this->assertTrue($options->numericOids);
+        $this->assertSame(SnmpOidOutput::Numeric, $options->oidFormat);
         $this->assertTrue($options->numericIndexes);
         $this->assertTrue($options->numericEnums);
     }

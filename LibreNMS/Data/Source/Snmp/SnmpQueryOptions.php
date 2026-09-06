@@ -27,6 +27,8 @@
 namespace LibreNMS\Data\Source\Snmp;
 
 use Illuminate\Support\Arr;
+use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Enum\SnmpStringOutput;
 
 class SnmpQueryOptions
 {
@@ -42,19 +44,21 @@ class SnmpQueryOptions
         // Query behavior
         public bool $allowBulk = true,
         public bool $tolerateUnorderedIndexes = false,
+        public bool $includeGivenOid = false,
 
         // OID formatting
-        public bool $numericOids = false,
         public bool $numericIndexes = false,
         public bool $outputMibNames = true,
+        public SnmpOidOutput $oidFormat = SnmpOidOutput::Module,
 
         // Value formatting
+        public bool $escapeQuotes = false,
         public bool $numericEnums = true,
         public bool $numericTimeticks = true,
-        public bool $asciiStrings = false,
-        public bool $hexStrings = false,
+        public bool $printHexText = false,
         public bool $printUnits = false,
         public bool $applyDisplayHints = true,
+        public SnmpStringOutput $stringFormat = SnmpStringOutput::Guess,
 
         // Output presentation
         public bool $quickPrint = true,
@@ -72,21 +76,39 @@ class SnmpQueryOptions
             $this->context = '';
             $this->allowBulk = true;
             $this->tolerateUnorderedIndexes = false;
-            $this->numericOids = false;
+            $this->escapeQuotes = false;
             $this->numericIndexes = false;
             $this->outputMibNames = true;
             $this->numericEnums = true;
             $this->numericTimeticks = true;
-            $this->asciiStrings = false;
-            $this->hexStrings = false;
+            $this->printHexText = false;
             $this->printUnits = false;
             $this->applyDisplayHints = true;
             $this->quickPrint = true;
             $this->extendedIndex = true;
             $this->allowUnderscores = false;
+            $this->stringFormat = SnmpStringOutput::Guess;
+            $this->oidFormat = SnmpOidOutput::Module;
 
             return $this;
         }
+
+        // Reset to SNMP library defaults
+        $this->context = '';
+        $this->allowBulk = true;
+        $this->tolerateUnorderedIndexes = false;
+        $this->numericIndexes = false;
+        $this->outputMibNames = false;
+        $this->numericEnums = false;
+        $this->numericTimeticks = false;
+        $this->printHexText = false;
+        $this->printUnits = true;
+        $this->applyDisplayHints = false;
+        $this->quickPrint = false;
+        $this->extendedIndex = false;
+        $this->allowUnderscores = false;
+        $this->stringFormat = SnmpStringOutput::Guess;
+        $this->oidFormat = SnmpOidOutput::Module;
 
         $wrapped = Arr::wrap($flags);
         $hasCustomOutputFlags = false;
@@ -99,45 +121,68 @@ class SnmpQueryOptions
 
             if (str_starts_with($flag, '-O')) {
                 $hasCustomOutputFlags = true;
-                $opts = substr($flag, 2);
-                $this->quickPrint = str_contains($opts, 'Q') || str_contains($opts, 'q');
-                $this->extendedIndex = str_contains($opts, 'X');
-                $this->printUnits = ! str_contains($opts, 'U');
-                $this->numericTimeticks = str_contains($opts, 't');
-                $this->numericIndexes = str_contains($opts, 'b');
-                $this->numericEnums = str_contains($opts, 'e');
-
-                $posN = strrpos($opts, 'n');
-                $posS = strrpos($opts, 's');
-                $posUpperS = strrpos($opts, 'S');
-                $lastSymbolicPos = max($posS !== false ? $posS : -1, $posUpperS !== false ? $posUpperS : -1);
-
-                if ($posN !== false && $posN > $lastSymbolicPos) {
-                    $this->numericOids = true;
-                } elseif ($lastSymbolicPos !== -1 && $lastSymbolicPos > ($posN !== false ? $posN : -1)) {
-                    $this->numericOids = false;
-                    $this->outputMibNames = $posUpperS !== false && ($posS === false || $posUpperS > $posS);
-                } elseif ($posS !== false) {
-                    $this->outputMibNames = false;
-                }
-
-                $posA = strrpos($opts, 'a');
-                $posX = strrpos($opts, 'x');
-                if ($posA !== false && ($posX === false || $posA > $posX)) {
-                    $this->asciiStrings = true;
-                    $this->hexStrings = false;
-                } elseif ($posX !== false && ($posA === false || $posX > $posA)) {
-                    $this->hexStrings = true;
-                    $this->asciiStrings = false;
+                foreach (str_split(substr((string) $flag, 2)) as $outopt) {
+                    switch ($outopt) {
+                        case 'a':
+                            $this->stringFormat = SnmpStringOutput::Ascii;
+                            break;
+                        case 'x':
+                            $this->stringFormat = SnmpStringOutput::Hex;
+                            break;
+                        case 'f':
+                            $this->oidFormat = SnmpOidOutput::Full;
+                            break;
+                        case 's':
+                            $this->oidFormat = SnmpOidOutput::Suffix;
+                            break;
+                        case 'S':
+                            $this->oidFormat = SnmpOidOutput::Module;
+                            break;
+                        case 'u':
+                            $this->oidFormat = SnmpOidOutput::Ucd;
+                            break;
+                        case 'n':
+                            $this->oidFormat = SnmpOidOutput::Numeric;
+                            break;
+                        case 'b':
+                            $this->numericIndexes = true;
+                            break;
+                        case 'e':
+                            $this->numericEnums = true;
+                            break;
+                        case 'E':
+                            $this->escapeQuotes = true;
+                            break;
+                        case 'Q':
+                            $this->quickPrint = true;
+                            break;
+                        case 't':
+                            $this->numericTimeticks = true;
+                            break;
+                        case 'T':
+                            $this->printHexText = true;
+                            break;
+                        case 'U':
+                            $this->printUnits = false;
+                            break;
+                        case 'X':
+                            $this->extendedIndex = true;
+                            break;
+                        default:
+                            throw new \Exception("Unknown option -O$outopt");
+                    }
                 }
             } elseif (str_starts_with($flag, '-C')) {
                 $opts = substr($flag, 2);
-                if (str_contains($opts, 'c') || str_contains($opts, 'i')) {
+                if (str_contains($opts, 'c')) {
                     $this->tolerateUnorderedIndexes = true;
+                }
+                if (str_contains($opts, 'i')) {
+                    $this->includeGivenOid = true;
                 }
             } elseif (str_starts_with($flag, '-P')) {
                 $opts = substr($flag, 2);
-                $this->allowUnderscores = ! str_contains($opts, 'u');
+                $this->allowUnderscores = str_contains($opts, 'u');
             } elseif (str_starts_with($flag, '-I')) {
                 $opts = substr($flag, 2);
                 if (str_contains($opts, 'h')) {
@@ -169,10 +214,6 @@ class SnmpQueryOptions
             } elseif (str_starts_with($flag, '-M') && strlen($flag) > 2) {
                 $this->mibDirs = explode(':', substr($flag, 2));
             }
-        }
-
-        if ($hasCustomOutputFlags && ! in_array('-Pu', $wrapped, true)) {
-            $this->allowUnderscores = true;
         }
 
         return $this;
