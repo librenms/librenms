@@ -42,6 +42,7 @@ class SnmpQueryOptions
         // Query behavior
         public bool $allowBulk = true,
         public bool $tolerateUnorderedIndexes = false,
+        public bool $includeGivenOid = false,
 
         // OID formatting
         public bool $numericOids = false,
@@ -132,8 +133,11 @@ class SnmpQueryOptions
                 }
             } elseif (str_starts_with($flag, '-C')) {
                 $opts = substr($flag, 2);
-                if (str_contains($opts, 'c') || str_contains($opts, 'i')) {
+                if (str_contains($opts, 'c')) {
                     $this->tolerateUnorderedIndexes = true;
+                }
+                if (str_contains($opts, 'i')) {
+                    $this->includeGivenOid = true;
                 }
             } elseif (str_starts_with($flag, '-P')) {
                 $opts = substr($flag, 2);
