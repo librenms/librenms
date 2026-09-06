@@ -4,6 +4,7 @@ namespace LibreNMS\Tests\Unit;
 
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Enum\SnmpStringOutput;
 use LibreNMS\Tests\TestCase;
 
 class SnmpQueryOptionsTest extends TestCase
@@ -189,7 +190,7 @@ class SnmpQueryOptionsTest extends TestCase
     public function testParseCliAcceptsSingleString(): void
     {
         $options = (new SnmpQueryOptions)->parseCli('-OUneb');
-        $this->assertTrue($options->numericOids);
+        $this->assertSame(SnmpOidOutput::Numeric, $options->oidFormat);
         $this->assertTrue($options->numericIndexes);
         $this->assertTrue($options->numericEnums);
     }
