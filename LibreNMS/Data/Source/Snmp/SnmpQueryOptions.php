@@ -68,26 +68,26 @@ class SnmpQueryOptions
     }
 
     /**
-     * @param  string[]|string|null  $flags
+     * @param  string[]|string|null  $args
      */
-    public function parseCli(array|string|null $flags): self
+    public function parseCli(array|string|null $args): self
     {
-        if ($flags === null) {
+        if ($args === null) {
             return $this->applyQuickPrintDefaults();
         }
 
         $this->applySnmpLibraryDefaults();
 
-        $flagsArray = Arr::wrap($flags);
+        $arguments = Arr::wrap($args);
 
-        for ($i = 0; $i < count($flagsArray); $i++) {
-            $flag = $flagsArray[$i];
-            if (! is_string($flag)) {
+        for ($i = 0; $i < count($arguments); $i++) {
+            $arg = $arguments[$i];
+            if (! is_string($arg)) {
                 continue;
             }
 
-            if (str_starts_with($flag, '-O')) {
-                foreach (str_split(substr($flag, 2)) as $outopt) {
+            if (str_starts_with($arg, '-O')) {
+                foreach (str_split(substr($arg, 2)) as $outopt) {
                     match ($outopt) {
                         'a' => $this->stringFormat = SnmpStringOutput::Ascii,
                         'x' => $this->stringFormat = SnmpStringOutput::Hex,
@@ -107,24 +107,24 @@ class SnmpQueryOptions
                         default => throw new \Exception("Unknown option -O$outopt"),
                     };
                 }
-            } elseif (str_starts_with($flag, '-C')) {
-                $opts = substr($flag, 2);
+            } elseif (str_starts_with($arg, '-C')) {
+                $opts = substr($arg, 2);
                 if (str_contains($opts, 'c')) {
                     $this->tolerateUnorderedIndexes = true;
                 }
                 if (str_contains($opts, 'i')) {
                     $this->includeGivenOid = true;
                 }
-            } elseif (str_starts_with($flag, '-P')) {
-                $this->allowUnderscores = str_contains(substr($flag, 2), 'u');
-            } elseif (str_starts_with($flag, '-I')) {
-                if (str_contains(substr($flag, 2), 'h')) {
+            } elseif (str_starts_with($arg, '-P')) {
+                $this->allowUnderscores = str_contains(substr($arg, 2), 'u');
+            } elseif (str_starts_with($arg, '-I')) {
+                if (str_contains(substr($arg, 2), 'h')) {
                     $this->applyDisplayHints = false;
                 }
-            } elseif ($flag === '-m' || (str_starts_with($flag, '-m') && strlen($flag) > 2)) {
-                $this->addMibs($flag === '-m' ? $this->nextArg($flagsArray, $i) : substr($flag, 2));
-            } elseif ($flag === '-M' || (str_starts_with($flag, '-M') && strlen($flag) > 2)) {
-                $mibDir = $flag === '-M' ? $this->nextArg($flagsArray, $i) : substr($flag, 2);
+            } elseif ($arg === '-m' || (str_starts_with($arg, '-m') && strlen($arg) > 2)) {
+                $this->addMibs($arg === '-m' ? $this->consumeNextArg($arguments, $i) : substr($arg, 2));
+            } elseif ($arg === '-M' || (str_starts_with($arg, '-M') && strlen($arg) > 2)) {
+                $mibDir = $arg === '-M' ? $this->consumeNextArg($arguments, $i) : substr($arg, 2);
                 if ($mibDir !== null) {
                     $this->mibDirs = explode(':', $mibDir);
                 }
@@ -189,8 +189,13 @@ class SnmpQueryOptions
         }
     }
 
-    private function nextArg(array $wrapped, int &$i): ?string
+    /**
+     * @param  string[]  $args
+     * @param  int  $i
+     * @return string|null
+     */
+    private function consumeNextArg(array $args, int &$i): ?string
     {
-        return isset($wrapped[$i + 1]) && is_string($wrapped[$i + 1]) ? $wrapped[++$i] : null;
+        return isset($args[$i + 1]) && is_string($args[$i + 1]) ? $args[++$i] : null;
     }
 }
