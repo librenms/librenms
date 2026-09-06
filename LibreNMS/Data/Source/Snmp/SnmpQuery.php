@@ -312,7 +312,7 @@ class SnmpQuery implements SnmpQueryInterface
     {
         $oidObj = new Oid($oid);
 
-        if ($options->oidFormat == SnmpOidOutput::Numeric && $oidObj->isNumeric()) {
+        if ($this->options->oidFormat == SnmpOidOutput::Numeric && $oidObj->isNumeric()) {
             return Str::start($oid, '.'); // numeric to numeric optimization
         }
 
