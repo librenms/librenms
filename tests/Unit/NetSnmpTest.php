@@ -240,6 +240,30 @@ class NetSnmpTest extends TestCase
         $this->assertNotContains('-t', $cli);
     }
 
+    public function testBuildCliDecidesBulk(): void
+    {
+        $targetV2 = new SnmpTarget(
+            hostname: '192.168.1.1',
+            config: new SnmpConfig(version: 'v2c', community: 'public'),
+        );
+        $targetV1 = new SnmpTarget(
+            hostname: '192.168.1.1',
+            config: new SnmpConfig(version: 'v1', community: 'public'),
+        );
+
+        // v2c with allowBulk (default) upgrades snmpwalk to snmpbulkwalk
+        $cliBulk = $this->backend->buildCli('snmpwalk', $targetV2, ['.'], new SnmpQueryOptions());
+        $this->assertStringEndsWith('snmpbulkwalk', $cliBulk[0]);
+
+        // v2c with allowBulk: false stays snmpwalk
+        $cliNoBulk = $this->backend->buildCli('snmpwalk', $targetV2, ['.'], new SnmpQueryOptions(allowBulk: false));
+        $this->assertStringEndsWith('snmpwalk', $cliNoBulk[0]);
+
+        // v1 with allowBulk: true stays snmpwalk because v1 does not support bulk
+        $cliV1 = $this->backend->buildCli('snmpwalk', $targetV1, ['.'], new SnmpQueryOptions(allowBulk: true));
+        $this->assertStringEndsWith('snmpwalk', $cliV1[0]);
+    }
+
     public function testBuildCliFormattingOptions(): void
     {
         $target = new SnmpTarget(
@@ -249,34 +273,17 @@ class NetSnmpTest extends TestCase
 
         $options = new SnmpQueryOptions(
             tolerateUnorderedIndexes: true,
-            outputOidsNumerically: true,
-            outputIndexesNumerically: true,
+            numericOids: true,
+            numericIndexes: true,
             outputMibNames: false,
-            outputEnumsAsStrings: true,
+            numericEnums: false,
         );
 
         $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
 
-        $this->assertContains('-OQXUt', $cli); // no 'e' because outputEnumsAsStrings = true
-        $this->assertContains('-On', $cli);
-        $this->assertContains('-Ob', $cli);
-        $this->assertContains('-Os', $cli);
+        $this->assertContains('-OQXUtnbs', $cli); // combined into one -O flag, no 'e' because numericEnums = false
+        $this->assertContains('-Pu', $cli);
         $this->assertContains('-Cc', $cli);
-    }
-
-    public function testSnmpQueryOptionsFromCli(): void
-    {
-        $options = (new SnmpQueryOptions)->parseCli(['-OUneb', '-Cc']);
-
-        $this->assertTrue($options->outputOidsNumerically);
-        $this->assertTrue($options->outputIndexesNumerically);
-        $this->assertFalse($options->outputEnumsAsStrings);
-        $this->assertTrue($options->tolerateUnorderedIndexes);
-        $this->assertTrue($options->outputMibNames);
-
-        $optionsHideMib = (new SnmpQueryOptions)->parseCli('-OQUs');
-        $this->assertFalse($optionsHideMib->outputMibNames);
-        $this->assertTrue($optionsHideMib->outputEnumsAsStrings);
     }
 
     public function testSnmpTargetFromDevice(): void
@@ -361,16 +368,17 @@ class NetSnmpTest extends TestCase
         $refMethod = new \ReflectionMethod($controller, 'buildCommandLine');
         $cmd = $refMethod->invoke($controller, $device);
 
-        $this->assertStringContainsString('snmpwalk', $cmd[0]);
+        $this->assertStringContainsString('snmp', $cmd[0]);
         $this->assertContains('udp:debug.device.local:161', $cmd);
-        $this->assertContains('-On', $cmd);
-        $this->assertContains('-Ob', $cmd);
+        $this->assertContains('-OUneb', $cmd);
+        $this->assertNotContains('-Pu', $cmd);
+        $this->assertNotContains('-OQXUte', $cmd);
         $this->assertContains('.', $cmd);
     }
 
     public function testTranslateAlreadyNumericOidReturnsImmediately(): void
     {
-        $options = new SnmpQueryOptions(outputOidsNumerically: true);
+        $options = new SnmpQueryOptions(numericOids: true);
         $result = $this->backend->translate('.1.3.6.1.2.1.1.1.0', $options);
         $this->assertSame('.1.3.6.1.2.1.1.1.0', $result);
 

@@ -46,10 +46,10 @@ class SnmpQuery implements SnmpQueryInterface
 {
     private Device $device;
     private string $context = '';
-    private SnmpQueryOptions $options;
+    private readonly SnmpQueryOptions $options;
     private bool $abort = false;
     private bool $cache = false;
-    private SnmpBackendInterface $backend;
+    private readonly SnmpBackendInterface $backend;
     private SnmpTranslatorInterface $translateBackend;
 
     public function __construct(
@@ -167,7 +167,7 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function numeric(bool $numeric = true): SnmpQueryInterface
     {
-        $this->options->outputOidsNumerically = $numeric;
+        $this->options->numericOids = $numeric;
 
         return $this;
     }
@@ -177,7 +177,7 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function numericIndex(bool $numericIndex = true): SnmpQueryInterface
     {
-        $this->options->outputIndexesNumerically = $numericIndex;
+        $this->options->numericIndexes = $numericIndex;
 
         return $this;
     }
@@ -197,7 +197,7 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function enumStrings(): SnmpQueryInterface
     {
-        $this->options->outputEnumsAsStrings = true;
+        $this->options->numericEnums = false;
 
         return $this;
     }
@@ -236,7 +236,7 @@ class SnmpQuery implements SnmpQueryInterface
             // if abort on failure is set, return after first failure
             if ($this->abort && ! $response->isValid()) {
                 $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $chunks));
-                Log::debug("SNMP failed getting " . implode(',', $chunk) . " of $oid_list aborting.");
+                Log::debug('SNMP failed getting ' . implode(',', $chunk) . " of $oid_list aborting.");
 
                 return $response;
             }
@@ -296,7 +296,7 @@ class SnmpQuery implements SnmpQueryInterface
             // if abort on failure is set, return after first failure
             if ($this->abort && ! $response->isValid()) {
                 $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $chunks));
-                Log::debug("SNMP failed next on " . implode(',', $chunk) . " of $oid_list aborting.");
+                Log::debug('SNMP failed next on ' . implode(',', $chunk) . " of $oid_list aborting.");
 
                 return $response;
             }
@@ -313,7 +313,7 @@ class SnmpQuery implements SnmpQueryInterface
     {
         $oidObj = new Oid($oid);
 
-        if ($this->options->outputOidsNumerically && $oidObj->isNumeric()) {
+        if ($this->options->numericOids && $oidObj->isNumeric()) {
             return Str::start($oid, '.'); // numeric to numeric optimization
         }
 
@@ -345,11 +345,10 @@ class SnmpQuery implements SnmpQueryInterface
                 $options->tolerateUnorderedIndexes = true;
             }
 
-            if ($this->device->snmpver === 'v1'
-                || ! LibrenmsConfig::getOsSetting($this->device->os, 'snmp_bulk', true)
+            if (! LibrenmsConfig::getOsSetting($this->device->os, 'snmp_bulk', true)
                 || ! empty(array_intersect($oids, LibrenmsConfig::getCombined($this->device->os, 'oids.no_bulk', 'snmp.')))
             ) {
-                $options->bulk = false;
+                $options->allowBulk = false;
             }
         }
 
@@ -424,10 +423,10 @@ class SnmpQuery implements SnmpQueryInterface
     {
         $oidsStr = implode(',', $oids);
         $optionsStr = implode(',', [
-            (int) $this->options->outputOidsNumerically,
-            (int) $this->options->outputIndexesNumerically,
+            (int) $this->options->numericOids,
+            (int) $this->options->numericIndexes,
             (int) $this->options->outputMibNames,
-            (int) $this->options->outputEnumsAsStrings,
+            (int) $this->options->numericEnums,
             (int) $this->options->tolerateUnorderedIndexes,
             implode(';', $this->options->mibs),
             implode(';', $this->options->mibDirs),

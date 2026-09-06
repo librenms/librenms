@@ -1,4 +1,5 @@
 <?php
+
 /**
  * NetSnmp.php
  *
@@ -42,12 +43,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
 
     public function walk(SnmpTarget $target, string $oid, SnmpQueryOptions $options): SnmpResponse
     {
-        return $this->runCommand($this->buildCli(
-            $options->bulk ? 'snmpbulkwalk' : 'snmpwalk',
-            $target,
-            [$oid],
-            $options,
-        ));
+        return $this->runCommand($this->buildCli('snmpwalk', $target, [$oid], $options));
     }
 
     public function next(SnmpTarget $target, array $oids, SnmpQueryOptions $options): SnmpResponse
@@ -59,7 +55,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
     {
         $oidObj = new Oid($oid);
 
-        if ($options->outputOidsNumerically && $oidObj->isNumeric()) {
+        if ($options->numericOids && $oidObj->isNumeric()) {
             return Str::start($oid, '.');
         }
 
@@ -67,7 +63,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
             LibrenmsConfig::get('snmptranslate', 'snmptranslate'),
             '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]),
             '-m', implode(':', $options->mibs),
-            $options->outputOidsNumerically ? '-On' : ($options->outputMibNames ? '-OS' : '-Os'),
+            $options->numericOids ? '-On' : ($options->outputMibNames ? '-OS' : '-Os'),
         ];
 
         if (! $oidObj->hasMib() && ! $oidObj->hasNumericRoot()) {
@@ -88,29 +84,20 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
     {
         $config = $target->config;
 
+        if ($command === 'snmpwalk' && $options->allowBulk && $config->version !== 'v1') {
+            $command = 'snmpbulkwalk';
+        }
+
         $cmd = [
             LibrenmsConfig::get($command, $command),
             '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]),
             '-m', implode(':', $options->mibs),
             ...$this->buildAuth($target, $options),
-            $options->outputEnumsAsStrings ? '-OQXUt' : '-OQXUte',
-            '-Pu',
+            ...$this->buildOutputFlags($options),
         ];
 
         if ($command === 'snmpbulkwalk' && $config->maxRepeaters > 0) {
             $cmd[] = "-Cr$config->maxRepeaters";
-        }
-
-        if ($options->outputOidsNumerically) {
-            $cmd[] = '-On';
-        }
-
-        if ($options->outputIndexesNumerically) {
-            $cmd[] = '-Ob';
-        }
-
-        if (! $options->outputMibNames) {
-            $cmd[] = '-Os';
         }
 
         if ($options->tolerateUnorderedIndexes) {
@@ -129,6 +116,62 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
         $cmd[] = "$config->transport:$hostname:$config->port";
 
         return [...$cmd, ...$oids];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function buildOutputFlags(SnmpQueryOptions $options): array
+    {
+        $opts = '';
+
+        if ($options->quickPrint) {
+            $opts .= 'Q';
+        }
+
+        if ($options->extendedIndex) {
+            $opts .= 'X';
+        }
+
+        if (! $options->printUnits) {
+            $opts .= 'U';
+        }
+
+        if ($options->numericTimeticks) {
+            $opts .= 't';
+        }
+
+        if ($options->numericOids) {
+            $opts .= 'n';
+        }
+
+        if ($options->numericEnums) {
+            $opts .= 'e';
+        }
+
+        if ($options->numericIndexes) {
+            $opts .= 'b';
+        }
+
+        if (! $options->outputMibNames) {
+            $opts .= 's';
+        }
+
+        $flags = [];
+
+        if ($opts !== '') {
+            $flags[] = "-O$opts";
+        }
+
+        if (! $options->allowUnderlines) {
+            $flags[] = '-Pu';
+        }
+
+        if (! $options->applyDisplayHints) {
+            $flags[] = '-Ih';
+        }
+
+        return $flags;
     }
 
     /**

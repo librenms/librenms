@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Device\Debug;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\StreamsOutputToBrowser;
 use App\Models\Device;
@@ -71,10 +72,20 @@ class DebugSnmpwalkController extends Controller
     private function buildCommandLine(Device $device): array
     {
         $options = new SnmpQueryOptions(
-            outputOidsNumerically: true,
-            outputIndexesNumerically: true,
+            allowBulk: LibrenmsConfig::getOsSetting($device->os, 'snmp_bulk', true),
+            numericOids: true,
+            numericIndexes: true,
+            quickPrint: false,
+            extendedIndex: false,
+            numericTimeticks: false,
+            allowUnderlines: true,
         );
 
-        return app(NetSnmp::class)->buildCli('snmpwalk', SnmpTarget::fromDevice($device), ['.'], $options);
+        return app(NetSnmp::class)->buildCli(
+            'snmpwalk',
+            SnmpTarget::fromDevice($device),
+            ['.'],
+            $options,
+        );
     }
 }

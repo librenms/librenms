@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SnmpConfig.php
  *

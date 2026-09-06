@@ -41,13 +41,11 @@ class SnmpQueryTest extends TestCase
         $mockBackend = $this->mockBackend();
         $mockBackend->shouldReceive('get')
             ->once()
-            ->withArgs(function (SnmpTarget $target, array $oids, SnmpQueryOptions $options) {
-                return $target->hostname === '10.1.2.3'
-                    && $target->config->community === 'test-community'
-                    && $oids === ['sysDescr.0']
-                    && $options->outputOidsNumerically === true
-                    && $options->context === '';
-            })
+            ->withArgs(fn (SnmpTarget $target, array $oids, SnmpQueryOptions $options) => $target->hostname === '10.1.2.3'
+                && $target->config->community === 'test-community'
+                && $oids === ['sysDescr.0']
+                && $options->numericOids === true
+                && $options->context === '')
             ->andReturn(new SnmpResponse("sysDescr.0 = Linux 6.0\n"));
 
         $query = (new SnmpQuery($mockBackend))
@@ -208,12 +206,10 @@ class SnmpQueryTest extends TestCase
         $mockBackend = $this->mockBackend();
         $mockBackend->shouldReceive('walk')
             ->once()
-            ->withArgs(function (SnmpTarget $target, string $oid, SnmpQueryOptions $options) {
-                return $options->outputIndexesNumerically === true
-                    && $options->outputMibNames === false
-                    && $options->outputEnumsAsStrings === true
-                    && $options->tolerateUnorderedIndexes === true;
-            })
+            ->withArgs(fn (SnmpTarget $target, string $oid, SnmpQueryOptions $options) => $options->numericIndexes === true
+                && $options->outputMibNames === false
+                && $options->numericEnums === false
+                && $options->tolerateUnorderedIndexes === true)
             ->andReturn(new SnmpResponse("test = 1\n"));
 
         $query = (new SnmpQuery($mockBackend))
@@ -236,12 +232,10 @@ class SnmpQueryTest extends TestCase
         $query = (new SnmpQuery($mockBackend))->device($this->device);
         $query->get('sysDescr.0');
 
-        \Illuminate\Support\Facades\Event::assertDispatched(\App\Events\SnmpQueryExecuted::class, function (\App\Events\SnmpQueryExecuted $event) {
-            return $event->method === 'snmpget'
-                && $event->oids === ['sysDescr.0']
-                && $event->cliCommand === ['/usr/bin/snmpget', 'sysDescr.0']
-                && $event->device === $this->device
-                && $event->response->raw === "sysDescr.0 = Linux 6.0\n";
-        });
+        \Illuminate\Support\Facades\Event::assertDispatched(\App\Events\SnmpQueryExecuted::class, fn (\App\Events\SnmpQueryExecuted $event) => $event->method === 'snmpget'
+            && $event->oids === ['sysDescr.0']
+            && $event->cliCommand === ['/usr/bin/snmpget', 'sysDescr.0']
+            && $event->device === $this->device
+            && $event->response->raw === "sysDescr.0 = Linux 6.0\n");
     }
 }
