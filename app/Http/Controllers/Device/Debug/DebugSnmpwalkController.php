@@ -75,10 +75,10 @@ class DebugSnmpwalkController extends Controller
             allowBulk: LibrenmsConfig::getOsSetting($device->os, 'snmp_bulk', true),
             numericOids: true,
             numericIndexes: true,
+            numericTimeticks: false,
             quickPrint: false,
             extendedIndex: false,
-            numericTimeticks: false,
-            allowUnderlines: true,
+            allowUnderscores: true,
         );
 
         return app(NetSnmp::class)->buildCli(

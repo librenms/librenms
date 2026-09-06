@@ -57,8 +57,9 @@ class SnmpQueryOptions
         // Output presentation
         public bool $quickPrint = true,
         public bool $extendedIndex = true,
-        public bool $allowUnderlines = false,
-    ) {}
+        public bool $allowUnderscores = false,
+    ) {
+    }
 
     /**
      * @param  string[]|string|null  $flags
@@ -78,7 +79,7 @@ class SnmpQueryOptions
             $this->applyDisplayHints = true;
             $this->quickPrint = true;
             $this->extendedIndex = true;
-            $this->allowUnderlines = false;
+            $this->allowUnderscores = false;
 
             return $this;
         }
@@ -110,7 +111,7 @@ class SnmpQueryOptions
                 }
             } elseif (str_starts_with($flag, '-P')) {
                 $opts = substr($flag, 2);
-                $this->allowUnderlines = ! str_contains($opts, 'u');
+                $this->allowUnderscores = ! str_contains($opts, 'u');
             } elseif (str_starts_with($flag, '-I')) {
                 $opts = substr($flag, 2);
                 if (str_contains($opts, 'h')) {
@@ -145,7 +146,7 @@ class SnmpQueryOptions
         }
 
         if ($hasCustomOutputFlags && ! in_array('-Pu', $wrapped, true)) {
-            $this->allowUnderlines = true;
+            $this->allowUnderscores = true;
         }
 
         return $this;

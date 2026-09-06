@@ -42,14 +42,14 @@ use LibreNMS\Data\Source\SnmpResponse;
  */
 interface SnmpBackendInterface
 {
-     /**
-      * snmpget one or more OIDs — fetches explicit values.
-      * Every OID is fetched in a single request; the caller is responsible
-      * for keeping $oids within the target's max-oids-per-request limit.
-      *
-       * @param  string[]  $oids
-      */
-     public function get(SnmpTarget $target, array $oids, SnmpQueryOptions $options): SnmpResponse;
+    /**
+     * snmpget one or more OIDs — fetches explicit values.
+     * Every OID is fetched in a single request; the caller is responsible
+     * for keeping $oids within the target's max-oids-per-request limit.
+     *
+     * @param  string[]  $oids
+     */
+    public function get(SnmpTarget $target, array $oids, SnmpQueryOptions $options): SnmpResponse;
 
     /**
      * snmpwalk (or snmpbulkwalk, per $options) a single OID subtree —

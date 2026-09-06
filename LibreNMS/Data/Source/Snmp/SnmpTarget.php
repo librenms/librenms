@@ -35,7 +35,8 @@ final readonly class SnmpTarget
         public string $hostname,
         public SnmpConfig $config,
         public ?Device $device = null,
-    ) {}
+    ) {
+    }
 
     public static function fromDevice(Device $device): self
     {

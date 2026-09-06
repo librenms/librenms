@@ -170,7 +170,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
             $flags[] = "-O$opts";
         }
 
-        if (! $options->allowUnderlines) {
+        if (! $options->allowUnderscores) {
             $flags[] = '-Pu';
         }
 
