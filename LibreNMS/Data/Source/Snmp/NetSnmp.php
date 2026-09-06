@@ -36,6 +36,9 @@ use Symfony\Component\Process\Process;
 
 class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
 {
+    /**
+     * @param  string[]  $oids
+     */
     public function get(SnmpTarget $target, array $oids, SnmpQueryOptions $options): SnmpResponse
     {
         return $this->runCommand($this->buildCli('snmpget', $target, $oids, $options));
@@ -46,6 +49,9 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
         return $this->runCommand($this->buildCli('snmpwalk', $target, [$oid], $options));
     }
 
+    /**
+     * @param  string[]  $oids
+     */
     public function next(SnmpTarget $target, array $oids, SnmpQueryOptions $options): SnmpResponse
     {
         return $this->runCommand($this->buildCli('snmpgetnext', $target, $oids, $options));
@@ -78,6 +84,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
     /**
      * Generate a net-snmp command line
      *
+     * @param  string[]  $oids
      * @return string[]
      */
     public function buildCli(string $command, SnmpTarget $target, array $oids, SnmpQueryOptions $options): array
@@ -226,6 +233,9 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
         return [];
     }
 
+    /**
+     * @param  string[]  $cliCommand
+     */
     private function runCommand(array $cliCommand): SnmpResponse
     {
         $proc = new Process($cliCommand);

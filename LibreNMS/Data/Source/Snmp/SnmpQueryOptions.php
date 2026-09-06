@@ -30,6 +30,10 @@ use Illuminate\Support\Arr;
 
 class SnmpQueryOptions
 {
+    /**
+     * @param  string[]  $mibs
+     * @param  string[]  $mibDirs
+     */
     public function __construct(
         public string $context = '',
         public array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'],
@@ -56,6 +60,9 @@ class SnmpQueryOptions
         public bool $allowUnderlines = false,
     ) {}
 
+    /**
+     * @param  string[]|string|null  $flags
+     */
     public function parseCli(array|string|null $flags): self
     {
         if ($flags === null) {

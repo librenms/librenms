@@ -3,7 +3,7 @@
 /**
  * SnmpResponse.php
  *
- * Responsible for parsing net-snmp output into usable PHP data structures.
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2021 Tony Murray
+ * @copyright  2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 

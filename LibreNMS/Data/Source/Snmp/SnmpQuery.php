@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * SnmpQuery.php
  *
  * -Description-
@@ -16,11 +16,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
- * @copyright  2021 Tony Murray
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -132,6 +132,8 @@ class SnmpQuery implements SnmpQueryInterface
     /**
      * Set MIBs to use for this query. Base mibs are included by default.
      * They will be appended to existing mibs unless $append is set to false.
+     *
+     * @param  string[]  $mibs
      */
     public function mibs(array $mibs, bool $append = true): SnmpQueryInterface
     {
@@ -205,7 +207,7 @@ class SnmpQuery implements SnmpQueryInterface
     /**
      * Set option(s) for net-snmp command line. Converts net-snmp flags to SnmpQueryOptions.
      *
-     * @param  array|string|null  $options
+     * @param  string[]|string|null  $options
      * @return $this
      */
     public function options($options = []): SnmpQueryInterface
@@ -219,7 +221,7 @@ class SnmpQuery implements SnmpQueryInterface
      * snmpget an OID
      * Commonly used to fetch a single or multiple explicit values.
      *
-     * @param  array|string  $oid
+     * @param  string[]|string  $oid
      * @return SnmpResponse
      */
     public function get($oid): SnmpResponse
@@ -249,7 +251,7 @@ class SnmpQuery implements SnmpQueryInterface
      * snmpwalk an OID
      * Fetches all OIDs under a given OID, commonly used with tables.
      *
-     * @param  array|string  $oid
+     * @param  string[]|string  $oid
      * @return SnmpResponse
      */
     public function walk($oid): SnmpResponse
@@ -279,7 +281,7 @@ class SnmpQuery implements SnmpQueryInterface
      * snmpnext for the given oid
      * snmpnext retrieves the first oid after the given oid.
      *
-     * @param  array|string  $oid
+     * @param  string[]|string  $oid
      * @return SnmpResponse
      */
     public function next($oid): SnmpResponse
@@ -333,6 +335,8 @@ class SnmpQuery implements SnmpQueryInterface
      *
      * Note: tolerateUnorderedIndexes and bulk are properties of the specific OID group being queried,
      * not request-wide constants, and must be resolved per OID chunk.
+     *
+     * @param  string[]  $oids
      */
     private function prepareOptions(array $oids, bool $walk = false): SnmpQueryOptions
     {
@@ -355,6 +359,10 @@ class SnmpQuery implements SnmpQueryInterface
         return $options;
     }
 
+    /**
+     * @param  string[]  $oids
+     * @param  \Closure(): SnmpResponse  $callback
+     */
     private function execWithCache(string $command, array $oids, SnmpQueryOptions $options, \Closure $callback): SnmpResponse
     {
         $execute = function () use ($command, $oids, $options, $callback): SnmpResponse {
@@ -403,6 +411,10 @@ class SnmpQuery implements SnmpQueryInterface
         return Cache::driver($driver)->rememberForever($key, $execute);
     }
 
+    /**
+     * @param  string[]  $oids
+     * @return array<int, array<string>>
+     */
     private function limitOids(array $oids, SnmpTarget $target): array
     {
         $max_oids = max($target->config->maxOid, 1);
@@ -414,11 +426,18 @@ class SnmpQuery implements SnmpQueryInterface
         return [$oids];
     }
 
+    /**
+     * @param  string[]|string  $oid
+     * @return string[]
+     */
     private function parseOid(array|string $oid): array
     {
         return is_string($oid) ? explode(' ', $oid) : $oid;
     }
 
+    /**
+     * @param  string[]  $oids
+     */
     private function getCacheKey(string $type, array $oids): string
     {
         $oidsStr = implode(',', $oids);
