@@ -237,7 +237,6 @@ modules:
                     descr: 'Battery Ext'
                     group: 'HSM'
                     index: pkAHsmBatteryExtStatus
-                    snmp_flags: ['-OteQUS', '-Ci']  # Workaround to prevent walking off the end of the MiB
                     state_name: BatteryExt
                     states:
                         -  { value: 0, generic: 0, descr: 'Ok or Absent' }
