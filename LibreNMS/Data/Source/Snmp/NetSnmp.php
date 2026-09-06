@@ -29,6 +29,8 @@ namespace LibreNMS\Data\Source\Snmp;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\SnmpStringOutput;
+use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 use Symfony\Component\Process\Process;
@@ -60,7 +62,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
     {
         $oidObj = new Oid($oid);
 
-        if ($options->numericOids && $oidObj->isNumeric()) {
+        if ($options->oidFormat == SnmpOidOutput::Numeric && $oidObj->isNumeric()) {
             return Str::start($oid, '.');
         }
 
@@ -68,7 +70,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
             LibrenmsConfig::get('snmptranslate', 'snmptranslate'),
             '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]),
             '-m', implode(':', $options->mibs),
-            $options->numericOids ? '-On' : ($options->outputMibNames ? '-OS' : '-Os'),
+            $options->oidFormat == SnmpOidOutput::Numeric ? '-On' : ($options->oidFormat == SnmpOidOutput::Module ? '-OS' : '-Os'),
         ];
 
         if (! $oidObj->hasMib() && ! $oidObj->hasNumericRoot()) {
@@ -151,10 +153,6 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
             $opts .= 't';
         }
 
-        if ($options->numericOids) {
-            $opts .= 'n';
-        }
-
         if ($options->numericEnums) {
             $opts .= 'e';
         }
@@ -163,15 +161,28 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
             $opts .= 'b';
         }
 
-        if (! $options->numericOids && ! $options->outputMibNames) {
-            $opts .= 's';
+        if ($options->escapeQuotes) {
+            $opts .= 'E';
         }
 
-        if ($options->hexStrings) {
-            $opts .= 'x';
-        } elseif ($options->asciiStrings) {
-            $opts .= 'a';
+        if ($options->printHexText) {
+            $opts .= 'T';
         }
+
+        $opts .= match($options->stringFormat) {
+            SnmpStringOutput::Ascii => 'a',
+            SnmpStringOutput::Hex => 'x',
+            default => '',
+        };
+
+        $opts .= match($options->oidFormat) {
+            SnmpOidOutput::Full => 'f',
+            SnmpOidOutput::Suffix => 's',
+            SnmpOidOutput::Module => 'S',
+            SnmpOidOutput::Ucd => 'u',
+            SnmpOidOutput::Numeric => 'n',
+            default => '',
+        };
 
         $flags = [];
 

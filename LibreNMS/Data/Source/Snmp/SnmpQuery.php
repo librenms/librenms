@@ -33,6 +33,7 @@ use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mib;
 use LibreNMS\Util\Oid;
@@ -165,7 +166,7 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function numeric(bool $numeric = true): SnmpQueryInterface
     {
-        $this->options->numericOids = $numeric;
+        $this->options->oidFormat = $numeric ? SnmpOidOutput::Numeric : SnmpOidOutput::Module;
 
         return $this;
     }
