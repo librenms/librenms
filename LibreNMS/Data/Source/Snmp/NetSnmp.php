@@ -178,7 +178,6 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
         $opts .= match ($options->oidFormat) {
             SnmpOidOutput::Full => 'f',
             SnmpOidOutput::Suffix => 's',
-            SnmpOidOutput::Module => 'S',
             SnmpOidOutput::Ucd => 'u',
             SnmpOidOutput::Numeric => 'n',
             default => '',
