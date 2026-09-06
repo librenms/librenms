@@ -24,6 +24,7 @@ class SnmpQueryOptionsTest extends TestCase
         $this->assertTrue($options->numericEnums);
         $this->assertTrue($options->numericTimeticks);
         $this->assertFalse($options->asciiStrings);
+        $this->assertFalse($options->hexStrings);
         $this->assertFalse($options->printUnits);
         $this->assertTrue($options->applyDisplayHints);
 
@@ -44,6 +45,7 @@ class SnmpQueryOptionsTest extends TestCase
             numericEnums: false,
             numericTimeticks: false,
             asciiStrings: true,
+            hexStrings: true,
             printUnits: true,
             applyDisplayHints: false,
             quickPrint: false,
@@ -62,6 +64,7 @@ class SnmpQueryOptionsTest extends TestCase
         $this->assertTrue($options->numericEnums);
         $this->assertTrue($options->numericTimeticks);
         $this->assertFalse($options->asciiStrings);
+        $this->assertFalse($options->hexStrings);
         $this->assertFalse($options->printUnits);
         $this->assertTrue($options->applyDisplayHints);
         $this->assertTrue($options->quickPrint);
@@ -77,6 +80,7 @@ class SnmpQueryOptionsTest extends TestCase
         $this->assertTrue($options->numericIndexes);
         $this->assertTrue($options->numericEnums);
         $this->assertFalse($options->asciiStrings);
+        $this->assertFalse($options->hexStrings);
         $this->assertFalse($options->printUnits);
         $this->assertFalse($options->quickPrint);
         $this->assertFalse($options->extendedIndex);
@@ -97,6 +101,25 @@ class SnmpQueryOptionsTest extends TestCase
         $this->assertFalse($options->outputMibNames);
         $this->assertTrue($options->numericIndexes);
         $this->assertTrue($options->asciiStrings);
+        $this->assertFalse($options->hexStrings);
+    }
+
+    public function testParseCliHexStringsPrecedence(): void
+    {
+        // When 'x' comes after 'a', hexStrings wins
+        $optionsX = (new SnmpQueryOptions)->parseCli(['-OteQUax']);
+        $this->assertTrue($optionsX->hexStrings);
+        $this->assertFalse($optionsX->asciiStrings);
+
+        // When 'a' comes after 'x', asciiStrings wins
+        $optionsA = (new SnmpQueryOptions)->parseCli(['-OteQUxa']);
+        $this->assertTrue($optionsA->asciiStrings);
+        $this->assertFalse($optionsA->hexStrings);
+
+        // Standard -OQUsx
+        $optionsOnlyX = (new SnmpQueryOptions)->parseCli(['-OQUsx']);
+        $this->assertTrue($optionsOnlyX->hexStrings);
+        $this->assertFalse($optionsOnlyX->asciiStrings);
     }
 
     public function testParseCliDisplayHints(): void

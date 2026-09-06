@@ -163,7 +163,9 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
             $opts .= 's';
         }
 
-        if ($options->asciiStrings) {
+        if ($options->hexStrings) {
+            $opts .= 'x';
+        } elseif ($options->asciiStrings) {
             $opts .= 'a';
         }
 
