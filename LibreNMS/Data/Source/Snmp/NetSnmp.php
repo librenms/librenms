@@ -27,6 +27,7 @@ namespace LibreNMS\Data\Source\Snmp;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
@@ -34,42 +35,40 @@ use Symfony\Component\Process\Process;
 
 class NetSnmp implements SnmpBackendInterface, SnmpTranslateBackendInterface
 {
-    public function get(SnmpTarget $target, array $oids, SnmpQueryOptions $options, string $context): SnmpResponse
+    public function get(SnmpTarget $target, array $oids, SnmpQueryOptions $options): SnmpResponse
     {
-        $cliCommand = $this->buildCli('snmpget', $target, $oids, $options, $context);
-
-        return $this->runCommand($cliCommand);
+        return $this->runCommand($this->buildCli('snmpget', $target, $oids, $options));
     }
 
-    public function walk(SnmpTarget $target, string $oid, SnmpQueryOptions $options, string $context): SnmpResponse
+    public function walk(SnmpTarget $target, string $oid, SnmpQueryOptions $options): SnmpResponse
     {
-        $command = $options->bulk ? 'snmpbulkwalk' : 'snmpwalk';
-        $cliCommand = $this->buildCli($command, $target, [$oid], $options, $context);
-
-        return $this->runCommand($cliCommand);
+        return $this->runCommand($this->buildCli(
+            $options->bulk ? 'snmpbulkwalk' : 'snmpwalk',
+            $target,
+            [$oid],
+            $options,
+        ));
     }
 
-    public function next(SnmpTarget $target, array $oids, SnmpQueryOptions $options, string $context): SnmpResponse
+    public function next(SnmpTarget $target, array $oids, SnmpQueryOptions $options): SnmpResponse
     {
-        $cliCommand = $this->buildCli('snmpgetnext', $target, $oids, $options, $context);
-
-        return $this->runCommand($cliCommand);
+        return $this->runCommand($this->buildCli('snmpgetnext', $target, $oids, $options));
     }
 
     public function translate(string $oid, SnmpQueryOptions $options): string
     {
         $oidObj = new Oid($oid);
-        $cmd = [LibrenmsConfig::get('snmptranslate', 'snmptranslate')];
-        array_push($cmd, '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]));
-        array_push($cmd, '-m', implode(':', $options->mibs));
 
-        if ($options->outputOidsNumerically) {
-            $cmd[] = '-On';
-        } elseif (! $options->outputMibNames) {
-            $cmd[] = '-Os';
-        } else {
-            $cmd[] = '-OS';
+        if ($options->outputOidsNumerically && $oidObj->isNumeric()) {
+            return Str::start($oid, '.');
         }
+
+        $cmd = [
+            LibrenmsConfig::get('snmptranslate', 'snmptranslate'),
+            '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]),
+            '-m', implode(':', $options->mibs),
+            $options->outputOidsNumerically ? '-On' : ($options->outputMibNames ? '-OS' : '-Os'),
+        ];
 
         if (! $oidObj->hasMib() && ! $oidObj->hasNumericRoot()) {
             $cmd[] = '-IR';
@@ -77,118 +76,117 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslateBackendInterface
 
         $cmd[] = $oid;
 
-        $proc = new Process($cmd);
-        $proc->setTimeout((int) LibrenmsConfig::get('snmp.exec_timeout', 1200));
-        $proc->run();
-
-        return (new SnmpResponse(
-            $proc->getOutput(),
-            $proc->getErrorOutput(),
-            $proc->getExitCode(),
-        ))->value();
+        return $this->runCommand($cmd)->value();
     }
 
-    public function buildCli(string $command, SnmpTarget $target, array $oids, SnmpQueryOptions $options, string $context): array
-    {
-        $cmd = $this->initCommand($command, $target, $options);
-
-        array_push($cmd, '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]));
-        array_push($cmd, '-m', implode(':', $options->mibs));
-
-        $this->buildAuth($cmd, $target, $context);
-
-        $cmd = array_merge($cmd, $this->buildOutputFlags($options));
-
-        if ($target->config->timeout !== 1) {
-            array_push($cmd, '-t', (string) $target->config->timeout);
-        }
-
-        if ($target->config->retries !== 5) {
-            array_push($cmd, '-r', (string) $target->config->retries);
-        }
-
-        $hostname = Rewrite::addIpv6Brackets($target->hostname);
-        $transport = $target->config->transport ?: 'udp';
-        $port = $target->config->port ?: 161;
-        $cmd[] = "$transport:$hostname:$port";
-
-        return array_merge($cmd, $oids);
-    }
-
-    private function initCommand(string $command, SnmpTarget $target, SnmpQueryOptions $options): array
-    {
-        if ($command === 'snmpbulkwalk') {
-            $cmd = [LibrenmsConfig::get('snmpbulkwalk', 'snmpbulkwalk')];
-            if ($target->config->maxRepeaters > 0) {
-                $cmd[] = "-Cr{$target->config->maxRepeaters}";
-            }
-
-            return $cmd;
-        }
-
-        return [LibrenmsConfig::get($command, $command)];
-    }
-
-    private function buildAuth(array &$cmd, SnmpTarget $target, string $context): void
+    /**
+     * Generate a net-snmp command line
+     *
+     * @return string[]
+     */
+    public function buildCli(string $command, SnmpTarget $target, array $oids, SnmpQueryOptions $options): array
     {
         $config = $target->config;
-        $context = $context ?: ($config->context ?? '');
 
-        if ($config->version === 'v3') {
-            array_push($cmd, '-v3', '-l', (string) $config->authlevel);
-            array_push($cmd, '-n', $context);
+        $cmd = [
+            LibrenmsConfig::get($command, $command),
+            '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]),
+            '-m', implode(':', $options->mibs),
+            ...$this->buildAuth($target, $options),
+            $options->outputEnumsAsStrings ? '-OQXUt' : '-OQXUte',
+            '-Pu',
+        ];
 
-            switch (strtolower((string) $config->authlevel)) {
-                case 'authpriv':
-                    array_push($cmd, '-x', (string) $config->cryptoalgo);
-                    array_push($cmd, '-X', (string) $config->cryptopass);
-                    // fallthrough
-                case 'authnopriv':
-                    array_push($cmd, '-a', (string) $config->authalgo);
-                    array_push($cmd, '-A', (string) $config->authpass);
-                    // fallthrough
-                case 'noauthnopriv':
-                    array_push($cmd, '-u', (string) ($config->authname ?: 'root'));
-                    break;
-                default:
-                    Log::debug("Unsupported SNMPv3 AuthLevel: {$config->authlevel}");
-            }
-        } elseif ($config->version === 'v2c' || $config->version === 'v1') {
-            array_push($cmd, '-' . $config->version, '-c', $context ? "{$config->community}@$context" : (string) $config->community);
-        } else {
-            Log::debug("Unsupported SNMP Version: {$config->version}");
+        if ($command === 'snmpbulkwalk' && $config->maxRepeaters > 0) {
+            $cmd[] = "-Cr$config->maxRepeaters";
         }
-    }
-
-    private function buildOutputFlags(SnmpQueryOptions $options): array
-    {
-        $baseFlag = $options->outputEnumsAsStrings ? '-OQXUt' : '-OQXUte';
-        $flags = [$baseFlag, '-Pu'];
 
         if ($options->outputOidsNumerically) {
-            $flags[] = '-On';
+            $cmd[] = '-On';
         }
 
         if ($options->outputIndexesNumerically) {
-            $flags[] = '-Ob';
+            $cmd[] = '-Ob';
         }
 
         if (! $options->outputMibNames) {
-            $flags[] = '-Os';
+            $cmd[] = '-Os';
         }
 
         if ($options->tolerateUnorderedIndexes) {
-            $flags[] = '-Cc';
+            $cmd[] = '-Cc';
         }
 
-        return $flags;
+        if ($config->timeout !== 1) {
+            array_push($cmd, '-t', (string) $config->timeout);
+        }
+
+        if ($config->retries !== 5) {
+            array_push($cmd, '-r', (string) $config->retries);
+        }
+
+        $hostname = Rewrite::addIpv6Brackets($target->hostname);
+        $cmd[] = "$config->transport:$hostname:$config->port";
+
+        return [...$cmd, ...$oids];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function buildAuth(SnmpTarget $target, SnmpQueryOptions $options): array
+    {
+        $config = $target->config;
+
+        if ($config->version === 'v2c' || $config->version === 'v1') {
+            return [
+                "-$config->version",
+                '-c',
+                $options->context ? "$config->community@$options->context" : (string) $config->community,
+            ];
+        }
+
+        if ($config->version === 'v3') {
+            $auth = match (strtolower((string) $config->authlevel)) {
+                'authpriv' => [
+                    '-x', (string) $config->cryptoalgo,
+                    '-X', (string) $config->cryptopass,
+                    '-a', (string) $config->authalgo,
+                    '-A', (string) $config->authpass,
+                    '-u', $config->authname ?: 'root',
+                ],
+                'authnopriv' => [
+                    '-a', (string) $config->authalgo,
+                    '-A', (string) $config->authpass,
+                    '-u', $config->authname ?: 'root',
+                ],
+                'noauthnopriv' => [
+                    '-u', $config->authname ?: 'root',
+                ],
+                default => [],
+            };
+
+            if ($auth === []) {
+                Log::debug("Unsupported SNMPv3 AuthLevel: $config->authlevel");
+            }
+
+            return [
+                '-v3',
+                '-l', (string) $config->authlevel,
+                '-n', $options->context,
+                ...$auth,
+            ];
+        }
+
+        Log::debug("Unsupported SNMP Version: $config->version");
+
+        return [];
     }
 
     private function runCommand(array $cliCommand): SnmpResponse
     {
         $proc = new Process($cliCommand);
         $proc->setTimeout((int) LibrenmsConfig::get('snmp.exec_timeout', 1200));
-
         $proc->run();
 
         return new SnmpResponse(

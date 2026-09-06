@@ -30,10 +30,11 @@ use Illuminate\Support\Arr;
 class SnmpQueryOptions
 {
     public function __construct(
+        public string $context = '',
         public array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'],
         public array $mibDirs = [],
 
-        // Query behavior
+        // Query behavior (Note: tolerateUnorderedIndexes and bulk are resolved per OID chunk, not request-wide constants)
         public bool $tolerateUnorderedIndexes = false,
         public bool $bulk = true,
 
@@ -44,14 +45,10 @@ class SnmpQueryOptions
         public bool $outputEnumsAsStrings = false,
     ) {}
 
-    public static function fromCli(array|string|null $flags): self
-    {
-        return (new self())->parseCli($flags);
-    }
-
     public function parseCli(array|string|null $flags): self
     {
         if ($flags === null) {
+            $this->context = '';
             $this->outputOidsNumerically = false;
             $this->outputIndexesNumerically = false;
             $this->outputMibNames = true;

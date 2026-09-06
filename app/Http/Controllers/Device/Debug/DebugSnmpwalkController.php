@@ -70,9 +70,11 @@ class DebugSnmpwalkController extends Controller
      */
     private function buildCommandLine(Device $device): array
     {
-        return app(NetSnmp::class)->buildCli('snmpwalk', SnmpTarget::fromDevice($device), ['.'], new SnmpQueryOptions(
+        $options = new SnmpQueryOptions(
             outputOidsNumerically: true,
             outputIndexesNumerically: true,
-        ), $device->context ?? '');
+        );
+
+        return app(NetSnmp::class)->buildCli('snmpwalk', SnmpTarget::fromDevice($device), ['.'], $options);
     }
 }

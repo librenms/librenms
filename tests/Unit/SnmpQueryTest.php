@@ -41,12 +41,12 @@ class SnmpQueryTest extends TestCase
         $mockBackend = $this->mockBackend();
         $mockBackend->shouldReceive('get')
             ->once()
-            ->withArgs(function (SnmpTarget $target, array $oids, SnmpQueryOptions $options, string $context) {
+            ->withArgs(function (SnmpTarget $target, array $oids, SnmpQueryOptions $options) {
                 return $target->hostname === '10.1.2.3'
                     && $target->config->community === 'test-community'
                     && $oids === ['sysDescr.0']
                     && $options->outputOidsNumerically === true
-                    && $context === '';
+                    && $options->context === '';
             })
             ->andReturn(new SnmpResponse("sysDescr.0 = Linux 6.0\n"));
 
@@ -193,7 +193,7 @@ class SnmpQueryTest extends TestCase
         $mockBackend = $this->mockBackend();
         $mockBackend->shouldReceive('get')
             ->once()
-            ->withArgs(fn (SnmpTarget $target, array $oids, SnmpQueryOptions $options, string $context) => $context === 'vlan-100')
+            ->withArgs(fn (SnmpTarget $target, array $oids, SnmpQueryOptions $options) => $options->context === 'vlan-100')
             ->andReturn(new SnmpResponse("val = 1\n"));
 
         $query = (new SnmpQuery($mockBackend))

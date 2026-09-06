@@ -33,7 +33,7 @@ class NetSnmpTest extends TestCase
         );
 
         $options = new SnmpQueryOptions();
-        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options, '');
+        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
 
         $this->assertStringEndsWith('snmpget', $cli[0]);
         $this->assertContains('-M', $cli);
@@ -60,7 +60,7 @@ class NetSnmpTest extends TestCase
         );
 
         $options = new SnmpQueryOptions();
-        $cli = $this->backend->buildCli('snmpget', $target, ['sysUpTime.0'], $options, '');
+        $cli = $this->backend->buildCli('snmpget', $target, ['sysUpTime.0'], $options);
 
         $this->assertContains('-v1', $cli);
         $this->assertContains('secret', $cli);
@@ -77,8 +77,8 @@ class NetSnmpTest extends TestCase
             ),
         );
 
-        $options = new SnmpQueryOptions();
-        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options, 'vrf1');
+        $options = new SnmpQueryOptions(context: 'vrf1');
+        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
 
         $this->assertContains('public@vrf1', $cli);
     }
@@ -98,8 +98,8 @@ class NetSnmpTest extends TestCase
             ),
         );
 
-        $options = new SnmpQueryOptions();
-        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options, 'ctx');
+        $options = new SnmpQueryOptions(context: 'ctx');
+        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
 
         $this->assertContains('-v3', $cli);
         $this->assertContains('-l', $cli);
@@ -132,7 +132,7 @@ class NetSnmpTest extends TestCase
         );
 
         $options = new SnmpQueryOptions();
-        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options, '');
+        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
 
         $this->assertContains('-v3', $cli);
         $this->assertContains('-l', $cli);
@@ -159,7 +159,7 @@ class NetSnmpTest extends TestCase
         );
 
         $options = new SnmpQueryOptions();
-        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options, '');
+        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
 
         $this->assertContains('-v3', $cli);
         $this->assertContains('-l', $cli);
@@ -182,7 +182,7 @@ class NetSnmpTest extends TestCase
             ),
         );
 
-        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], new SnmpQueryOptions(), '');
+        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], new SnmpQueryOptions());
 
         $this->assertContains('udp6:[2001:db8::1]:161', $cli);
     }
@@ -199,7 +199,7 @@ class NetSnmpTest extends TestCase
             ),
         );
 
-        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], new SnmpQueryOptions(), '');
+        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], new SnmpQueryOptions());
 
         $this->assertContains('-t', $cli);
         $this->assertContains('3', $cli);
@@ -222,7 +222,7 @@ class NetSnmpTest extends TestCase
             outputEnumsAsStrings: true,
         );
 
-        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options, '');
+        $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
 
         $this->assertContains('-OQXUt', $cli); // no 'e' because outputEnumsAsStrings = true
         $this->assertContains('-On', $cli);
@@ -233,7 +233,7 @@ class NetSnmpTest extends TestCase
 
     public function testSnmpQueryOptionsFromCli(): void
     {
-        $options = SnmpQueryOptions::fromCli(['-OUneb', '-Cc']);
+        $options = (new SnmpQueryOptions)::parseCli(['-OUneb', '-Cc']);
 
         $this->assertTrue($options->outputOidsNumerically);
         $this->assertTrue($options->outputIndexesNumerically);
@@ -241,7 +241,7 @@ class NetSnmpTest extends TestCase
         $this->assertTrue($options->tolerateUnorderedIndexes);
         $this->assertTrue($options->outputMibNames);
 
-        $optionsHideMib = SnmpQueryOptions::fromCli('-OQUs');
+        $optionsHideMib = (new SnmpQueryOptions)::parseCli('-OQUs');
         $this->assertFalse($optionsHideMib->outputMibNames);
         $this->assertTrue($optionsHideMib->outputEnumsAsStrings);
     }
@@ -312,5 +312,15 @@ class NetSnmpTest extends TestCase
         $this->assertContains('-On', $cmd);
         $this->assertContains('-Ob', $cmd);
         $this->assertContains('.', $cmd);
+    }
+
+    public function testTranslateAlreadyNumericOidReturnsImmediately(): void
+    {
+        $options = new SnmpQueryOptions(outputOidsNumerically: true);
+        $result = $this->backend->translate('.1.3.6.1.2.1.1.1.0', $options);
+        $this->assertSame('.1.3.6.1.2.1.1.1.0', $result);
+
+        $resultWithoutDot = $this->backend->translate('1.3.6.1.2.1.1.1.0', $options);
+        $this->assertSame('.1.3.6.1.2.1.1.1.0', $resultWithoutDot);
     }
 }

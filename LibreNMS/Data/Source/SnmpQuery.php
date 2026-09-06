@@ -230,7 +230,7 @@ class SnmpQuery implements SnmpQueryInterface
 
         foreach ($chunks as $chunk) {
             $options = $this->prepareOptions($chunk);
-            $res = $this->execWithCache('snmpget', $chunk, $options, fn () => $this->backend->get($target, $chunk, $options, $this->context));
+            $res = $this->execWithCache('snmpget', $chunk, $options, fn () => $this->backend->get($target, $chunk, $options));
             $response = $response->append($res);
 
             // if abort on failure is set, return after first failure
@@ -260,7 +260,7 @@ class SnmpQuery implements SnmpQueryInterface
 
         foreach ($oids as $singleOid) {
             $options = $this->prepareOptions([$singleOid], walk: true);
-            $res = $this->execWithCache('snmpwalk', [$singleOid], $options, fn () => $this->backend->walk($target, $singleOid, $options, $this->context));
+            $res = $this->execWithCache('snmpwalk', [$singleOid], $options, fn () => $this->backend->walk($target, $singleOid, $options));
             $response = $response->append($res);
 
             // if abort on failure is set, return after first failure
@@ -290,7 +290,7 @@ class SnmpQuery implements SnmpQueryInterface
 
         foreach ($chunks as $chunk) {
             $options = $this->prepareOptions($chunk);
-            $res = $this->execWithCache('snmpgetnext', $chunk, $options, fn () => $this->backend->next($target, $chunk, $options, $this->context));
+            $res = $this->execWithCache('snmpgetnext', $chunk, $options, fn () => $this->backend->next($target, $chunk, $options));
             $response = $response->append($res);
 
             // if abort on failure is set, return after first failure
@@ -328,9 +328,16 @@ class SnmpQuery implements SnmpQueryInterface
         return SnmpTarget::fromDevice($this->device);
     }
 
+    /**
+     * Prepare options for an execution chunk.
+     *
+     * Note: tolerateUnorderedIndexes and bulk are properties of the specific OID group being queried,
+     * not request-wide constants, and must be resolved per OID chunk.
+     */
     private function prepareOptions(array $oids, bool $walk = false): SnmpQueryOptions
     {
         $options = clone $this->options;
+        $options->context = $this->context ?: (string) ($this->device->getAttribute('context_name') ?: $this->device->getAttribute('context') ?: '');
         $options->mibDirs = Mib::directories($this->device, $this->options->mibDirs);
 
         if ($walk) {
@@ -362,7 +369,7 @@ class SnmpQuery implements SnmpQueryInterface
                 response: $response,
                 cliCommand: $response->command,
                 device: $this->device,
-                context: $this->context,
+                context: $options->context,
                 mibs: $options->mibs,
                 mibDir: implode(':', $options->mibDirs),
             ));
