@@ -50,6 +50,7 @@ final readonly class SnmpConfig
         public int $retries = 5,
         public int $maxRepeaters = 0,
         public int $maxOid = 10,
+        public bool $bulk = true,
     ) {
     }
 
@@ -73,6 +74,7 @@ final readonly class SnmpConfig
 
         $maxRepeaters = (int) ($device->getAttrib('snmp_max_repeaters') ?: LibrenmsConfig::getOsSetting($device->os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0)));
         $configuredMaxOid = $device->getAttrib('snmp_max_oid') ?: LibrenmsConfig::getOsSetting($device->os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10));
+        $rawBulk = $device->getAttrib('snmp_bulk') ?? LibrenmsConfig::getOsSetting($device->os, 'snmp_bulk', LibrenmsConfig::get('snmp_bulk', true));
 
         return new self(
             version: $device->snmpver ?? 'v2c',
@@ -90,6 +92,7 @@ final readonly class SnmpConfig
             retries: max(0, $retries),
             maxRepeaters: max(0, $maxRepeaters),
             maxOid: max(1, (int) $configuredMaxOid),
+            bulk: filter_var($rawBulk, FILTER_VALIDATE_BOOLEAN),
         );
     }
 }

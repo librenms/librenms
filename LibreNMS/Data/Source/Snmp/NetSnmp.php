@@ -92,7 +92,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
     {
         $config = $target->config;
 
-        if ($command === 'snmpwalk' && $options->allowBulk && $config->version !== 'v1') {
+        if ($command === 'snmpwalk' && $config->bulk && $options->allowBulk && $config->version !== 'v1') {
             $command = 'snmpbulkwalk';
         }
 

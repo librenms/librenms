@@ -3,7 +3,7 @@
 /**
  * SnmpQuery.php
  *
- * -Description-
+ * Responsible for parsing net-snmp output into usable PHP data structures.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -351,9 +351,7 @@ class SnmpQuery implements SnmpQueryInterface
                 $options->tolerateUnorderedIndexes = true;
             }
 
-            if (! LibrenmsConfig::getOsSetting($this->device->os, 'snmp_bulk', true)
-                || ! empty(array_intersect($oids, LibrenmsConfig::getCombined($this->device->os, 'oids.no_bulk', 'snmp.')))
-            ) {
+            if (! empty(array_intersect($oids, LibrenmsConfig::getCombined($this->device->os, 'oids.no_bulk', 'snmp.')))) {
                 $options->allowBulk = false;
             }
         }

@@ -125,7 +125,6 @@ modules:
                     descr: 'Health SignServer'
                     group: 'Health of VMs'
                     index: pkASignServerHealth
-                    snmp_flags: ['-OteQUS', '-Ci']  # Workaround to prevent walking off the end of the MiB
                     state_name: HealthSignserver
                     states:
                         -  { value: 0, generic: 0, descr: 'All OK' }

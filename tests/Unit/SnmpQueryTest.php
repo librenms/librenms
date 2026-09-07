@@ -268,4 +268,19 @@ class SnmpQueryTest extends TestCase
         $query = (new SnmpQuery($mockBackend))->device($this->device)->hideMib();
         $query->get('sysDescr.0');
     }
+
+    public function testPrepareOptionsDisablesBulkForNoBulkOids(): void
+    {
+        $this->device->os = 'generic';
+        \App\Facades\LibrenmsConfig::set('os.generic.oids.no_bulk', ['UCD-SNMP-MIB::laLoadInt']);
+
+        $mockBackend = $this->mockBackend();
+        $mockBackend->shouldReceive('walk')
+            ->once()
+            ->withArgs(fn (SnmpTarget $target, string $oid, SnmpQueryOptions $options) => $options->allowBulk === false)
+            ->andReturn(new SnmpResponse("laLoadInt = 1\n"));
+
+        $query = (new SnmpQuery($mockBackend))->device($this->device);
+        $query->walk('UCD-SNMP-MIB::laLoadInt');
+    }
 }

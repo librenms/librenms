@@ -285,6 +285,14 @@ class NetSnmpTest extends TestCase
         // v1 with allowBulk: true stays snmpwalk because v1 does not support bulk
         $cliV1 = $this->backend->buildCli('snmpwalk', $targetV1, ['.'], new SnmpQueryOptions(allowBulk: true));
         $this->assertStringEndsWith('snmpwalk', $cliV1[0]);
+
+        // v2c with bulk: false on SnmpConfig stays snmpwalk even with allowBulk: true
+        $targetNoBulk = new SnmpTarget(
+            hostname: '192.168.1.1',
+            config: new SnmpConfig(version: 'v2c', community: 'public', bulk: false),
+        );
+        $cliTargetNoBulk = $this->backend->buildCli('snmpwalk', $targetNoBulk, ['.'], new SnmpQueryOptions(allowBulk: true));
+        $this->assertStringEndsWith('snmpwalk', $cliTargetNoBulk[0]);
     }
 
     public function testBuildCliFormattingOptions(): void
@@ -370,7 +378,26 @@ class NetSnmpTest extends TestCase
         $this->assertSame(1161, $target->config->port);
         $this->assertSame(2, $target->config->timeout);
         $this->assertSame(3, $target->config->retries);
+        $this->assertTrue($target->config->bulk);
         $this->assertSame($device, $target->device);
+    }
+
+    public function testSnmpTargetFromDeviceRespectsSnmpBulkSetting(): void
+    {
+        $deviceBulk = new Device([
+            'hostname' => 'bulk.device',
+            'os' => 'ios',
+        ]);
+        $targetBulk = SnmpTarget::fromDevice($deviceBulk);
+        $this->assertTrue($targetBulk->config->bulk);
+
+        \App\Facades\LibrenmsConfig::set('os.airos.snmp_bulk', false);
+        $deviceNoBulk = new Device([
+            'hostname' => 'nobulk.device',
+            'os' => 'airos',
+        ]);
+        $targetNoBulk = SnmpTarget::fromDevice($deviceNoBulk);
+        $this->assertFalse($targetNoBulk->config->bulk);
     }
 
     public function testSnmpTargetFromDeviceFloatTimeout(): void
@@ -439,6 +466,24 @@ class NetSnmpTest extends TestCase
         $this->assertNotContains('-Pu', $cmd);
         $this->assertNotContains('-OQXUte', $cmd);
         $this->assertContains('.', $cmd);
+    }
+
+    public function testDebugSnmpwalkControllerRespectsOsSnmpBulkFalse(): void
+    {
+        \App\Facades\LibrenmsConfig::set('os.airos.snmp_bulk', false);
+        $device = new Device([
+            'hostname' => 'nobulk.device.local',
+            'os' => 'airos',
+            'snmpver' => 'v2c',
+            'community' => 'secret',
+            'port' => 161,
+        ]);
+
+        $controller = new \App\Http\Controllers\Device\Debug\DebugSnmpwalkController();
+        $refMethod = new \ReflectionMethod($controller, 'buildCommandLine');
+        $cmd = $refMethod->invoke($controller, $device);
+
+        $this->assertStringEndsWith('snmpwalk', $cmd[0]);
     }
 
     public function testTranslateAlreadyNumericOidReturnsImmediately(): void
