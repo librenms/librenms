@@ -434,7 +434,6 @@ class Service:
             10, self.systemd_watchdog, "systemd-watchdog"
         )
         self.is_master = False
-        self._poller_details = None
         self._poller_details_time = 0
 
     def service_age(self):
@@ -909,7 +908,7 @@ class Service:
             )
 
             try:
-                poller_details = self.get_poller_details()
+                poller_details = self.get_poller_details_due()
                 if poller_details is not None:
                     self._db.query(
                         "UPDATE `poller_cluster` SET `poller_details`=%s WHERE `node_id`=%s",
@@ -952,13 +951,13 @@ class Service:
                 exc_info=True,
             )
 
-    def get_poller_details(self):
+    def get_poller_details_due(self):
         now = time.time()
         if now - self._poller_details_time > POLLER_DETAILS_REFRESH:
-            self._poller_details = LibreNMS.get_poller_details_json()
             self._poller_details_time = now
+            return LibreNMS.get_poller_details_json()
 
-        return self._poller_details
+        return None
 
     def systemd_watchdog(self):
         if self.config.health_file:
