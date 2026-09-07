@@ -247,7 +247,7 @@ class PhpSnmp implements SnmpBackendInterface
             $res_str,
             $errors,
             $errors ? 1 : 0,
-            ["php-snmp-$cmd", ...$oids],
+            ['PHP-SNMP', ...NetSnmp::buildCli('snmp' . $cmd, $config, $oids, $options)],
         );
     }
 }

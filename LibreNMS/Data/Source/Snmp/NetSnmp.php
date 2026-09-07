@@ -90,7 +90,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
      * @param  string[]  $oids
      * @return string[]
      */
-    public function buildCli(string $command, SnmpConfig $config, array $oids, SnmpQueryOptions $options): array
+    public static function buildCli(string $command, SnmpConfig $config, array $oids, SnmpQueryOptions $options): array
     {
         if ($command === 'snmpwalk' && $config->bulk && $options->allowBulk && $config->version !== 'v1') {
             $command = 'snmpbulkwalk';
@@ -100,8 +100,8 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
             LibrenmsConfig::get($command, $command),
             '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]),
             '-m', implode(':', $options->mibs),
-            ...$this->buildAuth($config, $options),
-            ...$this->buildOutputFlags($options),
+            ...self::buildAuth($config, $options),
+            ...self::buildOutputFlags($options),
         ];
 
         if ($command === 'snmpbulkwalk' && $config->maxRepeaters > 0) {
@@ -129,7 +129,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
     /**
      * @return string[]
      */
-    private function buildOutputFlags(SnmpQueryOptions $options): array
+    private static function buildOutputFlags(SnmpQueryOptions $options): array
     {
         $opts = '';
 
@@ -201,7 +201,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
      *
      * @throws SnmpException
      */
-    private function buildAuth(SnmpConfig $config, SnmpQueryOptions $options): array
+    private static function buildAuth(SnmpConfig $config, SnmpQueryOptions $options): array
     {
         if ($config->version === 'v2c' || $config->version === 'v1') {
             return [
