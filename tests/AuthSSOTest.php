@@ -477,6 +477,7 @@ final class AuthSSOTest extends DBTestCase
     {
         LibrenmsConfig::set('auth_mechanism', $this->original_auth_mech);
         LibrenmsConfig::forget('sso');
+        LegacyAuth::reset();
         $_SERVER = $this->server;
         parent::tearDown();
     }
