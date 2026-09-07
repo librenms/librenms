@@ -275,7 +275,7 @@ return [
     'rbac' => [
         'title' => 'Roles & Permissions',
         'beta_warning_title' => 'Beta Feature',
-        'beta_warning_message' => 'This is a beta feature. Permissions might not be applied correctly yet. Please report any issues you encounter.',
+        'beta_warning_message' => 'This is a beta feature. Permissions can be applied incorrectly. Report any problems that you find.',
         'manage_users' => 'Manage Users',
         'manage_roles' => 'Manage Roles',
         'add_role' => 'Add Role',

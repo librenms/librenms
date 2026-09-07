@@ -34,13 +34,13 @@ read the command line help.
 ### 2. Save test data
 
 After the collection of the SNMP data, run
-`./scripts/save-test-data.php` with the `--os (-o) -v ''` option. It
+`lnms dev:generate-test-data <os>` with the `--variant ''` option. It
 dumps the database entries after discovery and after polling into JSON
 files. This step needs snmpsim. If you have a problem, the maintainers
 can generate the files from your snmprec file.
 
 You usually collect the data one time. After the snmprec file holds
-your data, use `save-test-data.php` to update the JSON database dump.
+your data, use `lnms dev:generate-test-data` to update the JSON database dump.
 
 ## Running tests
 
@@ -155,10 +155,10 @@ must use a variant to store your test data (-v <variant>).
 1. Add any additional os items like version, hardware, features, or serial.
 1. If there is additional snmp data required, run
    `lnms dev:collect-snmprec 42 --variant ''`
-1. Run `./scripts/save-test-data.php -o example-os` to update the
+1. Run `lnms dev:generate-test-data example-os` to update the
    dumped database data.
 1. Review data. If you modified the snmprec or code (do not modify the json
-   manually) run `./scripts/save-test-data.php -o example-os -m os -v ''`
+   manually) run `lnms dev:generate-test-data example-os -m os --variant ''`
 1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request
 
@@ -168,7 +168,7 @@ must use a variant to store your test data (-v <variant>).
 1. Run `lnms dev:collect-snmprec 42 --variant '' -m <module>`. It adds
    more data to the snmprec file
 1. Review data. If you modified the snmprec (do not modify the json
-   manually) run `./scripts/save-test-data.php -o example-os -v '' -m <module>`
+   manually) run `lnms dev:generate-test-data example-os --variant '' -m <module>`
 1. Run `lnms dev:check unit --db --snmpsim`
 1. If the tests succeed submit a pull request
 

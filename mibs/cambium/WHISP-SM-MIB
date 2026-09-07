@@ -1,10 +1,10 @@
 
 --
--- 		whisp-sm-mib.mib
---		GENERATED FROM ui_db.xml
+--      whisp-sm-mib.mib
+--      GENERATED FROM ui_db.xml
 --
 --      *****************************************************************************************
---		Copyright 2005 - 2015 (c), Cambium Networks
+--      Copyright 2005 - 2015 (c), Cambium Networks
 --      Cambium Networks Confidential Proprietary
 --      *****************************************************************************************
 --
@@ -42,8 +42,14 @@ whispSmMibModule  MODULE-IDENTITY
 -- Top Level Registrations
 
 whispSmConfig		OBJECT IDENTIFIER ::= {whispSm 1}
+whispPropSchedulerConfig		OBJECT IDENTIFIER ::= {whispSmConfig 172}
 whispSmSecurity		OBJECT IDENTIFIER ::= {whispSm 7}
 whispSmStatus		OBJECT IDENTIFIER ::= {whispSm 2}
+whispSmEvmStats		OBJECT IDENTIFIER ::= {whispSmStatus 162}
+whispSmEvmStatsIntervalLow		OBJECT IDENTIFIER ::= {whispSmEvmStats 1}
+whispSmEvmStatsIntervalMid		OBJECT IDENTIFIER ::= {whispSmEvmStats 2}
+whispSmEvmStatsIntervalHigh		OBJECT IDENTIFIER ::= {whispSmEvmStats 3}
+whispSmRFStatus		OBJECT IDENTIFIER ::= {whispSm 11}
 whispSmGroups		OBJECT IDENTIFIER ::= {whispSm 3}
 whispSmEvent		OBJECT IDENTIFIER ::= {whispSm 4}
 whispSmDfsEvent		OBJECT IDENTIFIER ::= {whispSmEvent 1}
@@ -69,8 +75,11 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
             Special settings:
             0:  none.
             all: All frequencies in the band(s) supported by the radio will be selected.
+            allwhole: All frequencies that are in whole 10 MHz (5600, 5610, 5620, etc)
+            allhalf: All frequencies that are in half 10 MHz (5600, 5605, 5610, etc)
             all49, all51, all52: Available only for 450i 5 GHz wideband radio.
             all54, all57: Available only for 450 and 450i 5 GHz radios.
+            allhalf54: (And other frequency band combinations) would select every 5 MHz in the 5.4 GHz band (5480, 5485, 5490, etc)
             When doing a set, separate values with comma with no white space between values."
 		::={whispSmConfig 1}
 
@@ -126,8 +135,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Authentication key. It should be equal or less than 32
-            characters long."
+			"Authentication key for 128-bit. Up to 32 characters in length."
 		::={whispSmConfig 7}
 
 	enable8023link	OBJECT-TYPE
@@ -149,8 +157,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		DESCRIPTION		
 			"This option is for SMs only. Backhaul timing slave always
             uses the set key.
-            0 - Use default key.
-            1 - Use set key."
+            0 - Use default 128-bit key.
+            1 - Use set 128-bit key."
 		::={whispSmConfig 9}
 
 	timingPulseGated	OBJECT-TYPE
@@ -247,7 +255,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"To enable or disable NAPT. For multipoint only.
-            1=Enable NAPT, 0=Disable NAPT."
+            1=Enable NAPT, 0=Disable NAPT.
+            Cannot be enabled with IPv6 enabled. To enable NAT, IPv6 must first be disabled."
 		::={whispSmConfig 19}
 
 	arpCacheTimeout	OBJECT-TYPE
@@ -623,9 +632,10 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 	ingressVID	OBJECT-TYPE
 		SYNTAX		INTEGER
 		MAX-ACCESS	read-write
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
-			"Untagged ingress VID."
+			"Untagged ingress VID.
+                        Deprecated - Use corresponding OID in whipsBoxConfig MIB."
 		::={whispSmConfig 55}
 
 -- CIR configuration
@@ -649,11 +659,16 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 	hiPriorityChannel	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					disabled(0),
-					enable(1)}
+					enabled(1)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To enable or disable high priority channel."
+			"Get or set the status of the High Priority Data Channel.
+                        
+                        NOTE: This can be used to enable the channel if only Low Priority Channel is enabled, for 
+                        backward compatibility. It will not allow the channel to be disabled if Medium or Ultra High
+                        Priority channels are enabled. Please use dataChanCount in whispSmConfig to control the number
+                        of Data Channels enabled instead."
 		::={whispSmConfig 58}
 
 	hiPriorityUplinkCIR	OBJECT-TYPE
@@ -794,7 +809,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To enable and set Broadcast/ Multicast MIR feature. Use value of 0 to disable. 
+			"To enable and set Broadcast/Multicast MIR feature. Use value of 0 to disable. 
                         Units are as per bCastMIRUnits variable. Set the units first and then set this value."
 		::={whispSmConfig 73}
 
@@ -805,7 +820,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-write
 		STATUS		obsolete
 		DESCRIPTION		
-			"Allows BHS re-registration every 24 hours. Enable allows re-registration and Disable does not.  24 Hour Encryption Refresh."
+			"Forces BHS reregistration every 24 hours. Enable forces reregistration and Disable does not.  24 Hour Encryption Refresh."
 		::={whispSmConfig 74}
 
 	smLEDModeFlag	OBJECT-TYPE
@@ -890,8 +905,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"Enable or disable TCP MSS Clamping.  Enabling this will cause the SM to edit the TCP MSS in TCP SYN and SYN-ACK packets.
-            			This will allow for a workaround for MTU issues so that the TCP session will only go up to the clamped MSS.  If you are
-            			using PMTUD reliably, this should not be needed."
+                        This will allow for a workaround for MTU issues so that the TCP session will only go up to the clamped MSS.  If you are
+                        using PMTUD reliably, this should not be needed."
 		::={whispSmConfig 83}
 
 	pppoeMTUOverrideEnable	OBJECT-TYPE
@@ -902,8 +917,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"Enable the overriding of the PPP link's MTU.  Normally, the PPP link will set the MTU to the MRU of the
-            			PPPoE Server, but this may be overridden.  If the MRU of the PPPoE server is smaller than the desired MTU,
-            			the smaller MTU will be used."
+                        PPPoE Server, but this may be overridden.  If the MRU of the PPPoE server is smaller than the desired MTU,
+                        the smaller MTU will be used."
 		::={whispSmConfig 84}
 
 	pppoeMTUOverrideValue	OBJECT-TYPE
@@ -912,8 +927,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"Enable the overriding of the PPP link's MTU.  Normally, the PPP link will set the MTU to the MRU of the
-            			PPPoE Server, but this may be overridden.  If the MRU of the PPPoE server is smaller than the desired MTU,
-            			the smaller MTU will be used.  Max MTU of a PPPoE link is 1492."
+                        PPPoE Server, but this may be overridden.  If the MRU of the PPPoE server is smaller than the desired MTU,
+                        the smaller MTU will be used.  Max MTU of a PPPoE link is 1492."
 		::={whispSmConfig 85}
 
 	pppoeTimerType	OBJECT-TYPE
@@ -924,9 +939,9 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"Set the PPPoE Timer type.  Can be a Keep Alive timer where the link will be checked periodically and
-            			automatically redialed if the link is down.  Also could be an Idle Timeout where the link will
-            			be automatically dropped after an idle period and redialed if user data is present. Keep Alive timers
-            			are in seconds while Idle Timeout timers are in minutes."
+                        automatically redialed if the link is down.  Also could be an Idle Timeout where the link will
+                        be automatically dropped after an idle period and redialed if user data is present. Keep Alive timers
+                        are in seconds while Idle Timeout timers are in minutes."
 		::={whispSmConfig 86}
 
 	pppoeTimeoutPeriod	OBJECT-TYPE
@@ -935,8 +950,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"The Timeout Period.  The use of this depends on the Timer Type.  If the Timer Type is KeepAlive, then
-            			the timeout period is in seconds.  If the Timer Type is Idle Timeout, then the timeout period is in minutes.
-            			Minimum values are 20 seconds for KeepAlive timer, and 5 minutes for Idle Timeout."
+                        the timeout period is in seconds.  If the Timer Type is Idle Timeout, then the timeout period is in minutes.
+                        Minimum values are 20 seconds for KeepAlive timer, and 5 minutes for Idle Timeout."
 		::={whispSmConfig 87}
 
 	timedSpectrumAnalysisDuration	OBJECT-TYPE
@@ -944,8 +959,10 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-write
 		STATUS		deprecated
 		DESCRIPTION		
-			"As of release 13.0.2 this value is depricated. Please use the OID in whispBoxConfig.
-                            Value in seconds for a timed spectrum analysis. Range is 10-1000 seconds."
+			"As of release 13.0.2 this value is deprecated. Please use the OID in whispBoxConfig.
+                            Value in seconds for a timed spectrum analysis. Range is 10-1000 seconds.
+                            Note that this represents the minimum scan duration. The current scan will still be allowed to
+                            complete when this duration is elapsed, so actual scan time could be longer."
 		::={whispSmConfig 88}
 
 	spectrumAnalysisOnBoot	OBJECT-TYPE
@@ -953,10 +970,11 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					disable(0),
 					enable(1)}
 		MAX-ACCESS	read-write
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
-			"To enable or disable Spectrum Analysis on boot up for one scan through the band.
-							(0) - Disabled
+			"As of release 15.1.5 this value is deprecated. Please use the OID in whispBoxConfig.
+                            To enable or disable Spectrum Analysis on boot up for one scan through the band.
+                            (0) - Disabled
                             (1) - Enabled"
 		::={whispSmConfig 89}
 
@@ -1052,9 +1070,9 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 	colorCode2	OBJECT-TYPE
 		SYNTAX		INTEGER (0..254)
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Second Color code. The variable is deprecated.  See additionalColorCode in whispSmConfig."
+			"Second Color code. The variable is obsolete.  See additionalColorCode in whispSmConfig."
 		::={whispSmConfig 97}
 
 	colorCodepriority2	OBJECT-TYPE
@@ -1064,18 +1082,18 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					tertiary(3),
 					disable(0)}
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Priority setting for the second color code. The variable is deprecated.
-                        	See additionalColorCodePriority in whispSmConfig."
+			"Priority setting for the second color code. The variable is obsolete.
+                            See additionalColorCodePriority in whispSmConfig."
 		::={whispSmConfig 98}
 
 	colorCode3	OBJECT-TYPE
 		SYNTAX		INTEGER (0..254)
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Third Color code. The variable is deprecated.  See additionalColorCode in whispSmConfig."
+			"Third Color code. The variable is obsolete.  See additionalColorCode in whispSmConfig."
 		::={whispSmConfig 99}
 
 	colorCodepriority3	OBJECT-TYPE
@@ -1085,18 +1103,18 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					tertiary(3),
 					disable(0)}
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Priority setting for the third color code. The variable is deprecated.
-                        	See additionalColorCodePriority in whispSmConfig."
+			"Priority setting for the third color code. The variable is obsolete.
+                            See additionalColorCodePriority in whispSmConfig."
 		::={whispSmConfig 100}
 
 	colorCode4	OBJECT-TYPE
 		SYNTAX		INTEGER (0..254)
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Fourth Color code. The variable is deprecated.  See additionalColorCode in whispSmConfig."
+			"Fourth Color code. The variable is obsolete.  See additionalColorCode in whispSmConfig."
 		::={whispSmConfig 101}
 
 	colorCodepriority4	OBJECT-TYPE
@@ -1106,18 +1124,18 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					tertiary(3),
 					disable(0)}
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Priority setting for the fourth color code. The variable is deprecated.
-                        	See additionalColorCodePriority in whispSmConfig."
+			"Priority setting for the fourth color code. The variable is obsolete.
+                            See additionalColorCodePriority in whispSmConfig."
 		::={whispSmConfig 102}
 
 	colorCode5	OBJECT-TYPE
 		SYNTAX		INTEGER (0..254)
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Fifth Color code. The variable is deprecated.  See additionalColorCode in whispSmConfig."
+			"Fifth Color code. The variable is obsolete.  See additionalColorCode in whispSmConfig."
 		::={whispSmConfig 103}
 
 	colorCodepriority5	OBJECT-TYPE
@@ -1127,18 +1145,18 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					tertiary(3),
 					disable(0)}
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Priority setting for the fifth color code. The variable is deprecated.
-                        	See additionalColorCodePriority in whispSmConfig."
+			"Priority setting for the fifth color code. The variable is obsolete.
+                            See additionalColorCodePriority in whispSmConfig."
 		::={whispSmConfig 104}
 
 	colorCode6	OBJECT-TYPE
 		SYNTAX		INTEGER (0..254)
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Sixth Color code. The variable is deprecated.  See additionalColorCode in whispSmConfig."
+			"Sixth Color code. The variable is obsolete.  See additionalColorCode in whispSmConfig."
 		::={whispSmConfig 105}
 
 	colorCodepriority6	OBJECT-TYPE
@@ -1148,18 +1166,18 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					tertiary(3),
 					disable(0)}
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Priority setting for the sixth color code. The variable is deprecated.
-                        	See additionalColorCodePriority in whispSmConfig."
+			"Priority setting for the sixth color code. The variable is obsolete.
+                            See additionalColorCodePriority in whispSmConfig."
 		::={whispSmConfig 106}
 
 	colorCode7	OBJECT-TYPE
 		SYNTAX		INTEGER (0..254)
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Seventh Color code. The variable is deprecated.  See additionalColorCode in whispSmConfig."
+			"Seventh Color code. The variable is obsolete.  See additionalColorCode in whispSmConfig."
 		::={whispSmConfig 107}
 
 	colorCodepriority7	OBJECT-TYPE
@@ -1169,18 +1187,18 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					tertiary(3),
 					disable(0)}
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Priority setting for the seventh color code. The variable is deprecated.
-                        	See additionalColorCodePriority in whispSmConfig."
+			"Priority setting for the seventh color code. The variable is obsolete.
+                            See additionalColorCodePriority in whispSmConfig."
 		::={whispSmConfig 108}
 
 	colorCode8	OBJECT-TYPE
 		SYNTAX		INTEGER (0..254)
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Eighth Color code. The variable is deprecated.  See additionalColorCode in whispSmConfig."
+			"Eighth Color code. The variable is obsolete.  See additionalColorCode in whispSmConfig."
 		::={whispSmConfig 109}
 
 	colorCodepriority8	OBJECT-TYPE
@@ -1190,18 +1208,18 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					tertiary(3),
 					disable(0)}
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Priority setting for the eighth color code. The variable is deprecated.
-                        	See additionalColorCodePriority in whispSmConfig."
+			"Priority setting for the eighth color code. The variable is obsolete.
+                            See additionalColorCodePriority in whispSmConfig."
 		::={whispSmConfig 110}
 
 	colorCode9	OBJECT-TYPE
 		SYNTAX		INTEGER (0..254)
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Ninth Color code. The variable is deprecated.  See additionalColorCode in whispSmConfig."
+			"Ninth Color code. The variable is obsolete.  See additionalColorCode in whispSmConfig."
 		::={whispSmConfig 111}
 
 	colorCodepriority9	OBJECT-TYPE
@@ -1211,18 +1229,18 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					tertiary(3),
 					disable(0)}
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Priority setting for the ninth color code. The variable is deprecated.
-                        	See additionalColorCodePriority in whispSmConfig."
+			"Priority setting for the ninth color code. The variable is obsolete.
+                            See additionalColorCodePriority in whispSmConfig."
 		::={whispSmConfig 112}
 
 	colorCode10	OBJECT-TYPE
 		SYNTAX		INTEGER (0..254)
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Tenth Color code. The variable is deprecated.  See additionalColorCode in whispSmConfig."
+			"Tenth Color code. The variable is obsolete.  See additionalColorCode in whispSmConfig."
 		::={whispSmConfig 113}
 
 	colorCodepriority10	OBJECT-TYPE
@@ -1232,10 +1250,10 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					tertiary(3),
 					disable(0)}
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Priority setting for the tenth color code. The variable is deprecated.
-                        	See additionalColorCodePriority in whispSmConfig."
+			"Priority setting for the tenth color code. The variable is obsolete.
+                            See additionalColorCodePriority in whispSmConfig."
 		::={whispSmConfig 114}
 
 	natDNSProxyEnable	OBJECT-TYPE
@@ -1246,7 +1264,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"If enabled, the SM will advertise itself as the DNS server when it sends out DHCP client leases and forward DNS queries automatically.
-                        	If disabled, the SM will forward on upstream DNS server information when it sends out DHCP client leases."
+                            If disabled, the SM will forward on upstream DNS server information when it sends out DHCP client leases."
 		::={whispSmConfig 115}
 
 	allIpv4Filter	OBJECT-TYPE
@@ -1293,7 +1311,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"Uses Syslog server configuration from AP/BHM if enabled and available,
-		             otherwise uses local configuration."
+                     otherwise uses local configuration."
 		::={whispSmConfig 119}
 
 	syslogMinLevelApPreferred	OBJECT-TYPE
@@ -1318,6 +1336,35 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		DESCRIPTION		
 			"Obtains Syslog transmit configuration from AP/BHM if available, or specifies the local transmit state."
 		::={whispSmConfig 121}
+
+	oneXBridgingMode	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					requireForAllTraffic(1),
+					requireForNonManagementTraffic(2)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"This sets the bridging mode for 802.1x authentication."
+		::={whispSmConfig 122}
+
+	oneXAuthMode	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					portBased(0),
+					srcMacBased(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"This sets the Authentication mode for 802.1x authentication."
+		::={whispSmConfig 123}
+
+	oneXVlan	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"VLAN to negotiate 802.1x."
+		::={whispSmConfig 124}
 
 	eapPeerAAAServerCommonName	OBJECT-TYPE
 		SYNTAX		DisplayString
@@ -1407,8 +1454,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"This will force a multipoint SM to initiate an asynchronous power adjust sequence.
-                        	This is done automatically every 2 minutes."
+			"This will force an SM or BHS to initiate an asynchronous power adjust sequence.
+                            This is done automatically every minute if power adjust is enabled."
 		::={whispSmConfig 134}
 
 	clearBerrResults	OBJECT-TYPE
@@ -1483,7 +1530,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					bandwidth20MHz(2),
 					bandwidth7MHz(3),
 					bandwidth15MHz(4),
-					bandwidth30MHz(5)}
+					bandwidth30MHz(5),
+					bandwidth40MHz(6)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
@@ -1493,13 +1541,16 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 	berDeModSelect	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					qpsk(0),
+					qam-8(4),
 					qam-16(1),
+					qam-32(5),
 					qam-64(2),
+					qam-128(6),
 					qam-256(3)}
-		MAX-ACCESS	read-write
+		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"The BER demodulation level the SM is set. 0 for QPSK, 1 for 16-QAM, 2 for 64-QAM, and 3 for 256-QAM."
+			"The BER demodulation level at the SM. 0 for QPSK, 1 for 16-QAM, 2 for 64-QAM, 3 for 256-QAM, 4 for 8-QAM, 5 for 32-QAM, 6 for 128-QAM."
 		::={whispSmConfig 143}
 
 	multicastVCRcvRate	OBJECT-TYPE
@@ -1516,9 +1567,9 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					pmp450(2),
 					both(3)}
 		MAX-ACCESS	read-write
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"Deprecated.  The 430 SM only supports PMP 450
+			"Obsolete.  The 430 SM only supports PMP 450
                           interoperability mode."
 		::={whispSmConfig 145}
 
@@ -1540,15 +1591,16 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"NAT Translation Table Size.
-            					Range 1024-8192."
+                                Range 1024-8192."
 		::={whispSmConfig 147}
 
 	ingressVIDPriority	OBJECT-TYPE
 		SYNTAX		INTEGER (0..7)
 		MAX-ACCESS	read-write
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
-			"ingress VID VLAN Priority."
+			"ingress VID VLAN Priority.
+                        Deprecated - Use corresponding OID in whipsBoxConfig MIB."
 		::={whispSmConfig 148}
 
 	ingressVIDPriorityMode	OBJECT-TYPE
@@ -1556,9 +1608,10 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					promote-IP-priority(0),
 					define-priority(1)}
 		MAX-ACCESS	read-write
-		STATUS		current
+		STATUS		obsolete
 		DESCRIPTION		
-			"ingress VID VLAN Priority Mode."
+			"ingress VID VLAN Priority Mode.
+                        Obsolete - Use corresponding OID in whipsBoxConfig MIB."
 		::={whispSmConfig 149}
 
 	providerVIDPriority	OBJECT-TYPE
@@ -1616,7 +1669,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Units of Broadcast/ Multicast MIR value. Set units first and then bCastMIR"
+			"Units of Broadcast/Multicast MIR value. Set units first and then bCastMIR"
 		::={whispSmConfig 155}
 
 	txPowerControl	OBJECT-TYPE
@@ -1626,16 +1679,16 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Enable/Disable Automatic control of SM TX power.
+			"Enable/Disable Automatic control of SM Tx power.
                             Engineering use only."
 		::={whispSmConfig 157}
 
 	bridgeTableSize	OBJECT-TYPE
-		SYNTAX		INTEGER (4..4096)
+		SYNTAX		INTEGER
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Bridge Table Size : 4 -- 4096."
+			"Bridge Table Size : 1 -- 4096."
 		::={whispSmConfig 158}
 
 	bridgeTableRestrict	OBJECT-TYPE
@@ -1660,22 +1713,254 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
                             This might be required in certain regions and frequency bands.
                             See User Guide for more information.
                             Enabling this will not allow a radio to transmit above its EIRP limit.
-                            The AP's Transmit Power Control may still adjust the Tx power down.
-                            SM only."
+                            The AP's Transmit Power Control may still adjust the Tx power down."
 		::={whispSmConfig 160}
 
 	maxTxPower	OBJECT-TYPE
-		SYNTAX		INTEGER (-30..27)
+		SYNTAX		INTEGER
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"This OID is controled by OID maxTxPowerEnable.
+			"This OID is controlled by OID maxTxPowerEnable.
                             This might be required in certain regions and frequency bands.
                             See user guide for more information.
                             Setting this will not allow a radio to transmit above its EIRP limit.
-                            The AP's Transmit Power Control may still adjust the Tx power down.
-                            SM only."
+                            The AP's Transmit Power Control may still adjust the Tx power down."
 		::={whispSmConfig 161}
+
+	medPriorityChannel	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Get the status of the Medium Priority Data Channel. Read only. Please use dataChanCount in whispSmConfig
+                        to control the number of Priority Channels enabled."
+		::={whispSmConfig 162}
+
+	uHiPriorityChannel	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Get the status of the Ultra High Priority Data Channel. Read only. Please use dataChanCount in whispSmConfig
+                        to control the number of Data Channels enabled."
+		::={whispSmConfig 163}
+
+	uHiPriorityUplinkCIR	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Ultra High priority uplink CIR."
+		::={whispSmConfig 164}
+
+	uHiPriorityDownlinkCIR	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Ultra High priority downlink CIR."
+		::={whispSmConfig 165}
+
+	smPrioritizationGroup	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					low(0),
+					high(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SM Prioritization Group.
+                            Indicates the group in which this SM will belong for SM Prioritization."
+		::={whispSmConfig 166}
+
+	authKey256Sm	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Authentication key for 256-bit. Up to 64 characters in length."
+		::={whispSmConfig 167}
+
+	authKey256Option	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					useDefault(0),
+					useKeySet(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"This option is for SMs only. Backhaul timing slave always
+            uses the set key.
+            0 - Use default 256-bit key.
+            1 - Use set 256-bit key."
+		::={whispSmConfig 168}
+
+	medPriorityUplinkCIR	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Medium priority uplink CIR."
+		::={whispSmConfig 169}
+
+	medPriorityDownlinkCIR	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Medium priority downlink CIR."
+		::={whispSmConfig 170}
+
+	dataChanCount	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					one(1),
+					two(2),
+					three(3),
+					four(4)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Number of Data Channels enabled. Minimum is 1 (Low Priority), and subsequent
+                        channels are enabled in order of: High, Medium, Ultra High priority. NOTE: PMP 430 only supports 2 channels."
+		::={whispSmConfig 171}
+
+	dlReferenceEVM	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Downlink reference EVM used for LQI calculations."
+		::={whispSmConfig 173}
+
+	ulReferenceEVM	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Uplink reference EVM used for LQI calculations."
+		::={whispSmConfig 174}
+
+	addPortFwdMap	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Add a new port forward mapping in the following format {Internal IP,Internal Port,External Port,Protocols (0=All, 1=UDP, 2=TCP)}.
+                        For example 169.254.1.1,80,8080,2"
+		::={whispSmConfig 176}
+
+	rfScanListFrequencyAdd	OBJECT-TYPE
+		SYNTAX		INTEGER (0..9000000)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Add a frequency to the scan list.
+            The frequencies vary by product and region.
+            A get on this OID will return 0.
+            A set on this OID will add a frequency, and return no error if it is already added."
+		::={whispSmConfig 177}
+
+	rfScanListFrequencyRemove	OBJECT-TYPE
+		SYNTAX		INTEGER (0..9000000)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Remove a frequency from the scan list.
+            The frequencies vary by product and region.
+            A get on this OID will return 0.
+            A set on this OID will remove a frequency from the scan list. 
+            The set will return no error even if the frequency is not present in the list to remove."
+		::={whispSmConfig 178}
+
+	enableGps	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable(1)/Disable(0) GPS data on SM. Always enabled for platforms with an onboard GPS."
+		::={whispSmConfig 179}
+
+	removePortFwdMap	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Remove a port forward mapping in the following format {Internal IP,Internal Port,External Port,Protocols (0=All, 1=UDP, 2=TCP)}.
+                        For example 169.254.1.1,80,8080,2"
+		::={whispSmConfig 180}
+
+	downlinkPlan	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Downlink plan in Kbps."
+		::={whispPropSchedulerConfig 1}
+
+	uplinkPlan	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Uplink plan in Kbps."
+		::={whispPropSchedulerConfig 2}
+
+	weight	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SM Weight (0.1 to 9.9) for proportional scheduling.
+                            To set value should be multiplied by 10
+                            for example 1.5 * 10 = 15"
+		::={whispPropSchedulerConfig 3}
+
+	userLockModulation	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1),
+					enableBelowThreshold(2)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SM User lock Modulation."
+		::={whispPropSchedulerConfig 4}
+
+	lockedModulation	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					eightX(8),
+					sevenX(7),
+					sixX(6),
+					fiveX(5),
+					fourX(4),
+					threeX(3),
+					twoX(2),
+					oneX(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SM locked Modulation."
+		::={whispPropSchedulerConfig 5}
+
+	thresholdModulation	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					eightX(8),
+					sevenX(7),
+					sixX(6),
+					fiveX(5),
+					fourX(4),
+					threeX(3),
+					twoX(2)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SM Threshold Modulation."
+		::={whispPropSchedulerConfig 6}
 
 	rfScanListTable OBJECT-TYPE
 		SYNTAX		SEQUENCE OF RfScanListEntry
@@ -1703,8 +1988,12 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"RF scan list.
-            The frequencies vary by product and region."
+			"RF scan list toggle.
+            The frequencies vary by product and region.
+            A get on the table will display the all the frequencies currently checked for scan.
+            A set on this OID will add a frequency to the scan list, if it is not already added.
+            If the frequency is already in the list, a set on this OID will remove the frequency from the list.
+            See rfScanListFrequencyAdd and rfScanListFrequencyRemove for explicit add/remove."
 		::={rfScanListEntry 1}
 
 	numAuthCerts	OBJECT-TYPE
@@ -1712,7 +2001,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"can have a max value of 2"
+			"can have a max value of 4. 2 for User Authenticaion server and 2 for SM Authentication server."
 		::={whispSmSecurity 2}
 
 	authenticationEnforce	OBJECT-TYPE
@@ -1737,7 +2026,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"Select the outer method for EAP Authentication.
-            			Note: PEAP is not supported for MPC860 platform."
+                        Note: PEAP is not supported for MPC860 platform."
 		::={whispSmSecurity 4}
 
 	phase2	OBJECT-TYPE
@@ -1874,17 +2163,20 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 	jitter	OBJECT-TYPE
 		SYNTAX		Gauge32 (0..15)
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		obsolete
 		DESCRIPTION		
-			"A measure of multipath interference.  Applicable to FSK radios only."
+			"A measure of multipath interference.  Applicable to FSK radios only. Obsolete."
 		::={whispSmStatus 3}
 
 	airDelay	OBJECT-TYPE
 		SYNTAX		Unsigned32
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		obsolete
 		DESCRIPTION		
-			"Round trip delay in bits."
+			"Round trip delay in bits.
+                              FSK only.
+                              This OID is obsolete.
+                              For OFDM use OID airDelayns."
 		::={whispSmStatus 4}
 
 	radioSlicingSm	OBJECT-TYPE
@@ -1892,13 +2184,13 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-only
 		STATUS		obsolete
 		DESCRIPTION		
-			"This variable is deprecated."
+			"This variable is obsolete."
 		::={whispSmStatus 5}
 
 	radioTxGainSm	OBJECT-TYPE
 		SYNTAX		INTEGER
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
 			"Radio transmission gain setting.  Applicable to FSK radios only."
 		::={whispSmStatus 6}
@@ -1917,7 +2209,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"Rx Power level.
-						  For MIMO this is the combined power of the horizontal and vertical paths."
+                          For MIMO this is the combined power of the horizontal and vertical paths."
 		::={whispSmStatus 8}
 
 	registeredToAp	OBJECT-TYPE
@@ -1925,7 +2217,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"AP MAC address that the SM registered to."
+			"Registered AP's MAC address."
 		::={whispSmStatus 9}
 
 -- DHCP client status:
@@ -2007,7 +2299,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"VC adapt rate."
+			"Uplink adapt rate."
 		::={whispSmStatus 20}
 
 	radioDbmInt	OBJECT-TYPE
@@ -2032,7 +2324,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Tx Power level. Valid for FSK and OFDM SMs."
+			"Tx Power level."
 		::={whispSmStatus 23}
 
 	activeRegion	OBJECT-TYPE
@@ -2053,8 +2345,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"BER level.
-						  For PMP 450 systems: 2=MIMO QPSK, 4=MIMO 16-QAM, 6=MIMO64-QAM, 8=256-QAM
-						  For non PMP 450: 2=2 level BER, 4=4 level BER."
+                          For PMP 450 systems: 2=MIMO QPSK, 4=MIMO 16-QAM, 6=MIMO64-QAM, 8=256-QAM
+                          For non PMP 450: 2=2 level BER, 4=4 level BER."
 		::={whispSmStatus 25}
 
 	nbBitsRcvd	OBJECT-TYPE
@@ -2062,13 +2354,13 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of BER bits received (non MIMO platforms only)."
+			"Number of BER bits received."
 		::={whispSmStatus 26}
 
 	nbPriBitsErr	OBJECT-TYPE
 		SYNTAX		Counter32
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		obsolete
 		DESCRIPTION		
 			"Number of Primary bit errors (non MIMO platforms only)."
 		::={whispSmStatus 27}
@@ -2076,7 +2368,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 	nbSndBitsErr	OBJECT-TYPE
 		SYNTAX		Counter32
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		obsolete
 		DESCRIPTION		
 			"Number of secondary bit errors (non MIMO platforms only)."
 		::={whispSmStatus 28}
@@ -2108,33 +2400,33 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 	minRSSI	OBJECT-TYPE
 		SYNTAX		INTEGER
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		obsolete
 		DESCRIPTION		
-			"Measured Min. RSSI. Applicable to FSK radios only."
+			"Measured Min. RSSI. Applicable to FSK radios only. Obsolete."
 		::={whispSmStatus 32}
 
 	maxRSSI	OBJECT-TYPE
 		SYNTAX		INTEGER
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		obsolete
 		DESCRIPTION		
-			"Measured Max. RSSI. Applicable to FSK radios only."
+			"Measured Max. RSSI. Applicable to FSK radios only. Obsolete."
 		::={whispSmStatus 33}
 
 	minJitter	OBJECT-TYPE
 		SYNTAX		Gauge32 (0..15)
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		obsolete
 		DESCRIPTION		
-			"Measured Min. Jitter. Applicable to FSK radios only."
+			"Measured Min. Jitter. Applicable to FSK radios only. Obsolete."
 		::={whispSmStatus 34}
 
 	maxJitter	OBJECT-TYPE
 		SYNTAX		Gauge32 (0..15)
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		obsolete
 		DESCRIPTION		
-			"Measured Max. Jitter. Applicable to FSK radios only."
+			"Measured Max. Jitter. Applicable to FSK radios only. Obsolete."
 		::={whispSmStatus 35}
 
 	smSessionTimer	OBJECT-TYPE
@@ -2204,7 +2496,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"Current PPPoE Timeout Period.  The use of this depends on the Timer Type.  If the Timer Type is KeepAlive, then
-            			the timeout period is in seconds.  If the Timer Type is Idle Timeout, then the timeout period is in minutes."
+                        the timeout period is in seconds.  If the Timer Type is Idle Timeout, then the timeout period is in minutes."
 		::={whispSmStatus 43}
 
 	pppoeDNSServer1	OBJECT-TYPE
@@ -2302,19 +2594,19 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 	primaryBERDisplay	OBJECT-TYPE
 		SYNTAX		DisplayString
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		obsolete
 		DESCRIPTION		
 			"Measured Primary Bit Error Rate.
-						  Non MIMO platforms only."
+                          Non MIMO platforms only."
 		::={whispSmStatus 55}
 
 	secondaryBERDisplay	OBJECT-TYPE
 		SYNTAX		DisplayString
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		obsolete
 		DESCRIPTION		
 			"Measured Secondary Bit Error Rate.
-						  FSK platforms only."
+                          FSK platforms only."
 		::={whispSmStatus 56}
 
 	totalBERDisplay	OBJECT-TYPE
@@ -2332,7 +2624,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"Maximum receive power of beacon in dBm.
-                            For MIMO radios, this is only available in the vertical path."
+                            For MIMO radios, this is in the vertical path."
 		::={whispSmStatus 58}
 
 	maxRadioDbm	OBJECT-TYPE
@@ -2358,27 +2650,27 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		DESCRIPTION		
 			"Average Receive Power of the AP's beacon in dBm.
                             OFDM Radios only.
-                            For MIMO this is only the verical path, as the beacon is not transmitted on horizontal."
+                            For MIMO this is only the verical path."
 		::={whispSmStatus 61}
 
 	zoltarFPGAFreqOffset	OBJECT-TYPE
 		SYNTAX		INTEGER
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
-			"FPGA peek of 70001088"
+			"No longer supported."
 		::={whispSmStatus 62}
 
 	zoltarSWFreqOffset	OBJECT-TYPE
 		SYNTAX		INTEGER
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
-			"FPGA peek of 7000108C"
+			"No longer supported."
 		::={whispSmStatus 63}
 
 	airDelayns	OBJECT-TYPE
-		SYNTAX		Unsigned32
+		SYNTAX		INTEGER
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
@@ -2420,8 +2712,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		DESCRIPTION		
 			"Engineering only.
                         Link Quality for incoming beacons.
-                        For Gen II OFDM radios and forward.
-                        For PMP 450 and forward this is vertical path."
+                        For Gen II OFDM radios and forward."
 		::={whispSmStatus 68}
 
 	dhcpServerPktXmt	OBJECT-TYPE
@@ -2656,13 +2947,12 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
                                 When operating in MIMO-A will return 0."
 		::={whispSmStatus 106}
 
-	maxRadioDbmDeprecated	OBJECT-TYPE
+	maxRadioDbmObsoleted	OBJECT-TYPE
 		SYNTAX		INTEGER
 		MAX-ACCESS	read-only
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
-			"This OID was inadvertently moved in 12.0.2.  Please use maxRadioDbm.  This OID is deprecated
-                             and kept for backwards compatibility."
+			"This OID was inadvertently moved in 12.0.2.  Please use maxRadioDbm.  This OID is obsoleted in 21.0."
 		::={whispSmStatus 107}
 
 	signalStrengthRatio	OBJECT-TYPE
@@ -2869,7 +3159,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					pmp430(1),
 					pmp450Interoperability(2)}
 		MAX-ACCESS	read-only
-		STATUS		deprecated
+		STATUS		obsolete
 		DESCRIPTION		
 			"The current radio mode that SM is operating in.
                         PMP 430 SMs only.
@@ -2883,21 +3173,27 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					noSession(0),
 					rate1X(1),
 					rate2X(2),
-					rete3X(3),
+					rate3X(3),
 					rate4X(4),
+					rate5X(5),
 					rate6X(6),
+					rate7X(7),
 					rate8X(8)}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
 			"The current transmitting rate of the low priority VC.
                             0 : SM is not in session
-                            1 : 1X QPSK SISO
-                            2 : 2X 16-QAM SISO or QPSK MIMO
-                            3 : 3X 64-QAM SISO
-                            4 : 4X 256-QAM SISO or 16-QAM MIMO
-                            6 : 6X 64-QAM MIMO
-                            8 : 8X 256-QAM MIMO"
+                            1 : 1X QPSK MIMO-A/SISO
+                            2 : 2X 16-QAM MIMO-A/SISO or QPSK MIMO-B
+                            3 : 3X 64-QAM MIMO-A/SISO or 8-QAM MIMO-B
+                            4 : 4X 256-QAM MIMO-A/SISO or 16-QAM MIMO-B
+                            5 : 5X 32-QAM MIMO-B
+                            6 : 6X 64-QAM MIMO-B
+                            7 : 7X 128-QAM MIMO-B
+                            8 : 8X 256-QAM MIMO-B
+                            
+                            NOTE: As of 15.2 for 450 platform, the adapt rates are the same per LUID. This OID will provide this common per LUID rate."
 		::={whispSmStatus 128}
 
 	adaptRateHighPri	OBJECT-TYPE
@@ -2906,22 +3202,28 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					noSession(0),
 					rate1X(1),
 					rate2X(2),
-					rete3X(3),
+					rate3X(3),
 					rate4X(4),
+					rate5X(5),
 					rate6X(6),
+					rate7X(7),
 					rate8X(8)}
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
 			"The current transmitting rate of the high priority VC.
                             -1 : High Priority Channel not configured
                             0 : SM is not in session
-                            1 : 1X QPSK SISO
-                            2 : 2X 16-QAM SISO or QPSK MIMO
-                            3 : 3X 64-QAM SISO
-                            4 : 4X 256-QAM SISO or 16-QAM MIMO
-                            6 : 6X 64-QAM MIMO
-                            8 : 8X 256-QAM MIMO"
+                            1 : 1X QPSK MIMO-A/SISO
+                            2 : 2X 16-QAM MIMO-A/SISO or QPSK MIMO-B
+                            3 : 3X 64-QAM MIMO-A/SISO or 8-QAM MIMO-B
+                            4 : 4X 256-QAM MIMO-A/SISO or 16-QAM MIMO-B
+                            5 : 5X 32-QAM MIMO-B
+                            6 : 6X 64-QAM MIMO-B
+                            7 : 7X 128-QAM MIMO-B
+                            8 : 8X 256-QAM MIMO-B
+                            
+                            NOTE: As of 15.2 for 450 platform, the adapt rates are the same per LUID. OID adaptRateLowPri will provide this common per LUID rate."
 		::={whispSmStatus 129}
 
 	bitErrorsQSPKpathA	OBJECT-TYPE
@@ -3019,7 +3321,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"The current percentage of beacons that the SM/BHS successfully receiving."
+			"The current percentage of beacons that the SM/BHS successfully received over the last 15 seconds."
 		::={whispSmStatus 139}
 
 	mapsPercentReceived	OBJECT-TYPE
@@ -3028,7 +3330,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"PMP 450 only.
-                            The current percentage of scheduling maps that the SM/BHS successfully receiving."
+                            The current percentage of scheduling maps that the SM successfully received over the last 15 seconds."
 		::={whispSmStatus 140}
 
 	natTslTableEntries	OBJECT-TYPE
@@ -3045,7 +3347,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"Maximum receive power level for this session.
-            					MIMO radios only."
+                                MIMO radios only."
 		::={whispSmStatus 142}
 
 	beaconsPercentMinReceived	OBJECT-TYPE
@@ -3053,7 +3355,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"The percentage of the least number of beacons that the SM/BHS successfully received in a 16 second window for the last 15 minutes. This will be updated only once in 15 minutes."
+			"The percentage of the least number of beacons that the SM/BHS successfully received in a 15 second window for the last 15 minutes. This will be updated only once in 15 minutes.
+                            For PMP SMs, this includes the Scheduling Uplink Map sent from the AP."
 		::={whispSmStatus 143}
 
 	beaconsPercentMaxReceived	OBJECT-TYPE
@@ -3061,7 +3364,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"The percentage of the maximum number of beacons that the SM/BHS successfully received in a 16 second window for the last 15 minutes. This will be updated only once in 15 minutes."
+			"The percentage of the maximum number of beacons that the SM/BHS successfully received in a 15 second window for the last 15 minutes. This will be updated only once in 15 minutes.
+                            For PMP SMs, this includes the Scheduling Uplink Map sent from the AP."
 		::={whispSmStatus 144}
 
 	beaconsPercentReceivedSnapshot	OBJECT-TYPE
@@ -3069,7 +3373,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"The percentage of beacons that the SM/BHS successfully received for the last 15 minutes. This will be updated only once in 15 minutes."
+			"The percentage of beacons that the SM/BHS successfully received for the last 15 minutes.
+                            For PMP SMs, this includes the Scheduling Uplink Map sent from the AP."
 		::={whispSmStatus 145}
 
 	smSectorID	OBJECT-TYPE
@@ -3078,7 +3383,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"The current Sector ID of the Registered AP/BHM. 
-                 			A value of -1 is return when the device is not registered or AP/BHM does not support Sector ID."
+                            A value of -1 is return when the device is not registered or AP/BHM does not support Sector ID."
 		::={whispSmStatus 146}
 
 	scanCycleCount	OBJECT-TYPE
@@ -3096,6 +3401,519 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		DESCRIPTION		
 			"Packet drop count for hosts with MAC address not in bridge table"
 		::={whispSmStatus 148}
+
+	spatialFrequency	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					noSession(-1),
+					invalid(2048)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The spatial frequency of registered SM.
+                            Spatial Frequency is the phase advance of the wavefront from one antenna column
+                            to the next caused by the angle at which the wavefront impinges on the array.
+                            It is represented in integer units, with 1024 equating to 360 degrees per column.
+                            A value of 2048 is used to signify a spatial frequency that is not yet known or otherwise invalid.
+                            A value of -1 is used to indicate that SM is not in session.
+                            Valid only for SMs that are capable of sounding and registered to MU-MIMO capable APs.
+                            General Error will result if sounding is not enabled on this device (either this device does not support sounding or the AP is not MU-MIMO capable).
+                            PMP only."
+		::={whispSmStatus 149}
+
+	isMumimoSector	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Returns 1 if SM is registered to MU-MIMO capable AP.
+                            PMP only."
+		::={whispSmStatus 150}
+
+	averageEvmDownlinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average downlink EVM expressed in dB for Path A."
+		::={whispSmStatus 151}
+
+	averageEvmDownlinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average downlink EVM expressed in dB for Path B."
+		::={whispSmStatus 152}
+
+	combinedEvmDownlink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The combined downlink EVM expressed in dB for both paths.
+                            This value is scaled up by 10 (ie. -269 is equivalent to -26.9 dB)."
+		::={whispSmStatus 153}
+
+	averageEvmUplinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average uplink EVM expressed in dB for Path A."
+		::={whispSmStatus 154}
+
+	averageEvmUplinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average uplink EVM expressed in dB for Path B."
+		::={whispSmStatus 155}
+
+	combinedEvmUplink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The combined uplink EVM expressed in dB for both paths.
+                            This value is scaled up by 10 (ie. -269 is equivalent to -26.9 dB)."
+		::={whispSmStatus 156}
+
+	intermediateModModeActive	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					false(0),
+					true(1)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Returns TRUE if Intermediate Modulation Modes are active on this link.
+                            Engineering Key only."
+		::={whispSmStatus 157}
+
+	cbrsStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					unknown(0),
+					enabled(1),
+					disabled(2)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Tells whether CBRS is enabled or disabled in AP/BHM."
+		::={whispSmStatus 158}
+
+	smLUID	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"LUID or Logical User Identifier. This OID will return 0 if the SM is not registered."
+		::={whispSmStatus 159}
+
+	registeredApSwVersion	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Registered AP's Software Version."
+		::={whispSmStatus 160}
+
+	rfStatPowerAdjustmentCount	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of times the AP or BHM has adjusted SM or BHS transmit power to match receieve target"
+		::={whispSmStatus 161}
+
+	evmStatsLowAverageEvmDownlinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average downlink EVM for 1 minute expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalLow 1}
+
+	evmStatsLowAverageEvmDownlinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average downlink EVM for 1 minute expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalLow 2}
+
+	evmStatsLowCombinedAvgEvmDownlink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The combined downlink EVM for 1 minute expressed in dB for both paths.
+                            This value is scaled up by 10 (ie. -269 is equivalent to -26.9 dB)."
+		::={whispSmEvmStatsIntervalLow 3}
+
+	evmStatsLowAverageEvmUplinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average uplink EVM for 1 minute expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalLow 4}
+
+	evmStatsLowAverageEvmUplinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average uplink EVM for 1 minute expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalLow 5}
+
+	evmStatsLowCombinedAvgEvmUplink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The combined uplink EVM for 1 minute expressed in dB for both paths.
+                            This value is scaled up by 10 (ie. -269 is equivalent to -26.9 dB)."
+		::={whispSmEvmStatsIntervalLow 6}
+
+	evmStatsLowBestEvmDownlinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The best downlink EVM for 1 minute expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalLow 7}
+
+	evmStatsLowBestEvmDownlinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The best downlink EVM for 1 minute expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalLow 8}
+
+	evmStatsLowBestEvmUplinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The best uplink EVM for 1 minute expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalLow 9}
+
+	evmStatsLowBestEvmUplinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The best uplink EVM for 1 minute expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalLow 10}
+
+	evmStatsLowWorstEvmDownlinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The worst downlink EVM for 1 minute expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalLow 11}
+
+	evmStatsLowWorstEvmDownlinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The worst downlink EVM for 1 minute expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalLow 12}
+
+	evmStatsLowWorstEvmUplinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The worst uplink EVM for 1 minute expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalLow 13}
+
+	evmStatsLowWorstEvmUplinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The worst uplink EVM for 1 minute expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalLow 14}
+
+	evmStatsMidAverageEvmDownlinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average downlink EVM for 5 minutes expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalMid 1}
+
+	evmStatsMidAverageEvmDownlinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average downlink EVM for 5 minutes expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalMid 2}
+
+	evmStatsMidCombinedAvgEvmDownlink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The combined downlink EVM for 5 minutes expressed in dB for both paths.
+                            This value is scaled up by 10 (ie. -269 is equivalent to -26.9 dB)."
+		::={whispSmEvmStatsIntervalMid 3}
+
+	evmStatsMidAverageEvmUplinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average uplink EVM for 5 minutes expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalMid 4}
+
+	evmStatsMidAverageEvmUplinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average uplink EVM for 5 minutes expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalMid 5}
+
+	evmStatsMidCombinedAvgEvmUplink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The combined average uplink EVM for 5 minutes expressed in dB for both paths.
+                            This value is scaled up by 10 (ie. -269 is equivalent to -26.9 dB)."
+		::={whispSmEvmStatsIntervalMid 6}
+
+	evmStatsMidBestEvmDownlinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The best downlink EVM for 5 minutes expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalMid 7}
+
+	evmStatsMidBestEvmDownlinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The best downlink EVM for 5 minutes expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalMid 8}
+
+	evmStatsMidBestEvmUplinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The best uplink EVM for 5 minutes expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalMid 9}
+
+	evmStatsMidBestEvmUplinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The best uplink EVM for 5 minutes expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalMid 10}
+
+	evmStatsMidWorstEvmDownlinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The worst downlink EVM for 5 minutes expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalMid 11}
+
+	evmStatsMidWorstEvmDownlinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The worst downlink EVM for 5 minutes expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalMid 12}
+
+	evmStatsMidWorstEvmUplinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The worst uplink EVM for 5 minutes expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalMid 13}
+
+	evmStatsMidWorstEvmUplinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The worst uplink EVM for 5 minutes expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalMid 14}
+
+	evmStatsHighAverageEvmDownlinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average downlink EVM for 15 minutes expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalHigh 1}
+
+	evmStatsHighAverageEvmDownlinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average downlink EVM for 15 minutes expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalHigh 2}
+
+	evmStatsHighCombinedAvgEvmDownlink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The combined average downlink EVM for 15 minutes expressed in dB for both paths.
+                            This value is scaled up by 10 (ie. -269 is equivalent to -26.9 dB)."
+		::={whispSmEvmStatsIntervalHigh 3}
+
+	evmStatsHighAverageEvmUplinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average uplink EVM for 15 minutes expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalHigh 4}
+
+	evmStatsHighAverageEvmUplinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The average uplink EVM for 15 minutes expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalHigh 5}
+
+	evmStatsHighCombinedAvgEvmUplink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The combined average uplink EVM for 15 minutes expressed in dB for both paths.
+                            This value is scaled up by 10 (ie. -269 is equivalent to -26.9 dB)."
+		::={whispSmEvmStatsIntervalHigh 6}
+
+	evmStatsHighBestEvmDownlinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The best downlink EVM for 15 minutes expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalHigh 7}
+
+	evmStatsHighBestEvmDownlinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The best downlink EVM for 15 minutes expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalHigh 8}
+
+	evmStatsHighBestEvmUplinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The best uplink EVM for 15 minutes expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalHigh 9}
+
+	evmStatsHighBestEvmUplinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The best uplink EVM for 15 minutes expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalHigh 10}
+
+	evmStatsHighWorstEvmDownlinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The worst downlink EVM for 15 minutes expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalHigh 11}
+
+	evmStatsHighWorstEvmDownlinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The worst downlink EVM for 15 minutes expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalHigh 12}
+
+	evmStatsHighWorstEvmUplinkPathA	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The worst uplink EVM for 15 minutes expressed in dB for Path A."
+		::={whispSmEvmStatsIntervalHigh 13}
+
+	evmStatsHighWorstEvmUplinkPathB	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					na(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The worst uplink EVM for 15 minutes expressed in dB for Path B."
+		::={whispSmEvmStatsIntervalHigh 14}
 
 	dhcpServerTable OBJECT-TYPE
 		SYNTAX		SEQUENCE OF DhcpServerEntry
@@ -3144,18 +3962,286 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 			"Lease time assigned by DHCP server host."
 		::={dhcpServerEntry 3}
 
+	smCarrierInfo OBJECT-TYPE
+		SYNTAX		SEQUENCE OF SMCarrierInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Canopy V SM Carrier Information table"
+		::= {whispSmRFStatus 1}
+
+	smCarrierInfoEntry OBJECT-TYPE
+		SYNTAX		SMCarrierInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Canopy V SM Carrier Information table entry"
+		INDEX		{smCarrierTableIdx}
+		::= {smCarrierInfo 1}
+
+		SMCarrierInfoEntry ::= SEQUENCE{
+			smCarrierTableIdx		INTEGER,
+			smCarrierStatus		INTEGER,
+			smCarrierBand		INTEGER,
+			smCarrierAggregateBw		INTEGER,
+			smCarrierTxPwr		INTEGER,
+			smCarrierRxPower		INTEGER,
+			smCarrierEIRP	INTEGER
+			}
+
+	smCarrierTableIdx	OBJECT-TYPE
+		SYNTAX		INTEGER (1..2)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Carrier Information Table Index"
+		::={smCarrierInfoEntry 1}
+
+	smCarrierStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					inactive(0),
+					active(1)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Carrier Status 1-Active 0-Inactive"
+		::={smCarrierInfoEntry 2}
+
+	smCarrierBand	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					band700(0),
+					band900(1),
+					band2400(2),
+					band3500(3),
+					band3700(4),
+					band4900(5),
+					band5100(6),
+					band5200(7),
+					band5400(8),
+					band5700(9),
+					band5800(10),
+					band5900(11),
+					band6050(12),
+					band3600(13),
+					band4959(14),
+					band3(15),
+					band5170(16),
+					band65(17),
+					band67(18),
+					band5763(19),
+					band66(20)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Active Carrier's Band"
+		::={smCarrierInfoEntry 3}
+
+	smCarrierAggregateBw	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"MHz"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Carrier Aggregate Bandwidth in MHz"
+		::={smCarrierInfoEntry 4}
+
+	smCarrierTxPwr	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"dBm"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Carrier Specific Transmit Power in dBm"
+		::={smCarrierInfoEntry 5}
+
+	smCarrierRxPower	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"dBm"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Carrier's Specific Receive Power in dBm.
+                            The received power is combined across vertical and horizontal paths per component carrier and averaged across component carriers."
+		::={smCarrierInfoEntry 6}
+
+	smCarrierEIRP	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"dBm"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Carrier EIRP in dBm"
+		::={smCarrierInfoEntry 7}
+
+	smComponentCarrierInfo OBJECT-TYPE
+		SYNTAX		SEQUENCE OF SMComponentCarrierInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Canopy V SM Component Carrier Information table"
+		::= {whispSmRFStatus 2}
+
+	smComponentCarrierInfoEntry OBJECT-TYPE
+		SYNTAX		SMComponentCarrierInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Canopy V SM Component Carrier Information table entry"
+		INDEX		{smCCTableIdx}
+		::= {smComponentCarrierInfo 1}
+
+		SMComponentCarrierInfoEntry ::= SEQUENCE{
+			smCCTableIdx		INTEGER,
+			smCCStatus		INTEGER,
+			smCCCarrierAssignment		INTEGER,
+			smCCChannelFreq		INTEGER,
+			smCCChannelBW		INTEGER,
+			smCCTxPwr		INTEGER,
+			smCCULModRate		DisplayString,
+			smCCSignalStrengthRatio		DisplayString,
+			smCCRxPower		INTEGER,
+			smCCBER		DisplayString,
+			smCCAvgBERQPSKPathA		DisplayString,
+			smCCAvgBERQPSKPathB		DisplayString,
+			smCCRssiHorizontal		DisplayString,
+			smCCRssiVertical	DisplayString
+			}
+
+	smCCTableIdx	OBJECT-TYPE
+		SYNTAX		INTEGER (1..4)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Index to the Canopy V Component Carrier Information Table"
+		::={smComponentCarrierInfoEntry 1}
+
+	smCCStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					inactive(0),
+					active(1)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"SM Component Carrier Status 1-Active 0-Inactive"
+		::={smComponentCarrierInfoEntry 2}
+
+	smCCCarrierAssignment	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Carrier Assignment for the Component Carrier"
+		::={smComponentCarrierInfoEntry 3}
+
+	smCCChannelFreq	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"kHz"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Component Carrier Specific Channel Frequency Value in kHz"
+		::={smComponentCarrierInfoEntry 4}
+
+	smCCChannelBW	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"MHz"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Channel Bandwidth in MHz"
+		::={smComponentCarrierInfoEntry 5}
+
+	smCCTxPwr	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"dBm"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The Component Carrier Transmit Power in dBm"
+		::={smComponentCarrierInfoEntry 6}
+
+	smCCULModRate	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Component Carrier Uplink Modulation Rate"
+		::={smComponentCarrierInfoEntry 7}
+
+	smCCSignalStrengthRatio	OBJECT-TYPE
+		SYNTAX		DisplayString
+		UNITS		"dBm"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Component Carrier's Signal Strength Ratio in dBm"
+		::={smComponentCarrierInfoEntry 8}
+
+	smCCRxPower	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"dBm"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Component Carrier Receive Power in dBm"
+		::={smComponentCarrierInfoEntry 9}
+
+	smCCBER	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Component Carrier Bit Error Rate"
+		::={smComponentCarrierInfoEntry 10}
+
+	smCCAvgBERQPSKPathA	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average number of bit errors received from BER packet at QPSK pathA."
+		::={smComponentCarrierInfoEntry 11}
+
+	smCCAvgBERQPSKPathB	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average number of bit errors received from BER packet at QPSK pathB."
+		::={smComponentCarrierInfoEntry 12}
+
+	smCCRssiHorizontal	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Component Carrier receive power level of the horizontal antenna in dBm."
+		::={smComponentCarrierInfoEntry 13}
+
+	smCCRssiVertical	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Component Carrier receive power level of the vertical antenna in dBm."
+		::={smComponentCarrierInfoEntry 14}
+
 	whispSmConfigGroup	OBJECT-GROUP
 			OBJECTS {
 					rfScanListBandFilter,
 					rfScanList,
+					rfScanListFrequencyAdd,
+					rfScanListFrequencyRemove,
 					powerUpMode,
 					lanIpSm,
 					lanMaskSm,
 					defaultGwSm,
 					networkAccess,
 					authKeySm,
+					authKey256Sm,
 					enable8023link,
 					authKeyOption,
+					authKey256Option,
 					timingPulseGated,
 					naptPrivateIP,
 					naptPrivateSubnetMask,
@@ -3210,11 +4296,18 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					ingressVIDPriorityMode,
 					providerVIDPriority,
 					providerVIDPriorityMode,
+					dataChanCount,
 					lowPriorityUplinkCIR,
 					lowPriorityDownlinkCIR,
+					medPriorityChannel,
+					medPriorityUplinkCIR,
+					medPriorityDownlinkCIR,
 					hiPriorityChannel,
 					hiPriorityUplinkCIR,
 					hiPriorityDownlinkCIR,
+					uHiPriorityChannel,
+					uHiPriorityUplinkCIR,
+					uHiPriorityDownlinkCIR,
 					smRateAdapt,
 					upLnkMaxBurstDataRate,
 					upLnkDataRate,
@@ -3288,20 +4381,29 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					deleteAdditionalColorCode,
 					bridgeTableSize,
 					bridgeTableRestrict,
+					addPortFwdMap,
+					removePortFwdMap,
 					berDeModSelect,
 					multicastVCRcvRate,
 					syslogServerApPreferred,
 					syslogMinLevelApPreferred,
 					syslogSMXmitSetting,
 					syslogSMXmitControl,
+					oneXBridgingMode,
+					oneXAuthMode,
+					oneXVlan,
+					smPrioritizationGroup,
 					bCastMIRUnits,
 					naptRemoteManage,
 					maxTxPowerEnable,
 					maxTxPower,
 					txPowerControl,
+					enableGps,
 					eapPeerAAAServerCommonName,
 					pmp430ApRegistrationOptions,
-					switchRadioModeAndReboot}
+					switchRadioModeAndReboot,
+					dlReferenceEVM,
+					ulReferenceEVM}
 		STATUS		current
 		DESCRIPTION
 			"Canopy Subscriber Module configuration group."
@@ -3309,6 +4411,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 
 	whispSmStatusGroup	OBJECT-GROUP
 			OBJECTS {
+					spatialFrequency,
+					isMumimoSector,
 					natTslTableEntries,
 					sessionStatus,
 					rssi,
@@ -3319,6 +4423,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					calibrationStatus,
 					radioDbm,
 					registeredToAp,
+					registeredApSwVersion,
 					dhcpCip,
 					dhcpSip,
 					dhcpClientLease,
@@ -3384,7 +4489,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					mimoBerRcvModulationType,
 					minRadioDbm,
 					maxRadioDbm,
-					maxRadioDbmDeprecated,
+					maxRadioDbmObsoleted,
 					pppoeSessIdleTime,
 					radioDbmAvg,
 					zoltarFPGAFreqOffset,
@@ -3425,19 +4530,71 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					fragmentsReceived2XHorizontal,
 					fragmentsReceived3XHorizontal,
 					fragmentsReceived4XHorizontal,
+					cbrsStatus,
 					beaconsPercentReceived,
 					mapsPercentReceived,
 					beaconsPercentMinReceived,
 					beaconsPercentMaxReceived,
 					beaconsPercentReceivedSnapshot,
 					maxReceivePower,
+					smLUID,
 					bridgecbUplinkCreditRate,
 					bridgecbUplinkCreditLimit,
 					bridgecbDownlinkCreditRate,
 					bridgecbDownlinkCreditLimit,
 					bridgecbDownlinkMaxBurstBitRate,
 					bridgecbUplinkMaxBurstBitRate,
+					intermediateModModeActive,
+					rfStatPowerAdjustmentCount,
+					evmStatsLowAverageEvmDownlinkPathA,
+					evmStatsLowAverageEvmDownlinkPathB,
+					evmStatsLowCombinedAvgEvmDownlink,
+					evmStatsLowAverageEvmUplinkPathA,
+					evmStatsLowAverageEvmUplinkPathB,
+					evmStatsLowCombinedAvgEvmUplink,
+					evmStatsLowBestEvmDownlinkPathA,
+					evmStatsLowBestEvmDownlinkPathB,
+					evmStatsLowBestEvmUplinkPathA,
+					evmStatsLowBestEvmUplinkPathB,
+					evmStatsLowWorstEvmDownlinkPathA,
+					evmStatsLowWorstEvmDownlinkPathB,
+					evmStatsLowWorstEvmUplinkPathA,
+					evmStatsLowWorstEvmUplinkPathB,
+					evmStatsMidAverageEvmDownlinkPathA,
+					evmStatsMidAverageEvmDownlinkPathB,
+					evmStatsMidCombinedAvgEvmDownlink,
+					evmStatsMidAverageEvmUplinkPathA,
+					evmStatsMidAverageEvmUplinkPathB,
+					evmStatsMidCombinedAvgEvmUplink,
+					evmStatsMidBestEvmDownlinkPathA,
+					evmStatsMidBestEvmDownlinkPathB,
+					evmStatsMidBestEvmUplinkPathA,
+					evmStatsMidBestEvmUplinkPathB,
+					evmStatsMidWorstEvmDownlinkPathA,
+					evmStatsMidWorstEvmDownlinkPathB,
+					evmStatsMidWorstEvmUplinkPathA,
+					evmStatsMidWorstEvmUplinkPathB,
+					evmStatsHighAverageEvmDownlinkPathA,
+					evmStatsHighAverageEvmDownlinkPathB,
+					evmStatsHighCombinedAvgEvmDownlink,
+					evmStatsHighAverageEvmUplinkPathA,
+					evmStatsHighAverageEvmUplinkPathB,
+					evmStatsHighCombinedAvgEvmUplink,
+					evmStatsHighBestEvmDownlinkPathA,
+					evmStatsHighBestEvmDownlinkPathB,
+					evmStatsHighBestEvmUplinkPathA,
+					evmStatsHighBestEvmUplinkPathB,
+					evmStatsHighWorstEvmDownlinkPathA,
+					evmStatsHighWorstEvmDownlinkPathB,
+					evmStatsHighWorstEvmUplinkPathA,
+					evmStatsHighWorstEvmUplinkPathB,
 					bridgeCbErrStatBridgeDropCount,
+					averageEvmDownlinkPathA,
+					averageEvmDownlinkPathB,
+					combinedEvmDownlink,
+					averageEvmUplinkPathA,
+					averageEvmUplinkPathB,
+					combinedEvmUplink,
 					radioModeStatus}
 		STATUS		current
 		DESCRIPTION
@@ -3462,11 +4619,25 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					tableIndex,
 					protocol,
 					port,
-					localIp}
+					localIp,
+					extPort}
 		STATUS		current
 		DESCRIPTION
 			"Canopy SM NAT port mapping Table group."
 		::= {whispSmGroups 4}
+
+	whispPropSchedulerConfigGroup	OBJECT-GROUP
+			OBJECTS {
+					downlinkPlan,
+					uplinkPlan,
+					weight,
+					userLockModulation,
+					lockedModulation,
+					thresholdModulation}
+		STATUS		current
+		DESCRIPTION
+			"Canopy SM Proportional Scheduler Config group."
+		::= {whispSmGroups 5}
 
 -- DFS events
 
@@ -3578,7 +4749,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 			tableIndex		INTEGER,
 			protocol		INTEGER,
 			port		INTEGER,
-			localIp	IpAddress
+			localIp		IpAddress,
+			extPort	INTEGER
 			}
 
 	tableIndex	OBJECT-TYPE
@@ -3591,7 +4763,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 
 	protocol	OBJECT-TYPE
 		SYNTAX		INTEGER
-		MAX-ACCESS	read-write
+		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
 			"Protocol type: 0:both UDP and TCP, 1:UDP, 2:TCP."
@@ -3599,7 +4771,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 
 	port	OBJECT-TYPE
 		SYNTAX		INTEGER
-		MAX-ACCESS	read-write
+		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
 			"Application port number. e.g. 23=telnet, 21=ftp etc. Should be a positive integer."
@@ -3607,11 +4779,19 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 
 	localIp	OBJECT-TYPE
 		SYNTAX		IpAddress
-		MAX-ACCESS	read-write
+		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
 			"IP of local host to which the incoming packet mapped to an application should be forwarded."
 		::={whispMappingEntry 4}
+
+	extPort	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"External port of the incoming packet mapped to an application should be forwarded."
+		::={whispMappingEntry 5}
 
 	whispSmTranslationTable OBJECT-TYPE
 		SYNTAX		SEQUENCE OF WhispSmTranslationTableEntry
@@ -3770,7 +4950,13 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 			evalAuthentication		INTEGER,
 			evalSMPPPoE		INTEGER,
 			evalPToPVLAN		INTEGER,
-			evalFramePeriod	INTEGER
+			evalFramePeriod		INTEGER,
+			evalAirDelayNs		INTEGER,
+			evalAirDelayString		DisplayString,
+			evalLastKnownPrimaryAP		INTEGER,
+			evalCbrsFail		INTEGER,
+			evalTotalActiveBandwdith		INTEGER,
+			evalAntennaGain	INTEGER
 			}
 
 	evalIndex	OBJECT-TYPE
@@ -3786,7 +4972,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Transmit Frequency in KHz"
+			"Transmit Frequency in kHz"
 		::={whispSmAPEvalEntry 2}
 
 	evalChannelBandwidth	OBJECT-TYPE
@@ -3864,7 +5050,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"Forward Error Correction Enabled Status.
-							Note, this is always enabled on 450 and forward."
+                            Note, this is always enabled on 450 and forward."
 		::={whispSmAPEvalEntry 10}
 
 	evalType	OBJECT-TYPE
@@ -3935,7 +5121,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"Radio is transmitting Bit Error Rate symbol or not
-							Note: This is always enabled on 450 and forward"
+                            Note: This is always enabled on 450 and forward"
 		::={whispSmAPEvalEntry 18}
 
 	evalEBCast	OBJECT-TYPE
@@ -4151,6 +5337,57 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		DESCRIPTION		
 			"Frame Period"
 		::={whispSmAPEvalEntry 43}
+
+	evalAirDelayNs	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Air Delay in ns. A value of -1 indicates air delay is not available."
+		::={whispSmAPEvalEntry 44}
+
+	evalAirDelayString	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Air Delay string (miles or km)."
+		::={whispSmAPEvalEntry 45}
+
+	evalLastKnownPrimaryAP	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					lastPrimaryAP(1),
+					notLastPrimaryAP(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Tells if this AP is Last known Primary Color code AP, SM registered with."
+		::={whispSmAPEvalEntry 46}
+
+	evalCbrsFail	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of times the registration request has been rejected due to CBRS failure"
+		::={whispSmAPEvalEntry 47}
+
+	evalTotalActiveBandwdith	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Total Active Bandwidth advertised by AP in MHz"
+		::={whispSmAPEvalEntry 48}
+
+	evalAntennaGain	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Antenna Gain of the AP in dBi
+                            Available if AP is on version 23.0 or later. Unavailable when AP is 450m."
+		::={whispSmAPEvalEntry 49}
 
 
 END

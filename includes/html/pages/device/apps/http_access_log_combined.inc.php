@@ -18,78 +18,103 @@ if (isset($vars['access_log_page'])) {
 print_optionbar_start();
 
 // print the link to the totals
-$label = (isset($vars['access_log_page']) || isset($vars['log']))
-    ? 'Totals'
-    : '<span class="pagemenu-selected">Totals</span>';
-echo generate_link($label, $link_array);
+$label = 'Totals';
+$link = generate_link($label, $link_array);
+$link = (isset($vars['access_log_page']) || isset($vars['log']))
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 
 echo ' | Details(';
 
-$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'bytes')
-    ? 'Bytes'
-    : '<span class="pagemenu-selected">Bytes</span>';
-echo generate_link($label, $link_array, ['access_log_page' => 'bytes']) . ',';
+$label = 'Bytes';
+$link = generate_link($label, $link_array, ['access_log_page' => 'bytes']) . ',';
+$link = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'bytes')
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 
-$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'method')
-    ? 'Method'
-    : '<span class="pagemenu-selected">Method</span>';
-echo generate_link($label, $link_array, ['access_log_page' => 'method']) . ',';
+$label = 'Method';
+$link = generate_link($label, $link_array, ['access_log_page' => 'method']) . ',';
+$link = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'method')
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 
-$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'version')
-    ? 'Version'
-    : '<span class="pagemenu-selected">Version</span>';
-echo generate_link($label, $link_array, ['access_log_page' => 'version']) . ',';
+$label = 'Version';
+$link = generate_link($label, $link_array, ['access_log_page' => 'version']) . ',';
+$link = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'version')
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 
-$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'log_size')
-    ? 'Log Size'
-    : '<span class="pagemenu-selected">Log Size</span>';
-echo generate_link($label, $link_array, ['access_log_page' => 'log_size']) . ',';
+$label = 'Log Size';
+$link = generate_link($label, $link_array, ['access_log_page' => 'log_size']) . ',';
+$link = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'log_size')
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 
-$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'refer')
-    ? 'Refer'
-    : '<span class="pagemenu-selected">Refer</span>';
-echo generate_link($label, $link_array, ['access_log_page' => 'refer']) . ',';
+$label = 'Refer';
+$link = generate_link($label, $link_array, ['access_log_page' => 'refer']) . ',';
+$link = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'refer')
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 
-$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'user')
-    ? 'User'
-    : '<span class="pagemenu-selected">User</span>';
-echo generate_link($label, $link_array, ['access_log_page' => 'user']) . ',';
+$label = 'User';
+$link = generate_link($label, $link_array, ['access_log_page' => 'user']) . ',';
+$link = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'user')
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 
-$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '1xx')
-    ? '1xx'
-    : '<span class="pagemenu-selected">1xx</span>';
-echo generate_link($label, $link_array, ['access_log_page' => '1xx']) . ',';
+$label = '1xx';
+$link = generate_link($label, $link_array, ['access_log_page' => '1xx']) . ',';
+$link = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '1xx')
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 
-$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '2xx')
-    ? '2xx'
-    : '<span class="pagemenu-selected">2xx</span>';
-echo generate_link($label, $link_array, ['access_log_page' => '2xx']) . ',';
+$label = '2xx';
+$link = generate_link($label, $link_array, ['access_log_page' => '2xx']) . ',';
+$link = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '2xx')
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 
-$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '3xx')
-    ? '3xx'
-    : '<span class="pagemenu-selected">2xx</span>';
-echo generate_link($label, $link_array, ['access_log_page' => '3xx']) . ',';
+$label = '3xx';
+$link = generate_link($label, $link_array, ['access_log_page' => '3xx']) . ',';
+$link = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '3xx')
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 
-$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '4xx')
-    ? '4xx'
-    : '<span class="pagemenu-selected">4xx</span>';
-echo generate_link($label, $link_array, ['access_log_page' => '4xx']) . ',';
+$label = '4xx';
+$link = generate_link($label, $link_array, ['access_log_page' => '4xx']) . ',';
+$link = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '4xx')
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 
-$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '5xx')
-    ? '5xx'
-    : '<span class="pagemenu-selected">5xx</span>';
-echo generate_link($label, $link_array, ['access_log_page' => '5xx']);
+$label = '5xx';
+$link = generate_link($label, $link_array, ['access_log_page' => '5xx']);
+$link = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '5xx')
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 
 echo ') | Sets: ';
 
 $index_int = 0;
 foreach ($app_data['logs'] as $index => $log_name) {
     $log_name = htmlspecialchars((string) $log_name);
-    $label = (isset($vars['access_log_page']) || $vars['log'] != $log_name)
-        ? $log_name
-        : '<span class="pagemenu-selected">' . $log_name . '</span>';
+    $link = generate_link($log_name, $link_array, ['log' => $log_name]);
+    $link = (isset($vars['access_log_page']) || $vars['log'] != $log_name)
+        ? $link
+        : '<span class="pagemenu-selected">' . $link . '</span>';
     $index_int++;
-    echo generate_link($label, $link_array, ['log' => $log_name]);
+    echo $link;
     if (isset($app_data['logs'][$index_int])) {
         echo ', ';
     }

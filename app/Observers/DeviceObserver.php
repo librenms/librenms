@@ -125,7 +125,7 @@ class DeviceObserver
             try {
                 $result = File::deleteDirectory($host_dir);
 
-                if (! $result) {
+                if (! $result && File::exists($host_dir)) {
                     Log::debug("Could not delete RRD files for: $device->hostname");
                 }
             } catch (\Exception $e) {
@@ -179,6 +179,8 @@ class DeviceObserver
         $device->ipv4()->delete();
         $device->ipv6()->delete();
         $device->isisAdjacencies()->delete();
+        $device->links()->delete();
+        $device->remoteLinks()->delete();
         $device->macs()->delete();
         $device->mefInfo()->delete();
         $device->mempools()->delete();

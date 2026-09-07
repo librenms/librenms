@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Observers\TransceiverObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\Keyable;
 
+#[ObservedBy([TransceiverObserver::class])]
 class Transceiver extends PortRelatedModel implements Keyable
 {
     use HasFactory;

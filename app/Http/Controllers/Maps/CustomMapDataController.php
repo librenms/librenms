@@ -112,14 +112,9 @@ class CustomMapDataController extends Controller
                         $edges[$edgeid]['colour_from'] = 'darkred';
                     }
                 } elseif ($edge->port->ifOperStatus != IfOperStatus::Up) {
-                    // If the port is not online, show the same as speed unknown
-                    if ($map->legend_colours) {
-                        $edges[$edgeid]['colour_to'] = $map->legend_colours['-1'];
-                        $edges[$edgeid]['colour_from'] = $map->legend_colours['-1'];
-                    } else {
-                        $edges[$edgeid]['colour_to'] = $this->speedColour(-1.0);
-                        $edges[$edgeid]['colour_from'] = $this->speedColour(-1.0);
-                    }
+                    // If the port is not online, show the same as device down
+                    $edges[$edgeid]['colour_to'] = $map->legend_colours['-2'] ?? '#8b0000';
+                    $edges[$edgeid]['colour_from'] = $map->legend_colours['-2'] ?? '#8b0000';
                 } else {
                     if ($map->legend_colours) {
                         $edges[$edgeid]['colour_to'] = $this->fixedColour($sorted_colours, $edges[$edgeid]['port_topct']);
@@ -333,7 +328,7 @@ class CustomMapDataController extends Controller
         // For the maths below, the 5.1 is worked out as 255 / 50
         // (255 being the max colour value and 50 is the max of the $pct calculation)
         if ($pct <= 0) {
-            // Black if we can't determine the percentage (link down or speed 0), or link speed strictly 0
+            // Black if we can't determine the percentage or link speed strictly 0
             return '#000000';
         } elseif ($pct < 50) {
             // 100% green and slowly increase the red until we get to yellow

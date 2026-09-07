@@ -15,11 +15,13 @@ echo ' | Containers:';
 $containers = $app->data['containers'] ?? [];
 sort($containers);
 foreach ($containers as $index => $container) {
-    $label = $vars['container'] == $container
-        ? '<span class="pagemenu-selected">' . $container . '</span>'
-        : $container;
+    $link = generate_link($container, $link_array, ['container' => $container]);
 
-    echo generate_link($label, $link_array, ['container' => $container]);
+    $label = $vars['container'] == $container
+        ? '<span class="pagemenu-selected">' . $link . '</span>'
+        : $link;
+
+    echo $link;
 
     if ($index < (count($containers) - 1)) {
         echo ', ';

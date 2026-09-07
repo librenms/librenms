@@ -5,7 +5,7 @@ return [
     'show_header' => 'Show Header',
     'purge' => 'Purge all deleted',
     'purged' => 'Purged',
-    'purged_message' => 'All deleted ports have been purged.',
+    'purged_message' => 'Purged all deleted ports.',
     'purge_failed' => 'Purge Failed',
     'server_error' => 'The server encountered an error.',
     'network_error' => 'Could not connect to the server.',

@@ -34,6 +34,8 @@ parameters:
     checkInternalClassCaseSensitivity: true
 
     checkModelProperties: true
+    checkAuthCallsWhenInRequestScope: true
+    checkModelMethodVisibility: true
     noUnnecessaryEnumerableToArrayCalls: true
 
     ignoreErrors:

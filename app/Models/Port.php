@@ -117,7 +117,7 @@ class Port extends DeviceRelatedModel
      *
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         $os = $this->device?->os;
 
@@ -153,7 +153,7 @@ class Port extends DeviceRelatedModel
      */
     public function getShortLabel(?int $length = null): string
     {
-        $name = Rewrite::normalizeIfName($this->ifName ?: $this->ifDescr);
+        $name = Rewrite::normalizeIfName($this->getLabel());
 
         return substr(Rewrite::shortenIfName($name), 0, $length);
     }

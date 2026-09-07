@@ -1,109 +1,4 @@
-import Prism from "prismjs";
-import "prismjs/components/prism-markup";
-import "prismjs/plugins/line-numbers/prism-line-numbers";
-import "prismjs/plugins/line-numbers/prism-line-numbers.css";
 import "../css/config-highlight.css";
-
-Prism.languages["network-config"] = {
-    comment: [
-        {
-            pattern: /^[ \t]*[!#;].*$/m,
-            greedy: true,
-        },
-        {
-            pattern: /(^|[ \t])\/\/.*$/m,
-            lookbehind: true,
-            greedy: true,
-        },
-    ],
-    string: {
-        pattern: /(^|[=\s])(["'])(?:\\.|(?!\2)[^\\\r\n])*\2/m,
-        lookbehind: true,
-        greedy: true,
-    },
-    variable: [
-        /\b(?:[a-f\d]{0,4}:){2,7}[a-f\d]{0,4}(?:\/\d{1,3})?\b/i,
-        /\b(?:\d{1,3}\.){3}\d{1,3}(?:\/\d{1,2})?\b/,
-        /\b(?:[a-f\d]{2}:){5}[a-f\d]{2}\b/i,
-        /\b(?:Gi|Fa|Te|Eth|Hu|Po|Vl|Lo|Tu|Se)[\w./:-]*\d[\w./:-]*\b/i,
-    ],
-    boolean: /\b(?:enable|disable|enabled|disabled|permit|deny|accept|reject|allow|drop|yes|no|true|false|up|down)\b/i,
-    keyword: /\b(?:set|delete|edit|commit|exit|end)\b/i,
-    number: /\b(?:0x[\da-f]+|\d+(?:\.\d+)?)\b/i,
-    operator: /(?:->|=>|==|!=|<=|>=|[=<>])/,
-    punctuation: /[{}\[\](),:]/,
-};
-
-Prism.languages["cisco-config"] = Prism.languages.extend("network-config", {
-    comment: {
-        pattern: /^[ \t]*!.*$/m,
-        greedy: true,
-    },
-    important: {
-        pattern: /^end$/m,
-        alias: "keyword",
-    },
-    keyword: /\b(?:aaa|access-class|access-group|access-list|banner|boot|class-map|clock|control-plane|crypto|default|description|enable|end|exec|hostname|interface|ip|ipv6|line|logging|mac-address-table|match|monitor|mpls|network|no|ntp|object-group|policy-map|port-channel|privilege|router|service|snmp-server|spanning-tree|switchport|username|version|vlan|vrf)\b/i,
-});
-
-Prism.languages["comware-config"] = Prism.languages.extend("network-config", {
-    important: {
-        pattern: /^(?:return|system-view)$/m,
-        alias: "keyword",
-    },
-    keyword: /\b(?:acl|bgp|description|display|interface|ip|ipv6|isis|lldp|local-user|ntp-service|ospf|port|quit|radius|rip|save|shutdown|snmp-agent|ssh|stp|undo|user-interface|vlan)\b/i,
-});
-
-Prism.languages["junos-config"] = Prism.languages.extend("network-config", {
-    comment: [
-        {
-            pattern: /(^|[ \t])\/\*[\s\S]*?\*\//,
-            lookbehind: true,
-            greedy: true,
-        },
-        {
-            pattern: /(^|[ \t])[#].*$/m,
-            lookbehind: true,
-            greedy: true,
-        },
-    ],
-    important: {
-        pattern: /\b(?:inactive|replace):/,
-        alias: "keyword",
-    },
-    keyword: /\b(?:apply-groups|chassis|class-of-service|delete|edit|firewall|forwarding-options|groups|interfaces|policy-options|protocols|routing-instances|routing-options|security|set|show|snmp|system)\b/i,
-});
-
-Prism.languages["fortios-config"] = Prism.languages.extend("network-config", {
-    important: {
-        pattern: /^\s*(?:config|edit|next|end)\b.*$/m,
-        alias: "keyword",
-    },
-    keyword: /\b(?:append|config|edit|end|get|move|next|purge|rename|select|set|show|unset)\b/i,
-});
-
-Prism.languages["routeros-config"] = Prism.languages.extend("network-config", {
-    function: {
-        pattern: /(^[ \t]*)\/[a-z][\w-]*(?:[ \t]+[a-z][\w-]*)*/im,
-        lookbehind: true,
-    },
-    keyword: [
-        {
-            pattern:
-                /(^[ \t]*)(?:add|disable|enable|export|get|move|print|remove|set|unset)\b/im,
-            lookbehind: true,
-        },
-        {
-            pattern: /(\[\s*)find\b/i,
-            lookbehind: true,
-        },
-    ],
-    property: /\b[a-z][\w-]*(?=\s*=)/i,
-});
-
-Prism.languages["set-config"] = Prism.languages.extend("network-config", {
-    keyword: /\b(?:activate|commit|compare|copy|deactivate|delete|discard|load|merge|rename|rollback|run|save|set|show)\b/i,
-});
 
 const osLanguages = {
     aos: "cisco-config",
@@ -138,10 +33,21 @@ const languageAliases = {
     xml: "markup",
 };
 
+const knownLanguages = new Set([
+    "network-config",
+    "cisco-config",
+    "comware-config",
+    "junos-config",
+    "fortios-config",
+    "routeros-config",
+    "set-config",
+    "markup",
+]);
+
 function resolveLanguage(os, configuredLanguage) {
     const explicitLanguage = languageAliases[configuredLanguage] ?? configuredLanguage;
 
-    if (explicitLanguage && Prism.languages[explicitLanguage]) {
+    if (explicitLanguage && knownLanguages.has(explicitLanguage)) {
         return explicitLanguage;
     }
 
@@ -152,35 +58,11 @@ function resolveLanguage(os, configuredLanguage) {
     return "network-config";
 }
 
-const HIGHLIGHT_THRESHOLD = 5000;
-const LINE_NUMBERS_THRESHOLD = 20000;
+let worker = null;
+let currentJobId = 0;
+let activeElement = null;
 
-export default function highlightConfig(element, content) {
-    const language = resolveLanguage(element.dataset.os, element.dataset.configHighlighting);
-
-    element.classList.add(`language-${language}`);
-    element.parentElement.classList.add(`language-${language}`);
-    element.textContent = content ?? "";
-
-    const pre = element.parentElement;
-    const lines = content ? (content.match(/\n(?!$)/g) || []).length + 1 : 1;
-
-    const existingRows = pre.querySelector(".line-numbers-rows");
-    if (existingRows) {
-        existingRows.remove();
-    }
-
-    const showLineNumbers = lines <= LINE_NUMBERS_THRESHOLD;
-    const showHighlighting = lines <= HIGHLIGHT_THRESHOLD;
-
-    if (!showLineNumbers) {
-        pre.classList.remove("line-numbers");
-        element.classList.remove("line-numbers");
-        pre.style.paddingLeft = "";
-        return;
-    }
-
-    pre.classList.add("line-numbers");
+function renderLineNumbers(element, lines, pre) {
     const startLine = parseInt(pre.getAttribute("data-start"), 10) || 1;
     const maxLineNumber = startLine + lines - 1;
     const digits = Math.max(3, String(maxLineNumber).length);
@@ -189,19 +71,70 @@ export default function highlightConfig(element, content) {
 
     pre.style.paddingLeft = `${paddingLeft}em`;
 
-    if (showHighlighting) {
-        Prism.highlightElement(element);
-    } else {
-        const rows = document.createElement("span");
-        rows.className = "line-numbers-rows";
-        rows.setAttribute("aria-hidden", "true");
-        rows.innerHTML = Array(lines + 1).join("<span></span>");
-        element.appendChild(rows);
+    const existingRows = element.querySelector(".line-numbers-rows");
+    if (existingRows) {
+        existingRows.remove();
     }
 
-    const rows = pre.querySelector(".line-numbers-rows");
-    if (rows) {
-        rows.style.left = `-${paddingLeft}em`;
-        rows.style.width = `${rowsWidth}em`;
+    const rows = document.createElement("span");
+    rows.className = "line-numbers-rows";
+    rows.setAttribute("aria-hidden", "true");
+    rows.style.left = `-${paddingLeft}em`;
+    rows.style.width = `${rowsWidth}em`;
+    rows.innerHTML = Array(lines + 1).join("<span></span>");
+
+    element.appendChild(rows);
+}
+
+function getWorker() {
+    if (!worker) {
+        worker = new Worker(new URL("./configHighlight.worker.js", import.meta.url), {
+            type: "module",
+        });
+
+        worker.onmessage = function (e) {
+            const { id, html, lines } = e.data;
+            if (id === currentJobId && activeElement) {
+                const pre = activeElement.parentElement;
+                activeElement.innerHTML = html;
+                if (pre) {
+                    renderLineNumbers(activeElement, lines, pre);
+                }
+            }
+        };
+    }
+    return worker;
+}
+
+export default function highlightConfig(element, content) {
+    const rawContent = typeof content === "string" ? content : (content?.content ? String(content.content) : "");
+    const language = resolveLanguage(element.dataset.os, element.dataset.configHighlighting);
+    const pre = element.parentElement;
+
+    element.className = `language-${language}`;
+    if (pre) {
+        pre.className = `config-highlight line-numbers language-${language} ${pre.className.split(" ").filter(c => !c.startsWith("language-") && c !== "line-numbers" && c !== "config-highlight").join(" ")}`.trim();
+    }
+
+    // Immediate display of raw text so user never waits for parsing
+    element.textContent = rawContent;
+    activeElement = element;
+
+    const lines = rawContent ? (rawContent.match(/\n(?!$)/g) || []).length + 1 : 1;
+
+    if (pre) {
+        renderLineNumbers(element, lines, pre);
+    }
+
+    // Cancel / supercede any ongoing tokenization job
+    const jobId = ++currentJobId;
+
+    if (rawContent) {
+        getWorker().postMessage({
+            id: jobId,
+            content: rawContent,
+            language,
+            lines,
+        });
     }
 }

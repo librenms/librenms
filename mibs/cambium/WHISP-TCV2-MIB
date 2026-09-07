@@ -49,7 +49,7 @@ WhispMACAddress ::= TEXTUAL-CONVENTION
           STATUS        current
           DESCRIPTION
                 "This a WHiSP MAC address or ESN type."
-          SYNTAX        OCTET STRING(SIZE(6))
+          SYNTAX        OCTET STRING(SIZE(12))
 
 --Textual convention for LUID
 WhispLUID ::= TEXTUAL-CONVENTION

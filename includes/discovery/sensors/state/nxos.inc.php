@@ -20,7 +20,7 @@
  * @author      Rudy Broersma <r.broersma@ctnet.nl>
  */
 
-$fan_trays = SnmpQuery::hideMib()->numeric(true)->walk('CISCO-ENTITY-FRU-CONTROL-MIB::cefcFanTrayOperStatus')->values(0);
+$fan_trays = SnmpQuery::numeric()->walk('CISCO-ENTITY-FRU-CONTROL-MIB::cefcFanTrayOperStatus')->values();
 
 /* CISCO-ENTITY-FRU-CONTROL-MIB cefcFanTrayOperStatus
  *  unknown(1),

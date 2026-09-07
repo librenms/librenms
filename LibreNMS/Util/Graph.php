@@ -181,6 +181,9 @@ class Graph
             $nodetails = ! $graph_params->visible('details');
             $noagg = ! $graph_params->visible('aggregate');
 
+            /** @var \Amenadiel\JpGraph\Graph\Graph|null $graph */
+            $graph = null;
+            /** @var array<array-key, mixed> $rrd_options */
             $rrd_options = [];
             $rrd_filename = null;
 
@@ -199,11 +202,10 @@ class Graph
                 throw new RrdGraphException("{$type}_$subtype template missing", "{$type}_$subtype missing", $width, $height);
             }
 
-            if (empty($rrd_options)) { // @phpstan-ignore empty.variable ($rrd_options is populated by included graph templates)
+            if (empty($rrd_options) && ! $graph instanceof \Amenadiel\JpGraph\Graph\Graph) {
                 throw new RrdGraphException('Graph Definition Error', 'Def Error', $width, $height);
             }
 
-            // @phpstan-ignore deadCode.unreachable ($rrd_options is populated by included graph templates, so this is reachable)
             return [...$graph_params->toRrdOptions(), ...$rrd_options];
         } finally {
             if ($previousCwd !== false) {

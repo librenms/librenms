@@ -16,11 +16,13 @@ $sn_list = [];
 foreach ($psu_list as $label) {
     $sn = $label;
 
+    $link = generate_link($label, $link_array, ['sn' => $sn]);
+
     if ($vars['sn'] == $sn) {
-        $label = '<span class="pagemenu-selected">' . $label . '</span>';
+        $link = '<span class="pagemenu-selected">' . $link . '</span>';
     }
 
-    array_push($sn_list, generate_link($label, $link_array, ['sn' => $sn]));
+    array_push($sn_list, $link);
 }
 
 printf('%s | PSUs: %s', generate_link('All PSUs', $link_array), implode(', ', $sn_list));

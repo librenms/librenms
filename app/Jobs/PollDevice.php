@@ -4,7 +4,9 @@ namespace App\Jobs;
 
 use App\Actions\Device\CheckDeviceAvailability;
 use App\Events\DevicePolled;
+use App\Events\ModulePolled;
 use App\Events\PollingDevice;
+use App\Events\PollingModule;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Device;
@@ -134,6 +136,7 @@ class PollDevice implements ShouldQueue
                 $should_poll = $instance->shouldPoll($this->os, $module_status, $connectivity);
 
                 if ($should_poll) {
+                    PollingModule::dispatch($this->device, $module);
                     Log::info("#### Load poller module $module ####\n");
                     Log::debug($module_status);
 
@@ -160,6 +163,7 @@ class PollDevice implements ShouldQueue
                 Module::savePerformance($module, ProcessType::Poller, $module_start, $start_memory);
                 $this->os->enableGraph('poller_modules_perf');
                 Log::info("#### Unload poller module $module ####\n");
+                ModulePolled::dispatch($this->device, $module);
             }
         }
     }

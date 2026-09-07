@@ -83,8 +83,8 @@ class SocialiteController extends Controller
         $this->socialite_user = Socialite::driver($provider)->user();
 
         // If we already have a valid session, user is trying to pair their account
-        if (Auth::user()) {
-            return $this->pairUser($provider);
+        if ($request->user()) {
+            return $this->pairUser($request, $provider);
         }
 
         $this->register($provider);
@@ -198,9 +198,9 @@ class SocialiteController extends Controller
         return collect($attributes)->keyBy->getName()->map->getAllAttributeValues()->all();
     }
 
-    private function pairUser(string $provider): RedirectResponse
+    private function pairUser(Request $request, string $provider): RedirectResponse
     {
-        $user = Auth::user();
+        $user = $request->user();
         $user->auth_type = "socialite_$provider";
         $user->auth_id = $this->socialite_user->getId();
 

@@ -79,6 +79,7 @@ class ServiceConfig(DBConfig):
     single_instance = True
     distributed = False
     group = 0
+    memory_pressure_percent = None
 
     debug = False
     log_level = 20
@@ -127,6 +128,10 @@ class ServiceConfig(DBConfig):
         self.group = ServiceConfig.parse_group(
             config.get("distributed_poller_group", ServiceConfig.group)
         )
+        self.memory_pressure_percent = os.getenv(
+            "DISPATCHER_MEMORY_PRESSURE_PERCENT",
+            ServiceConfig.memory_pressure_percent,
+        )
 
         self.master_timeout = config.get(
             "service_master_timeout", ServiceConfig.master_timeout
@@ -140,7 +145,8 @@ class ServiceConfig(DBConfig):
             "service_poller_workers", ServiceConfig.poller.workers
         )
         self.poller.frequency = config.get(
-            "service_poller_frequency", ServiceConfig.poller.frequency
+            "service_poller_frequency",
+            config.get("rrd").get("step", ServiceConfig.poller.frequency),
         )
         self.discovery.enabled = (
             config.get("service_discovery_enabled", True)

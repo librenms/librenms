@@ -43,7 +43,7 @@ class ModuleTestHelper
     private bool $quiet = false;
     private readonly string $variant;
     private readonly string $snmprec_file;
-    private string $json_file;
+    private readonly string $json_file;
     private readonly string $snmprec_dir;
     private readonly string $json_dir;
     private readonly string $file_name;
@@ -91,11 +91,6 @@ class ModuleTestHelper
     public function setQuiet(bool $quiet = true): void
     {
         $this->quiet = $quiet;
-    }
-
-    public function setJsonSavePath(string $path): void
-    {
-        $this->json_file = $path;
     }
 
     /**
@@ -229,12 +224,11 @@ class ModuleTestHelper
     }
 
     /**
-     * Run discovery and polling against snmpsim data and create a database dump
-     * Save the dumped data to tests/data/<os>.json
+     * Run discovery and polling against snmpsim data and create a database dump.
      *
      * @throws FileNotFoundException
      */
-    public function generateTestData(string $snmpSimIp, int $snmpSimPort, bool $noSave = false): ?array
+    public function generateTestData(string $snmpSimIp, int $snmpSimPort): ?array
     {
         global $device;
         LibrenmsConfig::set('rrd.enable', false); // disable rrd
@@ -362,34 +356,6 @@ class ModuleTestHelper
             // we don't need the debug from this
             Debug::set(false);
             delete_device($device_id);
-        }
-
-        if (! $noSave) {
-            d_echo($data);
-
-            // Save the data to the default test data location (or elsewhere if specified)
-            $existing_data = is_readable($this->json_file)
-                ? json_decode(file_get_contents($this->json_file), true)
-                : [];
-
-            // insert new data, don't store duplicate data
-            foreach ($data as $module => $module_data) {
-                // skip saving modules with no data
-                if (empty($module_data['discovery']) && empty($module_data['poller'])) {
-                    continue;
-                }
-                if (isset($module_data['discovery']) && isset($module_data['poller']) && $module_data['discovery'] == $module_data['poller']) {
-                    $existing_data[$module] = [
-                        'discovery' => $module_data['discovery'],
-                        'poller' => 'matches discovery',
-                    ];
-                } else {
-                    $existing_data[$module] = $module_data;
-                }
-            }
-
-            file_put_contents($this->json_file, json_encode($existing_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL);
-            $this->qPrint("Saved to $this->json_file\nReady for testing!\n");
         }
 
         return $data;

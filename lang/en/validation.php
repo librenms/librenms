@@ -14,9 +14,9 @@ return [
     */
 
     // Librenms specific
-    'alpha_space' => 'The :attribute may only contain letters, numbers, underscores and spaces.',
-    'ip_or_hostname' => 'The :attribute must a valid IP address/network or hostname.',
-    'is_regex' => 'The :attribute is not a valid regular expression',
+    'alpha_space' => 'The :attribute can contain only letters, numbers, underscores, and spaces.',
+    'ip_or_hostname' => 'The :attribute must be a valid IP address, network, or hostname.',
+    'is_regex' => 'The :attribute is not a valid regular expression.',
     'array_keys_not_empty' => 'The :attribute contains empty array keys.',
 
     /*
@@ -52,9 +52,9 @@ return [
     'results' => [
         'autofix' => 'Attempt to automatically fix',
         'fix' => 'Fix',
-        'fixed' => 'Fix has completed, refresh to re-run validations.',
+        'fixed' => 'The fix completed. Refresh to run the validations again.',
         'fetch_failed' => 'Failed to fetch validation results',
-        'backend_failed' => 'Failed to load data from backend, run ./validate.php on the console to check.',
+        'backend_failed' => 'Failed to load data from the backend. Run ./validate.php on the console to check.',
         'invalid_fixer' => 'Invalid Fixer',
         'show_all' => 'Show all',
         'show_less' => 'Show less',
@@ -86,19 +86,19 @@ return [
         ],
         'rrd' => [
             'CheckRrdVersion' => [
-                'fail' => 'rrdtool version :installed_version is too old, LibreNMS requires a minimum version of 1.5.5',
-                'fail_config' => 'The rrdtool_version :config_version you have specified is too old, LibreNMS requires a minimum version of 1.5.5',
+                'fail' => 'The rrdtool version :installed_version is too old. The minimum supported version is 1.5.5.',
+                'fail_config' => 'The rrdtool_version :config_version that you specified is too old. The minimum supported version is 1.5.5.',
                 'fix' => 'Either comment out or delete $config[\'rrdtool_version\'] = \':version\'; from your config.php file',
                 'ok' => 'rrdtool version ok',
             ],
             'CheckRrdcachedConnectivity' => [
-                'fail_socket' => ':socket does not appear to exist, rrdcached connectivity test failed',
+                'fail_socket' => ':socket does not exist. The rrdcached connectivity test failed.',
                 'fail_port' => 'Cannot connect to rrdcached server :server on port :port',
                 'ok' => 'Connected to rrdcached',
             ],
             'CheckRrdDirPermissions' => [
-                'fail_root' => 'Your RRD directory is owned by root, please consider changing over to user a non-root user',
-                'fail_mode' => 'Your RRD directory is not set to 0775',
+                'fail_root' => 'Your RRD directory is owned by root. Change the owner to a non-root user.',
+                'fail_mode' => 'Your RRD directory is not set to 0775.',
                 'ok' => 'rrd_dir is writable',
             ],
             'CheckRrdStep' => [
@@ -106,17 +106,17 @@ return [
                 'fail_bad_files' => 'Errors reading RRD files. :bad/:total',
                 'list_bad_step_title' => 'RRD files with incorrect step',
                 'list_bad_files_title' => 'Error running rrdinfo on files',
-                'list_bad_step_item' => ':file: step is :step, should be :target',
+                'list_bad_step_item' => ':file: the step is :step, but it must be :target',
                 'ok' => 'All :total RRD files have the correct step.',
-                'timeout' => 'Checking RRD files took too long, check skipped. You can run :command to check and fix all rrd files.',
+                'timeout' => 'The RRD file check took too long and was skipped. Run :command to check and fix all rrd files.',
             ],
         ],
         'database' => [
             'CheckDatabaseConnected' => [
                 'fail' => 'Unable to connect to database',
-                'fail_connect' => 'Unable to connect to database. Confirm database server is running and connection info is correct.  Check DB_HOST, DB_PORT, and DB_NAME in environment or in :env_file',
-                'fail_access' => 'Database connected, but user does not have permission to access database. Run SQL query to grant permissions (change localhost to local hostname if datababase is remote)',
-                'fail_auth' => 'Database credentials incorrect. Double check credentials in DB_USERNAME and DB_PASSWORD either in environment or in :env_file',
+                'fail_connect' => 'Unable to connect to the database. Check that the database server runs and that the connection information is correct. Check DB_HOST, DB_PORT, and DB_NAME in the environment or in :env_file.',
+                'fail_access' => 'The database is connected, but the user has no permission to access it. Run the SQL query to grant permissions. Change localhost to the local hostname if the database is remote.',
+                'fail_auth' => 'The database credentials are incorrect. Check DB_USERNAME and DB_PASSWORD in the environment or in :env_file.',
                 'ok' => 'Database Connected',
             ],
             'CheckDatabaseTableNamesCase' => [
@@ -130,7 +130,7 @@ return [
                 'ok' => 'SQL Server meets minimum requirements',
             ],
             'CheckMysqlEngine' => [
-                'fail' => 'Some tables are not using the recommended InnoDB engine, this may cause you issues.',
+                'fail' => 'Some tables do not use the recommended InnoDB engine. This can cause problems.',
                 'tables' => 'Tables',
                 'ok' => 'MySQL engine is optimal',
             ],
@@ -142,8 +142,8 @@ return [
                 'fail_outdated' => 'Your database is out of date!',
                 'fail_legacy_outdated' => 'Your database schema (:current) is older than the latest (:latest).',
                 'fix_legacy_outdated' => 'Manually run ./daily.sh, and check for any errors.',
-                'warn_extra_migrations' => 'Your database schema has extra migrations (:migrations). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.',
-                'warn_legacy_newer' => 'Your database schema (:current) is newer than expected (:latest). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.',
+                'warn_extra_migrations' => 'Your database schema has extra migrations (:migrations). If you just switched from the daily release to the stable release, your database is between releases. The next release resolves this.',
+                'warn_legacy_newer' => 'Your database schema (:current) is newer than expected (:latest). If you just switched from the daily release to the stable release, your database is between releases. The next release resolves this.',
                 'ok' => 'Database Schema is current',
             ],
             'CheckSchemaCollation' => [
@@ -168,16 +168,16 @@ return [
         ],
         'poller' => [
             'CheckActivePoller' => [
-                'fail' => 'Poller is not running.  No poller has run within the last :interval seconds.',
-                'both_fail' => 'Both Dispatcher Service and Python Wrapper were active recently, this could cause double polling',
+                'fail' => 'The poller is not running. No poller ran in the last :interval seconds.',
+                'both_fail' => 'The Dispatcher Service and the Python Wrapper were both active recently. This can cause double polling.',
                 'ok' => 'Active pollers found',
             ],
             'CheckDispatcherService' => [
                 'fail' => 'No active dispatcher nodes found',
                 'ok' => 'Dispatcher Service is enabled',
-                'nodes_down' => 'Some dispatcher nodes have not checked in recently',
+                'nodes_down' => 'Some dispatcher nodes did not check in recently',
                 'not_detected' => 'Dispatcher Service not detected',
-                'warn' => 'Dispatcher Service has been used, but not recently',
+                'warn' => 'The Dispatcher Service was used, but not recently',
             ],
             'CheckLocking' => [
                 'fail' => 'Caching server issue: :message',
@@ -188,13 +188,18 @@ return [
                 'no_pollers' => 'No python wrapper pollers found',
                 'cron_unread' => 'Could not read cron files',
                 'ok' => 'Python poller wrapper is polling',
-                'nodes_down' => 'Some poller nodes have not checked in recently',
+                'nodes_down' => 'Some poller nodes did not check in recently',
                 'not_detected' => 'Python wrapper cron entry is not present',
             ],
             'CheckRedis' => [
-                'bad_driver' => 'Using :driver for locking, you should set CACHE_STORE=redis',
+                'bad_driver' => ':driver is in use for locking. Set CACHE_STORE=redis.',
                 'ok' => 'Redis is functional',
                 'unavailable' => 'Redis is unavailable',
+            ],
+            'CheckSchedules' => [
+                'dispatcher_poll_fast' => 'Dispatcher service is set to poll faster than the RRD step.  This will cause unnecessary load on the server if you are not saving to other time series databases becuase the RRD fill cannot store data at the granularity of polling.',
+                'dispatcher_poll_slow' => 'Dispatcher service is set to poll slower than the RRD step.  This can cause errors with graphs because the RRD file is expecting data more frequently. It is recommneded to set service_poller_frequency to null so polling frequency will match the RRD step.',
+                'no_errors' => 'No errors found with polling frequencies.',
             ],
         ],
     ],

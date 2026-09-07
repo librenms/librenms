@@ -3,7 +3,7 @@
 return [
     'notification-subscription-status' => [
         'no-support' => 'This browser does not support notifications',
-        'no-transport' => 'To enable browser notifications, there must be an alert transport referencing this user',
+        'no-transport' => 'To enable browser notifications, an alert transport must reference this user',
         'enabled' => 'Notifications enabled for this browser',
         'disabled' => 'Notifications disabled for this browser',
         'enable' => 'Enable',
@@ -31,8 +31,8 @@ return [
             'end_maintenance' => 'End Maintenance',
         ],
         'errors' => [
-            'enable' => 'An error occurred setting this device into maintenance mode',
-            'disable' => 'An error occurred disabling maintenance mode',
+            'enable' => 'Failed to set this device into maintenance mode',
+            'disable' => 'Failed to disable maintenance mode',
         ],
     ],
 ];

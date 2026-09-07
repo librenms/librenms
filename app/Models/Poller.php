@@ -37,14 +37,14 @@ class Poller extends Model
 
     // ---- Scopes ----
 
-    public function scopeIsInactive(Builder $query): Builder
+    protected function scopeIsInactive(Builder $query): Builder
     {
         $default = (int) \App\Facades\LibrenmsConfig::get('rrd.step');
 
         return $query->where('last_polled', '<', \DB::raw("DATE_SUB(NOW(),INTERVAL $default SECOND)"));
     }
 
-    public function scopeIsActive(Builder $query): Builder
+    protected function scopeIsActive(Builder $query): Builder
     {
         $default = (int) \App\Facades\LibrenmsConfig::get('rrd.step');
 

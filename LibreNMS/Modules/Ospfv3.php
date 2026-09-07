@@ -217,7 +217,7 @@ class Ospfv3 implements Module
             'neighbours' => $ospf_neighbors->count(),
         ];
 
-        $datastore->put($os->getDeviceArray(), 'ospf-statistics', ['rrd_def' => $rrd_def], $fields);
+        $datastore->put($os->getDeviceArray(), 'ospfv3-statistics', ['rrd_def' => $rrd_def], $fields);
     }
 
     public function dataExists(Device $device): bool

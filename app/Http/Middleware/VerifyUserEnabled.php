@@ -17,7 +17,7 @@ class VerifyUserEnabled
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && ! Auth::user()->enabled) {
+        if ($request->user() !== null && ! $request->user()->enabled) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();

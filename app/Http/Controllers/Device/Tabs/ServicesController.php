@@ -26,11 +26,13 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Util\Time;
 
 class ServicesController implements DeviceTab
 {
@@ -56,6 +58,71 @@ class ServicesController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [];
+        Gate::authorize('view', $device);
+        abort_if(Gate::none(['service.view', 'service.viewAll']), 403);
+
+        $validated = $request->validate([
+            'view' => 'nullable|string|in:basic,details',
+        ]);
+        $view = $validated['view'] ?? 'basic';
+
+        $services = $device->services()
+            ->hasAccess($request->user())
+            ->get()
+            ->map(function ($service) use ($view) {
+                $statusClass = match ((int) $service->service_status) {
+                    0 => 'label-success',
+                    1 => 'label-warning',
+                    2 => 'label-danger',
+                    default => 'label-info',
+                };
+
+                $graphs = [];
+                if ($view === 'details') {
+                    $serviceDs = htmlspecialchars_decode((string) $service->service_ds);
+                    $checkScript = LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower((string) $service->service_type) . '.inc.php';
+                    if (is_file($checkScript)) {
+                        include $checkScript;
+                        if (isset($check_ds) && is_string($check_ds)) {
+                            $serviceDs = $check_ds;
+                        }
+                    }
+
+                    $decoded = json_decode($serviceDs, true);
+                    if (is_array($decoded)) {
+                        foreach ($decoded as $k => $v) {
+                            $graphTitle = isset($v['full_name']) ? (string) $v['full_name'] : (string) $k;
+                            $graphs[] = [
+                                'title' => $graphTitle,
+                                'ds' => $k,
+                            ];
+                        }
+                    }
+                }
+
+                return [
+                    'service' => $service,
+                    'status_class' => $statusClass,
+                    'last_changed' => $service->service_changed ? Time::formatInterval(time() - $service->service_changed) : __('Waiting for first check'),
+                    'graphs' => $graphs,
+                ];
+            });
+
+        $options = [
+            'basic' => [
+                'text' => __('Basic'),
+                'link' => route('device', ['device' => $device, 'tab' => 'services', 'view' => 'basic']),
+            ],
+            'details' => [
+                'text' => __('Details'),
+                'link' => route('device', ['device' => $device, 'tab' => 'services', 'view' => 'details']),
+            ],
+        ];
+
+        return [
+            'view' => $view,
+            'options' => $options,
+            'services' => $services,
+        ];
     }
 }

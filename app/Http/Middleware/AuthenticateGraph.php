@@ -57,7 +57,7 @@ class AuthenticateGraph
     public function handle(Request $request, Closure $next, $relative = null): Response
     {
         // if user is logged in, allow
-        if (\Auth::check()) {
+        if ($request->user() !== null) {
             return $next($request);
         }
 

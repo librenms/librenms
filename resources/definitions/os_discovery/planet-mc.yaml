@@ -1,0 +1,24 @@
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: PLANET-MC1610MR-MIB::chassisPowerStatus
+                    value: PLANET-MC1610MR-MIB::chassisPowerStatus
+                    num_oid: '.1.3.6.1.4.1.10456.2.625.4.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: chassisPowerStatus
+                    states:
+                        - { value: 0, descr: 'off', generic: 2 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                        - { value: 2, descr: fail, generic: 2 }
+                -
+                    oid: PLANET-MC1610MR-MIB::chassisFanStatus
+                    value: PLANET-MC1610MR-MIB::chassisFanStatus
+                    num_oid: '.1.3.6.1.4.1.10456.2.625.5.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: chassisFanStatus
+                    states:
+                        - { value: 0, descr: 'off', generic: 2 }
+                        - { value: 1, descr: 'on', generic: 0 }
+                        - { value: 2, descr: fail, generic: 2 }

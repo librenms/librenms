@@ -19,11 +19,15 @@ $databases = $app->data['databases'] ?? [];
 sort($databases);
 foreach ($databases as $index => $db) {
     $db = htmlspecialchars((string) $db);
-    $label = $vars['database'] == $db
-        ? '<span class="pagemenu-selected">' . $db . '</span>'
-        : $db;
 
-    echo generate_link($label, $link_array, ['database' => $db]);
+    $label = $db;
+    $link = generate_link($label, $link_array, ['database' => $db]);
+
+    $link = $vars['database'] == $db
+        ? '<span class="pagemenu-selected">' . $link . '</span>'
+        : $link;
+
+    echo $link;
 
     if ($index < (count($databases) - 1)) {
         echo ', ';

@@ -16,11 +16,13 @@ $array_list = [];
 foreach ($mdadm_arrays as $label) {
     $array = $label;
 
+    $link = generate_link($label, $link_array, ['array' => $array]);
+
     if (isset($vars['array']) && ($vars['array'] == $array)) {
-        $label = '<span class="pagemenu-selected">' . $label . '</span>';
+        $link = '<span class="pagemenu-selected">' . $link . '</span>';
     }
 
-    array_push($array_list, generate_link($label, $link_array, ['array' => $array]));
+    array_push($array_list, $link);
 }
 
 printf('%s | arrays: %s', generate_link('All RAID Arrays', $link_array), implode(', ', $array_list));
