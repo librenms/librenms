@@ -33,6 +33,7 @@ use App\Http\Controllers\Maps\CustomMapListController;
 use App\Http\Controllers\Maps\CustomMapNodeImageController;
 use App\Http\Controllers\Maps\DeviceDependencyController;
 use App\Http\Controllers\NacController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OuiLookupController;
 use App\Http\Controllers\OutagesController;
 use App\Http\Controllers\OverviewController;
@@ -249,6 +250,17 @@ Route::middleware(['auth'])->group(function (): void {
     Route::put('dashboard/widgets/{widget}', [WidgetSettingsController::class, 'update'])->name('dashboard.widget.settings');
 
     Route::get('tool/oui-lookup', OuiLookupController::class)->name('tool.oui-lookup');
+
+    // Notifications
+    Route::prefix('notifications')->name('notifications.')->whereNumber('notification')->group(function (): void {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('archive', [NotificationController::class, 'archive'])->name('archive');
+        Route::post('/', [NotificationController::class, 'store'])->name('store');
+        Route::put('read-all', [NotificationController::class, 'readAll'])->name('read-all');
+        Route::put('{notification}/read', [NotificationController::class, 'read'])->name('read');
+        Route::put('{notification}/stick', [NotificationController::class, 'stick'])->name('stick');
+        Route::delete('{notification}/stick', [NotificationController::class, 'unstick'])->name('unstick');
+    });
 
     // Push notifications
     Route::prefix('push')->group(function (): void {
