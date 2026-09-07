@@ -3,131 +3,126 @@
 @section('title', $isArchive ? __('Archive') . ' - ' . __('Notifications') : __('Notifications'))
 
 @section('content')
-<div class="container" x-data="notificationManager">
-    <div class="row">
-        <div class="col-md-12">
-            <h1><a href="{{ route('notifications.index') }}">{{ __('Notifications') }}</a></h1>
-            <h4>
-                @if ($isArchive)
-                    {{ __('Archive') }}
-                    <a href="{{ route('notifications.index') }}" class="btn btn-default pull-right" style="margin-top:-10px;">{{ __('Show Active') }}</a>
-                @else
-                    <strong class="count-notif" x-text="unreadCount">{{ $unreadCount }}</strong> {{ __('Unread Notifications') }}
-
-                    @can('create', \App\Models\Notification::class)
-                        <button type="button" class="btn btn-success pull-right fa fa-plus" @click="showCreate = true" title="{{ __('Create new notification') }}" style="margin-top:-10px;"></button>
-                    @endcan
-
-                    <button type="button" x-show="unreadCount > 0" @click="markAllRead($event)" class="btn btn-success pull-right fa fa-eye tw:mr-2" title="{{ __('Mark all as Read') }}" style="margin-top:-10px;"></button>
-                @endif
-            </h4>
-            <hr/>
-        </div>
-    </div>
-
-    @if (! $isArchive)
-        @can('create', \App\Models\Notification::class)
-            <x-modal show="showCreate" title="{{ __('Create Notification') }}" maxWidth="lg">
-                <form id="create-notification-form" @submit.prevent="submitCreate">
-                    <div class="form-group">
-                        <label for="notif_title" class="control-label">{{ __('Title') }}</label>
-                        <input type="text" class="form-control" id="notif_title" x-model="newTitle" placeholder="{{ __('Title') }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="notif_body" class="control-label">{{ __('Message') }}</label>
-                        <textarea class="form-control" id="notif_body" x-model="newBody" rows="4" placeholder="{{ __('Message') }}" required></textarea>
-                    </div>
-                </form>
-                <x-slot:footer>
-                    <button type="button" class="btn btn-default" @click="showCreate = false">{{ __('Cancel') }}</button>
-                    <button type="submit" form="create-notification-form" class="btn btn-success" :disabled="submitting">
-                        <span x-show="!submitting">{{ __('Add Notification') }}</span>
-                        <span x-show="submitting" x-cloak>{{ __('Saving...') }}</span>
-                    </button>
-                </x-slot:footer>
-            </x-modal>
-        @endcan
-    @endif
-
-    @if (! $isArchive && $sticky->isNotEmpty())
-        @foreach ($sticky as $notif)
-            <div class="well" id="notif-{{ $notif->notifications_id }}">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h4 class="{{ $notif->severity == 2 ? 'text-danger' : 'text-warning' }}">
-                            <strong><i class="fa fa-bell-o"></i>&nbsp;{{ $notif->title }}</strong>
-                            <span class="pull-right">
-                                @if ($notif->user_id != Auth::id())
-                                    <code>Sticky by {{ $notif->sticky_username ?? 'Unknown' }}</code>
-                                @else
-                                    <button type="button" class="btn btn-primary fa fa-bell-slash-o" @click="unstick({{ $notif->notifications_id }}, $event)" title="{{ __('Remove Sticky') }}" style="margin-top:-10px;"></button>
-                                @endif
-                            </span>
-                        </h4>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <blockquote{!! $notif->severity == 2 ? ' style="border-color: darkred;"' : '' !!}>
-                            <p>{!! \LibreNMS\Util\Clean::html($notif->body, ['HTML.Allowed' => 'br']) !!}</p>
-                            <footer>{{ $notif->datetime }} | Source: <code>{{ $notif->source }}</code></footer>
-                        </blockquote>
-                    </div>
-                </div>
-            </div>
-        @endforeach
-        <hr/>
-    @endif
-
-    @if ($notifications->isNotEmpty())
-        @foreach ($notifications as $notif)
-            @php
-                $severityClass = match ((int) $notif->severity) {
-                    2 => 'text-danger',
-                    1 => 'text-warning',
-                    default => 'text-success',
-                };
-            @endphp
-            <div class="well" id="notif-{{ $notif->notifications_id }}">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h4 class="{{ $severityClass }}">
-                            {{ $notif->title }}
-                            <span class="pull-right">
-                                @can('update', $notif)
-                                    <button type="button" class="btn btn-primary fa fa-bell-o" @click="stick({{ $notif->notifications_id }}, $event)" title="{{ __('Mark as Sticky') }}" style="margin-top:-10px;"></button>
-                                @endcan
-                                @if (! $isArchive)
-                                    <button type="button" class="btn btn-primary fa fa-eye" @click="markRead({{ $notif->notifications_id }}, $event)" title="{{ __('Mark as Read') }}" style="margin-top:-10px;"></button>
-                                @endif
-                            </span>
-                        </h4>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <blockquote{!! $notif->severity == 2 ? ' style="border-color: darkred;"' : '' !!}>
-                            <p>{!! \LibreNMS\Util\Clean::html($notif->body, ['HTML.Allowed' => 'br']) !!}</p>
-                            <footer>{{ $notif->datetime }} | Source: <code>{{ $notif->source }}</code></footer>
-                        </blockquote>
-                    </div>
-                </div>
-            </div>
-        @endforeach
-    @elseif (! $isArchive && $sticky->isEmpty())
-        <div class="alert alert-info">{{ __('No notifications.') }}</div>
-    @elseif ($isArchive)
-        <div class="alert alert-info">{{ __('No archived notifications.') }}</div>
-    @endif
-
-    @if (! $isArchive)
+    <div class="container" x-data="notificationManager">
         <div class="row">
             <div class="col-md-12">
-                <h3><a class="btn btn-default" href="{{ route('notifications.archive') }}">{{ __('Show Archive') }}</a></h3>
+                <h1><a href="{{ route('notifications.index') }}">{{ __('Notifications') }}</a></h1>
+                <h4>
+                    @if ($isArchive)
+                        {{ __('Archive') }}
+                        <a href="{{ route('notifications.index') }}" class="btn btn-default pull-right" style="margin-top:-10px;">{{ __('Show Active') }}</a>
+                    @elseif (!$isArchive)
+                        {{ __('Active') }}
+                        <a href="{{ route('notifications.archive') }}" class="btn btn-default pull-right" style="margin-top:-10px;">{{ __('Show Archive') }}</a>
+                    @else
+                        <strong class="count-notif" x-text="unreadCount">{{ $unreadCount }}</strong> {{ __('Unread Notifications') }}
+
+                        @can('create', \App\Models\Notification::class)
+                            <button type="button" class="btn btn-success pull-right fa fa-plus" @click="showCreate = true" title="{{ __('Create new notification') }}" style="margin-top:-10px;"></button>
+                        @endcan
+
+                        <button type="button" x-show="unreadCount > 0" @click="markAllRead($event)" class="btn btn-success pull-right fa fa-eye tw:mr-2" title="{{ __('Mark all as Read') }}" style="margin-top:-10px;"></button>
+                    @endif
+                </h4>
+                <hr/>
             </div>
         </div>
-    @endif
-</div>
+
+        @if (!$isArchive)
+            @can('create', \App\Models\Notification::class)
+                <x-modal show="showCreate" title="{{ __('Create Notification') }}" maxWidth="lg">
+                    <form id="create-notification-form" @submit.prevent="submitCreate">
+                        <div class="form-group">
+                            <label for="notif_title" class="control-label">{{ __('Title') }}</label>
+                            <input type="text" class="form-control" id="notif_title" x-model="newTitle" placeholder="{{ __('Title') }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="notif_body" class="control-label">{{ __('Message') }}</label>
+                            <textarea class="form-control" id="notif_body" x-model="newBody" rows="4" placeholder="{{ __('Message') }}" required></textarea>
+                        </div>
+                    </form>
+                    <x-slot:footer>
+                        <button type="button" class="btn btn-default" @click="showCreate = false">{{ __('Cancel') }}</button>
+                        <button type="submit" form="create-notification-form" class="btn btn-success" :disabled="submitting">
+                            <span x-show="!submitting">{{ __('Add Notification') }}</span>
+                            <span x-show="submitting" x-cloak>{{ __('Saving...') }}</span>
+                        </button>
+                    </x-slot:footer>
+                </x-modal>
+            @endcan
+        @endif
+
+        @if (!$isArchive && $sticky->isNotEmpty())
+            @foreach ($sticky as $notif)
+                <div class="well" id="notif-{{ $notif->notifications_id }}">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4 class="{{ $notif->severity == 2 ? 'text-danger' : 'text-warning' }}">
+                                <strong><i class="fa fa-bell-o"></i>&nbsp;{{ $notif->title }}</strong>
+                                <span class="pull-right">
+                                    @if ($notif->user_id != Auth::id())
+                                        <code>Sticky by {{ $notif->sticky_username ?? 'Unknown' }}</code>
+                                    @else
+                                        <button type="button" class="btn btn-primary fa fa-bell-slash-o" @click="unstick({{ $notif->notifications_id }}, $event)" title="{{ __('Remove Sticky') }}" style="margin-top:-10px;"></button>
+                                    @endif
+                                </span>
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <blockquote{!! $notif->severity == 2 ? ' style="border-color: darkred;"' : '' !!}>
+                                <p>{!! \LibreNMS\Util\Clean::html($notif->body, ['HTML.Allowed' => 'br']) !!}</p>
+                                <footer>{{ $notif->datetime }} | Source: <code>{{ $notif->source }}</code></footer>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+            <hr/>
+        @endif
+
+        @if ($notifications->isNotEmpty())
+            @foreach ($notifications as $notif)
+                @php
+            $severityClass = match ((int) $notif->severity) {
+                2 => 'text-danger',
+                1 => 'text-warning',
+                default => 'text-success',
+            };
+                @endphp
+                <div class="well" id="notif-{{ $notif->notifications_id }}">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4 class="{{ $severityClass }}">
+                                {{ $notif->title }}
+                                <span class="pull-right">
+                                    @can('update', $notif)
+                                        <button type="button" class="btn btn-primary fa fa-bell-o" @click="stick({{ $notif->notifications_id }}, $event)" title="{{ __('Mark as Sticky') }}" style="margin-top:-10px;"></button>
+                                    @endcan
+                                    @if (!$isArchive)
+                                        <button type="button" class="btn btn-primary fa fa-eye" @click="markRead({{ $notif->notifications_id }}, $event)" title="{{ __('Mark as Read') }}" style="margin-top:-10px;"></button>
+                                    @endif
+                                </span>
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <blockquote{!! $notif->severity == 2 ? ' style="border-color: darkred;"' : '' !!}>
+                                <p>{!! \LibreNMS\Util\Clean::html($notif->body, ['HTML.Allowed' => 'br']) !!}</p>
+                                <footer>{{ $notif->datetime }} | Source: <code>{{ $notif->source }}</code></footer>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        @elseif (!$isArchive && $sticky->isEmpty())
+            <div class="alert alert-info">{{ __('No notifications.') }}</div>
+        @elseif ($isArchive)
+            <div class="alert alert-info">{{ __('No archived notifications.') }}</div>
+        @endif
+    </div>
 @endsection
 
 @push('scripts')
