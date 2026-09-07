@@ -157,7 +157,7 @@ class SnmpQueryOptions
         $this->applyDisplayHints = true;
         $this->quickPrint = true;
         $this->extendedIndex = true;
-        $this->allowUnderscores = false;
+        $this->allowUnderscores = true;
         $this->stringFormat = SnmpStringOutput::Guess;
         $this->oidFormat = SnmpOidOutput::Module;
 
