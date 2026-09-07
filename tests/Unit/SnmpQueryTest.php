@@ -245,7 +245,7 @@ class SnmpQueryTest extends TestCase
         $mockBackend = $this->mockBackend();
         $mockBackend->shouldReceive('get')
             ->once()
-            ->withArgs(function (SnmpTarget $target, array $oids, SnmpQueryOptions $options) => $options->quickPrint === true
+            ->withArgs(fn (SnmpTarget $target, array $oids, SnmpQueryOptions $options) => $options->quickPrint === true
                     && $options->extendedIndex === true
                     && $options->printUnits === false
                     && $options->numericEnums === true
@@ -261,7 +261,7 @@ class SnmpQueryTest extends TestCase
         $mockBackend = $this->mockBackend();
         $mockBackend->shouldReceive('get')
             ->once()
-            ->withArgs(function (SnmpTarget $target, array $oids, SnmpQueryOptions $options) => $options->outputMibNames === false
+            ->withArgs(fn (SnmpTarget $target, array $oids, SnmpQueryOptions $options) => $options->outputMibNames === false
                     && $options->oidFormat === SnmpOidOutput::Suffix)
             ->andReturn(new SnmpResponse("sysDescr.0 = Linux\n"));
 
