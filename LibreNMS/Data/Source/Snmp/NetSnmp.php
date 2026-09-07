@@ -44,12 +44,12 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
      */
     public function get(SnmpConfig $config, array $oids, SnmpQueryOptions $options): SnmpResponse
     {
-        return $this->runCommand(self::buildCli('snmpget', $config, $oids, $options));
+        return $this->runCommand($this->buildCli('snmpget', $config, $oids, $options));
     }
 
     public function walk(SnmpConfig $config, string $oid, SnmpQueryOptions $options): SnmpResponse
     {
-        return $this->runCommand(self::buildCli('snmpwalk', $config, [$oid], $options));
+        return $this->runCommand($this->buildCli('snmpwalk', $config, [$oid], $options));
     }
 
     /**
@@ -57,7 +57,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
      */
     public function next(SnmpConfig $config, array $oids, SnmpQueryOptions $options): SnmpResponse
     {
-        return $this->runCommand(self::buildCli('snmpgetnext', $config, $oids, $options));
+        return $this->runCommand($this->buildCli('snmpgetnext', $config, $oids, $options));
     }
 
     public function translate(string $oid, SnmpQueryOptions $options): string
@@ -90,7 +90,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
      * @param  string[]  $oids
      * @return string[]
      */
-    public static function buildCli(string $command, SnmpConfig $config, array $oids, SnmpQueryOptions $options): array
+    public function buildCli(string $command, SnmpConfig $config, array $oids, SnmpQueryOptions $options): array
     {
         if ($command === 'snmpwalk' && $config->bulk && $options->allowBulk && $config->version !== 'v1') {
             $command = 'snmpbulkwalk';
@@ -100,8 +100,8 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
             LibrenmsConfig::get($command, $command),
             '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]),
             '-m', implode(':', $options->mibs),
-            ...self::buildAuth($config, $options),
-            ...self::buildOutputFlags($options),
+            ...$this->buildAuth($config, $options),
+            ...$this->buildOutputFlags($options),
         ];
 
         if ($command === 'snmpbulkwalk' && $config->maxRepeaters > 0) {
@@ -129,7 +129,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
     /**
      * @return string[]
      */
-    private static function buildOutputFlags(SnmpQueryOptions $options): array
+    private function buildOutputFlags(SnmpQueryOptions $options): array
     {
         $opts = '';
 
@@ -201,7 +201,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
      *
      * @throws SnmpException
      */
-    private static function buildAuth(SnmpConfig $config, SnmpQueryOptions $options): array
+    private function buildAuth(SnmpConfig $config, SnmpQueryOptions $options): array
     {
         if ($config->version === 'v2c' || $config->version === 'v1') {
             return [
