@@ -4,16 +4,16 @@
             "devices": [
                 {
                     "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2082.7.1.302.3612",
+                    "sysObjectID": ".1.3.6.1.4.1.99999.1",
                     "sysDescr": null,
                     "sysContact": "<private>",
-                    "version": "4.9.0 b5 3612 66950-0665 CxC 3.9.17",
-                    "hardware": "Cisco GS7000",
+                    "version": "4.9.0 b5 3612 TEST-MODEL CxC 3.9.17",
+                    "hardware": "Generic SCTE HMS Device",
                     "features": null,
                     "location": "<private>",
                     "os": "scte-hms",
                     "type": "network",
-                    "serial": "165F75",
+                    "serial": "TEST0001",
                     "icon": "generic.svg"
                 }
             ]
@@ -748,7 +748,7 @@
                     "ifMtu": 1500,
                     "ifType": "docsCableMaclayer",
                     "ifAlias": "Broadcom BCM3349 r.A0 CM CATV-MAC IF",
-                    "ifPhysAddress": "002697165f75",
+                    "ifPhysAddress": "001122334455",
                     "ifLastChange": 0,
                     "ifVlan": null,
                     "ifTrunk": null,
@@ -1301,12 +1301,12 @@
                     "entPhysicalAlias": "",
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "66950-0665",
+                    "entPhysicalModelName": "TEST-MODEL",
                     "entPhysicalVendorType": "zeroDotZero",
-                    "entPhysicalSerialNum": "00:26:97:16:5F:75 66950-0665",
+                    "entPhysicalSerialNum": "00:26:97:16:5F:75 TEST-MODEL",
                     "entPhysicalContainedIn": 12,
                     "entPhysicalParentRelPos": 7,
-                    "entPhysicalMfgName": "Cheetah Technologies, L.P.",
+                    "entPhysicalMfgName": "Generic SCTE Vendor",
                     "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
