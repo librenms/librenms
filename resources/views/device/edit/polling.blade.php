@@ -6,7 +6,7 @@
 
         @if($configuredMethods->isNotEmpty())
             <div
-                x-data="pollingTabs('{{ request('tab') }}', @js($configuredMethods->pluck('type')->values()), '{{ $configuredMethods->first()["type"] }}', @js($allMethods->mapWithKeys(fn($m) => [$m['type'] => ['enabled' => (bool)$m['enabled'], 'affectsAvailability' => (bool)$m['affects_availability'], 'credential_mode' => 'existing', 'formData' => $m['schema_defaults'] ?? [], 'settingsData' => $m['settings'] ?? []]])), {{ $errors->any() ? 'true' : 'false' }}, @js($unconfiguredMethods->map(fn($m) => ['type' => $m['type'], 'label' => $m['label']])->values()))"
+                x-data="pollingTabs('{{ request('tab') }}', @js($configuredMethods->pluck('type')->values()), '{{ $defaultTab }}', @js($allMethods->mapWithKeys(fn($m) => [$m['type'] => ['enabled' => (bool)$m['enabled'], 'affectsAvailability' => (bool)$m['affects_availability'], 'credential_mode' => 'existing', 'formData' => $m['schema_defaults'] ?? [], 'settingsData' => $m['settings'] ?? []]])), {{ $errors->any() ? 'true' : 'false' }}, @js($unconfiguredMethods->map(fn($m) => ['type' => $m['type'], 'label' => $m['label']])->values()))"
                 class="tw:flex tw:flex-col tw:md:flex-row tw:gap-6 tw:mt-6"
             >
                 <!-- Left Tabs -->
@@ -19,9 +19,14 @@
                                 style="display: none;">
                                 <button type="button" @click="activeTab = '{{ $method["type"] }}'"
                                         :class="activeTab === '{{ $method["type"] }}' ? 'tw:text-white!' : 'tw:text-gray-700 tw:dark:text-dark-white-200'"
-                                        class="tw:flex-1 tw:text-left tw:px-4 tw:py-3 tw:font-medium tw:transition-colors tw:flex tw:items-center">
-                                    <i class="fa fa-fw {{ $method['icon'] }} tw:mr-2"></i>
-                                    {{ $method['label'] }}
+                                        class="tw:flex-1 tw:text-left tw:px-4 tw:py-3 tw:font-medium tw:transition-colors tw:flex tw:items-center tw:gap-2">
+                                    <i class="fa fa-fw {{ $method['icon'] }}"></i>
+                                    <span class="tw:grow">{{ $method['label'] }}</span>
+                                    <span x-show="dirtyMethods['{{ $method['type'] }}']"
+                                          style="display: none;"
+                                          class="tw:inline-block tw:w-2 tw:h-2 tw:rounded-full tw:bg-amber-400 tw:animate-pulse tw:shrink-0"
+                                          title="{{ __('Unsaved changes pending') }}">
+                                    </span>
                                 </button>
                                 @if($method['configured'])
                                     <div class="tw:px-3 tw:py-3 tw:shrink-0 tw:flex tw:items-center">
@@ -117,6 +122,10 @@
                                         || this.selectedSecretId !== this.currentSecretId;
                                 },
                                 init() {
+                                    setDirty('{{ $method["type"] }}', this.isDirty);
+                                    this.$watch('isDirty', (val) => {
+                                        setDirty('{{ $method["type"] }}', val);
+                                    });
                                     this.$watch('enabled', (val) => {
                                         methods['{{ $method["type"] }}'].enabled = val;
                                     });
@@ -129,7 +138,15 @@
                              style="display: none;"
                              x-transition>
 
-                            <div class="tw:text-2xl tw:font-semibold tw:mb-6 tw:text-gray-800 tw:dark:text-dark-white-100 tw:border-b tw:pb-3 tw:dark:border-dark-gray-400">{{ $method['label'] }} {{ __('Settings') }}</div>
+                            <div class="tw:flex tw:items-center tw:justify-between tw:mb-6 tw:border-b tw:pb-3 tw:dark:border-dark-gray-400">
+                                <div class="tw:flex tw:items-center tw:gap-3">
+                                    <h3 class="tw:text-2xl tw:font-semibold tw:text-gray-800 tw:dark:text-dark-white-100 tw:m-0">{{ $method['label'] }} {{ __('Settings') }}</h3>
+                                    <span x-show="isDirty" style="display: none;" class="tw:inline-flex tw:items-center tw:gap-1.5 tw:px-2.5 tw:py-0.5 tw:rounded-full tw:text-xs tw:font-medium tw:bg-amber-100 tw:text-amber-800 tw:dark:bg-amber-900/50 tw:dark:text-amber-300">
+                                        <span class="tw:w-1.5 tw:h-1.5 tw:rounded-full tw:bg-amber-500 tw:animate-pulse"></span>
+                                        {{ __('Unsaved changes pending') }}
+                                    </span>
+                                </div>
+                            </div>
 
                             <form method="POST" action="{{ $method['configured'] ? route('device.edit.polling.update', ['device' => $device, 'methodType' => $method['type']]) : route('device.edit.polling.store', ['device' => $device]) }}">
                                 @csrf
@@ -285,11 +302,12 @@
                                                 </div>
 
                                                 {{-- New secret form --}}
-                                                <div x-show="credentialMode === 'new'" style="display: none;">
+                                                <div x-show="credentialMode === 'new'" style="display: none;"
+                                                     x-data="{ description: @js(old('description', strtoupper($method['type']) . ' ' . $device->hostname)) }">
                                                     <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl tw:mb-4">
                                                         <div class="form-group">
                                                             <label class="control-label">{{ __('Secret Description') }}</label>
-                                                            <input type="text" name="description" class="form-control" placeholder="{{ __('Optional') }}" value="{{ old('description') }}">
+                                                            <input type="text" name="description" x-model="description" class="form-control" value="{{ old('description') }}">
                                                         </div>
                                                         <div class="tw:flex tw:items-end">
                                                             <div class="checkbox tw:mb-0">
@@ -421,6 +439,13 @@
                 activeMethods: activeMethods,
                 methods: initialMethods || {},
                 allTypes: unconfiguredTabs || [],
+                dirtyMethods: {},
+                setDirty(type, isDirty) {
+                    this.dirtyMethods[type] = isDirty;
+                },
+                get hasUnsavedChanges() {
+                    return Object.values(this.dirtyMethods).some(Boolean);
+                },
                 get noAvailabilitySources() {
                     return !Object.values(this.methods).some(m => m.enabled && m.affectsAvailability);
                 },
@@ -434,6 +459,7 @@
                     }
                 },
                 removeMethod(type) {
+                    delete this.dirtyMethods[type];
                     this.activeMethods = this.activeMethods.filter(t => t !== type);
                     if (this.activeTab === type) {
                         this.activeTab = this.activeMethods[0] ?? '';

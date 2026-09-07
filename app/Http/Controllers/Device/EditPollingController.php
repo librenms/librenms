@@ -36,11 +36,16 @@ class EditPollingController
             fn (PollingMethodType $type): array => $this->buildMethodData($device, $type)
         );
 
+        $configuredMethods = $allMethods->filter(fn (array $m): bool => $m['configured'])->values();
+        $snmpConfigured = $configuredMethods->firstWhere('type', 'snmp');
+        $defaultTab = ($snmpConfigured && ! empty($snmpConfigured['enabled'])) ? 'snmp' : $configuredMethods->first()['type'] ?? '';
+
         return view('device.edit.polling', [
             'device' => $device,
             'allMethods' => $allMethods,
-            'configuredMethods' => $allMethods->filter(fn (array $m): bool => $m['configured'])->values(),
+            'configuredMethods' => $configuredMethods,
             'unconfiguredMethods' => $allMethods->filter(fn (array $m): bool => ! $m['configured'])->values(),
+            'defaultTab' => $defaultTab,
             'availableSecrets' => Secret::query()
                 ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
                 ->orderBy('description')
@@ -142,7 +147,7 @@ class EditPollingController
                 $secret = Secret::resolveForType($secretId, $type);
                 $row->secret()->associate($secret)->save();
             } else {
-                $description = $validated['description'] ?? (strtoupper($type->value) . ' ' . $device->hostname);
+                $description = $validated['description'];
                 $secret = Secret::create([
                     'secret_type' => $type->value,
                     'description' => $description,

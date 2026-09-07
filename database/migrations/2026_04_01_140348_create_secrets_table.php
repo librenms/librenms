@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('secrets', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('description');
+            $table->string('description')->unique();
             $table->string('secret_type')->index();
             $table->boolean('default')->default(false);
             $table->text('data');

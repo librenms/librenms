@@ -71,7 +71,7 @@ class StoreDeviceRequest extends FormRequest
                     'exists:secrets,id',
                 ];
 
-                $rules["polling_methods.{$method}.description"] = ['nullable', 'string', 'max:255'];
+                $rules["polling_methods.{$method}.description"] = ['nullable', 'string', 'max:255', 'unique:secrets,description'];
                 $rules["polling_methods.{$method}.default"] = ['nullable', 'boolean'];
 
                 $credentialMode = $data['credential_mode'] ?? 'default';

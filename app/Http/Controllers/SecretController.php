@@ -32,6 +32,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use LibreNMS\Enum\SecretType;
 
 class SecretController extends Controller
@@ -65,7 +66,7 @@ class SecretController extends Controller
         Gate::authorize('create', Secret::class);
 
         $validated = $request->validate([
-            'description' => 'required|string|max:255',
+            'description' => ['required', 'string', 'max:255', 'unique:secrets,description'],
             'secret_type' => 'required|string',
             'default' => 'boolean',
         ]);
@@ -111,7 +112,7 @@ class SecretController extends Controller
         Gate::authorize('update', $secret);
 
         $validated = $request->validate([
-            'description' => 'required|string|max:255',
+            'description' => ['required', 'string', 'max:255', Rule::unique('secrets', 'description')->ignore($secret->id)],
             'default' => 'boolean',
         ]);
 

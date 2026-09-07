@@ -105,12 +105,15 @@
                             </div>
 
                             {{-- New secret form --}}
-                            <div x-show="credentialMode === 'new'" style="display: none;" x-transition>
-                                <div class="tw:mb-4">
-                                    <label class="tw:block tw:font-medium tw:mb-2 tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Description') }}</label>
-                                    <input type="text" name="description" class="form-control" value="{{ old('description') }}">
-                                    <p class="tw:text-xs tw:text-gray-500 tw:dark:text-dark-white-400 tw:mt-1">{{ __('Optional. Leave blank to auto-generate.') }}</p>
-                                </div>
+                            <div x-show="credentialMode === 'new'" style="display: none;" x-transition
+                                 x-data="{ description: @js(old('description', strtoupper($method['type']) . ' ' . $device->hostname)) }">
+                                 <div class="tw:mb-4">
+                                     <label class="tw:block tw:font-medium tw:mb-2 tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Description') }}</label>
+                                     <input type="text" name="description" x-model="description" class="form-control @error('description') tw:border-red-500 @enderror">
+                                     @error('description')
+                                     <p class="tw:text-red-600 tw:dark:text-red-400 tw:text-sm tw:mt-1">{{ $message }}</p>
+                                     @enderror
+                                 </div>
 
                                 <div class="tw:mb-5" x-data="{ isDefault: {{ old('default') ? 'true' : 'false' }} }">
                                     <label class="tw:flex tw:items-center tw:cursor-pointer tw:group tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:w-full">

@@ -27,7 +27,7 @@ class StorePollingMethodRequest extends FormRequest
             'method_type' => ['required', Rule::enum(PollingMethodType::class)],
             'credential_mode' => ['nullable', Rule::in(['existing', 'new'])],
             'secret_id' => ['nullable', 'integer', 'exists:secrets,id'],
-            'description' => ['nullable', 'string', 'max:255'],
+            'description' => ['required_if:credential_mode,new', 'nullable', 'string', 'max:255', 'unique:secrets,description'],
             'default' => ['nullable', 'boolean'],
             'settings' => ['nullable', 'array'],
         ];
