@@ -20,7 +20,7 @@ use App\Events\SnmpQueryExecuted;
 use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\StringHelpers;
 

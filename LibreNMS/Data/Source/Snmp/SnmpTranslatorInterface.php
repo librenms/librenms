@@ -1,7 +1,7 @@
 <?php
 
-/*
- * SNMP.php
+/**
+ * SnmpTranslateBackendInterface.php
  *
  * -Description-
  *
@@ -16,26 +16,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
- * @copyright  2021 Tony Murray
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Facades;
+namespace LibreNMS\Data\Source\Snmp;
 
-use Illuminate\Support\Facades\Facade;
-use LibreNMS\Data\Source\Snmp\SnmpQuery;
-
-class FacadeAccessorSnmp extends Facade
+interface SnmpTranslatorInterface
 {
-    protected static function getFacadeAccessor()
-    {
-        // always resolve a new instance
-        self::clearResolvedInstance(SnmpQuery::class);
-
-        return SnmpQuery::class;
-    }
+    public function translate(string $oid, SnmpQueryOptions $options): string;
 }
