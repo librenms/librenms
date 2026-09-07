@@ -81,11 +81,11 @@ class User extends Authenticatable
     {
         return match ($type) {
             'total' => $this->notifications()->count(),
-            'read' => $this->notifications()->wherePivot('key', $type)->wherePivot('value', 1)->get(),
-            'unread' => Notification::whereNotIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('user_id', $this->user_id)->where('key', 'read')->where('value', 1))->get(),
-            'sticky' => Notification::leftJoin('notifications_attribs', 'notifications_attribs.notifications_id', '=', 'notifications.notifications_id')->where('key', 'sticky')->where('value', 1)->get(),
+            'read' => $this->notifications()->wherePivot('key', $type)->wherePivot('value', 1)->orderByDesc('datetime')->orderByDesc('notifications.notifications_id')->get(),
+            'unread' => Notification::whereNotIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('user_id', $this->user_id)->where('key', 'read')->where('value', 1))->orderByDesc('datetime')->orderByDesc('notifications_id')->get(),
+            'sticky' => Notification::leftJoin('notifications_attribs', 'notifications_attribs.notifications_id', '=', 'notifications.notifications_id')->where('key', 'sticky')->where('value', 1)->orderByDesc('datetime')->orderByDesc('notifications.notifications_id')->get(),
             'sticky_count' => Notification::whereIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('key', 'sticky')->where('value', 1)->select('notifications_id'))->count(),
-            default => $this->notifications,
+            default => $this->notifications()->orderByDesc('datetime')->orderByDesc('notifications.notifications_id')->get(),
         };
     }
 
