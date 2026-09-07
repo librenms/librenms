@@ -43,7 +43,15 @@ class ArtisanCommandController extends Controller
     private function run(Device $device, string $cmd, Request $request): StreamedResponse
     {
         if (! in_array($request->ip(), ['127.0.0.1', '::1'])) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            $jsonReponse = response()->json(['error' => 'Unauthorized'], 401);
+
+            return new StreamedResponse(
+                function () use ($jsonResponse) {
+                    echo $jsonResponse->getContent();
+                },
+                $jsonResponse->getStatusCode(),
+                $jsonResponse->headers->allPreserveCase()
+            );
         }
 
         $validated = $request->validate([

@@ -33,7 +33,7 @@ class ApiColorFormatter extends \Monolog\Formatter\LineFormatter
      */
     private $console_color;
 
-    public function __construct($format = "%message% %context% %extra%\n", $dateFormat = null, $allowInlineLineBreaks = true, $ignoreEmptyContextAndExtra = true)
+    public function __construct(?string $format = "%message% %context% %extra%\n", ?string $dateFormat = null, bool $allowInlineLineBreaks = true, bool $ignoreEmptyContextAndExtra = true)
     {
         parent::__construct(
             $format,
