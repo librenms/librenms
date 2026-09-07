@@ -72,6 +72,14 @@ class SnmpQueryOptions
         return (new self())->applyQuickPrintDefaults();
     }
 
+    public static function initDefaults(): self
+    {
+        $ret = (new self())->applyQuickPrintDefaults();
+        $ret->allowUnderscores = true;
+
+        return $ret;
+    }
+
     /**
      * @param  string[]|string|null  $args
      */
@@ -157,7 +165,7 @@ class SnmpQueryOptions
         $this->applyDisplayHints = true;
         $this->quickPrint = true;
         $this->extendedIndex = true;
-        $this->allowUnderscores = true;
+        $this->allowUnderscores = false;
         $this->stringFormat = SnmpStringOutput::Guess;
         $this->oidFormat = SnmpOidOutput::Module;
 

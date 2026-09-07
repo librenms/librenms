@@ -64,7 +64,7 @@ class SnmpQuery implements SnmpQueryInterface
             $this->translateBackend = resolve(SnmpTranslatorInterface::class);
         }
 
-        $this->options = $options ?? SnmpQueryOptions::quickPrint();
+        $this->options = $options ?? SnmpQueryOptions::initDefaults();
         $this->device = DeviceCache::getPrimary();
     }
 
