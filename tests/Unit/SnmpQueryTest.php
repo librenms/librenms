@@ -245,13 +245,11 @@ class SnmpQueryTest extends TestCase
         $mockBackend = $this->mockBackend();
         $mockBackend->shouldReceive('get')
             ->once()
-            ->withArgs(function (SnmpTarget $target, array $oids, SnmpQueryOptions $options) {
-                return $options->quickPrint === true
+            ->withArgs(function (SnmpTarget $target, array $oids, SnmpQueryOptions $options) => $options->quickPrint === true
                     && $options->extendedIndex === true
                     && $options->printUnits === false
                     && $options->numericEnums === true
-                    && $options->numericTimeticks === true;
-            })
+                    && $options->numericTimeticks === true)
             ->andReturn(new SnmpResponse("sysDescr.0 = Linux\n"));
 
         $query = (new SnmpQuery($mockBackend))->device($this->device);
@@ -263,10 +261,8 @@ class SnmpQueryTest extends TestCase
         $mockBackend = $this->mockBackend();
         $mockBackend->shouldReceive('get')
             ->once()
-            ->withArgs(function (SnmpTarget $target, array $oids, SnmpQueryOptions $options) {
-                return $options->outputMibNames === false
-                    && $options->oidFormat === SnmpOidOutput::Suffix;
-            })
+            ->withArgs(function (SnmpTarget $target, array $oids, SnmpQueryOptions $options) => $options->outputMibNames === false
+                    && $options->oidFormat === SnmpOidOutput::Suffix)
             ->andReturn(new SnmpResponse("sysDescr.0 = Linux\n"));
 
         $query = (new SnmpQuery($mockBackend))->device($this->device)->hideMib();
