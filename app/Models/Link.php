@@ -34,11 +34,6 @@ class Link extends Model
             ->orWhereIntegerInRaw('links.remote_device_id', Permissions::devicesForUser($user)));
     }
 
-    protected static function deviceForeignKey(): string
-    {
-        return 'local_device_id';
-    }
-
     // ---- Define Relationships ----
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>

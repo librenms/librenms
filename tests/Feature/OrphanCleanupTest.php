@@ -4,6 +4,7 @@ namespace LibreNMS\Tests\Feature;
 
 use App\Models\Device;
 use App\Models\Link;
+use App\Models\Mempool;
 use App\Models\Port;
 use App\Models\Processor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -151,5 +152,35 @@ class OrphanCleanupTest extends TestCase
 
         $this->assertDatabaseMissing('processors', ['processor_id' => $orphan->processor_id]);
         $this->assertDatabaseHas('processors', ['processor_id' => $kept->processor_id]);
+    }
+
+    public function test_a_device_related_model_sweeps_orphans_without_declaring_the_trait(): void
+    {
+        $orphan = Mempool::factory()->create(['device_id' => 99999]);
+        $kept = Mempool::factory()->create();
+
+        Mempool::deleteOrphans();
+
+        $this->assertDatabaseMissing('mempools', ['mempool_id' => $orphan->mempool_id]);
+        $this->assertDatabaseHas('mempools', ['mempool_id' => $kept->mempool_id]);
+    }
+
+    public function test_a_device_related_model_orphan_cleanup_does_not_read_the_devices_table(): void
+    {
+        Mempool::factory()->create(['device_id' => 99999]);
+
+        $queries = [];
+        DB::listen(function ($query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
+
+        Mempool::deleteOrphans();
+
+        $deletes = array_values(array_filter($queries, fn ($sql) => str_starts_with(strtolower(ltrim($sql)), 'delete')));
+
+        $this->assertNotEmpty($deletes, 'expected a delete statement');
+        foreach ($deletes as $sql) {
+            $this->assertStringNotContainsString('devices', $sql, "delete statement must not lock devices: $sql");
+        }
     }
 }
