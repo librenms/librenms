@@ -391,8 +391,8 @@ class NetSnmpTest extends TestCase
         $device->community = 'new';
         $target2 = $device->toSnmpTarget();
 
-        $this->assertSame($target1, 'test-comm');
-        $this->assertSame($target2, 'new');
+        $this->assertSame($target1->config->community, 'test-comm');
+        $this->assertSame($target2->config->community, 'new');
         $this->assertSame('router1.example.com', $target1->hostname);
     }
 
