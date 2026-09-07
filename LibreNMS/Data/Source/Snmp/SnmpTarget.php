@@ -3,7 +3,7 @@
 /**
  * SnmpTarget.php
  *
- * -Description-
+ * Represents an SNMP target endpoint comprising hostname and connection configuration.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
