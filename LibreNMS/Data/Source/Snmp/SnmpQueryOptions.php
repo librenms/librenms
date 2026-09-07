@@ -3,7 +3,7 @@
 /**
  * SnmpQueryOptions.php
  *
- * -Description-
+ * Configuration options controlling SNMP command arguments, OID formats, and output presentation.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ namespace LibreNMS\Data\Source\Snmp;
 use Illuminate\Support\Arr;
 use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Enum\SnmpStringOutput;
+use LibreNMS\Exceptions\UnsupportedSnmpOption;
 
 class SnmpQueryOptions
 {
@@ -47,7 +48,6 @@ class SnmpQueryOptions
 
         // OID formatting
         public bool $numericIndexes = false,
-        public bool $outputMibNames = true,
         public SnmpOidOutput $oidFormat = SnmpOidOutput::Module,
 
         // Value formatting
@@ -73,6 +73,8 @@ class SnmpQueryOptions
 
     /**
      * @param  string[]|string|null  $args
+     *
+     * @throws UnsupportedSnmpOption
      */
     public function parseCli(array|string|null $args): self
     {
@@ -80,7 +82,7 @@ class SnmpQueryOptions
             return $this->applyQuickPrintDefaults();
         }
 
-        $this->applySnmpLibraryDefaults();
+        $this->resetDefaults();
 
         $arguments = Arr::wrap($args);
 
@@ -90,8 +92,11 @@ class SnmpQueryOptions
                 continue;
             }
 
-            if (str_starts_with($arg, '-O')) {
-                foreach (str_split(substr($arg, 2)) as $outopt) {
+            $prefix = substr($arg, 0, 2);
+            $rest = substr($arg, 2);
+
+            if ($prefix === '-O') {
+                foreach (str_split($rest) as $outopt) {
                     match ($outopt) {
                         'a' => $this->stringFormat = SnmpStringOutput::Ascii,
                         'x' => $this->stringFormat = SnmpStringOutput::Hex,
@@ -108,26 +113,24 @@ class SnmpQueryOptions
                         'T' => $this->printHexText = true,
                         'U' => $this->printUnits = false,
                         'X' => $this->extendedIndex = true,
-                        default => throw new \Exception("Unknown option -O$outopt"),
+                        default => throw new UnsupportedSnmpOption("Unknown option -O$outopt"),
                     };
-
-                    $this->outputMibNames = $this->oidFormat !== SnmpOidOutput::Suffix;
                 }
-            } elseif (str_starts_with($arg, '-C')) {
-                $opts = substr($arg, 2);
-                if (str_contains($opts, 'c')) {
+            } elseif ($prefix === '-C') {
+                if (str_contains($rest, 'c')) {
                     $this->tolerateUnorderedIndexes = true;
                 }
-            } elseif (str_starts_with($arg, '-P')) {
-                $this->allowUnderscores = str_contains(substr($arg, 2), 'u');
-            } elseif (str_starts_with($arg, '-I')) {
-                if (str_contains(substr($arg, 2), 'h')) {
+            } elseif ($prefix === '-P') {
+                $this->allowUnderscores = str_contains($rest, 'u');
+            } elseif ($prefix === '-I') {
+                if (str_contains($rest, 'h')) {
                     $this->applyDisplayHints = false;
                 }
-            } elseif ($arg === '-m' || (str_starts_with($arg, '-m') && strlen($arg) > 2)) {
-                $this->addMibs($arg === '-m' ? $this->consumeNextArg($arguments, $i) : substr($arg, 2));
-            } elseif ($arg === '-M' || (str_starts_with($arg, '-M') && strlen($arg) > 2)) {
-                $mibDir = $arg === '-M' ? $this->consumeNextArg($arguments, $i) : substr($arg, 2);
+            } elseif ($prefix === '-m') {
+                $mib = $rest !== '' ? $rest : $this->consumeNextArg($arguments, $i);
+                $this->addMibs($mib);
+            } elseif ($prefix === '-M') {
+                $mibDir = $rest !== '' ? $rest : $this->consumeNextArg($arguments, $i);
                 if ($mibDir !== null) {
                     $this->mibDirs = explode(':', $mibDir);
                 }
@@ -139,44 +142,27 @@ class SnmpQueryOptions
 
     public function applyQuickPrintDefaults(): self
     {
-        $this->context = '';
-        $this->allowBulk = true;
-        $this->tolerateUnorderedIndexes = false;
-        $this->escapeQuotes = false;
-        $this->numericIndexes = false;
-        $this->outputMibNames = true;
-        $this->numericEnums = true;
-        $this->numericTimeticks = true;
-        $this->printHexText = false;
-        $this->printUnits = false;
-        $this->applyDisplayHints = true;
-        $this->quickPrint = true;
-        $this->extendedIndex = true;
-        $this->allowUnderscores = false;
-        $this->stringFormat = SnmpStringOutput::Guess;
-        $this->oidFormat = SnmpOidOutput::Module;
-
-        return $this;
+        return $this->resetDefaults(true);
     }
 
-    public function applySnmpLibraryDefaults(): self
+    private function resetDefaults(bool $quickPrint = false): self
     {
         $this->context = '';
         $this->allowBulk = true;
         $this->tolerateUnorderedIndexes = false;
         $this->escapeQuotes = false;
         $this->numericIndexes = false;
-        $this->outputMibNames = true;
-        $this->numericEnums = false;
-        $this->numericTimeticks = false;
         $this->printHexText = false;
-        $this->printUnits = true;
         $this->applyDisplayHints = true;
-        $this->quickPrint = false;
-        $this->extendedIndex = false;
-        $this->allowUnderscores = false;
         $this->stringFormat = SnmpStringOutput::Guess;
+        $this->allowUnderscores = false;
         $this->oidFormat = SnmpOidOutput::Module;
+
+        $this->numericEnums = $quickPrint;
+        $this->numericTimeticks = $quickPrint;
+        $this->printUnits = ! $quickPrint;
+        $this->quickPrint = $quickPrint;
+        $this->extendedIndex = $quickPrint;
 
         return $this;
     }

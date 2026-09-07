@@ -192,7 +192,6 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function hideMib(): SnmpQueryInterface
     {
-        $this->options->outputMibNames = false;
         $this->options->oidFormat = SnmpOidOutput::Suffix;
 
         return $this;
@@ -450,7 +449,6 @@ class SnmpQuery implements SnmpQueryInterface
         $optionsStr = implode(',', [
             (string) $this->options->oidFormat->name,
             (int) $this->options->numericIndexes,
-            (int) $this->options->outputMibNames,
             (int) $this->options->numericEnums,
             (int) $this->options->tolerateUnorderedIndexes,
             implode(';', $this->options->mibs),

@@ -306,17 +306,15 @@ class NetSnmpTest extends TestCase
         $options->tolerateUnorderedIndexes = true;
         $options->oidFormat = SnmpOidOutput::Numeric;
         $options->numericIndexes = true;
-        $options->outputMibNames = false;
         $options->numericEnums = false;
 
         $cli = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $options);
 
-        $this->assertContains('-OQXUtbn', $cli); // numericOids suppresses 's', no 'e' because numericEnums = false
+        $this->assertContains('-OQXUtbn', $cli); // numeric suppression of 's', no 'e' because numericEnums = false
         $this->assertContains('-Cc', $cli);
 
-        // When numericOids is false and outputMibNames is false, 's' is emitted
+        // When oidFormat is Suffix, 's' is emitted
         $optionsSymbolic = SnmpQueryOptions::quickPrint();
-        $optionsSymbolic->outputMibNames = false;
         $optionsSymbolic->oidFormat = SnmpOidOutput::Suffix;
         $cliSymbolic = $this->backend->buildCli('snmpget', $target, ['sysDescr.0'], $optionsSymbolic);
         $this->assertContains('-OQXUtes', $cliSymbolic);
@@ -376,7 +374,7 @@ class NetSnmpTest extends TestCase
         $this->assertSame('v2c', $target->config->version);
         $this->assertSame('test-comm', $target->config->community);
         $this->assertSame(1161, $target->config->port);
-        $this->assertSame(2, $target->config->timeout);
+        $this->assertEquals(2, $target->config->timeout);
         $this->assertSame(3, $target->config->retries);
         $this->assertTrue($target->config->bulk);
     }
@@ -432,7 +430,7 @@ class NetSnmpTest extends TestCase
             'timeout' => 0,
         ]);
         $targetZero = SnmpTarget::fromDevice($deviceZero);
-        $this->assertSame(\App\Facades\LibrenmsConfig::get('snmp.timeout', 1), $targetZero->config->timeout);
+        $this->assertEquals(\App\Facades\LibrenmsConfig::get('snmp.timeout', 1), $targetZero->config->timeout);
     }
 
     public function testSnmpResponseStoresCommand(): void

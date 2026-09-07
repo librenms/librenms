@@ -208,7 +208,7 @@ class SnmpQueryTest extends TestCase
         $mockBackend->shouldReceive('walk')
             ->once()
             ->withArgs(fn (SnmpTarget $target, string $oid, SnmpQueryOptions $options) => $options->numericIndexes === true
-                && $options->outputMibNames === false
+                && $options->oidFormat === SnmpOidOutput::Suffix
                 && $options->numericEnums === false
                 && $options->tolerateUnorderedIndexes === true)
             ->andReturn(new SnmpResponse("test = 1\n"));
@@ -256,13 +256,12 @@ class SnmpQueryTest extends TestCase
         $query->get('sysDescr.0');
     }
 
-    public function testHideMibSetsSuffixAndOidFormat(): void
+    public function testHideMibSetsSuffixOidFormat(): void
     {
         $mockBackend = $this->mockBackend();
         $mockBackend->shouldReceive('get')
             ->once()
-            ->withArgs(fn (SnmpTarget $target, array $oids, SnmpQueryOptions $options) => $options->outputMibNames === false
-                    && $options->oidFormat === SnmpOidOutput::Suffix)
+            ->withArgs(fn (SnmpTarget $target, array $oids, SnmpQueryOptions $options) => $options->oidFormat === SnmpOidOutput::Suffix)
             ->andReturn(new SnmpResponse("sysDescr.0 = Linux\n"));
 
         $query = (new SnmpQuery($mockBackend))->device($this->device)->hideMib();
