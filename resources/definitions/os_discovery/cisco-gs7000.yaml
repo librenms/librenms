@@ -1,0 +1,195 @@
+modules:
+    os:
+        hardware: SCTE-HMS-COMMON-MIB::commonModelNumber.0
+        serial: SCTE-HMS-COMMON-MIB::commonSerialNumber.0
+        version: SCTE-HMS-COMMON-MIB::commonVendorInfo.0
+
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: SCTE-HMS-COMMON-MIB::commonInternalTemperature
+                    num_oid: '.1.3.6.1.4.1.5591.1.3.1.13.{{ $index }}'
+                    descr: 'Internal Temperature'
+                    index: 'scteCommonInternalTemperature.{{ $index }}'
+                    group: 'Transponder Status'
+                    low_limit: -40
+                    low_warn_limit: -20
+                    warn_limit: 70
+                    high_limit: 85
+
+        voltage:
+            data:
+                -
+                    oid: SCTE-HMS-FIBERNODE-MIB::fnLinePowerVoltage1
+                    num_oid: '.1.3.6.1.4.1.5591.1.5.14.{{ $index }}'
+                    descr: 'AC Line Feed 1'
+                    index: 'scteFnLinePowerVoltage1.{{ $index }}'
+                    group: 'Fiber Node Power'
+                    low_limit: 50
+                    low_warn_limit: 55
+                    warn_limit: 95
+                    high_limit: 100
+
+                -
+                    oid: SCTE-HMS-FIBERNODE-MIB::fnLinePowerVoltage2
+                    num_oid: '.1.3.6.1.4.1.5591.1.5.15.{{ $index }}'
+                    descr: 'AC Line Feed 2'
+                    index: 'scteFnLinePowerVoltage2.{{ $index }}'
+                    group: 'Fiber Node Power'
+                    low_limit: 50
+                    low_warn_limit: 55
+                    warn_limit: 95
+                    high_limit: 100
+
+        power:
+            data:
+                -
+                    oid: SCTE-HMS-FIBERNODE-MIB::fnOpticalReceiverTable
+                    value: SCTE-HMS-FIBERNODE-MIB::fnOpticalReceiverPower
+                    num_oid: '.1.3.6.1.4.1.5591.1.5.5.1.2.{{ $index }}'
+                    descr: 'Optical Receiver {{ $index }}'
+                    index: 'scteFnOpticalReceiverPower.{{ $index }}'
+                    group: 'Fiber Node Optical'
+                    divisor: 10000
+
+        frequency:
+            data:
+                -
+                    oid: DOCS-IF-MIB::docsIfDownChannelFrequency
+                    num_oid: '.1.3.6.1.2.1.10.127.1.1.1.1.2.{{ $index }}'
+                    descr: 'DOCSIS Downstream Frequency'
+                    index: 'docsIfDownChannelFrequency.{{ $index }}'
+                    group: 'DOCSIS RF'
+
+                -
+                    oid: DOCS-IF-MIB::docsIfUpChannelFrequency
+                    num_oid: '.1.3.6.1.2.1.10.127.1.1.2.1.2.{{ $index }}'
+                    descr: 'DOCSIS Upstream Frequency'
+                    index: 'docsIfUpChannelFrequency.{{ $index }}'
+                    group: 'DOCSIS RF'
+        tv_signal:
+            data:
+                -
+                    oid: DOCS-IF-MIB::docsIfDownChannelPower
+                    num_oid: '.1.3.6.1.2.1.10.127.1.1.1.1.6.{{ $index }}'
+                    descr: 'DOCSIS Downstream Receive Power'
+                    index: 'docsIfDownChannelPower.{{ $index }}'
+                    group: 'DOCSIS RF'
+                    divisor: 10
+                    low_limit: -15
+                    low_warn_limit: -10
+                    warn_limit: 10
+                    high_limit: 15
+
+                -
+                    oid: DOCS-IF-MIB::docsIfCmStatusTxPower
+                    num_oid: '.1.3.6.1.2.1.10.127.1.2.2.1.3.{{ $index }}'
+                    descr: 'DOCSIS Upstream Transmit Power'
+                    index: 'docsIfCmStatusTxPower.{{ $index }}'
+                    group: 'DOCSIS RF'
+                    divisor: 10
+                    low_limit: 20
+                    low_warn_limit: 25
+                    warn_limit: 50
+                    high_limit: 54
+
+        snr:
+            data:
+                -
+                    oid: DOCS-IF-MIB::docsIfSigQSignalNoise
+                    num_oid: '.1.3.6.1.2.1.10.127.1.1.4.1.5.{{ $index }}'
+                    descr: 'DOCSIS Downstream SNR'
+                    index: 'docsIfSigQSignalNoise.{{ $index }}'
+                    group: 'DOCSIS RF'
+                    divisor: 10
+                    low_limit: 30
+                    low_warn_limit: 33
+                    warn_limit: 100
+                    high_limit: 100
+
+        state:
+            data:
+                -
+                    oid: SCTE-HMS-COMMON-MIB::commonCraftStatus
+                    num_oid: '.1.3.6.1.4.1.5591.1.3.1.17.{{ $index }}'
+                    descr: 'Craft Interface'
+                    index: 'scteCommonCraftStatus.{{ $index }}'
+                    group: 'Transponder Status'
+                    state_name: scteCommonCraftStatus
+                    states:
+                        - { value: 1, generic: 0, descr: 'Disconnected' }
+                        - { value: 2, generic: 0, descr: 'Connected' }
+
+                -
+                    oid: SCTE-HMS-COMMON-MIB::commonResetCause
+                    num_oid: '.1.3.6.1.4.1.5591.1.3.1.16.{{ $index }}'
+                    descr: 'Last Reset Cause'
+                    index: 'scteCommonResetCause.{{ $index }}'
+                    group: 'Transponder Status'
+                    state_name: scteCommonResetCause
+                    states:
+                        - { value: 1, generic: 0, descr: 'Other' }
+                        - { value: 2, generic: 0, descr: 'Power Up' }
+                        - { value: 3, generic: 0, descr: 'Command' }
+                        - { value: 4, generic: 0, descr: 'Watchdog' }
+                        - { value: 5, generic: 0, descr: 'Craft' }
+
+                -
+                    oid: SCTE-HMS-COMMON-MIB::commonTamperStatus
+                    num_oid: '.1.3.6.1.4.1.5591.1.3.1.12.{{ $index }}'
+                    descr: 'Tamper Status'
+                    index: 'scteCommonTamperStatus.{{ $index }}'
+                    group: 'Transponder Status'
+                    state_name: scteCommonTamperStatus
+                    states:
+                        - { value: 1, generic: 0, descr: 'Intact' }
+                        - { value: 2, generic: 2, descr: 'Tampered' }
+
+                -
+                    oid: SCTE-HMS-COMMON-MIB::commonAlarmDetectionControl
+                    num_oid: '.1.3.6.1.4.1.5591.1.3.1.8.{{ $index }}'
+                    descr: 'Alarm Detection'
+                    index: 'scteCommonAlarmDetectionControl.{{ $index }}'
+                    group: 'Transponder Status'
+                    state_name: scteCommonAlarmDetectionControl
+                    states:
+                        - { value: 1, generic: 1, descr: 'Disabled' }
+                        - { value: 2, generic: 0, descr: 'Enabled' }
+                        - { value: 3, generic: 0, descr: 'Enabled and Regenerate' }
+
+                -
+                    oid: SCTE-HMS-FIBERNODE-MIB::fnOpticalReceiverTable
+                    value: SCTE-HMS-FIBERNODE-MIB::fnOpticalReceiverState
+                    num_oid: '.1.3.6.1.4.1.5591.1.5.5.1.3.{{ $index }}'
+                    descr: 'Optical Receiver {{ $index }} State'
+                    index: 'scteFnOpticalReceiverState.{{ $index }}'
+                    group: 'Fiber Node Optical'
+                    state_name: scteFnOpticalReceiverState
+                    states:
+                        - { value: 1, generic: 0, descr: 'Off' }
+                        - { value: 2, generic: 0, descr: 'On' }
+
+                -
+                    oid: SCTE-HMS-FIBERNODE-MIB::fnABSwitchTable
+                    value: SCTE-HMS-FIBERNODE-MIB::fnOpticalReceiverABSwitchState
+                    num_oid: '.1.3.6.1.4.1.5591.1.5.13.1.4.{{ $index }}'
+                    descr: 'Optical Receiver A/B Switch {{ $index }}'
+                    index: 'scteFnABSwitchState.{{ $index }}'
+                    group: 'Fiber Node Optical'
+                    state_name: scteFnABSwitchState
+                    states:
+                        - { value: 1, generic: 0, descr: 'Path A' }
+                        - { value: 2, generic: 0, descr: 'Path B' }
+
+                -
+                    oid: SCTE-HMS-FIBERNODE-MIB::fnABSwitchTable
+                    value: SCTE-HMS-FIBERNODE-MIB::fnOpticalReceiverABSwitchControl
+                    num_oid: '.1.3.6.1.4.1.5591.1.5.13.1.7.{{ $index }}'
+                    descr: 'Optical Receiver A/B Switch {{ $index }} Control'
+                    index: 'scteFnABSwitchControl.{{ $index }}'
+                    group: 'Fiber Node Optical'
+                    state_name: scteFnABSwitchControl
+                    states:
+                        - { value: 1, generic: 0, descr: 'Enabled' }
+                        - { value: 2, generic: 1, descr: 'Disabled' }
