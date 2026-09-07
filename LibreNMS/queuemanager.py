@@ -697,7 +697,7 @@ class PollerQueueManager(QueueManager):
             )
 
             if self.config.apipoll:
-                url = f"http://localhost/api/v0/cmd/{device_id}/poll"
+                url = f"http://localhost/ajax/cmd/{device_id}/poll"
                 params = {"colour": 1, "buffer": 1}
                 headers = {"Accept-Encoding": ""}
                 if self.config.debug:
@@ -793,7 +793,7 @@ class DiscoveryQueueManager(TimedQueueManager):
             )
 
             if self.config.apipoll:
-                url = f"http://localhost/api/v0/cmd/{device_id}/discover"
+                url = f"http://localhost/ajax/cmd/{device_id}/discover"
                 params = {"colour": 1, "buffer": 1}
                 headers = {"Accept-Encoding": ""}
                 if self.config.debug:

@@ -452,6 +452,8 @@ Route::middleware(['auth'])->group(function (): void {
 // routes that don't need authentication
 Route::prefix('ajax')->group(function (): void {
     Route::post('set_timezone', [Ajax\TimezoneController::class, 'set']);
+    Route::get('cmd/{device}/discover', [App\Http\Controllers\Ajax\ArtisanCommandController::class, 'discover'])->name('discover_device');
+    Route::get('cmd/{device}/poll', [App\Http\Controllers\Ajax\ArtisanCommandController::class, 'poll'])->name('poll_device');
 });
 
 // installation routes
