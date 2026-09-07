@@ -29,6 +29,7 @@ use LibreNMS\Cache\Device as DeviceCache;
 use LibreNMS\Cache\PermissionsCache;
 use LibreNMS\Cache\Port as PortCache;
 use LibreNMS\Data\Source\Snmp\NetSnmp;
+use LibreNMS\Data\Source\Snmp\PhpSnmp;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
@@ -76,7 +77,13 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton('sensor-discovery', fn (Application $app) => new DiscoverySensor($app->make('device-cache')->getPrimary()));
 
-        $this->app->bind(SnmpBackendInterface::class, NetSnmp::class);
+        $this->app->bind(SnmpBackendInterface::class, function (Application $app) {
+            if (function_exists('snmp_init_mib')) {
+                return $app->make(PhpSnmp::class);
+            }
+
+            return $app->make(NetSnmp::class);
+        });
         $this->app->bind(SnmpTranslatorInterface::class, NetSnmp::class);
         $this->app->bind(SnmpQueryInterface::class, SnmpQueryBuilder::class);
     }
