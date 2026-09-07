@@ -26,11 +26,13 @@
 
 namespace LibreNMS\Data\Source\Snmp;
 
+use LibreNMS\Polling\Method\Config\SnmpConfig;
+
 /**
  * Executes SNMP requests against a device over the wire.
  *
  * Implementations own the transport (CLI binaries, php-snmp sessions, etc.)
- * and translate SnmpTarget/SnmpQueryOptions into whatever that transport
+ * and translate SnmpConfig/SnmpQueryOptions into whatever that transport
  * requires. Callers should depend on this interface, not a concrete
  * implementation, so the backend can be swapped without touching query logic.
  *
@@ -47,7 +49,7 @@ interface SnmpBackendInterface
      *
      * @param  string[]  $oids
      */
-    public function get(SnmpTarget $target, array $oids, SnmpQueryOptions $options): SnmpResponse;
+    public function get(SnmpConfig $config, array $oids, SnmpQueryOptions $options): SnmpResponse;
 
     /**
      * snmpwalk (or snmpbulkwalk, per $options) a single OID subtree —
@@ -57,7 +59,7 @@ interface SnmpBackendInterface
      * usefully batch multiple subtrees into a single request, since each
      * subtree ends at a different point and streams back independently.
      */
-    public function walk(SnmpTarget $target, string $oid, SnmpQueryOptions $options): SnmpResponse;
+    public function walk(SnmpConfig $config, string $oid, SnmpQueryOptions $options): SnmpResponse;
 
     /**
      * snmpgetnext for one or more OIDs — fetches the first OID after each
@@ -65,5 +67,5 @@ interface SnmpBackendInterface
      *
      * @param  string[]  $oids
      */
-    public function next(SnmpTarget $target, array $oids, SnmpQueryOptions $options): SnmpResponse;
+    public function next(SnmpConfig $config, array $oids, SnmpQueryOptions $options): SnmpResponse;
 }

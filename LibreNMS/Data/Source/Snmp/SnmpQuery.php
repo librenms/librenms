@@ -34,6 +34,7 @@ use DeviceCache;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mib;
 use LibreNMS\Util\Oid;
@@ -233,13 +234,13 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function get($oid): SnmpResponse
     {
-        $target = $this->getTarget();
-        $chunks = $this->limitOids($this->parseOid($oid), $target);
+        $config = $this->device->toSnmpConfig();
+        $chunks = $this->limitOids($this->parseOid($oid), $config);
         $response = new SnmpResponse('');
 
         foreach ($chunks as $chunk) {
             $options = $this->prepareOptions($chunk);
-            $res = $this->execWithCache('snmpget', $chunk, $options, fn () => $this->backend->get($target, $chunk, $options));
+            $res = $this->execWithCache('snmpget', $chunk, $options, fn () => $this->backend->get($config, $chunk, $options));
             $response = $response->append($res);
 
             // if abort on failure is set, return after first failure
@@ -263,7 +264,7 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function walk($oid): SnmpResponse
     {
-        $target = $this->getTarget();
+        $target = $this->device->toSnmpConfig();
         $oids = $this->parseOid($oid);
         $response = new SnmpResponse('');
 
@@ -293,13 +294,13 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function next($oid): SnmpResponse
     {
-        $target = $this->getTarget();
-        $chunks = $this->limitOids($this->parseOid($oid), $target);
+        $config = $this->device->toSnmpConfig();
+        $chunks = $this->limitOids($this->parseOid($oid), $config);
         $response = new SnmpResponse('');
 
         foreach ($chunks as $chunk) {
             $options = $this->prepareOptions($chunk);
-            $res = $this->execWithCache('snmpgetnext', $chunk, $options, fn () => $this->backend->next($target, $chunk, $options));
+            $res = $this->execWithCache('snmpgetnext', $chunk, $options, fn () => $this->backend->next($config, $chunk, $options));
             $response = $response->append($res);
 
             // if abort on failure is set, return after first failure
@@ -330,11 +331,6 @@ class SnmpQuery implements SnmpQueryInterface
         $options->mibDirs = Mib::directories($this->device, $this->options->mibDirs);
 
         return $this->translateBackend->translate((string) $oid, $options);
-    }
-
-    private function getTarget(): SnmpTarget
-    {
-        return $this->device->toSnmpTarget();
     }
 
     /**
@@ -420,9 +416,9 @@ class SnmpQuery implements SnmpQueryInterface
      * @param  string[]  $oids
      * @return array<int, array<string>>
      */
-    private function limitOids(array $oids, SnmpTarget $target): array
+    private function limitOids(array $oids, SnmpConfig $config): array
     {
-        $max_oids = max($target->config->maxOid, 1);
+        $max_oids = max($config->maxOid, 1);
 
         if (count($oids) > $max_oids) {
             return array_chunk($oids, $max_oids);

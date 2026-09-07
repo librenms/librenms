@@ -32,6 +32,8 @@ use App\Models\Device;
 final readonly class SnmpConfig
 {
     public function __construct(
+        public string $target,
+
         // Secrets
         public string $version = 'v2c',
         public ?string $community = null,
@@ -63,6 +65,7 @@ final readonly class SnmpConfig
         $rawBulk = $device->getAttrib('snmp_bulk') ?? LibrenmsConfig::getOsSetting($device->os, 'snmp_bulk', LibrenmsConfig::get('snmp_bulk', true));
 
         return new self(
+            target: $device->hostname,
             version: $device->snmpver ?? 'v2c',
             community: $device->community,
             authname: $device->authname,

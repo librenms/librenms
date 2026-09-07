@@ -22,11 +22,11 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Cache\DeviceMaintenanceCache;
-use LibreNMS\Data\Source\Snmp\SnmpTarget;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -146,9 +146,9 @@ class Device extends BaseModel
         return ($this->overwrite_ip ?: $this->hostname) ?: '';
     }
 
-    public function toSnmpTarget(): SnmpTarget
+    public function toSnmpConfig(): SnmpConfig
     {
-        return SnmpTarget::fromDevice($this);
+        return SnmpConfig::fromDevice($this);
     }
 
     public function ipFamily(): AddressFamily
