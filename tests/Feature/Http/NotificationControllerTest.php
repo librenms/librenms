@@ -307,4 +307,78 @@ class NotificationControllerTest extends TestCase
 
         $this->actingAs($user)->putJson('/notifications/9999999/read')->assertNotFound();
     }
+
+    public function testMenuNotificationCountMatchesPageCount(): void
+    {
+        $user1 = User::factory()->create(['enabled' => 1]);
+        $user2 = User::factory()->create(['enabled' => 1]);
+        $user3 = User::factory()->create(['enabled' => 1]);
+
+        // Create 5 notifications
+        $notifications = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $notifications[] = Notification::create([
+                'title' => "Notification $i",
+                'body' => "Body $i",
+                'checksum' => hash('sha512', "checksum-$i"),
+                'source' => 'system',
+                'datetime' => now(),
+            ]);
+        }
+
+        // User2 and User3 mark all 5 as read (creates 10 entries in notifications_attribs)
+        foreach ($notifications as $notif) {
+            $this->actingAs($user2)->putJson(route('notifications.read', $notif))->assertOk();
+            $this->actingAs($user3)->putJson(route('notifications.read', $notif))->assertOk();
+        }
+
+        // User1 has read 2 notifications, so 3 remain unread
+        $this->actingAs($user1)->putJson(route('notifications.read', $notifications[0]))->assertOk();
+        $this->actingAs($user1)->putJson(route('notifications.read', $notifications[1]))->assertOk();
+
+        // Check page
+        $pageResponse = $this->actingAs($user1)->get(route('notifications.index'));
+        $pageResponse->assertOk();
+        $pageResponse->assertViewHas('unreadCount', 3);
+
+        // Check menu query count directly (as computed by MenuComposer)
+        $menuCount = Notification::isSticky()->orWhere(fn ($q) => $q->isUnread($user1))->count();
+        $this->assertSame(3, $menuCount);
+    }
+
+    public function testNotificationsAreOrderedNewestFirst(): void
+    {
+        $user = User::factory()->create(['enabled' => 1]);
+
+        $older = Notification::create([
+            'title' => 'Older Notification',
+            'body' => 'Older Body',
+            'checksum' => hash('sha512', 'older-notif'),
+            'source' => 'system',
+            'datetime' => '2026-01-01 10:00:00',
+        ]);
+
+        $newer = Notification::create([
+            'title' => 'Newer Notification',
+            'body' => 'Newer Body',
+            'checksum' => hash('sha512', 'newer-notif'),
+            'source' => 'system',
+            'datetime' => '2026-01-02 10:00:00',
+        ]);
+
+        // Unread notifications: newer first
+        $response = $this->actingAs($user)->get(route('notifications.index'));
+        $response->assertOk();
+        $notifications = $response->viewData('notifications');
+        $this->assertSame([$newer->notifications_id, $older->notifications_id], $notifications->pluck('notifications_id')->values()->all());
+
+        // Read notifications: newer first
+        $this->actingAs($user)->putJson(route('notifications.read', $older))->assertOk();
+        $this->actingAs($user)->putJson(route('notifications.read', $newer))->assertOk();
+
+        $archiveResponse = $this->actingAs($user)->get(route('notifications.archive'));
+        $archiveResponse->assertOk();
+        $archiveNotifications = $archiveResponse->viewData('notifications');
+        $this->assertSame([$newer->notifications_id, $older->notifications_id], $archiveNotifications->pluck('notifications_id')->values()->all());
+    }
 }
