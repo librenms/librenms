@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Facades\Permissions;
+use App\Models\Traits\DeletesDeviceOrphans;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Gate;
 
 class Link extends Model
 {
+    use DeletesDeviceOrphans;
     use HasFactory;
 
     public $timestamps = false;

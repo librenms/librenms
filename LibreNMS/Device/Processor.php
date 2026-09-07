@@ -161,7 +161,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             );
         }
 
-        \App\Models\Processor::doesntHave('device')->delete();
+        \App\Models\Processor::deleteOrphans();
 
         echo PHP_EOL;
     }
