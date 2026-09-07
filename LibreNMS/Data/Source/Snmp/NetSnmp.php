@@ -27,10 +27,11 @@
 namespace LibreNMS\Data\Source\Snmp;
 
 use App\Facades\LibrenmsConfig;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Enum\SnmpStringOutput;
+use LibreNMS\Exceptions\SnmpException;
+use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 use Symfony\Component\Process\Process;
@@ -198,6 +199,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
 
     /**
      * @return string[]
+     * @throws SnmpException
      */
     private function buildAuth(SnmpTarget $target, SnmpQueryOptions $options): array
     {
@@ -214,6 +216,8 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
         if ($config->version === 'v3') {
             $auth = match (strtolower((string) $config->authlevel)) {
                 'authpriv' => [
+                    '-v3',
+                    '-l', (string) $config->authlevel,
                     '-x', (string) $config->cryptoalgo,
                     '-X', (string) $config->cryptopass,
                     '-a', (string) $config->authalgo,
@@ -221,31 +225,28 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
                     '-u', $config->authname ?: 'root',
                 ],
                 'authnopriv' => [
+                    '-v3',
+                    '-l', (string) $config->authlevel,
                     '-a', (string) $config->authalgo,
                     '-A', (string) $config->authpass,
                     '-u', $config->authname ?: 'root',
                 ],
                 'noauthnopriv' => [
+                    '-v3',
+                    '-l', (string) $config->authlevel,
                     '-u', $config->authname ?: 'root',
                 ],
-                default => [],
+                default => throw new SnmpException("Unsupported SNMPv3 AuthLevel: $config->authlevel"),
             };
 
-            if ($auth === []) {
-                Log::debug("Unsupported SNMPv3 AuthLevel: $config->authlevel");
+            if ($options->context) {
+                array_push($auth, '-n', $options->context);
             }
 
-            return [
-                '-v3',
-                '-l', (string) $config->authlevel,
-                '-n', $options->context,
-                ...$auth,
-            ];
+            return $auth;
         }
 
-        Log::debug("Unsupported SNMP Version: $config->version");
-
-        return [];
+        throw new SnmpVersionUnsupportedException($config->version);
     }
 
     /**

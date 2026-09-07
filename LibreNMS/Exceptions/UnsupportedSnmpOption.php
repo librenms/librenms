@@ -2,6 +2,6 @@
 
 namespace LibreNMS\Exceptions;
 
-class UnsupportedSnmpOption extends \Exception
+class UnsupportedSnmpOption extends SnmpException
 {
 }
