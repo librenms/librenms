@@ -36,8 +36,8 @@ Two operators are available for matching IP addresses against a network prefix:
 
 | Operator | Meaning |
 |---|---|
-| `in prefix` | The field value falls within the given CIDR prefix |
-| `not in prefix` | The field value does not fall within the given CIDR prefix |
+| `ip in prefix` | The field value falls within the given CIDR prefix |
+| `ip not in prefix` | The field value does not fall within the given CIDR prefix |
 
 Both IPv4 (`192.168.30.0/25`) and IPv6 (`2001:db8::/32`) prefixes are supported. A bare IP without a length is treated as a host route (`/32` or `/128`).
 
@@ -46,14 +46,14 @@ Both IPv4 (`192.168.30.0/25`) and IPv6 (`2001:db8::/32`) prefixes are supported.
 - `devices.ip` — the management IP LibreNMS uses to reach the device (one value per device, no join).  
   Useful for grouping by management network, e.g. all devices reachable via an out-of-band subnet.
 - `ipv4_addresses.ipv4_address` / `ipv6_addresses.ipv6_compressed` — every address on every interface.  
-  `in prefix` matches devices with **at least one** interface address in the prefix;  
-  `not in prefix` matches devices with **no** interface address in the prefix.
+  `ip in prefix` matches devices with **at least one** interface address in the prefix;  
+  `ip not in prefix` matches devices with **no** interface address in the prefix.
 - `ipv4_networks.ipv4_network` / `ipv6_networks.ipv6_network` — discovered subnet prefixes.  
   Useful for matching devices that have a subnet inside a given supernet.
 
 Example: all devices whose management IP is in `192.168.30.0/25`:
 
-- Field: `devices.ip`, Operator: `in prefix`, Value: `192.168.30.0/25`
+- Field: `devices.ip`, Operator: `ip in prefix`, Value: `192.168.30.0/25`
 
 ## Static Groups
 

@@ -55,8 +55,8 @@ class QueryBuilderParser implements \JsonSerializable
         'not_regex' => 'NOT REGEXP',
         'in' => 'IN',
         'not_in' => 'NOT IN',
-        'in_prefix' => 'IN_PREFIX',
-        'not_in_prefix' => 'NOT_IN_PREFIX',
+        'ip_in_prefix' => 'IN_PREFIX',
+        'ip_not_in_prefix' => 'NOT_IN_PREFIX',
     ];
 
     protected static array $values = [
@@ -231,8 +231,8 @@ class QueryBuilderParser implements \JsonSerializable
             $field = $this->expandMacro($field);
         }
 
-        if ($builder_op === 'in_prefix' || $builder_op === 'not_in_prefix') {
-            return $this->buildPrefixSql($field, $rule['value'], $builder_op === 'not_in_prefix');
+        if ($builder_op === 'ip_in_prefix' || $builder_op === 'ip_not_in_prefix') {
+            return $this->buildPrefixSql($field, $rule['value'], $builder_op === 'ip_not_in_prefix');
         }
 
         return trim("$field $op $value");
@@ -301,7 +301,7 @@ class QueryBuilderParser implements \JsonSerializable
             return $positive_sql;
         }
 
-        // For joined tables use NOT EXISTS so "not_in_prefix" means "device has no address in prefix",
+        // For joined tables use NOT EXISTS so "ip_not_in_prefix" means "device has no address in prefix",
         // not "device has at least one address outside prefix" (which the plain NOT gives with a LEFT JOIN).
         $table = $parts[0];
         if ($table !== 'devices') {
@@ -312,7 +312,7 @@ class QueryBuilderParser implements \JsonSerializable
         }
 
         // Confirmed unreachable for ipv4_networks/ipv6_networks, the only tables
-        // not_in_prefix reaches today -- both resolve a real 2+ element path via
+        // ip_not_in_prefix reaches today -- both resolve a real 2+ element path via
         // ports->ipv4_addresses/ipv6_addresses (verified by actually running this
         // parser against real schema data, not just reading the code). If this
         // ever fires for a table added later, that table's relationship path
@@ -323,7 +323,7 @@ class QueryBuilderParser implements \JsonSerializable
 
     /**
      * Wrap a positive prefix expression in a correlated NOT EXISTS subquery so that
-     * "not_in_prefix" means "the device has no row in the given table matching the prefix".
+     * "ip_not_in_prefix" means "the device has no row in the given table matching the prefix".
      *
      * @param  array  $path  Relationship path from 'devices' to the field table,
      *                       e.g. ['devices', 'ports', 'ipv4_addresses']

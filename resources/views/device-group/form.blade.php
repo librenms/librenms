@@ -85,15 +85,15 @@
             {type: 'greater_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
             {type: 'regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']},
             {type: 'not_regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']},
-            {type: 'in_prefix', nb_inputs: 1, multiple: false, apply_to: ['string']},
-            {type: 'not_in_prefix', nb_inputs: 1, multiple: false, apply_to: ['string']}
+            {type: 'ip_in_prefix', nb_inputs: 1, multiple: false, apply_to: ['string']},
+            {type: 'ip_not_in_prefix', nb_inputs: 1, multiple: false, apply_to: ['string']}
         ],
         lang: {
             operators: {
                 regexp: 'regex',
                 not_regex: 'not regex',
-                in_prefix: 'in prefix',
-                not_in_prefix: 'not in prefix'
+                ip_in_prefix: 'ip in prefix',
+                ip_not_in_prefix: 'ip not in prefix'
             }
         },
         sqlOperators: {

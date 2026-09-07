@@ -114,7 +114,7 @@ class QueryBuilderFilter implements \JsonSerializable
                     $this->filter[$field] = [
                         'id' => $field,
                         'type' => 'string',
-                        'operators' => ['in_prefix', 'not_in_prefix'],
+                        'operators' => ['ip_in_prefix', 'ip_not_in_prefix'],
                     ];
                     continue;
                 }
@@ -137,7 +137,7 @@ class QueryBuilderFilter implements \JsonSerializable
                         'type' => 'string',
                         'operators' => [
                             'equal', 'not_equal', 'contains', 'not_contains',
-                            'begins_with', 'in_prefix', 'not_in_prefix',
+                            'begins_with', 'ip_in_prefix', 'ip_not_in_prefix',
                         ],
                     ];
                     continue;
