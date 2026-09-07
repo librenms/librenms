@@ -25,7 +25,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\ObjectCache;
 
-$total = Auth::user()->notifications()->count();
+$total = \App\Models\Notification::isUnread(Auth::user())->count();
 
 ?>
 <div class="container">
