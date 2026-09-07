@@ -13,7 +13,6 @@ class OspfPortFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->randomDigit(),
             'ospf_port_id' => $this->faker->randomDigit(),
             'ospfIfIpAddress' => $this->faker->ipv4(),
             'ospfAddressLessIf' => $this->faker->randomDigit(),
