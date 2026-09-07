@@ -311,6 +311,13 @@ class QueryBuilderParser implements \JsonSerializable
             }
         }
 
+        // Confirmed unreachable for ipv4_networks/ipv6_networks, the only tables
+        // not_in_prefix reaches today -- both resolve a real 2+ element path via
+        // ports->ipv4_addresses/ipv6_addresses (verified by actually running this
+        // parser against real schema data, not just reading the code). If this
+        // ever fires for a table added later, that table's relationship path
+        // needs registering -- this plain NOT is the wrong semantic for a
+        // multi-row join and isn't a safe degradation to fall back on.
         return "NOT ($positive_sql)";
     }
 
