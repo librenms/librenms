@@ -1537,7 +1537,7 @@ return [
             ],
             'fragmentation' => [
                 'description' => 'MTU test packet fragmenataion',
-                'help' => 'Choose how you want to handle packet fragmentaion.  Allow with PMTU will allow packet fragmenation when PTMU discovery works, but may cause false positives if a router throttles PMTU packets.  Allow will allow routers to fragment the packets locally, but only works with the ping command.  Not allowed will ensure that the configured packet size can traverse the network end to end without fragmentation.',
+                'help' => 'Choose how you want to handle packet fragmentaion.  For more information, see the Configuration documentation.',
             ],
         ],
         'mydomain' => [
