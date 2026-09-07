@@ -27,7 +27,7 @@
 namespace App\Api\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\StreamsOutputToBrowser;
+use App\Http\Controllers\Traits\StreamsOutputToBrowserColour;
 use App\Models\Device;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Http\Request;
@@ -38,11 +38,13 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ArtisanCommandController extends Controller
 {
-    use StreamsOutputToBrowser;
+    use StreamsOutputToBrowserColour;
 
     private function run(Device $device, string $cmd, Request $request): StreamedResponse
     {
-        $this->authorize('debug', $device);
+        if (! in_array($request->ip(), ['127.0.0.1', '::1'])) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
 
         $validated = $request->validate([
             'buffer' => 'sometimes|boolean',

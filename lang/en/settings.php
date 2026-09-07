@@ -2120,8 +2120,8 @@ return [
                 ],
             ],
         ],
-        'service_api_key' => [
-            'description' => 'Dispatcher Service API Key',
+        'service_poll_api' => [
+            'description' => 'Poll using the API',
             'help' => 'Use a connection to localhost to poll and discover devices (requires additional setup).',
         ],
         'sensors' => [

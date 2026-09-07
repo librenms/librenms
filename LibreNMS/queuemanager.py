@@ -696,10 +696,10 @@ class PollerQueueManager(QueueManager):
                 else self.config.log_output
             )
 
-            if self.config.apikey:
+            if self.config.apipoll:
                 url = f"http://localhost/api/v0/cmd/{device_id}/poll"
                 params = {"colour": 1, "buffer": 1}
-                headers = {"X-Auth-Token": self.config.apikey, "Accept-Encoding": ""}
+                headers = {"Accept-Encoding": ""}
                 if self.config.debug:
                     params["verbose"] = 1
                 elif self.config.log_output is LibreNMS.LogOutput.NONE:
@@ -792,10 +792,10 @@ class DiscoveryQueueManager(TimedQueueManager):
                 else self.config.log_output
             )
 
-            if self.config.apikey:
+            if self.config.apipoll:
                 url = f"http://localhost/api/v0/cmd/{device_id}/discover"
                 params = {"colour": 1, "buffer": 1}
-                headers = {"X-Auth-Token": self.config.apikey, "Accept-Encoding": ""}
+                headers = {"Accept-Encoding": ""}
                 if self.config.debug:
                     params["verbose"] = 1
                 elif self.config.log_output is LibreNMS.LogOutput.NONE:
