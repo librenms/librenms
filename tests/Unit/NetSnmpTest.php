@@ -379,7 +379,7 @@ class NetSnmpTest extends TestCase
         $this->assertTrue($target->config->bulk);
     }
 
-    public function testDeviceToSnmpTargetCachesTarget(): void
+    public function testDeviceToSnmpTargetHandlesMutation(): void
     {
         $device = new Device([
             'hostname' => 'router1.example.com',
@@ -388,9 +388,11 @@ class NetSnmpTest extends TestCase
         ]);
 
         $target1 = $device->toSnmpTarget();
+        $device->community = 'new';
         $target2 = $device->toSnmpTarget();
 
-        $this->assertSame($target1, $target2);
+        $this->assertSame($target1, 'test-comm');
+        $this->assertSame($target2, 'new');
         $this->assertSame('router1.example.com', $target1->hostname);
     }
 
