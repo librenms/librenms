@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CliColorFormatter.php
+ * ApiColorFormatter.php
  *
  * -Description-
  *
@@ -26,14 +26,12 @@
 
 namespace App\Logging;
 
-class CliColorFormatter extends \Monolog\Formatter\LineFormatter
+class ApiColorFormatter extends \Monolog\Formatter\LineFormatter
 {
     /**
      * @var \Console_Color2
      */
     private $console_color;
-
-    protected bool $console;
 
     public function __construct($format = "%message% %context% %extra%\n", $dateFormat = null, $allowInlineLineBreaks = true, $ignoreEmptyContextAndExtra = true)
     {
@@ -45,7 +43,6 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
         );
 
         $this->console_color = new \Console_Color2();
-        $this->console ??= app()->runningInConsole();
     }
 
     public function format(\Monolog\LogRecord $record): string
@@ -53,7 +50,7 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
         // if no line break is specified, just output the raw message (maybe colored)
         if (isset($record->context['nlb']) && $record->context['nlb'] === true) {
             if (isset($record->context['color']) && $record->context['color']) {
-                return $this->console_color->convert($record->message, $this->console);
+                return $this->console_color->convert($record->message, true);
             }
 
             return $record->message;
@@ -68,7 +65,7 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
                 $record->datetime,
                 $record->channel,
                 $record->level,
-                $this->console_color->convert($record->message, $this->console),
+                $this->console_color->convert($record->message, true),
                 $context,
                 $record->extra,
                 $record->formatted,
