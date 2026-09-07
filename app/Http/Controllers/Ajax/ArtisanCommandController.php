@@ -46,7 +46,7 @@ class ArtisanCommandController extends Controller
             $jsonResponse = response()->json(['error' => 'Unauthorized'], 401);
 
             return new StreamedResponse(
-                function () use ($jsonResponse) {
+                function () use ($jsonResponse): void {
                     echo $jsonResponse->getContent();
                 },
                 $jsonResponse->getStatusCode(),
