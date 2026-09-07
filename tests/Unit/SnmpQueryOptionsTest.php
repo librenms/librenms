@@ -171,9 +171,6 @@ class SnmpQueryOptionsTest extends TestCase
     {
         $optionsC = (new SnmpQueryOptions)->parseCli(['-Cc']);
         $this->assertTrue($optionsC->tolerateUnorderedIndexes);
-
-        $optionsI = (new SnmpQueryOptions)->parseCli(['-Ci']);
-        $this->assertTrue($optionsI->includeGivenOid);
     }
 
     public function testParseCliMibVisibility(): void

@@ -112,10 +112,6 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
             $cmd[] = '-Cc';
         }
 
-        if ($options->includeGivenOid) {
-            $cmd[] = '-Ci';
-        }
-
         if ($config->timeout > 0 && $config->timeout != 1) {
             array_push($cmd, '-t', (string) $config->timeout);
         }

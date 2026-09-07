@@ -44,7 +44,6 @@ class SnmpQueryOptions
         // Query behavior
         public bool $allowBulk = true,
         public bool $tolerateUnorderedIndexes = false,
-        public bool $includeGivenOid = false,
 
         // OID formatting
         public bool $numericIndexes = false,
@@ -119,9 +118,6 @@ class SnmpQueryOptions
                 if (str_contains($opts, 'c')) {
                     $this->tolerateUnorderedIndexes = true;
                 }
-                if (str_contains($opts, 'i')) {
-                    $this->includeGivenOid = true;
-                }
             } elseif (str_starts_with($arg, '-P')) {
                 $this->allowUnderscores = str_contains(substr($arg, 2), 'u');
             } elseif (str_starts_with($arg, '-I')) {
@@ -146,7 +142,6 @@ class SnmpQueryOptions
         $this->context = '';
         $this->allowBulk = true;
         $this->tolerateUnorderedIndexes = false;
-        $this->includeGivenOid = false;
         $this->escapeQuotes = false;
         $this->numericIndexes = false;
         $this->outputMibNames = true;
@@ -169,7 +164,6 @@ class SnmpQueryOptions
         $this->context = '';
         $this->allowBulk = true;
         $this->tolerateUnorderedIndexes = false;
-        $this->includeGivenOid = false;
         $this->escapeQuotes = false;
         $this->numericIndexes = false;
         $this->outputMibNames = true;
