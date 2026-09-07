@@ -26,6 +26,7 @@ use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -143,6 +144,11 @@ class Device extends BaseModel
     public function pollerTarget(): string
     {
         return ($this->overwrite_ip ?: $this->hostname) ?: '';
+    }
+
+    public function toSnmpConfig(): SnmpConfig
+    {
+        return SnmpConfig::fromDevice($this);
     }
 
     public function ipFamily(): AddressFamily

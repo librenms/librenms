@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * SnmpQueryInterface.php
  *
  * -Description-
@@ -16,15 +16,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
- * @copyright  2021 Tony Murray
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Data\Source;
+namespace LibreNMS\Data\Source\Snmp;
 
 use App\Models\Device;
 
@@ -61,6 +61,8 @@ interface SnmpQueryInterface
     /**
      * Set MIBs to use for this query. Base mibs are included by default.
      * They will be appended to existing mibs unless $append is set to false.
+     *
+     * @param  string[]  $mibs
      */
     public function mibs(array $mibs, bool $append = true): SnmpQueryInterface;
 
@@ -102,16 +104,16 @@ interface SnmpQueryInterface
      * This will override other options set such as setting numeric.  Call with no options to reset to default.
      * Try to avoid setting options this way to keep the API generic.
      *
-     * @param  array|string|null  $options
+     * @param  SnmpQueryOptions|string[]|string|null  $options
      * @return $this
      */
-    public function options($options = []): SnmpQueryInterface;
+    public function options(SnmpQueryOptions|array|string|null $options = []): SnmpQueryInterface;
 
     /**
      * snmpget an OID
      * Commonly used to fetch a single or multiple explicit values.
      *
-     * @param  array|string  $oid
+     * @param  string[]|string  $oid
      * @return SnmpResponse
      */
     public function get($oid): SnmpResponse;
@@ -120,7 +122,7 @@ interface SnmpQueryInterface
      * snmpwalk an OID
      * Fetches all OIDs under a given OID, commonly used with tables.
      *
-     * @param  array|string  $oid
+     * @param  string[]|string  $oid
      * @return SnmpResponse
      */
     public function walk($oid): SnmpResponse;
@@ -129,7 +131,7 @@ interface SnmpQueryInterface
      * snmpnext for the given oid
      * snmpnext retrieves the first oid after the given oid.
      *
-     * @param  array|string  $oid
+     * @param  string[]|string  $oid
      * @return SnmpResponse
      */
     public function next($oid): SnmpResponse;
