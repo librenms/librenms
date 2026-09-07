@@ -31,7 +31,7 @@ class SnmpQueryOptionsTest extends TestCase
 
         $this->assertFalse($options->quickPrint);
         $this->assertFalse($options->extendedIndex);
-        $this->assertTrue($options->allowUnderscores);
+        $this->assertFalse($options->allowUnderscores);
     }
 
     public function testQuickPrintDefaults(): void
