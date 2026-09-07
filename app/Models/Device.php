@@ -44,8 +44,6 @@ class Device extends BaseModel
 {
     use PivotEventTrait, HasFactory, Filterable;
 
-    private ?SnmpTarget $snmpTarget = null;
-
     public $timestamps = false;
     protected $primaryKey = 'device_id';
     protected $fillable = [
@@ -150,7 +148,7 @@ class Device extends BaseModel
 
     public function toSnmpTarget(): SnmpTarget
     {
-        return $this->snmpTarget ??= SnmpTarget::fromDevice($this);
+        return SnmpTarget::fromDevice($this);
     }
 
     public function ipFamily(): AddressFamily
