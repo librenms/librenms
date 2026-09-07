@@ -44,12 +44,12 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
      */
     public function get(SnmpConfig $config, array $oids, SnmpQueryOptions $options): SnmpResponse
     {
-        return $this->runCommand($this->buildCli('snmpget', $config, $oids, $options));
+        return $this->runCommand(self::buildCli('snmpget', $config, $oids, $options));
     }
 
     public function walk(SnmpConfig $config, string $oid, SnmpQueryOptions $options): SnmpResponse
     {
-        return $this->runCommand($this->buildCli('snmpwalk', $config, [$oid], $options));
+        return $this->runCommand(self::buildCli('snmpwalk', $config, [$oid], $options));
     }
 
     /**
@@ -57,7 +57,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
      */
     public function next(SnmpConfig $config, array $oids, SnmpQueryOptions $options): SnmpResponse
     {
-        return $this->runCommand($this->buildCli('snmpgetnext', $config, $oids, $options));
+        return $this->runCommand(self::buildCli('snmpgetnext', $config, $oids, $options));
     }
 
     public function translate(string $oid, SnmpQueryOptions $options): string
