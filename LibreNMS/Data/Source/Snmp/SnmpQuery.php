@@ -329,7 +329,7 @@ class SnmpQuery implements SnmpQueryInterface
 
     private function getTarget(): SnmpTarget
     {
-        return SnmpTarget::fromDevice($this->device);
+        return $this->device->toSnmpTarget();
     }
 
     /**

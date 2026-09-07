@@ -22,6 +22,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Cache\DeviceMaintenanceCache;
+use LibreNMS\Data\Source\Snmp\SnmpTarget;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
@@ -42,6 +43,8 @@ use LibreNMS\Util\Url;
 class Device extends BaseModel
 {
     use PivotEventTrait, HasFactory, Filterable;
+
+    private ?SnmpTarget $snmpTarget = null;
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
@@ -143,6 +146,11 @@ class Device extends BaseModel
     public function pollerTarget(): string
     {
         return ($this->overwrite_ip ?: $this->hostname) ?: '';
+    }
+
+    public function toSnmpTarget(): SnmpTarget
+    {
+        return $this->snmpTarget ??= SnmpTarget::fromDevice($this);
     }
 
     public function ipFamily(): AddressFamily

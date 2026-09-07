@@ -379,7 +379,21 @@ class NetSnmpTest extends TestCase
         $this->assertSame(2, $target->config->timeout);
         $this->assertSame(3, $target->config->retries);
         $this->assertTrue($target->config->bulk);
-        $this->assertSame($device, $target->device);
+    }
+
+    public function testDeviceToSnmpTargetCachesTarget(): void
+    {
+        $device = new Device([
+            'hostname' => 'router1.example.com',
+            'snmpver' => 'v2c',
+            'community' => 'test-comm',
+        ]);
+
+        $target1 = $device->toSnmpTarget();
+        $target2 = $device->toSnmpTarget();
+
+        $this->assertSame($target1, $target2);
+        $this->assertSame('router1.example.com', $target1->hostname);
     }
 
     public function testSnmpTargetFromDeviceRespectsSnmpBulkSetting(): void

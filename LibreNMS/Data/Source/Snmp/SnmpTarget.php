@@ -34,7 +34,6 @@ final readonly class SnmpTarget
     public function __construct(
         public string $hostname,
         public SnmpConfig $config,
-        public ?Device $device = null,
     ) {
     }
 
@@ -43,7 +42,6 @@ final readonly class SnmpTarget
         return new self(
             hostname: (string) ($device->overwrite_ip ?: $device->hostname),
             config: SnmpConfig::fromDevice($device),
-            device: $device,
         );
     }
 }

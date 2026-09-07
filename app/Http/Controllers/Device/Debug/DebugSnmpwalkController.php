@@ -34,7 +34,6 @@ use Illuminate\Support\Facades\Process;
 use Illuminate\Validation\Rule;
 use LibreNMS\Data\Source\Snmp\NetSnmp;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
-use LibreNMS\Data\Source\Snmp\SnmpTarget;
 use LibreNMS\Enum\SnmpOidOutput;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -80,7 +79,7 @@ class DebugSnmpwalkController extends Controller
 
         return app(NetSnmp::class)->buildCli(
             'snmpwalk',
-            SnmpTarget::fromDevice($device),
+            $device->toSnmpTarget(),
             ['.'],
             $options,
         );
