@@ -20,11 +20,11 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2021 Tony Murray
+ * @copyright  2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Data\Source;
+namespace LibreNMS\Data\Source\Snmp;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
@@ -50,9 +50,14 @@ class SnmpResponse implements \Stringable
      * @param  string  $output
      * @param  string  $stderr
      * @param  int  $exitCode
+     * @param  array<int, string>  $command
      */
-    public function __construct(string $output, public readonly string $stderr = '', public readonly int $exitCode = 0)
-    {
+    public function __construct(
+        string $output,
+        public readonly string $stderr = '',
+        public readonly int $exitCode = 0,
+        public readonly array $command = [],
+    ) {
         $this->raw = (string) preg_replace('/Wrong Type \(should be .*\): /', '', $output);
     }
 
@@ -317,6 +322,7 @@ class SnmpResponse implements \Stringable
             $this->raw . $response->raw,
             $this->stderr . $response->stderr,
             $this->exitCode ?: $response->exitCode,
+            $response->command ?: $this->command,
         );
 
         $newResponse->errorMessage = $this->errorMessage ?: $response->errorMessage;
@@ -344,6 +350,6 @@ class SnmpResponse implements \Stringable
 
     public function __sleep()
     {
-        return ['raw', 'exitCode', 'stderr'];
+        return ['raw', 'exitCode', 'stderr', 'command'];
     }
 }
