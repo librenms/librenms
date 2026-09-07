@@ -10,10 +10,11 @@ show you all the options and explain what they do.
 
 !!! warning
 
-    There is currently a known issue with lnms set when setting JSON values.
-    As a workaround, the JSON must be double-encoded, and the resulting string 
-    must be properly escaped for the CLI. Until this issue is resolved, using 
-    the Web UI or config.php is generally less error-prone..
+    Setting a raw JSON value with `lnms config:set` requires escaping twice:
+    once for LibreNMS' own CLI argument parsing, and once for your shell's
+    quoting rules. The two layers interact, so nested quotes are easy to
+    mangle. This is currently the only config path that requires raw JSON
+    input, and it is unlikely to be fixed at the CLI level.
 
 example config with working encoding
 
