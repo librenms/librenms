@@ -15,7 +15,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-38
                     num_oid: '.1.3.6.1.4.1.49622.6.38.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-38
-                    index: 'sensor38.{{ $index }}'
+                    index: 'Reading-38.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-38
@@ -26,7 +26,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-44
                     num_oid: '.1.3.6.1.4.1.49622.6.44.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-44
-                    index: 'sensor44.{{ $index }}'
+                    index: 'Reading-44.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-44
@@ -37,7 +37,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-52
                     num_oid: '.1.3.6.1.4.1.49622.6.52.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-52
-                    index: 'sensor52.{{ $index }}'
+                    index: 'Reading-52.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-52
@@ -48,7 +48,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-57
                     num_oid: '.1.3.6.1.4.1.49622.6.57.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-57
-                    index: 'sensor57.{{ $index }}'
+                    index: 'Reading-57.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-57
@@ -63,7 +63,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-16
                     num_oid: '.1.3.6.1.4.1.49622.6.16.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-16
-                    index: 'sensor16.{{ $index }}'
+                    index: 'Reading-16.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-16
@@ -74,7 +74,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-17
                     num_oid: '.1.3.6.1.4.1.49622.6.17.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-17
-                    index: 'sensor17.{{ $index }}'
+                    index: 'Reading-17.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-17
@@ -85,7 +85,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-18
                     num_oid: '.1.3.6.1.4.1.49622.6.18.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-18
-                    index: 'sensor18.{{ $index }}'
+                    index: 'Reading-18.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-18
@@ -96,7 +96,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-19
                     num_oid: '.1.3.6.1.4.1.49622.6.19.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-19
-                    index: 'sensor19.{{ $index }}'
+                    index: 'Reading-19.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-19
@@ -107,7 +107,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-20
                     num_oid: '.1.3.6.1.4.1.49622.6.20.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-20
-                    index: 'sensor20.{{ $index }}'
+                    index: 'Reading-20.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-20
@@ -118,7 +118,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-21
                     num_oid: '.1.3.6.1.4.1.49622.6.21.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-21
-                    index: 'sensor21.{{ $index }}'
+                    index: 'Reading-21.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-21
@@ -129,7 +129,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-22
                     num_oid: '.1.3.6.1.4.1.49622.6.22.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-22
-                    index: 'sensor22.{{ $index }}'
+                    index: 'Reading-22.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-22
@@ -140,7 +140,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-23
                     num_oid: '.1.3.6.1.4.1.49622.6.23.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-23
-                    index: 'sensor23.{{ $index }}'
+                    index: 'Reading-23.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-23
@@ -151,7 +151,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-24
                     num_oid: '.1.3.6.1.4.1.49622.6.24.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-24
-                    index: 'sensor24.{{ $index }}'
+                    index: 'Reading-24.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-24
@@ -162,7 +162,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-25
                     num_oid: '.1.3.6.1.4.1.49622.6.25.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-25
-                    index: 'sensor25.{{ $index }}'
+                    index: 'Reading-25.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-25
@@ -173,7 +173,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-26
                     num_oid: '.1.3.6.1.4.1.49622.6.26.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-26
-                    index: 'sensor26.{{ $index }}'
+                    index: 'Reading-26.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-26
@@ -184,7 +184,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-27
                     num_oid: '.1.3.6.1.4.1.49622.6.27.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-27
-                    index: 'sensor27.{{ $index }}'
+                    index: 'Reading-27.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-27
@@ -195,7 +195,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-28
                     num_oid: '.1.3.6.1.4.1.49622.6.28.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-28
-                    index: 'sensor28.{{ $index }}'
+                    index: 'Reading-28.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-28
@@ -206,7 +206,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-29
                     num_oid: '.1.3.6.1.4.1.49622.6.29.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-29
-                    index: 'sensor29.{{ $index }}'
+                    index: 'Reading-29.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-29
@@ -217,7 +217,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-30
                     num_oid: '.1.3.6.1.4.1.49622.6.30.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-30
-                    index: 'sensor30.{{ $index }}'
+                    index: 'Reading-30.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-30
@@ -228,7 +228,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-31
                     num_oid: '.1.3.6.1.4.1.49622.6.31.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-31
-                    index: 'sensor31.{{ $index }}'
+                    index: 'Reading-31.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-31
@@ -239,7 +239,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-32
                     num_oid: '.1.3.6.1.4.1.49622.6.32.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-32
-                    index: 'sensor32.{{ $index }}'
+                    index: 'Reading-32.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-32
@@ -250,7 +250,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-42
                     num_oid: '.1.3.6.1.4.1.49622.6.42.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-42
-                    index: 'sensor42.{{ $index }}'
+                    index: 'Reading-42.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-42
@@ -261,7 +261,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-48
                     num_oid: '.1.3.6.1.4.1.49622.6.48.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-48
-                    index: 'sensor48.{{ $index }}'
+                    index: 'Reading-48.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-48
@@ -276,7 +276,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-39
                     num_oid: '.1.3.6.1.4.1.49622.6.39.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-39
-                    index: 'sensor39.{{ $index }}'
+                    index: 'Reading-39.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-39
@@ -287,7 +287,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-40
                     num_oid: '.1.3.6.1.4.1.49622.6.40.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-40
-                    index: 'sensor40.{{ $index }}'
+                    index: 'Reading-40.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-40
@@ -298,7 +298,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-45
                     num_oid: '.1.3.6.1.4.1.49622.6.45.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-45
-                    index: 'sensor45.{{ $index }}'
+                    index: 'Reading-45.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-45
@@ -309,7 +309,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-46
                     num_oid: '.1.3.6.1.4.1.49622.6.46.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-46
-                    index: 'sensor46.{{ $index }}'
+                    index: 'Reading-46.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-46
@@ -320,7 +320,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-53
                     num_oid: '.1.3.6.1.4.1.49622.6.53.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-53
-                    index: 'sensor53.{{ $index }}'
+                    index: 'Reading-53.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-53
@@ -331,7 +331,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-54
                     num_oid: '.1.3.6.1.4.1.49622.6.54.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-54
-                    index: 'sensor54.{{ $index }}'
+                    index: 'Reading-54.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-54
@@ -342,7 +342,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-58
                     num_oid: '.1.3.6.1.4.1.49622.6.58.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-58
-                    index: 'sensor58.{{ $index }}'
+                    index: 'Reading-58.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-58
@@ -353,7 +353,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-59
                     num_oid: '.1.3.6.1.4.1.49622.6.59.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-59
-                    index: 'sensor59.{{ $index }}'
+                    index: 'Reading-59.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-59
@@ -364,7 +364,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-75
                     num_oid: '.1.3.6.1.4.1.49622.6.75.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-75
-                    index: 'sensor75.{{ $index }}'
+                    index: 'Reading-75.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-75
@@ -375,7 +375,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-76
                     num_oid: '.1.3.6.1.4.1.49622.6.76.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-76
-                    index: 'sensor76.{{ $index }}'
+                    index: 'Reading-76.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-76
@@ -386,7 +386,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-77
                     num_oid: '.1.3.6.1.4.1.49622.6.77.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-77
-                    index: 'sensor77.{{ $index }}'
+                    index: 'Reading-77.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-77
@@ -397,7 +397,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-78
                     num_oid: '.1.3.6.1.4.1.49622.6.78.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-78
-                    index: 'sensor78.{{ $index }}'
+                    index: 'Reading-78.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-78
@@ -408,7 +408,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-79
                     num_oid: '.1.3.6.1.4.1.49622.6.79.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-79
-                    index: 'sensor79.{{ $index }}'
+                    index: 'Reading-79.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-79
@@ -419,7 +419,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-80
                     num_oid: '.1.3.6.1.4.1.49622.6.80.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-80
-                    index: 'sensor80.{{ $index }}'
+                    index: 'Reading-80.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-80
@@ -430,7 +430,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-81
                     num_oid: '.1.3.6.1.4.1.49622.6.81.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-81
-                    index: 'sensor81.{{ $index }}'
+                    index: 'Reading-81.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-81
@@ -441,7 +441,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-82
                     num_oid: '.1.3.6.1.4.1.49622.6.82.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-82
-                    index: 'sensor82.{{ $index }}'
+                    index: 'Reading-82.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-82
@@ -452,7 +452,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-83
                     num_oid: '.1.3.6.1.4.1.49622.6.83.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-83
-                    index: 'sensor83.{{ $index }}'
+                    index: 'Reading-83.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-83
@@ -467,7 +467,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-24
                     num_oid: '.1.3.6.1.4.1.49622.6.24.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-24
-                    index: 'sensor24.{{ $index }}'
+                    index: 'Reading-24.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-24
@@ -478,7 +478,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-25
                     num_oid: '.1.3.6.1.4.1.49622.6.25.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-25
-                    index: 'sensor25.{{ $index }}'
+                    index: 'Reading-25.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-25
@@ -489,7 +489,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-26
                     num_oid: '.1.3.6.1.4.1.49622.6.26.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-26
-                    index: 'sensor26.{{ $index }}'
+                    index: 'Reading-26.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-26
@@ -500,7 +500,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-27
                     num_oid: '.1.3.6.1.4.1.49622.6.27.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-27
-                    index: 'sensor27.{{ $index }}'
+                    index: 'Reading-27.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-27
@@ -511,7 +511,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-28
                     num_oid: '.1.3.6.1.4.1.49622.6.28.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-28
-                    index: 'sensor28.{{ $index }}'
+                    index: 'Reading-28.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-28
@@ -522,7 +522,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-29
                     num_oid: '.1.3.6.1.4.1.49622.6.29.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-29
-                    index: 'sensor29.{{ $index }}'
+                    index: 'Reading-29.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-29
@@ -533,7 +533,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-30
                     num_oid: '.1.3.6.1.4.1.49622.6.30.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-30
-                    index: 'sensor30.{{ $index }}'
+                    index: 'Reading-30.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-30
@@ -544,7 +544,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-32
                     num_oid: '.1.3.6.1.4.1.49622.6.32.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-32
-                    index: 'sensor32.{{ $index }}'
+                    index: 'Reading-32.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-32
@@ -555,7 +555,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-33
                     num_oid: '.1.3.6.1.4.1.49622.6.33.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-33
-                    index: 'sensor33.{{ $index }}'
+                    index: 'Reading-33.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-33
@@ -566,7 +566,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-34
                     num_oid: '.1.3.6.1.4.1.49622.6.34.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-34
-                    index: 'sensor34.{{ $index }}'
+                    index: 'Reading-34.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-34
@@ -577,7 +577,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-35
                     num_oid: '.1.3.6.1.4.1.49622.6.35.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-35
-                    index: 'sensor35.{{ $index }}'
+                    index: 'Reading-35.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-35
@@ -588,7 +588,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-36
                     num_oid: '.1.3.6.1.4.1.49622.6.36.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-36
-                    index: 'sensor36.{{ $index }}'
+                    index: 'Reading-36.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-36
@@ -599,7 +599,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-37
                     num_oid: '.1.3.6.1.4.1.49622.6.37.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-37
-                    index: 'sensor37.{{ $index }}'
+                    index: 'Reading-37.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-37
@@ -610,7 +610,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-38
                     num_oid: '.1.3.6.1.4.1.49622.6.38.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-38
-                    index: 'sensor38.{{ $index }}'
+                    index: 'Reading-38.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-38
@@ -621,7 +621,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-39
                     num_oid: '.1.3.6.1.4.1.49622.6.39.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-39
-                    index: 'sensor39.{{ $index }}'
+                    index: 'Reading-39.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-39
@@ -632,7 +632,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-40
                     num_oid: '.1.3.6.1.4.1.49622.6.40.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-40
-                    index: 'sensor40.{{ $index }}'
+                    index: 'Reading-40.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-40
@@ -643,7 +643,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-41
                     num_oid: '.1.3.6.1.4.1.49622.6.41.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-41
-                    index: 'sensor41.{{ $index }}'
+                    index: 'Reading-41.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-41
@@ -654,7 +654,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-42
                     num_oid: '.1.3.6.1.4.1.49622.6.42.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-42
-                    index: 'sensor42.{{ $index }}'
+                    index: 'Reading-42.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-42
@@ -665,7 +665,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-43
                     num_oid: '.1.3.6.1.4.1.49622.6.43.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-43
-                    index: 'sensor43.{{ $index }}'
+                    index: 'Reading-43.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-43
@@ -676,7 +676,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-44
                     num_oid: '.1.3.6.1.4.1.49622.6.44.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-44
-                    index: 'sensor44.{{ $index }}'
+                    index: 'Reading-44.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-44
@@ -687,7 +687,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-45
                     num_oid: '.1.3.6.1.4.1.49622.6.45.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-45
-                    index: 'sensor45.{{ $index }}'
+                    index: 'Reading-45.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-45
@@ -698,7 +698,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-46
                     num_oid: '.1.3.6.1.4.1.49622.6.46.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-46
-                    index: 'sensor46.{{ $index }}'
+                    index: 'Reading-46.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-46
@@ -709,7 +709,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-47
                     num_oid: '.1.3.6.1.4.1.49622.6.47.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-47
-                    index: 'sensor47.{{ $index }}'
+                    index: 'Reading-47.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-47
@@ -720,7 +720,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-48
                     num_oid: '.1.3.6.1.4.1.49622.6.48.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-48
-                    index: 'sensor48.{{ $index }}'
+                    index: 'Reading-48.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-48
@@ -731,7 +731,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-49
                     num_oid: '.1.3.6.1.4.1.49622.6.49.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-49
-                    index: 'sensor49.{{ $index }}'
+                    index: 'Reading-49.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-49
@@ -742,7 +742,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-50
                     num_oid: '.1.3.6.1.4.1.49622.6.50.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-50
-                    index: 'sensor50.{{ $index }}'
+                    index: 'Reading-50.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-50
@@ -753,7 +753,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-55
                     num_oid: '.1.3.6.1.4.1.49622.6.55.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-55
-                    index: 'sensor55.{{ $index }}'
+                    index: 'Reading-55.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-55
@@ -764,7 +764,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-60
                     num_oid: '.1.3.6.1.4.1.49622.6.60.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-60
-                    index: 'sensor60.{{ $index }}'
+                    index: 'Reading-60.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-60
@@ -779,7 +779,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-1
                     num_oid: '.1.3.6.1.4.1.49622.6.1.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-1
-                    index: 'sensor1.{{ $index }}'
+                    index: 'Reading-1.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-1
@@ -790,7 +790,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-2
                     num_oid: '.1.3.6.1.4.1.49622.6.2.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-2
-                    index: 'sensor2.{{ $index }}'
+                    index: 'Reading-2.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-2
@@ -801,7 +801,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-3
                     num_oid: '.1.3.6.1.4.1.49622.6.3.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-3
-                    index: 'sensor3.{{ $index }}'
+                    index: 'Reading-3.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-3
@@ -812,7 +812,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-4
                     num_oid: '.1.3.6.1.4.1.49622.6.4.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-4
-                    index: 'sensor4.{{ $index }}'
+                    index: 'Reading-4.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-4
@@ -823,7 +823,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-5
                     num_oid: '.1.3.6.1.4.1.49622.6.5.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-5
-                    index: 'sensor5.{{ $index }}'
+                    index: 'Reading-5.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-5
@@ -834,7 +834,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-6
                     num_oid: '.1.3.6.1.4.1.49622.6.6.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-6
-                    index: 'sensor6.{{ $index }}'
+                    index: 'Reading-6.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-6
@@ -845,7 +845,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-7
                     num_oid: '.1.3.6.1.4.1.49622.6.7.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-7
-                    index: 'sensor7.{{ $index }}'
+                    index: 'Reading-7.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-7
@@ -856,7 +856,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-8
                     num_oid: '.1.3.6.1.4.1.49622.6.8.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-8
-                    index: 'sensor8.{{ $index }}'
+                    index: 'Reading-8.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-8
@@ -867,7 +867,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-9
                     num_oid: '.1.3.6.1.4.1.49622.6.9.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-9
-                    index: 'sensor9.{{ $index }}'
+                    index: 'Reading-9.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-9
@@ -878,7 +878,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-10
                     num_oid: '.1.3.6.1.4.1.49622.6.10.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-10
-                    index: 'sensor10.{{ $index }}'
+                    index: 'Reading-10.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-10
@@ -889,7 +889,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-11
                     num_oid: '.1.3.6.1.4.1.49622.6.11.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-11
-                    index: 'sensor11.{{ $index }}'
+                    index: 'Reading-11.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-11
@@ -900,7 +900,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-12
                     num_oid: '.1.3.6.1.4.1.49622.6.12.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-12
-                    index: 'sensor12.{{ $index }}'
+                    index: 'Reading-12.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-12
@@ -911,7 +911,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-13
                     num_oid: '.1.3.6.1.4.1.49622.6.13.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-13
-                    index: 'sensor13.{{ $index }}'
+                    index: 'Reading-13.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-13
@@ -922,7 +922,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-14
                     num_oid: '.1.3.6.1.4.1.49622.6.14.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-14
-                    index: 'sensor14.{{ $index }}'
+                    index: 'Reading-14.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-14
@@ -933,7 +933,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-15
                     num_oid: '.1.3.6.1.4.1.49622.6.15.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-15
-                    index: 'sensor15.{{ $index }}'
+                    index: 'Reading-15.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-15
@@ -944,7 +944,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-16
                     num_oid: '.1.3.6.1.4.1.49622.6.16.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-16
-                    index: 'sensor16.{{ $index }}'
+                    index: 'Reading-16.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-16
@@ -955,7 +955,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-37
                     num_oid: '.1.3.6.1.4.1.49622.6.37.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-37
-                    index: 'sensor37.{{ $index }}'
+                    index: 'Reading-37.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-37
@@ -966,7 +966,7 @@ modules:
                     value: ASROCKRACK-AM5D4ID-MIB::Reading-43
                     num_oid: '.1.3.6.1.4.1.49622.6.43.5.{{ $index }}'
                     descr: ASROCKRACK-AM5D4ID-MIB::Name-43
-                    index: 'sensor43.{{ $index }}'
+                    index: 'Reading-43.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-AM5D4ID-MIB::Reading-43
@@ -977,7 +977,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-51
                     num_oid: '.1.3.6.1.4.1.49622.6.51.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-51
-                    index: 'sensor51.{{ $index }}'
+                    index: 'Reading-51.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-51
@@ -988,7 +988,7 @@ modules:
                     value: ASROCKRACK-BERGAMOD8-MIB::Reading-56
                     num_oid: '.1.3.6.1.4.1.49622.6.56.5.{{ $index }}'
                     descr: ASROCKRACK-BERGAMOD8-MIB::Name-56
-                    index: 'sensor56.{{ $index }}'
+                    index: 'Reading-56.{{ $index }}'
                     skip_values:
                         -
                             oid: ASROCKRACK-BERGAMOD8-MIB::Reading-56
