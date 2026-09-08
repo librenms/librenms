@@ -25,10 +25,8 @@ $options['f'] = isset($options['f']) ? $options['f'] : '';
 if ($options['f'] === 'composer_get_plugins') {
     $output = [];
 
-    $file = __DIR__ . '/composer.plugins.json';
-
-    $plugins = is_file($file) && is_readable($file) ?
-        json_decode((string) file_get_contents($file)) : [];
+    $plugins = is_file('composer.plugins.json') ?
+        json_decode(file_get_contents('composer.plugins.json')) : [];
 
     foreach ($plugins->require ?? [] as $package => $version) {
         $output[] = "$package:$version";
