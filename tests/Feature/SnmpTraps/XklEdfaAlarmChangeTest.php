@@ -22,8 +22,8 @@
  * @author     Heath Barnhart hbarnhart@kanren.net
  */
  
- namespace LibreNMS\Tests\Feature\SnmpTraps;
- use LibreNMS\Enum\Severity;
+namespace LibreNMS\Tests\Feature\SnmpTraps;
+use LibreNMS\Enum\Severity;
 
 final class XklEdfaAlarmChangeTest extends SnmpTrapTestCase
 {

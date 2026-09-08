@@ -22,7 +22,8 @@
  * @author     Heath Barnhart hbarnhart@kanren.net
  */
  
- namespace LibreNMS\Tests\Feature\SnmpTraps;
+namespace LibreNMS\Tests\Feature\SnmpTraps;
+use LibreNMS\Enum\Severity;
 
 final class XklRxPowerTest extends SnmpTrapTestCase
 {
@@ -40,6 +41,7 @@ TRAP,
 
 		'Transciever Wave 0 (N\/A) receive power OK. Current value: 16 1/10 dBm',
 		'Failed to handle XklRxPowerOK trap.',
+		[Severity::Ok],
 		);
 	}
 
@@ -58,6 +60,7 @@ TRAP,
 
 		'Transciever Wave 0 (N\/A) is below recieve warning threshold . Current value: -237 1/10 dBm',
 		'Failed to handle XklRxPowerLoWarn trap.',
+		[Severity::Warning],
 		);
 	}
 
@@ -76,6 +79,7 @@ TRAP,
 
 		'Transciever Wave 0 (N\/A) is below recieve alarm threshold -282 1/10 dBm. Current value: -400 1/10 dBm',
 		'Failed to handle XklRxPowerLoAlrm trap.',
+		[Severity::Error],
 		);
 	}
 
@@ -94,10 +98,11 @@ TRAP,
 
 		'Transciever Wave 0 (N\/A) is below recieve warning threshold -10 1/10 dBm. Current value: -5 1/10 dBm',
 		'Failed to handle XklRxPowerHiWarn trap.',
+		[Severity::Warning],
 		);
 	}
 
-public function testXklRxPowerHiAlrm(): void
+	public function testXklRxPowerHiAlrm(): void
     {
 	    $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -112,6 +117,7 @@ TRAP,
 
 		'Transciever Wave 0 (N\/A) is above recieve alarm threshold -10 1/10 dBm. Current value: 20 1/10 dBm',
 		'Failed to handle XklRxPowerHiAlrm trap.',
+		[Severity::Error],
 		);
 	}
 }

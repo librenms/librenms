@@ -22,7 +22,8 @@
  * @author     Heath Barnhart hbarnhart@kanren.net
  */
  
- namespace LibreNMS\Tests\Feature\SnmpTraps;
+namespace LibreNMS\Tests\Feature\SnmpTraps;
+use LibreNMS\Enum\Severity;
 
 final class XklTransportLinkTest extends SnmpTrapTestCase
 {
@@ -41,6 +42,7 @@ TRAP,
 
 		'Tranport 1 is up.',
 		'Failed to handle XklTransportLinkUp trap',
+		[Severity::Ok],
 		);
 	}
 
@@ -59,6 +61,7 @@ TRAP,
 
 		'Transport service 3 is down. Transmit status: up Receive status: los',
 		'Failed to handle trap XklTransportLinkDown',
+		[Severity::Error],
 		);
 	}
 }

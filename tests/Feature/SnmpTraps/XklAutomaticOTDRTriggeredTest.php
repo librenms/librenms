@@ -22,7 +22,8 @@
  * @author     Heath Barnhart hbarnhart@kanren.net
  */
  
- namespace LibreNMS\Tests\Feature\SnmpTraps;
+namespace LibreNMS\Tests\Feature\SnmpTraps;
+use LibreNMS\Enum\Severity;
 
 final class XklAutomaticOTDRTriggeredTest extends SnmpTrapTestCase
 {
@@ -43,6 +44,7 @@ TRAP,
 
 		'Automatic OTDR Event at 06-23-2026 01:25:21. Name: OSC 0 (N\/A) Length: 47.91km',
 		'Failed to handle XklAutomaticOTDRTriggered trap.',
+		[Severity::Warning],
 		);
 	}
 }
