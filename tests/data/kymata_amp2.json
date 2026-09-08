@@ -1,0 +1,267 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "hogelijn",
+                    "sysObjectID": ".1.3.6.1.4.1.60429.1",
+                    "sysDescr": "Kymata",
+                    "sysContact": "<private>",
+                    "version": "2",
+                    "hardware": "AMP2",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "kymata",
+                    "type": "wireless",
+                    "serial": "AMFCZT0002426",
+                    "icon": "kymata.png"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.60429.1.3.14.0",
+                    "sensor_index": "packetCounter.0",
+                    "sensor_type": "kymata",
+                    "sensor_descr": "Packets/min",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1016,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "dbm",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.60429.1.3.12.0",
+                    "sensor_index": "txLevel.0",
+                    "sensor_type": "kymata",
+                    "sensor_descr": "Tx Power",
+                    "group": null,
+                    "sensor_divisor": 100,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 24.49,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.60429.1.3.1.0",
+                    "sensor_index": "alarmStatus.0",
+                    "sensor_type": "Alarm status",
+                    "sensor_descr": "Alarm",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "Alarm status"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.60429.1.3.15.0",
+                    "sensor_index": "activityAP.0",
+                    "sensor_type": "AP Activity",
+                    "sensor_descr": "AP Activity",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "AP Activity"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.60429.1.3.16.0",
+                    "sensor_index": "pcbPowerProblem.0",
+                    "sensor_type": "PCB Power",
+                    "sensor_descr": "PCB Power Problem",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "PCB Power"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.60429.1.3.10.0",
+                    "sensor_index": "temperature.0",
+                    "sensor_type": "kymata",
+                    "sensor_descr": "Internal",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 35,
+                    "sensor_limit": 55,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 25,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.60429.1.3.11.0",
+                    "sensor_index": "voltage5V.0",
+                    "sensor_type": "kymata",
+                    "sensor_descr": "Voltage",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3.741,
+                    "sensor_limit": 4.30215,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 3.17985,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "Alarm status",
+                    "state_descr": "No Alarm",
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "Alarm status",
+                    "state_descr": "AP alarm, the devices does not receive beacons or traffic from the AP",
+                    "state_value": 1,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "Alarm status",
+                    "state_descr": "Low RF Out",
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "Alarm status",
+                    "state_descr": "PCBA RF Board Power Supply Problem",
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "Alarm status",
+                    "state_descr": "Temperature above 75C",
+                    "state_value": 4,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "AP Activity",
+                    "state_descr": "AP Off",
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "AP Activity",
+                    "state_descr": "Beacon",
+                    "state_value": 1,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "AP Activity",
+                    "state_descr": "Client/Traffic",
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "PCB Power",
+                    "state_descr": "No",
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "PCB Power",
+                    "state_descr": "Yes",
+                    "state_value": 1,
+                    "state_generic_value": 2
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
