@@ -1,0 +1,2117 @@
+HM2-PLATFORM-QOS-DIFFSERV-PRIVATE-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann Platform QOS-DiffServ MIB
+-- ***********************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, IpAddress,
+    Unsigned32, Counter32, Counter64
+                                        FROM SNMPv2-SMI
+    
+    InetPortNumber                      FROM INET-ADDRESS-MIB
+    
+    TEXTUAL-CONVENTION,RowStatus,
+    MacAddress, DisplayString,
+    StorageType,TruthValue              FROM SNMPv2-TC
+ 
+	hm2PlatformMibs, HmEnabledStatus    FROM HM2-TC-MIB
+    ifIndex,InterfaceIndex              FROM IF-MIB;
+
+hm2PlatformQOSDiffServPrivate MODULE-IDENTITY
+    LAST-UPDATED "201110280000Z" -- 28 Oct 2011 12:00:00 GMT
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION 
+        "The Hirschmann Private Platform2 MIB for QoS DiffServ.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION    "201110280000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { hm2PlatformMibs 7 }
+
+QosBurstSize ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS   current
+    DESCRIPTION
+       "The number of kilobytes (Kbytes) in a packet that may be sent in a
+       traffic stream without regard for other traffic streams."
+    SYNTAX   Unsigned32 (1..128)
+
+IntfDirection ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+       "IntfDirection specifies a direction of data travel on an
+       interface. 'inbound' traffic is operated on during reception from
+       the interface, while 'outbound' traffic is operated on prior to
+       transmission on the interface."
+    
+    SYNTAX  INTEGER {
+             in(1),     -- ingress interface
+             out(2)     -- egress interface
+            }
+
+EtypeValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "x"
+    STATUS   current
+    DESCRIPTION
+       "Ethertype value of a packet.  The allowed value is 0x0600 to 0xFFFF."
+    SYNTAX   Unsigned32 (1536..65535)   -- hex value 0x0600 to 0xFFFF
+        
+Ipv6AddressPrefix ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:"
+    STATUS       current
+    DESCRIPTION
+        "This data type is used to model IPv6 address prefixes. This is a binary 
+        string of up to 16 octets in network byte-order."
+    SYNTAX       OCTET STRING (SIZE (0..16))
+
+PolicingAction ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+       "Policing action"
+    
+    SYNTAX  INTEGER {
+             drop(1),
+             markdscp(2),
+						 markprec(3),
+						 send(4),
+						 markcos(5),
+						 markcos2(6),
+						 markcosAsSecCos(7)
+            }  
+
+--**************************************************************************************
+--    hm2AgentDiffServGenStatusGroup
+--**************************************************************************************
+
+    hm2AgentDiffServGenStatusGroup        OBJECT IDENTIFIER ::= { hm2PlatformQOSDiffServPrivate 1 }
+                                    
+    hm2AgentDiffServGenStatusAdminMode OBJECT-TYPE
+	SYNTAX      HmEnabledStatus
+    MAX-ACCESS   read-write
+    STATUS       current
+	DESCRIPTION
+         " DiffServ Admin Mode"
+	DEFVAL    { disable }
+        ::= { hm2AgentDiffServGenStatusGroup 1 }
+	
+    hm2AgentDiffServGenStatusClassTableSize OBJECT-TYPE
+	SYNTAX       Unsigned32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+        " Current size of the Class Table"
+        ::= { hm2AgentDiffServGenStatusGroup 2 }
+     
+    hm2AgentDiffServGenStatusClassTableMax OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+        " Max size of the Class Table"
+        ::= { hm2AgentDiffServGenStatusGroup 3 }
+     
+    hm2AgentDiffServGenStatusClassRuleTableSize OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+        " Current size of Class Rule Table"
+        ::= { hm2AgentDiffServGenStatusGroup 4 }
+     
+    hm2AgentDiffServGenStatusClassRuleTableMax OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+        " Max size of the Class Rule Table."
+        ::= { hm2AgentDiffServGenStatusGroup 5 }
+     
+    hm2AgentDiffServGenStatusPolicyTableSize OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+        " Current Size of the Policy Table."
+        ::= { hm2AgentDiffServGenStatusGroup 6 }
+     
+    hm2AgentDiffServGenStatusPolicyTableMax OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+        " Max size of the Policy Table"
+        ::= { hm2AgentDiffServGenStatusGroup 7 }
+
+    hm2AgentDiffServGenStatusPolicyInstTableSize OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+        " Current size of the Policy-Class Instance Table"
+        ::= { hm2AgentDiffServGenStatusGroup 8 }
+     
+    hm2AgentDiffServGenStatusPolicyInstTableMax OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+        " Max size of the Policy-Class Instance Table"
+        ::= { hm2AgentDiffServGenStatusGroup 9 } 
+     
+    hm2AgentDiffServGenStatusPolicyAttrTableSize OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+        " Current size of the Policy Attribute Table"
+        ::= { hm2AgentDiffServGenStatusGroup 10 }
+     
+    hm2AgentDiffServGenStatusPolicyAttrTableMax OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+        " Max size of the Policy Attribute Table"
+        ::= { hm2AgentDiffServGenStatusGroup 11 } 
+     
+    hm2AgentDiffServGenStatusServiceTableSize OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+        " Current size of the Service Table"
+        ::= { hm2AgentDiffServGenStatusGroup 12 }
+     
+    hm2AgentDiffServGenStatusServiceTableMax OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+        " Max size of the Service Table"
+        ::= { hm2AgentDiffServGenStatusGroup 13 } 
+           
+--**********************************************************************************
+-- hm2AgentDiffServClassGroup
+--
+--**********************************************************************************
+    
+    hm2AgentDiffServClassGroup        OBJECT IDENTIFIER ::= { hm2PlatformQOSDiffServPrivate 2 }
+    --*********************** classTable ***********************
+        
+    hm2AgentDiffServClassIndexNextFree OBJECT-TYPE
+	 SYNTAX       Unsigned32
+	 MAX-ACCESS   read-only
+	 STATUS       current
+	 DESCRIPTION
+		     "This object contains an unused value for classIndex, or a
+		      zero to indicate that none exists."
+    ::= { hm2AgentDiffServClassGroup 1 }
+
+    hm2AgentDiffServClassTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentDiffServClassEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of the DiffServ class entries"
+         ::= { hm2AgentDiffServClassGroup 2 }
+
+    hm2AgentDiffServClassEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentDiffServClassEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Represents entry for a DiffServ traffic class"
+         INDEX       { hm2AgentDiffServClassIndex }
+         ::= { hm2AgentDiffServClassTable 1 }
+         
+    Hm2AgentDiffServClassEntry ::= SEQUENCE {
+          hm2AgentDiffServClassIndex
+              Unsigned32,
+          hm2AgentDiffServClassName
+              DisplayString,
+          hm2AgentDiffServClassType
+              INTEGER,
+          hm2AgentDiffServClassRuleIndexNextFree
+              Unsigned32,
+          hm2AgentDiffServClassStorageType
+              StorageType,                 
+          hm2AgentDiffServClassRowStatus
+              RowStatus,
+          hm2AgentDiffServClassProtoType
+              INTEGER 
+          }
+    
+    hm2AgentDiffServClassIndex OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The identifier for DiffServ Class entry "
+         ::= { hm2AgentDiffServClassEntry 1 }
+    
+    hm2AgentDiffServClassName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Name of the DiffServ traffic class"
+         ::= { hm2AgentDiffServClassEntry 2 }
+    
+    hm2AgentDiffServClassType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      all(1),
+		      any(2),
+		      acl(3)
+                     }
+
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The class type indicates how the individual class match 
+		      criteria are evaluated.  For type all, all of the 
+		      individual match conditions must be true for a packet to
+		      be considered a member of the class.  For types any and 
+		      acl, only one of the match criteria must be true for a 
+		      packet to belong to the class; multiple matching criteria
+		      are evaluated in a sequential order, with the highest 
+		      precedence awarded to the first criterion defined for the
+		      class.  An acl class type copies its set of match criteria
+		      from the current rule definition of the specified 
+		      ACL number."
+         ::= { hm2AgentDiffServClassEntry 3 }
+
+    hm2AgentDiffServClassRuleIndexNextFree OBJECT-TYPE
+	 SYNTAX       Unsigned32
+	 MAX-ACCESS   read-only
+	 STATUS       current
+	 DESCRIPTION
+		     "This object contains an unused value for classRuleIndex, or a
+		      zero to indicate that none exists.  This index is maintained
+		      on a per-class basis."
+	 ::= { hm2AgentDiffServClassEntry 5 }
+
+    hm2AgentDiffServClassStorageType OBJECT-TYPE
+         SYNTAX      StorageType
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Storage-type for this conceptual row"
+         DEFVAL { nonVolatile }		     
+         ::= { hm2AgentDiffServClassEntry 6 }
+	 
+    hm2AgentDiffServClassRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The status of this conceptual row.
+
+                     All RowStatus operations are permitted.
+
+                     Other columns in this row may be modified when the status is 'active'.
+
+                     Entries can not be deleted until all rows in hm2AgentDiffServClassRuleTable
+                     with corresponding values of hm2AgentDiffServClassIndex have been deleted."
+
+         ::= { hm2AgentDiffServClassEntry 7 }
+        
+    hm2AgentDiffServClassProtoType OBJECT-TYPE
+         SYNTAX         INTEGER {
+                        ipv4(1),
+                        ipv6(2) 
+                        }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The diffserv class protocol type used to indicate how to interpret any layer 3. 
+                     This attribute is only valid if the value of hm2AgentDiffServClassProtoType 
+                     is set to all(1) or any(2)."
+         ::= { hm2AgentDiffServClassEntry 9 }    
+                                    
+    
+    --*********************** hm2AgentDiffServClassRuleTable ***********************     
+    
+    hm2AgentDiffServClassRuleTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentDiffServClassRuleEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of the DiffServ Class Rule entries"
+         ::= { hm2AgentDiffServClassGroup 3 }
+
+    hm2AgentDiffServClassRuleEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentDiffServClassRuleEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Represents entry for a set of class-match rules"
+         INDEX       { hm2AgentDiffServClassIndex,hm2AgentDiffServClassRuleIndex }
+         ::= { hm2AgentDiffServClassRuleTable 1 }
+         
+    Hm2AgentDiffServClassRuleEntry ::= SEQUENCE {
+          hm2AgentDiffServClassRuleIndex
+              Unsigned32,
+          hm2AgentDiffServClassRuleMatchEntryType
+              INTEGER,
+	  hm2AgentDiffServClassRuleMatchCos
+	      Unsigned32,    
+          hm2AgentDiffServClassRuleMatchDstIpAddr
+              IpAddress,
+	  hm2AgentDiffServClassRuleMatchDstIpMask
+              IpAddress,
+	  hm2AgentDiffServClassRuleMatchDstL4PortStart
+	      InetPortNumber,
+          hm2AgentDiffServClassRuleMatchDstL4PortEnd
+	      InetPortNumber,
+	  hm2AgentDiffServClassRuleMatchDstMacAddr
+	      MacAddress,
+	  hm2AgentDiffServClassRuleMatchDstMacMask
+              MacAddress,
+          hm2AgentDiffServClassRuleMatchEvery
+              TruthValue,
+	  hm2AgentDiffServClassRuleMatchIpDscp
+              Unsigned32,
+	  hm2AgentDiffServClassRuleMatchIpPrecedence
+              Unsigned32,
+	  hm2AgentDiffServClassRuleMatchIpTosBits
+	      OCTET STRING,
+	  hm2AgentDiffServClassRuleMatchIpTosMask
+	      OCTET STRING,
+	  hm2AgentDiffServClassRuleMatchProtocolNum
+	      Unsigned32,
+	  hm2AgentDiffServClassRuleMatchRefClassIndex
+	      Unsigned32,
+          hm2AgentDiffServClassRuleMatchSrcIpAddr
+              IpAddress,
+	  hm2AgentDiffServClassRuleMatchSrcIpMask
+              IpAddress,
+	  hm2AgentDiffServClassRuleMatchSrcL4PortStart
+	      InetPortNumber,
+          hm2AgentDiffServClassRuleMatchSrcL4PortEnd
+	      InetPortNumber,
+	  hm2AgentDiffServClassRuleMatchSrcMacAddr
+              MacAddress,
+	  hm2AgentDiffServClassRuleMatchSrcMacMask
+              MacAddress,
+	  hm2AgentDiffServClassRuleMatchExcludeFlag
+              TruthValue,
+          hm2AgentDiffServClassRuleStorageType
+              StorageType,                 
+          hm2AgentDiffServClassRuleRowStatus
+              RowStatus,
+	  hm2AgentDiffServClassRuleMatchCos2
+	      Unsigned32,    
+	  hm2AgentDiffServClassRuleMatchEtypeKey
+	      INTEGER,    
+	  hm2AgentDiffServClassRuleMatchEtypeValue
+	      EtypeValue,    
+	  hm2AgentDiffServClassRuleMatchVlanIdStart
+              Unsigned32,
+	  hm2AgentDiffServClassRuleMatchVlanIdEnd
+              Unsigned32,
+	  hm2AgentDiffServClassRuleMatchVlanId2Start
+              Unsigned32,
+	  hm2AgentDiffServClassRuleMatchVlanId2End
+              Unsigned32
+          }
+	  
+    hm2AgentDiffServClassRuleIndex OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The identifier for DiffServ Class Rule Table entry within a class"
+         ::= { hm2AgentDiffServClassRuleEntry 1 }
+    
+    hm2AgentDiffServClassRuleMatchEntryType OBJECT-TYPE
+         SYNTAX      INTEGER {
+	              cos(1),
+                      dstip(2),
+		      dstl4port(3),
+		      dstmac(4),
+		      every(5),
+		      ipdscp(6),
+		      ipprecedence(7),
+		      iptos(8),
+		      protocol(9),
+		      refclass(10),
+		      srcip(11),
+		      srcl4port(12),
+		      srcmac(13),
+		      vlan(14),
+		      cos2(15),
+		      etype(16),
+		      vlanid(17),
+		      vlanid2(18),
+                      flowLabel(19),
+                      srcPrefix(20),
+                      dstPrefix(21)
+                     }
+		     
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Class Rule match entry type, it determines which one of the individual 
+                      match conditions is defined for the present class rule. This object must
+                      be created before any other match object in this row."
+         ::= { hm2AgentDiffServClassRuleEntry 2 }
+	 
+
+     hm2AgentDiffServClassRuleMatchCos OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Three-bit user priority field in the 802.1Q tag header of a tagged 
+		      Ethernet frame used as a class-match parameter - only valid if the 
+                      hm2AgentDiffServClassRuleMatchEntryType is set to cos(1). For frames
+		      containing a double VLAN tag, this field is located in the first/outer
+		      tag."
+         ::= { hm2AgentDiffServClassRuleEntry 3 }
+	 	 
+    hm2AgentDiffServClassRuleMatchDstIpAddr OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Destination IP address match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to dstip(2)."
+         ::= { hm2AgentDiffServClassRuleEntry 4 }
+	 
+    hm2AgentDiffServClassRuleMatchDstIpMask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Destination IP address mask match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to dstip(2). This mask value
+		      identifies the portion of hm2AgentDiffServClassRuleMatchDstIpAddr that is 
+                      compared against a packet. A non-contiguous mask value is permitted."
+         ::= { hm2AgentDiffServClassRuleEntry 5 }
+	 
+    hm2AgentDiffServClassRuleMatchDstL4PortStart OBJECT-TYPE
+         SYNTAX      InetPortNumber
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Destination layer 4 port range start match value for the class - only 
+                      valid if the hm2AgentDiffServClassRuleMatchEntryType is set to dstl4port(3)."
+         ::= { hm2AgentDiffServClassRuleEntry 6 }
+	 
+    hm2AgentDiffServClassRuleMatchDstL4PortEnd OBJECT-TYPE
+         SYNTAX      InetPortNumber
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Destination layer 4 port range end match value for the class - only valid
+                      if the hm2AgentDiffServClassRuleMatchEntryType is set to dstl4port(3)."
+         ::= { hm2AgentDiffServClassRuleEntry 7 }
+
+    hm2AgentDiffServClassRuleMatchDstMacAddr OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Destination MAC address match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to dstmac(4)."
+         ::= { hm2AgentDiffServClassRuleEntry 8 }
+	 
+    hm2AgentDiffServClassRuleMatchDstMacMask OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Destination MAC address mask match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to dstmac(4). This mask value
+		      identifies the portion of hm2AgentDiffServClassRuleMatchDstMacAddr that is 
+                      compared against a packet. A non-contiguous mask value is permitted."
+         ::= { hm2AgentDiffServClassRuleEntry 9 }
+	 
+    hm2AgentDiffServClassRuleMatchEvery OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate that the class rule is defined to match on every packet, 
+                      regardless of content. - only valid if the 
+                      hm2AgentDiffServClassRuleMatchEntryType is set to every(5)."
+         ::= { hm2AgentDiffServClassRuleEntry 10 }
+
+    hm2AgentDiffServClassRuleMatchIpDscp OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..63)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP DiffServ Code Point (DSCP) match value for the class - only valid if 
+                      the hm2AgentDiffServClassRuleMatchEntryType is set to ipdscp(6).  The DSCP 
+		      is defined as the high-order six bits of the Service Type octet in the 
+                      IPv4 header."
+         ::= { hm2AgentDiffServClassRuleEntry 11 }
+
+    hm2AgentDiffServClassRuleMatchIpPrecedence OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Precedence match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to ipprecedence(7).
+		      The Precedence bits are defined as the high-order three bits of
+		      the Service Type octed in the IPv4 header." 
+         ::= { hm2AgentDiffServClassRuleEntry 12 }
+	 
+    hm2AgentDiffServClassRuleMatchIpTosBits OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE(1))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP TOS bits match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to iptos(8).
+		      The TOS bits are defined as all eight bits of the Service 
+		      Type octet in the IPv4 header."
+         ::= { hm2AgentDiffServClassRuleEntry 13 }
+	 
+    hm2AgentDiffServClassRuleMatchIpTosMask OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE(1))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP TOS bits mask match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to iptos(8). This mask value
+		      identifies the portion of hm2AgentDiffServClassRuleMatchIpTosBits that 
+		      is compared against a packet. A non-contiguous mask value is permitted." 
+         ::= { hm2AgentDiffServClassRuleEntry 14 }
+	     
+    hm2AgentDiffServClassRuleMatchProtocolNum OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..255)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Protocol number match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to protocol(9)."
+         ::= { hm2AgentDiffServClassRuleEntry 15 }
+	 
+    hm2AgentDiffServClassRuleMatchRefClassIndex OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Index of the corresponding referenced class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to refclass(10).
+		      The set of match conditions defined for the reference class 
+		      are directly inherited by the current class.
+		      
+		      Restrictions: 1) The class types of both, current class and
+		      the reference class must be identical (i.e., any vs. any,
+		      or all vs. all).
+		      2) Self-referencing of class-name is not allowed.
+		      3) Any attempt to delete the reference class while still 
+		         referenced by any class shall fail.  
+	              4) The combined match criteria of classname and reference class
+		         name must be an allowed combination based on the class type.
+			 Any subsequent changes to the reference class name match 
+			 criteria must maintain this validity, or the change attempt
+			 shall fail."
+			 
+         ::= { hm2AgentDiffServClassRuleEntry 16 }
+	
+    hm2AgentDiffServClassRuleMatchSrcIpAddr OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Source IP address match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to srcip(11)."
+         ::= { hm2AgentDiffServClassRuleEntry 17 }
+	 
+    hm2AgentDiffServClassRuleMatchSrcIpMask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Source IP address mask match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to srcip(11). This mask value
+		      identifies the portion of hm2AgentDiffServClassRuleMatchSrcIpAddr that 
+		      is compared against a packet. A non-contiguous mask value is permitted."
+         ::= { hm2AgentDiffServClassRuleEntry 18 }
+	 
+    hm2AgentDiffServClassRuleMatchSrcL4PortStart OBJECT-TYPE
+         SYNTAX      InetPortNumber
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Source layer 4 port range start match value for the class - only valid if 
+                      the hm2AgentDiffServClassRuleMatchEntryType is set to srcl4port(12)."
+         ::= { hm2AgentDiffServClassRuleEntry 19 }
+	 
+    hm2AgentDiffServClassRuleMatchSrcL4PortEnd OBJECT-TYPE
+         SYNTAX      InetPortNumber
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Source layer 4 port range end match value for the class - only valid if 
+                      the hm2AgentDiffServClassRuleMatchEntryType is set to srcl4port(12)."
+         ::= { hm2AgentDiffServClassRuleEntry 20 }
+
+    hm2AgentDiffServClassRuleMatchSrcMacAddr OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Source MAC address match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to srcmac(13)."
+         ::= { hm2AgentDiffServClassRuleEntry 21 }
+	 
+    hm2AgentDiffServClassRuleMatchSrcMacMask OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Source MAC address mask match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to srcmac(13). This mask value
+		      identifies the portion of hm2AgentDiffServClassRuleMatchSrcMacAddr that 
+		      is compared against a packet. A non-contiguous mask value is permitted." 
+         ::= { hm2AgentDiffServClassRuleEntry 22 }
+	 
+    hm2AgentDiffServClassRuleMatchExcludeFlag OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Class Rule exclude flag - when set to true(1), the match condition 
+                      identified by hm2AgentDiffServClassRuleMatchEntryType is negated. This means
+                      that for a given field, every value is considered to be a match EXCEPT for 
+                      the value specified in the class rule.  This flag must be false(2) for an 
+                      agendDiffServClassRuleMatchEntryType of refClass(10).
+		      This object must be set after the hm2AgentDiffServClassRuleMatchEntryType 
+                      object, but before any other match object in this row"
+         ::= { hm2AgentDiffServClassRuleEntry 24 }
+
+    hm2AgentDiffServClassRuleStorageType OBJECT-TYPE
+         SYNTAX      StorageType
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Storage-type for this conceptual row"
+         DEFVAL { nonVolatile }		     
+         ::= { hm2AgentDiffServClassRuleEntry 25 }
+	 
+    hm2AgentDiffServClassRuleRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The status of this conceptual row.
+
+                      All RowStatus operations are permitted.
+
+                     Other columns in this row may be modified when the status is 'active'."
+
+
+         ::= { hm2AgentDiffServClassRuleEntry 26 } 
+
+     hm2AgentDiffServClassRuleMatchCos2 OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Three-bit user priority field in the second/inner 802.1Q tag header of a 
+		      double VLAN tagged Ethernet  frame used as a class-match parameter 
+		      - only valid if the hm2AgentDiffServClassRuleMatchEntryType is set to 
+		      cos2(15)."
+         ::= { hm2AgentDiffServClassRuleEntry 27 }
+	 	 
+    hm2AgentDiffServClassRuleMatchEtypeKey OBJECT-TYPE
+         SYNTAX      INTEGER {
+	              custom(1),
+                      appletalk(2),
+		      arp(3),
+		      ibmsna(4),
+		      ipv4(5),
+		      ipv6(6),
+		      ipx(7),
+		      mplsmcast(8),
+		      mplsucast(9),
+		      netbios(10),
+		      novell(11),
+		      pppoe(12),
+		      rarp(13)
+                     }
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "Ethertype keyword match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to etype(16).  A keyword
+		      of custom(1) requires that the hm2AgentDiffServClassRuleMatchEtypeValue
+		      object also be set."
+         ::= { hm2AgentDiffServClassRuleEntry 28 }
+	 
+    hm2AgentDiffServClassRuleMatchEtypeValue OBJECT-TYPE
+         SYNTAX      EtypeValue
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "Ethertype match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to etype(16) and
+		      the hm2AgentDiffServClassRuleMatchEtypeKey is set to custom(1).
+	              The allowed value for this object is 0x0600 to 0xFFFF." 
+         ::= { hm2AgentDiffServClassRuleEntry 29 }
+	 
+    hm2AgentDiffServClassRuleMatchVlanIdStart OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4042)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "VLAN ID range start match value for the class - only valid if
+		      the hm2AgentDiffServClassRuleMatchEntryType is set to vlanid(17).
+                      The VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the 802.1Q tag header of a tagged Ethernet frame.  This is 
+		      contained in the first/outer tag of a double VLAN tagged frame."
+         ::= { hm2AgentDiffServClassRuleEntry 30 }
+	 
+    hm2AgentDiffServClassRuleMatchVlanIdEnd OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4042)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "VLAN ID range end match value for the class - only valid if 
+		      the hm2AgentDiffServClassRuleMatchEntryType is set to vlanid(17).
+                      The VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the 802.1Q tag header of a tagged Ethernet frame.  This is 
+		      contained in the first/outer tag of a double VLAN tagged frame."
+         ::= { hm2AgentDiffServClassRuleEntry 31 }
+	 
+    hm2AgentDiffServClassRuleMatchVlanId2Start OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4042)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "Secondary VLAN ID range start match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to vlanid2(18).
+                      The Secondary VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the second/inner 802.1Q tag header of a double VLAN tagged Ethernet 
+                      frame."
+         ::= { hm2AgentDiffServClassRuleEntry 32 }
+	 
+    hm2AgentDiffServClassRuleMatchVlanId2End OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4042)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "Secondary VLAN ID range end match value for the class - only valid if the 
+		      hm2AgentDiffServClassRuleMatchEntryType is set to vlanid2(18).
+                      The Secondary VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the second/inner 802.1Q tag header of a double VLAN tagged Ethernet 
+                      frame."
+         ::= { hm2AgentDiffServClassRuleEntry 33 }
+ 
+    --**********************************************************************************
+    -- hm2AgentDiffServPolicyGroup
+    --
+    --**********************************************************************************
+    
+
+    hm2AgentDiffServPolicyGroup        OBJECT IDENTIFIER ::= { hm2PlatformQOSDiffServPrivate 3 }
+    
+    --*********************** hm2AgentDiffServPolicyTable ************************     
+    
+    hm2AgentDiffServPolicyIndexNextFree OBJECT-TYPE
+	 SYNTAX       Unsigned32
+	 MAX-ACCESS   read-only
+	 STATUS       current
+	 DESCRIPTION
+		     "This object contains an unused value for hm2AgentDiffServPolicyIndex, or a
+		      zero to indicate that none exists."
+    ::= { hm2AgentDiffServPolicyGroup 1 }
+
+    hm2AgentDiffServPolicyTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentDiffServPolicyEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of the DiffServ policy entries."
+         ::= { hm2AgentDiffServPolicyGroup 2 }
+
+    hm2AgentDiffServPolicyEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentDiffServPolicyEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Represents entry for a DiffServ policy."
+         INDEX       { hm2AgentDiffServPolicyIndex }
+         ::= { hm2AgentDiffServPolicyTable 1 }
+         
+    Hm2AgentDiffServPolicyEntry ::= SEQUENCE {
+          hm2AgentDiffServPolicyIndex
+              Unsigned32,
+          hm2AgentDiffServPolicyName
+              DisplayString,
+	  hm2AgentDiffServPolicyType
+	      IntfDirection,
+          hm2AgentDiffServPolicyInstIndexNextFree
+              Unsigned32,
+          hm2AgentDiffServPolicyStorageType
+              StorageType,                 
+          hm2AgentDiffServPolicyRowStatus
+              RowStatus
+          }
+
+        
+    hm2AgentDiffServPolicyIndex OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The identifier for DiffServ Policy table entry."
+         ::= { hm2AgentDiffServPolicyEntry 1 }
+    
+    hm2AgentDiffServPolicyName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Name of the policy"
+         ::= { hm2AgentDiffServPolicyEntry 2 }
+	 
+    hm2AgentDiffServPolicyType OBJECT-TYPE
+         SYNTAX      IntfDirection
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     " The policy type dictates whether inbound or outbound policy
+                       attribute statements are used in the policy definition."
+         ::= { hm2AgentDiffServPolicyEntry 3 }
+    
+    hm2AgentDiffServPolicyInstIndexNextFree OBJECT-TYPE
+	 SYNTAX       Unsigned32
+	 MAX-ACCESS   read-only
+	 STATUS       current
+	 DESCRIPTION
+		     "This object contains an unused value for hm2AgentDiffServPolicyInstIndex, or 
+                      a zero to indicate that none exists. This index is maintained on a 
+                      per-policy basis."
+	 ::= { hm2AgentDiffServPolicyEntry 4 }
+
+    hm2AgentDiffServPolicyStorageType OBJECT-TYPE
+         SYNTAX      StorageType
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Storage-type for this conceptual row"
+         DEFVAL { nonVolatile }		     
+         ::= { hm2AgentDiffServPolicyEntry 5 }
+	 
+    hm2AgentDiffServPolicyRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The status of this conceptual row.  
+
+                      active(1)      - this Diffserv Policy is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance
+
+                     All RowStatus operations are permitted.
+
+                     Other columns in this row may be modified when the status is 'active'.
+
+                     Entries can not be deleted until all rows in hm2AgentDiffServPolicyInstTable 
+                     with corresponding values of hm2AgentDiffServPolicyIndex have been deleted."
+
+
+
+         ::= { hm2AgentDiffServPolicyEntry 6 }
+
+    --*********************** hm2AgentDiffServPolicyInstTable ************************     	 
+    
+    hm2AgentDiffServPolicyInstTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentDiffServPolicyInstEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of the policy-class instance entries."
+         ::= { hm2AgentDiffServPolicyGroup 3 }
+
+    hm2AgentDiffServPolicyInstEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentDiffServPolicyInstEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Represents entry for a policy-class instance."
+         INDEX       { hm2AgentDiffServPolicyIndex,hm2AgentDiffServPolicyInstIndex }
+         ::= { hm2AgentDiffServPolicyInstTable 1 }
+         
+    Hm2AgentDiffServPolicyInstEntry ::= SEQUENCE {
+          hm2AgentDiffServPolicyInstIndex
+              Unsigned32,
+          hm2AgentDiffServPolicyInstClassIndex
+	      Unsigned32,
+          hm2AgentDiffServPolicyInstAttrIndexNextFree
+              Unsigned32,
+          hm2AgentDiffServPolicyInstStorageType
+              StorageType,                 
+          hm2AgentDiffServPolicyInstRowStatus
+              RowStatus
+          }
+
+        
+    hm2AgentDiffServPolicyInstIndex OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The identifier for policy-class Instance table entry within a policy."
+         ::= { hm2AgentDiffServPolicyInstEntry 1 }
+    
+    hm2AgentDiffServPolicyInstClassIndex OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Index of the DiffServ Class Table row, whose class definition is used
+		      as the policy class instance. The class index identifies the classifier 
+		      definition used by the policy to establish an instance of that class 
+		      (to which policy attributes can be attached).  This is what connects a 
+                      class (instance) to a policy."
+         ::= { hm2AgentDiffServPolicyInstEntry 2 }
+    
+    hm2AgentDiffServPolicyInstAttrIndexNextFree OBJECT-TYPE
+	 SYNTAX       Unsigned32
+	 MAX-ACCESS   read-only
+	 STATUS       current
+	 DESCRIPTION
+		     "This object contains an unused value for hm2AgentDiffServPolicyAttrIndex, or 
+                      a zero to indicate that none exists. This index is maintained on a 
+                      per-policy-class-instance basis."
+	 ::= { hm2AgentDiffServPolicyInstEntry 3 }
+
+    hm2AgentDiffServPolicyInstStorageType OBJECT-TYPE
+         SYNTAX      StorageType
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Storage-type for this conceptual row."
+         DEFVAL { nonVolatile }		     
+         ::= { hm2AgentDiffServPolicyInstEntry 4 }
+	 
+    hm2AgentDiffServPolicyInstRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The status of this conceptual row.  
+
+                       active(1)      - this Diffserv Policy Instance is active
+                      createAndGo(4) - set to this value to create an instance
+                      destroy(6)     - set to this value to delete an instance
+  
+                      All RowStatus operations are permitted.
+  
+                      Other columns in this row may be modified when the status is 'active'.
+
+                      Entries can not be deleted until all rows in hm2AgentDiffServPolicyAttrTable with 
+                      corresponding values of hm2AgentDiffServPolicyIndex and hm2AgentDiffServPolicyInstIndex
+                      have been deleted."
+
+         ::= { hm2AgentDiffServPolicyInstEntry 5 }
+                                                    
+        
+    --*********************** hm2AgentDiffServPolicyAttrTable ************************       
+    
+    hm2AgentDiffServPolicyAttrTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentDiffServPolicyAttrEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of policy attribute entries"
+         ::= { hm2AgentDiffServPolicyGroup 4 }
+
+    hm2AgentDiffServPolicyAttrEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentDiffServPolicyAttrEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Represents entry for policy attributes"
+         INDEX       { hm2AgentDiffServPolicyIndex, hm2AgentDiffServPolicyInstIndex,
+                       hm2AgentDiffServPolicyAttrIndex }
+         ::= { hm2AgentDiffServPolicyAttrTable 1 }
+         
+    Hm2AgentDiffServPolicyAttrEntry ::= SEQUENCE {
+          hm2AgentDiffServPolicyAttrIndex
+              Unsigned32,
+	  hm2AgentDiffServPolicyAttrStmtEntryType
+              INTEGER, 
+	  hm2AgentDiffServPolicyAttrStmtMarkCosVal
+	      Unsigned32,
+      hm2AgentDiffServPolicyAttrStmtMarkIpDscpVal
+              Unsigned32,
+      hm2AgentDiffServPolicyAttrStmtMarkIpPrecedenceVal
+              Unsigned32,
+	  hm2AgentDiffServPolicyAttrStmtPoliceConformAct
+              PolicingAction,
+	  hm2AgentDiffServPolicyAttrStmtPoliceConformVal
+              Unsigned32,    
+	  hm2AgentDiffServPolicyAttrStmtPoliceExceedAct
+              PolicingAction,
+	  hm2AgentDiffServPolicyAttrStmtPoliceExceedVal
+              Unsigned32,
+	  hm2AgentDiffServPolicyAttrStmtPoliceNonconformAct
+              PolicingAction,
+	  hm2AgentDiffServPolicyAttrStmtPoliceNonconformVal
+              Unsigned32,
+	  hm2AgentDiffServPolicyAttrStmtPoliceSimpleCrate
+              Unsigned32,
+      hm2AgentDiffServPolicyAttrStmtPoliceSimpleCburst
+              QosBurstSize,
+	  hm2AgentDiffServPolicyAttrStmtPoliceSinglerateCrate
+              Unsigned32,
+      hm2AgentDiffServPolicyAttrStmtPoliceSinglerateCburst
+              QosBurstSize,
+	  hm2AgentDiffServPolicyAttrStmtPoliceSinglerateEburst
+              QosBurstSize,
+	  hm2AgentDiffServPolicyAttrStmtPoliceTworateCrate
+              Unsigned32,
+      hm2AgentDiffServPolicyAttrStmtPoliceTworateCburst
+              QosBurstSize,
+	  hm2AgentDiffServPolicyAttrStmtPoliceTworatePrate
+              Unsigned32,
+      hm2AgentDiffServPolicyAttrStmtPoliceTworatePburst
+              QosBurstSize,
+	  hm2AgentDiffServPolicyAttrStorageType
+              StorageType,                 
+      hm2AgentDiffServPolicyAttrRowStatus
+              RowStatus,
+	  hm2AgentDiffServPolicyAttrStmtAssignQueueId
+	      Unsigned32,
+	  hm2AgentDiffServPolicyAttrStmtDrop
+	      TruthValue,
+	  hm2AgentDiffServPolicyAttrStmtMarkCos2Val
+	      Unsigned32,
+	  hm2AgentDiffServPolicyAttrStmtPoliceColorConformIndex
+              Unsigned32,    
+	  hm2AgentDiffServPolicyAttrStmtPoliceColorConformMode
+              INTEGER,
+	  hm2AgentDiffServPolicyAttrStmtPoliceColorConformVal
+              Unsigned32,    
+	  hm2AgentDiffServPolicyAttrStmtPoliceColorExceedIndex
+              Unsigned32,    
+	  hm2AgentDiffServPolicyAttrStmtPoliceColorExceedMode
+              INTEGER,
+	  hm2AgentDiffServPolicyAttrStmtPoliceColorExceedVal
+              Unsigned32,    
+	  hm2AgentDiffServPolicyAttrStmtRedirectIntf
+	          InterfaceIndex,
+      hm2AgentDiffServPolicyAttrStmtMirrorIntf
+	          InterfaceIndex,
+      hm2AgentDiffServPolicyAttrStmtMarkCosAsSecCos
+              TruthValue    
+          }
+
+    hm2AgentDiffServPolicyAttrIndex OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The identifier for policy-attribute entry "
+         ::= { hm2AgentDiffServPolicyAttrEntry 1 }
+
+    
+    hm2AgentDiffServPolicyAttrStmtEntryType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      bandwidth(1),
+                      expedite(2),
+		      markCosVal(3),
+		      markIpDscpVal(4),
+		      markIpPrecedenceVal(5),
+		      policeSimple(6),
+		      policeSinglerate(7),
+		      policeTworate(8),
+		      randomdrop(9),
+		      shapeAverage(10),
+		      shapePeak(11),
+		      assignQueue(12),
+		      drop(13),
+		      markCos2Val(14),
+		      redirect(15),
+              mirror(16),
+              markCosAsSecCos(17)
+		      }
+
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Policy attribute statement entry type -- this entry type is 
+		      essential to determine which of the individual object(s) 
+		      is defined for this policy attribute statement. This object must be 
+                      created before any other policy attribute statement object in the row.
+
+                      The markIpDscpVal(4), markIpPrecedenceVal(5), policeSimple(6), 
+                      policeSinglerate(7) and policeTworate(8) values are only allowed for an 
+                      hm2AgentDiffServPolicyType of in(1). The remaining values are only allowed 
+                      for an hm2AgentDiffServPolicyType of out(2)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 2 }
+
+    hm2AgentDiffServPolicyAttrStmtMarkCosVal OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Three-bit user priority field value in the 802.1Q tag header of a tagged 
+		      Ethernet frame, marked as part of the inbound policy for a class instance.  
+                      For frames containing a double VLAN tag, this field is located in the 
+		      first/outer tag.  This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is set to markCosVal(3)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 8 }
+	 
+    hm2AgentDiffServPolicyAttrStmtMarkIpDscpVal OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..63)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Specified IP DSCP value to mark in all inbound packets belonging to the 
+                      class-instance.  This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is set to markIpDscpVal(4)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 9 }
+    
+    hm2AgentDiffServPolicyAttrStmtMarkIpPrecedenceVal OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Specified IP Precedence value to mark in all inbound packets belonging to 
+                      the class-instance.  This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is set to markIpPrecedenceVal(5)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 10 }
+    
+    hm2AgentDiffServPolicyAttrStmtPoliceConformAct OBJECT-TYPE
+         SYNTAX      PolicingAction
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Policing conform action attribute statement value -- determines 
+		      the action taken on conforming traffic for the policing style
+		      (simple,singlerate,tworate) currently configured for the specified 
+		      class instance within the policy. The default conform action is send(4).
+		      This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is policeSimple(6), 
+                      policeSinglerate(7), or policeTworate(8)."
+         DEFVAL { send }
+         ::= { hm2AgentDiffServPolicyAttrEntry 11 }
+	 
+    hm2AgentDiffServPolicyAttrStmtPoliceConformVal OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..63)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Policing conform value attribute statement -- 
+                      used to mark conforming packets when the conform action
+		      is one of the following:
+		         markdscp(2) - mark IP DSCP field
+			 markprec(3) - mark IP Precedence field
+			 markcos(5)  - mark 802.1p CoS field (first/only tag)
+			 markcos2(6) - mark secondary 802.1p CoS field (inner tag)
+			 markcosAsSecCos(7) - mark CoS as Secondary CoS value
+                      This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is policeSimple(6), 
+                      policeSinglerate(7), or policeTworate(8)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 12 }
+
+    hm2AgentDiffServPolicyAttrStmtPoliceExceedAct OBJECT-TYPE
+         SYNTAX      PolicingAction
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Policing exceed action attribute statement value -- determines 
+		      the action taken on excess traffic for the policing style (singlerate, 
+                      tworate) currently configured for the specified class instance within the 
+                      policy.  The default exceed action is drop(1). This attribute is only 
+                      valid if the value of hm2AgentDiffServPolicyAttrStmtEntryType is 
+                      policeSinglerate(7) or policeTworate(8)."
+         DEFVAL { drop }
+         ::= { hm2AgentDiffServPolicyAttrEntry 13 }
+	 
+    hm2AgentDiffServPolicyAttrStmtPoliceExceedVal OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..63)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Policing exceed value attribute statement -- 
+                      used to mark excess packets when the exceed action
+		      is one of the following:
+		         markdscp(2) - mark IP DSCP field
+			 markprec(3) - mark IP Precedence field
+			 markcos(5)  - mark 802.1p CoS field (first/only tag)
+			 markcos2(6) - mark secondary 802.1p CoS field (inner tag)
+			 markcosAsSecCos(7) - mark CoS as Secondary CoS value			 
+                      This is only valid if the value of hm2AgentDiffServPolicyAttrStmtEntryType is 
+                      policeSinglerate(7) or policeTworate(8)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 14 }
+         
+    hm2AgentDiffServPolicyAttrStmtPoliceNonconformAct OBJECT-TYPE
+         SYNTAX      PolicingAction
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Policing non-conform action attribute statement value -- determines the 
+                      action taken on nonconforming traffic for the policing style (simple, 
+                      singlerate,tworate) currently configured for the specified class instance 
+		      within the policy. The default non-conform action is drop(1). This 
+                      attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is policeSimple(6), 
+                      policeSinglerate(7), or policeTworate(8)."
+         DEFVAL { drop }
+         ::= { hm2AgentDiffServPolicyAttrEntry 15 }
+	 
+    hm2AgentDiffServPolicyAttrStmtPoliceNonconformVal OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..63)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Policing non-conform value attribute statement -- 
+                      used to mark nonconforming packets when the nonconform action
+		      is one of the following:
+		         markdscp(2) - mark IP DSCP field
+			 markprec(3) - mark IP Precedence field
+			 markcos(5)  - mark 802.1p CoS field (first/only tag)
+			 markcos2(6) - mark secondary 802.1p CoS field (inner tag)
+			 markcosAsSecCos(7) - mark CoS as Secondary CoS value			 
+                      This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is policeSimple(6), 
+                      policeSinglerate(7), or policeTworate(8)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 16 }
+	 
+    hm2AgentDiffServPolicyAttrStmtPoliceSimpleCrate OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Simple policing committed rate attribute statement value, specified in 
+                      kbps.  This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is set to policeSimple(6)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 17 }
+
+    hm2AgentDiffServPolicyAttrStmtPoliceSimpleCburst OBJECT-TYPE
+         SYNTAX      QosBurstSize
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Simple policing committed burst size attribute statement value, specified 
+                      in Kbytes.  This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is set to policeSimple(6)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 18 }
+
+    hm2AgentDiffServPolicyAttrStmtPoliceSinglerateCrate OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Single-rate policing committed rate attribute statement value, specified 
+                      in kbps.  This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is set to policeSinglerate(7)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 19 }
+
+    hm2AgentDiffServPolicyAttrStmtPoliceSinglerateCburst OBJECT-TYPE
+         SYNTAX      QosBurstSize
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Single-rate policing committed burst size attribute statement value, 
+                      specified in Kbytes.  This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is set to policeSinglerate(7)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 20 }
+	 
+    hm2AgentDiffServPolicyAttrStmtPoliceSinglerateEburst OBJECT-TYPE
+         SYNTAX      QosBurstSize
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Single-rate policing excess burst size attribute statement value, 
+                      specified in Kbytes.  This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is set to policeSinglerate(7)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 21 }
+	 
+    hm2AgentDiffServPolicyAttrStmtPoliceTworateCrate OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Two-rate policing committed rate attribute statement value, specified in 
+                      kbps.  This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is set to policeTworate(8)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 22 }
+
+    hm2AgentDiffServPolicyAttrStmtPoliceTworateCburst OBJECT-TYPE
+         SYNTAX      QosBurstSize
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Two-rate policing committed burst size attribute statement value, 
+                      specified in Kbytes.  This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is set to policeTworate(8)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 23 }
+	 
+    hm2AgentDiffServPolicyAttrStmtPoliceTworatePrate OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Two-rate policing peak rate attribute statement value, specified in kbps.
+		      This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is set to policeTworate(8)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 24 }
+
+    hm2AgentDiffServPolicyAttrStmtPoliceTworatePburst OBJECT-TYPE
+         SYNTAX      QosBurstSize
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Two-rate policing peak burst size attribute statement value, specified in 
+                      Kbytes.  This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is set to policeTworate(8)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 25 }
+
+    hm2AgentDiffServPolicyAttrStorageType OBJECT-TYPE
+         SYNTAX      StorageType
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Storage-type for this conceptual row."
+         DEFVAL { nonVolatile }		     
+         ::= { hm2AgentDiffServPolicyAttrEntry 34 }
+	 
+    hm2AgentDiffServPolicyAttrRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The status of this conceptual row.
+
+                       active(1)      - this Diffserv Policy Attribute is active
+                      createAndGo(4) - set to this value to create an instance
+                      destroy(6)     - set to this value to delete an instance
+  
+                      All RowStatus operations are permitted.
+  
+                      Other columns in this row may be modified when the status is 'active'."
+
+
+         ::= { hm2AgentDiffServPolicyAttrEntry 35 }
+	 
+    hm2AgentDiffServPolicyAttrStmtAssignQueueId OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Queue identifier to which all inbound packets belonging to this 
+		      class-instance are directed.  This attribute is only valid if the 
+		      value of hm2AgentDiffServPolicyAttrStmtEntryType is set to assignQueue(12)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 36 }
+	 
+    hm2AgentDiffServPolicyAttrStmtDrop OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate that all inbound packets belonging to this 
+                      class-instance are dropped at ingress.  This attribute is 
+		      only valid if the hm2AgentDiffServPolicyAttrStmtEntryType is 
+		      set to drop(13)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 37 }
+
+    hm2AgentDiffServPolicyAttrStmtMarkCos2Val OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Three-bit user priority field value in the second/inner 802.1Q tag header of 
+		      a double VLAN tagged Ethernet frame, marked as part of the inbound policy
+		      for a class instance.  This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is set to markCos2Val(14)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 38 }
+	 
+    hm2AgentDiffServPolicyAttrStmtPoliceColorConformIndex OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Index of the DiffServ Class Table row whose class definition is used
+		      to specify the policing color conform mode and value.  This identifies
+                      incoming traffic categorized as 'green' packets in the
+		      network.  This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is policeSimple(6), 
+                      policeSinglerate(7), or policeTworate(8).
+
+                      The DiffServ class referred to by this object must comply with
+		      the following restrictions:
+
+		      1) Contains only a single, non-excluded match condition identifying
+		         one of the following fields:  COS, IP DSCP, IP Precedence, or
+			 Secondary COS, in accordance with platform support capabilities.
+			 This is represented by an hm2AgentDiffServClassRuleMatchEntryType value
+			 of cos(1), ipdscp(6), ipprecedence(7), or cos2(15), respectively.
+
+		      2) Must not conflict with any (non-excluded) match conditions in the 
+		         classifier used for this policy-class instance, as indicated by the
+			 hm2AgentDiffServPolicyInstClassIndex object.
+
+                      3) The color conform mode and value identified by this class index must 
+		         not be the same as an existing color-aware exceed mode and value  
+			 defined by the hm2AgentDiffServPolicyAttrStmtPoliceColorExceedIndex object.
+
+		      A class index value of 0 for this object indicates conform color awareness 
+		      is not being used (e.g. color-blind mode).  Setting this object to 0 causes
+		      the hm2AgentDiffServPolicyAttrStmtPoliceColorExceedIndex object to be set
+		      to 0 as well."
+	 DEFVAL { 0 }
+         ::= { hm2AgentDiffServPolicyAttrEntry 39 }
+
+    hm2AgentDiffServPolicyAttrStmtPoliceColorConformMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      blind(1),
+                      cos(2),
+                      cos2(3),
+		      ipdscp(4),
+		      ipprec(5)
+		      }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Policing color conform mode -- indicates the color awareness
+		      mode of conforming traffic for the policing style (simple, 
+		      singlerate, or tworate) currently configured for the specified 
+		      class instance within the policy.  The default value is blind(1).
+
+		      Any value other than blind(1) denotes the packet field to
+		      check for the existing conform color marking, which is compared to the 
+		      hm2AgentDiffServPolicyAttrStmtPoliceColorConformVal object value.  Packets
+		      matching this specification are considered to be colored 'green'.
+
+                      This read-only object reflects the DiffServ class definition as indicated by
+		      hm2AgentDiffServPolicyAttrStmtPoliceColorConformIndex.  This attribute
+		      is only valid for hm2AgentDiffServPolicyAttrStmtEntryType values of 
+		      policeSimple(6), policeSinglerate(7), or policeTworate(8)."
+	 DEFVAL { blind }
+         ::= { hm2AgentDiffServPolicyAttrEntry 40 }
+	 
+    hm2AgentDiffServPolicyAttrStmtPoliceColorConformVal OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Policing color conform value -- indicates the color awareness
+		      packet mark value of conforming traffic for the policing style 
+		      (simple, singlerate, or tworate) currently configured for the 
+		      specified class instance within the policy.
+
+                      For the color conform field indicated by 
+		      hm2AgentDiffServPolicyAttrStmtPoliceColorConformMode, packets containing
+                      this value are considered to be colored 'green'.
+
+                      This read-only object reflects the DiffServ class definition as indicated by
+		      hm2AgentDiffServPolicyAttrStmtPoliceColorConformIndex.  This attribute
+		      is only valid for hm2AgentDiffServPolicyAttrStmtEntryType values of 
+		      policeSimple(6), policeSinglerate(7), or policeTworate(8), and 
+		      hm2AgentDiffServPolicyAttrStmtPoliceColorConformMode values of
+		      cos(2), cos2(3), ipdscp(4), or ipprec(5)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 41 }
+
+    hm2AgentDiffServPolicyAttrStmtPoliceColorExceedIndex OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Index of the DiffServ Class Table row whose class definition is used
+		      to specify the policing color exceed mode and value.  This identifies
+                      incoming traffic categorized as 'yellow' packets in the 
+		      network.  This attribute is only valid if the value of 
+                      hm2AgentDiffServPolicyAttrStmtEntryType is policeSinglerate(7) or 
+		      policeTworate(8).
+
+                      The DiffServ class referred to by this object must comply with
+		      the following restrictions:
+
+		      1) Contains only a single, non-excluded match condition identifying
+		         one of the following fields:  COS, IP DSCP, IP Precedence, or
+			 Secondary COS, in accordance with platform support capabilities.
+			 This is represented by an hm2AgentDiffServClassRuleMatchEntryType value
+			 of cos(1), ipdscp(6), ipprecedence(7), or cos2(15), respectively.
+
+		      2) Must not conflict with any (non-excluded) match conditions in the 
+		         classifier used for this policy-class instance, as indicated by the
+			 hm2AgentDiffServPolicyInstClassIndex object.
+
+                      3) The color exceed mode and value identified by this class index must 
+		         not be the same as an existing color-aware exceed mode and value 
+			 defined by the hm2AgentDiffServPolicyAttrStmtPoliceColorConformIndex object.
+
+		      A class index value of 0 for this object indicates exceed color awareness 
+		      is not being used.  When the hm2AgentDiffServPolicyAttrStmtPoliceColorConformIndex 
+		      object is 0, indicating color-blind operation, this object must also be 0.
+		      When a non-0 value is used for the hm2AgentDiffServPolicyAttrStmtPoliceColorConformIndex
+		      object, this object may remain set to 0 if exceed color awareness is not 
+		      desired, or may be set to an appropriate class index value to activate exceed
+		      color aware mode."
+	 DEFVAL { 0 }
+         ::= { hm2AgentDiffServPolicyAttrEntry 42 }
+
+    hm2AgentDiffServPolicyAttrStmtPoliceColorExceedMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      blind(1),
+                      cos(2),
+                      cos2(3),
+		      ipdscp(4),
+		      ipprec(5),
+		      unused(6)
+		      }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Policing color exceed mode -- indicates the color awareness
+		      mode of exceeding traffic for the policing style (singlerate
+		      or tworate) currently configured for the specified 
+		      class instance within the policy.  The default value is blind(1).
+
+		      Any value other than blind(1) or unused(6) denotes the packet field to
+		      check for the existing exceed color marking, which is compared to the 
+		      hm2AgentDiffServPolicyAttrStmtPoliceColorExceedVal object value.  Packets
+		      matching this specification are considered to be colored 'yellow'.
+
+		      Use of exceed color awareness is optional, and this field is set to
+		      unused(6) when color conform aware policing is used but the color exceed
+		      value is not used.  When hm2AgentDiffServPolicyAttrStmtPoliceColorConformMode
+		      value is blind(1), this object is blind(1) as well.
+
+                      This read-only object reflects the DiffServ class definition as indicated by
+		      hm2AgentDiffServPolicyAttrStmtPoliceColorExceedIndex.  This attribute
+		      is only valid for hm2AgentDiffServPolicyAttrStmtEntryType values of 
+		      policeSinglerate(7) or policeTworate(8)."
+	 DEFVAL { blind }
+         ::= { hm2AgentDiffServPolicyAttrEntry 43 }
+	 
+    hm2AgentDiffServPolicyAttrStmtPoliceColorExceedVal OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Policing color exceed value -- indicates the color awareness
+		      packet mark value of exceeding traffic for the policing style 
+		      (singlerate or tworate) currently configured for the 
+		      specified class instance within the policy.
+
+                      For the color exceed field indicated by 
+		      hm2AgentDiffServPolicyAttrStmtPoliceColorExceedMode, packets containing
+                      this value are considered to be colored 'yellow'.
+
+                      This read-only object reflects the DiffServ class definition as indicated by
+		      hm2AgentDiffServPolicyAttrStmtPoliceColorExceedIndex.  This attribute
+		      is only valid for hm2AgentDiffServPolicyAttrStmtEntryType values of 
+		      policeSinglerate(7) or policeTworate(8), and 
+		      hm2AgentDiffServPolicyAttrStmtPoliceColorExceedMode values of
+		      cos(2), cos2(3), ipdscp(4), or ipprec(5)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 44 }
+
+    hm2AgentDiffServPolicyAttrStmtRedirectIntf OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "External interface number to which all inbound packets belonging to this 
+		      class-instance are redirected.  This attribute is only valid if the 
+		      value of hm2AgentDiffServPolicyAttrStmtEntryType is set to redirect(15)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 45 }
+	 
+    hm2AgentDiffServPolicyAttrStmtMirrorIntf OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "External interface number to which all inbound packets belonging to this
+                      class-instance are mirrored.  This attribute is only valid if the
+                      value of hm2AgentDiffServPolicyAttrStmtEntryType is set to mirror(16)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 46 }
+
+    hm2AgentDiffServPolicyAttrStmtMarkCosAsSecCos OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate that all inbound packets belonging to this 
+                      class-instance are marked with secondary cos at ingress.  This attribute is 
+		      only valid if the hm2AgentDiffServPolicyAttrStmtEntryType is 
+		      set to markCosAsSecCos(17)."
+         ::= { hm2AgentDiffServPolicyAttrEntry 47 }
+
+
+    --*********************** hm2AgentDiffServPolicyPerfInTable ************************       
+    
+    hm2AgentDiffServPolicyPerfInTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentDiffServPolicyPerfInEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of inbound policy-class performance entries"
+         ::= { hm2AgentDiffServPolicyGroup 5 }
+
+    hm2AgentDiffServPolicyPerfInEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentDiffServPolicyPerfInEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Represents entry for the performance attributes of the associated inbound 
+		      policy-class instance"
+		     
+         INDEX       { hm2AgentDiffServPolicyIndex, hm2AgentDiffServPolicyInstIndex, ifIndex }
+         ::= { hm2AgentDiffServPolicyPerfInTable 1 }
+         
+    Hm2AgentDiffServPolicyPerfInEntry ::= SEQUENCE {
+	  hm2AgentDiffServPolicyPerfInOfferedPackets
+              Counter32, 
+	  hm2AgentDiffServPolicyPerfInDiscardedPackets
+              Counter32,
+	  hm2AgentDiffServPolicyPerfInHCOfferedPackets
+              Counter64,
+	  hm2AgentDiffServPolicyPerfInHCDiscardedPackets
+              Counter64,
+	  hm2AgentDiffServPolicyPerfInStorageType
+              StorageType,                 
+          hm2AgentDiffServPolicyPerfInRowStatus
+              RowStatus
+          }
+
+	 
+    hm2AgentDiffServPolicyPerfInOfferedPackets OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Offered packets count for the inbound policy-class instance performance 
+                     entry."
+         ::= { hm2AgentDiffServPolicyPerfInEntry 2 }
+	 
+    hm2AgentDiffServPolicyPerfInDiscardedPackets OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Discarded packets count for the inbound policy-class instance performance 
+                     entry."
+         ::= { hm2AgentDiffServPolicyPerfInEntry 4 }
+	 
+    hm2AgentDiffServPolicyPerfInHCOfferedPackets OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Offered packets high capacity count for the inbound policy-class instance 
+                     performance entry."
+         ::= { hm2AgentDiffServPolicyPerfInEntry 6 }
+	 
+    hm2AgentDiffServPolicyPerfInHCDiscardedPackets OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Discarded packets high capacity count for the inbound policy-class 
+                     instance performance entry."
+         ::= { hm2AgentDiffServPolicyPerfInEntry 8 }
+	 
+    hm2AgentDiffServPolicyPerfInStorageType OBJECT-TYPE
+         SYNTAX      StorageType
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Storage-type for this conceptual row."
+         DEFVAL { nonVolatile }		     
+         ::= { hm2AgentDiffServPolicyPerfInEntry 9 }
+	 
+    hm2AgentDiffServPolicyPerfInRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The status of this conceptual row."
+         ::= { hm2AgentDiffServPolicyPerfInEntry 10 }
+
+
+    --*********************** hm2AgentDiffServPolicyPerfOutTable ************************       
+    
+    hm2AgentDiffServPolicyPerfOutTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentDiffServPolicyPerfOutEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of outbound policy-class performance entries"
+         ::= { hm2AgentDiffServPolicyGroup 6 }
+
+    hm2AgentDiffServPolicyPerfOutEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentDiffServPolicyPerfOutEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Represents entry for the performance attributes of the associated outbound 
+		      policy-class instance"
+		     
+         INDEX       { hm2AgentDiffServPolicyIndex, hm2AgentDiffServPolicyInstIndex, ifIndex }
+         ::= { hm2AgentDiffServPolicyPerfOutTable 1 }
+         
+    Hm2AgentDiffServPolicyPerfOutEntry ::= SEQUENCE {
+	  hm2AgentDiffServPolicyPerfOutOfferedPackets
+              Counter32,  
+	  hm2AgentDiffServPolicyPerfOutDiscardedPackets
+              Counter32,
+	  hm2AgentDiffServPolicyPerfOutHCOfferedPackets
+              Counter64,
+	  hm2AgentDiffServPolicyPerfOutHCDiscardedPackets
+              Counter64,
+	  hm2AgentDiffServPolicyPerfOutStorageType
+              StorageType,                 
+          hm2AgentDiffServPolicyPerfOutRowStatus
+              RowStatus
+          }
+	 
+    hm2AgentDiffServPolicyPerfOutOfferedPackets OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Offered packets count for the outbound policy-class instance performance 
+                     entry."
+         ::= { hm2AgentDiffServPolicyPerfOutEntry 18 }
+	 
+    hm2AgentDiffServPolicyPerfOutDiscardedPackets OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Discarded packets count for the outbound policy-class instance performance 
+                     entry."
+         ::= { hm2AgentDiffServPolicyPerfOutEntry 20 }
+	 
+    hm2AgentDiffServPolicyPerfOutHCOfferedPackets OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Offered packets high capacity count for the outbound policy-class instance 
+                     performance entry."
+         ::= { hm2AgentDiffServPolicyPerfOutEntry 22 }
+	 
+    hm2AgentDiffServPolicyPerfOutHCDiscardedPackets OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Discarded packets high capacity count for the outbound policy-class 
+                     instance performance entry."
+         ::= { hm2AgentDiffServPolicyPerfOutEntry 24 }
+
+    hm2AgentDiffServPolicyPerfOutStorageType OBJECT-TYPE
+         SYNTAX      StorageType
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Storage-type for this conceptual row."
+         DEFVAL { nonVolatile }		     
+         ::= { hm2AgentDiffServPolicyPerfOutEntry 25 }
+	 
+    hm2AgentDiffServPolicyPerfOutRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The status of this conceptual row."
+         ::= { hm2AgentDiffServPolicyPerfOutEntry 26 }
+
+	      	 
+    --**********************************************************************************
+    -- hm2AgentDiffServService Group
+    --
+    --**********************************************************************************
+
+	 --*********************** hm2AgentDiffServServiceTable ************************
+        
+
+    hm2AgentDiffServServiceGroup        OBJECT IDENTIFIER ::= { hm2PlatformQOSDiffServPrivate 4 }
+    
+    hm2AgentDiffServServiceTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentDiffServServiceEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of the service entries."
+         ::= { hm2AgentDiffServServiceGroup 1 }
+
+    hm2AgentDiffServServiceEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentDiffServServiceEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Represents entry for policy assigned to an interface in a particular 
+                     direction."
+         INDEX       { hm2AgentDiffServServiceIfIndex,hm2AgentDiffServServiceIfDirection }
+         ::= { hm2AgentDiffServServiceTable 1 }
+         
+    Hm2AgentDiffServServiceEntry ::= SEQUENCE {
+          hm2AgentDiffServServiceIfIndex
+              InterfaceIndex,
+          hm2AgentDiffServServiceIfDirection
+              IntfDirection,
+          hm2AgentDiffServServicePolicyIndex
+              Unsigned32,
+          hm2AgentDiffServServiceIfOperStatus
+              INTEGER,
+          hm2AgentDiffServServiceStorageType
+              StorageType,                 
+          hm2AgentDiffServServiceRowStatus
+              RowStatus
+          }
+
+        
+    hm2AgentDiffServServiceIfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "External interface number of the interface to which policy is assigned."
+         ::= { hm2AgentDiffServServiceEntry 1 }
+    
+    hm2AgentDiffServServiceIfDirection OBJECT-TYPE
+         SYNTAX      IntfDirection
+	 MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Interface direction to which the policy is assigned."
+         ::= { hm2AgentDiffServServiceEntry 2 }
+    
+    hm2AgentDiffServServicePolicyIndex OBJECT-TYPE
+	 SYNTAX       Unsigned32
+	 MAX-ACCESS   read-create
+	 STATUS       current
+	 DESCRIPTION
+		     "Index of the Policy Table row whose policy definition is attached to the 
+                      interface in the specified direction."
+	 ::= { hm2AgentDiffServServiceEntry 3 }
+
+    hm2AgentDiffServServiceIfOperStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      up(1),    -- ready for DiffServ operation
+		      down(2)
+                     }
+
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The current operational state of the DiffServ service   
+		      interface.  If hm2AgentDiffServGenStatusAdminMode is 
+		      disable(2) then hm2AgentDiffServServiceIfOperStatus should 
+		      be down(2).  If hm2AgentDiffServServiceGenStatusAdminMode  
+		      is changed to enable(1) then hm2AgentDiffServServiceIfOperStatus
+		      should change to up(1) if the service interface is ready 
+		      to send and receive DiffServ traffic; it should remain
+		      in the down(2) state if the underlying interface hardware
+		      is not in a link up condition, if the policy definition 
+		      represented by hm2AgentDiffServServicePolicyIndex is incompatible
+		      with the interface (e.g., requires more bandwidth than the
+		      current capacity of the interface), or if the policy definition
+		      is considered to be incomplete (e.g., one or more composite
+		      rows is not in the active(1) state)."
+         ::= { hm2AgentDiffServServiceEntry 4 }
+             
+    hm2AgentDiffServServiceStorageType OBJECT-TYPE
+         SYNTAX      StorageType
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Storage-type for this conceptual row"
+         DEFVAL { nonVolatile }		     
+         ::= { hm2AgentDiffServServiceEntry 5 }
+	 
+    hm2AgentDiffServServiceRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The status of this conceptual row.
+
+                       active(1)      - Diffserv is active
+                      createAndGo(4) - set to this value to create an instance
+                      destroy(6)     - set to this value to delete an instance
+  
+                      All RowStatus operations are permitted.
+  
+                      Other columns in this row may be modified when the status is 'active'."
+
+         ::= { hm2AgentDiffServServiceEntry 6 }
+         
+
+--         
+-- SNMP Extension Group
+--
+
+    hm2AgentDiffServSNMPExtensionGroup   OBJECT IDENTIFIER ::= { hm2PlatformQOSDiffServPrivate 248 }
+    
+    hm2AgentDiffServClassNameInUseErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the name is already used by another class"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 1 }
+           
+    hm2AgentDiffServClassHasRulesErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the class has one or more rules and can not be deleted"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 2 }
+            
+    hm2AgentDiffServClassHasReferencesErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the class has one or more references and can not be deleted"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 3 }
+            
+    hm2AgentDiffServClassTableFullErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the class table is full and no other classes can be added or index is out of range"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 4 }
+          
+    hm2AgentDiffServClassRuleTableFullErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the class rule table is full and no other rules can be added"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 5 }
+            
+    hm2AgentDiffServClassIndexOutOfRangeErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the class index is out of range"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 6 }
+         
+    hm2AgentDiffServClassRuleIndexOutOfRangeErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the class rule index is out of range"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 7 }
+            
+    hm2AgentDiffServClassRuleColorRefErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the class is referenced by a policy policing color awareness attribute and new rules can not be added"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 8 }
+            
+    hm2AgentDiffServClassRuleInUseErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the class already has a rule of this type. IP DSCP, IP Precedence and IP TOS rule types are considered of same type"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 9 }
+            
+    hm2AgentDiffServClassRuleInvalidReferenceErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the reference class does not exist or is invalid"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 10 }
+            
+    hm2AgentDiffServClassRuleReferenceLoopErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that a loop was detected in the reference chain"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 11 }
+            
+    hm2AgentDiffServClassRuleMatchSecCosErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the class is already associated with an outbound policy and a macht secondary cos rule can not be added, or the class already has a match secondary cos rule and it can not be associated with an outbound policy"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 12 }
+            
+    hm2AgentDiffServPolicyTableFullErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the policy table is full and no other policies can be added or index is out of range"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 13 }
+            
+    hm2AgentDiffServPolicyNameInUseErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the name is already used by another policy"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 14 }
+            
+    hm2AgentDiffServPolicyHasInstancesErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the policy has one or more instances and can not be deleted"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 15 }
+            
+    hm2AgentDiffServPolicyHasReferencesErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the policy is used by one or more service-policies and can not be deleted"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 16 }
+            
+    hm2AgentDiffServPolicyIndexOutOfRangeErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the policy is out of range"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 17 }
+         
+    hm2AgentDiffServInstanceIndexOutOfRangeErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the instance index is out of range"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 18 }
+            
+    hm2AgentDiffServInstanceTableFullErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the instance table is full and no other instances can be added"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 19 }
+            
+    hm2AgentDiffServInstanceHasAttributesErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the instance has one or more attributes and can not be deleted"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 20 }
+            
+    hm2AgentDiffServAttributeIndexOutOfRangeErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the attribute index is out of range"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 21 }  
+            
+    hm2AgentDiffServAttributeTableFullErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the attribute table is full"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 22 }
+            
+    hm2AgentDiffServAttributeIncompatibilityErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the attribute type is incompatible with other existing attributes of this instance or with the policy type and can not be added"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 23 } 
+            
+    hm2AgentDiffServAttributeActionSetCosAsSecCosErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the set cos as secondary cos action is supported only for inbound policies"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 24 }    
+            
+    hm2AgentDiffServAttributeConformColorClassIndexErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the class is not valid for color-aware use"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 25 } 
+            
+    hm2AgentDiffServServiceInvalidInterfaceErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the interface number is not valid"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 26 } 
+            
+    hm2AgentDiffServServiceInvalidDirectionErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the direction is not valid"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 27 }
+            
+    hm2AgentDiffServServiceTableFullErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the service table is full"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 28 }
+            
+    hm2AgentDiffServServiceInvalidPolicyTypeErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the policy type does not correspond with the service type"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 29 } 
+            
+    hm2AgentDiffServInstanceExistsErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the policy already has an instance of the class"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 30 }
+            
+    hm2AgentDiffServInstanceInvalidClassErrorReturn OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION "Indicates that the class does not exist or is invalid and the instance can not be created"
+            ::= { hm2AgentDiffServSNMPExtensionGroup 31 }     
+    	 
+END

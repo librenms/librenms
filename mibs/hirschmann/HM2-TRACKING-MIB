@@ -1,0 +1,681 @@
+HM2-TRACKING-MIB   DEFINITIONS ::= BEGIN
+
+IMPORTS
+	hm2ConfigurationMibs, 
+	HmTimeSeconds1970,
+	HmEnabledStatus						FROM HM2-TC-MIB
+    MODULE-IDENTITY,
+    OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32							FROM SNMPv2-SMI    
+    InetAddress, InetAddressType        FROM INET-ADDRESS-MIB                        
+    RowStatus							FROM SNMPv2-TC
+    SnmpAdminString     				FROM SNMP-FRAMEWORK-MIB
+    inetCidrRouteEntry					FROM IP-FORWARD-MIB
+    InterfaceIndexOrZero, ifEntry       FROM IF-MIB;
+
+
+
+hm2TrackingMib MODULE-IDENTITY
+        LAST-UPDATED "202211241200Z" -- 24 Nov 2022 12:00:00 GMT
+        ORGANIZATION "Hirschmann Automation and Control GmbH"
+        CONTACT-INFO
+          "Customer Support
+           Postal: 
+           Hirschmann Automation and Control GmbH
+           Stuttgarter Str. 45-51
+           72654 Neckartenzlingen
+           Germany
+           Tel: +49 7127 14 1981
+           Web: http://www.hicomcenter.com/
+           E-Mail: hicomcenter@hirschmann.com"
+        DESCRIPTION
+          "The Hirschmann Private Tracking MIB definitions for Platform devices."
+
+        -- Revision history.
+        REVISION
+          "202211241200Z" -- 24 Nov 2022 12:00:00 GMT
+        DESCRIPTION
+          "Add hm2TrackingInterfaceStatusGroup"
+        REVISION
+          "201309031200Z" -- 3 Sep 2013 12:00:00 GMT
+        DESCRIPTION
+          "Initial Version"     
+        ::= { hm2ConfigurationMibs 115 }
+
+
+--
+-- *************************************************************
+-- hm2TrackingMib
+-- *************************************************************
+--        
+
+hm2TrackingMibNotifications   OBJECT IDENTIFIER ::= { hm2TrackingMib 0 }
+hm2TrackingMibObjects   OBJECT IDENTIFIER ::= { hm2TrackingMib 1 }
+
+
+--
+-- *************************************************************
+-- hm2TrackingMibNotifications
+-- *************************************************************
+--  
+
+
+hm2TrackStatusChangeEvent NOTIFICATION-TYPE
+	OBJECTS	{hm2TrackType, hm2TrackId, hm2TrackStatus, hm2TrackOperState }
+	STATUS  current
+    DESCRIPTION
+         "Sent when the state of a tracking instance changes between up and down."
+	::= { hm2TrackingMibNotifications 1 }
+
+            
+
+--
+-- *************************************************************
+-- hm2TrackingMib groups
+-- *************************************************************
+--
+
+
+hm2TrackingConfigGroup   		OBJECT IDENTIFIER ::= { hm2TrackingMibObjects 1 }
+hm2TrackingInterfaceGroup   	OBJECT IDENTIFIER ::= { hm2TrackingMibObjects 2 }
+hm2TrackingPingGroup   			OBJECT IDENTIFIER ::= { hm2TrackingMibObjects 3 }
+hm2TrackingLogicalGroup   		OBJECT IDENTIFIER ::= { hm2TrackingMibObjects 4 }
+hm2TrackingApplicationGroup   	OBJECT IDENTIFIER ::= { hm2TrackingMibObjects 5 }
+hm2TrackingStaticRouteGroup   	OBJECT IDENTIFIER ::= { hm2TrackingMibObjects 6 }
+hm2TrackingSNMPExtensionGroup 	OBJECT IDENTIFIER ::= { hm2TrackingMibObjects 7 }
+hm2TrackingInterfaceStatusGroup OBJECT IDENTIFIER ::= { hm2TrackingMibObjects 8 }
+
+--
+-- *************************************************************
+-- hm2TrackingConfigGroup
+-- *************************************************************
+--
+
+hm2TrackingConfigTable OBJECT-TYPE
+                SYNTAX          SEQUENCE OF Hm2TrackingConfigEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "Tracking configuration table.
+                				 This table provides the interface to setup a 
+                				 specific tracking instance in the tracking database."
+                ::= { hm2TrackingConfigGroup 1 }
+
+hm2TrackingConfigEntry OBJECT-TYPE
+                SYNTAX          Hm2TrackingConfigEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "The entry of the hm2TrackingConfigTable."
+                INDEX           { hm2TrackType, hm2TrackId }
+                ::= { hm2TrackingConfigTable 1 }
+
+Hm2TrackingConfigEntry ::= SEQUENCE {
+				hm2TrackType		        	INTEGER,
+                hm2TrackId 						Integer32,
+                hm2TrackName					SnmpAdminString,
+                hm2TrackDescription				SnmpAdminString,
+                hm2TrackOperState				INTEGER,
+                hm2TrackNumberOfChanges			Integer32,
+                hm2TrackTimeLastChange			HmTimeSeconds1970,
+                hm2TrackSendStateChangeTrap 	HmEnabledStatus,
+                hm2TrackStatus					RowStatus
+}
+
+hm2TrackType	OBJECT-TYPE
+                SYNTAX          INTEGER {
+                					interface(1),
+                					ping(2),
+                					logical(3)
+                				}
+                MAX-ACCESS      accessible-for-notify
+                STATUS          current
+                DESCRIPTION     "The kind of an object being tracked."
+                ::= { hm2TrackingConfigEntry 1 }
+
+
+hm2TrackId		OBJECT-TYPE
+                SYNTAX          Integer32 (1..256)
+                MAX-ACCESS      accessible-for-notify
+                STATUS          current
+                DESCRIPTION     "The id of an object being tracked."
+                ::= { hm2TrackingConfigEntry 2 }
+
+
+hm2TrackName	OBJECT-TYPE
+                SYNTAX          SnmpAdminString
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION     "The name of an object being tracked."
+                ::= { hm2TrackingConfigEntry 3 }
+
+hm2TrackDescription		OBJECT-TYPE
+                SYNTAX          SnmpAdminString
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION     "The name of an object being tracked."
+                ::= { hm2TrackingConfigEntry 4 }
+                              
+hm2TrackOperState	OBJECT-TYPE
+                SYNTAX          INTEGER {
+                					up(1),
+                					down(2),
+                					notReady(3)
+                				}
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION     "Shows if the tracked object is currently up(1), down(2) or notReady(3).
+                				 in case the state indicates notReady, the corresponding configuration
+                				 is missing or invalid."
+                DEFVAL			{ notReady }
+                ::= { hm2TrackingConfigEntry 5 }
+                
+                
+hm2TrackNumberOfChanges
+				OBJECT-TYPE
+                SYNTAX          Integer32
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION     "The number of state changes after an object being
+								tracked, entered its operational state.
+								If the current state was entered prior to the last
+                      			re-initialization of the local network management
+                      			subsystem, then this object contains a zero
+                      			value."
+                ::= { hm2TrackingConfigEntry 6 }                
+
+hm2TrackTimeLastChange
+				OBJECT-TYPE
+                SYNTAX          HmTimeSeconds1970
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION     "The time of the last state change of an object being
+                      			tracked, measured in seconds since 00:00:00, January 1, 1970.
+                      			If the current state was entered prior to the last
+                      			re-initialization of the local network management
+                      			subsystem, then this object contains the time the system was re-initialized. 
+                      			value."
+                ::= { hm2TrackingConfigEntry 7 }
+ 
+hm2TrackSendStateChangeTrap	OBJECT-TYPE
+                SYNTAX          HmEnabledStatus
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION     "Enables or disables the sending of a trap when hm2TrackStatus changes"
+                DEFVAL			{ disable }
+                ::= { hm2TrackingConfigEntry 8 }
+ 
+                
+hm2TrackStatus
+				OBJECT-TYPE
+                SYNTAX          RowStatus
+                MAX-ACCESS      read-create
+                STATUS          current
+                DESCRIPTION     "Defines the status of the tracking database entry.
+                				 Set to createAndWait(5) to create a new row.
+                				 Set to destroy(6) to delete an entry.
+                				 Reads as active(1) if the tracked object exists and is trackable,
+                				 notReady(3) otherwise."
+                ::= { hm2TrackingConfigEntry 9 }
+                
+--
+-- *************************************************************
+-- hm2TrackingInterfaceGroup
+-- *************************************************************
+--
+
+hm2TrackingInterfaceTable OBJECT-TYPE
+                SYNTAX          SEQUENCE OF Hm2TrackingInterfaceEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "Interface tracking configuration table.
+                				 This table provides the interface to setup the parameters
+                				 for an interface tracking object."  
+                ::= { hm2TrackingInterfaceGroup 1 }
+
+hm2TrackingInterfaceEntry OBJECT-TYPE
+                SYNTAX          Hm2TrackingInterfaceEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "The entry of the hm2TrackingInterfaceTable."
+                INDEX           { hm2TrackInterfaceId }
+                ::= { hm2TrackingInterfaceTable 1 }
+
+Hm2TrackingInterfaceEntry ::= SEQUENCE {
+                hm2TrackInterfaceId 			Integer32,
+                hm2TrackIfNumber        		InterfaceIndexOrZero,
+                hm2TrackIfLinkUpDelay    		Integer32,
+                hm2TrackIfLinkDownDelay  		Integer32
+				}
+
+hm2TrackInterfaceId
+				OBJECT-TYPE
+                SYNTAX          Integer32 
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "The identifier of the interface object being tracked."
+                ::= { hm2TrackingInterfaceEntry 1 }
+
+hm2TrackIfNumber
+				OBJECT-TYPE
+                SYNTAX          InterfaceIndexOrZero
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "The number of the interface being tracked."
+                DEFVAL			{ 0 }
+                ::= { hm2TrackingInterfaceEntry 2 }
+                
+
+hm2TrackIfLinkUpDelay		
+				OBJECT-TYPE
+                SYNTAX          Integer32 (0..255)
+                UNITS			"seconds"
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "If a link-up recovers within this delay,
+								the tracked object is not considered as up."
+				DEFVAL			{ 0 }
+                ::= { hm2TrackingInterfaceEntry 3 }
+                
+                
+hm2TrackIfLinkDownDelay		
+				OBJECT-TYPE
+                SYNTAX          Integer32 (0..255)
+                UNITS			"seconds"
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "If a link-down recovers within this delay,
+								the tracked object is not considered as down."
+				DEFVAL			{ 0 }
+                ::= { hm2TrackingInterfaceEntry 4 }
+
+
+--
+-- *************************************************************
+-- hm2TrackingPingGroup
+-- *************************************************************
+--
+
+hm2TrackingPingTable OBJECT-TYPE
+                SYNTAX          SEQUENCE OF Hm2TrackingPingEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "Ping tracking configuration table.
+                				 This table provides the interface to setup the parameters
+                				 for a ping tracking object."  
+                ::= { hm2TrackingPingGroup 1 }
+
+hm2TrackingPingEntry OBJECT-TYPE
+                SYNTAX          Hm2TrackingPingEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "The entry of the hm2TrackingPingTable."
+                INDEX           { hm2TrackPingId }
+                ::= { hm2TrackingPingTable 1 }
+
+Hm2TrackingPingEntry ::= SEQUENCE {
+                hm2TrackPingId 					Integer32,
+                hm2TrackPingIfNumber      		InterfaceIndexOrZero,
+                hm2TrackPingInetAddrType 		InetAddressType,
+                hm2TrackPingInetAddr   			InetAddress,
+                hm2TrackPingInterval     		Integer32,
+                hm2TrackPingMiss         		Integer32,
+                hm2TrackPingSuccess     		Integer32,
+                hm2TrackPingTimeout      		Integer32,
+                hm2TrackPingTTL					Integer32,
+                hm2TrackPingBestRouteIfNumber 	InterfaceIndexOrZero
+}
+
+hm2TrackPingId
+				OBJECT-TYPE
+                SYNTAX          Integer32 
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "The identifier of the ping object being tracked."
+                ::= { hm2TrackingPingEntry 1 }
+
+hm2TrackPingIfNumber
+				OBJECT-TYPE
+                SYNTAX          InterfaceIndexOrZero
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "The number of the source interface, the ping packets are sent.
+                				 A value of Zero (0) indicates that no interface is configured."
+                DEFVAL			{ 0 }
+                ::= { hm2TrackingPingEntry 2 }
+
+hm2TrackPingInetAddrType
+				OBJECT-TYPE
+                SYNTAX          InetAddressType
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "The address type of the router being monitored."
+                ::= { hm2TrackingPingEntry 3 }
+
+hm2TrackPingInetAddr
+				OBJECT-TYPE
+                SYNTAX          InetAddress
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "The address of the router being monitored."
+                ::= { hm2TrackingPingEntry 4 }
+
+                
+hm2TrackPingInterval
+				OBJECT-TYPE
+                SYNTAX          Integer32 (100..20000)
+                UNITS			"milliseconds"
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "The number of milliseconds between the pings to the
+								target router address."
+				DEFVAL			{ 1000 }
+                ::= { hm2TrackingPingEntry 5 }
+
+hm2TrackPingMiss
+				OBJECT-TYPE
+                SYNTAX          Integer32 (1..10)
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "This specifies the number of consecutive ping
+								misses until the tracked object is considered
+								to be down."
+				DEFVAL			{ 3 }
+                ::= { hm2TrackingPingEntry 6 }
+
+                
+hm2TrackPingSuccess
+				OBJECT-TYPE
+                SYNTAX          Integer32 (1..10)
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "This specifies the number of consecutive ping
+								successes until the tracked object is considered
+								to be up."
+				DEFVAL			{ 2 }
+                ::= { hm2TrackingPingEntry 7 }
+                
+hm2TrackPingTimeout
+				OBJECT-TYPE
+                SYNTAX          Integer32 (10..10000)
+                UNITS			"milliseconds"
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "This specifies the timeout in milliseconds for
+                				 a ping reply. After the timeout the ping reply
+                				 is considered as lost."
+				DEFVAL			{ 100 }
+                ::= { hm2TrackingPingEntry 8 }
+
+hm2TrackPingTTL
+				OBJECT-TYPE
+                SYNTAX          Integer32 (1..255)
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "This specifies the time to live for a ping request
+                				 packet."
+				DEFVAL			{ 128 }
+                ::= { hm2TrackingPingEntry 9 }
+
+hm2TrackPingBestRouteIfNumber
+				OBJECT-TYPE
+                SYNTAX          InterfaceIndexOrZero
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION     "This shows the number of the interface which
+                				 belongs to the best route. The interface number
+                				 is zero if the best route is not used to send
+                				 ping packets."
+                ::= { hm2TrackingPingEntry 10 }
+
+
+
+--
+-- *************************************************************
+-- hm2TrackingLogicalGroup
+-- *************************************************************
+--
+
+hm2TrackLogicalInstanceTable
+				OBJECT-TYPE
+                SYNTAX          SEQUENCE OF Hm2TrackLogicalInstanceEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "This table contains the configuration of the tracking
+                				 instances that are combined into logical
+                				 tracking instances."
+                ::= { hm2TrackingLogicalGroup 1 }
+
+
+hm2TrackLogicalInstanceEntry 
+				OBJECT-TYPE
+                SYNTAX          Hm2TrackLogicalInstanceEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "The entry of the hm2TrackLogicalInstanceTable."
+                INDEX           { hm2TrackLogicalId}
+                ::= { hm2TrackLogicalInstanceTable 1 }
+
+
+Hm2TrackLogicalInstanceEntry ::= SEQUENCE {
+                hm2TrackLogicalId				Integer32,
+                hm2TrackLogicalOperandNameA		SnmpAdminString,
+                hm2TrackLogicalOperandNameB		SnmpAdminString,
+                hm2TrackLogicalOperator			INTEGER
+                }
+
+hm2TrackLogicalId
+				OBJECT-TYPE
+                SYNTAX          Integer32
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "The identifier of the logical object being tracked."
+                ::= { hm2TrackLogicalInstanceEntry 1 }
+
+hm2TrackLogicalOperandNameA	OBJECT-TYPE
+                SYNTAX          SnmpAdminString
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "The name of the tracking object to be used as operand A in the logical operation: A operator B."
+                ::= { hm2TrackLogicalInstanceEntry 2 }
+                
+hm2TrackLogicalOperandNameB	OBJECT-TYPE
+                SYNTAX          SnmpAdminString
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "The name of the tracking object to be used as operand B in the logical operation: A operator B."
+                ::= { hm2TrackLogicalInstanceEntry 3 }                
+
+hm2TrackLogicalOperator	OBJECT-TYPE
+                SYNTAX          INTEGER {
+                					and(1),
+                					or(2)
+                				}
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "Defines the logical operation performed on the configured operands A and B."
+                DEFVAL			{ or }
+                ::= { hm2TrackLogicalInstanceEntry 4 }
+
+
+--
+-- *************************************************************
+-- hm2TrackingApplicationGroup
+-- *************************************************************
+--
+
+hm2TrackingApplicationTable
+				OBJECT-TYPE
+                SYNTAX          SEQUENCE OF Hm2TrackingApplicationEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "This table contains information about registered
+                				 applications, for each object being tracked."
+                ::= { hm2TrackingApplicationGroup 1 }
+
+
+hm2TrackingApplicationEntry 
+				OBJECT-TYPE
+                SYNTAX          Hm2TrackingApplicationEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "The entry of the hm2TrackingApplicationTable."
+                INDEX           { hm2TrackAppId, hm2TrackType, hm2TrackId }
+                ::= { hm2TrackingApplicationTable 1 }
+
+
+Hm2TrackingApplicationEntry ::= SEQUENCE {
+                hm2TrackAppId			Integer32,
+                hm2TrackAppName			SnmpAdminString,
+                hm2TrackAppObjectName	SnmpAdminString
+                }
+                
+hm2TrackAppId	
+				OBJECT-TYPE
+                SYNTAX          Integer32
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "The id of an application which tracks an object."
+                ::= { hm2TrackingApplicationEntry 1 }           
+                
+hm2TrackAppName		
+				OBJECT-TYPE
+                SYNTAX          SnmpAdminString
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION     "The name of the registered application."
+                ::= { hm2TrackingApplicationEntry 4 }
+                
+hm2TrackAppObjectName		
+				OBJECT-TYPE
+                SYNTAX          SnmpAdminString
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION     "The name of the tracking object the application registered for."
+                ::= { hm2TrackingApplicationEntry 5 }
+
+
+--
+-- *************************************************************
+-- hm2TrackStaticRouteTable
+-- *************************************************************
+--
+hm2TrackStaticRouteTable OBJECT-TYPE
+         SYNTAX   	 SEQUENCE OF Hm2TrackStaticRouteEntry
+         MAX-ACCESS  not-accessible
+         STATUS   	 current
+         DESCRIPTION
+           			 "."
+       ::= { hm2TrackingStaticRouteGroup 1 }
+
+    hm2TrackStaticRouteEntry OBJECT-TYPE
+         SYNTAX   	 Hm2TrackStaticRouteEntry
+         MAX-ACCESS  not-accessible
+         STATUS   	 current
+         DESCRIPTION
+           			 "."
+         AUGMENTS { inetCidrRouteEntry }
+         ::= { hm2TrackStaticRouteTable 1 }
+
+    Hm2TrackStaticRouteEntry ::=
+         SEQUENCE 
+         {
+             hm2TrackStaticRouteTrackId		SnmpAdminString,
+             hm2TrackStaticRouteTrackState  INTEGER
+         }
+
+	hm2TrackStaticRouteTrackId OBJECT-TYPE
+         SYNTAX          SnmpAdminString
+         MAX-ACCESS      read-create
+         STATUS          current
+         DESCRIPTION     "Associate and dissociate the tracking instance to a static route.
+         				  To dissociate, pass an empty string."
+         ::= { hm2TrackStaticRouteEntry 1 }
+
+	hm2TrackStaticRouteTrackState	OBJECT-TYPE
+         SYNTAX          INTEGER {
+             					up(1),
+               					down(2),
+               					notReady(3)
+               				}
+         MAX-ACCESS      read-only
+         STATUS          current
+         DESCRIPTION     "Shows if the tracked object is currently up(1), down(2) or notReady(3).
+           				 in case the state indicates notReady, the corresponding configuration
+           				 is missing or invalid."
+         DEFVAL			{ notReady }
+         ::= { hm2TrackStaticRouteEntry 2 }
+
+   --**************************************************************************************
+   --  hm2TrackingSNMPExtensionGroup - SNMP Extension Group
+   --**************************************************************************************
+
+   hm2TrackingInvalidTrackID OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the entry for track id is invalid."
+          ::= { hm2TrackingSNMPExtensionGroup 1 }
+
+   hm2TrackingTrackNameRegistrationErrorReturn OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the track name registeration is unsuccessful."
+          ::= { hm2TrackingSNMPExtensionGroup 2 }
+
+   hm2TrackingTrackNameDeregisterationErrorReturn OBJECT-IDENTITY
+          STATUS      current
+          DESCRIPTION "Indicates that the track name deregisteration is unsuccessful."
+          ::= { hm2TrackingSNMPExtensionGroup 3 }
+
+
+--
+-- *************************************************************
+-- hm2TrackingInterfaceStatusGroup
+-- *************************************************************
+--
+
+hm2TrackInterfaceStatusTable
+                OBJECT-TYPE
+                SYNTAX   	    SEQUENCE OF Hm2TrackInterfaceStatusEntry
+                MAX-ACCESS      not-accessible
+                STATUS   	    current
+                DESCRIPTION     "This table contains information about
+                                 tracking objects associated to each interface."
+                ::= { hm2TrackingInterfaceStatusGroup 1 }
+
+hm2TrackInterfaceStatusEntry
+                OBJECT-TYPE
+                SYNTAX   	    Hm2TrackInterfaceStatusEntry
+                MAX-ACCESS      not-accessible
+                STATUS   	    current
+                DESCRIPTION     "The entry of the hm2TrackInterfaceStatusTable."
+                AUGMENTS { ifEntry }
+                ::= { hm2TrackInterfaceStatusTable 1 }
+
+Hm2TrackInterfaceStatusEntry  ::= SEQUENCE {
+                hm2TrackInterfaceStatusTrackId	    SnmpAdminString,
+                hm2TrackInterfaceStatusTrackState   INTEGER
+                }
+
+hm2TrackInterfaceStatusTrackId
+                OBJECT-TYPE
+                SYNTAX          SnmpAdminString
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION     "Associate and dissociate the tracking object
+                                 to an interface. To dissociate, pass an empty string."
+                ::= { hm2TrackInterfaceStatusEntry 1 }
+
+hm2TrackInterfaceStatusTrackState
+                OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                    up(1),
+                                    down(2),
+                                    notReady(3)
+                                }
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION     "Shows if associated tracking object is currently
+                                 up(1) or down(2). In case the state indicates notReady(3),
+                                 the corresponding configuration is missing or invalid."
+                DEFVAL			{ notReady }
+                ::= { hm2TrackInterfaceStatusEntry 2 }
+
+
+END

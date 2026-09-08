@@ -1,0 +1,1227 @@
+HM2-PLATFORM-MSRP-MIB DEFINITIONS ::= BEGIN
+
+-- -------------------------------------------------------------
+-- MSRP private MIB for IEEE 802.1Q Devices
+-- -------------------------------------------------------------
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Counter32, Counter64, Unsigned32, Integer32			                    FROM SNMPv2-SMI
+    TruthValue, TEXTUAL-CONVENTION, MacAddress     							FROM SNMPv2-TC
+    BridgeId                                                                FROM BRIDGE-MIB
+	VlanId                                                                  FROM Q-BRIDGE-MIB
+    hm2AgentDot1qMrpMxrp                                                    FROM HM2-PLATFORM-MRP-MIB;
+
+hm2PlatformMSRP MODULE-IDENTITY
+    LAST-UPDATED "201304100000Z" -- April 10, 2013
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+             "The Hirschmann Private Platform2 MIB for 802.1Qat, 802.1Qav Configuration.
+              Copyright (C) 2013. All Rights Reserved."
+    REVISION 
+             "201304100000Z" -- April 10, 2013
+    DESCRIPTION
+             "Initial version."
+    ::= { hm2AgentDot1qMrpMxrp 3 }
+
+
+-- -------------------------------------------------------------
+-- TEXTUAL-CONVENTION related to MSRP/FQTSS MIB objects
+-- -------------------------------------------------------------
+
+-- BridgeId ::= OCTET STRING (SIZE (8))
+
+-- VlanId ::= TEXTUAL-CONVENTION
+--  STATUS      current
+--  DESCRIPTION
+--      "A 12-bit VLAN ID used in the VLAN Tag header."
+--  SYNTAX      INTEGER (1..4094)
+    
+    
+Hm2AgentDot1qPriorityValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "An 802.1Q user priority value."
+   REFERENCE   "12.13.3.3"
+    SYNTAX      Unsigned32 (0..7)
+
+Hm2AgentDot1qMsrpStreamRankValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "An 802.1 SRP Stream Rank value. This is an integer,
+         with the following interpretation placed on the value:
+
+         0: Emergency, high-rank stream,
+         1: Non-emergency stream."
+    REFERENCE    "35.2.2.8.5b"
+    SYNTAX       INTEGER {
+                     emergency(0),
+                     nonEmergency(1)
+                 }
+
+Hm2AgentDot1qMsrpStreamIdValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:1x:1x:1x:1x:1x.1x:1x"
+    STATUS       current
+    DESCRIPTION
+            "Represents an SRP Stream ID, which is often defined
+            as a MAC Address followed by a unique 16-bit ID."
+    SYNTAX       OCTET STRING (SIZE (8))
+
+Hm2AgentDot1qMsrpReservationDirectionValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "An 802.1 SRP Stream Reservation Direction value. This is
+         an integer, with the following interpretation placed on
+         the value:
+
+         0: Talker registrations,
+         1: Listener registrations."
+    REFERENCE    "35.2.1.2"
+    SYNTAX       INTEGER {
+                     talkerRegistrations(0),
+                     listenerRegistrations(1)
+                 }
+
+Hm2AgentDot1qMsrpReservationDeclarationTypeValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "An 802.1 SRP Stream Reservation Declaration Type value.
+         This is an integer, with the following interpretation
+         placed on the value:
+
+         0: Talker Advertise,
+         1: Talker Failed,
+         2: Listener Asking Failed,
+         3: Listener Ready,
+         4: Listener Ready Failed."
+    REFERENCE    "35.2.1.3"
+    SYNTAX       INTEGER {
+                     talkerAdvertise(0),
+                     talkerFailed(1),
+                     listenerAskingFailed(2),
+                     listenerReady(3),
+                     listenerReadyFailed(4)
+                 }
+
+Hm2AgentDot1qMsrpReservationFailureCodeValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "An 802.1 SRP Stream Reservation Failure Code value.
+         This is an integer, with the following interpretation
+         placed on the value:
+
+         0: No failure,
+         1: Insufficient bandwidth,
+         2: Insufficient Bridge resources,
+         3: Insufficient bandwidth for Traffic Class,
+         4: StreamID in use by another Talker,
+         5: Stream destination address already in use,
+         6: Stream pre-empted by higher rank,
+         7: Reported latency has changed,
+         8: Egress port is not AVBCapable,
+         9: Use a different destination_address,
+         10: Out of MSRP resources,
+         11: Out of MMRP resources,
+         12: Cannot store destination_address,
+         13: Requested priority is not an SR Class priority,
+         14: MaxFrameSize is too large for media,
+         15: maxFanInPorts limit has been reached,
+         16: Changes in FirstValue for a registered StreamID,
+         17: VLAN is blocked on this egress port (Registration Forbidden),
+         18: VLAN tagging is disabled on this egress port (untagged set),
+         19: SR class priority mismatch."
+    REFERENCE    "35.2.2.8.7"
+    SYNTAX       INTEGER {
+                    noFailure(0),
+                    insufficientBandwidth(1),
+                    insufficientResources(2),
+                    insufficientTrafficClassBandwidth(3),
+                    streamIDInUse(4),
+                    streamDestinationAddressInUse(5),
+                    streamPreemptedByHigherRank(6),
+                    latencyHasChanged(7),
+                    egressPortNotAVBCapable(8),
+                    useDifferentDestinationAddress(9),
+                    outOfMSRPResources(10),
+                    outOfMMRPResources(11),
+                    cannotStoreDestinationAddress(12),
+                    priorityIsNoAnSRCLass(13),
+                    maxFrameSizeTooLarge(14),
+                    maxFanInPortsLimitReached(15),
+                    firstValueChangedForStreamID(16),
+                    vlanBlockedOnEgress(17),
+                    vlanTaggingDisabledOnEgress(18),
+                    srClassPriorityMismatch(19)
+                }
+
+Hm2AgentDot1qFqtssTrafficClassValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "An 802.1 FQTSS traffic class value.
+        This is the numerical value associated with a traffic
+        class in a Bridge. Larger values are associated with
+        higher priority traffic classes."
+    REFERENCE   "12.21"
+    SYNTAX      Unsigned32 (0..7)
+
+Hm2AgentDot1qFqtssDeltaBandwidthValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "An 802.1 FQTSS delta bandwidth percentage,
+        represented as a fixed point number scaled by
+        1,000,000."
+    REFERENCE   "12.21, 34.4"
+    SYNTAX      Unsigned32 (0..100000000)
+
+Hm2AgentDot1qFtqssTxSelectionAlgorithmIDValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "An 802.1 transmission selection algorithm identifier
+         value. This is an integer, with the following
+         interpretation placed on the value:
+
+         0: Strict priority algorithm,
+         1: Credit-based shaper algorithm,
+         2-255: Reserved for future standardization,
+         256-4294967295: Vendor-specific transmission selection
+                         algorithm identifiers, consisting of a
+                         four-octet integer, where the 3 most
+                         significant octets hold an OUI value,
+                         and the least significant octet holds
+                         an integer value in the range 0-255
+                         assigned by the owner of the OUI."
+    REFERENCE   "8.6.8, 12.21"
+    SYNTAX  Unsigned32
+
+-- -------------------------------------------------------------
+-- groups in the MSRP MIB
+-- -------------------------------------------------------------
+
+hm2AgentDot1qMsrp                OBJECT IDENTIFIER ::= { hm2PlatformMSRP 1 }
+hm2AgentDot1qMrpMsrpStats        OBJECT IDENTIFIER ::= { hm2PlatformMSRP 2 }
+hm2AgentDot1qFqtss               OBJECT IDENTIFIER ::= { hm2PlatformMSRP 3 }
+
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+--
+-- The MSRP Port Table
+--
+-- @purpose  Describes basic MSRP per port functionality.
+--
+-- -------------------------------------------------------------
+
+hm2AgentDot1qPortMsrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hm2AgentDot1qPortMsrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of MSRP control information about every bridge
+        port.  This is indexed by hm2AgentDot1qMsrpPort."
+    ::= { hm2AgentDot1qMsrp 1 }
+
+hm2AgentDot1qPortMsrpEntry OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qPortMsrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MSRP control information for a bridge port."
+    INDEX   { hm2AgentDot1qMsrpPort }
+    ::= { hm2AgentDot1qPortMsrpTable 1 }
+
+Hm2AgentDot1qPortMsrpEntry ::=
+    SEQUENCE {
+        hm2AgentDot1qMsrpPort
+            Integer32,
+        hm2AgentDot1qPortMsrpEnabledStatus
+            TruthValue,
+        hm2AgentDot1qPortMsrpFailedRegistrations
+            Counter64,
+        hm2AgentDot1qPortMsrpLastPduOrigin
+            MacAddress,
+        hm2AgentDot1qPortMsrpPvid
+            VlanId
+     }
+
+hm2AgentDot1qMsrpPort OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION
+    	"The MSRP port number."
+    ::= { hm2AgentDot1qPortMsrpEntry 1 }
+
+hm2AgentDot1qPortMsrpEnabledStatus  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The administrative state of MSRP operation on this port.  The
+        value true(1) indicates that MSRP is enabled on this port
+        in all VLANs as long as hm2AgentDot1qBridgeMsrpEnabledStatus is
+        also true(1).  A value of false(2) indicates that MSRP is
+        disabled on this port in all VLANs: any MSRP frames received
+        will be silently discarded, and no MSRP registrations will be
+        propagated from other ports.  Setting this to a value of
+        true(1) will be stored by the agent but will only take
+        effect on the MSRP protocol operation if
+        hm2AgentDot1qBridgeMsrpEnabledStatus
+        also indicates the value true(1).  This object affects
+        all MSRP Applicant and Registrar state machines on this
+        port.  A transition from false(2) to true(1) will
+        cause a reset of all MSRP state machines on this port.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    DEFVAL { false }
+    ::= { hm2AgentDot1qPortMsrpEntry 2 }
+
+hm2AgentDot1qPortMsrpFailedRegistrations OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "failed MSRP registrations"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of failed MSRP registrations, for any
+        reason, in all VLANs, on this port.
+
+        Discontinuities in the value of the counter can occur at
+        re-initialization of the management system, and at other
+        times as indicated by the value of ifCounterDiscontinuityTime
+        object of the associated interface (if any)."
+    REFERENCE   "10.7.12.1"
+    ::= { hm2AgentDot1qPortMsrpEntry 3 }
+
+ 
+hm2AgentDot1qPortMsrpLastPduOrigin OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Source MAC Address of the last MSRP message
+        received on this port."
+    REFERENCE   "10.7.12.2"
+    ::= { hm2AgentDot1qPortMsrpEntry 4 }
+ 
+hm2AgentDot1qPortMsrpPvid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default VLAN ID that Streams are assigned to.
+        Talkers learn this VID from the SRP Domain attribute
+        and tag Streams accordingly. "
+
+    REFERENCE   "35.2.2.8.3b"
+    DEFVAL      { 2 }
+    ::= { hm2AgentDot1qPortMsrpEntry 5 }
+
+-- -------------------------------------------------------------
+-- End of the MSRP Port Table
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+--
+-- The MxRP Configuration
+--
+-- @purpose  Enable/Disable protocols of MxRP 
+--                    family.
+--
+-- -------------------------------------------------------------
+hm2AgentDot1qBridgeMsrpEnabledStatus  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        " The administrative status requested by management for
+        MSRP.  The value true(1) indicates that MSRP should
+        be enabled on this device, in all VLANs, on all ports
+        for which it has not been specifically disabled.  When
+        false(2), MSRP is disabled, in all VLANs and on all
+        ports, and all MSRP frames will be forwarded
+        transparently.  This objects affects both Applicant and
+        Registrar state machines.  A transition from false(2)
+        to true(1) will cause a reset of all MSRP state
+        machines on all ports.
+        
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    DEFVAL { false }
+    ::= { hm2AgentDot1qMsrp 2 }
+
+hm2AgentDot1qBridgeMsrpTalkerPruning OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the talkerPruning parameter which
+        controls the propagation of Talker declarations.
+        The value true(1) indicates that Talker attributes
+        are only declared on ports that have the Stream
+        destination_address registered in the MMRP MAC
+        Address Registration Entries.  When false(2),
+        Talker attribute are declared on all egress ports
+        in the active topology.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.22.1, 35.2.1.4b, 35.2.4.3.1"
+    DEFVAL      { false }
+    ::= { hm2AgentDot1qMsrp 3 }
+
+hm2AgentDot1qBridgeMsrpMaxFanInPorts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the msrpMaxFanInPorts parameter which
+        limits the total number of ports on a Bridge that
+        are allowed to establish reservations for inbound
+        Streams.  A value of zero (0) indicates no fan-in
+        limit is being specified and calculations involving
+        fan-in will only be limited by the number of MSRP
+        enabled ports.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.22.1, 35.2.1.4f"
+    DEFVAL      { 0 }
+    ::= { hm2AgentDot1qMsrp 4 }
+
+hm2AgentDot1qBridgeMsrpBoundaryPropagate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the boundaryPropagate parameter which
+        controls the propagation of Talker declarations.
+        The value true(1) indicates that Talker attributes
+        are propagated to the ports marked as boundary port.
+        When false(2) Talker attributes are not propagated
+        to the ports marked as boundary port.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "802.1ba requirement"
+    DEFVAL      { false }
+    ::= { hm2AgentDot1qMsrp 6 }
+
+-- -------------------------------------------------------------
+-- End of the MxRP Configuration
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- 
+-- The MSRP Stream table 
+-- 
+-- @purpose Detailed information about MSRP streams.
+-- -------------------------------------------------------------
+
+hm2AgentDot1qMsrpStreamTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF Hm2AgentDot1qMsrpStreamEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A table of detailed MSRP stream information.
+        This is indexed by Stream ID."
+   ::= { hm2AgentDot1qMsrp 7 }
+
+hm2AgentDot1qMsrpStreamEntry OBJECT-TYPE
+   SYNTAX      Hm2AgentDot1qMsrpStreamEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A list of objects containing characteristics
+        for each registered Stream. Rows in the table are
+        automatically created for Streams registered on any
+        port of a bridge"
+   INDEX   { hm2AgentDot1qMsrpStreamIndex }
+   ::= { hm2AgentDot1qMsrpStreamTable 1 }
+
+Hm2AgentDot1qMsrpStreamEntry ::=
+   SEQUENCE {
+       hm2AgentDot1qMsrpStreamIndex
+           Integer32,
+       hm2AgentDot1qMsrpStreamID
+           Hm2AgentDot1qMsrpStreamIdValue,
+       hm2AgentDot1qMsrpStreamDestMacAddr
+           MacAddress,
+       hm2AgentDot1qMsrpStreamVlanId
+           Integer32,
+       hm2AgentDot1qMsrpStreamTspecMaxFrameSize
+           Unsigned32,
+       hm2AgentDot1qMsrpStreamTspecMaxIntervalFrames
+           Unsigned32,
+       hm2AgentDot1qMsrpStreamDataFramePriority
+           Hm2AgentDot1qPriorityValue,
+       hm2AgentDot1qMsrpStreamRank
+           Hm2AgentDot1qMsrpStreamRankValue
+      }
+
+hm2AgentDot1qMsrpStreamIndex  OBJECT-TYPE
+   SYNTAX      Integer32(0..65535)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "An index for MSRP Details Table."
+   ::= { hm2AgentDot1qMsrpStreamEntry 1 }
+
+hm2AgentDot1qMsrpStreamID OBJECT-TYPE
+   SYNTAX      Hm2AgentDot1qMsrpStreamIdValue
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The Stream ID associated with the row of the table.
+
+        Rows in the table are automatically created when
+        Streams are registered via MSRP."
+
+   ::= { hm2AgentDot1qMsrpStreamEntry 2 }
+
+hm2AgentDot1qMsrpStreamDestMacAddr OBJECT-TYPE
+   SYNTAX  MacAddress
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION
+       "The MAC destination address for the Stream described
+        by this reservation."
+   ::= { hm2AgentDot1qMsrpStreamEntry 3 }
+
+hm2AgentDot1qMsrpStreamVlanId  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The VLAN ID associated with the MSRP registration
+        for this Stream."
+   ::= { hm2AgentDot1qMsrpStreamEntry 4 }
+
+hm2AgentDot1qMsrpStreamTspecMaxFrameSize  OBJECT-TYPE
+   SYNTAX      Unsigned32 (0..65535)
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The maximum size frame that will be sent by
+        a Talker for this Stream. This value is part
+        of the Traffic Specification for the Stream."
+   ::= { hm2AgentDot1qMsrpStreamEntry 5 }
+
+hm2AgentDot1qMsrpStreamTspecMaxIntervalFrames  OBJECT-TYPE
+   SYNTAX      Unsigned32 (0..65535)
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The maximum number of frame that will be sent
+        during a class measurement interval.  This
+        value is part of the Traffic Specification for
+        the Stream."
+   ::= { hm2AgentDot1qMsrpStreamEntry 6 }
+
+hm2AgentDot1qMsrpStreamDataFramePriority OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qPriorityValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The 802.1Q user priority value that the
+        referenced Stream will be tagged with. This value
+        is used to distinguish Class A and Class B traffic."
+    REFERENCE   "35.2.2.8.5a"
+    ::= { hm2AgentDot1qMsrpStreamEntry 7}
+
+hm2AgentDot1qMsrpStreamRank  OBJECT-TYPE
+   SYNTAX      Hm2AgentDot1qMsrpStreamRankValue
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "SRP supports emergency and non-emergency.
+        Emergency traffic will interrupt non-emergency
+        traffic if there is insufficient bandwidth or
+        resources available for the emergency traffic."
+   ::= { hm2AgentDot1qMsrpStreamEntry 8 }
+
+
+-- -------------------------------------------------------------
+-- End of MSRP Details
+-- -------------------------------------------------------------       
+
+
+
+-- -------------------------------------------------------------
+-- 
+-- The MSRP Reservation Table Details
+-- 
+-- @purpose This subtree defines the objects necessary for retrieving
+-- the Stream attribute registrations on each port of a Bridge.
+-- -------------------------------------------------------------
+
+hm2AgentDot1qMsrpReservationTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF Hm2AgentDot1qMsrpReservationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A table containing Stream attribute
+        registrations per port."
+   ::= { hm2AgentDot1qMsrp 8 }
+
+hm2AgentDot1qMsrpReservationEntry OBJECT-TYPE
+   SYNTAX      Hm2AgentDot1qMsrpReservationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A list of objects containing Stream attribute
+        registrations per port. Rows in the table are
+        automatically created for Streams registered on any
+        port of a bridge."
+   INDEX   {
+             hm2AgentDot1qMsrpReservationStreamId, 
+             hm2AgentDot1qMsrpReservationDirection, 
+             hm2AgentDot1qMsrpPort }
+   ::= { hm2AgentDot1qMsrpReservationTable 1 }
+
+Hm2AgentDot1qMsrpReservationEntry ::=
+   SEQUENCE {
+       hm2AgentDot1qMsrpReservationStreamId
+           Hm2AgentDot1qMsrpStreamIdValue,
+       hm2AgentDot1qMsrpReservationDirection
+           Hm2AgentDot1qMsrpReservationDirectionValue,
+       hm2AgentDot1qMsrpReservationDeclarationType
+           Hm2AgentDot1qMsrpReservationDeclarationTypeValue,   
+       hm2AgentDot1qMsrpReservationAccumulatedLatency
+           Unsigned32,
+       hm2AgentDot1qMsrpReservationFailureBridgeId
+           BridgeId,
+       hm2AgentDot1qMsrpReservationFailureCode
+           Hm2AgentDot1qMsrpReservationFailureCodeValue,
+       hm2AgentDot1qMsrpReservationDroppedStreamFrames
+           Counter64,
+       hm2AgentDot1qMsrpReservationStreamAge
+           Unsigned32
+     }
+
+hm2AgentDot1qMsrpReservationStreamId OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qMsrpStreamIdValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Stream ID associated with the row of the table.
+
+        Rows in the table are automatically created when
+        Streams are registered via MSRP."
+    REFERENCE   "35.2.2.8.2"
+    ::= { hm2AgentDot1qMsrpReservationEntry 1 }
+
+hm2AgentDot1qMsrpReservationDirection OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qMsrpReservationDirectionValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The source of this Stream registration, either
+        Talker or Listener."
+    REFERENCE   "35.2.1.2"
+    ::= { hm2AgentDot1qMsrpReservationEntry 2 }
+
+hm2AgentDot1qMsrpReservationDeclarationType OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qMsrpReservationDeclarationTypeValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of Talker or Listener registration."
+    REFERENCE   "35.2.1.3"
+    ::= { hm2AgentDot1qMsrpReservationEntry 3 }
+
+hm2AgentDot1qMsrpReservationAccumulatedLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "nano-seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Accumulated Latency associated with the current
+        registration.
+
+        For Talker registrations this represents the accumulated
+        latency from the Talker to the ingress port of this
+        Bridge.
+
+        For Listener registrations this represents the accumulated
+        latency to the ingress port of the neighbor Bridge or
+        end stations. This include the latency of the media
+        attached to this egress port."
+    REFERENCE   "35.2.2.8.6"
+    ::= { hm2AgentDot1qMsrpReservationEntry 4 }
+
+hm2AgentDot1qMsrpReservationFailureBridgeId OBJECT-TYPE
+    SYNTAX      BridgeId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The first Bridge that changes a Talker Advertise to a
+        Talker Failed registration will report its Bridge
+        Identification in this field. That single Bridge
+        Identification is then propagated from Bridge to Bridge."
+    REFERENCE   "35.2.2.8.7a"
+    ::= { hm2AgentDot1qMsrpReservationEntry 5 }
+    
+hm2AgentDot1qMsrpReservationFailureCode OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qMsrpReservationFailureCodeValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The first Bridge that changes a Talker Advertise to a
+        Talker Failed registration will report the Failure Code
+        in this field. That single Failure Code is then propagated
+        from Bridge to Bridge."
+    REFERENCE   "35.2.2.8.7b"
+    ::= { hm2AgentDot1qMsrpReservationEntry 6 }
+                                          
+hm2AgentDot1qMsrpReservationDroppedStreamFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the number of data stream frames that have
+        been dropped for whatever reason.  These are not MSRP
+        frames, but the stream data frames that are carried by
+        the MSRP Reservation.
+
+        Discontinuities in the value of the counter can occur at
+        re-initialization of the management system, and at other
+        times as indicated by the value of ifCounterDiscontinuityTime
+        object of the associated interface (if any)."
+     REFERENCE   "35.2.5.1"
+    ::= { hm2AgentDot1qMsrpReservationEntry 7 }     
+
+hm2AgentDot1qMsrpReservationStreamAge OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds since the reservation was established
+        on this port.  Talkers shall report this as the seconds
+        since the first receipt of the Talker Advertise or Talker
+        Failed.  Listeners shall report this as the number of
+        seconds since the destination_address was first added to
+        the Dynamic Reservations Entries."
+    REFERENCE   "35.2.1.4c"
+    ::= { hm2AgentDot1qMsrpReservationEntry 8 }
+
+ 
+-- -------------------------------------------------------------
+-- End of MSRP Reservation Table
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- MSRP Statistics
+-- -------------------------------------------------------------
+
+hm2AgentDot1qMrpMsrpPktTx OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames was transmitted."
+    ::= { hm2AgentDot1qMrpMsrpStats 1 }
+
+hm2AgentDot1qMrpMsrpPktRx OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames was received."
+    ::= { hm2AgentDot1qMrpMsrpStats 2 }
+
+hm2AgentDot1qMrpMsrpPktRxBadHeader OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames with bad header was received."
+    ::= { hm2AgentDot1qMrpMsrpStats 3 }
+
+hm2AgentDot1qMrpMsrpPktRxBadFormat OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames with bad data field was received."
+    ::= { hm2AgentDot1qMrpMsrpStats 4 }
+
+hm2AgentDot1qMrpMsrpPktTxFailure OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames was not transmitted."
+    ::= { hm2AgentDot1qMrpMsrpStats 5 }
+
+-- Beginn of hm2AgentDot1qMrpMsrpStatsTable
+hm2AgentDot1qMrpMsrpStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hm2AgentDot1qMrpMsrpStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which contains MSRP statistics per port."
+    ::= { hm2AgentDot1qMrpMsrpStats 6 }
+
+hm2AgentDot1qMrpMsrpStatsEntry OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qMrpMsrpStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MSRP statistics entry."
+    INDEX { hm2AgentDot1qMrpMsrpIntf }
+    ::= { hm2AgentDot1qMrpMsrpStatsTable 1 }
+
+Hm2AgentDot1qMrpMsrpStatsEntry ::=
+    SEQUENCE {
+    	hm2AgentDot1qMrpMsrpIntf
+    	    Integer32,
+        hm2AgentDot1qMrpMsrpPortPktTx
+            Counter32,
+        hm2AgentDot1qMrpMsrpPortPktRx
+            Counter32,
+        hm2AgentDot1qMrpMsrpPortPktRxBadHeader
+            Counter32,
+        hm2AgentDot1qMrpMsrpPortPktRxBadFormat
+            Counter32,
+        hm2AgentDot1qMrpMsrpPortPktTxFailure
+            Counter32,
+        hm2AgentDot1qMrpMsrpPortPktRegFailure
+            Counter32
+    }
+hm2AgentDot1qMrpMsrpIntf OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "Index of hm2AgentDot1qMrpMsrpStatistics table."
+    ::= { hm2AgentDot1qMrpMsrpStatsEntry 1 }
+
+hm2AgentDot1qMrpMsrpPortPktTx OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames was transmitted on interface."
+    ::= { hm2AgentDot1qMrpMsrpStatsEntry 2 }
+
+hm2AgentDot1qMrpMsrpPortPktRx OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames was received on interface."
+    ::= { hm2AgentDot1qMrpMsrpStatsEntry 3 }
+
+hm2AgentDot1qMrpMsrpPortPktRxBadHeader OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames with bad header was received on interface."
+    ::= { hm2AgentDot1qMrpMsrpStatsEntry 4 }
+
+hm2AgentDot1qMrpMsrpPortPktRxBadFormat OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames with bad data field was received on interface."
+    ::= { hm2AgentDot1qMrpMsrpStatsEntry 5 }
+
+hm2AgentDot1qMrpMsrpPortPktTxFailure OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames was not transmitted on interface."
+    ::= { hm2AgentDot1qMrpMsrpStatsEntry 6 }
+
+hm2AgentDot1qMrpMsrpPortPktRegFailure OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of failed registration attempts on interface."
+    ::= { hm2AgentDot1qMrpMsrpStatsEntry 7 }
+
+-- End of hm2AgentDot1qMrpMsrpStatsTable
+
+
+hm2AgentDot1qMrpMsrpPktMessageFailure OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of failures while adding message into MSRP queue."
+    ::= { hm2AgentDot1qMrpMsrpStats 7 }
+
+	
+-- -------------------------------------------------------------
+-- End of MSRP Statistics
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- FQTSS TABLE
+-- -------------------------------------------------------------
+
+-- =============================================================
+-- subtrees in the FQTSS MIB
+-- =============================================================
+
+hm2AgentDot1qFqtssNotifications
+    OBJECT IDENTIFIER ::= { hm2AgentDot1qFqtss 0 }
+
+hm2AgentDot1qFqtssObjects
+    OBJECT IDENTIFIER ::= { hm2AgentDot1qFqtss 1 }
+
+hm2AgentDot1qFqtssConformance
+    OBJECT IDENTIFIER ::= { hm2AgentDot1qFqtss 2 }
+
+hm2AgentDot1qFqtssBap
+    OBJECT IDENTIFIER ::= { hm2AgentDot1qFqtss 3 }
+
+hm2AgentDot1qFqtssMappings
+    OBJECT IDENTIFIER ::= { hm2AgentDot1qFqtss 4 }
+
+
+
+
+-- =============================================================
+-- hm2AgentDot1qFqtssBap subtree
+-- This subtree defines the objects necessary for the management
+-- of bandwidth allocation for queues that support FQTSS
+-- =============================================================
+
+hm2AgentDot1qFqtssBapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hm2AgentDot1qFqtssBapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing a set of bandwidth availability
+        parameters for each traffic class that supports the
+        credit-based shaper algorithm.
+        All writable objects in this table must be
+        persistent over power up restart/reboot."
+    REFERENCE   "12.21.1"
+    ::= { hm2AgentDot1qFqtssBap 1 }
+
+hm2AgentDot1qFqtssBapEntry OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qFqtssBapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing bandwidth allocation
+        information for each traffic class that supports the
+        credit-based shaper algorithm. Rows in the table are
+        automatically created and deleted as a result of the
+        operation of the algorithm described in 34.5. "
+    INDEX  { hm2AgentDot1qMsrpPort, hm2AgentDot1qFqtssTrafficClass  }
+    ::= { hm2AgentDot1qFqtssBapTable 1 }
+
+Hm2AgentDot1qFqtssBapEntry ::=
+    SEQUENCE {
+        hm2AgentDot1qFqtssTrafficClass
+            Hm2AgentDot1qFqtssTrafficClassValue,
+        hm2AgentDot1qFqtssDeltaBandwidth
+            Hm2AgentDot1qFqtssDeltaBandwidthValue,
+        hm2AgentDot1qFqtssOperIdleSlopeMs
+            Unsigned32,
+        hm2AgentDot1qFqtssOperIdleSlopeLs
+            Unsigned32,
+        hm2AgentDot1qFqtssAdminIdleSlopeMs
+            Unsigned32,
+        hm2AgentDot1qFqtssAdminIdleSlopeLs
+            Unsigned32
+        }
+
+hm2AgentDot1qFqtssTrafficClass OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qFqtssTrafficClassValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The traffic class number associated with the row of
+        the table.
+
+        A row in this table is created for each traffic class
+        that supports the credit-based shaper algrithm and whose
+        bandwidth can be reserved for AV traffic."
+    ::= { hm2AgentDot1qFqtssBapEntry 1 }
+
+
+hm2AgentDot1qFqtssDeltaBandwidth OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qFqtssDeltaBandwidthValue
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the deltaBandwidth parameter
+        for the traffic class.
+        This value is represented as a fixed point number
+        scaled by a factor of 1,000,000; i.e., 100,000,000
+        (the maximum value) represents 100%.
+
+        The default value of the deltaBandwidth parameter
+        for the highest numbered traffic class that supports
+        the credit-based shaper algorithm is 75%; for all
+        lower numbered traffic classes that support the
+        credit-based shaper algorithm the default value is 0%.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.21.1, 34.3"
+    ::= { hm2AgentDot1qFqtssBapEntry 2}
+
+hm2AgentDot1qFqtssOperIdleSlopeMs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bits per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The most significant 32 bits of the bandwidth,
+        in bits per second, that is currently allocated to the
+        traffic class (idleSlope(N)). This object MUST be read
+        at the same time as hm2AgentDot1qFqtssOperIdleSlopeLs,
+        which represents the LS 32 bits of the value, in order
+        for the read operation to succeed.
+
+        If SRP is supported and in operation, then the reserved
+        bandwidth is determined by the operation of SRP; otherwise,
+        the value of hm2AgentDot1qFqtssOperIdleSlopeMs is equal to
+        the value of hm2AgentDot1qFqtssAdminIdleSlopeMs.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.21.1, 34.3"
+    ::= { hm2AgentDot1qFqtssBapEntry 3 }
+
+
+hm2AgentDot1qFqtssOperIdleSlopeLs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bits per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The least significant 32 bits of the bandwidth,
+        in bits per second, that is currently allocated to the
+        traffic class (idleSlope(N)). This object MUST be read
+        at the same time as hm2AgentDot1qFqtssOperIdleSlopeMs,
+        which represents the LS 32 bits of the value, in order
+        for the read operation to succeed.
+
+        If SRP is supported and in operation, then the reserved
+        bandwidth is determined by the operation of SRP; otherwise,
+        the value of hm2AgentDot1qFqtssOperIdleSlopeLs is equal to
+        the value of hm2AgentDot1qFqtssAdminIdleSlopeLs..
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.21.1, 34.3"
+    ::= { hm2AgentDot1qFqtssBapEntry 4 }
+
+hm2AgentDot1qFqtssAdminIdleSlopeMs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bits per second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The most significant 32 bits of the bandwidth,
+        in bits per second, that the manager desires to allocate
+        to the traffic class as  idleSlope(N). This object MUST be
+        read or written at the same time as
+        hm2AgentDot1qFqtssAdminIdleSlopeLs,
+        which represents the LS 32 bits of the value, in order
+        for the read or write operation to succeed.
+
+        If SRP is supported and in operation, then the reserved
+        bandwidth is determined by the operation of SRP, and any
+        changes to the value of this object have no effect on the
+        operational value of idleSlope(N).
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.21.1, 34.3"
+    DEFVAL { 0 }
+    ::= { hm2AgentDot1qFqtssBapEntry 5 }
+
+hm2AgentDot1qFqtssAdminIdleSlopeLs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bits per second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The least significant 32 bits of the bandwidth,
+        in bits per second, that the manager desires to allocate
+        to the traffic class as  idleSlope(N). This object MUST be
+        read or written at the same time as
+        hm2AgentDot1qFqtssAdminIdleSlopeMs,
+        which represents the LS 32 bits of the value, in order
+        for the read or write operation to succeed.
+
+        If SRP is supported and in operation, then the reserved
+        bandwidth is determined by the operation of SRP, and any
+        changes to the value of this object have no effect on the
+        operational value of idleSlope(N).
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.21.1, 34.3"
+    DEFVAL { 0 }
+    ::= { hm2AgentDot1qFqtssBapEntry 6 }
+
+
+
+-- =============================================================
+-- The hm2AgentDot1qFqtssMappings subtree
+-- This subtree defines the objects necessary for the assignment
+-- of transmission selection algorithms to traffic classes,
+-- and definition of regeneration table override values.
+-- =============================================================
+
+-- =============================================================
+-- the hm2AgentDot1qFqtssTxSelectionAlgorithmTable
+-- =============================================================
+
+hm2AgentDot1qFqtssTxSelectionAlgorithmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hm2AgentDot1qFqtssTxSelectionAlgorithmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the assignment of transmission
+        selection algorithms to traffic classes for the Port.
+        This table provides management of the Transmission
+        Selection Algorithm Table defined in 8.6.8.
+
+        For a given Port, a row in the table exists for each
+        traffic class that is supported by the Port.
+
+        The default assignments of transmission selection
+        algorithms to traffic classes in the table are made
+        on instantiation of the table, in accordance
+        with the defaults defined in 8.6.8 and 34.5.
+
+        All writable objects in this table must be
+        persistent over power up restart/reboot."
+    REFERENCE   "8.6.8, 12.21.2, 34.5"
+    ::= { hm2AgentDot1qFqtssMappings 1 }
+
+hm2AgentDot1qFqtssTxSelectionAlgorithmEntry OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qFqtssTxSelectionAlgorithmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects that contain the mapping of a
+        traffic class value to a transmission selection algorithm
+        value."
+    INDEX  { hm2AgentDot1qMsrpPort, hm2AgentDot1qFqtssTrafficClass }
+    ::= { hm2AgentDot1qFqtssTxSelectionAlgorithmTable 1 }
+
+Hm2AgentDot1qFqtssTxSelectionAlgorithmEntry ::=
+    SEQUENCE {
+        hm2AgentDot1qFqtssTxSelectionAlgorithmID
+            Hm2AgentDot1qFtqssTxSelectionAlgorithmIDValue
+        }
+
+hm2AgentDot1qFqtssTxSelectionAlgorithmID OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qFtqssTxSelectionAlgorithmIDValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The identifier of the transmission selection algorithm
+        assigned to the traffic class.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "8.6.8, 12.21.2, 34.5"
+    ::= { hm2AgentDot1qFqtssTxSelectionAlgorithmEntry 1 }
+
+-- =============================================================
+-- the hm2AgentDot1qFqtssSrpRegenOverrideTable
+-- =============================================================
+
+hm2AgentDot1qFqtssSrpRegenOverrideTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hm2AgentDot1qFqtssSrpRegenOverrideEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the set of priority regeneration
+        table override values for the Port.
+
+        The recommended default values of priorities
+        associated with SR classes, and the corresponding
+        override values, are defined in 6.9.4.
+
+        All writable objects in this table must be
+        persistent over power up restart/reboot."
+    REFERENCE   "12.21.3, 6.6.4, 6.9.4"
+    ::= { hm2AgentDot1qFqtssMappings 2 }
+
+hm2AgentDot1qFqtssSrpRegenOverrideEntry OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qFqtssSrpRegenOverrideEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects that contain the mapping of a
+        priority value to a priority regeneration override
+        value, and a boundary port indication.
+        Rows in the table exist for all priorities that are
+        associated with SR classes."
+    INDEX  { hm2AgentDot1qMsrpPort, hm2AgentDot1qFqtssTrafficClass  }
+    ::= { hm2AgentDot1qFqtssSrpRegenOverrideTable 1 }
+
+Hm2AgentDot1qFqtssSrpRegenOverrideEntry ::=
+    SEQUENCE {
+        hm2AgentDot1qFqtssSrClassPriority
+            Hm2AgentDot1qPriorityValue,
+        hm2AgentDot1qFqtssPriorityRegenOverride
+            Hm2AgentDot1qPriorityValue,
+        hm2AgentDot1qFqtssSrpBoundaryPort
+            TruthValue
+        }
+
+hm2AgentDot1qFqtssSrClassPriority OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qPriorityValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The priority value that is overridden at the
+        SRP domain boundary. "
+    REFERENCE   "12.21.3, 6.6.4, 6.9.4"
+    ::= { hm2AgentDot1qFqtssSrpRegenOverrideEntry 1 }
+
+hm2AgentDot1qFqtssPriorityRegenOverride OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qPriorityValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The priority value that is used to override the
+         priority regeneration table entry at the SRP
+         domain boundary.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.21.3, 6.6.4, 6.9.4"
+    ::= { hm2AgentDot1qFqtssSrpRegenOverrideEntry 2 }
+
+hm2AgentDot1qFqtssSrpBoundaryPort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the SRPdomainBoundaryPort parameter
+        (6.6.4) for the priority. "
+    REFERENCE   "12.21.3, 6.6.4, 6.9.4"
+    ::= { hm2AgentDot1qFqtssSrpRegenOverrideEntry 3 }
+
+END

@@ -1,0 +1,651 @@
+
+HM2-PLATFORM-DVMRP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Counter32, Gauge32, 
+    NOTIFICATION-TYPE,
+    IpAddress, TimeTicks             FROM SNMPv2-SMI
+    DisplayString, RowStatus         FROM SNMPv2-TC
+    SnmpAdminString                  FROM SNMP-FRAMEWORK-MIB
+    InterfaceIndexOrZero,
+    InterfaceIndex                   FROM IF-MIB
+    hm2PlatformMulticast			 FROM HM2-PLATFORM-MULTICAST-MIB;
+
+hm2AgentDvmrp MODULE-IDENTITY
+	LAST-UPDATED "201307260000Z" -- July 26, 2013
+   	ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+   	DESCRIPTION
+    		 "The Hirschmann Private Platform2 MIB for DVMRP.
+              Copyright (C) 2013. All Rights Reserved."
+   	REVISION 
+		     "201307260000Z" -- July 26, 2013
+   	DESCRIPTION
+        	 "Initial version."
+    ::= { hm2PlatformMulticast 249 }
+
+hm2AgentDvmrpMIBNotifications	OBJECT IDENTIFIER ::= { hm2AgentDvmrp 0 }
+hm2AgentDvmrpMIBObjects 		OBJECT IDENTIFIER ::= { hm2AgentDvmrp 1 }
+-- hm2AgentDvmrpMIBConformance 	OBJECT IDENTIFIER ::= { hm2AgentDvmrp 2 }
+         
+hm2AgentDvmrpGroup         		OBJECT IDENTIFIER ::= { hm2AgentDvmrpMIBObjects 1 }
+hm2AgentDvmrpScalar     		OBJECT IDENTIFIER ::= { hm2AgentDvmrpGroup 1 }
+
+hm2AgentDvmrpVersionString OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The router's DVMRP version information.  Similar to
+            sysDescr in MIB-II, this is a free-form field which can be
+            used to display vendor-specific information."
+    ::= { hm2AgentDvmrpScalar 1 }
+
+hm2AgentDvmrpGenerationId OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The generation identifier for the routing process.  This is
+            used by neighboring routers to detect whether the DVMRP
+            routing table should be resent."
+    ::= { hm2AgentDvmrpScalar 2 }
+
+
+hm2AgentDvmrpNumRoutes OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of entries in the routing table.  This can be
+            used to monitor the routing table size to detect illegal
+            advertisements of unicast routes."
+    ::= { hm2AgentDvmrpScalar 3 }
+
+hm2AgentDvmrpReachableRoutes OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of entries in the routing table with non
+            infinite metrics.  This can be used to detect network
+            partitions by observing the ratio of reachable routes to
+            total routes."
+    ::= { hm2AgentDvmrpScalar 4 }
+
+-- The DVMRP Interface Table
+
+hm2AgentDvmrpInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hm2AgentDvmrpInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the router's multicast-
+            capable interfaces."
+    ::= { hm2AgentDvmrpGroup 2 }
+
+hm2AgentDvmrpInterfaceEntry OBJECT-TYPE
+    SYNTAX     Hm2AgentDvmrpInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hm2AgentDvmrpInterfaceTable.  This
+            row augments ipMRouteInterfaceEntry in the IP Multicast MIB,
+            where the threshold object resides."
+    INDEX      { hm2AgentDvmrpInterfaceIfIndex }
+    ::= { hm2AgentDvmrpInterfaceTable 1 }
+
+Hm2AgentDvmrpInterfaceEntry ::= SEQUENCE {
+    hm2AgentDvmrpInterfaceIfIndex               InterfaceIndex,
+    hm2AgentDvmrpInterfaceLocalAddress          IpAddress,
+    hm2AgentDvmrpInterfaceMetric                Integer32,
+    hm2AgentDvmrpInterfaceStatus                RowStatus,
+    hm2AgentDvmrpInterfaceRcvBadPkts            Counter32,
+    hm2AgentDvmrpInterfaceRcvBadRoutes          Counter32,
+    hm2AgentDvmrpInterfaceSentRoutes            Counter32,
+    hm2AgentDvmrpInterfaceInterfaceKey          SnmpAdminString,
+    hm2AgentDvmrpInterfaceInterfaceKeyVersion   Integer32,
+    hm2AgentDvmrpInterfaceGenerationId          Integer32
+}
+
+hm2AgentDvmrpInterfaceIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the interface for which DVMRP is
+            enabled."
+    ::= { hm2AgentDvmrpInterfaceEntry 1 }
+
+hm2AgentDvmrpInterfaceLocalAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP address this system will use as a source address on
+            this interface.  On unnumbered interfaces, it must be the
+            same value as hm2AgentDvmrpInterfaceLocalAddress for some interface
+            on the system."
+    ::= { hm2AgentDvmrpInterfaceEntry 2 }
+
+hm2AgentDvmrpInterfaceMetric OBJECT-TYPE
+    SYNTAX     Integer32 (1..31)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The distance metric for this interface which is used to
+            calculate distance vectors."
+    DEFVAL     { 1 }
+    ::= { hm2AgentDvmrpInterfaceEntry 3 }
+
+hm2AgentDvmrpInterfaceStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The status of this entry.  Creating the entry enables DVMRP
+            on the virtual interface; destroying the entry or setting it
+            to notInService disables DVMRP on the virtual interface."
+    ::= { hm2AgentDvmrpInterfaceEntry 4 }
+
+hm2AgentDvmrpInterfaceRcvBadPkts OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of DVMRP messages received on the interface by
+            the DVMRP process which were subsequently discarded as
+            invalid (e.g. invalid packet format, or a route report from
+            an unknown neighbor)."
+    ::= { hm2AgentDvmrpInterfaceEntry 5 }
+
+hm2AgentDvmrpInterfaceRcvBadRoutes OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of routes, in valid hm2AgentDvmrpGroup packets, which were
+            ignored because the entry was invalid."
+    ::= { hm2AgentDvmrpInterfaceEntry 6 }
+
+hm2AgentDvmrpInterfaceSentRoutes OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of routes, in DVMRP Report packets, which have
+            been sent on this interface.  Together with
+            hm2AgentDvmrpNeighborRcvRoutes at a peer, this object is useful for
+            detecting routes being lost."
+    ::= { hm2AgentDvmrpInterfaceEntry 7 }
+ 
+
+
+hm2AgentDvmrpInterfaceInterfaceKey OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The (shared) key for authenticating neighbors on this
+            interface.  This object is intended solely for the purpose
+            of setting the interface key, and MUST be accessible only
+            via requests using both authentication and privacy.  The
+            agent MAY report an empty string in response to get, get-
+            next, get-bulk requests."
+    ::= { hm2AgentDvmrpInterfaceEntry 8 }
+
+hm2AgentDvmrpInterfaceInterfaceKeyVersion OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The highest version number of all known interface keys for
+            this interface used for authenticating neighbors."
+    ::= { hm2AgentDvmrpInterfaceEntry 9 }
+ 
+hm2AgentDvmrpInterfaceGenerationId OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The generation identifier for the routing process.  This is
+            used by neighboring routers to detect whether the DVMRP
+            routing table should be resent."
+    ::= { hm2AgentDvmrpInterfaceEntry 248 }
+
+-- The DVMRP Neighbor Table
+
+hm2AgentDvmrpNeighborTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hm2AgentDvmrpNeighborEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the router's DVMRP
+            neighbors, as discovered by receiving DVMRP messages."
+    ::= { hm2AgentDvmrpGroup 3 }
+
+hm2AgentDvmrpNeighborEntry OBJECT-TYPE
+    SYNTAX     Hm2AgentDvmrpNeighborEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hm2AgentDvmrpNeighborTable."
+    INDEX      { hm2AgentDvmrpNeighborIfIndex, hm2AgentDvmrpNeighborAddress }
+    ::= { hm2AgentDvmrpNeighborTable 1 }
+
+Hm2AgentDvmrpNeighborEntry ::= SEQUENCE {
+    hm2AgentDvmrpNeighborIfIndex         InterfaceIndex,
+    hm2AgentDvmrpNeighborAddress         IpAddress,
+    hm2AgentDvmrpNeighborUpTime          TimeTicks,
+    hm2AgentDvmrpNeighborExpiryTime      TimeTicks,
+    hm2AgentDvmrpNeighborGenerationId    Integer32,
+    hm2AgentDvmrpNeighborMajorVersion    Integer32,
+    hm2AgentDvmrpNeighborMinorVersion    Integer32,
+    hm2AgentDvmrpNeighborCapabilities    BITS,
+    hm2AgentDvmrpNeighborRcvRoutes       Counter32,
+    hm2AgentDvmrpNeighborRcvBadPkts      Counter32,
+    hm2AgentDvmrpNeighborRcvBadRoutes    Counter32,
+    hm2AgentDvmrpNeighborState           INTEGER
+}
+
+hm2AgentDvmrpNeighborIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The value of ifIndex for the virtual interface used to
+            reach this DVMRP neighbor."
+    ::= { hm2AgentDvmrpNeighborEntry 1 }
+
+hm2AgentDvmrpNeighborAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP address of the DVMRP neighbor for which this entry
+            contains information."
+    ::= { hm2AgentDvmrpNeighborEntry 2 }
+
+hm2AgentDvmrpNeighborUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time since this DVMRP neighbor (last) became a neighbor
+            of the local router."
+    ::= { hm2AgentDvmrpNeighborEntry 3 }
+
+hm2AgentDvmrpNeighborExpiryTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The minimum time remaining before this DVMRP neighbor will
+            be aged out."
+    ::= { hm2AgentDvmrpNeighborEntry 4 }
+
+hm2AgentDvmrpNeighborGenerationId   OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The neighboring router's generation identifier."
+    ::= { hm2AgentDvmrpNeighborEntry 5 }
+
+hm2AgentDvmrpNeighborMajorVersion OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The neighboring router's major hm2AgentDvmrpGroup version number."
+    ::= { hm2AgentDvmrpNeighborEntry 6 }
+
+hm2AgentDvmrpNeighborMinorVersion OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The neighboring router's minor DVMRP version number."
+    ::= { hm2AgentDvmrpNeighborEntry 7 }
+
+hm2AgentDvmrpNeighborCapabilities OBJECT-TYPE
+    SYNTAX     BITS {
+                   leaf(0),
+                   prune(1),
+                   generationID(2),
+                   mtrace(3)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object describes the neighboring router's
+            capabilities.  The leaf bit indicates that the neighbor has
+            only one interface with neighbors.  The prune bit indicates
+            that the neighbor supports pruning.  The generationID bit
+            indicates that the neighbor sends its generationID in Probe
+            messages.  The mtrace bit indicates that the neighbor can
+            handle mtrace requests."
+    ::= { hm2AgentDvmrpNeighborEntry 8 }
+
+hm2AgentDvmrpNeighborRcvRoutes OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The total number of routes received in valid DVMRP packets
+            received from this neighbor.  This can be used to diagnose
+            problems such as unicast route injection, as well as giving
+            an indication of the level of DVMRP route exchange
+            activity."
+    ::= { hm2AgentDvmrpNeighborEntry 9 }
+
+hm2AgentDvmrpNeighborRcvBadPkts OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of packet received from this neighbor which were
+            discarded as invalid."
+    ::= { hm2AgentDvmrpNeighborEntry 10 }
+
+hm2AgentDvmrpNeighborRcvBadRoutes OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of routes, in valid DVMRP packets received from
+            this neighbor, which were ignored because the entry was
+            invalid."
+    ::= { hm2AgentDvmrpNeighborEntry 11 }
+
+hm2AgentDvmrpNeighborState OBJECT-TYPE
+    SYNTAX     INTEGER { oneway(1), active(2), ignoring(3), down(4) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "State of the neighbor adjacency."
+    ::= { hm2AgentDvmrpNeighborEntry 12 }
+
+-- The DVMRP Route Table
+
+hm2AgentDvmrpRouteTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hm2AgentDvmrpRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The table of routes learned through DVMRP route exchange."
+    ::= { hm2AgentDvmrpGroup 4 }
+
+hm2AgentDvmrpRouteEntry OBJECT-TYPE
+    SYNTAX     Hm2AgentDvmrpRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) containing the multicast routing
+            information used by DVMRP in place of the unicast routing
+            information."
+    INDEX      { hm2AgentDvmrpRouteSource, hm2AgentDvmrpRouteSourceMask }
+    ::= { hm2AgentDvmrpRouteTable 1 }
+
+Hm2AgentDvmrpRouteEntry ::= SEQUENCE {
+    hm2AgentDvmrpRouteSource             IpAddress,
+    hm2AgentDvmrpRouteSourceMask         IpAddress,
+    hm2AgentDvmrpRouteUpstreamNeighbor   IpAddress,
+    hm2AgentDvmrpRouteIfIndex            InterfaceIndexOrZero,
+    hm2AgentDvmrpRouteMetric             Integer32,
+    hm2AgentDvmrpRouteExpiryTime         TimeTicks,
+    hm2AgentDvmrpRouteUpTime             TimeTicks
+}
+
+hm2AgentDvmrpRouteSource OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The network address which when combined with the
+            corresponding value of hm2AgentDvmrpRouteSourceMask identifies the
+            sources for which this entry contains multicast routing
+            information."
+    ::= { hm2AgentDvmrpRouteEntry 1 }
+
+hm2AgentDvmrpRouteSourceMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The network mask which when combined with the corresponding
+            value of hm2AgentDvmrpRouteSource identifies the sources for which
+            this entry contains multicast routing information."
+    ::= { hm2AgentDvmrpRouteEntry 2 }
+
+hm2AgentDvmrpRouteUpstreamNeighbor OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address of the upstream neighbor (e.g., RPF neighbor)
+            from which IP datagrams from these sources are received."
+    ::= { hm2AgentDvmrpRouteEntry 3 }
+
+hm2AgentDvmrpRouteIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of ifIndex for the interface on which IP
+            datagrams sent by these sources are received.  A value of 0
+            typically means the route is an aggregate for which no next-
+            hop interface exists."
+    ::= { hm2AgentDvmrpRouteEntry 4 }
+
+hm2AgentDvmrpRouteMetric OBJECT-TYPE
+    SYNTAX     Integer32 (0..32)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The distance in hops to the source subnet."
+    ::= { hm2AgentDvmrpRouteEntry 5 }
+
+hm2AgentDvmrpRouteExpiryTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The minimum amount of time remaining before this entry will
+            be aged out."
+    ::= { hm2AgentDvmrpRouteEntry 6 }
+
+hm2AgentDvmrpRouteUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time since the route represented by this entry was
+            learned by the router."
+    ::= { hm2AgentDvmrpRouteEntry 7 }
+
+-- The DVMRP Routing Next Hop Table
+
+hm2AgentDvmrpRouteNextHopTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hm2AgentDvmrpRouteNextHopEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table containing information on the next
+            hops on outgoing interfaces for routing IP multicast
+            datagrams."
+    ::= { hm2AgentDvmrpGroup 5 }
+
+hm2AgentDvmrpRouteNextHopEntry OBJECT-TYPE
+    SYNTAX     Hm2AgentDvmrpRouteNextHopEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the list of next hops on
+            outgoing interfaces to which IP multicast datagrams from
+            particular sources are routed."
+    INDEX      { hm2AgentDvmrpRouteNextHopSource, hm2AgentDvmrpRouteNextHopSourceMask,
+                 hm2AgentDvmrpRouteNextHopIfIndex }
+    ::= { hm2AgentDvmrpRouteNextHopTable 1 }
+
+Hm2AgentDvmrpRouteNextHopEntry ::= SEQUENCE {
+    hm2AgentDvmrpRouteNextHopSource             IpAddress,
+    hm2AgentDvmrpRouteNextHopSourceMask         IpAddress,
+    hm2AgentDvmrpRouteNextHopIfIndex            InterfaceIndex,
+    hm2AgentDvmrpRouteNextHopType               INTEGER
+}
+
+hm2AgentDvmrpRouteNextHopSource OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The network address which when combined with the
+            corresponding value of hm2AgentDvmrpRouteNextHopSourceMask
+            identifies the sources for which this entry specifies a next
+            hop on an outgoing interface."
+    ::= { hm2AgentDvmrpRouteNextHopEntry 1 }
+
+hm2AgentDvmrpRouteNextHopSourceMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The network mask which when combined with the corresponding
+            value of hm2AgentDvmrpRouteNextHopSource identifies the sources for
+            which this entry specifies a next hop on an outgoing
+            interface."
+    ::= { hm2AgentDvmrpRouteNextHopEntry 2 }
+
+hm2AgentDvmrpRouteNextHopIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the interface for the outgoing
+            interface for this next hop."
+    ::= { hm2AgentDvmrpRouteNextHopEntry 3 }
+
+hm2AgentDvmrpRouteNextHopType OBJECT-TYPE
+    SYNTAX     INTEGER { leaf(1), branch(2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Type is leaf if no downstream dependent neighbors exist on
+            the outgoing virtual interface.  Otherwise, type is branch."
+    ::= { hm2AgentDvmrpRouteNextHopEntry 4 }
+
+-- The DVMRP Prune Table
+
+hm2AgentDvmrpPruneTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hm2AgentDvmrpPruneEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the router's upstream prune
+            state."
+    ::= { hm2AgentDvmrpGroup 6 }
+
+hm2AgentDvmrpPruneEntry OBJECT-TYPE
+    SYNTAX     Hm2AgentDvmrpPruneEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hm2AgentDvmrpPruneTable."
+    INDEX      { hm2AgentDvmrpPruneGroup, hm2AgentDvmrpPruneSource,
+                 hm2AgentDvmrpPruneSourceMask }
+    ::= { hm2AgentDvmrpPruneTable 1 }
+
+Hm2AgentDvmrpPruneEntry ::= SEQUENCE {
+    hm2AgentDvmrpPruneGroup              IpAddress,
+    hm2AgentDvmrpPruneSource             IpAddress,
+    hm2AgentDvmrpPruneSourceMask         IpAddress,
+    hm2AgentDvmrpPruneExpiryTime         TimeTicks
+}
+
+hm2AgentDvmrpPruneGroup OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The group address which has been pruned."
+    ::= { hm2AgentDvmrpPruneEntry 1 }
+
+hm2AgentDvmrpPruneSource OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address of the source or source network which has been
+            pruned."
+    ::= { hm2AgentDvmrpPruneEntry 2 }
+
+hm2AgentDvmrpPruneSourceMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address of the source or source network which has been
+            pruned.  The mask must either be all 1's, or else
+            hm2AgentDvmrpPruneSource and hm2AgentDvmrpPruneSourceMask must match
+            hm2AgentDvmrpRouteSource and hm2AgentDvmrpRouteSourceMask for some entry in
+            the hm2AgentDvmrpRouteTable."
+    ::= { hm2AgentDvmrpPruneEntry 3 }
+
+hm2AgentDvmrpPruneExpiryTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The amount of time remaining before this prune should
+            expire at the upstream neighbor.  This value should be the
+            minimum of the default prune lifetime and the remaining
+            prune lifetimes of the local router's downstream neighbors,
+            if any."
+    ::= { hm2AgentDvmrpPruneEntry 4 }
+
+-- DVMRP Notifications
+
+hm2AgentDvmrpNeighborLoss NOTIFICATION-TYPE
+    OBJECTS {
+       hm2AgentDvmrpInterfaceLocalAddress, 	-- The originator of the trap
+       hm2AgentDvmrpNeighborState  			-- The new state
+    }
+    STATUS             current
+    DESCRIPTION
+            "A hm2AgentDvmrpNeighborLoss trap signifies the loss of a 2-way
+            adjacency with a neighbor.  This trap should be generated
+            when the neighbor state changes from active to one-way,
+            ignoring, or down.  The trap should be generated only if the
+            router has no other neighbors on the same interface with a
+            lower IP address than itself."
+    ::= { hm2AgentDvmrpMIBNotifications 1 }
+
+hm2AgentDvmrpNeighborNotPruning NOTIFICATION-TYPE
+    OBJECTS {
+       hm2AgentDvmrpInterfaceLocalAddress, -- The originator of the trap
+       hm2AgentDvmrpNeighborCapabilities
+    }
+    STATUS             current
+    DESCRIPTION
+            "A hm2AgentDvmrpNeighborNotPruning trap signifies that a non-pruning
+            neighbor has been detected (in an implementation-dependent
+            manner).  This trap should be generated at most once per
+            generation ID of the neighbor.  For example, it should be
+            generated at the time a neighbor is first heard from if the
+            prune bit is not set in its capabilities.  It should also be
+            generated if the local system has the ability to tell that a
+            neighbor which sets the the prune bit in its capabilities is
+            not pruning any branches over an extended period of time.
+            The trap should be generated only if the router has no other
+            neighbors on the same interface with a lower IP address than
+            itself."
+    ::= { hm2AgentDvmrpMIBNotifications 2 }
+
+END

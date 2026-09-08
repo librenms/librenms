@@ -1,0 +1,551 @@
+HM2-L2REDUNDANCY-LRE-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann Layer 2 Redundancy LRE MIB
+-- *************************************************************
+--
+
+IMPORTS 
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32, 	
+    Counter32                       FROM SNMPv2-SMI
+    TruthValue                      FROM SNMPv2-TC
+    InterfaceIndex                  FROM IF-MIB
+    hm2L2RedundancyMibObjects       FROM HM2-L2REDUNDANCY-MIB
+    lreInterfaceConfigIndex,
+    lreInterfaceStatsIndex          FROM IEC-62439-3-MIB;
+
+hm2LreMibGroup			MODULE-IDENTITY 
+    LAST-UPDATED "201207020000Z"
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann Layer 2 Redundancy LRE MIB.
+         Copyright (C) 2012. All Rights Reserved."
+    REVISION "201207020000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { hm2L2RedundancyMibObjects 2 }
+
+-- ****************************************************************************
+-- Objects of the LRE Network Management
+-- ****************************************************************************
+
+hm2LreEntityNotifications 	OBJECT IDENTIFIER ::={ hm2LreMibGroup 0 }
+hm2LreEntityObjects 		OBJECT IDENTIFIER ::={ hm2LreMibGroup 1 }
+hm2LreEntityConformance 	OBJECT IDENTIFIER ::={ hm2LreMibGroup 2 }
+
+hm2LreConfiguration 		OBJECT IDENTIFIER ::={ hm2LreEntityObjects 1 }
+hm2LreStatistics 			OBJECT IDENTIFIER ::={ hm2LreEntityObjects 2 }
+
+hm2LreConfigurationGeneralGroup 	OBJECT IDENTIFIER ::={ hm2LreConfiguration 1 }
+hm2LreConfigurationInterfaceGroup 	OBJECT IDENTIFIER ::={ hm2LreConfiguration 2 }
+
+hm2LreStatisticsInterfaceGroup 		OBJECT IDENTIFIER ::={ hm2LreStatistics 1 }
+
+-- ****************************************************************************
+-- Objects for lreConfigurationInterfacesGroup
+-- ****************************************************************************
+
+hm2LreConfigurationInterfaces OBJECT IDENTIFIER 
+ ::= { hm2LreConfigurationInterfaceGroup 1 }
+
+
+-- *************************************
+-- ***Begin InterfaceConfigTable***
+-- *************************************
+hm2LreInterfaceConfigTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF HM2LREInterfaceConfigEntry
+  MAX-ACCESS 		not-accessible
+  STATUS 			current
+  DESCRIPTION
+    "List of PRP/HSR interfaces. Each entry corresponds
+    to one PRP/HSR Link Redundancy Entity (LRE), each representing a
+    pair of LAN adapters A and B. A basic device supporting PRP/HSR might
+    have only one LRE and thus one entry in the table, while more complex
+    devices might have several entries for multiple LRE's."
+  ::= { hm2LreConfigurationInterfaces 1 }
+
+
+hm2LreInterfaceConfigEntry OBJECT-TYPE
+  SYNTAX HM2LREInterfaceConfigEntry
+  MAX-ACCESS 	not-accessible
+  STATUS 		current
+  DESCRIPTION
+    "Each entry contains management information applicable to a
+     particular LRE."
+  INDEX { lreInterfaceConfigIndex }
+::= { hm2LreInterfaceConfigTable 1 }
+
+HM2LREInterfaceConfigEntry ::=
+  SEQUENCE {
+  hm2LreInterfaceA                  InterfaceIndex,
+  hm2LreInterfaceB                  InterfaceIndex,
+  hm2LreProxyNodeTableSize          Unsigned32,
+  hm2LreSupervisionTxEnable         TruthValue,
+  hm2LreSupervisionVDANsTxEnable    TruthValue,
+  hm2LreStatisticsClear             INTEGER,
+  hm2LreMaxFrameSizeLimit           Unsigned32,
+  hm2LreMaxFrameSize                Unsigned32,
+  hm2LreSpeed						INTEGER,
+  hm2LreDuplicateDetectionAging     Unsigned32,
+  hm2LreProxyNodeTableAging         Unsigned32
+  }
+
+
+hm2LreInterfaceA OBJECT-TYPE
+  SYNTAX 		InterfaceIndex
+  MAX-ACCESS 	read-only
+  STATUS 		current
+  DESCRIPTION 
+  	"Physical interface in LAN_A."
+::= { hm2LreInterfaceConfigEntry 1 }
+
+hm2LreInterfaceB OBJECT-TYPE
+  SYNTAX 		InterfaceIndex
+  MAX-ACCESS 	read-only
+  STATUS 		current
+  DESCRIPTION 
+  	"Physical interface in LAN_B."
+::= { hm2LreInterfaceConfigEntry 2 }
+
+hm2LreProxyNodeTableSize OBJECT-TYPE
+  SYNTAX 		Unsigned32
+  MAX-ACCESS 	read-only
+  STATUS 		current
+  DESCRIPTION 
+  	"Size of the proxy node table."
+::= { hm2LreInterfaceConfigEntry 3 }
+
+hm2LreSupervisionTxEnable OBJECT-TYPE
+  SYNTAX        TruthValue
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION 
+  "True if the LRE sends supervision frames. False if it
+  does not send supervision frames.
+  Note: LREs are required to send supervision frames"
+  DEFVAL      { true } 
+::= { hm2LreInterfaceConfigEntry 4 }
+
+hm2LreSupervisionVDANsTxEnable OBJECT-TYPE
+  SYNTAX        TruthValue
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION 
+  "True if the LRE sends a supervision for each VDAN. False if it
+  does not send supervision frames for each VDAN.
+  If supervision transmission for each VDAN is disabled but supervision transmission in general is enabled,
+  only one supervision frame from LRE management is send."
+  DEFVAL      { true } 
+::= { hm2LreInterfaceConfigEntry 5 }
+
+hm2LreStatisticsClear   OBJECT-TYPE
+  SYNTAX                INTEGER
+                        {
+  noOp (0),
+  clearStatistics (1)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION           
+  "specifies that the statistics counters are to be cleared"
+::= { hm2LreInterfaceConfigEntry 6 }
+
+hm2LreMaxFrameSizeLimit OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+             "This object identifies the largest value that can be
+             configured for hm2LreMaxFrameSize."
+ ::= { hm2LreInterfaceConfigEntry 7 }
+         
+hm2LreMaxFrameSize OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+             "This object identifies the currently configured maximum frame size
+              value for this port. The maximum value that this object can be set
+              to is the value of hm2LreMaxFrameSizeLimit."
+ ::= { hm2LreInterfaceConfigEntry 8 }
+
+hm2LreSpeed OBJECT-TYPE
+  SYNTAX      INTEGER
+  			{
+  				lreSpeed100Mbps (1),
+  				lreSpeed1Gbps (2)
+  			}
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+             "Specifies the speed of the LRE interfaces.
+             If the device does not support 1Gbps(2), a set to this value will 
+             return an error."
+  DEFVAL { lreSpeed100Mbps }
+ ::= { hm2LreInterfaceConfigEntry 9 }
+
+hm2LreDuplicateDetectionAging OBJECT-TYPE
+  SYNTAX      Unsigned32 (10..5000)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+             "Specifies the aging time in miliseconds for the duplicate detection."
+  DEFVAL { 400 }
+ ::= { hm2LreInterfaceConfigEntry 10 }
+
+hm2LreProxyNodeTableAging OBJECT-TYPE
+  SYNTAX      Unsigned32 (10..300)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+             "Specifies the aging time in seconds for the proxy node table."
+  DEFVAL { 60 }
+ ::= { hm2LreInterfaceConfigEntry 11 }
+
+-- *************************************
+-- ***  End InterfaceConfigTable  ***
+-- *************************************
+
+
+-- ****************************************************************************
+-- Objects for lreStatisticsInterfacesGroup
+-- ****************************************************************************
+
+hm2LreStatisticsInterfaces OBJECT IDENTIFIER
+::= { hm2LreStatisticsInterfaceGroup 1 }
+
+-- *************************************
+-- ***Begin LRE InterfacesStatsTable ***
+-- *************************************
+
+hm2LreInterfaceStatsTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF HM2LREInterfaceStatsEntry
+  MAX-ACCESS 	not-accessible
+  STATUS 		current
+  DESCRIPTION
+  	"A list of PRP/HSR redundant interfaces. Each entry corresponds
+   	 to one redundant PRP/HSR Link Redundancy Entity (LRE) with a
+   	 LAN connector A and B each. A basic device supporting PRP/HSR might
+   	 have only one LRE and thus one entry in the table, while more complex
+   	 devices might have several entries for multiple LRE's."
+  ::= { hm2LreStatisticsInterfaces 1 }
+
+
+hm2LreInterfaceStatsEntry OBJECT-TYPE
+  SYNTAX HM2LREInterfaceStatsEntry
+  MAX-ACCESS    not-accessible
+  STATUS        current
+  DESCRIPTION
+    "An entry containing management information applicable to a
+     particular LRE."
+  INDEX { lreInterfaceStatsIndex }
+::= { hm2LreInterfaceStatsTable 1 }
+
+HM2LREInterfaceStatsEntry ::=
+  SEQUENCE {
+            hm2LreProxyNodeTableEntries Unsigned32,
+            hm2LreRxAError              Counter32,
+            hm2LreRxACrcError           Counter32,
+            hm2LreRxBError              Counter32,
+            hm2LreRxBCrcError           Counter32,
+            hm2LreRxIError              Counter32,
+            hm2LreRxICrcError           Counter32,
+            hm2LreRxAWrongLan           Counter32,
+            hm2LreRxBWrongLan           Counter32,
+            hm2LreRxAllFrameA           Counter32,
+            hm2LreRxAllFrameB           Counter32,
+            hm2LreRxAllFrameIl          Counter32,
+            hm2LreRxShortFrameA         Counter32,
+            hm2LreRxShortFrameB         Counter32,
+            hm2LreRxLongFrameA          Counter32,
+            hm2LreRxLongFrameB          Counter32,
+            hm2LreRxADiscard            Counter32,
+            hm2LreRxBDiscard            Counter32,
+            hm2LreRxIlDiscard           Counter32,
+            hm2LreRxCpuDiscard          Counter32,
+            hm2LreTxARct                Counter32,
+            hm2LreTxAHsr                Counter32,
+            hm2LreTxAWithoutRct         Counter32,
+            hm2LreTxBRct                Counter32,
+            hm2LreTxBHsr                Counter32,
+            hm2LreTxBWithoutRct         Counter32,
+            hm2LreTxIlRct               Counter32,
+            hm2LreTxIlWithoutRct        Counter32
+  }
+
+
+hm2LreProxyNodeTableEntries OBJECT-TYPE
+  SYNTAX 		Unsigned32
+  MAX-ACCESS 	read-only
+  STATUS 		current
+  DESCRIPTION
+  	"Entries in the proxy node table.
+   	 Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 1 }
+
+hm2LreRxAError              OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of phy receive errors on port A.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 2 }
+
+hm2LreRxACrcError           OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames received with FCS error,
+     fragments and symbol error on port A.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 3 }
+
+hm2LreRxBError              OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of phy receive errors on port B.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 4 }
+
+hm2LreRxBCrcError           OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames received with FCS error,
+     fragments and symbol error on port B.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 5 }
+
+hm2LreRxIError              OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of phy receive errors on interlink port.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 6 }
+
+hm2LreRxICrcError           OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames received with FCS error,
+     fragments and symbol error on interlink port.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 7 }
+
+hm2LreRxAWrongLan           OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames with a wrong LAN identifier received on port A.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 8 }
+
+hm2LreRxBWrongLan           OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames with a wrong LAN identifier received on port B.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 9 }
+
+hm2LreRxAllFrameA           OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames received on port A.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 10 }
+
+hm2LreRxAllFrameB           OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames received on port B.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 11 }
+
+hm2LreRxAllFrameIl          OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames received on interlink port.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 12 }
+
+hm2LreRxShortFrameA         OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of short frames received on port A.
+    These frames are not forwarded.
+    Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 13 }
+
+hm2LreRxShortFrameB         OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of short frames received on port B.
+    These frames are not forwarded.
+    Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 14 }
+
+hm2LreRxLongFrameA          OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of long frames received on port A.
+    These frames are not forwarded.
+    Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 15 }
+
+hm2LreRxLongFrameB          OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of long frames received on port B.
+    These frames are not forwarded.
+    Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 16 }
+
+hm2LreRxADiscard            OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames received on port A which are discarded in internal switch.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 17 }
+
+hm2LreRxBDiscard            OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames received on port B which are discarded in internal switch.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 18 }
+
+hm2LreRxIlDiscard           OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames received on interlink port which are discarded in internal switch.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 19 }
+
+hm2LreRxCpuDiscard          OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames received on CPU port which are discarded in internal switch.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 20 }
+
+hm2LreTxARct                OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames transmitted on port A with redundancy control trailer (RCT).
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 21 }
+
+hm2LreTxAHsr                OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames transmitted on port A with HSR tag.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 22 }
+
+hm2LreTxAWithoutRct         OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames transmitted on port A without redundancy control trailer (RCT).
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 23 }
+
+hm2LreTxBRct                OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames transmitted on port B with redundancy control trailer (RCT).
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 24 }
+
+hm2LreTxBHsr                OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames transmitted on port B with HSR tag.
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 25 }
+
+hm2LreTxBWithoutRct         OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames transmitted on port B without redundancy control trailer (RCT).
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 26 }
+
+hm2LreTxIlRct               OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames transmitted on interlink port with redundancy control trailer (RCT).
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 27 }
+
+hm2LreTxIlWithoutRct        OBJECT-TYPE
+  SYNTAX        Counter32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "number of frames transmitted on interlink port without redundancy control trailer (RCT).
+     Initial value = 0."
+::= { hm2LreInterfaceStatsEntry 28 }
+
+
+-- *************************************
+-- ***  End LRE InterfacesStatsTable ***
+-- *************************************
+
+END
+

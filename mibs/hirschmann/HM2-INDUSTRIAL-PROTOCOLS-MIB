@@ -1,0 +1,1067 @@
+HM2-INDUSTRIAL-PROTOCOLS-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann Industrial Protocols MIB
+-- ***********************************************************
+--
+
+IMPORTS
+    DisplayString                 FROM SNMPv2-TC
+    TruthValue                    FROM SNMPv2-TC
+    RowStatus                     FROM SNMPv2-TC
+    OBJECT-IDENTITY,
+    MODULE-IDENTITY, 
+    OBJECT-TYPE,
+    Integer32,
+    Unsigned32					  FROM SNMPv2-SMI
+    SnmpAdminString               FROM SNMP-FRAMEWORK-MIB
+    InetPortNumber,
+    InetAddressIPv4	   			  FROM INET-ADDRESS-MIB
+    HmEnabledStatus,
+    hm2ConfigurationMibs          FROM HM2-TC-MIB;
+
+hm2IndustrialProtocolsMib MODULE-IDENTITY
+    LAST-UPDATED "201402240000Z" -- February 24, 2014
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        		"Hirschmann Industrial Protocols MIB.
+         	 	 Copyright (C) 2013. All Rights Reserved."
+         	 	  
+    REVISION     "201402240000Z" -- February 24, 2014
+    DESCRIPTION
+    			"Added hm2ModbusGroup."
+    REVISION     "201401150000Z" -- January 15, 2014
+    DESCRIPTION
+                 "Added hm2EthernetIPGroup."
+    REVISION     "201305220000Z" -- May 22, 2013
+    DESCRIPTION
+         	 	 "Initial version."
+    ::= { hm2ConfigurationMibs 101 }
+
+--
+-- Textual conventions
+--
+Hm2Iec62541OpcUaUserAccessRoles ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+		"user access roles."
+	SYNTAX INTEGER {
+		readOnly (1)
+	}
+
+Hm2Iec62541OpcUaSecurityPolicies ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+		"OPC/UA server security policy."
+	SYNTAX INTEGER {
+				none (1),
+				basic128Rsa15 (2),
+				basic256 (3),
+				basic256Sha256 (4)
+			}
+
+
+-- 
+-- ***********************************************************
+-- hm2IndustrialProtocolsMib
+-- ***********************************************************
+--
+hm2IndustrialProtocolsNotifications			OBJECT IDENTIFIER ::= { hm2IndustrialProtocolsMib 0 }
+hm2IndustrialProtocolsMibObjects			OBJECT IDENTIFIER ::= { hm2IndustrialProtocolsMib 1 }
+-- hm2IndustrialProtocolsMibConformance		OBJECT IDENTIFIER ::= { hm2IndustrialProtocolsMib 2 }
+hm2IndustrialProtocolsMibSNMPExtensionGroup	OBJECT IDENTIFIER ::= { hm2IndustrialProtocolsMib 3 }
+
+-- 
+-- ***********************************************************
+-- hm2IndustrialProtocol Groups 
+-- ***********************************************************
+--
+hm2Iec61850Group     	OBJECT IDENTIFIER ::= { hm2IndustrialProtocolsMibObjects 1 }
+hm2ProfinetIOGroup   	OBJECT IDENTIFIER ::= { hm2IndustrialProtocolsMibObjects 2 }
+hm2EthernetIPGroup		OBJECT IDENTIFIER ::= { hm2IndustrialProtocolsMibObjects 3 }
+hm2ModbusGroup		    OBJECT IDENTIFIER ::= { hm2IndustrialProtocolsMibObjects 4 }
+hm2Iec62541Group	    OBJECT IDENTIFIER ::= { hm2IndustrialProtocolsMibObjects 5 }
+
+-- 
+-- ***********************************************************
+-- hm2Iec61850Group 
+-- ***********************************************************
+--         
+hm2Iec61850ConfigGroup 		OBJECT IDENTIFIER ::= { hm2Iec61850Group 1 }         
+hm2Iec61850StatisticsGroup  OBJECT IDENTIFIER ::= { hm2Iec61850Group 2 }       
+
+-- 
+-- ***********************************************************
+-- hm2Iec61850ConfigGroup 
+-- ***********************************************************
+--
+hm2Iec61850MmsServerAdminStatus  OBJECT-TYPE
+		SYNTAX      HmEnabledStatus
+		MAX-ACCESS 	read-write
+   	    STATUS  	current
+		DESCRIPTION
+			"Enables/disables the IEC61850 MMS server functionality
+		     on this device. 
+		     If disabled(2), the IEC61850 MMS Server is deactivated, 
+		     but the IEC61850 MIBs can be accessed.  
+		     The default value is disabled."
+		DEFVAL  { disable }		     
+	::= { hm2Iec61850ConfigGroup 1 }
+
+hm2Iec61850MmsServerWriteAccessStatus  OBJECT-TYPE
+		SYNTAX		HmEnabledStatus
+		MAX-ACCESS 	read-write
+   	    STATUS  	current
+		DESCRIPTION
+			"Enables/disables the read/write capability of the IEC61850 MMS. 
+		     If disabled(2), the IEC61850 MMS Server is accessible read-only,  
+		     if enabled(1) the device configuration can be changed using 
+		     the IEC61850 MMS protocol.  
+		     The default value is disabled."
+		DEFVAL  { disable }		     
+	::= { hm2Iec61850ConfigGroup 2 }
+
+hm2Iec61850MmsServerPortNumber  OBJECT-TYPE
+		SYNTAX      InetPortNumber
+		MAX-ACCESS 	read-write
+   	    STATUS  	current
+		DESCRIPTION
+			"The port number of the IEC61850 MMS server.
+             Setting the port to zero is not allowed."						
+			DEFVAL  { 102 }
+	::= { hm2Iec61850ConfigGroup 3 }
+
+hm2Iec61850MmsServerMaxSessionsCount OBJECT-TYPE
+	 SYNTAX       	Integer32 (1..15)
+     MAX-ACCESS   	read-write
+     STATUS       	current
+     DESCRIPTION
+                  "Max number of IEC61850 MMS sessions permitted on this switch."
+	 DEFVAL { 5 }                  
+      ::= { hm2Iec61850ConfigGroup 4 }
+      
+hm2Iec61850MmsServerTechnicalKey OBJECT-TYPE
+	 SYNTAX       	SnmpAdminString (SIZE (0..32))
+     MAX-ACCESS   	read-write
+     STATUS       	current
+     DESCRIPTION
+                  "The IEC61850 MMS server technical key setting corresponds to the IEC61850 IED name. 
+			 This name is used to identify the device via a IEC61850 MMS client. 
+			 The size is restricted to 32 characters. According to IEC61850-7-2 Ed. the TechnicalKey represents
+			 an IEC61850 VisibleString. Thus the following characters are allowed:
+			 VisibleString ( FROM
+				('A'|'a'|'B'|'b'|'C'|'c'|'D'|'d'|'E'|'e'|'F'|'f'|
+				'G'|'g'|'H'|'h'|'I'|'i'|'J'|'j'|'K'|'k'|'L'|'l'|
+				'M'|'m'|'N'|'n'|'O'|'o'|'P'|'p'|'Q'|'q'|'R'|'r'|
+				'S'|'s'|'T'|'t'|'U'|'u'|'V'|'v'|'W'|'w'|'X'|'x'|
+				'Y'|'y'|'Z'|'z'|'_'|'0'|'1'|'2'|'3'|'4'|'5'|'6'|
+				'7'|'8'|'9') )"
+	 DEFVAL { "KEY" }                  
+      ::= { hm2Iec61850ConfigGroup 5 }      
+
+hm2Iec61850MmsTlsServerAdminStatus  OBJECT-TYPE
+		SYNTAX      HmEnabledStatus
+		MAX-ACCESS 	read-write
+   	    STATUS  	current
+		DESCRIPTION
+			"Enables/disables the IEC61850 MMS over TLS server functionality
+		     on this device. 
+		     If disabled(2), the IEC61850 MMS over TLS Server is deactivated, 
+		     but the IEC61850 MIBs can be accessed.  
+		     The default value is disabled."
+		DEFVAL  { disable }		     
+	::= { hm2Iec61850ConfigGroup 10 }
+
+hm2Iec61850MmsTlsServerWriteAccessStatus  OBJECT-TYPE
+		SYNTAX		HmEnabledStatus
+		MAX-ACCESS 	read-write
+   	    STATUS  	current
+		DESCRIPTION
+			"Enables/disables the read/write capability of the IEC61850 MMS. 
+		     If disabled(2), the IEC61850 MMS over TLS Server is accessible read-only,  
+		     if enabled(1) the device configuration can be changed using 
+		     the IEC61850 MMS over TLS protocol.  
+		     The default value is disabled."
+		DEFVAL  { disable }		     
+	::= { hm2Iec61850ConfigGroup 11 }
+
+hm2Iec61850MmsTlsServerPortNumber  OBJECT-TYPE
+		SYNTAX      InetPortNumber
+		MAX-ACCESS 	read-write
+   	    STATUS  	current
+		DESCRIPTION
+			"The port number of the IEC61850 MMS over TLS server.
+             Setting the port to zero is not allowed."						
+			DEFVAL  { 3782 }
+	::= { hm2Iec61850ConfigGroup 12 }
+
+hm2Iec61850MmsTlsServerMaxSessionsCount OBJECT-TYPE
+	 SYNTAX       	Integer32 (1..15)
+     MAX-ACCESS   	read-write
+     STATUS       	current
+     DESCRIPTION
+                  "Max number of IEC61850 MMS over TLS sessions permitted on this switch."
+	 DEFVAL { 5 }                  
+      ::= { hm2Iec61850ConfigGroup 13 }
+
+hm2Iec61850MmsTlsServerKeysPresent OBJECT-TYPE
+     SYNTAX      INTEGER {
+                 dsa(1),
+                 rsa(2),
+                 both(3),
+                 none(4)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "Indicates what key files are present on the device, if any."
+     ::= { hm2Iec61850ConfigGroup 20 }
+
+hm2Iec61850MmsTlsServerKeyOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    dsa(1),
+                    rsa(2),
+                    both(3),
+                    none(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "Indicates what key files are currently being generated or deleted, if any."
+        ::= { hm2Iec61850ConfigGroup 21 }
+
+hm2Iec61850MmsTlsServerRSAKeyControl OBJECT-TYPE
+     SYNTAX      INTEGER {
+                 noop(1),
+                 generate(2),
+                 delete(3)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "Controls RSA key generation and deletion.  Always returns noop(1)."
+     ::= { hm2Iec61850ConfigGroup 22 }
+
+hm2Iec61850MmsTlsServerDSAKeyControl OBJECT-TYPE
+     SYNTAX      INTEGER {
+                 noop(1),
+                 generate(2),
+                 delete(3)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "Controls DSA key generation and deletion.  Always returns noop(1)."
+     ::= { hm2Iec61850ConfigGroup 23 }
+
+hm2Iec61850MmsTlsServerFingerPrintDSA  	OBJECT-TYPE
+	 SYNTAX 		DisplayString (SIZE (0..128))
+	 MAX-ACCESS		read-only
+	 STATUS			current
+	 DESCRIPTION
+		"The local DSA fingerprint for IEC61850 MMS over TLS connections."						
+	 ::= { hm2Iec61850ConfigGroup 24 }
+
+hm2Iec61850MmsTlsServerFingerPrintRSA  	OBJECT-TYPE
+	 SYNTAX 		DisplayString (SIZE (0..128))
+	 MAX-ACCESS		read-only
+	 STATUS			current
+	 DESCRIPTION
+	 	"The local RSA fingerprint for IEC61850 MMS over TLS connections."						
+	 ::= { hm2Iec61850ConfigGroup 25 }
+	 
+hm2Iec61850MmsServerStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    unavailable(1),
+                    starting(2),
+                    running(3),
+                    stopping(4),
+                    halted(5),
+                    error(6)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "Returns current MMS server status.
+                    As the MMS server takes a long time to start or to stop,
+                    this will return the actual server state, not just if it is enabled or disabled.
+                    If the value is unavailable(1) then the feature is not available on the device."   
+    ::= { hm2Iec61850ConfigGroup 26 }
+
+-- 
+-- ***********************************************************
+-- hm2Iec61850StatisticsGroup 
+-- ***********************************************************
+--
+hm2Iec61850MmsServerSessionsCount OBJECT-TYPE
+     SYNTAX      	Integer32
+     MAX-ACCESS  	read-only
+     STATUS      	current
+     DESCRIPTION
+                 "Current number of active IEC61850 MMS sessions on this switch."
+     ::= { hm2Iec61850StatisticsGroup 1 }
+     
+hm2Iec61850MmsTlsServerSessionsCount OBJECT-TYPE
+     SYNTAX      	Integer32
+     MAX-ACCESS  	read-only
+     STATUS      	current
+     DESCRIPTION
+                 "Current number of active IEC61850 MMS over TLS sessions on this switch."
+     ::= { hm2Iec61850StatisticsGroup 10 }
+
+-- 
+-- ***********************************************************
+-- hm2ProfinetIOGroup 
+-- ***********************************************************
+-- 
+hm2ProfinetIOConfigGroup 		OBJECT IDENTIFIER ::= { hm2ProfinetIOGroup 1 }         
+hm2ProfinetIOStatisticsGroup  	OBJECT IDENTIFIER ::= { hm2ProfinetIOGroup 2 }         
+
+
+--
+-- ProfinetIO 
+--
+hm2PNIOAdminStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			enable(1),
+			disable(2)
+		}
+		MAX-ACCESS read-write
+   	    STATUS  current
+		DESCRIPTION
+			"Enables/disables the ProfinetIO functionality
+		     on this device. 
+		     If disabled(2), the ProfinetIO protocol is inactive, 
+		     but the ProfinetIO MIBs can be accessed. 
+		     The default value is disabled."
+		DEFVAL  { disable }		     
+	::= { hm2ProfinetIOConfigGroup 1 }
+
+hm2PNIODeviceID  OBJECT-TYPE
+		SYNTAX Integer32 (0..65535) -- 0x0000..0xFFFF
+		MAX-ACCESS read-only
+   	    STATUS  current
+		DESCRIPTION
+			"Identifier of the device family.
+			 Values 1 .. 65635 are valid device IDs."
+	::= { hm2ProfinetIOConfigGroup 2 }
+
+hm2PNIOModuleIdentNumber  OBJECT-TYPE
+		SYNTAX Integer32 
+		MAX-ACCESS read-only
+  	    STATUS  current
+		DESCRIPTION
+			"Identifier ID of the device of port or module."
+	::= { hm2ProfinetIOConfigGroup 3 }
+
+
+hm2PNIOOrderID  OBJECT-TYPE
+	    SYNTAX DisplayString (SIZE (0..64))
+		MAX-ACCESS read-only
+   	    STATUS  current
+		DESCRIPTION
+			"Product (switch) order ID. 
+			 The size is restricted to 64 characters."
+	::= { hm2ProfinetIOConfigGroup 4 }
+
+hm2PNIODeviceTypeDetails OBJECT-TYPE 
+		SYNTAX 		  DisplayString
+		MAX-ACCESS 		  read-only
+		STATUS 		  current
+		DESCRIPTION
+			 "Switch device type details, for example: 
+			  4 Port Rail Switch."
+    ::= { hm2ProfinetIOConfigGroup 5 }
+
+hm2PNIOSoftwareRelease OBJECT-TYPE 
+		SYNTAX 		  DisplayString
+		MAX-ACCESS 		  read-only
+		STATUS 		  current
+		DESCRIPTION
+		 "This value is a string that contains Version number of 
+		  software in profinetio format, for example: 01.0.03."
+    ::= { hm2ProfinetIOConfigGroup 6 }
+
+hm2PNIOHardwareRelease OBJECT-TYPE
+        SYNTAX     Integer32
+		MAX-ACCESS 	   read-only
+   	    STATUS  current
+		DESCRIPTION
+			"Version number of switch hardware in profinetio format."
+	::= { hm2ProfinetIOConfigGroup 7 }
+
+
+hm2PNIOOrderID9th  OBJECT-TYPE
+	    SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-only
+   	    STATUS  current
+		DESCRIPTION
+			"Product (switch) order ID. 
+			 The size is restricted to 32 characters
+			 (In the form of the 9-th numbers)."
+	::= { hm2ProfinetIOConfigGroup 8 }
+
+hm2PNIONameOfStation OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..240))
+      MAX-ACCESS read-write
+          STATUS  current
+      DESCRIPTION
+         "Device name. 
+          The size is restricted to 240 characters.
+          It must be conform to the restrictions 
+          as decribed in PNIO protocol specification."
+   ::= { hm2ProfinetIOConfigGroup 9 }
+
+hm2PNIONumActiveApplicationRelations OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Returns the number of active application relations."
+  ::= { hm2ProfinetIOConfigGroup 10 }
+  
+hm2PNIOClearIpParameter OBJECT-TYPE
+           SYNTAX TruthValue
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+             "Clears the IP parameters if set to true and PNIO is enabled."
+           DEFVAL  { false }
+  ::= { hm2ProfinetIOConfigGroup 11 }
+
+hm2PNIOIm1Data OBJECT-TYPE
+           SYNTAX SnmpAdminString (SIZE (0..54))
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+             "I&M1 data contains 2 fields: 
+              Tag function is a 32 byte visible string that indicates the submodule's function or task. 
+              Tag location is a 22 byte visible string that indicates the submodule's location."
+  ::=  { hm2ProfinetIOConfigGroup 21 }
+
+hm2PNIOIm2Data OBJECT-TYPE
+           SYNTAX SnmpAdminString (SIZE (0..16))
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+             "I&M2 is a Date and time function in the YYYY-MM-DD HH:MM format.
+              For example, 2018-08-10 10:50 "
+  ::=  { hm2ProfinetIOConfigGroup 22 }
+
+hm2PNIOIm3Data OBJECT-TYPE
+           SYNTAX SnmpAdminString (SIZE (0..54))
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+             "I&M3 is a general Descriptor function that is a 54 byte visible string 
+              for holding additional information. "
+  ::=  { hm2ProfinetIOConfigGroup 23 }
+
+hm2PNIOIm4Data OBJECT-TYPE
+           SYNTAX SnmpAdminString (SIZE (0..54))
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+             "I&M4 is used for a signature with PROFIsafe."
+  ::=  { hm2ProfinetIOConfigGroup 24 }
+
+hm2PNIOClearStationName OBJECT-TYPE
+           SYNTAX TruthValue
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+             "Clear Station Name if set to true and PNIO is enabled."
+           DEFVAL  { false }
+  ::=  { hm2ProfinetIOConfigGroup 25 }
+
+hm2PNIOPdevParameters OBJECT-TYPE
+           SYNTAX OCTET STRING
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+             "PDEV parameters of ApplicationRelation"
+  ::=  { hm2ProfinetIOConfigGroup 26 }
+
+
+
+hm2PNIODcpModeTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2PNIODcpModeEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+    DESCRIPTION "Table of DCP mode entries"
+	::= { hm2ProfinetIOConfigGroup 20 }
+
+hm2PNIODcpModeEntry OBJECT-TYPE
+    SYNTAX Hm2PNIODcpModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "DCP mode entry"
+    INDEX { hm2PNIODcpModePortID }
+	::= { hm2PNIODcpModeTable 1 }
+
+Hm2PNIODcpModeEntry ::= SEQUENCE {
+          hm2PNIODcpModePortID 	Integer32,
+		  hm2PNIODcpMode		INTEGER
+   }
+   
+hm2PNIODcpModePortID OBJECT-TYPE
+	SYNTAX 		Integer32
+	MAX-ACCESS 	not-accessible
+   	STATUS current
+    DESCRIPTION "Port ID for the DCP mode table entry"
+	::= { hm2PNIODcpModeEntry 1 }
+
+hm2PNIODcpMode OBJECT-TYPE
+		SYNTAX INTEGER {
+			none(0),
+			ingress(1),
+			egress(2),
+			both(3)
+		}
+		MAX-ACCESS read-write
+   	STATUS current
+    DESCRIPTION "DCP mode for one port.
+         Allowed values none(0), ingress(1), egress(2) or both(3) which is default."
+	::= { hm2PNIODcpModeEntry 2 }
+
+-- 
+-- ***********************************************************
+-- hm2EthernetIPGroup 
+-- ***********************************************************
+--         
+hm2EthernetIPConfigGroup 	OBJECT IDENTIFIER ::= { hm2EthernetIPGroup 1 }         
+hm2EthernetIPStatisticsGroup  	OBJECT IDENTIFIER ::= { hm2EthernetIPGroup 2 }         
+hm2EthernetIPTCPIPObjectGroup  	OBJECT IDENTIFIER ::= { hm2EthernetIPGroup 3 }
+hm2EthernetIPQoSObjectGroup  	OBJECT IDENTIFIER ::= { hm2EthernetIPGroup 4 }
+
+-- 
+-- ***********************************************************
+-- hm2EthernetIPConfigGroup 
+-- ***********************************************************
+--
+hm2EtherNetIPAdminStatus  OBJECT-TYPE
+		SYNTAX   		HmEnabledStatus
+		MAX-ACCESS 		read-write
+	    STATUS  		current
+		DESCRIPTION
+			"Enables/disables the EtherNet/IP(TM) operation on this device. 
+			 If disabled, the EtherNet/IP protocol is deactivated, but the EtherNet/IP MIBs can be accessed.  
+			The default value is disabled."
+		DEFVAL  { disable }		     
+	::= { hm2EthernetIPConfigGroup 1 }
+
+hm2EtherNetIPErrorCode  OBJECT-TYPE
+		SYNTAX 		Integer32(0..2147483647)
+		MAX-ACCESS 	read-only
+	   	STATUS  	current
+		DESCRIPTION
+			"Read the error code within EtherNet/IP(TM) action. "
+	::= { hm2EthernetIPConfigGroup 2 }
+
+hm2EtherNetIPProductCode  OBJECT-TYPE
+		SYNTAX		 Integer32 (0..65535) -- 0x0000..0xFFFF
+		MAX-ACCESS	 read-only
+   	   	STATUS 		 current
+		DESCRIPTION
+			"Read the Product Code as shown in the Identity Object
+			of EtherNet/IP(TM). Values 1 .. 65635 are valid product codes."
+	::= { hm2EthernetIPConfigGroup 3 }
+
+hm2EtherNetIPMajorRevision  OBJECT-TYPE
+		SYNTAX 		Integer32 (1..255) -- 0x01..0xFF
+		MAX-ACCESS	read-only
+   	    STATUS  	current
+		DESCRIPTION
+			"Read the major revision number as shown in the Identity Object
+			of EtherNet/IP(TM). Values 1 .. 255 are valid revisions."
+	::= { hm2EthernetIPConfigGroup 4 }
+
+hm2EtherNetIPMinorRevision  OBJECT-TYPE
+		SYNTAX 		Integer32 (1..255) -- 0x01..0xFF
+		MAX-ACCESS 	read-only
+   	    STATUS 		current
+		DESCRIPTION
+			"Read the minor revision number as shown in the Identity Object
+			of EtherNet/IP(TM). Values 1 .. 255 are valid revisions."
+	::= { hm2EthernetIPConfigGroup 5 }
+
+hm2EtherNetIPProductName  OBJECT-TYPE
+	    SYNTAX 		SnmpAdminString (SIZE (0..32))
+		MAX-ACCESS	read-only
+   	    STATUS 		current
+		DESCRIPTION
+			"Read the product name as shown in the Identity Object
+			of EtherNet/IP(TM). The size is restricted to 32 Characters."
+	::= { hm2EthernetIPConfigGroup 6 }
+
+hm2EtherNetIPCatalogName  OBJECT-TYPE
+	    SYNTAX 		SnmpAdminString (SIZE (0..255))
+		MAX-ACCESS	read-only
+   	    STATUS 		current
+		DESCRIPTION
+			"Read the catolog name as provided in the EDS file
+			for EtherNet/IP(TM). The size is restricted to 255 Characters."
+	::= { hm2EthernetIPConfigGroup 7 }
+
+hm2EtherNetIPWriteAccessStatus  OBJECT-TYPE
+	SYNTAX		HmEnabledStatus
+	MAX-ACCESS 	read-write
+   	STATUS  	current
+	DESCRIPTION
+		"Enables/disables the read/write capability of the EtherNet/IP protocol. 
+	     If disabled(2), the EtherNet/IP protocol is accessible the get requests only,  
+	     if enabled(1), the EtherNet/IP protocol is accessible the set/get requests, 
+	     The default value is disabled."
+	DEFVAL  { disable}		     
+	::= { hm2EthernetIPConfigGroup 8 }
+
+hm2EtherNetIPVlan  OBJECT-TYPE
+	SYNTAX 		Integer32 (-1..4042)
+	MAX-ACCESS 	read-write
+	STATUS  	current
+	DESCRIPTION
+		"Set the VLAN ID of EtherNet/IP. Possible values for the VLAN ID are -1 to 4042.
+		 A value of -1 corresponds to management VLAN(the default). A value 0 is for priority tagging.
+		 System supported values for VLAN ID are 1 to 4042. VLAN ID '1' is for untagged
+		 EtherNet/IP traffic. Incoming Ethernet/IP traffic with other than configured VLAN 
+		 is discarded. Outgoing Ethernet/IP traffic is tagged with configured VLAN ID." 
+	DEFVAL { -1 }
+	::= { hm2EthernetIPConfigGroup 9 }
+
+hm2EtherNetIPInterface  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the mode of the various interface for EtherNet/IP for this device.
+        EtherNet/IP traffic configure with physical interface
+        EtherNet/IP traffic configure with VLAN interface
+        EtherNet/IP traffic configure with mgmt(-1) interface"
+    DEFVAL { -1 }
+    ::= { hm2EthernetIPConfigGroup 10 }
+-- 
+-- ***********************************************************
+-- hm2EthernetIPStatisticsGroup 
+-- ***********************************************************
+--
+hm2EtherNetIPConnEstablished  OBJECT-TYPE
+		SYNTAX 		Unsigned32 
+		MAX-ACCESS	read-only
+   	    STATUS 		current
+		DESCRIPTION
+			"Statistics: number of connections that have been established
+			within EtherNet/IP."
+	::= { hm2EthernetIPStatisticsGroup 1 }
+
+hm2EtherNetIPConnTimeouts  OBJECT-TYPE
+		SYNTAX 		Unsigned32
+		MAX-ACCESS	read-only
+   	    STATUS  	current
+		DESCRIPTION
+			"Statistics: number of connection timeouts that have been occurred
+			within EtherNet/IP."
+	::= { hm2EthernetIPStatisticsGroup 2 }
+
+hm2EtherNetIPVendorObjRequests  OBJECT-TYPE
+		SYNTAX 		Unsigned32
+		MAX-ACCESS	read-only
+   	    STATUS 		current
+		DESCRIPTION
+			"Statistics: number of requests to the vendor specific objects
+			within EtherNet/IP."
+	::= { hm2EthernetIPStatisticsGroup 3 }
+
+-- 
+-- ***********************************************************
+-- hm2EthernetIPTCPIPObjectGroup
+-- ***********************************************************
+--
+hm2EtherNetIPMcastTTLValue  OBJECT-TYPE
+		SYNTAX 		Integer32(1..255)
+		MAX-ACCESS 	read-write
+	   	STATUS  	current
+		DESCRIPTION
+			"Time-to-Live value for IP multicast packets. "
+	::= { hm2EthernetIPTCPIPObjectGroup  1 }
+
+hm2EtherNetIPMcastAllocControl  OBJECT-TYPE
+		SYNTAX INTEGER {
+                   	default(0), -- default allocation algorithm
+                   	defined(1), -- use hm2EtherNetIPMcastCount and hm2EtherNetIPMcastStartAddress for allocation   
+                   	reserved(2)
+                  	}
+		MAX-ACCESS 	read-write
+	   	STATUS  	current
+		DESCRIPTION
+			"Controls how the device shall allocate IP multicast addresses. 
+			A value of 0 means multicast addresses shall be generated using 
+			the default allocation algorithm. A value of 1 means multicast 
+			addresses shall be allocated according to the values specified 
+			in Num Mcast and Mcast Start Addr. The value 2 is reserved. "
+	::= { hm2EthernetIPTCPIPObjectGroup  2 }
+
+hm2EtherNetIPMcastCount  OBJECT-TYPE
+		SYNTAX 		Integer32(1..255)
+		MAX-ACCESS 	read-write
+	   	STATUS  	current
+		DESCRIPTION
+			"The maximum number of IP multicast addresses to be allocated. "
+	::= { hm2EthernetIPTCPIPObjectGroup  3 }
+
+hm2EtherNetIPMcastStartAddress  OBJECT-TYPE
+		SYNTAX 		InetAddressIPv4
+		MAX-ACCESS 	read-write
+	   	STATUS  	current
+		DESCRIPTION
+			"The starting multicast address from which Num Mcast 
+			addresses are allocated. "
+	::= { hm2EthernetIPTCPIPObjectGroup  4 }
+
+hm2EtherNetIPLastConflictDetectedACDActivity  OBJECT-TYPE
+                SYNTAX          OCTET STRING (SIZE (28))
+		MAX-ACCESS 	read-write
+	   	STATUS  	current
+		DESCRIPTION
+			"The ARP Response PDU (a copy of the ARP message that 
+			caused the address conflict) in binary format. Can only 
+			be written to a value of zero. "
+	::= { hm2EthernetIPTCPIPObjectGroup  5 }
+	
+hm2EtherNetIPSelectACDStatus  OBJECT-TYPE
+	SYNTAX INTEGER {
+				default(0),		-- leave the status of the ACD unchanged
+              	enabled(1),		-- enable ACD, to be applied after the device executes a restart
+               	disabled(2) 	-- disable ACD, to be applied after the device executes a restart
+               	}
+	MAX-ACCESS 	read-write
+   	STATUS  	current
+	DESCRIPTION
+         	"Sets the status of the ip address conflict detection mechanism on this device.
+         	 The new value of this element is applied after the device executes a restart."
+	DEFVAL  { enabled }		     
+	::= { hm2EthernetIPTCPIPObjectGroup 6 }
+
+hm2EtherNetIPEncapsulationInactivity  OBJECT-TYPE
+   SYNTAX      Unsigned32(0..3600)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "sets the EncapsulationInactivity timeout. After a period of no Encapsulation activity on a TCP connection 
+       originator and target shall close the TCP connection. "
+   ::= { hm2EthernetIPTCPIPObjectGroup 7 }
+
+-- 
+-- ***********************************************************
+-- hm2EthernetIPQoSObjectGroup
+-- ***********************************************************
+--
+hm2EtherNetIPQosDscpUrgentValue  OBJECT-TYPE
+		SYNTAX 		Integer32(1..63)
+		MAX-ACCESS 	read-write
+	   	STATUS  	current
+		DESCRIPTION
+			"DSCP value for CIP transport Urgent priority messages. "
+	DEFVAL  { 55 }
+	::= { hm2EthernetIPQoSObjectGroup  1 }
+
+hm2EtherNetIPQosDscpScheduledValue  OBJECT-TYPE
+		SYNTAX 		Integer32(1..63)
+		MAX-ACCESS 	read-write
+	   	STATUS  	current
+		DESCRIPTION
+			"DSCP value for CIP transport Scheduled priority messages. "
+	DEFVAL  { 47 }
+	::= { hm2EthernetIPQoSObjectGroup  2 }
+
+hm2EtherNetIPQosDscpHighValue  OBJECT-TYPE
+		SYNTAX 		Integer32(1..63)
+		MAX-ACCESS 	read-write
+	   	STATUS  	current
+		DESCRIPTION
+			"DSCP value for CIP transport High priority messages. "
+	DEFVAL  { 43 }
+	::= { hm2EthernetIPQoSObjectGroup  3 }
+
+hm2EtherNetIPQosDscpLowValue  OBJECT-TYPE
+		SYNTAX 		Integer32(1..63)
+		MAX-ACCESS 	read-write
+	   	STATUS  	current
+		DESCRIPTION
+			"DSCP value for CIP transport Low priority messages. "
+	DEFVAL  { 31 }
+	::= { hm2EthernetIPQoSObjectGroup  4 }
+
+hm2EtherNetIPQosDscpExplicitValue  OBJECT-TYPE
+		SYNTAX 		Integer32(1..63)
+		MAX-ACCESS 	read-write
+	   	STATUS  	current
+		DESCRIPTION
+			"DSCP value for CIP transport Explicit priority messages. "
+	DEFVAL  { 27 }
+	::= { hm2EthernetIPQoSObjectGroup  5 }
+
+hm2EtherNetIPQosValue  OBJECT-TYPE
+        	SYNTAX  TruthValue
+        	MAX-ACCESS read-write
+        	STATUS current
+        	DESCRIPTION
+            	"This object indicates a changes which be applied after the device executes a restart."
+        	DEFVAL { false }
+	::= { hm2EthernetIPQoSObjectGroup  6 }
+
+-- 
+-- ***********************************************************
+-- hm2ModbusGroup 
+-- ***********************************************************
+--         
+hm2ModbusConfigGroup 		    OBJECT IDENTIFIER ::= { hm2ModbusGroup 1 }         
+hm2ModbusStatisticsGroup  	    OBJECT IDENTIFIER ::= { hm2ModbusGroup 2 }         
+
+-- 
+-- ***********************************************************
+-- hm2ModbusConfigGroup 
+-- ***********************************************************
+--
+hm2ModbusTcpServerAdminStatus  OBJECT-TYPE
+	SYNTAX      HmEnabledStatus
+	MAX-ACCESS 	read-write
+   	STATUS  	current
+	DESCRIPTION
+		"Enables/disables the Modbus TCP server functionality
+	     on this device. 
+	     If disabled(2), the Modbus TCP Server is deactivated, 
+	     but the Modbus MIBs can be accessed.  
+	     The default value is disabled."
+	DEFVAL  { disable }		     
+	::= { hm2ModbusConfigGroup 1 }
+
+hm2ModbusTcpServerWriteAccessStatus  OBJECT-TYPE
+	SYNTAX		HmEnabledStatus
+	MAX-ACCESS 	read-write
+   	STATUS  	current
+	DESCRIPTION
+		"Enables/disables the read/write capability of the Modbus TCP server. 
+	     If disabled(2), the Modbus TCP Server is accessible read-only,  
+	     if enabled(1) the device configuration can be changed using 
+	     the Modbus TCP protocol.  
+	     The default value is disabled."
+	DEFVAL  { enable }		     
+	::= { hm2ModbusConfigGroup 2 }
+
+hm2ModbusTcpServerPortNumber  OBJECT-TYPE
+	SYNTAX      InetPortNumber
+	MAX-ACCESS 	read-write
+   	STATUS  	current
+	DESCRIPTION
+		"The port number of the Modbus TCP server.
+         Setting the port to zero is not allowed."						
+	DEFVAL  { 502 }
+	::= { hm2ModbusConfigGroup 3 }
+
+hm2ModbusTcpServerMaxSessionsCount OBJECT-TYPE
+	SYNTAX       	Integer32 (1..5)
+    MAX-ACCESS   	read-write
+    STATUS       	current
+    DESCRIPTION
+        "Maximum number of concurrent sessions allowed by the Modbus TCP server."
+	DEFVAL { 5 }                  
+    ::= { hm2ModbusConfigGroup 4 }
+
+-- 
+-- ***********************************************************
+-- hm2ModbusStatisticsGroup 
+-- ***********************************************************
+--
+hm2ModbusTcpServerSessionsCount OBJECT-TYPE
+    SYNTAX      	Integer32
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+        "Current number of active sessions to the Modbus TCP server."
+    ::= { hm2ModbusStatisticsGroup 1 }
+
+-- 
+-- ***********************************************************
+-- hm2Iec62541Group - OPC/UA
+-- ***********************************************************
+--         
+hm2Iec62541ConfigGroup 		    OBJECT IDENTIFIER ::= { hm2Iec62541Group 1 }         
+
+-- 
+-- ***********************************************************
+-- hm2Iec62541ConfigGroup 
+-- ***********************************************************
+--
+hm2Iec62541OpcUaServerAdminStatus  OBJECT-TYPE
+	SYNTAX		HmEnabledStatus
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Enables/disables the Iec62541 OPC/UA server functionality
+		on this device.
+		If disabled(2), the Iec62541 OPC/UA Server is deactivated,
+		but the Iec62541 OPC/UA MIBs can be accessed.
+		The default value is disabled."
+	DEFVAL	{ disable }
+	::= { hm2Iec62541ConfigGroup 1 }
+
+hm2Iec62541OpcUaServerPortNumber  OBJECT-TYPE
+	SYNTAX		InetPortNumber (1..65535)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The port number of the Iec62541 OPC/UA server.
+		Setting the port to zero is not allowed."
+	DEFVAL  { 4840 }
+	::= { hm2Iec62541ConfigGroup 2 }
+
+hm2Iec62541OpcUaMaxSessionsCount  OBJECT-TYPE
+	SYNTAX		Integer32 (1..5)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Maximum number of OpcUa sessions.
+		An integer value from 1 to 5 specifies
+		the maximum number of OpcUa sessions that can be established.
+		The full range is not supported by all variants."
+	DEFVAL { 5 }
+	::= { hm2Iec62541ConfigGroup 3 }
+
+hm2Iec62541OpcUaSecurityPolicy  OBJECT-TYPE
+	SYNTAX		Hm2Iec62541OpcUaSecurityPolicies
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The security policy of the Iec62541 OPC/UA server."
+	DEFVAL  { none }
+	::= { hm2Iec62541ConfigGroup 4 }
+
+hm2Iec62541OpcUaUserConfigTable  OBJECT-TYPE
+	SYNTAX		SEQUENCE OF Hm2Iec62541OpcUaUserConfigEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OpcUa User configuration table.
+		This table provides the functionality the OpcUa Server uses
+		for any interaction started by the user - authentication,
+		password and access role.
+		All objects in this table can be set while a row is 'active'."
+	::= { hm2Iec62541ConfigGroup 10 }
+
+hm2Iec62541OpcUaUserConfigEntry  OBJECT-TYPE
+	SYNTAX		Hm2Iec62541OpcUaUserConfigEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OpcUa User configuration entry."
+	INDEX { IMPLIED hm2Iec62541OpcUaUserName }
+	::= { hm2Iec62541OpcUaUserConfigTable 1 }
+
+Hm2Iec62541OpcUaUserConfigEntry ::= SEQUENCE {
+	hm2Iec62541OpcUaUserName			SnmpAdminString,
+	hm2Iec62541OpcUaUserPassword		DisplayString,
+	hm2Iec62541OpcUaUserAccessRole		Hm2Iec62541OpcUaUserAccessRoles,
+	hm2Iec62541OpcUaUserStatus			RowStatus
+	}
+
+hm2Iec62541OpcUaUserName  OBJECT-TYPE
+	SYNTAX		SnmpAdminString (SIZE(1..32))
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"OpcUa user name."
+	::= { hm2Iec62541OpcUaUserConfigEntry 1 }
+
+hm2Iec62541OpcUaUserPassword  OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..64))
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"OpcUa user password
+		This object will always return '********' when read."
+	DEFVAL  { "" }
+	::= { hm2Iec62541OpcUaUserConfigEntry 2 }
+
+hm2Iec62541OpcUaUserAccessRole  OBJECT-TYPE
+	SYNTAX		Hm2Iec62541OpcUaUserAccessRoles
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"OpcUa user's access role.
+		The user's access role can be set while the row is active."
+	DEFVAL  { readOnly }
+	::= { hm2Iec62541OpcUaUserConfigEntry 3 }
+
+hm2Iec62541OpcUaUserStatus  OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"OpcUa user status.
+		active(1)			- This user account is active.
+		notInService(2) 	- Row has been suspended.
+		notReady(3)			- Row has incomplete values.
+		createAndGo(4)		- Accept row values and activate.
+		createAndWait(5)	- Accept row values and wait.
+		destroy(6)			- Set to this value to remove this user account."
+	::= { hm2Iec62541OpcUaUserConfigEntry 5 }
+
+-- ***********************************************************
+-- hm2IndustrialProtocolsMibSNMPExtensionGroup
+-- ***********************************************************
+hm2Iec61850SESGroup		OBJECT IDENTIFIER ::= { hm2IndustrialProtocolsMibSNMPExtensionGroup  1 }
+hm2ProfinetIOSESGroup	OBJECT IDENTIFIER ::= { hm2IndustrialProtocolsMibSNMPExtensionGroup  2 }
+hm2EthernetIPSESGroup	OBJECT IDENTIFIER ::= { hm2IndustrialProtocolsMibSNMPExtensionGroup  3 }
+hm2ModbusSESGroup		OBJECT IDENTIFIER ::= { hm2IndustrialProtocolsMibSNMPExtensionGroup  4 }
+hm2Iec62541SESGroup		OBJECT IDENTIFIER ::= { hm2IndustrialProtocolsMibSNMPExtensionGroup  5 }
+
+--
+-- ***********************************************************
+-- hm2ProfinetIOSESGroup
+-- ***********************************************************
+--
+hm2ProfinetIOInvalidStationName OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION   "Invalid station name."
+    ::= { hm2ProfinetIOSESGroup 1 }
+
+hm2ProfinetIOARActive OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Set not allowed, a Profinet application relation is active."
+    ::= { hm2ProfinetIOSESGroup 2 }
+
+--
+-- ***********************************************************
+--hm2EthernetIPSESGroup
+-- ***********************************************************
+--
+hm2EthernetIPUsedVlanId OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION   "VLAN not available, it is already used by another protocol."
+    ::= { hm2EthernetIPSESGroup 1 }
+
+hm2EthernetIPNoVlanId OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION   "VLAN does not exist."
+    ::= { hm2EthernetIPSESGroup 2 }
+
+hm2EthernetIPDynamicVlan OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION   "Dynamic VLANs are not allowed. Use a static VLAN."
+    ::= { hm2EthernetIPSESGroup 3 }
+
+hm2EthernetIPVlanUnaware OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION   "EtherNet/IP Separate VLAN cannot be used together
+				   with the VLAN Unaware Mode."
+    ::= { hm2EthernetIPSESGroup 4 }
+
+END

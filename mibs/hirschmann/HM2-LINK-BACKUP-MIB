@@ -1,0 +1,217 @@
+HM2-LINK-BACKUP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	hm2L2RedundancyMibObjects
+		FROM HM2-L2REDUNDANCY-MIB
+	HmEnabledStatus
+		FROM HM2-TC-MIB
+	InterfaceIndex
+		FROM IF-MIB
+	Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE
+		FROM SNMPv2-SMI
+	SnmpAdminString
+	    FROM SNMP-FRAMEWORK-MIB		
+	TruthValue, RowStatus, TEXTUAL-CONVENTION
+		FROM SNMPv2-TC;
+
+hm2LinkBackupMibGroup MODULE-IDENTITY
+	LAST-UPDATED "201305140000Z"	-- Mai 14, 2013 at 00:00 GMT (201305140000Z)
+	ORGANIZATION
+		"Hirschmann Automation and Control GmbH"
+	CONTACT-INFO
+		"Postal:     Stuttgarter Str. 45-51
+					 72654 Neckartenzlingen
+					 Germany
+		 Phone:      +49 7127 140
+		 E-mail:     hac.support@belden.com"
+	DESCRIPTION
+		"Hirschmann Link Backup MIB.
+		Copyright (C) 2013. All Rights Reserved."
+	REVISION "201305140000Z"		-- Mai 14, 2013 at 00:00 GMT (201305140000Z)
+	DESCRIPTION
+		"Initial version."
+::= { hm2L2RedundancyMibObjects 3 }
+
+
+--
+-- *************************************************************
+-- hm2LinkBackupMibGroup
+-- *************************************************************
+--		
+hm2LinkBackupNotifications 	OBJECT IDENTIFIER ::= { hm2LinkBackupMibGroup 0 }
+hm2LinkBackupObjects 		OBJECT IDENTIFIER ::= { hm2LinkBackupMibGroup 1 }
+-- hm2LinkBackupConformance 	OBJECT IDENTIFIER ::= { hm2LinkBackupMibGroup 2 }
+
+--
+-- *************************************************************
+-- hm2LicenseMgmtMib groups
+-- *************************************************************
+--
+hm2LinkBackupConfiguration 	OBJECT IDENTIFIER ::= { hm2LinkBackupObjects 1 }
+hm2LinkBackupGeneralGroup 	OBJECT IDENTIFIER ::= { hm2LinkBackupConfiguration 1 }
+hm2LinkBackupInterfaceGroup OBJECT IDENTIFIER ::= { hm2LinkBackupConfiguration 2 }
+
+--
+-- Textual conventions
+--
+HmLinkBackupStatus ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+		"Status of the interface."
+	SYNTAX INTEGER
+		{
+		forwarding(1),
+		blocking(2),
+		down(3),
+		unknown(4)
+		}
+
+--
+-- hm2LinkBackupConfiguration
+--
+hm2LinkBackupAdminStatus OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enables/disables the global link backup functionality on the device."
+	DEFVAL { disable } 
+::= { hm2LinkBackupGeneralGroup 1 }
+  
+--
+-- hm2LinkBackupConfiguration
+--
+	
+hm2LinkBackupInterfaceConfigTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2LinkBackupInterfaceConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table containing current configuration and status information for each link backup pair."
+::= { hm2LinkBackupInterfaceGroup 1 }
+
+hm2LinkBackupInterfaceConfigEntry OBJECT-TYPE
+	SYNTAX Hm2LinkBackupInterfaceConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A logical row in the hm2LinkBackupIfConfigTable."
+	INDEX { hm2LinkBackupPrimaryInterface, hm2LinkBackupBackupInterface } 
+::= { hm2LinkBackupInterfaceConfigTable 1 }
+
+
+Hm2LinkBackupInterfaceConfigEntry ::= SEQUENCE
+	{
+	hm2LinkBackupPrimaryInterface 		InterfaceIndex,
+	hm2LinkBackupBackupInterface 		InterfaceIndex,
+	hm2LinkBackupPrimaryInterfaceStatus HmLinkBackupStatus,
+	hm2LinkBackupBackupInterfaceStatus 	HmLinkBackupStatus,
+	hm2LinkBackupFailBackEnable			TruthValue,
+	hm2LinkBackupFailBackDelay			Integer32,
+	hm2LinkBackupDescription			SnmpAdminString,
+	hm2LinkBackupRowStatus 				RowStatus
+	}
+
+hm2LinkBackupPrimaryInterface OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"The primary interface of the link backup pair."
+::= { hm2LinkBackupInterfaceConfigEntry 1 }
+
+hm2LinkBackupBackupInterface OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"The primary interface of the link backup pair."
+::= { hm2LinkBackupInterfaceConfigEntry 2 }
+
+hm2LinkBackupPrimaryInterfaceStatus OBJECT-TYPE
+	SYNTAX HmLinkBackupStatus
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current status of the primary interface for this link backup pair."
+	DEFVAL { 4 }
+::= { hm2LinkBackupInterfaceConfigEntry 3 }
+
+hm2LinkBackupBackupInterfaceStatus OBJECT-TYPE
+	SYNTAX HmLinkBackupStatus
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current status of the backup interface for this link backup pair."
+	DEFVAL { 4 }
+::= { hm2LinkBackupInterfaceConfigEntry 4 }
+
+hm2LinkBackupFailBackEnable OBJECT-TYPE
+	SYNTAX 		TruthValue
+	MAX-ACCESS 	read-create
+	STATUS 		current
+	DESCRIPTION
+		"If set to 'true', the backup interface goes to 'blocking' and the 
+		 primary interface to 'forwarding' after the time configured in
+		 hm2LinkBackupFailBackDelay. If set to 'false' the backup interface
+		 stays in 'forwarding' even the primary interface has re-established
+		 a link or the admin status of the primary interface has been set from 'down' to 'up'."
+	DEFVAL { true }
+::= { hm2LinkBackupInterfaceConfigEntry 5 }
+
+hm2LinkBackupFailBackDelay OBJECT-TYPE
+	SYNTAX 		Integer32 (0 | 1..3600)
+	UNITS  		"seconds"
+	MAX-ACCESS 	read-create
+	STATUS 		current
+	DESCRIPTION
+		"The time in seconds when the backup interface goes to 'blocking' and the
+		 primary interface goes to 'forwarding' after the primary interface has
+		 re-established a link or the admin status of the primary interface has
+		 been set from 'down' to 'up' if hm2LinkBackupFailBackEnable is set to 'true'.
+		 If the hm2LinkBackupFailBackDelay is set to '0' the primary interface goes 
+		 to 'forwarding' immediately after it has re-established a link or the
+		 admin status of the primary interface has been set from 'down' to 'up'
+		 and the backup interface goes to 'blocking' if hm2LinkBackupFailBackEnable
+		 is set to 'true'."
+	DEFVAL { 30 } 
+::= { hm2LinkBackupInterfaceConfigEntry 6 }
+
+hm2LinkBackupDescription OBJECT-TYPE
+	SYNTAX 		SnmpAdminString
+	MAX-ACCESS 	read-create
+	STATUS 		current
+	DESCRIPTION
+		"A description of the link backup pair."
+	DEFVAL { "" }
+::= { hm2LinkBackupInterfaceConfigEntry 7 }
+
+hm2LinkBackupRowStatus OBJECT-TYPE
+	SYNTAX 		RowStatus
+	MAX-ACCESS 	read-create
+	STATUS 		current
+	DESCRIPTION
+		"Describes the status of a row in the table.
+		 Supports creation, deletion and activation of rows.
+		 A row must not be active(1) in order to be modified.
+		 A row can be taken out of service by setting the value
+		 notInService(2)."
+::= { hm2LinkBackupInterfaceConfigEntry 10 }
+
+--
+-- hm2LinkBackupNotifications
+--
+hm2LinkBackupStatusTrap NOTIFICATION-TYPE
+	OBJECTS { 	hm2LinkBackupPrimaryInterface, 
+				hm2LinkBackupBackupInterface, 
+				hm2LinkBackupPrimaryInterfaceStatus, 
+				hm2LinkBackupBackupInterfaceStatus
+			} 
+	STATUS current
+	DESCRIPTION
+		"This trap is sent for each link backup pair if either the status
+		 of the hm2LinkBackupPrimaryInterfaceStatus or the status of the
+		 hm2LinkBackupBackupInterfaceStatus changes."
+::= { hm2LinkBackupNotifications 1 }
+
+END

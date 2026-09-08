@@ -1,0 +1,443 @@
+HM2-PLATFORM-PORTSECURITY-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann Platform Portsecurity MIB
+-- ***********************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32                          FROM SNMPv2-SMI
+    DisplayString,
+    MacAddress,
+    TruthValue                          FROM SNMPv2-TC
+    ifIndex                             FROM IF-MIB
+   	hm2PlatformMibs, HmEnabledStatus	FROM HM2-TC-MIB;
+
+hm2PlatformPortSecurity MODULE-IDENTITY
+	LAST-UPDATED "201107120000Z" -- July 12, 2011
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+   	DESCRIPTION
+          "The Hirschmann Private Platform2 MIB for Port Security Feature.
+		   Copyright (C) 2011. All Rights Reserved."
+    REVISION
+          "201107120000Z" -- 12 July 2011 12:00:00 GMT
+    DESCRIPTION
+          "Initial release."
+      ::= { hm2PlatformMibs 20 }
+
+     --**************************************************************************************
+    -- hm2AgentPortSecurityGroup -> contains MIB objects displaying Port Security
+    --
+    --**************************************************************************************
+
+hm2AgentPortSecurityGroup OBJECT IDENTIFIER ::= { hm2PlatformPortSecurity 1}
+
+hm2AgentGlobalPortSecurityMode OBJECT-TYPE
+    SYNTAX      HmEnabledStatus
+	MAX-ACCESS 	read-write
+	STATUS 		current
+	DESCRIPTION
+		"Mode showing whether at the global level, port security is enabled or not."
+    DEFVAL { disable }
+	::={ hm2AgentPortSecurityGroup 1 }
+
+hm2AgentPortSecurityTable OBJECT-TYPE
+	SYNTAX	     SEQUENCE OF Hm2AgentPortSecurityEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION "A table for Port Security and associated functionality."
+	::= { hm2AgentPortSecurityGroup 2 }
+
+hm2AgentPortSecurityEntry OBJECT-TYPE
+	SYNTAX Hm2AgentPortSecurityEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Represents entry for port security table"
+	INDEX       { ifIndex }
+	::={ hm2AgentPortSecurityTable 1}
+
+	Hm2AgentPortSecurityEntry ::=
+		SEQUENCE {
+		hm2AgentPortSecurityMode
+			HmEnabledStatus,
+		hm2AgentPortSecurityDynamicLimit
+			Unsigned32,
+		hm2AgentPortSecurityStaticLimit
+			Unsigned32,
+        hm2AgentPortSecurityViolationTrapMode
+        	HmEnabledStatus,
+        hm2AgentPortSecurityStaticMACs
+    		DisplayString,
+        hm2AgentPortSecurityLastDiscardedMAC
+        	DisplayString,
+        hm2AgentPortSecurityMACAddressAdd
+    		DisplayString,
+        hm2AgentPortSecurityMACAddressRemove
+        	DisplayString,
+        hm2AgentPortSecurityMACAddressMove
+        	HmEnabledStatus,
+        hm2AgentPortSecurityDynamicCount
+        	Unsigned32,
+        hm2AgentPortSecurityStaticCount
+        	Unsigned32,
+    	hm2AgentPortSecurityViolationTrapCount
+        	Unsigned32,
+        hm2AgentPortSecurityViolationTrapFrequency
+        	Unsigned32,
+        hm2AgentPortSecurityAutoDisable
+            TruthValue,
+        hm2AgentPortSecurityStaticIpCount
+            Unsigned32,
+        hm2AgentPortSecurityStaticIPs
+            DisplayString,
+        hm2AgentPortSecurityIPAddressAdd
+            DisplayString,
+        hm2AgentPortSecurityIPAddressRemove
+            DisplayString
+		}
+
+	hm2AgentPortSecurityMode OBJECT-TYPE
+      SYNTAX      	HmEnabledStatus
+	  MAX-ACCESS 	read-write
+	  STATUS 		current
+	  DESCRIPTION
+		"Mode showing whether at port level security is enabled or not."
+          DEFVAL { disable }
+          ::={ hm2AgentPortSecurityEntry 1 }
+
+	hm2AgentPortSecurityDynamicLimit OBJECT-TYPE
+        SYNTAX  Unsigned32(0..600)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This variable signifies the limit of dynamically locked MAC addresses
+			 allowed on a specific port."
+	    DEFVAL { 600 }
+	::={ hm2AgentPortSecurityEntry 2 }
+
+	hm2AgentPortSecurityStaticLimit OBJECT-TYPE
+        SYNTAX  Unsigned32(0..64)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This variable signifies the limit of statically locked MAC addresses
+			 allowed on a specific port."
+	    DEFVAL { 64 }
+		::={ hm2AgentPortSecurityEntry 3 }
+
+	hm2AgentPortSecurityViolationTrapMode OBJECT-TYPE
+		SYNTAX      HmEnabledStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This variable is used to enable or disable the sending of new violation
+			 traps designating when a packet with a disallowed MAC address is
+			 received on a locked port."
+		DEFVAL { disable }
+		::={hm2AgentPortSecurityEntry 4 }
+
+	hm2AgentPortSecurityStaticMACs OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..1536))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This variable displays the statically locked MAC addresses for port.
+			 The list displayed in a particular fashion :
+			 2 a0:b1:c2:d1:e3:a1,11 a0:b1:c2:d3:e4:f5
+			 (i.e., VLAN MAC pairs separated by commas)."
+		::={hm2AgentPortSecurityEntry 6 }
+
+	hm2AgentPortSecurityLastDiscardedMAC OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This variable displays the vlan-id and source MAC address of the last packet that was
+			 discarded on a locked port."
+		::={hm2AgentPortSecurityEntry 7 }
+
+
+	hm2AgentPortSecurityMACAddressAdd OBJECT-TYPE
+    	SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS current
+	    DESCRIPTION
+			"This MIB variable accepts a VLAN id and MAC address to be added to the list
+		 	of statically locked MAC addresses on a port. The VLAN id and MAC address combination
+		 	would be entered in a particular fashion like :- 2 a0:b0:c0:d1:e2:a1(the vlan-id and
+		 	MAC address separated by a blank-space)."
+        ::={ hm2AgentPortSecurityEntry 8 }
+
+    hm2AgentPortSecurityMACAddressRemove OBJECT-TYPE
+    	SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+	    STATUS current
+	    DESCRIPTION
+			"This MIB variable accepts a VLAN id and MAC address to be removed from the list
+		 	of statically locked MAC addresses on a port.. The VLAN id and MAC address combination
+		 	would be entered in a particular fashion like :- 2 a0:b0:c0:d1:e2:a1(the vlan-id and
+		 	MAC address separated by a blank-space)."
+        ::={ hm2AgentPortSecurityEntry 9 }
+
+     hm2AgentPortSecurityMACAddressMove OBJECT-TYPE
+    	SYNTAX      HmEnabledStatus
+        MAX-ACCESS  read-write
+	    STATUS current
+	    DESCRIPTION
+			"When this object is enabled, all the dynamically locked MAC addresses will
+             be moved to statically locked addresses on a port. GET operation on this object will display
+             disable."
+        ::={ hm2AgentPortSecurityEntry 10 }
+
+      hm2AgentPortSecurityDynamicCount OBJECT-TYPE
+        SYNTAX  Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The current number of dynamically locked MAC addresses on this port."
+		::={ hm2AgentPortSecurityEntry 20 }
+
+	  hm2AgentPortSecurityStaticCount OBJECT-TYPE
+        SYNTAX  Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The current number of statically locked MAC addresses on this port."
+		::={ hm2AgentPortSecurityEntry 21 }
+
+	  hm2AgentPortSecurityViolationTrapCount OBJECT-TYPE
+        SYNTAX  Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of active violations for which a violation trap was sent on this port.
+			 This counter is only valid when hm2AgentPortSecurityViolationTrapMode is enabled"
+		::={ hm2AgentPortSecurityEntry 22 }
+		
+	  hm2AgentPortSecurityViolationTrapFrequency OBJECT-TYPE
+		SYNTAX  Unsigned32 (0..3600)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The minimum seconds between two successive violation traps on this port."
+	    DEFVAL { 0 }
+		::={ hm2AgentPortSecurityEntry 23 }
+		
+	  hm2AgentPortSecurityAutoDisable OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates whether a port is auto-disabled when the configured threshold is reached."
+        DEFVAL { true }
+        ::={ hm2AgentPortSecurityEntry 248 }
+
+      hm2AgentPortSecurityStaticIpCount OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current number of statically locked IP addresses on this port."
+        ::={ hm2AgentPortSecurityEntry 249 }
+
+      hm2AgentPortSecurityStaticIPs OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..1536))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This variable displays the statically locked IP addresses for port.
+             The list displayed in a particular fashion :
+             2 100.1.1.200, 11 110.2.2.100."
+        ::={ hm2AgentPortSecurityEntry 250 }
+
+      hm2AgentPortSecurityIPAddressAdd OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS current
+        DESCRIPTION
+            "This MIB variable accepts a VLAN id and IP address to be added to the list
+            of statically locked IP addresses on a port. The VLAN id and IP address combination
+            would be entered in a particular fashion like :- 2 192.168.248.100 (the vlan-id and
+            IP address separated by a blank-space)."
+        ::={ hm2AgentPortSecurityEntry 251 }
+
+       hm2AgentPortSecurityIPAddressRemove OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS current
+        DESCRIPTION
+            "This MIB variable accepts a VLAN id and IP address to be removed from the list
+            of statically locked IP addresses on a port.. The VLAN id and IP address combination
+            would be entered in a particular fashion like :- 2 192.168.248.100 (the vlan-id and
+            IP address separated by a blank-space)."
+        ::={ hm2AgentPortSecurityEntry 252 }
+
+ --**********************************************************************--
+
+ 	hm2AgentPortSecurityDynamicTable OBJECT-TYPE
+    	SYNTAX       SEQUENCE OF Hm2AgentPortSecurityDynamicEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "A table for Port Security Dynamic and associated functionality."
+        ::= { hm2AgentPortSecurityGroup 3 }
+
+    hm2AgentPortSecurityDynamicEntry OBJECT-TYPE
+    	SYNTAX Hm2AgentPortSecurityDynamicEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Represents entry for port MAC Locking table"
+        INDEX       { ifIndex,hm2AgentPortSecurityDynamicVLANId,hm2AgentPortSecurityDynamicMACAddress }
+        ::={ hm2AgentPortSecurityDynamicTable 1}
+
+    Hm2AgentPortSecurityDynamicEntry ::=
+    	SEQUENCE {
+        	hm2AgentPortSecurityDynamicVLANId
+            	Unsigned32,
+            hm2AgentPortSecurityDynamicMACAddress
+            	MacAddress
+        }
+
+     hm2AgentPortSecurityDynamicVLANId OBJECT-TYPE
+     	SYNTAX      Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+     	DESCRIPTION
+        	"Source VLAN id of the packet that is received on the dynamically locked port."
+        ::={hm2AgentPortSecurityDynamicEntry 1 }
+
+     hm2AgentPortSecurityDynamicMACAddress OBJECT-TYPE
+      	SYNTAX  MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        	"Source MAC address of the packet that is received on the dynamically locked port."
+        ::={ hm2AgentPortSecurityDynamicEntry 2 }
+
+ --**********************************************************************--
+
+ 	 hm2AgentPortSecurityStaticTable OBJECT-TYPE
+     	SYNTAX       SEQUENCE OF Hm2AgentPortSecurityStaticEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "A table for Port Security Static and associated functionality."
+        ::= { hm2AgentPortSecurityGroup 10 }
+
+        hm2AgentPortSecurityStaticEntry OBJECT-TYPE
+            SYNTAX Hm2AgentPortSecurityStaticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "Represents entry for port MAC Locking table"
+            INDEX       { ifIndex,hm2AgentPortSecurityStaticVLANId,hm2AgentPortSecurityStaticMACAddress }
+            ::={ hm2AgentPortSecurityStaticTable 1}
+
+        Hm2AgentPortSecurityStaticEntry ::=
+        	SEQUENCE {
+                hm2AgentPortSecurityStaticVLANId
+                	Unsigned32,
+                hm2AgentPortSecurityStaticMACAddress
+                	MacAddress
+                }
+
+        hm2AgentPortSecurityStaticVLANId OBJECT-TYPE
+        	SYNTAX      Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            	"VLAN id of the statically locked address ."
+            ::={hm2AgentPortSecurityStaticEntry 1 }
+
+        hm2AgentPortSecurityStaticMACAddress OBJECT-TYPE
+        	SYNTAX  MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            	"Statically locked MAC address."
+            ::={ hm2AgentPortSecurityStaticEntry 2 }
+
+--**********************************************************************--
+
+     hm2AgentPortSecurityIpStaticTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF Hm2AgentPortSecurityIpStaticEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "A table for Port Security Static and associated functionality."
+        ::= { hm2AgentPortSecurityGroup 11 }
+
+        hm2AgentPortSecurityIpStaticEntry OBJECT-TYPE
+            SYNTAX Hm2AgentPortSecurityIpStaticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "Represents entry for port MAC Locking IP table"
+            INDEX       { ifIndex,hm2AgentPortSecurityStaticIpVLANId,hm2AgentPortSecurityStaticIpAddress }
+            ::={ hm2AgentPortSecurityIpStaticTable 1}
+
+        Hm2AgentPortSecurityIpStaticEntry ::=
+            SEQUENCE {
+                hm2AgentPortSecurityStaticIpVLANId
+                    Unsigned32,
+                hm2AgentPortSecurityStaticIpAddress
+                    IpAddress
+                }
+
+        hm2AgentPortSecurityStaticIpVLANId OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "VLAN id of the statically locked address ."
+            ::={hm2AgentPortSecurityIpStaticEntry 1 }
+
+        hm2AgentPortSecurityStaticIpAddress OBJECT-TYPE
+            SYNTAX  IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Statically locked IP address."
+            ::={ hm2AgentPortSecurityIpStaticEntry 2 }
+
+--**************************************************************************************
+
+hm2AgentPortSecurityOperationMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                macAddressBased(1),
+                ipAddressBased(2)
+                }
+                
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Mode showing which operational mode is enabled for port security (MAC vs. IP).
+         In MAC mode, filtering is done based on MAC addresses added statically/dinamically.
+         In IP mode, filtering is done based on MAC addresses resolved via ARP requests
+         for the programmed IP address."
+    DEFVAL { macAddressBased }
+    ::={ hm2AgentPortSecurityGroup 12 }
+
+    
+    -- hm2AgentPortSecurity   Traps
+    --
+    --**************************************************************************************
+
+    hm2AgentPortSecurityTraps  OBJECT IDENTIFIER ::= { hm2PlatformPortSecurity 2 }
+
+    hm2AgentPortSecurityViolation NOTIFICATION-TYPE
+        OBJECTS {
+                 ifIndex,
+                 hm2AgentPortSecurityLastDiscardedMAC
+                }
+        STATUS  current
+        DESCRIPTION
+            "Sent when a packet is received on a locked port with a source MAC address
+             that is not allowed."
+         ::= { hm2AgentPortSecurityTraps 1 }
+
+END
+

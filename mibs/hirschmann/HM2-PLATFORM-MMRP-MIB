@@ -1,0 +1,263 @@
+HM2-PLATFORM-MMRP-MIB DEFINITIONS ::= BEGIN
+
+-- -------------------------------------------------------------
+-- MMRP private MIB for IEEE 802.1Q Devices
+-- -------------------------------------------------------------
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Counter32, Integer32					               FROM SNMPv2-SMI
+    EnabledStatus                                          FROM P-BRIDGE-MIB
+    hm2AgentDot1qMrpMxrp                                   FROM HM2-PLATFORM-MRP-MIB;
+
+
+hm2PlatformMMRP MODULE-IDENTITY
+    LAST-UPDATED "201304100000Z" -- April 10, 2013
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+             "The Hirschmann Private Platform2 MIB for 802.1ak MMRP Configuration.
+              Copyright (C) 2013. All Rights Reserved."
+    REVISION 
+             "201304100000Z" -- April 10, 2013
+    DESCRIPTION
+             "Initial version."
+    ::= { hm2AgentDot1qMrpMxrp 1 }
+
+-- -------------------------------------------------------------
+-- groups in the MMRP MIB
+-- -------------------------------------------------------------
+
+hm2AgentDot1qMmrp                OBJECT IDENTIFIER ::= { hm2PlatformMMRP 1 }
+hm2AgentDot1qMrpMmrpStats        OBJECT IDENTIFIER ::= { hm2PlatformMMRP 2 }
+
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+--
+-- The MMRP Port Table
+--
+-- @purpose  Describes basic MMRP per port functionality.
+--
+-- -------------------------------------------------------------
+
+hm2AgentDot1qPortMmrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hm2AgentDot1qPortMmrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of MMRP control information about every bridge
+        port.  This is indexed by hm2AgentDot1qMmrpPort."
+    ::= { hm2AgentDot1qMmrp 1 }
+
+hm2AgentDot1qPortMmrpEntry OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qPortMmrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MMRP control information for a bridge port."
+    INDEX   { hm2AgentDot1qMmrpPort }
+    ::= { hm2AgentDot1qPortMmrpTable 1 }
+
+Hm2AgentDot1qPortMmrpEntry ::=
+    SEQUENCE {
+        hm2AgentDot1qMmrpPort
+            Integer32,
+        hm2AgentDot1qPortMmrpMode
+            EnabledStatus
+     }
+
+hm2AgentDot1qMmrpPort OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION
+    "The MMRP port number."
+    ::= { hm2AgentDot1qPortMmrpEntry 1 }
+
+hm2AgentDot1qPortMmrpMode OBJECT-TYPE
+    SYNTAX     EnabledStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "Enables/disables the MMRP admin-state on the port."
+    DEFVAL { enabled }
+    ::= { hm2AgentDot1qPortMmrpEntry 2 }
+ 
+-- -------------------------------------------------------------
+-- End of the MMRP Port Table
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+--
+-- The MxRP Configuration
+--
+-- @purpose  Enable/Disable protocols of MxRP 
+--                    family.
+--
+-- -------------------------------------------------------------
+hm2AgentDot1qBridgeMmrpMode OBJECT-TYPE
+    SYNTAX     EnabledStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+    	"Enables/disables the global MMRP admin-state on the device."
+      DEFVAL { disabled }
+    ::= { hm2AgentDot1qMmrp 2 }
+
+hm2AgentDot1qBridgeMrpPeriodicStateMachineForMmrp OBJECT-TYPE
+    SYNTAX     EnabledStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Enables/disables the MRP periodic state machine for MMRP."
+      DEFVAL { disabled }
+    ::= { hm2AgentDot1qMmrp 3 }
+
+-- -------------------------------------------------------------
+-- End of the MxRP Configuration
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- MMRP Statistics
+-- -------------------------------------------------------------
+                          
+               
+hm2AgentDot1qMrpMmrpPktTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Total number of MMRP PDU's transmitted by the device."
+    ::= { hm2AgentDot1qMrpMmrpStats 1 }
+
+hm2AgentDot1qMrpMmrpPktRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Total number of MMRP PDU's received by the device."
+    ::= { hm2AgentDot1qMrpMmrpStats 2 }
+
+hm2AgentDot1qMrpMmrpPktRxBadHeader OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Total number of MMRP PDU's received by the device with bad header."
+    ::= { hm2AgentDot1qMrpMmrpStats 3 }
+
+hm2AgentDot1qMrpMmrpPktRxBadFormat OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Total number of MMRP PDU's received by the device with bad format."
+    ::= { hm2AgentDot1qMrpMmrpStats 4 }
+
+hm2AgentDot1qMrpMmrpPktTxFailure OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Total number of MMRP PDU's that were not transmitted by the device."
+    ::= { hm2AgentDot1qMrpMmrpStats 5 }
+
+hm2AgentDot1qMrpMmrpStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hm2AgentDot1qMrpMmrpStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which contains MMRP statistics per port."
+    ::= { hm2AgentDot1qMrpMmrpStats 6 }
+
+hm2AgentDot1qMrpMmrpStatsEntry OBJECT-TYPE
+    SYNTAX      Hm2AgentDot1qMrpMmrpStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MMRP statistics entry."
+    INDEX { hm2AgentDot1qMrpMmrpIntf }
+    ::= { hm2AgentDot1qMrpMmrpStatsTable 1 }
+
+Hm2AgentDot1qMrpMmrpStatsEntry ::=
+    SEQUENCE {
+        hm2AgentDot1qMrpMmrpIntf   
+            Integer32,
+        hm2AgentDot1qMrpMmrpPortPktTx
+            Counter32,
+        hm2AgentDot1qMrpMmrpPortPktRx
+            Counter32,
+        hm2AgentDot1qMrpMmrpPortPktRxBadHeader
+            Counter32,
+        hm2AgentDot1qMrpMmrpPortPktRxBadFormat
+            Counter32,
+        hm2AgentDot1qMrpMmrpPortPktTxFailure
+            Counter32
+    }
+
+hm2AgentDot1qMrpMmrpIntf OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Index of hm2AgentDot1qMrpMmrpStatistics table."
+    ::= { hm2AgentDot1qMrpMmrpStatsEntry 1 }
+    
+hm2AgentDot1qMrpMmrpPortPktTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Total number of MMRP PDU's transmitted on port."
+    ::= { hm2AgentDot1qMrpMmrpStatsEntry 2 }
+
+hm2AgentDot1qMrpMmrpPortPktRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Total number of MMRP PDU's received on port."
+    ::= { hm2AgentDot1qMrpMmrpStatsEntry 3 }
+
+hm2AgentDot1qMrpMmrpPortPktRxBadHeader OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Total number of MMRP PDU's received on port with bad header."
+    ::= { hm2AgentDot1qMrpMmrpStatsEntry 4 }
+
+hm2AgentDot1qMrpMmrpPortPktRxBadFormat OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Total number of MMRP PDU's received on port with bad format."
+    ::= { hm2AgentDot1qMrpMmrpStatsEntry 5}
+
+hm2AgentDot1qMrpMmrpPortPktTxFailure OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Total number of MMRP PDU's that were not transmitted on port."
+    ::= { hm2AgentDot1qMrpMmrpStatsEntry 6 }
+
+hm2AgentDot1qMrpMmrpDynamicAddrCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Total number of MAC addresses learned dynamically for MMRP."
+    ::= { hm2AgentDot1qMrpMmrpStats 248 }
+-- -------------------------------------------------------------
+-- End of MMRP Statistics
+-- -------------------------------------------------------------
+
+END

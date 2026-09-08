@@ -1,0 +1,1985 @@
+
+HM2-TIMESYNC-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann Time Sync MIB
+-- *************************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+	OBJECT-IDENTITY,
+    Integer32					FROM SNMPv2-SMI -- RFC 2578
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    TruthValue, RowStatus       FROM SNMPv2-TC
+    InetAddressType, 
+    InetAddress,
+	InetPortNumber              FROM INET-ADDRESS-MIB -- RFC4001  
+    HmEnabledStatus,
+    hm2ConfigurationMibs,
+    HmTimeSeconds1970	        FROM HM2-TC-MIB
+    InterfaceIndexOrZero,
+    ifIndex     				FROM IF-MIB;
+
+hm2TimeSyncMib MODULE-IDENTITY
+	LAST-UPDATED "201809070000Z" -- Sep 07, 2018
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann Time Sync MIB.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION     "201809070000Z" -- Sep 07, 2018
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 50 }
+
+--
+-- *************************************************************
+-- Textual Conventions                                          
+-- *************************************************************
+--
+HmSntpClientServerStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The status of the last received response from a
+         configured server.
+
+          other
+            - None of the following enumeration values.
+
+          success
+            - The SNTP operation was successful and the system time
+              was updated.
+
+          requestTimedOut
+            - An SNTP poll request timed out without receiving a
+              response from the SNTP server.
+
+          badDateEncoded
+            - The time provided by the SNTP server was not valid.
+
+          versionNotSupported
+            - The SNTP version supported by the server is not compatible
+              with the version supported by the client. This is indicated
+              by the server returning a version later than the version
+              configured for that server or a version of '0'.
+
+          serverUnsychronized
+            - The SNTP server is not synchronized with its peers.  This
+              is indicated via the 'leap indicator' field on the SNTP
+              message.
+
+          serverKissOfDeath
+            - The SNTP server indicated that no further polls are to be
+              sent to this server. This is indicated by a stratum field
+              field equal to 0 in a message received from a server."
+
+    REFERENCE
+        "RFC 4330 - Simple Network Time Protocol (SNTP) Version 4
+                    for IPv4, IPv6 and OSI; Section 4."
+    SYNTAX INTEGER {
+      other(1),
+      success(2),
+      requestTimedOut(3),
+      badDateEncoded(4),
+      versionNotSupported(5),
+      serverUnsychronized(6),
+      serverKissOfDeath(7)
+    }
+    
+Hm2Ptp2LogSyncIntervalTc ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+			"Logarithm to the base of 2 of the mean synchronization interval."
+		SYNTAX 		INTEGER {
+							msec-125 (-3),
+							msec-250 (-2),
+							msec-500 (-1),
+							sec-1 (0),
+							sec-2 (1)
+							}
+Hm2Ptp2LogPdelayReqIntervalTc ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+			"Logarithm to the base of 2 of the minimum PDelay Request interval (used for p2p-delay)."
+		SYNTAX 		INTEGER {
+							sec-1 (0),
+							sec-2 (1),
+							sec-4 (2),
+							sec-8 (3),
+							sec-16 (4),
+							sec-32 (5)
+							}
+PtpTimeInterval ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+			"The scaledNanoseconds member is the time interval expressed in units of nanoseconds and multiplied by
+			 2^+16. Positive or negative time intervals outside the maximum range of this data type shall be encoded as the
+			 largest positive and negative values of the data type respectively.
+			 For example: 2.5 ns is expressed as: (hex) 0x0000 0000 0002 8000"
+	REFERENCE
+			"IEEE 1588-2008 Standard for a Precision Clock
+			 Synchronization Protocol for Networked
+			 Measurement and Control Systems"			 
+    SYNTAX   OCTET STRING (SIZE (8))
+
+PtpTimeStamp ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+      "first 48 bit: seconds since 1.1.1970
+      last 32 bit: nanoseconds"
+   REFERENCE 
+      "IEEE P1588 Standard "
+   SYNTAX OCTET STRING (SIZE (10))
+   
+PtpPortIdentity ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+			"The PtpPortIdentity type identifies a PTP port.
+			 The first 8 octets within this value specifies the ClockIdentity.
+			 The last 2 octets within this value specifies the port number.
+			 For example: '00 80 63 FF FF 00 00 00 00 01'. ClockIdentity is
+			 '008063FFFF000000' and port number is '0001'"
+	REFERENCE
+			"IEEE 1588-2008 Standard for a Precision Clock
+			 Synchronization Protocol for Networked
+			 Measurement and Control Systems"
+    SYNTAX   OCTET STRING (SIZE (10))
+
+PtpClockIdentity ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+			"The PtpClockIdentity type identifies a PTP clock.
+			 The PtpClockIdentity shall be in the IEEE EUI-64
+			 format.
+			 For example: '008063FFFF000000'"
+	REFERENCE
+			"IEEE 1588-2008 Standard for a Precision Clock
+			 Synchronization Protocol for Networked
+			 Measurement and Control Systems"
+    SYNTAX   OCTET STRING (SIZE (8))
+
+PtpClockQuality ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+			"The PtpClockQuality represents the quality of a clock.
+			 The first octet represents the clock class. The second
+			 octet represents the clockAccuracy and the last two octets
+			 represent the offsetScaledLogVariance
+			 For example: "
+	REFERENCE
+			"IEEE 1588-2008  Standard for a Precision Clock
+			 Synchronization Protocol for Networked
+			 Measurement and Control Systems"
+    SYNTAX   OCTET STRING (SIZE (4))
+
+--
+-- *************************************************************
+-- hm2TimeSyncMib
+-- *************************************************************
+--
+hm2TimeSyncMibNotifications			OBJECT IDENTIFIER ::= { hm2TimeSyncMib 0 }
+hm2TimeSyncMibObjects				OBJECT IDENTIFIER ::= { hm2TimeSyncMib 1 }
+-- hm2TimeSyncMibConformance			OBJECT IDENTIFIER ::= { hm2TimeSyncMib 2 }
+hm2TimeSyncMibSNMPExtensionGroup 	OBJECT IDENTIFIER ::= { hm2TimeSyncMib 3 }
+
+--
+-- *************************************************************
+-- hm2TimeSyncMib groups
+-- *************************************************************
+--
+hm2SystemTimeGroup OBJECT IDENTIFIER ::= { hm2TimeSyncMibObjects 1 }
+hm2SntpGroup       OBJECT IDENTIFIER ::= { hm2TimeSyncMibObjects 2 }
+hm2NtpGroup        OBJECT IDENTIFIER ::= { hm2TimeSyncMibObjects 3 }
+hm2PtpGroup        OBJECT IDENTIFIER ::= { hm2TimeSyncMibObjects 4 }
+hm2IrigGroup       OBJECT IDENTIFIER ::= { hm2TimeSyncMibObjects 5 }
+hm2Dot1asGroup     OBJECT IDENTIFIER ::= { hm2TimeSyncMibObjects 6 }
+
+--
+-- *************************************************************
+-- hm2SystemTimeGroup
+-- *************************************************************
+--
+hm2SystemUtcTime OBJECT-TYPE
+			SYNTAX			 HmTimeSeconds1970		
+			MAX-ACCESS		 read-write
+			STATUS			 current
+			DESCRIPTION
+				"Time measured in seconds since 00:00:00 UTC, January 1, 1970.
+				 The clock of the device may be set using this variable."
+			::= { hm2SystemTimeGroup 1 }
+
+hm2SystemTimeSource OBJECT-TYPE
+			SYNTAX			 INTEGER {
+							  local (1),
+							  sntp  (2),
+							  ntp   (3),
+							  ptp   (4),
+							  gps   (5)
+							 }		
+			MAX-ACCESS		 read-only
+			STATUS			 current
+			DESCRIPTION
+				"Shows the source of the system time."
+			::= { hm2SystemTimeGroup 2 }
+			
+hm2SystemLocalTime OBJECT-TYPE
+			SYNTAX			 HmTimeSeconds1970		
+			MAX-ACCESS		 read-write
+			STATUS			 current
+			DESCRIPTION
+				"The current local time. This includes the timezone offset and if supported summertime offset.
+				 Measured in seconds since 00:00:00, January 1, 1970."
+			::= { hm2SystemTimeGroup 3 }			
+			
+hm2SystemLocalOffset OBJECT-TYPE
+			SYNTAX Integer32 (-780..840)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"The difference between the local timezone and UTC in minutes."
+			DEFVAL { 60 }			
+			::= { hm2SystemTimeGroup 4 }
+			
+--
+-- *************************************************************
+-- hm2Sntp groups
+-- *************************************************************
+--
+hm2SntpServerGroup  		OBJECT IDENTIFIER ::= { hm2SntpGroup 1 }
+hm2SntpServerBroadcastGroup  	OBJECT IDENTIFIER ::= { hm2SntpGroup 2 }
+hm2SntpClientGroup  		OBJECT IDENTIFIER ::= { hm2SntpGroup 3 }
+
+--
+-- *************************************************************
+-- hm2SNTPServer group
+-- *************************************************************
+--
+hm2SntpServerAdminState OBJECT-TYPE
+   SYNTAX 		HmEnabledStatus
+   MAX-ACCESS 	read-write
+   STATUS     	current
+   DESCRIPTION
+       			"Enables/disables SNTP server admin mode."
+   DEFVAL { disable }       
+   ::= { hm2SntpServerGroup 1 }
+
+hm2SntpServerPort  OBJECT-TYPE
+   SYNTAX 		InetPortNumber (1..65535)
+   MAX-ACCESS 	read-write
+   STATUS 		current
+   DESCRIPTION
+       			"The local port number used to listen for client requests."
+   DEFVAL { 123 }       
+   ::= { hm2SntpServerGroup 2 }
+
+hm2SntpServerOnlyIfSync OBJECT-TYPE
+   SYNTAX 		HmEnabledStatus
+   MAX-ACCESS 	read-write
+   STATUS     	current
+   DESCRIPTION
+       			"The SNTP server is enabled only if synchronized
+       			 to another external time reference. (e.g. NTP or PTP)."
+   REFERENCE
+           		"RFC4330 - 6.  SNTP Server Operations"
+   DEFVAL { disable }       
+   ::= { hm2SntpServerGroup 3 }
+
+hm2SntpServerStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+      				disabled (1),
+      			    notSynchronized(2),
+                    syncToLocal(3),
+                    syncToRefclock(4),
+                    syncToRemoteServer(5)
+				   }
+   MAX-ACCESS 	read-only
+   STATUS 		current
+   DESCRIPTION
+       			"Operational status of the SNTP server."
+   ::= { hm2SntpServerGroup 4 }
+
+hm2SntpServerInterface OBJECT-TYPE
+   SYNTAX      InterfaceIndexOrZero
+   MAX-ACCESS 	read-write
+   STATUS 		current
+   DESCRIPTION
+       			"Interface used by the SNTP server."
+   DEFVAL { 0 }
+   ::= { hm2SntpServerGroup 5 }
+   
+--
+-- *************************************************************
+-- hm2SNTPServerBroadcast group
+-- *************************************************************
+--
+hm2SntpServerBroadcastAdminState OBJECT-TYPE
+   SYNTAX 		HmEnabledStatus
+   MAX-ACCESS 	read-write
+   STATUS     	current
+   DESCRIPTION
+		"Enables/disables SNTP server broadcast admin mode."
+   DEFVAL { disable }       
+   ::= { hm2SntpServerBroadcastGroup 1 }
+
+hm2SntpServerBroadcastAddrType OBJECT-TYPE
+   SYNTAX     InetAddressType
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+       "Address type."
+   DEFVAL { ipv4 }         
+   ::= { hm2SntpServerBroadcastGroup 2 }
+
+hm2SntpServerBroadcastAddr  OBJECT-TYPE
+   SYNTAX     InetAddress
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+       "Destination address for SNTP broadcast or
+        multicast."
+   DEFVAL {  '00000000'h } 
+   ::= { hm2SntpServerBroadcastGroup 3 }
+
+hm2SntpServerBroadcastPort  OBJECT-TYPE
+   SYNTAX 		InetPortNumber (1..65535)
+   MAX-ACCESS 	read-write
+   STATUS 		current
+   DESCRIPTION
+		"The port number to send the broadcast packets
+		 to the clients."
+   DEFVAL { 123 }       
+   ::= { hm2SntpServerBroadcastGroup 4 }
+
+hm2SntpServerBroadcastInterval OBJECT-TYPE
+   SYNTAX     Integer32 (64..1024)
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+		"Interval of SNTP broadcast messages send in seconds."
+   REFERENCE
+		"RFC4330 - 6.  SNTP Server Operations"
+   DEFVAL  { 128 }        
+   ::= { hm2SntpServerBroadcastGroup 5 }
+
+hm2SntpServerBroadcastVlanTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2SntpServerBroadcastVlanEntry
+   MAX-ACCESS 		not-accessible
+   STATUS 			current
+   DESCRIPTION
+		"This table contains all VLANs used for SNTP server 
+		broadcast or multicast messages."
+   ::= { hm2SntpServerBroadcastGroup 10 }
+
+hm2SntpServerBroadcastVlanEntry OBJECT-TYPE
+   SYNTAX 		Hm2SntpServerBroadcastVlanEntry
+   MAX-ACCESS 	not-accessible
+   STATUS 		current
+   DESCRIPTION 
+		"The SNTP broadcast server VLAN objects."
+   INDEX { hm2SntpServerBroadcastVlan }
+   ::= { hm2SntpServerBroadcastVlanTable 1 }
+
+Hm2SntpServerBroadcastVlanEntry ::= SEQUENCE {
+   hm2SntpServerBroadcastVlan 						Integer32,
+   hm2SntpServerBroadcastVlanRowStatus		RowStatus
+   }
+
+-- *************************************************************
+-- hm2SntpServerBroadcastVlanEntry
+-- *************************************************************
+hm2SntpServerBroadcastVlan OBJECT-TYPE
+   SYNTAX 			Integer32 (1..4042)
+   MAX-ACCESS 		read-only
+   STATUS 			current
+   DESCRIPTION
+		"VLAN used for SNTP server broadcast or multicast messages."
+   ::= { hm2SntpServerBroadcastVlanEntry 1 }
+   
+hm2SntpServerBroadcastVlanRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+		"Indicates the status of an entry in this table,
+		 and is used to create/delete entries. Objects
+		 within this table can by changed while the status
+		 is 'active'."
+    ::= { hm2SntpServerBroadcastVlanEntry 2 }
+
+--   
+-- *************************************************************
+-- hm2SntpClient group
+-- *************************************************************
+--
+hm2SntpClientAdminState OBJECT-TYPE
+   SYNTAX 		HmEnabledStatus
+   MAX-ACCESS 	read-write
+   STATUS     	current
+   DESCRIPTION
+		"Enables/disables the SNTP client admin mode."
+   DEFVAL { disable }       
+   ::= { hm2SntpClientGroup 1 }
+
+hm2SntpClientOperatingMode OBJECT-TYPE
+   SYNTAX 		INTEGER {
+      					 unicast (1),
+     					 broadcast (2)
+   						}
+   MAX-ACCESS 	read-write
+   STATUS 		current
+   DESCRIPTION
+		"Enables/disables SNTP client operating mode. 
+		 In 'unicast' mode, the client sends a request
+		 to a designated unicast server and expects a
+		 reply from that server.
+		 In 'broadcast' client mode, it sends no request and waits for
+		 a broadcast from one or more broadcast servers."
+   REFERENCE
+        "RFC4330 - 5.  SNTP Client Operations"
+   DEFVAL { unicast }
+   ::= { hm2SntpClientGroup 2 }
+
+hm2SntpClientDisableAfterSync OBJECT-TYPE
+   SYNTAX 		HmEnabledStatus
+   MAX-ACCESS 	read-write
+   STATUS     	current
+   DESCRIPTION
+		"When set to 'enable' the SNTP client is
+		 disabled after the device is synchronized the first
+		 time successfully to a SNTP server."
+   DEFVAL { disable }       
+   ::= { hm2SntpClientGroup 3 }
+
+hm2SntpClientRequestInterval    OBJECT-TYPE
+   SYNTAX     	Integer32 (5..3600)
+   MAX-ACCESS 	read-write
+   STATUS     	current
+   DESCRIPTION
+		"SNTP client request interval in seconds."
+   DEFVAL  { 30 }         
+   ::= { hm2SntpClientGroup 4 }
+
+hm2SntpClientStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+      				disabled (1),
+      			    notSynchronized(2),
+                    synchronizedToRemoteServer(5)
+   				  }
+   MAX-ACCESS 	read-only
+   STATUS 		current
+   DESCRIPTION
+		"Overall operational status of the SNTP client."
+   ::= { hm2SntpClientGroup 5 }
+
+hm2SntpClientBroadcastRecvTimeout    OBJECT-TYPE
+   SYNTAX     	Integer32 (128..2048)
+   MAX-ACCESS 	read-write
+   STATUS     	current
+   DESCRIPTION
+		"Time in seconds after the client in broadcast client mode 
+                 will change the status from 'synchronizedToRemoteServer' 
+                 to 'notSynchronized' if no broadcast packets are received."
+   DEFVAL  { 320 }         
+   ::= { hm2SntpClientGroup 6 }
+   
+hm2SntpClientInterface OBJECT-TYPE
+   SYNTAX      InterfaceIndexOrZero
+   MAX-ACCESS 	read-write
+   STATUS 		current
+   DESCRIPTION
+       			"Interface used by the SNTP client."
+   DEFVAL { 0 }
+   ::= { hm2SntpClientGroup 7 }
+   
+hm2SntpClientServerAddrTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Hm2SntpClientServerAddrEntry
+   MAX-ACCESS 		not-accessible
+   STATUS 			current
+   DESCRIPTION
+		"This table contains objects to configure
+		 SNTP client connections."
+   ::= { hm2SntpClientGroup 10 }
+
+hm2SntpClientServerAddrEntry OBJECT-TYPE
+   SYNTAX 		Hm2SntpClientServerAddrEntry
+   MAX-ACCESS 	not-accessible
+   STATUS 		current
+   DESCRIPTION 
+		"The SNTP client connection objects."
+   INDEX { hm2SntpClientServerIndex }
+   ::= { hm2SntpClientServerAddrTable 1 }
+
+Hm2SntpClientServerAddrEntry ::= SEQUENCE {
+   hm2SntpClientServerIndex 		Integer32,
+   hm2SntpClientServerAddrType 	InetAddressType,
+   hm2SntpClientServerAddr 			InetAddress,
+   hm2SntpClientServerPort	 		InetPortNumber,
+   hm2SntpClientServerDescr	 		DisplayString,
+   hm2SntpClientServerStatus 		INTEGER,
+   hm2SntpClientServerRowStatus		RowStatus
+   }
+
+-- *************************************************************
+-- hm2SntpClientServer entry
+-- *************************************************************
+hm2SntpClientServerIndex OBJECT-TYPE
+   SYNTAX 			Integer32 (1..4)
+   MAX-ACCESS 		not-accessible
+   STATUS 			current
+   DESCRIPTION
+		"Index for server table."
+   ::= { hm2SntpClientServerAddrEntry 1 }
+
+hm2SntpClientServerAddrType OBJECT-TYPE
+   SYNTAX 			InetAddressType
+   MAX-ACCESS 		read-create
+   STATUS 			current
+   DESCRIPTION
+		"Address type."
+   DEFVAL { ipv4 }         
+   ::= { hm2SntpClientServerAddrEntry 2 }
+
+hm2SntpClientServerAddr  OBJECT-TYPE
+   SYNTAX 		InetAddress
+   MAX-ACCESS 	read-create
+   STATUS 		current
+   DESCRIPTION
+		"The address of the external time server."
+   DEFVAL { '00000000'H } -- 0.0.0.0       			
+   ::= { hm2SntpClientServerAddrEntry 3 }
+
+hm2SntpClientServerPort  OBJECT-TYPE
+   SYNTAX 		InetPortNumber (1..65535)
+   MAX-ACCESS 	read-create
+   STATUS 		current
+   DESCRIPTION
+		"The port number of the external time server."
+   DEFVAL { 123 }       
+   ::= { hm2SntpClientServerAddrEntry 4 }
+
+hm2SntpClientServerDescr  OBJECT-TYPE
+   SYNTAX 		DisplayString
+   MAX-ACCESS 	read-create
+   STATUS 		current
+   DESCRIPTION
+   	   "The description of the server configured."
+   ::= { hm2SntpClientServerAddrEntry 5 }
+   
+hm2SntpClientServerStatus OBJECT-TYPE
+   SYNTAX 		HmSntpClientServerStatus
+   MAX-ACCESS 	read-only
+   STATUS 		current
+   DESCRIPTION
+		"Status of the SNTP client - server connection."
+   ::= { hm2SntpClientServerAddrEntry 6 }
+   
+hm2SntpClientServerRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+		"Indicates the status of an entry in this table,
+		 and is used to create/delete entries. Objects
+		 within this table can by changed while the status
+		 is 'active'."
+    ::= { hm2SntpClientServerAddrEntry 7 }
+--
+-- *************************************************************
+-- hm2NtpGroup 
+-- *************************************************************
+--
+hm2NtpGeneralGroup OBJECT IDENTIFIER ::= { hm2NtpGroup 1 }
+
+hm2NtpOperatingState OBJECT-TYPE
+    SYNTAX      INTEGER { disabled(1),
+                          notSynchronized(2),
+                          syncToLocal(3),
+                          syncToRefclock(4),
+                          syncToRemoteServer(5)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Operational status of the NTP server/client."
+    ::= { hm2NtpGeneralGroup 1 }
+
+hm2NtpServerGroup OBJECT IDENTIFIER ::= { hm2NtpGroup 2 }
+hm2NtpServerConfigGroup OBJECT IDENTIFIER ::= { hm2NtpServerGroup 1 }
+
+hm2NtpServerAdminState OBJECT-TYPE
+    SYNTAX      HmEnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enables/disables the NTP server."
+    DEFVAL      { disable }
+    ::= { hm2NtpServerConfigGroup 1 }
+
+hm2NtpServerOperatingMode OBJECT-TYPE
+    SYNTAX      INTEGER { symmetric(1), client-server(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "NTP server operating mode."
+    DEFVAL      { client-server }
+    ::= { hm2NtpServerConfigGroup 2 }
+
+hm2NtpServerLocalClockStratum OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The stratum to be used for the case that
+         the server is only synchronized to the local clock"
+    DEFVAL      { 12 }
+    ::= { hm2NtpServerConfigGroup 3 }
+
+hm2NtpClientGroup OBJECT IDENTIFIER ::= { hm2NtpGroup 3 }
+hm2NtpClientConfigGroup OBJECT IDENTIFIER ::= { hm2NtpClientGroup 1 }
+
+hm2NtpClientAdminState OBJECT-TYPE
+    SYNTAX      HmEnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enables/disables the NTP client."
+    DEFVAL      { disable }
+    ::= { hm2NtpClientConfigGroup 1 }
+
+hm2NtpClientOperatingMode OBJECT-TYPE
+    SYNTAX      INTEGER { unicast(1), broadcast(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "NTP client operating mode."
+    DEFVAL      { unicast }
+    ::= { hm2NtpClientConfigGroup 2 }
+
+hm2NtpClientServerAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hm2NtpClientServerAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains variables for each interface of
+         the switch."
+    ::= { hm2NtpClientGroup 4 }
+
+hm2NtpClientServerAddrEntry OBJECT-TYPE
+    SYNTAX      Hm2NtpClientServerAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This entry contains variables for each interface of
+         the switch."
+    INDEX       { hm2NtpClientServerIndex }
+    ::= { hm2NtpClientServerAddrTable 1 }
+
+Hm2NtpClientServerAddrEntry ::= SEQUENCE {
+    hm2NtpClientServerIndex         Integer32,
+    hm2NtpClientServerAddressType   InetAddressType,
+    hm2NtpClientServerAddress       InetAddress,
+    hm2NtpClientServerPort          InetPortNumber,
+    hm2NtpClientServerInitialBurst  HmEnabledStatus,
+    hm2NtpClientServerBurst         HmEnabledStatus,
+    hm2NtpClientServerPrefer        TruthValue,
+    hm2NtpClientServerStatus        INTEGER,
+    hm2NtpClientServerRowStatus     RowStatus
+}
+
+hm2NtpClientServerIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Index for Server table."
+    ::= { hm2NtpClientServerAddrEntry 1 }
+
+hm2NtpClientServerAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Address type for external time server.
+         Currently, only IPv4, IPv6 and DNS are supported."
+    DEFVAL      { ipv4 }
+    ::= { hm2NtpClientServerAddrEntry 2 }
+
+hm2NtpClientServerAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The address of the external time server."
+    DEFVAL      { '00000000'H }
+    ::= { hm2NtpClientServerAddrEntry 3 }
+
+hm2NtpClientServerPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The port number of the external time server. Zero is not allowed
+         as port number."
+    DEFVAL      { 123 }
+    ::= { hm2NtpClientServerAddrEntry 4 }
+
+hm2NtpClientServerInitialBurst OBJECT-TYPE
+    SYNTAX      HmEnabledStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The initial burst is intended to speed up the initial synchronization.
+         Use with caution as it can cause a overload situation on the server."
+    REFERENCE   
+        "RFC5905 - 52.  Poll Process Operations"
+    DEFVAL      { disable }
+    ::= { hm2NtpClientServerAddrEntry 5 }
+
+hm2NtpClientServerBurst OBJECT-TYPE
+    SYNTAX      HmEnabledStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The burst mode can be used to increase the precision
+         on links with high jitter e.g. GSM/UMTS links"
+    REFERENCE   
+        "RFC5905 - 52.  Poll Process Operations"
+    DEFVAL      { disable }
+    ::= { hm2NtpClientServerAddrEntry 6 }
+
+hm2NtpClientServerPrefer OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The prefer flag can be used to mark the peer as preferred.
+         Among a set of correctly operating peers, this one will be chosen
+         as synchronization source."
+    REFERENCE   
+        "RFC5905 - 96.  System Process"
+    DEFVAL      { false }
+    ::= { hm2NtpClientServerAddrEntry 7 }
+
+hm2NtpClientServerStatus OBJECT-TYPE
+    SYNTAX      INTEGER { disabled(1),
+                          protocolError(2),
+                          notSynchronized(3),
+                          notResponding(4),
+                          synchronizing(5),
+                          synchronized(6),
+                          genericError(7)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status of the NTP client server connection."
+    ::= { hm2NtpClientServerAddrEntry 10 }
+
+hm2NtpClientServerRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the status of an entry in this table,
+         and is used to create/delete entries. Objects
+         within this table can be changed while the status
+         is 'active'."
+    ::= { hm2NtpClientServerAddrEntry 11 }
+
+hm2NtpClientListenAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hm2NtpClientListenAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Client table."
+    ::= { hm2NtpClientGroup 5 }
+
+hm2NtpClientListenAddrEntry OBJECT-TYPE
+    SYNTAX      Hm2NtpClientListenAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Client entry."
+    INDEX       { hm2NtpClientListenAddrIndex }
+    ::= { hm2NtpClientListenAddrTable 1 }
+
+Hm2NtpClientListenAddrEntry ::= SEQUENCE {
+    hm2NtpClientListenAddrIndex         Integer32,
+    hm2NtpClientListenAddrAddressType   InetAddressType,
+    hm2NtpClientListenAddrAddress       InetAddress,
+    hm2NtpClientListenAddrPort          InetPortNumber,
+    hm2NtpClientListenAddrStatus        INTEGER,
+    hm2NtpClientListenAddrRowStatus     RowStatus
+}
+
+hm2NtpClientListenAddrIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Index for server table."
+    ::= { hm2NtpClientListenAddrEntry 1 }
+
+hm2NtpClientListenAddrAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Address type for external time server.
+         Currently, only IPv4, IPv6 and DNS are supported."
+    DEFVAL      { ipv4 }
+    ::= { hm2NtpClientListenAddrEntry 2 }
+
+hm2NtpClientListenAddrAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The address of the external time server."
+    DEFVAL      { '00000000'H }
+    ::= { hm2NtpClientListenAddrEntry 3 }
+
+hm2NtpClientListenAddrPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The port number of the external time server. Zero is not allowed
+         as port number."
+    DEFVAL      { 123 }
+    ::= { hm2NtpClientListenAddrEntry 4 }
+
+hm2NtpClientListenAddrStatus OBJECT-TYPE
+    SYNTAX      INTEGER { disabled(1),
+                          protocolError(2), 
+                          notSynchronized(3),
+                          notResponding(4), 
+                          synchronizing(5),
+                          synchronized(6),
+                          genericError(7)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status of the NTP client server connection."
+    ::= { hm2NtpClientListenAddrEntry 10 }
+
+hm2NtpClientListenAddrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the status of an entry in this table,
+         and is used to create/delete entries. Objects
+         within this table can by changed while the status
+         is 'active'."
+    ::= { hm2NtpClientListenAddrEntry 11 }
+
+--
+-- *************************************************************
+-- hm2PtpGroup 
+-- *************************************************************
+--
+hm2PtpGlobal	OBJECT IDENTIFIER ::= { hm2PtpGroup 1 }
+
+hm2PtpEnable OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"Enable or disable the Precision Time Protocol (PTP)
+			on this node."		
+		DEFVAL  { disable }
+		::= { hm2PtpGlobal 1 }
+
+
+hm2PtpClockMode OBJECT-TYPE
+		SYNTAX		INTEGER {
+					v2-boundary-clock (2),
+					v2-transparent-clock (3)
+					}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"This members value shall indicate which clock mode is used."			 
+		DEFVAL  { v2-transparent-clock }
+		::= { hm2PtpGlobal 2 }
+
+hm2PtpProfile OBJECT-TYPE
+		SYNTAX		INTEGER {
+					user-defined (1),
+					default-e2e (2),
+					default-p2p (3)
+					}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Configures PTP parameters to a specific profile. Setting the object
+			 to user-defined (1) has no effect."
+		DEFVAL  { default-e2e }
+		::= { hm2PtpGlobal 3 }
+
+hm2PtpIsSynchronized OBJECT-TYPE
+		SYNTAX		INTEGER {
+					true (1),
+					false (2)
+					}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"If the clock is synchronized to the current Master this object is set to true. 
+			Otherwise it is set to false. The clock sets this object to true, if the offset (ns)
+			to the current Master is less than hm2PtpSyncLowerBound. The clock sets this object to false, 
+			if the offset (ns) to the current Master is bigger than hm2PtpSyncUpperBound."
+		::= { hm2PtpGlobal 4 }
+
+
+hm2PtpSyncLowerBound OBJECT-TYPE
+		SYNTAX		Integer32(1..999999999)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"This object defines when the hm2PtpIsSynchronized object is set to true. 
+			If the absolute value of the offset is smaller than hm2PtpSyncLowerBound, 
+			the hm2PtpIsSynchronized is set true.
+			The value is interpreted as nanoseconds."
+		DEFVAL  { 30 }			
+		::= { hm2PtpGlobal 5 }
+
+
+hm2PtpSyncUpperBound OBJECT-TYPE
+		SYNTAX		Integer32(31..1000000000)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"This object defines when the hm2PtpIsSynchronized object is set to false. 
+			If the absolute value of the offset is bigger than hm2PtpSyncUpperBound, the hm2PtpIsSynchronized is set false.
+			The value is interpreted as nanoseconds."
+		DEFVAL  { 5000 }			
+		::= { hm2PtpGlobal 6 }
+
+hm2PtpAbsMaxOffset OBJECT-TYPE
+		SYNTAX		Integer32 
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"This members value shall indicate the absolute value for the maximum offset between its parent and this node. 
+			The value is set to zero if the offset is the first time smaller than hm2PtpSyncLowerBound.
+			Offsets bigger than +/-1 second are indicated by the maximum value."
+		::= { hm2PtpGlobal 7 }
+
+hm2PtpTimeSeconds OBJECT-TYPE
+		SYNTAX		PtpTimeStamp 
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Current PTP time in PTP timescale"
+		::= { hm2PtpGlobal 8 }
+		
+hm2PtpManagement	OBJECT-TYPE
+		SYNTAX 		TruthValue
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"If set to true PTP management via PTP management messages is enabled."
+		DEFVAL  { false }
+		::= { hm2PtpGlobal 9 }
+
+--
+-- ptp2-group (IEEE 1588-2008)  --
+--
+
+hm2Ptp2Objects			OBJECT IDENTIFIER ::= { hm2PtpGroup 2 }
+hm2Ptp2Configuration	OBJECT IDENTIFIER ::= { hm2Ptp2Objects 1 }
+
+hm2Ptp2TwoStepClock OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"A value of true indicates that this node is a two-step device."
+		::= { hm2Ptp2Configuration 1 }
+
+hm2Ptp2ClockIdentity OBJECT-TYPE
+		SYNTAX		PtpClockIdentity	
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"This value is the clock identity of the local clock."
+		::= { hm2Ptp2Configuration 2 }
+
+hm2Ptp2ClockQuality OBJECT-TYPE
+		SYNTAX		PtpClockQuality
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Clock quality of the local clock."
+		::= { hm2Ptp2Configuration 3 }
+
+hm2Ptp2ClockClass OBJECT-TYPE
+		SYNTAX		Integer32 (0..255)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"First octet of hm2Ptp2ClockQuality. This represents the clock class of the local clock."
+		::= { hm2Ptp2Configuration 4 }
+		
+hm2Ptp2ClockAccuracy OBJECT-TYPE
+		SYNTAX		INTEGER {
+							within25ns(32), -- 20H
+						    within100ns(33), -- 21H
+						    within250ns(34), -- 22H
+						    within1000ns(35), -- 23H
+						    within2500ns(36), -- 24H
+						    within10us(37), -- 25H
+						    within25us(38), -- 26H
+						    within100us(39), -- 27H
+						    within250us(40), -- 28H
+						    within1000us(41), -- 29H
+						    within2500us(42), -- 2AH
+						    within10ms(43), -- 2BH
+						    within25ms(44), -- 2CH
+						    within100ms(45), -- 2DH
+						    within250ms(46), -- 2EH
+						    within1s(47), -- 2FH
+						    within10s(48), -- 30H
+						    beyond10s(49), -- 31H
+						    unknown(254) -- FEH
+							}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Second octet of hm2Ptp2ClockQuality. This represents the clock accuracy of the local clock."
+		::= { hm2Ptp2Configuration 5 }
+		
+hm2Ptp2ClockVariance OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Last two octets of hm2Ptp2ClockQuality. This represents the clock variance of the local clock."
+		::= { hm2Ptp2Configuration 6 }
+
+hm2Ptp2Priority1 OBJECT-TYPE
+		SYNTAX		Integer32(0..255)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Priority 1 value of the local clock"
+		DEFVAL  { 128 } 			
+		::= { hm2Ptp2Configuration 7 }
+
+hm2Ptp2Priority2 OBJECT-TYPE
+		SYNTAX		Integer32(0..255)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Priority 2 value of the local clock"
+		DEFVAL  { 128 } 			
+		::= { hm2Ptp2Configuration 8 }
+
+hm2Ptp2DomainNumber OBJECT-TYPE
+		SYNTAX		Integer32(0..255) 
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"PTP domain number of the local clock."
+		DEFVAL  { 0 } 			
+		::= { hm2Ptp2Configuration 9 }
+
+hm2Ptp2StepsRemoved OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The value of hm2Ptp2StepsRemoved is the number of communication paths traversed between the local
+			 clock and the grandmaster clock."
+		::= { hm2Ptp2Configuration 10 }
+
+hm2Ptp2OffsetFromMaster OBJECT-TYPE
+		SYNTAX		PtpTimeInterval
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Current value of the time difference between master and slave measured by this clock."
+		::= { hm2Ptp2Configuration 11 }
+
+hm2Ptp2MeanPathDelay OBJECT-TYPE
+		SYNTAX		PtpTimeInterval 
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Current value of the mean propagation time (e2e-delay) between Master and Slave. 
+			 This is only valid if hm2Ptp2DelayMechanism is set to e2e on the current slave port."
+		::= { hm2Ptp2Configuration 12 }
+
+hm2Ptp2ParentPortIdentity OBJECT-TYPE
+		SYNTAX		PtpPortIdentity
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The port identity value of the port on the master that issues the synchronization
+			 messages used to synchronize this clock."
+		::= { hm2Ptp2Configuration 13 }
+
+hm2Ptp2ParentStats OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"A value of True indicates that the objects hm2Ptp2ObservedParentOffsetScaledLogVariance 
+			 and hm2Ptp2ObservedParentClockPhaseChangeRate are valid."
+		::= { hm2Ptp2Configuration 14 }
+
+hm2Ptp2ObservedParentOffsetScaledLogVariance OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Estimate of the parent clocks PTP variance observed by this clock."
+		::= { hm2Ptp2Configuration 15 }
+
+hm2Ptp2ObservedParentClockPhaseChangeRate OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Estimate of the phase change rate (drift) observed by this clock."
+		::= { hm2Ptp2Configuration 16 }
+
+hm2Ptp2GrandmasterIdentity OBJECT-TYPE
+		SYNTAX		PtpClockIdentity
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"ClockIdentity of the Grandmaster clock synchronizing this clock."
+		::= { hm2Ptp2Configuration 17 }
+
+hm2Ptp2GrandmasterClockQuality OBJECT-TYPE
+		SYNTAX		PtpClockQuality
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"ClockQuality of the Grandmaster clock synchronizing this clock."
+		::= { hm2Ptp2Configuration 18 }
+
+hm2Ptp2GrandmasterClockClass OBJECT-TYPE
+		SYNTAX		Integer32 (0..255)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"First octet of hm2Ptp2GrandmasterClockQuality. This represents the grand masters clock class."
+		::= { hm2Ptp2Configuration 19 }
+		
+hm2Ptp2GrandmasterClockAccuracy OBJECT-TYPE
+		SYNTAX		INTEGER {
+							within25ns(32), -- 20H
+						    within100ns(33), -- 21H
+						    within250ns(34), -- 22H
+						    within1000ns(35), -- 23H
+						    within2500ns(36), -- 24H
+						    within10us(37), -- 25H
+						    within25us(38), -- 26H
+						    within100us(39), -- 27H
+						    within250us(40), -- 28H
+						    within1000us(41), -- 29H
+						    within2500us(42), -- 2AH
+						    within10ms(43), -- 2BH
+						    within25ms(44), -- 2CH
+						    within100ms(45), -- 2DH
+						    within250ms(46), -- 2EH
+						    within1s(47), -- 2FH
+						    within10s(48), -- 30H
+						    beyond10s(49), -- 31H
+						    unknown(254) -- FEH
+							}
+		MAX-ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"Second octet of hm2Ptp2GrandmasterClockAccuracy. This represents the grand masters clock accuracy."
+		::= { hm2Ptp2Configuration 20 }
+		
+hm2Ptp2GrandmasterClockVariance OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Last two octets of hm2Ptp2GrandmasterClockQuality. This represents the grand masters clock variance."
+		::= { hm2Ptp2Configuration 21 }
+
+hm2Ptp2GrandmasterPriority1 OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Priority 1 value of the grand master clock."
+		::= { hm2Ptp2Configuration 22 }
+
+hm2Ptp2GrandmasterPriority2 OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Priority 2 value of the grand master clock."
+		::= { hm2Ptp2Configuration 23 }
+
+hm2Ptp2CurrentUtcOffset OBJECT-TYPE
+		SYNTAX		Integer32 (-32768..32767)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Current difference between the PTP timescale (TAI) and UTC in seconds."
+		DEFVAL  { 37 }
+		::= { hm2Ptp2Configuration 24 }
+
+hm2Ptp2CurrentUtcOffsetValid OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"A value of True indicates that the hm2Ptp2CurrentUtcOffset is known to be correct."
+		DEFVAL  { false }			
+		::= { hm2Ptp2Configuration 25 }
+
+hm2Ptp2Leap59 OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"A value of true indicates that the last minute of the current UTC day contains 59 seconds."
+		::= { hm2Ptp2Configuration 26 }
+
+hm2Ptp2Leap61 OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"A value of true indicates that the last minute of the current UTC day contains 61 seconds."
+		::= { hm2Ptp2Configuration 27 }
+
+hm2Ptp2TimeTraceable OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"A value of True indicates that the current time is traceable to a primary reference."
+		::= { hm2Ptp2Configuration 28 }
+
+hm2Ptp2FrequencyTraceable OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"A value of True indicates that the frequency determining 
+			 the timescale is traceable to a primary reference."
+		::= { hm2Ptp2Configuration 29 }
+
+hm2Ptp2PtpTimescale OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"A value of True indicates that the clocks timescale is PTP."
+		::= { hm2Ptp2Configuration 30 }
+
+hm2Ptp2TimeSource OBJECT-TYPE
+		SYNTAX		INTEGER {
+							atomicClock(16), -- 10H
+							gps(32), -- 20H
+							terrestrialRadio(48), -- 30H
+							ptp(64), -- 40H
+							ntp(80), --50H
+							handSet(96), --60H
+							other(144), --90H
+							internalOscillator(160) --A0H
+							}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"The source of time used by the Grandmaster clock."
+		DEFVAL  { internalOscillator }
+		::= { hm2Ptp2Configuration 31 }
+		
+		
+hm2Ptp2PortTable OBJECT-TYPE
+		SYNTAX			SEQUENCE OF Hm2Ptp2PortEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+			"This table contains variables for each PTP2 port of
+			the switch."
+		::= { hm2Ptp2Objects 2 }
+
+hm2Ptp2PortEntry OBJECT-TYPE
+		SYNTAX 		 Hm2Ptp2PortEntry
+		MAX-ACCESS 	 not-accessible
+		STATUS 		 current
+		DESCRIPTION     "Entry for one port."
+		INDEX		{ ifIndex }
+		::= { hm2Ptp2PortTable 1 }
+
+Hm2Ptp2PortEntry ::= SEQUENCE {
+		hm2Ptp2PortEnable HmEnabledStatus,
+		hm2Ptp2PortState INTEGER,
+		hm2Ptp2LogDelayReqInterval	Integer32,
+		hm2Ptp2PeerMeanPathDelay PtpTimeInterval,
+		hm2Ptp2LogAnnounceInterval INTEGER,
+		hm2Ptp2AnnounceReceiptTimeout Integer32,
+		hm2Ptp2LogSyncInterval INTEGER,
+		hm2Ptp2DelayMechanism INTEGER,
+		hm2Ptp2LogPdelayReqInterval Hm2Ptp2LogPdelayReqIntervalTc,
+		hm2Ptp2VersionNumber INTEGER,
+		hm2Ptp2NetworkProtocol INTEGER,
+		hm2Ptp2V1Compatibility INTEGER,
+		hm2Ptp2DelayAsymmetry Integer32,
+		hm2Ptp2PortCapability BITS,
+		hm2Ptp2VlanID Integer32,
+		hm2Ptp2VlanPriority Integer32
+		}
+
+hm2Ptp2PortEnable	OBJECT-TYPE
+		SYNTAX 		HmEnabledStatus
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"Enable or disable the sending and receiving / processing of PTP synchronization messages."
+		DEFVAL  { enable }			
+		::= { hm2Ptp2PortEntry 1 }
+		
+hm2Ptp2PortState OBJECT-TYPE
+		SYNTAX		INTEGER {
+					initializing (1),
+					faulty (2),
+					disabled (3),
+					listening (4),
+					pre-master (5),
+					master (6),
+					passive (7),
+					uncalibrated (8),
+					slave (9)
+					}
+		MAX-ACCESS 		 read-only
+		STATUS 		 current
+		DESCRIPTION
+			"State of the PTP2 port instance."
+		::= { hm2Ptp2PortEntry 2 }
+
+hm2Ptp2LogDelayReqInterval		OBJECT-TYPE
+		SYNTAX 		Integer32
+		MAX-ACCESS 	read-only
+		STATUS 		current
+		DESCRIPTION
+			"Logarithm to the base of 2 of the minimum DelayRequest interval used to measure the e2e-delay."
+		::= { hm2Ptp2PortEntry 3 }
+
+hm2Ptp2PeerMeanPathDelay		OBJECT-TYPE
+		SYNTAX 		PtpTimeInterval
+		MAX-ACCESS 	read-only
+		STATUS 		current
+		DESCRIPTION
+			"If hm2Ptp2DelayMechanism is set to p2p this value is an estimate of the current one-way propagation delay (p2p-delay)."
+		::= { hm2Ptp2PortEntry 4 }
+
+hm2Ptp2LogAnnounceInterval	OBJECT-TYPE
+		SYNTAX 		INTEGER {
+					sec-1 (0),
+					sec-2 (1),
+					sec-4 (2),
+					sec-8 (3),
+					sec-16 (4)
+					}
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"Logarithm to the base of 2 of the mean announce interval."
+		DEFVAL  { sec-2 }			
+		::= { hm2Ptp2PortEntry 5 }
+
+hm2Ptp2AnnounceReceiptTimeout	OBJECT-TYPE
+		SYNTAX 		Integer32 (2..10)
+		MAX-ACCESS 		read-write
+		STATUS 		current
+		DESCRIPTION
+			"Announce receipt timeout in multiples of hm2Ptp2LogAnnounceInterval."
+		DEFVAL  { 3 }			
+		::= { hm2Ptp2PortEntry 6 }
+
+hm2Ptp2LogSyncInterval	OBJECT-TYPE
+		SYNTAX 		Hm2Ptp2LogSyncIntervalTc
+		MAX-ACCESS 		read-write
+		STATUS 		current
+		DESCRIPTION
+			"Logarithm to the base of 2 of the mean synchronization interval."
+		DEFVAL  { sec-1 }
+		::= { hm2Ptp2PortEntry 7 }
+
+hm2Ptp2DelayMechanism	OBJECT-TYPE
+		SYNTAX 	INTEGER {
+							e2e(1),
+							p2p(2),
+							disabled(254) -- FEH
+						}
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"This value indicates the propagation delay measuring option used by this port."
+		DEFVAL  { e2e }			
+		::= { hm2Ptp2PortEntry 8 }
+
+hm2Ptp2LogPdelayReqInterval	OBJECT-TYPE
+		SYNTAX 		Hm2Ptp2LogPdelayReqIntervalTc
+		MAX-ACCESS 		read-write
+		STATUS 		current
+		DESCRIPTION
+			"Logarithm to the base of 2 of the minimum PDelay Request interval (used for p2p-delay)."
+		DEFVAL  { sec-1 }			
+		::= { hm2Ptp2PortEntry 9 }
+
+hm2Ptp2VersionNumber	OBJECT-TYPE
+		SYNTAX 		INTEGER {
+								ptpVersion1 (1),
+								ptpVersion2 (2)
+							}
+		MAX-ACCESS 		read-write
+		STATUS 			current
+		DESCRIPTION
+			"PTP version in use on this port (always ptpVersion2)."
+		DEFVAL  { ptpVersion2 }			
+		::= { hm2Ptp2PortEntry 10 }
+
+hm2Ptp2NetworkProtocol	OBJECT-TYPE
+		SYNTAX 		INTEGER {
+						    	udpIpv4    (1),
+						    	ieee8023   (3)
+							}
+		MAX-ACCESS 		read-write
+		STATUS 			current
+		DESCRIPTION
+			"Current configured network transport protocol of this port."
+		DEFVAL  { ieee8023 }		
+		::= { hm2Ptp2PortEntry 11 }
+
+hm2Ptp2V1Compatibility 	OBJECT-TYPE
+		SYNTAX 		INTEGER {
+								on   (1),
+								off  (2),
+								auto (3)
+							}
+		MAX-ACCESS 		read-write
+		STATUS 		current
+		DESCRIPTION
+			"If set to on all PTPv2 messages will be padded to the length of a PTPv1 frame. This is required by some hardware."
+		DEFVAL  { auto }			
+		::= { hm2Ptp2PortEntry 12 }
+
+hm2Ptp2DelayAsymmetry  	OBJECT-TYPE
+		SYNTAX 		Integer32(-2000000000..2000000000)
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"Asymmetry of the link connected to this port in nanoseconds. 
+			The hm2Ptp2DelayAsymmetry is positive when the master-to-slave 
+			propagation time is longer than the slave-to-master propagation time."
+		DEFVAL  { 0 }
+		::= { hm2Ptp2PortEntry 13 }
+		
+hm2Ptp2PortCapability  	OBJECT-TYPE 
+	   SYNTAX      BITS {
+	                  reserved(0),
+	                  one-step(1),
+	                  e2e-delay(2),
+	                  p2p-delay(3),
+	                  ptp2Ieee8023(4),
+	                  ptp2UdpIpv4(5),
+	                  ptp2UdpIpv6(6),
+	                  asymmCorrection(7),
+	                  halfDuplex(8),
+	                  ptp2UdpE2EGlobal(9)
+	               }
+	   MAX-ACCESS  read-only
+	   STATUS      current 
+	   DESCRIPTION 
+	      "This object shows the capability of the ptp port."
+	   ::= { hm2Ptp2PortEntry 14 }
+	   
+hm2Ptp2VlanID	OBJECT-TYPE
+		SYNTAX 		Integer32(-1..4042)
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"VLAN in which PTP packets are send. With a value of -1 all packets are send untagged"
+		DEFVAL  { -1 }
+		::= { hm2Ptp2PortEntry 15 }
+
+hm2Ptp2VlanPriority	OBJECT-TYPE
+		SYNTAX 		Integer32(0..7)
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"VLAN priority of tagged ptp packets"
+		DEFVAL  { 6 }
+		::= { hm2Ptp2PortEntry 16 }
+		
+--
+-- hm2Ptp2TCConfiguration / Transparent Clock configuration (IEEE1588-2008) --
+--
+
+hm2Ptp2TCObjects		OBJECT IDENTIFIER ::= { hm2PtpGroup 3 }
+hm2Ptp2TCConfiguration	OBJECT IDENTIFIER ::= { hm2Ptp2TCObjects 1 }
+
+hm2Ptp2TCClockIdentity	OBJECT-TYPE
+		SYNTAX 		PtpClockIdentity
+		MAX-ACCESS 	read-only
+		STATUS 		current
+		DESCRIPTION
+			"This value is the clock identity of the transparent clock."
+		::= { hm2Ptp2TCConfiguration 1 }
+
+hm2Ptp2TCDelayMechanism	OBJECT-TYPE
+		SYNTAX 		INTEGER{
+							e2e(1),
+							p2p(2),
+							e2e-optimized(3),
+							disabled(254) -- FEH
+							}
+		MAX-ACCESS 		read-write
+		STATUS 		current
+		DESCRIPTION
+			"Configures the transparent clock to be either a e2e- or p2p-transparent clock.
+			If supported a value of e2e-optimized sets the clock to e2e mode where delay requests 
+			are only forwarded on the port where the current Master (hm2Ptp2TCCurrentMaster) is connected."
+		DEFVAL  { e2e }
+		::= { hm2Ptp2TCConfiguration 2 }
+
+hm2Ptp2TCPrimaryDomain	OBJECT-TYPE
+		SYNTAX 		Integer32(0..255)
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"PTP domain number of the primary syntonization domain."
+		DEFVAL  { 0 }
+		::= { hm2Ptp2TCConfiguration 3 }
+
+hm2Ptp2TCSyntonized	OBJECT-TYPE
+		SYNTAX 		TruthValue
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"A value of true indicates that the syntonization of the transparent clock is enabled."
+		DEFVAL  { true }
+		::= { hm2Ptp2TCConfiguration 4 }
+
+hm2Ptp2TCNetworkProtocol	OBJECT-TYPE
+		SYNTAX 		INTEGER {
+						    udpIpv4    (1),
+						    ieee8023   (3)
+							}
+		MAX-ACCESS 		read-write
+		STATUS 		current
+		DESCRIPTION
+			"Current configured network transport protocol of the transparent clock."
+		DEFVAL  { ieee8023 }
+		::= { hm2Ptp2TCConfiguration 5 }
+
+hm2Ptp2TCCurrentMaster OBJECT-TYPE
+		SYNTAX 		PtpPortIdentity
+		MAX-ACCESS 	read-only
+		STATUS 		current
+		DESCRIPTION
+			"The port identity value of the port on the master that issues the synchronization
+			 messages used to syntonize/synchronize this clock."
+		::= { hm2Ptp2TCConfiguration 6 }
+
+hm2Ptp2TCMultiDomainMode	OBJECT-TYPE
+		SYNTAX 		TruthValue
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"If set to false, PTP messages from domains other than hm2Ptp2TCPrimaryDomain are ignored."
+		DEFVAL  { false }
+		::= { hm2Ptp2TCConfiguration 7 }
+		
+hm2Ptp2TCSyncLocalClock	OBJECT-TYPE
+		SYNTAX 		TruthValue
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"Enable synchronisation of the local clock (TC hybrid mode). This requires syntonization to be enabled.
+			 All transparent clock operations are still done based on the syntonized clock."
+		DEFVAL  { false }
+		::= { hm2Ptp2TCConfiguration 8 }
+		
+hm2Ptp2TCOffsetFromMaster OBJECT-TYPE
+		SYNTAX		PtpTimeInterval
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Current value of the time difference between Master and this clock measured by this clock. 
+			 This object is only valid if hm2Ptp2TCSyncLocalClock is set to true."
+		::= { hm2Ptp2TCConfiguration 9 }
+
+hm2Ptp2TCMeanPathDelay OBJECT-TYPE
+		SYNTAX		PtpTimeInterval 
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Current value of the mean propagation time (e2e-delay) between Master and Slave. 
+			 This object is only valid for e2e-transparent-clock and hm2Ptp2TCSyncLocalClock is set to true."
+		::= { hm2Ptp2TCConfiguration 10 }	
+		
+hm2Ptp2TCVlanID	OBJECT-TYPE
+		SYNTAX 		Integer32(-1..4095)
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"VLAN in which PTP packets are send. With a value of -1 all packets are send untagged."
+		DEFVAL  { -1 }
+		::= { hm2Ptp2TCConfiguration 11 }
+
+hm2Ptp2TCVlanPriority	OBJECT-TYPE
+		SYNTAX 		Integer32(0..7)
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"VLAN priority of tagged PTP packets."
+		DEFVAL  { 6 }
+		::= { hm2Ptp2TCConfiguration 12 }
+				
+hm2Ptp2TCCapability  OBJECT-TYPE 
+	   SYNTAX      BITS {
+	                  reserved(0),
+	                  one-step(1),
+	                  e2e-delay(2),
+	                  p2p-delay(3),
+	                  ptp2Ieee8023(4),
+	                  ptp2UdpIpv4(5),
+	                  ptp2UdpIpv6(6),
+	                  asymmCorrection(7),
+	                  halfDuplex(8)     
+	               }
+	   MAX-ACCESS  read-only
+	   STATUS      current 
+	   DESCRIPTION 
+	      "This object shows the capability of the TC."
+	   ::= { hm2Ptp2TCConfiguration 13 }
+
+hm2Ptp2TCPortTable OBJECT-TYPE
+		SYNTAX			SEQUENCE OF Hm2Ptp2TCPortEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+			"This table contains variables for each PTP2 TC port of
+			the switch."
+		::= { hm2Ptp2TCObjects 2 }
+
+hm2Ptp2TCPortEntry OBJECT-TYPE
+		SYNTAX 		 Hm2Ptp2TCPortEntry
+		MAX-ACCESS 	 not-accessible
+		STATUS 		 current
+		DESCRIPTION     "Entry for one port."
+		INDEX		{ ifIndex }
+		::= { hm2Ptp2TCPortTable 1 }
+
+Hm2Ptp2TCPortEntry ::= SEQUENCE {
+		hm2Ptp2TCPortEnable HmEnabledStatus,
+		hm2Ptp2TCLogPdelayReqInterval Hm2Ptp2LogPdelayReqIntervalTc,
+		hm2Ptp2TCFaulty TruthValue,
+		hm2Ptp2TCPeerMeanPathDelay PtpTimeInterval,
+		hm2Ptp2TCDelayAsymmetry Integer32
+		}
+
+hm2Ptp2TCPortEnable		OBJECT-TYPE
+		SYNTAX 		HmEnabledStatus
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"Enable or disable the sending and receiving / processing of PTP synchronization messages."
+		DEFVAL  { enable }			
+		::= { hm2Ptp2TCPortEntry 1 }
+
+hm2Ptp2TCLogPdelayReqInterval	OBJECT-TYPE
+		SYNTAX 		Hm2Ptp2LogPdelayReqIntervalTc
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"Logarithm to the base of 2 of the minimum PDelay Request interval (used for p2p-delay)."
+		DEFVAL  { sec-1 }
+		::= { hm2Ptp2TCPortEntry 2 }
+
+hm2Ptp2TCFaulty	OBJECT-TYPE
+		SYNTAX 		TruthValue
+		MAX-ACCESS 	read-only
+		STATUS 		current
+		DESCRIPTION
+			"True if port is in Faulty state."
+		::= { hm2Ptp2TCPortEntry 3 }
+
+hm2Ptp2TCPeerMeanPathDelay	OBJECT-TYPE
+		SYNTAX 		PtpTimeInterval 
+		MAX-ACCESS 	read-only
+		STATUS 		current
+		DESCRIPTION
+			"This value is an estimate of the current one way propagation delay of a p2p-transparent-clock."
+		::= { hm2Ptp2TCPortEntry 4 }
+
+hm2Ptp2TCDelayAsymmetry  	OBJECT-TYPE
+		SYNTAX 		Integer32(-2000000000..2000000000)
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"Asymmetry of the link connected to this port in nanoseconds. 
+			The hm2Ptp2TCDelayAsymmetry is positive when the master-to-slave 
+			propagation time is longer than the slave-to-master propagation time."
+		DEFVAL  { 0 }			
+		::= { hm2Ptp2TCPortEntry 5 }
+
+-- *************************************************************
+-- hm2IrigGroup
+-- *************************************************************
+hm2IrigAdminStatus OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+	  "Enables/disables the IRIG-B output."
+   DEFVAL { disable }
+   ::= { hm2IrigGroup 1 }
+
+hm2IrigMode OBJECT-TYPE
+   SYNTAX INTEGER {
+	  irig-b000 (0),
+	  irig-b001 (1),
+	  irig-b002 (2),
+	  irig-b003 (3),
+	  irig-b004 (4),
+	  irig-b005 (5),
+	  irig-b006 (6),
+	  irig-b007 (7)
+   }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+	  "Set the IRIG Mode, allowed values:
+	  (See https://wsmrc2vger.wsmr.army.mil/rcc/manuals/200-04/TT-45.pdf)
+	  irig-b000 (0) - Mode IRIG B000, BCDtoy, CF, SBS
+	  irig-b001 (1) - Mode IRIG B001, BCDtoy, CF
+	  irig-b002 (2) - Mode IRIG B002, BCDtoy
+	  irig-b003 (3) - Mode IRIG B003, BCDtoy, SBS
+	  irig-b004 (4) - Mode IRIG B004, BCDtoy, BCDyear, CF, SBS
+	  irig-b005 (5) - Mode IRIG B005, BCDtoy, BCDyear, CF
+	  irig-b006 (6) - Mode IRIG B006, BCDtoy, BCDyear
+	  irig-b007 (7) - Mode IRIG B007, BCDtoy, BCDyear, SBS
+	  with 
+		BCDtoy: binary coded decimal time of year
+		BCDyear: binary coded decimal year
+		CF: control functions
+		SBS: straight binary seconds of day
+	  only modes b002,B003,B006 and b007 are supported."
+   DEFVAL { irig-b003 }
+   ::= { hm2IrigGroup 2 }
+
+hm2IrigPpsAdminStatus OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+	  "Enables/disables the pps output."
+   DEFVAL { disable }
+   ::= { hm2IrigGroup 3 }
+
+hm2IrigTimeMode OBJECT-TYPE
+   SYNTAX INTEGER {
+	utc (1),
+	local(2)
+   }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+	  "Define the IRIG-B time base (UTC or local)."
+   DEFVAL { utc }
+   ::= { hm2IrigGroup 4 }
+
+hm2IrigOperStatus OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+	  "Current operational status of the IRIG-B output. "
+   ::= { hm2IrigGroup 5 }
+
+hm2IrigTimeQuality OBJECT-TYPE
+   SYNTAX INTEGER {
+	  locked(0),
+	  within1ns(1),
+	  within10ns(2),
+	  within100ns(3),
+	  within1us(4),
+	  within10us(5),
+	  within100us(6),
+	  within1ms(7),
+	  within10ms(8),
+	  within100ms(9),
+	  within1s(10),
+	  within10s(11),
+	  within100s(12),
+	  within1000s(13),
+	  within10000s(14),
+	  failure(15)
+   }   
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+	  "Current IRIG-B time quality according to IEEE 1344."
+   ::= { hm2IrigGroup 6 }
+
+
+--
+-- *************************************************************
+-- hm2Dot1asGroup
+-- *************************************************************
+--
+hm2Dot1asGlobal	OBJECT IDENTIFIER ::= { hm2Dot1asGroup 1 }
+
+hm2Dot1asEnable OBJECT-TYPE
+		SYNTAX HmEnabledStatus
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"Enable or disable the 802.1AS Protocol
+			on this node."
+		DEFVAL  { disable }
+		::= { hm2Dot1asGlobal 1 }
+
+hm2Dot1asIsSynchronized OBJECT-TYPE
+		SYNTAX		INTEGER {
+					true (1),
+					false (2)
+					}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"If the clock is synchronized to the current Master this object is set to true.
+			Otherwise it is set to false. The clock sets this object to true, if the offset (ns)
+			to the current Master is less than hm2dot1asSyncLowerBound. The clock sets this object to false,
+			if the offset (ns) to the current Master is bigger than hm2dot1asSyncUpperBound."
+		::= { hm2Dot1asGlobal 2 }
+
+hm2Dot1asSyncLowerBound OBJECT-TYPE
+		SYNTAX		Integer32(1..999999999)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"This object defines when the hm2dot1asIsSynchronized object is set to true.
+			If the absolute value of the offset is smaller than hm2dot1asSyncLowerBound,
+			the hm2dot1asIsSynchronized is set true.
+			The value is interpreted as nanoseconds."
+		DEFVAL  { 30 }
+		::= { hm2Dot1asGlobal 3 }
+
+hm2Dot1asSyncUpperBound OBJECT-TYPE
+		SYNTAX		Integer32(31..1000000000)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"This object defines when the hm2dot1asIsSynchronized object is set to false.
+			If the absolute value of the offset is bigger than hm2dot1asSyncUpperBound, the hm2dot1asIsSynchronized is set false.
+			The value is interpreted as nanoseconds."
+		DEFVAL  { 5000 }
+		::= { hm2Dot1asGlobal 4 }
+
+hm2Dot1asAbsMaxOffset OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"This members value shall indicate the absolute value for the maximum offset between its parent and this node. 
+			The value is set to zero if the offset is the first time smaller than hm2dot1asSyncLowerBound.
+			Offsets bigger than +/-1 second are indicated by the maximum value."
+		::= { hm2Dot1asGlobal 5 }
+
+-- ***********************************************************
+-- hm2TimeSyncSNMPExtensionGroup
+-- ***********************************************************
+hm2TimeSyncSystemTimeSESGroup 	OBJECT IDENTIFIER ::= { hm2TimeSyncMibSNMPExtensionGroup 1 }
+hm2TimeSyncSntpSESGroup 		OBJECT IDENTIFIER ::= { hm2TimeSyncMibSNMPExtensionGroup 2 }
+hm2TimeSyncNtpSESGroup	 		OBJECT IDENTIFIER ::= { hm2TimeSyncMibSNMPExtensionGroup 3 }
+hm2TimeSyncPtpSESGroup	 		OBJECT IDENTIFIER ::= { hm2TimeSyncMibSNMPExtensionGroup 4 }
+hm2TimeSyncIrigSESGroup	 		OBJECT IDENTIFIER ::= { hm2TimeSyncMibSNMPExtensionGroup 5 }
+hm2TimeSyncDot1asSESGroup	 	OBJECT IDENTIFIER ::= { hm2TimeSyncMibSNMPExtensionGroup 6 }
+
+-- ***********************************************************
+-- hm2TimeSyncSntpSESGroup
+-- ***********************************************************
+hm2TimeSyncSntpSESIpv4PortNumberPairInUse OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the given IPv4 address / port number combination is already in use."
+           ::= { hm2TimeSyncSntpSESGroup 1 }
+
+hm2TimeSyncSntpSESDnsPortNumberPairInUse OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the given DNS name / port number combination is already in use."
+           ::= { hm2TimeSyncSntpSESGroup 2 }
+
+hm2TimeSyncSntpSESIpv6PortNumberPairInUse OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION
+           		"Indicates that the given IPv6 address / port number combination is already in use."
+           ::= { hm2TimeSyncSntpSESGroup 3 }
+
+-- ***********************************************************
+-- hm2TimeSyncPtpSESGroup
+-- ***********************************************************
+hm2TimeSyncPtpSESPortIsNotCapable OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION
+                "Indicates that the given port number is not PTP capable."
+           ::= { hm2TimeSyncPtpSESGroup 1 }
+    
+-- *************************************************************
+-- Notifications
+-- *************************************************************
+   
+-- *************************************************************
+-- Ptp2 notifications
+-- *************************************************************
+hm2Ptp2SynchronizationChange  NOTIFICATION-TYPE
+	OBJECTS		{ hm2PtpIsSynchronized }
+	STATUS		current
+	DESCRIPTION 
+	"This notification is sent if the PTP synchronization status is changed."
+	::= { hm2TimeSyncMibNotifications 1 }
+
+-- *************************************************************
+-- SNTP notifications
+-- *************************************************************
+hm2SntpClientSynchronizationChangeTrap  NOTIFICATION-TYPE
+	OBJECTS		{ hm2SntpClientStatus }
+	STATUS		current
+	DESCRIPTION 
+	"This notification is sent if the SNTP synchronization status (hm2SntpClientStatus) is changed."
+	::= { hm2TimeSyncMibNotifications 10 }
+
+-- *************************************************************
+-- Dot1as notifications
+-- *************************************************************
+hm2Dot1asSynchronizationChange  NOTIFICATION-TYPE
+	OBJECTS		{ hm2Dot1asIsSynchronized }
+	STATUS		current
+	DESCRIPTION 
+	"This notification is sent if the dot1as synchronization status is changed."
+	::= { hm2TimeSyncMibNotifications 20 }
+
+END
+

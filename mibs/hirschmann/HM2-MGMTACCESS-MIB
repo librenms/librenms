@@ -1,0 +1,1243 @@
+HM2-MGMTACCESS-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann Management Access MIB
+-- *************************************************************
+--
+
+IMPORTS
+   NOTIFICATION-TYPE,
+   MODULE-IDENTITY, 
+   OBJECT-IDENTITY,
+   OBJECT-TYPE,
+   Integer32, Counter64    FROM SNMPv2-SMI -- RFC 2578
+   DisplayString,
+   TEXTUAL-CONVENTION,
+   RowStatus               FROM SNMPv2-TC
+   SnmpAdminString         FROM SNMP-FRAMEWORK-MIB
+   InetAddressType,
+   InetAddress,
+   InetPortNumber,
+   InetAddressPrefixLength FROM INET-ADDRESS-MIB
+   hm2ConfigurationMibs,
+   HmEnabledStatus,
+   HmLargeDisplayString      FROM HM2-TC-MIB;
+
+hm2MgmtAccessMib MODULE-IDENTITY
+	LAST-UPDATED "201103160000Z" -- March 16, 2011
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann Management Access MIB.
+         Copyright (C) 2012. All Rights Reserved."
+    REVISION     "201103160000Z" -- March 16, 2011
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 25 }
+
+--
+-- *************************************************************
+-- Textual Conventions
+-- *************************************************************
+--
+Hm2RestartAction ::= TEXTUAL-CONVENTION
+			STATUS			current
+			DESCRIPTION		"."
+			SYNTAX			INTEGER {
+										other(1),
+										restart(2)
+									}
+
+Hm2TlsVersions ::= TEXTUAL-CONVENTION
+			STATUS			current
+			DESCRIPTION		"The Transport Layer Security versions available on the device."
+			SYNTAX			BITS {
+									tlsv1-0(0),
+									tlsv1-1(1), -- not implemented
+									tlsv1-2(2)
+								}
+
+Hm2TlsCipherSuites ::= TEXTUAL-CONVENTION
+			STATUS			current
+			DESCRIPTION		"The Transport Layer Security ciphers available on the device."
+			SYNTAX			BITS {
+									tls-rsa-with-rc4-128-sha(0),
+									tls-rsa-with-aes-128-cbc-sha(1),
+									tls-dhe-rsa-with-aes-128-cbc-sha(2),
+									tls-dhe-rsa-with-aes-256-cbc-sha(3),
+									tls-ecdhe-rsa-with-aes-128-cbc-sha(4),
+									tls-ecdhe-rsa-with-aes-256-cbc-sha(5),
+									tls-ecdhe-rsa-with-aes-128-gcm-sha256(6),
+									tls-ecdhe-rsa-with-aes-256-gcm-sha384(7)
+								}
+
+Hm2SshHmacAlgorithms ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION   "The Secure Shell algorithms for HMAC available on the device."
+      SYNTAX      BITS {
+                  hmac-sha1(0),
+                  hmac-sha2-256(1),
+                  hmac-sha2-512(2),
+                  hmac-sha1-etm-at-openssh-com(3),
+                  hmac-sha2-256-etm-at-openssh-com(4),
+                  hmac-sha2-512-etm-at-openssh-com(5)
+                }
+
+Hm2SshKexAlgorithms ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION   "The Secure Shell algorithms for key exchange available on the device."
+      SYNTAX      BITS {
+                  diffie-hellman-group1-sha1(0),
+                  diffie-hellman-group14-sha1(1),
+                  diffie-hellman-group14-sha256(2),
+                  diffie-hellman-group16-sha512(3),
+                  diffie-hellman-group18-sha512(4),
+                  diffie-hellman-group-exchange-sha256(5),
+                  ecdh-sha2-nistp256(6),
+                  ecdh-sha2-nistp384(7)
+                }
+
+Hm2SshEncryptionAlgorithms ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION   "The Secure Shell algorithms for encryption available on the device."
+      SYNTAX      BITS {
+                  aes128-ctr(0),
+                  aes192-ctr(1),
+                  aes256-ctr(2),
+                  aes128-gcm-at-openssh-com(3),
+                  aes256-gcm-at-openssh-com(4),
+                  chacha20-poly1305-at-openssh-com(5)
+                }
+
+--
+-- *************************************************************
+-- hm2MgmtAccessMib
+-- *************************************************************
+--
+hm2MgmtAccessMibNotifications			OBJECT IDENTIFIER ::= { hm2MgmtAccessMib 0 }
+hm2MgmtAccessMibObjects					OBJECT IDENTIFIER ::= { hm2MgmtAccessMib 1 }
+-- hm2MgmtAccessMibConformance					OBJECT IDENTIFIER ::= { hm2MgmtAccessMib 2 }
+hm2MgmtAccessMibSNMPExtensionGroup 		OBJECT IDENTIFIER ::= { hm2MgmtAccessMib 3 }
+
+--
+-- *************************************************************
+-- hm2MgmtAccessMib groups
+-- *************************************************************
+--
+hm2MgmtAccessSnmpGroup 					OBJECT IDENTIFIER ::= { hm2MgmtAccessMibObjects 1 }
+hm2MgmtAccessWebGroup 					OBJECT IDENTIFIER ::= { hm2MgmtAccessMibObjects 2 }
+hm2MgmtAccessTelnetGroup				OBJECT IDENTIFIER ::= { hm2MgmtAccessMibObjects 3 }
+hm2MgmtAccessSshGroup					OBJECT IDENTIFIER ::= { hm2MgmtAccessMibObjects 4 }
+hm2MgmtAccessPreLoginBannerGroup		OBJECT IDENTIFIER ::= { hm2MgmtAccessMibObjects 5 }
+hm2MgmtAccessCliGroup					OBJECT IDENTIFIER ::= { hm2MgmtAccessMibObjects 6 }
+hm2RestrictedMgmtAccessGroup 			OBJECT IDENTIFIER ::= { hm2MgmtAccessMibObjects 7 }
+hm2MgmtAccessStatisticsGroup 			OBJECT IDENTIFIER ::= { hm2MgmtAccessMibObjects 10 }
+
+--
+-- *************************************************************
+-- hm2MgmtAccessSnmp
+-- *************************************************************
+--
+hm2SnmpV1AdminStatus		OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS	read-write
+			STATUS	current
+			DESCRIPTION
+			"Enables/disables the SNMP version 1 protocol."
+			DEFVAL  { disable }			
+			::= { hm2MgmtAccessSnmpGroup 1 }
+
+hm2SnmpV2AdminStatus 	OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS	read-write
+			STATUS	current
+			DESCRIPTION
+			"Enables/disables the SNMP version 2c protocol."						
+			DEFVAL  { disable }
+			::= { hm2MgmtAccessSnmpGroup 2 }
+
+hm2SnmpV3AdminStatus 	OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS	read-write
+			STATUS	current
+			DESCRIPTION
+			"Enables/disables the SNMP version 3 protocol."						
+			DEFVAL  { enable }
+			::= { hm2MgmtAccessSnmpGroup 3 }
+
+hm2SnmpPortNumber  	OBJECT-TYPE
+			SYNTAX	InetPortNumber
+			MAX-ACCESS	read-write
+			STATUS	current
+			DESCRIPTION
+			"The port number of the snmp server.
+			To activate the port number the device
+			has to be restarted.
+            Setting the port to zero is not allowed."						
+			DEFVAL  { 161 }
+			::= { hm2MgmtAccessSnmpGroup 4 }
+
+hm2SnmpOver802AdminStatus OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION "Enables/disables SNMP over IEEE 802 networks."
+			DEFVAL { disable }
+			::= { hm2MgmtAccessSnmpGroup 5 }
+			
+hm2SnmpTrapServiceAdminStatus OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION "Enables/disables the SNMP trap sending service globally on the device."
+			DEFVAL { enable }
+			::= { hm2MgmtAccessSnmpGroup 6 }
+			
+--
+-- *************************************************************
+-- hm2MgmtAccessWeb
+-- *************************************************************
+--
+
+hm2WebHttpAdminStatus OBJECT-TYPE
+			SYNTAX			 HmEnabledStatus
+			MAX-ACCESS		 read-write
+			STATUS			 current
+			DESCRIPTION
+			"Enables/Disables HTTP access to the device."
+			DEFVAL 		 	{ enable } 
+			::= { hm2MgmtAccessWebGroup 1 }
+		
+hm2WebHttpsAdminStatus OBJECT-TYPE
+			SYNTAX			 HmEnabledStatus
+			MAX-ACCESS		 read-write
+			STATUS			 current
+			DESCRIPTION
+				 "Enables/Disables HTTPS access to the device."
+			 DEFVAL  { enable }	
+			::= { hm2MgmtAccessWebGroup 2 }
+			
+hm2WebHttpPortNumber OBJECT-TYPE
+			SYNTAX	InetPortNumber
+			MAX-ACCESS		 read-write
+			STATUS			 current
+			DESCRIPTION
+			"The port number of the HTTP web server.
+                         Setting the port to zero is not allowed."
+			DEFVAL			 { 80 }
+			::= { hm2MgmtAccessWebGroup 3 }
+					
+hm2WebHttpsPortNumber OBJECT-TYPE
+			SYNTAX	InetPortNumber
+			MAX-ACCESS		 read-write
+			STATUS			 current
+			DESCRIPTION
+			"The port number of the HTTPS web server.
+                         Setting the port to zero is not allowed."
+			DEFVAL { 443 }
+			::= { hm2MgmtAccessWebGroup 4 }	
+
+hm2WebHttpsCertPresent OBJECT-TYPE
+		SYNTAX INTEGER {
+		     pem(1),
+		     none(2)
+		     }
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+		             "Indicates what HTTP certificate files are present on the device, if any."
+		::= { hm2MgmtAccessWebGroup 5 }
+
+hm2WebHttpsCertControl OBJECT-TYPE
+     	SYNTAX INTEGER {
+               noop(1),
+               generate(2),
+               delete(3)
+                 }
+	     MAX-ACCESS  read-write
+	     STATUS      current
+	     DESCRIPTION
+                 "Controls HTTPS certificate generation and deletion. Always returns noop(1)."
+     ::= { hm2MgmtAccessWebGroup 6 }
+     
+hm2WebHttpsCertOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+		     		generate(1),
+		     		delete(2),
+		     		none(3)
+		     		}
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "Indicates what key files are currently being generated, if any."
+        ::= { hm2MgmtAccessWebGroup 7 }
+
+hm2WebIntfTimeOut OBJECT-TYPE
+		   SYNTAX Integer32 (0..160)
+		   MAX-ACCESS read-write
+		   STATUS current
+		   DESCRIPTION
+		            "Web interface idle timeout value for this switch in minutes.
+		    	     If the value is set to 0 the idle logout is disabled."
+			DEFVAL { 5 }           
+		   ::= { hm2MgmtAccessWebGroup 8 }
+
+hm2WebTrapEnable  OBJECT-TYPE
+    	SYNTAX      HmEnabledStatus
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+            	"Indicates whether login success, login failed or logout traps 
+             	 should be generated for this application."
+			DEFVAL { enable }             
+    ::= { hm2MgmtAccessWebGroup 9 }
+
+hm2WebLastLogoutUserName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "User name of last logout for this application."
+        ::= { hm2MgmtAccessWebGroup 10 }
+
+hm2WebLastLoginUserName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "User name of last login for this application."
+        ::= { hm2MgmtAccessWebGroup 11 }
+
+hm2WebLastLoginInetAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "InetAddressType of the last login used for this application."
+        ::= { hm2MgmtAccessWebGroup 12 }
+
+hm2WebLastLoginInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "IP address or DNS name specified in the last request for this application."
+        ::= { hm2MgmtAccessWebGroup 13 }
+        
+hm2WebHttpsCertFingerPrintType OBJECT-TYPE 
+       SYNTAX INTEGER { 
+                   sha1(1), 
+                   sha256(2) 
+                   } 
+      MAX-ACCESS  read-write 
+      STATUS      current 
+      DESCRIPTION 
+          "Controls HTTPS certificate fingerprint generation. If set to 'sha1' hm2WebHttpsCertFingerPrint 
+           will show the SHA1 fingerprint of the certificate." 
+      DEFVAL { sha256 }  
+     ::= { hm2MgmtAccessWebGroup  14 } 
+      
+hm2WebHttpsCertFingerPrint    OBJECT-TYPE 
+      SYNTAX         DisplayString 
+      MAX-ACCESS     read-only 
+      STATUS         current 
+      DESCRIPTION 
+         "The HTTPS certificate fingerprint as hash. The type of the hash is defined with hm2WebHttpsCertFingerPrintType."                         
+     ::= { hm2MgmtAccessWebGroup  15 }                  
+        
+hm2WebHttpsServerRestart     OBJECT-TYPE
+      SYNTAX       Hm2RestartAction
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+                   "Setting the object to restart will have the effect of restarting the HTTPS server.
+                    The server will load the new settings."
+      ::= { hm2MgmtAccessWebGroup  16 }
+
+hm2WebHttpsServerTlsVersions OBJECT-TYPE
+      SYNTAX       Hm2TlsVersions
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+                   "The TLS version supported by the HTTPS server.
+                    Changing the value has only effect after restarting the HTTPS Server."
+      DEFVAL       {{ tlsv1-2 }}
+      ::= { hm2MgmtAccessWebGroup  17 }
+
+hm2WebHttpsServerTlsCipherSuites OBJECT-TYPE
+      SYNTAX       Hm2TlsCipherSuites
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+                   "The cipher suite used by the HTTPS server.
+                    Changing the value has only effect after restarting the HTTPS server."
+      DEFVAL       {{
+                     tls-ecdhe-rsa-with-aes-128-gcm-sha256,
+                     tls-ecdhe-rsa-with-aes-256-gcm-sha384
+                   }}
+      ::= { hm2MgmtAccessWebGroup  18 }
+
+--
+-- *************************************************************
+-- hm2MgmtAccessTelnet
+-- *************************************************************
+--
+hm2TelnetServerAdminStatus OBJECT-TYPE
+   SYNTAX HmEnabledStatus
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Enable/Disable telnet operation. A (1) enables, a (2) disables.
+      When disabled, no telnet sessions are allowed by the system."
+   DEFVAL { disable }
+   ::= { hm2MgmtAccessTelnetGroup 1 }
+            
+hm2TelnetServerPort OBJECT-TYPE
+   SYNTAX InetPortNumber
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Telnet port operation. Default telnet port is 23.
+       Setting the port to zero is not allowed."
+   DEFVAL { 23 }           
+   ::= { hm2MgmtAccessTelnetGroup 2 }
+
+hm2TelnetServerSessionsCount OBJECT-TYPE
+     SYNTAX      	Integer32
+     MAX-ACCESS  	read-only
+     STATUS      	current
+     DESCRIPTION
+                 "Current number of active telnet sessions on this switch."
+     ::= { hm2MgmtAccessTelnetGroup 3 }
+          
+hm2TelnetServerMaxSessions OBJECT-TYPE
+   SYNTAX Integer32 (1..5)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Maximum number of telnet sessions.
+      An integer value from 1 to 5 specifies 
+      the maximum number of telnet sessions that can be established.
+      The full range is not supported by all variants."
+   DEFVAL { 5 }           
+   ::= { hm2MgmtAccessTelnetGroup 4 }
+      
+hm2TelnetServerSessionsTimeOut OBJECT-TYPE
+   SYNTAX Integer32 (0..160)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+      "Telnet login timeout (minutes)
+      Config telnet timeout  will set the telnet session timeout value. 
+      A session is active as long as the session has not remained idle for 
+      the value set. Specify a value from 0 to 160.                     
+      Note: Changing the timeout value for active 
+      sessions does not become effective until the session is re-established."
+   DEFVAL { 5 }           
+   ::= { hm2MgmtAccessTelnetGroup 5 }
+
+hm2TelnetTrapEnable  OBJECT-TYPE
+    	SYNTAX      HmEnabledStatus
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+            	"Indicates whether login success, login failed or logout traps 
+             	 should be generated for this application."
+			DEFVAL { enable }             
+    ::= { hm2MgmtAccessTelnetGroup 6 }
+
+hm2TelnetLastLogoutUserName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "User name of last logout for this application."
+        ::= { hm2MgmtAccessTelnetGroup 7 }
+
+hm2TelnetLastLoginUserName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "User name of last login for this application."
+        ::= { hm2MgmtAccessTelnetGroup 8 }
+
+hm2TelnetLastLoginInetAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "InetAddressType of the last login used for this application."
+        ::= { hm2MgmtAccessTelnetGroup 9 }
+
+hm2TelnetLastLoginInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "IP address or DNS name specified in the last request for this application."
+        ::= { hm2MgmtAccessTelnetGroup 10 }                  
+
+--
+-- *************************************************************
+-- hm2MgmtAccessSsh
+-- *************************************************************
+--
+hm2SshAdminStatus OBJECT-TYPE
+        SYNTAX      	HmEnabledStatus
+        MAX-ACCESS  	read-write
+        STATUS      	current
+        DESCRIPTION
+			"Configures whether the SSH service is enabled on this switch.  The
+            default value is enable(1)."
+        DEFVAL { enable }
+        ::= { hm2MgmtAccessSshGroup 1 }
+
+hm2SshProtocolLevel OBJECT-TYPE
+     SYNTAX      INTEGER {
+                 ssh20(2) -- SSH 2.0
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "Configures which protocol versions of SSH are enabled on this
+      			  switch.  Currently only SSHv2 is supported."
+     ::= { hm2MgmtAccessSshGroup 2 }
+
+hm2SshPortNumber  	OBJECT-TYPE
+   SYNTAX			InetPortNumber
+   MAX-ACCESS 		read-write
+   STATUS 			current
+   DESCRIPTION 		"The port number of the SSH server.
+                         Setting the port to zero is not allowed."
+   DEFVAL 			{ 22 }           
+   ::= { hm2MgmtAccessSshGroup 3 }
+
+
+hm2SshSessionsCount OBJECT-TYPE
+     SYNTAX      	Integer32
+     MAX-ACCESS  	read-only
+     STATUS      	current
+     DESCRIPTION
+                 "Current number of active SSH sessions on this switch."
+     ::= { hm2MgmtAccessSshGroup 4 }
+
+hm2SshMaxSessionsCount OBJECT-TYPE
+	 SYNTAX       	Integer32 (1..5)
+     MAX-ACCESS   	read-write
+     STATUS       	current
+     DESCRIPTION
+                  "Max number of SSH sessions permitted on this switch.
+                   The full range is not supported by all variants."
+	 DEFVAL { 5 }                  
+      ::= { hm2MgmtAccessSshGroup 5 }
+
+hm2SshSessionTimeout OBJECT-TYPE
+      SYNTAX       Integer32 (0..160)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+                  "SSH idle timeout value for this switch in minutes.
+                   If the value is set to 0 the idle logout is disabled."
+	  DEFVAL { 5 }                   
+      ::= { hm2MgmtAccessSshGroup 6 }
+
+hm2SshKeysPresent OBJECT-TYPE
+     SYNTAX      INTEGER {
+                 dsa(1),
+                 rsa(2),
+                 both(3),
+                 none(4)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "Indicates what key files are present on the device, if any."
+     ::= { hm2MgmtAccessSshGroup 7 }
+
+hm2SshKeyOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    dsa(1),
+                    rsa(2),
+                    both(3),
+                    none(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "Indicates what key files are currently being generated or deleted, if any."
+        ::= { hm2MgmtAccessSshGroup 8 }
+
+hm2SshRSAKeyControl OBJECT-TYPE
+     SYNTAX      INTEGER {
+                 noop(1),
+                 generate(2),
+                 delete(3)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "Controls RSA key generation and deletion.  Always returns noop(1)."
+     ::= { hm2MgmtAccessSshGroup 9 }
+
+hm2SshDSAKeyControl OBJECT-TYPE
+     SYNTAX      INTEGER {
+                 noop(1),
+                 generate(2),
+                 delete(3)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      obsolete
+     DESCRIPTION
+                 "Controls DSA key generation and deletion.  Always returns noop(1)."
+     ::= { hm2MgmtAccessSshGroup 10 }
+
+hm2SshFingerPrintDSA  	OBJECT-TYPE
+	 SYNTAX 		DisplayString (SIZE (0..128))
+	 MAX-ACCESS		read-only
+	 STATUS			obsolete
+	 DESCRIPTION
+		"The local DSA fingerprint for SSH connections."						
+	 ::= { hm2MgmtAccessSshGroup 11 }
+
+hm2SshFingerPrintRSA  	OBJECT-TYPE
+	 SYNTAX 		DisplayString (SIZE (0..128))
+	 MAX-ACCESS		read-only
+	 STATUS			current
+	 DESCRIPTION
+		"The local RSA key fingerprint for SSH connections. The type of the hash is defined with hm2SshKeyFingerPrintType."
+	 ::= { hm2MgmtAccessSshGroup 12 }
+
+hm2SshTrapEnable  OBJECT-TYPE
+    	SYNTAX      HmEnabledStatus
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+            	"Indicates whether login success, login failed or logout traps 
+             	 should be generated for this application."
+			DEFVAL { enable }             
+    ::= { hm2MgmtAccessSshGroup 13 }
+
+hm2SshLastLogoutUserName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "User name of last logout for this application."
+        ::= { hm2MgmtAccessSshGroup 14 }
+
+hm2SshLastLoginUserName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "User name of last login for this application."
+        ::= { hm2MgmtAccessSshGroup 15 }
+
+hm2SshLastLoginInetAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "InetAddressType of the last login used for this application."
+        ::= { hm2MgmtAccessSshGroup 16 }
+
+hm2SshLastLoginInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "IP address or DNS name specified in the last request for this application."
+        ::= { hm2MgmtAccessSshGroup 17 }
+
+hm2SshKeyFingerPrintType OBJECT-TYPE 
+       SYNTAX INTEGER {
+                   md5(1),
+                   sha256(2)
+                   }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "Controls SSH key fingerprint display. If set to 'md5' SSH will show the MD5 fingerprint of a key."
+      DEFVAL { sha256 }
+     ::= { hm2MgmtAccessSshGroup 18 }
+
+hm2SshHmacAlgorithms OBJECT-TYPE
+      SYNTAX       Hm2SshHmacAlgorithms
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+                   "The HMAC algorithms supported by the SSH server."
+      DEFVAL       {{
+      						hmac-sha1,
+      						hmac-sha2-256,
+      						hmac-sha1-etm-at-openssh-com,
+      						hmac-sha2-256-etm-at-openssh-com
+                   }}
+      ::= { hm2MgmtAccessSshGroup 19 }
+
+hm2SshKexAlgorithms OBJECT-TYPE
+      SYNTAX       Hm2SshKexAlgorithms
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+                   "The key exchange algorithms supported by the SSH server."
+      DEFVAL       {{
+							diffie-hellman-group16-sha512,
+							diffie-hellman-group18-sha512,
+							diffie-hellman-group-exchange-sha256,
+							ecdh-sha2-nistp256
+                   }}
+      ::= { hm2MgmtAccessSshGroup 20 }
+
+hm2SshEncryptionAlgorithms OBJECT-TYPE
+      SYNTAX       Hm2SshEncryptionAlgorithms
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+                   "The encryption algorithms supported by the SSH server."
+      DEFVAL       {{
+      						aes128-ctr,
+							aes128-gcm-at-openssh-com,
+							chacha20-poly1305-at-openssh-com
+                   }}
+      ::= { hm2MgmtAccessSshGroup 21 }
+
+-- *************************************************************
+-- Outbound SSH client MIB objects
+-- *************************************************************
+
+hm2SshOutboundSessionsCount OBJECT-TYPE
+     SYNTAX      	Integer32
+     MAX-ACCESS  	read-only
+     STATUS      	current
+     DESCRIPTION
+                 "Current number of active outbound SSH sessions from this switch."
+     ::= { hm2MgmtAccessSshGroup 50 }
+     
+hm2SshOutboundMaxSessionsCount OBJECT-TYPE
+	 SYNTAX       	Integer32 (1..5)
+     MAX-ACCESS   	read-write
+     STATUS       	current
+     DESCRIPTION
+                  "Max number of outbound SSH sessions permitted on this switch."
+	 DEFVAL { 5 }                  
+      ::= { hm2MgmtAccessSshGroup 51 }
+
+hm2SshOutboundSessionTimeout OBJECT-TYPE
+      SYNTAX       Integer32 (0..160)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+                  "SSH outbound idle timeout value for this switch in minutes.
+                   If the value is set to 0 the idle logout is disabled."
+	  DEFVAL { 5 }
+        ::= { hm2MgmtAccessSshGroup 52 }
+
+--
+-- *************************************************************
+-- hm2MgmtAccessPreLoginBannerGroup
+-- *************************************************************
+--
+
+hm2PreLoginBannerAdminStatus	OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+				"Enables/disables the NERC CIP-005-1 R2.6 compliant use banner"
+	DEFVAL  { disable }			
+	::= { hm2MgmtAccessPreLoginBannerGroup 1 }
+                                              
+hm2PreLoginBannerText  OBJECT-TYPE
+	 SYNTAX 		HmLargeDisplayString (SIZE (0..512))			 
+	 MAX-ACCESS     read-write
+	 STATUS			current
+	 DESCRIPTION
+	 			"The text added in this variable by the user will be displayed in
+	 			 the system login page as banner before login into the CLI 
+	 			 (local or remote) or before login into the web interface.
+	 			 The default value is an empty string.
+	 			 Special meaning have the sequences '\t' and '\n' which
+	 			 allow the user to format the string with tabulator (\t) 
+	 			 and newline (\n) format instructions. The use case is to provide a NERC 
+	 			 CIP-005-1 R2.6 compliant use banner. The banner must be enabled using
+	 			 hm2PreLoginBannerAdminStatus"
+	 DEFVAL  { "" }                
+	 ::= { hm2MgmtAccessPreLoginBannerGroup 2 }
+
+--
+-- *************************************************************
+-- hm2MgmtAccessCliGroup
+-- *************************************************************
+--
+hm2CliLoginPrompt OBJECT-TYPE
+	SYNTAX 		DisplayString (SIZE(0..128))
+	MAX-ACCESS 	read-write
+	STATUS 		current
+	DESCRIPTION 
+	            "Prompt string for the command line interface."
+	DEFVAL  { "" }				 
+	::= { hm2MgmtAccessCliGroup 1 }
+
+hm2CliLoginTimeoutSerial  OBJECT-TYPE
+	SYNTAX 		Integer32 (0..160)
+	MAX-ACCESS 	read-write
+	STATUS 		current
+	DESCRIPTION 
+	            "Timeout for serial connections in minutes.
+ 	             If the value is set to 0, there will be 
+ 	             no idle logout at all."
+	DEFVAL  { 5 }				 
+	::= { hm2MgmtAccessCliGroup 3 }
+
+
+hm2CliLoginBannerAdminStatus	OBJECT-TYPE
+	SYNTAX HmEnabledStatus
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	"Enables/disables the display of the cli login banner text
+	 instead of the standard login banner."
+	DEFVAL  { disable }			
+	::= { hm2MgmtAccessCliGroup 10  }
+
+
+hm2CliLoginBannerText  OBJECT-TYPE
+	 SYNTAX 		HmLargeDisplayString (SIZE (0..1024))			 
+	 MAX-ACCESS     read-write
+	 STATUS			current
+	 DESCRIPTION
+	 			"The text added in this variable by the user will be displayed in
+	 			 the system login page (local or remote) instead of the systemoverview.
+	 			 The default value is an empty string.
+	 			 Special meaning have the sequences '\t' and '\n' which
+	 			 allow the user to format the string with tabulator (\t) 
+	 			 and newline (\n) format instructions.
+	 			 The Banner must be enabled using CliLoginBannerAdminStatus."
+	 DEFVAL  { "" }                
+	 ::= { hm2MgmtAccessCliGroup 11 }
+
+hm2ConsoleTrapEnable  OBJECT-TYPE
+    	SYNTAX      HmEnabledStatus
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+            	"Indicates whether login success, login failed or logout traps 
+             	 should be generated for console (V.24)."
+			DEFVAL { enable }             
+    ::= { hm2MgmtAccessCliGroup 12 }
+
+hm2ConsoleLastLogoutUserName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "User name of last logout for this application."
+        ::= { hm2MgmtAccessCliGroup 13 }
+
+hm2ConsoleLastLoginUserName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "User name of last login for console (V.24)."
+        ::= { hm2MgmtAccessCliGroup 14 }
+        
+hm2ConsoleServiceShellAdminState OBJECT-TYPE
+        SYNTAX      HmEnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                    "Admin State of service shell. (1=enable, 2=disable)."
+        DEFVAL { enable }
+        ::= { hm2MgmtAccessCliGroup 15 }
+
+--
+-- *************************************************************
+-- hm2RestrictedMgmtAccessGroupTable
+-- *************************************************************
+--
+
+hm2RmaTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Hm2RmaEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION "A list of management access entries (rules) to increase security."
+			::= { hm2RestrictedMgmtAccessGroup 1 }
+
+hm2RmaEntry OBJECT-TYPE
+			SYNTAX Hm2RmaEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION "An entry contains a rule for the management access."
+			INDEX { hm2RmaIndex }
+			::= { hm2RmaTable 1 }
+
+Hm2RmaEntry ::= SEQUENCE {
+				hm2RmaIndex 		Integer32,
+				hm2RmaRowStatus 	RowStatus,
+				hm2RmaIpAddrType 	InetAddressType,
+				hm2RmaIpAddr 		InetAddress,
+				hm2RmaPrefixLength	InetAddressPrefixLength,
+				hm2RmaSrvHttp 		HmEnabledStatus,
+				hm2RmaSrvHttps 		HmEnabledStatus,
+				hm2RmaSrvSnmp 		HmEnabledStatus, 
+				hm2RmaSrvTelnet 	HmEnabledStatus,
+				hm2RmaSrvSsh 		HmEnabledStatus,
+				hm2RmaSrvIEC61850   HmEnabledStatus,
+				hm2RmaSrvModbusTcp  HmEnabledStatus,
+				hm2RmaSrvEthernetIP HmEnabledStatus,
+				hm2RmaSrvProfinetIO HmEnabledStatus 
+			}
+
+hm2RmaIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..16)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION "The unique index used for each row in the RMA table."
+			::= { hm2RmaEntry 1 }
+
+hm2RmaRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION "Describes the status of a row in this table if it is active or not available."
+			::= { hm2RmaEntry 2 }
+
+hm2RmaIpAddrType OBJECT-TYPE
+			SYNTAX InetAddressType
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION "Type of allowed IP address."
+			DEFVAL { ipv4 }
+			::= { hm2RmaEntry 3 }
+			
+hm2RmaIpAddr OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION "Allowed IP address in IPv4 or IPv6 style."
+			DEFVAL { '00000000'h }
+			::= { hm2RmaEntry 4 }
+
+hm2RmaPrefixLength OBJECT-TYPE
+			SYNTAX InetAddressPrefixLength
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION "The length of the IP netmask."  
+			DEFVAL { 0 }
+			::= { hm2RmaEntry 5 }
+
+hm2RmaSrvHttp OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION "Enables/disables HTTP access."
+			DEFVAL { enable }
+			::= { hm2RmaEntry 6 }
+
+hm2RmaSrvHttps OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION "Enables/disables HTTPS access."
+			DEFVAL { enable }
+			::= { hm2RmaEntry 7 }
+
+hm2RmaSrvSnmp OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION "Enables/disbales SNMP access."
+			DEFVAL { enable }
+			::= { hm2RmaEntry 8 }
+
+hm2RmaSrvTelnet OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION "Enables/disables telnet access."
+			DEFVAL { enable }
+			::= { hm2RmaEntry 9 }
+
+hm2RmaSrvSsh OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION "Enables/disables SSH access."
+			DEFVAL { enable }
+			::= { hm2RmaEntry 10 }
+
+hm2RmaSrvIEC61850 OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION "Enables/disables IEC61850-MMS access."
+			DEFVAL { enable }
+			::= { hm2RmaEntry 11 }
+
+hm2RmaSrvModbusTcp OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION "Enables/disables Modbus/TCP access."
+			DEFVAL { enable }
+			::= { hm2RmaEntry 12 }
+
+hm2RmaSrvEthernetIP OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION "Enables/disables EtherNet/IP access."
+			DEFVAL { enable }
+			::= { hm2RmaEntry 13 }
+
+hm2RmaSrvProfinetIO OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION "Enables/disables PROFINET access."
+			DEFVAL { enable }
+			::= { hm2RmaEntry 14 }
+
+--
+-- *************************************************************
+-- hm2RestrictedMgmtAccessGroup Objects
+-- *************************************************************
+--
+
+hm2RmaOperation OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION "Enables/disables management access globally."
+			DEFVAL { disable }
+			::= { hm2RestrictedMgmtAccessGroup 2 }
+
+--
+-- *************************************************************
+-- hm2MgmtAccessStatisticsGroup
+-- *************************************************************
+--
+
+hm2HttpPacketsSent				OBJECT-TYPE
+    		SYNTAX      Counter64
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            		"Number of HTTP management packets sent."
+    		::= { hm2MgmtAccessStatisticsGroup 1 }
+
+hm2HttpPacketsReceived			OBJECT-TYPE
+    		SYNTAX      Counter64
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            		"Number of HTTP management packets received."
+    		::= { hm2MgmtAccessStatisticsGroup 2 }
+
+hm2HttpsPacketsSent				OBJECT-TYPE
+    		SYNTAX      Counter64
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            		"Number of HTTPS management packets sent."
+    		::= { hm2MgmtAccessStatisticsGroup 3 }
+
+hm2HttpsPacketsReceived			OBJECT-TYPE
+    		SYNTAX      Counter64
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            		"Number of HTTPS management packets received."
+    		::= { hm2MgmtAccessStatisticsGroup 4 }
+
+hm2TelnetPacketsSent			OBJECT-TYPE
+    		SYNTAX      Counter64
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            		"Number of Telnet management packets sent."
+    		::= { hm2MgmtAccessStatisticsGroup 5 }
+
+hm2TelnetPacketsReceived		OBJECT-TYPE
+    		SYNTAX      Counter64
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            		"Number of Telnet management packets received."
+    		::= { hm2MgmtAccessStatisticsGroup 6 }
+
+hm2SshPacketsSent				OBJECT-TYPE
+    		SYNTAX      Counter64
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            		"Number of SSH management packets sent."
+    		::= { hm2MgmtAccessStatisticsGroup 7 }
+
+hm2SshPacketsReceived			OBJECT-TYPE
+    		SYNTAX      Counter64
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            		"Number of SSH management packets received."
+    		::= { hm2MgmtAccessStatisticsGroup 8 }
+
+-- *************************************************************
+-- hm2MgmtAccessMibNotifications 
+-- *************************************************************
+--
+	hm2WebLoginSuccessTrap NOTIFICATION-TYPE
+		OBJECTS	{ hm2WebLastLoginUserName, hm2WebLastLoginInetAddressType, hm2WebLastLoginInetAddress}
+		STATUS  current
+		DESCRIPTION "This trap is sent if a user successfully grants access via web to the device. 
+		             hm2WebLastLoginInetAddress contains the IP address or DNS name of the login request. 
+		             hm2WebLastLoginUserName contains the user name of the last user who logged in 
+					 into the device."
+		::= { hm2MgmtAccessMibNotifications 1 }
+	
+	hm2WebLoginFailedTrap NOTIFICATION-TYPE
+		OBJECTS	{ hm2WebLastLoginUserName, hm2WebLastLoginInetAddressType, hm2WebLastLoginInetAddress}
+		STATUS  current
+		DESCRIPTION "This trap is sent if a user tried to grant access via web to the device. 
+					 hm2WebLastLoginInetAddress contains the IP address or the DNS name of the login request.
+					 hm2WebLastLoginUserName contains the user name of the user who tried to 
+					 login into the device."
+		::= { hm2MgmtAccessMibNotifications 2 }
+		
+	hm2WebLogoutTrap NOTIFICATION-TYPE
+		OBJECTS	{ hm2WebLastLogoutUserName }
+		STATUS  current
+		DESCRIPTION "This trap is sent when a user logs out a web session.
+					 hm2WebLastLogoutUserName contains the user name of the last user who logged out of the device."
+		::= { hm2MgmtAccessMibNotifications 3 }		
+
+	hm2TelnetLoginSuccessTrap NOTIFICATION-TYPE
+		OBJECTS	{ hm2TelnetLastLoginUserName, hm2TelnetLastLoginInetAddressType, hm2TelnetLastLoginInetAddress}
+		STATUS  current
+		DESCRIPTION "This trap is sent if a user successfully grants access via telnet to the device. 
+		             hm2TelnetLoginLastInetAddress contains the IP address	or DNS name of the login request. 
+		             hm2TelnetLastLoginUserName contains the user name of the last user who logged in 
+					 into the device."
+		::= { hm2MgmtAccessMibNotifications 4 }
+	
+	hm2TelnetLoginFailedTrap NOTIFICATION-TYPE
+		OBJECTS	{ hm2TelnetLastLoginUserName, hm2TelnetLastLoginInetAddressType, hm2TelnetLastLoginInetAddress}
+		STATUS  current
+		DESCRIPTION "This trap is sent if a user tried to grant access via telnet to the device. 
+					 hm2TelnetLastLoginInetAddress contains the IP address or the DNS name of the login request.
+					 hm2TelnetLastLoginUserName contains the user name of the last user who tried to 
+					 log in into the device."
+		::= { hm2MgmtAccessMibNotifications 5 }
+		
+	hm2TelnetLogoutTrap NOTIFICATION-TYPE
+		OBJECTS	{ hm2TelnetLastLogoutUserName }
+		STATUS  current
+		DESCRIPTION "This trap is sent when a user logs out a telnet session.
+					 hm2TelnetLastLogoutUserName contains the user name of the last user who logged out of the device."
+		::= { hm2MgmtAccessMibNotifications 6 }		
+
+	hm2SshLoginSuccessTrap NOTIFICATION-TYPE
+		OBJECTS	{ hm2SshLastLoginUserName, hm2SshLastLoginInetAddressType, hm2SshLastLoginInetAddress}
+		STATUS  current
+		DESCRIPTION "This trap is sent if a user successfully grants access via SSH to the device. 
+		             hm2SshLastLoginInetAddress contains the IP address or DNS name of the login request. 
+		             hm2SshLastLoginUserName contains the user name of the last user logged in  
+					 into the device."
+		::= { hm2MgmtAccessMibNotifications 7 }
+	
+	hm2SshLoginFailedTrap NOTIFICATION-TYPE
+		OBJECTS	{ hm2SshLastLoginUserName, hm2SshLastLoginInetAddressType, hm2SshLastLoginInetAddress}
+		STATUS  current
+		DESCRIPTION "This trap is sent if a user tried to grant access via SSH to the device. 
+					 hm2SshLastLoginInetAddress contains the IP address or the DNS name of the login request.
+					 hm2SshLastLoginUserName contains the user name of the last user who tried to 
+					 login into the device."
+		::= { hm2MgmtAccessMibNotifications 8 }
+		
+	hm2SshLogoutTrap NOTIFICATION-TYPE
+		OBJECTS	{ hm2SshLastLogoutUserName }
+		STATUS  current
+		DESCRIPTION "This trap is sent when a user logs out a SSH session.
+					 hm2SshLastLogoutUserName contains the user name of the last user who logged out of the device."
+		::= { hm2MgmtAccessMibNotifications 9 }				
+
+	hm2ConsoleLoginSuccessTrap NOTIFICATION-TYPE
+		OBJECTS	{ hm2ConsoleLastLoginUserName }
+		STATUS  current
+		DESCRIPTION "This trap is sent if a user successfully grants access via console (V.24) to the device. 
+		             hm2ConsoleLastLoginUserName contains the user name of the last user who logged in  
+					 into the device."
+		::= { hm2MgmtAccessMibNotifications 10 }
+	
+	hm2ConsoleLoginFailedTrap NOTIFICATION-TYPE
+		OBJECTS	{ hm2ConsoleLastLoginUserName }
+		STATUS  current
+		DESCRIPTION "This trap is sent if a user tried to grant access via console (V.24) to the device. 
+					 hm2ConsoleLastLoginUserName contains the user name of the last user who tried to login  
+					 into the device."
+		::= { hm2MgmtAccessMibNotifications 11 }
+		
+	hm2ConsoleLogoutTrap NOTIFICATION-TYPE
+		OBJECTS	{ hm2ConsoleLastLogoutUserName }
+		STATUS  current
+		DESCRIPTION "This trap is sent when a user logs out a console (V.24) session.
+					 hm2ConsoleLastLogoutUserName contains the user name of the last user who logged out of the device."
+		::= { hm2MgmtAccessMibNotifications 12 }				
+
+-- ***********************************************************
+-- hm2MgmtAccessMibSNMPExtensionGroup
+-- ***********************************************************
+hm2MgmtAccessSnmpSESGroup 			OBJECT IDENTIFIER ::= { hm2MgmtAccessMibSNMPExtensionGroup 1 }
+hm2MgmtAccessWebSESGroup 			OBJECT IDENTIFIER ::= { hm2MgmtAccessMibSNMPExtensionGroup 2 }
+hm2MgmtAccessTelnetSESGroup	 		OBJECT IDENTIFIER ::= { hm2MgmtAccessMibSNMPExtensionGroup 3 }
+hm2MgmtAccessSshSESGroup	 		OBJECT IDENTIFIER ::= { hm2MgmtAccessMibSNMPExtensionGroup 4 }
+hm2MgmtAccessPreLoginBannerSESGroup	OBJECT IDENTIFIER ::= { hm2MgmtAccessMibSNMPExtensionGroup 5 }
+hm2MgmtAccessCliSESGroup	 		OBJECT IDENTIFIER ::= { hm2MgmtAccessMibSNMPExtensionGroup 6 }
+hm2RestrictedMgmtAccessSESGroup	 	OBJECT IDENTIFIER ::= { hm2MgmtAccessMibSNMPExtensionGroup 7 }
+
+-- ***********************************************************
+-- hm2MgmtAccessWebSESGroup
+-- ***********************************************************
+hm2MgmtAccessWebSESCertGenInProgress OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the certificate generation is already in progress."
+           ::= { hm2MgmtAccessWebSESGroup 1 }
+
+hm2MgmtAccessWebSESCertNotPresent OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that no certificate is available."
+           ::= { hm2MgmtAccessWebSESGroup 2 }
+
+-- ***********************************************************
+-- hm2MgmtAccessSshSESGroup
+-- ***********************************************************
+hm2MgmtAccessSshSESServerEnabled OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the SSH server is running."
+           ::= { hm2MgmtAccessSshSESGroup 1 }
+
+hm2MgmtAccessSshSESKeyGenInProgress OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the SSH key generation is in progress."
+           ::= { hm2MgmtAccessSshSESGroup 2 }
+
+hm2MgmtAccessSshSESKeyNotAvailable  OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION 
+           		"Indicates that the SSH key is not available."
+           ::= { hm2MgmtAccessSshSESGroup 3 }           
+
+END

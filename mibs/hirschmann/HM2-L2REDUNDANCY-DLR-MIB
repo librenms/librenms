@@ -1,0 +1,889 @@
+HM2-L2REDUNDANCY-DLR-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann Layer 2 Redundancy DLR MIB
+-- *************************************************************
+--
+
+IMPORTS 
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Unsigned32, Integer32           FROM SNMPv2-SMI
+
+    RowStatus,
+    TEXTUAL-CONVENTION,
+    MacAddress                      FROM SNMPv2-TC
+
+    InterfaceIndexOrZero            FROM IF-MIB
+    SnmpAdminString                 FROM SNMP-FRAMEWORK-MIB
+    hm2L2RedundancyMibObjects       FROM HM2-L2REDUNDANCY-MIB
+
+    InetAddressType,
+    InetAddress                     FROM INET-ADDRESS-MIB
+    HmEnabledStatus                 FROM HM2-TC-MIB;
+
+hm2DlrMibGroup			MODULE-IDENTITY 
+    LAST-UPDATED "201411070000Z"
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann Layer 2 Redundancy DLR MIB.
+         Copyright (C) 2014. All Rights Reserved."
+    
+    REVISION "201411070000Z" -- November 7, 2014
+    DESCRIPTION
+        "Initial version."
+    ::= { hm2L2RedundancyMibObjects 5 }
+
+--
+-- *************************************************************
+-- hm2DlrMibGroup
+-- *************************************************************
+--
+
+hm2DlrMibNotifications         OBJECT IDENTIFIER ::= { hm2DlrMibGroup 0 }
+hm2DlrMibObjects               OBJECT IDENTIFIER ::= { hm2DlrMibGroup 1 }
+-- hm2DlrMibConformance        OBJECT IDENTIFIER ::= { hm2DlrMibGroup 2 }
+
+--
+-- *************************************************************
+-- hm2DlrMib object groups
+-- *************************************************************
+-- 
+
+hm2DlrConfiguration         OBJECT IDENTIFIER ::={ hm2DlrMibObjects 1 }
+hm2DlrStatus                OBJECT IDENTIFIER ::={ hm2DlrMibObjects 2 }
+
+--
+-- *************************************************************
+-- DLR specific Textual Conventions
+-- *************************************************************
+--
+
+Hm2DlrNetworkTopologyType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Network topology type."
+    SYNTAX       INTEGER {
+                            linear(0),   -- network is linear
+                            ring(1)      -- network is ring 
+                         }
+
+Hm2DlrNetworkStatusType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Network status type."
+    SYNTAX       INTEGER {
+                            normal(0),    -- network is functioning normal 
+                            ringFault(1), -- indicates "ring fault"
+                            loop(2),      -- indicates "unexpected loop detected"
+                            partial(3),   -- indicates "partial network fault"
+                            rapidFault(4) -- indicates "rapid fault/restore cycle"
+                         }
+
+Hm2DlrGatewayStatusType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Gateway status type."
+    SYNTAX       INTEGER {
+                            nonGateway(0),  -- gateway not enabled
+                            backup(1),      -- backup gateway
+                            active(2),      -- active gateway
+                            uplinkFault(3), -- communication lost on uplink port
+                            unsupported(4), -- cannot support currently operating gateway parameters (advertise interval and/or advertise timeout)
+                            networkFault(5) -- partial network fault
+                         }
+
+Hm2DlrRingDeviceStatusType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Ring device status type."
+    SYNTAX       INTEGER {
+                            backup(0),     -- device is functioning as backup supervisor
+                            supervisor(1), -- device is functioning as the active ring supervisor
+                            node(2),       -- device is functioning as normal ring node
+                            nonDlr(3),     -- device is operating in a non-DLR topology
+                            unsupported(4) -- device cannot support currently operating ring parameters (beacon interval and/or beacon timeout)
+                         }
+
+Hm2DlrPortStatusType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Operational port status type."
+    SYNTAX       INTEGER {
+                            disabled(1),    -- all frames are dropped 
+                            blocked(2),     -- all frames are dropped except DLR frames and
+                                            -- frames from other protocols that also define to pass blocked ports
+                            forwarding(3),  -- all frames are passed through
+                            notConnected(4) -- the port has no link
+                         }
+
+Hm2DlrTimeInterval ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "A period of time, measured in units of 1 second."
+    SYNTAX       Integer32 (0..2147483647)
+     
+--
+-- *************************************************************
+-- DLR global objects
+-- *************************************************************
+--
+
+hm2DlrGlobalAdminState    OBJECT-TYPE
+    SYNTAX      HmEnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable DLR globally." 
+    DEFVAL  { disable }
+    ::= { hm2DlrConfiguration 1 }
+
+--
+-- *************************************************************
+-- DLR configuration tables
+-- *************************************************************
+--
+
+hm2DlrConfigTable  OBJECT-TYPE 
+    SYNTAX      SEQUENCE OF Hm2DlrConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION 
+        "DLR configuration parameters table." 
+    ::= { hm2DlrConfiguration 10 }
+
+    
+hm2DlrGatewayConfigTable  OBJECT-TYPE 
+    SYNTAX      SEQUENCE OF Hm2DlrGatewayConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION 
+        "Gateway settings table." 
+    ::= { hm2DlrConfiguration 11 }
+    
+--
+-- *************************************************************
+-- DLR status tables
+-- *************************************************************
+--
+
+hm2DlrStatusTable  OBJECT-TYPE 
+    SYNTAX      SEQUENCE OF Hm2DlrStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION 
+        "DLR runtime status table." 
+    ::= { hm2DlrStatus 1 }   
+
+
+hm2DlrRingParticipantsTable  OBJECT-TYPE 
+    SYNTAX      SEQUENCE OF Hm2DlrRingParticipantsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION 
+        "DLR ring participants table." 
+    ::= { hm2DlrStatus 2 }
+
+
+hm2DlrGatewayStatusTable  OBJECT-TYPE 
+    SYNTAX      SEQUENCE OF Hm2DlrGatewayStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION 
+        "DLR gateway status table." 
+    ::= { hm2DlrStatus 3 }
+    
+--
+-- *************************************************************
+-- DLR ring configuration objects
+-- *************************************************************
+--
+
+hm2DlrConfigEntry  OBJECT-TYPE 
+    SYNTAX      Hm2DlrConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION 
+        "Entry for DLR configuration parameters."
+    INDEX       { hm2DlrRingIndex } 
+    ::= { hm2DlrConfigTable 1 }
+    
+Hm2DlrConfigEntry ::= SEQUENCE {
+        hm2DlrRingIndex               Unsigned32,
+        hm2DlrRingName                SnmpAdminString,
+        hm2DlrRingport1IfIndex        InterfaceIndexOrZero,
+        hm2DlrRingport2IfIndex        InterfaceIndexOrZero,
+        hm2DlrRingport1OperStatus     Hm2DlrPortStatusType,
+        hm2DlrRingport2OperStatus     Hm2DlrPortStatusType,
+        hm2DlrSupervisorAdminState    HmEnabledStatus,
+        hm2DlrSupervisorPrecedence    Unsigned32,
+        hm2DlrBeaconInterval          Unsigned32,
+        hm2DlrBeaconTimeout           Unsigned32,
+        hm2DlrVLANID                  Unsigned32,
+        hm2DlrService                 INTEGER,             
+        hm2DlrConfigRowStatus         RowStatus
+    }
+
+hm2DlrRingIndex  OBJECT-TYPE 
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current 
+    DESCRIPTION 
+        "DLR ring index." 
+    -- This index is kept in config table only, but it is used in the whole mib -
+    ::= { hm2DlrConfigEntry 1 }
+
+
+hm2DlrRingName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A logical name for the DLR ring to ease the  
+         management of DLR rings."
+    DEFVAL { "" }
+    ::= { hm2DlrConfigEntry 2 }
+
+
+hm2DlrRingport1IfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Interface index of the ringport 1 in the DLR ring.
+         A non-zero value indicates the ifIndex for the
+         corresponding entry in the ifTable. "
+    ::= { hm2DlrConfigEntry 3 }
+
+
+hm2DlrRingport2IfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Interface index of the ringport 2 in the DLR ring.
+         A non-zero value indicates the ifIndex for the
+         corresponding entry in the ifTable. "
+    ::= { hm2DlrConfigEntry 4 }
+
+
+hm2DlrRingport1OperStatus   OBJECT-TYPE
+    SYNTAX      Hm2DlrPortStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational status of ringport 1."
+    ::= { hm2DlrConfigEntry 5 }
+
+
+hm2DlrRingport2OperStatus   OBJECT-TYPE
+    SYNTAX      Hm2DlrPortStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational status of ringport 2."
+    ::= { hm2DlrConfigEntry 6 }
+
+
+hm2DlrSupervisorAdminState    OBJECT-TYPE
+    SYNTAX      HmEnabledStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable the supervisor function.
+         enable(1) indicates the device is configured 
+         as a ring supervisor.
+         disable(2) indicates the device is configured
+         as a normal ring node."
+    DEFVAL  { disable }
+    ::= { hm2DlrConfigEntry 7 }
+
+    
+hm2DlrSupervisorPrecedence   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Precedence of the ring supervisor.
+         Numerically higher value indicates higher precedence."
+    DEFVAL  { 0 }
+    ::= { hm2DlrConfigEntry 8 }
+
+    
+hm2DlrBeaconInterval    OBJECT-TYPE
+    SYNTAX      Unsigned32 (400..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Beacon interval time in microseconds." 
+    DEFVAL  { 400 }
+    ::= { hm2DlrConfigEntry 9 }
+
+
+hm2DlrBeaconTimeout    OBJECT-TYPE
+    SYNTAX      Unsigned32 (800..500000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Beacon timeout in microseconds.
+         The Beacon Timeout shall be at least two times the Beacon Interval value." 
+    DEFVAL  { 1960 }
+    ::= { hm2DlrConfigEntry 10 }
+
+    
+hm2DlrVLANID    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4042)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "VLAN ID to use in the DLR protocol messages." 
+    DEFVAL  { 1 }
+    ::= { hm2DlrConfigEntry 11 }
+
+
+hm2DlrService  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                      noService(0),
+                      verifyFaultLocation(1), 
+                      clearRapidFaults(2),
+                      restartSignOn(3),
+                      clearGatewayPartialFault(4)
+                    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "DLR specific services. 
+         noService(0) will be returned when reading this attribute.
+         verifyFaultLocation(1) causes the supervisor to verify fault location. 
+         clearRapidFaults(2) clears the Rapid Fault condition in the supervisor,
+         allowing the supervisor to return to normal operation.
+         restartSignOn(3) restarts the Sign On process and refreshes the participants list.
+         clearGatewayPartialFault(4) clears the partial network fault condition in the gateway,
+         allowing the gateway to return to normal operation.
+         clearGatewayPartialFault(4) is only supported if device is capable of the gateway."
+    ::= { hm2DlrConfigEntry 12 }
+
+
+hm2DlrConfigRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Describes the status of a row in the table.
+             Supports creation, deletion and activation of rows.
+             A row must not be active(1) in order to be modified.
+             A row can be taken out of service by setting the value
+             notInService(2)."
+    ::= { hm2DlrConfigEntry 15 }
+    
+--
+-- *************************************************************
+-- DLR status objects
+-- *************************************************************
+--
+
+hm2DlrStatusEntry  OBJECT-TYPE 
+    SYNTAX      Hm2DlrStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION 
+        "DLR runtime status entry."
+    INDEX       { hm2DlrRingIndex } 
+    ::= { hm2DlrStatusTable 1 }
+
+Hm2DlrStatusEntry ::= SEQUENCE {
+        hm2DlrCapabilityFlags                   BITS,
+        hm2DlrDeviceOperStatus                  Hm2DlrRingDeviceStatusType,
+        hm2DlrNetworkTopology                   Hm2DlrNetworkTopologyType,
+        hm2DlrNetworkStatus                     Hm2DlrNetworkStatusType,
+        hm2DlrLastNetworkStatusChange           Hm2DlrTimeInterval,
+        hm2DlrRingParticipantsCount             Unsigned32,
+        hm2DlrActiveSupervisorIpAddressType     InetAddressType,
+        hm2DlrActiveSupervisorIpAddress         InetAddress,
+        hm2DlrActiveSupervisorMacAddress        MacAddress,
+        hm2DlrActiveSupervisorPrecedence        Unsigned32,
+        hm2DlrRingFaultsCount                   Unsigned32,
+        hm2DlrLastActiveNodePort1IpAddressType  InetAddressType,
+        hm2DlrLastActiveNodePort1IpAddress      InetAddress,
+        hm2DlrLastActiveNodePort1MacAddress     MacAddress,
+        hm2DlrLastActiveNodePort2IpAddressType  InetAddressType,
+        hm2DlrLastActiveNodePort2IpAddress      InetAddress,
+        hm2DlrLastActiveNodePort2MacAddress     MacAddress
+    }
+
+hm2DlrCapabilityFlags   OBJECT-TYPE
+    SYNTAX      BITS {
+                      announce(0),   -- announce-based ring node 
+                      beacon(1),     -- beacon-based ring node
+                      supervisor(5), -- supervisor capable
+                      gateway(6),    -- gateway capable
+                      flushTable(7)  -- supporting flush table
+                     }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "DLR device capabilities." 
+    DEFVAL  { {beacon} }
+    ::= { hm2DlrStatusEntry 1 }
+
+
+hm2DlrDeviceOperStatus    OBJECT-TYPE
+    SYNTAX      Hm2DlrRingDeviceStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational status of the device in the DLR ring." 
+    DEFVAL  { node }
+    ::= { hm2DlrStatusEntry 2 }
+
+
+hm2DlrNetworkTopology    OBJECT-TYPE
+    SYNTAX      Hm2DlrNetworkTopologyType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current network topology mode." 
+    DEFVAL  { ring }
+    ::= { hm2DlrStatusEntry 3 }
+    
+
+hm2DlrNetworkStatus    OBJECT-TYPE
+    SYNTAX      Hm2DlrNetworkStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current network status." 
+    DEFVAL  { normal }
+    ::= { hm2DlrStatusEntry 4 }
+
+
+hm2DlrLastNetworkStatusChange   OBJECT-TYPE
+    SYNTAX      Hm2DlrTimeInterval
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The time in seconds since the network status has changed at last." 
+    DEFVAL  { 0 }
+    ::= { hm2DlrStatusEntry 5 }
+  
+
+hm2DlrRingParticipantsCount   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of devices in the ring protocol participiants list." 
+    DEFVAL  { 0 }
+    ::= { hm2DlrStatusEntry 6 }
+
+    
+hm2DlrActiveSupervisorIpAddressType  OBJECT-TYPE 
+    SYNTAX      InetAddressType 
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "Address type of hm2DlrActiveSupervisorIpAddress."
+    DEFVAL  { ipv4 } 
+    ::= { hm2DlrStatusEntry 7 }
+
+
+hm2DlrActiveSupervisorIpAddress  OBJECT-TYPE 
+    SYNTAX      InetAddress 
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "IP address of the active ring supervisor."
+    DEFVAL  { '00000000'H } 
+    ::= { hm2DlrStatusEntry 8 }
+
+
+hm2DlrActiveSupervisorMacAddress  OBJECT-TYPE 
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "MAC address of the active ring supervisor." 
+    DEFVAL  { '000000000000'H } 
+    ::= { hm2DlrStatusEntry 9 }
+  
+
+hm2DlrActiveSupervisorPrecedence   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Precedence value of the active ring supervisor." 
+    DEFVAL  { 0 }
+    ::= { hm2DlrStatusEntry 10 }
+
+
+hm2DlrRingFaultsCount    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of times since the supervisor has started,
+         that the device has detected a ring fault,
+         as either active or backup supervisor."
+    DEFVAL  { 0 }
+    ::= { hm2DlrStatusEntry 11 }
+
+
+hm2DlrLastActiveNodePort1IpAddressType  OBJECT-TYPE 
+    SYNTAX      InetAddressType 
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "Address type of hm2DlrLastActiveNodePort1IpAddress."
+    DEFVAL  { ipv4 } 
+    ::= { hm2DlrStatusEntry 12 }
+
+
+hm2DlrLastActiveNodePort1IpAddress  OBJECT-TYPE 
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "IP address of last active node on port 1."
+    DEFVAL  { '00000000'H } 
+    ::= { hm2DlrStatusEntry 13 }
+
+
+hm2DlrLastActiveNodePort1MacAddress  OBJECT-TYPE 
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "MAC address of last active node on port 1."
+    DEFVAL  { '000000000000'H } 
+    ::= { hm2DlrStatusEntry 14 } 
+    
+
+hm2DlrLastActiveNodePort2IpAddressType  OBJECT-TYPE 
+    SYNTAX      InetAddressType 
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "Address type of hm2DlrLastActiveNodePort2IpAddress."
+    DEFVAL  { ipv4 } 
+    ::= { hm2DlrStatusEntry 15 }
+
+
+hm2DlrLastActiveNodePort2IpAddress  OBJECT-TYPE 
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "IP address of last active node on port 2."
+    DEFVAL  { '00000000'H } 
+    ::= { hm2DlrStatusEntry 16 }
+
+
+hm2DlrLastActiveNodePort2MacAddress  OBJECT-TYPE 
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "MAC address of last active node on port 2."
+    DEFVAL  { '000000000000'H } 
+    ::= { hm2DlrStatusEntry 17 } 
+
+--
+-- *************************************************************
+-- DLR ring protocol participants
+-- *************************************************************
+-- 
+
+hm2DlrRingParticipantsEntry  OBJECT-TYPE 
+    SYNTAX      Hm2DlrRingParticipantsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION 
+        "List of devices participating in the ring protocol."
+    INDEX       { hm2DlrRingIndex, hm2DlrRingParticipantsIndex }
+    ::= { hm2DlrRingParticipantsTable 1 }
+
+Hm2DlrRingParticipantsEntry ::= SEQUENCE {
+        hm2DlrRingParticipantsIndex         Unsigned32,
+        hm2DlrRingParticipantsIpAddressType InetAddressType,
+        hm2DlrRingParticipantsIpAddress     InetAddress,
+        hm2DlrRingParticipantsMacAddress    MacAddress
+    }
+    
+hm2DlrRingParticipantsIndex  OBJECT-TYPE 
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION 
+        "Index for the ring participants table." 
+    ::= { hm2DlrRingParticipantsEntry 1 }
+
+
+hm2DlrRingParticipantsIpAddressType  OBJECT-TYPE 
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION
+        "Address type of hm2DlrRingParticipantsIpAddress."
+    DEFVAL { ipv4 }
+    ::= { hm2DlrRingParticipantsEntry 2 }
+
+ 
+hm2DlrRingParticipantsIpAddress  OBJECT-TYPE 
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "IP address of the participant node."
+    ::= { hm2DlrRingParticipantsEntry 3 }
+
+
+hm2DlrRingParticipantsMacAddress  OBJECT-TYPE 
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "MAC address of the participant node."
+    ::= { hm2DlrRingParticipantsEntry 4 }
+    
+
+--
+-- *************************************************************
+-- DLR gateway config objects
+-- *************************************************************
+-- 
+
+hm2DlrGatewayConfigEntry  OBJECT-TYPE 
+    SYNTAX      Hm2DlrGatewayConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION 
+        "Entry with DLR gateway settings for the indexed ring."
+    INDEX       { hm2DlrRingIndex, hm2DlrGatewayIndex }
+    ::= { hm2DlrGatewayConfigTable 1 }
+    
+Hm2DlrGatewayConfigEntry ::= SEQUENCE {
+        hm2DlrGatewayIndex                    Unsigned32,
+        hm2DlrGatewayName                     SnmpAdminString,
+        hm2DlrGatewayConfigLearningUpdate     HmEnabledStatus,
+        hm2DlrGatewayConfigPrecedence         Unsigned32,
+        hm2DlrGatewayConfigAdvertiseInterval  Unsigned32,
+        hm2DlrGatewayConfigAdvertiseTimeout   Unsigned32,
+        hm2DlrGatewayConfigUplinkPort1IfIndex InterfaceIndexOrZero,
+        hm2DlrGatewayConfigUplinkPort2IfIndex InterfaceIndexOrZero,
+        hm2DlrGatewayUplinkPort1OperStatus    Hm2DlrPortStatusType,
+        hm2DlrGatewayUplinkPort2OperStatus    Hm2DlrPortStatusType,
+        hm2DlrGatewayConfigRowStatus          RowStatus
+    }
+  
+hm2DlrGatewayIndex  OBJECT-TYPE 
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current 
+    DESCRIPTION
+        "DLR gateway index."
+    ::= { hm2DlrGatewayConfigEntry 1 }
+
+
+hm2DlrGatewayName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A logical name for the DLR gateway to ease the 
+         management of DLR gateways."
+    DEFVAL { "" }
+    ::= { hm2DlrGatewayConfigEntry 2 }
+
+
+hm2DlrGatewayConfigLearningUpdate    OBJECT-TYPE
+    SYNTAX      HmEnabledStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable DLR gateway learning update.
+         enable(1) indicates all DLR nodes will send 
+         Learning_Update frame after gateway switchover.
+         disable(2) indicates DLR nodes will not send 
+         Learning_Update frame after gateway switchover."
+    DEFVAL  { enable }
+    ::= { hm2DlrGatewayConfigEntry 3 }
+
+
+hm2DlrGatewayConfigPrecedence   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Precedence of the DLR gateway."
+    DEFVAL  { 0 }
+    ::= { hm2DlrGatewayConfigEntry 4 }
+
+
+hm2DlrGatewayConfigAdvertiseInterval    OBJECT-TYPE
+    SYNTAX      Unsigned32 (1000..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Gateway advertise interval time in microseconds."
+    DEFVAL  { 2000 }
+    ::= { hm2DlrGatewayConfigEntry 5 }
+
+
+hm2DlrGatewayConfigAdvertiseTimeout    OBJECT-TYPE
+    SYNTAX      Unsigned32 (2500..500000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Gateway  advertise timeout in microseconds."
+    DEFVAL  { 5000 }
+    ::= { hm2DlrGatewayConfigEntry 6 }
+
+
+hm2DlrGatewayConfigUplinkPort1IfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Interface index of the uplink port 1 of the DLR 
+         gateway.
+         A non-zero value indicates the ifIndex for the 
+         corresponding entry in the ifTable. "
+    ::= { hm2DlrGatewayConfigEntry 7 }
+
+
+hm2DlrGatewayConfigUplinkPort2IfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Interface index of the uplink port 2 of the DLR 
+         gateway.
+         A non-zero value indicates the ifIndex for the
+         corresponding entry in the ifTable. "
+    ::= { hm2DlrGatewayConfigEntry 8 }
+
+
+hm2DlrGatewayUplinkPort1OperStatus   OBJECT-TYPE
+    SYNTAX      Hm2DlrPortStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational status of the gateway uplink port 1."
+    ::= { hm2DlrGatewayConfigEntry 9 }
+
+
+hm2DlrGatewayUplinkPort2OperStatus   OBJECT-TYPE
+    SYNTAX      Hm2DlrPortStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational status of the gateway uplink port 2."
+    ::= { hm2DlrGatewayConfigEntry 10 }
+
+
+hm2DlrGatewayConfigRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Describes the status of a row in the table.
+             Supports creation, deletion and activation of rows.
+             A row must not be active(1) in order to be modified.
+             A row can be taken out of service by setting the value
+             notInService(2)."
+    ::= { hm2DlrGatewayConfigEntry 15 }
+
+--
+-- *************************************************************
+-- DLR gateway status objects
+-- *************************************************************
+--
+
+hm2DlrGatewayStatusEntry  OBJECT-TYPE 
+    SYNTAX      Hm2DlrGatewayStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION 
+        "DLR gateway status information entry."
+    INDEX       { hm2DlrRingIndex, hm2DlrGatewayIndex } 
+    ::= { hm2DlrGatewayStatusTable 1 }
+    
+Hm2DlrGatewayStatusEntry ::= SEQUENCE {
+        hm2DlrGatewayStatus              Hm2DlrGatewayStatusType,
+        hm2DlrGatewayStatusPrecedence    Unsigned32,
+        hm2DlrGatewayStatusIpAddressType InetAddressType,
+        hm2DlrGatewayStatusIpAddress     InetAddress,
+        hm2DlrGatewayStatusMacAddress    MacAddress
+    }
+
+hm2DlrGatewayStatus    OBJECT-TYPE
+    SYNTAX      Hm2DlrGatewayStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Gateway status." 
+    DEFVAL  { nonGateway }
+    ::= { hm2DlrGatewayStatusEntry 1 }
+    
+
+hm2DlrGatewayStatusPrecedence   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Precedence value of the active gateway."
+    DEFVAL  { 0 }
+    ::= { hm2DlrGatewayStatusEntry 2 }
+
+
+hm2DlrGatewayStatusIpAddressType  OBJECT-TYPE 
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "Address type of hm2DlrGatewayStatusIpAddress."
+    DEFVAL  { ipv4 } 
+    ::= { hm2DlrGatewayStatusEntry 3 }
+
+
+hm2DlrGatewayStatusIpAddress  OBJECT-TYPE 
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "IP address of the active gateway."
+    DEFVAL  { '00000000'H } 
+    ::= { hm2DlrGatewayStatusEntry 4 }
+
+
+hm2DlrGatewayStatusMacAddress  OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "MAC address of the active gateway."
+    DEFVAL  { '000000000000'H } 
+    ::= { hm2DlrGatewayStatusEntry 5 }
+
+   
+-- 
+-- ***********************************************************
+-- DLR notifications (traps)
+-- ***********************************************************
+--
+    
+hm2DlrRingStatusTrap  NOTIFICATION-TYPE
+    OBJECTS     { hm2DlrRingIndex, hm2DlrNetworkStatus }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the network status changes."
+    ::= { hm2DlrMibNotifications 1 }
+
+-- -------------------------------------------------------------
+-- End of the DLR MIB
+-- -------------------------------------------------------------
+END
+

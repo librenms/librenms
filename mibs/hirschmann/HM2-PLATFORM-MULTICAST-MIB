@@ -1,0 +1,591 @@
+HM2-PLATFORM-MULTICAST-MIB DEFINITIONS ::= BEGIN
+          
+-- 
+-- ***********************************************************
+-- Hirschmann Platform Layer3 Multicast MIB
+-- ***********************************************************
+--          
+
+IMPORTS
+    MODULE-IDENTITY,OBJECT-TYPE,
+    OBJECT-IDENTITY,
+    Integer32,
+    Unsigned32, TimeTicks               FROM SNMPv2-SMI
+    RowStatus                           FROM SNMPv2-TC
+    InetAddress,InetAddressType,
+    InetAddressPrefixLength             FROM INET-ADDRESS-MIB
+    InterfaceIndex                      FROM IF-MIB
+    pimBsrCandidateBSREntry             FROM PIM-BSR-MIB
+    mgmdHostInterfaceIfIndex,
+    mgmdHostInterfaceQuerierType,
+    mgmdHostCacheAddressType,
+    mgmdHostCacheAddress,
+    mgmdHostCacheIfIndex				FROM MGMD-STD-MIB
+    hm2PlatformMibs, HmEnabledStatus	FROM HM2-TC-MIB
+    PimGroupMappingOriginType           FROM PIM-STD-MIB;
+               
+hm2PlatformMulticast MODULE-IDENTITY
+	LAST-UPDATED "201307250000Z" -- July 25, 2013
+   	ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+   	DESCRIPTION
+    		 "The Hirschmann Private Platform2 MIB for Layer3 Multicast.
+              Copyright (C) 2013. All Rights Reserved."
+   	REVISION 
+		     "201307250000Z" -- July 25, 2013
+   	DESCRIPTION
+        	 "Initial version."
+    ::= { hm2PlatformMibs 4 }
+
+    --**************************************************************************************
+    hm2AgentMulticastIGMPConfigGroup                      OBJECT IDENTIFIER ::= { hm2PlatformMulticast 1 }
+    
+    hm2AgentMulticastIGMPAdminMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables IGMP on the system."
+         DEFVAL { disable }
+         ::= { hm2AgentMulticastIGMPConfigGroup 1 }
+
+    hm2AgentMulticastIGMPProxyOperStatus OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The operating status of IGMP proxy on this device."
+         ::= { hm2AgentMulticastIGMPConfigGroup 249 }
+
+    --**************************************************************************************
+    -- hm2AgentMulticastPIMConfigGroup                      OBJECT IDENTIFIER ::= { hm2PlatformMulticast 2 }
+    --**************************************************************************************
+    hm2AgentMulticastPIMSMConfigGroup                    OBJECT IDENTIFIER ::= { hm2PlatformMulticast 3 }
+    
+    hm2AgentMulticastPIMSMAdminMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables PIM Sparse Mode on the system."
+         DEFVAL { disable }
+         ::= { hm2AgentMulticastPIMSMConfigGroup 1 }
+
+    hm2AgentMulticastPIMSMGroupMappingTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentMulticastPIMSMGroupMappingEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The (conceptual) table listing BSR-specific information
+                     about PIM group mappings learned via C-RP advertisements
+                     or created locally using configurations."
+         ::= { hm2AgentMulticastPIMSMConfigGroup 249 }
+
+    hm2AgentMulticastPIMSMGroupMappingEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentMulticastPIMSMGroupMappingEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "An entry (conceptual row) in the
+                     hm2AgentMulticastPIMSMGroupMappingTable."
+         INDEX       { hm2AgentMulticastPIMSMGroupMappingGrpAddrType,
+                       hm2AgentMulticastPIMSMGroupMappingGrpAddr }
+         ::= { hm2AgentMulticastPIMSMGroupMappingTable 1 }
+
+    Hm2AgentMulticastPIMSMGroupMappingEntry ::= SEQUENCE {
+         hm2AgentMulticastPIMSMGroupMappingGrpAddrType   InetAddressType,
+         hm2AgentMulticastPIMSMGroupMappingGrpAddr       InetAddress,
+         hm2AgentMulticastPIMSMGroupMappingRPAddrType    InetAddressType,
+         hm2AgentMulticastPIMSMGroupMappingRPAddr        InetAddress,
+         hm2AgentMulticastPIMSMGroupMappingOrigin        PimGroupMappingOriginType,
+         hm2AgentMulticastPIMSMGroupMappingGrpPrefixLen  InetAddressPrefixLength,
+         hm2AgentMulticastPIMSMGroupMappingExpiryTime    TimeTicks
+    }
+
+    hm2AgentMulticastPIMSMGroupMappingGrpAddrType OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The Inet address type of the IP multicast group prefix."
+         ::= { hm2AgentMulticastPIMSMGroupMappingEntry 1 }
+
+    hm2AgentMulticastPIMSMGroupMappingGrpAddr OBJECT-TYPE
+         SYNTAX     InetAddress (SIZE (4|8|16|20))
+         MAX-ACCESS not-accessible
+         STATUS     current
+         DESCRIPTION
+                     "The IP multicast group address that, when combined with
+                     hm2AgentMulticastPIMSMGroupMappingGrpPrefixLen, gives the
+                     group prefix for this mapping. The InetAddressType is given by the
+                     hm2AgentMulticastPIMSMGroupMappingGrpAddrType object."
+         ::= { hm2AgentMulticastPIMSMGroupMappingEntry 2 }
+
+    hm2AgentMulticastPIMSMGroupMappingRPAddrType OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The Inet address type of the RP address."
+         ::= { hm2AgentMulticastPIMSMGroupMappingEntry 3 }
+
+    hm2AgentMulticastPIMSMGroupMappingRPAddr OBJECT-TYPE
+         SYNTAX      InetAddress (SIZE (4|8|16|20))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The IP address of the RP to be used for the given group.
+                     The InetAddressType is given by the
+                     hm2AgentMulticastPIMSMGroupMappingRPAddrType object."
+         ::= { hm2AgentMulticastPIMSMGroupMappingEntry 4 }
+
+    hm2AgentMulticastPIMSMGroupMappingOrigin OBJECT-TYPE
+         SYNTAX      PimGroupMappingOriginType
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The mechanism by which the RP for the group was learned."
+         ::= { hm2AgentMulticastPIMSMGroupMappingEntry 5 }
+
+    hm2AgentMulticastPIMSMGroupMappingGrpPrefixLen OBJECT-TYPE
+         SYNTAX      InetAddressPrefixLength (4..128)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The multicast group prefix length that, when combined with
+                     hm2AgentMulticastPIMSMGroupMappingGrpAddr, gives the group prefix
+                     for this mapping.
+                     If hm2AgentMulticastPIMSMGroupMappingGrpAddrType is 'ipv4' or 'ipv4z',
+                     this object must be in the range 4..32.
+                     If hm2AgentMulticastPIMSMGroupMappingGrpAddrType is 'ipv6' or 'ipv6z',
+                     this object must be in the range 8..128."
+         ::= { hm2AgentMulticastPIMSMGroupMappingEntry 6 }
+
+    hm2AgentMulticastPIMSMGroupMappingExpiryTime OBJECT-TYPE
+         SYNTAX      TimeTicks
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The minimum time remaining before this entry will be
+                     aged out. The value zero indicates that this entry will
+                     never be aged out."
+         ::= { hm2AgentMulticastPIMSMGroupMappingEntry 7 }
+
+    --**************************************************************************************
+    hm2AgentMulticastPIMDMConfigGroup                   OBJECT IDENTIFIER ::= { hm2PlatformMulticast 4 }
+    
+    hm2AgentMulticastPIMDMAdminMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables PIM Dense Mode on the system."
+         DEFVAL { disable }
+         ::= { hm2AgentMulticastPIMDMConfigGroup 1 }
+
+	hm2AgentMulticastPIMDMPruneAssertHoldtime OBJECT-TYPE
+		  SYNTAX		 Unsigned32 (60..64800)
+		  UNITS		 "seconds"
+		  MAX-ACCESS  read-write
+		  STATUS      current
+		  DESCRIPTION
+                      "The value inserted into the Holdtime field of a PIM-DM
+                       Prune message sent on any interface."
+		  DEFVAL { 210 }
+		  ::= { hm2AgentMulticastPIMDMConfigGroup 248 }
+              
+    --**************************************************************************************
+    hm2AgentMulticastRoutingConfigGroup                 OBJECT IDENTIFIER ::= { hm2PlatformMulticast 5 }
+    
+    hm2AgentMulticastRoutingAdminMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables Multicast Routing Mode on the system."
+         DEFVAL { disable }
+         ::= { hm2AgentMulticastRoutingConfigGroup 1 }
+    
+    hm2AgentMulticastSoftwareDSCP OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..64)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Configures the DSCP value that is written into
+                      multicast packets that are routed in software.
+                      If set to 64, the DSCP value of incoming packets
+                      is not changed."
+         DEFVAL { 48 }
+         ::= { hm2AgentMulticastRoutingConfigGroup 248 }
+
+    --**************************************************************************************
+    hm2AgentMulticastDVMRPConfigGroup                    OBJECT IDENTIFIER ::= { hm2PlatformMulticast 6 }
+    
+    hm2AgentMulticastDVMRPAdminMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables DVMRP on the system."
+         DEFVAL { disable }
+         ::= { hm2AgentMulticastDVMRPConfigGroup 1 }
+
+	hm2AgentMulticastDVMRPRouteExpiryTime  OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..200)
+         UNITS       "seconds"
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "TBD."
+         DEFVAL { 120 }
+    ::= { hm2AgentMulticastDVMRPConfigGroup 248 }
+
+         
+    --**************************************************************************************
+    --
+    -- hm2AgentSnmpTrapFlagsConfigGroupMulticast
+    --
+    --**************************************************************************************
+    hm2AgentSnmpTrapFlagsConfigGroupMulticast       	OBJECT IDENTIFIER ::= { hm2PlatformMulticast 7 }
+         
+    hm2AgentSnmpDVMRPTrapFlag OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables DVMRP Traps on the system."
+         DEFVAL { disable }
+         ::= { hm2AgentSnmpTrapFlagsConfigGroupMulticast 1 }
+
+    hm2AgentSnmpPIMTrapFlag OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables PIM Traps on the system."
+         DEFVAL { disable }
+         ::= { hm2AgentSnmpTrapFlagsConfigGroupMulticast 2 }
+
+    --**************************************************************************************
+    --
+    -- The Static Multicast Route Table
+    --
+    --**************************************************************************************
+    hm2AgentIpStaticMRouteTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentIpStaticMRouteEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The table listing the Static Multicast Route Entries."
+         ::= { hm2PlatformMulticast 8 }
+
+    hm2AgentIpStaticMRouteEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentIpStaticMRouteEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Information about a table entry."
+         INDEX       { hm2AgentIpStaticMRouteSrcAddressType,
+                       hm2AgentIpStaticMRouteSrcIpAddr,
+                       hm2AgentIpStaticMRouteSrcNetMask}
+         ::= { hm2AgentIpStaticMRouteTable 1 }
+
+    Hm2AgentIpStaticMRouteEntry ::= SEQUENCE {
+         hm2AgentIpStaticMRouteSrcAddressType   InetAddressType,
+         hm2AgentIpStaticMRouteSrcIpAddr        InetAddress,
+         hm2AgentIpStaticMRouteSrcNetMask       Integer32,
+         hm2AgentIpStaticMRouteRpfIpAddr        InetAddress,
+         hm2AgentIpStaticMRouteIfIndex          InterfaceIndex,
+         hm2AgentIpStaticMRoutePreference       Integer32,
+         hm2AgentIpStaticMRouteStatus           RowStatus,
+         hm2AgentIpStaticMRouteExtRpfIpAddrType InetAddressType,
+         hm2AgentIpStaticMRouteExtRpfIpAddr     InetAddress
+         }
+
+    hm2AgentIpStaticMRouteSrcAddressType OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The address type of this Multicast data source."
+         ::= { hm2AgentIpStaticMRouteEntry 1 }
+
+    hm2AgentIpStaticMRouteSrcIpAddr OBJECT-TYPE
+         SYNTAX      InetAddress (SIZE(4|16))
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The address of the Multicast data source."
+         ::= { hm2AgentIpStaticMRouteEntry 2 }
+
+    hm2AgentIpStaticMRouteSrcNetMask OBJECT-TYPE
+         SYNTAX      Integer32(1..128)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+     
+         DESCRIPTION
+                     "The network mask for the IP address of the Multicast data source."
+         ::= { hm2AgentIpStaticMRouteEntry 3 }
+
+    hm2AgentIpStaticMRouteRpfIpAddr OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  read-create
+         STATUS      deprecated
+         DESCRIPTION
+                     "The RPF Address. This object has been deprecated, because it has no address type. It is replaced by hm2AgentIpStaticMRouteExtRpfIpAddr."
+         ::= { hm2AgentIpStaticMRouteEntry 4 }
+
+    hm2AgentIpStaticMRouteIfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The interface index is valid only for IPv6 and only if RPF address is link-local."
+         ::= { hm2AgentIpStaticMRouteEntry 5 }
+
+    hm2AgentIpStaticMRoutePreference OBJECT-TYPE
+         SYNTAX      Integer32(1..255)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The preference of this route entry."
+         DEFVAL      { 1 }
+         ::= { hm2AgentIpStaticMRouteEntry 6 }
+
+    hm2AgentIpStaticMRouteStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The status of this row.
+                      The status object cannot be set to active(1) before a valid value has been written to hm2AgentIpStaticMRouteExtRpfIpAddr.
+                      All writeable objects in this entry can be modified when the status of this entry is active(1)."
+         ::= { hm2AgentIpStaticMRouteEntry 7 }
+
+    hm2AgentIpStaticMRouteExtRpfIpAddrType OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The address type of the RPF Address."
+         ::= { hm2AgentIpStaticMRouteEntry 248 }
+
+    hm2AgentIpStaticMRouteExtRpfIpAddr OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The RPF Address."
+         ::= { hm2AgentIpStaticMRouteEntry 249 }
+
+   --***************************************************************************
+   -- Candidate BSR advertisement interval
+   --***************************************************************************
+    hm2AgentPIMBsrCandidateConfTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF Hm2AgentPIMBsrCandidateConfEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  
+                     "Provides Candidate-BSR-Advertisements interval information."
+       ::= { hm2AgentMulticastPIMSMConfigGroup 4 }
+
+    hm2AgentPIMBsrCandidateConfEntry OBJECT-TYPE
+        SYNTAX        Hm2AgentPIMBsrCandidateConfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION  
+                      "Information about a table entry."
+       AUGMENTS { pimBsrCandidateBSREntry }
+       ::= { hm2AgentPIMBsrCandidateConfTable 1 }
+
+    Hm2AgentPIMBsrCandidateConfEntry ::=  SEQUENCE {
+        pimBsrCandidateBSRAdvInterval  Unsigned32 
+        }   
+
+    pimBsrCandidateBSRAdvInterval  OBJECT-TYPE
+       SYNTAX      Unsigned32 (1..16383)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION  
+                   "A Candidate BSR generates Candidate-BSR-Advertisements
+               		periodically. This object represents the time interval
+               		in seconds between two consecutive advertisements."
+       DEFVAL { 60 }
+       ::= { hm2AgentPIMBsrCandidateConfEntry 1 }
+
+   --***************************************************************************
+   -- hm2AgentMulticastMgmdExtConfigGroup
+   --***************************************************************************
+
+    hm2AgentMulticastMgmdExtConfigGroup   OBJECT IDENTIFIER ::= { hm2PlatformMulticast 250 }
+
+    hm2AgentMulticastMgmdExtTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF Hm2AgentMulticastMgmdExtEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                     "The (conceptual) table listing the upstream interface of the router.
+                     This is also known as proxy interface."
+       ::= { hm2AgentMulticastMgmdExtConfigGroup 10 }
+
+    hm2AgentMulticastMgmdExtEntry OBJECT-TYPE
+        SYNTAX        Hm2AgentMulticastMgmdExtEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                      "An entry (conceptual row) representing the upstream interface of the router."
+       INDEX { mgmdHostInterfaceIfIndex, mgmdHostInterfaceQuerierType }
+       ::= { hm2AgentMulticastMgmdExtTable 1 }
+
+    Hm2AgentMulticastMgmdExtEntry ::=  SEQUENCE {
+        hm2AgentMulticastMgmdUnsolicitRprtInterval  Unsigned32,
+        hm2AgentMulticastMgmdNumberOfGroups Integer32
+        }
+
+    hm2AgentMulticastMgmdUnsolicitRprtInterval  OBJECT-TYPE
+       SYNTAX      Unsigned32 (1..260)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+                   "Specify how often the system should send unsolicited reports to routers on the upstream interface."
+       DEFVAL { 1 }
+       ::= { hm2AgentMulticastMgmdExtEntry 1 }
+
+    hm2AgentMulticastMgmdNumberOfGroups  OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+                   "Number of groups corresponding to the proxy interface."
+       ::= { hm2AgentMulticastMgmdExtEntry 2 }
+
+	--***************************************************************************
+   -- hm2AgentMulticastMgmdHostCacheExtGroup
+   --***************************************************************************
+
+    hm2AgentMulticastMgmdHostCacheExtGroup   OBJECT IDENTIFIER ::= { hm2PlatformMulticast 251 }
+
+    hm2AgentMulticastMgmdHostCacheExtTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF Hm2AgentMulticastMgmdHostCacheExtEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                     "The (conceptual) table listing group addresses of the upstream interface of the router."
+       ::= { hm2AgentMulticastMgmdHostCacheExtGroup 10 }
+
+    hm2AgentMulticastMgmdHostCacheExtEntry OBJECT-TYPE
+        SYNTAX        Hm2AgentMulticastMgmdHostCacheExtEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                      "An entry (conceptual row) representing a group of upstream interface of the router."
+       INDEX { mgmdHostCacheAddressType , mgmdHostCacheAddress, mgmdHostCacheIfIndex }
+       ::= { hm2AgentMulticastMgmdHostCacheExtTable 1 }
+
+    Hm2AgentMulticastMgmdHostCacheExtEntry ::=  SEQUENCE {
+        hm2AgentMulticastMgmdHostStatus INTEGER
+        }
+
+    hm2AgentMulticastMgmdHostStatus  OBJECT-TYPE
+       SYNTAX      INTEGER  { non-member   (1),
+							  delay-member (2),
+							  idle-member  (3)
+							}
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+                   "A variable that describes the state of the host in relation with an IP multicast group."
+       ::= { hm2AgentMulticastMgmdHostCacheExtEntry 1 }
+
+   --***************************************************************************
+   -- hm2AgentMulticastSNMPExtensionGroup
+   --***************************************************************************
+
+    hm2AgentMulticastSNMPExtensionGroup   OBJECT IDENTIFIER ::= { hm2PlatformMulticast 260 }
+
+    hm2AgentMulticastProtocolEnableErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "Cannot enable protocol x because protocol y is enabled."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 1 }
+
+    hm2AgentMulticastNullGroupErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "The group address or the group address mask is zero."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 2 }
+
+    hm2AgentMulticastBoundaryRangeEntriesErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "The group address is out of administratively scoped addresses range(239.x.x.x)."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 3 }
+
+    hm2AgentMulticastHostEntriesErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "The group address has host bits set."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 4 }
+
+    hm2AgentMgmdHostInvalidEntryErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "The entry cannot be deleted because is not valid."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 5 }
+
+    hm2AgentMulticastProtocolDeInitErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "The multicast routing protocol is deinitializing. Please retry later."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 6 }
+       
+    hm2AgentMulticastLocalAddressErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "The IP address is not local."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 7 }
+
+    hm2AgentMulticastCandRPErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "Candidate RP is already configured on another interface."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 8 }
+
+    hm2AgentMulticastUnicastValidationErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "The IP address is out of unicast range."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 9 }
+
+   hm2AgentMulticastGroupValidationErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "The group address is out of multicast range."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 10 }
+
+   hm2AgentMulticastSSMValidationErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "The group address is in SSM range."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 11 }
+
+   hm2AgentMulticastStaticSourceErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "Source address is a directly connected address."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 12 }
+
+   hm2AgentMulticastStaticRPFErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "The RPF address is a local address."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 13 }
+       
+   hm2AgentMulticastStaticHostErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "The source IP address has the host bit set."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 14 }
+
+   hm2AgentMulticastCandRPPrimaryErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "The candidate RP address must be a primary IP address."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 15 }
+
+   hm2AgentMulticastCandBSRPrimaryErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "The candidate BSR address must be a primary IP address."
+       ::= { hm2AgentMulticastSNMPExtensionGroup 16 }
+       
+END

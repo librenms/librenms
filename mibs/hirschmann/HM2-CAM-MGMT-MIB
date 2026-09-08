@@ -1,0 +1,484 @@
+
+HM2-CAM-MGMT-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann CAM Management MIB
+-- *************************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE,
+	OBJECT-IDENTITY,
+    Integer32           	FROM SNMPv2-SMI -- RFC 2578
+	DisplayString,
+    RowStatus,               
+    TruthValue				FROM SNMPv2-TC
+    InetAddressType, 
+    InetAddress,
+	InetPortNumber          FROM INET-ADDRESS-MIB -- RFC4001
+    SnmpAdminString     	FROM SNMP-FRAMEWORK-MIB
+	HmEnabledStatus,
+	hm2ConfigurationMibs   	FROM HM2-TC-MIB;
+
+hm2CamMgmtMib MODULE-IDENTITY
+	LAST-UPDATED "201307010000Z" -- July 1, 2013
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann dummy for Central Authentication Management MIB for ABB.
+         Copyright (C) 2013. All Rights Reserved."
+    REVISION     "201307010000Z" -- July 1, 2013
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 200 }
+
+--
+-- *************************************************************
+-- hm2CamMgmtMib
+-- *************************************************************
+--
+hm2CamMgmtMibNotifications			OBJECT IDENTIFIER ::= { hm2CamMgmtMib 0 }
+hm2CamMgmtMibObjects				OBJECT IDENTIFIER ::= { hm2CamMgmtMib 1 }
+-- hm2CamMgmtMibConformance			OBJECT IDENTIFIER ::= { hm2CamMgmtMib 2 }
+hm2CamMgmtMibSnmpExtensionGroup		OBJECT IDENTIFIER ::= { hm2CamMgmtMib 3 }
+
+--
+-- *************************************************************
+-- hm2CamMgmtMib groups
+-- *************************************************************
+--
+hm2CamConfigGroup 					OBJECT IDENTIFIER ::= { hm2CamMgmtMibObjects 1 }
+hm2CamActionGroup					OBJECT IDENTIFIER ::= { hm2CamMgmtMibObjects 10 }
+hm2CamPwdChangeGroup				OBJECT IDENTIFIER ::= { hm2CamMgmtMibObjects 20 }
+hm2CamCertInfoGroup					OBJECT IDENTIFIER ::= { hm2CamMgmtMibObjects 30 }
+
+--
+-- *************************************************************
+-- hm2CamConfigGroup
+-- *************************************************************
+--
+	
+hm2CamConfigAdminStatus OBJECT-TYPE
+    SYNTAX		HmEnabledStatus
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+				"Configure authentication via CAM server.
+				 If CAM authentication is enabled local users are deactivated.
+				 Authentication will be done via CAM server (primary or backup) or
+				 replicated user database on switch. Otherwise access to the switch
+				 is not possible."
+	DEFVAL		{ disable }                   
+     ::= { hm2CamConfigGroup 1 }
+	 
+hm2CamConfigLastValidServerindex OBJECT-TYPE
+    SYNTAX		Integer32 (1..2)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+				"Last valid CAM server with succesful connection and authentication.
+				 Note: this attribute is set by CAM management application."                 
+     ::= { hm2CamConfigGroup 2 }
+
+hm2CamClientServerAddrTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2CamClientServerAddrEntry
+	MAX-ACCESS 		not-accessible
+	STATUS 			current
+	DESCRIPTION
+		"This table contains objects to configure
+		 CAM client connections."
+	::= { hm2CamConfigGroup 10 }
+
+hm2CamClientServerAddrEntry OBJECT-TYPE
+   SYNTAX 		Hm2CamClientServerAddrEntry
+   MAX-ACCESS 	not-accessible
+   STATUS 		current
+   DESCRIPTION 
+		"The CAM client connection objects."
+   INDEX { hm2CamClientServerIndex }
+   ::= { hm2CamClientServerAddrTable 1 }
+
+Hm2CamClientServerAddrEntry ::= SEQUENCE {
+   hm2CamClientServerIndex 					Integer32,
+   hm2CamClientServerAddrType 				InetAddressType,
+   hm2CamClientServerAddr 					InetAddress,
+   hm2CamClientServerPort	 				InetPortNumber,
+   hm2CamClientServerDescr	 				SnmpAdminString,
+   hm2CamClientServerBaseDN					SnmpAdminString,
+   hm2CamClientServerSearchString			SnmpAdminString,
+   hm2CamClientServerStatus 				INTEGER,
+   hm2CamClientServerReplicationInterval	Integer32,
+   hm2CamClientServerReplicationStatus		INTEGER,
+   hm2CamClientServerRowStatus				RowStatus,
+   hm2CamClientServerSslTls                 HmEnabledStatus
+   }		 
+
+hm2CamClientServerIndex OBJECT-TYPE
+    SYNTAX		Integer32 (1..2)
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+				"Index for CAM server table."
+     ::= { hm2CamClientServerAddrEntry 1 }
+
+hm2CamClientServerAddrType OBJECT-TYPE
+    SYNTAX		InetAddressType
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+				"Address type."
+	DEFVAL		{ ipv4 }                   
+     ::= { hm2CamClientServerAddrEntry 2 }
+         
+hm2CamClientServerAddr OBJECT-TYPE
+    SYNTAX		InetAddress
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+				"IP address of CAM authentication server."
+	DEFVAL		{ '00000000'H }                   
+     ::= { hm2CamClientServerAddrEntry 3 }
+
+hm2CamClientServerPort OBJECT-TYPE
+    SYNTAX		InetPortNumber
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+				"The port number of the CAM authentication server."
+	DEFVAL		{ 389 }                   
+     ::= { hm2CamClientServerAddrEntry 4 }
+
+hm2CamClientServerDescr  OBJECT-TYPE
+   SYNTAX 		SnmpAdminString (SIZE(0..100))
+   MAX-ACCESS 	read-create
+   STATUS 		current
+   DESCRIPTION
+   	   "The description of the server configured."
+   ::= { hm2CamClientServerAddrEntry 5 }
+
+hm2CamClientServerBaseDN  OBJECT-TYPE
+   SYNTAX 		SnmpAdminString (SIZE(0..100))
+   MAX-ACCESS 	read-create
+   STATUS 		current
+   DESCRIPTION
+   	   "Base distinguished name for LDAP query to CAM server."
+   ::= { hm2CamClientServerAddrEntry 6 }
+
+hm2CamClientServerSearchString  OBJECT-TYPE
+   SYNTAX 		SnmpAdminString (SIZE(0..100))
+   MAX-ACCESS 	read-create
+   STATUS 		current
+   DESCRIPTION
+   	   "Search string for LDAP query to CAM server."
+   ::= { hm2CamClientServerAddrEntry 7 }   
+ 
+ hm2CamClientServerStatus OBJECT-TYPE
+     SYNTAX      INTEGER {
+				 ok(1),
+				 unreachable(2),
+				 other(3)
+				 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "Status of authentication against CAM server:
+                  - ok			-> CAM server reachable, authentication succeeded
+				  - unreachable -> CAM server (primary and backup) not reachable
+				  - other       -> any other error state"
+	 DEFVAL  { other }					    
+     ::= { hm2CamClientServerAddrEntry 8 }
+		
+hm2CamClientServerReplicationInterval OBJECT-TYPE
+     SYNTAX      Integer32 (10..1440)
+	 UNITS		 "minutes"
+     MAX-ACCESS  read-create
+     STATUS      obsolete
+     DESCRIPTION
+                 "CAM replication was removed - function is no longer available."
+     DEFVAL  { 60 }
+     ::= { hm2CamClientServerAddrEntry 9 }
+     
+hm2CamClientServerReplicationStatus OBJECT-TYPE
+     SYNTAX      INTEGER {
+				 ok(1),
+				 unsuccessful(2),
+				 other(3)
+				 }
+     MAX-ACCESS  read-only
+     STATUS      obsolete
+     DESCRIPTION
+                 "CAM replication was removed - function is no longer available."
+	 DEFVAL  { other }					    
+     ::= { hm2CamClientServerAddrEntry 10 } 
+		 
+hm2CamClientServerRowStatus OBJECT-TYPE
+	SYNTAX      RowStatus
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+		"Indicates the status of an entry in this table,
+		and is used to create/delete entries. Objects
+		within this table can by changed while the status
+		is 'active'."
+	::= { hm2CamClientServerAddrEntry 11 }
+
+hm2CamClientServerSslTls OBJECT-TYPE
+    SYNTAX      HmEnabledStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+                "Indicates if CAM server uses SSL/TSL for
+                authentication. Disable means CAM server
+                authentication is done via StartTLS."
+    DEFVAL      { disable }
+    ::= { hm2CamClientServerAddrEntry 12 }
+
+
+--
+-- *************************************************************
+-- hm2CamActionGroup
+-- *************************************************************
+--
+hm2CamAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+				 other(1),
+				 testConnection(2)
+				 }
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+				"Test available CAM server connections. Status of testing the CAM
+				server connections is shown in hm2CamActionConnectionStatus."      
+	DEFVAL  { other }   
+     ::= { hm2CamActionGroup 1 }
+  
+hm2CamActionConnectionStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+				 ok(1),
+				 unreachable(2),
+				 pending(3),
+				 other(4)
+				 }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+				"Status of available CAM server connections.
+					- ok(1) 		-> at least one CAM server reachable.
+					- unreachable(2)-> no CAM server reachable.
+					- pending(3)    -> testing connections is in progress.
+					- other(4)		-> no test has been done."   
+     ::= { hm2CamActionGroup 2 }
+
+hm2CamActionReplicationStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+				 ok(1),
+				 unsuccessful(2),
+				 pending(3),
+				 other(4)
+				 }
+	MAX-ACCESS	read-only
+	STATUS		obsolete
+	DESCRIPTION
+				"CAM replication was removed - function is no longer available."  
+     ::= { hm2CamActionGroup 3 }
+
+--
+-- *************************************************************
+-- hm2CamPwdChangeGroup
+-- *************************************************************
+--
+	
+hm2CamPwdChangeUserName OBJECT-TYPE
+    SYNTAX 		SnmpAdminString (SIZE(0..100))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+				"Set user name of user whose password has to be changed on CAM server."         
+     ::= { hm2CamPwdChangeGroup 1 }
+	 
+hm2CamPwdChangeUserPwOld OBJECT-TYPE
+    SYNTAX 		SnmpAdminString (SIZE(0..100))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+				"Set old password of user whose password has to be changed on CAM server."         
+     ::= { hm2CamPwdChangeGroup 2 }
+     
+hm2CamPwdChangeUserPwNew OBJECT-TYPE
+    SYNTAX 		SnmpAdminString (SIZE(0..100))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+				"Set new password of user whose password has to be changed on CAM server."         
+     ::= { hm2CamPwdChangeGroup 3 }
+     
+hm2CamPwdChangeAction OBJECT-TYPE
+     SYNTAX      INTEGER {
+				 other(1),
+				 changePwd(2)
+				 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "Execute password change of given user on CAM server.
+                  - other       -> no action, password is not changed on CAM server
+                  - changePwd	-> change password"
+	 DEFVAL  { other }					    
+     ::= { hm2CamPwdChangeGroup 4 } 
+
+
+hm2CamPwdChangeActionStatus OBJECT-TYPE
+     SYNTAX      INTEGER {
+				 ok(1),
+				 unsuccessful(2),
+				 pending(3),
+				 other(4)
+				 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+				"Status of password change action on available CAM server.
+					- ok(1) 		 -> password change successful.
+					- unsuccessful(2)-> password change unsuccessful.
+					- pending(3)     -> password change is in progress.
+					- other(4)		 -> password change was never done."
+     ::= { hm2CamPwdChangeGroup 5 }
+     
+--
+-- *************************************************************
+-- hm2CamCertInfoTable
+-- *************************************************************
+--
+hm2CamCertInfoTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2CamCertInfoEntry
+	MAX-ACCESS 		not-accessible
+	STATUS 			current
+	DESCRIPTION
+		"This table ...."
+	::= { hm2CamCertInfoGroup 1 }
+
+hm2CamCertInfoEntry OBJECT-TYPE
+   SYNTAX 		Hm2CamCertInfoEntry
+   MAX-ACCESS 	not-accessible
+   STATUS 		current
+   DESCRIPTION 
+		"The CAM ..."
+   INDEX { hm2CamCertInfoIndex }
+   ::= { hm2CamCertInfoTable 1 }
+
+Hm2CamCertInfoEntry ::= SEQUENCE {
+   hm2CamCertInfoIndex 			INTEGER,
+   hm2CamCertInfoPresent		TruthValue,
+   hm2CamCertInfoExpiry			SnmpAdminString,   
+   hm2CamCertInfoIssuer			SnmpAdminString,
+   hm2CamCertInfoSubject		SnmpAdminString,
+   hm2CamCertInfoSerialNumber	SnmpAdminString
+   }		 
+
+hm2CamCertInfoIndex OBJECT-TYPE
+    SYNTAX		INTEGER {
+    					  rootCert(1),
+    					  deviceCert(2)
+    					}
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+				"Index for CAM certificate table."
+     ::= { hm2CamCertInfoEntry 1 }
+	
+hm2CamCertInfoPresent OBJECT-TYPE
+    SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+				"Certificate present on device."
+     ::= { hm2CamCertInfoEntry 2 }	
+	
+hm2CamCertInfoExpiry OBJECT-TYPE
+    SYNTAX		SnmpAdminString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+				"Expiry information of certificate."
+     ::= { hm2CamCertInfoEntry 3 }
+  
+hm2CamCertInfoIssuer OBJECT-TYPE
+    SYNTAX		SnmpAdminString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+				"Issuer information of certificate."
+     ::= { hm2CamCertInfoEntry 4 }
+
+hm2CamCertInfoSubject OBJECT-TYPE
+    SYNTAX		SnmpAdminString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+				"Subject information of certificate."
+     ::= { hm2CamCertInfoEntry 5 }
+  
+hm2CamCertInfoSerialNumber OBJECT-TYPE
+    SYNTAX		SnmpAdminString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+				"Serial number of certificate."
+     ::= { hm2CamCertInfoEntry 6 }
+
+
+-- 
+-- ***********************************************************
+-- hm2CamMgmtMibNotifications
+-- ***********************************************************
+--
+hm2CamConfigStatusTrap  NOTIFICATION-TYPE
+	OBJECTS		{ hm2CamClientServerIndex, hm2CamClientServerStatus }
+	STATUS		current
+	DESCRIPTION 
+				"This notification is send when authentication via CAM server is done."
+	::= { hm2CamMgmtMibNotifications 1 }
+	
+hm2CamReplicationStatusTrap  NOTIFICATION-TYPE
+	OBJECTS		{ hm2CamClientServerIndex, hm2CamClientServerReplicationStatus }
+	STATUS		obsolete
+	DESCRIPTION 
+				"CAM replication was removed - function is no longer available."  
+	::= { hm2CamMgmtMibNotifications 2 }
+
+--
+-- *************************************************************
+-- hm2CamMgmtMibSnmpExtension groups
+-- *************************************************************
+--
+hm2CamConfigSESGroup 				OBJECT IDENTIFIER ::= { hm2CamMgmtMibSnmpExtensionGroup 1 }
+hm2CamActionSESGroup				OBJECT IDENTIFIER ::= { hm2CamMgmtMibSnmpExtensionGroup 10 }
+hm2CamPwdChangeSESGroup				OBJECT IDENTIFIER ::= { hm2CamMgmtMibSnmpExtensionGroup 20 }
+hm2CamCertInfoSESGroup				OBJECT IDENTIFIER ::= { hm2CamMgmtMibSnmpExtensionGroup 30 }
+
+--**************************************************************************************
+-- 	hm2CamConfigSESGroup
+--**************************************************************************************
+
+	hm2CamMgmtNoCaCertErrorReturn OBJECT-IDENTITY
+   		STATUS        current
+   		DESCRIPTION
+   					"CAM enable failed because no CA certificate is present."
+   	::= { hm2CamConfigSESGroup 1 }
+   	
+   	hm2CamMgmtTestConnErrorReturn OBJECT-IDENTITY
+   		STATUS        current
+   		DESCRIPTION
+   					"CAM enable failed because connection test failed."
+   	::= { hm2CamConfigSESGroup 2 }
+
+END
+

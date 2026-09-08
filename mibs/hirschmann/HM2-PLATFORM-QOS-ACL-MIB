@@ -1,0 +1,1733 @@
+HM2-PLATFORM-QOS-ACL-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann Platform ACL MIB
+-- ***********************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, OBJECT-IDENTITY,
+    IpAddress, Integer32, 
+	Unsigned32, Counter64, Gauge32          
+                                         FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, 
+	MacAddress, TruthValue, 
+	DisplayString, TimeStamp      
+                                         FROM SNMPv2-TC
+
+    InterfaceIndexOrZero                 FROM IF-MIB
+    hm2PlatformQoS                       FROM HM2-PLATFORM-QOS-MIB
+    HmEnabledStatus						 FROM HM2-TC-MIB;
+                
+hm2PlatformQosAcl MODULE-IDENTITY
+    LAST-UPDATED "201212200000Z"
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION 
+        "The Hirschmann Platform2 MIB for Access Control Lists (ACL).
+		 Copyright (C) 2012. All Rights Reserved."
+    REVISION    "201212200000Z"
+    DESCRIPTION 
+        "Added new rule hit trap to allow sending of SNMPv1 traps."    
+    REVISION    "201205020000Z"
+    DESCRIPTION 
+        "Updated with new prefix. Updated value ranges to work with configmgr."    
+    REVISION    "201106120000Z"
+    DESCRIPTION 
+        "Initial version."
+
+    ::= { hm2PlatformQoS 2  }
+
+
+EtypeValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "x"
+    STATUS   current
+    DESCRIPTION
+       "Ethertype value of a packet.  The allowed value is 0x0600 to 0xFFFF.
+       A value of 0 indicates, that this field is not used."
+    SYNTAX   Unsigned32 (0..65535)   -- hex value 0x0600 to 0xFFFF
+    
+Ipv6AddressPrefix ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:"
+    STATUS       current
+    DESCRIPTION
+        "This data type is used to model IPv6 address prefixes. This is a binary 
+        string of up to 16 octets in network byte order."
+    SYNTAX       OCTET STRING (SIZE (0..16))     
+
+AclBurstSize ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS   current
+    DESCRIPTION
+       "The number of kilobytes (Kbytes) in a packet that may be sent in a
+       traffic stream without regard for other traffic streams."
+    SYNTAX   Unsigned32 (0|1..128)
+
+Hm2PortOperator ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+       "The operator of a source/destination tcp/udp port for ip acl classes."
+    SYNTAX  INTEGER
+                {
+         		eq(0),
+         		neq(1),
+         		lt(2),
+         		gt(3)
+                }
+
+--**************************************************************************************
+    
+    hm2AgentAclNamedIpv4IndexNextFree OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                     "This object contains an unused value for the hm2AgentAclIndex
+                      to be used when creating a new named IPv4 ACL.  A value of zero
+                      indicates the ACL table is full.
+                      For MSP devices the IPv4 ACL indexes start with 1000."
+    ::= { hm2PlatformQosAcl 14 }
+
+    --**************************************************************************************
+    
+    hm2AgentAclTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentAclEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of ACL instances."
+         ::= { hm2PlatformQosAcl 1 }
+
+    hm2AgentAclEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentAclEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "An ACL instance table entry."
+         INDEX       { hm2AgentAclIndex }
+         ::= { hm2AgentAclTable 1 }
+         
+    Hm2AgentAclEntry ::= SEQUENCE {         
+           hm2AgentAclIndex
+               Integer32,
+           hm2AgentAclStatus
+               RowStatus,
+           hm2AgentAclName
+               DisplayString,
+           hm2AgentAclStatsAction
+           	   INTEGER
+           }
+    
+    hm2AgentAclIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The IP ACL table index this instance is associated with.
+                      For MSP devices the IPv4 ACL indexes start with 1000."
+         ::= { hm2AgentAclEntry 1 }
+         
+    hm2AgentAclStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.  Entries can not be deleted until all rows in 
+                     the hm2AgentAclIfTable and hm2AgentAclRuleTable with corresponding values of hm2AgentAclIndex 
+                     have been deleted.
+                     
+                     active(1)      - this ACL instance is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance"
+         ::= { hm2AgentAclEntry 2 }
+    
+    hm2AgentAclName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The name of this IPv4 ACL entry, which must consist of
+                      1 to 31 alphanumeric characters and uniquely identify
+                      this IPv4 ACL. An existing IPv4 ACL can be renamed by
+                      setting this object to a new name.
+
+                      This object must be set to complete a new IPv4 ACL 
+                      row instance."
+         ::= { hm2AgentAclEntry 3 }
+    
+    hm2AgentAclStatsAction OBJECT-TYPE
+         SYNTAX      INTEGER
+         	 	 	 {
+    					other(1),
+    					flushAclHitCount(2)
+         	 	 	 }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                    "Setting the object to 'flushAclHitCount(2)' will reset hit counter statistics for all rules in this ACL.
+                     Reading the object always returns 'other'."
+         ::= { hm2AgentAclEntry 248 }
+
+    --**************************************************************************************
+    
+    hm2AgentAclIfTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentAclIfEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of ACL interface instances per direction."
+         ::= { hm2PlatformQosAcl 8 }
+
+    hm2AgentAclIfEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentAclIfEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "An ACL interface instance entry."
+         INDEX       { hm2AgentAclIfIndex, hm2AgentAclIfDirection, hm2AgentAclIfSequence, hm2AgentAclIfAclType, hm2AgentAclIfAclId  }
+         ::= { hm2AgentAclIfTable 1 }
+         
+    Hm2AgentAclIfEntry ::= SEQUENCE {         
+           hm2AgentAclIfIndex
+               Integer32,
+           hm2AgentAclIfDirection
+               INTEGER,
+           hm2AgentAclIfSequence
+               Unsigned32,
+           hm2AgentAclIfAclType
+               INTEGER,
+           hm2AgentAclIfAclId
+               Integer32,
+           hm2AgentAclIfStatus
+               RowStatus
+           }
+    
+    hm2AgentAclIfIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface index to which this ACL instance applies."
+         ::= { hm2AgentAclIfEntry 1 }
+         
+    hm2AgentAclIfDirection OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      inbound(1),
+                      outbound(2)
+                     }
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface direction to which this ACL instance applies."
+         ::= { hm2AgentAclIfEntry 2 }
+         
+    hm2AgentAclIfSequence OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4294967295)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The relative evaluation sequence of this ACL for this
+                      interface and direction.  When multiple ACLs are allowed 
+                      for a given interface and direction, the sequence number 
+                      determines the order in which the list of ACLs are evaluated,
+                      with lower sequence numbers given higher precedence.  The
+                      sequence number value is arbitrary, but must be a unique
+                      non-zero value for a given interface and direction.
+                       
+                      Setting this object to an existing sequence number 
+                      value for a given interface and direction causes the 
+                      ACL corresponding to that value to be replaced with
+                      this ACL."
+         ::= { hm2AgentAclIfEntry 3 }
+         
+    hm2AgentAclIfAclType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      ip(1),
+                      mac(2),
+                      ipv6(3)
+                     }
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "The type of this ACL, which is used to interpret the 
+                      hm2AgentAclIfId object value.  Each type of ACL uses its own
+                      numbering scheme for identification (see hm2AgentAclIfAclId object
+                      for details).
+
+                      The hm2AgentAclIfAclId object must be specified along with this 
+                      object."
+         ::= { hm2AgentAclIfEntry 4 }
+         
+    hm2AgentAclIfAclId OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "The ACL identifier value, which is interpreted based on
+                      the hm2AgentAclIfType object.
+
+                      For the IP ACLs, the actual ACL number is its identifier
+                      as follows:  IP standard ranges from 1-99, while 
+                      IP extended ranges from 100-199. Here, hm2AgentAclIfAclId represents 
+                      hm2AgentAclIndex. 
+
+                      The MAC ACLs use an internally generated index value
+                      that is assigned when the ACL is created. Here, hm2AgentAclIfAclId 
+                      represents hm2AgentAclMacIndex.
+
+                      The IPv6 ACLs use an internally generated index value
+                      that is assigned when the ACL is created. Here, hm2AgentAclVlanAclId 
+                      represents hm2AgentAclIpv6Index.  
+
+                      The hm2AgentAclIfType object must be specified along with
+                      this object."
+         ::= { hm2AgentAclIfEntry 5 }
+         
+    hm2AgentAclIfStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.
+                     
+                     active(1)      - this ACL interface instance is active
+                     createAndGo(4) - set to this value to assign an ACL to an interface and direction
+                     destroy(6)     - set to this value to remove an ACL from an interface and direction"
+         ::= { hm2AgentAclIfEntry 6 }
+
+
+    --**************************************************************************************
+    -- Layer 3 IP Access List Rules
+    --
+    --**************************************************************************************
+    
+    hm2AgentAclRuleTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentAclRuleEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of IP ACL rule instances."
+         ::= { hm2PlatformQosAcl 4 }
+
+    hm2AgentAclRuleEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentAclRuleEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of IP ACL Classification Rules"
+         INDEX       { hm2AgentAclIndex, hm2AgentAclRuleIndex }
+         ::= { hm2AgentAclRuleTable 1 }
+         
+    Hm2AgentAclRuleEntry ::= SEQUENCE {         
+           hm2AgentAclRuleIndex
+               Integer32,
+           hm2AgentAclRuleAction
+               INTEGER,
+           hm2AgentAclRuleProtocol
+               Integer32,
+           hm2AgentAclRuleSrcIpAddress
+               IpAddress,
+           hm2AgentAclRuleSrcIpMask
+               IpAddress,
+           hm2AgentAclRuleSrcL4Port
+               Integer32,
+           hm2AgentAclRuleSrcL4PortRangeStart
+               Integer32,
+           hm2AgentAclRuleSrcL4PortRangeEnd
+               Integer32,
+           hm2AgentAclRuleDestIpAddress
+               IpAddress,
+           hm2AgentAclRuleDestIpMask
+               IpAddress,
+           hm2AgentAclRuleDestL4Port
+               Integer32,
+           hm2AgentAclRuleDestL4PortRangeStart
+               Integer32,
+           hm2AgentAclRuleDestL4PortRangeEnd
+               Integer32,
+           hm2AgentAclRuleIPDSCP
+               Integer32,
+           hm2AgentAclRuleIpPrecedence
+               Integer32,
+           hm2AgentAclRuleIpTosBits
+               Integer32,
+           hm2AgentAclRuleIpTosMask
+               Integer32,
+           hm2AgentAclRuleStatus
+               RowStatus,
+           hm2AgentAclRuleAssignQueueId
+               Unsigned32,
+           hm2AgentAclRuleRedirectIntf
+               InterfaceIndexOrZero,
+           hm2AgentAclRuleMatchEvery
+              TruthValue,
+           hm2AgentAclRuleMirrorIntf
+               InterfaceIndexOrZero,
+           hm2AgentAclRuleLogging
+             TruthValue,
+           hm2AgentAclRuleTimeRangeName
+               DisplayString,
+           hm2AgentAclRuleTimeRangeStatus
+               INTEGER,
+		   hm2AgentAclRuleRedirectExtAgentId
+		   	   Unsigned32,
+           hm2AgentAclRuleIcmpType
+               Integer32,
+           hm2AgentAclRuleIcmpCode
+               Integer32,
+           hm2AgentAclRuleIgmpType
+               Integer32,
+           hm2AgentAclRuleEstablished
+               TruthValue,
+           hm2AgentAclRuleFragments
+               TruthValue,
+           hm2AgentAclRuleIndexNextFree
+               Integer32,               
+           hm2AgentAclRuleRateLimitCrateUnit
+		   	   INTEGER,
+           hm2AgentAclRuleRateLimitCrate
+               Unsigned32,
+           hm2AgentAclRuleRateLimitCburst
+               AclBurstSize,
+           hm2AgentAclRuleStatsAction
+               INTEGER,               
+           hm2AgentAclRuleHitCount
+               Counter64,
+           hm2AgentAclRuleHitCountDiscontinuityTime
+               TimeStamp,
+          hm2AgentAclRuleTcpFlagBits
+               Integer32,
+           hm2AgentAclRuleTcpFlagMask
+               Integer32,
+          hm2AgentAclRuleSrcL4PortOperator
+                   Hm2PortOperator,
+          hm2AgentAclRuleDstL4PortOperator
+           	   Hm2PortOperator
+           }
+    
+    hm2AgentAclRuleIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The index of this rule instance within an IP ACL."
+         ::= { hm2AgentAclRuleEntry 1 }
+         
+    hm2AgentAclRuleAction OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      permit(1),
+                      deny(2)
+                      }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The type of action this rule should perform."
+         DEFVAL { deny }
+         ::= { hm2AgentAclRuleEntry 2 }
+         
+    hm2AgentAclRuleProtocol OBJECT-TYPE
+         SYNTAX      Integer32 (-1 | 0..255)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "icmp - 1
+                      igmp - 2
+                      ip-in-ip - 4
+                      tcp - 6
+                      udp - 17
+                      ip - 255 (ip all)
+                      All values from 1 to 255 are valid. 0 disables this match
+                      criteria."
+         ::= { hm2AgentAclRuleEntry 3 }
+           
+    hm2AgentAclRuleSrcIpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The source IP address used in the ACL classification."
+         ::= { hm2AgentAclRuleEntry 4 }
+
+    hm2AgentAclRuleSrcIpMask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Source IP mask used in the ACL classification.
+         This mask is expressed using wild-card notation, which
+         is the 1's compliment of traditional subnet masks.
+         Here, the 'don't care bits' are represented by binary 1's and 
+         'do care bits' are represented by binary 0's."
+         ::= { hm2AgentAclRuleEntry 5 }
+
+
+    hm2AgentAclRuleSrcL4Port OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The source port number (Layer 4) used in the ACL classification.
+                     A value of -1 disables this criteria."                     
+         ::= { hm2AgentAclRuleEntry 6 }
+
+    hm2AgentAclRuleSrcL4PortRangeStart OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The source port number(Layer 4) range start."
+         ::= { hm2AgentAclRuleEntry 7 }
+
+    hm2AgentAclRuleSrcL4PortRangeEnd OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The source port number(Layer 4) range end."
+         ::= { hm2AgentAclRuleEntry 8 }
+
+    hm2AgentAclRuleDestIpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The destination IP address used in the ACL classification."
+         ::= { hm2AgentAclRuleEntry 9 }
+
+    hm2AgentAclRuleDestIpMask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The destination IP mask used in the ACL classification.
+         This mask is expressed using wild-card notation, which
+         is  the 1's compliment of traditional subnet masks.
+         Here, the 'don't care bits' are represented by binary 1's and 
+         'do care bits' are represented by binary 0's. "
+         ::= { hm2AgentAclRuleEntry 10 }
+
+    hm2AgentAclRuleDestL4Port OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The destination port number(Layer 4) used in ACl classification."
+         ::= { hm2AgentAclRuleEntry 11 }
+
+    hm2AgentAclRuleDestL4PortRangeStart OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The destination port number(Layer 4) starting range used in ACL classification."
+         ::= { hm2AgentAclRuleEntry 12 }
+
+    hm2AgentAclRuleDestL4PortRangeEnd OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The destination port number(Layer 4) ending range used in ACL classification."
+         ::= { hm2AgentAclRuleEntry 13 }
+
+    hm2AgentAclRuleIPDSCP OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Differentiated Services Code Point value.
+                     A value of -1 indicates that this field is not used."
+         ::= { hm2AgentAclRuleEntry 14 }
+
+    hm2AgentAclRuleIpPrecedence OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The type of service (TOS) IP precedence value.
+                     A value of -1 indicates that this field is not used."
+         ::= { hm2AgentAclRuleEntry 15 }
+
+    hm2AgentAclRuleIpTosBits OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The type of service (TOS) bits value."
+         ::= { hm2AgentAclRuleEntry 16 }
+
+    hm2AgentAclRuleIpTosMask OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The type of service (TOS) mask value."
+         ::= { hm2AgentAclRuleEntry 17 }
+
+    hm2AgentAclRuleStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.
+                     
+                     active(1)      - this ACL rule is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance"
+         ::= { hm2AgentAclRuleEntry 18 }
+
+    hm2AgentAclRuleAssignQueueId OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7 | 4294967295)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Queue identifier to which all inbound packets matching this 
+                      ACL rule are directed.  This object defaults to the standard
+                      queue assignment for user priority 0 traffic per the IEEE 802.1D
+                      specification based on the number of assignable queues in the 
+                      system:
+                         1-3 queues:  0
+                         4-7 queues:  1
+                           8 queues:  2
+                      This default assignment is static and is not influenced by
+                      other system configuration changes.
+                      A value of 4294967295 indicates that this field is not used"
+         ::= { hm2AgentAclRuleEntry 19 }
+         
+    hm2AgentAclRuleRedirectIntf OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "A non-zero value indicates the external ifIndex to which all 
+                      inbound packets matching this ACL rule are directed.  A 
+                      value of zero means packet redirection is not in effect, which
+                      is the default value of this object.  Note that packet
+		      redirection and mirroring (hm2AgentAclRuleMirrorIntf object)
+		      are mutually exclusive rule attributes."
+         DEFVAL { 0 }
+         ::= { hm2AgentAclRuleEntry 20 }
+         
+    hm2AgentAclRuleMatchEvery OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate that the ACL rule is defined to match on every IP packet, 
+                      regardless of content."
+                      DEFVAL { false }             
+         ::= { hm2AgentAclRuleEntry 21 }
+         
+    hm2AgentAclRuleMirrorIntf OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "A non-zero value indicates the external ifIndex to which all 
+                      inbound packets matching this ACL rule are copied.  A 
+                      value of zero means packet mirroring is not in effect, which
+                      is the default value of this object.  Note that packet
+		      mirroring and redirection (hm2AgentAclRuleRedirectIntf object)
+		      are mutually exclusive rule attributes."
+         DEFVAL { 0 }
+         ::= { hm2AgentAclRuleEntry 22 }
+         
+    hm2AgentAclRuleLogging OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate that the ACL rule is being logged. 
+                      A hardware count of the number of packets that match this rule
+                      is reported via the hm2AgentAclTrapRuleLogEvent notification.
+
+                      This object may be supported for a hm2AgentAclRuleAction 
+		      setting of permit(1) and/or deny(2), depending on the
+		      ACL feature capabilities of the device."
+         ::= { hm2AgentAclRuleEntry 23 }     
+
+    hm2AgentAclRuleTimeRangeName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..31))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Name of the time range, that the ACL rule 
+                      has referenced. It has to start with a character and shall consist of
+                      0 to 31 alphanumeric characters."
+         ::= { hm2AgentAclRuleEntry 24 }
+
+    hm2AgentAclRuleTimeRangeStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     inactive(1),
+                     active(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Flag that indicates the ACL rule status.
+                      If the status is active, it implies that the ACL rule is in effect.
+                      If the status is inactive, it implies that the ACL rule is not in effect."
+         ::= { hm2AgentAclRuleEntry 25 }
+         
+    hm2AgentAclRuleRedirectExtAgentId OBJECT-TYPE
+         SYNTAX      Unsigned32 (0|1..100)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "A non-zero value indicates the external control plane application 
+                      agentId to which all inbound packets matching this ACL rule 
+                      are directed.  A value of zero means redirection is not in 
+                      effect, which is the default value of this object. Note that 
+                      this action is mutually exclusive with redirect to 
+                      interface(aclRuleRedirectIntf object) and mirroring 
+                      (aclRuleMirrorIntf object) rule attributes."
+         DEFVAL { 0 }
+         ::= { hm2AgentAclRuleEntry 28 }
+         
+    hm2AgentAclRuleIcmpType OBJECT-TYPE
+        SYNTAX      Integer32 (-1|0..255)
+        MAX-ACCESS  read-create 
+        STATUS      current
+        DESCRIPTION
+                   "ACL rule matches on the specified ICMP type. All values 
+                   from 0 to 255 are valid. A value of -1 indicates that this field is not used."
+        ::= { hm2AgentAclRuleEntry 29 }
+
+    hm2AgentAclRuleIcmpCode OBJECT-TYPE
+        SYNTAX      Integer32 (-1|0..255)
+        MAX-ACCESS  read-create 
+        STATUS      current
+        DESCRIPTION
+                    "ACL rule matches on the specified ICMP code. All values
+                    from 0 to 255 are valid. A value of -1 indicates that this field is not used."
+         ::= { hm2AgentAclRuleEntry 30}
+
+    hm2AgentAclRuleIgmpType OBJECT-TYPE
+         SYNTAX      Integer32 (0|1..255)
+         MAX-ACCESS  read-create 
+         STATUS      current
+         DESCRIPTION
+                     "ACL rule matches on the specified IGMP type. All values
+                      from 1 to 255 are valid."
+         ::= { hm2AgentAclRuleEntry 31 }
+
+    hm2AgentAclRuleEstablished OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate the ACL rule to match on TCP packets that 
+                     has either RST or ACK bits set in the TCP header" 
+         ::= { hm2AgentAclRuleEntry 32}
+
+    hm2AgentAclRuleFragments OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate the ACL rule to match if the packet is fragmented"
+         ::= { hm2AgentAclRuleEntry 33}
+                
+	hm2AgentAclRuleIndexNextFree OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                     "This object contains an unused value for the hm2AgentAclRuleIndex
+                      to be used when creating a new named IPv4 ACL. A value of
+                      zero indicates the ACL rule table is full."
+         ::= { hm2AgentAclRuleEntry 248 }
+              
+	hm2AgentAclRuleRateLimitCrateUnit OBJECT-TYPE
+	    SYNTAX       INTEGER {
+	                 pps(1),
+	                 kbps(2)
+	                 }
+		MAX-ACCESS   read-create
+	    STATUS       current
+	    DESCRIPTION
+	                "The unit of the aclRuleRateLimitCrate.
+	                 Can be either packets per second (pps)
+	                 or kilobits per second (kbps)."
+	    DEFVAL      { kbps }
+	    ::= {hm2AgentAclRuleEntry 249 }
+	
+	hm2AgentAclRuleRateLimitCrate OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..10000000)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Committed rate attribute statement value, specified in kbps.
+                     Value 0 disables this match criteria."
+         DEFVAL { 0 }
+         ::= { hm2AgentAclRuleEntry 250 }         
+         
+    hm2AgentAclRuleRateLimitCburst OBJECT-TYPE
+         SYNTAX      AclBurstSize
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Committed burst size attribute statement value, specified in kbytes.
+                     Value 0 disables this match criteria."
+         DEFVAL { 0 }
+         ::= { hm2AgentAclRuleEntry 251 }
+
+    hm2AgentAclRuleStatsAction OBJECT-TYPE
+		SYNTAX       INTEGER {
+					 other(1),
+					 flushRuleHitCount(2)
+					 }
+		MAX-ACCESS   read-create
+		STATUS       current
+		DESCRIPTION
+					"Setting the object to 'flushRuleHitCount(2)' will reset hit counter statistics.
+					 Reading the object always returns 'other'."
+		::= {hm2AgentAclRuleEntry 252 }
+     	    
+    hm2AgentAclRuleHitCount OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of packets that matched the ACL rule."
+         ::= { hm2AgentAclRuleEntry 253 }
+
+    hm2AgentAclRuleHitCountDiscontinuityTime OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The value of sysUpTime on the most recent occasion at which
+                any one or more of this rule's counters suffered a discontinuity.
+                If no such discontinuities have occurred since the last re-
+                initialization of the local management subsystem, then this
+                object contains a zero value."
+        ::= { hm2AgentAclRuleEntry 254 }
+        
+     hm2AgentAclRuleTcpFlagBits OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The TCP flag value."
+         ::= { hm2AgentAclRuleEntry 255 }
+
+    hm2AgentAclRuleTcpFlagMask OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The TCP flag mask value."
+         ::= { hm2AgentAclRuleEntry 256 }
+         
+    hm2AgentAclRuleSrcL4PortOperator OBJECT-TYPE
+         SYNTAX      Hm2PortOperator	
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The operator for the source port."
+         DEFVAL { eq }   
+         ::= { hm2AgentAclRuleEntry 257 }     
+     
+    hm2AgentAclRuleDstL4PortOperator OBJECT-TYPE
+         SYNTAX      Hm2PortOperator
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The operator for the destination port."
+         DEFVAL { eq }   
+         ::= { hm2AgentAclRuleEntry 258 }
+--**************************************************************************************
+    -- Layer 2 MAC Access Lists
+    --
+    --**************************************************************************************
+    
+    hm2AgentAclMacIndexNextFree OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                     "This object contains an unused value for the hm2AgentAclMacIndex
+                      to be used when creating a new MAC ACL.  A value of zero
+                      indicates the ACL table is full.
+                      For MSP devices the MAC ACL indexes start with 10000."
+    ::= { hm2PlatformQosAcl 5 }
+
+    --**************************************************************************************
+
+    hm2AgentAclMacTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentAclMacEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of MAC ACL instances."
+         ::= { hm2PlatformQosAcl 6 }
+
+    hm2AgentAclMacEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentAclMacEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "An ACL MAC instance table entry."
+         INDEX       { hm2AgentAclMacIndex }
+         ::= { hm2AgentAclMacTable 1 }
+         
+    Hm2AgentAclMacEntry ::= SEQUENCE {         
+           hm2AgentAclMacIndex
+               Integer32,
+           hm2AgentAclMacName
+               DisplayString,
+           hm2AgentAclMacStatus
+               RowStatus,
+		   hm2AgentAclMacStatsAction
+               INTEGER               
+           }
+    
+    hm2AgentAclMacIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The MAC ACL table index this instance is associated with.
+                      When creating a new MAC ACL, refer to the hm2AgentAclMacIndexNextFree
+                      object to determine the next available hm2AgentAclMacIndex to use.
+                      For MSP devices the MAC ACL indexes start with 10000."
+         ::= { hm2AgentAclMacEntry 1 }
+         
+    hm2AgentAclMacName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The name of this MAC ACL entry, which must consist of
+                      1 to 31 alphanumeric characters and uniquely identify
+                      this MAC ACL.  An existing MAC ACL can be renamed by
+                      setting this object to a new name.
+
+                      This object must be set to complete a new MAC ACL 
+                      row instance."
+         ::= { hm2AgentAclMacEntry 2 }
+    
+    hm2AgentAclMacStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.  ACL MAC entries can not be deleted until all rows in 
+                     the hm2AgentAclIfTable and hm2AgentAclRuleTable with corresponding values of hm2AgentAclMacIndex 
+                     have been deleted.
+                     
+                     active(1)      - this ACL instance is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance
+
+                     The hm2AgentAclMacName object must be set to complete this row instance."
+         ::= { hm2AgentAclMacEntry 3 }
+
+    hm2AgentAclMacStatsAction OBJECT-TYPE
+         SYNTAX      INTEGER
+         	 	 	 {
+    					other(1),
+    					flushAclHitCount(2)
+         	 	 	 }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+					"Setting the object to 'flushAclHitCount(2)' will reset hit counter statistics for the rules in this ACL.
+					 Reading the object always returns 'other'."
+         ::= { hm2AgentAclMacEntry 248 }
+
+    --**************************************************************************************
+    
+    hm2AgentAclMacRuleTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentAclMacRuleEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of layer 2 MAC ACL rule instances."
+         ::= { hm2PlatformQosAcl 7 }
+
+    hm2AgentAclMacRuleEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentAclMacRuleEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of layer 2 MAC ACL classification rules."
+         INDEX       { hm2AgentAclMacIndex, hm2AgentAclMacRuleIndex }
+         ::= { hm2AgentAclMacRuleTable 1 }
+         
+    Hm2AgentAclMacRuleEntry ::= SEQUENCE {         
+           hm2AgentAclMacRuleIndex
+               Integer32,
+           hm2AgentAclMacRuleAction
+               INTEGER,
+           hm2AgentAclMacRuleCos
+               Unsigned32,
+           hm2AgentAclMacRuleCos2
+               Unsigned32,
+           hm2AgentAclMacRuleDestMacAddr
+               MacAddress,
+           hm2AgentAclMacRuleDestMacMask
+               MacAddress,
+           hm2AgentAclMacRuleEtypeKey
+               INTEGER,
+           hm2AgentAclMacRuleEtypeValue
+               EtypeValue,
+           hm2AgentAclMacRuleSrcMacAddr
+               MacAddress,
+           hm2AgentAclMacRuleSrcMacMask
+               MacAddress,
+           hm2AgentAclMacRuleVlanId
+               Unsigned32,
+           hm2AgentAclMacRuleVlanIdRangeStart
+               Unsigned32,
+           hm2AgentAclMacRuleVlanIdRangeEnd
+               Unsigned32,
+           hm2AgentAclMacRuleVlanId2
+               Unsigned32,
+           hm2AgentAclMacRuleVlanId2RangeStart
+               Unsigned32,
+           hm2AgentAclMacRuleVlanId2RangeEnd
+               Unsigned32,
+           hm2AgentAclMacRuleStatus
+               RowStatus,
+           hm2AgentAclMacRuleAssignQueueId
+               Unsigned32,
+           hm2AgentAclMacRuleRedirectIntf
+               InterfaceIndexOrZero,
+           hm2AgentAclMacRuleMatchEvery
+               TruthValue,
+           hm2AgentAclMacRuleMirrorIntf
+               InterfaceIndexOrZero,
+           hm2AgentAclMacRuleLogging
+               TruthValue,
+           hm2AgentAclMacRuleTimeRangeName
+               DisplayString,
+           hm2AgentAclMacRuleTimeRangeStatus
+               INTEGER,
+           hm2AgentAclMacRuleIndexNextFree
+               Integer32,
+           hm2AgentAclMacRuleRateLimitCrateUnit
+		   	   INTEGER,
+           hm2AgentAclMacRuleRateLimitCrate
+               Unsigned32,
+           hm2AgentAclMacRuleRateLimitCburst
+               AclBurstSize,
+		   hm2AgentAclMacRuleStatsAction               
+		   	   INTEGER,
+           hm2AgentAclMacRuleHitCount
+               Counter64,
+           hm2AgentAclMacRuleHitCountDiscontinuityTime
+               TimeStamp
+           }
+    
+    hm2AgentAclMacRuleIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The index of this rule instance within an MAC ACL."
+         ::= { hm2AgentAclMacRuleEntry 1 }
+         
+    hm2AgentAclMacRuleAction OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      permit(1),
+                      deny(2)
+                      }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The type of action this MAC ACL rule should perform."
+         DEFVAL { deny }
+         ::= { hm2AgentAclMacRuleEntry 2 }
+
+     hm2AgentAclMacRuleCos OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The class of service (COS) used in the MAC ACL classification.
+
+                      This is the three-bit user priority field in the 802.1Q tag 
+                      header of a tagged Ethernet frame. For frames containing a 
+                      double VLAN tag, this field is located in the first/outer tag.
+                      A value of 4294967295 indicates that this field is not used."
+         ::= { hm2AgentAclMacRuleEntry 3 }
+                  
+     hm2AgentAclMacRuleCos2 OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7 | 4294967295)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The secondary class of service (COS2) used in the MAC ACL classification.
+
+                      This is the three-bit user priority field in the second/inner 802.1Q 
+                      tag header of a double VLAN tagged Ethernet frame.
+                      A value of 4294967295 indicates that this field is not used."
+         ::= { hm2AgentAclMacRuleEntry 4 }
+                  
+    hm2AgentAclMacRuleDestMacAddr OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The destination MAC address used in the MAC ACL classification."
+         ::= { hm2AgentAclMacRuleEntry 5 }
+         
+    hm2AgentAclMacRuleDestMacMask OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The destination MAC address mask used in the MAC ACL classification. 
+
+                      This mask value identifies the portion of the hm2AgentAclMacRuleDestMacAddr
+                      that is compared against a packet.
+                      The 'don't care bits' are represented by binary 0's and 
+                      'do care bits' are represented by binary 1's. 
+                      A non-contiguous mask value is 
+                      permitted."
+         ::= { hm2AgentAclMacRuleEntry 6 }
+         
+    hm2AgentAclMacRuleEtypeKey OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      custom(1),
+                      appletalk(2),
+                      arp(3),
+                      ibmsna(4),
+                      ipv4(5),
+                      ipv6(6),
+                      ipxold(7),
+                      mplsmcast(8),
+                      mplsucast(9),
+                      netbios(10),
+                      novell(11),
+                      pppoedisc(12),
+                      rarp(13),
+                      pppoesess(14),
+                      ipxnew(15),
+                      profinet(16),
+                      powerlink(17),
+                      ethercat(18),
+                      pppoe(248)
+                     }
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The Ethertype keyword used in the MAC ACL classification.
+
+                      A keyword of custom(1) requires that the hm2AgentAclMacRuleEtypeValue
+                      object also be set."
+         ::= { hm2AgentAclMacRuleEntry 7 }
+         
+    hm2AgentAclMacRuleEtypeValue OBJECT-TYPE
+         SYNTAX      EtypeValue
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The Ethertype custom value used in the MAC ACL classification.
+                     
+                      This object is only valid if the hm2AgentAclMacRuleEtypeKey is set to 
+                      custom(1).  Values ranging from 0x0600 to 0xFFFF
+                      (1536 to 65535) are interpreted as the Ethertype. 
+                      Lower values are interpreted as frame size.
+                      A value of 0 indicates that this field is not used."
+         ::= { hm2AgentAclMacRuleEntry 8 }
+         
+    hm2AgentAclMacRuleSrcMacAddr OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The source MAC address used in the MAC ACL classification."
+         ::= { hm2AgentAclMacRuleEntry 9 }
+         
+    hm2AgentAclMacRuleSrcMacMask OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The source MAC address mask used in the MAC ACL classification. 
+
+                      This mask value identifies the portion of the hm2AgentAclMacRuleSrcMacAddr
+                      that is compared against a packet.
+                      The 'don't care bits' are represented by binary 0's and 
+                      'do care bits' are represented by binary 1's.
+                      A non-contiguous mask value is 
+                      permitted."
+         ::= { hm2AgentAclMacRuleEntry 10 }
+
+    hm2AgentAclMacRuleVlanId OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4042)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The VLAN ID value used in the MAC ACL classification.
+
+                      The VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the 802.1Q tag header of a tagged Ethernet frame which is 
+                      contained in the first/outer tag of a double VLAN tagged frame."
+         ::= { hm2AgentAclMacRuleEntry 11 }
+         
+    hm2AgentAclMacRuleVlanIdRangeStart OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4042)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The VLAN ID range start value used in the MAC ACL classification.
+		      Setting this value greater than the current hm2AgentAclMacRuleVlanIdRangeEnd
+		      changes the VLAN ID range end to the same value as the range start.
+
+                      The VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the 802.1Q tag header of a tagged Ethernet frame which is 
+                      contained in the first/outer tag of a double VLAN tagged frame."
+         ::= { hm2AgentAclMacRuleEntry 12 }
+         
+    hm2AgentAclMacRuleVlanIdRangeEnd OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4042)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The VLAN ID range end value used in the MAC ACL classification.
+		      Setting this value less than the current hm2AgentAclMacRuleVlanIdRangeStart
+		      changes the VLAN ID range start to the same value as the range end.
+
+                      The VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the 802.1Q tag header of a tagged Ethernet frame which is 
+                      contained in the first/outer tag of a double VLAN tagged frame."
+         ::= { hm2AgentAclMacRuleEntry 13 }
+         
+    hm2AgentAclMacRuleVlanId2 OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4042)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The secondary VLAN ID value used in the MAC ACL classification.
+
+                      The secondary VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the second/inner 802.1Q tag header of a double VLAN tagged Ethernet 
+                      frame."
+         ::= { hm2AgentAclMacRuleEntry 14 }
+         
+    hm2AgentAclMacRuleVlanId2RangeStart OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4042)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The secondary VLAN ID range start value used in the MAC ACL classification.
+		      Setting this value greater than the current hm2AgentAclMacRuleVlanId2RangeEnd
+		      changes the Secondary VLAN ID range end to the same value as the range start.
+
+                      The secondary VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the second/inner 802.1Q tag header of a double VLAN tagged Ethernet 
+                      frame."
+         ::= { hm2AgentAclMacRuleEntry 15 }
+         
+    hm2AgentAclMacRuleVlanId2RangeEnd OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4042)
+         MAX-ACCESS  read-create
+         STATUS      current 
+         DESCRIPTION
+                     "The secondary VLAN ID range end value used in the MAC ACL classification.
+		      Setting this value less than the current hm2AgentAclMacRuleVlanId2RangeStart
+		      changes the Secondary VLAN ID range start to the same value as the range end.
+
+                      The secondary VLAN ID field is defined as the 12-bit VLAN identifier
+                      in the second/inner 802.1Q tag header of a double VLAN tagged Ethernet 
+                      frame."
+         ::= { hm2AgentAclMacRuleEntry 16 }
+         
+    hm2AgentAclMacRuleStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.
+                     
+                     active(1)      - this ACL Rule is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance"
+         ::= { hm2AgentAclMacRuleEntry 17 }
+
+    hm2AgentAclMacRuleAssignQueueId OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7 | 4294967295)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Queue identifier to which all inbound packets matching this 
+                      MAC ACL rule are directed.  This object defaults to the standard
+                      queue assignment for user priority 0 traffic per the IEEE 802.1D
+                      specification based on the number of assignable queues in the 
+                      system:
+                         1-3 queues:  0
+                         4-7 queues:  1
+                           8 queues:  2
+                      This default assignment is static and is not influenced by
+                      other system configuration changes.
+                      A value of 4294967295 indicates that this field is not used"
+         ::= { hm2AgentAclMacRuleEntry 18 }
+         
+    hm2AgentAclMacRuleRedirectIntf OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "A non-zero value indicates the external ifIndex to which all 
+                      inbound packets matching this MAC ACL rule are directed.  A
+                      value of zero means packet redirection is not in effect, which
+                      is the default value of this object.  Note that packet
+		      redirection and mirroring (hm2AgentAclMacRuleMirrorIntf object)
+		      are mutually exclusive rule attributes."
+         DEFVAL { 0 }
+         ::= { hm2AgentAclMacRuleEntry 19 }
+         
+    hm2AgentAclMacRuleMatchEvery OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate that the MAC ACL rule is defined to match all packets, 
+                      regardless of Ethertype."
+         ::= { hm2AgentAclMacRuleEntry 20 }
+         
+    hm2AgentAclMacRuleMirrorIntf OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "A non-zero value indicates the external ifIndex to which all 
+                      inbound packets matching this MAC ACL rule are copied.  A
+                      value of zero means packet mirroring is not in effect, which
+                      is the default value of this object.  Note that packet
+                      mirroring and redirection (hm2AgentAclMacRuleRedirectIntf object)
+                      are mutually exclusive rule attributes."
+         DEFVAL { 0 }
+         ::= { hm2AgentAclMacRuleEntry 21 }
+         
+    hm2AgentAclMacRuleLogging OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate that the ACL rule is being logged. 
+                      A hardware count of the number of packets that match this rule
+                      is reported via the hm2AgentAclTrapRuleLogEvent notification.
+
+                      This object may be supported for an hm2AgentAclMacRuleAction 
+		      setting of permit(1) and/or deny(2), depending on the
+		      ACL feature capabilities of the device."
+         ::= { hm2AgentAclMacRuleEntry 22 }
+
+   hm2AgentAclMacRuleTimeRangeName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..31))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Name of the time range, that the ACL rule
+                      has referenced. It has to start with a character and shall consist of
+                      0 to 31 alphanumeric characters."
+         ::= { hm2AgentAclMacRuleEntry 23 }
+
+    hm2AgentAclMacRuleTimeRangeStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     inactive(1),
+                     active(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Flag that indicates the ACL rule status.
+                      If the status is active, it implies that the ACL rule is in effect.
+                      If the status is inactive, it implies that the ACL rule is not in effect."
+         ::= { hm2AgentAclMacRuleEntry 24 }
+         
+    hm2AgentAclMacRuleIndexNextFree OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                     "This object contains an unused value for the hm2AgentAclMacRuleIndex
+                      to be used when creating a new MAC ACL. A value of
+                      zero indicates the ACL rule table is full."
+         ::= { hm2AgentAclMacRuleEntry 248 }   
+     
+     hm2AgentAclMacRuleRateLimitCrateUnit OBJECT-TYPE
+	    SYNTAX       INTEGER {
+	                 pps(1),
+	                 kbps(2)
+	                 }
+		MAX-ACCESS   read-create
+	    STATUS       current
+	    DESCRIPTION
+	                "The unit of the aclMacRuleRateLimitCrate.
+	                 Can be either packets per second (pps)
+	                 or kilobits per second (kbps)."
+	    DEFVAL      { kbps }
+	    ::= { hm2AgentAclMacRuleEntry 249 }
+	    
+	hm2AgentAclMacRuleRateLimitCrate OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..10000000)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Committed rate attribute statement value, specified in kbps.
+                     Value 0 disables this match criteria."
+		 DEFVAL { 0 }
+         ::= { hm2AgentAclMacRuleEntry 250 }
+            
+	hm2AgentAclMacRuleRateLimitCburst OBJECT-TYPE
+         SYNTAX      AclBurstSize
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Committed burst size attribute statement value, specified in kbytes.
+                     Value 0 disables this match criteria."
+		 DEFVAL { 0 }         
+         ::= { hm2AgentAclMacRuleEntry 251 }
+
+    hm2AgentAclMacRuleStatsAction OBJECT-TYPE
+		SYNTAX       INTEGER {
+					 other(1),
+					 flushRuleHitCount(2)
+					 }
+		MAX-ACCESS   read-create
+		STATUS       current
+		DESCRIPTION
+					"Setting the object to 'flushRuleHitCount(2)' will reset hit counter statistics.
+					 Reading the object always returns 'other'."
+		::= {hm2AgentAclMacRuleEntry 252 }
+
+    hm2AgentAclMacRuleHitCount OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of packets that matched the ACL rule."
+         ::= { hm2AgentAclMacRuleEntry 253 }
+
+    hm2AgentAclMacRuleHitCountDiscontinuityTime OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The value of sysUpTime on the most recent occasion at which
+                any one or more of this rule's counters suffered a discontinuity.
+                If no such discontinuities have occurred since the last re-
+                initialization of the local management subsystem, then this
+                object contains a zero value."
+        ::= { hm2AgentAclMacRuleEntry 254 }
+
+    --**************************************************************************************
+    -- Global controls
+    --
+    --**************************************************************************************
+    
+    --**************************************************************************************
+    --    hm2AgentAclLoggingGroup
+    --**************************************************************************************
+
+    hm2AgentAclLoggingGroup        OBJECT IDENTIFIER ::= { hm2PlatformQosAcl 9 }
+                                    
+    hm2AgentAclTrapRuleIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "The index of an ACL rule instance.
+		      Used by hm2AgentAclTrapRuleLogEvent trap."
+         ::= { hm2AgentAclLoggingGroup 2 }
+         
+    hm2AgentAclTrapRuleAction OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      permit(1),
+                      deny(2)
+                      }
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "The type of action this rule should perform, either 
+		      permit(1) or deny(2).
+		      Used by hm2AgentAclTrapRuleLogEvent trap."
+         ::= { hm2AgentAclLoggingGroup 3 }
+         
+    hm2AgentAclTrapRuleHitCount OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "Number of packets that matched the ACL rule during the most
+                      recent logging interval.  Used by hm2AgentAclTrapRuleLogEvent trap."
+         ::= { hm2AgentAclLoggingGroup 4 }
+         
+    hm2AgentAclTrapFlag OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "ACL Trap Flag - Enables or disables ACL trap generation.
+                     When this value is set to enable(1), ACL traps are 
+                     sent from the switch when they occur."
+         DEFVAL  { enable }  
+         ::= { hm2AgentAclLoggingGroup 5 }
+
+      hm2AgentAclTrapRuleTimeRangeName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "Name of the time range on which there is a notification received.
+                      Used by hm2AgentAclTrapRuleTimeRangeEvent trap."
+       ::= { hm2AgentAclLoggingGroup 6 }
+
+     hm2AgentAclTrapRuleTimeRangeNotification OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     activate(1),
+                     deactivate(2),
+                     delete(3)
+                     }
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "Flag to indicate the type of time range notification received.
+                      Used by hm2AgentAclTrapRuleTimeRangeEvent trap."
+      ::= { hm2AgentAclLoggingGroup 7 }
+
+     hm2AgentAclTrapRuleInstallationStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     failure(1),
+                     success(2)
+                     }
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "Value specifies the status of the ACL Rule installed in hardware as activated/deactivated.
+                      Used by hm2AgentAclTrapRuleTimeRangeEvent trap."
+      ::= { hm2AgentAclLoggingGroup 8 }
+
+      hm2AgentAclTrapRuleHitCountHigh OBJECT-TYPE
+         SYNTAX      Gauge32
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+              "Upper 32bit of number of packets that matched the ACL rule during the most
+              recent logging interval.  Used by hm2AgentAclTrapRuleLogEventV1 trap."
+         ::= { hm2AgentAclLoggingGroup 248 }
+ 
+      hm2AgentAclTrapRuleHitCountLow OBJECT-TYPE
+         SYNTAX      Gauge32
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+              "Lower 32bit of number of packets that matched the ACL rule during the most
+              recent logging interval.  Used by hm2AgentAclTrapRuleLogEventV1 trap."
+         ::= { hm2AgentAclLoggingGroup 249 }
+
+    --**************************************************************************************
+    -- ACL Trap Definitions
+    --**************************************************************************************
+
+    hm2AgentAclNotifications   OBJECT IDENTIFIER ::= { hm2PlatformQosAcl 0 }
+
+    hm2AgentAclTrapRuleLogEvent NOTIFICATION-TYPE
+        OBJECTS {
+                 hm2AgentAclIfAclType,
+		 hm2AgentAclIfAclId,
+		 hm2AgentAclTrapRuleIndex,
+		 hm2AgentAclTrapRuleAction,
+                 hm2AgentAclTrapRuleHitCount
+                }
+        STATUS  current
+        DESCRIPTION
+            "This trap is generated on a periodic basis to indicate that an 
+             ACL rule configured for logging was actively used by hardware to 
+             take action on one or more packets.  The hm2AgentAclTrapRuleHitCount denotes 
+             the number of packets that matched this rule during the most recent logging
+             interval. ACL trap generation requires that the hm2AgentAclTrapFlag object
+             is set to enable(1)."
+         ::= { hm2AgentAclNotifications 1 }
+
+    hm2AgentAclTrapRuleTimeRangeEvent NOTIFICATION-TYPE
+        OBJECTS {
+                 hm2AgentAclIfAclType,
+                 hm2AgentAclIfAclId,
+                 hm2AgentAclTrapRuleIndex,
+                 hm2AgentAclTrapRuleTimeRangeName,
+                 hm2AgentAclTrapRuleTimeRangeNotification,
+                 hm2AgentAclTrapRuleInstallationStatus
+                }
+         STATUS  current
+        DESCRIPTION
+            "This trap is generated when there is a time range notification
+             received on any Time based ACL rule.
+             The hm2AgentAclTrapRuleTimeRangeName denotes the time range name associated with the ACL rule, 
+             hm2AgentAclTrapRuleTimeRangeNotification indicates the type of notification received and 
+             hm2AgentAclTrapRuleInstallationStatus indicates the installation status of ACL rule in the hardware.
+             When activate notification is received, ACL rule is activated in the hardware.
+             When deactivate notifcation is received, ACL rule is deactivated in the hardware. 
+             When delete notification is received, ACL rule is activated in the hardware, if it is 
+             not already activated. ACL trap generation requires the hm2AgentAclTrapFlag object to be set to enable(1)."
+         ::= { hm2AgentAclNotifications 2 }
+ 
+     hm2AgentAclTrapRuleLogEventV1 NOTIFICATION-TYPE
+        OBJECTS {
+                 hm2AgentAclIfAclType,
+                 hm2AgentAclIfAclId,
+                 hm2AgentAclTrapRuleIndex,
+                 hm2AgentAclTrapRuleAction,
+                 hm2AgentAclTrapRuleHitCountHigh,
+                 hm2AgentAclTrapRuleHitCountLow
+                }
+        STATUS  current
+        DESCRIPTION
+            "This trap is generated on a periodic basis to indicate that an
+             ACL rule configured for logging was actively used by hardware to
+             take action on one or more packets.  The hm2AgentAclTrapRuleHitCount denotes
+             the number of packets that matched this rule during the most recent logging
+             interval. ACL trap generation requires that the hm2AgentAclTrapFlag object
+             is set to enable(1).
+             This version of the trap is only sent when device uses SNMPv1 style traps.
+             Devices using SNMPv2 and above send hm2AgentAclTrapRuleLogeEvent instead.
+            "
+         ::= { hm2AgentAclNotifications 248 }
+
+    --**************************************************************************************
+             
+--**************************************************************************************
+    
+    hm2AgentAclVlanTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentAclVlanEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "A table of ACL VLAN instances per direction."
+         ::= { hm2PlatformQosAcl 13 }
+
+    hm2AgentAclVlanEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentAclVlanEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "An ACL VLAN table entry."
+         INDEX       { hm2AgentAclVlanIndex, hm2AgentAclVlanDirection, hm2AgentAclVlanSequence, hm2AgentAclVlanAclType, hm2AgentAclVlanAclId  }
+         ::= { hm2AgentAclVlanTable 1 }
+         
+    Hm2AgentAclVlanEntry ::= SEQUENCE {         
+           hm2AgentAclVlanIndex
+               Integer32,
+           hm2AgentAclVlanDirection
+               INTEGER,
+           hm2AgentAclVlanSequence
+               Unsigned32,
+           hm2AgentAclVlanAclType
+               INTEGER,
+           hm2AgentAclVlanAclId
+               Integer32,
+           hm2AgentAclVlanStatus
+               RowStatus
+           }
+    
+    hm2AgentAclVlanIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The VLAN to which this ACL instance applies."
+         ::= { hm2AgentAclVlanEntry 1 }
+         
+    hm2AgentAclVlanDirection OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      inbound(1),
+                      outbound(2)
+                     }
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The VLAN direction to which this ACL instance applies."
+         ::= { hm2AgentAclVlanEntry 2 }
+         
+    hm2AgentAclVlanSequence OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..4294967295)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The relative evaluation sequence of this ACL for this
+                      VLAN and direction. When multiple ACLs are allowed 
+                      for a given VLAN and direction, the sequence number 
+                      determines the order in which the list of ACLs are evaluated,
+                      with lower sequence numbers given higher precedence.  The
+                      sequence number value is arbitrary, but must be an unique
+                      non-zero value for a given VLAN and direction.
+                       
+                      Setting this object to an existing sequence number 
+                      value for a given VLAN and direction causes the 
+                      ACL corresponding to that value to be replaced with
+                      this ACL."
+         ::= { hm2AgentAclVlanEntry 3 }
+         
+    hm2AgentAclVlanAclType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      ip(1),
+                      mac(2),
+                      ipv6(3)
+                     }
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The type of this ACL, which is used to interpret the 
+                      hm2AgentAclVlanId object value. Each type of ACL uses its own
+                      numbering scheme for identification (see hm2AgentAclVlanAclId object
+                      for details).
+
+                      The hm2AgentAclVlanAclId object must be specified along with this 
+                      object."
+         ::= { hm2AgentAclVlanEntry 4 }
+         
+    hm2AgentAclVlanAclId OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The ACL identifier value, which is interpreted based on
+                      the hm2AgentAclVlanType object.
+
+                      For the IP ACLs, the actual ACL number is its identifier
+                      as follows:  IP standard ranges from 1-99, while 
+                      IP extended ranges from 100-199. Here, hm2AgentAclVlanAclId represents 
+                      hm2AgentAclIndex. 
+
+                      The MAC ACLs use an internally generated index value 
+                      that is assigned when the ACL is created. Here, hm2AgentAclVlanAclId 
+                      represents hm2AgentAclMacIndex.
+
+                      The IPv6 ACLs use an internally generated index value
+                      that is assigned when the ACL is created. Here, hm2AgentAclVlanAclId 
+                      represents hm2AgentAclIpv6Index.
+
+                      The hm2AgentAclVlanType object must be specified along with
+                      this object."
+         ::= { hm2AgentAclVlanEntry 5 }
+         
+    hm2AgentAclVlanStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.
+                     
+                     active(1)      - this ACL VLAN instance is active
+                     createAndGo(4) - set to this value to assign an ACL to a VLAN and direction
+                     destroy(6)     - set to this value to remove an ACL from a VLAN and direction"
+         ::= { hm2AgentAclVlanEntry 6 }
+--**************************************************************************************
+    hm2AgentOperatorRuleAssignOutboundInvalid OBJECT-IDENTITY
+         STATUS        current
+         DESCRIPTION   "IP ACL rule with 'greater than', 'lower than', 'not equal' operators cannot be assigned to an interface in outbound direction."
+    ::= { hm2PlatformQosAcl 248 }
+
+END

@@ -1,0 +1,386 @@
+
+HM2-DNS-MIB DEFINITIONS ::= BEGIN
+
+--
+-- ************************************************************* 
+-- Hirschmann DNS Management MIB
+-- *************************************************************
+-- 
+
+IMPORTS
+   MODULE-IDENTITY,
+   OBJECT-IDENTITY, 
+   Integer32,
+   OBJECT-TYPE                          FROM SNMPv2-SMI -- RFC 2578
+   RowStatus                            FROM SNMPv2-TC
+   SnmpAdminString						FROM SNMP-FRAMEWORK-MIB
+   hm2ConfigurationMibs,
+   HmActionValue,
+   HmEnabledStatus                      FROM HM2-TC-MIB
+   InetAddressType, InetAddress         FROM INET-ADDRESS-MIB; -- RFC4001  
+
+
+hm2DnsMib MODULE-IDENTITY
+    LAST-UPDATED "201106170000Z" -- June 17, 2011
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann DNS MIB for DNS client, DNS client cache and DNS caching server.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION     "201106170000Z" -- June 17, 2011
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 90 }
+
+
+--
+-- *************************************************************
+-- hm2DnsMib
+-- *************************************************************
+--
+hm2DnsMibNotifications      OBJECT IDENTIFIER ::= { hm2DnsMib 0 }
+hm2DnsMibObjects            OBJECT IDENTIFIER ::= { hm2DnsMib 1 }
+-- hm2DnsMibConformance		OBJECT IDENTIFIER ::= { hm2DnsMib 2 }
+hm2DnsMibSNMPExtensionGroup OBJECT IDENTIFIER ::= { hm2DnsMib 3 }
+
+--
+-- *************************************************************
+-- hm2DnsMib groups
+-- *************************************************************
+--
+hm2DnsClientGroup           OBJECT IDENTIFIER ::= { hm2DnsMibObjects 1 }
+hm2DnsCacheGroup            OBJECT IDENTIFIER ::= { hm2DnsMibObjects 2 } -- deprecated 
+hm2DnsCachingServerGroup    OBJECT IDENTIFIER ::= { hm2DnsMibObjects 3 }
+
+--
+-- *************************************************************
+-- hm2DnsClient
+-- *************************************************************
+--
+
+hm2DnsClientAdminState OBJECT-TYPE
+            SYNTAX           HmEnabledStatus
+            MAX-ACCESS       read-write
+            STATUS           current
+            DESCRIPTION
+            "The operational status of DNS client. If disabled, no host name
+            lookups will be done for names entered on the CLI and in the
+            configuration of services e.g. NTP."
+            DEFVAL          { disable } 
+            ::= { hm2DnsClientGroup 1 }
+
+hm2DnsClientConfigSource    OBJECT-TYPE
+            SYNTAX          INTEGER {
+                            user(1),
+                            mgmt-dhcp(2),
+                            provider(3)
+                            }
+            MAX-ACCESS      read-write
+            STATUS          current
+            DESCRIPTION
+                "DNS client server source.
+                 If the value is set to user(1), 
+                 the variables from hm2DnsClientServerCfgTable
+                 will be used.
+                 If the value is set to mgmt-dhcp(2), the DNS servers received
+                 by DHCP on the management interface will be used.
+                 If the value is set to provider(3),
+                 the DNS configuration will be taken from DHCP, PPP or PPPoE on
+                 the primary WAN link."
+            DEFVAL { mgmt-dhcp }
+            ::= { hm2DnsClientGroup 2 }
+
+--
+-- DNS Client Configuration Table
+--
+hm2DnsClientServerCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hm2DnsClientServerCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "The table that contains the DNS Servers entries configured by the user in the system."
+            ::= { hm2DnsClientGroup 3 }
+
+hm2DnsClientServerCfgEntry OBJECT-TYPE
+            SYNTAX Hm2DnsClientServerCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "An entry contains the IP address of a DNS server configured in the system."
+            INDEX { hm2DnsClientServerIndex }
+            ::= { hm2DnsClientServerCfgTable 1 }
+
+            
+Hm2DnsClientServerCfgEntry ::= SEQUENCE {
+                hm2DnsClientServerIndex   Integer32,
+                hm2DnsClientServerAddressType InetAddressType,
+                hm2DnsClientServerAddress  InetAddress,
+                hm2DnsClientServerRowStatus   RowStatus
+            }
+
+hm2DnsClientServerIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..4)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "The unique index used for each server added in the DNS servers table."
+            ::= { hm2DnsClientServerCfgEntry 1 }
+
+hm2DnsClientServerAddressType OBJECT-TYPE
+           SYNTAX     InetAddressType
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+               "Address type for DNS server.
+                Currently, only ipv4 and ipv6 are supported."
+           DEFVAL { ipv4 }         
+           ::= { hm2DnsClientServerCfgEntry 2 }
+                    
+hm2DnsClientServerAddress OBJECT-TYPE
+           SYNTAX     InetAddress
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION "The IP address of the DNS server."
+           DEFVAL { '00000000'H }
+           ::= { hm2DnsClientServerCfgEntry 3 }
+
+hm2DnsClientServerRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION "Describes the status of a row in the table."
+            ::= { hm2DnsClientServerCfgEntry 4 }
+-- end of DNS Client Configuration Table
+
+--
+-- DNS Client Diagnostics Table - contains the list of used DNS servers
+--
+hm2DnsClientServerDiagTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hm2DnsClientServerDiagEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "The table that contains the DNS Servers entries configured and used in the system."
+            ::= { hm2DnsClientGroup 4 }
+
+hm2DnsClientServerDiagEntry OBJECT-TYPE
+            SYNTAX Hm2DnsClientServerDiagEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "An entry contains the IP address of a DNS server used in the system."
+            INDEX { hm2DnsClientServerDiagIndex }
+            ::= { hm2DnsClientServerDiagTable 1 }
+
+Hm2DnsClientServerDiagEntry ::= SEQUENCE {
+                hm2DnsClientServerDiagIndex   		Integer32,
+                hm2DnsClientServerDiagAddressType 	InetAddressType,
+                hm2DnsClientServerDiagAddress  		InetAddress
+            }
+
+hm2DnsClientServerDiagIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..4)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "The unique index used for each server added in the DNS servers table."
+            ::= { hm2DnsClientServerDiagEntry 1 }
+
+hm2DnsClientServerDiagAddressType OBJECT-TYPE
+           SYNTAX     InetAddressType
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+               "Address type for DNS server used.
+                Currently, only ipv4 and ipv6 are supported."
+           ::= { hm2DnsClientServerDiagEntry 2 }
+                    
+hm2DnsClientServerDiagAddress OBJECT-TYPE
+           SYNTAX     InetAddress
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION "The IP address of the DNS server used by the system.
+                        The entry can be configured by the provider, e.g. 
+                        through DHCP client or PPPoE client."
+           ::= { hm2DnsClientServerDiagEntry 3 }
+
+-- end of DNS Client Diagnostics Table
+
+--
+-- DNS Client Global Group
+--
+hm2DnsClientGlobalGroup OBJECT IDENTIFIER ::= { hm2DnsClientGroup 5 }
+hm2DnsClientDefaultDomainName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The default domain name for unqualified hostnames."
+       DEFVAL { "" }
+       ::= { hm2DnsClientGlobalGroup 1 }
+       
+hm2DnsClientRequestTimeout OBJECT-TYPE
+       SYNTAX  Integer32 (0..3600)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The timeout before retransmitting a request to the server. The 
+                timeout value is configured and displayed in seconds."
+       DEFVAL { 3 }
+       ::= { hm2DnsClientGlobalGroup 2 }
+
+hm2DnsClientRequestRetransmits OBJECT-TYPE
+       SYNTAX  Integer32 (0..100)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The number of times the request is retransmitted. The request
+                is retransmitted provided the maximum timeout value allows
+                this many number of retransmits."
+       DEFVAL { 2 }
+       ::= { hm2DnsClientGlobalGroup 3 }
+
+hm2DnsClientCacheAdminState OBJECT-TYPE
+	   SYNTAX           HmEnabledStatus
+	   MAX-ACCESS       read-write
+	   STATUS           current
+	   DESCRIPTION
+	   "Enables/Disables DNS client cache functionality of the device."
+	   DEFVAL          { enable } 
+	   ::= { hm2DnsClientGlobalGroup 4 }
+	   
+--
+-- DNS Client Static Host Table
+--
+hm2DnsClientStaticHostConfigTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF Hm2DnsClientStaticHostConfigEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "Static table of DNS hostname to IP address table"
+       ::= {hm2DnsClientGroup 6 }
+
+hm2DnsClientStaticHostConfigEntry OBJECT-TYPE
+       SYNTAX      Hm2DnsClientStaticHostConfigEntry 
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "An entry in the static DNS hostname IP address list.
+               Rows may be created or deleted at any time by the DNS
+               resolver and by SNMP SET requests."
+       INDEX     { hm2DnsClientStaticIndex } 
+       ::= {hm2DnsClientStaticHostConfigTable 1 }
+
+Hm2DnsClientStaticHostConfigEntry ::=
+       SEQUENCE {
+          hm2DnsClientStaticIndex
+               Integer32,
+          hm2DnsClientStaticHostName
+               SnmpAdminString,
+          hm2DnsClientStaticHostAddressType
+               InetAddressType,
+          hm2DnsClientStaticHostIPAddress
+               InetAddress,
+          hm2DnsClientStaticHostStatus
+               RowStatus
+       }
+
+hm2DnsClientStaticIndex OBJECT-TYPE
+       SYNTAX      Integer32 (1..64)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "The index of the entry."
+       ::= {hm2DnsClientStaticHostConfigEntry 1 }
+
+hm2DnsClientStaticHostName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE (0 .. 255))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "The static hostname."
+       ::= {hm2DnsClientStaticHostConfigEntry 2 }
+
+hm2DnsClientStaticHostAddressType OBJECT-TYPE
+       SYNTAX     InetAddressType
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "Address type for static hosts used.
+                Currently, only ipv4 and ipv6 are supported."
+       ::= { hm2DnsClientStaticHostConfigEntry 3 }
+           
+hm2DnsClientStaticHostIPAddress OBJECT-TYPE
+       SYNTAX      InetAddress
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "The IP address of the static host."
+       ::= {hm2DnsClientStaticHostConfigEntry 4 }
+
+hm2DnsClientStaticHostStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "Describes the status of a row in the table."
+       ::= { hm2DnsClientStaticHostConfigEntry 5 }
+
+--
+-- hm2DnsCachingServerGroup
+--
+hm2DnsCachingServerGlobalGroup OBJECT IDENTIFIER ::= { hm2DnsCachingServerGroup 1 }
+
+hm2DnsCachingServerAdminState OBJECT-TYPE
+            SYNTAX           HmEnabledStatus
+            MAX-ACCESS       read-write
+            STATUS           current
+            DESCRIPTION
+            "Enables/Disables DNS caching server functionality of the device."
+            DEFVAL { enable } 
+            ::= { hm2DnsCachingServerGlobalGroup 1 }
+
+--
+-- hm2DnsCache - deprecated
+--
+hm2DnsCacheAdminState OBJECT-TYPE
+            SYNTAX           HmEnabledStatus
+            MAX-ACCESS       read-write
+            STATUS           deprecated
+            DESCRIPTION
+            "Enables/Disables DNS cache functionality of the device.
+             **NOTE: this object is deprecated and replaced by hm2DnsClientCacheAdminState/hm2DnsCachingServerAdminState**."
+            DEFVAL { enable } 
+            ::= { hm2DnsCacheGroup 1 }
+
+hm2DnsCacheFlushAction OBJECT-TYPE
+            SYNTAX           HmActionValue
+            MAX-ACCESS       read-write
+            STATUS           deprecated
+            DESCRIPTION
+            "Setting this value to action will flush the DNS cache. After flushing the cache, 
+             it will be set to noop automatically.
+             **NOTE: this object is deprecated and replaced by hm2DevMgmtActionFlushDnsClientCache/hm2DevMgmtActionFlushDnsCachingServerCache**."
+            DEFVAL          { noop } 
+            ::= { hm2DnsCacheGroup 2 }
+
+hm2DnsCHHostNameAlreadyExistsSESError OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION "The host name entered exists and is associated with an IP. The change attempt was canceled."
+	::= { hm2DnsMibSNMPExtensionGroup 1 }
+
+hm2DnsCHBadIpNotAcceptedSESError OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION "The Ip Adress entered is not a valid one for a host. The change attempt was canceled."
+	::= { hm2DnsMibSNMPExtensionGroup 2 }
+
+hm2DnsCHBadRowCannotBeActivatedSESError OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION "The instance cannot be activated due to compliance issues. Please modify the entry and try again."
+	::= { hm2DnsMibSNMPExtensionGroup 3 }
+
+hm2DnsCHHostNameNotValidSESError OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "The host name entered is empty or not valid. Please modify the entry and try again."
+       ::= { hm2DnsMibSNMPExtensionGroup 4 }
+
+END
