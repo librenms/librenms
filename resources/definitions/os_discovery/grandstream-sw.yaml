@@ -13,3 +13,29 @@ modules:
                     oid: GRANDSTREAM-GWN-PRODUCTS-SWITCH-MIB::gwnSystemTemper
                     num_oid: '.1.3.6.1.4.1.42397.1.4.12.1.1.{{ $index }}'
                     descr: 'switch-temperature-{{ $index }}'
+        voltage:
+            options:
+                divisor: 1000
+            data:
+                -
+                    oid: GRANDSTREAM-GWN-POE-STATUS-MIB::gwnPoeInputVoltage
+                    num_oid: '.1.3.6.1.4.1.42397.1.4.8.3.1.1.{{ $index }}'
+                    descr: 'PoE Input Voltage'
+                -
+                    oid: GRANDSTREAM-GWN-POE-STATUS-MIB::gwnPoePortTable
+                    value: GRANDSTREAM-GWN-POE-STATUS-MIB::gwnPoePortVoltage
+                    num_oid: '.1.3.6.1.4.1.42397.1.4.8.3.3.1.2.{{ $index }}'
+                    descr: 'PoE Port {{ $index }} Voltage'
+        power:
+            options:
+                divisor: 1000
+            data:
+                -
+                    oid: GRANDSTREAM-GWN-POE-STATUS-MIB::gwnPoePortTable
+                    value: GRANDSTREAM-GWN-POE-STATUS-MIB::gwnPoePortPower
+                    num_oid: '.1.3.6.1.4.1.42397.1.4.8.3.3.1.3.{{ $index }}'
+                    descr: 'PoE Port {{ $index }} Power'
+                -
+                    oid: GRANDSTREAM-GWN-POE-STATUS-MIB::gwnPoeTotalUsed
+                    num_oid: '.1.3.6.1.4.1.42397.1.4.8.3.4.2.{{ $index }}'
+                    descr: 'Total PoE Used'
