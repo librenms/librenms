@@ -709,7 +709,7 @@ class PollerQueueManager(QueueManager):
                 response = requests.get(url, params=params, headers=headers)
 
                 http_output = response.content.decode().rstrip()
-                if response.ok and response.headers.get('Content-Type') == "text/plain":
+                if response.ok and response.headers.get("Content-Type") == "text/plain":
                     lastline_pos = http_output.rfind("\n")
                     if lastline_pos < 0:
                         exit_code = 0
@@ -807,7 +807,7 @@ class DiscoveryQueueManager(TimedQueueManager):
                 response = requests.get(url, params=params, headers=headers)
 
                 http_output = response.content.decode().rstrip()
-                if response.ok and response.headers.get('Content-Type') == "text/plain":
+                if response.ok and response.headers.get("Content-Type") == "text/plain":
                     lastline_pos = http_output.rfind("\n")
                     if lastline_pos < 0:
                         exit_code = 0
