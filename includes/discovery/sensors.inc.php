@@ -44,6 +44,10 @@ if ($device['os'] == 'gw-eydfa') {
     include base_path('includes/discovery/sensors/gw-eydfa.inc.php');
 }
 
+if ($device['os'] == 'bdcom') {
+    include base_path('includes/discovery/sensors/bdcom-onu.inc.php');
+}
+
 // filter submodules
 $run_sensors = array_intersect(Sensor::values(), LibrenmsConfig::get('discovery_submodules.sensors', Sensor::values()));
 
