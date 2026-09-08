@@ -68,9 +68,7 @@ class PollDevice implements ShouldQueue
         $measurement->manager()->checkpoint(); // don't count previous stats
 
         // check and save status
-        if($this->nodata) DB::beginTransaction();
         app(CheckDeviceAvailability::class)->execute($this->device, true);
-        if($this->nodata) DB::rollBack();
 
         $this->pollModules($connectivity);
 
