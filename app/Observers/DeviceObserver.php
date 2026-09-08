@@ -10,7 +10,6 @@ use App\Models\Eventlog;
 use Illuminate\Support\Facades\App;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostRenameException;
-use LibreNMS\Exceptions\RrdException;
 use Log;
 
 class DeviceObserver
@@ -85,6 +84,7 @@ class DeviceObserver
             $new_name = $device->hostname;
             $old_name = $device->getOriginal('hostname');
 
+
             // Fail if another device has the same hostname
             if (Device::where('hostname', $device->hostname)->whereNot('device_id', $device->device_id)->count() > 0) {
                 $device->hostname = $old_name;
@@ -92,21 +92,17 @@ class DeviceObserver
                 throw new HostRenameException("Renaming of $old_name failed because there is already a device with the hostname $new_name");
             }
 
-            if (is_dir($new_rrd_dir)) {
-                $device->hostname = $old_name;
+            try {
+                Rrd::renameDevice($old_name, $new_name);
+            } catch (\Exception $e) {
+                Eventlog::log("Renaming of $old_name failed", $device, 'system', Severity::Error);
 
                 throw new HostRenameException($e->getMessage());
             }
 
-            if (rename($old_rrd_dir, $new_rrd_dir)) {
-                $device->ip = null;
-                $source = auth()->user()?->username ?: 'console';
-                Eventlog::log("Hostname changed -> $new_name ($source)", $device, 'system', Severity::Notice);
-            } else {
-                $device->hostname = $old_name;
-                Eventlog::log("Renaming of $old_name failed because the RRD directory rename failed", $device, 'system', Severity::Error);
-                throw new HostRenameException("Renaming of $old_name failed");
-            }
+            $device->ip = null;
+            $source = auth()->user()?->username ?: 'console';
+            Eventlog::log("Hostname changed -> $new_name ($source)", $device, 'system', Severity::Notice);
         }
     }
 

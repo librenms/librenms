@@ -30,7 +30,6 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
-use Exception;
 use File;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
@@ -664,10 +663,10 @@ class Rrd extends BaseDatastore
         $new_rrd_dir = $this->dirFromHost($newName, true);
 
         if (is_dir($new_rrd_dir)) {
-            throw new RrdException("Renaming of $oldName failed due to existing RRD folder for $newName");
+            throw new RrdStoreException("Renaming of $oldName failed due to existing RRD folder for $newName");
         }
 
-        if (! is_dir($new_rrd_dir) && rename($this->dirFromHost($oldName, true), $new_rrd_dir) === true) {
+        if (rename($this->dirFromHost($oldName, true), $new_rrd_dir) === true) {
             return true;
         }
 
@@ -682,7 +681,7 @@ class Rrd extends BaseDatastore
         // delete rrd files
         $host_dir = $this->dirFromHost($hostname, true);
         if (! File::deleteDirectory($host_dir)) {
-            throw new RrdException("Could not delete RRD files for: $hostname");
+            throw new RrdStoreException("Could not delete RRD files for: $hostname");
         }
     }
 
