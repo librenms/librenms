@@ -98,8 +98,16 @@ class ComposerHelper
 
     public static function getPlugins(): array
     {
-        $plugins = is_file('composer.plugins.json') ?
-            json_decode(file_get_contents('composer.plugins.json'), true) : [];
+        // Resolved against the install directory, not the working directory:
+        // this is also reached from the web UI (Validations\Updates), where the
+        // working directory is the document root. base_path() is deliberately
+        // not used -- this class is registered as a Composer script handler,
+        // and Composer's script autoloader registers psr-0/psr-4/classmap only,
+        // so Laravel's function helpers do not exist during those events.
+        $file = realpath(__DIR__ . '/..') . '/composer.plugins.json';
+
+        $plugins = is_file($file) && is_readable($file) ?
+            json_decode((string) file_get_contents($file), true) : [];
 
         return $plugins['require'] ?? [];
     }
