@@ -29,6 +29,77 @@ modules:
                         - ZTE-AN-ENVMON-MIB::zxAnEnvRack
                         - ZTE-AN-ENVMON-MIB::zxAnEnvShelf
                         - ZTE-AN-ENVMON-MIB::zxAnEnvSlot
+                        - IF-MIB::ifName
+        dbm:
+            data:
+                -
+                    oid: ZTE-AN-INTERFACE-MIB::zxAnOpticalModuleMonTable
+                    value: ZTE-AN-INTERFACE-MIB::zxAnOpticalPowerRxCurrValue
+                    num_oid: '.1.3.6.1.4.1.3902.1015.3.1.13.1.1.{{ $index }}'
+                    index: 'zxAnOpticalPowerRxCurrValue.{{ $index }}'
+                    descr: 'Rx {{ IF-MIB::ifName }}'
+                    group: transceiver
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: 'IF-MIB::ifName'
+                            op: 'exists'
+                            value: false
+                    skip_value_gt: 100000
+                    skip_value_lt: -60000
+                -
+                    oid: ZTE-AN-INTERFACE-MIB::zxAnOpticalModuleMonTable
+                    value: ZTE-AN-INTERFACE-MIB::zxAnOpticalPowerTxCurrValue
+                    num_oid: '.1.3.6.1.4.1.3902.1015.3.1.13.1.4.{{ $index }}'
+                    index: 'zxAnOpticalPowerTxCurrValue.{{ $index }}'
+                    descr: 'Tx {{ IF-MIB::ifName }}'
+                    group: transceiver
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: 'IF-MIB::ifName'
+                            op: 'exists'
+                            value: false
+                    skip_value_gt: 100000
+                    skip_value_lt: -60000
+                -
+                    oid: ZTE-AN-OPTICAL-MODULE-MIB::zxAnOpticalModuleInfoTable
+                    value: ZTE-AN-OPTICAL-MODULE-MIB::zxAnOpticalIfRxPwrCurrValue
+                    num_oid: '.1.3.6.1.4.1.3902.1082.30.40.2.4.1.2.{{ $index }}'
+                    index: 'zxAnOpticalIfRxPwrCurrValue.{{ $index }}'
+                    descr: 'Rx {{ IF-MIB::ifName }}'
+                    group: transceiver
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: 'IF-MIB::ifName'
+                            op: 'exists'
+                            value: false
+                    skip_value_gt: 100000
+                    skip_value_lt: -60000
+                -
+                    oid: ZTE-AN-OPTICAL-MODULE-MIB::zxAnOpticalModuleInfoTable
+                    value: ZTE-AN-OPTICAL-MODULE-MIB::zxAnOpticalIfTxPwrCurrValue
+                    num_oid: '.1.3.6.1.4.1.3902.1082.30.40.2.4.1.3.{{ $index }}'
+                    index: 'zxAnOpticalIfTxPwrCurrValue.{{ $index }}'
+                    descr: 'Tx {{ IF-MIB::ifName }}'
+                    group: transceiver
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: 'IF-MIB::ifName'
+                            op: 'exists'
+                            value: false
+                    skip_value_gt: 100000
+                    skip_value_lt: -60000
         temperature:
             data:
                 -
@@ -36,6 +107,42 @@ modules:
                     value: ZTE-AN-ENVMON-MIB::zxAnCardTemp
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.2.{{ $index }}'
                     descr: "Temp Card {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}"
+                -
+                    oid: ZTE-AN-INTERFACE-MIB::zxAnOpticalModuleMonTable
+                    value: ZTE-AN-INTERFACE-MIB::zxAnOpticalTemperature
+                    num_oid: '.1.3.6.1.4.1.3902.1015.3.1.13.1.12.{{ $index }}'
+                    index: 'zxAnOpticalTemperature.{{ $index }}'
+                    descr: 'SFP {{ IF-MIB::ifName }}'
+                    group: transceiver
+                    divisor: 1000
+                    low_limit: -5
+                    high_limit: 80
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: 'IF-MIB::ifName'
+                            op: 'exists'
+                            value: false
+                    skip_value_gt: 1000000
+                -
+                    oid: ZTE-AN-OPTICAL-MODULE-MIB::zxAnOpticalModuleInfoTable
+                    value: ZTE-AN-OPTICAL-MODULE-MIB::zxAnOpticalTemperature
+                    num_oid: '.1.3.6.1.4.1.3902.1082.30.40.2.4.1.8.{{ $index }}'
+                    index: 'zxAnOpticalTemperature.{{ $index }}'
+                    descr: 'SFP {{ IF-MIB::ifName }}'
+                    group: transceiver
+                    divisor: 1000
+                    low_limit: -5
+                    high_limit: 80
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: 'IF-MIB::ifName'
+                            op: 'exists'
+                            value: false
+                    skip_value_gt: 1000000
         fanspeed:
             data:
                 -
@@ -60,6 +167,40 @@ modules:
                     descr: "Voltage Card {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}"
                     skip_value_lt: 1
                     divisor: 1000
+                -
+                    oid: ZTE-AN-INTERFACE-MIB::zxAnOpticalModuleMonTable
+                    value: ZTE-AN-INTERFACE-MIB::zxAnOpticalSupplyVoltage
+                    num_oid: '.1.3.6.1.4.1.3902.1015.3.1.13.1.10.{{ $index }}'
+                    index: 'zxAnOpticalSupplyVoltage.{{ $index }}'
+                    descr: 'SFP Vcc {{ IF-MIB::ifName }}'
+                    group: transceiver
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: 'IF-MIB::ifName'
+                            op: 'exists'
+                            value: false
+                    skip_value_gt: 100000
+                    skip_value_lt: 1
+                -
+                    oid: ZTE-AN-OPTICAL-MODULE-MIB::zxAnOpticalModuleInfoTable
+                    value: ZTE-AN-OPTICAL-MODULE-MIB::zxAnOpticalSupplyVoltage
+                    num_oid: '.1.3.6.1.4.1.3902.1082.30.40.2.4.1.6.{{ $index }}'
+                    index: 'zxAnOpticalSupplyVoltage.{{ $index }}'
+                    descr: 'SFP Vcc {{ IF-MIB::ifName }}'
+                    group: transceiver
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: 'IF-MIB::ifName'
+                            op: 'exists'
+                            value: false
+                    skip_value_gt: 100000
+                    skip_value_lt: 1
 
         power:
             data:
@@ -79,14 +220,76 @@ modules:
                     descr: "Current Card {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}"
                     skip_value_lt: 1
                     divisor: 1000
+                -
+                    oid: ZTE-AN-INTERFACE-MIB::zxAnOpticalModuleMonTable
+                    value: ZTE-AN-INTERFACE-MIB::zxAnOpticalBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.3902.1015.3.1.13.1.9.{{ $index }}'
+                    index: 'zxAnOpticalBiasCurrent.{{ $index }}'
+                    descr: 'SFP bias {{ IF-MIB::ifName }}'
+                    group: transceiver
+                    divisor: 1000000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: 'IF-MIB::ifName'
+                            op: 'exists'
+                            value: false
+                    skip_value_gt: 10000000
+                    skip_value_lt: 1
+                -
+                    oid: ZTE-AN-OPTICAL-MODULE-MIB::zxAnOpticalModuleInfoTable
+                    value: ZTE-AN-OPTICAL-MODULE-MIB::zxAnOpticalBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.3902.1082.30.40.2.4.1.5.{{ $index }}'
+                    index: 'zxAnOpticalBiasCurrent.{{ $index }}'
+                    descr: 'SFP bias {{ IF-MIB::ifName }}'
+                    group: transceiver
+                    divisor: 1000000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: 'IF-MIB::ifName'
+                            op: 'exists'
+                            value: false
+                    skip_value_gt: 10000000
+                    skip_value_lt: 1
 
         state:
             data:
                 -
+                    oid: ZTE-AN-CHASSIS-MIB::zxAnCardTable
+                    value: ZTE-AN-CHASSIS-MIB::zxAnCardOperStatus
+                    num_oid: '.1.3.6.1.4.1.3902.1082.10.1.2.4.1.5.{{ $index }}'
+                    index: 'zxAnCardOperStatus.{{ $index }}'
+                    descr: 'Card {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }} slot {{ $subindex2 }}'
+                    group: Cards
+                    skip_values:
+                        -
+                            oid: ZTE-AN-CHASSIS-MIB::zxAnCardActualType
+                            op: '='
+                            value: ''
+                    state_name: zxAnCardOperStatus
+                    states:
+                        - { value: 1, generic: 0, descr: 'inService' }
+                        - { value: 2, generic: 1, descr: 'notInService' }
+                        - { value: 3, generic: 1, descr: 'hwOnline' }
+                        - { value: 4, generic: 2, descr: 'hwOffline' }
+                        - { value: 5, generic: 1, descr: 'configuring' }
+                        - { value: 6, generic: 2, descr: 'configFailed' }
+                        - { value: 7, generic: 2, descr: 'typeMismatch' }
+                        - { value: 8, generic: 1, descr: 'deactived' }
+                        - { value: 9, generic: 2, descr: 'faulty' }
+                        - { value: 10, generic: 2, descr: 'invalid' }
+                        - { value: 11, generic: 2, descr: 'noPower' }
+                        - { value: 12, generic: 2, descr: 'unauthorized' }
+                        - { value: 34, generic: 1, descr: 'powerSaving' }
+                -
                     oid: ZTE-AN-ENVMON-MIB::zxAnEnvFanTable
+                    value: ZTE-AN-ENVMON-MIB::zxAnEnvFanOperStatus
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.4.11.1.5.{{ $index }}'
                     index: 'zxAnEnvFanOperStatus.{{ $index }}'
-                    descr: "Fan speed Slot {{ $index }} Oper Status"
+                    descr: "Fan {{ $subindex2 }} Oper Status"
                     group: Fans
                     state_name: zxAnEnvFanOperStatus
                     states:
@@ -95,9 +298,10 @@ modules:
                         - { value: 3, generic: 2, descr: 'unknown' }
                 -
                     oid: ZTE-AN-ENVMON-MIB::zxAnEnvFanTable
+                    value: ZTE-AN-ENVMON-MIB::zxAnEnvFanOnlineStatus
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.4.11.1.6.{{ $index }}'
                     index: 'zxAnEnvFanOnlineStatus.{{ $index }}'
-                    descr: "Fan speed Slot {{ $index }} Online Status"
+                    descr: "Fan {{ $subindex2 }} Online Status"
                     group: Fans
                     state_name: zxAnEnvFanOnlineStatus
                     states:
@@ -106,9 +310,10 @@ modules:
                         - { value: 3, generic: 2, descr: 'unknown' }
                 -
                     oid: ZTE-AN-ENVMON-MIB::zxAnPowerSupplyTable
+                    value: ZTE-AN-ENVMON-MIB::zxAnPowerSupplyInVoltageStatus
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.3.11.1.3.{{ $index }}'
                     index: 'zxAnPowerSupplyInVoltageStatus.{{ $index }}'
-                    descr: "Power Supply {{ $index }} Status"
+                    descr: "Power Supply {{ $subindex2 }} Status"
                     group: Power
                     state_name: zxAnPowerSupplyInVoltageStatus
                     states:
