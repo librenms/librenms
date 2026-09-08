@@ -96,4 +96,9 @@ class Secret extends BaseModel
         return $this->belongsToMany(Device::class, 'device_polling_methods', 'secret_id', 'device_id')
             ->withPivot('method_type');
     }
+
+    public function isInUse(): bool
+    {
+        return $this->devices()->exists();
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Secret;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -57,8 +58,12 @@ class SecretPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user): bool
+    public function delete(User $user, ?Secret $secret = null): bool
     {
+        if ($secret && $secret->isInUse()) {
+            return false;
+        }
+
         return $this->hasGlobalPermission($user, 'delete');
     }
 

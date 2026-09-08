@@ -128,7 +128,7 @@
 
     <div class="form-group {{ ($hasErrors && ($errors->has($errorKey) || $errors->has($key))) ? 'has-error' : '' }}"
          :class="(typeof errors !== 'undefined' && errors && (errors['{{ $errorKey }}'] || errors['{{ $key }}'])) ? 'has-error' : ''"
-         @if($field['visible_if']) x-show="{{ $field['visible_if'] }}" @endif
+         @if($field['visible_if']) x-show="{{ $field['visible_if'] }}" x-cloak @endif
          id="group-{{ $key }}">
 
         <label for="{{ $id }}" class="control-label">

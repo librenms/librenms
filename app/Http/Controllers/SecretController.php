@@ -52,12 +52,15 @@ class SecretController extends Controller
 
         $type = $request->query('type', 'snmp');
         $secretType = SecretType::tryFrom($type) ?? SecretType::Snmp;
-        $schema = $secretType->definition()->schema();
+        $definition = $secretType->definition();
+        $schema = $definition->schema();
+        $data = array_merge($definition->schemaDefaults(), old());
 
         return view('secrets.create', [
             'types' => SecretType::cases(),
             'currentType' => $secretType,
             'schema' => $schema,
+            'data' => $data,
         ]);
     }
 
@@ -95,10 +98,13 @@ class SecretController extends Controller
     {
         Gate::authorize('update', $secret);
 
-        $schema = $secret->secret_type->definition()->schema();
-        $data = Gate::allows('unmask', $secret)
+        $definition = $secret->secret_type->definition();
+        $schema = $definition->schema();
+        $defaults = $definition->schemaDefaults();
+        $secretData = Gate::allows('unmask', $secret)
             ? $secret->data
             : $this->maskPasswordFields($secret->data, $schema);
+        $data = array_merge($defaults, $secretData, old());
 
         return view('secrets.edit', [
             'secret' => $secret,
@@ -137,6 +143,12 @@ class SecretController extends Controller
     public function destroy(Secret $secret, ToastInterface $toast): RedirectResponse
     {
         Gate::authorize('delete', $secret);
+
+        if ($secret->isInUse()) {
+            $toast->error(__('Cannot delete a secret that is in use.'));
+
+            return redirect()->route('secrets.index');
+        }
 
         $secret->delete();
 

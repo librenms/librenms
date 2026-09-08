@@ -30,7 +30,8 @@
 
             <hr class="tw:my-6">
 
-            <form method="POST" action="{{ route('secrets.store') }}">
+            <form method="POST" action="{{ route('secrets.store') }}"
+                  x-data="{ formData: @js($data) }">
                 @csrf
                 <input type="hidden" name="secret_type" value="{{ $currentType->value }}">
 
@@ -50,7 +51,12 @@
                     </div>
                 </div>
 
-                <x-field-schema-fields :fields="$schema" />
+                <x-field-schema-fields
+                    :fields="$schema"
+                    :data="$data"
+                    :method-type="$currentType->value"
+                    model-prefix="formData"
+                />
 
                 <div class="tw:mt-6">
                     <button type="submit" class="btn btn-primary">

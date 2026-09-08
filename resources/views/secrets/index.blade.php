@@ -63,17 +63,26 @@
                                                class="btn btn-xs btn-warning">
                                                 <i class="fas fa-pencil"></i>
                                             </a>
-                                            <form action="{{ route('secrets.destroy', $secret->id) }}" method="POST"
-                                                  onsubmit="return confirm('{{ __('Are you sure you want to delete this secret?') }}');"
-                                                  class="tw:inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                        title="{{ __('Delete Secret') }}"
-                                                        class="btn btn-xs btn-danger">
+                                            @if($secret->devices_count === 0)
+                                                <form action="{{ route('secrets.destroy', $secret->id) }}" method="POST"
+                                                      onsubmit="return confirm('{{ __('Are you sure you want to delete this secret?') }}');"
+                                                      class="tw:inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                            title="{{ __('Delete Secret') }}"
+                                                            class="btn btn-xs btn-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <button type="button"
+                                                        disabled
+                                                        title="{{ __('Cannot delete secret in use') }}"
+                                                        class="btn btn-xs btn-danger tw:opacity-50 tw:cursor-not-allowed">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
-                                            </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

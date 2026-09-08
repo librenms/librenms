@@ -15,7 +15,8 @@
                 <i class="fas fa-pencil fa-fw fa-lg" aria-hidden="true"></i> {{ __('Edit Secret') }} - {{ Str::upper($secret->secret_type->value) }}
             </x-slot>
 
-            <form method="POST" action="{{ route('secrets.update', $secret->id) }}">
+            <form method="POST" action="{{ route('secrets.update', $secret->id) }}"
+                  x-data="{ formData: @js($data) }">
                 @csrf
                 @method('PUT')
 
@@ -35,7 +36,13 @@
                     </div>
                 </div>
 
-                <x-field-schema-fields :fields="$schema" :data="$data" />
+                <x-field-schema-fields
+                    :fields="$schema"
+                    :data="$data"
+                    :method-type="$secret->secret_type->value"
+                    model-prefix="formData"
+                    :check-can-unmask="true"
+                />
 
                 <div class="tw:mt-6">
                     <button type="submit" class="btn btn-primary">
