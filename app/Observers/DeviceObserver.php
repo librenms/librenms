@@ -7,10 +7,10 @@ use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Eventlog;
-use File;
 use Illuminate\Support\Facades\App;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostRenameException;
+use LibreNMS\Exceptions\RrdException;
 use Log;
 
 class DeviceObserver
@@ -83,10 +83,7 @@ class DeviceObserver
         // handle device renames
         if ($device->isDirty('hostname')) {
             $new_name = $device->hostname;
-
             $old_name = $device->getOriginal('hostname');
-            $new_rrd_dir = Rrd::dirFromHost($new_name);
-            $old_rrd_dir = Rrd::dirFromHost($old_name);
 
             // Fail if another device has the same hostname
             if (Device::where('hostname', $device->hostname)->whereNot('device_id', $device->device_id)->count() > 0) {
@@ -97,9 +94,8 @@ class DeviceObserver
 
             if (is_dir($new_rrd_dir)) {
                 $device->hostname = $old_name;
-                Eventlog::log("Renaming of $old_name failed due to existing RRD folder for $new_name", $device, 'system', Severity::Error);
 
-                throw new HostRenameException("Renaming of $old_name failed due to existing RRD folder for $new_name");
+                throw new HostRenameException($e->getMessage());
             }
 
             if (rename($old_rrd_dir, $new_rrd_dir)) {
@@ -120,14 +116,8 @@ class DeviceObserver
     public function deleted(Device $device): void
     {
         if (! empty($device->hostname)) {
-            // delete rrd files
-            $host_dir = Rrd::dirFromHost($device->hostname);
             try {
-                $result = File::deleteDirectory($host_dir);
-
-                if (! $result && File::exists($host_dir)) {
-                    Log::debug("Could not delete RRD files for: $device->hostname");
-                }
+                Rrd::deleteDevice($device->hostname);
             } catch (\Exception $e) {
                 Log::error("Could not delete RRD files for: $device->hostname", [$e]);
             }

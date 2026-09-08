@@ -30,7 +30,8 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
-use Illuminate\Support\Facades\Log;
+use Exception;
+use File;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\RrdException;
@@ -41,6 +42,10 @@ use LibreNMS\Exceptions\RrdStoreException;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
+use Log;
+use SplFileInfo;
+use Symfony\Component\Process\Process;
+use Throwable;
 
 class Rrd extends BaseDatastore
 {
@@ -261,10 +266,14 @@ class Rrd extends BaseDatastore
      */
     public function proxmoxName($pmxcluster, $vmid, $vmport): string
     {
-        $pmxcdir = implode('/', [$this->rrd_dir, 'proxmox', self::safeName($pmxcluster)]);
-        // this is not needed for remote rrdcached
-        if (! is_dir($pmxcdir)) {
-            mkdir($pmxcdir, 0775, true);
+        if ($this->rrdcached) {
+            $pmxcdir = implode('/', ['proxmox', self::safeName($pmxcluster)]);
+        } else {
+            $pmxcdir = implode('/', [$this->rrd_dir, 'proxmox', self::safeName($pmxcluster)]);
+            // this is not needed for remote rrdcached
+            if (! is_dir($pmxcdir)) {
+                mkdir($pmxcdir, 0775, true);
+            }
         }
 
         return implode('/', [$pmxcdir, self::safeName($vmid . '_netif_' . $vmport . '.rrd')]);
@@ -292,8 +301,8 @@ class Rrd extends BaseDatastore
      */
     public function renameFile(Device $device, $oldname, $newname): bool
     {
-        $oldrrd = self::name($device->hostname, $oldname);
-        $newrrd = self::name($device->hostname, $newname);
+        $oldrrd = self::_name($device->hostname, $oldname, true);
+        $newrrd = self::_name($device->hostname, $newname, true);
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
                 Eventlog::log("Renamed $oldrrd to $newrrd", $device, 'poller', Severity::Ok);
@@ -311,7 +320,35 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * Generates a partial filename based on the hostname (or IP) and some extra items
+     *
+     * @param  string  $host  Host name
+     * @param  array|string  $extra  Components of RRD filename - will be separated with "-", or a pre-formed rrdname
+     * @param  bool  $forceabsolute  Do we always want an absolute filename
+     * @return string the name of the rrd file for $host's $extra component
+     */
+    private function partname($host, $extra, $forceabsolute = false): string
+    {
+        $partname = self::safeName(is_array($extra) ? implode('-', $extra) : $extra);
+
+        return implode('/', [$this->dirFromHost($host, $forceabsolute), $partname]);
+    }
+
+    /**
      * Generates a filename based on the hostname (or IP) and some extra items
+     *
+     * @param  string  $host  Host name
+     * @param  array|string  $extra  Components of RRD filename - will be separated with "-", or a pre-formed rrdname
+     * @param  bool  $forceabsolute  Do we always want an absolute filename
+     * @return string the name of the rrd file for $host's $extra component
+     */
+    private function _name($host, $extra, $forceabsolute = false): string
+    {
+        return $this->partname($host, $extra, $forceabsolute) . '.rrd';
+    }
+
+    /**
+     * Public interface to the _name() function - doesn't allow forcing absolute paths
      *
      * @param  string  $host  Host name
      * @param  array|string  $extra  Components of RRD filename - will be separated with "-", or a pre-formed rrdname
@@ -319,20 +356,23 @@ class Rrd extends BaseDatastore
      */
     public function name($host, $extra): string
     {
-        $filename = self::safeName(is_array($extra) ? implode('-', $extra) : $extra);
-
-        return implode('/', [$this->dirFromHost($host), $filename . '.rrd']);
+        return $this->_name($host, $extra);
     }
 
     /**
      * Generates a path based on the hostname (or IP)
      *
      * @param  string  $host  Host name
+     * @param  bool  $forceabsolute  Do we always want an absolute directory name
      * @return string the name of the rrd directory for $host
      */
-    public function dirFromHost($host): string
+    private function dirFromHost($host, $forceabsolute = false): string
     {
         $host = self::safeName(trim((string) $host, '[]'));
+
+        if ($this->rrdcached && ! $forceabsolute) {
+            return $host;
+        }
 
         return Str::finish($this->rrd_dir, '/') . $host;
     }
@@ -511,7 +551,7 @@ class Rrd extends BaseDatastore
             return;
         }
 
-        foreach (glob($this->name($hostname, $prefix)) as $rrd) {
+        foreach (glob($this->partname($hostname, $prefix, true) . '*.rrd') as $rrd) {
             unlink($rrd);
         }
     }
@@ -601,5 +641,76 @@ class Rrd extends BaseDatastore
     private function coalesceStatisticType($type): string
     {
         return ($type == 'update' || $type == 'create') ? $type : 'other';
+    }
+
+    /**
+     * Initialise storage for a device
+     */
+    public function initStorage(Device $device): void
+    {
+        $device_dir = $this->dirFromHost($device->hostname, true);
+
+        if (LibrenmsConfig::get('rrdcached', false) && LibrenmsConfig::get('rrd.enable', true) && ! is_dir($device_dir)) {
+            mkdir($device_dir);
+            Log::info("Created directory : $device_dir");
+        }
+    }
+
+    /**
+     * Rename storage for a device
+     */
+    public function renameDevice(string $oldName, string $newName): bool
+    {
+        $new_rrd_dir = $this->dirFromHost($newName, true);
+
+        if (is_dir($new_rrd_dir)) {
+            throw new RrdException("Renaming of $oldName failed due to existing RRD folder for $newName");
+        }
+
+        if (! is_dir($new_rrd_dir) && rename($this->dirFromHost($oldName, true), $new_rrd_dir) === true) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Delete a device
+     */
+    public function deleteDevice(string $hostname): void
+    {
+        // delete rrd files
+        $host_dir = $this->dirFromHost($hostname, true);
+        if (! File::deleteDirectory($host_dir)) {
+            throw new RrdException("Could not delete RRD files for: $hostname");
+        }
+    }
+
+    /**
+     * Get storage stats for a device
+     */
+    public function getStorageSize(Device $device): array
+    {
+        $directory = $this->dirFromHost($device->hostname, true);
+
+        if (! File::isDirectory($directory) || ! File::isReadable($directory)) {
+            return [0, 0];
+        }
+
+        try {
+            $files = collect(File::allFiles($directory));
+
+            $size = $files->sum(function (SplFileInfo $file): int {
+                try {
+                    return $file->getSize();
+                } catch (Throwable) {
+                    return 0;
+                }
+            });
+
+            return [$size, $files->count()];
+        } catch (Throwable) {
+            return [0, 0];
+        }
     }
 }
