@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Secret;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -23,8 +24,10 @@ class UpdatePollingMethodRequest extends FormRequest
         if ($type && $type->hasSecret() && $this->has('secret_data')) {
             $device = $this->route('device');
             if ($device) {
+                $secretId = $this->input('secret_id');
+                $targetSecret = $secretId ? Secret::find($secretId) : null;
                 $pollingMethod = $device->pollingMethods()->where('method_type', $type->value)->first();
-                $oldData = $pollingMethod->secret->data ?? [];
+                $oldData = $targetSecret ? $targetSecret->data : ($pollingMethod?->secret ? $pollingMethod->secret->data : []);
 
                 $secretData = $this->input('secret_data');
                 if (is_array($secretData)) {
@@ -51,6 +54,8 @@ class UpdatePollingMethodRequest extends FormRequest
             'affects_availability' => ['nullable', 'boolean'],
             'secret_update_mode' => ['nullable', Rule::in(['update', 'create'])],
             'secret_id' => ['nullable', 'integer', 'exists:secrets,id'],
+            'is_editing_secret' => ['nullable', 'boolean'],
+            'description' => ['nullable', 'string', 'max:255'],
             'force_save' => ['nullable', 'boolean'],
             'settings' => ['nullable', 'array'],
         ];

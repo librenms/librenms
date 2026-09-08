@@ -255,4 +255,118 @@ class EditPollingControllerTest extends TestCase
             'message' => __('poller.method_removed'),
         ]);
     }
+
+    public function testUpdateSecretDataPersistsToDatabase(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+        $admin->givePermissionTo('secret.update');
+
+        $secret = \App\Models\Secret::create([
+            'description' => 'Original SNMP Secret',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'default' => false,
+            'data' => ['version' => 'v2c', 'community' => 'public'],
+        ]);
+
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $secret->id,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'snmp']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '1',
+                'secret_id' => (string) $secret->id,
+                'is_editing_secret' => '1',
+                'description' => 'Updated SNMP Secret',
+                'secret_data' => [
+                    'version' => 'v2c',
+                    'community' => 'supersecret',
+                    'port' => 161,
+                    'retries' => 0,
+                    'timeout' => 1,
+                ],
+                'settings' => [
+                    'transport' => 'udp',
+                    'port' => 161,
+                    'timeout' => 1,
+                    'retries' => 0,
+                    'max_repeaters' => 0,
+                    'max_oid' => 10,
+                    'port_association_mode' => 'ifIndex',
+                ],
+            ]
+        );
+
+        $response->assertOk();
+        $this->assertEquals('Updated SNMP Secret', $secret->fresh()->description);
+        $this->assertEquals('supersecret', $secret->fresh()->data['community']);
+    }
+
+    public function testUpdateSecretWithCreateModeCreatesNewSecret(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+        $admin->givePermissionTo('secret.create');
+        $admin->givePermissionTo('secret.update');
+
+        $originalSecret = \App\Models\Secret::create([
+            'description' => 'Shared SNMP Secret',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'default' => false,
+            'data' => ['version' => 'v2c', 'community' => 'public'],
+        ]);
+
+        $device = Device::factory()->create();
+        $pollingMethod = DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $originalSecret->id,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'snmp']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '1',
+                'secret_id' => (string) $originalSecret->id,
+                'is_editing_secret' => '1',
+                'secret_update_mode' => 'create',
+                'description' => 'New Dedicated Secret',
+                'secret_data' => [
+                    'version' => 'v2c',
+                    'community' => 'brandnew',
+                    'port' => 161,
+                    'retries' => 0,
+                    'timeout' => 1,
+                ],
+                'settings' => [
+                    'transport' => 'udp',
+                    'port' => 161,
+                    'timeout' => 1,
+                    'retries' => 0,
+                    'max_repeaters' => 0,
+                    'max_oid' => 10,
+                    'port_association_mode' => 'ifIndex',
+                ],
+            ]
+        );
+
+        $response->assertOk();
+        $this->assertEquals('public', $originalSecret->fresh()->data['community']);
+        $newSecretId = $pollingMethod->fresh()->secret_id;
+        $this->assertNotEquals($originalSecret->id, $newSecretId);
+        $newSecret = \App\Models\Secret::find($newSecretId);
+        $this->assertEquals('New Dedicated Secret', $newSecret->description);
+        $this->assertEquals('brandnew', $newSecret->data['community']);
+    }
 }

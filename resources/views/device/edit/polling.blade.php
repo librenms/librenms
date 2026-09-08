@@ -187,6 +187,7 @@
 
                                             <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:text-sm tw:bg-white tw:dark:bg-dark-gray-500">
                                                 <input type="hidden" name="secret_id" :value="selectedSecretId">
+                                                <input type="hidden" name="is_editing_secret" :value="isEditingSecret ? '1' : '0'">
 
                                                 {{-- Secret picker --}}
                                                 <div class="tw:mb-4">
@@ -526,7 +527,6 @@
                 onSecretChange() {
                     this.formData = { ...(this.secretFormDataById[this.selectedSecretId] || {}) };
                     this.secretDescription = this.selectedSecretMeta?.description ?? '';
-                    this.isEditingSecret = true;
                     this.showSecretInfo = false;
                 },
                 toggleEditSecret() {
@@ -576,7 +576,6 @@
                             this.formData = { ...(data.method.secret_form_data ?? {}) };
                             this.settingsData = { ...(data.method.settings ?? {}) };
                             this.initialSettingsData = { ...(data.method.settings ?? {}) };
-                            this.isEditingSecret = false;
                         }
                         this.setDirty(this.type, false);
                     } catch (err) {

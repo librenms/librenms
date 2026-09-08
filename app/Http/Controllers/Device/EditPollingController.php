@@ -201,16 +201,18 @@ class EditPollingController
         $validated = $request->validated();
 
         $secretId = null;
-        if ($type->hasSecret() && array_key_exists('secret_id', $validated)) {
-            $this->authorize('update', Secret::class);
-            $secretId = (int) $validated['secret_id'];
-            if (! $secretId) {
-                throw ValidationException::withMessages([
-                    'secret_id' => __('poller.select_credential'),
-                ]);
+        if ($type->hasSecret()) {
+            if (array_key_exists('secret_id', $validated)) {
+                $this->authorize('update', Secret::class);
+                $secretId = (int) $validated['secret_id'];
+                if (! $secretId) {
+                    throw ValidationException::withMessages([
+                        'secret_id' => __('poller.select_credential'),
+                    ]);
+                }
+            } elseif ($request->has('secret_data')) {
+                $this->authorize('update', Secret::class);
             }
-        } elseif ($type->hasSecret() && $request->has('secret_data')) {
-            $this->authorize('update', Secret::class);
         }
 
         $pollingMethod->setRelation('device', $device);
@@ -224,25 +226,32 @@ class EditPollingController
         );
 
         if ($type->hasSecret()) {
-            if ($secretId !== null) {
+            $isEditingSecret = (bool) $request->input('is_editing_secret', $request->has('secret_data'));
+            $secretData = $request->has('secret_data') ? $request->validatedSecretData() : null;
+            $mode = $validated['secret_update_mode'] ?? 'update';
+            $description = $validated['description'] ?? null;
+
+            if ($secretId !== null && ! $isEditingSecret) {
                 $secret = Secret::resolveForType($secretId, $type);
                 $pollingMethod->secret()->associate($secret)->save();
-            } elseif ($request->has('secret_data')) {
-                $secretData = $request->validatedSecretData();
-                $mode = $validated['secret_update_mode'] ?? 'update';
-                $existingSecret = $pollingMethod->secret;
-                $isSharedSecret = $existingSecret && $existingSecret->devices()->count() > 1;
+            } elseif ($secretData !== null) {
+                $targetSecret = $secretId !== null ? Secret::resolveForType($secretId, $type) : $pollingMethod->secret;
 
-                if (! $existingSecret || $mode === 'create' || $mode === 'copy' || $isSharedSecret) {
+                if ($mode === 'create' || ! $targetSecret) {
                     $secret = Secret::create([
                         'secret_type' => $type->value,
-                        'description' => 'Custom ' . strtoupper($type->value) . ' (' . $device->hostname . ')',
+                        'description' => $description ?: ('Custom ' . strtoupper($type->value) . ' (' . $device->hostname . ')'),
                         'default' => false,
                         'data' => $secretData,
                     ]);
                     $pollingMethod->secret()->associate($secret)->save();
                 } else {
-                    $existingSecret->update(['data' => $secretData]);
+                    $updateAttributes = ['data' => $secretData];
+                    if ($description !== null && $description !== '') {
+                        $updateAttributes['description'] = $description;
+                    }
+                    $targetSecret->update($updateAttributes);
+                    $pollingMethod->secret()->associate($targetSecret)->save();
                 }
             }
 
