@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Device\Debug;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\StreamsOutputToBrowser;
 use App\Models\Device;
+use LibreNMS\Util\Debug;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -49,6 +50,7 @@ class DebugPollAndDiscoveryController extends Controller
             'type' => ['required', Rule::in(['poller', 'discovery'])],
         ]);
 
+        Debug::enableQueryDebug();
         if ($validated['format'] == 'download') {
             $this->enableDownload($validated['type'] . '-' . $device->hostname . '.txt');
         }
