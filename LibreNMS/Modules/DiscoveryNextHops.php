@@ -1,0 +1,325 @@
+<?php
+
+/**
+ * DiscoveryNextHops.php
+ *
+ * Auto-creates pingonly child devices, one per "interesting" next-hop
+ * found in a monitored device's routing table. Default route by default
+ * (the ISP / WAN gateway), plus optional user-flagged supernets for
+ * internal routers.
+ *
+ * Depends on the existing `route` discovery module: that module already
+ * walks IP-FORWARD-MIB::inetCidrRouteTable (and friends) and persists the
+ * data to the `routes` table. We just consume what's already there.
+ *
+ * Each newly-discovered next-hop:
+ *   - is added as a pingonly device (snmp_disable=1, os=ping),
+ *   - has the discovering device set as its parent (device_relationships),
+ *   - so failures propagate cleanly via existing dependency-aware alerting.
+ *
+ * Why this matters: today, when an ISP gateway becomes unreachable, the
+ * monitored router itself stays "up" in LibreNMS — the dashboard shows
+ * green while no traffic actually leaves the network. This module makes
+ * each next-hop a first-class monitored entity.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2026 Kamil Bienkiewicz
+ * @author     Kamil Bienkiewicz
+ */
+
+namespace LibreNMS\Modules;
+
+use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use App\Models\Eventlog;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\HostExistsException;
+use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Module;
+use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
+
+class DiscoveryNextHops implements Module
+{
+    /** Route type 4 = remote (per IANA / IP-FORWARD-MIB::inetCidrRouteType) */
+    private const ROUTE_TYPE_REMOTE = 4;
+
+    /** Sentinel "no next-hop" addresses we filter out */
+    private const NULL_HOPS = ['0.0.0.0', '::', '0:0:0:0:0:0:0:0'];
+
+    /** Sentinel default-route destinations */
+    private const DEFAULT_DESTS = ['0.0.0.0', '::', '0:0:0:0:0:0:0:0'];
+
+    /** Per-IP discovery debounce (seconds) — same pattern as DiscoveryArp */
+    private const DEBOUNCE_TTL = 3600;
+
+    /**
+     * @inheritDoc
+     *
+     * @return array<string>
+     */
+    public function dependencies(): array
+    {
+        return ['route'];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function discover(OS $os): void
+    {
+        $device = $os->getDevice();
+        $only_default = (bool) LibrenmsConfig::get('autodiscovery.discovery-next-hops.only-default-route', true);
+        $extra_supernets = (array) LibrenmsConfig::get('autodiscovery.discovery-next-hops.supernets', []);
+
+        $candidates = $this->collectCandidates($device, $only_default, $extra_supernets);
+
+        Log::info(sprintf(
+            'Found %d next-hop candidate(s) on %s',
+            count($candidates), $device->hostname
+        ));
+
+        $created = 0;
+        $linked = 0;
+        $skipped_existing = 0;
+        $skipped_debounced = 0;
+
+        foreach ($candidates as $hop_ip => $meta) {
+            // Per-IP debounce: don't re-evaluate the same hop more than once per hour
+            if (! Cache::add('next_hops_discovery:' . $hop_ip, true, self::DEBOUNCE_TTL)) {
+                $skipped_debounced++;
+                continue;
+            }
+
+            // If the hop matches any already-monitored device — by hostname,
+            // by primary IP, or by any of its interface IPs — just ensure
+            // parent linkage. Device::findByIp() walks ipv4_addresses /
+            // ipv6_addresses, so this catches the "next-hop is core-router's
+            // eth0" case that hostname-only matching misses.
+            $existing = Device::findByIp($hop_ip);
+
+            if ($existing) {
+                if ($this->ensureParentRelationship($existing, $device)) {
+                    $linked++;
+                }
+                $skipped_existing++;
+                continue;
+            }
+
+            if ($this->createDiscoveredHop($hop_ip, $meta, $device)) {
+                $created++;
+            }
+        }
+
+        Log::info(sprintf(
+            '  Next-hops: %d new, %d already-existing (linked: %d), %d debounced',
+            $created, $skipped_existing, $linked, $skipped_debounced
+        ));
+    }
+
+    /**
+     * Filter the device's routes table down to interesting next-hops.
+     *
+     * @param  array<string>  $extra_supernets  CIDR strings to also consider beyond the default route
+     * @return array<string, array{route: \App\Models\Route, is_default: bool}>
+     */
+    private function collectCandidates(Device $device, bool $only_default, array $extra_supernets): array
+    {
+        $candidates = [];
+
+        $routes = $device->routes()
+            ->where('inetCidrRouteType', self::ROUTE_TYPE_REMOTE)
+            ->get();
+
+        foreach ($routes as $route) {
+            $hop = $route->inetCidrRouteNextHop;
+            if (in_array($hop, self::NULL_HOPS, true)) {
+                continue;
+            }
+
+            $is_default = in_array($route->inetCidrRouteDest, self::DEFAULT_DESTS, true)
+                       && (int) $route->inetCidrRoutePfxLen === 0;
+
+            if (! $is_default) {
+                if ($only_default) {
+                    $supernet = $route->inetCidrRouteDest . '/' . $route->inetCidrRoutePfxLen;
+                    if (! in_array($supernet, $extra_supernets, true)) {
+                        continue;
+                    }
+                }
+            }
+
+            // Keep only one entry per unique next-hop IP. Prefer the default route
+            // if both default and non-default share the same next-hop.
+            if (! isset($candidates[$hop]) || $is_default) {
+                $candidates[$hop] = [
+                    'route' => $route,
+                    'is_default' => $is_default,
+                ];
+            }
+        }
+
+        return $candidates;
+    }
+
+    /**
+     * Create a new device for this next-hop and link it to its parent.
+     *
+     * Two modes:
+     *   - Default route (WAN gateway): pingonly with force=true. Public IPs
+     *     aren't in `nets` and rarely speak SNMP, so we skip those checks
+     *     and create the device directly.
+     *   - Internal supernet next-hop: SNMP-first with ping_fallback=true.
+     *     Respects `nets`, attempts SNMP credential discovery, falls back
+     *     to pingonly if SNMP fails. Lets manageable internal routers get
+     *     fully discovered instead of stub pingonly entries.
+     *
+     * @param  array{route: \App\Models\Route, is_default: bool}  $meta
+     */
+    private function createDiscoveredHop(string $hop_ip, array $meta, Device $parent): bool
+    {
+        $route = $meta['route'];
+        $is_default = $meta['is_default'];
+
+        $sysName = $is_default
+            ? sprintf('Internet via %s', $parent->hostname)
+            : sprintf(
+                'Network %s/%s via %s',
+                $route->inetCidrRouteDest,
+                $route->inetCidrRoutePfxLen,
+                $parent->hostname
+            );
+
+        if ($is_default) {
+            $newDevice = new Device([
+                'hostname' => $hop_ip,
+                'snmp_disable' => 1,
+                'os' => 'ping',
+                'sysName' => $sysName,
+                'type' => 'firewall',
+            ]);
+            $force = true;
+            $ping_fallback = false;
+        } else {
+            // Internal next-hop — try SNMP first, let LibreNMS auto-detect OS
+            $newDevice = new Device([
+                'hostname' => $hop_ip,
+                'sysName' => $sysName,
+            ]);
+            $force = false;
+            $ping_fallback = true;
+        }
+
+        try {
+            $action = new ValidateDeviceAndCreate($newDevice, force: $force, ping_fallback: $ping_fallback);
+            if (! $action->execute()) {
+                Log::debug("next-hop $hop_ip: creation no-op (already exists)");
+
+                return false;
+            }
+        } catch (HostExistsException|HostUnreachableException $e) {
+            Log::info("next-hop $hop_ip: skipped — " . $e->getMessage());
+
+            return false;
+        } catch (\Throwable $e) {
+            Log::warning("next-hop $hop_ip: creation failed: " . $e->getMessage());
+
+            return false;
+        }
+
+        // Re-fetch the persisted Device so we have its device_id for parent linkage
+        $persisted = Device::where('hostname', $hop_ip)->first();
+        if ($persisted) {
+            $this->ensureParentRelationship($persisted, $parent);
+        }
+
+        $kind = ($persisted && ! $persisted->snmp_disable)
+            ? sprintf('SNMP-managed (%s)', $persisted->os)
+            : 'pingonly';
+
+        Eventlog::log(
+            sprintf(
+                'Next-hop discovery: added %s as %s child of %s (%s)',
+                $hop_ip, $kind, $parent->hostname, $sysName
+            ),
+            $parent->device_id,
+            'discovery',
+            Severity::Notice
+        );
+
+        return true;
+    }
+
+    /**
+     * Make sure $child's parents() includes $parent. Idempotent.
+     *
+     * @return bool true if a new attachment was created, false if already linked
+     */
+    private function ensureParentRelationship(Device $child, Device $parent): bool
+    {
+        if ($child->device_id === $parent->device_id) {
+            return false;
+        }
+        if ($child->parents()->where('parent_device_id', $parent->device_id)->exists()) {
+            return false;
+        }
+        $child->parents()->attach($parent->device_id);
+
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function poll(OS $os, DataStorageInterface $datastore): void
+    {
+        // no polling — pingonly children are polled by the standard ICMP path
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dataExists(Device $device): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function cleanup(Device $device): int
+    {
+        return 0;
+    }
+
+    /**
+     * @inheritDoc
+     *
+     * @return array<string, mixed>|null
+     */
+    public function dump(Device $device, string $type): ?array
+    {
+        return null;
+    }
+}
