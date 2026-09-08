@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Device;
 use App\Models\Secret;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -49,13 +50,36 @@ class UpdatePollingMethodRequest extends FormRequest
      */
     public function rules(): array
     {
+        $type = $this->pollingType();
+        $isEditingSecret = $this->has('is_editing_secret') ? $this->boolean('is_editing_secret') : $this->has('secret_data');
+        $secretUpdateMode = $this->input('secret_update_mode', 'update');
+
+        $descriptionRules = ['nullable', 'string', 'max:255'];
+        if ($isEditingSecret && $type && $type->hasSecret()) {
+            $device = $this->route('device');
+            /** @var Device|null $deviceModel */
+            $deviceModel = $device instanceof Device ? $device : (is_numeric($device) ? Device::find($device) : null);
+            $secretId = $this->input('secret_id');
+            $targetSecretId = $secretId ? (int) $secretId : $deviceModel?->pollingMethods()->where('method_type', $type->value)->first()?->secret_id;
+            $targetSecret = $targetSecretId ? Secret::find($targetSecretId) : null;
+            $isShared = $targetSecret ? ($targetSecret->devices()->count() > 1) : false;
+
+            if ($secretUpdateMode === 'create' && $isShared) {
+                $descriptionRules = ['required', 'string', 'max:255', Rule::unique('secrets', 'description')];
+            } elseif ($targetSecretId) {
+                $descriptionRules = ['nullable', 'string', 'max:255', Rule::unique('secrets', 'description')->ignore($targetSecretId)];
+            } else {
+                $descriptionRules = ['nullable', 'string', 'max:255', Rule::unique('secrets', 'description')];
+            }
+        }
+
         $rules = [
             'enabled' => ['nullable', 'boolean'],
             'affects_availability' => ['nullable', 'boolean'],
             'secret_update_mode' => ['nullable', Rule::in(['update', 'create'])],
             'secret_id' => ['nullable', 'integer', 'exists:secrets,id'],
             'is_editing_secret' => ['nullable', 'boolean'],
-            'description' => ['nullable', 'string', 'max:255'],
+            'description' => $descriptionRules,
             'force_save' => ['nullable', 'boolean'],
             'settings' => ['nullable', 'array'],
         ];
@@ -108,5 +132,15 @@ class UpdatePollingMethodRequest extends FormRequest
     public function validatedSecretData(): array
     {
         return $this->validated('secret_data', []);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'description.unique' => __('The secret description has already been taken. Please choose a different description.'),
+        ];
     }
 }

@@ -29,6 +29,7 @@ class StorePollingMethodRequest extends FormRequest
             'secret_id' => ['nullable', 'integer', 'exists:secrets,id'],
             'description' => ['required_if:credential_mode,new', 'nullable', 'string', 'max:255', 'unique:secrets,description'],
             'default' => ['nullable', 'boolean'],
+            'force_save' => ['nullable', 'boolean'],
             'settings' => ['nullable', 'array'],
         ];
 

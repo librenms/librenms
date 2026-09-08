@@ -13,15 +13,27 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('device.edit.polling.store', $device) }}"
+    <form x-ref="addForm" method="POST" action="{{ route('device.edit.polling.store', $device) }}"
           x-data="{
               methodType: '{{ old('method_type', '') }}',
               credentialMode: '{{ old('credential_mode', 'existing') }}',
               loading: false,
-              async submitForm(e) {
+              errors: {},
+              unreachableDialog: false,
+              unreachableMessage: '',
+              unreachableDetails: '',
+              saveAnyway() {
+                  this.unreachableDialog = false;
+                  this.submitForm(null, true);
+              },
+              async submitForm(e, force = false) {
                   this.loading = true;
-                  const form = e.target;
+                  this.errors = {};
+                  const form = this.$refs.addForm;
                   const formData = new FormData(form);
+                  if (force) {
+                      formData.set('force_save', '1');
+                  }
                   try {
                       const response = await fetch(form.action, {
                           method: 'POST',
@@ -34,14 +46,18 @@
                       });
                       const data = await response.json();
                       if (!response.ok) {
-                          if (data.errors) {
-                              const msg = Object.values(data.errors).flat().join('<br>');
-                              toastr.error(msg);
+                          if (data.status === 'unreachable') {
+                              this.unreachableMessage = data.message || '{{ __('poller.reachability_check_failed') }}';
+                              this.unreachableDetails = data.error_details || '';
+                              this.unreachableDialog = true;
+                          } else if (data.errors) {
+                              this.errors = data.errors;
                           } else {
                               toastr.error(data.message || '{{ __('Failed to add polling method') }}');
                           }
                           return;
-                      }
+                        }
+                      this.errors = {};
                       toastr.success(data.message || '{{ __('Polling method added') }}');
                       window.location.href = '{{ route('device.edit.polling', ['device' => $device]) }}?tab=' + encodeURIComponent(this.methodType);
                   } catch (err) {
@@ -55,7 +71,7 @@
         @csrf
 
         {{-- Step 1: Pick a polling type --}}
-        <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-6 tw:mb-6 tw:max-w-2xl">
+        <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-6 tw:mb-6 tw:max-w-2xl" :class="(errors && errors['method_type']) ? 'has-error' : ''">
             <label class="tw:block tw:font-medium tw:mb-2 tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Polling Type') }}</label>
             <select name="method_type" x-model="methodType" class="form-control tw:rounded-lg tw:border-gray-200 tw:bg-white tw:dark:border-dark-gray-400 tw:dark:bg-dark-gray-500 tw:dark:text-white @error('method_type') tw:border-red-500 @enderror" required>
                 <option value="">{{ __('Select a polling type...') }}</option>
@@ -66,6 +82,9 @@
             @error('method_type')
             <p class="tw:text-red-600 tw:dark:text-red-400 tw:text-sm tw:mt-1">{{ $message }}</p>
             @enderror
+            <template x-if="errors && errors['method_type']">
+                <p class="tw:text-red-600 tw:dark:text-red-400 tw:text-sm tw:mt-1" x-text="errors['method_type']?.[0]"></p>
+            </template>
         </div>
 
         {{-- Step 2: Per-method configuration --}}
@@ -116,19 +135,30 @@
                             </div>
 
                             {{-- Existing secret picker --}}
-                            <div x-show="credentialMode === 'existing'" style="display: none;" x-transition class="tw:mb-0">
-                                <label class="tw:block tw:font-medium tw:mb-2 tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Select Secret') }}</label>
-                                <select name="secret_id" class="form-control @error('secret_id') tw:border-red-500 @enderror">
-                                    <option value="">{{ __('Select an existing secret...') }}</option>
+                            <div x-show="credentialMode === 'existing'" style="display: none;" x-transition class="tw:mb-0" :class="(errors && errors['secret_id']) ? 'has-error' : ''">
+                                <x-select2
+                                    :id="'secret-select-add-' . $method['type']"
+                                    name="secret_id"
+                                    :label="__('Select Secret')"
+                                    type="secret"
+                                    :data="['secret_type' => $method['type']]"
+                                    :placeholder="__('Select an existing secret...')"
+                                    :selected="old('secret_id')"
+                                    :allow-clear="false"
+                                    class="tw:max-w-md"
+                                >
                                     @foreach($availableSecrets[$method['type']] ?? [] as $secret)
                                         <option value="{{ $secret->id }}" {{ old('secret_id') == $secret->id ? 'selected' : '' }}>
                                             {{ $secret->description }}
                                         </option>
                                     @endforeach
-                                </select>
+                                </x-select2>
                                 @error('secret_id')
                                 <p class="tw:text-red-600 tw:dark:text-red-400 tw:text-sm tw:mt-1">{{ $message }}</p>
                                 @enderror
+                                <template x-if="errors && errors['secret_id']">
+                                    <p class="tw:text-red-600 tw:dark:text-red-400 tw:text-sm tw:mt-1" x-text="errors['secret_id']?.[0]"></p>
+                                </template>
                                 @if(($availableSecrets[$method['type']] ?? collect())->isEmpty())
                                     <p class="tw:text-sm tw:text-amber-600 tw:dark:text-amber-400 tw:mt-2">
                                         <i class="fa fa-exclamation-triangle tw:mr-1"></i>
@@ -141,12 +171,15 @@
                             {{-- New secret form --}}
                             <div x-show="credentialMode === 'new'" style="display: none;" x-transition
                                  x-data="{ description: @js(old('description', strtoupper($method['type']) . ' ' . $device->hostname)) }">
-                                 <div class="tw:mb-4">
+                                 <div class="tw:mb-4" :class="(errors && errors['description']) ? 'has-error' : ''">
                                      <label class="tw:block tw:font-medium tw:mb-2 tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Description') }}</label>
                                      <input type="text" name="description" x-model="description" class="form-control @error('description') tw:border-red-500 @enderror">
                                      @error('description')
                                      <p class="tw:text-red-600 tw:dark:text-red-400 tw:text-sm tw:mt-1">{{ $message }}</p>
                                      @enderror
+                                     <template x-if="errors && errors['description']">
+                                         <p class="tw:text-red-600 tw:dark:text-red-400 tw:text-sm tw:mt-1" x-text="errors['description']?.[0]"></p>
+                                     </template>
                                  </div>
 
                                 <div class="tw:mb-5" x-data="{ isDefault: {{ old('default') ? 'true' : 'false' }} }">
@@ -204,5 +237,51 @@
                 {{ __('Add Polling Type') }}
             </button>
         </div>
+
+        {{-- Reachability Failure Dialog --}}
+        <template x-teleport="body">
+            <div x-show="unreachableDialog" x-cloak style="display: none;"
+                 class="tw:fixed tw:inset-0 tw:z-100 tw:flex tw:items-center tw:justify-center tw:p-4 tw:bg-black/60 tw:backdrop-blur-xs"
+                 @click="unreachableDialog = false"
+                 @keydown.escape.window="unreachableDialog = false">
+                <div x-show="unreachableDialog"
+                     x-transition:enter="tw:ease-out tw:duration-300"
+                     x-transition:enter-start="tw:opacity-0 tw:scale-95"
+                     x-transition:enter-end="tw:opacity-100 tw:scale-100"
+                     x-transition:leave="tw:ease-in tw:duration-200"
+                     x-transition:leave-start="tw:opacity-100 tw:scale-100"
+                     x-transition:leave-end="tw:opacity-0 tw:scale-95"
+                     @click.stop
+                     class="tw:w-full tw:max-w-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-gray-200 tw:dark:border-dark-gray-300 tw:rounded-xl tw:shadow-2xl tw:p-6"
+                     role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+                    <div class="tw:flex tw:items-start tw:gap-4">
+                        <div class="tw:shrink-0 tw:flex tw:items-center tw:justify-center tw:h-12 tw:w-12 tw:rounded-full tw:bg-amber-100 tw:dark:bg-amber-900/50">
+                            <i class="fa fa-exclamation-triangle tw:text-amber-600 tw:dark:text-amber-400 tw:text-xl"></i>
+                        </div>
+                        <div class="tw:grow">
+                            <h3 class="tw:text-lg tw:font-semibold tw:text-gray-900 tw:dark:text-dark-white-100 tw:m-0" id="modal-title">
+                                {{ __('poller.reachability_check_failed') }}
+                            </h3>
+                            <div class="tw:mt-2">
+                                <p class="tw:text-sm tw:text-gray-600 tw:dark:text-dark-white-300" x-text="unreachableMessage"></p>
+                                <template x-if="unreachableDetails">
+                                    <div class="tw:mt-3 tw:p-3 tw:bg-gray-100 tw:dark:bg-dark-gray-600 tw:rounded tw:text-xs tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-200 tw:overflow-x-auto tw:max-h-40" x-text="unreachableDetails"></div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tw:mt-6 tw:flex tw:flex-col-reverse tw:sm:flex-row tw:justify-end tw:gap-3">
+                        <button type="button" @click="unreachableDialog = false" class="btn btn-default">
+                            {{ __('Edit Settings') }}
+                        </button>
+                        <button type="button" @click="saveAnyway()" class="btn btn-warning">
+                            <i class="fa fa-save tw:mr-1"></i> {{ __('Save Anyway') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
     </form>
 @endif

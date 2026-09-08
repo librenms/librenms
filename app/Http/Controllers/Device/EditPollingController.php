@@ -17,6 +17,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
 
@@ -139,6 +140,68 @@ class EditPollingController
             ]);
         }
 
+        $forceSave = $request->boolean('force_save');
+
+        if (! $forceSave) {
+            $transientSettings = $request->validatedSettings();
+            $transientSecretData = [];
+            $transientSecret = null;
+            if ($definition->secretDefinition() !== null) {
+                if ($credentialMode === 'existing' && $secretId !== null) {
+                    $transientSecret = Secret::resolveForType($secretId, $type);
+                } else {
+                    $transientSecretData = $request->validatedSecretData();
+                }
+            }
+
+            $transientMethod = DevicePollingMethod::transient(
+                type: $type,
+                settings: $transientSettings,
+                secretData: $transientSecretData,
+                device: $device,
+                affectsAvailability: $definition->defaultAffectsAvailability(),
+                enabled: true,
+            );
+            if ($transientSecret !== null) {
+                $transientMethod->setRelation('secret', $transientSecret);
+            }
+
+            $existingMethods = $device->pollingMethods->reject(fn ($m) => $m->method_type === $type);
+            $testDevice = clone $device;
+            $testDevice->setRelation('pollingMethods', $existingMethods->concat([$transientMethod]));
+
+            $probeResult = $definition->probe()->check($testDevice);
+
+            if (! $probeResult->isSuccess()) {
+                $errorDetails = null;
+                if ($probeResult->stat('response') instanceof SnmpResponse) {
+                    /** @var SnmpResponse $snmpResponse */
+                    $snmpResponse = $probeResult->stat('response');
+                    $errorDetails = $snmpResponse->getErrorMessage() ?: ($snmpResponse->stderr ?: null);
+                } elseif ($probeResult->stat('error')) {
+                    $errorDetails = (string) $probeResult->stat('error');
+                }
+
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'status' => 'unreachable',
+                        'message' => __('poller.reachability_failed', [
+                            'hostname' => $device->hostname,
+                            'method' => __('poller.methods.' . $type->value),
+                        ]),
+                        'error_details' => $errorDetails,
+                    ], 422);
+                }
+
+                $toast->error(__('poller.reachability_failed', [
+                    'hostname' => $device->hostname,
+                    'method' => __('poller.methods.' . $type->value),
+                ]));
+
+                return redirect()->back();
+            }
+        }
+
         $row = DevicePollingMethod::saveForDevice(
             device: $device,
             type: $type,
@@ -167,6 +230,10 @@ class EditPollingController
             $device->port_association_mode = PortAssociationMode::getId($row->settings['port_association_mode']) ?? 1;
             $device->saveQuietly();
         }
+
+        $row->last_check_successful = isset($probeResult) ? $probeResult->isSuccess() : false;
+        $row->last_checked_at = now();
+        $row->save();
 
         $toast->success(__('poller.method_added'));
 
@@ -215,13 +282,81 @@ class EditPollingController
             }
         }
 
+        $forceSave = $request->boolean('force_save');
+        $enabled = (bool) ($validated['enabled'] ?? true);
+
+        if ($enabled && ! $forceSave) {
+            $transientSettings = $validated['settings'] ?? [];
+            $transientSecretData = [];
+            $transientSecret = null;
+            if ($type->hasSecret()) {
+                $isEditingSecret = (bool) $request->input('is_editing_secret', $request->has('secret_data'));
+                $secretData = $request->has('secret_data') ? $request->validatedSecretData() : null;
+
+                if ($secretId !== null && ! $isEditingSecret) {
+                    $transientSecret = Secret::resolveForType($secretId, $type);
+                } elseif ($secretData !== null) {
+                    $transientSecretData = $secretData;
+                } else {
+                    $transientSecret = $pollingMethod->secret;
+                }
+            }
+
+            $transientMethod = DevicePollingMethod::transient(
+                type: $type,
+                settings: $transientSettings,
+                secretData: $transientSecretData,
+                device: $device,
+                affectsAvailability: (bool) ($validated['affects_availability'] ?? false),
+                enabled: true,
+            );
+            if ($transientSecret !== null) {
+                $transientMethod->setRelation('secret', $transientSecret);
+            }
+
+            $existingMethods = $device->pollingMethods->reject(fn ($m) => $m->method_type === $type);
+            $testDevice = clone $device;
+            $testDevice->setRelation('pollingMethods', $existingMethods->concat([$transientMethod]));
+
+            $probeResult = $type->definition()->probe()->check($testDevice);
+
+            if (! $probeResult->isSuccess()) {
+                $errorDetails = null;
+                if ($probeResult->stat('response') instanceof SnmpResponse) {
+                    /** @var SnmpResponse $snmpResponse */
+                    $snmpResponse = $probeResult->stat('response');
+                    $errorDetails = $snmpResponse->getErrorMessage() ?: ($snmpResponse->stderr ?: null);
+                } elseif ($probeResult->stat('error')) {
+                    $errorDetails = (string) $probeResult->stat('error');
+                }
+
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'status' => 'unreachable',
+                        'message' => __('poller.reachability_failed', [
+                            'hostname' => $device->hostname,
+                            'method' => __('poller.methods.' . $type->value),
+                        ]),
+                        'error_details' => $errorDetails,
+                    ], 422);
+                }
+
+                $toast->error(__('poller.reachability_failed', [
+                    'hostname' => $device->hostname,
+                    'method' => __('poller.methods.' . $type->value),
+                ]));
+
+                return redirect()->back();
+            }
+        }
+
         $pollingMethod->setRelation('device', $device);
 
         $pollingMethod = DevicePollingMethod::saveForDevice(
             device: $device,
             type: $type,
             settings: $validated['settings'] ?? [],
-            enabled: (bool) ($validated['enabled'] ?? true),
+            enabled: $enabled,
             affectsAvailability: (bool) ($validated['affects_availability'] ?? false),
         );
 
@@ -234,24 +369,33 @@ class EditPollingController
             if ($secretId !== null && ! $isEditingSecret) {
                 $secret = Secret::resolveForType($secretId, $type);
                 $pollingMethod->secret()->associate($secret)->save();
-            } elseif ($secretData !== null) {
+            } elseif ($isEditingSecret || $secretData !== null) {
                 $targetSecret = $secretId !== null ? Secret::resolveForType($secretId, $type) : $pollingMethod->secret;
+                $isShared = $targetSecret ? ($targetSecret->devices()->count() > 1) : false;
+                $shouldCreate = ($mode === 'create' && $isShared) || ! $targetSecret;
 
-                if ($mode === 'create' || ! $targetSecret) {
+                if ($shouldCreate) {
                     $secret = Secret::create([
                         'secret_type' => $type->value,
                         'description' => $description ?: ('Custom ' . strtoupper($type->value) . ' (' . $device->hostname . ')'),
                         'default' => false,
-                        'data' => $secretData,
+                        'data' => $secretData ?? ($targetSecret?->data ?? []),
                     ]);
                     $pollingMethod->secret()->associate($secret)->save();
                 } else {
-                    $updateAttributes = ['data' => $secretData];
+                    $updateAttributes = [];
+                    if ($secretData !== null) {
+                        $updateAttributes['data'] = $secretData;
+                    }
                     if ($description !== null && $description !== '') {
                         $updateAttributes['description'] = $description;
                     }
-                    $targetSecret->update($updateAttributes);
-                    $pollingMethod->secret()->associate($targetSecret)->save();
+                    if (! empty($updateAttributes) && $targetSecret) {
+                        $targetSecret->update($updateAttributes);
+                    }
+                    if ($targetSecret) {
+                        $pollingMethod->secret()->associate($targetSecret)->save();
+                    }
                 }
             }
 
@@ -264,6 +408,12 @@ class EditPollingController
 
         $setDeviceAvailability->execute($device, false);
         $device->saveQuietly();
+
+        if ($enabled) {
+            $pollingMethod->last_check_successful = isset($probeResult) ? $probeResult->isSuccess() : false;
+            $pollingMethod->last_checked_at = now();
+            $pollingMethod->save();
+        }
 
         $toast->success(__('poller.method_updated'));
 

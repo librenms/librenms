@@ -34,6 +34,8 @@ return [
     'method_exists' => 'This polling method is already configured for this device.',
     'select_credential' => 'Select an existing credential',
     'credential_type_mismatch' => 'Selected credential does not match polling method type.',
+    'reachability_failed' => 'Could not connect to :hostname using :method.',
+    'reachability_check_failed' => 'Reachability Check Failed',
     'settings' => [
         'settings' => [
             'poller_groups' => [

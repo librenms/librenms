@@ -107,7 +107,7 @@
                                     $method['secret']
                                         ? [(string) $method['secret']->id => [
                                             'description' => $method['secret']->description,
-                                            'usage_count' => $method['usage_count'] ?? 1,
+                                            'usage_count' => $method['usage_count'] ?? 0,
                                         ]]
                                         : []
                                 )),
@@ -147,7 +147,7 @@
                                 </div>
                             </div>
 
-                            <form method="POST" :action="configured ? updateUrl : storeUrl" @submit.prevent="saveForm($event)">
+                            <form x-ref="form" method="POST" :action="configured ? updateUrl : storeUrl" @submit.prevent="saveForm($event)">
                                 @csrf
                                 <input type="hidden" name="_method" value="PUT" :disabled="!configured">
                                 <input type="hidden" name="method_type" value="{{ $method['type'] }}" :disabled="configured">
@@ -190,14 +190,27 @@
                                                 <input type="hidden" name="is_editing_secret" :value="isEditingSecret ? '1' : '0'">
 
                                                 {{-- Secret picker --}}
-                                                <div class="tw:mb-4">
+                                                <div class="tw:mb-4 form-group" :class="(errors && errors['secret_id']) ? 'has-error' : ''">
                                                     <label class="tw:block tw:text-sm tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-1">{{ __('Secret') }}</label>
                                                     <div class="tw:flex tw:items-center tw:gap-2 tw:max-w-xl">
-                                                        <select x-model="selectedSecretId" @change="onSecretChange()" class="form-control">
+                                                        <x-select2
+                                                            :id="'secret-select-' . $method['type']"
+                                                            type="secret"
+                                                            :data="['secret_type' => $method['type']]"
+                                                            :selected="$method['secret'] ? ['id' => (string) $method['secret']->id, 'text' => $method['secret']->description] : null"
+                                                            :placeholder="__('Select Secret')"
+                                                            :allow-clear="false"
+                                                            x-model="selectedSecretId"
+                                                            x-ref="secretSelect"
+                                                            @change="onSecretChange()"
+                                                            class="tw:grow"
+                                                        >
                                                             @foreach(($availableSecrets[$method['type']] ?? collect()) as $secret)
-                                                                <option value="{{ (string) $secret->id }}">{{ $secret->description }}</option>
+                                                                <option value="{{ (string) $secret->id }}" {{ (string) ($method['secret']?->id ?? '') === (string) $secret->id ? 'selected' : '' }}>
+                                                                    {{ $secret->description }}
+                                                                </option>
                                                             @endforeach
-                                                        </select>
+                                                        </x-select2>
                                                         <button
                                                             type="button"
                                                             class="btn btn-default btn-sm tw:shrink-0"
@@ -219,13 +232,16 @@
                                                             <i class="fa fa-edit"></i>
                                                         </button>
                                                     </div>
+                                                    <template x-if="errors && errors['secret_id']">
+                                                        <span class="help-block" x-text="errors['secret_id']?.[0]"></span>
+                                                    </template>
 
                                                     <div x-show="showSecretInfo" x-cloak style="display: none;"
                                                          class="tw:mt-3 tw:bg-gray-50 tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-lg tw:p-3 tw:text-sm">
                                                         <div class="tw:font-semibold tw:text-gray-800 tw:dark:text-dark-white-100" x-text="selectedSecretMeta?.description ?? '{{ __('Unknown secret') }}'"></div>
                                                         <div class="tw:text-gray-500 tw:dark:text-dark-white-300 tw:mt-1">
                                                             <template x-if="isSharedSecret">
-                                                                <span>{{ __('Shared — used by') }} <span x-text="(selectedSecretMeta?.usage_count ?? 1) - 1"></span> {{ __('other device(s).') }}</span>
+                                                                <span>{{ __('Shared — used by') }} <span x-text="otherDevicesCount"></span> {{ __('other device(s).') }}</span>
                                                             </template>
                                                             <template x-if="!isSharedSecret">
                                                                 <span>{{ __('Only used by this device.') }}</span>
@@ -239,9 +255,15 @@
 
                                                 {{-- Editing a secret's values --}}
                                                 <div x-show="isEditingSecret" x-cloak style="display: none;">
-                                                    <div class="form-group tw:max-w-md">
+                                                    <div class="form-group tw:max-w-md" :class="(errors && errors['description']) ? 'has-error' : ''">
                                                         <label class="control-label">{{ __('Secret Description') }}</label>
                                                         <input type="text" name="description" x-model="secretDescription" class="form-control">
+                                                        <p class="tw:text-amber-600 tw:dark:text-amber-400 tw:text-xs tw:mt-1.5" x-show="showSharedGuard && updateMode === 'create' && secretDescription === (selectedSecretMeta?.description ?? '')">
+                                                            <i class="fa fa-info-circle tw:mr-1"></i> {{ __('Please update the description so it does not match the existing secret.') }}
+                                                        </p>
+                                                        <template x-if="errors && errors['description']">
+                                                            <span class="help-block" x-text="errors['description']?.[0]"></span>
+                                                        </template>
                                                     </div>
 
                                                     <x-field-schema-fields
@@ -262,14 +284,14 @@
                                                                 </p>
                                                                 <div class="tw:flex tw:flex-col tw:gap-2">
                                                                     <label class="tw:flex tw:items-center tw:cursor-pointer">
-                                                                        <input type="radio" name="secret_update_mode" value="create" x-model="updateMode" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
+                                                                        <input type="radio" name="secret_update_mode" value="create" x-model="updateMode" :disabled="!showSharedGuard" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
                                                                         <span class="tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Create a new secret for this device only (recommended)') }}</span>
                                                                     </label>
                                                                     <label class="tw:flex tw:items-center tw:cursor-pointer">
-                                                                        <input type="radio" name="secret_update_mode" value="update" x-model="updateMode" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
+                                                                        <input type="radio" name="secret_update_mode" value="update" x-model="updateMode" :disabled="!showSharedGuard" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
                                                                         <span class="tw:text-gray-700 tw:dark:text-dark-white-200">
                                                                             {{ __('Update the shared secret') }}
-                                                                            (<span x-text="(selectedSecretMeta?.usage_count ?? 1) - 1"></span> {{ __('other device(s) affected') }})
+                                                                            (<span x-text="otherDevicesCount"></span> {{ __('other device(s) affected') }})
                                                                         </span>
                                                                     </label>
                                                                 </div>
@@ -298,16 +320,24 @@
                                                 </div>
 
                                                 {{-- Existing secret picker --}}
-                                                <div x-show="credentialMode === 'existing'" style="display: none;" class="form-group tw:max-w-md tw:mb-0">
-                                                    <label class="control-label">{{ __('Select Secret') }}</label>
-                                                    <select name="secret_id" class="form-control">
-                                                        <option value="">{{ __('Select an existing secret...') }}</option>
+                                                <div x-show="credentialMode === 'existing'" style="display: none;" class="tw:max-w-md tw:mb-0">
+                                                    <x-select2
+                                                        :id="'secret-select-unconf-' . $method['type']"
+                                                        name="secret_id"
+                                                        :label="__('Select Secret')"
+                                                        type="secret"
+                                                        :data="['secret_type' => $method['type']]"
+                                                        :placeholder="__('Select an existing secret...')"
+                                                        :selected="old('secret_id')"
+                                                        :allow-clear="false"
+                                                        class="tw:max-w-md"
+                                                    >
                                                         @foreach($availableSecrets[$method['type']] ?? [] as $secret)
                                                             <option value="{{ $secret->id }}" {{ old('secret_id') == $secret->id ? 'selected' : '' }}>
                                                                 {{ $secret->description }}
                                                             </option>
                                                         @endforeach
-                                                    </select>
+                                                    </x-select2>
                                                 </div>
 
                                                 {{-- New secret form --}}
@@ -388,12 +418,6 @@
                                                 <template x-if="!loading"><i class="fa fa-save tw:mr-1"></i></template>
                                                 {{ __('Save Settings') }}
                                             </button>
-
-                                            @if($method['type'] === 'snmp')
-                                                <button type="submit" name="force_save" value="1" class="btn btn-warning" x-show="enabled">
-                                                    <i class="fa fa-exclamation-triangle tw:mr-1"></i> {{ __('Force Save') }}
-                                                </button>
-                                            @endif
                                         @else
                                             <button type="submit" :disabled="loading" class="btn btn-success tw:bg-emerald-600 tw:border-emerald-600 tw:hover:bg-emerald-700">
                                                 <template x-if="loading"><i class="fa fa-spinner fa-spin tw:mr-1"></i></template>
@@ -410,6 +434,52 @@
                                     @endif
                                 </div>
                             </form>
+
+                            {{-- Reachability Failure Dialog --}}
+                            <template x-teleport="body">
+                                <div x-show="unreachableDialog" x-cloak style="display: none;"
+                                     class="tw:fixed tw:inset-0 tw:z-100 tw:flex tw:items-center tw:justify-center tw:p-4 tw:bg-black/60 tw:backdrop-blur-xs"
+                                     @click="unreachableDialog = false"
+                                     @keydown.escape.window="unreachableDialog = false">
+                                    <div x-show="unreachableDialog"
+                                         x-transition:enter="tw:ease-out tw:duration-300"
+                                         x-transition:enter-start="tw:opacity-0 tw:scale-95"
+                                         x-transition:enter-end="tw:opacity-100 tw:scale-100"
+                                         x-transition:leave="tw:ease-in tw:duration-200"
+                                         x-transition:leave-start="tw:opacity-100 tw:scale-100"
+                                         x-transition:leave-end="tw:opacity-0 tw:scale-95"
+                                         @click.stop
+                                         class="tw:w-full tw:max-w-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-gray-200 tw:dark:border-dark-gray-300 tw:rounded-xl tw:shadow-2xl tw:p-6"
+                                         role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+                                        <div class="tw:flex tw:items-start tw:gap-4">
+                                            <div class="tw:shrink-0 tw:flex tw:items-center tw:justify-center tw:h-12 tw:w-12 tw:rounded-full tw:bg-amber-100 tw:dark:bg-amber-900/50">
+                                                <i class="fa fa-exclamation-triangle tw:text-amber-600 tw:dark:text-amber-400 tw:text-xl"></i>
+                                            </div>
+                                            <div class="tw:grow">
+                                                <h3 class="tw:text-lg tw:font-semibold tw:text-gray-900 tw:dark:text-dark-white-100 tw:m-0" id="modal-title">
+                                                    {{ __('poller.reachability_check_failed') }}
+                                                </h3>
+                                                <div class="tw:mt-2">
+                                                    <p class="tw:text-sm tw:text-gray-600 tw:dark:text-dark-white-300" x-text="unreachableMessage"></p>
+                                                    <template x-if="unreachableDetails">
+                                                        <div class="tw:mt-3 tw:p-3 tw:bg-gray-100 tw:dark:bg-dark-gray-600 tw:rounded tw:text-xs tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-200 tw:overflow-x-auto tw:max-h-40" x-text="unreachableDetails"></div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tw:mt-6 tw:flex tw:flex-col-reverse tw:sm:flex-row tw:justify-end tw:gap-3">
+                                            <button type="button" @click="unreachableDialog = false" class="btn btn-default">
+                                                {{ __('Edit Settings') }}
+                                            </button>
+                                            <button type="button" @click="saveAnyway()" class="btn btn-warning">
+                                                <i class="fa fa-save tw:mr-1"></i> {{ __('Save Anyway') }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     @endforeach
                 </div>
@@ -503,18 +573,31 @@
                 destroyUrl: config.destroyUrl,
                 labels: config.labels || {},
 
+                errors: {},
+                unreachableDialog: false,
+                unreachableMessage: '',
+                unreachableDetails: '',
+
                 get selectedSecretMeta() {
                     return this.secretMeta[this.selectedSecretId] || null;
                 },
+                get otherDevicesCount() {
+                    const total = this.selectedSecretMeta?.usage_count ?? 0;
+                    const isCurrent = this.configured && (String(this.selectedSecretId) === String(this.currentSecretId));
+                    return isCurrent ? Math.max(0, total - 1) : total;
+                },
                 get isSharedSecret() {
-                    return (this.selectedSecretMeta?.usage_count ?? 1) > 1;
+                    return this.otherDevicesCount > 0;
+                },
+                get secretDataChanged() {
+                    return JSON.stringify(this.formData) !== JSON.stringify(this.secretFormDataById[this.selectedSecretId] || {});
                 },
                 get secretValuesChanged() {
-                    return JSON.stringify(this.formData) !== JSON.stringify(this.secretFormDataById[this.selectedSecretId] || {})
+                    return this.secretDataChanged
                         || this.secretDescription !== (this.selectedSecretMeta?.description ?? '');
                 },
                 get showSharedGuard() {
-                    return this.configured && this.isEditingSecret && this.isSharedSecret;
+                    return this.configured && this.isEditingSecret && this.isSharedSecret && this.secretDataChanged;
                 },
                 get isDirty() {
                     if (!this.configured) { return true; }
@@ -528,17 +611,26 @@
                     this.formData = { ...(this.secretFormDataById[this.selectedSecretId] || {}) };
                     this.secretDescription = this.selectedSecretMeta?.description ?? '';
                     this.showSecretInfo = false;
+                    this.updateMode = this.showSharedGuard ? 'create' : 'update';
                 },
                 toggleEditSecret() {
                     this.isEditingSecret = !this.isEditingSecret;
                     if (this.isEditingSecret) { this.showSecretInfo = false; }
                 },
-                async saveForm(e) {
+                saveAnyway() {
+                    this.unreachableDialog = false;
+                    this.saveForm(null, true);
+                },
+                async saveForm(e, force = false) {
                     this.loading = true;
-                    const form = e.target;
+                    this.errors = {};
+                    const form = this.$refs.form;
                     const formData = new FormData(form);
-                    if (e.submitter && e.submitter.name && !formData.has(e.submitter.name)) {
+                    if (e && e.submitter && e.submitter.name && !formData.has(e.submitter.name)) {
                         formData.append(e.submitter.name, e.submitter.value);
+                    }
+                    if (force) {
+                        formData.set('force_save', '1');
                     }
                     const actionUrl = this.configured ? this.updateUrl : this.storeUrl;
                     try {
@@ -553,14 +645,18 @@
                         });
                         const data = await response.json();
                         if (!response.ok) {
-                            if (data.errors) {
-                                const msg = Object.values(data.errors).flat().join('<br>');
-                                toastr.error(msg);
+                            if (data.status === 'unreachable') {
+                                this.unreachableMessage = data.message || @js(__('poller.reachability_check_failed'));
+                                this.unreachableDetails = data.error_details || '';
+                                this.unreachableDialog = true;
+                            } else if (data.errors) {
+                                this.errors = data.errors;
                             } else {
                                 toastr.error(data.message || this.labels.saveFailed || 'Failed to save settings');
                             }
                             return;
                         }
+                        this.errors = {};
                         toastr.success(data.message || this.labels.saved || 'Settings saved');
                         if (data.method) {
                             this.configured = data.method.configured;
@@ -576,6 +672,19 @@
                             this.formData = { ...(data.method.secret_form_data ?? {}) };
                             this.settingsData = { ...(data.method.settings ?? {}) };
                             this.initialSettingsData = { ...(data.method.settings ?? {}) };
+
+                            if (data.method.secret && this.$refs.secretSelect) {
+                                const selectEl = this.$refs.secretSelect.tagName === 'SELECT'
+                                    ? this.$refs.secretSelect
+                                    : (this.$refs.secretSelect.querySelector('select') || this.$refs.secretSelect);
+                                const $select = $(selectEl);
+                                const secretId = String(data.method.secret.id);
+                                const secretDesc = data.method.secret.description;
+                                $select.find(`option[value="${secretId}"]`).remove();
+                                const newOption = new Option(secretDesc, secretId, true, true);
+                                $select.append(newOption);
+                                $select.val(secretId).trigger('change');
+                            }
                         }
                         this.setDirty(this.type, false);
                     } catch (err) {
@@ -628,7 +737,7 @@
                         }
                     });
                     this.$watch('showSharedGuard', (val) => {
-                        if (val) { this.updateMode = 'create'; }
+                        this.updateMode = val ? 'create' : 'update';
                     });
                 }
             };
