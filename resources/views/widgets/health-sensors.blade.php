@@ -2,6 +2,39 @@
     <div class="alert alert-danger">{{ $error }}</div>
 @elseif ($sensors->isEmpty())
     <div class="alert alert-info">{{ __('No health sensors matched the current filters.') }}</div>
+@elseif ($display_mode === 'table')
+    <div class="health-sensors-widget tw:overflow-y-auto">
+        <table class="table table-condensed table-hover tw:mb-0">
+            <thead>
+                <tr>
+                    <th class="tw:text-right">#</th>
+                    <th>{{ __('Device') }}</th>
+                    <th>{{ __('Sensor') }}</th>
+                    <th class="tw:text-right">{{ __('Value') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($sensors as $index => $row)
+                    @php($sensor = $row['sensor'])
+                    @php($status = $row['status'] ?? 'unknown')
+                    <tr @class(['danger' => $status === 'critical', 'warning' => $status === 'warning'])>
+                        <td class="tw:text-right tw:text-gray-500">{{ $index + 1 }}</td>
+                        <td>
+                            <a href="{{ route('device', ['device' => $sensor->device_id]) }}" class="tw:text-inherit tw:no-underline hover:tw:underline">
+                                {{ $sensor->device?->displayName() ?? __('Unknown device') }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ url('graphs/id=' . $sensor->sensor_id . '/type=sensor_' . $sensor->sensor_class . '/') }}" class="tw:text-inherit tw:no-underline hover:tw:underline">
+                                {{ \Str::limit($sensor->sensor_descr, 64) }}
+                            </a>
+                        </td>
+                        <td class="tw:text-right tw:font-semibold tw:whitespace-nowrap">{{ $sensor->formatValue() }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 @else
     @php($colWidth = max(1, min(12, intdiv(12, max(1, (int) ($cols ?? 3))))))
 
