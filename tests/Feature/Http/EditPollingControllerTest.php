@@ -160,4 +160,44 @@ class EditPollingControllerTest extends TestCase
 
         $response->assertSessionHasErrors(['description']);
     }
+
+    public function testIndexRendersPollingViewWithPreservedSecretKeys(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+
+        $secret = \App\Models\Secret::create([
+            'description' => 'SNMP Secret 123',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'default' => false,
+            'data' => ['version' => 'v2c', 'community' => 'public'],
+        ]);
+
+        $device = Device::factory()->create(['hostname' => 'test-device.example.com']);
+
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $secret->id,
+            'enabled' => true,
+        ]);
+
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('device.edit.polling', ['device' => $device]));
+        $response->assertOk();
+        $response->assertSee('SNMP Secret 123');
+        $response->assertViewHas('allMethods', function ($allMethods) use ($secret) {
+            $snmp = $allMethods->firstWhere('type', 'snmp');
+            $this->assertArrayHasKey((string) $secret->id, $snmp['secret_meta']);
+            $this->assertArrayHasKey((string) $secret->id, $snmp['secret_form_data_by_id']);
+
+            return true;
+        });
+    }
 }

@@ -104,22 +104,69 @@
                                 credentialMode: 'existing',
                                 currentSecretId: '{{ (string) ($method['secret']?->id ?? '') }}',
                                 selectedSecretId: '{{ (string) ($method['secret']?->id ?? '') }}',
-                                pendingSecretId: '{{ (string) ($method['secret']?->id ?? '') }}',
-                                isChangingSecret: false,
-                                secretSelectionConfirmed: false,
-                                secretDescriptions: @js($method['secret_descriptions'] ?? []),
-                                secretFormDataById: @js($method['secret_form_data_by_id'] ?? []),
-                                formData: @js($method['secret_form_data'] ?? $method['schema_defaults'] ?? []),
-                                initialFormData: @js($method['secret_form_data'] ?? $method['schema_defaults'] ?? []),
-                                settingsData: @js($method['settings'] ?? []),
-                                initialSettingsData: @js($method['settings'] ?? []),
+                                showSecretInfo: false,
+                                isEditingSecret: false,
+                                secretDescription: @js($method['secret']?->description ?? ''),
+                                // secretMeta: { [id]: { description, usage_count } }, covering every secret of
+                                // this type (from $method['secret_meta']). The merge below is just a defensive
+                                // backstop for the assigned secret in case it ever falls outside that list.
+                                secretMeta: @js((object) array_replace(
+                                    $method['secret_meta'] ?? [],
+                                    $method['secret']
+                                        ? [(string) $method['secret']->id => [
+                                            'description' => $method['secret']->description,
+                                            'usage_count' => $method['usage_count'] ?? 1,
+                                        ]]
+                                        : []
+                                )),
+                                // Likewise a defensive backstop: $method['secret_form_data_by_id'] already
+                                // covers every secret of this type, matching formData's initial value for
+                                // whichever one is currently assigned.
+                                secretFormDataById: @js((object) array_replace(
+                                    $method['secret_form_data_by_id'] ?? [],
+                                    $method['secret']
+                                        ? [(string) $method['secret']->id => (object) ($method['secret_form_data'] ?? $method['schema_defaults'] ?? [])]
+                                        : []
+                                )),
+                                secretFieldLabels: @js((object) collect($method['schema_fields'] ?? [])->mapWithKeys(fn (array $f) => [$f['key'] => $f['label'] ?? $f['key']])),
+                                formData: @js((object) ($method['secret_form_data'] ?? $method['schema_defaults'] ?? [])),
+                                settingsData: @js((object) ($method['settings'] ?? [])),
+                                initialSettingsData: @js((object) ($method['settings'] ?? [])),
+                                get selectedSecretMeta() {
+                                    return this.secretMeta[this.selectedSecretId] || null;
+                                },
+                                get isSharedSecret() {
+                                    return (this.selectedSecretMeta?.usage_count ?? 1) > 1;
+                                },
+                                get secretValuesChanged() {
+                                    return JSON.stringify(this.formData) !== JSON.stringify(this.secretFormDataById[this.selectedSecretId] || {})
+                                        || this.secretDescription !== (this.selectedSecretMeta?.description ?? '');
+                                },
+                                // The shared-secret guard now tracks editing intent (the Edit button),
+                                // not whether values have changed yet — it should appear as soon as
+                                // someone opens the editor on a secret other devices also use.
+                                get showSharedGuard() {
+                                    return this.configured && this.isEditingSecret && this.isSharedSecret;
+                                },
                                 get isDirty() {
                                     if (!this.configured) { return true; }
                                     return this.enabled !== this.initialEnabled
                                         || this.affectsAvailability !== this.initialAffectsAvailability
-                                        || JSON.stringify(this.formData) !== JSON.stringify(this.initialFormData)
-                                        || JSON.stringify(this.settingsData) !== JSON.stringify(this.initialSettingsData)
-                                        || this.selectedSecretId !== this.currentSecretId;
+                                        || this.selectedSecretId !== this.currentSecretId
+                                        || this.secretValuesChanged
+                                        || JSON.stringify(this.settingsData) !== JSON.stringify(this.initialSettingsData);
+                                },
+                                onSecretChange() {
+                                    // Switching secrets loads that secret's own stored values fresh —
+                                    // it does not carry over edits made to the previously selected secret.
+                                    this.formData = { ...(this.secretFormDataById[this.selectedSecretId] || {}) };
+                                    this.secretDescription = this.selectedSecretMeta?.description ?? '';
+                                    this.isEditingSecret = true;
+                                    this.showSecretInfo = false;
+                                },
+                                toggleEditSecret() {
+                                    this.isEditingSecret = !this.isEditingSecret;
+                                    if (this.isEditingSecret) { this.showSecretInfo = false; }
                                 },
                                 init() {
                                     setDirty('{{ $method["type"] }}', this.isDirty);
@@ -131,6 +178,11 @@
                                     });
                                     this.$watch('affectsAvailability', (val) => {
                                         methods['{{ $method["type"] }}'].affectsAvailability = val;
+                                    });
+                                    // Default to the safe choice the moment editing a shared secret's
+                                    // values actually becomes a live concern.
+                                    this.$watch('showSharedGuard', (val) => {
+                                        if (val) { this.updateMode = 'create'; }
                                     });
                                 }
                              }"
@@ -183,91 +235,103 @@
                                     </div>
                                 </div>
 
-                                {{-- Credentials section — shown for any method that has a secret --}}
+                                {{-- Credentials section --}}
                                 @if(!empty($method['schema_fields']))
                                     @if($method['configured'])
                                         <div x-show="enabled" class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
                                             <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Credentials') }}</h4>
 
                                             <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:text-sm tw:bg-white tw:dark:bg-dark-gray-500">
-                                                <input type="hidden" name="secret_id" :value="selectedSecretId" :disabled="!secretSelectionConfirmed">
+                                                <input type="hidden" name="secret_id" :value="selectedSecretId">
 
+                                                {{-- Secret picker --}}
                                                 <div class="tw:mb-4">
-                                                    <div x-show="!isChangingSecret" class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-                                                        <div class="tw:font-medium tw:text-lg tw:text-gray-800 tw:dark:text-dark-white-100" x-text="secretDescriptions[selectedSecretId] ?? '{{ __('None') }}'"></div>
+                                                    <label class="tw:block tw:text-sm tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-1">{{ __('Secret') }}</label>
+                                                    <div class="tw:flex tw:items-center tw:gap-2 tw:max-w-xl">
+                                                        <select x-model="selectedSecretId" @change="onSecretChange()" class="form-control">
+                                                            @foreach(($availableSecrets[$method['type']] ?? collect()) as $secret)
+                                                                <option value="{{ (string) $secret->id }}">{{ $secret->description }}</option>
+                                                            @endforeach
+                                                        </select>
                                                         <button
                                                             type="button"
-                                                            class="btn btn-default btn-sm"
-                                                            @click="pendingSecretId = selectedSecretId; isChangingSecret = true"
-                                                            title="{{ __('Change Secret') }}"
-                                                            aria-label="{{ __('Change Secret') }}"
+                                                            class="btn btn-default btn-sm tw:shrink-0"
+                                                            :class="showSecretInfo ? 'tw:bg-gray-200 tw:dark:bg-dark-gray-400' : ''"
+                                                            @click="showSecretInfo = !showSecretInfo; if (showSecretInfo) { isEditingSecret = false; }"
+                                                            title="{{ __('View secret details') }}"
+                                                            aria-label="{{ __('View secret details') }}"
+                                                        >
+                                                            <i class="fa fa-info-circle"></i>
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-default btn-sm tw:shrink-0"
+                                                            :class="isEditingSecret ? 'tw:bg-gray-200 tw:dark:bg-dark-gray-400' : ''"
+                                                            @click="toggleEditSecret()"
+                                                            title="{{ __('Edit secret') }}"
+                                                            aria-label="{{ __('Edit secret') }}"
                                                         >
                                                             <i class="fa fa-edit"></i>
                                                         </button>
                                                     </div>
 
-                                                    <div x-show="isChangingSecret" style="display: none;" class="tw:flex tw:flex-col tw:gap-2 tw:max-w-xl">
-                                                        <select x-model="pendingSecretId" class="form-control">
-                                                            @foreach(($availableSecrets[$method['type']] ?? collect()) as $secret)
-                                                                <option value="{{ (string) $secret->id }}">{{ $secret->description }}</option>
-                                                            @endforeach
-                                                        </select>
-
-                                                        <div class="tw:flex tw:items-center tw:gap-2">
-                                                            <button
-                                                                type="button"
-                                                                class="btn btn-primary btn-sm"
-                                                                @click="selectedSecretId = pendingSecretId; formData = { ...formData, ...(secretFormDataById[pendingSecretId] || {}) }; secretSelectionConfirmed = pendingSecretId !== currentSecretId; isChangingSecret = false"
-                                                                title="{{ __('Confirm') }}"
-                                                                aria-label="{{ __('Confirm') }}"
-                                                            >
-                                                                <i class="fa fa-check"></i>
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                class="btn btn-default btn-sm"
-                                                                @click="pendingSecretId = selectedSecretId; secretSelectionConfirmed = false; isChangingSecret = false"
-                                                                title="{{ __('Cancel') }}"
-                                                                aria-label="{{ __('Cancel') }}"
-                                                            >
-                                                                <i class="fa fa-times"></i>
-                                                            </button>
+                                                    <div x-show="showSecretInfo" x-cloak style="display: none;"
+                                                         class="tw:mt-3 tw:bg-gray-50 tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-lg tw:p-3 tw:text-sm">
+                                                        <div class="tw:font-semibold tw:text-gray-800 tw:dark:text-dark-white-100" x-text="selectedSecretMeta?.description ?? '{{ __('Unknown secret') }}'"></div>
+                                                        <div class="tw:text-gray-500 tw:dark:text-dark-white-300 tw:mt-1">
+                                                            <template x-if="isSharedSecret">
+                                                                <span>{{ __('Shared — used by') }} <span x-text="(selectedSecretMeta?.usage_count ?? 1) - 1"></span> {{ __('other device(s).') }}</span>
+                                                            </template>
+                                                            <template x-if="!isSharedSecret">
+                                                                <span>{{ __('Only used by this device.') }}</span>
+                                                            </template>
+                                                        </div>
+                                                        <div class="tw:text-gray-500 tw:dark:text-dark-white-300 tw:mt-1" x-show="Object.keys(secretFormDataById[selectedSecretId] || {}).length">
+                                                            {{ __('Fields set') }}: <span x-text="Object.keys(secretFormDataById[selectedSecretId] || {}).map(k => secretFieldLabels[k] || k).join(', ')"></span>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                @if($method['usage_count'] > 1)
-                                                    <div class="tw:mb-5 tw:bg-yellow-50 tw:dark:bg-transparent tw:border tw:border-yellow-200 tw:dark:border-yellow-800 tw:p-4 tw:rounded-lg">
+                                                {{-- Editing a secret's values --}}
+                                                <div x-show="isEditingSecret" x-cloak style="display: none;">
+                                                    <div class="form-group tw:max-w-md">
+                                                        <label class="control-label">{{ __('Secret Description') }}</label>
+                                                        <input type="text" name="description" x-model="secretDescription" class="form-control">
+                                                    </div>
+
+                                                    <x-field-schema-fields
+                                                        :fields="$method['schema_fields']"
+                                                        :method-type="$method['type']"
+                                                        name-prefix="secret_data"
+                                                        model-prefix="formData"
+                                                        :check-can-unmask="true"
+                                                        :grid="true" />
+
+                                                    <div x-show="showSharedGuard" x-cloak style="display: none;" class="tw:mb-5 tw:bg-red-50 tw:dark:bg-transparent tw:border tw:border-red-200 tw:dark:border-red-800 tw:p-4 tw:rounded-lg">
                                                         <div class="tw:flex tw:items-start">
-                                                            <i class="fa fa-exclamation-triangle tw:text-yellow-600 tw:dark:text-yellow-500 tw:mt-1 tw:mr-3"></i>
+                                                            <i class="fa fa-exclamation-triangle tw:text-red-600 tw:dark:text-red-500 tw:mt-1 tw:mr-3"></i>
                                                             <div>
-                                                                <p class="tw:text-sm tw:font-medium tw:text-yellow-800 tw:dark:text-yellow-400 tw:mb-2">
-                                                                    {{ __('This secret is shared across :count devices.', ['count' => $method['usage_count']]) }}
+                                                                <p class="tw:text-sm tw:font-medium tw:text-red-800 tw:dark:text-red-400 tw:mb-2">
+                                                                    <span x-text="selectedSecretMeta?.description"></span>
+                                                                    {{ __('is shared with other devices. Choose how to apply your changes:') }}
                                                                 </p>
                                                                 <div class="tw:flex tw:flex-col tw:gap-2">
                                                                     <label class="tw:flex tw:items-center tw:cursor-pointer">
-                                                                        <input type="radio" name="secret_update_mode" value="update" x-model="updateMode" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
-                                                                        <span class="tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Update this shared secret (affects all devices)') }}</span>
+                                                                        <input type="radio" name="secret_update_mode" value="create" x-model="updateMode" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
+                                                                        <span class="tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Create a new secret for this device only (recommended)') }}</span>
                                                                     </label>
                                                                     <label class="tw:flex tw:items-center tw:cursor-pointer">
-                                                                        <input type="radio" name="secret_update_mode" value="create" x-model="updateMode" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
-                                                                        <span class="tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Create a new secret for this device only') }}</span>
+                                                                        <input type="radio" name="secret_update_mode" value="update" x-model="updateMode" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
+                                                                        <span class="tw:text-gray-700 tw:dark:text-dark-white-200">
+                                                                            {{ __('Update the shared secret') }}
+                                                                            (<span x-text="(selectedSecretMeta?.usage_count ?? 1) - 1"></span> {{ __('other device(s) affected') }})
+                                                                        </span>
                                                                     </label>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                @else
-                                                    <input type="hidden" name="secret_update_mode" value="update">
-                                                @endif
-
-                                                <x-field-schema-fields
-                                                    :fields="$method['schema_fields']"
-                                                    :method-type="$method['type']"
-                                                    name-prefix="secret_data"
-                                                    model-prefix="formData"
-                                                    :check-can-unmask="true"
-                                                    :grid="true" />
+                                                </div>
                                             </div>
                                         </div>
                                     @else
@@ -297,7 +361,7 @@
                                                             <option value="{{ $secret->id }}" {{ old('secret_id') == $secret->id ? 'selected' : '' }}>
                                                                 {{ $secret->description }}
                                                             </option>
-                                                         @endforeach
+                                                        @endforeach
                                                     </select>
                                                 </div>
 

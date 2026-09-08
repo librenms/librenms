@@ -71,13 +71,17 @@ class EditPollingController
         $secretsForType = Secret::query()
             ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
             ->where('secret_type', $type->value)
+            ->withCount('devices')
             ->orderBy('description')
             ->get();
-        $secretDescriptions = $secretsForType->mapWithKeys(fn (Secret $availableSecret): array => [
-            (string) $availableSecret->id => $availableSecret->description,
+        $secretMeta = $secretsForType->mapWithKeys(fn (Secret $availableSecret): array => [
+            (string) $availableSecret->id => [
+                'description' => $availableSecret->description,
+                'usage_count' => $availableSecret->devices_count,
+            ],
         ])->all();
         $secretFormDataById = $secretsForType->mapWithKeys(fn (Secret $availableSecret): array => [
-            (string) $availableSecret->id => collect($schemaFields)->mapWithKeys(fn (array $field): array => [
+            (string) $availableSecret->id => (object) collect($schemaFields)->mapWithKeys(fn (array $field): array => [
                 $field['key'] => $canUnmaskSecrets ? (string) data_get($availableSecret->data, $field['key'], '') : '',
             ])->all(),
         ])->all();
@@ -102,7 +106,7 @@ class EditPollingController
             'secret_form_data' => collect($schema)->mapWithKeys(fn (array $field, string $key): array => [
                 $key => $canUnmaskSecrets ? (string) data_get($secret?->data, $key, '') : '',
             ])->all(),
-            'secret_descriptions' => $secretDescriptions,
+            'secret_meta' => $secretMeta,
             'secret_form_data_by_id' => $secretFormDataById,
             'usage_count' => $secret?->devices()->count() ?? 0,
             'configured' => $row !== null,
