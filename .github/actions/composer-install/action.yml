@@ -1,0 +1,37 @@
+name: 'Composer Install'
+description: 'Install PHP dependencies using Composer including caching'
+
+inputs:
+  cache-version:
+    description: 'Cache version key for Composer dependency cache'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Get composer cache directory
+      id: composer-cache
+      shell: bash
+      run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+    - name: Cache composer cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ inputs.cache-version }}-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-${{ inputs.cache-version }}-
+
+    - name: Cache vendor directory
+      uses: actions/cache@v4
+      with:
+        path: vendor
+        key: ${{ runner.os }}-vendor-${{ inputs.cache-version }}-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-vendor-${{ inputs.cache-version }}-
+
+    - name: Composer install
+      shell: bash
+      run: composer install --prefer-dist --no-interaction --no-progress --no-scripts --no-autoloader
+
+    - name: Composer dump-autoload
+      shell: bash
+      run: composer dump --strict-psr --strict-ambiguous --no-interaction --no-scripts
