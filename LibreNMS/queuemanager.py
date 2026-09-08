@@ -819,7 +819,7 @@ class DiscoveryQueueManager(TimedQueueManager):
                         else:
                             exit_code = 0
                 else:
-                    try_cli = true
+                    try_cli = True
 
             if try_cli:
                 args_list = ["device:discover", device_id]
