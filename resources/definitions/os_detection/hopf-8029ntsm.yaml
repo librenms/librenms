@@ -1,0 +1,21 @@
+os: hopf-8029ntsm
+text: 'HOPF 8029NTSM Time Server'
+type: appliance
+icon: hopf
+group: hopf
+
+mib_dir: hopf
+
+discovery:
+    -
+      sysObjectID:
+          - .1.3.6.1.4.1.12527.26
+          - .1.3.6.1.4.1.12527.28
+    -
+      sysObjectID_regex:
+          - '/^\.1\.3\.6\.1\.4\.1\.12527\.(26|28)(\.|$)/'
+      sysDescr_regex:
+          - '/8029/i'
+    -
+      sysDescr_regex:
+          - '/8029\s*NTS/i'

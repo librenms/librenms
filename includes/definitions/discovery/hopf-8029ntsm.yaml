@@ -1,0 +1,166 @@
+modules:
+    os:
+        hardware: HOPF8029NTSM-MIB::hopf8029NTSMDeviceType.0
+
+        version: HOPF8029NTSM-MIB::hopf8029NTSMFirmwareVersion.0
+
+        serial: HOPF8029NTSM-MIB::hopf8029NTSMSerialNumber.0
+
+    sensors:
+        state:
+            data:
+                -
+                    oid: HOPF8029NTSM-MIB::SyncModuleTimeSyncStateInt
+                    value: HOPF8029NTSM-MIB::SyncModuleTimeSyncStateInt
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.6.{{ $index }}'
+                    descr: 'Sync module lock state'
+                    group: 'Sync Module'
+                    index: 'hopf8029ntsm.syncState'
+                    state_name: HOPF8029NTSM-MIB::SyncModuleTimeSyncStateInt
+                    states:
+                        - { value: 0, generic: 2, descr: 'invalid time and date' }
+                        - { value: 1, generic: 1, descr: 'crystal mode (holdover)' }
+                        - { value: 2, generic: 1, descr: 'radio synchronous, low precision' }
+                        - { value: 3, generic: 0, descr: 'radio synchronous, high precision' }
+
+                -
+                    oid: HOPF8029NTSM-MIB::SyncModuleTimeDST
+                    value: HOPF8029NTSM-MIB::SyncModuleTimeDST
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.2.{{ $index }}'
+                    descr: 'Daylight saving time active'
+                    group: 'Sync Module'
+                    index: 'hopf8029ntsm.dst'
+                    state_name: HOPF8029NTSM-MIB::SyncModuleTimeDST
+                    states:
+                        - { value: 0, generic: 0, descr: 'Off' }
+                        - { value: 1, generic: 0, descr: 'On' }
+
+                -
+                    oid: HOPF8029NTSM-MIB::SyncModuleTimeDSTChange
+                    value: HOPF8029NTSM-MIB::SyncModuleTimeDSTChange
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.3.{{ $index }}'
+                    descr: 'DST change announced'
+                    group: 'Sync Module'
+                    index: 'hopf8029ntsm.dstChangeAnnounce'
+                    state_name: HOPF8029NTSM-MIB::SyncModuleTimeDSTChange
+                    states:
+                        - { value: 0, generic: 0, descr: 'Off' }
+                        - { value: 1, generic: 1, descr: 'On (change within 1 hour)' }
+
+                -
+                    oid: HOPF8029NTSM-MIB::SyncModuleTimeLEAP
+                    value: HOPF8029NTSM-MIB::SyncModuleTimeLEAP
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.4.{{ $index }}'
+                    descr: 'Leap second announced'
+                    group: 'Sync Module'
+                    index: 'hopf8029ntsm.leapAnnounce'
+                    state_name: HOPF8029NTSM-MIB::SyncModuleTimeLEAP
+                    states:
+                        - { value: 0, generic: 0, descr: 'Off' }
+                        - { value: 1, generic: 1, descr: 'On (insertion within 1 hour)' }
+
+                -
+                    oid: HOPF8029NTSM-MIB::SyncModuleErrorCrystalRegulation
+                    value: HOPF8029NTSM-MIB::SyncModuleErrorCrystalRegulation
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.5.{{ $index }}'
+                    descr: 'Crystal frequency regulation error'
+                    group: 'Sync Module Hardware Errors'
+                    index: 'hopf8029ntsm.err.crystalRegulation'
+                    state_name: HOPF8029NTSM-MIB::SyncModuleErrorCrystalRegulation
+                    states:
+                        - { value: 0, generic: 0, descr: 'error off' }
+                        - { value: 1, generic: 2, descr: 'error on' }
+                -
+                    oid: HOPF8029NTSM-MIB::SyncModuleErrorFRAM
+                    value: HOPF8029NTSM-MIB::SyncModuleErrorFRAM
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.6.{{ $index }}'
+                    descr: 'FRAM error'
+                    group: 'Sync Module Hardware Errors'
+                    index: 'hopf8029ntsm.err.fram'
+                    state_name: HOPF8029NTSM-MIB::SyncModuleErrorFRAM
+                    states:
+                        - { value: 0, generic: 0, descr: 'error off' }
+                        - { value: 1, generic: 2, descr: 'error on' }
+                -
+                    oid: HOPF8029NTSM-MIB::SyncModuleErrorSyncChannel
+                    value: HOPF8029NTSM-MIB::SyncModuleErrorSyncChannel
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.7.{{ $index }}'
+                    descr: 'Sync channel error'
+                    group: 'Sync Module Hardware Errors'
+                    index: 'hopf8029ntsm.err.syncChannel'
+                    state_name: HOPF8029NTSM-MIB::SyncModuleErrorSyncChannel
+                    states:
+                        - { value: 0, generic: 0, descr: 'error off' }
+                        - { value: 1, generic: 2, descr: 'error on' }
+
+                -
+                    oid: HOPF8029NTSM-MIB::SyncModuleErrorPCID
+                    value: HOPF8029NTSM-MIB::SyncModuleErrorPCID
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.1.{{ $index }}'
+                    descr: 'General module error (PCID)'
+                    group: 'Sync Module Software Errors'
+                    index: 'hopf8029ntsm.err.pcid'
+                    state_name: HOPF8029NTSM-MIB::SyncModuleErrorPCID
+                    states:
+                        - { value: 0, generic: 0, descr: 'error off' }
+                        - { value: 1, generic: 2, descr: 'error on' }
+                -
+                    oid: HOPF8029NTSM-MIB::SyncModuleErrorTimeZone
+                    value: HOPF8029NTSM-MIB::SyncModuleErrorTimeZone
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.2.{{ $index }}'
+                    descr: 'Missing time zone offset data'
+                    group: 'Sync Module Software Errors'
+                    index: 'hopf8029ntsm.err.timeZone'
+                    state_name: HOPF8029NTSM-MIB::SyncModuleErrorTimeZone
+                    states:
+                        - { value: 0, generic: 0, descr: 'error off' }
+                        - { value: 1, generic: 1, descr: 'error on' }
+                -
+                    oid: HOPF8029NTSM-MIB::SyncModuleErrorDST
+                    value: HOPF8029NTSM-MIB::SyncModuleErrorDST
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.3.{{ $index }}'
+                    descr: 'Missing or incomplete DST data'
+                    group: 'Sync Module Software Errors'
+                    index: 'hopf8029ntsm.err.dst'
+                    state_name: HOPF8029NTSM-MIB::SyncModuleErrorDST
+                    states:
+                        - { value: 0, generic: 0, descr: 'error off' }
+                        - { value: 1, generic: 1, descr: 'error on' }
+                -
+                    oid: HOPF8029NTSM-MIB::SyncModuleErrorSyncProtocol
+                    value: HOPF8029NTSM-MIB::SyncModuleErrorSyncProtocol
+                    num_oid: '.1.3.6.1.4.1.12527.28.3.8.4.{{ $index }}'
+                    descr: 'Sync protocol error'
+                    group: 'Sync Module Software Errors'
+                    index: 'hopf8029ntsm.err.syncProtocol'
+                    state_name: HOPF8029NTSM-MIB::SyncModuleErrorSyncProtocol
+                    states:
+                        - { value: 0, generic: 0, descr: 'error off' }
+                        - { value: 1, generic: 2, descr: 'error on' }
+
+                -
+                    oid: HOPF8029NTSM-MIB::ntpSysLeap
+                    value: HOPF8029NTSM-MIB::ntpSysLeap
+                    num_oid: '.1.3.6.1.4.1.12527.28.2.1.1.{{ $index }}'
+                    descr: 'NTP leap indicator'
+                    group: 'NTP'
+                    index: 'hopf8029ntsm.ntpSysLeap'
+                    state_name: HOPF8029NTSM-MIB::ntpSysLeap
+                    states:
+                        - { value: 0, generic: 0, descr: 'no warning' }
+                        - { value: 1, generic: 1, descr: 'leap second to be added' }
+                        - { value: 2, generic: 1, descr: 'leap second to be subtracted' }
+                        - { value: 3, generic: 2, descr: 'alarm (clock not synchronized)' }
+
+                -
+                    oid: HOPF8029NTSM-MIB::ntpAccuracy
+                    value: HOPF8029NTSM-MIB::ntpAccuracy
+                    num_oid: '.1.3.6.1.4.1.12527.28.2.3.{{ $index }}'
+                    descr: 'NTP accuracy'
+                    group: 'NTP'
+                    index: 'hopf8029ntsm.ntpAccuracy'
+                    state_name: HOPF8029NTSM-MIB::ntpAccuracy
+                    states:
+                        - { value: 0, generic: 1, descr: 'low' }
+                        - { value: 1, generic: 0, descr: 'medium' }
+                        - { value: 2, generic: 0, descr: 'high' }
