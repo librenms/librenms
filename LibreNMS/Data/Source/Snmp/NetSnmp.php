@@ -34,7 +34,6 @@ use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Util\Oid;
-use LibreNMS\Util\Rewrite;
 use Symfony\Component\Process\Process;
 
 class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
@@ -120,10 +119,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
             array_push($cmd, '-r', (string) $config->retries);
         }
 
-        $hostname = Rewrite::addIpv6Brackets($config->target);
-        $cmd[] = "$config->transport:$hostname:$config->port";
-
-        return [...$cmd, ...$oids];
+        return [...$cmd, $config->formattedTarget(), ...$oids];
     }
 
     /**

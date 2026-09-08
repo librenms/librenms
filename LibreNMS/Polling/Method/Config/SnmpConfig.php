@@ -28,6 +28,7 @@ namespace LibreNMS\Polling\Method\Config;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use LibreNMS\Util\Rewrite;
 
 final readonly class SnmpConfig
 {
@@ -56,6 +57,20 @@ final readonly class SnmpConfig
     ) {
     }
 
+    public function formattedTarget(bool $withTransport = true): string
+    {
+        $parts = [];
+
+        if ($withTransport) {
+            $parts[] = $this->transport;
+        }
+
+        $parts[] = Rewrite::addIpv6Brackets($this->target);
+        $parts[] = $this->port;
+
+        return implode(':', $parts);
+    }
+
     public static function fromDevice(Device $device): self
     {
         $timeout = (float) ($device->timeout > 0 ? $device->timeout : LibrenmsConfig::get('snmp.timeout', 1));
@@ -65,7 +80,7 @@ final readonly class SnmpConfig
         $rawBulk = $device->getAttrib('snmp_bulk') ?? LibrenmsConfig::getOsSetting($device->os, 'snmp_bulk', LibrenmsConfig::get('snmp_bulk', true));
 
         return new self(
-            target: $device->hostname,
+            target: $device->overwrite_ip ?: $device->hostname,
             version: $device->snmpver ?? 'v2c',
             community: $device->community,
             authname: $device->authname,
