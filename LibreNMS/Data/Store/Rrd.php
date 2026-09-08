@@ -663,7 +663,7 @@ class Rrd extends BaseDatastore
         $new_rrd_dir = $this->dirFromHost($newName, true);
 
         if (is_dir($new_rrd_dir)) {
-            throw new RrdStoreException("Renaming of $oldName failed due to existing RRD folder for $newName");
+            throw new RrdPermissionException("Renaming of $oldName failed due to existing RRD folder for $newName");
         }
 
         if (rename($this->dirFromHost($oldName, true), $new_rrd_dir) === true) {
@@ -681,7 +681,7 @@ class Rrd extends BaseDatastore
         // delete rrd files
         $host_dir = $this->dirFromHost($hostname, true);
         if (! File::deleteDirectory($host_dir)) {
-            throw new RrdStoreException("Could not delete RRD files for: $hostname");
+            throw new RrdPermissionException("Could not delete RRD files for: $hostname");
         }
     }
 
