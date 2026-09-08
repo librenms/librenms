@@ -90,7 +90,7 @@ class DevicePoll extends LnmsCommand
         }
 
         foreach ($devices as $device_id) {
-            PollDevice::dispatch($device_id, $modules);
+            PollDevice::dispatch($device_id, $modules, $this->option('no-data') ?? false);
         }
 
         $this->line('Submitted work for ' . $devices->count() . ' devices');
