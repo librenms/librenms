@@ -123,11 +123,13 @@
         $name  = $inputName($key);
         $id    = $inputId($key);
         $value = $currentValue($key);
+        $dotPrefix = preg_replace('/\[([^\]]+)\]/', '.$1', $namePrefix);
+        $dotErrorKey = $dotPrefix !== '' ? "{$dotPrefix}.{$key}" : $key;
         $errorKey = $namePrefix !== '' ? "{$namePrefix}.{$key}" : $key;
     @endphp
 
-    <div class="form-group {{ ($hasErrors && ($errors->has($errorKey) || $errors->has($key))) ? 'has-error' : '' }}"
-         :class="(typeof errors !== 'undefined' && errors && (errors['{{ $errorKey }}'] || errors['{{ $key }}'])) ? 'has-error' : ''"
+    <div class="form-group {{ ($hasErrors && ($errors->has($dotErrorKey) || $errors->has($errorKey) || $errors->has($key))) ? 'has-error' : '' }}"
+         :class="(typeof errors !== 'undefined' && errors && (errors['{{ $dotErrorKey }}'] || errors['{{ $errorKey }}'] || errors['{{ $key }}'])) ? 'has-error' : ''"
          @if($field['visible_if']) x-show="{{ $field['visible_if'] }}" x-cloak @endif
          id="group-{{ $key }}">
 
@@ -208,11 +210,11 @@
                    @if($field['required']) required @endif>
         @endif
 
-        @if($hasErrors && ($errors->has($errorKey) || $errors->has($key)))
-            <span class="help-block">{{ $errors->first($errorKey) ?: $errors->first($key) }}</span>
+        @if($hasErrors && ($errors->has($dotErrorKey) || $errors->has($errorKey) || $errors->has($key)))
+            <span class="help-block">{{ $errors->first($dotErrorKey) ?: ($errors->first($errorKey) ?: $errors->first($key)) }}</span>
         @endif
-        <template x-if="typeof errors !== 'undefined' && errors && (errors['{{ $errorKey }}'] || errors['{{ $key }}'])">
-            <span class="help-block" x-text="(errors['{{ $errorKey }}'] || errors['{{ $key }}'])?.[0]"></span>
+        <template x-if="typeof errors !== 'undefined' && errors && (errors['{{ $dotErrorKey }}'] || errors['{{ $errorKey }}'] || errors['{{ $key }}'])">
+            <span class="help-block" x-text="(errors['{{ $dotErrorKey }}'] || errors['{{ $errorKey }}'] || errors['{{ $key }}'])?.[0]"></span>
         </template>
     </div>
 @endforeach

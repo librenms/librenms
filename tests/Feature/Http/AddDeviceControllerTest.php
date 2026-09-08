@@ -234,8 +234,44 @@ class AddDeviceControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422);
-        $response->assertJsonStructure(['message', 'errors' => ['hostname']]);
+        $response->assertJsonStructure(['status', 'message', 'error_details', 'errors' => ['hostname']]);
+        $this->assertEquals('unreachable', $response->json('status'));
+        $this->assertStringContainsString('SNMP v2c: No reply with community public', $response->json('error_details'));
         $this->assertStringContainsString('Could not connect to json-unreachable.example.com', $response->json('errors.hostname.0'));
+    }
+
+    public function testStoreDeviceWithForceAddSucceeds(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.create');
+
+        $capturedForce = null;
+        $mock = Mockery::mock('overload:App\Actions\Device\ValidateDeviceAndCreate');
+        $mock->shouldReceive('__construct')
+            ->andReturnUsing(function ($device, $force) use (&$capturedForce) {
+                $capturedForce = $force;
+            });
+        $mock->shouldReceive('execute')->once()->andReturn(true);
+
+        $response = $this->actingAs($admin)->postJson(route('device.add.store'), [
+            'hostname' => 'force-add.example.com',
+            'poller_group' => 0,
+            'force_add' => 1,
+            'polling_methods' => [
+                'snmp' => [
+                    'active' => '1',
+                    'validate' => '1',
+                    'credential_mode' => 'default',
+                    'settings' => [
+                        'transport' => 'udp',
+                    ],
+                ],
+            ],
+        ]);
+
+        $response->assertOk();
+        $this->assertTrue($capturedForce);
     }
 
     public function testStoreDeviceWithoutPollingMethodsReturnsCustomErrorMessage(): void

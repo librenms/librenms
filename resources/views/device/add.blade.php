@@ -14,10 +14,10 @@
                   @submit.prevent="submitForm()"
                   x-data="addDeviceForm(@js($add_device_config))">
                 @csrf
-                <template x-if="errors.length > 0">
+                <template x-if="topErrors.length > 0">
                     <div class="alert alert-danger tw:mb-6">
                         <ul class="tw:list-disc tw:list-inside tw:space-y-1">
-                            <template x-for="(error, index) in errors" :key="index">
+                            <template x-for="(error, index) in topErrors" :key="index">
                                 <li x-text="error"></li>
                             </template>
                         </ul>
@@ -38,7 +38,8 @@
                     <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:space-y-5">
                         {{-- Hostname & Poller Group --}}
                         <div class="tw:grid tw:grid-cols-1 @config('distributed_poller') tw:md:grid-cols-2 @endconfig tw:gap-5">
-                            <div class="form-group @error('hostname') has-error @enderror tw:mb-0">
+                            <div class="form-group @error('hostname') has-error @enderror tw:mb-0"
+                                 :class="(errors && errors['hostname']) ? 'has-error' : ''">
                                 <label for="hostname" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">
                                     {{ __('Hostname or IP') }} <span class="tw:text-red-500">*</span>
                                 </label>
@@ -47,10 +48,14 @@
                                 @error('hostname')
                                     <span class="help-block">{{ $message }}</span>
                                 @enderror
+                                <template x-if="errors && errors['hostname']">
+                                    <span class="help-block" x-text="errors['hostname']?.[0]"></span>
+                                </template>
                             </div>
 
                             @config('distributed_poller')
-                            <div class="form-group tw:mb-0">
+                            <div class="form-group @error('poller_group') has-error @enderror tw:mb-0"
+                                 :class="(errors && errors['poller_group']) ? 'has-error' : ''">
                                 <label for="poller_group" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">
                                     {{ __('Poller Group') }}
                                 </label>
@@ -60,6 +65,12 @@
                                         <option value="{{ $group->id }}">{{ $group->group_name }}</option>
                                     @endforeach
                                 </select>
+                                @error('poller_group')
+                                    <span class="help-block">{{ $message }}</span>
+                                @enderror
+                                <template x-if="errors && errors['poller_group']">
+                                    <span class="help-block" x-text="errors['poller_group']?.[0]"></span>
+                                </template>
                             </div>
                             @endconfig
                         </div>
@@ -103,7 +114,8 @@
 
                             {{-- Template Input (Hidden by default until user indicates they want to modify it) --}}
                             <div x-show="showTemplateInput" x-cloak class="tw:pt-2.5 tw:border-t tw:border-gray-200/80 tw:dark:border-dark-gray-400/80">
-                                <div class="form-group @error('display_template') has-error @enderror tw:mb-0">
+                                <div class="form-group @error('display_template') has-error @enderror tw:mb-0"
+                                     :class="(errors && errors['display_template']) ? 'has-error' : ''">
                                     <div class="tw:flex tw:items-center tw:justify-between tw:mb-1.5">
                                         <div class="tw:flex tw:items-center tw:gap-1.5">
                                             <label for="display_template" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-0">
@@ -132,6 +144,9 @@
                                     @error('display_template')
                                         <span class="help-block">{{ $message }}</span>
                                     @enderror
+                                    <template x-if="errors && errors['display_template']">
+                                        <span class="help-block" x-text="errors['display_template']?.[0]"></span>
+                                    </template>
                                 </div>
                             </div>
                         </div>
@@ -153,16 +168,24 @@
                                 @foreach($availableMethods as $method)
                                     <li x-show="activeMethods.includes('{{ $method['type'] }}')"
                                         x-cloak
-                                        :class="activeTab === '{{ $method['type'] }}'
-                                            ? 'tw:bg-blue-600 tw:border-blue-600 tw:dark:bg-blue-700 tw:dark:border-blue-700'
-                                            : 'tw:border-gray-200 tw:hover:bg-gray-50 tw:dark:border-dark-gray-400 tw:dark:hover:bg-dark-gray-400'"
+                                        :class="[
+                                            activeTab === '{{ $method['type'] }}'
+                                                ? 'tw:bg-blue-600 tw:border-blue-600 tw:dark:bg-blue-700 tw:dark:border-blue-700'
+                                                : 'tw:border-gray-200 tw:hover:bg-gray-50 tw:dark:border-dark-gray-400 tw:dark:hover:bg-dark-gray-400',
+                                            hasMethodErrors('{{ $method['type'] }}') ? (activeTab === '{{ $method['type'] }}' ? 'tw:ring-2 tw:ring-red-400' : 'tw:border-red-500 tw:dark:border-red-500') : ''
+                                        ]"
                                         class="tw:flex tw:items-center tw:border tw:rounded-lg tw:shadow-sm tw:transition-colors tw:overflow-hidden">
                                         <button type="button"
                                                 @click="activeTab = '{{ $method['type'] }}'"
                                                 :class="activeTab === '{{ $method['type'] }}' ? 'tw:text-white!' : 'tw:text-gray-700 tw:dark:text-dark-white-200'"
-                                                class="tw:flex-1 tw:text-left tw:px-4 tw:py-3 tw:font-medium tw:transition-colors tw:flex tw:items-center">
-                                            <i class="fa fa-fw {{ $method['icon'] }} tw:mr-2"></i>
-                                            {{ $method['label'] }}
+                                                class="tw:flex-1 tw:text-left tw:px-4 tw:py-3 tw:font-medium tw:transition-colors tw:flex tw:items-center tw:justify-between">
+                                            <span class="tw:flex tw:items-center">
+                                                <i class="fa fa-fw {{ $method['icon'] }} tw:mr-2"></i>
+                                                {{ $method['label'] }}
+                                            </span>
+                                            <template x-if="hasMethodErrors('{{ $method['type'] }}')">
+                                                <i class="fa fa-exclamation-circle" :class="activeTab === '{{ $method['type'] }}' ? 'tw:text-red-200' : 'tw:text-red-500'"></i>
+                                            </template>
                                         </button>
                                         <button type="button"
                                                 @click="removeMethod('{{ $method['type'] }}')"
@@ -306,13 +329,17 @@
                                                     <template x-if="methods['{{ $method['type'] }}'].credential_mode === 'new'">
                                                         <div>
                                                             <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl tw:mb-4">
-                                                                <div class="form-group">
+                                                                <div class="form-group"
+                                                                     :class="(errors && errors['polling_methods.{{ $method['type'] }}.description']) ? 'has-error' : ''">
                                                                     <label class="control-label">{{ __('Secret Description') }}</label>
                                                                     <input type="text"
                                                                            name="polling_methods[{{ $method['type'] }}][description]"
                                                                            class="form-control"
                                                                            placeholder="{{ __('Optional') }}"
                                                                            x-model="methods['{{ $method['type'] }}'].description">
+                                                                    <template x-if="errors && errors['polling_methods.{{ $method['type'] }}.description']">
+                                                                        <span class="help-block" x-text="errors['polling_methods.{{ $method['type'] }}.description']?.[0]"></span>
+                                                                    </template>
                                                                 </div>
                                                                 <div class="form-group tw:flex tw:items-end">
                                                                     <div class="checkbox tw:mb-0">
@@ -383,13 +410,19 @@
                     </div>
                     <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500">
                         <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-3 tw:gap-4 tw:max-w-2xl">
-                            <div class="form-group tw:mb-0">
+                            <div class="form-group tw:mb-0" :class="(errors && errors.sysName) ? 'has-error' : ''">
                                 <label for="sysName" class="control-label">{{ __('sysName') }} <span class="text-muted">({{ __('optional') }})</span></label>
                                 <input type="text" id="sysName" name="sysName" class="form-control" x-model="sysName">
+                                <template x-if="errors && errors.sysName">
+                                    <span class="help-block" x-text="errors.sysName?.[0]"></span>
+                                </template>
                             </div>
-                            <div class="form-group tw:mb-0">
+                            <div class="form-group tw:mb-0" :class="(errors && errors.hardware) ? 'has-error' : ''">
                                 <label for="hardware" class="control-label">{{ __('Hardware') }} <span class="text-muted">({{ __('optional') }})</span></label>
                                 <input type="text" id="hardware" name="hardware" class="form-control" x-model="hardware">
+                                <template x-if="errors && errors.hardware">
+                                    <span class="help-block" x-text="errors.hardware?.[0]"></span>
+                                </template>
                             </div>
                             <x-select2
                                 id="os-select"
@@ -410,6 +443,52 @@
                         {{ __('Add Device') }}
                     </button>
                 </div>
+
+                {{-- Reachability Failure Dialog --}}
+                <template x-teleport="body">
+                    <div x-show="unreachableDialog" x-cloak style="display: none;"
+                         class="tw:fixed tw:inset-0 tw:z-100 tw:flex tw:items-center tw:justify-center tw:p-4 tw:bg-black/60 tw:backdrop-blur-xs"
+                         @click="unreachableDialog = false"
+                         @keydown.escape.window="unreachableDialog = false">
+                        <div x-show="unreachableDialog"
+                             x-transition:enter="tw:ease-out tw:duration-300"
+                             x-transition:enter-start="tw:opacity-0 tw:scale-95"
+                             x-transition:enter-end="tw:opacity-100 tw:scale-100"
+                             x-transition:leave="tw:ease-in tw:duration-200"
+                             x-transition:leave-start="tw:opacity-100 tw:scale-100"
+                             x-transition:leave-end="tw:opacity-0 tw:scale-95"
+                             @click.stop
+                             class="tw:w-full tw:max-w-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-gray-200 tw:dark:border-dark-gray-300 tw:rounded-xl tw:shadow-2xl tw:p-6"
+                             role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+                            <div class="tw:flex tw:items-start tw:gap-4">
+                                <div class="tw:shrink-0 tw:flex tw:items-center tw:justify-center tw:h-12 tw:w-12 tw:rounded-full tw:bg-amber-100 tw:dark:bg-amber-900/50">
+                                    <i class="fa fa-exclamation-triangle tw:text-amber-600 tw:dark:text-amber-400 tw:text-xl"></i>
+                                </div>
+                                <div class="tw:grow">
+                                    <h3 class="tw:text-lg tw:font-semibold tw:text-gray-900 tw:dark:text-dark-white-100 tw:m-0" id="modal-title">
+                                        {{ __('poller.reachability_check_failed') }}
+                                    </h3>
+                                    <div class="tw:mt-2">
+                                        <p class="tw:text-sm tw:text-gray-600 tw:dark:text-dark-white-300" x-text="unreachableMessage"></p>
+                                        <template x-if="unreachableDetails">
+                                            <div class="tw:mt-3 tw:p-3 tw:bg-gray-100 tw:dark:bg-dark-gray-600 tw:rounded tw:text-xs tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-200 tw:overflow-x-auto tw:max-h-40" x-text="unreachableDetails"></div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tw:mt-6 tw:flex tw:flex-col-reverse tw:sm:flex-row tw:justify-end tw:gap-3">
+                                <button type="button" @click="unreachableDialog = false" class="btn btn-default">
+                                    {{ __('Edit Settings') }}
+                                </button>
+                                <button type="button" @click="addAnyway()" class="btn btn-warning">
+                                    <i class="fa fa-plus tw:mr-1"></i> {{ __('Add Anyway') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </form>
         </x-panel>
     </div>
@@ -432,7 +511,36 @@
                 methods: config.methods || {},
                 allTypes: config.all_types || [],
                 loading: false,
-                errors: [],
+                errors: {},
+                generalError: '',
+                unreachableDialog: false,
+                unreachableMessage: '',
+                unreachableDetails: '',
+
+                get topErrors() {
+                    if (this.generalError) {
+                        return [this.generalError];
+                    }
+                    const flat = [];
+                    for (const key in this.errors) {
+                        const val = this.errors[key];
+                        if (Array.isArray(val)) {
+                            flat.push(...val);
+                        } else if (typeof val === 'string') {
+                            flat.push(val);
+                        }
+                    }
+                    return flat;
+                },
+
+                hasMethodErrors(type) {
+                    return Object.keys(this.errors || {}).some(k => k.startsWith(`polling_methods.${type}.`));
+                },
+
+                addAnyway() {
+                    this.unreachableDialog = false;
+                    this.submitForm(true);
+                },
 
                 get activeDisplayTemplate() {
                     return (this.display_template && this.display_template.trim() !== '')
@@ -534,10 +642,11 @@
                     }
                 },
 
-                async submitForm() {
+                async submitForm(force = false) {
                     if (this.loading) return;
                     this.loading = true;
-                    this.errors = [];
+                    this.errors = {};
+                    this.generalError = '';
 
                     const pollingMethods = {};
                     for (const type of this.activeMethods) {
@@ -580,6 +689,7 @@
                         sysName: this.sysName,
                         hardware: this.hardware,
                         os: selectedOs,
+                        force_add: force ? 1 : 0,
                     };
 
                     try {
@@ -601,27 +711,27 @@
                             return;
                         }
 
-                        if (data.errors) {
-                            const flatErrors = [];
-                            for (const field in data.errors) {
-                                const fieldErrors = data.errors[field];
-                                if (Array.isArray(fieldErrors)) {
-                                    flatErrors.push(...fieldErrors);
-                                } else if (typeof fieldErrors === 'string') {
-                                    flatErrors.push(fieldErrors);
-                                }
+                        if (data.status === 'unreachable') {
+                            this.unreachableMessage = data.message || '{{ __('poller.reachability_check_failed') }}';
+                            this.unreachableDetails = data.error_details || '';
+                            this.unreachableDialog = true;
+                            if (data.errors) {
+                                this.errors = data.errors;
                             }
-                            this.errors = flatErrors.length > 0 ? flatErrors : [data.message || '{{ __('Failed to save device.') }}'];
+                        } else if (data.errors) {
+                            this.errors = data.errors;
+                            this.generalError = (Object.keys(data.errors).length === 0 && data.message) ? data.message : '';
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
                         } else if (data.message) {
-                            this.errors = [data.message];
+                            this.generalError = data.message;
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
                         } else {
-                            this.errors = ['{{ __('Failed to save device.') }}'];
+                            this.generalError = '{{ __('Failed to save device.') }}';
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
-
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     } catch (err) {
                         console.error(err);
-                        this.errors = [err.message || '{{ __('An unexpected error occurred.') }}'];
+                        this.generalError = err.message || '{{ __('An unexpected error occurred.') }}';
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     } finally {
                         this.loading = false;

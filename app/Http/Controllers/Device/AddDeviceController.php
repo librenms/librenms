@@ -117,7 +117,7 @@ class AddDeviceController
 
         // Per-method validate flags: validate if *any* active method requests it.
         // The SNMP method's validate flag doubles as the old force_add inverse.
-        $forceAdd = collect($rawMethods)
+        $forceAdd = $request->boolean('force_add') || collect($rawMethods)
             ->filter(fn (array $data): bool => (bool) ($data['active'] ?? false))
             ->every(fn (array $data): bool => empty($data['validate']));
 
@@ -132,10 +132,13 @@ class AddDeviceController
                 ], 422);
             }
         } catch (HostUnreachableException $e) {
-            $errors = array_merge([$e->getMessage()], $e->getReasons());
+            $reasons = $e->getReasons();
+            $errors = array_merge([$e->getMessage()], $reasons);
 
             return response()->json([
+                'status' => 'unreachable',
                 'message' => $e->getMessage(),
+                'error_details' => ! empty($reasons) ? implode("\n", $reasons) : null,
                 'errors' => ['hostname' => $errors],
             ], 422);
         } catch (\Exception $e) {

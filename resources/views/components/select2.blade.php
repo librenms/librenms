@@ -12,14 +12,22 @@
     'allowClear' => true,
     'disabled' => false,
     'required' => false,
+    'errorKey' => null,
 ])
 
 @php
     $id = $id ?? 'select2-' . \Illuminate\Support\Str::random(8);
     $defaultConfig = array_merge(['width' => '100%', 'allowClear' => $allowClear], (array) $config);
+    $hasErrors = isset($errors) && $errors instanceof \Illuminate\Support\ViewErrorBag;
+    $dotName = $name ? preg_replace('/\[([^\]]+)\]/', '.$1', $name) : null;
+    $resolvedErrorKey = $errorKey ?? $dotName ?? $name;
 @endphp
 
-<div {{ $attributes->only(['class', 'x-show', 'x-cloak', 'style'])->merge(['class' => 'form-group tw:mb-0']) }}>
+<div {{ $attributes->only(['class', 'x-show', 'x-cloak', 'style'])->merge(['class' => 'form-group tw:mb-0']) }}
+     @if($resolvedErrorKey)
+         :class="(typeof errors !== 'undefined' && errors && (errors['{{ $resolvedErrorKey }}'] || errors['{{ $name }}'])) ? 'has-error' : ''"
+     @endif
+>
     @if($label)
         <label for="{{ $id }}" class="control-label tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200">
             {{ $label }}
@@ -59,4 +67,13 @@
     >
         {{ $slot }}
     </select>
+
+    @if($resolvedErrorKey)
+        @if($hasErrors && ($errors->has($resolvedErrorKey) || ($name && $errors->has($name))))
+            <span class="help-block">{{ $errors->first($resolvedErrorKey) ?: $errors->first($name) }}</span>
+        @endif
+        <template x-if="typeof errors !== 'undefined' && errors && (errors['{{ $resolvedErrorKey }}'] || errors['{{ $name }}'])">
+            <span class="help-block" x-text="(errors['{{ $resolvedErrorKey }}'] || errors['{{ $name }}'])?.[0]"></span>
+        </template>
+    @endif
 </div>
