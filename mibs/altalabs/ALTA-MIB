@@ -1,0 +1,26 @@
+-- Portions based on BEGEMOT-MIB, Copyright (C) 2010, The FreeBSD Foundation
+
+ALTA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises
+	FROM SNMPv2-SMI;
+
+alta MODULE-IDENTITY
+    LAST-UPDATED "202404190000Z"
+    ORGANIZATION "Alta Labs"
+    CONTACT-INFO
+	    "		Alta Labs
+
+	     Postal:	Alta Labs
+			192 N Old Hwy 91, Unit 1
+			Hurricane, UT 84737
+
+	     Fax:	N/A
+
+	     E-Mail:    support@alta.inc"
+    DESCRIPTION
+	    "The root of the Alta enterprises tree."
+    ::= { enterprises 61802 }
+
+END
