@@ -49,6 +49,7 @@ final class AuthHTTPTest extends TestCase
     protected function tearDown(): void
     {
         LibrenmsConfig::set('auth_mechanism', $this->original_auth_mech);
+        LegacyAuth::reset();
         $_SERVER = $this->server;
         parent::tearDown();
     }
