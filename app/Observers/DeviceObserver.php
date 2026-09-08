@@ -84,7 +84,6 @@ class DeviceObserver
             $new_name = $device->hostname;
             $old_name = $device->getOriginal('hostname');
 
-
             // Fail if another device has the same hostname
             if (Device::where('hostname', $device->hostname)->whereNot('device_id', $device->device_id)->count() > 0) {
                 $device->hostname = $old_name;
