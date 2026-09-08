@@ -1,6 +1,6 @@
 modules:
     os:
-        sysDescr_regex: '/RouterOS (?<hardware>.*)/'
+        sysDescr_regex: '/RouterOS (?<hardware>\S+)/'
         features: MIKROTIK-MIB::mtxrLicLevel.0
         features_template: 'Level {{ MIKROTIK-MIB::mtxrLicLevel.0 }}'
         serial: MIKROTIK-MIB::mtxrSerialNumber.0
