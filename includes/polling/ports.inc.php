@@ -685,6 +685,7 @@ foreach ($ports as $port) {
                 } else {
                     $current_oid = $this_port['ifAlias'];
                 }
+                $parse_ifAlias = $current_oid;
             }
             if ($oid == 'ifSpeed') {
                 $ifSpeed_override = DeviceCache::getPrimary()->getAttrib('ifSpeed:' . $port['ifName']);
@@ -764,7 +765,7 @@ foreach ($ports as $port) {
             // handle functional style parsers
             if (is_callable($port_parser)) {
                 $port_ifAlias = app()->call($port_parser, [
-                    'ifAlias' => $this_port['ifAlias'] ?? '',
+                    'ifAlias' => $parse_ifAlias ?? ($this_port['ifAlias'] ?? ''),
                     'ifIndex' => $port['ifIndex'] ?? '',
                     'ifName' => $this_port['ifName'] ?? '',
                     'port_id' => $port['port_id'] ?? 0,
