@@ -16,8 +16,42 @@
     <form method="POST" action="{{ route('device.edit.polling.store', $device) }}"
           x-data="{
               methodType: '{{ old('method_type', '') }}',
-              credentialMode: '{{ old('credential_mode', 'existing') }}'
-          }">
+              credentialMode: '{{ old('credential_mode', 'existing') }}',
+              loading: false,
+              async submitForm(e) {
+                  this.loading = true;
+                  const form = e.target;
+                  const formData = new FormData(form);
+                  try {
+                      const response = await fetch(form.action, {
+                          method: 'POST',
+                          headers: {
+                              'Accept': 'application/json',
+                              'X-Requested-With': 'XMLHttpRequest',
+                              'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]')?.getAttribute('content') || form.querySelector('input[name=\"_token\"]')?.value || ''
+                          },
+                          body: formData
+                      });
+                      const data = await response.json();
+                      if (!response.ok) {
+                          if (data.errors) {
+                              const msg = Object.values(data.errors).flat().join('<br>');
+                              toastr.error(msg);
+                          } else {
+                              toastr.error(data.message || '{{ __('Failed to add polling method') }}');
+                          }
+                          return;
+                      }
+                      toastr.success(data.message || '{{ __('Polling method added') }}');
+                      window.location.href = '{{ route('device.edit.polling', ['device' => $device]) }}?tab=' + encodeURIComponent(this.methodType);
+                  } catch (err) {
+                      toastr.error('{{ __('An error occurred while adding polling method.') }}');
+                  } finally {
+                      this.loading = false;
+                  }
+              }
+          }"
+          @submit.prevent="submitForm($event)">
         @csrf
 
         {{-- Step 1: Pick a polling type --}}
@@ -163,8 +197,8 @@
         @endforeach
 
         {{-- Submit — only shown once a type is selected --}}
-        <div x-show="methodType !== ''" style="display: none;" class="tw:mt-6 tw:pt-6 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-400" x-data="{ loading: false }">
-            <button type="submit" :disabled="loading" class="btn btn-success tw:bg-emerald-600 tw:hover:bg-emerald-700 tw:border-emerald-600" @click="loading = true">
+        <div x-show="methodType !== ''" style="display: none;" class="tw:mt-6 tw:pt-6 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-400">
+            <button type="submit" :disabled="loading" class="btn btn-success tw:bg-emerald-600 tw:hover:bg-emerald-700 tw:border-emerald-600">
                 <template x-if="loading"><i class="fa fa-spinner fa-spin tw:mr-1"></i></template>
                 <template x-if="!loading"><i class="fa fa-plus tw:mr-1"></i></template>
                 {{ __('Add Polling Type') }}

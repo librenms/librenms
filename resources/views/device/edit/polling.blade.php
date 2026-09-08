@@ -94,22 +94,14 @@
                     </div>
 
                     @foreach($allMethods as $method)
-                        <div x-data="{
+                        <div x-data="pollingMethodForm({
+                                type: '{{ $method['type'] }}',
                                 configured: {{ $method['configured'] ? 'true' : 'false' }},
                                 enabled: {{ $method['enabled'] ? 'true' : 'false' }},
-                                initialEnabled: {{ $method['enabled'] ? 'true' : 'false' }},
                                 affectsAvailability: {{ $method['affects_availability'] ? 'true' : 'false' }},
-                                initialAffectsAvailability: {{ $method['affects_availability'] ? 'true' : 'false' }},
-                                updateMode: 'update',
-                                credentialMode: 'existing',
                                 currentSecretId: '{{ (string) ($method['secret']?->id ?? '') }}',
                                 selectedSecretId: '{{ (string) ($method['secret']?->id ?? '') }}',
-                                showSecretInfo: false,
-                                isEditingSecret: false,
                                 secretDescription: @js($method['secret']?->description ?? ''),
-                                // secretMeta: { [id]: { description, usage_count } }, covering every secret of
-                                // this type (from $method['secret_meta']). The merge below is just a defensive
-                                // backstop for the assigned secret in case it ever falls outside that list.
                                 secretMeta: @js((object) array_replace(
                                     $method['secret_meta'] ?? [],
                                     $method['secret']
@@ -119,9 +111,6 @@
                                         ]]
                                         : []
                                 )),
-                                // Likewise a defensive backstop: $method['secret_form_data_by_id'] already
-                                // covers every secret of this type, matching formData's initial value for
-                                // whichever one is currently assigned.
                                 secretFormDataById: @js((object) array_replace(
                                     $method['secret_form_data_by_id'] ?? [],
                                     $method['secret']
@@ -131,61 +120,19 @@
                                 secretFieldLabels: @js((object) collect($method['schema_fields'] ?? [])->mapWithKeys(fn (array $f) => [$f['key'] => $f['label'] ?? $f['key']])),
                                 formData: @js((object) ($method['secret_form_data'] ?? $method['schema_defaults'] ?? [])),
                                 settingsData: @js((object) ($method['settings'] ?? [])),
-                                initialSettingsData: @js((object) ($method['settings'] ?? [])),
-                                get selectedSecretMeta() {
-                                    return this.secretMeta[this.selectedSecretId] || null;
-                                },
-                                get isSharedSecret() {
-                                    return (this.selectedSecretMeta?.usage_count ?? 1) > 1;
-                                },
-                                get secretValuesChanged() {
-                                    return JSON.stringify(this.formData) !== JSON.stringify(this.secretFormDataById[this.selectedSecretId] || {})
-                                        || this.secretDescription !== (this.selectedSecretMeta?.description ?? '');
-                                },
-                                // The shared-secret guard now tracks editing intent (the Edit button),
-                                // not whether values have changed yet — it should appear as soon as
-                                // someone opens the editor on a secret other devices also use.
-                                get showSharedGuard() {
-                                    return this.configured && this.isEditingSecret && this.isSharedSecret;
-                                },
-                                get isDirty() {
-                                    if (!this.configured) { return true; }
-                                    return this.enabled !== this.initialEnabled
-                                        || this.affectsAvailability !== this.initialAffectsAvailability
-                                        || this.selectedSecretId !== this.currentSecretId
-                                        || this.secretValuesChanged
-                                        || JSON.stringify(this.settingsData) !== JSON.stringify(this.initialSettingsData);
-                                },
-                                onSecretChange() {
-                                    // Switching secrets loads that secret's own stored values fresh —
-                                    // it does not carry over edits made to the previously selected secret.
-                                    this.formData = { ...(this.secretFormDataById[this.selectedSecretId] || {}) };
-                                    this.secretDescription = this.selectedSecretMeta?.description ?? '';
-                                    this.isEditingSecret = true;
-                                    this.showSecretInfo = false;
-                                },
-                                toggleEditSecret() {
-                                    this.isEditingSecret = !this.isEditingSecret;
-                                    if (this.isEditingSecret) { this.showSecretInfo = false; }
-                                },
-                                init() {
-                                    setDirty('{{ $method["type"] }}', this.isDirty);
-                                    this.$watch('isDirty', (val) => {
-                                        setDirty('{{ $method["type"] }}', val);
-                                    });
-                                    this.$watch('enabled', (val) => {
-                                        methods['{{ $method["type"] }}'].enabled = val;
-                                    });
-                                    this.$watch('affectsAvailability', (val) => {
-                                        methods['{{ $method["type"] }}'].affectsAvailability = val;
-                                    });
-                                    // Default to the safe choice the moment editing a shared secret's
-                                    // values actually becomes a live concern.
-                                    this.$watch('showSharedGuard', (val) => {
-                                        if (val) { this.updateMode = 'create'; }
-                                    });
+                                updateUrl: '{{ route('device.edit.polling.update', ['device' => $device, 'methodType' => $method['type']]) }}',
+                                storeUrl: '{{ route('device.edit.polling.store', ['device' => $device]) }}',
+                                destroyUrl: '{{ route('device.edit.polling.destroy', ['device' => $device, 'methodType' => $method['type']]) }}',
+                                labels: {
+                                    saveFailed: @js(__('Failed to save settings')),
+                                    saved: @js(__('Settings saved')),
+                                    saveError: @js(__('An error occurred while saving.')),
+                                    confirmRemove: @js(__('Are you sure you want to remove this polling method?')),
+                                    removeFailed: @js(__('Failed to remove polling method')),
+                                    removed: @js(__('Polling method removed')),
+                                    removeError: @js(__('An error occurred while removing.'))
                                 }
-                             }"
+                            })"
                              x-show="activeTab === '{{ $method["type"] }}' && activeMethods.includes('{{ $method["type"] }}')"
                              style="display: none;"
                              x-transition>
@@ -200,13 +147,10 @@
                                 </div>
                             </div>
 
-                            <form method="POST" action="{{ $method['configured'] ? route('device.edit.polling.update', ['device' => $device, 'methodType' => $method['type']]) : route('device.edit.polling.store', ['device' => $device]) }}">
+                            <form method="POST" :action="configured ? updateUrl : storeUrl" @submit.prevent="saveForm($event)">
                                 @csrf
-                                @if($method['configured'])
-                                    @method('PUT')
-                                @else
-                                    <input type="hidden" name="method_type" value="{{ $method['type'] }}">
-                                @endif
+                                <input type="hidden" name="_method" value="PUT" :disabled="!configured">
+                                <input type="hidden" name="method_type" value="{{ $method['type'] }}" :disabled="configured">
                                 <input type="hidden" name="tab" value="{{ $method['type'] }}">
 
                                 {{-- Method Options --}}
@@ -435,10 +379,10 @@
                                     </div>
                                 @endif
 
-                                <div class="tw:flex tw:items-center tw:justify-between tw:gap-4 tw:mt-6 tw:pt-6 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-400" x-data="{ loading: false }">
+                                <div class="tw:flex tw:items-center tw:justify-between tw:gap-4 tw:mt-6 tw:pt-6 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-400">
                                     <div class="tw:flex tw:items-center tw:gap-2">
                                         @if($method['configured'])
-                                            <button type="submit" :disabled="!isDirty || loading" class="btn btn-primary tw:bg-blue-600 tw:border-blue-600 tw:hover:bg-blue-700" :class="(!isDirty) ? 'tw:opacity-50 tw:cursor-not-allowed' : ''" @click="loading = true">
+                                            <button type="submit" :disabled="!isDirty || loading" class="btn btn-primary tw:bg-blue-600 tw:border-blue-600 tw:hover:bg-blue-700" :class="(!isDirty) ? 'tw:opacity-50 tw:cursor-not-allowed' : ''">
                                                 <template x-if="loading"><i class="fa fa-spinner fa-spin tw:mr-1"></i></template>
                                                 <template x-if="!loading"><i class="fa fa-save tw:mr-1"></i></template>
                                                 {{ __('Save Settings') }}
@@ -450,7 +394,7 @@
                                                 </button>
                                             @endif
                                         @else
-                                            <button type="submit" :disabled="loading" class="btn btn-success tw:bg-emerald-600 tw:border-emerald-600 tw:hover:bg-emerald-700" @click="loading = true">
+                                            <button type="submit" :disabled="loading" class="btn btn-success tw:bg-emerald-600 tw:border-emerald-600 tw:hover:bg-emerald-700">
                                                 <template x-if="loading"><i class="fa fa-spinner fa-spin tw:mr-1"></i></template>
                                                 <template x-if="!loading"><i class="fa fa-plus tw:mr-1"></i></template>
                                                 {{ __('Add Polling Type') }}
@@ -459,20 +403,12 @@
                                     </div>
 
                                     @if($method['configured'] && $method['type'] !== 'icmp')
-                                        <button type="submit" form="delete-form-{{ $method['type'] }}" class="btn btn-danger" onclick="return confirm('{{ __('Are you sure you want to remove this polling method?') }}')">
+                                        <button type="button" class="btn btn-danger" @click="deleteMethod()">
                                             <i class="fa fa-trash tw:mr-1"></i> {{ __('Remove') }} {{ $method['label'] }}
                                         </button>
                                     @endif
                                 </div>
                             </form>
-
-                            @if($method['configured'] && $method['type'] !== 'icmp')
-                                <form id="delete-form-{{ $method['type'] }}" method="POST" action="{{ route('device.edit.polling.destroy', ['device' => $device, 'methodType' => $method['type']]) }}" style="display: none;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <input type="hidden" name="tab" value="{{ $method['type'] }}">
-                                </form>
-                            @endif
                         </div>
                     @endforeach
                 </div>
@@ -536,6 +472,166 @@
                         window.history.replaceState({}, '', url.toString());
                     });
                 },
+            };
+        }
+
+        function pollingMethodForm(config) {
+            return {
+                type: config.type,
+                configured: config.configured,
+                enabled: config.enabled,
+                initialEnabled: config.enabled,
+                affectsAvailability: config.affectsAvailability,
+                initialAffectsAvailability: config.affectsAvailability,
+                updateMode: 'update',
+                credentialMode: 'existing',
+                loading: false,
+                currentSecretId: config.currentSecretId || '',
+                selectedSecretId: config.selectedSecretId || '',
+                showSecretInfo: false,
+                isEditingSecret: false,
+                secretDescription: config.secretDescription || '',
+                secretMeta: config.secretMeta || {},
+                secretFormDataById: config.secretFormDataById || {},
+                secretFieldLabels: config.secretFieldLabels || {},
+                formData: config.formData || {},
+                settingsData: config.settingsData || {},
+                initialSettingsData: JSON.parse(JSON.stringify(config.settingsData || {})),
+                updateUrl: config.updateUrl,
+                storeUrl: config.storeUrl,
+                destroyUrl: config.destroyUrl,
+                labels: config.labels || {},
+
+                get selectedSecretMeta() {
+                    return this.secretMeta[this.selectedSecretId] || null;
+                },
+                get isSharedSecret() {
+                    return (this.selectedSecretMeta?.usage_count ?? 1) > 1;
+                },
+                get secretValuesChanged() {
+                    return JSON.stringify(this.formData) !== JSON.stringify(this.secretFormDataById[this.selectedSecretId] || {})
+                        || this.secretDescription !== (this.selectedSecretMeta?.description ?? '');
+                },
+                get showSharedGuard() {
+                    return this.configured && this.isEditingSecret && this.isSharedSecret;
+                },
+                get isDirty() {
+                    if (!this.configured) { return true; }
+                    return this.enabled !== this.initialEnabled
+                        || this.affectsAvailability !== this.initialAffectsAvailability
+                        || this.selectedSecretId !== this.currentSecretId
+                        || this.secretValuesChanged
+                        || JSON.stringify(this.settingsData) !== JSON.stringify(this.initialSettingsData);
+                },
+                onSecretChange() {
+                    this.formData = { ...(this.secretFormDataById[this.selectedSecretId] || {}) };
+                    this.secretDescription = this.selectedSecretMeta?.description ?? '';
+                    this.isEditingSecret = true;
+                    this.showSecretInfo = false;
+                },
+                toggleEditSecret() {
+                    this.isEditingSecret = !this.isEditingSecret;
+                    if (this.isEditingSecret) { this.showSecretInfo = false; }
+                },
+                async saveForm(e) {
+                    this.loading = true;
+                    const form = e.target;
+                    const formData = new FormData(form);
+                    if (e.submitter && e.submitter.name && !formData.has(e.submitter.name)) {
+                        formData.append(e.submitter.name, e.submitter.value);
+                    }
+                    const actionUrl = this.configured ? this.updateUrl : this.storeUrl;
+                    try {
+                        const response = await fetch(actionUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || form.querySelector('input[name="_token"]')?.value || ''
+                            },
+                            body: formData
+                        });
+                        const data = await response.json();
+                        if (!response.ok) {
+                            if (data.errors) {
+                                const msg = Object.values(data.errors).flat().join('<br>');
+                                toastr.error(msg);
+                            } else {
+                                toastr.error(data.message || this.labels.saveFailed || 'Failed to save settings');
+                            }
+                            return;
+                        }
+                        toastr.success(data.message || this.labels.saved || 'Settings saved');
+                        if (data.method) {
+                            this.configured = data.method.configured;
+                            this.initialEnabled = data.method.enabled;
+                            this.enabled = data.method.enabled;
+                            this.initialAffectsAvailability = data.method.affects_availability;
+                            this.affectsAvailability = data.method.affects_availability;
+                            this.currentSecretId = String(data.method.secret?.id ?? '');
+                            this.selectedSecretId = String(data.method.secret?.id ?? '');
+                            this.secretDescription = data.method.secret?.description ?? '';
+                            this.secretMeta = data.method.secret_meta ?? {};
+                            this.secretFormDataById = data.method.secret_form_data_by_id ?? {};
+                            this.formData = { ...(data.method.secret_form_data ?? {}) };
+                            this.settingsData = { ...(data.method.settings ?? {}) };
+                            this.initialSettingsData = { ...(data.method.settings ?? {}) };
+                            this.isEditingSecret = false;
+                        }
+                        this.setDirty(this.type, false);
+                    } catch (err) {
+                        toastr.error(this.labels.saveError || 'An error occurred while saving.');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                async deleteMethod() {
+                    if (!confirm(this.labels.confirmRemove || 'Are you sure you want to remove this polling method?')) {
+                        return;
+                    }
+                    try {
+                        const formData = new FormData();
+                        formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
+                        formData.append('_method', 'DELETE');
+                        const response = await fetch(this.destroyUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                            },
+                            body: formData
+                        });
+                        const data = await response.json();
+                        if (!response.ok) {
+                            toastr.error(data.message || this.labels.removeFailed || 'Failed to remove polling method');
+                            return;
+                        }
+                        toastr.success(data.message || this.labels.removed || 'Polling method removed');
+                        this.removeMethod(this.type);
+                    } catch (err) {
+                        toastr.error(this.labels.removeError || 'An error occurred while removing.');
+                    }
+                },
+                init() {
+                    this.setDirty(this.type, this.isDirty);
+                    this.$watch('isDirty', (val) => {
+                        this.setDirty(this.type, val);
+                    });
+                    this.$watch('enabled', (val) => {
+                        if (this.methods && this.methods[this.type]) {
+                            this.methods[this.type].enabled = val;
+                        }
+                    });
+                    this.$watch('affectsAvailability', (val) => {
+                        if (this.methods && this.methods[this.type]) {
+                            this.methods[this.type].affectsAvailability = val;
+                        }
+                    });
+                    this.$watch('showSharedGuard', (val) => {
+                        if (val) { this.updateMode = 'create'; }
+                    });
+                }
             };
         }
 

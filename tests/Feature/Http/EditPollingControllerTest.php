@@ -200,4 +200,59 @@ class EditPollingControllerTest extends TestCase
             return true;
         });
     }
+
+    public function testUpdateReturnsJsonResponseWhenRequested(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'icmp']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '1',
+                'settings' => [],
+            ]
+        );
+
+        $response->assertOk();
+        $response->assertJson([
+            'status' => 'ok',
+            'message' => __('poller.method_updated'),
+        ]);
+        $response->assertJsonPath('method.type', 'icmp');
+        $response->assertJsonPath('method.affects_availability', true);
+    }
+
+    public function testDestroyReturnsJsonResponseWhenRequested(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::UnixAgent,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->deleteJson(
+            route('device.edit.polling.destroy', ['device' => $device, 'methodType' => 'unix-agent'])
+        );
+
+        $response->assertOk();
+        $response->assertJson([
+            'status' => 'ok',
+            'message' => __('poller.method_removed'),
+        ]);
+    }
 }

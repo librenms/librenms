@@ -12,6 +12,7 @@ use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -118,7 +119,7 @@ class EditPollingController
     /**
      * @throws AuthorizationException|ValidationException
      */
-    public function store(StorePollingMethodRequest $request, Device $device, ToastInterface $toast): RedirectResponse
+    public function store(StorePollingMethodRequest $request, Device $device, ToastInterface $toast): JsonResponse|RedirectResponse
     {
         $this->authorize('update', $device);
 
@@ -169,6 +170,16 @@ class EditPollingController
 
         $toast->success(__('poller.method_added'));
 
+        if ($request->wantsJson()) {
+            $device->load('pollingMethods.secret');
+
+            return response()->json([
+                'status' => 'ok',
+                'message' => __('poller.method_added'),
+                'method' => $this->buildMethodData($device, $type),
+            ]);
+        }
+
         return redirect()->route('device.edit.polling', ['device' => $device, 'tab' => $type->value]);
     }
 
@@ -181,7 +192,7 @@ class EditPollingController
         string $methodType,
         ToastInterface $toast,
         SetDeviceAvailability $setDeviceAvailability
-    ): RedirectResponse {
+    ): JsonResponse|RedirectResponse {
         $this->authorize('update', $device);
 
         $type = PollingMethodType::tryFrom($methodType) ?? abort(404);
@@ -247,6 +258,16 @@ class EditPollingController
 
         $toast->success(__('poller.method_updated'));
 
+        if ($request->wantsJson()) {
+            $device->load('pollingMethods.secret');
+
+            return response()->json([
+                'status' => 'ok',
+                'message' => __('poller.method_updated'),
+                'method' => $this->buildMethodData($device, $type),
+            ]);
+        }
+
         return redirect()->route('device.edit.polling', ['device' => $device, 'tab' => $type->value]);
     }
 
@@ -258,7 +279,7 @@ class EditPollingController
         string $methodType,
         ToastInterface $toast,
         SetDeviceAvailability $setDeviceAvailability
-    ): RedirectResponse {
+    ): JsonResponse|RedirectResponse {
         $this->authorize('update', $device);
 
         $type = PollingMethodType::tryFrom($methodType) ?? abort(404);
@@ -274,6 +295,13 @@ class EditPollingController
         $device->saveQuietly();
 
         $toast->success(__('poller.method_removed'));
+
+        if (request()->wantsJson()) {
+            return response()->json([
+                'status' => 'ok',
+                'message' => __('poller.method_removed'),
+            ]);
+        }
 
         return redirect()->route('device.edit.polling', ['device' => $device, 'tab' => $type->value]);
     }
