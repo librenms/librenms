@@ -96,7 +96,7 @@ An example to override the device dependency map to use a hierarchical layout is
 Note that you can choose to enter the JSON config on one line if you want.
 
 ```bash
-lnms config:set network_map_devicedependency_vis_options '{ layout:{ hierarchical: { enabled: true, direction: "LR", sortMethod: "directed", nodeSpacing: 50, treeSpacing: 50, levelSeparation: 300 } }, "edges": { arrows: { to: { enabled: true, scaleFactor:0.5 }, }, "smooth": { enabled: false }, font: { size: 14, color: "red", face: "sans", background: "white", strokeWidth:3, align: "middle", strokeWidth: 2 } }, "physics": {"enabled": false } }'
+lnms config:set network_map_dependencymap_vis_options '"{\"layout\":{\"hierarchical\":{\"enabled\":true,\"direction\":\"UD\",\"sortMethod\":\"directed\",\"nodeSpacing\":50,\"treeSpacing\":50,\"levelSeparation\":300}},\"edges\":{\"arrows\":{\"to\":{\"enabled\":true,\"scaleFactor\":0.5}},\"smooth\":{\"enabled\":false},\"font\":{\"size\":14,\"color\":\"red\",\"face\":\"sans\",\"background\":\"white\",\"strokeWidth\":2,\"align\":\"middle\"}},\"physics\":{\"enabled\":false}}"'
 ```
 
 ### Configurator Output
