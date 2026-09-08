@@ -1,0 +1,145 @@
+-- *****************************************************************
+-- MIB-MODIO: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-MODIO DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    ;
+    
+modioMib	        OBJECT IDENTIFIER ::= { switchMgmt 6 }
+
+
+
+-- Modio Digital Inputs Table
+
+modioDigitalInputsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF modioDigitalInputsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of digital input table entries."
+    ::= { modioMib 2 }
+
+modioDigitalInputsEntry OBJECT-TYPE
+    SYNTAX      modioDigitalInputsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Digital inputs table entry."
+    INDEX   { dinIdx }
+    ::= { modioDigitalInputsTable 1 }
+
+modioDigitalInputsEntry ::= SEQUENCE {
+    	dinIdx
+    		INTEGER,
+        dinName
+            DisplayString (SIZE (0..32)),
+        dinAvailability
+            INTEGER { NO(0), YES(1) },
+        dinState
+            INTEGER { LOW(0), HIGH(1) }
+    }
+    
+dinIdx OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A unique row index."
+    ::= { modioDigitalInputsEntry 1 }
+        
+dinName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Digital input name."
+    ::= { modioDigitalInputsEntry 2 }
+
+dinAvailability OBJECT-TYPE
+    SYNTAX      INTEGER { NO(0), YES(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Digital input name."
+    ::= { modioDigitalInputsEntry 3 }
+
+dinState OBJECT-TYPE
+    SYNTAX      INTEGER { LOW(0), HIGH(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Digital input state."
+    ::= { modioDigitalInputsEntry 4 }
+
+
+
+-- Modio Digital Outputs Table
+
+modioDigitalOutputsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF modioDigitalOutputsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of digital output table entries."
+    ::= { modioMib 3 }
+
+modioDigitalOutputsEntry OBJECT-TYPE
+    SYNTAX      modioDigitalOutputsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Digital outputs table entry."
+    INDEX   { doutIdx }
+    ::= { modioDigitalOutputsTable 1 }
+
+modioDigitalOutputsEntry ::= SEQUENCE {
+    	outIdx
+    		INTEGER,
+        doutName
+            DisplayString (SIZE (0..32)),
+        doutAvailability
+            INTEGER { NO(0), YES(1) },
+        doutState
+            INTEGER { LOW(0), HIGH(1) }
+    }
+    
+doutIdx OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A unique row index."
+    ::= { modioDigitalOutputsEntry 1 }
+        
+doutName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Digital output name."
+    ::= { modioDigitalOutputsEntry 2 }
+
+doutAvailability OBJECT-TYPE
+    SYNTAX      INTEGER { NO(0), YES(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Digital output name."
+    ::= { modioDigitalOutputsEntry 3 }
+
+doutState OBJECT-TYPE
+    SYNTAX      INTEGER { LOW(0), HIGH(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Digital output state."
+    ::= { modioDigitalOutputsEntry 4 }
+
+END

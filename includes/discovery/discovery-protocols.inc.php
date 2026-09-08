@@ -10,6 +10,67 @@ use LibreNMS\Util\Validate;
 
 global $link_exists;
 
+if ($device['os'] == 'hyperion') {
+    echo 'Bitstream Hyperion LLDP: ';
+
+    $lldp_array = SnmpQuery::hideMib()
+        ->walk('MIB-LLDP::lldpStatusNeighborsInformationTable')
+        ->table(2);
+
+    foreach ($lldp_array as $ifIndex => $neighbors) {
+        $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+
+        if (! $port) {
+            d_echo("Skipping ifIndex $ifIndex (no port found)\n");
+            continue;
+        }
+
+        foreach ($neighbors as $entry) {
+            $remote_hostname = $entry['lldpStatusNeighborsInformationSystemName'] ?? '';
+            $remote_port     = $entry['lldpStatusNeighborsInformationPortId'] ?? '';
+            $remote_platform = $entry['lldpStatusNeighborsInformationSystemDescription'] ?? '';
+            $remote_version  = '';
+
+            if (empty($remote_hostname)) {
+                continue;
+            }
+
+            $remote_device_id = find_device_id($remote_hostname);
+
+            if (! $remote_device_id &&
+                ! can_skip_discovery($remote_hostname, $remote_version)
+            ) {
+                if (LibrenmsConfig::get('autodiscovery.xdp') === true) {
+                    $remote_device_id = discover_new_device(
+                        $remote_hostname,
+                        $device,
+                        'LLDP',
+                        $port
+                    );
+                }
+            }
+
+            $remote_port_id = find_port_id($remote_port, '', $remote_device_id);
+
+            d_echo("Discover link: {$device['device_id']}, {$port->port_id}, lldp, $remote_port_id, $remote_hostname, $remote_port, $remote_platform\n");
+
+            discover_link(
+                $port->port_id,
+                'lldp',
+                $remote_port_id,
+                $remote_hostname,
+                $remote_port,
+                $remote_platform,
+                $remote_version,
+                $device['device_id'],
+                $remote_device_id
+            );
+        }
+    }
+
+    echo PHP_EOL;
+}
+
 if ($device['os'] == 'ironware') {
     echo ' Brocade FDP: ';
     $fdp_array = SnmpQuery::hideMib()->walk('FOUNDRY-SN-SWITCH-GROUP-MIB::snFdpCacheEntry')->table(2);

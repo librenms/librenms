@@ -6,14 +6,14 @@
                     "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.6603.0",
                     "sysDescr": "Hyperion-200 GigaBit Ethernet Switch",
-                    "sysContact": null,
-                    "version": null,
+                    "sysContact": "<private>",
+                    "version": "BCH200-2-2-L3-PoE-03-95-18",
                     "hardware": "Hyperion-200 GigaBit Ethernet Switch",
                     "features": null,
                     "location": null,
                     "os": "hyperion",
                     "type": "network",
-                    "serial": null,
+                    "serial": "System MAC: 78-62-99-01-a4-3f",
                     "icon": "bitstream.png"
                 }
             ]
