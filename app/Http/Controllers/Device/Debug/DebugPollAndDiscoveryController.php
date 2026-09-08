@@ -32,7 +32,6 @@ use App\Models\Device;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -62,9 +61,7 @@ class DebugPollAndDiscoveryController extends Controller
         return $this->stream(function () use ($cmd, $args): void {
             Event::forget(CommandStarting::class); // prevent normal cli setup and checks
 
-            DB::beginTransaction();
             $exitCode = Artisan::call($cmd, $args, $this->getCliStreamOutput());
-            DB::rollBack();
 
             if ($exitCode) {
                 echo PHP_EOL . 'exit_status:' . $exitCode . PHP_EOL;

@@ -48,6 +48,7 @@ class PerDeviceProcess
         private readonly ModuleList $moduleList,
         private readonly ?string $os = null,
         private readonly ?string $deviceType = null,
+        private readonly bool $nodata = false,
     ) {
         $this->results = new Result;
     }
@@ -75,7 +76,7 @@ class PerDeviceProcess
         foreach ($query->pluck('device_id') as $device_id) {
             $this->current_device_id = $device_id;
             $this->results->markAttempted();
-            $dispatcher->dispatchSync(new $this->job($device_id, $this->moduleList));
+            $dispatcher->dispatchSync(new $this->job($device_id, $this->moduleList, $this->nodata));
         }
 
         return $this->results;

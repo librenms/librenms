@@ -64,7 +64,8 @@ class DevicePoll extends LnmsCommand
                 DevicePolled::class,
                 ModuleList::fromUserOverrides($this->option('modules')),
                 $this->option('os'),
-                $this->option('type')
+                $this->option('type'),
+                $this->option('no-data') ?? false
             );
 
             $this->line(__('commands.device:poll.starting'));
