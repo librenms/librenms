@@ -243,7 +243,10 @@ class QueryBuilderParser implements \JsonSerializable
             return $subject;
         }
 
-        $macros = LibrenmsConfig::get('alert.macros.rule');
+        $macros = array_merge(
+            LibrenmsConfig::get('alert.macros.rule', []),
+            array_map(fn ($filter) => $filter['sql'] ?? '', QueryBuilderFilter::pluginFilters())
+        );
 
         $count = 0;
         while ($count++ < $depth_limit && Str::contains($subject, 'macros.')) {

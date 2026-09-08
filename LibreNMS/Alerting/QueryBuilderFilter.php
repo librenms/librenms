@@ -27,8 +27,11 @@
 namespace LibreNMS\Alerting;
 
 use App\Facades\LibrenmsConfig;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\DB\Schema;
+use LibreNMS\Interfaces\Plugins\Hooks\QueryBuilderFilterHook;
+use LibreNMS\Interfaces\Plugins\PluginManagerInterface;
 
 class QueryBuilderFilter implements \JsonSerializable
 {
@@ -40,6 +43,8 @@ class QueryBuilderFilter implements \JsonSerializable
 
     private $filter = [];
     private $schema;
+    /** @var array<string, array>|null */
+    private static $plugin_filters = null;
 
     /**
      * QueryBuilderFilter constructor.
@@ -57,6 +62,37 @@ class QueryBuilderFilter implements \JsonSerializable
         }
 
         $this->generateTableFilter();
+        $this->generatePluginFilter();
+    }
+
+    /**
+     * Filters supplied by plugins, keyed by macro name.
+     * Each entry is a filter definition with an additional 'sql' entry.
+     *
+     * @return array<string, array>
+     */
+    public static function pluginFilters(): array
+    {
+        if (self::$plugin_filters === null) {
+            self::$plugin_filters = array_merge(
+                [],
+                ...app(PluginManagerInterface::class)->call(QueryBuilderFilterHook::class)
+            );
+        }
+
+        return self::$plugin_filters;
+    }
+
+    private function generatePluginFilter(): void
+    {
+        foreach (self::pluginFilters() as $name => $filter) {
+            $field = 'macros.' . $name;
+
+            $this->filter[$field] = array_merge(
+                ['id' => $field, 'type' => 'string'],
+                Arr::except($filter, 'sql')
+            );
+        }
     }
 
     private function generateMacroFilter($config_location)
