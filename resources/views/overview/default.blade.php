@@ -513,7 +513,7 @@
     function widget_dom(data) {
         dom = '<div id="'+data.user_widget_id+'" class="grid-stack-item" data-type="'+data.widget+'" data-settings="0" gs-id="'+data.user_widget_id+'">'+
               '<div class="grid-stack-item-content tw:ring tw:ring-gray-200 tw:dark:ring-dark-gray-200 tw:left-0! tw:bottom-0!">'+
-              '<header class="tw:bg-gray-200 tw:dark:bg-dark-gray-200 tw:text-gray-800 tw:dark:text-dark-white-100 tw:p-3 tw:text-center"><span id="widget_title_'+data.user_widget_id+'" class="dashboard-widget-title">'+data.title+
+              '<header class="widget-header tw:p-3 tw:text-center"><span id="widget_title_'+data.user_widget_id+'" class="dashboard-widget-title">'+data.title+
               '</span><span id="widget_title_counter_'+data.user_widget_id+'"></span>'+
               '<span class="fade-edit tw:float-right">'+
 
