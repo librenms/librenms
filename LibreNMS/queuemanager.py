@@ -696,6 +696,7 @@ class PollerQueueManager(QueueManager):
                 else self.config.log_output
             )
 
+            try_cli = not self.config.apipoll
             if self.config.apipoll:
                 url = f"http://localhost/ajax/cmd/{device_id}/poll"
                 params = {"colour": 1, "buffer": 1}
@@ -707,21 +708,22 @@ class PollerQueueManager(QueueManager):
 
                 response = requests.get(url, params=params, headers=headers)
 
-                output = response.content.decode().rstrip()
-                if response.ok:
-                    lastline_pos = output.rfind("\n")
+                http_output = response.content.decode().rstrip()
+                if response.ok and response.headers.get('Content-Type') == "text/plain":
+                    lastline_pos = http_output.rfind("\n")
                     if lastline_pos < 0:
                         exit_code = 0
                     else:
-                        lastline = output[lastline_pos:]
+                        lastline = http_output[lastline_pos:]
                         if lastline.startswith("exit_status:"):
                             exit_code = int(lastline.split(":")[1])
-                            output = output[:lastline_pos]
+                            output = http_output[:lastline_pos]
                         else:
                             exit_code = 0
                 else:
-                    exit_code = 1
-            else:
+                    try_cli = True
+
+            if try_cli:
                 args_list = ["device:poll", device_id]
                 if self.config.debug:
                     args_list.append("-vv")
@@ -792,6 +794,7 @@ class DiscoveryQueueManager(TimedQueueManager):
                 else self.config.log_output
             )
 
+            try_cli = not self.config.apipoll
             if self.config.apipoll:
                 url = f"http://localhost/ajax/cmd/{device_id}/discover"
                 params = {"colour": 1, "buffer": 1}
@@ -803,21 +806,22 @@ class DiscoveryQueueManager(TimedQueueManager):
 
                 response = requests.get(url, params=params, headers=headers)
 
-                output = response.content.decode().rstrip()
-                if response.ok:
-                    lastline_pos = output.rfind("\n")
+                http_output = response.content.decode().rstrip()
+                if response.ok and response.headers.get('Content-Type') == "text/plain":
+                    lastline_pos = http_output.rfind("\n")
                     if lastline_pos < 0:
                         exit_code = 0
                     else:
-                        lastline = output[lastline_pos:]
+                        lastline = http_output[lastline_pos:]
                         if lastline.startswith("exit_status:"):
                             exit_code = int(lastline.split(":")[1])
-                            output = output[:lastline_pos]
+                            output = http_output[:lastline_pos]
                         else:
                             exit_code = 0
                 else:
-                    exit_code = 1
-            else:
+                    try_cli = true
+
+            if try_cli:
                 args_list = ["device:discover", device_id]
                 if self.config.debug:
                     args_list.append("-vv")
