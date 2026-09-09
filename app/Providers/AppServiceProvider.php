@@ -212,7 +212,7 @@ class AppServiceProvider extends ServiceProvider
                 return true;
             }
 
-            if (is_string($value) && preg_match('/^[+-]?\d+[hdmwy]$/', $value)) {
+            if (is_string($value) && preg_match('/^[+-]?\d+(mo|[smhdwy])$/', $value)) {
                 return true;
             }
 
