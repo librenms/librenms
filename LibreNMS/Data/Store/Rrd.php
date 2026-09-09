@@ -34,6 +34,7 @@ use File;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Store\Rrd\RrdBackendInterface;
 use LibreNMS\Data\Store\Rrd\RrdCmd;
+use LibreNMS\Data\Store\Rrd\RrdPhp;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdFileExistsException;
@@ -84,7 +85,7 @@ class Rrd extends BaseDatastore
         $this->rrdcached = LibrenmsConfig::get('rrdcached', false);
         $this->rrd_dir = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
         $this->step = LibrenmsConfig::get('rrd.step', 300);
-        $this->rra = preg_split('/s+/', trim(LibrenmsConfig::get(
+        $this->rra = preg_split('/\s+/', trim(LibrenmsConfig::get(
             'rrd_rra',
             'RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ' .
             ' RRA:MIN:0.5:1:2016 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:1440     RRA:MIN:0.5:288:1440 ' .
@@ -92,7 +93,7 @@ class Rrd extends BaseDatastore
             ' RRA:LAST:0.5:1:2016 '
         )));
         $this->version = LibrenmsConfig::get('rrdtool_version', '1.4');
-        $this->backend = new RrdCmd();
+        $this->backend = class_exists('\RRDGraph') ? new RrdPhp() : new RrdCmd();
     }
 
     /**
@@ -491,8 +492,6 @@ class Rrd extends BaseDatastore
             try {
                 $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
                 $check_output = $this->backend->last($filename);
-
-                $result = $this->backend->last($filename);
                 $this->recordStatistic($stat->end());
 
                 return ! (str_contains($check_output, $filename) && str_contains($check_output, 'No such file or directory'));
