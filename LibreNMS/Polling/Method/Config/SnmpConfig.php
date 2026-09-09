@@ -62,22 +62,31 @@ readonly class SnmpConfig implements PollingMethodConfigInterface
     ) {
     }
 
-    public static function fromDevice(Device $device, ?DevicePollingMethod $method = null): static
+    public static function fromDevice(Device $device): static
     {
-        $method ??= $device->pollingMethod(PollingMethodType::Snmp)
-            ?? DevicePollingMethod::transient(PollingMethodType::Snmp, device: $device, enabled: false);
+        return static::fromModel($device->pollingMethod(PollingMethodType::Snmp));
+    }
 
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    public static function fromModel(DevicePollingMethod $method): static
+    {
         $definition = PollingMethodType::Snmp->definition();
         $secretDefinition = $definition->secretDefinition();
 
         $settings = $definition->resolveValues($method->settings ?? []);
         $secretData = $secretDefinition->resolveValues($method->secret->data ?? []);
 
+        $os = $method->device->os ?? 'generic';
+
         $timeout = (float) ($settings['timeout'] > 0 ? $settings['timeout'] : LibrenmsConfig::get('snmp.timeout', 1));
         $retries = (int) (is_numeric($settings['retries']) ? $settings['retries'] : LibrenmsConfig::get('snmp.retries', 5));
-        $maxRepeaters = (int) ($settings['max_repeaters'] ?: LibrenmsConfig::getOsSetting($device->os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0)));
-        $configuredMaxOid = (int) ($settings['max_oid'] ?: LibrenmsConfig::getOsSetting($device->os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10)));
-        $rawBulk = $device->getAttrib('snmp_bulk') ?? LibrenmsConfig::getOsSetting($device->os, 'snmp_bulk', LibrenmsConfig::get('snmp_bulk', true));
+        $maxRepeaters = (int) ($settings['max_repeaters'] ?: LibrenmsConfig::getOsSetting($os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0)));
+        $configuredMaxOid = (int) ($settings['max_oid'] ?: LibrenmsConfig::getOsSetting($os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10)));
+        $rawBulk = LibrenmsConfig::getOsSetting($os, 'snmp_bulk', LibrenmsConfig::get('snmp_bulk', true));
 
         return new static(
             enabled: $method->enabled,
@@ -99,15 +108,5 @@ readonly class SnmpConfig implements PollingMethodConfigInterface
             maxOid: max(1, $configuredMaxOid),
             bulk: filter_var($rawBulk, FILTER_VALIDATE_BOOLEAN),
         );
-    }
-
-    public function isEnabled(): bool
-    {
-        return $this->enabled;
-    }
-
-    public static function fromModel(DevicePollingMethod $method): static
-    {
-        return static::fromDevice($method->device, $method);
     }
 }
