@@ -33,6 +33,7 @@ use App\Http\Controllers\Maps\CustomMapListController;
 use App\Http\Controllers\Maps\CustomMapNodeImageController;
 use App\Http\Controllers\Maps\DeviceDependencyController;
 use App\Http\Controllers\NacController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OuiLookupController;
 use App\Http\Controllers\OutagesController;
 use App\Http\Controllers\OverviewController;
@@ -191,6 +192,18 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
         Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
+        Route::prefix('routing')->name('routing.')->group(function (): void {
+            Route::get('bgp', Device\Tabs\Routing\BgpController::class)->name('bgp');
+            Route::get('cef', Device\Tabs\Routing\CefController::class)->name('cef');
+            Route::get('cisco-otv', Device\Tabs\Routing\CiscoOtvController::class)->name('cisco-otv');
+            Route::get('ipsec-tunnels', Device\Tabs\Routing\IpsecTunnelsController::class)->name('ipsec-tunnels');
+            Route::get('isis', Device\Tabs\Routing\IsisController::class)->name('isis');
+            Route::get('mpls', Device\Tabs\Routing\MplsController::class)->name('mpls');
+            Route::get('ospf', Device\Tabs\Routing\OspfController::class)->name('ospf');
+            Route::get('ospfv3', Device\Tabs\Routing\Ospfv3Controller::class)->name('ospfv3');
+            Route::get('routes', Device\Tabs\Routing\RoutesController::class)->name('routes');
+            Route::get('vrf', Device\Tabs\Routing\VrfController::class)->name('vrf');
+        });
         Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
         Route::get('config/backups', [Device\Tabs\ConfigController::class, 'backups'])->name('config.backups');
@@ -249,6 +262,17 @@ Route::middleware(['auth'])->group(function (): void {
     Route::put('dashboard/widgets/{widget}', [WidgetSettingsController::class, 'update'])->name('dashboard.widget.settings');
 
     Route::get('tool/oui-lookup', OuiLookupController::class)->name('tool.oui-lookup');
+
+    // Notifications
+    Route::prefix('notifications')->name('notifications.')->whereNumber('notification')->group(function (): void {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('archive', [NotificationController::class, 'archive'])->name('archive');
+        Route::post('/', [NotificationController::class, 'store'])->name('store');
+        Route::put('read-all', [NotificationController::class, 'readAll'])->name('read-all');
+        Route::put('{notification}/read', [NotificationController::class, 'read'])->name('read');
+        Route::put('{notification}/stick', [NotificationController::class, 'stick'])->name('stick');
+        Route::delete('{notification}/stick', [NotificationController::class, 'unstick'])->name('unstick');
+    });
 
     // Push notifications
     Route::prefix('push')->group(function (): void {

@@ -27,7 +27,7 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Tests\TestCase;
 
 final class SnmpResponseTest extends TestCase

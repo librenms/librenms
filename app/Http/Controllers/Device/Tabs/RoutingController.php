@@ -3,8 +3,6 @@
 /**
  * RoutingController.php
  *
- * -Description-
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,11 +10,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
  *
@@ -26,40 +24,19 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
-use App\Facades\DeviceCache;
-use App\Models\Component;
 use App\Models\Device;
+use App\View\Components\Device\RoutingTabs;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Route;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Util\Url;
 
 class RoutingController implements DeviceTab
 {
-    private array $tabs = [];
-
-    public function __construct()
-    {
-        if (Gate::any('routing.view', 'routing.viewAll')) {
-            $device = DeviceCache::getPrimary();
-            $this->tabs = [
-                'ospf' => $device->ospfInstances()->count(),
-                'ospfv3' => $device->ospfv3Instances()->count(),
-                'isis' => $device->isisAdjacencies()->count(),
-                'bgp' => $device->bgppeers()->count(),
-                'vrf' => $device->vrfs()->count(),
-                'cef' => $device->cefSwitching()->count(),
-                'mpls' => $device->mplsServices()->count(),
-                'cisco-otv' => Component::query()->where('device_id', $device->device_id)->where('type', 'Cisco-OTV')->count(),
-                'loadbalancer_rservers' => $device->rServers()->count(),
-                'ipsec_tunnels' => $device->ipsecTunnels()->count(),
-                'routes' => $device->routes()->count(),
-            ];
-        }
-    }
-
     public function visible(Device $device): bool
     {
-        return in_array(true, $this->tabs);
+        return ! empty(RoutingTabs::getRoutingTabs($device));
     }
 
     public function slug(): string
@@ -79,8 +56,26 @@ class RoutingController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [
-            'routing_tabs' => array_filter($this->tabs),
-        ];
+        $options = Url::parseOptions();
+
+        $routingTabs = RoutingTabs::getRoutingTabs($device);
+        $tabKeys = array_keys($routingTabs);
+
+        $proto = $options['proto'] ?? $options['section'] ?? $tabKeys[0] ?? 'cef';
+
+        // Map any legacy names if needed (e.g. ipsec_tunnels -> ipsec-tunnels)
+        $protoNormalized = str_replace('_', '-', $proto);
+
+        $queryParams = Arr::except($options, ['proto', 'section', 'tab', 'device']);
+
+        if (Route::has('device.routing.' . $protoNormalized)) {
+            abort(redirect()->route('device.routing.' . $protoNormalized, array_merge(['device' => $device], $queryParams)));
+        }
+
+        if (! empty($tabKeys) && Route::has('device.routing.' . $tabKeys[0])) {
+            abort(redirect()->route('device.routing.' . $tabKeys[0], array_merge(['device' => $device], $queryParams)));
+        }
+
+        abort(redirect()->route('device.routing.cef', array_merge(['device' => $device], $queryParams)));
     }
 }
