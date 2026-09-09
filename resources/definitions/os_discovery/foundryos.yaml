@@ -1,10 +1,4 @@
 modules:
-    # snAgGblDynMemTotal/Free are marked deprecated in FOUNDRY-SN-AGENT-MIB in
-    # favour of snAgSystemDRAMTotal/Free (which is why ironware.yaml uses the
-    # latter). The legacy hardware this OS covers implements only the deprecated
-    # pair: snAgSystemDRAM* returns no such object on every device tested
-    # (FES4802, FES2402-PREM-ILP, FWSX448 on 04.x, and NetIron MLX), while
-    # snAgGblDynMem* is populated on all of them.
     mempools:
         data:
             -
@@ -36,7 +30,7 @@ modules:
                     divisor: 2
                     num_oid: '.1.3.6.1.4.1.1991.1.1.2.13.1.1.4.{{ $index }}'
                     descr: FOUNDRY-SN-AGENT-MIB::snAgentTempSensorDescr
-                    index: '{{ $index }}'
+                    index: 'snAgentTempValue.{{ $index }}'
                     group: 'Module Temperatures'
                 -
                     oid: FOUNDRY-SN-AGENT-MIB::snChasActualTemperature
