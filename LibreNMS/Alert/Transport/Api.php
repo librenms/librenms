@@ -36,7 +36,7 @@ class Api extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        $request_body = $this->config['api-body'];
+        $request_body = $this->config['api-body'] ?? '';
         $username = $this->config['api-auth-username'];
         $password = $this->config['api-auth-password'];
         $as_form = $this->config['api-as-form'] ?? false;
@@ -45,13 +45,13 @@ class Api extends Transport
         $host = explode('?', (string) $this->config['api-url'], 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
         //get each line of key-values and process the variables for Options
-        $query = $this->parseUserOptions($this->config['api-options'], $alert_data);
-        $request_headers = $this->parseUserOptions($this->config['api-headers'], $alert_data);
+        $query = $this->parseUserOptions($this->config['api-options'] ?? '', $alert_data);
+        $request_headers = $this->parseUserOptions($this->config['api-headers'] ?? '', $alert_data);
         $client = Http::client()
         ->withHeaders($request_headers); //get each line of key-values and process the variables for Headers
 
         if ($method !== 'get') {
-            $request_body = SimpleTemplate::parse($this->config['api-body'] ?? '', $alert_data);
+            $request_body = SimpleTemplate::parse($request_body, $alert_data);
             if ($as_form == true) {
                 $request_body = $this->parseUserOptions($request_body);
                 $method = 'postform';
@@ -81,7 +81,7 @@ class Api extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $request_body ?? $query, [
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $request_body, [
             'query' => $query,
         ]);
     }
