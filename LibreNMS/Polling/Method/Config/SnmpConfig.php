@@ -30,9 +30,9 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Interfaces\PollingMethodConfigInterface;
 use SnmpQuery;
+use LibreNMS\Util\Rewrite;
 
 readonly class SnmpConfig implements PollingMethodConfigInterface
 {
@@ -62,13 +62,10 @@ readonly class SnmpConfig implements PollingMethodConfigInterface
     ) {
     }
 
-    public static function fromDevice(Device $device): static
+    public static function fromDevice(Device $device, ?DevicePollingMethod $method = null): static
     {
-        $method = $device->pollingMethod(PollingMethodType::Snmp);
-
-        if ($method === null) {
-            throw new SnmpException('Invalid polling method type');
-        }
+        $method ??= $device->pollingMethod(PollingMethodType::Snmp)
+            ?? DevicePollingMethod::transient(PollingMethodType::Snmp, device: $device, enabled: false);
 
         $definition = PollingMethodType::Snmp->definition();
         $secretDefinition = $definition->secretDefinition();
@@ -109,59 +106,8 @@ readonly class SnmpConfig implements PollingMethodConfigInterface
         return $this->enabled;
     }
 
-    public function isAvailable(Device $device, bool $commit = false): bool
-    {
-        $response = SnmpQuery::device($device)->get('SNMPv2-MIB::sysObjectID.0');
-
-        return $response->getExitCode() === 0 || $response->getExitCode() === 2 || $response->isValid();
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    public function toNetSnmpOptions(?string $context = null): array
-    {
-        $options = ['-' . $this->version];
-        $resolvedContext = $context ?? $this->context;
-
-        if ($this->version === 'v3') {
-            if ($this->authname !== null) {
-                array_push($options, '-u', $this->authname);
-            }
-
-            array_push($options, '-l', $this->authlevel);
-
-            if (in_array($this->authlevel, ['authNoPriv', 'authPriv'])) {
-                array_push($options, '-a', $this->authalgo);
-
-                if ($this->authpass !== null) {
-                    array_push($options, '-A', $this->authpass);
-                }
-            }
-
-            if ($this->authlevel === 'authPriv') {
-                array_push($options, '-x', $this->cryptoalgo);
-
-                if ($this->cryptopass !== null) {
-                    array_push($options, '-X', $this->cryptopass);
-                }
-            }
-
-            if ($resolvedContext !== null) {
-                array_push($options, '-n', $resolvedContext);
-            }
-        } else {
-            if ($this->community !== null) {
-                $community = $resolvedContext ? "$this->community@$resolvedContext" : $this->community;
-                array_push($options, '-c', $community);
-            }
-        }
-
-        return $options;
-    }
-
     public static function fromModel(DevicePollingMethod $method): static
     {
-        return self::fromDevice($method->device); // TODO fix up
+        return static::fromDevice($method->device, $method);
     }
 }

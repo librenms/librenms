@@ -27,6 +27,7 @@
 namespace LibreNMS\Data\Source\Snmp;
 
 use App\Models\Device;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 
 interface SnmpQueryInterface
 {
@@ -34,6 +35,11 @@ interface SnmpQueryInterface
      * Easy way to start a new instance
      */
     public static function make(): SnmpQueryInterface;
+
+    /**
+     * Set explicit SNMP configuration or community string for the query.
+     */
+    public function config(SnmpConfig $config): SnmpQueryInterface;
 
     /**
      * Specify a device to make the snmp query against.

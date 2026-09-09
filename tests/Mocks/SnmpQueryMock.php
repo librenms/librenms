@@ -34,6 +34,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Data\Source\Snmp\SnmpQuery;
 use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Oid;
 use Log;
@@ -41,7 +42,8 @@ use Log;
 class SnmpQueryMock implements SnmpQueryInterface
 {
     private static ?array $cache = null;
-    private Device $device;
+    private ?Device $device = null;
+    private ?SnmpConfig $config = null;
     private string $context = '';
     private ?string $mibDir = null;
     private array $mibs = [];
@@ -60,7 +62,14 @@ class SnmpQueryMock implements SnmpQueryInterface
         return new static;
     }
 
-    public function device(Device $device): SnmpQueryInterface
+    public function config(SnmpConfig $config): SnmpQueryInterface
+    {
+        $this->config = $config;
+
+        return $this;
+    }
+
+    public function device(?Device $device): SnmpQueryInterface
     {
         $this->device = $device;
 
@@ -353,12 +362,12 @@ class SnmpQueryMock implements SnmpQueryInterface
 
     private function community(): string
     {
-        $snmpMethod = $this->device->pollingMethodFor()->snmp();
-        $community = $snmpMethod->community ?? '';
-
-        // Fallback for older mocks that might manually set attributes
-        if (empty($community)) {
-            $community = $this->device->getAttribute('community') ?? '';
+        if ($this->config !== null) {
+            $community = $this->config->community ?? '';
+        } elseif ($this->device !== null) {
+            $community = $this->device->toSnmpConfig()->community ?? '';
+        } else {
+            $community = '';
         }
 
         if (! empty($this->context)) {

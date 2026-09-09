@@ -3,12 +3,15 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQuery;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Tests\TestCase;
@@ -22,14 +25,24 @@ class SnmpQueryTest extends TestCase
     {
         parent::setUp();
 
-        $this->device = new Device([
-            'hostname' => '10.1.2.3',
-            'snmpver' => 'v2c',
-            'community' => 'test-community',
-            'timeout' => 2,
-            'retries' => 1,
-        ]);
-        $this->device->device_id = 1;
+        $this->device = $this->makeDeviceWithSnmpConfig();
+    }
+
+    private function makeDeviceWithSnmpConfig(array $secretData = [], array $settings = [], array $deviceAttrs = []): Device
+    {
+        $device = new Device(array_merge(['hostname' => '10.1.2.3'], $deviceAttrs));
+        $device->device_id = 1;
+        $device->setRelation('attribs', new Collection);
+
+        $method = DevicePollingMethod::transient(
+            PollingMethodType::Snmp,
+            settings: array_merge(['timeout' => 2, 'retries' => 1], $settings),
+            secretData: array_merge(['version' => 'v2c', 'community' => 'test-community'], $secretData),
+            device: $device,
+        );
+        $device->setRelation('pollingMethods', collect([$method]));
+
+        return $device;
     }
 
     private function mockBackend(): Mockery\MockInterface&SnmpBackendInterface
@@ -93,15 +106,7 @@ class SnmpQueryTest extends TestCase
 
     public function testLimitOidsChunksRequests(): void
     {
-        $device = new Device([
-            'hostname' => '10.1.2.3',
-            'snmpver' => 'v2c',
-            'community' => 'test-community',
-        ]);
-        $device->device_id = 1;
-        // set max_oid to 2
-        $attrib = new \App\Models\DeviceAttrib(['device_id' => 1, 'attrib_type' => 'snmp_max_oid', 'attrib_value' => '2']);
-        $device->setRelation('attribs', new \Illuminate\Database\Eloquent\Collection([$attrib]));
+        $device = $this->makeDeviceWithSnmpConfig(settings: ['max_oid' => 2]);
 
         $mockBackend = $this->mockBackend();
         $mockBackend->shouldReceive('get')
@@ -182,12 +187,14 @@ class SnmpQueryTest extends TestCase
 
     public function testContextV3Prefix(): void
     {
-        $v3Device = new Device([
-            'hostname' => '10.1.2.3',
-            'snmpver' => 'v3',
-            'authlevel' => 'noAuthNoPriv',
-        ]);
-        $v3Device->device_id = 2;
+        $v3Device = $this->makeDeviceWithSnmpConfig(
+            secretData: [
+                'version' => 'v3',
+                'authlevel' => 'noAuthNoPriv',
+                'authname' => null,
+            ],
+            deviceAttrs: ['device_id' => 2],
+        );
 
         $mockBackend = $this->mockBackend();
         $mockBackend->shouldReceive('get')
@@ -281,5 +288,28 @@ class SnmpQueryTest extends TestCase
 
         $query = (new SnmpQuery($mockBackend))->device($this->device);
         $query->walk('UCD-SNMP-MIB::laLoadInt');
+    }
+
+    public function testQueryWithExplicitSnmpConfig(): void
+    {
+        $mockBackend = $this->mockBackend();
+        $mockBackend->shouldReceive('get')
+            ->once()
+            ->withArgs(fn (SnmpConfig $config, array $oids) => $config->target === '192.168.1.1'
+                && $config->community === 'custom-comm'
+                && $oids === ['sysDescr.0'])
+            ->andReturn(new SnmpResponse("sysDescr.0 = Custom\n"));
+
+        $explicitConfig = new SnmpConfig(
+            target: '192.168.1.1',
+            community: 'custom-comm',
+        );
+
+        $query = (new SnmpQuery($mockBackend))
+            ->device(null)
+            ->config($explicitConfig);
+
+        $response = $query->get('sysDescr.0');
+        $this->assertSame("sysDescr.0 = Custom\n", $response->raw);
     }
 }
