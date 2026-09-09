@@ -77,7 +77,6 @@ return [
             'programs' => '프로그램',
             'python' => 'Python',
             'rrd' => 'RRD',
-            'rrdcheck' => 'RRD 점검',
             'scheduler' => '스케줄러',
             'system' => '시스템',
             'updates' => '업데이트',
