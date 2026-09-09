@@ -49,7 +49,7 @@ function snmp_exec(string $cmd, array|string|null $oids, array|string|null $opti
     }
 
     $snmp = resolve(SnmpBackendInterface::class);
-    $response = match($cmd) {
+    $response = match ($cmd) {
         'snmpwalk' => $snmp->walk($target, array_first($oids), $config, $queryOptions),
         'snmpget' => $snmp->get($target, $oids, $config, $queryOptions),
         'snmpgetnext' => $snmp->next($target, $oids, $config, $queryOptions),
