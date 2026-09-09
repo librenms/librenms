@@ -77,12 +77,9 @@ class RrdCmd implements RrdBackendInterface
     }
 
     /**
-     * @param  string  $filename
      * @param  string[]  $data
      *
      * @throws RrdException
-     *
-     * @internal
      */
     public function create(string $filename, array $data): void
     {
@@ -90,15 +87,9 @@ class RrdCmd implements RrdBackendInterface
     }
 
     /**
-     * Updates an rrd database at $filename using $options
-     * Where $options is an array, each entry which is not a number is replaced with "U"
-     *
-     * @param  string  $filename
      * @param  string[]  $data
      *
      * @throws RrdException
-     *
-     * @internal
      */
     public function update(string $filename, array $data): void
     {
@@ -110,11 +101,9 @@ class RrdCmd implements RrdBackendInterface
     /**
      * Modify an rrd file's max value and trim the peaks as defined by rrdtool
      *
-     * @param  string  $filename  the path to the rrd file
      * @param  string[]  $options
-     * @return bool
      */
-    public function tune($filename, $options): bool
+    public function tune(string $filename, array $options): bool
     {
         try {
             $this->command('tune', $filename, $options);
@@ -127,17 +116,10 @@ class RrdCmd implements RrdBackendInterface
         return true;
     }
 
-    // rrdtool_tune
-
     /**
      * Generates and pipes a command to rrdtool
      *
-     * @internal
-     *
-     * @param  string  $command  create, update, updatev, graph, graphv, dump, restore, fetch, tune, first, last, lastupdate, info, resize, xport, flushcached
-     * @param  string  $filename  The full patth to the rrd file
      * @param  string[]  $options  rrdtool command options
-     * @return string the output of the command
      *
      * @throws RrdException thrown when the rrdtool process(s) cannot be started
      */
@@ -156,20 +138,12 @@ class RrdCmd implements RrdBackendInterface
         return $output;
     }
 
-    /**
-     * Return the last timestamp a RRD file was updated or an error message if it does not
-     *
-     * @param  string  $filename  full path to the rrd file
-     * @return string
-     */
-    public function last($filename): string
+    public function last(string $filename): string
     {
         return $this->command('last', $filename);
     }
 
     /**
-     * Return a string with the list of files in a given directory
-     *
      * @param  string|string[]  $prefix
      * @return string[]
      */
@@ -181,13 +155,7 @@ class RrdCmd implements RrdBackendInterface
     }
 
     /**
-     * Generates a graph file at $graph_file using $options
-     * Graphs are a single command per run, so this just runs rrdtool
-     *
      * @param  string[]  $options
-     * @return string
-     *
-     * @throws RrdGraphException
      */
     public function graph(array $options): string
     {

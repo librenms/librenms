@@ -28,7 +28,6 @@ namespace LibreNMS\Data\Store\Rrd;
 
 use LibreNMS\Data\Store\TimeSeriesPoint;
 use LibreNMS\Exceptions\RrdException;
-use LibreNMS\Exceptions\RrdGraphException;
 
 interface RrdBackendInterface
 {
@@ -46,7 +45,6 @@ interface RrdBackendInterface
     /**
      * Create a rrd database at $filename using the supplied arguments
      *
-     * @param  string  $filename
      * @param  string[]  $def
      *
      * @throws RrdException
@@ -56,7 +54,6 @@ interface RrdBackendInterface
     /**
      * Updates an rrd database at $filename using the supplied data
      *
-     * @param  string  $filename
      * @param  string[]  $data
      *
      * @throws RrdException
@@ -66,19 +63,14 @@ interface RrdBackendInterface
     /**
      * Modify an rrd file's max value
      *
-     * @param  string  $filename  the path to the rrd file
      * @param  string[]  $options
-     * @return bool
      */
-    public function tune($filename, $options): bool;
+    public function tune(string $filename, array $options): bool;
 
     /**
      * Return the last timestamp a RRD file was updated or an error message if it does not
-     *
-     * @param  string  $filename  full path to the rrd file
-     * @return string
      */
-    public function last($filename): string;
+    public function last(string $filename): string;
 
     /**
      * Return a list of files
@@ -89,12 +81,9 @@ interface RrdBackendInterface
     public function list(string $dir, string|array $prefix): array;
 
     /**
-     * Generates a graph file at $graph_file using $options
+     * Returns a graph using $options
      *
      * @param  string[]  $options
-     * @return string
-     *
-     * @throws RrdGraphException
      */
     public function graph(array $options): string;
 }
