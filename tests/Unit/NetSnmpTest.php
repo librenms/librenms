@@ -414,18 +414,12 @@ class NetSnmpTest extends TestCase
 
     public function testMibDirectoriesResolvesOsAndGroup(): void
     {
-        $device = new Device([
-            'hostname' => 'router1.example.com',
-            'os' => 'ios',
-            'snmpver' => 'v2c',
-            'community' => 'public',
-        ]);
-
-        $dirs = \LibreNMS\Util\Mib::directories($device, ['custom/mib/dir']);
+        $dirs = \LibreNMS\Util\Mib::directories('ios', ['custom/mib/dir', 'juniper']);
         $joined = implode(':', $dirs);
 
         $this->assertStringContainsString('cisco', $joined);
-        $this->assertStringContainsString('custom/mib/dir', $joined);
+        $this->assertStringNotContainsString('custom/mib/dir', $joined);
+        $this->assertStringContainsString('juniper', $joined);
     }
 
     public function testDebugSnmpwalkControllerBuildsCommandLine(): void
