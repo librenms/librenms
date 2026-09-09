@@ -1,0 +1,21 @@
+os: scte-hms
+text: 'SCTE HMS'
+type: network
+icon: generic
+mib_dir: scte
+
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.
+        snmpget:
+            oid: SCTE-HMS-COMMON-MIB::commonVendor.0
+            op: regex
+            value: '/^(?!No Such).+$/'
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.
+        snmpget:
+            oid: SCTE-HMS-PS-MIB::psMonitored.0
+            op: regex
+            value: '/^[0-8]$/'

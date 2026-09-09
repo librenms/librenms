@@ -1,0 +1,10 @@
+os: alpha-power
+text: 'Alpha Power'
+type: power
+icon: alpha
+mib_dir: scte
+
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.926.1.99.1.4.2
