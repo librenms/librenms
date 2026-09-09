@@ -23,8 +23,6 @@ tests that module. These modules are available:
 
 - `mail` - it validates your mail transport configuration.
 - `dist-poller` - it tests your distributed poller configuration.
-- `rrdcheck` - it tests your rrd files for unreadable data or corrupt
-  data. Such data is a cause of broken graphs.
 
 To run the tool, become the `librenms` user. Then run `./validate.php`
 in your install directory.

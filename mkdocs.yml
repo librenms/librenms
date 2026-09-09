@@ -294,11 +294,11 @@ nav:
       - Intro: Developing/Support-New-OS.md
       - Initial Detection: Developing/os/Initial-Detection.md
       - Mem/CPU Information: Developing/os/Mem-CPU-Information.md
-      - Test Units: Developing/os/Test-Units.md
       - Health Information: Developing/os/Health-Information.md
       - Wireless Sensors: Developing/os/Wireless-Sensors.md
       - Custom Graphs: Developing/os/Custom-Graphs.md
       - Settings: Developing/os/Settings.md
+      - Unit Tests: Developing/os/Test-Units.md
       - Sensor State Support: Developing/Sensor-State-Support.md
     - SNMP Traps: Developing/SNMP-Traps.md
     - Dynamic Config: Developing/Dynamic-Config.md

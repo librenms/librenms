@@ -35,6 +35,16 @@ class Poller extends Model
     protected $primaryKey = 'id';
     protected $fillable = ['poller_name'];
 
+    /**
+     * @return array{poller_details: 'array'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'poller_details' => 'array',
+        ];
+    }
+
     // ---- Scopes ----
 
     protected function scopeIsInactive(Builder $query): Builder

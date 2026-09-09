@@ -1,0 +1,10 @@
+os: planet-mc
+text: Planet Media Converter Chassis
+type: network
+icon: planet
+mib_dir: planet
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.10456.2.625

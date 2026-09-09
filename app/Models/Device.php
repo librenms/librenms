@@ -26,6 +26,7 @@ use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -145,6 +146,11 @@ class Device extends BaseModel
         return ($this->overwrite_ip ?: $this->hostname) ?: '';
     }
 
+    public function toSnmpConfig(): SnmpConfig
+    {
+        return SnmpConfig::fromDevice($this);
+    }
+
     public function ipFamily(): AddressFamily
     {
         return str_ends_with($this->transport ?? '', '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
@@ -157,25 +163,13 @@ class Device extends BaseModel
         }
 
         try {
-            $parsed = IP::parse($ip);
+            $device_id = static::hasIp(IP::parse($ip))->value('device_id');
+            $device = DeviceCache::get($device_id);
+
+            return $device->exists ? $device : null;
         } catch (InvalidIpException) {
             return null;
         }
-
-        $device = static::where('hostname', $ip)->orWhere('ip', inet_pton($ip))->first();
-        if ($device) {
-            return $device;
-        }
-
-        $deviceId = match ($parsed->getFamily()) {
-            'ipv4' => Port::whereHas('ipv4', fn ($q) => $q->where('ipv4_address', (string) $parsed))->value('device_id'),
-            'ipv6' => Port::whereHas('ipv6', fn ($q) => $q->where('ipv6_address', $parsed->uncompressed()))->value('device_id'),
-            default => null,
-        };
-
-        $device = DeviceCache::get($deviceId);
-
-        return $device->exists ? $device : null;
     }
 
     public function hasSnmpInfo(): bool
@@ -703,6 +697,19 @@ class Device extends BaseModel
         return $query->where('hostname', $deviceSpec);
     }
 
+    protected function scopeHasIp(Builder $query, IP $ip): Builder
+    {
+        return $query->where(function (Builder $query) use ($ip): Builder {
+            $family = $ip->getFamily();
+            $ip_string = $ip->uncompressed();
+
+            return $query->where('hostname', $ip_string)
+                ->orWhere('ip', $ip->packed())
+                ->when($family === 'ipv4', fn (Builder $q) => $q->orWhereHas('ipv4', fn (Builder $qi) => $qi->where('ipv4_address', $ip_string)))
+                ->when($family === 'ipv6', fn (Builder $q) => $q->orWhereHas('ipv6', fn (Builder $qi) => $qi->where('ipv6_address', $ip_string)));
+        });
+    }
+
     // ---- Define Relationships ----
     /**
      * @return HasMany<AccessPoint, $this>
@@ -766,6 +773,14 @@ class Device extends BaseModel
     public function bgppeers(): HasMany
     {
         return $this->hasMany(BgpPeer::class, 'device_id');
+    }
+
+    /**
+     * @return HasMany<BgpPeerCbgp, $this>
+     */
+    public function bgpPeersCbgp(): HasMany
+    {
+        return $this->hasMany(BgpPeerCbgp::class, 'device_id');
     }
 
     /**
