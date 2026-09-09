@@ -29,27 +29,30 @@ namespace LibreNMS\Data\Source\Snmp;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\SnmpOidOutput;
-use LibreNMS\Enum\SnmpStringOutput;
-use LibreNMS\Exceptions\SnmpException;
-use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Util\Oid;
-use LibreNMS\Util\Rewrite;
 use Symfony\Component\Process\Process;
 
 class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
 {
+    private readonly NetSnmpOptions $optionsParser;
+
+    public function __construct(?NetSnmpOptions $optionsParser = null)
+    {
+        $this->optionsParser = $optionsParser ?? new NetSnmpOptions;
+    }
+
     /**
      * @param  string[]  $oids
      */
     public function get(string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
-        return $this->runCommand($this->buildCli('snmpget', $target, $oids, $config, $options));
+        return $this->runCommand($this->optionsParser->buildCli('snmpget', $target, $oids, $config, $options));
     }
 
     public function walk(string $target, string $oid, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
-        return $this->runCommand($this->buildCli('snmpwalk', $target, [$oid], $config, $options));
+        return $this->runCommand($this->optionsParser->buildCli('snmpwalk', $target, [$oid], $config, $options));
     }
 
     /**
@@ -57,7 +60,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
      */
     public function next(string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
-        return $this->runCommand($this->buildCli('snmpgetnext', $target, $oids, $config, $options));
+        return $this->runCommand($this->optionsParser->buildCli('snmpgetnext', $target, $oids, $config, $options));
     }
 
     public function translate(string $oid, SnmpQueryOptions $options): string
@@ -82,168 +85,6 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
         $cmd[] = $oid;
 
         return $this->runCommand($cmd)->value();
-    }
-
-    /**
-     * Generate a net-snmp command line
-     *
-     * @param  string[]  $oids
-     * @return string[]
-     */
-    public function buildCli(string $command, string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options): array
-    {
-        if ($command === 'snmpwalk' && $config->bulk && $options->allowBulk && $config->version !== 'v1') {
-            $command = 'snmpbulkwalk';
-        }
-
-        $cmd = [
-            LibrenmsConfig::get($command, $command),
-            '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]),
-            '-m', implode(':', $options->mibs),
-            ...$this->buildAuth($config, $options),
-            ...$this->buildOutputFlags($options),
-        ];
-
-        if ($command === 'snmpbulkwalk' && $config->maxRepeaters > 0) {
-            $cmd[] = "-Cr$config->maxRepeaters";
-        }
-
-        if ($options->tolerateUnorderedIndexes) {
-            $cmd[] = '-Cc';
-        }
-
-        if ($config->timeout > 0 && $config->timeout != 1) {
-            array_push($cmd, '-t', (string) $config->timeout);
-        }
-
-        if ($config->retries !== 5) {
-            array_push($cmd, '-r', (string) $config->retries);
-        }
-
-        $formattedTarget = sprintf('%s:%s:%s', $config->transport, Rewrite::addIpv6Brackets($target), $config->port);
-
-        return [...$cmd, $formattedTarget, ...$oids];
-    }
-
-    /**
-     * @return string[]
-     */
-    private function buildOutputFlags(SnmpQueryOptions $options): array
-    {
-        $opts = '';
-
-        if ($options->quickPrint) {
-            $opts .= 'Q';
-        }
-
-        if ($options->extendedIndex) {
-            $opts .= 'X';
-        }
-
-        if (! $options->printUnits) {
-            $opts .= 'U';
-        }
-
-        if ($options->numericTimeticks) {
-            $opts .= 't';
-        }
-
-        if ($options->numericEnums) {
-            $opts .= 'e';
-        }
-
-        if ($options->numericIndexes) {
-            $opts .= 'b';
-        }
-
-        if ($options->escapeQuotes) {
-            $opts .= 'E';
-        }
-
-        if ($options->printHexText) {
-            $opts .= 'T';
-        }
-
-        $opts .= match ($options->stringFormat) {
-            SnmpStringOutput::Ascii => 'a',
-            SnmpStringOutput::Hex => 'x',
-            default => '',
-        };
-
-        $opts .= match ($options->oidFormat) {
-            SnmpOidOutput::Full => 'f',
-            SnmpOidOutput::Suffix => 's',
-            SnmpOidOutput::Ucd => 'u',
-            SnmpOidOutput::Numeric => 'n',
-            default => '',
-        };
-
-        $flags = [];
-
-        if ($opts !== '') {
-            $flags[] = "-O$opts";
-        }
-
-        if ($options->allowUnderscores) {
-            $flags[] = '-Pu';
-        }
-
-        if (! $options->applyDisplayHints) {
-            $flags[] = '-Ih';
-        }
-
-        return $flags;
-    }
-
-    /**
-     * @return string[]
-     *
-     * @throws SnmpException
-     */
-    private function buildAuth(SnmpConfig $config, SnmpQueryOptions $options): array
-    {
-        if ($config->version === 'v2c' || $config->version === 'v1') {
-            return [
-                "-$config->version",
-                '-c',
-                $options->context ? "$config->community@$options->context" : (string) $config->community,
-            ];
-        }
-
-        if ($config->version === 'v3') {
-            $auth = match (strtolower((string) $config->authlevel)) {
-                'authpriv' => [
-                    '-v3',
-                    '-l', (string) $config->authlevel,
-                    '-x', (string) $config->cryptoalgo,
-                    '-X', (string) $config->cryptopass,
-                    '-a', (string) $config->authalgo,
-                    '-A', (string) $config->authpass,
-                    '-u', $config->authname ?: 'root',
-                ],
-                'authnopriv' => [
-                    '-v3',
-                    '-l', (string) $config->authlevel,
-                    '-a', (string) $config->authalgo,
-                    '-A', (string) $config->authpass,
-                    '-u', $config->authname ?: 'root',
-                ],
-                'noauthnopriv' => [
-                    '-v3',
-                    '-l', (string) $config->authlevel,
-                    '-u', $config->authname ?: 'root',
-                ],
-                default => throw new SnmpException("Unsupported SNMPv3 AuthLevel: $config->authlevel"),
-            };
-
-            if ($options->context) {
-                array_push($auth, '-n', $options->context);
-            }
-
-            return $auth;
-        }
-
-        throw new SnmpVersionUnsupportedException($config->version);
     }
 
     /**

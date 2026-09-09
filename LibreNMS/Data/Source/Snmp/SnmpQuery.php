@@ -27,7 +27,6 @@
 namespace LibreNMS\Data\Source\Snmp;
 
 use App\Events\SnmpQueryExecuted;
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use DeviceCache;
@@ -219,7 +218,7 @@ class SnmpQuery implements SnmpQueryInterface
         if ($options instanceof SnmpQueryOptions) {
             $this->options = $options;
         } else {
-            $this->options->parseCli($options ?: null);
+            $this->options = resolve(NetSnmpOptions::class)->parseCli($options ?: null);
         }
 
         return $this;
@@ -236,12 +235,12 @@ class SnmpQuery implements SnmpQueryInterface
     {
         $config = $this->device->toSnmpConfig();
         $target = $this->device->pollerTarget();
+        $this->options->mibDirs = Mib::directories($this->device->os, $this->options->mibDirs);
         $chunks = $this->limitOids($this->parseOid($oid), $config);
         $response = new SnmpResponse('');
 
         foreach ($chunks as $chunk) {
-            $options = $this->prepareOptions($chunk);
-            $res = $this->execWithCache('snmpget', $chunk, $options, fn () => $this->backend->get($target, $chunk, $config, $options));
+            $res = $this->execWithCache('snmpget', $chunk, $this->options, fn () => $this->backend->get($target, $chunk, $config, $this->options));
             $response = $response->append($res);
 
             // if abort on failure is set, return after first failure
@@ -267,11 +266,12 @@ class SnmpQuery implements SnmpQueryInterface
     {
         $config = $this->device->toSnmpConfig();
         $target = $this->device->pollerTarget();
+        $this->options->mibDirs = Mib::directories($this->device->os, $this->options->mibDirs);
         $oids = $this->parseOid($oid);
         $response = new SnmpResponse('');
 
         foreach ($oids as $singleOid) {
-            $options = $this->prepareOptions([$singleOid], walk: true);
+            $options = $this->options->createPerWalkInstance($this->device->os, $singleOid);
             $res = $this->execWithCache('snmpwalk', [$singleOid], $options, fn () => $this->backend->walk($target, $singleOid, $config, $options));
             $response = $response->append($res);
 
@@ -299,11 +299,11 @@ class SnmpQuery implements SnmpQueryInterface
         $config = $this->device->toSnmpConfig();
         $target = $this->device->pollerTarget();
         $chunks = $this->limitOids($this->parseOid($oid), $config);
+        $this->options->mibDirs = Mib::directories($this->device->os, $this->options->mibDirs);
         $response = new SnmpResponse('');
 
         foreach ($chunks as $chunk) {
-            $options = $this->prepareOptions($chunk);
-            $res = $this->execWithCache('snmpgetnext', $chunk, $options, fn () => $this->backend->next($target, $chunk, $config, $options));
+            $res = $this->execWithCache('snmpgetnext', $chunk, $this->options, fn () => $this->backend->next($target, $chunk, $config, $this->options));
             $response = $response->append($res);
 
             // if abort on failure is set, return after first failure
@@ -330,37 +330,9 @@ class SnmpQuery implements SnmpQueryInterface
             return Str::start($oid, '.'); // numeric to numeric optimization
         }
 
-        $options = clone $this->options;
-        $options->mibDirs = Mib::directories($this->device, $this->options->mibDirs);
+        $this->options->mibDirs = Mib::directories($this->device->os, $this->options->mibDirs);
 
-        return $this->translateBackend->translate($oid, $options);
-    }
-
-    /**
-     * Prepare options for an execution chunk.
-     *
-     * Note: tolerateUnorderedIndexes and bulk are properties of the specific OID group being queried,
-     * not request-wide constants, and must be resolved per OID chunk.
-     *
-     * @param  string[]  $oids
-     */
-    private function prepareOptions(array $oids, bool $walk = false): SnmpQueryOptions
-    {
-        $options = clone $this->options;
-        $options->context = $this->context ?: (string) ($this->device->getAttribute('context_name') ?: $this->device->getAttribute('context') ?: '');
-        $options->mibDirs = Mib::directories($this->device, $this->options->mibDirs);
-
-        if ($walk) {
-            if (! empty(array_intersect($oids, LibrenmsConfig::getCombined($this->device->os, 'oids.unordered', 'snmp.')))) {
-                $options->tolerateUnorderedIndexes = true;
-            }
-
-            if (! empty(array_intersect($oids, LibrenmsConfig::getCombined($this->device->os, 'oids.no_bulk', 'snmp.')))) {
-                $options->allowBulk = false;
-            }
-        }
-
-        return $options;
+        return $this->translateBackend->translate($oid, $this->options);
     }
 
     /**

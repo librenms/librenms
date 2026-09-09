@@ -26,10 +26,9 @@
 
 namespace LibreNMS\Data\Source\Snmp;
 
-use Illuminate\Support\Arr;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Enum\SnmpStringOutput;
-use LibreNMS\Exceptions\UnsupportedSnmpOption;
 
 class SnmpQueryOptions
 {
@@ -68,126 +67,29 @@ class SnmpQueryOptions
 
     public static function quickPrint(): self
     {
-        return (new self())->applyQuickPrintDefaults();
+        $options = new self;
+
+        $options->numericEnums = true;
+        $options->numericTimeticks = true;
+        $options->printUnits = false;
+        $options->quickPrint = true;
+        $options->extendedIndex = true;
+
+        return $options;
     }
 
-    /**
-     * @param  string[]|string|null  $args
-     *
-     * @throws UnsupportedSnmpOption
-     */
-    public function parseCli(array|string|null $args): self
+    public function createPerWalkInstance(string $os, string $oid): self
     {
-        if ($args === null) {
-            return $this->applyQuickPrintDefaults();
+        $options = clone $this;
+
+        if (in_array($oid, LibrenmsConfig::getCombined($os, 'oids.unordered', 'snmp.'))) {
+            $options->tolerateUnorderedIndexes = true;
         }
 
-        $this->resetDefaults();
-
-        $arguments = Arr::wrap($args);
-
-        for ($i = 0; $i < count($arguments); $i++) {
-            $arg = $arguments[$i];
-            if (! is_string($arg)) {
-                continue;
-            }
-
-            $prefix = substr($arg, 0, 2);
-            $rest = substr($arg, 2);
-
-            if ($prefix === '-O') {
-                foreach (str_split($rest) as $outopt) {
-                    match ($outopt) {
-                        'a' => $this->stringFormat = SnmpStringOutput::Ascii,
-                        'x' => $this->stringFormat = SnmpStringOutput::Hex,
-                        'f' => $this->oidFormat = SnmpOidOutput::Full,
-                        's' => $this->oidFormat = SnmpOidOutput::Suffix,
-                        'S' => $this->oidFormat = SnmpOidOutput::Module,
-                        'u' => $this->oidFormat = SnmpOidOutput::Ucd,
-                        'n' => $this->oidFormat = SnmpOidOutput::Numeric,
-                        'b' => $this->numericIndexes = true,
-                        'e' => $this->numericEnums = true,
-                        'E' => $this->escapeQuotes = true,
-                        'Q' => $this->quickPrint = true,
-                        't' => $this->numericTimeticks = true,
-                        'T' => $this->printHexText = true,
-                        'U' => $this->printUnits = false,
-                        'X' => $this->extendedIndex = true,
-                        default => throw new UnsupportedSnmpOption("Unknown option -O$outopt"),
-                    };
-                }
-            } elseif ($prefix === '-C') {
-                if (str_contains($rest, 'c')) {
-                    $this->tolerateUnorderedIndexes = true;
-                }
-            } elseif ($prefix === '-P') {
-                $this->allowUnderscores = str_contains($rest, 'u');
-            } elseif ($prefix === '-I') {
-                if (str_contains($rest, 'h')) {
-                    $this->applyDisplayHints = false;
-                }
-            } elseif ($prefix === '-m') {
-                $mib = $rest !== '' ? $rest : $this->consumeNextArg($arguments, $i);
-                $this->addMibs($mib);
-            } elseif ($prefix === '-M') {
-                $mibDir = $rest !== '' ? $rest : $this->consumeNextArg($arguments, $i);
-                if ($mibDir !== null) {
-                    $this->mibDirs = explode(':', $mibDir);
-                }
-            }
+        if (in_array($oid, LibrenmsConfig::getCombined($os, 'oids.no_bulk', 'snmp.'))) {
+            $options->allowBulk = false;
         }
 
-        return $this;
-    }
-
-    public function applyQuickPrintDefaults(): self
-    {
-        return $this->resetDefaults(true);
-    }
-
-    private function resetDefaults(bool $quickPrint = false): self
-    {
-        $this->context = '';
-        $this->allowBulk = true;
-        $this->tolerateUnorderedIndexes = false;
-        $this->escapeQuotes = false;
-        $this->numericIndexes = false;
-        $this->printHexText = false;
-        $this->applyDisplayHints = true;
-        $this->stringFormat = SnmpStringOutput::Guess;
-        $this->allowUnderscores = false;
-        $this->oidFormat = SnmpOidOutput::Module;
-
-        $this->numericEnums = $quickPrint;
-        $this->numericTimeticks = $quickPrint;
-        $this->printUnits = ! $quickPrint;
-        $this->quickPrint = $quickPrint;
-        $this->extendedIndex = $quickPrint;
-
-        return $this;
-    }
-
-    private function addMibs(?string $mib): void
-    {
-        if ($mib === null) {
-            return;
-        }
-
-        if (str_starts_with($mib, '+')) {
-            $this->mibs[] = substr($mib, 1);
-            $this->mibs = array_values(array_unique($this->mibs));
-        } else {
-            $this->mibs = explode(':', $mib);
-        }
-    }
-
-    /**
-     * @param  string[]  $args
-     * @param  int  $i
-     * @return string|null
-     */
-    private function consumeNextArg(array $args, int &$i): ?string
-    {
-        return isset($args[$i + 1]) && is_string($args[$i + 1]) ? $args[++$i] : null;
+        return $options;
     }
 }

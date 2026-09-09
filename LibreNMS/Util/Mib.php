@@ -27,43 +27,59 @@
 namespace LibreNMS\Util;
 
 use App\Facades\LibrenmsConfig;
-use App\Models\Device;
+use Illuminate\Support\Str;
 
 class Mib
 {
     /**
      * Get the list of MIB directories for a device, including OS and group directories.
      *
-     * @param  Device|null  $device
+     * @param  string  $os
      * @param  array<int, string>  $extraDirs
      * @return array<int, string>
      */
-    public static function directories(?Device $device = null, array $extraDirs = []): array
+    public static function directories(string $os = '', array $extraDirs = []): array
     {
-        $base = LibrenmsConfig::get('mib_dir');
+        $base = rtrim(LibrenmsConfig::get('mib_dir'), '/');
         $dirs = [$base];
 
-        if ($device) {
+        if ($os) {
             // os group
-            if ($osGroup = LibrenmsConfig::getOsSetting($device->os, 'group')) {
-                if (file_exists("$base/$osGroup")) {
+            if ($osGroup = LibrenmsConfig::getOsSetting($os, 'group')) {
+                if (is_dir("$base/$osGroup")) {
                     $dirs[] = "$base/$osGroup";
                 }
             }
 
             // os directory
-            $osMibdir = LibrenmsConfig::getOsSetting($device->os, 'mib_dir');
-            if ($osMibdir && is_string($osMibdir)) {
-                $dirs[] = "$base/$osMibdir";
-            } elseif (file_exists($base . '/' . $device->os)) {
-                $dirs[] = $base . '/' . $device->os;
+            $osMibDir = LibrenmsConfig::getOsSetting($os, 'mib_dir');
+            if ($osMibDir && is_string($osMibDir)) {
+                $dirs[] = "$base/$osMibDir";
+            } elseif (is_dir($base . '/' . $os)) {
+                $dirs[] = $base . '/' . $os;
             }
         }
 
         foreach ($extraDirs as $mibDir) {
-            $dirs[] = str_starts_with((string) $mibDir, '/') ? (string) $mibDir : "$base/$mibDir";
+            $extra = Str::start($mibDir, "$base/");
+            if (is_dir($extra)) {
+                $dirs[] = rtrim($extra, '/');
+            }
         }
 
-        return array_values(array_unique(array_filter(array_map(fn ($dir) => rtrim((string) $dir, '/'), $dirs))));
+        return array_values(array_unique($dirs));
+    }
+
+    public static function parseCliInput(string $mibs, array $existing = []): array
+    {
+        if ($mibs === '') {
+            return $existing;
+        }
+
+        if (! str_starts_with($mibs, '+')) {
+            return explode(':', $mibs);
+        }
+
+        return array_values(array_unique([...$existing, ...explode(':', substr($mibs, 1))]));
     }
 }
