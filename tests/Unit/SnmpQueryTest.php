@@ -42,7 +42,7 @@ class SnmpQueryTest extends TestCase
         $mockBackend = $this->mockBackend();
         $mockBackend->shouldReceive('get')
             ->once()
-            ->withArgs(fn (SnmpConfig $config, array $oids, SnmpQueryOptions $options) => $config->target === '10.1.2.3'
+            ->withArgs(fn (string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options) => $target === '10.1.2.3'
                 && $config->community === 'test-community'
                 && $oids === ['sysDescr.0']
                 && $options->oidFormat === SnmpOidOutput::Numeric

@@ -34,6 +34,7 @@ use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Util\Oid;
+use LibreNMS\Util\Rewrite;
 use Symfony\Component\Process\Process;
 
 class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
@@ -41,22 +42,22 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
     /**
      * @param  string[]  $oids
      */
-    public function get(SnmpConfig $config, array $oids, SnmpQueryOptions $options): SnmpResponse
+    public function get(string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
-        return $this->runCommand($this->buildCli('snmpget', $config, $oids, $options));
+        return $this->runCommand($this->buildCli('snmpget', $target, $oids, $config, $options));
     }
 
-    public function walk(SnmpConfig $config, string $oid, SnmpQueryOptions $options): SnmpResponse
+    public function walk(string $target, string $oid, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
-        return $this->runCommand($this->buildCli('snmpwalk', $config, [$oid], $options));
+        return $this->runCommand($this->buildCli('snmpwalk', $target, [$oid], $config, $options));
     }
 
     /**
      * @param  string[]  $oids
      */
-    public function next(SnmpConfig $config, array $oids, SnmpQueryOptions $options): SnmpResponse
+    public function next(string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
-        return $this->runCommand($this->buildCli('snmpgetnext', $config, $oids, $options));
+        return $this->runCommand($this->buildCli('snmpgetnext', $target, $oids, $config, $options));
     }
 
     public function translate(string $oid, SnmpQueryOptions $options): string
@@ -89,7 +90,7 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
      * @param  string[]  $oids
      * @return string[]
      */
-    public function buildCli(string $command, SnmpConfig $config, array $oids, SnmpQueryOptions $options): array
+    public function buildCli(string $command, string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options): array
     {
         if ($command === 'snmpwalk' && $config->bulk && $options->allowBulk && $config->version !== 'v1') {
             $command = 'snmpbulkwalk';
@@ -119,7 +120,9 @@ class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
             array_push($cmd, '-r', (string) $config->retries);
         }
 
-        return [...$cmd, $config->formattedTarget(), ...$oids];
+        $formattedTarget = sprintf('%s:%s:%s', $config->transport, Rewrite::addIpv6Brackets($target), $config->port);
+
+        return [...$cmd, $formattedTarget, ...$oids];
     }
 
     /**

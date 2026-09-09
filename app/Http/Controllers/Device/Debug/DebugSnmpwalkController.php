@@ -72,8 +72,9 @@ class DebugSnmpwalkController extends Controller
     {
         return app(NetSnmp::class)->buildCli(
             'snmpwalk',
-            $device->toSnmpConfig(),
+            $device->pollerTarget(),
             ['.'],
+            $device->toSnmpConfig(),
             new SnmpQueryOptions(
                 numericIndexes: true,
                 oidFormat: SnmpOidOutput::Numeric,
