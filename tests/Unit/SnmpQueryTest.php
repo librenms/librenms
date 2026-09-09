@@ -233,7 +233,7 @@ class SnmpQueryTest extends TestCase
         $query = (new SnmpQuery($mockBackend))->device($this->device);
         $query->get('sysDescr.0');
 
-        \Illuminate\Support\Facades\Event::assertDispatched(\App\Events\SnmpQueryExecuted::class, fn (\App\Events\SnmpQueryExecuted $event) => $event->method === 'snmpget'
+        \Illuminate\Support\Facades\Event::assertDispatched(\App\Events\SnmpQueryExecuted::class, fn (\App\Events\SnmpQueryExecuted $event) => str_ends_with($event->method, '::snmpget')
             && $event->oids === ['sysDescr.0']
             && $event->cliCommand === ['/usr/bin/snmpget', 'sysDescr.0']
             && $event->device === $this->device

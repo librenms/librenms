@@ -240,7 +240,7 @@ class SnmpQuery implements SnmpQueryInterface
 
         foreach ($chunks as $chunk) {
             $options = $this->prepareOptions($chunk);
-            $res = $this->execWithCache('snmpget', $chunk, $options, fn () => $this->backend->get($config, $chunk, $options));
+            $res = $this->execWithCache(class_basename($this->backend) . '::snmpget', $chunk, $options, fn () => $this->backend->get($config, $chunk, $options));
             $response = $response->append($res);
 
             // if abort on failure is set, return after first failure
@@ -270,7 +270,7 @@ class SnmpQuery implements SnmpQueryInterface
 
         foreach ($oids as $singleOid) {
             $options = $this->prepareOptions([$singleOid], walk: true);
-            $res = $this->execWithCache('snmpwalk', [$singleOid], $options, fn () => $this->backend->walk($target, $singleOid, $options));
+            $res = $this->execWithCache(class_basename($this->backend) . '::snmpwalk', [$singleOid], $options, fn () => $this->backend->walk($target, $singleOid, $options));
             $response = $response->append($res);
 
             // if abort on failure is set, return after first failure
@@ -300,7 +300,7 @@ class SnmpQuery implements SnmpQueryInterface
 
         foreach ($chunks as $chunk) {
             $options = $this->prepareOptions($chunk);
-            $res = $this->execWithCache('snmpgetnext', $chunk, $options, fn () => $this->backend->next($config, $chunk, $options));
+            $res = $this->execWithCache(class_basename($this->backend) . '::snmpgetnext', $chunk, $options, fn () => $this->backend->next($config, $chunk, $options));
             $response = $response->append($res);
 
             // if abort on failure is set, return after first failure

@@ -54,7 +54,13 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton('sensor-discovery', fn (Application $app) => new \App\Discovery\Sensor($app->make('device-cache')->getPrimary()));
 
-        $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpBackendInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
+        $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpBackendInterface::class, function (Application $app) {
+            if (function_exists('snmp_init_mib')) {
+                return $app->make(\LibreNMS\Data\Source\Snmp\PhpSnmp::class);
+            }
+
+            return $app->make(\LibreNMS\Data\Source\Snmp\NetSnmp::class);
+        });
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpQueryInterface::class, \LibreNMS\Data\Source\Snmp\SnmpQuery::class);
     }
