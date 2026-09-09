@@ -77,6 +77,20 @@ different url you can set:
 lnms config:set leaflet.tile_url 'localhost.com'
 ```
 
+The tile path `/{z}/{x}/{y}.png` is added to the url. A query string stays at
+the end of the url, so you can add an API key:
+
+```bash
+lnms config:set leaflet.tile_url '{s}.tiles.example.com/osm?key=YOUR_KEY'
+```
+
+To control the full url, add the `{z}`, `{x}` and `{y}` placeholders yourself.
+The url is then used as it is:
+
+```bash
+lnms config:set leaflet.tile_url 'https://tiles.example.com/{z}/{x}/{y}@2x.png?key=YOUR_KEY'
+```
+
 ## Additional Leaflet config
 
 ```bash
