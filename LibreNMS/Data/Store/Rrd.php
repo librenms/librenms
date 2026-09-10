@@ -33,9 +33,9 @@ use App\Polling\Measure\Measurement;
 use File;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Store\Rrd\RrdPath;
+use LibreNMS\Data\Store\Rrd\PhpRrd;
 use LibreNMS\Data\Store\Rrd\RrdBackendInterface;
-use LibreNMS\Data\Store\Rrd\RrdCmd;
-use LibreNMS\Data\Store\Rrd\RrdPhp;
+use LibreNMS\Data\Store\Rrd\RrdtoolRrd;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdFileExistsException;
@@ -91,7 +91,7 @@ class Rrd extends BaseDatastore
             ' RRA:LAST:0.5:1:2016 '
         )));
         $this->version = LibrenmsConfig::get('rrdtool_version', '1.4');
-        $this->backend = class_exists('\RRDGraph') ? new RrdPhp() : new RrdCmd();
+        $this->backend = class_exists('\RRDGraph') ? new PhpRrd() : new RrdtoolRrd();
     }
 
     /**
