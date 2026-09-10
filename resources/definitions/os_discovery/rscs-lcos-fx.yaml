@@ -1,0 +1,81 @@
+modules:
+    os:
+        hardware: RSCS-LICENSE::licenseType.0
+
+    mempools:
+        data:
+            -
+                total: RSCS-SYSTEM::memorySizeBytes.0
+                total_num_oid: '.1.3.6.1.4.1.29577.8.1.0'
+                used: RSCS-SYSTEM::memoryUsageBytes.0
+                used_num_oid: '.1.3.6.1.4.1.29577.8.2.0'
+                descr: 'System Memory'
+                index: 0
+
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - RSCS-IPSEC-S2S::ipsecS2STunnelName
+                        - RSCS-WAN-CONNECTIONS::wanConnectionName
+                        - RSCS-WAN-CONNECTIONS::wanConnectionInterfaceName
+
+        count:
+            data:
+                -
+                    oid: RSCS-IPSEC-S2S::ipsecS2STunnelCount
+                    num_oid: '.1.3.6.1.4.1.29577.5.1.2.{{ $index }}'
+                    index: 'ipsecS2STunnelCount.{{ $index }}'
+                    descr: 'Configured IPsec S2S Tunnels'
+                    group: 'IPsec S2S'
+
+                -
+                    oid: RSCS-IPSEC-S2S::activeIpsecS2STunnelCount
+                    num_oid: '.1.3.6.1.4.1.29577.5.1.3.{{ $index }}'
+                    index: 'activeIpsecS2STunnelCount.{{ $index }}'
+                    descr: 'Active IPsec S2S Tunnels'
+                    group: 'IPsec S2S'
+
+                -
+                    oid: RSCS-IPSEC-S2S::failingIpsecS2STunnelCount
+                    num_oid: '.1.3.6.1.4.1.29577.5.1.4.{{ $index }}'
+                    index: 'failingIpsecS2STunnelCount.{{ $index }}'
+                    descr: 'Failing IPsec S2S Tunnels'
+                    group: 'IPsec S2S'
+                    high_limit: 1
+
+                -
+                    oid: RSCS-LICENSE::daysRemaining
+                    num_oid: '.1.3.6.1.4.1.29577.6.3.{{ $index }}'
+                    index: 'licenseDaysRemaining.{{ $index }}'
+                    descr: 'License Days Remaining'
+                    group: 'License'
+                    low_warn_limit: 90
+                    low_limit: 30
+
+        state:
+            data:
+                -
+                    oid: RSCS-IPSEC-S2S::ipsecS2STunnelTable
+                    value: RSCS-IPSEC-S2S::ipsecS2STunnelState
+                    num_oid: '.1.3.6.1.4.1.29577.5.1.1.1.3.{{ $index }}'
+                    descr: 'IPsec S2S: {{ RSCS-IPSEC-S2S::ipsecS2STunnelName }}'
+                    index: 'ipsecS2STunnelState.{{ $index }}'
+                    group: 'IPsec S2S'
+                    state_name: rscsIpsecS2STunnelState
+                    states:
+                        - { value: 1, generic: 0, descr: Up }
+                        - { value: 2, generic: 2, descr: Down }
+
+                -
+                    oid: RSCS-WAN-CONNECTIONS::wanConnectionTable
+                    value: RSCS-WAN-CONNECTIONS::wanConnectionState
+                    num_oid: '.1.3.6.1.4.1.29577.3.1.1.3.{{ $index }}'
+                    descr: 'WAN: {{ RSCS-WAN-CONNECTIONS::wanConnectionName }} ({{ RSCS-WAN-CONNECTIONS::wanConnectionInterfaceName }})'
+                    index: 'wanConnectionState.{{ $index }}'
+                    group: 'WAN Connections'
+                    state_name: rscsWanConnectionState
+                    states:
+                        - { value: 1, generic: 0, descr: Up }
+                        - { value: 2, generic: 2, descr: Down }
