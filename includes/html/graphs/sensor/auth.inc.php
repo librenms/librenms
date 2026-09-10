@@ -11,8 +11,7 @@ if (is_numeric($vars['id'])) {
 
         $rrd_filename = Rrd::name($device['hostname'], get_sensor_rrd_name($device, $sensor));
 
-        $title = generate_device_link($device);
-        $title .= ' :: Sensor :: ' . htmlentities((string) $sensor->sensor_descr);
+        $title = ' :: Sensor :: ' . $sensor->sensor_descr;
         $auth = true;
     }
 }
