@@ -8,8 +8,7 @@ if (is_numeric($vars['id'])) {
 
         $rrd_filename = Rrd::name($device['hostname'], ['ipsectunnel', $tunnel['peer_addr']]);
 
-        $title = generate_device_link($device);
-        $title .= ' :: IPSEC Tunnel :: ' . htmlentities((string) $tunnel['peer_addr']);
+        $title = ' :: IPSEC Tunnel :: ' . $tunnel['peer_addr'];
         $auth = true;
     }
 }
