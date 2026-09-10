@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/stale@v10
         with:
-          days-before-issue-stale: 80
+          days-before-issue-stale: 90
           days-before-issue-close: 14
           stale-issue-label: 'Stale'
           stale-issue-message: >
