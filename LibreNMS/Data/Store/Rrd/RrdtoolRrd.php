@@ -1,7 +1,7 @@
 <?php
 
 /**
- * RrdCmd.php
+ * RrdtoolRrd.php
  *
  * -Description-
  *
@@ -35,7 +35,7 @@ use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use Log;
 
-class RrdCmd implements RrdBackendInterface
+class RrdtoolRrd implements RrdBackendInterface
 {
     private ?RrdProcess $rrd = null;
 

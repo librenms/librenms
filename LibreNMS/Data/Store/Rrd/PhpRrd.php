@@ -32,15 +32,15 @@ use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdGraphException;
 use Log;
 
-class RrdPhp implements RrdBackendInterface
+class PhpRrd implements RrdBackendInterface
 {
-    private readonly RrdCmd $rrdcmd;
+    private readonly RrdtoolRrd $rrdtool;
     private readonly string $rrdcached;
 
     public function __construct()
     {
-        // Create a RrdCmd to fall through to
-        $this->rrdcmd = new RrdCmd();
+        // Create a RrdtoolRrd to fall through to
+        $this->rrdtool = new RrdtoolRrd();
         $this->rrdcached = LibrenmsConfig::get('rrdcached', '');
 
         putenv('LC_ALL=C'); // force english/standard output
@@ -59,7 +59,7 @@ class RrdPhp implements RrdBackendInterface
     public function terminate(): void
     {
         // Clean up the RrdCmd
-        $this->rrdcmd->terminate();
+        $this->rrdtool->terminate();
     }
 
     /**
@@ -69,7 +69,7 @@ class RrdPhp implements RrdBackendInterface
     {
         if ($this->rrdcached) {
             // PHP-RRD does not support this command with cached
-            return $this->rrdcmd->lastUpdate($filename);
+            return $this->rrdtool->lastUpdate($filename);
         }
 
         Log::debug("PHPRRD[%glastupdate $filename%n]", ['color' => true]);
@@ -119,7 +119,7 @@ class RrdPhp implements RrdBackendInterface
     {
         if ($this->rrdcached) {
             // PHP-RRD does not support this command with cached
-            return $this->rrdcmd->tune($filename, $options);
+            return $this->rrdtool->tune($filename, $options);
         }
 
         Log::debug("PHPRRD[%gtune $filename " . implode('|', $options) . '%n]', ['color' => true]);
@@ -136,7 +136,7 @@ class RrdPhp implements RrdBackendInterface
     {
         if ($this->rrdcached) {
             // PHP-RRD does not support this command with cached
-            return $this->rrdcmd->last($filename);
+            return $this->rrdtool->last($filename);
         }
 
         Log::debug("PHPRRD[%glast $filename%n]", ['color' => true]);
@@ -155,7 +155,7 @@ class RrdPhp implements RrdBackendInterface
     public function list(string $dir, string|array $prefix): array
     {
         // Not implemented in PHP-RRD
-        return $this->rrdcmd->list($dir, $prefix);
+        return $this->rrdtool->list($dir, $prefix);
     }
 
     /**
