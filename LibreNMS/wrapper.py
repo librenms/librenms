@@ -579,6 +579,18 @@ def wrapper(
             )
             db_connection.query(query)
 
+    if wrapper_type == "discovery":
+        try:
+            poller_details = LibreNMS.get_poller_details_json()
+            if poller_details is not None:
+                db_connection.query(
+                    "UPDATE pollers SET poller_details=%s WHERE poller_name=%s",
+                    (poller_details, config["distributed_poller_name"]),
+                )
+        except Exception:
+            logger.warning("Could not record poller details")
+            logger.debug("Traceback:", exc_info=True)
+
     db_connection.close()
 
     if total_time > wrappers[wrapper_type]["total_exec_time"]:

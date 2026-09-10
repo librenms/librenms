@@ -32,8 +32,9 @@ use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Validation\Rule;
-use LibreNMS\Data\Source\NetSnmpQuery;
-use ReflectionMethod;
+use LibreNMS\Data\Source\Snmp\NetSnmp;
+use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
+use LibreNMS\Enum\SnmpOidOutput;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DebugSnmpwalkController extends Controller
@@ -66,15 +67,20 @@ class DebugSnmpwalkController extends Controller
 
     /**
      * @return array<int, string>
-     *
-     * @throws \ReflectionException
      */
     private function buildCommandLine(Device $device): array
     {
-        $query = NetSnmpQuery::make()->device($device)->options(['-OUneb']);
-
-        $buildCli = new ReflectionMethod($query, 'buildCli');
-
-        return $buildCli->invoke($query, 'snmpwalk', ['.']);
+        return app(NetSnmp::class)->buildCli(
+            'snmpwalk',
+            $device->pollerTarget(),
+            ['.'],
+            $device->toSnmpConfig(),
+            new SnmpQueryOptions(
+                numericIndexes: true,
+                oidFormat: SnmpOidOutput::Numeric,
+                numericEnums: true,
+                printUnits: false,
+            ),
+        );
     }
 }

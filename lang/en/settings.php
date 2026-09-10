@@ -1541,6 +1541,10 @@ return [
             'description' => 'Display network links on the map',
             'help' => 'Show the network links between locations on the world map (weathermap style)',
         ],
+        'network_map_vis_options' => [
+            'description' => 'Network map layout options',
+            'help' => 'Advanced vis.js options (JSON) controlling layout, physics, and styling of the auto-generated network map. Edit with care — this must remain valid JSON.',
+        ],
         'network_map_worldmap_show_disabled_alerts' => [
             'description' => 'Show devices with alerts disabled',
             'help' => 'Show devices on the network map that have alerts disabled',
