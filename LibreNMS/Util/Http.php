@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Http.php
  *
@@ -25,9 +26,9 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http as LaravelHttp;
-use LibreNMS\Config;
 
 class Http
 {
@@ -43,7 +44,7 @@ class Http
                 'no' => Proxy::ignore(),
             ],
         ])->withHeaders([
-            'User-Agent' => Config::get('project_name') . '/' . Version::VERSION, // we don't need fine version here, just rough
+            'User-Agent' => LibrenmsConfig::get('project_name') . '/' . Version::VERSION, // we don't need fine version here, just rough
         ]);
     }
 }

@@ -3638,6 +3638,56 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2011.5.25.31.1.1.18.1.6.11.0",
+                    "sensor_index": "11.0",
+                    "sensor_type": "hwPwrStatusTable",
+                    "sensor_descr": "PWR11",
+                    "group": "Power Supply",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "hwPwrStatusTable"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2011.5.25.31.1.1.18.1.6.12.0",
+                    "sensor_index": "12.0",
+                    "sensor_type": "hwPwrStatusTable",
+                    "sensor_descr": "PWR12",
+                    "group": "Power Supply",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "hwPwrStatusTable"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2011.5.25.31.1.1.8.1.5.17301503.7.255.1",
                     "sensor_index": "17301503.7.255.1",
                     "sensor_type": "hwTemperatureThresholdTable",
@@ -7889,70 +7939,84 @@
                 {
                     "state_name": "hwEntityFanState",
                     "state_descr": "Normal",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwEntityFanState",
                     "state_descr": "Abnormal",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
+                    "state_name": "hwPwrStatusTable",
+                    "state_descr": "Supply",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "hwPwrStatusTable",
+                    "state_descr": "Not Supply",
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "hwPwrStatusTable",
+                    "state_descr": "Sleep",
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "hwPwrStatusTable",
+                    "state_descr": "Unknown",
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
                     "state_name": "hwTemperatureThresholdTable",
                     "state_descr": "Normal",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwTemperatureThresholdTable",
                     "state_descr": "Minor",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "hwTemperatureThresholdTable",
                     "state_descr": "Major",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "hwTemperatureThresholdTable",
                     "state_descr": "Fatal",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "hwVoltageInfoTable",
                     "state_descr": "Normal",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwVoltageInfoTable",
                     "state_descr": "Minor",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "hwVoltageInfoTable",
                     "state_descr": "Major",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "hwVoltageInfoTable",
                     "state_descr": "Fatal",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 }
@@ -8889,6 +8953,56 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2011.5.25.31.1.1.18.1.6.11.0",
+                    "sensor_index": "11.0",
+                    "sensor_type": "hwPwrStatusTable",
+                    "sensor_descr": "PWR11",
+                    "group": "Power Supply",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "hwPwrStatusTable"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2011.5.25.31.1.1.18.1.6.12.0",
+                    "sensor_index": "12.0",
+                    "sensor_type": "hwPwrStatusTable",
+                    "sensor_descr": "PWR12",
+                    "group": "Power Supply",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "hwPwrStatusTable"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2011.5.25.31.1.1.8.1.5.17301503.7.255.1",
                     "sensor_index": "17301503.7.255.1",
                     "sensor_type": "hwTemperatureThresholdTable",
@@ -13140,70 +13254,84 @@
                 {
                     "state_name": "hwEntityFanState",
                     "state_descr": "Normal",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwEntityFanState",
                     "state_descr": "Abnormal",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
+                    "state_name": "hwPwrStatusTable",
+                    "state_descr": "Supply",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "hwPwrStatusTable",
+                    "state_descr": "Not Supply",
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "hwPwrStatusTable",
+                    "state_descr": "Sleep",
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "hwPwrStatusTable",
+                    "state_descr": "Unknown",
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
                     "state_name": "hwTemperatureThresholdTable",
                     "state_descr": "Normal",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwTemperatureThresholdTable",
                     "state_descr": "Minor",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "hwTemperatureThresholdTable",
                     "state_descr": "Major",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "hwTemperatureThresholdTable",
                     "state_descr": "Fatal",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "hwVoltageInfoTable",
                     "state_descr": "Normal",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwVoltageInfoTable",
                     "state_descr": "Minor",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "hwVoltageInfoTable",
                     "state_descr": "Major",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "hwVoltageInfoTable",
                     "state_descr": "Fatal",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 }
@@ -13214,37 +13342,24 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "vrp",
+                    "type": "vrp",
                     "storage_index": "1",
-                    "storage_type": "dsk",
+                    "storage_type": "cfCard",
                     "storage_descr": "cfcard:",
                     "storage_size": 3646947328,
+                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 1350004736,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": null,
+                    "storage_free": 2296942592,
+                    "storage_free_oid": ".1.3.6.1.4.1.2011.6.9.1.4.2.1.4.1",
+                    "storage_perc": 37,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "vrp",
-                    "storage_index": "1",
-                    "storage_type": "dsk",
-                    "storage_descr": "cfcard:",
-                    "storage_size": 3646947328,
-                    "storage_units": 1024,
-                    "storage_used": 1350004736,
-                    "storage_free": 2296942592,
-                    "storage_perc": 37,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "stp": {
         "discovery": {
@@ -13292,6 +13407,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13311,6 +13427,7 @@
                     "entPhysicalContainedIn": 17432577,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13330,6 +13447,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "PRECISION",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13349,6 +13467,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13368,6 +13487,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13387,6 +13507,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13406,6 +13527,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13425,6 +13547,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13444,6 +13567,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13463,6 +13587,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13482,6 +13607,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13501,6 +13627,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13520,6 +13647,7 @@
                     "entPhysicalContainedIn": 17432577,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13539,6 +13667,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 16
                 },
                 {
@@ -13558,6 +13687,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 17
                 },
                 {
@@ -13577,6 +13707,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 18
                 },
                 {
@@ -13596,6 +13727,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 19
                 },
                 {
@@ -13615,6 +13747,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 20
                 },
                 {
@@ -13634,6 +13767,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 21
                 },
                 {
@@ -13653,6 +13787,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 22
                 },
                 {
@@ -13672,6 +13807,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 23
                 },
                 {
@@ -13691,6 +13827,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 24
                 },
                 {
@@ -13710,6 +13847,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 25
                 },
                 {
@@ -13729,6 +13867,7 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13748,6 +13887,7 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13767,6 +13907,7 @@
                     "entPhysicalContainedIn": 17432576,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13786,6 +13927,7 @@
                     "entPhysicalContainedIn": 17432577,
                     "entPhysicalParentRelPos": 61,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13805,6 +13947,7 @@
                     "entPhysicalContainedIn": 17432832,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13824,6 +13967,7 @@
                     "entPhysicalContainedIn": 17432577,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 4
                 },
                 {
@@ -13843,6 +13987,7 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13862,6 +14007,7 @@
                     "entPhysicalContainedIn": 17498112,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13881,6 +14027,7 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13900,6 +14047,7 @@
                     "entPhysicalContainedIn": 17563648,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13919,6 +14067,7 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13938,6 +14087,7 @@
                     "entPhysicalContainedIn": 17629184,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13957,6 +14107,7 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13976,6 +14127,7 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13995,6 +14147,7 @@
                     "entPhysicalContainedIn": 17760256,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14014,6 +14167,7 @@
                     "entPhysicalContainedIn": 17432577,
                     "entPhysicalParentRelPos": 78,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14033,6 +14187,7 @@
                     "entPhysicalContainedIn": 17432577,
                     "entPhysicalParentRelPos": 79,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -14078,7 +14233,8 @@
                     "ifStackStatus": "active"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "transceivers": {
         "discovery": {
@@ -14158,6 +14314,34 @@
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 25
+                }
+            ]
+        }
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "2804:44cc:0000:0000:0000:0000:0156:0148",
+                    "ipv6_compressed": "2804:44cc::156:148",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "2804:44cc::/64",
+                    "ifIndex": 23
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 3
                 }
             ]
         }

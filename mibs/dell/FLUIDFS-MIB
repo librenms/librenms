@@ -1,0 +1,1327 @@
+
+
+        FLUIDFS-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32, IpAddress
+                    FROM SNMPv2-SMI
+            TEXTUAL-CONVENTION
+                    FROM SNMPv2-TC;
+                             
+        fluidFSMIBIdentity MODULE-IDENTITY        
+        LAST-UPDATED "201303011002Z"        
+        ORGANIZATION  "Dell Inc."
+        CONTACT-INFO
+            "Contact: Customer Support             
+             WEB:     www.dell.com"
+    
+        DESCRIPTION
+            "FluidFS Snmp read interface..
+    
+            Copyright (c) 2004-2013 by Dell, Inc.
+    
+            All rights reserved.  This software may not be copied, disclosed,
+            transferred, or used except in accordance with a license granted
+            by Dell, Inc.  This software embodies proprietary information
+            and trade secrets of Dell, Inc.
+            "
+    
+        -- Revision history, in reverse chronological order
+        REVISION    "201303011002Z"         
+        DESCRIPTION "Initial revision"
+        ::= { fluidFS 100 }
+           
+	dell               OBJECT IDENTIFIER ::= { enterprises          674 }
+	enterpriseSoftware OBJECT IDENTIFIER ::= { dell               11000 }
+	storageMgmt        OBJECT IDENTIFIER ::= { enterpriseSoftware  2000 }
+	fluidFS      	   OBJECT IDENTIFIER ::= { storageMgmt          200 }           
+            
+        fluidFSProduct  OBJECT IDENTIFIER ::= { fluidFS 1 }        
+    -- activeDirectoryStatus struct definition
+    DataActiveDirectoryStatus ::= SEQUENCE 
+    {
+        activeDirectoryStatusConfigured  OCTET STRING,
+        activeDirectoryStatusStatus  OCTET STRING,
+        activeDirectoryStatusDomain  OCTET STRING,
+        activeDirectoryStatusConfiguredEnumType  Boolean,
+        activeDirectoryStatusStatusEnumType  DomainStatusType,
+        activeDirectoryStatusTenantId  Integer32
+    }
+
+    -- activeDirectoryStatus object declaration
+    activeDirectoryStatus OBJECT-TYPE
+        SYNTAX       SEQUENCE OF DataActiveDirectoryStatus
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "Active Directory status"
+        ::= { fluidFSProduct 1 }
+        
+    -- activeDirectoryStatus object fields declarations
+        
+    activeDirectoryStatusConfigured OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "Indicates whether the cluster is configured to be joined to Active Directory"
+       ::= { activeDirectoryStatusEntry 1 }
+        
+    activeDirectoryStatusStatus OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "Indicates whether the Active Directory is able to access the Domain"
+       ::= { activeDirectoryStatusEntry 2 }
+        
+    activeDirectoryStatusDomain OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "The DNS domain name that the cluster is joined to"
+       ::= { activeDirectoryStatusEntry 3 }
+        
+    activeDirectoryStatusConfiguredEnumType OBJECT-TYPE
+       SYNTAX      Boolean
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Indicates whether the cluster is configured to be joined to Active Directory"
+       ::= { activeDirectoryStatusEntry 4 }
+        
+    activeDirectoryStatusStatusEnumType OBJECT-TYPE
+       SYNTAX      DomainStatusType
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Indicates whether the Active Directory is able to access the Domain"
+       ::= { activeDirectoryStatusEntry 5 }
+        
+    activeDirectoryStatusEntry OBJECT-TYPE
+       SYNTAX      DataActiveDirectoryStatus
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION ""
+       INDEX   { activeDirectoryStatusTenantId }
+       ::= { activeDirectoryStatus 1 }
+           
+    activeDirectoryStatusTenantId OBJECT-TYPE
+       SYNTAX      Integer32 (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Indicates the instance id"
+       ::= { activeDirectoryStatusEntry 6 }
+    
+        
+        
+                
+    clusterName  OBJECT IDENTIFIER ::= { fluidFSProduct 9 }
+        
+    -- clusterName object fields declarations
+        
+    clusterNameClusterName OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "FluidFS cluster name"
+       ::= { clusterName 1 }
+    
+                
+    -- externalServerState struct definition
+    DataExternalServerState ::= SEQUENCE 
+    {
+        externalServerStateIndex  Integer32,
+        externalServerStateHost  OCTET STRING,
+        externalServerStateType  OCTET STRING,
+        externalServerStateState  OCTET STRING,
+        externalServerStateTypeEnumType  ExternalServerType,
+        externalServerStateStateEnumType  ExternalServerState
+    }
+
+    -- externalServerState object declaration
+    externalServerState OBJECT-TYPE
+        SYNTAX       SEQUENCE OF DataExternalServerState
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "Accessibility status to external servers (like: NIS servers, LDAP servers, Antivirus servers, etc."
+        ::= { fluidFSProduct 12 }
+        
+    -- externalServerState object fields declarations
+        
+    externalServerStateEntry OBJECT-TYPE
+       SYNTAX      DataExternalServerState
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION ""
+       INDEX   { externalServerStateIndex }
+       ::= { externalServerState 1 }
+           
+    externalServerStateIndex OBJECT-TYPE
+       SYNTAX      Integer32 (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { externalServerStateEntry 1 }
+        
+    externalServerStateHost OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "The host name or IP address of the external server"
+       ::= { externalServerStateEntry 2 }
+        
+    externalServerStateType OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "The type of the external server"
+       ::= { externalServerStateEntry 3 }
+        
+    externalServerStateState OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "The accessibility status to the external server"
+       ::= { externalServerStateEntry 4 }
+        
+    externalServerStateTypeEnumType OBJECT-TYPE
+       SYNTAX      ExternalServerType
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "The type of the external server"
+       ::= { externalServerStateEntry 5 }
+        
+    externalServerStateStateEnumType OBJECT-TYPE
+       SYNTAX      ExternalServerState
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "The accessibility status to the external server"
+       ::= { externalServerStateEntry 6 }
+    
+        
+        
+                
+    -- nASAppliance struct definition
+    DataNASAppliance ::= SEQUENCE 
+    {
+        nASApplianceIndex  Integer32,
+        nASApplianceId  Integer32,
+        nASApplianceApplianceServiceTag  OCTET STRING,
+        nASApplianceFileSystemMember  OCTET STRING,
+        nASApplianceStatus  OCTET STRING,
+        nASApplianceModel  OCTET STRING,
+        nASApplianceFileSystemMemberEnumType  Boolean,
+        nASApplianceStatusEnumType  ComponentStatus,
+        nASApplianceModelEnumType  MemberModel,
+        nASApplianceApplianceID  Integer32,
+        nASApplianceWriteThroughModeEnumType  WriteThroughModeTypes,
+        nASApplianceWriteCachUsage  Integer32,
+        nASApplianceStatusEnumType  DomainInfoStatusTypes
+    }
+
+    -- nASAppliance object declaration
+    nASAppliance OBJECT-TYPE
+        SYNTAX       SEQUENCE OF DataNASAppliance
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "NAS appliances status"
+        ::= { fluidFSProduct 16 }
+        
+    -- nASAppliance object fields declarations
+        
+    nASApplianceEntry OBJECT-TYPE
+       SYNTAX      DataNASAppliance
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION ""
+       INDEX   { nASApplianceIndex }
+       ::= { nASAppliance 1 }
+           
+    nASApplianceIndex OBJECT-TYPE
+       SYNTAX      Integer32 (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { nASApplianceEntry 1 }
+        
+    nASApplianceId OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "The NAS appliance ID"
+       ::= { nASApplianceEntry 2 }
+        
+    nASApplianceApplianceServiceTag OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "The NAS appliance service tag"
+       ::= { nASApplianceEntry 3 }
+        
+    nASApplianceFileSystemMember OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "Indicates whether this appliance part of the file-system (or will be)"
+       ::= { nASApplianceEntry 4 }
+        
+    nASApplianceStatus OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "NAS appliance overall status. Summarizes networks, power, fans, and controllers status"
+       ::= { nASApplianceEntry 5 }
+        
+    nASApplianceModel OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "NAS appliance platform model"
+       ::= { nASApplianceEntry 6 }
+        
+    nASApplianceFileSystemMemberEnumType OBJECT-TYPE
+       SYNTAX      Boolean
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Indicates whether this appliance part of the file-system (or will be)"
+       ::= { nASApplianceEntry 7 }
+        
+    nASApplianceStatusEnumType OBJECT-TYPE
+       SYNTAX      ComponentStatus
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "NAS appliance overall status. Summarizes networks, power, fans, and controllers status"
+       ::= { nASApplianceEntry 8 }
+        
+    nASApplianceModelEnumType OBJECT-TYPE
+       SYNTAX      MemberModel
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "NAS appliance platform model"
+       ::= { nASApplianceEntry 9 }
+        
+    nASApplianceApplianceID OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "The appliance number"
+       ::= { nASApplianceEntry 10 }
+        
+    nASApplianceWriteThroughModeEnumType OBJECT-TYPE
+       SYNTAX      WriteThroughModeTypes
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "0 - mirroring, 1 - journaling"
+       ::= { nASApplianceEntry 11 }
+        
+    nASApplianceWriteCachUsage OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "percentage of cache usage"
+       ::= { nASApplianceEntry 12 }
+        
+    nASApplianceStatusEnumType OBJECT-TYPE
+       SYNTAX      DomainInfoStatusTypes
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "status of the majority of domains in the appliance : running | journaling | In transition"
+       ::= { nASApplianceEntry 13 }
+    
+        
+        
+                
+    nASPool  OBJECT IDENTIFIER ::= { fluidFSProduct 38 }
+        
+    -- nASPool object fields declarations
+        
+    nASPoolTotalCapacityMB OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Total NAS pool capacity (in MBs)"
+       ::= { nASPool 1 }
+        
+    nASPoolTotalReservedMB OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of NAS volumes reserved space (in MBs) from the entire NAS pool"
+       ::= { nASPool 2 }
+        
+    nASPoolTotalUsedMB OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of used space (in MBs) in all NAS volumes"
+       ::= { nASPool 3 }
+        
+    nASPoolTotalUnusedMB OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of unused space (in MBs) in all NAS volumes"
+       ::= { nASPool 4 }
+        
+    nASPoolTotalUnusedReservedMB OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of unused reserved space (in MBs) in all NAS volumes"
+       ::= { nASPool 5 }
+        
+    nASPoolTotalUnusedUnreservedMB OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of unused unreserved space (in MBs) in all NAS volumes"
+       ::= { nASPool 6 }
+        
+    nASPoolTotalOverCommittedMB OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of over committed space (in MBs) in all NAS volumes"
+       ::= { nASPool 7 }
+        
+    nASPoolTotalOptimizationSavedSpaceMB OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of data (in MBs) which was saved by the data reduction"
+       ::= { nASPool 8 }
+        
+    nASPoolNumberOfVirtualVolumes OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Total number of NAS volumes"
+       ::= { nASPool 9 }
+        
+    nASPoolNumberOfVirtualVolumesWithSnapshots OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Number of NAS volumes which have snapshots"
+       ::= { nASPool 10 }
+        
+    nASPoolNumberOfVirtualVolumesWithReplication OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Number of NAS volumes which part of the replication (as source or destination NAS volume)"
+       ::= { nASPool 11 }
+        
+    nASPoolNumberOfVirtualVolumesWithDataReduction OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Number of NAS volumes which are defined with data reduction"
+       ::= { nASPool 12 }
+        
+    nASPoolNumberOfNfsExports OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Total number of NFS exports"
+       ::= { nASPool 13 }
+        
+    nASPoolNumberOfCifsShares OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Total number of CIFS shares"
+       ::= { nASPool 14 }
+        
+    nASPoolNumberOfSnapshots OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Total number of snapshots"
+       ::= { nASPool 15 }
+        
+    nASPoolNumberOfClonedVolumes OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Total number of cloned NAS volumes"
+       ::= { nASPool 16 }
+    
+                
+    -- nASVolume struct definition
+    DataNASVolume ::= SEQUENCE 
+    {
+        nASVolumeIndex  Integer32,
+        nASVolumeVolumeName  OCTET STRING,
+        nASVolumeSizeMB  OCTET STRING,
+        nASVolumeUsedSpaceMB  OCTET STRING,
+        nASVolumeSecurityStyleEnumType  SecurityStyle,
+        nASVolumeIsCloneEnumType  Boolean,
+        nASVolumeMetadataRedundancyEnabledEnumType  Boolean,
+        nASVolumeOptimizationSavedSpaceMB  OCTET STRING,
+        nASVolumeNumberOfSnapshots  Integer32,
+        nASVolumeReplicationStatusEnumType  VolumeReplicationStatus
+    }
+
+    -- nASVolume object declaration
+    nASVolume OBJECT-TYPE
+        SYNTAX       SEQUENCE OF DataNASVolume
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "NAS volumes status"
+        ::= { fluidFSProduct 41 }
+        
+    -- nASVolume object fields declarations
+        
+    nASVolumeEntry OBJECT-TYPE
+       SYNTAX      DataNASVolume
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION ""
+       INDEX   { nASVolumeIndex }
+       ::= { nASVolume 1 }
+           
+    nASVolumeIndex OBJECT-TYPE
+       SYNTAX      Integer32 (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { nASVolumeEntry 1 }
+        
+    nASVolumeVolumeName OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "NAS volume name"
+       ::= { nASVolumeEntry 2 }
+        
+    nASVolumeSizeMB OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "The size of the NAS volume (in MB)"
+       ::= { nASVolumeEntry 3 }
+        
+    nASVolumeUsedSpaceMB OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "The used space of the NAS volume (in MB)"
+       ::= { nASVolumeEntry 4 }
+        
+    nASVolumeSecurityStyleEnumType OBJECT-TYPE
+       SYNTAX      SecurityStyle
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Defines how the system will maintain and verify file access security. Set to NTFS to have file access governed by NT ACL in all of the protocols. Set to UNIX to have file access governed by UNIX permissions in all of the protocols"
+       ::= { nASVolumeEntry 5 }
+        
+    nASVolumeIsCloneEnumType OBJECT-TYPE
+       SYNTAX      Boolean
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Indicates whether this volume is clone or not"
+       ::= { nASVolumeEntry 6 }
+        
+    nASVolumeMetadataRedundancyEnabledEnumType OBJECT-TYPE
+       SYNTAX      Boolean
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Enable meta data redundancy feature for better resilience or disable for higher performance volume"
+       ::= { nASVolumeEntry 7 }
+        
+    nASVolumeOptimizationSavedSpaceMB OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Space saved by optimization for this virtual volume (in MB). This should vary between the used space size and 0"
+       ::= { nASVolumeEntry 8 }
+        
+    nASVolumeNumberOfSnapshots OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { nASVolumeEntry 9 }
+        
+    nASVolumeReplicationStatusEnumType OBJECT-TYPE
+       SYNTAX      VolumeReplicationStatus
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { nASVolumeEntry 10 }
+    
+        
+        
+                
+    -- storageSubsystem struct definition
+    DataStorageSubsystem ::= SEQUENCE 
+    {
+        storageSubsystemIndex  Integer32,
+        storageSubsystemLunsAccessibility  OCTET STRING,
+        storageSubsystemLunsAccessibilityEnumType  AccessState
+    }
+
+    -- storageSubsystem object declaration
+    storageSubsystem OBJECT-TYPE
+        SYNTAX       SEQUENCE OF DataStorageSubsystem
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "Accessibility status to storage sub-system"
+        ::= { fluidFSProduct 32 }
+        
+    -- storageSubsystem object fields declarations
+        
+    storageSubsystemEntry OBJECT-TYPE
+       SYNTAX      DataStorageSubsystem
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION ""
+       INDEX   { storageSubsystemIndex }
+       ::= { storageSubsystem 1 }
+           
+    storageSubsystemIndex OBJECT-TYPE
+       SYNTAX      Integer32 (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { storageSubsystemEntry 1 }
+        
+    storageSubsystemLunsAccessibility OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "Accessibility status to the storage sub-system"
+       ::= { storageSubsystemEntry 2 }
+        
+    storageSubsystemLunsAccessibilityEnumType OBJECT-TYPE
+       SYNTAX      AccessState
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Accessibility status to the storage sub-system"
+       ::= { storageSubsystemEntry 3 }
+    
+        
+        
+                
+    systemServiceMode  OBJECT IDENTIFIER ::= { fluidFSProduct 36 }
+        
+    -- systemServiceMode object fields declarations
+        
+    systemServiceModeState OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "System serviceability mode"
+       ::= { systemServiceMode 1 }
+        
+    systemServiceModeStateEnumType OBJECT-TYPE
+       SYNTAX      ServiceabilityState
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "System serviceability mode"
+       ::= { systemServiceMode 2 }
+    
+                
+    -- systemTrafficStatistics struct definition
+    DataSystemTrafficStatistics ::= SEQUENCE 
+    {
+        systemTrafficStatisticsIndex  Integer32,
+        systemTrafficStatisticsTimestamp  OCTET STRING,
+        systemTrafficStatisticsNFSReadMBsPerSec  Integer32,
+        systemTrafficStatisticsNFSWriteMBsPerSec  Integer32,
+        systemTrafficStatisticsNDMPReadMBsPerSec  Integer32,
+        systemTrafficStatisticsNDMPWriteMBsPerSec  Integer32,
+        systemTrafficStatisticsCIFSReadMBsPerSec  Integer32,
+        systemTrafficStatisticsCIFSWriteMBsPerSec  Integer32,
+        systemTrafficStatisticsReplicationReadMBsPerSec  Integer32,
+        systemTrafficStatisticsReplicationWriteMBsPerSec  Integer32,
+        systemTrafficStatisticsNetworkOverheadReadMBsPerSec  Integer32,
+        systemTrafficStatisticsNetworkOverheadWriteMBsPerSec  Integer32,
+        systemTrafficStatisticsStorageSubSystemReadMBsPerSec  Integer32,
+        systemTrafficStatisticsStorageSubSystemWriteMBsPerSec  Integer32,
+        systemTrafficStatisticsNFSIOPSRead  Integer32,
+        systemTrafficStatisticsNFSIOPSWrite  Integer32,
+        systemTrafficStatisticsNFSIOPSOther  Integer32,
+        systemTrafficStatisticsCIFSIOPSRead  Integer32,
+        systemTrafficStatisticsCIFSIOPSWrite  Integer32,
+        systemTrafficStatisticsCIFSIOPSOther  Integer32
+    }
+
+    -- systemTrafficStatistics object declaration
+    systemTrafficStatistics OBJECT-TYPE
+        SYNTAX       SEQUENCE OF DataSystemTrafficStatistics
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "System traffic statistics"
+        ::= { fluidFSProduct 37 }
+        
+    -- systemTrafficStatistics object fields declarations
+        
+    systemTrafficStatisticsEntry OBJECT-TYPE
+       SYNTAX      DataSystemTrafficStatistics
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION ""
+       INDEX   { systemTrafficStatisticsIndex }
+       ::= { systemTrafficStatistics 1 }
+           
+    systemTrafficStatisticsIndex OBJECT-TYPE
+       SYNTAX      Integer32 (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { systemTrafficStatisticsEntry 1 }
+        
+    systemTrafficStatisticsTimestamp OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Timestamp of the system traffic statistics"
+       ::= { systemTrafficStatisticsEntry 2 }
+        
+    systemTrafficStatisticsNFSReadMBsPerSec OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of data (in MBs) that was read through NFS protocol in one second"
+       ::= { systemTrafficStatisticsEntry 3 }
+        
+    systemTrafficStatisticsNFSWriteMBsPerSec OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of data (in MBs) that was written through NFS protocol in one second"
+       ::= { systemTrafficStatisticsEntry 4 }
+        
+    systemTrafficStatisticsNDMPReadMBsPerSec OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of data (in MBs) that was read through NDMP protocol in one second"
+       ::= { systemTrafficStatisticsEntry 5 }
+        
+    systemTrafficStatisticsNDMPWriteMBsPerSec OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of data (in MBs) that was written through NDMP protocol in one second"
+       ::= { systemTrafficStatisticsEntry 6 }
+        
+    systemTrafficStatisticsCIFSReadMBsPerSec OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of data (in MBs) that was read through CIFS protocol in one second"
+       ::= { systemTrafficStatisticsEntry 7 }
+        
+    systemTrafficStatisticsCIFSWriteMBsPerSec OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of data (in MBs) that was written through CIFS protocol in one second"
+       ::= { systemTrafficStatisticsEntry 8 }
+        
+    systemTrafficStatisticsReplicationReadMBsPerSec OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of data (in MBs) that was read by the replication process in one second"
+       ::= { systemTrafficStatisticsEntry 9 }
+        
+    systemTrafficStatisticsReplicationWriteMBsPerSec OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of data (in MBs) that was written by the replication process in one second"
+       ::= { systemTrafficStatisticsEntry 10 }
+        
+    systemTrafficStatisticsNetworkOverheadReadMBsPerSec OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of outgoing network overhead (in MBs) in one second"
+       ::= { systemTrafficStatisticsEntry 11 }
+        
+    systemTrafficStatisticsNetworkOverheadWriteMBsPerSec OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of incoming network overhead (in MBs) in one second"
+       ::= { systemTrafficStatisticsEntry 12 }
+        
+    systemTrafficStatisticsStorageSubSystemReadMBsPerSec OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of data (in MBs) that was read from the storage sub-system in one second"
+       ::= { systemTrafficStatisticsEntry 13 }
+        
+    systemTrafficStatisticsStorageSubSystemWriteMBsPerSec OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Amount of data (in MBs) that was written to the storage sub-system in one second"
+       ::= { systemTrafficStatisticsEntry 14 }
+        
+    systemTrafficStatisticsNFSIOPSRead OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Number of NFS read IO operations in one second"
+       ::= { systemTrafficStatisticsEntry 15 }
+        
+    systemTrafficStatisticsNFSIOPSWrite OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Number of NFS write IO operations in one second"
+       ::= { systemTrafficStatisticsEntry 16 }
+        
+    systemTrafficStatisticsNFSIOPSOther OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Number of NFS IO operations (except read and write) in one second"
+       ::= { systemTrafficStatisticsEntry 17 }
+        
+    systemTrafficStatisticsCIFSIOPSRead OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Number of CIFS read IO operations in one second"
+       ::= { systemTrafficStatisticsEntry 18 }
+        
+    systemTrafficStatisticsCIFSIOPSWrite OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Number of CIFS write IO operations in one second"
+       ::= { systemTrafficStatisticsEntry 19 }
+        
+    systemTrafficStatisticsCIFSIOPSOther OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Number of CIFS IO operations (except read and write) in one second"
+       ::= { systemTrafficStatisticsEntry 20 }
+    
+        
+        
+                
+    -- clusterPartenrships struct definition
+    DataClusterPartenrships ::= SEQUENCE 
+    {
+        clusterPartenrshipsIndex  Integer32,
+        clusterPartenrshipsClusterName  OCTET STRING,
+        clusterPartenrshipsClusterIP  OCTET STRING,
+        clusterPartenrshipsStatus  OCTET STRING,
+        clusterPartenrshipsStatusEnumType  TrustedSystemStatus,
+        clusterPartenrshipsClusterName  OCTET STRING
+    }
+
+    -- clusterPartenrships object declaration
+    clusterPartenrships OBJECT-TYPE
+        SYNTAX       SEQUENCE OF DataClusterPartenrships
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "Cluster partnerships"
+        ::= { fluidFSProduct 39 }
+        
+    -- clusterPartenrships object fields declarations
+        
+    clusterPartenrshipsEntry OBJECT-TYPE
+       SYNTAX      DataClusterPartenrships
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION ""
+       INDEX   { clusterPartenrshipsIndex }
+       ::= { clusterPartenrships 1 }
+           
+    clusterPartenrshipsIndex OBJECT-TYPE
+       SYNTAX      Integer32 (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { clusterPartenrshipsEntry 1 }
+        
+    clusterPartenrshipsClusterName OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Name of the the partner cluster"
+       ::= { clusterPartenrshipsEntry 2 }
+        
+    clusterPartenrshipsClusterIP OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "IP address of the partner cluster"
+       ::= { clusterPartenrshipsEntry 3 }
+        
+    clusterPartenrshipsStatus OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "Accessibility status to the partner cluster"
+       ::= { clusterPartenrshipsEntry 4 }
+        
+    clusterPartenrshipsStatusEnumType OBJECT-TYPE
+       SYNTAX      TrustedSystemStatus
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Accessibility status to the partner cluster"
+       ::= { clusterPartenrshipsEntry 6 }
+        
+    clusterPartenrshipsClusterName OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Name of the the partner cluster"
+       ::= { clusterPartenrshipsEntry 5 }
+    
+        
+        
+                
+    -- example struct definition
+    DataExample ::= SEQUENCE 
+    {
+        exampleIndex  Integer32,
+        exampleShareName  OCTET STRING,
+        examplePath  OCTET STRING,
+        exampleComment  OCTET STRING,
+        exampleHideFiles  OCTET STRING,
+        exampleAllowGuests  OCTET STRING,
+        exampleLocking  OCTET STRING,
+        exampleAntiVirus  OCTET STRING,
+        exampleAvPolicy  OCTET STRING,
+        exampleAvExtensions  OCTET STRING,
+        exampleAvExtensionsPolicy  OCTET STRING,
+        exampleAvExcludeDirs  OCTET STRING,
+        exampleGenericField  Integer32,
+        exampleAllowGuestsEnumType  Boolean,
+        exampleLockingEnumType  Locking,
+        exampleAntiVirusEnumType  Boolean,
+        exampleAvPolicyEnumType  AvPolicyType,
+        exampleAvExtensions  OCTET STRING,
+        exampleAvExtensionsPolicyEnumType  IncludeType,
+        exampleStaticValue  OCTET STRING,
+        exampleRestrictedStaticValue1  OCTET STRING,
+        exampleRestrictedStaticValue2  OCTET STRING,
+        exampleRestrictedStaticValue3  OCTET STRING,
+        exampleRestrictedStaticValue4  OCTET STRING
+    }
+
+    -- example object declaration
+    example OBJECT-TYPE
+        SYNTAX       SEQUENCE OF DataExample
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  " Snmp interface for Example"
+        ::= { fluidFSProduct 99999 }
+        
+    -- example object fields declarations
+        
+    exampleEntry OBJECT-TYPE
+       SYNTAX      DataExample
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION ""
+       INDEX   { exampleIndex }
+       ::= { example 1 }
+           
+    exampleIndex OBJECT-TYPE
+       SYNTAX      Integer32 (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { exampleEntry 1 }
+        
+    exampleShareName OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Snmp key for Example.ShareName"
+       ::= { exampleEntry 2 }
+        
+    examplePath OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Snmp key for Example.Path"
+       ::= { exampleEntry 3 }
+        
+    exampleComment OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Snmp key for Example.Comment"
+       ::= { exampleEntry 4 }
+        
+    exampleHideFiles OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Snmp key for Example.HideFiles"
+       ::= { exampleEntry 5 }
+        
+    exampleAllowGuests OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "Snmp key for Example.AllowGuests"
+       ::= { exampleEntry 6 }
+        
+    exampleLocking OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "Snmp key for Example.Locking"
+       ::= { exampleEntry 7 }
+        
+    exampleAntiVirus OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "Snmp key for Example.AntiVirus"
+       ::= { exampleEntry 8 }
+        
+    exampleAvPolicy OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "Snmp key for Example.AvPolicy"
+       ::= { exampleEntry 9 }
+        
+    exampleAvExtensions OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "Snmp key for Example.AvExtensions"
+       ::= { exampleEntry 10 }
+        
+    exampleAvExtensionsPolicy OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      deprecated
+       DESCRIPTION "Snmp key for Example.AvExtensionsPolicy"
+       ::= { exampleEntry 11 }
+        
+    exampleAvExcludeDirs OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Snmp key for Example.AvExcludeDirs"
+       ::= { exampleEntry 12 }
+        
+    exampleGenericField OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Snmp key for Example.GenericField"
+       ::= { exampleEntry 13 }
+        
+    exampleAllowGuestsEnumType OBJECT-TYPE
+       SYNTAX      Boolean
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Snmp key for Example.AllowGuests"
+       ::= { exampleEntry 14 }
+        
+    exampleLockingEnumType OBJECT-TYPE
+       SYNTAX      Locking
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Snmp key for Example.Locking"
+       ::= { exampleEntry 15 }
+        
+    exampleAntiVirusEnumType OBJECT-TYPE
+       SYNTAX      Boolean
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Snmp key for Example.AntiVirus"
+       ::= { exampleEntry 16 }
+        
+    exampleAvPolicyEnumType OBJECT-TYPE
+       SYNTAX      AvPolicyType
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Snmp key for Example.AvPolicy"
+       ::= { exampleEntry 17 }
+        
+    exampleAvExtensions OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Snmp key for Example.AvExtensions"
+       ::= { exampleEntry 18 }
+        
+    exampleAvExtensionsPolicyEnumType OBJECT-TYPE
+       SYNTAX      IncludeType
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Snmp key for Example.AvExtensionsPolicy"
+       ::= { exampleEntry 19 }
+        
+    exampleStaticValue OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Example of static value"
+       ::= { example 20 }
+        
+    exampleRestrictedStaticValue1 OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Example of restricted static value 1"
+       ::= { example 21 }
+        
+    exampleRestrictedStaticValue2 OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Example of restricted static value 2"
+       ::= { example 22 }
+        
+    exampleRestrictedStaticValue3 OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Example of restricted static value 3"
+       ::= { example 23 }
+        
+    exampleRestrictedStaticValue4 OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Example of restricted static value 4"
+       ::= { example 24 }
+        
+        
+                
+    -- fluidFsCifsShare struct definition
+    DataFluidFsCifsShare ::= SEQUENCE 
+    {
+        fluidFsCifsShareIndex  Integer32,
+        fluidFsCifsShareVolumeName  OCTET STRING,
+        fluidFsCifsShareShareName  OCTET STRING,
+        fluidFsCifsSharePath  OCTET STRING,
+        fluidFsCifsShareAccessBasedEnumEnumType  Boolean
+    }
+
+    -- fluidFsCifsShare object declaration
+    fluidFsCifsShare OBJECT-TYPE
+        SYNTAX       SEQUENCE OF DataFluidFsCifsShare
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  " Snmp interface for Example"
+        ::= { fluidFSProduct 6 }
+        
+    -- fluidFsCifsShare object fields declarations
+        
+    fluidFsCifsShareEntry OBJECT-TYPE
+       SYNTAX      DataFluidFsCifsShare
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION ""
+       INDEX   { fluidFsCifsShareIndex }
+       ::= { fluidFsCifsShare 1 }
+           
+    fluidFsCifsShareIndex OBJECT-TYPE
+       SYNTAX      Integer32 (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { fluidFsCifsShareEntry 1 }
+        
+    fluidFsCifsShareVolumeName OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { fluidFsCifsShareEntry 2 }
+        
+    fluidFsCifsShareShareName OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { fluidFsCifsShareEntry 3 }
+        
+    fluidFsCifsSharePath OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { fluidFsCifsShareEntry 4 }
+        
+    fluidFsCifsShareAccessBasedEnumEnumType OBJECT-TYPE
+       SYNTAX      Boolean
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { fluidFsCifsShareEntry 5 }
+    
+        
+        
+                
+    -- fluidFsNfsExport struct definition
+    DataFluidFsNfsExport ::= SEQUENCE 
+    {
+        fluidFsNfsExportIndex  Integer32,
+        fluidFsNfsExportVolumeName  OCTET STRING,
+        fluidFsNfsExportPath  OCTET STRING
+    }
+
+    -- fluidFsNfsExport object declaration
+    fluidFsNfsExport OBJECT-TYPE
+        SYNTAX       SEQUENCE OF DataFluidFsNfsExport
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  " Snmp interface for Example"
+        ::= { fluidFSProduct 46 }
+        
+    -- fluidFsNfsExport object fields declarations
+        
+    fluidFsNfsExportEntry OBJECT-TYPE
+       SYNTAX      DataFluidFsNfsExport
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION ""
+       INDEX   { fluidFsNfsExportIndex }
+       ::= { fluidFsNfsExport 1 }
+           
+    fluidFsNfsExportIndex OBJECT-TYPE
+       SYNTAX      Integer32 (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { fluidFsNfsExportEntry 1 }
+        
+    fluidFsNfsExportVolumeName OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { fluidFsNfsExportEntry 2 }
+        
+    fluidFsNfsExportPath OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { fluidFsNfsExportEntry 3 }
+    
+        
+        
+                
+    version  OBJECT IDENTIFIER ::= { fluidFSProduct 47 }
+        
+    -- version object fields declarations
+        
+    versionVersion OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Current version of FluidFS"
+       ::= { version 1 }
+        
+    versionProductName OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { version 2 }
+        
+    versionProductDescription OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { version 3 }
+        
+    versionProductVendor OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION ""
+       ::= { version 4 }
+                
+    DomainStatusType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {notjoined(0), unknown(1), offline(2), problematic(3), optimal(4)}
+    
+    DomainInfoStatusTypes ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {running(0), notrunning(1)}
+    
+    ExternalServerState ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {available(0), unavailable(1), unknown(2)}
+    
+    WriteThroughModeTypes ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {mirroring(0), journaling(1), intransition(2)}
+    
+    ServiceabilityState ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {normal(0), writethroughmode(1), noservice(2)}
+    
+    ComponentStatus ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {optimal(0), notoptimal(1), critical(2), notavailable(3), irrelevant(4)}
+    
+    MemberModel ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {fs8600(0), fs8610(1), fs8611(2), fs8610i(3), fs8611i(4), fs8700(5), kv8710(6), vm0002(7), vm1000(8), vm2000(9), un1000(10), notavailable(11)}
+    
+    AvPolicyType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {donothing(0), quarantine(1), remove(2)}
+    
+    Boolean ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {yes(0), no(1)}
+    
+    SecurityStyle ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {mixed(0), unix(1), ntfs(2)}
+    
+    ExternalServerType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {gateway(0), staticroute(1), dns(2), antivirus(3), nis(4), ldap(5), ntp(6), iscsiportal(7), vm(8), auditingserver(9)}
+    
+    AccessState ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {fault(0), notoptimal(1), optimal(2)}
+    
+    TrustedSystemStatus ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {available(0), unavailable(1)}
+    
+    IncludeType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {include(0), exclude(1)}
+    
+    Locking ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {alllocks(0), nobyterangelocks(1), onlysharelocks(2)}
+    
+    VolumeReplicationStatus ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION  ""
+    SYNTAX INTEGER {standalone(0), source(1), destination(2), sourceanddestination(3), promoted(4), notavailable(5)}
+    
+END

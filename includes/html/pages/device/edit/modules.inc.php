@@ -19,21 +19,21 @@
       </tr>
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Module;
 
 $language = \config('app.locale');
-$settings = (include Config::get('install_dir') . '/lang/' . $language . '/settings.php')['settings'];
+$settings = (include LibrenmsConfig::get('install_dir') . '/lang/' . $language . '/settings.php')['settings'];
 
 $attribs = DeviceCache::getPrimary()->getAttribs();
 $poller_module_names = $settings['poller_modules'];
 $discovery_module_names = $settings['discovery_modules'];
 
-$poller_modules = Config::get('poller_modules');
+$poller_modules = LibrenmsConfig::get('poller_modules');
 unset($poller_modules['core']); // core cannot be toggled
 ksort($poller_modules);
 foreach ($poller_modules as $module => $module_status) {
-    $module_name = $poller_module_names[$module]['description'] ?: $module;
+    $module_name = empty($poller_module_names[$module]['description']) ? $module : $poller_module_names[$module]['description'];
     echo '
       <tr>
         <td><strong>' . $module_name . '</strong></td>
@@ -50,8 +50,8 @@ foreach ($poller_modules as $module => $module_status) {
         </td>
         <td>';
 
-    if (Config::has("os.{$device['os']}.poller_modules.$module")) {
-        if (Config::get("os.{$device['os']}.poller_modules.$module")) {
+    if (LibrenmsConfig::has("os.{$device['os']}.poller_modules.$module")) {
+        if (LibrenmsConfig::get("os.{$device['os']}.poller_modules.$module")) {
             echo '<span class="text-success">Enabled</span>';
             $module_status = 1;
         } else {
@@ -95,11 +95,11 @@ foreach ($poller_modules as $module => $module_status) {
        </td>
        <td style="vertical-align: middle">';
 
-    echo '<button type="button" class="btn btn-default tw-mr-1 poller-reset-button" id="poller-reset-button-' . $module . '" style="visibility: ' . (isset($attribs['poll_' . $module]) ? 'visible' : 'hidden') . '" title="Reset device override"><i class="fa fa-lg fa-solid fa-rotate-left"></i></button>';
+    echo '<button type="button" class="btn btn-default tw:mr-1 poller-reset-button" id="poller-reset-button-' . $module . '" style="visibility: ' . (isset($attribs['poll_' . $module]) ? 'visible' : 'hidden') . '" title="Reset device override"><i class="fa fa-lg fa-solid fa-rotate-left"></i></button>';
 
     $moduleInstance = Module::fromName($module);
     if ($moduleInstance->dataExists(DeviceCache::getPrimary())) {
-        echo '<button type="button" class="btn btn-default delete-button-' . $module . '" title="Delete Module Data" data-toggle="modal" data-target="#delete-module-data" data-module="' . $module . '" data-module-name="' . $module_name . '"><i class="fa fa-lg fa-solid fa-trash tw-text-red-600"></button>';
+        echo '<button type="button" class="btn btn-default delete-button-' . $module . '" title="Delete Module Data" data-toggle="modal" data-target="#delete-module-data" data-module="' . $module . '" data-module-name="' . $module_name . '"><i class="fa fa-lg fa-solid fa-trash tw:text-red-600"></button>';
     }
 
 echo '</td>
@@ -124,11 +124,11 @@ echo '</td>
 
 <?php
 
-$discovery_modules = Config::get('discovery_modules');
+$discovery_modules = LibrenmsConfig::get('discovery_modules');
 unset($discovery_modules['core']); // core cannot be toggled
 ksort($discovery_modules);
 foreach ($discovery_modules as $module => $module_status) {
-    $module_name = $discovery_module_names[$module]['description'] ?: $module;
+    $module_name = empty($discovery_module_names[$module]['description']) ? $module : $discovery_module_names[$module]['description'];
     echo '
       <tr>
         <td>
@@ -147,8 +147,8 @@ foreach ($discovery_modules as $module => $module_status) {
         </td>
         <td>';
 
-    if (Config::has("os.{$device['os']}.discovery_modules.$module")) {
-        if (Config::get("os.{$device['os']}.discovery_modules.$module")) {
+    if (LibrenmsConfig::has("os.{$device['os']}.discovery_modules.$module")) {
+        if (LibrenmsConfig::get("os.{$device['os']}.discovery_modules.$module")) {
             echo '<span class="text-success">Enabled</span>';
             $module_status = 1;
         } else {
@@ -190,11 +190,11 @@ foreach ($discovery_modules as $module => $module_status) {
         </td>
        <td style="vertical-align: middle">';
 
-    echo '<button type="button" class="btn btn-default tw-mr-1 discovery-reset-button" id="discovery-reset-button-' . $module . '" style="visibility: ' . (isset($attribs['discover_' . $module]) ? 'visible' : 'hidden') . '" title="Reset device override"><i class="fa fa-lg fa-solid fa-rotate-left"></i></button>';
+    echo '<button type="button" class="btn btn-default tw:mr-1 discovery-reset-button" id="discovery-reset-button-' . $module . '" style="visibility: ' . (isset($attribs['discover_' . $module]) ? 'visible' : 'hidden') . '" title="Reset device override"><i class="fa fa-lg fa-solid fa-rotate-left"></i></button>';
 
     $moduleInstance = Module::fromName($module);
     if ($moduleInstance->dataExists(DeviceCache::getPrimary())) {
-        echo '<button type="button" class="btn btn-default delete-button-' . $module . '" title="Delete Module Data" data-toggle="modal" data-target="#delete-module-data" data-module="' . $module . '" data-module-name="' . $module_name . '"><i class="fa fa-lg fa-solid fa-trash tw-text-red-600"></button>';
+        echo '<button type="button" class="btn btn-default delete-button-' . $module . '" title="Delete Module Data" data-toggle="modal" data-target="#delete-module-data" data-module="' . $module . '" data-module-name="' . $module_name . '"><i class="fa fa-lg fa-solid fa-trash tw:text-red-600"></button>';
     }
 
     echo '</td>

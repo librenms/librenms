@@ -1,0 +1,128 @@
+-- ****************************************************************
+-- *  Moxa Switching - Dual Homing PRIVATE MIB
+-- *
+-- *  Copyright (c) 2019 by Moxa Inc.
+-- *  All rights reserved.
+-- *****************************************************************
+
+MOXA-DUALHOMING-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, IpAddress
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DateAndTime, MacAddress, DisplayString, TruthValue
+            FROM SNMPv2-TC
+        layer2Redundancy
+          FROM MOXA-SWITCHING-MIB;
+
+    mxDualHoming   MODULE-IDENTITY
+        LAST-UPDATED "202202170000Z"
+        ORGANIZATION "Moxa Inc."
+        CONTACT-INFO
+            "
+            Postal: Moxa Inc.
+            13F., No. 3, Sec. 4, New Taipei Blvd.
+            Xinzhuang Dist., New Taipei City 242032, Taiwan, R.O.C.
+
+            Tel: +866-2-89191230
+            Web: http://www.moxa.com/
+            "
+        DESCRIPTION
+            "The MIB module defines Moxa Dual-Homing"
+
+        REVISION    "202202170000Z"
+        DESCRIPTION "update CONTACT-INFO"
+
+        REVISION    "201906300000Z"
+        DESCRIPTION "Initial Revision"
+
+        ::= { layer2Redundancy 7 }
+
+    moxa               OBJECT IDENTIFIER ::= { enterprises 8691 }
+    switching            OBJECT IDENTIFIER ::= { moxa 603 }
+
+-- -------------------------------------------------------------
+-- groups in the MOXA-DUALHOMING-MIB MIB
+-- -------------------------------------------------------------
+
+  dualhomingNotification      OBJECT IDENTIFIER ::= { mxDualHoming 0 }
+  dualhomingConfiguration     OBJECT IDENTIFIER ::= { mxDualHoming 1 }
+  dualhomingStatus            OBJECT IDENTIFIER ::= { mxDualHoming 2 }
+  -- dualhomingExtensions        OBJECT IDENTIFIER ::= { mxDualHoming 3 }
+
+-- -------------------------------------------------------------
+-- notification group
+-- -------------------------------------------------------------
+
+  dualhomingNotifyPathChanged NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "The notification is sent when the current forwarding path changed."
+        ::= { dualhomingNotification 1 }
+
+-- -------------------------------------------------------------
+-- configuration group
+-- -------------------------------------------------------------
+  dualhomingConfigEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The administrative module status requested by management for the
+            Dual Homing Module. This enables or disables Dual Homing in the
+            system. "
+        ::= { dualhomingConfiguration 1 }
+
+  dualhomingConfigPathMode OBJECT-TYPE
+        SYNTAX INTEGER { primary-first(1), maintain-current(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The administrative path mode status of Dual Homing requested by
+            management for the Dual Homing Module. A value of (1) indicates
+            that the primary path is the top priority forwarding path. A value
+            of (2) indicates that the current forwarding path is the top
+            priority forwarding path. "
+        ::= { dualhomingConfiguration 2 }
+
+  dualhomingConfigPriSecPort OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (2))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The port ID of Primary Port on Dual Homing."
+        ::= { dualhomingConfiguration 3 }
+
+-- -------------------------------------------------------------
+-- status group
+-- -------------------------------------------------------------
+  dualhomingStatPrimary OBJECT IDENTIFIER ::= { dualhomingStatus 1 }
+
+  dualhomingProtocolStatePrimary OBJECT-TYPE
+        SYNTAX INTEGER {
+				linkDown (0),
+				blocking (1),
+                forwarding (2),
+				disabled (3)
+                }
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "The operating state of primary path of Dual Homing."
+        ::= { dualhomingStatPrimary 1 }
+
+  dualhomingStatSecondary OBJECT IDENTIFIER ::= { dualhomingStatus 2 }
+
+  dualhomingProtocolStateSecondary OBJECT-TYPE
+        SYNTAX INTEGER {
+				linkDown (0),
+				blocking (1),
+                forwarding (2),
+				disabled (3)
+                }
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "The operating state of primary path of Dual Homing."
+        ::= { dualhomingStatSecondary 2 }
+
+END

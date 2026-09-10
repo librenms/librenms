@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Datastore.php
  *
@@ -25,33 +26,25 @@
 
 namespace LibreNMS\Interfaces\Data;
 
-interface Datastore extends DataStorageInterface
+use App\Polling\Measure\MeasurementCollection;
+
+interface Datastore extends WriteInterface
 {
     /**
      * Check if this is enabled by the configuration
      *
      * @return bool
      */
-    public static function isEnabled();
-
-    /**
-     * Checks if the datastore wants rrdtags to be sent when issuing put()
-     *
-     * @return bool
-     */
-    public function wantsRrdTags();
+    public static function isEnabled(): bool;
 
     /**
      * The name of this datastore
      *
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
-    /**
-     * Array of stats should be [type => [count => n, time => s]]
-     *
-     * @return array
-     */
-    public function getStats();
+    public function getStats(): MeasurementCollection;
+
+    public function terminate(): void;
 }

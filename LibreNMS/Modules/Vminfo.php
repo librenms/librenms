@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Vminfo.php
  *
@@ -25,14 +26,15 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Observers\ModuleModelObserver;
-use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 
 class Vminfo implements \LibreNMS\Interfaces\Module
@@ -47,10 +49,12 @@ class Vminfo implements \LibreNMS\Interfaces\Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
         // libvirt does not use snmp, only ssh tunnels
-        return $status->isEnabledAndDeviceUp($os->getDevice(), check_snmp: ! Config::get('enable_libvirt')) && $os instanceof VminfoDiscovery;
+        return $status->isEnabled()
+            && (LibrenmsConfig::get('enable_libvirt') || $connectivity->snmpIsAvailable())
+            && $os instanceof VminfoDiscovery;
     }
 
     /**
@@ -66,9 +70,9 @@ class Vminfo implements \LibreNMS\Interfaces\Module
         }
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof VminfoPolling;
+        return $status->isEnabled() && $connectivity->snmpIsAvailable() && $os instanceof VminfoPolling;
     }
 
     /**

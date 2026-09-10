@@ -226,37 +226,24 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "31",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/",
                     "storage_size": 21003628544,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 2355781632,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.31",
+                    "storage_free": 18647846912,
+                    "storage_free_oid": null,
+                    "storage_perc": 11,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "31",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/",
-                    "storage_size": 21003628544,
-                    "storage_units": 4096,
-                    "storage_used": 2355781632,
-                    "storage_free": 18647846912,
-                    "storage_perc": 11,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "wireless": {
         "discovery": {
@@ -264,7 +251,7 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "ap-count",
-                    "sensor_index": "1",
+                    "sensor_index": "211838000212",
                     "sensor_type": "ruckuswireless-sz",
                     "sensor_descr": "Connected APs",
                     "sensor_divisor": 1,
@@ -286,7 +273,7 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "ap-count",
-                    "sensor_index": "2",
+                    "sensor_index": "total",
                     "sensor_type": "ruckuswireless-sz",
                     "sensor_descr": "Total APs",
                     "sensor_divisor": 1,
@@ -308,9 +295,9 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "clients",
-                    "sensor_index": "1",
+                    "sensor_index": "private1",
                     "sensor_type": "ruckuswireless-sz",
-                    "sensor_descr": "SSID: <private>",
+                    "sensor_descr": "SSID: private1",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -330,9 +317,9 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "clients",
-                    "sensor_index": "2",
+                    "sensor_index": "private2",
                     "sensor_type": "ruckuswireless-sz",
-                    "sensor_descr": "SSID: <private>",
+                    "sensor_descr": "SSID: private2",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -352,9 +339,9 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "clients",
-                    "sensor_index": "3",
+                    "sensor_index": "private3",
                     "sensor_type": "ruckuswireless-sz",
-                    "sensor_descr": "SSID: <private>",
+                    "sensor_descr": "SSID: private3",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -374,9 +361,9 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "clients",
-                    "sensor_index": "6",
+                    "sensor_index": "private6",
                     "sensor_type": "ruckuswireless-sz",
-                    "sensor_descr": "SSID: <private>",
+                    "sensor_descr": "SSID: private6",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -396,9 +383,9 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "clients",
-                    "sensor_index": "7",
+                    "sensor_index": "private7",
                     "sensor_type": "ruckuswireless-sz",
-                    "sensor_descr": "SSID: <private>",
+                    "sensor_descr": "SSID: private7",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -418,9 +405,9 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "clients",
-                    "sensor_index": "8",
+                    "sensor_index": "private8",
                     "sensor_type": "ruckuswireless-sz",
-                    "sensor_descr": "SSID: <private>",
+                    "sensor_descr": "SSID: private8",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -440,9 +427,9 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "clients",
-                    "sensor_index": "9",
+                    "sensor_index": "total",
                     "sensor_type": "ruckuswireless-sz",
-                    "sensor_descr": "System Total:",
+                    "sensor_descr": "System Total",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -466,7 +453,7 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "ap-count",
-                    "sensor_index": "1",
+                    "sensor_index": "211838000212",
                     "sensor_type": "ruckuswireless-sz",
                     "sensor_descr": "Connected APs",
                     "sensor_divisor": 1,
@@ -488,7 +475,7 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "ap-count",
-                    "sensor_index": "2",
+                    "sensor_index": "total",
                     "sensor_type": "ruckuswireless-sz",
                     "sensor_descr": "Total APs",
                     "sensor_divisor": 1,
@@ -510,9 +497,9 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "clients",
-                    "sensor_index": "1",
+                    "sensor_index": "private1",
                     "sensor_type": "ruckuswireless-sz",
-                    "sensor_descr": "SSID: <private>",
+                    "sensor_descr": "SSID: private1",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -532,9 +519,9 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "clients",
-                    "sensor_index": "2",
+                    "sensor_index": "private2",
                     "sensor_type": "ruckuswireless-sz",
-                    "sensor_descr": "SSID: <private>",
+                    "sensor_descr": "SSID: private2",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -554,9 +541,9 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "clients",
-                    "sensor_index": "3",
+                    "sensor_index": "private3",
                     "sensor_type": "ruckuswireless-sz",
-                    "sensor_descr": "SSID: <private>",
+                    "sensor_descr": "SSID: private3",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -576,9 +563,9 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "clients",
-                    "sensor_index": "6",
+                    "sensor_index": "private6",
                     "sensor_type": "ruckuswireless-sz",
-                    "sensor_descr": "SSID: <private>",
+                    "sensor_descr": "SSID: private6",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -598,9 +585,9 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "clients",
-                    "sensor_index": "7",
+                    "sensor_index": "private7",
                     "sensor_type": "ruckuswireless-sz",
-                    "sensor_descr": "SSID: <private>",
+                    "sensor_descr": "SSID: private7",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -620,9 +607,9 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "clients",
-                    "sensor_index": "8",
+                    "sensor_index": "private8",
                     "sensor_type": "ruckuswireless-sz",
-                    "sensor_descr": "SSID: <private>",
+                    "sensor_descr": "SSID: private8",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
@@ -642,9 +629,9 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "clients",
-                    "sensor_index": "9",
+                    "sensor_index": "total",
                     "sensor_type": "ruckuswireless-sz",
-                    "sensor_descr": "System Total:",
+                    "sensor_descr": "System Total",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",

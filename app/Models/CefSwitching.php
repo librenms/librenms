@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CefSwitching.php
  *
@@ -25,8 +26,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class CefSwitching extends DeviceRelatedModel
 {
+    use HasFactory;
     public $timestamps = false;
     protected $table = 'cef_switching';
     protected $primaryKey = 'cef_switching_id';

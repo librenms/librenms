@@ -11,11 +11,10 @@
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
+$processor = new LibreNMS\Syslog\Processor();
+
 $s = fopen('php://stdin', 'r');
 while ($line = fgets($s)) {
-    //logfile($line);
-    [$entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']] = explode('||', trim($line));
-    process_syslog($entry, 1);
-    unset($entry);
-    unset($line);
+    // Log::channel('log_file')->critical($line); // uncomment to log input to librenms.log
+    $processor->process($line);
 }

@@ -18,7 +18,7 @@ class PortStack extends DeviceRelatedModel implements Keyable
         'ifStackStatus',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return $this->high_ifIndex . '-' . $this->low_ifIndex;
     }

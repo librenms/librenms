@@ -11,6 +11,7 @@ use Illuminate\View\Component;
 
 class TransceiverSensors extends Component
 {
+    /** @var Collection<int|string, \Illuminate\Database\Eloquent\Collection<int, \App\Models\Sensor>> */
     public Collection $groupedSensors;
 
     /**

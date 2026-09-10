@@ -7,7 +7,7 @@ $no_refresh = true;
         <tr>
             <th data-column-id="port_id" data-width="100px">Ports</th>
             <th data-column-id="mac_address" data-formatter="tooltip" data-width="170px">Mac Address</th>
-            <th data-column-id="mac_oui" data-formatter="tooltip" data-sortable="false" data-width="130px" data-visible="<?php echo \LibreNMS\Config::get('mac_oui.enabled') ? 'true' : 'false' ?>">Vendor</th>
+            <th data-column-id="mac_oui" data-formatter="tooltip" data-sortable="false" data-width="130px" data-visible="<?php echo \App\Facades\LibrenmsConfig::get('mac_oui.enabled') ? 'true' : 'false' ?>">Vendor</th>
             <th data-column-id="ip_address" data-formatter="tooltip" data-width="140px">IP Address</th>
             <th data-column-id="vlan" data-formatter="tooltip" data-width="60px">Vlan</th>
             <th data-column-id="domain" data-formatter="nac_domain" data-formatter="tooltip">Domain</th>

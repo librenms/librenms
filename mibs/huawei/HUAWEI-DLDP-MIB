@@ -5,12 +5,12 @@
 --
 
 --   =================================================================
--- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: HUAWEI DLDP MIB, this mib will maintain information of DLDP 
 --              protocol for datacomm product.  
 -- Reference:
--- Version:     V2.02
+-- Version:     V2.04
 -- History:
 --  
 --  V2.00 2008-07-15 initial version
@@ -35,7 +35,7 @@
 	
 --  Revision history
 		hwDldpMIB MODULE-IDENTITY 
-			LAST-UPDATED "201410210000Z"		-- October 21, 2014 at 00:00 GMT
+			LAST-UPDATED "202004070001Z"  	-- April 7, 2020 at 00:00 GMT
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -46,17 +46,23 @@
 				Website: http://www.huawei.com
 				Email: support@huawei.com
 				"
+			DESCRIPTION
+				"V2.04, Modify node hwDldpNeighborNum, hwDldpNeighborNumResume."
+				REVISION "202004070001Z"  	-- April 7, 2020 at 00:00 GMT
 			DESCRIPTION 
 				"This file is a DLDP-MIB. It provides the functions such as
 				globally enabling or disabling the DLDP protocol, enabling the global
 				alarm, clearing statistics on ports and configuring work mode."
+                                                          REVISION "201809180001Z"		-- Sept 18, 2018 at 00:00 GMT
+			DESCRIPTION
+				"V2.02, Modify node hwDldpUnidirectionalShutdown,hwDldpWorkMode,hwDldpAuthenMode."
 			REVISION "201410210000Z"		-- October 21, 2014 at 00:00 GMT
 			DESCRIPTION
 				"V2.02, hhhhhh."
-			REVISION "200807151430Z"		-- July 15, 2008 at 14:30 GMT
+                                                          REVISION "201311300000Z"		-- November 30, 2013 at 00:00 GMT
 			DESCRIPTION
 				"V2.00, initial version."
-			REVISION "201311300000Z"		-- November 30, 2013 at 00:00 GMT
+			REVISION "200807151430Z"		-- July 15, 2008 at 14:30 GMT
 			DESCRIPTION
 				"V2.01, added hwDldpIfTable, hwDldpIfNeighbourTable and hwDldpIfStatisticsTable."
 			::= { hwDatacomm 173 }
@@ -102,7 +108,7 @@
 				"Globally enable or disable the DLDP configuration. If the hwDldpEnable 
 				is 1, DLDP is enabled. If the hwDldpEnable is 2, DLDP is disabled. 
 				By default, DLDP is disabled."
-			DEFVAL { 2 }
+			DEFVAL { disabled }
 			::= { hwDldpConfiguration 1 }
 		
 		-- 1.3.6.1.4.1.2011.5.25.173.1.1.2
@@ -117,7 +123,7 @@
 			DESCRIPTION
 				"When the device discovers a one-way link, the shutdown mode of port. The modes include
 				auto and manual. By default, DLDP is auto."
-			DEFVAL { 1 }
+			DEFVAL { auto }
 			::= { hwDldpConfiguration 2 }
 		
 		-- 1.3.6.1.4.1.2011.5.25.173.1.1.3
@@ -132,7 +138,7 @@
 			DESCRIPTION
 				"It configures the work mode of the DLDP protocol, including normal and enhanced mode.
 				By default, the mode is enhanced."
-			DEFVAL { 2 }
+			DEFVAL { enhance }
 			::= { hwDldpConfiguration 3 }
 		
 		-- 1.3.6.1.4.1.2011.5.25.173.1.1.4
@@ -172,7 +178,7 @@
 				"Global authentication mode of the DLDP configuration. It has three authentication
 				modes, including none, md5, simple, and sha. By default the authentication mode
 				is none."
-			DEFVAL { 1 }
+			DEFVAL { none }
 			::= { hwDldpConfiguration 6 }
 		
 		-- 1.3.6.1.4.1.2011.5.25.173.1.1.7
@@ -807,6 +813,15 @@
 				"It describes the reason interface fault."
 			::= { hwDldpPortTrapObjects 3 }
 		
+		-- 1.3.6.1.4.1.2011.5.25.173.2.4
+		hwDldpMaxNeighborNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"It describes the max number of global dldp neighbor ."
+			::= { hwDldpPortTrapObjects 4 }
+		
 		-- 1.3.6.1.4.1.2011.5.25.173.3
 		hwDldpTraps OBJECT IDENTIFIER ::= { hwDldpMIB 3 }
 		
@@ -842,6 +857,22 @@
 			DESCRIPTION 
 				"Notify the NMS that the DLDP detected Loop State was resumed. The hwDldpTrapInterfaceIndex node is interface index."
 			::= { hwDldpTraps 4 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.173.3.5
+		hwDldpNeighborNum NOTIFICATION-TYPE
+			OBJECTS { hwDldpMaxNeighborNum }
+			STATUS current
+			DESCRIPTION 
+				"Notify the NMS that the number of DLDP neighbors reached the upper limit."
+			::= { hwDldpTraps 5 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.173.3.6
+		hwDldpNeighborNumResume NOTIFICATION-TYPE
+			OBJECTS { hwDldpMaxNeighborNum }
+			STATUS current
+			DESCRIPTION 
+				"Notify the NMS that the number of DLDP neighbors fell below 70% of the maximum supported by the device."
+			::= { hwDldpTraps 6 }
 		
 		-- 1.3.6.1.4.1.2011.5.25.173.4
 		hwDldpConformance OBJECT IDENTIFIER ::= { hwDldpMIB 4 }
@@ -909,7 +940,7 @@
 		
 		-- 1.3.6.1.4.1.2011.5.25.173.4.2.4
 		hwDldpPortTrapGroup OBJECT-GROUP
-			OBJECTS { hwDldpTrapInterfaceIndex, hwDldpTrapIfName }
+			OBJECTS { hwDldpTrapInterfaceIndex, hwDldpTrapIfName, hwDldpMaxNeighborNum }
 			STATUS current
 			DESCRIPTION 
 				"The collection of objects indicates that the activated port index detected one way or found that two way is resumed."
@@ -917,7 +948,7 @@
 		
 		-- 1.3.6.1.4.1.2011.5.25.173.4.2.5
 		hwDldpTrapGroup NOTIFICATION-GROUP
-			NOTIFICATIONS { hwDldpUnidirectionalLink, hwDldpLinkResume, hwDldpLoopDetect, hwDldpLoopResume }
+			NOTIFICATIONS { hwDldpUnidirectionalLink, hwDldpLinkResume, hwDldpLoopDetect, hwDldpLoopResume, hwDldpNeighborNum, hwDldpNeighborNumResume }
 			STATUS current
 			DESCRIPTION 
 				"The collection of notifications used to indicate that the HUAWEI-DLDP-MIB

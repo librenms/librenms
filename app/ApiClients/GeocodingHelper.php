@@ -1,4 +1,5 @@
 <?php
+
 /**
  * GeocodingHelper.php *
  * -Description-
@@ -24,10 +25,10 @@
 
 namespace App\ApiClients;
 
+use App\Facades\LibrenmsConfig;
 use Exception;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
-use LibreNMS\Config;
 use Log;
 
 trait GeocodingHelper
@@ -43,7 +44,7 @@ trait GeocodingHelper
      */
     public function getCoordinates($address)
     {
-        if (! Config::get('geoloc.latlng', true)) {
+        if (! LibrenmsConfig::get('geoloc.latlng', true)) {
             Log::debug('Geocoding disabled');
 
             return [];
@@ -88,7 +89,7 @@ trait GeocodingHelper
      * @param  string  $address
      * @return array
      *
-     * @throws \Exception you may throw an Exception if validation fails
+     * @throws Exception you may throw an Exception if validation fails
      */
     abstract protected function buildGeocodingOptions(string $address): array;
 }

@@ -62,7 +62,7 @@ foreach ($top_level_stats as $stat) {
     if (isset($data[$stat]) && is_numeric($data[$stat])) {
         $rrd_name = $rrd_name = ['app', $name, $app->app_id, $stat];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, ['data' => $data[$stat]]);
+        app('Datastore')->put($device, 'app', $tags, ['data' => $data[$stat]]);
         $metrics[$stat] = $data[$stat];
     } else {
         $metrics[$stat] = null;
@@ -73,7 +73,7 @@ foreach ($multimount_stats as $stat) {
     if (isset($data[$stat]) && is_numeric($data[$stat])) {
         $rrd_name = $rrd_name = ['app', $name, $app->app_id, $stat];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, ['data' => $data[$stat]]);
+        app('Datastore')->put($device, 'app', $tags, ['data' => $data[$stat]]);
         $metrics[$stat] = $data[$stat];
     } else {
         $metrics[$stat] = null;
@@ -87,7 +87,7 @@ foreach ($data['users'] as $user => $user_hash) {
             if (isset($user_hash[$stat]) && is_numeric($user_hash[$stat])) {
                 $rrd_name = $rrd_name = ['app', $name, $app->app_id, 'users___' . $user . '___' . $stat];
                 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-                data_update($device, 'app', $tags, ['data' => $user_hash[$stat]]);
+                app('Datastore')->put($device, 'app', $tags, ['data' => $user_hash[$stat]]);
                 $metrics['users___' . $user . '___' . $stat] = $user_hash[$stat];
             } else {
                 $metrics['users___' . $user . '___' . $stat] = null;

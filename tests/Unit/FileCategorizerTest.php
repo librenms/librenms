@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FileCategorizerTest.php
  *
@@ -29,7 +30,7 @@ use Illuminate\Support\Arr;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\FileCategorizer;
 
-class FileCategorizerTest extends TestCase
+final class FileCategorizerTest extends TestCase
 {
     public function testEmptyFiles(): void
     {
@@ -174,8 +175,8 @@ class FileCategorizerTest extends TestCase
         $this->assertCategorized([
             'os' => ['dlink', 'eltex-olt'],
             'os-files' => [
-                'includes/definitions/dlink.yaml',
-                'includes/definitions/discovery/eltex-olt.yaml',
+                'resources/definitions/os_detection/dlink.yaml',
+                'resources/definitions/os_discovery/eltex-olt.yaml',
             ],
         ]);
     }
@@ -191,8 +192,8 @@ class FileCategorizerTest extends TestCase
                 'tests/data/3com.json',
                 'tests/snmpsim/calix.snmprec',
                 'LibreNMS/OS/Ptp650.php',
-                'includes/definitions/dd-wrt.yaml',
-                'includes/definitions/discovery/arista_eos.yaml',
+                'resources/definitions/os_detection/dd-wrt.yaml',
+                'resources/definitions/os_discovery/arista_eos.yaml',
             ],
             'php' => [
                 'LibreNMS/OS/Ptp650.php',
@@ -202,8 +203,8 @@ class FileCategorizerTest extends TestCase
             'tests/data/3com.json',
             'tests/snmpsim/calix.snmprec',
             'LibreNMS/OS/Ptp650.php',
-            'includes/definitions/dd-wrt.yaml',
-            'includes/definitions/discovery/arista_eos.yaml',
+            'resources/definitions/os_detection/dd-wrt.yaml',
+            'resources/definitions/os_discovery/arista_eos.yaml',
         ]);
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -21,7 +22,7 @@ $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.3.111.103.115';
 echo ' ' . $name;
 
 // get data through snmp
-$ogs_data = snmp_get($device, $oid, '-Oqv');
+$ogs_data = SnmpQuery::get($oid)->value();
 
 // define the rrd
 $rrd_def = RrdDefinition::make()
@@ -31,7 +32,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('zombie_jobs', 'GAUGE', 0);
 
 // parse the data from the script
-$data = explode("\n", $ogs_data);
+$data = explode("\n", (string) $ogs_data);
 $fields = [
     'running_jobs' => $data[0],
     'pending_jobs' => $data[1],
@@ -46,7 +47,7 @@ $tags = [
     'rrd_name' => ['app', $name, $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, $ogs_data, $fields);
 
 // cleanup

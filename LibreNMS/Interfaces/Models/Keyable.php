@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Keyable.php
  *
@@ -32,5 +33,5 @@ interface Keyable
      *
      * @return string|int
      */
-    public function getCompositeKey();
+    public function getCompositeKey(): string|int;
 }

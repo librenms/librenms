@@ -1,5 +1,121 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import './toast.css';
+@import "tailwindcss" prefix(tw);
+@import "../../html/css/bootstrap.min.css" layer(components);
 
-@import 'toast.css';
+@source "../../includes/html/pages/**/*.php";
+@source "../../includes/html/**/*.inc.php";
+@custom-variant dark (&:where(.dark, .dark *));
+@layer base {
+    button:not(:disabled),
+    [role="button"]:not(:disabled) {
+        cursor: pointer;
+    }
+}
+@layer utilities {
+    html,
+    body {
+        font-size: 14px;
+    }
+}
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-2xl: 1440px;
+
+  --color-dark-gray-100: #4f565d;
+  --color-dark-gray-200: #3e444c;
+  --color-dark-gray-300: #353a41;
+  --color-dark-gray-400: #2e3338;
+  --color-dark-gray-500: #272b30;
+  --color-dark-white-100: #f9fafb;
+  --color-dark-white-200: #c8c8c8;
+  --color-dark-white-300: #bebfbf;
+  --color-dark-white-400: #acb6bf;
+
+  --border-width-0_5: 0.5px;
+
+  --shadow-inner-glow: inset 0 0 11px rgba(0, 0, 0, 0.1);
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+.device-link-up {
+    @apply tw:font-bold tw:text-blue-900 tw:visited:text-blue-900 tw:dark:text-dark-white-100 tw:dark:visited:text-dark-white-100
+}
+.device-link-down {
+    @apply tw:font-bold tw:text-red-600 tw:visited:text-red-600 tw:dark:text-red-500! tw:dark:visited:text-red-500!
+}
+.device-link-disabled {
+    @apply tw:font-bold tw:text-gray-400 tw:visited:text-gray-400 tw:dark:text-gray-500! tw:dark:visited:text-gray-500!
+}
+
+#coordinates-text  {
+  @apply tw:underline;
+}
+
+.lnms-btn {
+  @apply tw:inline-flex tw:items-center tw:gap-1 tw:rounded-lg tw:px-2 tw:py-1 tw:font-normal tw:no-underline;
+}
+
+.lnms-btn-badge {
+  @apply tw:inline-flex tw:text-xs tw:min-w-5 tw:px-1.5 tw:items-center tw:justify-center tw:rounded-xl tw:font-bold;
+}
+
+.lnms-btn-default {
+  @apply tw:bg-[#3a3f44] tw:hover:bg-[#1e2023] tw:text-white! tw:dark:bg-dark-gray-400 tw:dark:hover:bg-dark-gray-300 tw:dark:border tw:dark:border-dark-gray-100 tw:dark:text-dark-white-100!;
+}
+
+.lnms-btn-default .lnms-btn-badge {
+  @apply tw:bg-white tw:text-[#232628];
+}
+
+.lnms-btn-success {
+  @apply tw:bg-[#5cb85c] tw:hover:bg-[#449d44] tw:text-white!;
+}
+
+.lnms-btn-success .lnms-btn-badge {
+  @apply tw:bg-white tw:text-[#5cb85c];
+}
+
+.lnms-btn-danger {
+  @apply tw:bg-[#d9534f] tw:hover:bg-[#c9302c] tw:text-white!;
+}
+
+.lnms-btn-danger .lnms-btn-badge {
+  @apply tw:bg-white tw:text-[#d9534f];
+}
+
+.lnms-btn-primary {
+  @apply tw:bg-[#337ab7] tw:hover:bg-[#286090] tw:text-white!;
+}
+
+.lnms-btn-primary .lnms-btn-badge {
+  @apply tw:bg-white tw:text-[#337ab7];
+}
+
+.lnms-btn-warning {
+  @apply tw:bg-[#f0ad4e] tw:hover:bg-[#ec971f] tw:text-white!;
+}
+
+.lnms-btn-warning .lnms-btn-badge {
+  @apply tw:bg-white tw:text-[#f0ad4e];
+}

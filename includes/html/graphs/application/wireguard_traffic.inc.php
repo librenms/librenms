@@ -53,7 +53,7 @@ if (! isset($rrd_filename)) {
 }
 
 if (! Rrd::checkRrdExists($rrd_filename)) {
-    graph_error('No Data file ' . basename($rrd_filename), 'No Data');
+    graph_error('No Data file ' . basename((string) $rrd_filename), 'No Data');
 }
 
 require 'includes/html/graphs/generic_duplex.inc.php';

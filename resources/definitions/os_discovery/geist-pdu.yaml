@@ -1,0 +1,74 @@
+modules:
+    os:
+        hardware: GEIST-MIB-V3::productHardware.0
+        version: GEIST-MIB-V3::productVersion.0
+    sensors:
+        power:
+            options:
+                skip_values: 0
+            data:
+                -
+                    oid: GEIST-MIB-V3::ctrl3ChIECTable
+                    value: GEIST-MIB-V3::ctrl3ChIECRealPowerA
+                    num_oid: '.1.3.6.1.4.1.21239.2.25.1.10.{{ $index }}'
+                    descr: '{{ $GEIST-MIB-V3::ctrl3ChIECName }} Phase A'
+                    index: 'ctrl3ChIECRealPowerA.{{ $index }}'
+                -
+                    oid: GEIST-MIB-V3::ctrl3ChIECTable
+                    value: GEIST-MIB-V3::ctrl3ChIECRealPowerB
+                    num_oid: '.1.3.6.1.4.1.21239.2.25.1.18.{{ $index }}'
+                    descr: '{{ $GEIST-MIB-V3::ctrl3ChIECName }} Phase B'
+                    index: 'ctrl3ChIECRealPowerB.{{ $index }}'
+                -
+                    oid: GEIST-MIB-V3::ctrl3ChIECTable
+                    value: GEIST-MIB-V3::ctrl3ChIECRealPowerC
+                    num_oid: '.1.3.6.1.4.1.21239.2.25.1.26.{{ $index }}'
+                    descr: '{{ $GEIST-MIB-V3::ctrl3ChIECName }} Phase C'
+                    index: 'ctrl3ChIECRealPowerC.{{ $index }}'
+        voltage:
+            options:
+                skip_values: 0
+            data:
+                -
+                    oid: GEIST-MIB-V3::ctrl3ChIECTable
+                    value: GEIST-MIB-V3::ctrl3ChIECVoltsA
+                    num_oid: '.1.3.6.1.4.1.21239.2.25.1.6.{{ $index }}'
+                    descr: '{{ $GEIST-MIB-V3::ctrl3ChIECName }} Phase A'
+                    index: 'ctrl3ChIECVoltsA.{{ $index }}'
+                -
+                    oid: GEIST-MIB-V3::ctrl3ChIECTable
+                    value: GEIST-MIB-V3::ctrl3ChIECVoltsB
+                    num_oid: '.1.3.6.1.4.1.21239.2.25.1.14.{{ $index }}'
+                    descr: '{{ $GEIST-MIB-V3::ctrl3ChIECName }} Phase B'
+                    index: 'ctrl3ChIECVoltsB.{{ $index }}'
+                -
+                    oid: GEIST-MIB-V3::ctrl3ChIECTable
+                    value: GEIST-MIB-V3::ctrl3ChIECVoltsC
+                    num_oid: '.1.3.6.1.4.1.21239.2.25.1.22.{{ $index }}'
+                    descr: '{{ $GEIST-MIB-V3::ctrl3ChIECName }} Phase C'
+                    index: 'ctrl3ChIECVoltsC.{{ $index }}'
+        current:
+            options:
+                skip_values: 0
+            data:
+                -
+                    oid: GEIST-MIB-V3::ctrl3ChIECTable
+                    value: GEIST-MIB-V3::ctrl3ChIECDeciAmpsA
+                    num_oid: '.1.3.6.1.4.1.21239.2.25.1.8.{{ $index }}'
+                    descr: '{{ $GEIST-MIB-V3::ctrl3ChIECName }} Phase A'
+                    index: 'ctrl3ChIECDeciAmpsA.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: GEIST-MIB-V3::ctrl3ChIECTable
+                    value: GEIST-MIB-V3::ctrl3ChIECDeciAmpsB
+                    num_oid: '.1.3.6.1.4.1.21239.2.25.1.16.{{ $index }}'
+                    descr: '{{ $GEIST-MIB-V3::ctrl3ChIECName }} Phase B'
+                    index: 'ctrl3ChIECDeciAmpsB.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: GEIST-MIB-V3::ctrl3ChIECTable
+                    value: GEIST-MIB-V3::ctrl3ChIECDeciAmpsC
+                    num_oid: '.1.3.6.1.4.1.21239.2.25.1.24.{{ $index }}'
+                    descr: '{{ $GEIST-MIB-V3::ctrl3ChIECName }} Phase C'
+                    index: 'ctrl3ChIECDeciAmpsC.{{ $index }}'
+                    divisor: 10

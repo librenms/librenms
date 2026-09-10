@@ -7,6 +7,14 @@
     </div>
 
     <div class="form-group">
+        <label for="show_totals-{{ $id }}" class="control-label">{{ __('Display totals') }}</label>
+        <select class="form-control" name="show_totals" id="show_totals-{{ $id }}">
+            <option value="1" @if($show_totals) selected @endif>{{ __('Show') }}</option>
+            <option value="0" @unless($show_totals) selected @endunless>{{ __('Hide') }}</option>
+        </select>
+    </div>
+
+    <div class="form-group">
         <label for="type-{{ $id }}" class="control-label">{{ __('Display type') }}</label>
         <select class="form-control" name="type" id="type-{{ $id }}" onchange="toggle_availability_type(this, '{{ $id }}');">
             <option value="0" @if($type == 0) selected @endif>{{ __('boxes') }}</option>

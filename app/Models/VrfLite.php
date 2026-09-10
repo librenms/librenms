@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VrfLite.php
  *
@@ -25,8 +26,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class VrfLite extends DeviceRelatedModel
 {
+    use HasFactory;
     protected $table = 'vrf_lite_cisco';
     protected $primaryKey = 'vrf_lite_cisco_id';
     public $timestamps = false;

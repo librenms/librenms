@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MefController.php
  *
@@ -53,6 +54,8 @@ class MefController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [];
+        return [
+            'mef_rows' => $device->mefInfo()->orderBy('mefID')->get(),
+        ];
     }
 }

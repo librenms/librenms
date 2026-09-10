@@ -18,8 +18,8 @@ return new class extends Migration
         });
 
         // Let's get a value for existing PortsFdb data :
-        DB::table('ports_fdb')->update(['created_at' => \Carbon\Carbon::now()]);
-        DB::table('ports_fdb')->update(['updated_at' => \Carbon\Carbon::now()]);
+        DB::table('ports_fdb')->update(['created_at' => Carbon\Carbon::now()]);
+        DB::table('ports_fdb')->update(['updated_at' => Carbon\Carbon::now()]);
     }
 
     /**

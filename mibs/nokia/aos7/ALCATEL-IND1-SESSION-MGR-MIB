@@ -8,38 +8,33 @@ IMPORTS
         IpAddress, Integer32 FROM SNMPv2-SMI
         RowStatus            FROM SNMPv2-TC
         SnmpAdminString      FROM SNMP-FRAMEWORK-MIB
+        InetAddressType, InetAddress, InetAddressPrefixLength     FROM INET-ADDRESS-MIB
         MODULE-COMPLIANCE,
         OBJECT-GROUP,
         NOTIFICATION-GROUP   FROM SNMPv2-CONF
         softentIND1Sesmgr    FROM ALCATEL-IND1-BASE;
 
 alcatelIND1SessionMgrMIB MODULE-IDENTITY
-        LAST-UPDATED "201005260000Z"
-        ORGANIZATION "Alcatel-Lucent"
-        CONTACT-INFO
-            "Please consult with Customer Service to ensure the most appropriate
-             version of this document is used with the products in question:
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
         DESCRIPTION
             "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  User Sessions Manager Subsystem.
 
              The right to make changes in specification and other information
@@ -53,13 +48,17 @@ alcatelIND1SessionMgrMIB MODULE-IDENTITY
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201911270000Z"
+        DESCRIPTION
+            "Updated the latest contact and Copyright information for ALE USA Inc."
 
         REVISION      "201005130000Z"
         DESCRIPTION
             "Fixed the Notifications to use MIB Module OID.0 as Notifications root."
-
         ::= { softentIND1Sesmgr 1}
 
     alcatelIND1SessionMgrMIBNotifications OBJECT-IDENTITY
@@ -194,7 +193,9 @@ alcatelIND1SessionMgrMIB MODULE-IDENTITY
             sessionUserWritePrivileges  OCTET STRING,
             sessionUserProfileName      SnmpAdminString,
             sessionUserIpAddress        IpAddress,
-            sessionRowStatus            RowStatus
+            sessionRowStatus            RowStatus,
+            sessionUserInetAddressType  InetAddressType,
+            sessionUserInetAddress      InetAddress
             }
 
         sessionIndex  OBJECT-TYPE
@@ -245,7 +246,7 @@ alcatelIND1SessionMgrMIB MODULE-IDENTITY
             ::= { sessionActiveEntry 4 }
 
         sessionUserReadPrivileges  OBJECT-TYPE
-            SYNTAX  OCTET STRING (SIZE (8))
+            SYNTAX  OCTET STRING (SIZE (16))
             MAX-ACCESS  read-only
             STATUS  current
             DESCRIPTION
@@ -258,7 +259,7 @@ alcatelIND1SessionMgrMIB MODULE-IDENTITY
             ::= { sessionActiveEntry 5 }
 
         sessionUserWritePrivileges  OBJECT-TYPE
-            SYNTAX  OCTET STRING (SIZE (8))
+            SYNTAX  OCTET STRING (SIZE (16))
             MAX-ACCESS  read-only
             STATUS  current
             DESCRIPTION
@@ -298,6 +299,22 @@ alcatelIND1SessionMgrMIB MODULE-IDENTITY
                 The only value supported for set is destroy(6),
                 to kill a user session."
             ::= { sessionActiveEntry 9 }
+
+        sessionUserInetAddressType  OBJECT-TYPE
+            SYNTAX  InetAddressType
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "The IP address type of the user logged-in."
+            ::= { sessionActiveEntry 10 }
+
+        sessionUserInetAddress  OBJECT-TYPE
+            SYNTAX  InetAddress
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "The IP address of the user logged-in."
+            ::= { sessionActiveEntry 11 }
 
 
 -- Session login timout
@@ -371,6 +388,31 @@ switchMgtTrapsObj  OBJECT IDENTIFIER ::= { sessionMgr 7 }
             authentication is refused."
         ::= {alcatelIND1SessionMgrMIBNotifications 1 }
 
+    sessionAuthenticationSuccessTrap  NOTIFICATION-TYPE
+        OBJECTS {
+            sessionAccessType,
+            sessionUserName,
+            sessionUserIpAddress,
+            sessionDefaultCredential
+        }
+        STATUS  current
+        DESCRIPTION
+            "Authentication Success Trap is sent each time a user
+            authentication is accepted."
+        ::= {alcatelIND1SessionMgrMIBNotifications 2 }
+
+    sessionResetToFactoryTrap  NOTIFICATION-TYPE
+        OBJECTS {
+            sessionResetToFactoryUsername,
+            sessionResetToFactoryIpAddressType,
+            sessionResetToFactoryIpAddress,
+            sessionResetToFactoryCommand
+        }
+        STATUS  current
+        DESCRIPTION
+            "Trap to notify the reset to factory."
+        ::= {alcatelIND1SessionMgrMIBNotifications 3 }
+
 --
 -- Object used in the trap
 --
@@ -385,6 +427,111 @@ switchMgtTrapsObj  OBJECT IDENTIFIER ::= { sessionMgr 7 }
                 "The reason why the user authentication failed."
             ::= { switchMgtTrapsObj 1 }
 
+        sessionDefaultCredential  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                true(1),
+                false(2)
+            }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Specify if the 'admin' user logged in using the default password."
+            ::= { switchMgtTrapsObj 2 }
+
+        sessionResetToFactoryUsername  OBJECT-TYPE
+            SYNTAX SnmpAdminString (SIZE (0..32))
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Name of the user who activates reset-to-factory."
+            ::= { switchMgtTrapsObj 3 }
+
+        sessionResetToFactoryIpAddressType  OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "IP Address Type of the session which activates reset-to-factory."
+            ::= { switchMgtTrapsObj 4 }
+
+        sessionResetToFactoryIpAddress  OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "IP Address of the session which activates reset-to-factory."
+            ::= { switchMgtTrapsObj 5 }
+
+        sessionResetToFactoryCommand  OBJECT-TYPE
+            SYNTAX SnmpAdminString (SIZE (0..255))
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Command of the session which activates reset-to-factory."
+            ::= { switchMgtTrapsObj 6 }
+
+-- Session reauthentication interval
+
+        sessionReauthenticationInterval  OBJECT-TYPE
+            SYNTAX  Integer32
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "The reauthentication interval for sessions in minutes."
+            DEFVAL  { 5 }
+            ::= { sessionMgr 8 }
+
+-- Session cli auto complete space
+
+        sessionCliAutoCompleteSpace  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                enable(1),
+                disable(2)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Enable or disable auto completion of CLI command."
+            DEFVAL  { disable }
+            ::= { sessionMgr 9 }
+
+-- Session limit number
+
+        sessionFtpLimitNum  OBJECT-TYPE
+            SYNTAX  Integer32 (1..4)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Session ftp limit number."
+            DEFVAL { 4 }
+            ::= { sessionMgr 10 }
+
+        sessionSshLimitNum  OBJECT-TYPE
+            SYNTAX  Integer32 (1..8)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Session ssh limit number."
+            DEFVAL { 8 }
+            ::= { sessionMgr 11 }
+
+        sessionTelnetLimitNum  OBJECT-TYPE
+            SYNTAX  Integer32 (1..6)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Session telnet limit number."
+            DEFVAL { 6 }
+            ::= { sessionMgr 12 }
+
+        sessionHttpLimitNum  OBJECT-TYPE
+            SYNTAX  Integer32 (1..32)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Session http/https limit number."
+            DEFVAL { 32 }
+            ::= { sessionMgr 13 }
 
 --
 -- Compliance Statements
@@ -435,7 +582,9 @@ switchMgtTrapsObj  OBJECT IDENTIFIER ::= { sessionMgr 7 }
             sessionUserWritePrivileges,
             sessionUserProfileName,
             sessionUserIpAddress,
-            sessionRowStatus
+            sessionRowStatus,
+            sessionUserInetAddressType,
+            sessionUserInetAddress
         }
         STATUS  current
         DESCRIPTION
@@ -444,7 +593,9 @@ switchMgtTrapsObj  OBJECT IDENTIFIER ::= { sessionMgr 7 }
 
     sessionTrapsGroup NOTIFICATION-GROUP
         NOTIFICATIONS {
-            sessionAuthenticationTrap
+            sessionAuthenticationTrap,
+            sessionAuthenticationSuccessTrap,
+            sessionResetToFactoryTrap
         }
         STATUS  current
         DESCRIPTION
@@ -459,7 +610,18 @@ switchMgtTrapsObj  OBJECT IDENTIFIER ::= { sessionMgr 7 }
             sessionLoginAttempt,
             sessionCliCommandLogEnable,
             sessionXonXoffEnable,
-            sessionAuthFailure
+            sessionAuthFailure,
+            sessionReauthenticationInterval,
+            sessionCliAutoCompleteSpace,
+            sessionFtpLimitNum,
+            sessionSshLimitNum,
+            sessionTelnetLimitNum,
+            sessionHttpLimitNum,
+            sessionDefaultCredential,
+            sessionResetToFactoryUsername,
+            sessionResetToFactoryIpAddressType,
+            sessionResetToFactoryIpAddress,
+            sessionResetToFactoryCommand
         }
         STATUS  current
         DESCRIPTION

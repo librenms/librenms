@@ -22,10 +22,12 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
+use App\Models\Device;use Illuminate\Support\Facades\Gate;
+
 $no_refresh = true;
 $pagetitle[] = 'Capture';
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('debug', Device::class)) {
     print_error('Insufficient Privileges');
 } else {
     ?>
@@ -39,10 +41,10 @@ if (! Auth::user()->hasGlobalAdmin()) {
     <div class="tab-content">
     <?php
     $tabs = [
-        'discovery' => 'ajax_output.php?id=capture&format=text&type=discovery&hostname=' . htmlentities($device['hostname']),
-        'poller'    => 'ajax_output.php?id=capture&format=text&type=poller&hostname=' . htmlentities($device['hostname']),
-        'snmp'      => 'ajax_output.php?id=capture&format=text&type=snmpwalk&hostname=' . htmlentities($device['hostname']),
-        'alerts'    => 'ajax_output.php?id=query&format=text&type=alerts&hostname=' . htmlentities($device['hostname']),
+        'discovery' => route('device.debug.process', ['device' => $device['device_id'], 'format' => 'text', 'type' => 'discovery', 'verbose' => 1]),
+        'poller' => route('device.debug.process', ['device' => $device['device_id'], 'format' => 'text', 'type' => 'poller', 'verbose' => 1]),
+        'snmp' => route('device.debug.snmp', ['device' => $device['device_id'], 'format' => 'text']),
+        'alerts' => route('device.debug.alerts', ['device' => $device['device_id'], 'format' => 'text']),
     ];
 
     foreach ($tabs as $tab => $url) {

@@ -16,27 +16,21 @@ IMPORTS
 
 
 alcatelIND1IPsecMIB MODULE-IDENTITY
-    LAST-UPDATED "201007200000Z"
-    ORGANIZATION "Alcatel - Architects Of An Internet World"
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc"
     CONTACT-INFO
-        "Please consult with Customer Service to insure the most appropriate
-         version of this document is used with the products in question:
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                 Alcatel-Lucent, Enterprise Solutions Division
-                (Formerly Alcatel Internetworking, Incorporated)
-                           26801 West Agoura Road
-                        Agoura Hills, CA  91301-5122
-                          United States Of America
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -55,13 +49,25 @@ alcatelIND1IPsecMIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-           Copyright (C) 1995-2010 Alcatel-Lucent
-                         ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "201911270000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
+
+    REVISION      "201911110000Z"
+    DESCRIPTION
+        "Add alaIPsecDefaultDiscardPolicyTable."
+
+    REVISION      "201609120000Z"
+    DESCRIPTION
+        "Add alaIPsecDefaultDiscardPolicy."
 
     REVISION      "201007200000Z"
     DESCRIPTION
-        "The latest version of this MIB Module."
-
+        "The first version of this MIB Module."
     ::= { softentIND1IPsec 1 }
 
 
@@ -137,6 +143,9 @@ IPsecAHAlgorithm ::= TEXTUAL-CONVENTION
                   none(0),
                   hmacmd5(2),
                   hmacsha1(3),
+                  hmacsha256(5),
+                  hmacsha384(6),
+                  hmacsha512(7),
                   aesxcbcmac(9)
                 }
 
@@ -797,6 +806,63 @@ alaIPsecSecurityPolicyRuleRowStatus OBJECT-TYPE
         policy IPsec rule entries."
     ::= { alaIPsecSecurityPolicyRuleEntry 4 }
 
+--
+-- Default drop policy
+--
+
+alaIPsecDefaultDiscardPolicy OBJECT-TYPE
+    SYNTAX      IPsecAdminState
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Enable or disable the default discard policy."
+    ::= { alaIPsecConfig 3 }
+
+--
+-- Default Drop Policy Table
+--
+
+alaIPsecDefaultDiscardPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaIPsecDefaultDiscardPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table allowing to modify default discard policy."
+    ::= { alaIPsecConfig 4 }
+
+alaIPsecDefaultDiscardPolicyEntry OBJECT-TYPE
+    SYNTAX      AlaIPsecDefaultDiscardPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The default discard policy table entry."
+    INDEX       { alaIPsecDefaultDiscardPolicyType }
+    ::= { alaIPsecDefaultDiscardPolicyTable 1 }
+
+AlaIPsecDefaultDiscardPolicyEntry ::= SEQUENCE {
+    alaIPsecDefaultDiscardPolicyType             INTEGER,
+    alaIPsecDefaultDiscardPolicyState            IPsecAdminState
+}
+
+alaIPsecDefaultDiscardPolicyType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  ipv4(1),
+                  ipv6(2)
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique identifier for default discard policy, represent for IP address type."
+    ::= { alaIPsecDefaultDiscardPolicyEntry 1 }
+
+alaIPsecDefaultDiscardPolicyState OBJECT-TYPE
+    SYNTAX      IPsecAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Status of a default discard policy for an IP address type."
+    DEFVAL { disabled }
+    ::= { alaIPsecDefaultDiscardPolicyEntry 2 }
 
 --
 -- IPsec Security Association Configuration Table
@@ -863,7 +929,7 @@ alaIPsecSAConfigSourceType OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The type of source address specified.  Currently only ipv6(2) is allowed."
+        "The type of source address specified."
     ::= { alaIPsecSAConfigEntry 3 }
 
 alaIPsecSAConfigSource OBJECT-TYPE
@@ -879,7 +945,7 @@ alaIPsecSAConfigDestinationType OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The type of destination address specified.  Currently only ipv6(2) is allowed."
+        "The type of destination address specified."
     ::= { alaIPsecSAConfigEntry 5 }
 
 alaIPsecSAConfigDestination OBJECT-TYPE
@@ -1246,7 +1312,8 @@ alaIPsecConfigGroup OBJECT-GROUP
     OBJECTS     {
                   -- alaIPsecSecurityKeyID,
                   alaIPsecSecurityKeyCurrent,
-                  alaIPsecSecurityKeyNew
+                  alaIPsecSecurityKeyNew,
+		  alaIPsecDefaultDiscardPolicy
                 }
     STATUS      current
     DESCRIPTION
@@ -1374,5 +1441,14 @@ alaIPsecStatisticsGroup OBJECT-GROUP
         "A collection of objects to support management of IPsec
          statistics."
     ::= { alcatelIND1IPsecMIBGroups 6 }
+
+alaIPsecDefaultDiscardPolicyGroup OBJECT-GROUP
+    OBJECTS     {
+                  alaIPsecDefaultDiscardPolicyState
+                }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects to support management of default discard policy table."
+    ::= { alcatelIND1IPsecMIBGroups 7 }
 
 END

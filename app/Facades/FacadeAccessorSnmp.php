@@ -1,4 +1,5 @@
 <?php
+
 /*
  * SNMP.php
  *
@@ -26,15 +27,15 @@
 namespace App\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use LibreNMS\Data\Source\NetSnmpQuery;
+use LibreNMS\Data\Source\Snmp\SnmpQuery;
 
 class FacadeAccessorSnmp extends Facade
 {
     protected static function getFacadeAccessor()
     {
         // always resolve a new instance
-        self::clearResolvedInstance(NetSnmpQuery::class);
+        self::clearResolvedInstance(SnmpQuery::class);
 
-        return NetSnmpQuery::class;
+        return SnmpQuery::class;
     }
 }

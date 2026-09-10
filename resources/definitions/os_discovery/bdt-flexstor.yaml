@@ -1,0 +1,31 @@
+modules:
+    os:
+        hardware:
+            - BDTMIB::bDTDevVendorID.0
+            - BDTMIB::bDTDevProductID.0
+            - BDTMIB::bDTDescription.0
+        hardware_template: '{{ BDTMIB::bDTDevVendorID.0 }} {{ BDTMIB::bDTDevProductID.0 }} {{ BDTMIB::bDTDescription.0 }}'
+        version:
+            - BDTMIB::bDTDevFirmwareRev.0
+            - BDTMIB::bDTDevRobFirmwareRev.0
+            - BDTMIB::bDTDevBootcodeRev.0
+        version_template: 'FW: {{ BDTMIB::bDTDevFirmwareRev.0 }} Robotic FW: {{ BDTMIB::bDTDevRobFirmwareRev.0 }} Bootcode: {{ BDTMIB::bDTDevBootcodeRev.0 }}'
+        serial:
+            - BDTMIB::bDTDevSerialNumber.0
+    sensors:
+        state:
+            data:
+                -
+                    oid: BDTMIB::bDTGlobalStatus
+                    value: BDTMIB::bDTGlobalStatus
+                    num_oid: '.1.3.6.1.4.1.20884.10893.2.101.2.1.{{ $index }}'
+                    descr: 'Global Status'
+                    index: 'bDTGlobalStatus.{{ $index }}'
+                    state_name: bDTGlobalStatus
+                    states:
+                        - { value: 1, generic: 3, descr: other }
+                        - { value: 2, generic: 3, descr: unknown }
+                        - { value: 3, generic: 0, descr: ok }
+                        - { value: 4, generic: 1, descr: non-critical }
+                        - { value: 5, generic: 2, descr: critical }
+                        - { value: 6, generic: 2, descr: non-recoverable }

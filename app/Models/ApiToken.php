@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ApiToken.php
  *
@@ -32,17 +33,24 @@ class ApiToken extends BaseModel
     public $timestamps = false;
     protected $table = 'api_tokens';
 
+    protected function casts(): array
+    {
+        return [
+            'disabled' => 'boolean',
+        ];
+    }
+
     // ---- Helper Functions ----
 
     /**
      * Check if the given token is valid
-     *
-     * @param  string  $token
-     * @return bool
      */
-    public static function isValid($token, $user_id = null)
+    public static function isValid(string $token, ?int $user_id = null): bool
     {
-        $query = self::query()->isEnabled()->where('token_hash', $token);
+        $query = self::query()
+            ->isEnabled()
+            ->where('token_hash', $token)
+            ->whereHas('user', fn ($query) => $query->where('enabled', true));
 
         if (! is_null($user_id)) {
             $query->where('user_id', $user_id);
@@ -62,16 +70,32 @@ class ApiToken extends BaseModel
         return User::find(self::idFromToken($token));
     }
 
+    public static function randomTokenValue(): string
+    {
+        return bin2hex(random_bytes(16));
+    }
+
     public static function generateToken(User $user, $description = '')
     {
         $token = new static;
         $token->user_id = $user->user_id;
-        $token->token_hash = $bytes = bin2hex(random_bytes(16));
+        $token->token_hash = self::randomTokenValue();
         $token->description = $description;
         $token->disabled = false;
         $token->save();
 
         return $token;
+    }
+
+    /**
+     * Replace the stored secret for this row (same id / metadata; old value stops working).
+     */
+    public function rotateTokenHash(): string
+    {
+        $this->token_hash = self::randomTokenValue();
+        $this->save();
+
+        return $this->token_hash;
     }
 
     /**
@@ -82,7 +106,11 @@ class ApiToken extends BaseModel
      */
     public static function idFromToken($token)
     {
-        return self::query()->isEnabled()->where('token_hash', $token)->value('user_id');
+        return self::query()
+            ->isEnabled()
+            ->where('token_hash', $token)
+            ->whereHas('user', fn ($query) => $query->where('enabled', true))
+            ->value('user_id');
     }
 
     // ---- Query scopes ----
@@ -93,9 +121,11 @@ class ApiToken extends BaseModel
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

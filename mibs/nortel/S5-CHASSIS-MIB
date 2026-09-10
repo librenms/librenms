@@ -17,7 +17,7 @@ IMPORTS
     FROM IF-MIB;
 
 s5ChasMib MODULE-IDENTITY
-       LAST-UPDATED    "201504070000Z"
+       LAST-UPDATED    "201908230000Z"
        ORGANIZATION    "Avaya"
        CONTACT-INFO    "Avaya"
        DESCRIPTION
@@ -34,6 +34,22 @@ s5ChasMib MODULE-IDENTITY
            This Specification is supplied 'AS IS', and Nortel Networks makes
            no warranty, either express or implied, as to the use,
            operation, condition, or performance of the Specification."
+
+     REVISION "201908230000Z" -- August 23rd, 2019
+     DESCRIPTION "Version 157: Added s5ChasPsuInfoTable, with the following objects:
+                                s5ChasPsuInfoPsuId		Integer32,
+	                        s5ChasPsuInfoOrderCode		DisplayString,
+	                        s5ChasPsuInfoOrderCodeRev	DisplayString,
+	                        s5ChasPsuInfoDescription	DisplayString,
+	                        s5ChasPsuInfoSerialNumber	DisplayString,
+	                        s5ChasPsuInfoSuppPartNum	DisplayString,
+	                        s5ChasPsuInfoModelRevision	DisplayString,
+	                        s5ChasPsuInfoManufacturer	DisplayString,
+                               under s5ChasPs (azmeu)."
+
+     REVISION "201810090000Z" -- October 9, 2018
+     DESCRIPTION "Version 156: Changed s5ChasStoreFilename size, from (0..128) to (0..255).
+                               Change requested by Andreea Tanasie(made by azmeu)"
 
      REVISION "201504070000Z" -- April 7, 2015
      DESCRIPTION "Version 155: Changed s5ChasComDescr size."
@@ -1440,7 +1456,7 @@ s5ChasStoreCntntVer OBJECT-TYPE
   ::= { s5ChasStoreEntry 7 }
 
 s5ChasStoreFilename OBJECT-TYPE
-  SYNTAX  DisplayString (SIZE (0..128))
+  SYNTAX  DisplayString (SIZE (0..255))
   MAX-ACCESS  read-write
   STATUS  current
   DESCRIPTION
@@ -1780,6 +1796,7 @@ s5ChasUtilMemoryAvailableMB OBJECT-TYPE
 
 -- Chassis Power Supply Table
 
+-- RPSU
 
 s5ChasPsRpsuTable OBJECT-TYPE
         SYNTAX  SEQUENCE OF S5ChasPsRpsuEntry
@@ -1885,6 +1902,100 @@ s5ChasPsRpsuSourceConfig OBJECT-TYPE
                        a UPS for devices attached to powered ethernet
                        ports."
     ::= {s5ChasPsRpsuEntry 5}
+
+-- PSU
+
+s5ChasPsuInfoTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF S5ChasPsuInfoEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A table that contains information about
+	                 the power supply units that are plugged
+			 into the switch."
+::= { s5ChasPs 2 }
+
+s5ChasPsuInfoEntry OBJECT-TYPE
+	SYNTAX		S5ChasPsuInfoEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A row in the s5ChasPsuInfoTable."
+	INDEX		{ s5ChasPsuInfoPsuId }
+::= { s5ChasPsuInfoTable 1 }
+
+S5ChasPsuInfoEntry ::= SEQUENCE {
+	s5ChasPsuInfoPsuId		Integer32,
+	s5ChasPsuInfoOrderCode		DisplayString,
+	s5ChasPsuInfoOrderCodeRev	DisplayString,
+	s5ChasPsuInfoDescription	DisplayString,
+	s5ChasPsuInfoSerialNumber	DisplayString,
+	s5ChasPsuInfoSuppPartNum	DisplayString,
+	s5ChasPsuInfoModelRevision	DisplayString,
+	s5ChasPsuInfoManufacturer	DisplayString
+}
+
+s5ChasPsuInfoPsuId OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 	"The power supply ID."
+::= { s5ChasPsuInfoEntry 1 }
+
+s5ChasPsuInfoOrderCode OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 	"The order code for the power supply."
+::= { s5ChasPsuInfoEntry 2 }
+
+s5ChasPsuInfoOrderCodeRev OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 	"The order code revision for the
+	                power supply."
+::= { s5ChasPsuInfoEntry 3 }
+
+s5ChasPsuInfoDescription OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 	"A short description for the power supply.
+	                It should be similar to one of the
+			following:
+			
+			AC-DC-12V-250W
+			AC-DC-56V1400W-F2B"
+::= { s5ChasPsuInfoEntry 4 }
+
+s5ChasPsuInfoSerialNumber OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 	"The serial number for the power supply."
+::= { s5ChasPsuInfoEntry 5 }
+
+s5ChasPsuInfoSuppPartNum OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 	"The unique part number, given by the
+	                supplier/manufacturer."
+::= { s5ChasPsuInfoEntry 6 }
+
+s5ChasPsuInfoModelRevision OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 	"The model revision for the power supply."
+::= { s5ChasPsuInfoEntry 7 }
+
+s5ChasPsuInfoManufacturer OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 	"The name of the manufacturer of the power
+	                supply."
+::= { s5ChasPsuInfoEntry 8 }
 
 
 -- Notification auxiliary objects

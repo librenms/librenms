@@ -7,13 +7,14 @@ to visualize where your equipment is located geographically.
 
 World Map Widget, requires you to have properly formatted addresses in
 sysLocation or sysLocation override. As part of the standard poller
-these addresses will be Geocoded by Google and stored in the database.
+Google geocodes these addresses, and LibreNMS stores them in the
+database.
 
 Location resolution happens as follows
 
 1. If `device['location']` contains `[lat, lng]` (note the square
    brackets), that is used
-1. If there is a location overide for the device in the WebUI and it
+1. If there is a location override for the device in the WebUI and it
    contains `[lat, lng]` (note the square brackets), that is used.
 1. Attempt to resolve lat, lng using `lnms config:set geoloc.engine`
 1. Properly formatted addresses in sysLocation or sysLocation
@@ -39,7 +40,7 @@ We have two current mapping engines available:
 
 ### World Map Widget Settings
 
-- *Initial Latitude / Longitude*: The map will be centered on those
+- *Initial Latitude / Longitude*: the map centre is at these
   coordinates.
 - *Initial Zoom*: Initial zoom of the map. [More information about
   zoom levels](https://wiki.openstreetmap.org/wiki/Zoom_levels).
@@ -49,12 +50,12 @@ We have two current mapping engines available:
 
 Example Settings:
 
-![Example World Map Settings](/img/world-map-widget-settings.png)
+![Example World Map Settings](../img/world-map-widget-settings.png)
 
 ### Device Overview World Map Settings
 
-If a device has a location with a valid latitude and logitude, the
-device overview page will have a panel showing the device on a world
+If a device has a location with a valid latitude and longitude, the
+device overview page holds a panel with the device on a world
 map.  The following settings affect this map:
 
 ```bash
@@ -68,7 +69,7 @@ lnms config:set device_location_map_show_device_dependencies false
 
 ## Offline OpenStreet Map
 
-If you can't access OpenStreet map directly you can run a local [tile
+Without direct access to OpenStreetMap, run a local [tile
 server](http://wiki.openstreetmap.org/wiki/Tile_servers). To specify a
 different url you can set:
 
@@ -93,6 +94,12 @@ lnms config:set network_map_worldmap_link_type xdp/depends
 lnms config:set network_map_worldmap_show_disabled_alerts false
 ```
 
+!!! note
+    If entering negative coordinates, use this format:
+    ```bash
+    lnms config:set leaflet.default_lng -- -5.350342
+    ```
+
 ## Geocode engine config
 
 !!! setting "external/location"
@@ -116,7 +123,7 @@ Cons: Microsoft (debatable)
 ## Jquery-Mapael config
 
 Further custom options are available to load different maps of the
-world, set default coordinates of where the map will zoom and the zoom
+world. Set the default coordinates of the map centre and the zoom
 level by default. An example of this is:
 
 ```bash

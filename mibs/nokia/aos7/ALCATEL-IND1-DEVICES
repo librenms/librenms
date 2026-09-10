@@ -12,28 +12,21 @@ FROM
 
 
 alcatelIND1DevicesMIB MODULE-IDENTITY
-
-    LAST-UPDATED  "201003010000Z"
-    ORGANIZATION  "Alcatel-Lucent"
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
     CONTACT-INFO
-        "Please consult with Customer Service to ensure the most appropriate
-         version of this document is used with the products in question:
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
-                           26801 West Agoura Road
-                        Agoura Hills, CA  91301-5122
-                          United States Of America
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -54,19 +47,29 @@ alcatelIND1DevicesMIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-                     Copyright (C) 1995-2010 Alcatel-Lucent
-                         ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "202204100000Z"
+    DESCRIPTION
+        "Added OIDs for 6570M product family, OS6900-X24C2, OS6900-T24C2."
+
+    REVISION      "201911270000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
 
     REVISION      "201504240000Z"
     DESCRIPTION
       "Added OS10K, OS6900 and OS6860 SFP definitions."
+
     REVISION      "201108040000Z"
     DESCRIPTION
       "Added OS10K Power Supply, Fan Tray and Fabric Object Indentifier definitions"
+
     REVISION      "201003010000Z"
     DESCRIPTION
         "Initial version of this MIB Module."
-
     ::= { hardwareIND1Devices 1 }
 
 
@@ -544,6 +547,91 @@ deviceOmniSwitch6900X72 OBJECT-IDENTITY
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1.6"
     ::= { chassisOmniSwitch6900 6 }
 
+deviceOmniSwitch6900C32 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series .
+        Model Name: OS6900-C32
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1.7"
+    ::= { chassisOmniSwitch6900 7 }
+
+deviceOmniSwitch6900V72 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series .
+        Model Name: OS6900-V72
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1.8"
+    ::= { chassisOmniSwitch6900 8 }
+
+deviceOmniSwitch6900T48C6 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series .
+        Model Name: OS6900-T48C6
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1.9"
+    ::= { chassisOmniSwitch6900 9 }
+
+deviceOmniSwitch6900X48C6 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series .
+        Model Name: OS6900-X48C6
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1.10"
+    ::= { chassisOmniSwitch6900 10 }
+
+deviceOmniSwitch6900X48C4E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series .
+        Model Name: OS6900-X48C4E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1.11"
+    ::= { chassisOmniSwitch6900 11 }
+
+deviceOmniSwitch6900C32E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series .
+        Model Name: OS6900-C32E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1.12"
+    ::= { chassisOmniSwitch6900 12 }
+
+deviceOmniSwitch6900V48C8 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series .
+        Model Name: OS6900-V48C8
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1.13"
+    ::= { chassisOmniSwitch6900 13 }
+
+-- 8.9.R01 new Chassis supported ...
+
+deviceOmniSwitch6900X24C2 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series OS6900-X24C2 single slot chassis.
+        Model Name: OS6900-X24C2 
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1.14"
+    ::= { chassisOmniSwitch6900 14 }
+
+deviceOmniSwitch6900T24C2 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series OS6900-T24C2 single slot chassis.
+        Model Name: OS6900-T24C2 
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1.15"
+    ::= { chassisOmniSwitch6900 15 }
+	
+-- 8.9.R01 new Chassis supported ... End
+
 fansOmniSwitch6900 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -592,6 +680,78 @@ powersOmniSwitch6900DCRF OBJECT-IDENTITY
         Assembly:
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.3.4"
     ::= { powersOmniSwitch6900 4 }
+
+powersOmniSwitchYukon650BRAC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Yukon Series BR AC power supply 650W.
+        Model Name: YUKON_PS_650W_BR_AC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.3.5"
+    ::= { powersOmniSwitch6900 5 }
+
+powersOmniSwitchYukon650CRAC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Yukon Series CR AC power supply 650W.
+        Model Name: YUKON_PS_650W_CR_AC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.3.6"
+    ::= { powersOmniSwitch6900 6 }
+
+powersOmniSwitchYukon650BRDC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Yukon Series BR DC power supply 650W.
+        Model Name: YUKON_PS_650W_BR_DC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.3.7"
+    ::= { powersOmniSwitch6900 7 }
+
+powersOmniSwitchYukon650CRDC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Yukon Series CR DC power supply 650W.
+        Model Name: YUKON_PS_650W_CR_DC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.3.8"
+    ::= { powersOmniSwitch6900 8 }
+
+powersOmniSwitchYukon400BRAC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Yukon Series BR AC power supply 400W.
+        Model Name: YUKON_PS_400W_BR_AC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.3.9"
+    ::= { powersOmniSwitch6900 9 }
+
+powersOmniSwitchYukon400CRAC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Yukon Series CR AC power supply 400W.
+        Model Name: YUKON_PS_400W_CR_AC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.3.10"
+    ::= { powersOmniSwitch6900 10 }
+
+powersOmniSwitchYukon400CRDC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Yukon Series CR DC power supply 400W.
+        Model Name: YUKON_PS_400W_CR_DC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.3.11"
+    ::= { powersOmniSwitch6900 11 }
+
+powersOmniSwitchYukon400DRDC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Yukon Series DR DC power supply 400W.
+        Model Name: YUKON_PS_400W_DR_DC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.3.12"
+    ::= { powersOmniSwitch6900 12 }
 
 modulesOmniSwitch6900 OBJECT-IDENTITY
     STATUS current
@@ -649,6 +809,15 @@ daughterBoardOmniSwitch6900XNI-T8 OBJECT-IDENTITY
         Assembly:
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.5.5"
     ::= { daughterBoardOmniSwitch6900 5 }
+
+daughterBoardOmniSwitch6900XNI-U12E OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series daughter board U12E.
+        Model Name: OS6900-XNI-U12E
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.5.6"
+    ::= { daughterBoardOmniSwitch6900 6 }
 
 icOmniSwitch6900GIC OBJECT-IDENTITY
     STATUS current
@@ -728,6 +897,60 @@ gicOmniSwitch6900FC OBJECT-IDENTITY
         sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.8"
     ::= { icOmniSwitch6900GIC 8 }
 
+gicOmniSwitch6900GBXD OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 1000Base-BX10 Interface Card.
+        Model Name: SFP-GIG-BX-D
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.9"
+    ::= { icOmniSwitch6900GIC 9 }
+
+gicOmniSwitch6900GBXU OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 1000Base-BX10 Interface Card.
+        Model Name: SFP-GIG-BX-U
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.10"
+    ::= { icOmniSwitch6900GIC 10 }
+
+gicOmniSwitch6900GBXD20 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 1000Base-BX20 Interface Card.
+        Model Name: SFP-GIG-BX-D20
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.11"
+    ::= { icOmniSwitch6900GIC 11 }
+
+gicOmniSwitch6900GBXU20 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 1000Base-BX20 Interface Card.
+        Model Name: SFP-GIG-BX-U20
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.12"
+    ::= { icOmniSwitch6900GIC 12 }
+
+gicOmniSwitch6900GBXD40 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 1000Base-BX40 Interface Card.
+        Model Name: SFP-GIG-BX-D40
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.13"
+    ::= { icOmniSwitch6900GIC 13 }
+
+gicOmniSwitch6900GBXU40 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 1000Base-BX40 Interface Card.
+        Model Name: SFP-GIG-BX-U40
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.14"
+    ::= { icOmniSwitch6900GIC 14 }
+
 icOmniSwitch6900TenGIC OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -770,7 +993,7 @@ mgicOmniSwitch6900LRM OBJECT-IDENTITY
         sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.2.4"
     ::= { icOmniSwitch6900TenGIC 4 }
 
-mgicOmniSwitch6000ZR OBJECT-IDENTITY
+mgicOmniSwitch6900ZRDWDM OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "OmniSwitch 6900 Series Single Mode Fiber 10GBase-ZR Interface Card.
@@ -796,6 +1019,24 @@ mgicOmniSwitch6900DualSR OBJECT-IDENTITY
         Assembly:   903178-90
         sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.2.7"
     ::= { icOmniSwitch6900TenGIC 7 }
+
+mgicOmniSwitch6900CT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Copper 10Base-T Interface Card.
+        Model Name: SFP-10G-T
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.2.8"
+    ::= { icOmniSwitch6900TenGIC 8 }
+
+mgicOmniSwitch6900ZR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 10GBase-ZR Interface Card.
+        Model Name: SFP-10G-ZR
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.2.9"
+    ::= { icOmniSwitch6900TenGIC 9 }
 
 icOmniSwitch6900FortyGIC OBJECT-IDENTITY
     STATUS current
@@ -866,13 +1107,105 @@ qgicOmniSwitch6900Q4X10GLR OBJECT-IDENTITY
         sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.3.7"
     ::= { icOmniSwitch6900FortyGIC 7 }
 
+icOmniSwitch6900TwentyFiveGIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 25 GIG Interface Cards (IC)."
+    ::= { modulesOmniSwitch6900 4 }
+
+qgicOmniSwitch690025GLR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 25GBase-LR4 Interface Card.
+        Model Name: QSFP-25G-LR
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.4.1"
+    ::= { icOmniSwitch6900TwentyFiveGIC 1 }
+
+qgicOmniSwitch690025GSR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Multi Mode Fiber 25GBase-SR4 Interface Card.
+        Model Name: QSFP-25G-SR
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.4.2"
+    ::= { icOmniSwitch6900TwentyFiveGIC 2 }
+
+qgicOmniSwitch690025GCR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 25GBase-CR4 Copper Interface Card.
+        Model Name: QSFP-40G-CR
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.4.3"
+    ::= { icOmniSwitch6900TwentyFiveGIC 3 }
+
+icOmniSwitch6900HundredGIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 100 GIG Interface Cards (IC)."
+    ::= { modulesOmniSwitch6900 5 }
+
+cgicOmniSwitch6900CSR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 100G SR4 Fiber Interface Cable.
+        Model Name: QSFP-100G-SR4
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.5.1"
+    ::= { icOmniSwitch6900HundredGIC 1 }
+
+cgicOmniSwitch6900CCLR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 100G CR4 Direct Attached Cable Interface Cable.
+        Model Name: QSFP-100G-CR4
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.5.2"
+    ::= { icOmniSwitch6900HundredGIC 2 }
+
+cgicOmniSwitch6900CLR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 100G LR4 Fiber Interface Cable.
+        Model Name: QSFP-100G-LR4
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.5.3"
+    ::= { icOmniSwitch6900HundredGIC 3 }
+
+cgicOmniSwitch6900CCWDM OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 100G CWDM4 Fiber Interface Cable.
+        Model Name: QSFP-100G-CWDM4
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.5.4"
+    ::= { icOmniSwitch6900HundredGIC 4 }
+
+cgicOmniSwitch6900CAOC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 100G AOC 20M Fiber Interface Cable.
+        Model Name: QSFP-100G-AOC
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.5.5"
+    ::= { icOmniSwitch6900HundredGIC 5 }
+
+cgicOmniSwitch6900C4X25GC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 4x25G Direct Attach Copper Interface Cable.
+        Model Name: QSFP-4x25G-DAC
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.5.6"
+    ::= { icOmniSwitch6900HundredGIC 6 }
+
 
 familyOmniSwitch6860 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Branch For OmniSwitch 6860 Series Product Family."
     ::= { alcatelIND1DevicesMIB 11 }
-
 
 chassisOmniSwitch6860 OBJECT-IDENTITY
     STATUS current
@@ -892,7 +1225,6 @@ deviceOmniSwitch6860-24 OBJECT-IDENTITY
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.1"
     ::= { chassisOmniSwitch6860 1 }
 
-
 deviceOmniSwitch6860-P24 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -901,7 +1233,6 @@ deviceOmniSwitch6860-P24 OBJECT-IDENTITY
         Assembly:
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.2"
     ::= { chassisOmniSwitch6860 2 }
-
 
 deviceOmniSwitch6860-48 OBJECT-IDENTITY
     STATUS current
@@ -912,7 +1243,6 @@ deviceOmniSwitch6860-48 OBJECT-IDENTITY
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.3"
     ::= { chassisOmniSwitch6860 3 }
 
-
 deviceOmniSwitch6860-P48 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -921,7 +1251,6 @@ deviceOmniSwitch6860-P48 OBJECT-IDENTITY
         Assembly:
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.4"
     ::= { chassisOmniSwitch6860 4 }
-
 
 deviceOmniSwitch6860E-24 OBJECT-IDENTITY
     STATUS current
@@ -932,7 +1261,6 @@ deviceOmniSwitch6860E-24 OBJECT-IDENTITY
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.5"
     ::= { chassisOmniSwitch6860 5 }
 
-
 deviceOmniSwitch6860E-P24 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -941,7 +1269,6 @@ deviceOmniSwitch6860E-P24 OBJECT-IDENTITY
         Assembly:
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.6"
     ::= { chassisOmniSwitch6860 6 }
-
 
 deviceOmniSwitch6860E-48 OBJECT-IDENTITY
     STATUS current
@@ -952,7 +1279,6 @@ deviceOmniSwitch6860E-48 OBJECT-IDENTITY
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.7"
     ::= { chassisOmniSwitch6860 7 }
 
-
 deviceOmniSwitch6860E-P48 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -961,7 +1287,6 @@ deviceOmniSwitch6860E-P48 OBJECT-IDENTITY
         Assembly:
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.8"
     ::= { chassisOmniSwitch6860 8 }
-
 
 deviceOmniSwitch6860E-U28 OBJECT-IDENTITY
     STATUS current
@@ -972,6 +1297,59 @@ deviceOmniSwitch6860E-U28 OBJECT-IDENTITY
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.9"
     ::= { chassisOmniSwitch6860 9 }
 
+deviceOmniSwitch6860E-P24-Z8 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series .
+        Model Name: OS6860E-P24-Z8
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.10"
+    ::= { chassisOmniSwitch6860 10 }
+
+deviceOmniSwitch6860N-U28 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series .
+        Model Name: 6860N-U28
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.11"
+    ::= { chassisOmniSwitch6860 11 }
+
+deviceOmniSwitchOS6860N-P48Z OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series .
+        Model Name: 6860N-P48Z
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.12"
+    ::= { chassisOmniSwitch6860 12 }
+
+deviceOmniSwitchOS6860N-P48M OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series .
+        Model Name: 6860N-P48M
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.13"
+    ::= { chassisOmniSwitch6860 13 }
+
+deviceOmniSwitchOS6860N-P24Z OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series .
+        Model Name: 6860N-P24Z
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.14"
+    ::= { chassisOmniSwitch6860 14 }
+
+deviceOmniSwitchOS6860N-P24M OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series .
+        Model Name: 6860N-P24M
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.15"
+    ::= { chassisOmniSwitch6860 15 }
 
 fansOmniSwitch6860 OBJECT-IDENTITY
     STATUS current
@@ -1026,6 +1404,33 @@ powersOmniSwitch6860POE920-AC OBJECT-IDENTITY
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.3.4"
     ::= { powersOmniSwitch6860 4 }
 
+
+powersOmniSwitch6860NPOE2000-AC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860N Series 2000 AC power supply FR (evacuate).
+        Model Name: OS6860N_PS_2000W_AC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.3.5"
+    ::= { powersOmniSwitch6860 5 }
+
+powersOmniSwitch6860NPOE920-AC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860N Series 920 AC power supply FR (evacuate).
+        Model Name: OS6860N_PS_920W_AC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.3.6"
+    ::= { powersOmniSwitch6860 6 }
+
+powersOmniSwitch6860NPOE600-AC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860N Series 600 AC power supply FR (evacuate).
+        Model Name: OS6860N_PS_600W_AC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.3.7"
+    ::= { powersOmniSwitch6860 7 }
 
 modulesOmniSwitch6860 OBJECT-IDENTITY
     STATUS current
@@ -1211,6 +1616,48 @@ externBoardOmniSwitch6860CPU OBJECT-IDENTITY
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.5.1"
     ::= { externBoardOmniSwitch6860 1 }
 
+daughterBoardOmniSwitch6860 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for OmniSwitch 6860 Series daughter board."
+    ::= { familyOmniSwitch6860 6 }
+
+daughterBoardOmniSwitch6860N-XNI-U4 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860N Series daughter board XNI-U4.
+        Model Name: OS6860N-XNI-U4 
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.6.1"
+    ::= { daughterBoardOmniSwitch6860 1 }
+
+daughterBoardOmniSwitch6860N-QNI-U2 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860N Series daughter board QNI-U2.
+        Model Name: OS6860N-QNI-U2 
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.6.2"
+    ::= { daughterBoardOmniSwitch6860 2 }
+
+daughterBoardOmniSwitch6860N-CNI-U1 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860N Series daughter board CNI-U1.
+        Model Name: OS6860N-CNI-U1
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.6.3"
+    ::= { daughterBoardOmniSwitch6860 3 }
+
+daughterBoardOmniSwitch6860N-VNI-U4 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860N Series daughter board VNI-U4.
+        Model Name: OS6860N-VNI-U4
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.6.4"
+    ::= { daughterBoardOmniSwitch6860 4 }
+
 familyOmniSwitch9900 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -1223,14 +1670,23 @@ chassisOmniSwitch9900 OBJECT-IDENTITY
         "Branch For OmniSwitch 9900 Series Chassis."
     ::= { familyOmniSwitch9900 1 }
 
-deviceOmniSwitch9907 OBJECT-IDENTITY
+deviceOmniSwitch9900 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "OmniSwitch 9900 7-Slot Chassis.
-        Model Name: OS9907
+        Model Name: OS9900
         Assembly:
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.1.1"
     ::= { chassisOmniSwitch9900 1 }
+
+deviceOmniSwitch9912 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 12-Slot Chassis.
+        Model Name: OS9912
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.1.2"
+    ::= { chassisOmniSwitch9900 2 }
 
 fansOmniSwitch9900 OBJECT-IDENTITY
     STATUS current
@@ -1291,6 +1747,15 @@ cmmOmniSwitch9900 OBJECT-IDENTITY
         Assembly:
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.1.1"
     ::= { modulesOmniSwitch9900CM 1 }
+
+cmm2OmniSwitch9900 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Chassis Management Module 2.
+        Model Name: OS99-CMM2
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.1.2"
+    ::= { modulesOmniSwitch9900CM 2 }
 
 cmmOmniSwitch9900PROC OBJECT-IDENTITY
     STATUS current
@@ -1367,6 +1832,7 @@ gniOmniSwitch9900XT48 OBJECT-IDENTITY
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.2.2"
     ::= { niOmniSwitch9900XNI 2 }
 
+
 gniOmniSwitch9900XP48 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -1377,11 +1843,86 @@ gniOmniSwitch9900XP48 OBJECT-IDENTITY
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.2.3"
     ::= { niOmniSwitch9900XNI 3 }
 
-niOmniSwitch9900QNI OBJECT-IDENTITY
+gniOmniSwitch9900P48Z16 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
-        "OmniSwitch 9900 Series 40 GIG Ethernet Network Interface (QNI) Modules."
+        "OmniSwitch 9900 Series 48 port 1 2.5 10 GIG Multi Gig Twisted Pair Ethernet Network Interface (XNI)
+        with Power over Ethernet Module.
+        Model Name: OS99-XNI-P48Z16
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.2.4"
+    ::= { niOmniSwitch9900XNI 4 }
+
+gniOmniSwitch9900XU24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 24 port 10 GIG Ethernet Network Interface (XNI) Module.
+        Model Name: OS99-XNI-U24
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.2.5"
+    ::= { niOmniSwitch9900XNI 5 }
+
+gniOmniSwitch9900XT24 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 24 port 10 GIG Twisted Pair Ethernet Network Interface (XNI) Module.
+        Model Name: OS99-XNI-25
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.2.6"
+    ::= { niOmniSwitch9900XNI 6 }
+
+gniOmniSwitch9900XP24Z8 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 24 port 1 2.5 10 GIG Multi Gig Twisted Pair Ethernet Network Interface (XNI)
+        with Power over Ethernet Module.
+        Model Name: OS99-XNI-P24Z8
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.2.7"
+    ::= { niOmniSwitch9900XNI 7 }
+
+gniOmniSwitch9900UP24Q2 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 12 port 10 GIG, 2 port 40 GIG, and 12 port 1 2.5 10 GIG Multi Gig Twisted Pair Ethernet Network Interface (XNI)
+        with Power over Ethernet Module.
+        Model Name: OS99-XNI-UP24Q2
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.2.8"
+    ::= { niOmniSwitch9900XNI 8 }
+
+gniOmniSwitch9900U12Q OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 12 port 10 GIG and 1 port 40 GIG Ethernet Network Interface (XNI) Module.
+        Model Name: OS99-XNI-U12Q
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.2.9"
+    ::= { niOmniSwitch9900XNI 9 }
+
+niOmniSwitch9900CNI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 100 GIG Ethernet Network Interface (CNI) Modules."
     ::= { modulesOmniSwitch9900NI 3 }
+
+gniOmniSwitch9900CNIU8 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 8 port 100 GIG Twisted Pair Ethernet Network Interface (XNI) Module.
+        Model Name: OS99-CNI-U8
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.3.1"
+    ::= { niOmniSwitch9900CNI 1 }
+
+gniOmniSwitch9900CNIU20 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 20 port 100 GIG Twisted Pair Ethernet Network Interface (XNI) Module.
+        Model Name: OS99-CNI-U20
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.3.2"
+    ::= { niOmniSwitch9900CNI 2 }
 
 niOmniSwitch9900IC OBJECT-IDENTITY
     STATUS current
@@ -1578,6 +2119,102 @@ qgicOmniSwitch9900QC OBJECT-IDENTITY
         sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.3.4"
     ::= { icOmniSwitch9900FortyGIC 4 }
 
+qgicOmniSwitch9900Q4X10GC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 4x10G Direct Attached Copper Interface Cable.
+        Model Name: QSFP-4x10G-C
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.3.5"
+    ::= { icOmniSwitch9900FortyGIC 5 }
+
+qgicOmniSwitch9900Q4X10GSR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 4x10G SR Fiber Interface Cable.
+        Model Name: QSFP-4x10G-SR
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.3.6"
+    ::= { icOmniSwitch9900FortyGIC 6 }
+
+qgicOmniSwitch9900Q4X10GLR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 4x10G LR Fiber Interface Cable.
+        Model Name: QSFP-4x10G-LR
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.3.7"
+    ::= { icOmniSwitch9900FortyGIC 7 }
+
+qgicOmniSwitch9900QSRBD OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 40G SR-BD Fiber Interface Cable.
+        Model Name: QSFP-40G-SR-BD
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.3.8"
+    ::= { icOmniSwitch9900FortyGIC 8 }
+
+icOmniSwitch9900HundredGIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 100 GIG Interface Cards (IC)."
+    ::= { niOmniSwitch9900IC 4 }
+
+cgicOmniSwitch9900CSR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 100G SR4 Fiber Interface Cable.
+        Model Name: QSFP-100G-SR4
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.4.1"
+    ::= { icOmniSwitch9900HundredGIC 1 }
+
+cgicOmniSwitch9900CCLR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 100G CR4 Direct Attached Cable Interface Cable.
+        Model Name: QSFP-100G-CR4
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.4.2"
+    ::= { icOmniSwitch9900HundredGIC 2 }
+
+cgicOmniSwitch9900CLR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 100G LR4 Fiber Interface Cable.
+        Model Name: QSFP-100G-LR4
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.4.3"
+    ::= { icOmniSwitch9900HundredGIC 3 }
+
+cgicOmniSwitch9900CCWDM OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 100G CWDM4 Fiber Interface Cable.
+        Model Name: QSFP-100G-CWDM4
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.4.4"
+    ::= { icOmniSwitch9900HundredGIC 4 }
+
+cgicOmniSwitch9900CAOC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 100G AOC 20M Fiber Interface Cable.
+        Model Name: QSFP-100G-AOC
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.4.5"
+    ::= { icOmniSwitch9900HundredGIC 5 }
+
+cgicOmniSwitch9900C4X25GC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 4x25G Direct Attach Copper Interface Cable.
+        Model Name: QSFP-4x25G-DAC
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.4.6"
+    ::= { icOmniSwitch9900HundredGIC 6 }
+
 cfmOmniSwitch9900 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -1592,6 +2229,24 @@ cfmOmniSwitch9900CFM OBJECT-IDENTITY
         Assembly:
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.3.1"
     ::= { cfmOmniSwitch9900 1 }
+
+cfmOmniSwitch9900CFM2 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Chassis Management Module Fabric-2.
+        Model Name: OS9900-CFM2
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.3.2"
+    ::= { cfmOmniSwitch9900 2 }
+
+cfmOmniSwitch9900CFM12 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Chassis Management Module Fabric-12.
+        Model Name: OS9900-CFM12
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.3.3"
+    ::= { cfmOmniSwitch9900 3 }
 
 familyOmniSwitch6865 OBJECT-IDENTITY
     STATUS current
@@ -1634,5 +2289,782 @@ deviceOmniSwitch6865U28X OBJECT-IDENTITY
         Assembly:
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.13.1.3"
     ::= { chassisOmniSwitch6865 3 }
+
+familyOmniSwitch6560 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "Branch For OmniSwitch 6560 Series Product Family."   
+    ::= { alcatelIND1DevicesMIB 14 } 
+
+chassisOmniSwitch6560 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "Branch For OmniSwitch 6560 1-Slot Chassis.   
+         Model Name: OS6560   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1"   
+    ::= { familyOmniSwitch6560 1 } 
+
+deviceOmniSwitch6560P24Z8 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-P24Z8   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.1"   
+    ::= { chassisOmniSwitch6560 1 } 
+
+deviceOmniSwitch6560P24Z24 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-P24Z24   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.2"   
+    ::= { chassisOmniSwitch6560 2 }   
+    
+deviceOmniSwitch6560P48Z16 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-P48Z16   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.3"   
+    ::= { chassisOmniSwitch6560 3 } 
+
+deviceOmniSwitch656024Z8 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-24Z8   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.4"   
+    ::= { chassisOmniSwitch6560 4 } 
+
+deviceOmniSwitch656024Z24 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-24Z24   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.5"   
+    ::= { chassisOmniSwitch6560 5 }   
+    
+deviceOmniSwitch656048Z16 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-48Z16   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.6"   
+    ::= { chassisOmniSwitch6560 6 } 
+
+deviceOmniSwitch6560X10 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-X10   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.7"   
+    ::= { chassisOmniSwitch6560 7 } 
+
+deviceOmniSwitch6560P24 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-P24   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.8"   
+    ::= { chassisOmniSwitch6560 8 } 
+
+deviceOmniSwitch6560P24X OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-P24X   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.9"   
+    ::= { chassisOmniSwitch6560 9 } 
+
+deviceOmniSwitch6560P24X4 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-P24X4 
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.10"   
+    ::= { chassisOmniSwitch6560 10 } 
+
+deviceOmniSwitch656024 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-24   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.11"   
+    ::= { chassisOmniSwitch6560 11 } 
+
+deviceOmniSwitch656024X OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-24X   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.12"   
+    ::= { chassisOmniSwitch6560 12 } 
+
+deviceOmniSwitch656024X4 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-24X4 
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.13"   
+    ::= { chassisOmniSwitch6560 13 } 
+
+deviceOmniSwitch6560P48Z16E OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-P48Z16E
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.14"   
+    ::= { chassisOmniSwitch6560 14 } 
+
+deviceOmniSwitchOS656048Z16E OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6560 Series.   
+         Model Name: OS6560-48Z16E
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.15"   
+    ::= { chassisOmniSwitch6560 15 } 
+
+deviceOmniSwitchOS656048X4 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6560 Series.
+         Model Name: OS6560-48X4
+         Assembly:
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.16"
+    ::= { chassisOmniSwitch6560 16 }
+
+deviceOmniSwitchOS6560P48X4 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6560 Series.
+         Model Name: OS6560-P48X4
+         Assembly:
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.17"
+    ::= { chassisOmniSwitch6560 17 }
+
+deviceOmniSwitchOS6560EP48Z16 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6560 Series.
+         Model Name: OS6560E-P48Z16
+         Assembly:
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.18"
+    ::= { chassisOmniSwitch6560 18 }
+
+deviceOmniSwitchOS6560EP24Z8 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6560 Series.
+         Model Name: OS6560E-P24Z8
+         Assembly:
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.1.19"
+    ::= { chassisOmniSwitch6560 19 }
+	
+powersOmniSwitch6560 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6560 Series Power Supplies."
+    ::= { familyOmniSwitch6560 3 }
+	
+powersOmniSwitch656065INT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Nandi Series 65W Internal Power Supply.
+        Model Name: OS6560_PS_65W_INT
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.3.1"
+    ::= { powersOmniSwitch6560 1 }
+	
+powersOmniSwitch6560120INT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Nandi Series 120W Internal Power Supply.
+        Model Name: OS6560_PS_120W_INT
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.14.3.2"
+    ::= { powersOmniSwitch6560 2 }
+
+familyOmniSwitch6465 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "Branch For OmniSwitch 6465 Series Product Family."   
+    ::= { alcatelIND1DevicesMIB 15 } 
+
+chassisOmniSwitch6465 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "Branch For OmniSwitch 6465 1-Slot Chassis.   
+         Model Name: OS6465   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.15.1"   
+    ::= { familyOmniSwitch6465 1 } 
+
+deviceOmniSwitch6465P6 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6465 Series.   
+         Model Name: OS6465-P6   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.15.1.1"   
+    ::= { chassisOmniSwitch6465 1 } 
+
+deviceOmniSwitch6465P12 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6465 Series.   
+         Model Name: OS6465-P12   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.15.1.2"   
+    ::= { chassisOmniSwitch6465 2 }   
+    
+deviceOmniSwitch6465P28 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6465 Series.   
+         Model Name: OS6465-P28   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.15.1.3"   
+    ::= { chassisOmniSwitch6465 3 } 
+
+deviceOmniSwitchOS6465TP12 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6465 Series.   
+         Model Name: OS6465T-P12   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.15.1.4"   
+    ::= { chassisOmniSwitch6465 4 }    
+
+deviceOmniSwitchOS6465T12 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6465 Series.   
+         Model Name: OS6465T-12   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.15.1.5"   
+    ::= { chassisOmniSwitch6465 5 }   
+
+deviceOmniSwitchOS6465H-P12 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6465 Series.
+         Model Name: OS6465H-P12
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.15.1.6"
+    ::= { chassisOmniSwitch6465 6 }   
+	
+powersOmniSwitch6465 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6465 Series Power Supplies."
+    ::= { familyOmniSwitch6465 3 }
+	
+powersOmniSwitch646565INT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Vindhya Series 65W Internal Power Supply.
+        Model Name: OS6465T_PS_65W_INT
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.15.3.1"
+    ::= { powersOmniSwitch6465 1 }
+	
+powersOmniSwitch6465185INT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Vindhya Series 185W Internal Power Supply.
+        Model Name: OS6465T_PS_185W_INT
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.15.3.2"
+    ::= { powersOmniSwitch6465 2 }
+
+familyOmniSwitch6360 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "Branch For OmniSwitch 6360 Series Product Family."   
+    ::= { alcatelIND1DevicesMIB 16 } 
+
+chassisOmniSwitch6360 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "Branch For OmniSwitch 6360 1-Slot Chassis.   
+         Model Name: OS6360   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.1"   
+    ::= { familyOmniSwitch6360 1 } 
+
+deviceOmniSwitch636010 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6360 Series.   
+         Model Name: OS6360_10   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.1.1"   
+    ::= { chassisOmniSwitch6360 1 } 
+
+deviceOmniSwitch636024 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6360 Series.   
+         Model Name: OS6360_24   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.1.2"   
+    ::= { chassisOmniSwitch6360 2 } 
+
+deviceOmniSwitch636048 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6360 Series.   
+         Model Name: OS6360_48   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.1.3"   
+    ::= { chassisOmniSwitch6360 3 } 
+
+deviceOmniSwitch6360P10 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6360 Series.   
+         Model Name: OS6360_P10   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.1.4"   
+    ::= { chassisOmniSwitch6360 4 } 
+
+deviceOmniSwitch6360P24 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6360 Series.   
+         Model Name: OS6360_P24   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.1.5"   
+    ::= { chassisOmniSwitch6360 5 } 
+
+deviceOmniSwitch6360PH24 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6360 Series.   
+         Model Name: OS6360_PH24   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.1.6"   
+    ::= { chassisOmniSwitch6360 6 } 
+
+deviceOmniSwitch6360P24X OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6360 Series.   
+         Model Name: OS6360_P24X   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.1.7"   
+    ::= { chassisOmniSwitch6360 7 } 
+
+deviceOmniSwitch6360P48 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6360 Series.   
+         Model Name: OS6360_P48   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.1.8"   
+    ::= { chassisOmniSwitch6360 8 } 
+
+deviceOmniSwitch6360P48X OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "OmniSwitch 6360 Series.   
+         Model Name: OS6360_P48X   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.1.9"   
+    ::= { chassisOmniSwitch6360 9 } 
+
+deviceOmniSwitch6360PH48 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6360 Series.
+         Model Name: OS6360_PH48
+         Assembly:
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.1.10"
+    ::= { chassisOmniSwitch6360 10 }
+
+deviceOmniSwitch6360P10A OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6360 Series.
+         Model Name: OS6360_P10A
+         Assembly:
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.1.11"
+    ::= { chassisOmniSwitch6360 11 }
+
+deviceOmniSwitch6360P24A OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6360 Series.
+         Model Name: OS6360_P24A
+         Assembly:
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.1.12"
+    ::= { chassisOmniSwitch6360 12 }
+
+deviceOmniSwitch6360P48A OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6360 Series.
+         Model Name: OS6360_P48A
+         Assembly:
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.1.13"
+    ::= { chassisOmniSwitch6360 13 }
+
+fansOmniSwitch6360 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6360 Series Fan Trays."
+    ::= { familyOmniSwitch6360 2 }
+
+powersOmniSwitch6360 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6360 Series Power Supplies."
+    ::= { familyOmniSwitch6360 3 }
+
+powersOmniSwitchAravalli30INT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Aravalli Series 30W Internal Power Supply.
+        Model Name: OS6360_PS_30W_INT
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.3.1"
+    ::= { powersOmniSwitch6360 1 }
+
+powersOmniSwitchAravalli65INT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Aravalli Series 65W Internal Power Supply.
+        Model Name: OS6360_PS_65W_INT
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.3.2"
+    ::= { powersOmniSwitch6360 2 }
+
+powersOmniSwitchAravalli120INT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Aravalli Series 30W Internal Power Supply.
+        Model Name: OS6360_PS_120W_INT
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.3.3"
+    ::= { powersOmniSwitch6360 3 }
+
+powersOmniSwitchAravalli165INT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Aravalli Series 165W Internal Power Supply.
+        Model Name: OS6360_PS_165W_INT
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.3.4"
+    ::= { powersOmniSwitch6360 4 }
+
+powersOmniSwitchAravalli260INT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Aravalli Series 260W Internal Power Supply.
+        Model Name: OS6360_PS_260W_INT
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.3.5"
+    ::= { powersOmniSwitch6360 5 }
+
+powersOmniSwitchAravalli550INT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Aravalli Series 550W Internal Power Supply.
+        Model Name: OS6360_PS_550W_INT
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.3.6"
+    ::= { powersOmniSwitch6360 6 }
+
+powersOmniSwitchAravalli950INT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Aravalli Series 950W Internal Power Supply.
+        Model Name: OS6360_PS_950W_INT
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.16.3.7"
+    ::= { powersOmniSwitch6360 7 }
+
+
+-- 8.9.R01 new Chassis supported ... 
+
+familyOmniSwitch6570 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "Branch For OmniSwitch 6570 Series Product Family."   
+    ::= { alcatelIND1DevicesMIB 17 } 
+
+
+chassisOmniSwitch6570 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6570M Series Chassis."
+    ::= { familyOmniSwitch6570 1 }
+
+
+chassisOmniSwitch6570M12 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "Branch For OmniSwitch OS6570M-12 1-Slot Chassis.   
+         Model Name: OS6570M-12   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.17.1.1"   
+    ::= { chassisOmniSwitch6570 1 } 
+
+chassisOmniSwitch6570M12D OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "Branch For OmniSwitch OS6570M-12D 1-Slot Chassis.   
+         Model Name: OS6570M-12D   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.17.1.2"   
+    ::= { chassisOmniSwitch6570 2 }
+
+chassisOmniSwitch6570MU28 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "Branch For OmniSwitch OS6570M-U28 1-Slot Chassis.   
+         Model Name: OS6570M-U28   
+         Assembly:   
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.17.1.3"   
+    ::= { chassisOmniSwitch6570 3 }	
+	
+fansOmniSwitch6570 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6570M Series Fan Trays."
+    ::= { familyOmniSwitch6570 2 }
+
+powersOmniSwitch6570 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6570M Series Power Supplies."
+    ::= { familyOmniSwitch6570 3 }
+
+powersOmniSwitchWhitney30INT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Whitney Series 30W Internal Power Supply.
+        Model Name: OS6570_PS_30W_INT
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.17.3.1"
+    ::= { powersOmniSwitch6570 1 }
+
+powersOmniSwitchWhitney65INT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Whitney Series 65W Internal Power Supply.
+        Model Name: OS6570_PS_65W_INT
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.17.3.2"
+    ::= { powersOmniSwitch6570 2 }
+
+powersOmniSwitchWhitney150AC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Whitney Series AC power supply 150W.
+        Model Name: OS6570_PS_150W_AC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.17.3.3"
+    ::= { powersOmniSwitch6570 3 }
+	
+-- 8.9.R01 new Chassis supported ... End
+
+-- 8.10.R02 new Chassis supported ... 
+
+familyOmniSwitch6870 OBJECT-IDENTITY   
+    STATUS current   
+    DESCRIPTION   
+        "Branch For OmniSwitch 6870 Series Product Family."   
+    ::= { alcatelIND1DevicesMIB 18 } 
+
+chassisOmniSwitch6870 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6870 1-Slot Chassis.
+        Model Name: OS6870
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.1"
+    ::= { familyOmniSwitch6870 1 }
+
+fansOmniSwitch6870 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6870 Series Fan Trays."
+    ::= { familyOmniSwitch6870 2 }
+
+powersOmniSwitch6870 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6870 Series Power Supplies."
+    ::= { familyOmniSwitch6870 3 }
+
+modulesOmniSwitch6870 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6870 Series Modules."
+    ::= { familyOmniSwitch6870 4 }
+
+externBoardOmniSwitch6870 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6870 Series external board."
+    ::= { familyOmniSwitch6870 5 }
+
+daughterBoardOmniSwitch6870 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for OmniSwitch 6870 Series daughter board."
+    ::= { familyOmniSwitch6870 6 }
+
+deviceOmniSwitchOS687024 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6870 Series .
+        Model Name: OS6870_24
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.1.1"
+    ::= { chassisOmniSwitch6870 1 }
+
+deviceOmniSwitchOS687048 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6870 Series .
+        Model Name: OS6870_48
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.1.2"
+    ::= { chassisOmniSwitch6870 2 }
+
+deviceOmniSwitchOS6870V12 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6870 Series .
+        Model Name: OS6870_V12
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.1.3"
+    ::= { chassisOmniSwitch6870 3 }
+
+deviceOmniSwitchOS6870P24Z OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6870 Series .
+        Model Name: OS6870_P24Z
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.1.4"
+    ::= { chassisOmniSwitch6870 4 }
+
+deviceOmniSwitchOS6870P48Z OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6870 Series .
+        Model Name: OS6870_P48Z
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.1.5"
+    ::= { chassisOmniSwitch6870 5 }
+
+deviceOmniSwitchOS6870P24M OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6870 Series .
+        Model Name: OS6870_P24M
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.1.6"
+    ::= { chassisOmniSwitch6870 6 }
+
+deviceOmniSwitchOS6870P48M OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6870 Series .
+        Model Name: OS6870_P48M
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.1.7"
+    ::= { chassisOmniSwitch6870 7 }
+
+daughterBoardOmniSwitch6870LNIU6  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6870 Series daughter board LNI-U6.
+        Model Name: OS6870_LNI_U6 
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.6.1"
+    ::= { daughterBoardOmniSwitch6870 1 }
+
+daughterBoardOmniSwitchOS6870CNIU2  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6870 Series daughter board CNI-U2.
+        Model Name: OS6870_CNI_U2 
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.6.2"
+    ::= { daughterBoardOmniSwitch6870 2 }
+	
+powersOmniSwitch6870250AC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Kailash Series 250W AC Power Supply.
+        Model Name: OS6870_PS_250W_AC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.3.1"
+    ::= { powersOmniSwitch6870 1 }
+	
+powersOmniSwitch6870250DC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Kailash Series 250W DC Power Supply.
+        Model Name: OS6870_PS_250W_DC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.3.2"
+    ::= { powersOmniSwitch6870 2 }
+	
+powersOmniSwitch6870POE600AC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Kailash Series 600W POE AC Power Supply.
+        Model Name: OS6870_PS_600W_POE_AC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.3.3"
+    ::= { powersOmniSwitch6870 3 }
+	
+powersOmniSwitch6870POE1200AC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Kailash Series 1200W POE AC Power Supply.
+        Model Name: OS6870_PS_1200W_POE_AC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.3.4"
+    ::= { powersOmniSwitch6870 4 }
+	
+powersOmniSwitch6870POE2000AC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Whitney Kailash Series 2000W POE AC Power Supply.
+        Model Name: OS6870_PS_2000W_POE_AC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.3.5"
+    ::= { powersOmniSwitch6870 5 }
+	
+powersOmniSwitch6870550AC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch Kailash Series 550W AC Power Supply.
+        Model Name: OS6870_PS_550W_AC
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.18.3.6"
+    ::= { powersOmniSwitch6870 6 }
 
 END

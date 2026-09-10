@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CppmServiceRestartTrapTest.php
  *
@@ -27,7 +28,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class CppmServiceRestartTrapTest extends SnmpTrapTestCase
+final class CppmServiceRestartTrapTest extends SnmpTrapTestCase
 {
     public function testServiceRestart(): void
     {

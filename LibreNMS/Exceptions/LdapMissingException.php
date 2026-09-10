@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LdapMissingException.php
  *
@@ -25,6 +26,8 @@
 
 namespace LibreNMS\Exceptions;
 
+use Exception;
+
 class LdapMissingException extends AuthenticationException
 {
     private const DEFAULT_MESSAGE = 'PHP does not support LDAP, please install or enable the PHP LDAP extension';
@@ -32,7 +35,7 @@ class LdapMissingException extends AuthenticationException
     public function __construct(
         string $message = self::DEFAULT_MESSAGE,
         int $code = 0,
-        \Exception $previous = null
+        ?Exception $previous = null
     ) {
         parent::__construct($message, false, $code, $previous);
     }

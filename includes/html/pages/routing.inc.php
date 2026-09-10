@@ -2,7 +2,16 @@
 
 $pagetitle[] = 'Routing';
 
-if ($_GET['optb'] == 'graphs' || $_GET['optc'] == 'graphs') {
+$optb = $_GET['optb'] ?? '';
+$optc = $_GET['optc'] ?? '';
+$vars['view'] ??= 'basic';
+$vars['graph'] ??= '';
+$vars['type'] ??= 'all';
+$vars['adminstatus'] ??= '';
+$vars['state'] ??= '';
+$width = $vars['width'] ?? '218';
+
+if ($optb == 'graphs' || $optc == 'graphs') {
     $graphs = 'graphs';
 } else {
     $graphs = 'nographs';
@@ -17,6 +26,7 @@ $type_text['bgp'] = 'BGP';
 $type_text['cef'] = 'CEF';
 $type_text['mpls'] = 'MPLS';
 $type_text['ospf'] = 'OSPF';
+$type_text['ospfv3'] = 'OSPFv3';
 $type_text['isis'] = 'ISIS';
 $type_text['vrf'] = 'VRFs';
 $type_text['cisco-otv'] = 'OTV';
@@ -26,7 +36,7 @@ print_optionbar_start();
 // if (!$vars['protocol']) { $vars['protocol'] = "overview"; }
 echo "<span style='font-weight: bold;'>Routing</span> &#187; ";
 
-$vars['protocol'] = basename($vars['protocol']);
+$vars['protocol'] = basename((string) $vars['protocol']);
 $sep = '';
 foreach ($routing_count as $type => $value) {
     if (! $vars['protocol']) {
@@ -59,12 +69,13 @@ switch ($vars['protocol']) {
     case 'cef':
     case 'mpls':
     case 'ospf':
+    case 'ospfv3':
     case 'isis':
     case 'cisco-otv':
         include 'includes/html/pages/routing/' . $vars['protocol'] . '.inc.php';
         break;
 
     default:
-        echo report_this('Unknown protocol ' . $vars['protocol']);
+        echo 'Unknown protocol';
         break;
 }

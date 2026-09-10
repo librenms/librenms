@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AdvaObjectDeletionTest.php
  *
@@ -25,7 +26,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class AdvaObjectDeletionTest extends SnmpTrapTestCase
+final class AdvaObjectDeletionTest extends SnmpTrapTestCase
 {
     public function testUserDeletion(): void
     {
@@ -44,7 +45,7 @@ TRAP,
         );
     }
 
-    public function testFLowDeletion(): void
+    public function testFlowDeletion(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

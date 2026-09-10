@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Rrd.php
  *
@@ -31,6 +32,6 @@ class Rrd extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return 'LibreNMS\Data\Store\Rrd';
+        return \LibreNMS\Data\Store\Rrd::class;
     }
 }

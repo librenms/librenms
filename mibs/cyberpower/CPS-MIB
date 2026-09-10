@@ -1,14 +1,14 @@
---/********************* (c) 2010-2019 CyberPower System ***************************/
+--/********************* (c) 2010-2025 CyberPower System ***************************/
 --
 -- PROJECT: SNMP MIB FILE CONSTRUCTED
 --
--- Version : 2.9
+-- Version : 2.13
 --
--- File Name: CPSMIB2019.mib
+-- File Name: CPSMIB2025.mib
 --
--- CREATION DATE :  10/23/2019
+-- CREATION DATE : 12/03/2025
 --
--- AUTHOR : Kevin
+-- AUTHOR : John
 --
 --//////////////////////////////////////////////////////////////////////////////
 --
@@ -49,6 +49,8 @@ environmentSensor              OBJECT IDENTIFIER ::=  { hardware 4 }
 ats                            OBJECT IDENTIFIER ::=  { hardware 5 }
 ePDU2                          OBJECT IDENTIFIER ::=  { hardware 6 }
 battmgr                        OBJECT IDENTIFIER ::=  { hardware 7 }
+environmentSensor2             OBJECT IDENTIFIER ::=  { hardware 8 }
+currentProbe                   OBJECT IDENTIFIER ::=  { hardware 50 }
 
 mconfigClock                   OBJECT IDENTIFIER ::=  { mconfig 5 }
 
@@ -86,6 +88,7 @@ upsBaseTest                    OBJECT IDENTIFIER ::=  { upsTest 1 }
 upsAdvanceTest                 OBJECT IDENTIFIER ::=  { upsTest 2 }
 
 upsBankOutletControl           OBJECT IDENTIFIER ::=  { upsOutlet 1 }
+upsIndividualOutlet            OBJECT IDENTIFIER ::=  { upsOutlet 2 }
 
 upsPhaseInput                  OBJECT IDENTIFIER ::=  { upsPhase 1 }
 upsPhaseOutput                 OBJECT IDENTIFIER ::=  { upsPhase 2 }
@@ -145,9 +148,11 @@ ePDU2Outlet                    OBJECT IDENTIFIER ::= { ePDU2 6 }
 
 ePDU2OutletSwitched						 OBJECT IDENTIFIER ::= { ePDU2Outlet 1 }
 ePDU2OutletMetered						 OBJECT IDENTIFIER ::= { ePDU2Outlet 2 }
+ePDU2OutletMonitored						 OBJECT IDENTIFIER ::= { ePDU2Outlet 3 }
 
-ePDU2Sensor                    OBJECT IDENTIFIER ::= { ePDU2 7 }
+
 ePDU2Group                     OBJECT IDENTIFIER ::= { ePDU2 8 }
+ePDU2Source                    OBJECT IDENTIFIER ::= { ePDU2 9 }
 
 bmIdent			  OBJECT IDENTIFIER ::=  { battmgr 1 }
 bmProperty		OBJECT IDENTIFIER ::=  { battmgr 2 }
@@ -156,8 +161,25 @@ bmControl			OBJECT IDENTIFIER ::=  { battmgr 4 }
 bmProbes			OBJECT IDENTIFIER ::=  { battmgr 5 }
 bmFuncRes		  OBJECT IDENTIFIER ::=  { battmgr 6 }
 bmFuncEqual	  OBJECT IDENTIFIER ::=  { battmgr 7 }
+bmStrings			OBJECT IDENTIFIER ::=  { battmgr 10 }
+bmFuncShutdown	OBJECT IDENTIFIER ::=  { battmgr 20 }
+bmWireless		OBJECT IDENTIFIER ::=  { battmgr 50 }
 
 bmFuncResMeasure		  			  OBJECT IDENTIFIER ::=  { bmFuncRes 1 }
+
+bmWirelessProperty		OBJECT IDENTIFIER ::=  { bmWireless 1 }
+bmWirelessStatus			OBJECT IDENTIFIER ::=  { bmWireless 2 }
+bmWirelessConfig			OBJECT IDENTIFIER ::=  { bmWireless 3 }
+bmWirelessControl			OBJECT IDENTIFIER ::=  { bmWireless 4 }
+
+envir2Ident                     OBJECT IDENTIFIER ::=  { environmentSensor2 1 }
+envir2Temp                      OBJECT IDENTIFIER ::=  { environmentSensor2 2 }
+envir2Humid                     OBJECT IDENTIFIER ::=  { environmentSensor2 3 }
+envir2Contact                   OBJECT IDENTIFIER ::=  { environmentSensor2 4 }
+
+currIdent                     OBJECT IDENTIFIER ::=  { currentProbe 1 }
+currConfig                    OBJECT IDENTIFIER ::=  { currentProbe 2 }
+currMeasure                   OBJECT IDENTIFIER ::=  { currentProbe 3 }
 
 -- object types
 -- the cpsmgmt group
@@ -360,7 +382,14 @@ mtrapinfoBmEventId OBJECT-TYPE
          9 - Warning: Enter battery equalization active mode.
          10- Warning: Leave battery equalization active mode.
          11- Alarm: Battery equalizing has failed. 
-         12- Info: Battery equalizing succeed. 
+         12- Info: Battery equalizing succeeds. 
+         13- Warning: Enter BMS software operation mode. 
+         14- Warning: Leave BMS software operatioin mode. 
+         15- Warning: Authentication to the BMS software has been failed. 
+         16- Alarm: Communication to the BMS software has been lost. 
+         17- Info: Communication to the BMS software has restored. 
+         18- Alarm: Communication with Wireless module has been lost. 
+         19- Info: Communication with Wireless module has been restored. 
          
        Known Specific Event ID: Battery Probes
          101 - Alarm: Low battery voltage. 
@@ -376,9 +405,71 @@ mtrapinfoBmEventId OBJECT-TYPE
          111 - Info: Battery resistance event has cleared. 
          112 - Alarm: Battery resistance health has crossed alarm threshold. 
          113 - Warning: Battery resistance health has crossed warning threshold. 
-         114 - Info: Battery resistance health has returned to Normal. "
+         114 - Info: Battery resistance health has returned to Normal.
+         115 - Alarm: Battery voltage has under the shutdown threshold for a time. 
+         116 - Info: Battery voltage has restored from the shutdown threshold. 
+         117 - Alarm: Battery probes has been shut down. 
+         118 - Alarm: Low battery soc. 
+         119 - Warning: Low battery soc. 
+         120 - Info: Battery soc event has cleared. 
+		 
+      Known Specific Event ID: BM String Voltage 
+         201 - Alarm: Low string voltage. 
+         202 - Alarm: High string voltage.
+         203 - Warning: Low string voltage. 
+         204 - Warning: High string voltage.  
+         205 - Info: String voltage event has cleared.
+         226 - Alarm: Low string soc. 
+         207 - Warning: Low string soc. 
+         208 - Info: String soc event has cleared. 
+         
+      Known Specific Event ID: BM Wireless
+         301 - Warning: Wireless sensors may incomplete, searching wireless sensors. 
+         302 - Info: Wireless sensor has left the network. 
+         303 - Info: Wireless sensor has joined the network. 
+         304 - Info: Wireless sensors complete and communication normally. 
+         305 - Warning: Communication with the wireless sensor has been losted. 
+         306 - Info: Communication with the wireless sensor has been restored. 
+         307 - Warning: Restart/Reset wireless neetwork. 
+         308 - Info: Wireless network configuration changed. "
    ::= { mtrapinfo 6 }
+   
+mtrapinfoCpEventId OBJECT-TYPE
+	SYNTAX INTEGER
+   	ACCESS read-only
+   	STATUS mandatory
+   	DESCRIPTION
+      "Allow CPS traps with an integer argument for providing detail
+       information about Current Probe specific event identifier. 
+       Not being defined in the MIB, only reply 0. 
+		Known Specific Event ID: Current Probes
+			301 - Warning: Low charge current. 
+			302 - Warning: High charge current. 
+			303 - Alarm: Low charge current. 
+			304 - Alarm: High charge current. 
+			305 - Info: Charge current event has cleared. 
 
+			306 - Warning: Low discharge current. 
+			307 - Warning: High discharge current. 
+			308 - Alarm: Low discharge current. 
+			309 - Alarm: High discharge current. 
+			310 - Info: Discharge current event has cleared. 
+
+			311 - Warning: Low RMS current. 
+			312 - Warning: High RMS current. 
+			313 - Alarm: Low RMS current. 
+			314 - Alarm: High RMS current. 
+			315 - Info: RMS current event has cleared. 
+
+			350 - Warning: Discharge. 
+			351 - Alarm: Discharge. 
+			352 - Info: Discharge event has cleared. 
+			
+			380 - Alarm: Number of current probe has decreased. 
+			381 - Info: Number of current probe has increased. 
+			382 - Info: Current probe configuration has been changed. "
+   ::= { mtrapinfo 7 }
+   
 -- The mcontrol group
 mcontrolRestart OBJECT-TYPE
    SYNTAX INTEGER   {
@@ -392,8 +483,7 @@ mcontrolRestart OBJECT-TYPE
    DESCRIPTION
       "Setting this OID to restartCurrentSystem (2) will restart the current system.
       Setting this OID to restartCurrentAgent (3) will restart the current agent. 
-      Setting this OID to restartCurrentSystemAnd Agent (4) will restart the current 
-      the current system and agent."
+      Setting this OID to restartCurrentSystemAnd Agent (4) will restart the current system and agent."
 
    ::= { mcontrol 1 }
 
@@ -700,7 +790,8 @@ upsAdvanceInputStatus OBJECT-TYPE
       overVoltage(2),
       underVoltage(3),
       frequencyFailure(4),
-      blackout(5)
+      blackout(5),
+      powerFailure(6)
    }
    ACCESS read-only
    STATUS mandatory
@@ -708,6 +799,13 @@ upsAdvanceInputStatus OBJECT-TYPE
       "Display the present status of the utility power supplied to the UPS."
    ::= { upsAdvanceInput 6 }
 
+upsAdvanceInputWatt OBJECT-TYPE
+    SYNTAX Gauge
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Getting this OID will return the input power that each phase of the UPS can provide. It is represented in Watt."
+   ::= { upsAdvanceInput 7 }
 
 -- the upsBaseOutput group
 upsBaseOutputStatus OBJECT-TYPE
@@ -787,6 +885,30 @@ upsAdvanceOutputPower OBJECT-TYPE
    DESCRIPTION
      "The total output active power of the UPS system in W."
    ::= { upsAdvanceOutput 5 }
+
+upsAdvanceOutputEnergy OBJECT-TYPE
+   SYNTAX Gauge
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "The total output energy of the UPS system in 1/10 kWh."
+   ::= { upsAdvanceOutput 6 }
+
+upsAdvanceOutputEnergyStartTime OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "Indicates the date and time of the last device energy	meter reset."
+   ::= { upsAdvanceOutput 7 }
+
+upsAdvanceApparentOutputPower OBJECT-TYPE
+   SYNTAX Gauge
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+     "The total output apparent power of the UPS system in VA."
+   ::= { upsAdvanceOutput 8 }
 
 -- the upsBaseConfig group
 upsBaseConfigNumDevices OBJECT-TYPE
@@ -1093,6 +1215,27 @@ upsAdvanceConfigLowBatteryThreshold OBJECT-TYPE
        The value expressed in percentage."
    ::= { upsAdvanceConfig 18 }
 
+upsAdvanceConfigEnergyReset OBJECT-TYPE
+   SYNTAX INTEGER {
+      noOperation (1),
+      reset (2)
+   }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Setting this OID to reset (2) will cause the output energy meter value to be reset to zero. 
+       Getting this OID will do nothing and return the noOperation(1) value."
+   ::= { upsAdvanceConfig 19 }
+
+upsAdvanceConfigBatteryRuntimeThreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "When the UPS supplies battery power and the remaining runtime is lower than this threshold, 
+       the UPS will sound an alarm. 
+       The value expressed in minutes."
+   ::= { upsAdvanceConfig 20 }
 
 -- the upsBaseControl group
 upsBaseControlConserveBattery OBJECT-TYPE
@@ -1374,6 +1517,289 @@ upsBankControlOutletCommand OBJECT-TYPE
        the outlet off."
    ::= { upsBankOutletControlEntry 2 }
 
+-- the upsIndividualOutlet grop
+upsIndividualOutletTableSize OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The number of switched outlets"
+		::= {upsIndividualOutlet 1}
+
+upsIndividualOutletConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UPSIndividualOutletConfigEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table of switched outlet configuration data."
+		::= {upsIndividualOutlet 2}
+
+upsIndividualOutletConfigEntry OBJECT-TYPE
+		SYNTAX UPSIndividualOutletConfigEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"Configuration data from currently queried switched outlet."
+		INDEX {upsIndividualOutletConfigIndex}
+		::= {upsIndividualOutletConfigTable 1}
+
+UPSIndividualOutletConfigEntryStruct ::= 
+	SEQUENCE {
+		upsIndividualOutletConfigIndex					INTEGER, 
+		upsIndividualOutletConfigName						DisplayString, 
+		upsIndividualOutletConfigPowerOnTime		INTEGER, 
+		upsIndividualOutletConfigPowerOffTime		INTEGER, 
+		upsIndividualOutletConfigRebootDuration	INTEGER
+	}
+
+upsIndividualOutletConfigIndex OBJECT-TYPE
+		SYNTAX INTEGER(1..96)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The index to the switched outlet configuration table entry."
+		::= {upsIndividualOutletConfigEntry 1}
+
+upsIndividualOutletConfigName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"The user-defined switched outlet name string."
+		::= {upsIndividualOutletConfigEntry 2}
+
+upsIndividualOutletConfigPowerOnTime OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"The amount of time (in seconds) the outlet will delay 
+			powering on at coldstart or when a command that requires 
+			a turn-on delay is issued.
+			Allowed values are:
+				-1 - never power on.
+				 0 - power on immediately.
+				 1 to 7200 - power on up to 7200 seconds after being commanded."
+		::= {upsIndividualOutletConfigEntry 3}
+
+upsIndividualOutletConfigPowerOffTime OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"The amount of time (in seconds) the outlet will delay 
+			powering off when a command that requires a 
+			turn-off delay is issued.
+			Allowed values are:
+			 -1 - never power off.
+			  0 - power off immediately.
+			  1 to 7200 - power off up to 7200 seconds after being commanded."
+		::= {upsIndividualOutletConfigEntry 4}
+
+upsIndividualOutletConfigRebootDuration OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"During a reboot sequence, power is turned off and then 
+			back on. This OID defines the amount of time to wait, 
+			in seconds, after turning the power off, at the start 
+			of the sequence, before turning power back on, at the 
+			end of the reboot sequence. 
+			Allowed range is any value between 5 and 60 seconds (1 minute)."
+		::= {upsIndividualOutletConfigEntry 5}
+
+upsIndividualOutletInfoTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UPSIndividualOutletInfoEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table of switched outlet information."
+		::= {upsIndividualOutlet 3}
+
+upsIndividualOutletInfoEntry OBJECT-TYPE
+		SYNTAX UPSIndividualOutletInfoEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"Information of the currently queried switched outlet."
+		INDEX {upsIndividualOutletInfoIndex}
+		::= {upsIndividualOutletInfoTable 1}
+
+UPSIndividualOutletInfoEntryStruct ::= 
+	SEQUENCE {
+		upsIndividualOutletInfoIndex				INTEGER, 
+		upsIndividualOutletInfoName					DisplayString, 
+		upsIndividualOutletInfoBank					INTEGER
+	}
+
+upsIndividualOutletInfoIndex OBJECT-TYPE
+		SYNTAX INTEGER(1..96)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The index to the switched outlet information table entry."
+		::= {upsIndividualOutletInfoEntry 1}
+
+upsIndividualOutletInfoName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The numeric switched outlet name."
+		::= {upsIndividualOutletInfoEntry 2}
+
+upsIndividualOutletInfoBank OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The numeric bank ID."
+		::= {upsIndividualOutletInfoEntry 3}
+
+upsIndividualOutletStatusTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UPSIndividualOutletStatusEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table of switched outlet status information."
+		::= {upsIndividualOutlet 4}
+
+upsIndividualOutletStatusEntry OBJECT-TYPE
+		SYNTAX UPSIndividualOutletStatusEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"Status information for currently queried switched outlet."
+		INDEX {upsIndividualOutletStatusIndex}
+		::= {upsIndividualOutletStatusTable 1}
+
+UPSIndividualOutletStatusEntryStruct ::= 
+	SEQUENCE {
+		upsIndividualOutletStatusIndex					INTEGER, 
+		upsIndividualOutletStatusName						DisplayString, 
+		upsIndividualOutletStatusState					INTEGER, 
+		upsIndividualOutletStatusCommandPending	INTEGER
+	}
+
+upsIndividualOutletStatusIndex OBJECT-TYPE
+		SYNTAX INTEGER(1..96)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION 
+			"The index to the switched outlet status information table entry."
+		::= {upsIndividualOutletStatusEntry 1}
+
+upsIndividualOutletStatusName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The user-defined switched outlet name string."
+		::= {upsIndividualOutletStatusEntry 2}
+
+upsIndividualOutletStatusState OBJECT-TYPE
+		SYNTAX INTEGER {
+			outletStatusOn (1), 
+			outletStatusOff (2)
+		}
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Indicates the present switch state of the switched outlet being queried."
+		::= {upsIndividualOutletStatusEntry 3}
+
+upsIndividualOutletStatusCommandPending OBJECT-TYPE
+		SYNTAX INTEGER { 
+			outletStatusCommandPending (1), 
+			outletStatusNoCommandPending (2)
+		}
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Getting this variable will return the command pending state of the outlet. 
+			If a command is pending on the outlet, the outletStatusCommandPending (1) 
+			value will be returned. If there is not a command pending on the outlet, 
+			the outletStatusNoCommandPending (2) will be returned."
+		::= {upsIndividualOutletStatusEntry 4}
+
+upsIndividualOutletControlTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UPSIndividualOutletControlEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table of switched outlet control data."
+		::= {upsIndividualOutlet 5}
+
+upsIndividualOutletControlEntry OBJECT-TYPE
+		SYNTAX UPSIndividualOutletControlEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"Control data for currently queried switched outlet."
+		INDEX {upsIndividualOutletControlIndex}
+		::= {upsIndividualOutletControlTable 1}
+
+UPSIndividualOutletControlEntryStruct ::= 
+	SEQUENCE {
+		upsIndividualOutletControlIndex				INTEGER, 
+		upsIndividualOutletControlName				DisplayString, 
+		upsIndividualOutletControlCommand			INTEGER
+	}
+
+upsIndividualOutletControlIndex OBJECT-TYPE
+		SYNTAX INTEGER(1..96)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The index to the switched outlet control data table entry."
+		::= {upsIndividualOutletControlEntry 1}
+
+upsIndividualOutletControlName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The user-defined switched outlet name string."
+		::= {upsIndividualOutletControlEntry 2}
+
+upsIndividualOutletControlCommand OBJECT-TYPE
+		SYNTAX INTEGER {
+			immediateOn (1), 
+			immediateOff (2), 
+			immediateReboot (3), 
+			delayedOn (4), 
+			delayedOff (5), 
+			delayedReboot (6), 
+			cancelPendingCommand (7)
+		}
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"Getting this variable will return the outlet state. 
+			If the outlet is on, the immediateOn (1) value will be returned. 
+			If the outlet is off, the immediateOff (2) value will be returned. 
+			
+			Setting this variable to immediateOn (1) will immediately turn the outlet on.
+			
+			Setting this variable to immediateOff (2) will immediately turn the outlet off. 
+			
+			Setting this variable to immediateReboot (3) will immediately reboot the outlet.
+			
+			Setting this variable to delayedOn (4) will turn the outlet on 
+			after the upsIndividualOutletConfigPowerOnTime OID time has elapsed. 
+			
+			Setting this variable to delayedOff (5) will turn the outlet off 
+			after the upsIndividualOutletConfigPowerOffTime OID time has elapsed.
+			
+			Setting this variable to delayedReboot (6) will cause the 
+			switched outlet to perform a delayedOff command, wait the 
+			upsIndividualOutletConfigRebootDuration OID time, and then perform a 
+			delayedOn command. 
+			
+			Setting this variable to cancelPendingCommand (7) will cause any 
+			pending command to this outlet to be canceled."
+		::= {upsIndividualOutletControlEntry 3}
 
 --  the upsPhase group   
 --  the upsPhaseInput group in the upsPhase group
@@ -1619,6 +2045,22 @@ upsStatus OBJECT-TYPE
 		DESCRIPTION
 			"The UPS system status."
 		::= { upsSystem 1 }
+		
+upsTemperature OBJECT-TYPE
+   SYNTAX Gauge
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The UPS NTC temperature expressed in Celsius."
+   ::= { upsSystem 2 }
+   
+upsFaultCode OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The UPS Hardware Fault code."
+   ::= { upsSystem 3 }   
 		
 -- the eswitch group
 -- the eSwitchIdent group
@@ -3862,9 +4304,9 @@ envirContactEntry  OBJECT-TYPE
    ACCESS not-accessible
    STATUS mandatory
    DESCRIPTION
-      "This gives access to contact entries"
+      "This gives access to contact entries."
    INDEX  { envirContactIndex }
-   ::= { envirContactTable 1 }  
+   ::= { envirContactTable 1 }
 
 ContactEntry ::=
    SEQUENCE {
@@ -5034,8 +5476,9 @@ atsLoadCfgBankEntry OBJECT-TYPE
 			atsLoadCfgBankLowLoad							INTEGER,
 			atsLoadCfgBankNearOverLoad				INTEGER,
 			atsLoadCfgBankOverLoad						INTEGER,
-			atsLoadCfgBankOutletRestriction		INTEGER
-		}      
+			atsLoadCfgBankOutletRestriction		INTEGER,
+			atsLoadCfgBankEnergyReset					INTEGER
+		}
 
 atsLoadCfgBankTableIndex OBJECT-TYPE
 		SYNTAX INTEGER {
@@ -5110,6 +5553,18 @@ atsLoadCfgBankOutletRestriction OBJECT-TYPE
 			outlets on the corresponding phase to turn on if the 
 			ePDULoadConfigOverloadThreshold OID is exceeded."
 		::= { atsLoadCfgBankEntry 5 }
+
+atsLoadCfgBankEnergyReset OBJECT-TYPE
+		SYNTAX INTEGER {
+			noOperation (1),
+			reset (2)
+		}
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"Setting this OID to reset (2) will cause the bank energy meter value to be reset to zero. 
+			Getting this OID will do nothing and return the noOperation(1) value."
+		::= { atsLoadCfgBankEntry 6 }
 
 --  the atsOutlet group   
 --  the atsOutletDevice group in the atsOutlet group
@@ -5908,7 +6363,8 @@ EPDU2DeviceInfoEntryStruct ::=
 		ePDU2DeviceInfoNumBreakers			INTEGER, 
 		ePDU2DeviceInfoBreakerRating		INTEGER, 
 		ePDU2DeviceInfoOrientation			INTEGER, 
-		ePDU2DeviceInfoOutletLayout			INTEGER
+		ePDU2DeviceInfoOutletLayout			INTEGER,
+		ePDU2DeviceInfoPowerLimit				INTEGER
 	}
 
 ePDU2DeviceInfoIndex OBJECT-TYPE
@@ -6008,8 +6464,7 @@ ePDU2DeviceInfoOutletLayout OBJECT-TYPE
 		SYNTAX INTEGER {
 			seqPhaseToNeutral (1),
 			seqPhaseToPhase (2),
-			seqPhToNeu21PhToPh (3),
-			seqPhToPhGrouped (4)
+			seqOther (3)
 		}
 		ACCESS read-only
 		STATUS mandatory
@@ -6017,17 +6472,27 @@ ePDU2DeviceInfoOutletLayout OBJECT-TYPE
 			"Getting this OID will return outlet layout for the device.
 			
 			SeqPhaseToNeutral(1) indicates outlet layout as follows:
-				1:1-N,2:2-N,3:3-N,4:1-N,5:2-N,...
-				
+				Outlet(1-5 and 16-20):1-N,
+				outlet(6-10 and 21-25):2-N,
+				outlet(11-15 and 26-30):3-N,4:1-N,5:2-N,
+				or for single phase SKUs, all outlets 1-N.
+
 			SeqPhaseToPhase(2) indicates outlet layout as follows:
-				1:1-2,2:2-3,3:3-1,4:1-2,5:2-3,...
+				Outlet(1-5 and 16-20):1-2,
+				outlet(6-10 and 21-25):2-3,
+				outlet(11-15 and 26-30):3-1.
 				
-			SeqPhToNeu21PhToPh(3) indicates outlet layout as follows:
-				1:1-N,2:2-N...21:3-N,22:1-2,23:2-3,24:3-1,...
-				
-			SeqPhToPhGrouped(4) indicates outlet layout as follows:
-				Otlts1-8::(3-1),Otlts9-16::(2-3),Otlts17-24::(1-2)." 
+			SeqOther(3) indicates outlet layout as follows:
+				TBD" 
 		::= {ePDU2DeviceInfoEntry 12}
+		
+ePDU2DeviceInfoPowerLimit OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The maximum power limit, measured in Watt, for the Rack PDU."
+		::= {ePDU2DeviceInfoEntry 13}
 
 -- Device Status Table
 ePDU2DeviceStatusTable OBJECT-TYPE
@@ -6546,23 +7011,23 @@ ePDU2PhaseStatusEntry OBJECT-TYPE
 
 EPDU2PhaseStatusEntryStruct ::= 
 	SEQUENCE {
-		ePDU2PhaseStatusIndex							INTEGER, 
-		ePDU2PhaseStatusModuleIndex				INTEGER, 
-		ePDU2PhaseStatusNumber							INTEGER, 
-		ePDU2PhaseStatusLoadState					INTEGER, 
-		ePDU2PhaseStatusLoad								Gauge, 
+		ePDU2PhaseStatusIndex								INTEGER,
+		ePDU2PhaseStatusModuleIndex					INTEGER,
+		ePDU2PhaseStatusNumber							INTEGER,
+		ePDU2PhaseStatusLoadState						INTEGER,
+		ePDU2PhaseStatusLoad								Gauge,
 		ePDU2PhaseStatusVoltage							Gauge,
 		ePDU2PhaseStatusPower								Gauge,
 		ePDU2PhaseStatusApparentPower				Gauge,
 		ePDU2PhaseStatusPowerFactor					Gauge,
-		ePDU2PhaseStatusPeakLoad						Gauge, 
-		ePDU2PhaseStatusPeakLoadTimestamp	DisplayString, 
-		ePDU2PhaseStatusPeakLoadStartTime	DisplayString,
-		ePDU2PhaseStatusLineToLineVoltage  					Gauge
+		ePDU2PhaseStatusPeakLoad						Gauge,
+		ePDU2PhaseStatusPeakLoadTimestamp		DisplayString,
+		ePDU2PhaseStatusPeakLoadStartTime		DisplayString,
+		ePDU2PhaseStatusLineToLineVoltage		Gauge
 	}
 
 ePDU2PhaseStatusIndex OBJECT-TYPE
-		SYNTAX INTEGER(1..13)
+		SYNTAX INTEGER(1..12)
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
@@ -6613,9 +7078,8 @@ ePDU2PhaseStatusVoltage OBJECT-TYPE
 		ACCESS read-only
 		STATUS mandatory
 		DESCRIPTION
-			"Indicates the Voltage, in tenths of Volts, of the Rack
-       PDU phase being queried"
-		::= {ePDU2PhaseStatusEntry 6}	
+			"Indicates the Voltage, in tenths of Volts, of the Rack PDU phase being queried."
+		::= {ePDU2PhaseStatusEntry 6}
 		
 ePDU2PhaseStatusPower OBJECT-TYPE
 		SYNTAX Gauge
@@ -7662,13 +8126,217 @@ ePDU2OutletMeteredStatusEnergyStart OBJECT-TYPE
 			meter reset."
 		::= {ePDU2OutletMeteredStatusEntry 12}
 
--- ePDU2Sensor
-ePDU2SensorTableSize OBJECT-TYPE
+ePDU2OutletMonitoredTableSize OBJECT-TYPE
 		SYNTAX INTEGER
 		ACCESS read-only
 		STATUS mandatory
-		DESCRIPTION "ePDU2SensorTableSize"
-		::= {ePDU2Sensor 1}
+		DESCRIPTION
+			"The number of monitored outlets on connected Rack PDUs."
+		::= {ePDU2OutletMonitored 1}
+
+ePDU2OutletMonitoredConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF EPDU2OutletMonitoredConfigEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table of Rack PDU monitored outlet configuration data."
+		::= {ePDU2OutletMonitored 2}
+		
+ePDU2OutletMonitoredConfigEntry OBJECT-TYPE
+		SYNTAX EPDU2OutletMonitoredConfigEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"Configuration data from currently queried Rack PDU monitored outlet."
+		INDEX {ePDU2OutletMonitoredConfigIndex}
+		::= {ePDU2OutletMonitoredConfigTable 1}
+		
+EPDU2OutletMonitoredConfigEntryStruct ::= 
+	SEQUENCE {
+		ePDU2OutletMonitoredConfigIndex									INTEGER, 
+		ePDU2OutletMonitoredConfigModuleIndex						INTEGER, 
+		ePDU2OutletMonitoredConfigNumber								INTEGER, 
+		ePDU2OutletMonitoredConfigName									DisplayString
+	}
+		
+ePDU2OutletMonitoredConfigIndex OBJECT-TYPE
+		SYNTAX INTEGER(1..96)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The index to the Rack PDU monitored outlet configuration table entry."
+		::= {ePDU2OutletMonitoredConfigEntry 1}
+		
+ePDU2OutletMonitoredConfigModuleIndex OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The user-defined Rack PDU numeric ID."
+		::= {ePDU2OutletMonitoredConfigEntry 2}
+		
+ePDU2OutletMonitoredConfigNumber OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The numeric monitored outlet ID."
+		::= {ePDU2OutletMonitoredConfigEntry 3}
+		
+ePDU2OutletMonitoredConfigName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"The user-defined monitored outlet name string."
+		::= {ePDU2OutletMonitoredConfigEntry 4}
+		
+ePDU2OutletMonitoredInfoTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF EPDU2OutletMonitoredInfoEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table of Rack PDU monitored outlet information."
+		::= {ePDU2OutletMonitored 3}
+		
+ePDU2OutletMonitoredInfoEntry OBJECT-TYPE
+		SYNTAX EPDU2OutletMonitoredInfoEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"Information of currently queried Rack PDU monitored outlet."
+		INDEX {ePDU2OutletMonitoredInfoIndex}
+		::= {ePDU2OutletMonitoredInfoTable 1}
+		
+EPDU2OutletMonitoredInfoEntryStruct ::= 
+	SEQUENCE {
+		ePDU2OutletMonitoredInfoIndex					INTEGER, 
+		ePDU2OutletMonitoredInfoModuleIndex		INTEGER, 
+		ePDU2OutletMonitoredInfoNumber				INTEGER, 
+		ePDU2OutletMonitoredInfoName					DisplayString, 
+		ePDU2OutletMonitoredInfoLayout				INTEGER, 
+		ePDU2OutletMonitoredInfoRating				INTEGER, 
+		ePDU2OutletMonitoredInfoBank					INTEGER
+	}
+		
+ePDU2OutletMonitoredInfoIndex OBJECT-TYPE
+		SYNTAX INTEGER(1..96)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The index to the Rack PDU monitored information table entry."
+		::= {ePDU2OutletMonitoredInfoEntry 1}
+		
+ePDU2OutletMonitoredInfoModuleIndex OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The Rack PDU numeric ID."
+		::= {ePDU2OutletMonitoredInfoEntry 2}
+		
+ePDU2OutletMonitoredInfoNumber OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The numeric monitored outlet ID."
+		::= {ePDU2OutletMonitoredInfoEntry 3}
+		
+ePDU2OutletMonitoredInfoName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The user-defined monitored outlet name string."
+		::= {ePDU2OutletMonitoredInfoEntry 4}
+		
+ePDU2OutletMonitoredInfoLayout OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"This OID describes the phase connections of the referenced outlet as follows:
+			seqPhase1ToNeutral(1) indicates that the outlet is wired from Phase 1 to Neutral.
+			seqPhase2ToNeutral(2) indicates that the outlet is wired from Phase 2 to Neutral. 
+			seqPhase3ToNeutral(3) indicates that the outlet is wired from Phase 3 to Neutral. 
+			seqPhase1ToPhase2(4) indicates that the outlet is wired from Phase 1 to Phase 2.
+			seqPhase2ToPhase3(5) indicates that the outlet is wired from Phase 2 to Phase 3. 
+			seqPhase3ToPhase1(6) indicates that the outlet is wired from Phase 3 to Phase 1."
+		::= {ePDU2OutletMonitoredInfoEntry 5}
+		
+ePDU2OutletMonitoredInfoRating OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Maximum power rating of Rack PDU monitored outlet."
+		::= {ePDU2OutletMonitoredInfoEntry 6}
+		
+ePDU2OutletMonitoredInfoBank OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"This outlet's numeric bank ID."
+		::= {ePDU2OutletMonitoredInfoEntry 7}
+
+ePDU2OutletMonitoredStatusTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF EPDU2OutletMonitoredStatusEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table of Rack PDU monitored outlet status data."
+		::= {ePDU2OutletMonitored 4}
+
+ePDU2OutletMonitoredStatusEntry OBJECT-TYPE
+		SYNTAX EPDU2OutletMonitoredStatusEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"Status data from currently queried Rack PDU monitored outlet."
+		INDEX {ePDU2OutletMonitoredStatusIndex}
+		::= {ePDU2OutletMonitoredStatusTable 1}
+
+EPDU2OutletMonitoredStatusEntryStruct ::= 
+	SEQUENCE {
+		ePDU2OutletMonitoredStatusIndex								INTEGER, 
+		ePDU2OutletMonitoredStatusModuleIndex					INTEGER, 
+		ePDU2OutletMonitoredStatusNumber							INTEGER, 
+		ePDU2OutletMonitoredStatusName								DisplayString
+	}
+
+ePDU2OutletMonitoredStatusIndex OBJECT-TYPE
+		SYNTAX INTEGER(1..96)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The index to the Rack PDU monitored status table entry."
+		::= {ePDU2OutletMonitoredStatusEntry 1}
+		
+ePDU2OutletMonitoredStatusModuleIndex OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The Rack PDU numeric ID."
+		::= {ePDU2OutletMonitoredStatusEntry 2}
+		
+ePDU2OutletMonitoredStatusNumber OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The numeric monitored outlet ID."
+		::= {ePDU2OutletMonitoredStatusEntry 3}
+		
+ePDU2OutletMonitoredStatusName OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The user-defined monitored outlet name string."
+		::= {ePDU2OutletMonitoredStatusEntry 4}
 		
 -- ePDU2Group
 ePDU2GroupNumberOfDevices OBJECT-TYPE
@@ -7738,6 +8406,490 @@ ePDU2GroupPeakRecordReset OBJECT-TYPE
 			Getting this OID in models that support this feature will do nothing 
 			and return the noOperation(1) value."
 		::= {ePDU2Group 5}
+--ePDU2Source
+ePDU2SourceTableSize OBJECT-TYPE
+    SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"A Host Automatic Transfer Switch response total number of Automatic Transfer Switches on daisy chain. 
+			Automatic Transfer Switch as a Slave can only response 1."
+    ::= { ePDU2Source 1 }
+
+-- Source Config Table
+ePDU2SourceConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF EPDU2SourceConfigEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table of Source configuration data."
+		::= { ePDU2Source 2 }
+		
+ePDU2SourceConfigEntry OBJECT-TYPE
+		SYNTAX EPDU2SourceConfigEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"Configuration data from Source being queried."
+		INDEX  { ePDU2SourceConfigIndex }
+		::= { ePDU2SourceConfigTable 1 }
+
+EPDU2SourceConfigEntryStruct ::=
+	SEQUENCE {
+	  ePDU2SourceConfigIndex													INTEGER, 
+	  ePDU2SourceConfigModuleIndex											INTEGER, 
+	  ePDU2SourceConfigPreferredSource									INTEGER, 
+	  ePDU2SourceConfigFrequencyDeviation							INTEGER, 
+	  ePDU2SourceConfigVoltageSensitivity							INTEGER, 
+	  ePDU2SourceConfigNominalVoltage									INTEGER, 
+	  ePDU2SourceConfigTransferVoltageRange						INTEGER, 
+	  ePDU2SourceConfigNarrowRangeValue								INTEGER, 
+	  ePDU2SourceConfigMediumRangeValue								INTEGER, 
+	  ePDU2SourceConfigWideRangeValue									INTEGER, 
+	  ePDU2EventCountsReset														INTEGER
+	}	
+	
+ePDU2SourceConfigIndex OBJECT-TYPE
+    SYNTAX INTEGER(1..4)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+				"The index to the Automatic Transfer Switch table entry."
+		::= { ePDU2SourceConfigEntry 1 }		
+
+ePDU2SourceConfigModuleIndex OBJECT-TYPE
+    SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+				"The Automatic Transfer Switch numeric ID."
+		::= { ePDU2SourceConfigEntry 2 }
+
+ePDU2SourceConfigPreferredSource OBJECT-TYPE
+ SYNTAX INTEGER {
+      sourceA(1),
+      sourceB(2), 
+      none(3)
+  }
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+				"This variable returns the preferred source of power when both sources are OK"
+		::= { ePDU2SourceConfigEntry 3 }
+
+ePDU2SourceConfigFrequencyDeviation OBJECT-TYPE
+    SYNTAX INTEGER(1..3)
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+				"To configure the frequency deviation." 
+		::= { ePDU2SourceConfigEntry 4 }
+	
+ePDU2SourceConfigVoltageSensitivity OBJECT-TYPE
+   SYNTAX INTEGER {
+			high				(1),
+			medium			(2),
+			low					(3)
+		}
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"This variable defines the sensitivity to changes in voltage: 
+			high(1) for best protection, low(3) for frequent small line 
+			voltage changes."
+		::= { ePDU2SourceConfigEntry 5 }
+		
+ePDU2SourceConfigNominalVoltage OBJECT-TYPE
+  SYNTAX INTEGER 
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"This variable returns the nominal voltage of the input."
+		::= { ePDU2SourceConfigEntry 6 }
+	
+ePDU2SourceConfigTransferVoltageRange OBJECT-TYPE
+		SYNTAX INTEGER {
+			wide				(1),
+			medium			(2),
+			narrow			(3)
+		}
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"This variable defines the range of acceptable voltage from a power source.
+			If the voltage measured from the selected input source is not within this
+			range, the Automatic Transfer Switch will switch over (transfer) to the 
+			alternate power source."
+		::= { ePDU2SourceConfigEntry 7 }
+
+ePDU2SourceConfigNarrowRangeValue OBJECT-TYPE
+		SYNTAX INTEGER 
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"To configure the Narrow Range value of acceptable voltage 
+			from a power source."
+		::= { ePDU2SourceConfigEntry 8 }
+		
+ePDU2SourceConfigMediumRangeValue OBJECT-TYPE
+		SYNTAX INTEGER 
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"To configure the Medium Range value of acceptable voltage 
+			from a power source."
+		::= { ePDU2SourceConfigEntry 9 }
+
+ePDU2SourceConfigWideRangeValue OBJECT-TYPE
+		SYNTAX INTEGER 
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"To configure the Wide Range value of acceptable voltage 
+			from a power source."
+		::= { ePDU2SourceConfigEntry 10 }
+
+ePDU2EventCountsReset OBJECT-TYPE
+		SYNTAX INTEGER  {
+			none				(1),
+			clear				(2) 
+		} 
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"Setting this variable will clear all event counts in Automatic Transfer Switch."
+		::= { ePDU2SourceConfigEntry 11 }	
+
+-- Source Info Table
+ePDU2SourceInfoTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF EPDU2SourceInfoEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table of Automatic Transfer Switch information."
+		::= { ePDU2Source 3 }
+
+ePDU2SourceInfoEntry OBJECT-TYPE
+		SYNTAX EPDU2SourceInfoEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"Information of the Automatic Transfer Switch being queried."
+		INDEX {ePDU2SourceInfoIndex}
+		::= { ePDU2SourceInfoTable 1 }
+
+EPDU2SourceInfoEntryStruct ::= 
+	SEQUENCE {
+		ePDU2SourceInfoIndex																INTEGER,
+		ePDU2SourceInfoModuleIndex													INTEGER,
+		ePDU2SourceInfoSourceSwitch												INTEGER, 
+		ePDU2SourceInfoSourcePreferenceChange							INTEGER, 
+		ePDU2SourceInfoPreferredSourceFreqOutofRange				INTEGER, 
+		ePDU2SourceInfoPreferredSourceVoltOutofRange				INTEGER, 
+		ePDU2SourceInfoDeviceCurrentOverload								INTEGER, 
+		ePDU2SourceInfoBank1Overload												INTEGER, 
+		ePDU2SourceInfoBank2Overload												INTEGER, 
+		ePDU2SourceInfoBank3Overload												INTEGER
+	}
+
+ePDU2SourceInfoIndex OBJECT-TYPE
+		SYNTAX INTEGER(1..4)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The index to the Automatic Transfer Switch Information table entry."
+		::= {ePDU2SourceInfoEntry 1}
+		
+ePDU2SourceInfoModuleIndex OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The Automatic Transfer Switch numeric ID."
+		::= {ePDU2SourceInfoEntry 2}
+
+ePDU2SourceInfoSourceSwitch OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The Source Switch event counts of Automatic Transfer Switch."
+		::= {ePDU2SourceInfoEntry 3}
+		
+ePDU2SourceInfoSourcePreferenceChange OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The Source Preference Change event counts of Automatic Transfer Switch."
+		::= {ePDU2SourceInfoEntry 4}
+
+ePDU2SourceInfoPreferredSourceFreqOutofRange OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The Preferred Source Frequency Out of Range event counts of Automatic Transfer Switch."
+		::= {ePDU2SourceInfoEntry 5}
+		
+ePDU2SourceInfoPreferredSourceVoltOutofRange OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The Preferred Source Voltage Out of Range event counts of Automatic Transfer Switch."
+		::= {ePDU2SourceInfoEntry 6}
+
+ePDU2SourceInfoDeviceCurrentOverload OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The Device Current Overload event counts of Automatic Transfer Switch."
+		::= {ePDU2SourceInfoEntry 7}
+
+ePDU2SourceInfoBank1Overload OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The Bank 1 Current Overload event counts of Automatic Transfer Switch.
+			Models that do not support this feature will respond to this OID
+			with a value of (-1)."
+		::= {ePDU2SourceInfoEntry 8}
+	
+ePDU2SourceInfoBank2Overload OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The Bank 2 Current Overload event counts of Automatic Transfer Switch.
+			Models that do not support this feature will respond to this OID
+			with a value of (-1)."
+		::= {ePDU2SourceInfoEntry 9}
+
+ePDU2SourceInfoBank3Overload OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The Bank 3 Current Overload event counts of Automatic Transfer Switch.
+			Models that do not support this feature will respond to this OID
+			with a value of (-1)."
+		::= {ePDU2SourceInfoEntry 10}
+		
+-- Source Status Table
+ePDU2SourceStatusTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF EPDU2SourceStatusEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table of Automatic Transfer Switch current status."
+		::= { ePDU2Source 4 }
+
+ePDU2SourceStatusEntry OBJECT-TYPE
+		SYNTAX EPDU2SourceStatusEntryStruct
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"Status data from the Automatic Transfer Switch being queried."
+		INDEX {ePDU2SourceStatusIndex}
+		::= { ePDU2SourceStatusTable 1 }
+
+EPDU2SourceStatusEntryStruct ::= 
+	SEQUENCE {
+		ePDU2SourceStatusIndex												INTEGER, 
+		ePDU2SourceStatusModuleIndex									INTEGER, 
+		ePDU2SourceStatusSelectedSource								INTEGER,
+		ePDU2SourceStatusNominalFrequency							INTEGER,
+		ePDU2SourceStatusSourceAVoltage								INTEGER,	
+		ePDU2SourceStatusSourceBVoltage								INTEGER,
+		ePDU2SourceStatusSourceAFrequency							INTEGER,
+		ePDU2SourceStatusSourceBFrequency							INTEGER,
+		ePDU2SourceStatusSourceAVolStatus							INTEGER,
+		ePDU2SourceStatusSourceBVolStatus							INTEGER,
+		ePDU2SourceStatusSourceAFreqStatus						INTEGER,
+		ePDU2SourceStatusSourceBFreqStatus						INTEGER,
+		ePDU2SourceStatusSourcePhaseSync							INTEGER,
+		ePDU2SourceStatusPowerSupplySourceAStatus			INTEGER,
+		ePDU2SourceStatusPowerSupplySourceBStatus			INTEGER,
+		ePDU2SourceStatusRedundancyState							INTEGER
+	}
+
+ePDU2SourceStatusIndex OBJECT-TYPE
+		SYNTAX INTEGER(1..4)
+    ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The index to the Automatic Transfer Switch status table entry."
+		::= {ePDU2SourceStatusEntry 1}
+		
+ePDU2SourceStatusModuleIndex OBJECT-TYPE
+		SYNTAX INTEGER
+    ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The Automatic Transfer Switch numeric ID"
+		::= {ePDU2SourceStatusEntry 2}
+
+ePDU2SourceStatusSelectedSource OBJECT-TYPE
+		SYNTAX INTEGER {
+			sourceA		(1),
+      sourceB		(2),
+      none			(3)
+		} 
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"This variable returns the current source of power. "
+		::= { ePDU2SourceStatusEntry 3 } 
+	
+	
+ePDU2SourceStatusNominalFrequency OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The Nominal Frequency  in 0.1 Hertz."
+		::= { ePDU2SourceStatusEntry 4 }	
+		
+ePDU2SourceStatusSourceAVoltage OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The input voltage of source A in 0.1 Volt."
+		::= { ePDU2SourceStatusEntry 5 }	
+	
+ePDU2SourceStatusSourceBVoltage OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The input voltage of source B in 0.1 Volt."
+		::= { ePDU2SourceStatusEntry 6 }	
+	
+ePDU2SourceStatusSourceAFrequency OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The input frequency of source A in 0.1 Hertz."
+		::= { ePDU2SourceStatusEntry 7 }	
+	
+ePDU2SourceStatusSourceBFrequency OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The input frequency of source B in 0.1 Hertz."
+		::= { ePDU2SourceStatusEntry 8 }	
+		
+ePDU2SourceStatusSourceAVolStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			normal					(1),
+			overVoltage			(2),
+			underVoltage		(3)
+		}
+		ACCESS     read-only
+		STATUS     mandatory
+		DESCRIPTION
+			"The input voltage status of source A."
+		::= { ePDU2SourceStatusEntry 9 } 
+
+ePDU2SourceStatusSourceBVolStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			normal					(1),
+			overVoltage			(2),
+			underVoltage		(3)
+		}
+		ACCESS     read-only
+		STATUS     mandatory
+		DESCRIPTION
+			"The input voltage status of source B."
+		::= { ePDU2SourceStatusEntry 10 } 
+
+ePDU2SourceStatusSourceAFreqStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			normal					(1),
+			overFrequency		(2),
+			underFrequency	(3)
+		}
+		ACCESS     read-only
+		STATUS     mandatory
+		DESCRIPTION
+			"The input frequency status of source A."
+		::= { ePDU2SourceStatusEntry 11 } 
+	
+ePDU2SourceStatusSourceBFreqStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			normal					(1),
+			overFrequency		(2),
+			underFrequency	(3)
+		}
+		ACCESS     read-only
+		STATUS     mandatory
+		DESCRIPTION
+			"The input frequency status of source B."
+		::= { ePDU2SourceStatusEntry 12 }
+		
+ePDU2SourceStatusSourcePhaseSync OBJECT-TYPE
+		SYNTAX INTEGER {
+			inSync					(1),
+			outOfSync					(2)
+		}
+		ACCESS     read-only
+		STATUS     mandatory
+		DESCRIPTION
+			"This variable returns the status of the phase sync."
+		::= { ePDU2SourceStatusEntry 13 }
+
+ePDU2SourceStatusPowerSupplySourceAStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			normal						(1),
+			failed3p3v				(2),
+			failed24v					(3),
+			failed3p3and24v		(4)
+		}
+		ACCESS     read-only
+		STATUS     mandatory
+		DESCRIPTION
+			"This variable returns the status of the power supply	in system.
+			normal(1) indicates the power supply of source A in normal.
+			3.3vFailed(2) indicates the power supply 3.3v of source A is failed.
+			24vFailed(3) indicates the power supply 24v of source A is failed.
+			3.3and24vfailed(4) indicates both power supply 3.3 and 24v of source A is failed."
+		::= { ePDU2SourceStatusEntry 14 }
+	
+ePDU2SourceStatusPowerSupplySourceBStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			normal						(1),
+			failed3p3v				(2),
+			failed24v					(3),
+			failed3p3and24v		(4)
+		}
+		ACCESS     read-only
+		STATUS     mandatory
+		DESCRIPTION
+			"This variable returns the status of the power supply	in system.
+			normal(1) indicates the power supply of source B in normal.
+			3.3vFailed(2) indicates the power supply 3.3v of source B is failed.
+			24vFailed(3) indicates the power supply 24v of source B is failed.
+			3.3and24vfailed(4) indicates both power supply 3.3 and 24v of source B is failed."
+		::= { ePDU2SourceStatusEntry 15 }
+
+ePDU2SourceStatusRedundancyState OBJECT-TYPE
+		SYNTAX INTEGER {
+			atsRedundancyLost		(1),
+			atsFullyRedundant		(2)
+		}
+		ACCESS     read-only
+		STATUS     mandatory
+		DESCRIPTION
+			"This variable returns the current redundancy state of the ATS.
+			atsRedundancyLost(1) indicates that the ATS is unable to switch over to the alternate power source if the current source fails.
+			atsFullyRedundant(2) indicates that the ATS will switch over to the alternate power source if the current source fails."
+		::= { ePDU2SourceStatusEntry 16 }
 
 -- Battery Manager
 bmIdentModelName OBJECT-TYPE
@@ -7864,7 +9016,7 @@ bmConfigStringCount OBJECT-TYPE
    ACCESS read-write
    STATUS mandatory
    DESCRIPTION
-      "Battery manager string count setting."
+      "Configure number of battery strings to manage."
    ::= { bmConfig 2 }
   
 bmConfigProbesCountOnString OBJECT-TYPE
@@ -7872,7 +9024,7 @@ bmConfigProbesCountOnString OBJECT-TYPE
    ACCESS read-write
    STATUS mandatory
    DESCRIPTION
-      "Battery manager probe count on a string setting."
+      "Configure number of batteries on a string."
    ::= { bmConfig 3 }
    
 bmConfigLowVoltAlarmThreshold OBJECT-TYPE
@@ -7987,9 +9139,74 @@ bmConfigMergeFeature OBJECT-TYPE
    ACCESS read-write
    STATUS mandatory
    DESCRIPTION
-      "String merge feature setting."
+      "Enable/Disable merge feature. 
+      Setting this OID may result in erasing existed battery records."
    ::= { bmConfig 17 }
-               
+   
+bmConfigLowStringVoltageAlarmThreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "String low voltage alarm threshold setting, unit in 0.1 volt."
+   ::= { bmConfig 20 }
+   
+bmConfigHighStringVoltageAlarmThreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "String high voltage alarm threshold setting, unit in 0.1 volt."
+   ::= { bmConfig 21 }
+
+bmConfigLowStringVoltageWarnThreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "String low voltage warning threshold setting, unit in 0.1 volt."
+   ::= { bmConfig 22 } 
+    
+bmConfigHighStringVoltageWarnThreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "String high voltage warning threshold setting, unit in 0.1 volt."
+   ::= { bmConfig 23 }
+
+bmConfigLowStringSocAlarmThreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "String low soc alarm threshold setting, unit in 1%."
+   ::= { bmConfig 24 }
+   
+bmConfigLowStringSocWarnThreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "String low soc warning threshold setting, unit in %1."
+   ::= { bmConfig 25 }
+
+bmConfigLowBattSocAlarmThreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Battery low soc alarm threshold setting, unit in 1%."
+   ::= { bmConfig 26 }
+
+bmConfigLowBattSocWarnThreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Battery low soc warning threshold setting, unit in 1%."
+   ::= { bmConfig 27 }
+
 bmControlSysytemIdenticator OBJECT-TYPE
    SYNTAX INTEGER {
       noTestIndicators(1), 
@@ -8035,7 +9252,7 @@ bmProbesTable OBJECT-TYPE
    ACCESS not-accessible
    STATUS mandatory
    DESCRIPTION
-      "Allows for getting of status of probes."
+      "The battery probes installation information."
    ::= { bmProbes 3 }
 
 bmProbesEntry OBJECT-TYPE
@@ -8043,7 +9260,7 @@ bmProbesEntry OBJECT-TYPE
    ACCESS not-accessible
    STATUS mandatory
    DESCRIPTION
-      "The status of probes installation to gather status from."
+      "The battery probes installation information."
    INDEX  { bmProbesIndex }
    ::= { bmProbesTable 1 }
 
@@ -8060,7 +9277,7 @@ bmProbesIndex OBJECT-TYPE
    ACCESS read-only
    STATUS mandatory
    DESCRIPTION
-      "Probes table index"
+      "The index of the bmProbesEntry entry."
    ::= { bmProbesEntry 1 }
    
 bmProbesPackIndex    OBJECT-TYPE
@@ -8068,7 +9285,7 @@ bmProbesPackIndex    OBJECT-TYPE
    ACCESS  read-only
    STATUS  mandatory
    DESCRIPTION
-      "The battery pack number the probe installed."
+      "The pack number the battery probe installed."
    ::= { bmProbesEntry 2 }
 
 bmProbesStringIndex    OBJECT-TYPE
@@ -8076,7 +9293,7 @@ bmProbesStringIndex    OBJECT-TYPE
    ACCESS  read-only
    STATUS  mandatory
    DESCRIPTION
-      "The string number the probe installed."
+      "The string number the battery probe installed."
    ::= { bmProbesEntry 3 }
    
 bmProbesBattIndex    OBJECT-TYPE
@@ -8084,7 +9301,7 @@ bmProbesBattIndex    OBJECT-TYPE
    ACCESS  read-only
    STATUS  mandatory
    DESCRIPTION
-      "The battery number the probe installed."
+      "The battery number the battery probe installed."
    ::= { bmProbesEntry 4 }
 
 bmProbesVoltageTableSize OBJECT-TYPE
@@ -8100,7 +9317,7 @@ bmProbesVoltageTable OBJECT-TYPE
    ACCESS not-accessible
    STATUS mandatory
    DESCRIPTION
-      "Allows for getting of voltage of batteries."
+      "The batteries voltage information."
    ::= { bmProbes 5 }
 
 bmProbesVoltageEntry OBJECT-TYPE
@@ -8108,7 +9325,7 @@ bmProbesVoltageEntry OBJECT-TYPE
    ACCESS not-accessible
    STATUS mandatory
    DESCRIPTION
-      "Batteries voltage status."
+      "The batteries voltage information."
    INDEX  { bmProbesVoltageIndex}
    ::= { bmProbesVoltageTable 1 }
 
@@ -8121,7 +9338,9 @@ BmProbesVoltageEntry ::=
       bmProbesVoltageProbeIndex    INTEGER, 
       bmProbesVoltageAlarmStatus   INTEGER,
       bmProbesVoltage              INTEGER, 
-      bmProbesVoltageEqualPercentage INTEGER
+      bmProbesVoltageEqualPercentage INTEGER, 
+      bmProbesVoltageSocAlarmStatus INTEGER, 
+      bmProbesVoltageSoc           INTEGER
    }
 
 bmProbesVoltageIndex OBJECT-TYPE
@@ -8129,7 +9348,7 @@ bmProbesVoltageIndex OBJECT-TYPE
    ACCESS read-only
    STATUS mandatory
    DESCRIPTION
-      "The index of the voltage status entry."
+      "The index of the BmProbesVoltageEntry entry."
    ::= { bmProbesVoltageEntry 1 }
    
 bmProbesVoltagePackIndex    OBJECT-TYPE
@@ -8137,7 +9356,7 @@ bmProbesVoltagePackIndex    OBJECT-TYPE
    ACCESS  read-only
    STATUS  mandatory
    DESCRIPTION
-      "The battery pack index to the voltage record."
+      "The battery pack number the battery voltage reading belongs to."
    ::= { bmProbesVoltageEntry 2 }
 
 bmProbesVoltageStringIndex    OBJECT-TYPE
@@ -8145,7 +9364,7 @@ bmProbesVoltageStringIndex    OBJECT-TYPE
    ACCESS  read-only
    STATUS  mandatory
    DESCRIPTION
-      "The battery string index to the voltage record."
+      "The battery string number the battery voltage reading belongs to."
    ::= { bmProbesVoltageEntry 3 }
    
 bmProbesVoltageBattIndex    OBJECT-TYPE
@@ -8194,12 +9413,34 @@ bmProbesVoltageEqualPercentage    OBJECT-TYPE
       "Getting this oid to get battery voltage equalizing power, unit in percentage."
    ::= { bmProbesVoltageEntry 8 }
 
+bmProbesVoltageSocAlarmStatus OBJECT-TYPE
+   SYNTAX  INTEGER {
+      voltageSocNormal(1), 
+      voltageSocWarnLow(2), 
+      voltageSocWarnHigh(3), 
+      voltageSocAlarmLow(4), 
+      voltageSocAlarmHigh(5)
+   }
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The battery soc alarm status."
+   ::= { bmProbesVoltageEntry 9 }
+
+bmProbesVoltageSoc OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "Getting this oid to get battery soc, unit in percentage."
+   ::= { bmProbesVoltageEntry 10 }
+
 bmProbesTempTableSize OBJECT-TYPE
    SYNTAX INTEGER
    ACCESS read-only
    STATUS mandatory
    DESCRIPTION
-      "The size of the Temperature table"
+      "The size of the battery temperature table"
    ::= { bmProbes 6 }
    
 bmProbesTempTable OBJECT-TYPE
@@ -8207,7 +9448,7 @@ bmProbesTempTable OBJECT-TYPE
    ACCESS not-accessible
    STATUS mandatory
    DESCRIPTION
-      "Allows for getting of temperature of probes."
+      "The batteries temperature information."
    ::= { bmProbes 7 }
 
 bmProbesTempEntry OBJECT-TYPE
@@ -8215,7 +9456,7 @@ bmProbesTempEntry OBJECT-TYPE
    ACCESS not-accessible
    STATUS mandatory
    DESCRIPTION
-      "Temperature status entry."
+      "The batteries temperature information."
    INDEX  { bmProbesTempIndex }
    ::= { bmProbesTempTable 1 }
 
@@ -8235,7 +9476,7 @@ bmProbesTempIndex OBJECT-TYPE
    ACCESS read-only
    STATUS mandatory
    DESCRIPTION
-      "The index of the temperature entry."
+      "The index of the BmProbesTempEntry entry."
    ::= { bmProbesTempEntry 1 }
 
 bmProbesTempPackIndex OBJECT-TYPE
@@ -8243,7 +9484,7 @@ bmProbesTempPackIndex OBJECT-TYPE
    ACCESS read-only
    STATUS mandatory
    DESCRIPTION
-      "The battery pack index of the temperature entry."
+      "The battery pack number the battery temperature reading belongs to."
    ::= { bmProbesTempEntry 2 }
 
 bmProbesTempStringIndex    OBJECT-TYPE
@@ -8251,7 +9492,7 @@ bmProbesTempStringIndex    OBJECT-TYPE
    ACCESS  read-only
    STATUS  mandatory
    DESCRIPTION
-      "The index to the string."
+      "The battery string number the battery temperature reading belongs to."
    ::= { bmProbesTempEntry 3 }
 
 bmProbesTempBattIndex    OBJECT-TYPE
@@ -8285,7 +9526,7 @@ bmProbesTempAlarmStatus    OBJECT-TYPE
    ::= { bmProbesTempEntry 6 }
 
 bmProbesTemperature    OBJECT-TYPE
-   SYNTAX  INTEGER(-40..60)    
+   SYNTAX  INTEGER(-40..100)    
    ACCESS  read-only
    STATUS  mandatory
    DESCRIPTION
@@ -8297,7 +9538,7 @@ bmProbesResTableSize OBJECT-TYPE
    ACCESS read-only
    STATUS mandatory
    DESCRIPTION
-      "The size of the Resistance table"
+      "The size of the battery resistance table"
    ::= { bmProbes 8 }
    
 bmProbesResTable OBJECT-TYPE
@@ -8305,7 +9546,7 @@ bmProbesResTable OBJECT-TYPE
    ACCESS not-accessible
    STATUS mandatory
    DESCRIPTION
-      "Allows for getting of resistance of probes."
+      "The batteries resistance information."
    ::= { bmProbes 9 }
 
 bmProbesResEntry OBJECT-TYPE
@@ -8313,7 +9554,7 @@ bmProbesResEntry OBJECT-TYPE
    ACCESS not-accessible
    STATUS mandatory
    DESCRIPTION
-      "The resistance status entry."
+      "The batteries resistance information."
    INDEX  { bmProbesResIndex }
    ::= { bmProbesResTable 1 }
 
@@ -8334,7 +9575,7 @@ bmProbesResIndex OBJECT-TYPE
    ACCESS read-only
    STATUS mandatory
    DESCRIPTION
-      "The index of the resistance entry."
+      "The index of the BmProbesResEntry entry."
    ::= { bmProbesResEntry 1 }
 
 bmProbesResPackIndex OBJECT-TYPE
@@ -8342,7 +9583,7 @@ bmProbesResPackIndex OBJECT-TYPE
    ACCESS read-only
    STATUS mandatory
    DESCRIPTION
-      "The battery pack index to the resistance entry."
+      "The battery pack number the battery resistance reading belongs to."
    ::= { bmProbesResEntry 2 }   
    
 bmProbesResStringIndex OBJECT-TYPE
@@ -8350,7 +9591,7 @@ bmProbesResStringIndex OBJECT-TYPE
    ACCESS  read-only
    STATUS  mandatory
    DESCRIPTION
-      "The index to the string."
+      "The battery string number the battery resistance reading belongs to."
    ::= { bmProbesResEntry 3 }
 
 bmProbesResBattIndex    OBJECT-TYPE
@@ -8384,7 +9625,7 @@ bmProbesResAlarmStatus    OBJECT-TYPE
    ::= { bmProbesResEntry 6 }
 
 bmProbesResistance    OBJECT-TYPE
-   SYNTAX  INTEGER(-40..60)    
+   SYNTAX  INTEGER(0..100)    
    ACCESS  read-only
    STATUS  mandatory
    DESCRIPTION
@@ -8392,7 +9633,7 @@ bmProbesResistance    OBJECT-TYPE
    ::= { bmProbesResEntry 7 }
    
 bmProbesResHealth    OBJECT-TYPE
-   SYNTAX  INTEGER(-40..60)    
+   SYNTAX  INTEGER(0..100)    
    ACCESS  read-only
    STATUS  mandatory
    DESCRIPTION
@@ -8491,7 +9732,1049 @@ bmFuncEqualElapseTime OBJECT-TYPE
    DESCRIPTION
       "This oid shows the elapsed time since last equalization started."
    ::= { bmFuncEqual 5 }
-        
+
+bmStringsNum OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Current connected string number."
+   ::= { bmStrings 1 }
+   
+bmStringsTableSize OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Current configured string number."
+   ::= { bmStrings 2 }
+   
+bmStringsTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF BmStringsEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+      "Allows for getting of status of strings."
+   ::= { bmStrings 3 }
+
+bmStringsEntry OBJECT-TYPE
+   SYNTAX BmStringsEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+      "The status of strings installation to gather status from."
+   INDEX  { bmStringsIndex }
+   ::= { bmStringsTable 1 }
+
+BmStringsEntry ::=
+   SEQUENCE {
+      bmStringsIndex        INTEGER,
+      bmStringsPackIndex    INTEGER,
+      bmStringsProbeCount	INTEGER
+   }
+
+bmStringsIndex OBJECT-TYPE
+   SYNTAX INTEGER(1..4)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Strings table index"
+   ::= { bmStringsEntry 1 }
+   
+bmStringsPackIndex    OBJECT-TYPE
+   SYNTAX  INTEGER(1..4)
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The battery pack number the string installed."
+   ::= { bmStringsEntry 2 }
+
+bmStringsProbeCount    OBJECT-TYPE
+   SYNTAX  INTEGER(1..960)    
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The probe number installed in string."
+   ::= { bmStringsEntry 3 }
+
+bmStringsVoltageTableSize OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+       "The size of the string voltage table" 
+   ::= { bmStrings 4 }
+   
+bmStringsVoltageTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF BmStringsVoltageEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+      "Allows for getting of voltage of strings."
+   ::= { bmStrings 5 }
+
+bmStringsVoltageEntry OBJECT-TYPE
+   SYNTAX BmStringsVoltageEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+      "The status of string voltage installation to gather status from."
+   INDEX  { bmStringsVoltageIndex }
+   ::= { bmStringsVoltageTable 1 }
+
+BmStringsVoltageEntry ::=
+   SEQUENCE {
+      bmStringsVoltageIndex          INTEGER,
+      bmStringsVoltagePackIndex      INTEGER,
+      bmStringsVoltageAlarmStatus					INTEGER,
+      bmStringsVoltage					    INTEGER, 
+      bmStringsVoltageSocAlarmStatus INTEGER, 
+      bmStringsVoltageSoc            INTEGER
+   }
+
+bmStringsVoltageIndex OBJECT-TYPE
+   SYNTAX INTEGER(1..10)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Strings table index"
+   ::= { bmStringsVoltageEntry 1 }
+   
+bmStringsVoltagePackIndex    OBJECT-TYPE
+   SYNTAX  INTEGER(1..10)
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The battery pack number the string installed."
+   ::= { bmStringsVoltageEntry 2 }
+   
+bmStringsVoltageAlarmStatus    OBJECT-TYPE
+   SYNTAX  INTEGER {
+      stringvoltageNormal(1), 
+      stringvoltageWarnLow(2), 
+      stringvoltageWarnHigh(3), 
+      stringvoltageAlarmLow(4), 
+      stringvoltageAlarmHigh(5)
+   }
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The string voltage alarm status."
+   ::= { bmStringsVoltageEntry 3 }
+   
+bmStringsVoltage    OBJECT-TYPE
+   SYNTAX  INTEGER    
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "Getting this oid to get string voltage, unit in 10mV (0.01 V)."
+   ::= { bmStringsVoltageEntry 4 }
+
+bmStringsVoltageSocAlarmStatus    OBJECT-TYPE
+   SYNTAX  INTEGER {
+      stringvoltageSocNormal(1), 
+      stringvoltageSocWarnLow(2), 
+      stringvoltageSocWarnHigh(3), 
+      stringvoltageSocAlarmLow(4), 
+      stringvoltageSocAlarmHigh(5)
+   }
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The string soc alarm status."
+   ::= { bmStringsVoltageEntry 5 }
+
+bmStringsVoltageSoc OBJECT-TYPE
+SYNTAX  INTEGER    
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "Getting this oid to get string soc, unit in 1%."
+   ::= { bmStringsVoltageEntry 6 }
+
+bmFuncShutdownVolt OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Shutdown voltage threshold setting, unit in  1 mV.(0.01 V)"
+   ::= { bmFuncShutdown 1 }
+
+   
+bmFuncShutdownStatus    OBJECT-TYPE
+   SYNTAX  INTEGER {
+      normal(1), 
+      downcount(2), 
+      shutdown(3)
+   }
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The low voltage shutdown status."
+   ::= { bmFuncShutdown 2 }
+   
+bmShutdownDownCount    OBJECT-TYPE
+   SYNTAX  INTEGER    
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "Down count before battery probe shutdown, unit in minute."
+   ::= { bmFuncShutdown 3 }
+
+-- environment2 Group
+-- envir2Ident group
+envir2IdentTableSize OBJECT-TYPE
+    SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The number of environment sensor."
+    ::= { envir2Ident 1 }
+
+envir2IdentTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ENVIR2IdentEntryStruct 
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table of environment sensor identification information."
+		::= { envir2Ident 2 }
+
+envir2IdentEntry OBJECT-TYPE
+		SYNTAX ENVIR2IdentEntryStruct 
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"Identification data from environment sensor being queried."
+		INDEX  { envir2IdentIndex }
+		::= { envir2IdentTable 1 }
+
+ENVIR2IdentEntryStruct ::=
+  SEQUENCE {
+  	envir2IdentIndex						   			 	INTEGER, 
+  	envir2IdentModulePosition							INTEGER,
+	  envir2IdentName			    							DisplayString,
+	  envir2IdentLocation										DisplayString,
+	  envir2IdentSerialNumber								DisplayString
+  }
+
+envir2IdentIndex OBJECT-TYPE
+    SYNTAX INTEGER(1..8)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+				"The index to the environment sensor table entry."
+		::= { envir2IdentEntry 1 }
+
+envir2IdentModulePosition OBJECT-TYPE
+    SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+				"The position of environment sensor. "
+		::= { envir2IdentEntry 2 }
+
+envir2IdentName OBJECT-TYPE
+		SYNTAX  DisplayString 
+ 		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The name of the environment sensor.
+				The maximum string size is device dependent."
+		::= { envir2IdentEntry  3 }
+
+envir2IdentLocation OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+  	STATUS  mandatory
+  	DESCRIPTION
+			"The location of the environment sensor.
+				The maximum string size is device dependent."
+		::= { envir2IdentEntry 4 }
+
+envir2IdentSerialNumber OBJECT-TYPE
+    SYNTAX DisplayString
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+				"The serial number of the environment sensor."
+		::= { envir2IdentEntry 5 }
+
+-- envir2Temp group
+envir2TempTableSize OBJECT-TYPE
+    SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The number of environment sensor."
+    ::= { envir2Temp 1 }
+
+envir2TempUnit OBJECT-TYPE
+    SYNTAX INTEGER{
+    	celsius								(1), 
+    	fahrenheit						(2)
+    }
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+				"This OID describes the unit of environment sensor. 
+					Setting the OID to Celsius(1) or Fahrenheit(2) to change the temperature unit." 
+		::= { envir2Temp 2 }
+
+envir2TempTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ENVIR2TempEntryStruct 
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table of environment sensor identification information in temperature."
+		::= { envir2Temp 3 }
+
+envir2TempEntry OBJECT-TYPE
+		SYNTAX ENVIR2TempEntryStruct 
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"Identification data from environment sensor being queried."
+		INDEX  { envir2TemperatureIndex }
+		::= { envir2TempTable 1 }
+
+ENVIR2TempEntryStruct ::=
+  SEQUENCE {
+  	envir2TemperatureIndex			   			 	INTEGER,
+  	envir2TempModulePosition							INTEGER, 
+	  envir2Temperature		    							INTEGER,
+	  envir2TempHighThreshold								INTEGER,
+	  envir2TempLowThreshold								INTEGER,
+	  envir2TempRateOfChange								INTEGER,
+	  envir2TempHysteresis									INTEGER
+  }	
+
+envir2TemperatureIndex OBJECT-TYPE
+    SYNTAX INTEGER(1..8)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+				"The index to the environment sensor table entry."
+		::= { envir2TempEntry 1 }
+
+envir2TempModulePosition OBJECT-TYPE
+    SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+				"The position of environment sensor."
+		::= { envir2TempEntry 2 }
+
+envir2Temperature OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The environment temperature expressed in 1/100. 
+      The value is  determined by temperature unit which can be changed in envir2TempUnit."
+   ::= { envir2TempEntry 3 }
+
+envir2TempHighThreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+      "The high temperature threshold of the environment sensor. 
+      The value is  determined by temperature unit which can be changed in envir2TempUnit."
+   ::= { envir2TempEntry 4 }
+
+envir2TempLowThreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+      "The low temperature threshold of the environment sensor. 
+      The value is  determined by temperature unit which can be changed in envir2TempUnit."
+   ::= { envir2TempEntry 5 }
+
+envir2TempRateOfChange OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+      "The rate of change of the temperature.
+      	The value expressed in degree per 5 minute. 
+      	The value is  determined by temperature unit which can be changed in envir2TempUnit."
+   ::= { envir2TempEntry 6 }
+
+envir2TempHysteresis OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+      "The number of degrees beyond the temperature thresholds
+       	at which an active temperature alarm will be cleared.
+      	 This configuration setting applies to all temperature thresholds. 
+      	 The value is  determined by temperature unit which can be changed in envir2TempUnit."
+   ::= { envir2TempEntry 7 }
+
+-- envir2Humid group
+envir2HumidTableSize OBJECT-TYPE
+    SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The number of environment sensor."
+    ::= { envir2Humid 1 }
+
+envir2HumidTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ENVIR2HumidEntryStruct 
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table of environment sensor identification information in humidity."
+		::= { envir2Humid 2 }
+
+envir2HumidEntry OBJECT-TYPE
+		SYNTAX ENVIR2HumidEntryStruct 
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"Identification data from environment sensor being queried."
+		INDEX  { envir2HumidityIndex }
+		::= { envir2HumidTable 1 }
+
+ENVIR2HumidEntryStruct ::=
+  SEQUENCE {
+  	envir2HumidityIndex					   			 	INTEGER, 
+  	envir2HumidModulePosition							INTEGER,
+	  envir2Humidity			    							INTEGER,
+	  envir2HumidHighThreshold							INTEGER,
+	  envir2HumidLowThreshold								INTEGER,
+	  envir2HumidRateOfChange								INTEGER,
+	  envir2HumidHysteresis									INTEGER
+  }	
+
+envir2HumidityIndex OBJECT-TYPE
+    SYNTAX INTEGER(1..8)
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+				"The index to the environment sensor table entry."
+		::= { envir2HumidEntry 1 }
+
+envir2HumidModulePosition OBJECT-TYPE
+    SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+				"The position of environment sensor."
+		::= { envir2HumidEntry 2 }
+
+envir2Humidity OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The environment relative humidity expressed in 1/100."
+   ::= { envir2HumidEntry 3 }
+
+envir2HumidHighThreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+      "The high relative humidity threshold of the environment sensor.
+       The value expressed in persentage."
+   ::= { envir2HumidEntry 4 }
+
+envir2HumidLowThreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+      "The low relative humidity threshold of the environment sensor.
+       The value expressed in persentage."
+   ::= { envir2HumidEntry 5 }
+
+envir2HumidRateOfChange OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+      "The rate of change of the relative humidity.
+       The value expressed in persentage per 5 minute."
+   ::= { envir2HumidEntry 6 }
+
+envir2HumidHysteresis OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+      "The number of degrees beyond the relative humidity thresholds
+       at which an active relative humidity alarm will be cleared.
+       This configuration setting applies to all relative humidity
+       thresholds.
+       Units are displayed in persentage."
+   ::= { envir2HumidEntry 7 }
+
+-- envir2Contact group
+envir2ContactTableSize OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The number of the contact in the environment sensor."
+   ::= { envir2Contact 1 }
+
+envir2ContactTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF ENVIR2ContactEntryStruct
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+      "Allows for getting of information of each contact of the environment sensor."
+   ::= { envir2Contact 2 } 
+
+envir2ContactEntry  OBJECT-TYPE
+   SYNTAX ENVIR2ContactEntryStruct  
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+      "This gives access to contact entries"
+   INDEX  { envir2ContactIndex }
+   ::= { envir2ContactTable 1 }  
+
+ENVIR2ContactEntryStruct ::=
+   SEQUENCE {
+      envir2ContactIndex   	  	 			  	INTEGER,
+      envir2ContactModulePosition					INTEGER,
+      envir2ContactModuleNumber						INTEGER,
+      envir2ContactName 	  	  				  DisplayString,
+      envir2ContactStatus 	  					  INTEGER,
+      envir2ContactNormalState 						INTEGER
+   }
+
+envir2ContactIndex OBJECT-TYPE
+   SYNTAX INTEGER(1..32)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The index to the contact of the environment sensor."
+   ::= { envir2ContactEntry 1 }
+
+envir2ContactModulePosition OBJECT-TYPE
+    SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+				"The position of environment sensor."
+		::= { envir2ContactEntry 2 }
+
+envir2ContactModuleNumber OBJECT-TYPE
+    SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+				"The numeric contact ID."
+		::= { envir2ContactEntry 3 }
+
+envir2ContactName OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Getting or setting the name of the contact of the environment sensor."
+   ::= { envir2ContactEntry 4 }
+
+envir2ContactStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+      contactNormal         (1),
+      contactAbnormal       (2)
+   } 
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Getting this OID will return the Contact Status."
+   ::= { envir2ContactEntry 5 }
+
+envir2ContactNormalState OBJECT-TYPE
+   SYNTAX INTEGER {
+      normalOpen         (1),
+      normalClose        (2)
+   } 
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Set the contact normal state."
+   ::= { envir2ContactEntry 6 }
+
+bmWirelessPropertyMAC OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The battery manager wireless module MAC address."
+   ::= { bmWirelessProperty 1 }
+   
+bmWirelessPropertyHwInfo OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The battery manager wireless module hardware information."
+   ::= { bmWirelessProperty 2 }
+   
+bmWirelessPropertyFwInfo OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The battery manager wireless module firmware information."
+   ::= { bmWirelessProperty 3 }
+
+bmWirelessStatusState OBJECT-TYPE
+   SYNTAX INTEGER {
+      bmWirelessOnline(1),
+      bmWirelessOffline(2)
+   }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The battery manager wireless module status."
+   ::= { bmWirelessStatus 1 }
+
+bmWirelessStatusChannel OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The battery manager wireless network channel number."
+   ::= { bmWirelessStatus 2 }
+
+bmWirelessStatusPANID OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The battery manager wireless network PAN ID number."
+   ::= { bmWirelessStatus 3 }
+
+bmWirelessStatusLinkedNodes OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The battery manager wireless network linked node numbder."
+   ::= { bmWirelessStatus 4 }
+
+bmWirelessConfigJoin OBJECT-TYPE
+   SYNTAX INTEGER {
+      autoJoin(1),
+      manual(2)
+   }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "The battery manager wireless network auto join configuration."
+   ::= { bmWirelessConfig 1 }
+   
+bmWirelessControlRestart OBJECT-TYPE
+   SYNTAX INTEGER {
+      none(1),
+      reboot(2), 
+      reset(3)
+   }
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "The battery manager wireless network auto join configuration."
+   ::= { bmWirelessControl 1 }
+
+currIdentSystemID OBJECT-TYPE
+   SYNTAX INTEGER{
+   		batteryManager(1)
+   }
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Current probe connecting system type information. "
+   ::= { currIdent 1 }
+   
+currIdentSystemSerialNumber OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Current probe connecting system serial number information. "
+   ::= { currIdent 2 }
+   
+currIdentSystemName OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Current probe connecting system name information. "
+   ::= { currIdent 3 }
+   
+currIdentSystemLocation OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Current probe connecting system location information. "
+   ::= { currIdent 4 }
+   
+currIdentTableSize OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Number of current probe connecting to the system. "
+   ::= { currIdent 5 }
+   
+currIdentTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF CurrIdentEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+      "Current probe identification table. "
+   ::= { currIdent 6 }
+
+currIdentEntry OBJECT-TYPE
+   SYNTAX CurrIdentEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+      "Current probe identification entry. "
+   INDEX  { currIdentIndex }
+   ::= { currIdentTable 1 }
+
+CurrIdentEntry ::=
+   SEQUENCE {
+      currIdentIndex           	INTEGER,
+      currIdentName							DisplayString, 
+      currIdentLocation					DisplayString, 
+	    currIdentMeasureNum				INTEGER
+   }
+
+currIdentIndex OBJECT-TYPE
+   SYNTAX INTEGER(1..4)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The current probe ident index. "
+   ::= { currIdentEntry 1 }
+
+currIdentName OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "The current probe ident name. "
+   ::= { currIdentEntry 2 }
+
+currIdentLocation OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "The current probe ident location. "
+   ::= { currIdentEntry 3 }
+
+currIdentMeasureNum OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Number of the current flow measure by the current probe. "
+   ::= { currIdentEntry 4 }
+
+currConfigTableSize OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Number of entry in the currConfigTable. "
+   ::= { currConfig 1 }
+   
+currConfigTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF CurrConfigEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+      "Table provides current flow's configuration parameters. "
+   ::= { currConfig 2 }
+
+currConfigEntry OBJECT-TYPE
+   SYNTAX CurrConfigEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+      "The current flow's configration parameters entry. "
+   INDEX  { currConfigIndex }
+   ::= { currConfigTable 1 }
+
+CurrConfigEntry ::=
+	SEQUENCE {
+		currConfigIndex											INTEGER, 
+		currConfigCurrentSensorRating				INTEGER, 
+			  
+		currConfigChargeCurrentWarningLow			INTEGER, 
+		currConfigChargeCurrentWarningHigh		INTEGER, 
+		currConfigChargeCurrentAlarmLow			INTEGER, 
+		currConfigChargeCurrentAlarmHigh			INTEGER, 
+			  
+		currConfigDischargeCurrentWarningLow		INTEGER, 
+		currConfigDischargeCurrentWarningHigh		INTEGER, 
+		currConfigDischargeCurrentAlarmLow		INTEGER, 
+		currConfigDischargeCurrentAlarmHigh		INTEGER, 
+			  
+		currConfigRMSCurrentWarninigLow				INTEGER, 
+		currConfigRMSCurrentWarningHigh				INTEGER, 
+		currConfigRMSCurrentAlarmLow					INTEGER, 
+		currConfigRMSCurrentAlarmHigh					INTEGER
+	}
+
+currConfigIndex OBJECT-TYPE
+   SYNTAX INTEGER(1..4)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Entry index. "
+   ::= { currConfigEntry 1 }
+
+currConfigCurrentSensorRating OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Connecting current sensor element's rating, unit in 1 A. 
+      Sets to 0 if you do not use current sensor for this measure channel. 
+      Gets as 0 if this measure channel had not used. "
+   ::= { currConfigEntry 2 }
+
+currConfigChargeCurrentWarningLow OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+   		"Warning threshold for low charge current, unit in 0.01A. "
+   ::= { currConfigEntry 3 }
+
+currConfigChargeCurrentWarningHigh OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Warning threshold for high charge current, unit in 0.01A. "
+   ::= { currConfigEntry 4 } 
+
+currConfigChargeCurrentAlarmLow OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Alarm threshold for low charge current, unit in 0.01A. " 
+   ::= { currConfigEntry 5 }
+   
+currConfigChargeCurrentAlarmHigh OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+   		"Alarm threshold for high charge current, unit in 0.01A. "
+   ::= { currConfigEntry 6 }
+      
+currConfigDischargeCurrentWarningLow OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Warning threshold for low discharge current, unit in 0.01A. "
+   ::= { currConfigEntry 7 }
+   
+currConfigDischargeCurrentWarningHigh OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+   		"Warning threshold for high discharge current, unit in 0.01A. "
+   ::= { currConfigEntry 8 }
+
+currConfigDischargeCurrentAlarmLow OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Alarm threshold for low discharge current, unit in 0.01A. "
+   ::= { currConfigEntry 9 }
+
+currConfigDischargeCurrentAlarmHigh OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+   		"Alarm threshold for high discharge current, unit in 0.01A. "
+   ::= { currConfigEntry 10 }
+
+currConfigRMSCurrentWarninigLow OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Warning threshold for low RMS current, unit in 0.01A. "
+   ::= { currConfigEntry 11 }
+
+currConfigRMSCurrentWarningHigh OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Warning threshold for high RMS current, unit in 0.01A. "
+   ::= { currConfigEntry 12 }
+
+currConfigRMSCurrentAlarmLow OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Alarm threshold for low RMS current, unit in 0.01A. "
+   ::= { currConfigEntry 13 }
+
+currConfigRMSCurrentAlarmHigh OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Alarm threshold for high RMS current, unit in 0.01A. "
+   ::= { currConfigEntry 14 }
+
+currMeasureTableSize OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "Table size for the current probe's measurement. "
+   ::= { currMeasure 1 }
+   
+currMeasureTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF CurrMeasureEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+      "Table for the current probe's measurement. "
+   ::= { currMeasure 2 }
+
+currMeasureEntry OBJECT-TYPE
+   SYNTAX CurrMeasureEntry
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+      "The status of current sensors installation to gather status from. "
+   INDEX  { currMeasureIndex }
+   ::= { currMeasureTable 1 }
+
+CurrMeasureEntry ::=
+   SEQUENCE {
+      currMeasureIndex					INTEGER, 
+	  currMeasureIdentName				DisplayString, 
+	  currMeasureDescription			DisplayString, 
+      currMeasureAlarmStatus			INTEGER, 
+	  currMeasureChargingState			INTEGER, 
+      currMeasureCurrent				INTEGER, 
+      currMeasureFunction				INTEGER
+   }
+
+currMeasureIndex OBJECT-TYPE
+   SYNTAX INTEGER(1..4)
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The current measurement's index. "
+   ::= { currMeasureEntry 1 }
+
+currMeasureIdentName OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+      "The current measurement's current probe name. "
+   ::= { currMeasureEntry 2 }
+
+currMeasureDescription OBJECT-TYPE
+   SYNTAX DisplayString
+   ACCESS read-write
+   STATUS mandatory
+   DESCRIPTION
+      "Current flow measurement's description. "
+   ::= { currMeasureEntry 3 }
+
+currMeasureAlarmStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+      currentNormal(1), 
+      
+      chargeCurrentWarnLow(2), 
+      chargeCurrentWarnHigh(3),
+      chargeCurrentAlarmLow(4), 
+      chargeCurrentAlarmHigh(5),
+      
+      dischargeCurrentWarnLow(6), 
+      dischargeCurrentWarnHigh(7),
+      dischargeCurrentAlarmLow(8), 
+      dischargeCurrentAlarmHigh(9),
+      
+      rmsCurrentWarnLow(10), 
+      rmsCurrentWarnHigh(11), 
+      rmsCurrentAlarmLow(12), 
+      rmsCurrentAlarmHigh(13)
+   }
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The current alarm status. 
+      For battery system, abnormal value can be (2) to (9). 
+      For AC measure condition, abnormal value can be (50) to (53). 
+      "
+   ::= { currMeasureEntry 4 }
+
+currMeasureChargingState    OBJECT-TYPE
+   SYNTAX INTEGER {
+      batteryCharging(1), 
+      batteryDischarging(2), 
+      notDetermine(3)
+   }    
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+       "For battery system to get battery charging state." 
+   ::= { currMeasureEntry 5 }
+   
+currMeasureCurrent    OBJECT-TYPE
+   SYNTAX  INTEGER    
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+       "Getting this oid to get current measurement, unit in 10mA (0.01 A).
+       For battery system, negative value indicates the discharge state. " 
+   ::= { currMeasureEntry 6 }
+
+currMeasureFunction    OBJECT-TYPE
+   SYNTAX  INTEGER {	  
+      dcBatteryStringA(1), 
+      dcBatteryStringB(2), 
+      dcBatteryStringC(3), 
+      dcBatteryStringD(4), 
+      dcBatteryStringE(5), 
+      dcBatteryStringF(6), 
+      dcBatteryStringG(7), 
+      dcBatteryStringH(8), 
+	  dcReserved(9),
+	  
+	  acInputCurrent(20)
+   }
+   ACCESS  read-write
+   STATUS  mandatory
+   DESCRIPTION
+      "Getting this oid to check the configuration be matched with actual installation. 
+      Setting this oid to tell system what the measure target is. 
+      For the DC current(prefix as dc), charge/discharge threshold would be considered and used. 
+      For the AC current(prefix ad ac), RMS threshold would be considered and used. "
+   ::= { currMeasureEntry 7 }
+    
 -- Traps
 -- Annotations are provided for Novell's NMS product
 communicationLost TRAP-TYPE
@@ -9535,6 +11818,33 @@ outletUserLogoutInfo TRAP-TYPE
    --#STATE OPERATIONAL
    ::= 74
    
+firmwareUpdateSuccess TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { mtrapinfoString }
+   DESCRIPTION
+       "INFORMATION: Firmware update success."
+   --#TYPE "CPS: Firmware update success information."
+   --#SUMMARY "Firmware update success."
+   --#SEVERITY Information
+   --#TIMEINDEX 1
+   --#HELP ""
+   --#HELPTAG 0
+   --#STATE OPERATIONAL
+   ::= 75
+
+firmwareUpdateFail TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { mtrapinfoString }
+   DESCRIPTION
+       "INFORMATION: Firmware update fail."
+   --#TYPE "CPS: Firmware update fail information."
+   --#SUMMARY "Firmware update fail."
+   --#SEVERITY Information
+   --#TIMEINDEX 1
+   --#HELP ""
+   --#HELPTAG 0
+   --#STATE OPERATIONAL
+   ::= 76   
 -- ePDU. Traps
 
 ePDUCommunicationEstablished TRAP-TYPE
@@ -10442,6 +12752,145 @@ envRateOfHumdChangeAbnormal TRAP-TYPE
    --#STATE NONOPERATIONAL
    ::= 213   
 
+accessoryDeviceEvent TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { mtrapinfoString }
+		DESCRIPTION
+			"INFORMATIONAL: An accessory event has been happened."
+		::= 250
+
+accessoryDeviceAlarm TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { mtrapinfoString }
+		DESCRIPTION
+			"Alarm: An accessory alarm has been detected."
+		::= 251
+
+accessoryDeviceAlarmClear TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { mtrapinfoString }
+		DESCRIPTION
+			"INFORMATIONAL: An accessory alarm has been cleared."
+		::= 252
+
+envTemperatureEvent TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { envir2IdentSerialNumber, envir2IdentName, envir2IdentLocation,
+								envir2TemperatureIndex, envir2Temperature, mtrapinfoString }
+		DESCRIPTION
+			"INFORMATIONAL: An environment sensor Temperature event has been happened.
+				The first argument is the sensor serial number.
+				The second argument is the sensor name.
+				The third argument is the sensor location.
+				The foutrh argument is the temperture table index.
+				The fifth argument is the temperture."
+		::= 253
+
+envTemperatureAlarm TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { envir2IdentSerialNumber, envir2IdentName, envir2IdentLocation,
+								envir2TemperatureIndex, envir2Temperature, mtrapinfoString }
+		DESCRIPTION
+			"Alarm: An environment sensor Temperature alarm has been detected.
+				The first argument is the sensor serial number.
+				The second argument is the sensor name.
+				The third argument is the sensor location.
+				The foutrh argument is the temperture table index.
+				The fifth argument is the temperture."
+		::= 254
+
+envTemperatureAlarmClear TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { envir2IdentSerialNumber, envir2IdentName, envir2IdentLocation,
+								envir2TemperatureIndex, envir2Temperature, mtrapinfoString }
+		DESCRIPTION
+			"INFORMATIONAL: An environment sensor Temperature alarm has been cleared.
+				The first argument is the sensor serial number.
+				The second argument is the sensor name.
+				The third argument is the sensor location.
+				The foutrh argument is the temperture table index.
+				The fifth argument is the temperture."
+		::= 255
+
+envHumidityEvent TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { envir2IdentSerialNumber, envir2IdentName, envir2IdentLocation,
+								envir2HumidityIndex, envir2Humidity, mtrapinfoString }
+		DESCRIPTION
+			"INFORMATIONAL: An environment sensor Humidity event has been happened.
+				The first argument is the sensor serial number.
+				The second argument is the sensor name.
+				The third argument is the sensor location.
+				The foutrh argument is the humidity table index.
+				The fifth argument is the humidity."
+		::= 256
+
+envHumidityAlarm TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { envir2IdentSerialNumber, envir2IdentName, envir2IdentLocation,
+								envir2HumidityIndex, envir2Humidity, mtrapinfoString }
+		DESCRIPTION
+			"Alarm: An environment sensor Humidity alarm has been detected.
+				The first argument is the sensor serial number.
+				The second argument is the sensor name.
+				The third argument is the sensor location.
+				The foutrh argument is the humidity table index.
+				The fifth argument is the humidity."
+		::= 257
+
+envHumidityAlarmClear TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { envir2IdentSerialNumber, envir2IdentName, envir2IdentLocation,
+								envir2HumidityIndex, envir2Humidity, mtrapinfoString }
+		DESCRIPTION
+			"INFORMATIONAL: An environment sensor Humidity alarm has been cleared.
+				The first argument is the sensor serial number.
+				The second argument is the sensor name.
+				The third argument is the sensor location.
+				The foutrh argument is the humidity table index.
+				The fifth argument is the humidity."
+		::= 258
+
+envContactEvent TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { envir2IdentSerialNumber, envir2IdentName, envir2IdentLocation,
+								envir2ContactIndex, envir2ContactName, mtrapinfoString }
+		DESCRIPTION
+			"INFORMATIONAL: An environment sensor Contact event has been happened.
+				The first argument is the sensor serial number.
+				The second argument is the sensor name.
+				The third argument is the sensor location.
+				The foutrh argument is the contect table index.
+				The fifth argument is the contact name."
+		::= 259
+
+envContactAlarm TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { envir2IdentSerialNumber, envir2IdentName, envir2IdentLocation,
+								envir2ContactIndex, envir2ContactName, mtrapinfoString }
+		DESCRIPTION
+			"Alarm: An environment sensor Contact alarm has been detected.
+				The first argument is the sensor serial number.
+				The second argument is the sensor name.
+				The third argument is the sensor location.
+				The foutrh argument is the contect table index.
+				The fifth argument is the contact name."
+		::= 260
+
+envContactAlarmClear TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { envir2IdentSerialNumber, envir2IdentName, envir2IdentLocation,
+								envir2ContactIndex, envir2ContactName, mtrapinfoString }
+		DESCRIPTION
+			"INFORMATIONAL: An environment sensor Contact alarm has been cleared.
+				The first argument is the sensor serial number.
+				The second argument is the sensor name.
+				The third argument is the sensor location.
+				The foutrh argument is the contect table index.
+				The fifth argument is the contact name."
+		::= 261
+
+-- ATS Traps
 atsSwitchSource TRAP-TYPE
    ENTERPRISE cps
    VARIABLES { atsIdentName, atsIdentSerialNumber, atsStatusSelectedSource, mtrapinfoString }
@@ -11387,6 +13836,209 @@ pduDaisyChainAlarmClear TRAP-TYPE
        The foutrh argument is the alarm deice serial number.
        The fifth argument is the alarm device name."
 		::= 417
+		
+pduOutletMonitoredEvent TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { ePDU2IdentSerialNumber, ePDU2IdentName, ePDU2OutletMonitoredConfigIndex, 
+              ePDU2OutletMonitoredConfigNumber, ePDU2OutletMonitoredConfigName, mtrapinfoString }
+		DESCRIPTION
+			"INFORMATIONAL: A PDU metered outlet event has been happened.
+       The first argument is the serial number.
+       The second argument is the device name.
+       The third argument is the outlet table index.
+       The foutrh argument is the outlet number.
+       The fifth argument is the outlet name."
+		::= 418			
+
+pduSourceEvent TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { ePDU2IdentSerialNumber, ePDU2IdentName, 
+              ePDU2SourceStatusIndex, mtrapinfoString }
+		DESCRIPTION
+			"INFORMATIONAL: A ATS source event has been happened.
+       The first argument is the serial number.
+       The second argument is the device name.
+       The third argument is the source table index."
+		::= 419
+		
+pduSourceAlarm TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { ePDU2IdentSerialNumber, ePDU2IdentName, ePDU2SourceStatusSelectedSource, 
+              ePDU2SourceStatusIndex, mtrapinfoString }
+		DESCRIPTION
+			"INFORMATIONAL: A ATS source alarm has been detected.
+       The first argument is the serial number.
+       The second argument is the device name.
+       The third argument is the source table index."
+		::= 420
+	
+pduSourceAlarmClear TRAP-TYPE
+		ENTERPRISE cps
+		VARIABLES { ePDU2IdentSerialNumber, ePDU2IdentName, ePDU2SourceStatusSelectedSource, 
+              ePDU2SourceStatusIndex, mtrapinfoString }
+		DESCRIPTION
+			"INFORMATIONAL: A ATS source alarm has been cleared.
+       The first argument is the serial number.
+       The second argument is the device name.
+       The third argument is the source table index."
+		::= 421
+		
+-- UPS2 Traps
+upsOutletOn TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { upsAdvanceIdentSerialNumber, upsBaseIdentName,
+               upsIndividualOutletStatusIndex, upsIndividualOutletStatusName,
+               mtrapinfoString }
+   DESCRIPTION
+      "INFORMATIONAL: An outlet has turned on.
+       The first argument is the serial number.
+       The second argument is the device name.
+       The third argument is the outlet index number.
+       The fourth argument is the outlet name."
+   --#TYPE "An outlet has turned on."
+   --#SUMMARY "An outlet has turned on."
+   --#ARGUMENTS { }
+   --#SEVERITY INFORMATIONAL
+   --#TIMEINDEX 1
+   --#HELP ""
+   --#HELPTAG 0
+   --#STATE OPERATIONAL
+   ::= 500
+
+upsOutletOff TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { upsAdvanceIdentSerialNumber, upsBaseIdentName,
+               upsIndividualOutletStatusIndex, upsIndividualOutletStatusName,
+               mtrapinfoString }
+   DESCRIPTION
+      "INFORMATIONAL: An outlet has turned off.
+       The first argument is the serial number.
+       The second argument is the device name.
+       The third argument is the outlet index number.
+       The fourth argument is the outlet name."
+   --#TYPE "An outlet has turned off."
+   --#SUMMARY "An outlet has turned off."
+   --#ARGUMENTS { }
+   --#SEVERITY INFORMATIONAL
+   --#TIMEINDEX 1
+   --#HELP ""
+   --#HELPTAG 0
+   --#STATE OPERATIONAL
+   ::= 501
+
+upsOutletOnCommand TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { upsAdvanceIdentSerialNumber, upsBaseIdentName,
+               upsIndividualOutletControlIndex, upsIndividualOutletControlName,
+               mtrapinfoString }
+   DESCRIPTION
+      "INFORMATIONAL: An outlet has been assigned to turn on.
+       The first argument is the serial number.
+       The second argument is the device name.
+       The third argument is the outlet index number.
+       The fourth argument is the outlet name."
+   --#TYPE "An outlet has been assigned to turn on."
+   --#SUMMARY "An outlet has been assigned to turn on."
+   --#ARGUMENTS { }
+   --#SEVERITY INFORMATIONAL
+   --#TIMEINDEX 1
+   --#HELP ""
+   --#HELPTAG 0
+   --#STATE OPERATIONAL
+   ::= 502
+
+upsOutletOffCommand TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { upsAdvanceIdentSerialNumber, upsBaseIdentName,
+               upsIndividualOutletControlIndex, upsIndividualOutletControlName,
+               mtrapinfoString }
+   DESCRIPTION
+      "INFORMATIONAL: An outlet has been assigned to turn off.
+       The first argument is the serial number.
+       The second argument is the device name.
+       The third argument is the outlet index number.
+       The fourth argument is the outlet name."
+   --#TYPE "An outlet has been assigned to turn off."
+   --#SUMMARY "An outlet has been assigned to turn off."
+   --#ARGUMENTS { }
+   --#SEVERITY INFORMATIONAL
+   --#TIMEINDEX 1
+   --#HELP ""
+   --#HELPTAG 0
+   --#STATE OPERATIONAL
+   ::= 503
+
+upsOutletRebootCommand TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { upsAdvanceIdentSerialNumber, upsBaseIdentName,
+               upsIndividualOutletControlIndex, upsIndividualOutletControlName,
+               mtrapinfoString }
+   DESCRIPTION
+      "INFORMATIONAL: An outlet has been assigned to reboot.
+       The first argument is the serial number.
+       The second argument is the device name.
+       The third argument is the outlet index number.
+       The fourth argument is the outlet name."
+   --#TYPE "An outlet has been assigned to reboot."
+   --#SUMMARY "An outlet has been assigned to reboot."
+   --#ARGUMENTS { }
+   --#SEVERITY INFORMATIONAL
+   --#TIMEINDEX 1
+   --#HELP ""
+   --#HELPTAG 0
+   --#STATE OPERATIONAL
+   ::= 504
+
+upsCancelPendingCommand TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { upsAdvanceIdentSerialNumber, upsBaseIdentName,
+               upsIndividualOutletControlIndex, upsIndividualOutletControlName,
+               mtrapinfoString }
+   DESCRIPTION
+      "INFORMATIONAL: A cancel pending command has been made on an outlet.
+       The first argument is the serial number.
+       The second argument is the device name.
+       The third argument is the outlet index number.
+       The fourth argument is the outlet name."
+   --#TYPE "Cancel Pending Command made."
+   --#SUMMARY "A Cancel Pending Command has been made on an outlet."
+   --#ARGUMENTS { }
+   --#SEVERITY INFORMATIONAL
+   --#TIMEINDEX 1
+   --#HELP ""
+   --#HELPTAG 0
+   --#STATE OPERATIONAL
+   ::= 505
+
+upsAutoPingFail TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { upsAdvanceIdentSerialNumber, upsBaseIdentName,
+               mtrapinfoString }
+   DESCRIPTION
+       "SEVERE: AutoPing failed."
+   --#TYPE "CPS UPS: AutoPing failed"
+   --#SUMMARY "AutoPing failed."
+   --#SEVERITY SEVERE
+   --#TIMEINDEX 1
+   --#HELP ""
+   --#HELPTAG 0
+   --#STATE DEGRADED
+   ::= 506
+
+upsAutoPingRecovery TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { upsAdvanceIdentSerialNumber, upsBaseIdentName,
+               mtrapinfoString }
+   DESCRIPTION
+      "INFORMATIONAL: AutoPing recovered."
+   --#TYPE "CPS UPS: AutoPing recovered"
+   --#SUMMARY "AutoPing recovered."
+   --#SEVERITY INFORMATIONAL
+   --#TIMEINDEX 1
+   --#HELP ""
+   --#HELPTAG 0
+   --#STATE OPERATIONAL
+   ::= 507
 
 bmSystemAlarm TRAP-TYPE
    ENTERPRISE cps
@@ -11466,5 +14118,79 @@ bmProbesInfo TRAP-TYPE
        The seventh argument is the trap information string."
    ::= 605
 
+bmStringsAlarm TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { bmIdentSerialNumber, bmIdentName, bmIdentLocation, bmStringsIndex, mtrapinfoBmEventId, mtrapinfoString }
+   DESCRIPTION
+      "ALARM: String alarm event.
+       The first argument is the bm device serial number.
+       The second argument is the bm system identification name. 
+       The third argument is the bm system location. 
+       The fourth argument is the string index. 
+       The fifth argument is the alarm event specific identifier. 
+       The sixth argument is the trap information string."
+   ::= 606
+
+bmStringsWarning TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { bmIdentSerialNumber, bmIdentName, bmIdentLocation, bmStringsIndex, mtrapinfoBmEventId, mtrapinfoString }
+   DESCRIPTION
+      "WARNING: String warning event.
+       The first argument is the bm device serial number.
+       The second argument is the bm system identification name. 
+       The third argument is the bm system location. 
+       The fourth argument is the string index. 
+       The fifth argument is the alarm event specific identifier. 
+       The sixth argument is the trap information string."
+   ::= 607
+
+bmStringsInfo TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { bmIdentSerialNumber, bmIdentName, bmIdentLocation, bmStringsIndex, mtrapinfoBmEventId, mtrapinfoString }
+   DESCRIPTION
+      "INFO: String info event.
+       The first argument is the bm device serial number.
+       The second argument is the bm system identification name. 
+       The third argument is the bm system location. 
+       The fourth argument is the string index. 
+       The fifth argument is the alarm event specific identifier. 
+       The sixth argument is the trap information string."
+   ::= 608
+
+currProbesAlarm TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { 
+   		currIdentSystemName, currIdentSystemLocation, mtrapinfoCpEventId, mtrapinfoString }
+   DESCRIPTION
+      "ALARM: Current probe alarm event.
+       The first argument is the system identification name.
+       The second argument is the system location.
+       The third argument is the alarm event specific identifier.
+       The fourth argument is the trap information string."
+   ::= 700
+
+currProbesWarning TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { 
+   		currIdentSystemName, currIdentSystemLocation, mtrapinfoCpEventId, mtrapinfoString }
+   DESCRIPTION
+      "Warning: Current probe warning event.
+       The first argument is the system identification name.
+       The second argument is the system location.
+       The third argument is the alarm event specific identifier.
+       The fourth argument is the trap information string."
+   ::= 701
+   
+currProbesInfo TRAP-TYPE
+   ENTERPRISE cps
+   VARIABLES { 
+   		currIdentSystemName, currIdentSystemLocation, mtrapinfoCpEventId, mtrapinfoString }
+   DESCRIPTION
+      "Info: Current probe info event.
+       The first argument is the system identification name.
+       The second argument is the system location.
+       The third argument is the alarm event specific identifier.
+       The fourth argument is the trap information string."
+   ::= 702
 END
 

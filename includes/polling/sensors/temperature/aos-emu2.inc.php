@@ -1,4 +1,5 @@
 <?php
+
 /**
  * aos-emu2.inc.php
  *
@@ -22,4 +23,6 @@
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-$sensor_value = fahrenheit_to_celsius($sensor_value, $sensor_cache['scale']);
+$scale = SnmpQuery::cache()->enumStrings()->get('PowerNet-MIB::emsStatusSysTempUnits.0')->value();
+
+$sensor_value = fahrenheit_to_celsius($sensor_value, $scale);

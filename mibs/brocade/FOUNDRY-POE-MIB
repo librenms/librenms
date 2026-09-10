@@ -1,0 +1,325 @@
+FOUNDRY-POE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+			Integer32, Unsigned32	   	FROM SNMPv2-SMI	  			-- [RFC2578]
+	DisplayString		 				FROM SNMPv2-TC 		 		-- [RFC2579]
+	InterfaceIndex						FROM IF-MIB
+	snAgentSys	 						FROM FOUNDRY-SN-ROOT-MIB
+	;
+
+snAgentPoe MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+	      "The Brocade proprietary MIB module for Power Over Ethernet(PoE)
+		It has PoE port and module configuring information.
+
+              Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION     "200909300000Z" -- September 30, 2009
+    DESCRIPTION	"Changed INTEGER to Integer32"
+
+    REVISION 	"200904030000Z"  -- 3 April 2009
+    DESCRIPTION	"Initial version, snAgentPoePortTable which was in SNMPv1 written in SNMPv2-SMI."
+
+  ::= { snAgentSys 14 }
+
+-- Power Over Ethernet MIB Group
+
+snAgentPoeGbl  OBJECT IDENTIFIER ::= { snAgentPoe 1 }
+snAgentPoePort OBJECT IDENTIFIER ::= { snAgentPoe 2 }
+snAgentPoeModule OBJECT IDENTIFIER ::= { snAgentPoe 3 }
+snAgentPoeUnit OBJECT IDENTIFIER ::= { snAgentPoe 4 }
+
+
+-- Power Over Ethernet Global Objects
+
+snAgentPoeGblPowerCapacityTotal  OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This object shows the total inline power capacity available in the device, measured in mWatts. "
+	::= { snAgentPoeGbl 1 }
+
+snAgentPoeGblPowerCapacityFree  OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This object shows the inline power capacity currently available in the device which is unallocated, measured in mWatts."
+	::= { snAgentPoeGbl 2 }
+
+snAgentPoeGblPowerAllocationsRequestsHonored   OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This object shows number of times the inline power allocations requests honored."
+	::= { snAgentPoeGbl 3}
+
+
+-- Power Over Ethernet Port Table
+
+snAgentPoePortTable       OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnAgentPoePortEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A table of POE port information."
+	::= { snAgentPoePort 2 }
+
+snAgentPoePortEntry       OBJECT-TYPE
+	SYNTAX	SnAgentPoePortEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A row in the POE port table."
+	INDEX	{ snAgentPoePortNumber }
+	::= { snAgentPoePortTable 1 }
+
+SnAgentPoePortEntry ::= SEQUENCE {
+	snAgentPoePortNumber
+		InterfaceIndex,
+	snAgentPoePortControl
+		INTEGER,
+	snAgentPoePortWattage
+		Integer32,
+	snAgentPoePortClass
+		Integer32,
+	snAgentPoePortPriority
+		INTEGER,
+	snAgentPoePortConsumed
+		Integer32,
+	snAgentPoePortType
+		DisplayString
+	}
+
+snAgentPoePortNumber OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The port number in ifIndex value."
+	::= { snAgentPoePortEntry 1 }
+
+snAgentPoePortControl OBJECT-TYPE
+	SYNTAX	INTEGER {
+              other(1),
+              disable(2),
+              enable(3),
+              enableLegacyDevice(4)
+            }
+	MAX-ACCESS  read-create
+	STATUS	current
+	DESCRIPTION
+		"Control inline power on/off to a port. If a port does not
+		have inline power capability, reading this object returns
+		'other(1)'."
+	::= { snAgentPoePortEntry 2 }
+
+snAgentPoePortWattage OBJECT-TYPE
+	SYNTAX	Integer32
+	MAX-ACCESS  read-create
+	STATUS	current
+    DESCRIPTION
+		"Adjust the inline power wattage. Valid value between 1000
+		to 15400(IEEE802_3AF)/30000(IEEE802_3AT). Each unit is milliwatts. This object can only be
+		set after snSwIfInLinePowerControl has been set to 'enable(3)'
+		or 'enableLegacyDevice(4)'. If a port does not have inline
+		power capability, reading this object returns undefined value."
+    ::= { snAgentPoePortEntry 3 }
+
+snAgentPoePortClass OBJECT-TYPE
+	SYNTAX	Integer32
+	MAX-ACCESS  read-create
+	STATUS	current
+    DESCRIPTION
+		"Adjust the inline power class. Valid value between 0 to 3(IEEE802_3AF)/4(IEEE802_3AT).
+		This object can only be set after snSwIfInLinePowerControl
+		has been set to 'enable(3)' or 'enableLegacyDevice(4)'. If
+		a port does not have inline power capability, reading this
+		object returns undefined value."
+    ::= { snAgentPoePortEntry 4 }
+
+snAgentPoePortPriority OBJECT-TYPE
+	SYNTAX	INTEGER	{
+              invalid(0),
+              critical(1),
+              high(2),
+              low(3),
+              medium(4),
+              other(5)
+            }
+	MAX-ACCESS  read-create
+	STATUS	current
+	DESCRIPTION
+		"Inline power allocation priority for the power device
+		 0- Not a POE port, 1- Critical, 2- High, 3- Low,
+		 4- Medium, 5- other."
+	::= { snAgentPoePortEntry 5 }
+
+snAgentPoePortConsumed OBJECT-TYPE
+	SYNTAX	Integer32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Inline power consumed by the port. Each unit is milliwatts."
+	::= { snAgentPoePortEntry 6 }
+
+snAgentPoePortType OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Inline Power device type	802.3af, 802.3at or Legacy device."
+	::= { snAgentPoePortEntry 7 }
+
+
+-- Power Over Module Table
+
+snAgentPoeModuleTable       OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnAgentPoeModuleEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A table of POE Module configuration."
+	::= { snAgentPoeModule 1 }
+
+snAgentPoeModuleEntry       OBJECT-TYPE
+	SYNTAX	SnAgentPoeModuleEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A row in the POE Module table."
+	INDEX	{ snAgentPoeModuleNumber }
+	::= { snAgentPoeModuleTable 1 }
+
+SnAgentPoeModuleEntry ::= SEQUENCE {
+	snAgentPoeModuleNumber
+		Unsigned32,
+	snAgentPoeModuleBudget
+		Unsigned32,
+	snAgentPoeModuleMaxPDTypeSupport
+		INTEGER
+	}
+
+snAgentPoeModuleNumber OBJECT-TYPE
+    SYNTAX  Unsigned32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This objects talks about POE module number."
+	::= { snAgentPoeModuleEntry 1 }
+
+snAgentPoeModuleBudget OBJECT-TYPE
+	SYNTAX	Unsigned32
+	MAX-ACCESS  read-create
+	STATUS	current
+    DESCRIPTION
+		"This objects talks about module power budget in watts."
+    ::= { snAgentPoeModuleEntry 2 }
+
+snAgentPoeModuleMaxPDTypeSupport  OBJECT-TYPE
+	SYNTAX	INTEGER	{
+              ieee802dot3af(0),
+              ieee802dot3at(1)
+            }
+	MAX-ACCESS  read-only
+	STATUS	current
+    DESCRIPTION
+		"This object talks about the POE module type which is capable to support Power Device (PD) type
+		ieee802.3af or ieee802.3at(also called POE plus)type. Module which support ieee802.3at can also
+		support ieee802.3af but reverse is not true."
+
+    ::= { snAgentPoeModuleEntry 3 }
+
+
+
+-- Power Over Unit Table (stacking system)
+
+snAgentPoeUnitTable       OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnAgentPoeUnitEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A table of POE informaion for each unit. Only the unit
+		that has POE capability appears in a table row"
+	::= { snAgentPoeUnit 1 }
+
+snAgentPoeUnitEntry       OBJECT-TYPE
+	SYNTAX	SnAgentPoeUnitEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A row in the POE Unit table."
+	INDEX	{ snAgentPoeUnitIndex }
+	::= { snAgentPoeUnitTable 1 }
+
+SnAgentPoeUnitEntry ::= SEQUENCE {
+	snAgentPoeUnitIndex
+		Unsigned32,
+	snAgentPoeUnitPowerCapacityTotal
+		Unsigned32,
+	snAgentPoeUnitPowerCapacityFree
+		Unsigned32,
+	snAgentPoeUnitPowerAllocationsRequestsHonored
+		Unsigned32
+	}
+
+snAgentPoeUnitIndex OBJECT-TYPE
+    SYNTAX  Unsigned32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The Index to POE unit Table."
+	::= { snAgentPoeUnitEntry 1 }
+
+snAgentPoeUnitPowerCapacityTotal  OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This object shows the total inline power capacity available on that unit (device), measured in mWatts. "
+	::= { snAgentPoeUnitEntry 2 }
+
+snAgentPoeUnitPowerCapacityFree  OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This object shows the inline power capacity currently available on that unit (device) which is unallocated, measured in mWatts."
+	::= { snAgentPoeUnitEntry 3 }
+
+snAgentPoeUnitPowerAllocationsRequestsHonored   OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This object shows number of times the inline power allocations requests honored on that unit (device)."
+	::= { snAgentPoeUnitEntry 4}
+
+END
+

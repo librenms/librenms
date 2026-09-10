@@ -1,13 +1,9 @@
--- =================================================================
--- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved
--- 
--- Description: The HUAWEI-IPV6-MIB provides information about IPv6.
---              
--- Reference:
--- Version:     V1.0
--- History:
---              wangshuangxu,2007.5.24,publish 
--- =================================================================
+-- =============================================================================================================
+-- Copyright (C) 2021 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: The HUAWEI-IPV6-MIB provides information about IPv6.         
+-- Reference:   
+-- Version: V2.06
+-- ==============================================================================================================
 HUAWEI-IPV6-MIB DEFINITIONS ::= BEGIN
 
     IMPORTS
@@ -17,31 +13,54 @@ HUAWEI-IPV6-MIB DEFINITIONS ::= BEGIN
             FROM IF-MIB
         OBJECT-GROUP, MODULE-COMPLIANCE
             FROM SNMPv2-CONF
-        OBJECT-TYPE, MODULE-IDENTITY
+        OBJECT-TYPE, MODULE-IDENTITY,Integer32,Unsigned32
             FROM SNMPv2-SMI
-        RowStatus
+        RowStatus, DisplayString, TruthValue
             FROM SNMPv2-TC 
-        DisplayString
-            FROM SNMPv2-TC
-        ipv6IfIndex
+        Ipv6Address                             
+            FROM IPV6-TC
+        ipv6IfIndex, ipv6NetToMediaPhysAddress
             FROM IPV6-MIB           
         EnabledStatus                                   
-            FROM P-BRIDGE-MIB;
-
+            FROM P-BRIDGE-MIB   
+        hwFrameIndex, hwSlotIndex,hwSubslotIndex,hwPortIndex,hwOntIndex   
+       	    FROM HUAWEI-DEVICE-MIB
+        hwVlanID
+            FROM HUAWEI-VLAN-MIB
+        NOTIFICATION-TYPE
+            FROM SNMPv2-SMI;
+            
     hwIpv6Mib MODULE-IDENTITY
-        LAST-UPDATED "200705241610Z"
-        ORGANIZATION "IPv6-Team of Huawei Technologies"
+        LAST-UPDATED "202112010000Z"
+        ORGANIZATION
+           "Huawei Technologies Co.,Ltd."
         CONTACT-INFO
-            "R&D BeiJing, Huawei Technologies co.,Ltd.
-            Showchuang Bld.,NO.3 Xinxi Rd., 
-            Shang-Di Information Industry Base,
-            Hai-Dian District Beijing P.R. China
-            Zip:100085 
-            Http://www.huawei.com                                       
-            E-mail:winstan@huawei.com"
+            "Huawei Industrial Base                      
+             Bantian, Longgang                           
+             Shenzhen 518129                             
+             People's Republic of China                  
+             Website: http://www.huawei.com              
+             Email: support@huawei.com                   
+             " 
         DESCRIPTION
             "The MIB module for entities implementing the IPv6
              protocol."
+--  Revision history
+        REVISION     "202112010000Z"
+        DESCRIPTION  "V2.06, IMPORTS Unsigned32 FROM SNMPv2-SMI." 
+
+        REVISION     "202109090000Z"
+        DESCRIPTION  "V2.05, add nodes hwIpv6NdThresholdExceedTrapsPrefix and hwNdTrapsOids." 
+
+        REVISION     "201812240000Z"
+        DESCRIPTION  "V2.04, add Options of hwIpv6GeneratedLinklocalType ." 
+
+        REVISION     "201508060000Z"
+        DESCRIPTION  "V2.02, modify the max-access of hwIpv6GlobalAddrAddress." 
+
+        REVISION     "201406300000Z"
+        DESCRIPTION  "V2.01, modify the description.
+		              add nodes hwIpv6ProductAn, hwIpv6ProductAnTraps, hwIpv6AlarmTrapsPrefix and hwDadIPv6ConflictTrap." 
         ::= { hwDatacomm 153 }
         
     hwIpv6MibObjects OBJECT IDENTIFIER ::= { hwIpv6Mib 1 }
@@ -81,12 +100,12 @@ HUAWEI-IPV6-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION
-            "This object identifies interface name."
+            "Interface name."
         ::= { hwIpv6IfEntry 1 }
         
     hwIpv6IfEnableFlag OBJECT-TYPE
         SYNTAX    EnabledStatus  
-        MAX-ACCESS read-only
+        MAX-ACCESS read-write
         STATUS     current
         DESCRIPTION
             "This object identifies whether IPv6 is enabled on interface 
@@ -94,6 +113,186 @@ HUAWEI-IPV6-MIB DEFINITIONS ::= BEGIN
             this object refers to 1,else refers to 2."
         ::= { hwIpv6IfEntry 2 }
         
+        
+    -- ==============================    
+    -- the IPv6 linklocal address configure table
+    -- ==============================        
+
+    hwIpv6LinklocalCfgTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF HwIpv6LinklocalCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Link local address configuration table for a router which
+                consists of a sequence (i.e., one or more conceptual
+                rows) of 'hwIpv6LinklocalCfgEntry' items which describe
+                the link local address characteristics of IPv6 enabled interfaces."
+        ::= { hwIpv6MibObjects 2 }
+    
+    hwIpv6LinklocalCfgEntry OBJECT-TYPE
+        SYNTAX     HwIpv6LinklocalCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An entry in hwIpv6LinklocalCfgTable containing link local address 
+            characteristics of an IPv6 enabled interface. 
+                Each row entry is identified uniquely by an ipv6IfIndex.
+                ipv6IfIndex represents interface index of an interface."
+           
+        INDEX   { ipv6IfIndex }
+        ::= { hwIpv6LinklocalCfgTable 1 }        
+        
+    HwIpv6LinklocalCfgEntry ::= SEQUENCE {
+        hwIpv6GeneratedLinklocalType             INTEGER,    
+        hwIpv6LinklocalAddr             Ipv6Address,
+        hwIpv6ConfigAutoLinklocal        TruthValue,
+        hwIpv6linklocalAddrRowStatus        RowStatus
+        }
+        
+    hwIpv6GeneratedLinklocalType OBJECT-TYPE
+        SYNTAX INTEGER  
+            {
+            manual(1),
+            auto(2)
+            }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Specifies the configuration type of the link local address.
+            Options:                                                      
+            1. manual(1)   -indicates the link local address is manually configured.
+            2. auto'(2) -indicates the link local address is auto configured."
+        ::= { hwIpv6LinklocalCfgEntry 1 }
+                
+    hwIpv6LinklocalAddr OBJECT-TYPE
+        SYNTAX    Ipv6Address  
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "This object specifies the link local address on the interface.
+            For creation of auto link local address, this object value must be ignored."
+        ::= { hwIpv6LinklocalCfgEntry 2 }         
+          
+    hwIpv6ConfigAutoLinklocal OBJECT-TYPE
+        SYNTAX    TruthValue  
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+            "This object specifies whether auto link local address configuration 
+            is enabled by administrator or not. Is 'true' when enabled otherwise 'false'."
+        ::= { hwIpv6LinklocalCfgEntry 3 }     
+             
+    hwIpv6linklocalAddrRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus  
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "The RowStatus variable should be used in accordance to
+               installation and removal conventions for conceptual
+               rows with following deviations:
+                             
+               - only 'createAndGo' is supported for row creation, 
+               - notInService(2) value is not supported.
+               
+               To create a row in this table, a manager sets this
+               object to createAndGo(4).
+               
+               When the link local address is in Tentative/Duplicate state 
+               then hwIpv6linklocalAddrRowStatus will take a value notReady (3).
+               Otherwise hwIpv6linklocalAddrRowStatus is Active (1)
+               
+               To delete the row in this table, a manager sets this object to Destroy(6)."
+
+        ::= { hwIpv6LinklocalCfgEntry 4 }
+
+    -- ==============================    
+    -- the IPv6 global linklocal address configure table
+    -- ==============================        
+  -- ==============================    
+    -- the IPv6 global address configure table
+    -- ==============================        
+
+    hwIpv6GlobalCfgTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF HwIpv6GlobalCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Global/EUI address configuration table for a router which
+                consists of a sequence (i.e., one or more conceptual
+                rows) of 'hwIpv6GlobalCfgEntry' items which describe
+                the IPv6 global or EUI address characteristics of IPv6 enabled interfaces."
+        ::= { hwIpv6MibObjects 4 }
+    
+    hwIpv6GlobalCfgEntry OBJECT-TYPE
+        SYNTAX     HwIpv6GlobalCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An entry in hwIpv6GlobalCfgTable containing IPv6 global or EUI address 
+            characteristics of an IPv6 enabled interface. 
+                Each row entry is identified uniquely by a combination of 
+                ipv6IfIndex and ipv6GblAddr.
+                
+                ipv6IfIndex represents interface index of an interface.
+                ipv6GblAddr represents EUI prefix or global IPv6 address."
+        INDEX   { ipv6IfIndex, hwIpv6GlobalAddrAddress }
+        ::= { hwIpv6GlobalCfgTable 1 }        
+        
+    HwIpv6GlobalCfgEntry ::= SEQUENCE {
+        hwIpv6GlobalAddrAddress             Ipv6Address,
+        hwIpv6GlobalAddrPfxLength           Integer32,
+        hwIpv6GlobalAddrEuiFlag             TruthValue,
+        hwIpv6GlobalAddrRowStatus        RowStatus
+        }
+        
+    hwIpv6GlobalAddrAddress OBJECT-TYPE
+        SYNTAX    Ipv6Address  
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+         "This object specifies the global or EUI IPv6 address on the interface."
+        ::= { hwIpv6GlobalCfgEntry 1 }
+                 
+    hwIpv6GlobalAddrPfxLength OBJECT-TYPE
+        SYNTAX     Integer32(1..128)
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "The length of the prefix (in bits) associated with the configured 
+            global or EUI IPv6 address of this entry."
+        ::= { hwIpv6GlobalCfgEntry 2 }
+          
+    hwIpv6GlobalAddrEuiFlag OBJECT-TYPE
+        SYNTAX    TruthValue  
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "This object specifies whether the global address is an EUI address or not.
+            Is 'true' if created as EUI address otherwise false."
+        ::= { hwIpv6GlobalCfgEntry 3 }  
+        
+    hwIpv6GlobalAddrRowStatus OBJECT-TYPE
+        SYNTAX    RowStatus  
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "The RowStatus variable should be used in accordance to
+               installation and removal conventions for conceptual
+               rows with following deviations:
+                             
+               - only 'createAndGo' is supported for row creation, 
+               - notInService(2) value is not supported.
+               
+               To create a row in this table, a manager sets this
+               object to createAndGo(4).
+               
+               When the global or EUI IPv6 address is in Tentative/Duplicate state 
+               then hwIpv6GlobalAddrRowStatus value will be notReady (3). 
+               Otherwise hwIpv6GlobalAddrRowStatus is Active (1).
+               
+               To delete the row in this table, a manager sets this object to Destroy(6)."
+        ::= { hwIpv6GlobalCfgEntry 4 }   
+
     hwIpv6MibConformance OBJECT IDENTIFIER ::= { hwIpv6Mib 2 }
     
     hwIpv6Compliances  OBJECT IDENTIFIER ::= { hwIpv6MibConformance 1 }
@@ -112,14 +311,101 @@ HUAWEI-IPV6-MIB DEFINITIONS ::= BEGIN
     hwIpv6Group OBJECT-GROUP
         OBJECTS { 
             hwIpv6IfDescr, 
-            hwIpv6IfEnableFlag}
+            hwIpv6IfEnableFlag,
+            hwIpv6GeneratedLinklocalType,
+            hwIpv6LinklocalAddr,
+            hwIpv6ConfigAutoLinklocal,
+            hwIpv6linklocalAddrRowStatus,
+            hwIpv6GlobalAddrAddress,
+            hwIpv6GlobalAddrPfxLength,
+            hwIpv6GlobalAddrEuiFlag,
+            hwIpv6GlobalAddrRowStatus
+        }
         STATUS current
         DESCRIPTION 
             "The IPv6 table member."
         ::= { hwIpv6Groups 1 }
+     
+     hwIpv6ProductAn OBJECT IDENTIFIER ::= { hwIpv6Mib 3 }
+     
+     hwIpv6ProductAnTraps OBJECT IDENTIFIER ::= { hwIpv6ProductAn 2 }
+     
+     hwIpv6AlarmTrapsPrefix OBJECT IDENTIFIER ::= { hwIpv6ProductAnTraps 0 }
+     
+     hwDadIPv6ConflictTrap NOTIFICATION-TYPE
+        OBJECTS 
+            { 
+                hwVlanID,
+                hwIpv6LinklocalAddr, 
+                hwIpv6GlobalAddrAddress, 
+                ipv6NetToMediaPhysAddress, 
+                hwFrameIndex, 
+                hwSlotIndex,
+                hwPortIndex,
+                hwOntIndex   
+            }
+        STATUS current
+        DESCRIPTION 
+            "This notification is generated when device receives an NA packet,which  
+             source Ipv6 address is the same as Ipv6 address of the device.
+            "
+        ::= { hwIpv6ProductAnTraps 0 1 }
 
+     hwIpv6NdThresholdExceedTrapsPrefix OBJECT IDENTIFIER ::= { hwIpv6ProductAnTraps 1 }
+
+     hwIpv6NdThresholdExceedTrap NOTIFICATION-TYPE
+        OBJECTS
+            {
+                hwNdThreshold,
+                hwNdDynNum,
+                hwNdStaNum
+            }
+        STATUS current
+        DESCRIPTION 
+            "This notification is generated when The number of ND entries on the device exceeded the upper threshold.
+            "
+        ::= { hwIpv6ProductAnTraps 1 1 }
+
+     hwIpv6NdThresholdRestoredTrap NOTIFICATION-TYPE
+        OBJECTS 
+            {
+                hwNdThreshold,
+                hwNdDynNum,
+                hwNdStaNum
+            }
+        STATUS current
+        DESCRIPTION 
+            "This notification is generated when The number of ND entries was restored to the threshold.
+            "
+        ::= { hwIpv6ProductAnTraps 1 2 }
+
+    hwNdTrapsOids OBJECT IDENTIFIER ::= { hwIpv6ProductAn 3 }
+
+    hwNdThreshold OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The threshold of ND entries.
+            "
+        ::= { hwNdTrapsOids 1 }
+
+    hwNdDynNum OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The number of ND dynamic entries.
+            "
+        ::= { hwNdTrapsOids 2 }
+
+    hwNdStaNum OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The number of ND static entries.
+            "
+        ::= { hwNdTrapsOids 3 }
 END
-    
-                  
-                                                                           
-                                                                           
+

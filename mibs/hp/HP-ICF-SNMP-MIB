@@ -3,7 +3,7 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
     IMPORTS
         hpSwitch            
             FROM HP-ICF-OID            
-        ifIndex, InterfaceIndexOrZero            
+        InterfaceIndexOrZero            
             FROM IF-MIB            
         InetAddressType, InetAddress            
             FROM INET-ADDRESS-MIB            
@@ -15,10 +15,8 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
 
     -- 1.3.6.1.4.1.11.2.14.11.5.1.38
     hpicfSnmpMIB MODULE-IDENTITY 
-        LAST-UPDATED "200708240000Z"      -- August 24, 2007 at 00:00 GMT
-        ORGANIZATION 
-            "Hewlett-Packard Company
-            Procurve Networking Business"
+        LAST-UPDATED "200812090000Z"      -- August 24, 2007 at 00:00 GMT
+        ORGANIZATION "HP Networking"
         CONTACT-INFO 
             "Hewlett-Packard Company
             8000 Foothills Blvd.
@@ -26,18 +24,26 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION 
             "This MIB module contains HP proprietary
             objects for managing SNMP entity."
-        REVISION "200611110000Z"      -- November 11, 2006 at 00:00 GMT
+        REVISION "200812090000Z"      --December 12 2008 at 00:00 GMT    
+        DESCRIPTION "Updated Description for 
+        hpicfSnmpResponseSourceAddrPolicy,
+        hpicfSnmpResponseSourceAddress,
+        hpicfSnmpResponseSourceAddrIfIndex,
+        hpicfSnmpTrapSourceAddrPolicy,hpicfSnmpTrapSourceAddress,
+        and hpicfSnmpTrapSourceAddrIfIndex "
+        
+        REVISION "200708240000Z"      -- August 24, 2007 at 00:00 GMT
+        DESCRIPTION 
+            "Added hpicfSnmpNotification information."
+        REVISION "200611110000Z"        -- November 11, 2006 at 00:00 GMT
         DESCRIPTION 
             "Updated description and changed InterfaceIndex                      
                     to InterfaceIndexOrZero for                       
                     hpicfSnmpResponseSourceAddrIfIndex and                       
                     hpicfSnmpTrapSourceAddrIfIndex objects."
-        REVISION "200609010000Z"      -- September 01, 2006 at 00:00 GMT
+        REVISION "200609010000Z"        -- September 01, 2006 at 00:00 GMT
         DESCRIPTION 
             "Initial revision"
-        REVISION "200708240000Z"      -- August 24, 2007 at 00:00 GMT
-        DESCRIPTION 
-            "Added hpicfSnmpNotification information."
         ::= { hpSwitch 38 }
 
     
@@ -94,7 +100,7 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
                configured. In this case the source address will be 
                the address of the interface from which packet goes 
                out of the box. 
-            b) user configured ip address
+            b) user configured IP address
                In this case the configured address will be used as 
                source address in the SNMP response.
             c) user configured interface
@@ -105,7 +111,7 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
                order will be used as source address while sending
                SNMP responses for requests.
             d) dst_ip_of_request
-               In this case, the destination ip address present in 
+               In this case, the destination IP address present in 
                the IP header of received SNMP request will be used 
                as source address in the SNMP response."
         ::= { hpicfSnmpGlobalCfg 1 }
@@ -118,7 +124,7 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "An entry in the table, containing information about
-            a single source address. This table alows only 2 values 
+            a single source address. This table allows only 2 values 
             that can be used as index to this table. These are:
             1) hpicfSnmpResponseSourceAddressType = ipv4
               Where user wants to configure the source address type 
@@ -183,8 +189,11 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
              IP addresses specified in hpicfSnmpResponseSourceAddress
              object as source address while sending the response.
              hpicfSnmpResponseSourceAddress must be set to a valid
-             and active ip address before setting policy to
+             and active IP address before setting policy to
              configuredIP.
+				 Note: This IP address will be used in the SNMP response
+				 PDU provided it is configured as an IP address on any 
+				 one of the interfaces of the device.
             c) configuredInterface
              By setting this value will enable the SNMP agent to use
              IP addresses configured on the interface specified by 
@@ -197,8 +206,11 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
              hpicfSnmpResponseSourceAddrIfIndex object must be set
              to a valid loopback interface number before setting
              policy to configuredInterface.
+				 Note: The configured interface's IP address will be used 
+				 in the SNMP response PDU provided the interface has an IP 
+				 address configured.
             d) dst_ip_of_request
-             In this case, the destination ip address present in 
+             In this case, the destination IP address present in 
              the IP header of received SNMP request will be used as 
              source address in the SNMP response."
         DEFVAL { 1 }
@@ -212,10 +224,13 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "This object is used to set the IP address which will be 
-            used as source ip while sending the SNMP response.
+            used as source IP while sending the SNMP response.
             This object should be used in conjunction with the 
             hpicfSnmpResponseSourceAddressType and 
-            hpicfSnmpResponseSourceAddrPolicy."
+            hpicfSnmpResponseSourceAddrPolicy. 
+				Note: This IP address will be used in the SNMP response
+				PDU provided it is configured as an IP address on any 
+				one of the interfaces of the device."
         ::= { hpicfSnmpResponseSourceAddrPolicyEntry 3 }
 
     
@@ -229,7 +244,10 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
             will be used as source IP while sending the SNMP response.
             This object should be used in conjunction with the 
             hpicfSnmpResponseSourceAddressType and 
-            hpicfSnmpResponseSourceAddrPolicy."
+            hpicfSnmpResponseSourceAddrPolicy.
+				Note: The configured interface's IP address will be used 
+			   in the SNMP response PDU provided the interface has an IP 
+			   address configured."
         ::= { hpicfSnmpResponseSourceAddrPolicyEntry 4 }
 
     
@@ -253,7 +271,7 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "An entry in the table, containing information about
-            a single source address. This table alows only 2 values 
+            a single source address. This table allows only 2 values 
             that can be used as index to this table. These are:
             1) hpicfSnmpResponseSourceAddressType = ipv4
               Where user wants to configure the source address 
@@ -283,7 +301,7 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS accessible-for-notify
         STATUS current
         DESCRIPTION
-            " This table alows only 2 values 
+            " This table allows only 2 values 
             that can be used as index to this table. These are:
             1) hpicfSnmpResponseSourceAddressType = ipv4
              Where user wants to configure the source address 
@@ -320,6 +338,9 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
              hpicfSnmpTrapSourceAddress must be set to a valid
              and active ip address before setting policy to
              configuredIP.
+				 Note: This IP address will be used in the SNMP trap
+				 PDU provided it is configured as an IP address on any 
+				 one of the interfaces of the device.
             c) configuredInterface
              By setting this value will enable the SNMP agent to use
              IP addresses configured on the interface specified by 
@@ -329,6 +350,9 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
              address present on the interface in lexicographical 
              order will be used as source address while sending
              SNMP responses for requests.
+				 Note: The configured interface's IP address will be used 
+				 in the SNMP trap PDU provided the interface has an IP 
+				 address configured.
              hpicfSnmpTrapSourceAddrIfIndex object must be set
              to a valid loopback interface number before setting
              policy to configuredInterface."
@@ -342,10 +366,13 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "This object is used to set the IP address which will be 
-            used as source ip while sending the SNMP TRAPs.
+            used as source IP while sending the SNMP TRAPs.
             This object should be used in conjunction with the 
             hpicfSnmpResponseSourceAddressType and 
-            hpicfSnmpTrapSourceAddrPolicy."
+            hpicfSnmpTrapSourceAddrPolicy. 
+				Note: This IP address will be used in the SNMP trap
+				PDU provided it is configured as an IP address on any 
+				one of the interfaces of the device."
         ::= { hpicfSnmpTrapSourceAddrEntry 3 }
 
     
@@ -356,10 +383,13 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "This object is used to set the interface whose IP address
-            will be used as source ip while sending the SNMP TRAPs.
+            will be used as source IP while sending the SNMP TRAPs.
             This object should be used in conjunction with the 
             hpicfSnmpResponseSourceAddressType and
-            hpicfSnmpTrapSourceAddrPolicy."
+            hpicfSnmpTrapSourceAddrPolicy.
+			   Note: The configured interface's IP address will be used 
+			   in the SNMP trap PDU provided the interface has an IP 
+			   address configured."
         ::= { hpicfSnmpTrapSourceAddrEntry 4 }
 
     
@@ -374,7 +404,7 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "Controls whether hpicfSnmpAuthFail notifications will be generated.
-            The default value is ‘1’ (Enabled).  A value of ‘2’ represents 
+            The default value is 1 (Enabled).  A value of 2 represents 
             Disabled.  Writing this object requires authentication, such 
             as provided by SNMPv3.
             
@@ -447,7 +477,15 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
                     configuration of Trap source Addresses"
         ::= { hpicfSnmpCompliances 1 }
 
-    
+    hpicfSnmpCompliance1 MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "A compliance statement for HP Routing switches with SNMP"
+        MODULE -- this module
+        MANDATORY-GROUPS { hpicfSnmpNotifyObjectGroup,
+                           hpicfSnmpNotificationGroup }
+        ::= { hpicfSnmpCompliances 2 }
+ 
     -- 1.3.6.1.4.1.11.2.14.11.5.1.38.2.2
     hpicfSnmpCompliancesGroups OBJECT IDENTIFIER ::= { hpicfSnmpConformance 2 }
 
@@ -475,7 +513,7 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION 
             "A collection of objects allowing configuration of source
-            addresses for SNMP traps geneated by the switch."
+            addresses for SNMP traps generated by the switch."
         ::= { hpicfSnmpCompliancesGroups 2 }
 
     
@@ -511,7 +549,7 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION 
             "The operational status of hpicfSwitchAuthServerFail notifications.
-            The default value is ‘1’ (Enabled).  A value of ‘2’ represents 
+            The default value is 1 (Enabled).  A value of 2 represents 
             Disabled.  Writing this object requires authentication, such 
             as provided by SNMPv3."
         ::= { hpicfSnmpCompliancesGroups 5 }
@@ -525,5 +563,5 @@ HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
             "Description."
         ::= { hpicfSnmpCompliancesGroups 6 }
 
-
+    
 END

@@ -1,7 +1,5 @@
 <?php
 
-$class = 'signal';
-$unit = 'dBm';
-$graph_type = 'sensor_signal';
+$class = \LibreNMS\Enum\Sensor::Signal;
 
 require 'sensors.inc.php';

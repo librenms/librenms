@@ -156,7 +156,6 @@ return [
     'alpha_space' => ':attribute 只能包含字母、数字、下划线和空格。',
     'ip_or_hostname' => ':attribute 必须是一个有效的IP地址/网络或主机名。',
     'is_regex' => ':attribute 不是一个有效的正则表达式',
-    'keys_in' => ':attribute 包含无效的键: :extra。有效键为: :values',
 
     /*
     |--------------------------------------------------------------------------
@@ -203,13 +202,14 @@ return [
     'validations' => [
         'rrd' => [
             'CheckRrdVersion' => [
-                'fail' => '您指定的rrdtool版本比已安装的版本新。配置: :config_version 已安装: :installed_version',
-                'fix' => '请在您的config.php文件中注释或删除 $config[\'rrdtool_version\'] = \':version\';',
-                'ok' => 'rrdtool版本正常',
+                'fail' => 'rrdtool 版本 :installed_version 太旧，LibreNMS 需要最低版本为 1.5.5',
+                'fail_config' => '您指定的 rrdtool_version :config_version 太旧，LibreNMS 需要最低版本为 1.5.5',
+                'fix' => '请在您的 config.php 文件中注释或删除 $config[\'rrdtool_version\'] = \':version\';',
+                'ok' => 'rrdtool 版本正常',
             ],
             'CheckRrdcachedConnectivity' => [
                 'fail_socket' => ':socket 似乎不存在，rrdcached连接性测试失败',
-                'fail_port' => '无法连接到端口 :port 上的rrdcached服务器',
+                'fail_port' => '无法连接到 rrdcached 服务器 :server 端口 :port',
                 'ok' => '已连接到rrdcached',
             ],
             'CheckRrdDirPermissions' => [
@@ -292,7 +292,7 @@ return [
                 'not_detected' => 'Python包装器cron条目不存在',
             ],
             'CheckRedis' => [
-                'bad_driver' => '使用:driver进行锁定，您应设置CACHE_DRIVER=redis',
+                'bad_driver' => '使用:driver进行锁定，您应设置CACHE_STORE=redis',
                 'ok' => 'Redis功能正常',
                 'unavailable' => 'Redis不可用',
             ],

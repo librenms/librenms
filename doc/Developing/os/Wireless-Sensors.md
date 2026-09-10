@@ -1,8 +1,8 @@
-This document will guide you through adding wireless sensors for your
-new wireless device.
+This document describes how to add wireless sensors for your new
+wireless device.
 
-Currently we have support for the following wireless metrics along
-with the values we expect to see the data in:
+LibreNMS supports these wireless metrics. The table gives the expected
+unit of each value:
 
 | Type        | Measurement | Interface                    | Description                                                                                     |
 | ----------- | ----------- | ---------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -31,12 +31,12 @@ with the values we expect to see the data in:
 | ssr         | dB          | WirelessSsrDiscovery         | The Signal strength ratio, the ratio(or difference) of Vertical rx power to Horizontal rx power |
 | utilization | %           | WirelessUtilizationDiscovery | The % of utilization compared to the current rate                                               |
 
-You will need to create a new OS class for your os if one doesn't exist
-under `LibreNMS/OS`.  The name of this file should be the os name in
-camel case for example `airos -> Airos`, `ios-wlc -> IosWlc`.
+If `LibreNMS/OS` holds no class for your OS, create one. Give the file
+the OS name in camel case. Two examples are `airos -> Airos` and
+`ios-wlc -> IosWlc`.
 
-Your new OS class should extend LibreNMS\OS and implement the
-interfaces for the sensors your os supports.
+Your new OS class extends `LibreNMS\OS`. It implements the interfaces
+of the sensors of your OS.
 
 ```php
 namespace LibreNMS\OS;
@@ -57,50 +57,49 @@ class Airos extends OS implements WirelessClientsDiscovery
 }
 ```
 
-All discovery interfaces will require you to return an array of WirelessSensor objects.
+Each discovery interface returns an array of WirelessSensor objects.
 
-`new WirelessSensor()` Accepts the following arguments:
+`new WirelessSensor()` accepts these arguments:
 
-- `$type =` Required. This is the sensor class from the table above (i.e humidity).
-- `$device_id =` Required. You can get this value with $this->getDeviceId()
-- `$oids =` Required. This must be the numerical OID for where the data
-  can be found, i.e .1.2.3.4.5.6.7.0. If this is an array of oids, you
-  should probably specify an $aggregator.
-- `$subtype =` Required. This should be the OS name, i.e airos.
-- `$index =` Required. This must be unique for this sensor type, device and subtype.
-  Typically it's the index from the table being walked or it could be
-  the name of the OID if it's a single value.
-- `$description =` Required. This is a descriptive value for the sensor.
-  Shown to the user, if this is a per-ssid statistic, using `SSID:
-  $ssid` here is appropriate
-- `$current =` Defaults to null. Can be used to set the current value on discovery.
-  If this is null the values will be polled right away and if they do
-  not return valid value(s), the sensor will not be
-  discovered. Supplying a value here implies you have already verified
-  this sensor is valid.
-- `$multiplier =` Defaults to 1. This is used to multiply the returned value.
-- `$divisor =` Defaults to 1. This is used to divided the returned value.
-- $aggregator = Defaults to sum. Valid values: sum, avg. This will
-  combine multiple values from multiple oids into one.
-- `$access_point_id =` Defaults to null. If this is a wireless
-  controller, you can link sensors to entries in the access_points table.
-- `$high_limit =` Defaults to null. Sets the high limit for the sensor,
-  used in alerting to report out range sensors.
-- `$low_limit =` Defaults to null. Sets the low threshold limit for the
-  sensor, used in alerting to report out range sensors.
-- `$high_warn =` Defaults to null. Sets the high warning limit for the
-  sensor, used in alerting to report near out of range sensors.
-- `$low_warn =` Defaults to null. Sets the low warning limit for the
-  sensor, used in alerting to report near out of range sensors.
-- `$entPhysicalIndex =` Defaults to null. Sets the entPhysicalIndex to
-  be used to look up further hardware if available.
-- `$entPhysicalIndexMeasured =` Defaults to null. Sets the type of
-  entPhysicalIndex used, i.e ports.
+- `$type =` required. The sensor class from the table above, such as humidity.
+- `$device_id =` required. `$this->getDeviceId()` gives this value.
+- `$oids =` required. The numeric OID of the data, such as
+  .1.2.3.4.5.6.7.0. For an array of OIDs, also give an `$aggregator`.
+- `$subtype =` required. The OS name, such as airos.
+- `$index =` required. It must be unique for this sensor type, device,
+  and subtype. It is usually the index of the walked table. For a
+  single value, it can be the name of the OID.
+- `$description =` required. A description of the sensor for the user.
+  For a statistic of one SSID, use the form `SSID: $ssid`
+- `$current =` the default is null. It sets the current value at the
+  discovery. With null, LibreNMS polls the values immediately. Without
+  a valid value, LibreNMS does not discover the sensor. A value here
+  means that you already tested the sensor.
+- `$multiplier =` the default is 1. It multiplies the returned value.
+- `$divisor =` the default is 1. It divides the returned value.
+- $aggregator = the default is sum. The valid values are sum and avg.
+  It combines the values of several OIDs into one value.
+- `$access_point_id =` the default is null. On a wireless controller,
+  it links a sensor to an entry in the access_points table.
+- `$high_limit =` the default is null. It sets the high limit of the
+  sensor. The alerting uses it to report a sensor out of range.
+- `$low_limit =` the default is null. It sets the low threshold of the
+  sensor. The alerting uses it to report a sensor out of range.
+- `$high_warn =` the default is null. It sets the high warning limit of
+  the sensor. The alerting uses it to report a sensor near its range
+  limit.
+- `$low_warn =` the default is null. It sets the low warning limit of
+  the sensor. The alerting uses it to report a sensor near its range
+  limit.
+- `$entPhysicalIndex =` the default is null. It sets the
+  entPhysicalIndex for the lookup of more hardware.
+- `$entPhysicalIndexMeasured =` the default is null. It sets the type
+  of the entPhysicalIndex, such as ports.
 
-Polling is done automatically based on the discovered data.  If for
-some reason you need to override polling, you can implement the
-required polling interface in `LibreNMS/Interfaces/Polling/Sensors`.
-Using the polling interfaces should be avoided if possible.
+LibreNMS polls automatically from the discovered data. To override the
+polling, implement the necessary polling interface in
+`LibreNMS/Interfaces/Polling/Sensors`. Avoid the polling interfaces
+where possible.
 
-Graphing is performed automatically for wireless sensors, no custom
-graphing is required or supported.
+LibreNMS graphs the wireless sensors automatically. Your own graphing
+code is not necessary and not supported.

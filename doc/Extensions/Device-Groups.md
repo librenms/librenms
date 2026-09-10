@@ -1,38 +1,43 @@
 # Grouping Devices
 
-LibreNMS supports grouping your devices together in much the same way
-as you can configure alerts. This document will hopefully help you get
-started.
+LibreNMS groups your devices in the same way as the alerts. This
+document describes how to start.
 
 ## Dynamic Groups
 
 ### Rule Editor
 
-The rule is based on the MySQL structure your data is in. Such as __tablename.columnname__.
-If you already know the entity you want, you can browse around inside
-MySQL using `show tables` and `desc <tablename>`.
+A dynamic group uses the MySQL structure of your data, in the same way
+as the alerting system. QueryBuilder then generates the SQL queries of
+your groups.
 
-As a working example and a common question, let's assume you want to
-group devices by hostname. If your hostname format is
-dcX.[devicetype].example.com. You would use the field
-`devices.hostname`.
+In MySQL, run `show tables` to see all the LibreNMS tables. Then run
+`desc <tablename>` to see the structure of a table. These two names
+give the format of the QueryBuilder interface:
+__tablename.columnname__.
 
-If you want to group them by device type, you would add a rule for
-routers of `devices.hostname` endswith `rtr.example.com`.
+To see the data of the table, run `select * from <tablename> limit 5;`.
+The output shows the data of your dynamic group.
 
-If you want to group them by DC, you could use the rule
-`devices.hostname` regex `dc1\..*\.example\.com` (Don't forget to
-escape periods in the regex)
+This common example groups the devices by hostname. The hostname format
+is `dcX.[devicetype].example.com`.
+
+To group them by the device type `rtr`, add a rule for the routers:
+`devices.hostname` `endswith` `rtr.example.com`. This rule matches
+dcX.`rtr.example.com`.
+
+To group them by data centre, use the rule `devices.hostname` regex
+`dc1\..*\.example\.com`. Escape each period in the regex. This rule
+matches `dc1.rtr.example.com`.
 
 ## Static Groups
 
-You can create static groups (and convert dynamic groups to static) to
-put specific devices in a group. Just select static as the type and
-select the devices you want in the group.
+A static group holds specific devices. You can also convert a dynamic
+group to a static group. Select `static` as the type. Then select the
+devices of the group.
 
-![Device Groups](/img/device_groups.png)
+![Device Groups](../img/device_groups.png)
 
-You can now select this group from the Devices -> All Devices link in
-the navigation at the top. You can also use the group to map alert
-rules to by creating an alert mapping
-`Overview -> Alerts -> Rule Mapping`.
+The group is now available at Devices -> All Devices in the top
+navigation. You can also map your device groups to an alert rule. Use
+the `Match devices, groups and locations list` section of that rule.

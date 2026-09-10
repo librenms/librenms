@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mgnt2TrapNMSEvent.php
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * NeighboursController.php
  *
@@ -25,10 +26,10 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Link;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Url;
 
@@ -58,12 +59,6 @@ class NeighboursController implements DeviceTab
     {
         $selection = Url::parseOptions('selection', 'list');
 
-        $devices[$device->device_id] = [
-            'url' => Url::deviceLink($device, null, [], 0, 0, 0, 1),
-            'hw' => $device->hardware,
-            'name' => $device->shortDisplayName(),
-        ];
-
         if ($selection == 'list') {
             $linksQuery = $device->links()->with('port', 'remoteDevice', 'remotePort');
 
@@ -86,8 +81,8 @@ class NeighboursController implements DeviceTab
             'selection' => $selection,
             'device' => $device,
             'links' => $links,
-            'link_types' => Config::get('network_map_items', ['xdp', 'mac']),
-            'visoptions' => Config::get('network_map_vis_options'),
+            'link_types' => LibrenmsConfig::get('network_map_items', ['xdp', 'mac']),
+            'visoptions' => LibrenmsConfig::get('network_map_vis_options'),
         ];
     }
 }

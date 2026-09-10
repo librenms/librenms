@@ -1,4 +1,5 @@
 <?php
+
 /* LibreNMS
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,18 +40,39 @@ class Grafana extends Transport
             'title' => 'yes',
         ];
 
-        //$graph_url = url('graph.php') . '?' . http_build_query($graph_args);
-        // FIXME - workaround for https://github.com/grafana/oncall/issues/3031
-        $graph_url = url('graph.php') . '/' . str_replace('&', '/', http_build_query($graph_args));
-
         $data = [
-            'alert_uid' => $alert_data['id'] ?: $alert_data['uid'],
+            'alert_uid' => $alert_data['id'],
             'title' => $alert_data['title'] ?? null,
-            'message' => $alert_data['msg'],
-            'image_url' => $graph_url,
+            'image_url' => route('graph', $graph_args),
             'link_to_upstream_details' => Url::deviceUrl($device),
             'state' => ($alert_data['state'] == AlertState::ACTIVE) ? 'alerting' : 'ok',
+            'raw_state' => $alert_data['state'],
+            'device_id' => $alert_data['device_id'],
+            'hostname' => $alert_data['hostname'],
+            'sysName' => $alert_data['sysName'],
+            'location' => $alert_data['location'],
+            'sysDescr' => $alert_data['sysDescr'],
+            'os' => $alert_data['os'],
+            'type' => $alert_data['type'],
+            'hardware' => $alert_data['hardware'],
+            'software' => $alert_data['software'] ?? '',
+            'features' => $alert_data['features'],
+            'serial' => $alert_data['serial'] ?? '',
+            'uptime' => $alert_data['uptime'],
+            'notes' => $alert_data['notes'],
+            'alert_notes' => $alert_data['alert_notes'],
+            'severity' => $alert_data['severity'],
+            'proc' => $alert_data['proc'],
+            'transport' => $alert_data['transport'] ?? '',
+            'transport_name' => $alert_data['transport_name'] ?? '',
         ];
+
+        $tmp_msg = json_decode((string) $alert_data['msg'], true);
+        if (isset($tmp_msg['title']) && isset($tmp_msg['message'])) {
+            $data = array_merge($data, $tmp_msg);
+        } else {
+            $data['message'] = $alert_data['msg'];
+        }
 
         $res = Http::client()->post($this->config['url'] ?? '', $data);
 

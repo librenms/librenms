@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DeviceRelatedModel.php
  *
@@ -26,10 +27,16 @@
 namespace App\Models;
 
 use App\Facades\DeviceCache;
+use App\Models\Traits\DeletesDeviceOrphans;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $device_id
+ */
 class DeviceRelatedModel extends BaseModel
 {
+    use DeletesDeviceOrphans;
+
     // ---- Query Scopes ----
 
     public function scopeHasAccess($query, User $user)
@@ -50,10 +57,12 @@ class DeviceRelatedModel extends BaseModel
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
+     */
     public function device(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
+        return $this->belongsTo(Device::class, 'device_id', 'device_id');
     }
 
     // ---- Accessors/Mutators ----

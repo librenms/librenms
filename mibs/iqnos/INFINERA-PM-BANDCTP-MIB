@@ -1,0 +1,617 @@
+-- *****************************************************************
+-- INFINERA-PM-BANDCTP-MIB
+-- 
+-- October 2008, Sharfuddin Syed / Narendra Gupta
+-- 
+-- 
+-- Copyright (c) 2008-2012 by Infinera Inc.
+-- All rights reserved.
+-- ****************************************************************
+
+INFINERA-PM-BANDCTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32                                   FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF
+    DisplayString, TruthValue                   FROM SNMPv2-TC
+    ifIndex                                     FROM IF-MIB
+    FloatHundredths, FloatArbitraryPrecision    FROM INFINERA-TC-MIB
+    perfMon                                     FROM INFINERA-REG-MIB;
+
+
+bandCtpPmMIB MODULE-IDENTITY
+    LAST-UPDATED  "200810200000Z"
+    ORGANIZATION  "Infinera"
+    CONTACT-INFO
+        "Infinera
+        1322 Bordeaux Drive
+        Sunnyvale, CA - 94089
+
+        Contact : Technical Support
+        Email   : support@infinera.com
+        Phone   : 1-877-INF-5288"
+    DESCRIPTION
+        " "
+    REVISION      "200810200000Z"  
+    DESCRIPTION
+        "First Version"
+    ::= { perfMon 1 }
+
+
+
+bandCtpPmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BandCtpPmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of BandCtpPm entries. Each entry is uniquely identified by the values of ifIndex, sample duration and bandCtpPmTimestamp."
+    ::= { bandCtpPmMIB 2 } 
+
+bandCtpPmEntry  OBJECT-TYPE
+    SYNTAX      BandCtpPmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A BandCtpPm entry containing historical performance information pertaining to Infinera BandCtp interfaces.
+        This table is a subclass of IfCommon.
+        Entries will exist in this table only for interfaces of type C-Band CTP.
+        Each interface may have a number of entries in this table, each with a different combination
+        of timestamp and sample duration."
+    INDEX { ifIndex, bandCtpPmSampleDuration, bandCtpPmTimestamp }
+    ::= { bandCtpPmTable 1 }
+
+
+BandCtpPmEntry  ::= SEQUENCE {
+    bandCtpPmTimestamp               Integer32,
+    bandCtpPmSampleDuration          INTEGER,
+    bandCtpPmValidity                TruthValue,
+    bandCtpPmOchSpanLossMin          FloatArbitraryPrecision,
+    bandCtpPmOchSpanLossMax          FloatArbitraryPrecision,
+    bandCtpPmOchSpanLossAve          FloatArbitraryPrecision,
+    bandCtpPmNetSpanLossMin          FloatArbitraryPrecision,
+    bandCtpPmNetSpanLossMax          FloatArbitraryPrecision,
+    bandCtpPmNetSpanLossAve          FloatArbitraryPrecision,
+    bandCtpPmBandOprMin              FloatArbitraryPrecision,
+    bandCtpPmBandOprMax              FloatArbitraryPrecision,
+    bandCtpPmBandOprAve              FloatArbitraryPrecision,
+    bandCtpPmBandOptMin              FloatArbitraryPrecision,
+    bandCtpPmBandOptMax              FloatArbitraryPrecision,
+    bandCtpPmBandOptAve              FloatArbitraryPrecision,
+    bandCtpPmBmmPostEdfaMin          FloatArbitraryPrecision,
+    bandCtpPmBmmPostEdfaMax          FloatArbitraryPrecision,
+    bandCtpPmBmmPostEdfaAve          FloatArbitraryPrecision,
+    bandCtpPmTxEdfaOprMin	     FloatArbitraryPrecision,
+    bandCtpPmTxEdfaOprMax	     FloatArbitraryPrecision,
+    bandCtpPmTxEdfaOprAve	     FloatArbitraryPrecision,
+    bandCtpPmRxEdfaOptMin	     FloatArbitraryPrecision,
+    bandCtpPmRxEdfaOptMax	     FloatArbitraryPrecision,
+    bandCtpPmRxEdfaOptAve	     FloatArbitraryPrecision,
+    bandCtpPmOptOsaTapRatioMin	     FloatArbitraryPrecision,
+    bandCtpPmOptOsaTapRatioMax	     FloatArbitraryPrecision,
+    bandCtpPmOptOsaTapRatioAve	     FloatArbitraryPrecision
+}
+
+bandCtpPmTimestamp OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "End Time stamp for this interval. If this time is later than the current time,
+        then the data for this bucket is currently being collected."
+    ::= { bandCtpPmEntry  1 }
+
+
+bandCtpPmSampleDuration OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    fifteenMinutes(1),
+                    day(2)
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The duration of this sample."
+   ::= { bandCtpPmEntry  2 }
+
+
+bandCtpPmValidity OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Flag indicating if data was valid for the entire interval"
+    ::= { bandCtpPmEntry  3 }
+
+
+bandCtpPmOchSpanLossMin OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Low threshold setting for C-Band Expected Span Loss PM parameter"
+    ::= { bandCtpPmEntry  4 }
+
+
+bandCtpPmOchSpanLossMax OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "High threshold setting for C-Band Expected Span Loss PM parameter"
+    ::= { bandCtpPmEntry  5 }
+
+
+bandCtpPmOchSpanLossAve OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "C-band average optical channel span loss"
+    ::= { bandCtpPmEntry  6 }
+
+
+bandCtpPmNetSpanLossMin OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Span loss incurred when OA module is deployed across the span. 
+                 Measured on the Band CTP of OA circuit pack."
+    ::= { bandCtpPmEntry  7 }
+
+
+bandCtpPmNetSpanLossMax OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Span loss incurred when OA module is deployed across the span. 
+                Measured on the Band CTP of OA circuit pack."
+    ::= { bandCtpPmEntry  8 }
+
+
+bandCtpPmNetSpanLossAve OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Span loss incurred when OA module is deployed across the span. 
+                 Measured on the Band CTP of OA circuit pack."
+    ::= { bandCtpPmEntry  9 }
+
+
+bandCtpPmBandOprMin OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum C-Band optical power received from the OTS input."
+    ::= { bandCtpPmEntry  10 }
+
+
+bandCtpPmBandOprMax OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum C-Band optical power received from the OTS input."
+    ::= { bandCtpPmEntry  11 }
+
+
+bandCtpPmBandOprAve OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average C-Band optical power received from the OTS input."
+    ::= { bandCtpPmEntry  12 }
+
+
+bandCtpPmBandOptMin OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum C-Band optical power transmitted onto the OTS output."
+    ::= { bandCtpPmEntry  13 }
+
+
+bandCtpPmBandOptMax OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum C-Band optical power transmitted onto the OTS output."
+    ::= { bandCtpPmEntry  14 }
+
+
+bandCtpPmBandOptAve OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average C-Band optical power transmitted onto the OTS output."
+    ::= { bandCtpPmEntry  15 }
+
+
+bandCtpPmBmmPostEdfaMin OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum C-Band optical power recived after edfa amplification."
+    ::= { bandCtpPmEntry  16 }
+
+
+bandCtpPmBmmPostEdfaMax OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum C-Band optical power recived after edfa amplification."
+    ::= { bandCtpPmEntry  17 }
+
+
+bandCtpPmBmmPostEdfaAve OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average C-Band optical power recived after edfa amplification"
+    ::= { bandCtpPmEntry  18 }
+
+bandCtpPmTxEdfaOprMin	OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmEntry  19 }
+
+bandCtpPmTxEdfaOprMax	OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmEntry  20 }
+
+bandCtpPmTxEdfaOprAve	OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmEntry  21 }
+
+bandCtpPmRxEdfaOptMin	OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmEntry  22 }
+
+bandCtpPmRxEdfaOptMax	OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmEntry  23 }
+
+bandCtpPmRxEdfaOptAve	OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmEntry  24 }
+
+bandCtpPmOptOsaTapRatioMin	OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmEntry  25 }
+
+bandCtpPmOptOsaTapRatioMax	OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmEntry  26 }
+
+bandCtpPmOptOsaTapRatioAve	OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmEntry  27 }
+
+bandCtpPmRealTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BandCtpPmRealEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of BandCtpPmReal entries. Each entry is uniquely identified by the value of ifIndex."
+    ::= { bandCtpPmMIB 1 } 
+
+bandCtpPmRealEntry  OBJECT-TYPE
+    SYNTAX      BandCtpPmRealEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A BandCtpPmReal entry containing current real-time performance information pertaining to Infinera
+        BandCtp interfaces. This table is a subclass of IfCommon.
+        Entries will exist in this table only for interfaces of type C-Band CTP."
+    INDEX { ifIndex }
+    ::= { bandCtpPmRealTable 1 }
+
+
+BandCtpPmRealEntry  ::= SEQUENCE {
+    bandCtpPmRealOchSpanLoss                     FloatArbitraryPrecision,
+    bandCtpPmRealNetSpanLoss                     FloatArbitraryPrecision,
+    bandCtpPmRealBandOpr                         FloatArbitraryPrecision,
+    bandCtpPmRealBandOchOpr                      FloatArbitraryPrecision,
+    bandCtpPmRealBandOprNum                      FloatArbitraryPrecision,
+    bandCtpPmRealOamBandTxEdfaLbc1               FloatArbitraryPrecision,
+    bandCtpPmRealOamBandTxEdfaLbc2               FloatArbitraryPrecision,
+    bandCtpPmRealBmmBandEdfaLbcTx                FloatArbitraryPrecision,
+    bandCtpPmRealBandOptTx                       FloatArbitraryPrecision,
+    bandCtpPmRealBandOchOpt                      FloatArbitraryPrecision,
+    bandCtpPmRealBandOptNum                      FloatArbitraryPrecision,
+    bandCtpPmRealBmmEdfaLbc1                     FloatArbitraryPrecision,
+    bandCtpPmRealBmmEdfaLbc2                     FloatArbitraryPrecision,
+    bandCtpPmRealBmmPostEdfa                     FloatArbitraryPrecision,
+    bandCtpPmRealDampUpdateTS                    DisplayString,
+    bandCtpPmRealOprQ                            DisplayString,
+    bandCtpPmRealPostOsaTapRatio                 FloatArbitraryPrecision,
+    bandCtpPmRealTxEdfaOpr                       FloatArbitraryPrecision,
+    bandCtpPmRealRxEdfaOpt                       FloatArbitraryPrecision,
+    bandCtpPmRealOptOsaTapRatio                  FloatArbitraryPrecision,
+    bandCtpPmRealBandEdfaLbcTx                   FloatArbitraryPrecision,
+    bandCtpPmRealBandRxEdfaLbc1                  FloatArbitraryPrecision,
+    bandCtpPmRealBandRxEdfaLbc2                  FloatArbitraryPrecision
+}
+
+bandCtpPmRealOchSpanLoss OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Och Span Loss"
+    ::= { bandCtpPmRealEntry  1 }
+
+
+bandCtpPmRealNetSpanLoss OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Span loss incurred when OA is deployed across the span (supported on the Band CTP of OA circuit pack)."
+    ::= { bandCtpPmRealEntry  2 }
+
+
+bandCtpPmRealBandOpr OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "C-Band Total Optical Power Received."
+    ::= { bandCtpPmRealEntry  3 }
+
+
+bandCtpPmRealBandOchOpr OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "C-Band Total Optical Power Received."
+    ::= { bandCtpPmRealEntry  4 }
+
+
+bandCtpPmRealBandOprNum OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "BandOprNum"
+    ::= { bandCtpPmRealEntry  5 }
+
+
+bandCtpPmRealOamBandTxEdfaLbc1 OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Laser biase current 1"
+    ::= { bandCtpPmRealEntry  6 }
+
+
+bandCtpPmRealOamBandTxEdfaLbc2 OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Laser biase current 2"
+    ::= { bandCtpPmRealEntry  7 }
+
+
+bandCtpPmRealBmmBandEdfaLbcTx OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Laser biase current 3"
+    ::= { bandCtpPmRealEntry  8 }
+
+
+bandCtpPmRealBandOptTx OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Band-C optical power transmitted"
+    ::= { bandCtpPmRealEntry  9 }
+
+
+bandCtpPmRealBandOchOpt OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Calculate Och optical power transmitted"
+    ::= { bandCtpPmRealEntry  10 }
+
+
+bandCtpPmRealBandOptNum OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of effective channels"
+    ::= { bandCtpPmRealEntry  11 }
+
+
+bandCtpPmRealBmmEdfaLbc1 OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Rx Edfa Laser biase current 1."
+    ::= { bandCtpPmRealEntry  12 }
+
+
+bandCtpPmRealBmmEdfaLbc2 OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Rx Edfa Laser biase current 2."
+    ::= { bandCtpPmRealEntry  13 }
+
+
+bandCtpPmRealBmmPostEdfa OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Post edfa C-Band recieved power."
+    ::= { bandCtpPmRealEntry  14 }
+
+bandCtpPmRealDampUpdateTS OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last damp update time, time is expressed in format YYYY-MM-DD<space>hh:mm:ss."
+    ::= { bandCtpPmRealEntry  15 }
+
+bandCtpPmRealOprQ OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Operational Qualifier"
+    ::= { bandCtpPmRealEntry  16 }
+
+bandCtpPmRealPostOsaTapRatio OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmRealEntry 17 }
+
+bandCtpPmRealTxEdfaOpr	OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmRealEntry 18 }
+
+bandCtpPmRealRxEdfaOpt	OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmRealEntry 19 }
+
+bandCtpPmRealOptOsaTapRatio	OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmRealEntry 20 }
+
+bandCtpPmRealBandEdfaLbcTx   OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmRealEntry 21 }
+
+bandCtpPmRealBandRxEdfaLbc1 OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmRealEntry 22 }
+
+bandCtpPmRealBandRxEdfaLbc2 OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bandCtpPmRealEntry 23 }
+
+
+-- Conformance Statements
+bandCtpPmConformance    OBJECT IDENTIFIER ::= { bandCtpPmMIB 3 }
+bandCtpPmCompliances    OBJECT IDENTIFIER ::= { bandCtpPmConformance 1 }
+bandCtpPmGroups         OBJECT IDENTIFIER ::= { bandCtpPmConformance 2 }
+
+bandCtpPmCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+    "Describes the requirements for conformance to the BANDCTP-MIB"
+    MODULE
+        MANDATORY-GROUPS { bandCtpPmGroup }
+    ::= { bandCtpPmCompliances 1 }
+
+bandCtpPmRealCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+    "Describes the requirements for conformance to the bandCtpPmReal-MIB"
+    MODULE
+        MANDATORY-GROUPS { bandCtpPmRealGroup }
+    ::= { bandCtpPmCompliances 2 }
+
+bandCtpPmGroup OBJECT-GROUP
+    OBJECTS {
+        bandCtpPmValidity,
+        bandCtpPmOchSpanLossMin,
+        bandCtpPmOchSpanLossMax,
+        bandCtpPmOchSpanLossAve,
+        bandCtpPmNetSpanLossMin,
+        bandCtpPmNetSpanLossMax,
+        bandCtpPmNetSpanLossAve,
+        bandCtpPmBandOprMin,
+        bandCtpPmBandOprMax,
+        bandCtpPmBandOprAve,
+        bandCtpPmBandOptMin,
+        bandCtpPmBandOptMax,
+        bandCtpPmBandOptAve,
+        bandCtpPmBmmPostEdfaMin,
+        bandCtpPmBmmPostEdfaMax,
+        bandCtpPmBmmPostEdfaAve,
+		bandCtpPmTxEdfaOprMin,
+		bandCtpPmTxEdfaOprMax,
+		bandCtpPmTxEdfaOprAve,
+		bandCtpPmRxEdfaOptMin,
+		bandCtpPmRxEdfaOptMax,
+		bandCtpPmRxEdfaOptAve,
+	    bandCtpPmOptOsaTapRatioMin,
+        bandCtpPmOptOsaTapRatioMax,
+        bandCtpPmOptOsaTapRatioAve
+    }
+    STATUS current
+    DESCRIPTION
+        " A collection of objects for reading the historical performance of the bandCtp."
+    ::= { bandCtpPmGroups 1 }
+
+bandCtpPmRealGroup OBJECT-GROUP
+    OBJECTS {
+        bandCtpPmRealOchSpanLoss,
+        bandCtpPmRealNetSpanLoss,
+        bandCtpPmRealBandOpr,
+        bandCtpPmRealBandOchOpr,
+        bandCtpPmRealBandOprNum,
+        bandCtpPmRealOamBandTxEdfaLbc1,
+        bandCtpPmRealOamBandTxEdfaLbc2,
+        bandCtpPmRealBmmBandEdfaLbcTx,
+        bandCtpPmRealBandOptTx,
+        bandCtpPmRealBandOchOpt,
+        bandCtpPmRealBandOptNum,
+        bandCtpPmRealBmmEdfaLbc1,
+        bandCtpPmRealBmmEdfaLbc2,
+        bandCtpPmRealBmmPostEdfa,
+        bandCtpPmRealDampUpdateTS,
+        bandCtpPmRealOprQ,
+        bandCtpPmRealPostOsaTapRatio,
+		bandCtpPmRealTxEdfaOpr,      
+		bandCtpPmRealRxEdfaOpt,      
+		bandCtpPmRealOptOsaTapRatio,
+        bandCtpPmRealBandEdfaLbcTx,
+        bandCtpPmRealBandRxEdfaLbc1,
+        bandCtpPmRealBandRxEdfaLbc2
+    }
+    STATUS current
+    DESCRIPTION
+        " A collection of objects for reading the real-time performance of the bandCtp."
+    ::= { bandCtpPmGroups 2 }
+
+
+END

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * unix.inc.php
  *
@@ -30,6 +31,11 @@ if (! empty($snmpData)) {
     foreach ($snmpData as $lmData) {
         $type = 'lmTempSensors';
         $divisor = 1000;
+
+        if (! isset($lmData[$type . 'Index'])) {
+            continue;
+        }
+
         $index = $lmData[$type . 'Index'];
         $descr = $lmData[$type . 'Device'];
         $value = intval($lmData[$type . 'Value']) / $divisor;
@@ -48,7 +54,7 @@ if (! empty($snmpData)) {
         24 => ['descr' => 'Battery Temperature', 'LL' => 10, 'LW' => 15, 'W' => 35, 'H' => 40],
     ];
     foreach ($snmpData as $index => $upsData) {
-        if ($upsnut[$index]) {
+        if (isset($upsnut[$index])) {
             $value = intval($upsData['nsExtendOutLine']);
             if (! empty($value)) {
                 $oid = Oid::of('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index)->toNumeric();

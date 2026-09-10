@@ -8,11 +8,11 @@
                     "sysDescr": "",
                     "sysContact": "<private>",
                     "version": "v7.0.1,build0022,220323 (Interim)",
-                    "hardware": "FortiADC VM",
+                    "hardware": "FortiADC-VM",
                     "features": null,
                     "location": "<private>",
                     "os": "fortiadc",
-                    "type": "appliance",
+                    "type": "loadbalancer",
                     "serial": "FADV040000000000",
                     "icon": "fortinet.svg"
                 }
@@ -2183,7 +2183,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.12356.112.8.2.1.0",
-                    "sensor_index": "fadcVirturalServerNumber.0",
+                    "sensor_index": "fadcVirtualServerNumber.0",
                     "sensor_type": "fortiadc",
                     "sensor_descr": "Virtual Servers",
                     "group": "Server Load Balance",
@@ -2206,5 +2206,39 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.10.10.242",
+                    "ipv4_prefixlen": 28,
+                    "context_name": "",
+                    "ipv4_network": "10.10.10.240/28",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "10.10.10.243",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "10.46.254.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.46.254.0/24",
+                    "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "10.46.254.10",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 3
+                }
+            ]
+        }
     }
 }

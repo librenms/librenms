@@ -11083,28 +11083,28 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2001,
                     "vlan_domain": 1,
                     "vlan_name": "dienste",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3150,
                     "vlan_domain": 1,
                     "vlan_name": "prod",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3971,
                     "vlan_domain": 1,
                     "vlan_name": "remed",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -11607,6 +11607,19 @@
                     "ifAlias": "RMON Port 50 on Unit 1",
                     "ifDescr": "RMON Port 50 on Unit 1",
                     "ifName": "1/50"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "143.160.138.68",
+                    "ipv4_prefixlen": 27,
+                    "context_name": "",
+                    "ipv4_network": "143.160.138.64/27",
+                    "ifIndex": 5120
                 }
             ]
         }

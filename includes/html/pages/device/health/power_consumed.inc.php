@@ -1,7 +1,5 @@
 <?php
 
-$class = 'power_consumed';
-$unit = 'kWh';
-$graph_type = 'sensor_power_consumed';
+$class = \LibreNMS\Enum\Sensor::PowerConsumed;
 
 require 'sensors.inc.php';

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * CyberPowerTrapsTest.php
  *
@@ -27,7 +28,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class CyberPowerTrapsTest extends SnmpTrapTestCase
+final class CyberPowerTrapsTest extends SnmpTrapTestCase
 {
     public function testCpUpsOverload(): void
     {

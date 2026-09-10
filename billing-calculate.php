@@ -9,8 +9,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Billing;
-use LibreNMS\Config;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
 
@@ -26,7 +26,7 @@ if (isset($options['r'])) {
 
 Debug::set(isset($options['d']));
 
-$scheduler = Config::get('schedule_type.billing');
+$scheduler = LibrenmsConfig::get('schedule_type.billing');
 if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
     if (Debug::isEnabled()) {
         echo "Billing is not enabled for cron scheduling.  Add the -f command ar

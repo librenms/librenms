@@ -1,7 +1,9 @@
 <?php
 
-$agent_data = $agent_data ?? [];
-\DeviceCache::getPrimary()->applications->each(function ($app) use ($device, $agent_data) {
+use Illuminate\Support\Facades\Cache;
+
+$agent_data = Cache::driver('array')->get('agent_data', []);
+\DeviceCache::getPrimary()->applications->each(function ($app) use ($device, $agent_data): void {
     echo 'Application: ' . $app->app_type . ', app_id=' . $app->app_id;
 
     $app_include = base_path('includes/polling/applications/' . \LibreNMS\Util\Clean::fileName($app->app_type) . '.inc.php');

@@ -11,6 +11,8 @@
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
+c_echo('%RWarning: delhost.php is deprecated!%n Use %9lnms device:remove%n instead.' . PHP_EOL . PHP_EOL);
+
 // Remove a host and all related data from the system
 if ($argv[1]) {
     $host = strtolower($argv[1]);

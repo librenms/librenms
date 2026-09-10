@@ -21,34 +21,35 @@ IMPORTS
 
 
 alaQoSMIB MODULE-IDENTITY
-  LAST-UPDATED "201408210000Z"
-  ORGANIZATION "Alcatel IND"
-  CONTACT-INFO
-    "Please consult with Customer Service to ensure the most appropriate
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
       version of this document is used with the products in question:
 
-                 Alcatel-Lucent, Enterprise Solutions Division
-                (Formerly Alcatel Internetworking, Incorporated)
-                        26801 West Agoura Road 
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
                      Agoura Hills, CA  91301-5122
                        United States Of America
 
-     Telephone:               North America  +1 800 995 2696
-                              Latin America  +1 877 919 9526
-                              Europe         +31 23 556 0100
-                              Asia           +65 394 7933
-                              All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-     Electronic Mail:         support@ind.alcatel.com
-     World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-     File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
   DESCRIPTION
-    "QoS and Filtering MIB"
+    "                    QoS and Filtering MIB
 
-   REVISION "201407140000Z"
-   DESCRIPTION
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "201911270000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
+
+    REVISION "201407140000Z"
+    DESCRIPTION
        "Added alaQoSV6NetworkGroupTable and alaQoSAppliedV6NetworkGroupTable"
-
   ::= { softentIND1QoS 1 }
 
 -- FILE: ALCATEL-IND1-QOS-MIB.mib
@@ -153,7 +154,7 @@ QoSRuleEntry ::=
   }
 
 alaQoSRuleName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of rule"
@@ -342,7 +343,7 @@ alaQoSRuleTrapEvents OBJECT-TYPE
                 no (2)
               }
   MAX-ACCESS  read-create
-  STATUS      current
+  STATUS      deprecated
   DESCRIPTION "Send SNMP trap when 'qos user-port shutdown' param or
                 rule having action=port-disable is matched/invoked?"
   DEFVAL      { yes }
@@ -455,7 +456,7 @@ QoSAppliedRuleEntry ::=
   }
 
 alaQoSAppliedRuleName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of rule"
@@ -563,7 +564,7 @@ alaQoSAppliedRuleActive OBJECT-TYPE
 
 alaQoSAppliedRuleRowStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete rules according to the
                RowStatus convention"
@@ -862,11 +863,15 @@ QoSConditionEntry ::=
     alaQosConditionVmL4DestPortStatus		            INTEGER,
     alaQosConditionVxlanStatus				    INTEGER,
     alaQoSConditionSourcePortSplitGroup                           SnmpAdminString,
-    alaQoSConditionSourcePortSplitGroupStatus                     INTEGER
+    alaQoSConditionSourcePortSplitGroupStatus                     INTEGER,
+    alaQoSConditionSourceVlanGroup                     SnmpAdminString,
+    alaQoSConditionSourceVlanGroupStatus                     INTEGER,
+    alaQoSConditionSourceServiceID                     Integer32,
+    alaQoSConditionSourceServiceIDStatus                     INTEGER
  }
 
 alaQoSConditionName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of condition"
@@ -1910,7 +1915,7 @@ alaQoSConditionInner8021pStatus OBJECT-TYPE
   ::= { alaQoSConditionEntry 108 }
 
 alaQoSConditionVrfName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(0..32))
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Name of Vrf to match traffic in"
@@ -2245,6 +2250,42 @@ alaQoSConditionSourcePortSplitGroupStatus OBJECT-TYPE
   DEFVAL      { disabled }
   ::= { alaQoSConditionEntry 143 }
 
+alaQoSConditionSourceVlanGroup OBJECT-TYPE
+  SYNTAX      SnmpAdminString (SIZE(0..31))
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source physical vlan group to use for traffic classification"
+  ::= { alaQoSConditionEntry 144 }
+
+alaQoSConditionSourceVlanGroupStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the source physical vlan group
+               needs to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSConditionEntry 145 }
+
+alaQoSConditionSourceServiceID OBJECT-TYPE
+  SYNTAX      Integer32 (0..65535)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source service ID."
+  ::= { alaQoSConditionEntry 146}
+
+alaQoSConditionSourceServiceIDStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+        enabled (1),
+        disabled (2)
+  }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Enable/disable source service ID."
+  ::= { alaQoSConditionEntry 147 }
+
 --
 -- Definition of condition table
 --
@@ -2415,7 +2456,7 @@ QoSAppliedConditionEntry ::=
   }
 
 alaQoSAppliedConditionName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of condition"
@@ -2454,7 +2495,7 @@ alaQoSAppliedConditionSourceSlotStatus OBJECT-TYPE
   ::= { alaQoSAppliedConditionEntry 4 }
 
 alaQoSAppliedConditionSourcePort OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (1..128)
   MAX-ACCESS  read-only
   STATUS      current
   DESCRIPTION "Source physical port range start to use for
@@ -2499,7 +2540,7 @@ alaQoSAppliedConditionDestinationSlotStatus OBJECT-TYPE
   ::= { alaQoSAppliedConditionEntry 9 }
 
 alaQoSAppliedConditionDestinationPort OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (1..128)
   MAX-ACCESS  read-only
   STATUS      current
   DESCRIPTION "Destination physical port range start to use for traffic
@@ -2974,14 +3015,14 @@ alaQoSAppliedConditionIcmpCodeStatus OBJECT-TYPE
 
 alaQoSAppliedConditionRowStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete conditions according to the
                RowStatus convention"
   ::= { alaQoSAppliedConditionEntry 64 }
 
 alaQoSAppliedConditionSourcePortEnd OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (1..128)
   MAX-ACCESS  read-only
   STATUS      current
   DESCRIPTION "Source physical port range end to use for traffic
@@ -2990,7 +3031,7 @@ alaQoSAppliedConditionSourcePortEnd OBJECT-TYPE
   ::= { alaQoSAppliedConditionEntry 65 }
 
 alaQoSAppliedConditionDestinationPortEnd OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (1..128)
   MAX-ACCESS  read-only
   STATUS      current
   DESCRIPTION "Destination physical port range end to use for traffic
@@ -3388,7 +3429,7 @@ alaQoSAppliedConditionInner8021pStatus OBJECT-TYPE
   ::= { alaQoSAppliedConditionEntry 108}
 
 alaQoSAppliedConditionVrfName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(0..32))
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Name of Vrf to match traffic in"
@@ -3768,7 +3809,7 @@ QoSServiceEntry ::=
   }
 
 alaQoSServiceName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of the service"
@@ -4027,7 +4068,7 @@ QoSAppliedServiceEntry ::=
   }
 
 alaQoSAppliedServiceName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of the service"
@@ -4092,7 +4133,7 @@ alaQoSAppliedServiceDestinationIpPortStatus OBJECT-TYPE
 
 alaQoSAppliedServiceRowStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete services according to the
                RowStatus convention"
@@ -4259,7 +4300,7 @@ QoSServiceGroupsEntry ::=
   }
 
 alaQoSServiceGroupsName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of service group"
@@ -4318,7 +4359,7 @@ QoSAppliedServiceGroupsEntry ::=
   }
 
 alaQoSAppliedServiceGroupsName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of service group"
@@ -4339,7 +4380,7 @@ alaQoSAppliedServiceGroupsSource OBJECT-TYPE
 
 alaQoSAppliedServiceGroupsStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete service groups according to the
                RowStatus convention"
@@ -4376,7 +4417,7 @@ QoSServiceGroupEntry ::=
   }
 
 alaQoSServiceGroupServiceName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of service in service group entry"
@@ -4421,7 +4462,7 @@ QoSAppliedServiceGroupEntry ::=
   }
 
 alaQoSAppliedServiceGroupServiceName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of service in service group entry"
@@ -4429,7 +4470,7 @@ alaQoSAppliedServiceGroupServiceName OBJECT-TYPE
 
 alaQoSAppliedServiceGroupStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete service group entries according to the
                RowStatus convention"
@@ -4466,7 +4507,7 @@ QoSNetworkGroupsEntry ::=
   }
 
 alaQoSNetworkGroupsName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of network group"
@@ -4525,7 +4566,7 @@ QoSAppliedNetworkGroupsEntry ::=
   }
 
 alaQoSAppliedNetworkGroupsName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of network group"
@@ -4546,7 +4587,7 @@ alaQoSAppliedNetworkGroupsSource OBJECT-TYPE
 
 alaQoSAppliedNetworkGroupsStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete network groups according to the
                RowStatus convention"
@@ -4654,7 +4695,7 @@ alaQoSAppliedNetworkGroupIpMask OBJECT-TYPE
 
 alaQoSAppliedNetworkGroupStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete network group entries according to the
                RowStatus convention"
@@ -4691,7 +4732,7 @@ QoSMACGroupsEntry ::=
   }
 
 alaQoSMACGroupsName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of MAC group"
@@ -4750,7 +4791,7 @@ QoSAppliedMACGroupsEntry ::=
   }
 
 alaQoSAppliedMACGroupsName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of MAC group"
@@ -4771,7 +4812,7 @@ alaQoSAppliedMACGroupsSource OBJECT-TYPE
 
 alaQoSAppliedMACGroupsStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete MAC groups according to the
                RowStatus convention"
@@ -4879,7 +4920,7 @@ alaQoSAppliedMACGroupMacMask OBJECT-TYPE
 
 alaQoSAppliedMACGroupStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete MAC group entries according to the
                RowStatus convention"
@@ -4916,7 +4957,7 @@ QoSPortGroupsEntry ::=
   }
 
 alaQoSPortGroupsName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of port group"
@@ -4975,7 +5016,7 @@ QoSAppliedPortGroupsEntry ::=
   }
 
 alaQoSAppliedPortGroupsName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of port group"
@@ -4996,7 +5037,7 @@ alaQoSAppliedPortGroupsSource OBJECT-TYPE
 
 alaQoSAppliedPortGroupsStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete port groups according to the
                RowStatus convention"
@@ -5112,7 +5153,7 @@ alaQoSAppliedPortGroupSlot OBJECT-TYPE
   ::= { alaQoSAppliedPortGroupEntry 1 }
 
 alaQoSAppliedPortGroupPort OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (1..128)
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Physical port range start for port group entry"
@@ -5120,14 +5161,14 @@ alaQoSAppliedPortGroupPort OBJECT-TYPE
 
 alaQoSAppliedPortGroupStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete port group entries according to the
                RowStatus convention"
   ::= { alaQoSAppliedPortGroupEntry 3 }
 
 alaQoSAppliedPortGroupPortEnd OBJECT-TYPE
-  SYNTAX      Integer32 (0..52)
+  SYNTAX      Integer32 (0..128)
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Physical port range end for port group entry
@@ -5166,7 +5207,7 @@ QoSMapGroupsEntry ::=
   }
 
 alaQoSMapGroupsName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of map group"
@@ -5225,7 +5266,7 @@ QoSAppliedMapGroupsEntry ::=
   }
 
 alaQoSAppliedMapGroupsName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of map group"
@@ -5246,7 +5287,7 @@ alaQoSAppliedMapGroupsSource OBJECT-TYPE
 
 alaQoSAppliedMapGroupsStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete map groups according to the
                RowStatus convention"
@@ -5378,7 +5419,7 @@ alaQoSAppliedMapGroupValue OBJECT-TYPE
 
 alaQoSAppliedMapGroupStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete map group entries according to the
                RowStatus convention"
@@ -5469,11 +5510,12 @@ QoSActionEntry ::=
     alaQoSActionRTCPDSCPStatus                              INTEGER,
     alaQoSActionTrustDSCP                                   INTEGER,
     alaQoSActionTrustDSCPStatus                             INTEGER,
-    alaQoSActionRedirectModule                              INTEGER
+    alaQoSActionRedirectModule                              INTEGER,
+    alaQoSActionMirrorSession                               Integer32
   }
 
 alaQoSActionName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of action"
@@ -5795,7 +5837,7 @@ alaQoSActionRedirectSlotStatus OBJECT-TYPE
   ::= { alaQoSActionEntry 31 }
 
 alaQoSActionRedirectPort OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (1..128)
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Destination physical port for redirected traffic"
@@ -5830,7 +5872,7 @@ alaQoSActionMirrorSlot OBJECT-TYPE
   ::= { alaQoSActionEntry 35 }
 
 alaQoSActionMirrorPort OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (1..128)
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Destination physical port for mirrored traffic"
@@ -6094,6 +6136,15 @@ alaQoSActionRedirectModule OBJECT-TYPE
   DEFVAL      { none }
   ::= { alaQoSActionEntry 61 }
 
+  alaQoSActionMirrorSession OBJECT-TYPE
+        SYNTAX  Integer32 (1..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Identifies a specific port mirroring instance."
+        DEFVAL  { 1 }
+  ::= { alaQoSActionEntry 62}
+
 
 --
 -- Definition of action table
@@ -6178,11 +6229,12 @@ QoSAppliedActionEntry ::=
     alaQoSAppliedActionRTCPDSCP                             Integer32,
     alaQoSAppliedActionRTCPDSCPStatus                       INTEGER,
     alaQoSAppliedActionTrustDSCP                            INTEGER,
-    alaQoSAppliedActionTrustDSCPStatus                      INTEGER
+    alaQoSAppliedActionTrustDSCPStatus                      INTEGER,
+    alaQoSAppliedActionMirrorSession                        Integer32
   }
 
 alaQoSAppliedActionName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of action"
@@ -6433,7 +6485,7 @@ alaQoSAppliedActionAlternateGatewayIpAddrStatus OBJECT-TYPE
 
 alaQoSAppliedActionRowStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete actions according to the
                RowStatus convention"
@@ -6477,7 +6529,7 @@ alaQoSAppliedActionRedirectSlotStatus OBJECT-TYPE
   ::= { alaQoSAppliedActionEntry 31 }
 
 alaQoSAppliedActionRedirectPort OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (1..128)
   MAX-ACCESS  read-only
   STATUS      current
   DESCRIPTION "Destination physical port for redirected traffic"
@@ -6508,7 +6560,7 @@ alaQoSAppliedActionMirrorSlot OBJECT-TYPE
   ::= { alaQoSAppliedActionEntry 35 }
 
 alaQoSAppliedActionMirrorPort OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (1..128)
   MAX-ACCESS  read-only
   STATUS      current
   DESCRIPTION "Destination physical port for mirrored traffic"
@@ -6751,6 +6803,14 @@ alaQoSAppliedActionTrustDSCPStatus OBJECT-TYPE
   DEFVAL        { enable }
   ::= { alaQoSAppliedActionEntry 60 }
 
+alaQoSAppliedActionMirrorSession OBJECT-TYPE
+  SYNTAX        Integer32 (1..2147483647)
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Identifies a specific port mirroring instance."
+  DEFVAL        { 1 }
+  ::= { alaQoSAppliedActionEntry 61 }
+
 
 
 --
@@ -6810,7 +6870,7 @@ alaQoSPortSlot OBJECT-TYPE
   ::= { alaQoSPortEntry 1 }
 
 alaQoSPortPort OBJECT-TYPE
-  SYNTAX      Integer32 (0..52)
+  SYNTAX      Integer32 (0..128)
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Physical port number"
@@ -7180,7 +7240,8 @@ alaQoSConfigUserportFilter OBJECT-TYPE
                   pim = 128
                   dvmrp = 256
                   is-is = 512
-                  dnsreply = 1024"
+                  dnsreply = 1024
+                  spoofv6 = 2048"
   ::= { alaQoSConfig 15 }
 
 alaQoSConfigAppliedUserportFilter OBJECT-TYPE
@@ -7198,7 +7259,8 @@ alaQoSConfigAppliedUserportFilter OBJECT-TYPE
                   pim = 128
                   dvmrp = 256
                   is-is = 512
-                  dnsreply = 1024"
+                  dnsreply = 1024
+                  spoofv6 = 2048"
   ::= { alaQoSConfig 16 }
 
 alaQoSConfigUserportShutdown OBJECT-TYPE
@@ -7217,7 +7279,8 @@ alaQoSConfigUserportShutdown OBJECT-TYPE
                   pim = 128
                   dvmrp = 256
                   is-is = 512
-                  dnsreply = 1024"
+                  dnsreply = 1024
+                  spoofv6 = 2048"
   ::= { alaQoSConfig 17 }
 
 alaQoSConfigAppliedUserportShutdown OBJECT-TYPE
@@ -7236,7 +7299,8 @@ alaQoSConfigAppliedUserportShutdown OBJECT-TYPE
                   pim = 128
                   dvmrp = 256
                   is-is = 512
-                  dnsreply = 1024"
+                  dnsreply = 1024
+                  spoofv6 = 2048"
   ::= { alaQoSConfig 18 }
 
 alaQoSConfigAutoPhones OBJECT-TYPE
@@ -7366,7 +7430,19 @@ alaQoSStatsNonSpoofedEvents OBJECT-TYPE
   DESCRIPTION "Total number of non-spoofed events"
   ::= { alaQoSStats 2 }
 
+alaQoSStatsSpoofedv6Events OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Total Number of spoofedv6 events"
+  ::= { alaQoSStats 3 }
 
+alaQoSStatsNonSpoofedv6Events OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Total number of non-spoofedv6 events"
+  ::= { alaQoSStats 4 }
 
 --
 -- Definition of validity period table
@@ -7408,7 +7484,7 @@ QoSValidityPeriodEntry ::=
   }
 
 alaQoSValidityPeriodName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of validity period"
@@ -7575,7 +7651,7 @@ QoSAppliedValidityPeriodEntry ::=
   }
 
 alaQoSAppliedValidityPeriodName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of validity period"
@@ -7690,7 +7766,7 @@ alaQoSAppliedValidityPeriodEndInterval OBJECT-TYPE
 
 alaQoSAppliedValidityPeriodRowStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete validity periods according
                to the RowStatus convention"
@@ -7729,7 +7805,7 @@ QoSRuleGroupsEntry ::=
   }
 
 alaQoSRuleGroupsName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of rule group"
@@ -7815,7 +7891,7 @@ QoSAppliedRuleGroupsEntry ::=
   }
 
 alaQoSAppliedRuleGroupsName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of rule group"
@@ -7840,7 +7916,8 @@ alaQoSAppliedRuleGroupsType OBJECT-TYPE
                 default (1),
                 egress (2),
                 unp (3),
-                appfp (4)
+                appfp (4),
+                empacl (5)
               }
   MAX-ACCESS  read-only
   STATUS      current
@@ -7859,7 +7936,7 @@ alaQoSAppliedRuleGroupsEnabled OBJECT-TYPE
 
 alaQoSAppliedRuleGroupsStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete rule groups according to the
                RowStatus convention"
@@ -7895,11 +7972,17 @@ QoSRuleGroupEntry ::=
     alaQoSRuleGroupCountType                          INTEGER,
     alaQoSRuleGroupPacketCount                        Counter64,
     alaQoSRuleGroupByteCount                          Counter64,
-    alaQoSRuleGroupStatus                             RowStatus
+    alaQoSRuleGroupStatus                             RowStatus,
+    alaQoSRuleGroupGreenPacketCount                   Counter64,
+    alaQoSRuleGroupYellowPacketCount                  Counter64,
+    alaQoSRuleGroupRedPacketCount                     Counter64,
+    alaQoSRuleGroupGreenByteCount                     Counter64,
+    alaQoSRuleGroupYellowByteCount                    Counter64,
+    alaQoSRuleGroupRedByteCount                       Counter64
   }
 
 alaQoSRuleGroupRuleName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of rule in rule group entry"
@@ -7945,6 +8028,47 @@ alaQoSRuleGroupStatus OBJECT-TYPE
                RowStatus convention"
   ::= { alaQoSRuleGroupEntry 6 }
 
+alaQoSRuleGroupGreenPacketCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of packets which are green compliant."
+  ::= { alaQoSRuleGroupEntry 7 }
+
+alaQoSRuleGroupYellowPacketCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of packets which are yellow compliant."
+  ::= { alaQoSRuleGroupEntry 8 }
+
+alaQoSRuleGroupRedPacketCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of packets which are red compliant."
+  ::= { alaQoSRuleGroupEntry 9 }
+
+alaQoSRuleGroupGreenByteCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of Bytes which are green compliant."
+  ::= { alaQoSRuleGroupEntry 10 }
+
+alaQoSRuleGroupYellowByteCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of Bytes which are yellow compliant."
+  ::= { alaQoSRuleGroupEntry 11 }
+
+alaQoSRuleGroupRedByteCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of Bytes which are red compliant."
+  ::= { alaQoSRuleGroupEntry 12 }
 --
 -- Definition of rule group entry table
 --
@@ -7975,11 +8099,17 @@ QoSAppliedRuleGroupEntry ::=
     alaQoSAppliedRuleGroupCountType                   INTEGER,
     alaQoSAppliedRuleGroupPacketCount                 Counter64,
     alaQoSAppliedRuleGroupByteCount                   Counter64,
-    alaQoSAppliedRuleGroupStatus                      RowStatus
+    alaQoSAppliedRuleGroupStatus                      RowStatus,
+    alaQoSAppliedRuleGroupGreenPacketCount            Counter64,
+    alaQoSAppliedRuleGroupYellowPacketCount           Counter64,
+    alaQoSAppliedRuleGroupRedPacketCount              Counter64,
+    alaQoSAppliedRuleGroupGreenByteCount              Counter64,
+    alaQoSAppliedRuleGroupYellowByteCount             Counter64,
+    alaQoSAppliedRuleGroupRedByteCount                Counter64
   }
 
 alaQoSAppliedRuleGroupRuleName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(1..31))
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Name of rule in rule group entry"
@@ -8019,12 +8149,53 @@ alaQoSAppliedRuleGroupByteCount OBJECT-TYPE
 
 alaQoSAppliedRuleGroupStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete rule group entries according to the
                RowStatus convention"
   ::= { alaQoSAppliedRuleGroupEntry 6 }
 
+alaQoSAppliedRuleGroupGreenPacketCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of packets which are green compliant."
+  ::= { alaQoSAppliedRuleGroupEntry 7 }
+
+alaQoSAppliedRuleGroupYellowPacketCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of packets which are yellow compliant."
+  ::= { alaQoSAppliedRuleGroupEntry 8 }
+
+alaQoSAppliedRuleGroupRedPacketCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of packets which are red compliant."
+  ::= { alaQoSAppliedRuleGroupEntry 9 }
+
+alaQoSAppliedRuleGroupGreenByteCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of Bytes which are green compliant."
+  ::= { alaQoSAppliedRuleGroupEntry 10 }
+
+alaQoSAppliedRuleGroupYellowByteCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of Bytes which are yellow compliant."
+  ::= { alaQoSAppliedRuleGroupEntry 11 }
+
+alaQoSAppliedRuleGroupRedByteCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of Bytes which are red compliant."
+  ::= { alaQoSAppliedRuleGroupEntry 12 }
 
 --
 -- Definition of DSCP table
@@ -8033,14 +8204,14 @@ alaQoSAppliedRuleGroupStatus OBJECT-TYPE
 alaQoSDSCPTable OBJECT-TYPE
   SYNTAX      SEQUENCE OF AlaQoSDSCPEntry
   MAX-ACCESS  not-accessible
-  STATUS      current
+  STATUS      deprecated
   DESCRIPTION "Table of QoS Condition definitions"
   ::= { alaQoSMIBObjects 55 }
 
 alaQoSDSCPEntry OBJECT-TYPE
   SYNTAX      AlaQoSDSCPEntry
   MAX-ACCESS  not-accessible
-  STATUS      current
+  STATUS      deprecated
   DESCRIPTION "Definition of QoS DSCP"
   INDEX {
           alaQoSDSCPEntryNumber
@@ -8059,14 +8230,14 @@ AlaQoSDSCPEntry ::=
 alaQoSDSCPEntryNumber OBJECT-TYPE
   SYNTAX                Integer32(1..5000)
   MAX-ACCESS            not-accessible
-  STATUS                current
+  STATUS                deprecated
   DESCRIPTION           "DSCP Entry number for the traffic."
   ::= { alaQoSDSCPEntry 1}
 
 alaQoSDSCPPriority OBJECT-TYPE
   SYNTAX                Integer32
   MAX-ACCESS            read-create
-  STATUS                current
+  STATUS                deprecated
   DESCRIPTION           "DSCP priority for the traffic."
   ::= { alaQoSDSCPEntry 2}
 
@@ -8077,7 +8248,7 @@ alaQoSDSCPDropPrecedence OBJECT-TYPE
                                 high (3)
                         }
   MAX-ACCESS            read-create
-  STATUS                current
+  STATUS                deprecated
   DESCRIPTION           "DSCP drop precedence for the traffic."
   DEFVAL        {low}
   ::= { alaQoSDSCPEntry 3}
@@ -8085,7 +8256,7 @@ alaQoSDSCPDropPrecedence OBJECT-TYPE
 alaQoSDSCPRowStatus OBJECT-TYPE
   SYNTAX                RowStatus
   MAX-ACCESS            read-create
-  STATUS                current
+  STATUS                deprecated
   DESCRIPTION           "RowStatus entry for QoS DSCP."
   ::= { alaQoSDSCPEntry 4}
 
@@ -8202,7 +8373,7 @@ alaQoSExtendedRuleSlot OBJECT-TYPE
   ::= { alaQoSExtendedRuleEntry 3 }
 
 alaQoSExtendedRulePort OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (1..128)
   MAX-ACCESS  read-only
   STATUS      current
   DESCRIPTION "Port on which rate-limit is enabled."
@@ -8366,7 +8537,7 @@ alaQoSAppliedV6NetworkGroupIpMask OBJECT-TYPE
 
 alaQoSAppliedV6NetworkGroupStatus OBJECT-TYPE
   SYNTAX      RowStatus
-  MAX-ACCESS  read-only
+  MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Used to create/delete network group entries according to the
                RowStatus convention"
@@ -8466,7 +8637,7 @@ alaQoSIpNetworkSummaryDestinationGroup OBJECT-TYPE
   ::= { alaQoSIpNetworkSummaryEntry 7 }
 
 alaQoSIpNetworkSummaryVrfName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(0..32))
   MAX-ACCESS  read-only
   STATUS      current
   DESCRIPTION "VRF Name as specified in condition classifier for given rule."
@@ -8489,6 +8660,226 @@ alaQoSIpNetworkSummaryHitCount OBJECT-TYPE
   STATUS      current
   DESCRIPTION "Number of packets hit the rule."
   ::= { alaQoSIpNetworkSummaryEntry 10 }
+
+--
+-- Definition of vlan group table
+--
+
+alaQoSVlanGroupsTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF QoSVlanGroupsEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of QoS VlanGroups definitions"
+  ::= { alaQoSMIBObjects 59 }
+
+alaQoSVlanGroupsEntry OBJECT-TYPE
+  SYNTAX      QoSVlanGroupsEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of QoS VlanGroups"
+  INDEX {
+          alaQoSVlanGroupsName
+        }
+  ::= { alaQoSVlanGroupsTable 1 }
+
+QoSVlanGroupsEntry ::=
+  SEQUENCE
+  {
+    alaQoSVlanGroupsName                                    SnmpAdminString,
+    alaQoSVlanGroupsSource                                  INTEGER,
+    alaQoSVlanGroupsStatus                                  RowStatus
+  }
+
+alaQoSVlanGroupsName OBJECT-TYPE
+  SYNTAX      SnmpAdminString (SIZE(1..31))
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Name of vlan group"
+  ::= { alaQoSVlanGroupsEntry 1 }
+
+alaQoSVlanGroupsSource OBJECT-TYPE
+  SYNTAX      INTEGER {
+                ldap (1),
+                cli (2),
+                blt (3),
+                api (4),
+                imp (5)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "What entity created the vlan group."
+  DEFVAL      { cli }
+  ::= { alaQoSVlanGroupsEntry 2 }
+
+alaQoSVlanGroupsStatus OBJECT-TYPE
+  SYNTAX      RowStatus
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Used to create/delete vlan groups according to the
+               RowStatus convention"
+  ::= { alaQoSVlanGroupsEntry 3 }
+
+--
+-- Definition of vlan group entry table
+--
+
+alaQoSVlanGroupTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF QoSVlanGroupEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of QoS VlanGroup definitions"
+  ::= { alaQoSMIBObjects 60 }
+
+alaQoSVlanGroupEntry OBJECT-TYPE
+  SYNTAX      QoSVlanGroupEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of QoS VlanGroup"
+  INDEX {
+          alaQoSVlanGroupsName,
+          alaQoSVlanGroupVlanID,
+          alaQoSVlanGroupVlanIDEnd
+        }
+  ::= { alaQoSVlanGroupTable 1 }
+
+QoSVlanGroupEntry ::=
+  SEQUENCE
+  {
+    alaQoSVlanGroupVlanID                                   Integer32,
+    alaQoSVlanGroupVlanIDEnd                                Integer32,
+    alaQoSVlanGroupStatus                                   RowStatus
+  }
+
+alaQoSVlanGroupVlanID OBJECT-TYPE
+  SYNTAX      Integer32 (1..4094)
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Vlan ID of this entry."
+  ::= { alaQoSVlanGroupEntry 1 }
+
+alaQoSVlanGroupVlanIDEnd OBJECT-TYPE
+  SYNTAX      Integer32 (1..4094)
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Vlan ID end of this entry"
+  ::= { alaQoSVlanGroupEntry 2 }
+
+alaQoSVlanGroupStatus OBJECT-TYPE
+  SYNTAX      RowStatus
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Rowstatus of this entry"
+  ::= { alaQoSVlanGroupEntry 3 }
+
+--
+-- Definition of applied vlan groups table
+--
+
+alaQoSAppliedVlanGroupsTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF QoSAppliedVlanGroupsEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of QoS AppliedVlanGroups definitions"
+  ::= { alaQoSMIBObjects 61 }
+
+alaQoSAppliedVlanGroupsEntry OBJECT-TYPE
+  SYNTAX      QoSAppliedVlanGroupsEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of QoS AppliedVlanGroups"
+  INDEX {
+          alaQoSAppliedVlanGroupsName
+        }
+  ::= { alaQoSAppliedVlanGroupsTable 1 }
+
+QoSAppliedVlanGroupsEntry ::=
+  SEQUENCE
+  {
+    alaQoSAppliedVlanGroupsName                                    SnmpAdminString,
+    alaQoSAppliedVlanGroupsSource                                  INTEGER,
+    alaQoSAppliedVlanGroupsStatus                                  RowStatus
+  }
+
+alaQoSAppliedVlanGroupsName OBJECT-TYPE
+  SYNTAX      SnmpAdminString (SIZE(1..31))
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Name of applied vlan group"
+  ::= { alaQoSAppliedVlanGroupsEntry 1 }
+
+alaQoSAppliedVlanGroupsSource OBJECT-TYPE
+  SYNTAX      INTEGER {
+                ldap (1),
+                cli (2),
+                blt (3),
+                api (4),
+                imp (5)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "What entity created the applied vlan group."
+  DEFVAL      { cli }
+  ::= { alaQoSAppliedVlanGroupsEntry 2 }
+
+alaQoSAppliedVlanGroupsStatus OBJECT-TYPE
+  SYNTAX      RowStatus
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Used to create/delete applied vlan groups according to the
+               RowStatus convention"
+  ::= { alaQoSAppliedVlanGroupsEntry 3 }
+
+--
+-- Definition of applied vlan group entry table
+--
+
+alaQoSAppliedVlanGroupTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF QoSAppliedVlanGroupEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of QoS AppliedVlanGroup definitions"
+  ::= { alaQoSMIBObjects 62 }
+
+alaQoSAppliedVlanGroupEntry OBJECT-TYPE
+  SYNTAX      QoSAppliedVlanGroupEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of QoS AppliedVlanGroup"
+  INDEX {
+          alaQoSAppliedVlanGroupsName,
+          alaQoSAppliedVlanGroupVlanID,
+          alaQoSAppliedVlanGroupVlanIDEnd
+        }
+  ::= { alaQoSAppliedVlanGroupTable 1 }
+
+QoSAppliedVlanGroupEntry ::=
+  SEQUENCE
+  {
+    alaQoSAppliedVlanGroupVlanID                                   Integer32,
+    alaQoSAppliedVlanGroupVlanIDEnd                                Integer32,
+    alaQoSAppliedVlanGroupStatus                                   RowStatus
+  }
+
+alaQoSAppliedVlanGroupVlanID OBJECT-TYPE
+  SYNTAX      Integer32 (1..4094)
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Starting value for vlan ID for this entry."
+  ::= { alaQoSAppliedVlanGroupEntry 1 }
+
+alaQoSAppliedVlanGroupVlanIDEnd OBJECT-TYPE
+  SYNTAX      Integer32 (1..4094)
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Ending value for vlan ID for this entry."
+  ::= { alaQoSAppliedVlanGroupEntry 2 }
+
+alaQoSAppliedVlanGroupStatus OBJECT-TYPE
+  SYNTAX      RowStatus
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Rowstatus of this entry"
+  ::= { alaQoSAppliedVlanGroupEntry 3 }
 
 --
 --  Conformance Information
@@ -8719,7 +9110,11 @@ alaQoSMIBConditionObjects OBJECT-GROUP
     alaQosConditionVmL4DestPortStatus,
     alaQosConditionVxlanStatus,
     alaQoSConditionSourcePortSplitGroup,
-    alaQoSConditionSourcePortSplitGroupStatus
+    alaQoSConditionSourcePortSplitGroupStatus,
+    alaQoSConditionSourceVlanGroup,
+    alaQoSConditionSourceVlanGroupStatus,
+    alaQoSConditionSourceServiceID,
+    alaQoSConditionSourceServiceIDStatus
   }
 
   STATUS      current
@@ -9174,7 +9569,8 @@ alaQoSMIBActionObjects OBJECT-GROUP
     alaQoSActionRTCPDSCPStatus,
     alaQoSActionTrustDSCP,
     alaQoSActionTrustDSCPStatus,
-    alaQoSActionRedirectModule
+    alaQoSActionRedirectModule,
+    alaQoSActionMirrorSession
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information for Actions"
@@ -9240,7 +9636,8 @@ alaQoSMIBAppliedActionObjects OBJECT-GROUP
     alaQoSAppliedActionRTCPDSCP,
     alaQoSAppliedActionRTCPDSCPStatus,
     alaQoSAppliedActionTrustDSCP,
-    alaQoSAppliedActionTrustDSCPStatus
+    alaQoSAppliedActionTrustDSCPStatus,
+    alaQoSAppliedActionMirrorSession
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information
@@ -9309,7 +9706,9 @@ alaQoSMIBConfigObjects OBJECT-GROUP
 alaQoSMIBStatsObjects OBJECT-GROUP
   OBJECTS {
     alaQoSStatsSpoofedEvents,
-    alaQoSStatsNonSpoofedEvents
+    alaQoSStatsNonSpoofedEvents,
+    alaQoSStatsSpoofedv6Events,
+    alaQoSStatsNonSpoofedv6Events
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information for Statss"
@@ -9345,7 +9744,13 @@ alaQoSMIBRuleGroupObjects OBJECT-GROUP
     alaQoSRuleGroupCountType,
     alaQoSRuleGroupPacketCount,
     alaQoSRuleGroupByteCount,
-    alaQoSRuleGroupStatus
+    alaQoSRuleGroupStatus,
+    alaQoSRuleGroupGreenPacketCount,                   
+    alaQoSRuleGroupYellowPacketCount,                  
+    alaQoSRuleGroupRedPacketCount,                     
+    alaQoSRuleGroupGreenByteCount,                     
+    alaQoSRuleGroupYellowByteCount,                    
+    alaQoSRuleGroupRedByteCount           
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information for RuleGroups"
@@ -9357,7 +9762,13 @@ alaQoSMIBAppliedRuleGroupObjects OBJECT-GROUP
     alaQoSAppliedRuleGroupCountType,
     alaQoSAppliedRuleGroupPacketCount,
     alaQoSAppliedRuleGroupByteCount,
-    alaQoSAppliedRuleGroupStatus
+    alaQoSAppliedRuleGroupStatus,
+    alaQoSAppliedRuleGroupGreenPacketCount,
+    alaQoSAppliedRuleGroupYellowPacketCount,
+    alaQoSAppliedRuleGroupRedPacketCount,
+    alaQoSAppliedRuleGroupGreenByteCount,
+    alaQoSAppliedRuleGroupYellowByteCount,
+    alaQoSAppliedRuleGroupRedByteCount
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information
@@ -9480,6 +9891,41 @@ alaQoSIpNetworkSummaryGroupObjects OBJECT-GROUP
   DESCRIPTION "Collections of objects providing information for Ip Network Summary."
   ::= { alaQoSMIBGroups 43 }
 
+alaQoSMIBVlanGroupsObjects OBJECT-GROUP
+  OBJECTS {
+    alaQoSVlanGroupsSource,
+    alaQoSVlanGroupsStatus
+  }
+  STATUS      current
+  DESCRIPTION "Collections of objects providing information for VlanGroups"
+  ::= { alaQoSMIBGroups 44 }
+
+alaQoSMIBVlanGroupObjects OBJECT-GROUP
+  OBJECTS {
+    alaQoSVlanGroupStatus
+  }
+  STATUS      current
+  DESCRIPTION "Collections of objects providing information for VlanGroup"
+  ::= { alaQoSMIBGroups 45 }
+
+alaQoSMIBAppliedVlanGroupsObjects OBJECT-GROUP
+  OBJECTS {
+    alaQoSAppliedVlanGroupsSource,
+    alaQoSAppliedVlanGroupsStatus
+  }
+  STATUS      current
+  DESCRIPTION "Collections of objects providing information for AppliedVlanGroups"
+  ::= { alaQoSMIBGroups 46 }
+
+alaQoSMIBAppliedVlanGroupObjects OBJECT-GROUP
+  OBJECTS {
+    alaQoSAppliedVlanGroupStatus
+  }
+  STATUS      current
+  DESCRIPTION "Collections of objects providing information for AppliedVlanGroup"
+  ::= { alaQoSMIBGroups 47 }
+
+
 alaQoSMIBCompliance MODULE-COMPLIANCE
   STATUS      current
   DESCRIPTION "Compliance statement for QoS."
@@ -9527,7 +9973,11 @@ alaQoSMIBCompliance MODULE-COMPLIANCE
     alaQoSMIBV6NetworkGroupObjects,
     alaQoSMIBAppliedV6NetworkGroupObjects,
     alaQoSRuleExtendedObjects,
-    alaQoSIpNetworkSummaryGroupObjects
+    alaQoSIpNetworkSummaryGroupObjects,
+    alaQoSMIBVlanGroupsObjects,
+    alaQoSMIBVlanGroupObjects,
+    alaQoSMIBAppliedVlanGroupsObjects,
+    alaQoSMIBAppliedVlanGroupObjects
   }
   ::= { alaQoSMIBCompliances 1 }
 

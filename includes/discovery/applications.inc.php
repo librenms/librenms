@@ -1,4 +1,5 @@
 <?php
+
 /**
  * applications.inc.php
  *
@@ -24,8 +25,10 @@
  */
 
 use App\Models\Application;
+use App\Models\ApplicationMetric;
+use App\Models\Eventlog;
 use App\Observers\ModuleModelObserver;
-use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 
 echo "\nApplications: ";
 
@@ -35,7 +38,7 @@ $results = snmpwalk_cache_oid($device, 'nsExtendStatus', [], 'NET-SNMP-EXTEND-MI
 // Load our list of available applications
 $applications = [];
 if ($results) {
-    foreach (glob(Config::get('install_dir') . '/includes/polling/applications/*.inc.php') as $file) {
+    foreach (glob(base_path('includes/polling/applications/*.inc.php')) as $file) {
         $name = basename($file, '.inc.php');
         $applications[$name] = $name;
     }
@@ -86,20 +89,20 @@ foreach ($results as $extend => $result) {
             }
             $app_obj->discovered = 1;
             $app_obj->save();
-            log_event("Application enabled by discovery: $app", $device, 'application', 1);
+            Eventlog::log("Application enabled by discovery: $app", $device['device_id'], 'application', Severity::Ok);
         }
     }
 }
 
 // remove non-existing apps
 $apps_to_remove = array_diff($discovered_apps, $current_apps);
-DeviceCache::getPrimary()->applications()->whereIn('app_type', $apps_to_remove)->get()->each(function (Application $app) {
+DeviceCache::getPrimary()->applications()->whereIn('app_type', $apps_to_remove)->get()->each(function (Application $app): void {
     $app->delete();
     \App\Models\Eventlog::log("Application disabled by discovery: $app->app_type", DeviceCache::getPrimary(), 'application', \LibreNMS\Enum\Severity::Notice);
 });
 
 // clean application_metrics
-dbDeleteOrphans('application_metrics', ['applications.app_id']);
+ApplicationMetric::doesntHave('app')->delete();
 
 echo PHP_EOL;
 

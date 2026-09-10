@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AdvaAttributeChangeTest.php
  *
@@ -25,8 +26,11 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class AdvaAttributeChangeTest extends SnmpTrapTestCase
+use PHPUnit\Framework\Attributes\TestDox;
+
+final class AdvaAttributeChangeTest extends SnmpTrapTestCase
 {
+    #[TestDox('Syslog IP version modified')]
     public function testSyslogIPVersionModified(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
@@ -44,6 +48,7 @@ TRAP,
         );
     }
 
+    #[TestDox('Syslog IPv6 addr modified')]
     public function testSyslogIP6AddrModified(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
@@ -61,6 +66,7 @@ TRAP,
         );
     }
 
+    #[TestDox('Syslog IP addr modified')]
     public function testSyslogIPAddrModified(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'

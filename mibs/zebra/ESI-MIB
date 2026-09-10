@@ -1,0 +1,3648 @@
+--ESI-MIB { iso org(3) dod(6) internet(1) private(4) enterprises(1) esi(683) }
+--Extended Systems MIB.
+
+--Revision 2.2, July 12, 1999
+
+--(C) Copyright 1995, Extended Systems, Inc.
+
+
+--ESI-MIB { iso org(3) dod(6) internet(1) private(4) enterprises(1) 683 }
+
+
+ESI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  enterprises, OBJECT-TYPE, NetworkAddress,
+  IpAddress, Counter                          FROM RFC1155-SMI
+  DisplayString                               FROM RFC1213-MIB
+  TRAP-TYPE                                   FROM RFC-1215;
+
+  esi              OBJECT IDENTIFIER ::= { enterprises 683 }
+  general          OBJECT IDENTIFIER ::= { esi 1 }
+  commands         OBJECT IDENTIFIER ::= { esi 2 }
+  esiSNMP          OBJECT IDENTIFIER ::= { esi 3 }
+  esiSNMPCommands  OBJECT IDENTIFIER ::= { esiSNMP 2 }
+  driver           OBJECT IDENTIFIER ::= { esi 4 }
+  tokenRing        OBJECT IDENTIFIER ::= { esi 5 }
+  printServers     OBJECT IDENTIFIER ::= { esi 6 }
+  psGeneral        OBJECT IDENTIFIER ::= { printServers 1 }
+  psOutput         OBJECT IDENTIFIER ::= { printServers 2 }
+  psProtocols      OBJECT IDENTIFIER ::= { printServers 3 }
+  genProtocols     OBJECT IDENTIFIER ::= { general 15 }
+  outputCommands   OBJECT IDENTIFIER ::= { psOutput 2 }
+  outputConfigure  OBJECT IDENTIFIER ::= { psOutput 3 }
+  outputJobLog     OBJECT IDENTIFIER ::= { psOutput 6 }
+  trCommands       OBJECT IDENTIFIER ::= { tokenRing 2 }
+  trConfigure      OBJECT IDENTIFIER ::= { tokenRing 3 }
+  tcpip            OBJECT IDENTIFIER ::= { psProtocols 1 }
+  netware          OBJECT IDENTIFIER ::= { psProtocols 2 }
+  vines            OBJECT IDENTIFIER ::= { psProtocols 3 }
+  lanManager       OBJECT IDENTIFIER ::= { psProtocols 4 }
+  eTalk            OBJECT IDENTIFIER ::= { psProtocols 5 }
+  tcpipCommands    OBJECT IDENTIFIER ::= { tcpip 3 }
+  tcpipConfigure   OBJECT IDENTIFIER ::= { tcpip 4 }
+  tcpipStatus      OBJECT IDENTIFIER ::= { tcpip 5 }
+  nwCommands       OBJECT IDENTIFIER ::= { netware 3 }
+  nwConfigure      OBJECT IDENTIFIER ::= { netware 4 }
+  nwStatus         OBJECT IDENTIFIER ::= { netware 5 }
+  bvCommands       OBJECT IDENTIFIER ::= { vines 3 }
+  bvConfigure      OBJECT IDENTIFIER ::= { vines 4 }
+  bvStatus         OBJECT IDENTIFIER ::= { vines 5 }
+  eTalkCommands    OBJECT IDENTIFIER ::= { eTalk 3 }
+  eTalkConfigure   OBJECT IDENTIFIER ::= { eTalk 4 }
+  eTalkStatus      OBJECT IDENTIFIER ::= { eTalk 5 }
+
+-- object types
+
+-- the general group
+
+genGroupVersion     OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The version for the general group."
+    ::= { general 1 }
+
+genMIBVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The version of the MIB."
+    ::= { general 2 }
+
+genProductName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..20))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A textual description of the device."
+    ::= { general 3 }
+
+genProductNumber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..5))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The product number of the device."
+    ::= { general 4 }
+
+genSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..7))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The serial number of the device."
+    ::= { general 5 }
+
+genHWAddress OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (6))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The device's hardware address."
+    ::= { general 6 }
+
+genCableType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        tenbase2(1),
+        tenbaseT(2),
+        aui(3),
+        utp(4),
+        stp(5),
+        fiber100fx(6)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "Indicates the network cable type connected to the
+         device."
+    ::= { general 7 }
+
+genDateCode OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..10))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The device's datecode."
+    ::= { general 8 }
+
+genVersion OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..10))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A string indicating the version of the firmware."
+    ::= { general 9 }
+
+genConfigurationDirty OBJECT-TYPE
+    SYNTAX  INTEGER {
+        no(1),
+        yes(2)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A variable's value has been changed which will
+         require that the device be reset or power cycled
+         before it will take effect.
+         Set cmdReset to take this action.
+
+         A list of critical variables that will cause
+         genConfigurationDirty to be set follows:
+
+         snmpGetCommunityName,
+         snmpSetCommunityName,
+
+         trPriority,
+         trEarlyTokenRelease,
+         trPacketSize,
+         trRouting,
+         trLocallyAdminAddr,
+
+         psJetAdminEnabled,
+
+         outputType,
+         outputHandshake,
+
+         tcpipEnabled,
+         tcpipIPAddress,
+         tcpipDefaultGateway,
+         tcpipSubnetMask,
+         tcpipUsingNetProtocols,
+         tcpipBootProtocolsEnabled,
+         tcpipRawPortNumber,
+         tcpipMLPTCPPort,
+         tcpipMLPPort,
+         
+         nwEnabled,
+         nwSetFrameFormat,
+         nwMode,
+         nwPrintServerName,
+         nwPrintServerPassword,
+         nwQueueScanTime,
+         nwFileServerName,
+         nwPortPrinterNumber,
+         nwPortFontDownload,
+         nwPortPCLQueue,
+         nwPortPSQueue,
+         nwPortFormsOn,
+         nwPortNotification,
+
+         bvEnabled,
+         bvSetSequencedRouting,
+         bvLoginName,
+         bvLoginPassword,
+         bvPrintServiceName,
+         bvPrintServiceRouting,
+
+         lmEnabled,
+
+         eTalkEnabled"
+    ::= { general 10 }
+
+genCompanyName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..30))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A string indicating the manufacturer of the device."
+    ::= { general 11 }
+
+genCompanyLoc OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..30))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A string indicating the location of the manufacturer
+         of the device."
+    ::= { general 12 }
+
+genCompanyPhone OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A string indicating the phone number of the
+         manufacturer of the device."
+    ::= { general 13 }
+
+genCompanyTechSupport OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..64))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A string indicating the technical support information
+         for the device."
+    ::= { general 14 }
+
+genNumProtocols OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The number of network protocols supported on the
+         device."
+    ::= { genProtocols 1 }
+
+genProtocolTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF GenProtocolEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+         "A list of network protocols.  The number of
+         entries is given by the value of genNumProtocols."
+   ::= { genProtocols 2 }
+
+genProtocolEntry OBJECT-TYPE
+    SYNTAX  GenProtocolEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+         "A network protocol supported on the device."
+    INDEX   { genProtocolIndex }
+    ::= { genProtocolTable 1 }
+
+GenProtocolEntry ::=
+    SEQUENCE {
+        genProtocolIndex
+            INTEGER,
+        genProtocolDescr
+            DisplayString,
+        genProtocolID
+            INTEGER
+    }
+
+genProtocolIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A unique value for each network protocol.  Its
+         value ranges between 1 and the value of
+         genNumProtocols.  The value for each protocol must
+         remain constant at least from one re-initialization
+         of the entity's network management system to the next
+         re-initialization."
+    ::= { genProtocolEntry 1 }
+
+genProtocolDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A textual string describing the network protocol."
+    ::= { genProtocolEntry 2 }
+
+genProtocolID OBJECT-TYPE
+    SYNTAX  INTEGER {
+        tcp-ip(1),
+        netware(2),
+        vines(3),
+        lanmanger(4),
+        ethertalk(5)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A unique identification number for the network
+         protocol."
+    ::= { genProtocolEntry 3 }
+
+genSysUpTimeString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..35))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A string indicating the system up time for the device."
+    ::= { general 16 }
+
+-- the commands group
+
+cmdGroupVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The version for the commands group."
+::= { commands 1 }
+
+cmdReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+        no(1),
+        yes(2)
+    }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "A value of 2 will reset the device.  The following
+         list of variables will also cause the device to reset
+         itself.
+
+         cmdRestoreDefaults,
+         snmpRestoreDefaults,
+         trRestoreDefaults,
+         outputRestoreDefaults,
+         tcpipRestoreDefaults,
+         tcpipFirmwareUpgrade,
+         nwRestoreDefaults,
+         nwFirmwareUpgrade,
+         bvRestoreDefaults,
+         bvFirmwareUpgrade,
+         eTalkRestoreDefaults"
+::= { commands 2 }
+
+cmdPrintConfig OBJECT-TYPE
+    SYNTAX  INTEGER {
+        no(1),
+        yes(2)
+    }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "A value of 2 will cause the device to print a
+         configuration page."
+    ::= { commands 3 }
+
+cmdRestoreDefaults OBJECT-TYPE
+    SYNTAX  INTEGER {
+        no(1),
+        yes(2)
+    }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "A value of 2 will restore all parameters on the device
+         to factory defaults, as well as reset the device."
+    ::= { commands 4 }
+
+-- the esiSNMP group
+
+snmpGroupVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The version for the snmp group."
+    ::= { esiSNMP 1 }
+
+snmpRestoreDefaults OBJECT-TYPE
+    SYNTAX  INTEGER {
+        no(1),
+        yes(2)
+    }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "A value of 2 will restore all SNMP parameters
+         on the device to factory defaults, as well as reset
+         the device."
+    ::= { esiSNMPCommands 1 }
+
+snmpGetCommunityName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..31))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+        "Get community name for the managed node.
+
+         In order for changes to this variable to take effect,
+         the print server must be reset.  See cmdReset to do
+         this."
+    ::= { esiSNMP 3 }
+
+snmpSetCommunityName OBJECT-TYPE
+     SYNTAX  DisplayString (SIZE (1..31))
+     ACCESS  read-write
+     STATUS  optional
+     DESCRIPTION
+          "Set community name for the managed node.  This value
+          cannot be read, just set.
+
+          In order for changes to this variable to take effect,
+          the print server must be reset.  See cmdReset to do
+          this."
+::= { esiSNMP 4 }
+
+snmpTrapCommunityName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..31))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "Trap community name for the managed node."
+    ::= { esiSNMP 5 }
+
+-- the driver group
+
+driverGroupVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The version for the driver group."
+    ::= { driver 1 }
+
+driverRXPackets OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The number of packets received."
+    ::= { driver 2 }
+
+driverTXPackets OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The number of packets transmitted."
+    ::= { driver 3 }
+
+driverRXPacketsUnavailable OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The number of inbound packets which were chosen
+         to be discarded even though no errors had been
+         detected to prevent their being deliverable to a
+         higher-layer protocol due to a lack of buffer space."
+    ::= { driver 4 }
+
+driverRXPacketErrors OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The number of inbound packets that contained
+         errors preventing them from being deliverable to a
+         higher-layer protocol."
+    ::= { driver 5 }
+
+driverTXPacketErrors OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The number of outbound packets that could not be
+         transmitted because of errors."
+    ::= { driver 6 }
+
+driverTXPacketRetries OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The number of retransmitted packets."
+    ::= { driver 7 }
+
+driverChecksumErrors OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The number of packets containing checksum errors
+         received."
+    ::= { driver 8 }
+
+-- the tokenRing group
+
+trGroupVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The version for the tokenRing group."
+    ::= { tokenRing 1 }
+
+trRestoreDefaults OBJECT-TYPE
+    SYNTAX  INTEGER {
+        no(1),
+        yes(2)
+    }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "A value of 2 will restore all token-ring parameters
+         on the device to factory defaults, as well as reset
+         the device."
+    ::= { trCommands 1 }
+
+trPriority OBJECT-TYPE
+    SYNTAX  INTEGER (0..6)
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "The token which is passed around the ring until a
+         station needs it can be assigned a priority from 0 to
+         6.  Priority 0 is the lowest and 6 is the highest.  The
+         priority of the device can be increased to improve
+         performance.  However, the performance of file servers
+         and crucial stations could be affected.
+
+         In order for changes to this variable to take effect,
+         the device must be reset.  See cmdReset to do this."
+         ::= { trConfigure 1 }
+
+trEarlyTokenRelease OBJECT-TYPE
+    SYNTAX  INTEGER {
+        no(1),
+        yes(2)
+    }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "Early token release allows the device to release the
+         token immediately after transmitting data but only on
+         16 Mbps systems.  This feature enhances ring performance.
+
+         In order for changes to this variable to take effect,
+         the device must be reset.  See cmdReset to do this."
+    ::= { trConfigure 2 }
+
+trPacketSize OBJECT-TYPE
+    SYNTAX  INTEGER {
+        one-k(1),
+        two-k(2),
+        four-k(3)
+    }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "You should only change the packet size if you are
+         using a driver for your Token Ring adapter which
+         allows packet sizes greater than One_K.
+
+         In order for changes to this variable to take effect,
+         the device must be reset.  See cmdReset to do this."
+    ::= { trConfigure 3 }
+
+trRouting OBJECT-TYPE
+    SYNTAX  INTEGER {
+        off(1),
+        all-None(2),
+        single-All(3),
+        single-None(4)
+    }
+   ACCESS  read-write
+   STATUS  optional
+   DESCRIPTION
+        "Set this variable to change the source routing
+        configuration on the device.
+
+        Off:  No source routing.
+
+        All, None:  All-routes broadcast, nonbroadcast return.
+        The frame will be transmitted on every route within
+        the network resulting in multiple copies on a given ring.
+
+        Single, All:  Single-route broadcast, all routes
+        broadcast return.  The frame will be transmitted across
+        the designated bridges, which will result in the frame
+        appearing only once on each ring.  The response frame
+        is on all routes broadcast to the originator.
+
+        Single, None:  Single-route broadcast, nonbroadcast
+        return.  The frame will be transmitted across designated
+        bridges, which will result in the frame appearing only
+        once each ring.
+
+         In order for changes to this variable to take effect,
+         the device must be reset.  See cmdReset to do this."
+    ::= { trConfigure 4 }
+
+trLocallyAdminAddr OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (6))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "This is the locally administered node address for the
+         device.  Valid values are 000000000000 and between
+         400000000000 and 7FFFFFFFFFFF.  A value of 000000000000
+         indicates that a locally administered address is not in
+         use."
+    ::= { trConfigure 5 }
+
+-- the psGeneral group
+
+psGroupVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The version for the psGeneral group."
+    ::= { psGeneral 1 }
+
+psJetAdminEnabled OBJECT-TYPE
+    SYNTAX  INTEGER {
+        no(1),
+        yes(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+         "Indicates whether or not the JetAdmin support is
+         enabled on the print server.
+
+         In order for changes to this variable to take effect,
+         the print server must be reset.  See cmdReset to do
+         this."
+    ::= { psGeneral 2 }
+
+psVerifyConfiguration OBJECT-TYPE
+    SYNTAX  INTEGER {
+        getvalue(0),
+        serial-configuration(1)
+    }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "This variable is used to force the print server to verify valid configuration
+          settings. Setting the variable to the appropriate enumeration will cause the 
+          print server to verify the settings for that enumeration. If the settings are
+          valid, the result of the set will be OK. If the settings are not valid, the 
+          result will be BadValue. Gets on this variable will always return 0. 
+         
+         1 - Indicates whether or not the current serial configuration is
+              valid. 
+             Valid configurations - If the serial port is set in bidirectional mode,
+             the baud rate must be less than 115200 and the handshaking must be set to 
+             hardware handshaking.
+             
+         2 - Not used yet. 
+         "
+    ::= { psGeneral 3 }
+
+-- the psOutput group
+
+outputGroupVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The version for the output group."
+    ::= { psOutput 1 }
+
+outputRestoreDefaults OBJECT-TYPE
+    SYNTAX  INTEGER {
+        no(1),
+        yes(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+         "A value of 2 will restore all output parameters on
+         the print server to factory defaults, as well as reset
+         the print server."
+    ::= { outputCommands 1 }
+    
+outputCommandsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF OutputCommandsEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+         "A list of physical output ports.  The number of
+         entries is given by the value of outputNumPorts."
+    ::= { outputCommands 2 }
+    
+outputCommandsEntry OBJECT-TYPE
+    SYNTAX  OutputCommandsEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A physical output port on the print server."
+    INDEX   { outputIndex }
+    ::= { outputCommandsTable 1 }
+    
+OutputCommandsEntry ::=
+    SEQUENCE {
+        outputCancelCurrentJob
+            INTEGER
+    }
+    
+outputCancelCurrentJob OBJECT-TYPE
+    SYNTAX  INTEGER {
+        no(1),
+        yes(2)
+    }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "A value of 2 will cancel the job currently printing 
+         on that port."
+    ::= { outputCommandsEntry 1 }
+
+outputNumPorts OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The number of physical output ports on the print
+         server."
+    ::= { outputConfigure 1 }
+
+outputTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF OutputEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+         "A list of physical output ports.  The number of
+         entries is given by the value of outputNumPorts."
+    ::= { outputConfigure 2 }
+
+outputEntry OBJECT-TYPE
+    SYNTAX  OutputEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A physical output port on the print server."
+    INDEX   { outputIndex }
+    ::= { outputTable 1 }
+
+OutputEntry ::=
+    SEQUENCE {
+        outputIndex
+            INTEGER,
+        outputName
+            DisplayString,
+        outputStatusString
+            DisplayString,
+        outputStatus
+            INTEGER,
+        outputExtendedStatus
+            INTEGER,
+        outputPrinter
+            INTEGER,
+        outputLanguageSwitching
+            INTEGER,
+        outputConfigLanguage
+            INTEGER,
+        outputPCLString
+            OCTET STRING,
+        outputPSString
+            OCTET STRING,
+        outputCascaded
+            INTEGER,
+        outputSetting
+            INTEGER,
+        outputOwner
+            INTEGER,
+        outputBIDIStatusEnabled
+            INTEGER,
+        outputPrinterModel
+            DisplayString,
+        outputPrinterDisplay
+            DisplayString,
+        outputCapabilities
+            INTEGER,
+        outputHandshake
+            INTEGER,
+        outputDataBits
+            INTEGER,
+        outputStopBits
+            INTEGER,
+        outputParity
+            INTEGER,
+        outputBaudRate
+            INTEGER,
+        outputProtocolManager
+            INTEGER
+    }
+
+outputIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A unique value for each physical output port.
+         Its value ranges between 1 and the value of
+         outputNumPorts.  The value for each protocol must
+         remain constant at least from one re-initialization
+         of the entity's network management system to the next
+         re-initialization."
+    ::= { outputEntry 1 }
+
+outputName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+         "A textual description of the output port."
+    ::= { outputEntry 2 }
+
+outputStatusString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..80))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A string indicating the status of the physical
+         output port."
+    ::= { outputEntry 3 }
+
+outputStatus OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        on-Line(1),
+        off-Line(2)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "Indicates status of the printer.  Get
+         outputExtendedStatus for further information."
+    ::= { outputEntry 4 }
+
+outputExtendedStatus OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        none(1),
+        no-Printer-Attached(2),
+        toner-Low(3),
+        paper-Out(4),
+        paper-Jam(5),
+        door-Open(6),
+        printer-Error(15)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "Indicates printer status to be used in conjunction with
+         outputStatus."
+    ::= { outputEntry 5 }
+
+outputPrinter OBJECT-TYPE
+    SYNTAX  INTEGER {
+        hp-III(1),
+        hp-IIISi(2),
+        ibm(3),
+        no-Specific-Printer(4)
+    }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "The type of printer the output port is attached to.
+
+         Even if the group is supported, this variable may not
+         be supported."
+::= { outputEntry 6 }
+
+outputLanguageSwitching OBJECT-TYPE
+    SYNTAX  INTEGER {
+        off(1),
+        pcl(2),
+        postScript(3),
+        als(4)
+    }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "Indicates the language switching option for the physical
+         port.
+
+         Even if the group is supported, this variable may not be
+         supported."
+    ::= { outputEntry 7 }
+
+outputConfigLanguage OBJECT-TYPE
+    SYNTAX  INTEGER {
+        text(1),
+        pcl(2),
+        postScript(3),
+        off(4),
+        epl-zpl(5)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+         "Indicates the language that configuration pages will be
+         printed in.
+
+         If set to off, a config sheet will not be printed on this
+         port."
+    ::= { outputEntry 8 }
+
+outputPCLString OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (127))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+         "This string will be sent out the physical port if
+         (1) outputLanguageSwitching is set to PCL or
+         outputLanguageSwitching is set to Auto and the job is
+           determined to be PCL, and (2) outputPrinter is set to
+           No_Specific_Printer.
+
+           Even if the group is supported, this variable may not be
+           supported."
+      ::= { outputEntry 9 }
+
+  outputPSString OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (127))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This string will be sent out the physical port if
+           (1) outputLanguageSwitching is set to PostScript or
+           outputLanguageSwitching is set to Auto and the job is
+           determined to be PostScript, and (2) outputPrinter is
+           set to No_Specific_Printer.
+
+           Even if the group is supported, this variable may not be
+           supported."
+      ::= { outputEntry 10 }
+
+  outputCascaded OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 indicates that the physical output port is
+           connected to an Extended System's printer sharing device.
+
+           Even if the group is supported, this variable may not be
+           supported."
+      ::= { outputEntry 11 }
+
+  outputSetting OBJECT-TYPE
+      SYNTAX  INTEGER {
+          serial-infrared(32758),
+          serial-bidirectional(32759),
+          serial-unidirectional(32760),
+          serial-input(32761),
+          parallel-compatibility-no-bidi(32762),
+          ieee-1284-std-nibble-mode(32763),
+          z-Link(32764),
+          internal(32765),
+          ieee-1284-ecp-or-fast-nibble-mode(32766),
+          extendedLink(32767)          
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+           "Indicates the type (and optionally speed) for the
+           physical output port.  Setting this variable to physical
+           connections (such as Parallel) will result in an error.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { outputEntry 12 }
+
+  outputOwner OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no-Owner(1),
+          tcpip(2),
+          netware(3),
+          vines(4),
+          lanManager(5),
+          etherTalk(6),
+          config-Page(7)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "Indicates which protocol or task currently is printing on
+           the port."
+      ::= { outputEntry 13 }
+
+  outputBIDIStatusEnabled OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 indicates that the BIDI status system is
+            enabled."
+      ::= { outputEntry 14 }
+
+  outputPrinterModel OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..60))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "A string indicating the printer model attached to the output port."
+      ::= { outputEntry 15 }
+
+  outputPrinterDisplay OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..30))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "A string indicating the message on the attached printer front panel."
+      ::= { outputEntry 16 }
+
+  outputCapabilities OBJECT-TYPE
+      SYNTAX  INTEGER {
+          serial-Uni-Baud-9600(1),
+          serial-Uni-Baud-19200(2),
+          serial-Uni-Baud-38400(4),
+          serial-Uni-Baud-57600(8),
+          serial-Uni-Baud-115200(16),
+          serial-bidi-Baud-9600(32),
+          serial-bidi-Baud-19200(64),
+          serial-bidi-Baud-38400(128),
+          serial-bidi-Baud-57600(256),
+          zpl-epl-capable(262144),
+          serial-irin(524288),
+          serial-in(1048576),
+          serial-config-settings(2097152),
+          parallel-compatibility-no-bidi(4194304),
+          ieee-1284-std-nibble-mode(8388608),
+          z-link(16777216),
+          bidirectional(33554432),
+          serial-Software-Handshake(67108864),
+          serial-Output(134217728),
+          extendedLink(268435456),
+          internal(536870912),
+          ieee-1284-ecp-or-fast-nibble-mode(1073741824)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "This field is implemented as a BIT mask.  If the bit is set then
+           the port is capable of functioning in this mode.
+
+           Bit  Property
+           ---  ------------------------
+           0    Serial Unidirectional Baud 9600
+           1    Serial Unidirectional Baud 19200
+           2    Serial Unidirectional Baud 38400
+           3    Serial Unidirectional Baud 57600
+           4    Serial Unidirectional Baud 115200
+           5    Serial Bidirectional Baud 9600
+           6    Serial Bidirectional Baud 19200
+           7    Serial Bidirectional Baud 38400
+           8    Serial Bidirectional Baud 57600
+           19   Infrared Input on serial port
+           20   Serial Input
+           21   Serial Configuration Settings
+           22   Parallel Compatibility Mode (no bidi)
+           23   IEEE 1284 Standard Nibble Mode
+           24   ZLink
+           25   Bidirectional Support (PJL status)
+           26   Serial Software Handshaking
+           27   Serial Output
+           28   Extended Link Technology
+           29   Printer Internal (MIO)
+           30   IEEE 1284 ECP or Fast Nibble Mode"
+      ::= { outputEntry 17 }
+
+  outputHandshake OBJECT-TYPE
+      SYNTAX  INTEGER {
+          not-Supported(1),
+          hardware-Software(2),
+          hardware(3),
+          software(4)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "If the port in serial mode operation this indicates the
+           handshaking method being used.  Setting this value to 'not-
+           supported' will result in an error.  Setting this value on
+           non serial capable ports will result in an error.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { outputEntry 18 }
+
+  outputDataBits OBJECT-TYPE
+      SYNTAX  INTEGER {
+          seven-bits(7),
+          eight-bits(8),
+          not-Supported(255)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "If the port in serial mode operation this indicates the
+           number of data bits being used.  Setting this value to 'not-
+           supported' will result in an error.  Setting this value on
+           non serial capable ports will result in an error.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { outputEntry 19 }
+
+  outputStopBits OBJECT-TYPE
+      SYNTAX  INTEGER {
+          one-bit(1),
+          two-bits(2),
+          not-Supported(255)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "If the port in serial mode operation this indicates the
+           number of stop bits being used.  Setting this value to 'not-
+           supported' will result in an error.  Setting this value on
+           non serial capable ports will result in an error.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { outputEntry 20 }
+
+  outputParity OBJECT-TYPE
+      SYNTAX  INTEGER {
+          none(1),
+          odd(2),
+          even(3),
+          not-Supported(255)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "If the port in serial mode operation this indicates the
+           parity checking method being used.  Setting this value to 'not-
+           supported' will result in an error.  Setting this value on
+           non serial capable ports will result in an error.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { outputEntry 21 }
+
+  outputBaudRate OBJECT-TYPE
+      SYNTAX  INTEGER {
+          unidirectional-9600(1),
+          unidirectional-19200(2),
+          unidirectional-38400(3),
+          unidirectional-57600(4),
+          unidirectional-115200(5),
+          bidirectional-9600(6),
+          bidirectional-19200(7),
+          bidirectional-38400(8),
+          bidirectional-57600(9)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "If the port in serial mode operation this indicates the
+           baud rate being used. Setting this value on
+           non serial capable ports will result in an error.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { outputEntry 22 }
+
+  outputProtocolManager OBJECT-TYPE
+      SYNTAX  INTEGER {
+           protocol-none(0),      
+           protocol-compatibility(1),
+           protocol-1284-4(2)
+      }
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           " Indicates the type of output protocol manager being used on the
+             port.  Protocol-none means either there is no printer attached or
+             the print server has not yet determined which output managers are
+             supported on the printer.   Protocol-compatibility means the printer
+             does not support any of the protocol managers supported by the print
+             server.  Protocol-1284-4 means the output is using the 1284.4 logical
+             port protocol manager.
+           "
+      ::= { outputEntry 23 }
+
+outputDisplayMask OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "Bit mask describing what should be displayed by the utilities
+         
+          bit   Description
+          ---   -----------
+          0     outputCancelCurrentJob (Includes all CancelCurrentJob info)  
+          1     outputName
+          2     outputStatusString
+          3     outputStatus
+          4     outputExtendedStatus
+          5     outputPrinter
+          6     outputLanguageSwitching
+          7     outputConfigLanguage
+          8     outputString (Includes outputPCLString and outputPSString)
+          9     outputCascaded
+          10    outputSetting
+          11    outputOwner
+          12    outputBIDIStatusEnabled
+          13    outputPrinterModel
+          14    outputPrinterDisplay
+          15    outputHandshake
+          16    outputJobLog  (includes all job logging)
+          17    outputSerialConfig"
+    ::= { psOutput 4 }
+
+outputAvailableTrapsMask OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "Bit mask describing what output printer traps are available
+         
+          bit   Description
+          ---   -----------
+          0     online
+          1     offline
+          2     printer attached
+          3     toner low
+          4     paper out
+          5     paper jam
+          6     door open
+          7     printer error"
+    ::= { psOutput 5 }
+
+outputNumLogEntries OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The number of job log entries per output port."
+    ::= { outputJobLog 1 }
+
+outputJobLogTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF OutputJobLogEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+         "A 2 dimensional list of Job log entries indexed by the output port
+         number and the log entry index (1 through outputNumJobLogEntries).  
+         The number of entries per output port is given by the value of 
+         outputNumJobLogEntries."
+    ::= { outputJobLog 2 }
+
+outputJobLogEntry OBJECT-TYPE
+    SYNTAX  OutputJobLogEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A Job log entry."
+    INDEX   { outputIndex }
+    ::= { outputJobLogTable 1 }
+
+OutputJobLogEntry ::=
+    SEQUENCE {
+        outputJobLogInformation
+            DisplayString,
+        outputJobLogTime
+            DisplayString
+    }
+
+outputJobLogInformation OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..100))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A textual description of print job information.
+         The protocol, source, and file size are always included.  
+         Other information such as File Server, Queue, File Name, etc
+         will be included if available."
+    ::= { outputJobLogEntry 1 }
+
+outputJobLogTime OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..50))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "A string indicating the elasped time since the last job was
+         printed. Reported in form X hours X minutes X seconds."
+    ::= { outputJobLogEntry 2 }
+
+outputTotalJobTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF OutputTotalJobEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+        "Table showing the total number of jobs printed for each port."
+   ::= { outputJobLog 3 }
+
+outputTotalJobEntry OBJECT-TYPE
+   SYNTAX  OutputTotalJobEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+       "An entry in the outputTotalJobTable."
+   INDEX   { outputTotalJobIndex }
+   ::= { outputTotalJobTable 1 }
+
+OutputTotalJobEntry ::=
+   SEQUENCE {
+       outputTotalJobIndex
+           INTEGER,
+       outputTotalJobsLogged
+           INTEGER
+   }
+
+outputTotalJobIndex OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "A unique value for entry in the outputTotalJobTable.
+        Its value ranges between 1 and the value of
+        numPorts."
+   ::= { outputTotalJobEntry 1 }
+
+outputTotalJobsLogged OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The total number of jobs printed by the port since the 
+         print server was powered on. "
+    ::= { outputTotalJobEntry 2 }
+  
+  
+  -- the tcpip group
+
+  tcpipGroupVersion OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "The version for the tcpip group."
+      ::= { tcpip 1 }
+
+  tcpipEnabled OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Indicates whether or not the tcpip protocol stack is
+           enabled on the print server.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { tcpip 2 }
+
+  tcpipRestoreDefaults OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 will restore all tcpip parameters on
+           the print server to factory defaults, as well as reset
+           the print server."
+      ::= { tcpipCommands 1 }
+
+  tcpipFirmwareUpgrade OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 will put the print server into firmware
+           upgrade mode waiting to receive a firmware upgrade file
+           via tftp."
+      ::= { tcpipCommands 2 }
+
+  tcpipIPAddress OBJECT-TYPE
+      SYNTAX  IpAddress
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The Internet Address.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { tcpipConfigure 1 }
+
+  tcpipDefaultGateway OBJECT-TYPE
+      SYNTAX  IpAddress
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The default gateway for the print server.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { tcpipConfigure 2 }
+
+  tcpipSubnetMask OBJECT-TYPE
+      SYNTAX  IpAddress
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The subnet mask for the print server.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+  ::= { tcpipConfigure 3 }
+
+  tcpipUsingNetProtocols OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 indicates that the print server is using
+           a combination of RARP, BOOTP, default IP address, or
+           gleaning to determine its IP address.
+
+           See tcpipBootProtocolsEnabled to determine which boot
+           protocols are enabled.  If the value of
+           tcpipUsingNetProtocols is 1, the IP address is stored
+           permanently in flash memory.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { tcpipConfigure 4 }
+
+  tcpipBootProtocolsEnabled OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This is the 16 bit mask which determines which boot
+           protocols will be used to determine the print server's
+           IP address.
+
+                      BIT       Boot Protocol Enabled
+                      ---       --------------------------
+                       0        RARP
+                       1        BootP
+                       2        DHCP
+                       3        Gleaning
+                       4        Default Address Enabled (If no address after 2 minutes
+                                                  timeout and go to 198.102.102.254) 
+
+           A value of 31 indicates that all boot protocols are
+           enabled.  These protocols will only be used if
+           tcpipUsingNetProtocols is set to 2.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { tcpipConfigure 5 }
+
+  tcpipIPAddressSource OBJECT-TYPE
+      SYNTAX  INTEGER {
+          permanent(1),
+          default(2),
+          rarp(3),
+          bootp(4),
+          dhcp(5),
+          glean(6)
+      }
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "This variable indicates how the IP address for the
+           print server was determined."
+      ::= { tcpipConfigure 6 }
+
+  tcpipIPAddressServerAddress OBJECT-TYPE
+      SYNTAX  IpAddress
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "This variable indicates the source of the IP address
+           if a boot protocol was used.  This value will be
+           0.0.0.0 if no boot server was used."
+      ::= { tcpipConfigure 7 }
+
+  tcpipTimeoutChecking OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 indicates that a packet timeout
+           will be active on all tcp connections.  If a packet has
+           not been received from the connection within this timeout the
+           connection will be reset.
+
+           To set this timeout, see tcpipTimeoutCheckingValue"
+      ::= { tcpipConfigure 8 }
+
+  tcpipNumTraps OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "The number of UDP trap destinations."
+      ::= { tcpipConfigure 9 }
+
+  tcpipTrapTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF TcpipTrapEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+           "A list of UDP trap definitions.  The number of
+           entries is given by the value of tcpipNumTraps."
+      ::= { tcpipConfigure 10 }
+
+  tcpipTrapEntry OBJECT-TYPE
+      SYNTAX  TcpipTrapEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+          "An entry in the tcpipTrapTable."
+      INDEX   { tcpipTrapIndex }
+      ::= { tcpipTrapTable 1 }
+
+  TcpipTrapEntry ::=
+      SEQUENCE {
+          tcpipTrapIndex
+              INTEGER,
+          tcpipTrapDestination
+              IpAddress,
+          tcpipProtocolTrapMask
+              INTEGER,
+          tcpipPrinterTrapMask
+              INTEGER,
+          tcpipOutputTrapMask
+              INTEGER
+      }
+
+  tcpipTrapIndex OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "A unique value for entry in the tcpipTrapTable.
+           Its value ranges between 1 and the value of
+           tcpipNumTraps."
+      ::= { tcpipTrapEntry 1 }
+
+  tcpipTrapDestination OBJECT-TYPE
+      SYNTAX  IpAddress
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+          "This is the IP address that traps are sent to.
+          A value of 0.0.0.0 will disable traps over UDP."
+      ::= { tcpipTrapEntry 2 }
+
+  tcpipProtocolTrapMask OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This is the 16 bit mask which determines which protocol
+           specific traps will be sent out via UDP.
+
+           Currently no protocol specific traps are supported."
+      ::= { tcpipTrapEntry 3 }
+
+  tcpipPrinterTrapMask OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This is the 16 bit mask which determines which printer
+           specific traps will be sent out via UDP.
+
+           A value of 65535 indicates that all printer specific
+           traps should be reported via UDP.
+
+                      BIT       CONDITION
+                      ---       --------------------------
+                       0        On-line (Condition cleared)
+                       1        Off-line
+                       2        No printer attached
+                       3        Toner Low
+                       4        Paper Out
+                       5        Paper Jam
+                       6        Door Open
+                      15        Printer Error"
+      ::= { tcpipTrapEntry 4 }
+
+  tcpipOutputTrapMask OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This is the 16 bit mask which determines which physical
+           output ports will be checked when generating printer
+           specific traps to be sent out via UDP.
+
+           A value of 65535 indicates that all physical output ports
+           will generate traps.
+
+                      BIT       CONDITION
+                      ---       --------------------------
+                       0        Port 1
+                       1        Port 2
+                       2        Port 3
+                       3        Port 4
+                      ...        ..."
+      ::= { tcpipTrapEntry 5 }
+
+  tcpipBanners OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 indicates that banners will be printed
+           with tcpip jobs.
+
+           Even if the group is supported, this variable may not be
+           supported."
+      ::= { tcpipConfigure 11 }
+
+  tcpipWinsAddress OBJECT-TYPE
+      SYNTAX  IpAddress
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The IP address of the WINS server.
+
+            The print server will register its sysName to
+            this WINS server."
+      ::= { tcpipConfigure 12 }
+
+  tcpipWinsAddressSource OBJECT-TYPE
+      SYNTAX  INTEGER {
+          dhcp(1),
+          permanent(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The source of the WINS server address.
+
+            If set to dhcp, the print server will use the
+            WINS address supplied with dhcp.
+
+            If it is set to permanent, it will use the
+            WINS address stored in flash."
+      ::= { tcpipConfigure 13 }
+
+  tcpipConfigPassword OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (5..24))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The print server html/telnet configuration password.
+           This value cannot be read, just set."
+      ::= { tcpipConfigure 14 }
+
+  tcpipTimeoutCheckingValue OBJECT-TYPE
+      SYNTAX  INTEGER (0..65535)
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The TCP connection timeout in seconds.
+            A value of 0 has the same effect as disabling
+            timeout checking."
+      ::= { tcpipConfigure 15 }
+
+  tcpipArpInterval OBJECT-TYPE
+      SYNTAX  INTEGER (0..30)
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The ARP interval in minutes.
+            The print server will ARP itself once when
+            this timer expires.  Set to 0 to disable."
+      ::= { tcpipConfigure 16 }      
+
+  tcpipRawPortNumber OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The raw TCP port number the print server will listen
+            for print jobs on.  On multiple port devices, additional
+            ports will sequentially follow this port number.
+            The default port is 9100.  Setting this value to a TCP
+            port that is in use by another TCP application will 
+            return an error.
+            
+            In order for changes to this variable to take effect,
+            the print server must be reset.  See cmdReset to do
+            this."
+      ::= { tcpipConfigure 17 }
+      
+  tcpipNumSecurity OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "The number of secure IP address ranges."
+      ::= { tcpipConfigure 18 }  
+  
+  tcpipSecurityTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF TcpipSecurityEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+           "A list of secure IP address ranges.  This adds security for both
+           printing and admin rights. 
+           
+           AdminEnabled: When the admin enabled field is set to yes for a secure
+           address range, the print server may only be configured via IP from 
+           IP address within that range. If the admin field is not set for any address
+           ranges, the print server will accept admin commands from any IP address 
+           which has the valid community names and/or passwords. 
+           
+           PortMask: When there is a port mask set for a secure IP address range, the 
+           print server will only accept TCP/IP print jobs from hosts that are in the
+           secure address range.  If there are no ranges with a port mask set, the print
+           server will accept TCP/IP print jobs from any host.
+           
+           The number of entries is given by the value of tcpipNumSecurity."
+      ::= { tcpipConfigure 19 }
+
+  tcpipSecurityEntry OBJECT-TYPE
+      SYNTAX  TcpipSecurityEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+          "An entry in the tcpipSecurityTable."
+      INDEX   { tcpipSecurityIndex }
+      ::= { tcpipSecurityTable 1 }
+
+  TcpipSecurityEntry ::=
+      SEQUENCE {
+          tcpipSecurityIndex
+              INTEGER,
+          tcpipSecureStartIPAddress
+              IpAddress,
+          tcpipSecureEndIPAddress
+              IpAddress,
+          tcpipSecurePrinterMask
+              INTEGER,
+          tcpipSecureAdminEnabled
+              INTEGER
+      }
+
+  tcpipSecurityIndex OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "A unique value for entry in the tcpipSecurityTable.
+           Its value ranges between 1 and the value of
+           tcpipNumSecurity."
+      ::= { tcpipSecurityEntry 1 }
+
+  tcpipSecureStartIPAddress OBJECT-TYPE
+      SYNTAX  IpAddress
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+          "This is the starting IP address for the secure IP
+          address range.  A value of 0.0.0.0 for both
+          tcpipStartIPAddress and tcpipEndIPAddress will 
+          disable the address range."
+      ::= { tcpipSecurityEntry 2 }
+
+  tcpipSecureEndIPAddress OBJECT-TYPE
+      SYNTAX  IpAddress
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+          "This is the ending IP address for the secure IP
+          address range.  A value of 0.0.0.0 for both
+          tcpipStartIPAddress and tcpipEndIPAddress will 
+          disable the address range."
+      ::= { tcpipSecurityEntry 3 }
+
+  tcpipSecurePrinterMask OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This is the 8 bit mask which determines which physical
+           output ports this range of IP addresses can print to.
+           A value of 127 indicates that the range of IP addresses
+           can print to any of the output ports.
+           
+           This value can not be configured until a valid start and 
+           end address range have been configured.
+
+
+                      BIT       CONDITION
+                      ---       --------------------------
+                       0        Port 1
+                       1        Port 2
+                       2        Port 3
+                       3        Port 4
+                      ...        ...
+                       8        Reserved, must be set to 0."
+      ::= { tcpipSecurityEntry 4 }
+      
+  tcpipSecureAdminEnabled OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           " This allows an advanced level of admin security for IP. Setting this will 
+           restrict which IP addresses can configure the print server. The 
+           correct community names and passwords are still required if this is used, it
+           just adds another level of security. 
+            
+           Indicates whether or not admin rights are enabled for this range of 
+           IP addresses. If no range of addresses has this enabled, then any IP address
+           can configure the print server if it has the correct community names and/or
+           passwords. If this field is set to yes for any range of addresses, the 
+           print server will only be configurable via IP from that range of addresses.
+           
+           This value can not be configured until a valid start and end address range 
+           have been configured."
+           
+      ::= { tcpipSecurityEntry 5 }
+  
+  tcpipLowBandwidth OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 will optimize the TCP stack for low bandwidth
+            networks.  A value of 1 will optimize the TCP stack for high
+            bandwidth networks."
+      ::= { tcpipConfigure 20 }
+      
+  tcpipNumLogicalPrinters OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "The number of available logical printers."
+      ::= { tcpipConfigure 21 }  
+  
+  tcpipMLPTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF TcpipMLPEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+           "A table of the available logical printers.
+           The number of entries is given by the value of tcpipNumLogicalPrinters."
+      ::= { tcpipConfigure 22 }
+
+  tcpipMLPEntry OBJECT-TYPE
+      SYNTAX  TcpipMLPEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+          "An entry in the tcpipMLPTable."
+      INDEX   { tcpipMLPIndex }
+      ::= { tcpipMLPTable 1 }
+
+  TcpipMLPEntry ::=
+      SEQUENCE {
+          tcpipMLPIndex
+              INTEGER,
+          tcpipMLPName
+              DisplayString,
+          tcpipMLPPort
+              INTEGER,
+          tcpipMLPTCPPort
+              INTEGER,
+          tcpipMLPPreString
+              DisplayString,
+          tcpipMLPPostString
+              DisplayString,
+          tcpipMLPDeleteBytes
+              INTEGER
+      }
+
+  tcpipMLPIndex OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "A unique value for entry in the tcpipMLPTable.
+            Its value ranges between 1 and the value of
+            tcpipNumLogicalPrinters."
+      ::= { tcpipMLPEntry 1 }
+
+
+  tcpipMLPName OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..20))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Contains the name of the logical printer.  This name is also
+            the LPR remote queue name associated with the logical printer."
+      ::= { tcpipMLPEntry 2 }
+      
+  tcpipMLPPort OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The number of the physical output port associated with the logical
+            printer.
+            
+            In order for changes to this variable to take effect,
+            the print server must be reset.  See cmdReset to do
+            this."
+      ::= { tcpipMLPEntry 3 }
+      
+  tcpipMLPTCPPort OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The TCP port associated with the logical printer.  Any print data
+            sent to this TCP port will be processed through this logical
+            printer entry.
+            
+            In order for changes to this variable to take effect,
+            the print server must be reset.  See cmdReset to do
+            this."
+      ::= { tcpipMLPEntry 4 }
+      
+  tcpipMLPPreString OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..64))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This contains any data that should be sent down to the printer
+            at the beginning of jobs sent to this logical printer.  To enter
+            non-printable ascii characters in the string, enclose the decimal 
+            value inside of <>.  For example, to enter an ESC-E the string would 
+            be '<27>E'."
+      ::= { tcpipMLPEntry 5 }
+      
+  tcpipMLPPostString OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..64))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This contains any data that should be sent down to the printer
+            at the end of jobs sent to this logical printer.  To enter
+            non-printable ascii characters in the string, enclose the decimal 
+            value inside of <>.  For example, to enter an ESC-E the string would 
+            be '<27>E'."
+      ::= { tcpipMLPEntry 6 }
+
+  tcpipMLPDeleteBytes OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The number of bytes that will be deleted from the beginning of
+            jobs sent to this logical printer."
+      ::= { tcpipMLPEntry 7 }
+
+  tcpipSmtpServerAddr OBJECT-TYPE
+      SYNTAX  IpAddress
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The IP address of the e-mail server which will be used to send e-mail
+           notification of printer status conditions. This address must contain the 
+           valid IP address of an e-mail server before any of the contents of the 
+           SmtpTable are used."
+      ::= { tcpipConfigure 23 }
+
+  tcpipNumSmtpDestinations OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "The number of configurable e-mail destinations to receive
+            printer status conditions. "
+      ::= { tcpipConfigure 24 }
+
+  tcpipSmtpTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF TcpipSmtpEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+           "A list of SMTP e-mail addresses and printer status conditions
+           to send e-mails for. The number of entries is given by the 
+           value of tcpipNumSmtpDestinations."
+      ::= { tcpipConfigure 25 }
+
+  tcpipSmtpEntry OBJECT-TYPE
+      SYNTAX  TcpipSmtpEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+          "An entry in the tcpipSmtpTable."
+      INDEX   { tcpipSmtpIndex }
+      ::= { tcpipSmtpTable 1 }
+
+  TcpipSmtpEntry ::=
+      SEQUENCE {
+          tcpipSmtpIndex
+              INTEGER,
+          tcpipSmtpEmailAddr
+              OCTET STRING,
+          tcpipSmtpProtocolMask
+              INTEGER,
+          tcpipSmtpPrinterMask
+              INTEGER,
+          tcpipSmtpOutputMask
+              INTEGER
+      }
+
+  tcpipSmtpIndex OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "A unique value for entry in the tcpipSmtpTable.
+           Its value ranges between 1 and the value of
+           tcpipNumSmtpDestinations."
+      ::= { tcpipSmtpEntry 1 }
+
+  tcpipSmtpEmailAddr OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (64))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+          "This is the e-mail address that printer status conditions 
+          are sent to. If this string is empty the status conditions will
+          not be sent."
+      ::= { tcpipSmtpEntry 2 }
+
+  tcpipSmtpProtocolMask OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This is the 16 bit mask which determines which protocol
+           specific conditions will be sent out via e-mail.
+
+           Currently no protocol specific conditions are supported."
+      ::= { tcpipSmtpEntry 3 }
+
+  tcpipSmtpPrinterMask OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This is the 16 bit mask which determines which printer
+           specific conditions will be sent out via e-mail.
+
+           A value of 65535 indicates that all printer specific
+           conditions should be reported via e-mail.
+
+                      BIT       CONDITION
+                      ---       --------------------------
+                       0        On-line (Condition cleared)
+                       1        Off-line
+                       2        No printer attached
+                       3        Toner Low
+                       4        Paper Out
+                       5        Paper Jam
+                       6        Door Open
+                      15        Printer Error"
+      ::= { tcpipSmtpEntry 4 }
+
+  tcpipSmtpOutputMask OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This is the 16 bit mask which determines which physical
+           output ports will be checked when generating printer
+           specific conditions to be sent out via e-mail.
+
+           A value of 65535 indicates that all physical output ports
+           will generate e-mails upon a change in status.
+
+                      BIT       CONDITION
+                      ---       --------------------------
+                       0        Port 1
+                       1        Port 2
+                       2        Port 3
+                       3        Port 4
+                      ...        ..."
+      ::= { tcpipSmtpEntry 5 }
+
+  tcpipWebAdminName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (25))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+          "This is the admin name used by web configuration for login."
+      ::= { tcpipConfigure 26 }
+
+  tcpipWebAdminPassword OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (25))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+          "This is the admin password used by web configuration for login."
+      ::= { tcpipConfigure 27 }
+
+  tcpipWebUserName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (25))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+          "This is the user name used by web configuration for login. Not
+           currently used. "
+      ::= { tcpipConfigure 28 }
+
+  tcpipWebUserPassword OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (25))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+          "This is the user password used by web configuration for login. Not
+          currently used."
+      ::= { tcpipConfigure 29 }
+
+  tcpipWebHtttpPort OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The port number used to communicate over http. Must be between 0 and 
+           65535. It must not be the same as any other port used. Other ports used are
+           20, 21, 23, 515, & raw port numbers (9100, 9101, ...  if at default)" 
+      ::= { tcpipConfigure 30 }
+
+  tcpipWebFaqURL OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (64))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+          "This is the URL for FAQ at the ESI (or other OEM) website."
+      ::= { tcpipConfigure 31 }
+
+  tcpipWebUpdateURL OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (64))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+          "This is the URL for finding firmware updates at the ESI 
+          (or other OEM) website."
+      ::= { tcpipConfigure 32 }
+
+  tcpipWebCustomLinkName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (25))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+          "This is the name assigned to the custom link defined by the user."
+      ::= { tcpipConfigure 33 }
+
+  tcpipWebCustomLinkURL OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (64))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+          "This is the URL for a custom link specified by the user."
+      ::= { tcpipConfigure 34 }
+
+  tcpipPOP3ServerAddress OBJECT-TYPE
+      SYNTAX  IpAddress
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The IP address of the POP3 server from which email will be retrieved. 
+           This address must contain the valid IP address of a POP3 server before 
+           any attempts to retrieve email will be made."
+      ::= { tcpipConfigure 35 }
+
+  tcpipPOP3PollInterval OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+           "The number of seconds between attempts to retrieve mail from the 
+           POP3 server. "
+      ::= { tcpipConfigure 36 }
+
+  tcpipPOP3UserName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (64))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+          "This is the user name for the print server's email account on 
+          the POP3 server."
+      ::= { tcpipConfigure 37 }
+
+  tcpipPOP3Password OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (20))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+          "This is the password for the print server's email account on
+          the POP3 server."
+      ::= { tcpipConfigure 38 }
+
+  tcpipDomainName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (64))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+          "This is the Domain name used by POP3 and SMTP."
+      ::= { tcpipConfigure 39 }
+            
+  tcpipError OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..80))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "Contains any tcpip specific error information."
+      ::= { tcpipStatus 1 }
+
+  tcpipDisplayMask OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+         "Bit mask describing what should be displayed by the utilities
+         
+          bit   Description
+          ---   -----------
+          0     tcpipAddress (Includes tcpipDefaultGateway and tcpipSubnetMask)
+          1     tcpipUsingNetProtocols (Includes tcpipBootProtocolsEnabled, tcpipAddressSource,                                                                tcpipAddressServerAddress)
+          2     tcpipTimeoutChecking
+          3     tcpipTraps (Includes all trap info)
+          4     tcpipBanners
+          5     tcpipSecurity (Includes all security info)
+          6     tcpipWinsAddress (Includes tcpipWinsAddressSource)
+          7     tcpipConfigPassword
+          8     tcpipTimeoutCheckingValue
+          9     tcpipArpInterval
+          10    tcpipRawPortNumber
+          11    tcpipError
+          12    tcpipLowBandwidth
+          13    tcpipMLP (Includes all logical printer settings)"
+      ::= { tcpip 6 }
+  
+  -- the netware group
+
+  nwGroupVersion OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "The version for the netware group."
+      ::= { netware 1 }
+
+  nwEnabled OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Indicates whether or not the NetWare protocol stack is
+           enabled on the print server.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { netware 2 }
+
+  nwRestoreDefaults OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 will restore all NetWare parameters on
+           the print server to factory defaults, as well as reset
+           the print server."
+  ::= { nwCommands 1 }
+
+  nwFirmwareUpgrade OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 will put the print server into firmware
+           upgrade mode."
+      ::= { nwCommands 2 }
+
+  nwFrameFormat OBJECT-TYPE
+      SYNTAX  INTEGER {
+          unknown(1),
+          ethernet-II(2),
+          ethernet-802-3(3),
+          ethernet-802-2(4),
+          ethernet-Snap(5),
+          token-Ring(6),
+          token-Ring-Snap(7)
+      }
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "Indicates the frame format that the print server is
+           using.  See nwSetFrameFormat to determine which frame
+           frame format the print server is configured for."
+      ::= { nwConfigure 1 }
+
+  nwSetFrameFormat OBJECT-TYPE
+      SYNTAX  INTEGER {
+          auto-Sense(1),
+          forced-Ethernet-II(2),
+          forced-Ethernet-802-3(3),
+          forced-Ethernet-802-2(4),
+          forced-Ethernet-Snap(5),
+          forced-Token-Ring(6),
+          forced-Token-Ring-Snap(7)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Indicates the frame format that the print server is
+           using.  Setting this value to 1 (Auto_Sense) indicates
+           that automatic frame format sensing will be used.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { nwConfigure 2 }
+
+  nwMode OBJECT-TYPE
+      SYNTAX  INTEGER {
+          unknown(1),
+          pserver(2),
+          rprinter(3)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Mode the print server is running in.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { nwConfigure 3 }
+
+  nwPrintServerName OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..47))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Contains print server name.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { nwConfigure 4 }
+
+  nwPrintServerPassword OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..9))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The print server password.  This value cannot be read,
+           just set.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { nwConfigure 5 }
+
+  nwQueueScanTime OBJECT-TYPE
+      SYNTAX  INTEGER (1..255)
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Determines how often, in tenths of a second that the
+           print server will scan the queues for jobs.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { nwConfigure 6 }
+
+  nwNetworkNumber OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (4))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "The print server's network number."
+      ::= { nwConfigure 7 }
+
+  nwMaxFileServers OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "The print server maximum number of file servers which
+           it can be attached to at once."
+      ::= { nwConfigure 8 }
+
+  nwFileServerTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF NwFileServerEntry
+      ACCESS  not-accessible
+      STATUS  optional
+      DESCRIPTION
+           "A table of file servers to service."
+      ::= { nwConfigure 9 }
+
+  nwFileServerEntry OBJECT-TYPE
+      SYNTAX  NwFileServerEntry
+      ACCESS  not-accessible
+      STATUS  optional
+      DESCRIPTION
+           "A file server for the print server to service."
+      INDEX   { nwFileServerIndex }
+      ::= { nwFileServerTable 1 }
+
+  NwFileServerEntry ::=
+      SEQUENCE {
+          nwFileServerIndex
+              INTEGER,
+          nwFileServerName
+              DisplayString,
+          nwFileServerConnectionStatus
+              INTEGER
+      }
+
+  nwFileServerIndex OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "A unique value for each file server.  Its value
+           ranges between 1 and the value of nwMaxFileServers.
+           The value for each server must remain constant at
+           least from one re-initialization of the entity's
+           network management system to the next
+           re-initialization.  The first entry in the table is
+           the default file server."
+      ::= { nwFileServerEntry 1 }
+
+  nwFileServerName OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..47))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The file server name.  This name will be NULL if there
+           is no file server to be serviced.  Only the default
+           file server (the first entry in the table) can be set.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { nwFileServerEntry 2 }
+
+  nwFileServerConnectionStatus OBJECT-TYPE
+      SYNTAX  INTEGER {
+          up(1),
+          down(2),
+          startupInProgress(3),
+          serverReattaching(4),
+          serverNeverAttached(5),
+          pse-UNKNOWN-FILE-SERVER(258),
+          pse-NO-RESPONSE(261),
+          pse-CANT-LOGIN(276),
+          pse-NO-SUCH-QUEUE(512),
+          pse-UNABLE-TO-ATTACH-TO-QUEUE(515),
+          bad-CONNECTION(768),
+          bad-SERVICE-CONNECTION(769),
+          other(32767)
+      }
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "The value describes the status of the connection
+           between the file server and the print server."
+      ::= { nwFileServerEntry 3 }
+
+  nwPortTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF NwPortEntry
+      ACCESS  not-accessible
+      STATUS  optional
+      DESCRIPTION
+           "A table of NetWare port specific information."
+      ::= { nwConfigure 10 }
+
+  nwPortEntry OBJECT-TYPE
+      SYNTAX  NwPortEntry
+      ACCESS  not-accessible
+      STATUS  optional
+      DESCRIPTION
+           "An entry of NetWare port specific information."
+      INDEX   { nwPortIndex }
+      ::= { nwPortTable 1 }
+
+  NwPortEntry ::=
+      SEQUENCE {
+          nwPortIndex
+              INTEGER,
+          nwPortStatus
+              DisplayString,
+          nwPortPrinterNumber
+              INTEGER,
+          nwPortFontDownload
+              INTEGER,
+          nwPortPCLQueue
+              DisplayString,
+          nwPortPSQueue
+              DisplayString,
+          nwPortFormsOn
+              INTEGER,
+          nwPortFormNumber
+              INTEGER,
+          nwPortNotification
+              INTEGER
+      }
+
+  nwPortIndex OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "A unique value for each physical output port.  Its
+           value ranges between 1 and the value of outputNumPorts.
+           The value for each port must remain constant at least
+           from one re-initialization of the entity's network
+           management system to the next re-initialization."
+      ::= { nwPortEntry 1 }
+
+  nwPortStatus OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..80))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "A string indicating the NetWare specific status of the
+           physical output port."
+      ::= { nwPortEntry 2 }
+
+  nwPortPrinterNumber OBJECT-TYPE
+      SYNTAX  INTEGER (0..255)
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Indicates the printer number for the print server to
+           use when running in RPRinter mode.  A value of 255
+           indicates that the port is unconfigured for RPRinter
+           mode.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+  ::= { nwPortEntry 3 }
+
+  nwPortFontDownload OBJECT-TYPE
+      SYNTAX  INTEGER {
+          disabled(1),
+          enabled-No-Power-Sense(2),
+          enabled-Power-Sense(3)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This variable controls the font downloading feature
+           of the print server.
+
+           Disabled - Do not download fonts.
+
+           Enabled, without Printer Sense - Only download fonts
+           after the print server has been reset or power cycled.
+
+           Enabled, with Printer Sense - Download fonts after the
+           print server has been reset or power-cycled, or after
+           the printer has been power-cycled.  This option is only
+           available on certain print servers.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { nwPortEntry 4 }
+
+  nwPortPCLQueue OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..47))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A string indicating the name of the queue containing
+           the PCL fonts to download when font downloading is
+           enabled.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { nwPortEntry 5 }
+
+  nwPortPSQueue OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..47))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A string indicating the name of the queue containing
+           the PS fonts to download when font downloading is
+           enabled.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { nwPortEntry 6 }
+
+  nwPortFormsOn OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 will enable forms checking.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { nwPortEntry 7 }
+
+  nwPortFormNumber OBJECT-TYPE
+      SYNTAX  INTEGER (0..255)
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Indicates the form number to check jobs against
+           when nwPortFormsOn is enabled."
+      ::= { nwPortEntry 8 }
+
+  nwPortNotification OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 will enable job notification."
+      ::= { nwPortEntry 9 }
+
+  nwNumTraps OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "The number of IPX trap destinations."
+      ::= { nwConfigure 11 }
+
+  nwTrapTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF NwTrapEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+           "A list of IPX trap definitions.  The number of
+           entries is given by the value of nwNumTraps."
+      ::= { nwConfigure 12 }
+
+  nwTrapEntry OBJECT-TYPE
+      SYNTAX  NwTrapEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+          "An entry in the nwTrapTable."
+      INDEX   { nwTrapIndex }
+      ::= { nwTrapTable 1 }
+
+  NwTrapEntry ::=
+      SEQUENCE {
+          nwTrapIndex
+              INTEGER,
+          nwTrapDestination
+              OCTET STRING,
+          nwTrapDestinationNet
+              OCTET STRING,
+          nwProtocolTrapMask
+              INTEGER,
+          nwPrinterTrapMask
+              INTEGER,
+          nwOutputTrapMask
+              INTEGER
+      }
+
+  nwTrapIndex OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "A unique value for entry in the nwTrapTable.
+           Its value ranges between 1 and the value of
+           nwNumTraps."
+      ::= { nwTrapEntry 1 }
+
+  nwTrapDestination OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (6))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+          "This is the network address that IPX traps are sent to.
+          A value of 00 00 00 00 00 00 in conjunction with a
+          nwTrapDestinationNet of 00 00 00 00 will disable traps
+          over IPX."
+      ::= { nwTrapEntry 2 }
+
+  nwTrapDestinationNet OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (4))
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+           "This is the network number that IPX traps are sent to.
+           A value of 00 00 00 00 in conjunction with a
+           nwTrapDestination of 00 00 00 00 00 00 will disable
+           traps over IPX."
+      ::= { nwTrapEntry 3 }
+
+  nwProtocolTrapMask OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This is the 16 bit mask which determines which protocol
+           specific traps will be sent out via IPX.
+
+           Currently no protocol specific traps are supported."
+      ::= { nwTrapEntry 4 }
+
+  nwPrinterTrapMask OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This is the 16 bit mask which determines which printer
+           specific traps will be sent out via IPX.
+
+           A value of 65535 indicates that all printer specific
+           traps should be reported via IPX.
+
+                      BIT       CONDITION
+                      ---       --------------------------
+                       0        On-line (Condition cleared)
+                       1        Off-line
+                       2        No printer attached
+                       3        Toner Low
+                       4        Paper Out
+                       5        Paper Jam
+                       6        Door Open
+                      15        Printer Error"
+      ::= { nwTrapEntry 5 }
+
+  nwOutputTrapMask OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This is the 16 bit mask which determines which physical
+           output ports will be checked when generating printer
+           specific traps to be sent out via IPX.
+
+           A value of 65535 indicates that all physical output ports
+           will generate traps.
+
+                      BIT       CONDITION
+                      ---       --------------------------
+                       0        Port 1
+                       1        Port 2
+                       2        Port 3
+                       3        Port 4
+                      ...        ..."
+      ::= { nwTrapEntry 6 }
+
+
+  nwNDSPrintServerName OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..512))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+        "Directory Services object used by the print server to
+         connect to the NDS tree.  This string contains the entire
+         canonicalized name.
+
+         NOTE: This variable must be stored in Unicode."
+      ::= { nwConfigure 13 }
+
+  nwNDSPreferredDSTree OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..47))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+        "Directory Services tree to which the NDS print server
+         initially connects."
+      ::= { nwConfigure 14 }
+
+  nwNDSPreferredDSFileServer OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..47))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+        "The NetWare server to which the NDS print server initially
+         makes a bindery connection."
+      ::= { nwConfigure 15 }
+
+  nwNDSPacketCheckSumEnabled OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+        "Compute the checksum for packets.
+
+                1 = disabled
+                2 = enabled"
+      ::= { nwConfigure 16 }
+
+  nwNDSPacketSignatureLevel OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+        "Packet signature is a security method to prevent
+         packet forging.
+
+                1 = disabled
+                2 = enabled
+                3 = preferred
+                4 = required"
+      ::= { nwConfigure 17 }
+
+  nwAvailablePrintModes OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+        "Reports which NetWare print modes are available.
+
+                      BIT       CONDITION
+                      ---       --------------------------
+                       0        PServer
+                       1        RPrinter
+                       2        NDS
+                       3        SPX Direct
+                       4        JetAdmin
+        "
+      ::= { nwConfigure 18 }
+
+  nwDirectPrintEnabled OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+        "Indicates whether or not direct mode ipx/spx
+         printing is enabled."
+      ::= { nwConfigure 19 }
+
+  nwJAConfig OBJECT-TYPE
+      SYNTAX INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+        "Indicates whether or not JetAdmin was used to configure
+         the netware settings."
+      ::= { nwConfigure 20 }
+
+  nwDisableSAP OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+        "Indicates whether or not SAPs are enabled."
+      ::= { nwConfigure 21 }
+
+  nwError OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..160))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "Contains any NetWare specific error information."
+      ::= { nwStatus 1 }
+
+  nwDisplayMask OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+         "Bit mask describing what should be displayed by the utilities
+         
+          bit   Description
+          ---   -----------
+          0     nwFrameFormat
+          1     nwJetAdmin
+          2     nwFileServer (Includes all file server info)
+          3     nwMode
+          4     nwPrintServerName
+          5     nwPrintServerPassword
+          6     nwQueueScanTime
+          7     nwNetworkNumber
+          8     nwPortStatus
+          9     nwPortPrinterNumber
+          10    nwPortFontDownload (Includes nwPortPCLQueue and nwPortPSQueue)
+          11    nwPortFormsOn (Includes nwPortFormsNumber)
+          12    nwPortNotification
+          13    nwTraps (Includes all trap info)
+          14    nwNDSPrintServerName
+          15    nwNDSPreferredDSTree
+          16    nwNDSPreferredDSFileServer
+          17    nwNDSPacketCheckSumEnabled
+          18    nwNDSPacketSignatureLevel
+          19    nwDirectPrintEnabled
+          20    nwError
+          21    nwSapDisable"
+      ::= { netware 6 }
+  
+  -- the vines group
+
+  bvGroupVersion OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "The version for the vines group."
+      ::= { vines 1 }
+
+  bvEnabled OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Indicates whether or not the Banyan VINES protocol
+           stack is enabled on the print server."
+      ::= { vines 2 }
+
+  bvRestoreDefaults OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 will restore all VINES parameters on
+           the print server to factory defaults, as well as reset
+           the device."
+      ::= { bvCommands 1 }
+
+  bvFirmwareUpgrade OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 will put the print server into firmware
+           upgrade mode."
+     ::= { bvCommands 2 }
+
+  bvSetSequenceRouting OBJECT-TYPE
+      SYNTAX  INTEGER {
+          automatic-Routing(1),
+          force-Sequenced-Routing(2),
+          force-Non-Sequenced-Routing(3)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Sets the VINES Routing selection.
+
+           Automatic - Utilizes Sequenced Routing if available,
+                       otherwise uses Non-Sequenced Routing.
+
+           Force-Sequenced - Will only use Sequenced Routing.
+
+           Force-Non-Sequenced - Will only use Non-Sequenced Routing
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this.
+
+           WARNING - Sequential Routing requires a VINES 5.5 or
+           greater server on the same subnet."
+      ::= { bvCommands 3 }
+
+  bvDisableVPMan OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 will disable VPMan access to the print
+           server for one minute."
+      ::= { bvCommands 4 }
+
+  bvLoginName OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (5..63))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The StreetTalk name the device will use to login with.
+           This value will be ESIxxxxxxxx where xxxxxxx is the Serial
+           number of the device if it is unconfigured.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { bvConfigure 1 }
+
+  bvLoginPassword OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..15))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The password for the login name, bvLoginName.  This value
+           cannot be read, just set.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { bvConfigure 2 }
+
+  bvNumberPrintServices OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "The number of Print Services this device supports."
+      ::= { bvConfigure 3 }
+
+  bvPrintServiceTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF BvPrintServiceEntry
+      ACCESS  not-accessible
+      STATUS  optional
+      DESCRIPTION
+           "Table of Print Services for this device."
+      ::= { bvConfigure 4 }
+
+  bvPrintServiceEntry OBJECT-TYPE
+      SYNTAX  BvPrintServiceEntry
+      ACCESS  not-accessible
+      STATUS  optional
+      DESCRIPTION
+           "Print Services Table entry."
+      INDEX   { bvPrintServiceIndex }
+      ::= { bvPrintServiceTable 1 }
+
+  BvPrintServiceEntry ::=
+      SEQUENCE {
+          bvPrintServiceIndex
+              INTEGER,
+          bvPrintServiceName
+              DisplayString,
+          bvPrintServiceRouting
+              INTEGER
+      }
+
+  bvPrintServiceIndex OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "A unique value for each print service."
+      ::= { bvPrintServiceEntry 1 }
+
+  bvPrintServiceName OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..63))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The StreetTalk Name for this Print Service.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { bvPrintServiceEntry 2 }
+
+  bvPrintServiceRouting OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "The output port that the print service will print to.
+           This value will range from 0 to the number of output ports,
+           see outputNumPorts.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { bvPrintServiceEntry 3 }
+      
+  bvPnicDescription OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..255))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Contains the VINES PNIC description."
+      ::= { bvConfigure 5 }
+
+  bvError OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..48))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "Contains any VINES specific error information."
+      ::= { bvStatus 1 }
+
+  bvRouting OBJECT-TYPE
+      SYNTAX  INTEGER {
+          sequenced-Routing(1),
+          non-Sequenced-Routing(2),
+          unknown-Routing(32766),
+          protocol-Disabled(32767)
+      }
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "The current VINES Routing being used by the device."
+      ::= { bvStatus 2 }
+
+  bvNumPrintServices OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "The number of Print Services this device supports."
+      ::= { bvStatus 3 }
+
+  bvPrintServiceStatusTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF BvPrintServiceStatusEntry
+      ACCESS  not-accessible
+      STATUS  optional
+      DESCRIPTION
+           "Table of Print Service Status Entry's."
+      ::= { bvStatus 4 }
+
+  bvPrintServiceStatusEntry OBJECT-TYPE
+      SYNTAX  BvPrintServiceStatusEntry
+      ACCESS  not-accessible
+      STATUS  optional
+      DESCRIPTION
+           "Print Service Status Entry."
+      INDEX   { bvPSStatusIndex }
+      ::= { bvPrintServiceStatusTable 1 }
+
+  BvPrintServiceStatusEntry ::=
+      SEQUENCE {
+          bvPSStatusIndex
+              INTEGER,
+          bvPSName
+              DisplayString,
+          bvPSStatus
+              DisplayString,
+          bvPSDestination
+              INTEGER,
+          bvPrinterStatus
+              DisplayString,
+          bvJobActive
+              INTEGER,
+          bvJobSource
+              DisplayString,
+          bvJobTitle
+              DisplayString,
+          bvJobSize
+              DisplayString,
+          bvJobNumber
+              DisplayString
+      }
+
+  bvPSStatusIndex OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "A unique value for each status entry."
+      ::= { bvPrintServiceStatusEntry 1 }
+
+  bvPSName OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..63))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "The StreetTalk Name for this Print Service."
+      ::= { bvPrintServiceStatusEntry 2 }
+
+  bvPSStatus  OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..48))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "Print Service Status."
+      ::= { bvPrintServiceStatusEntry 3 }
+
+  bvPSDestination OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "Port Destination for this print service."
+      ::= { bvPrintServiceStatusEntry 4 }
+
+  bvPrinterStatus OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..80))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+          "Printer status for this Print Service."
+      ::= { bvPrintServiceStatusEntry 5 }
+
+  bvJobActive OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "Whether there is a VINES job active for this print
+           service."
+      ::= { bvPrintServiceStatusEntry 6 }
+
+  bvJobSource  OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..64))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "The active print jobs source."
+      ::= { bvPrintServiceStatusEntry 7 }
+
+  bvJobTitle  OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..64))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "The title of the active print job."
+      ::= { bvPrintServiceStatusEntry 8 }
+
+  bvJobSize  OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..9))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "The size of the active print job."
+      ::= { bvPrintServiceStatusEntry 9 }
+
+  bvJobNumber  OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..4))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+          "The VINES job number of the active print job."
+      ::= { bvPrintServiceStatusEntry 10 }
+
+  -- the LanMan group
+
+  lmGroupVersion OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "The version for the lanManger group."
+      ::= { lanManager 1 }
+
+  lmEnabled OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+          "Indicates whether or not the Lan Manager protocol
+          stack is enabled on the print server.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { lanManager 2 }
+
+  -- the eTalk group
+
+  eTalkGroupVersion OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+           "The version for the eTalk group."
+      ::= { eTalk 1 }
+
+  eTalkEnabled OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Indicates whether or not the EtherTalk protocol
+           stack is enabled on the print server.
+
+           In order for changes to this variable to take effect,
+           the print server must be reset.  See cmdReset to do
+           this."
+      ::= { eTalk 2 }
+
+  eTalkRestoreDefaults OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "A value of 2 will restore all EtherTalk parameters on
+           the print server to factory defaults, as well as reset
+           the print server."
+      ::= { eTalkCommands 1 }
+
+  eTalkNetwork OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (2))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "Indicates the EtherTalk network number that the print
+           server is currently using."
+      ::= { eTalkConfigure 1 }
+
+  eTalkNode OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (1))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "Indicates the EtherTalk node number that the print
+           server is currently using."
+      ::= { eTalkConfigure 2 }
+
+  eTalkNumPorts OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "Indicates the number of physical output ports that
+           are EtherTalk compatible."
+      ::= { eTalkConfigure 3 }
+
+  eTalkPortTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF ETalkPortEntry
+      ACCESS  not-accessible
+      STATUS  optional
+      DESCRIPTION
+           "A table of EtherTalk specific port configuration
+           information."
+      ::= { eTalkConfigure 4 }
+
+  eTalkPortEntry OBJECT-TYPE
+      SYNTAX  ETalkPortEntry
+      ACCESS  not-accessible
+      STATUS  optional
+      DESCRIPTION
+           "An entry of EtherTalk port specific information."
+      INDEX   { eTalkPortIndex }
+      ::= { eTalkPortTable 1 }
+
+  ETalkPortEntry ::=
+      SEQUENCE {
+          eTalkPortIndex
+              INTEGER,
+          eTalkPortEnable
+              INTEGER,
+          eTalkName
+              DisplayString,
+          eTalkActiveName
+              DisplayString,
+          eTalkType1
+              DisplayString,
+          eTalkType2
+              DisplayString,
+          eTalkZone
+              DisplayString,
+          eTalkActiveZone
+              DisplayString
+      }
+
+  eTalkPortIndex OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "A unique value for each physical output port which is
+           compatible with EtherTalk.  Its value ranges between
+           1 and the value of eTalkNumPorts.  The value for each
+           port must remain constant at least from one
+           re-initialization of the entity's network management
+           system to the next re-initialization."
+      ::= { eTalkPortEntry 1 }
+
+  eTalkPortEnable OBJECT-TYPE
+      SYNTAX  INTEGER {
+          no(1),
+          yes(2)
+      }
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Indicates whether or not the physical output port is
+           enabled to print via EtherTalk and will show up in the
+           Chooser."
+      ::= { eTalkPortEntry 2 }
+
+  eTalkName  OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (1..32))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "This is the EtherTalk name for the print server."
+      ::= { eTalkPortEntry 3 }
+
+  eTalkActiveName  OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (1..32))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "This is the EtherTalk name for the print server
+           that is currently being used."
+      ::= { eTalkPortEntry 4 }
+
+  eTalkType1  OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (1..32))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Indicates the first EtherTalk type.  This type is
+           mandatory."
+      ::= { eTalkPortEntry 5 }
+
+  eTalkType2  OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..32))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Indicates the second EtherTalk type.  This type is
+           optional.  Setting this name to NULL will disable it."
+      ::= { eTalkPortEntry 6 }
+
+  eTalkZone  OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (1..32))
+      ACCESS  read-write
+      STATUS  optional
+      DESCRIPTION
+           "Indicates the EtherTalk zone.  This must be defined
+           on the router."
+      ::= { eTalkPortEntry 7 }
+
+  eTalkActiveZone  OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (1..32))
+      ACCESS  read-only
+      STATUS  optional
+      DESCRIPTION
+           "Indicates the EtherTalk zone that is currently being
+           used.  This must be defined on the router."
+      ::= { eTalkPortEntry 8 }
+
+  eTalkError  OBJECT-TYPE
+       SYNTAX  DisplayString (SIZE (0..80))
+       ACCESS  read-only
+       STATUS  optional
+       DESCRIPTION
+            "Shows any errors for the EtherTalk protocol."
+       ::= { eTalkStatus 1 }
+
+  -- Traps
+
+  trapPrinterOnline TRAP-TYPE
+       ENTERPRISE printServers
+       VARIABLES  {outputIndex}
+       DESCRIPTION
+            "The printer is on-line.  This trap will be sent
+            out after a printer error condition has been cleared."
+                        --#TYPE "Printer On-Line"
+                        --#SUMMARY "Port %s is On-Line"
+                        --#ARGUMENTS{0}
+                        --#SEVERITY INFORMATIONAL
+                        --#TIMEINDEX 2
+                        --#STATE  OPERATIONAL
+       ::= 1
+
+  trapPrinterOffline TRAP-TYPE
+       ENTERPRISE printServers
+       VARIABLES  {outputIndex}
+       DESCRIPTION
+            "The printer is off-line."
+                        --#TYPE "Printer Off-Line"
+                        --#SUMMARY "Port %s is Off-Line"
+                        --#ARGUMENTS {0}
+                        --#SEVERITY INFORMATIONAL
+                        --#TIMEINDEX 2
+                        --#STATE  NONOPERATIONAL
+       ::= 2
+
+  trapNoPrinterAttached TRAP-TYPE
+       ENTERPRISE printServers
+       VARIABLES  {outputIndex}
+       DESCRIPTION
+            "No printer is attached to the output port."
+                        --#TYPE "No Printer Attached"
+                        --#SUMMARY "Port %s - No Printer Attached"
+                        --#ARGUMENTS {0}
+                        --#SEVERITY INFORMATIONAL
+                        --#TIMEINDEX 2
+                        --#STATE  NONOPERATIONAL
+       ::= 3
+
+  trapPrinterTonerLow TRAP-TYPE
+       ENTERPRISE printServers
+       VARIABLES  {outputIndex}
+       DESCRIPTION
+            "The printer toner is low."
+                        --#TYPE "Toner Low"
+                        --#SUMMARY "Port %s - Toner Low"
+                        --#ARGUMENTS {0}
+                        --#SEVERITY MINOR
+                        --#TIMEINDEX 2
+                        --#STATE  DEGRADED
+       ::= 4
+
+  trapPrinterPaperOut TRAP-TYPE
+       ENTERPRISE printServers
+       VARIABLES  {outputIndex}
+       DESCRIPTION
+            "The printer is out of paper."
+                        --#TYPE "Printer Out of Paper"
+                        --#SUMMARY "Port %s - Out of Paper"
+                        --#ARGUMENTS {0}
+                        --#SEVERITY MINOR
+                        --#TIMEINDEX 2
+                        --#STATE  NONOPERATIONAL
+       ::= 5
+
+  trapPrinterPaperJam TRAP-TYPE
+       ENTERPRISE printServers
+       VARIABLES  {outputIndex}
+       DESCRIPTION
+            "The printer has a paper jam."
+                        --#TYPE "Paper Jam"
+                        --#SUMMARY "Port %s - Paper Jam"
+                        --#ARGUMENTS {0}
+                        --#SEVERITY MAJOR
+                        --#TIMEINDEX 2
+                        --#STATE  NONOPERATIONAL
+       ::= 6
+
+  trapPrinterDoorOpen TRAP-TYPE
+       ENTERPRISE printServers
+       VARIABLES  {outputIndex}
+       DESCRIPTION
+            "The printer door is open."
+                        --#TYPE "Printer Door Open"
+                        --#SUMMARY "Port %s - Printer Door Open"
+                        --#ARGUMENTS {0}
+                        --#SEVERITY INFORMATIONAL
+                        --#TIMEINDEX 2
+                        --#STATE  NONOPERATIONAL
+       ::= 7
+
+  trapPrinterError TRAP-TYPE
+       ENTERPRISE printServers
+       VARIABLES  {outputIndex}
+       DESCRIPTION
+            "General printer error."
+                        --#TYPE "General Printer Error"
+                        --#SUMMARY "Port %s - Printer Error"
+                        --#ARGUMENTS {0}
+                        --#SEVERITY MINOR
+                        --#TIMEINDEX 2
+                        --#STATE  NONOPERATIONAL
+       ::= 16
+END

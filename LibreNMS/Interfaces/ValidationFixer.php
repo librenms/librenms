@@ -1,4 +1,5 @@
 <?php
+
 /*
  * ValidationFixer.php
  *

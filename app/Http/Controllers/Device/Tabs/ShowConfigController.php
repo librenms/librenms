@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ShowConfigController.php
  *
@@ -25,21 +26,33 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\ConfigBackup\ConfigBackupManager;
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use Symfony\Component\Process\Process;
 
 class ShowConfigController extends Controller implements DeviceTab
 {
     private $rancidPath;
     private $rancidFile;
 
+    public function __construct(
+        private readonly ConfigBackupManager $configBackupManager,
+    ) {
+    }
+
     public function visible(Device $device): bool
     {
-        if (auth()->user()->can('show-config', $device)) {
+        if ($this->configBackupManager->handles($device)) {
+            return false; // a modern config backup provider takes over the Config tab
+        }
+
+        if (Gate::allows('configBackupView', $device)) {
             return $this->oxidizedEnabled($device) || $this->getRancidConfigFile() !== false;
         }
 
@@ -71,11 +84,11 @@ class ShowConfigController extends Controller implements DeviceTab
 
     private function oxidizedEnabled(Device $device)
     {
-        return Config::get('oxidized.enabled') === true
-                && Config::has('oxidized.url')
+        return LibrenmsConfig::get('oxidized.enabled') === true
+                && LibrenmsConfig::has('oxidized.url')
                 && $device->getAttrib('override_Oxidized_disable') !== 'true'
-                && ! in_array($device->type, Config::get('oxidized.ignore_types', []))
-                && ! in_array($device->os, Config::get('oxidized.ignore_os', []));
+                && ! in_array($device->type, LibrenmsConfig::get('oxidized.ignore_types', []))
+                && ! in_array($device->os, LibrenmsConfig::get('oxidized.ignore_os', []));
     }
 
     private function getRancidPath()
@@ -98,31 +111,64 @@ class ShowConfigController extends Controller implements DeviceTab
 
     private function findRancidConfigFile()
     {
-        if (Config::has('rancid_configs') && ! is_array(Config::get('rancid_configs'))) {
-            Config::set('rancid_configs', (array) Config::get('rancid_configs', []));
+        if (LibrenmsConfig::has('rancid_configs') && ! is_array(LibrenmsConfig::get('rancid_configs'))) {
+            LibrenmsConfig::set('rancid_configs', (array) LibrenmsConfig::get('rancid_configs', []));
         }
 
-        if (Config::has('rancid_configs.0')) {
+        if (LibrenmsConfig::has('rancid_configs.0')) {
             $device = DeviceCache::getPrimary();
-            foreach (Config::get('rancid_configs') as $configs) {
-                if ($configs[strlen($configs) - 1] != '/') {
-                    $configs .= '/';
-                }
-
-                if (is_file($configs . $device['hostname'])) {
-                    $this->rancidPath = $configs;
-
-                    return $configs . $device['hostname'];
-                } elseif (is_file($configs . strtok($device['hostname'], '.'))) { // Strip domain
-                    $this->rancidPath = $configs;
-
-                    return $configs . strtok($device['hostname'], '.');
+            foreach (LibrenmsConfig::get('rancid_configs') as $configs) {
+                if (LibrenmsConfig::get('rancid_repo_type') == 'git-bare') {
+                    $topLevel = strpos($configs, '.git');
+                    $configPath = '';
+                    if ($topLevel === false) {
+                        if (is_dir($configs . '.git')) {
+                            $configs .= '.git';
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        $configPath = substr($configs, $topLevel + 5);
+                        $configs = substr($configs, 0, $topLevel + 4);
+                    }
+                    if (strlen($configPath) > 0 && $configPath[strlen($configPath) - 1] != '/') {
+                        $configPath .= '/';
+                    }
+                    $process = new Process(['git', 'ls-tree', '--name-only', '-r', 'HEAD'], $configs);
+                    $process->run();
+                    $config_files = explode(PHP_EOL, $process->getOutput());
+                    if (count($config_files) > 0) {
+                        $this->rancidPath = $configs;
+                    }
+                    if (in_array($configPath . $device['hostname'], $config_files)) {
+                        return $configPath . $device['hostname'];
+                    }
+                    if (in_array($configPath . strtok($device['hostname'], '.'), $config_files)) {
+                        return $configPath . strtok($device['hostname'], '.');
+                    }
+                    if (! empty(LibrenmsConfig::get('mydomain')) && in_array($configPath . $device['hostname'] . '.' . LibrenmsConfig::get('mydomain'), $config_files)) {
+                        return $configPath . $device['hostname'] . '.' . LibrenmsConfig::get('mydomain');
+                    }
                 } else {
-                    if (! empty(Config::get('mydomain'))) { // Try with domain name if set
-                        if (is_file($configs . $device['hostname'] . '.' . Config::get('mydomain'))) {
-                            $this->rancidPath = $configs;
+                    if ($configs[strlen($configs) - 1] != '/') {
+                        $configs .= '/';
+                    }
 
-                            return $configs . $device['hostname'] . '.' . Config::get('mydomain');
+                    if (is_file($configs . $device['hostname'])) {
+                        $this->rancidPath = $configs;
+
+                        return $configs . $device['hostname'];
+                    } elseif (is_file($configs . strtok($device['hostname'], '.'))) { // Strip domain
+                        $this->rancidPath = $configs;
+
+                        return $configs . strtok($device['hostname'], '.');
+                    } else {
+                        if (! empty(LibrenmsConfig::get('mydomain'))) { // Try with domain name if set
+                            if (is_file($configs . $device['hostname'] . '.' . LibrenmsConfig::get('mydomain'))) {
+                                $this->rancidPath = $configs;
+
+                                return $configs . $device['hostname'] . '.' . LibrenmsConfig::get('mydomain');
+                            }
                         }
                     }
                 }

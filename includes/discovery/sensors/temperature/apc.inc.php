@@ -27,25 +27,25 @@ $apc_env_data = snmpwalk_cache_oid($device, 'uioSensor', [], 'PowerNet-MIB', nul
 if ($apc_env_data) {
     // NMC2/NMC3/etc. Universal Input Output
     foreach (array_keys($apc_env_data) as $index) {
-        $current = $apc_env_data[$index]['uioSensorStatusTemperatureDegC'];
+        $current = $apc_env_data[$index]['uioSensorStatusTemperatureDegC'] ?? 0;
         if ($current > 0) {
             // Temperature <= 0 -> Sensor not available
-            $descr = $apc_env_data[$index]['uioSensorConfigSensorName'];
+            $descr = $apc_env_data[$index]['uioSensorConfigSensorName'] ?? null;
             $sensorType = 'apc';
             $oid = '.1.3.6.1.4.1.318.1.1.25.1.2.1.6.' . $index;
 
             // APC enum disabled(1), enabled(2)
-            $low_limit = ($apc_env_data[$index]['uioSensorConfigMinTemperatureEnable'] != 1 ? $apc_env_data[$index]['uioSensorConfigMinTemperatureThreshold'] : null);
-            $low_warn_limit = ($apc_env_data[$index]['uioSensorConfigLowTemperatureEnable'] != 1 ? $apc_env_data[$index]['uioSensorConfigLowTemperatureThreshold'] : null);
-            $high_warn_limit = ($apc_env_data[$index]['uioSensorConfigHighTemperatureEnable'] != 1 ? $apc_env_data[$index]['uioSensorConfigHighTemperatureThreshold'] : null);
-            $high_limit = ($apc_env_data[$index]['uioSensorConfigMaxTemperatureEnable'] != 1 ? $apc_env_data[$index]['uioSensorConfigMaxTemperatureThreshold'] : null);
+            $low_limit = (isset($apc_env_data[$index]['uioSensorConfigMinTemperatureEnable']) && $apc_env_data[$index]['uioSensorConfigMinTemperatureEnable'] != 1 ? $apc_env_data[$index]['uioSensorConfigMinTemperatureThreshold'] : null);
+            $low_warn_limit = (isset($apc_env_data[$index]['uioSensorConfigLowTemperatureEnable']) && $apc_env_data[$index]['uioSensorConfigLowTemperatureEnable'] != 1 ? $apc_env_data[$index]['uioSensorConfigLowTemperatureThreshold'] : null);
+            $high_warn_limit = (isset($apc_env_data[$index]['uioSensorConfigHighTemperatureEnable']) && $apc_env_data[$index]['uioSensorConfigHighTemperatureEnable'] != 1 ? $apc_env_data[$index]['uioSensorConfigHighTemperatureThreshold'] : null);
+            $high_limit = (isset($apc_env_data[$index]['uioSensorConfigMaxTemperatureEnable']) && $apc_env_data[$index]['uioSensorConfigMaxTemperatureEnable'] != 1 ? $apc_env_data[$index]['uioSensorConfigMaxTemperatureThreshold'] : null);
 
             // universalInputOutput sensor entries all have an sub-index, presumably to allow for multiple sensors in the
             // future. Here we remove the sub-index from the first entry, so 1.1 becomes 1, 2.1 becomes 2, etc. However any
             // future appearing sub-index will remain untouched, so 1.2 will stay 1.2, 2.2 will stay 2.2, etc.
             // The reason that we remove the sub-index from the first entry is to preserve compatibility with sensors
             // created by prior versions using the legacy iemConfig and iemStatus tables.
-            $split_index = explode('.', $index);
+            $split_index = explode('.', (string) $index);
             if (count($split_index) == 2 && $split_index[1] == 1) {
                 $index = $split_index[0];
             }
@@ -189,7 +189,7 @@ foreach ($cooling_unit as $index => $data) {
     $descr = $data['coolingUnitExtendedAnalogDescription'];
     $scale = $data['coolingUnitExtendedAnalogScale'];
     $value = $data['coolingUnitExtendedAnalogValue'];
-    if (preg_match('/Temperature/', $descr) && $data['coolingUnitExtendedAnalogUnits'] == 'C' && $value >= 0) {
+    if (preg_match('/Temperature/', (string) $descr) && $data['coolingUnitExtendedAnalogUnits'] == 'C' && $value >= 0) {
         discover_sensor(null, 'temperature', $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
     }
 }
@@ -199,14 +199,14 @@ foreach ($pre_cache['cooling_unit_analog'] as $index => $data) {
     $descr = $data['coolingUnitStatusAnalogDescription'];
     $scale = $data['coolingUnitStatusAnalogScale'] ?? null;
     $value = $data['coolingUnitStatusAnalogValue'] ?? null;
-    if (preg_match('/Temperature/', $descr) && $data['coolingUnitStatusAnalogUnits'] == 'C' && $value >= 0) {
+    if (preg_match('/Temperature/', (string) $descr) && $data['coolingUnitStatusAnalogUnits'] == 'C' && $value >= 0) {
         discover_sensor(null, 'temperature', $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
     }
 }
 
 foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.5.' . $index;
-    $descr = $data['memSensorsStatusSensorName'] . ' - ' . $data['memSensorsStatusSensorLocation'];
+    $descr = ($data['memSensorsStatusSensorName'] ?? '') . ' - ' . ($data['memSensorsStatusSensorLocation'] ?? '');
     $divisor = 1;
     $multiplier = 1;
     $value = $data['memSensorsTemperature'];

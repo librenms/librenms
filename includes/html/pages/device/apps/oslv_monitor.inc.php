@@ -1,11 +1,28 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Port;
 use App\Models\Storage;
 
 $name = 'oslv_monitor';
 
 $device_obj = DeviceCache::get($device['device_id']);
+
+// FreeBSD epair interfaces are created in pairs, epairNa and epairNb. The end
+// reported here is the guest side, while the host device LibreNMS polls has the
+// opposite end, so on FreeBSD whenever the name is an epairNa/epairNb, flip the
+// a/b suffix and look up that counterpart instead.
+$oslvm_find_port = function ($device_id, $if_name) use ($device) {
+    if ($device['os'] === 'freebsd' && preg_match('/^epair.*[ab]$/', (string) $if_name)) {
+        $if_name = preg_replace_callback(
+            '/[ab]$/',
+            fn ($matches) => $matches[0] === 'a' ? 'b' : 'a',
+            (string) $if_name
+        );
+    }
+
+    return Port::with('device')->firstWhere(['device_id' => $device_id, 'ifName' => $if_name]);
+};
 
 $link_array = [
     'page' => 'device',
@@ -26,10 +43,13 @@ if (! isset($app_data['has']) || ! is_array($app_data['has'])) {
 
 print_optionbar_start();
 
-$label = isset($vars['oslvm'])
-    ? 'Totals'
-    : '<span class="pagemenu-selected">Totals</span>';
-echo generate_link($label, $link_array);
+$label = 'Totals';
+$link = generate_link($label, $link_array);
+
+$link = isset($vars['oslvm'])
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 
 if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
     $oslvm_name = 'Jails';
@@ -42,13 +62,18 @@ if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
         echo "\n<br>Current " . $oslvm_name . ": \n";
     }
     $index_int = 0;
-    foreach ($app_data['oslvms'] as $index => $oslvm) {
-        $oslvm = htmlspecialchars($oslvm);
-        $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-            ? $oslvm
-            : '<span class="pagemenu-selected">' . $oslvm . '</span>';
+    foreach ($app_data['oslvms'] as $oslvm) {
+        $oslvm = htmlspecialchars((string) $oslvm);
+
+        $label = $oslvm;
+        $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+        $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
         $index_int++;
-        echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+        echo $link;
+
         if (isset($app_data['oslvms'][$index_int])) {
             echo ', ';
         }
@@ -57,13 +82,17 @@ if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
         echo "\n<br>Old " . $oslvm_name . ': ';
         sort($app_data['inactive']);
         $index_int = 0;
-        foreach ($app_data['inactive'] as $index => $oslvm) {
-            $oslvm = htmlspecialchars($oslvm);
-            $label = (! isset($vars['inactive']) || $vars['oslvm'] != $oslvm)
-                ? $oslvm
-                : '<span class="pagemenu-selected">' . $oslvm . '</span>';
+        foreach ($app_data['inactive'] as $oslvm) {
+            $oslvm = htmlspecialchars((string) $oslvm);
+
+            $label = $oslvm;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['inactive']) || $vars['oslvm'] != $oslvm)
+                ? $link
+                : '<span class="pagemenu-selected">' . $link . '</span>';
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($app_data['inactive'][$index_int])) {
                 echo ', ';
             }
@@ -77,8 +106,8 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     $systemd_containers = [];
     $other_containers = [];
     $user_containers = [];
-    foreach ($app_data['oslvms'] as $index => $oslvm) {
-        $oslvm = htmlspecialchars($oslvm);
+    foreach ($app_data['oslvms'] as $oslvm) {
+        $oslvm = htmlspecialchars((string) $oslvm);
         if (preg_match('/^d_.*/', $oslvm)) {
             $docker_containers[] = $oslvm;
         } elseif (preg_match('/^s_.*/', $oslvm)) {
@@ -96,8 +125,8 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     $seen_systemd_containers = [];
     $seen_other_containers = [];
     $seen_user_containers = [];
-    foreach ($app_data['inactive'] as $index => $oslvm) {
-        $oslvm = htmlspecialchars($oslvm);
+    foreach ($app_data['inactive'] as $oslvm) {
+        $oslvm = htmlspecialchars((string) $oslvm);
         if (preg_match('/^d_.*/', $oslvm)) {
             $seen_docker_containers[] = $oslvm;
         } elseif (preg_match('/^s_.*/', $oslvm)) {
@@ -123,14 +152,19 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             echo "\n<br>Current Podman Containers<b>:</b> \n";
         }
         $index_int = 0;
-        foreach ($podman_containers as $index => $oslvm) {
+        foreach ($podman_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^p\_/', '', $oslvm_name);
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-            ? $oslvm_name
-            : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($podman_containers[$index_int])) {
                 echo ', ';
             }
@@ -139,14 +173,19 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     if (isset($seen_podman_containers[0])) {
         echo "\n<br>Previous Podman Containers<b>:</b> \n";
         $index_int = 0;
-        foreach ($seen_podman_containers as $index => $oslvm) {
+        foreach ($seen_podman_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^p\_/', '', $oslvm_name);
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-            ? $oslvm_name
-            : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($seen_podman_containers[$index_int])) {
                 echo ', ';
             }
@@ -160,14 +199,19 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             echo "\n<br>Current Docker Containers<b>:</b> \n";
         }
         $index_int = 0;
-        foreach ($docker_containers as $index => $oslvm) {
+        foreach ($docker_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^d\_/', '', $oslvm_name);
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-                ? $oslvm_name
-                : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+                ? $link
+                : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($docker_containers[$index_int])) {
                 echo ', ';
             }
@@ -176,14 +220,19 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     if (isset($seen_docker_containers[0])) {
         echo "\n<br>Previous Docker Containers<b>:</b> \n";
         $index_int = 0;
-        foreach ($seen_docker_containers as $index => $oslvm) {
+        foreach ($seen_docker_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^d\_/', '', $oslvm_name);
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-            ? $oslvm_name
-            : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($seen_docker_containers[$index_int])) {
                 echo ', ';
             }
@@ -197,14 +246,19 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             echo "\n<br>Current SystemD Containers<b>:</b> \n";
         }
         $index_int = 0;
-        foreach ($systemd_containers as $index => $oslvm) {
+        foreach ($systemd_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^s\_/', '', $oslvm_name);
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-                ? $oslvm_name
-                : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+                ? $link
+                : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($systemd_containers[$index_int])) {
                 echo ', ';
             }
@@ -213,14 +267,19 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     if (isset($seen_systemd_containers[0])) {
         echo "\n<br>Previous SystemD Containers<b>:</b> \n";
         $index_int = 0;
-        foreach ($seen_systemd_containers as $index => $oslvm) {
+        foreach ($seen_systemd_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^s\_/', '', $oslvm_name);
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-            ? $oslvm_name
-            : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($seen_systemd_containers[$index_int])) {
                 echo ', ';
             }
@@ -234,17 +293,22 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             echo "\n<br>Current User Containers<b>:</b> \n";
         }
         $index_int = 0;
-        foreach ($user_containers as $index => $oslvm) {
+        foreach ($user_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^u\_/', '', $oslvm_name);
             if (isset($app_data['uid_mapping'][$oslvm_name])) {
                 $oslvm_name = $oslvm_name . '(' . $app_data['uid_mapping'][$oslvm_name]['name'] . ')';
             }
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-                ? $oslvm_name
-                : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+                ? $link
+                : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($user_containers[$index_int])) {
                 echo ', ';
             }
@@ -253,17 +317,22 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     if (isset($seen_user_containers[0])) {
         echo "\n<br>Previous User Containers<b>:</b> \n";
         $index_int = 0;
-        foreach ($seen_user_containers as $index => $oslvm) {
+        foreach ($seen_user_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^u\_/', '', $oslvm_name);
             if (isset($app_data['uid_mapping'][$oslvm_name])) {
                 $oslvm_name = $oslvm_name . '(' . $app_data['uid_mapping'][$oslvm_name]['name'] . ')';
             }
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-            ? $oslvm_name
-            : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($seen_user_containers[$index_int])) {
                 echo ', ';
             }
@@ -277,12 +346,16 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             echo "\n<br>Current Other Containers<b>:</b> \n";
         }
         $index_int = 0;
-        foreach ($other_containers as $index => $oslvm) {
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-                ? $oslvm
-                : '<span class="pagemenu-selected">' . $oslvm . '</span>';
+        foreach ($other_containers as $oslvm) {
+            $label = $oslvm;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+                ? $link
+                : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($other_containers[$index_int])) {
                 echo ', ';
             }
@@ -291,14 +364,19 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     if (isset($seen_other_containers[0])) {
         echo "\n<br>Previous Other Containers<b>:</b> \n";
         $index_int = 0;
-        foreach ($seen_other_containers as $index => $oslvm) {
+        foreach ($seen_other_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^d\_/', '', $oslvm_name);
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-            ? $oslvm_name
-            : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($seen_other_containers[$index_int])) {
                 echo ', ';
             }
@@ -317,8 +395,8 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
             ],
             'rows' => [],
         ];
-        foreach ($app_data['oslvm_data'][$vars['oslvm']]['path'] as $index => $path) {
-            $path = htmlspecialchars($path);
+        foreach ($app_data['oslvm_data'][$vars['oslvm']]['path'] as $path) {
+            $path = htmlspecialchars((string) $path);
             $path = preg_replace('/\/$/', '', $path);
             $mount_path = $path;
             $mount_path_raw = false;
@@ -330,8 +408,8 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 ['storage_descr' => $mount_path],
                 ['device_id' => $device['device_id']]
             );
-            if (! isset($storage_info) && ! preg_match('/^\/+$/', $mount_path)) {
-                $mount_path = preg_replace('/\/[^\/]+$/', '', $mount_path);
+            if (! isset($storage_info) && ! preg_match('/^\/+$/', (string) $mount_path)) {
+                $mount_path = preg_replace('/\/[^\/]+$/', '', (string) $mount_path);
                 while ($mount_path != '' && ! isset($storage_info)) {
                     $storage_info = Storage::firstWhere(
                         ['storage_descr' => $mount_path],
@@ -350,10 +428,10 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 $path_graph_array = [];
                 $path_graph_array['height'] = '100';
                 $path_graph_array['width'] = '210';
-                $path_graph_array['to'] = LibreNMS\Config::get('time.now');
+                $path_graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
                 $path_graph_array['id'] = $storage_info['storage_id'];
                 $path_graph_array['type'] = 'storage_usage';
-                $path_graph_array['from'] = LibreNMS\Config::get('time.day');
+                $path_graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
                 $path_graph_array['legend'] = 'no';
 
                 $path_link_array = $path_graph_array;
@@ -410,7 +488,7 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
             ],
             'rows' => [],
         ];
-        foreach ($app_data['oslvm_data'][$vars['oslvm']]['ip'] as $index => $ip_data) {
+        foreach ($app_data['oslvm_data'][$vars['oslvm']]['ip'] as $ip_data) {
             $ip = '';
             $interface = '';
             $interface_raw = false;
@@ -429,16 +507,16 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 if (is_array($ip_data)) {
                     if (isset($ip_data['ip']) && ! is_null($ip_data['ip'])) {
                         $ip = $ip_data['ip'];
-                        $ip = htmlspecialchars($ip);
+                        $ip = htmlspecialchars((string) $ip);
                     }
                     if (isset($ip_data['gw']) && ! is_null($ip_data['gw'])) {
                         $gw_ip = $ip_data['gw'];
-                        $gw_ip = htmlspecialchars($gw_ip);
+                        $gw_ip = htmlspecialchars((string) $gw_ip);
                     }
                     if (isset($ip_data['if']) && ! is_null($ip_data['if'])) {
                         $interface = $ip_data['if'];
-                        $interface = htmlspecialchars($interface);
-                        $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $interface]);
+                        $interface = htmlspecialchars((string) $interface);
+                        $port = $oslvm_find_port($app->device_id, $interface);
                         if (isset($port)) {
                             $interface_raw = true;
                             $interface = generate_port_link([
@@ -458,8 +536,8 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                     }
                     if (isset($ip_data['gw_if']) && ! is_null($ip_data['gw_if'])) {
                         $gw_interface = $ip_data['gw_if'];
-                        $gw_interface = htmlspecialchars($gw_interface);
-                        $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $gw_interface]);
+                        $gw_interface = htmlspecialchars((string) $gw_interface);
+                        $port = $oslvm_find_port($app->device_id, $gw_interface);
                         if (isset($port)) {
                             $gw_interface_raw = true;
                             $gw_interface = generate_port_link([
@@ -611,26 +689,42 @@ if ($app_data['has']['sock']) {
     ];
 }
 if ($app_data['has']['linux_mem_stats']) {
-    $graphs[] = [
-        'type' => 'cgroups_pg',
-        'description' => 'Linux Pg Memory Stats',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_mem_misc',
-        'description' => 'Misc Linux Memory Stats',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_zswap',
-        'description' => 'Zswap Size',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_zswap_activity',
-        'description' => 'Zswap Activity',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_workingset',
-        'description' => 'Workingset Stats',
-    ];
+    if (LibrenmsConfig::get('apps.oslv_monitor.linux_pg_memory_stats')) {
+        $graphs[] = [
+            'type' => 'cgroups_pg',
+            'description' => 'Linux Pg Memory Stats',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.misc_linux_memory_stats')) {
+        $graphs[] = [
+            'type' => 'cgroups_mem_misc',
+            'description' => 'Misc Linux Memory Stats',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.zswap_size')) {
+        $graphs[] = [
+            'type' => 'cgroups_zswap',
+            'description' => 'Zswap Size',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.zswap_activity')) {
+        $graphs[] = [
+            'type' => 'cgroups_zswap_activity',
+            'description' => 'Zswap Activity',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.workingset_stats')) {
+        $graphs[] = [
+            'type' => 'cgroups_workingset',
+            'description' => 'Workingset Stats',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.thp_activity')) {
+        $graphs[] = [
+            'type' => 'cgroups_thp_activity',
+            'description' => 'THP Activity',
+        ];
+    }
 }
 if ($app_data['has']['throttled_time']) {
     $graphs[] = [

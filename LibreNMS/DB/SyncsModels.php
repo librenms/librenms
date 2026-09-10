@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SyncsModels.php
  *
@@ -39,7 +40,7 @@ trait SyncsModels
      * @param  \Illuminate\Database\Eloquent\Model  $parentModel
      * @param  string  $relationship
      * @param  \Illuminate\Support\Collection<Keyable>  $models  \LibreNMS\Interfaces\Models\Keyable
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     protected function syncModels($parentModel, $relationship, $models, $existing = null): Collection
     {
@@ -51,7 +52,10 @@ trait SyncsModels
                 // update
                 foreach ($existing_rows as $index => $existing_row) {
                     if ($index == 0) {
-                        $existing_row->fill($models->get($exist_key)->getAttributes())->save();
+                        // fill attributes, ignoring mutators and fillable
+                        $merged = array_merge($existing_row->getAttributes(), $models->get($exist_key)->getAttributes());
+                        $existing_row->setRawAttributes($merged);
+                        $existing_row->save();
                     } else {
                         // delete extra rows at this key
                         $existing_row->delete();
@@ -86,7 +90,11 @@ trait SyncsModels
     {
         $filter = function ($models, $params) {
             foreach ($params as $key => $value) {
-                $models = $models->where($key, '=', $value);
+                if (is_array($value)) {
+                    $models = $models->where(...$value);
+                } else {
+                    $models = $models->where($key, '=', $value);
+                }
             }
 
             return $models;
@@ -99,9 +107,9 @@ trait SyncsModels
      * Combine a list of existing and potentially new models
      * If the model exists fill any new data from the new models
      *
-     * @param  \Illuminate\Support\Collection  $existing  \LibreNMS\Interfaces\Models\Keyable
-     * @param  \Illuminate\Support\Collection  $discovered  \LibreNMS\Interfaces\Models\Keyable
-     * @return \Illuminate\Support\Collection
+     * @param  Collection  $existing  \LibreNMS\Interfaces\Models\Keyable
+     * @param  Collection  $discovered  \LibreNMS\Interfaces\Models\Keyable
+     * @return Collection
      */
     protected function fillNew(Collection $existing, Collection $discovered): Collection
     {

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Eltex-MES24xx SFP TxBiasCurrent
  *
@@ -18,55 +19,62 @@
  * @package    LibreNMS
  * @link       https://www.librenms.org
  *
- * @copyright  2024 Peca Nesovanovic
+ * @copyright  2025 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
-use LibreNMS\Util\Oid;
+use App\Models\Sensor;
+use LibreNMS\OS;
+use LibreNMS\OS\EltexMes24xx;
 
-echo 'eltexPhyTransceiverDiagnosticTable' . PHP_EOL;
-$snmpData = SnmpQuery::cache()->hideMib()->walk('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticTable')->table(3);
-if (! empty($snmpData)) {
-    foreach ($snmpData as $index => $typeData) {
-        foreach ($typeData as $type => $data) {
-            $eltexPhyTransceiverDiagnosticTable[$type][$index] = array_shift($data);
-        }
-    }
+if (empty($os)) {
+    $os = OS::make($device);
 }
 
-$divisor = 1000;
-$multiplier = 1;
-if (! empty($eltexPhyTransceiverDiagnosticTable['txBiasCurrent'])) {
-    foreach ($eltexPhyTransceiverDiagnosticTable['txBiasCurrent'] as $ifIndex => $data) {
-        $value = $data['eltexPhyTransceiverDiagnosticCurrentValue'] / $divisor;
-        if ($value) {
+if ($os instanceof EltexMes24xx) {
+    $map = array_flip($os->getIfIndexEntPhysicalMap()); // map ifindex -> entphy index
+    $snmpData = SnmpQuery::cache()->hideMib()->walk('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticTable')->table(3);
+    if (! empty($snmpData)) {
+        foreach ($snmpData as $index => $typeData) {
+            foreach ($typeData as $type => $data) {
+                $eltexPhyTransceiverDiagnosticTable[$type][$index] = array_shift($data);
+            }
+        }
+    }
+
+    $divisor = 1000;
+    $multiplier = 1;
+
+    foreach ($eltexPhyTransceiverDiagnosticTable['txBiasCurrent'] ?? [] as $ifIndex => $data) {
+        if (! empty($data['eltexPhyTransceiverDiagnosticUnits'])) {
+            $value = $data['eltexPhyTransceiverDiagnosticCurrentValue'] / $divisor;
             $high_limit = $data['eltexPhyTransceiverDiagnosticHighAlarmThreshold'] / 1000 / $divisor;
             $high_warn_limit = $data['eltexPhyTransceiverDiagnosticHighWarningThreshold'] / 1000 / $divisor;
             $low_warn_limit = $data['eltexPhyTransceiverDiagnosticLowWarningThreshold'] / 1000 / $divisor;
             $low_limit = $data['eltexPhyTransceiverDiagnosticLowAlarmThreshold'] / 1000 / $divisor;
-            $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
-            $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.3.1')->toNumeric();
-            discover_sensor(
-                null,
-                'current',
-                $device,
-                $oid,
-                'SfpTxBias' . $ifIndex,
-                'ELTEX-PHY-MIB',
-                $descr,
-                $divisor,
-                $multiplier,
-                $low_limit,
-                $low_warn_limit,
-                $high_warn_limit,
-                $high_limit,
-                $value,
-                'snmp',
-                null,
-                null,
-                null,
-                'Transceiver'
-            );
+            $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+            $descr = $port?->ifName;
+            $oid = '.1.3.6.1.4.1.35265.52.1.1.3.2.1.8.' . $ifIndex . '.3.1';
+
+            app('sensor-discovery')->discover(new Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'current',
+                'sensor_oid' => $oid,
+                'sensor_index' => 'SfpTxBias' . $ifIndex,
+                'sensor_type' => 'eltex-mes24xx',
+                'sensor_descr' => 'SfpTxBias-' . $descr,
+                'sensor_divisor' => $divisor,
+                'sensor_multiplier' => $multiplier,
+                'sensor_limit_low' => $low_limit,
+                'sensor_limit_low_warn' => $low_warn_limit,
+                'sensor_limit_warn' => $high_warn_limit,
+                'sensor_limit' => $high_limit,
+                'sensor_current' => $value,
+                'entPhysicalIndex' => $map[$ifIndex] ?? null,
+                'entPhysicalIndex_measured' => 'port',
+                'user_func' => null,
+                'group' => 'transceiver',
+            ]));
         }
     }
 }

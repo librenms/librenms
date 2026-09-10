@@ -28,12 +28,13 @@ IMPORTS
     tmnxSRNotifyPrefix, tmnxSRObjs
                                                          FROM TIMETRA-GLOBAL-MIB
     TmnxEnabledDisabled,
-    TmnxEnabledDisabledAdminState
+    TmnxEnabledDisabledAdminState,
+    TmnxLldpManAddressIndex, TmnxPortID
                                                          FROM TIMETRA-TC-MIB
     ;
 
 tmnxLldpMIBModule                MODULE-IDENTITY
-    LAST-UPDATED "201501010000Z"
+    LAST-UPDATED "202402280000Z"
     ORGANIZATION "Nokia"
     CONTACT-INFO
         "Nokia SROS Support
@@ -59,6 +60,11 @@ tmnxLldpMIBModule                MODULE-IDENTITY
          This Specification is supplied 'as is', and Nokia makes no warranty,
          either express or implied, as to the use, operation, condition, or
          performance of the Specification."
+
+    REVISION    "202402280000Z"
+    DESCRIPTION
+        "Rev 24.0                28 Feb 2024 00:00
+         Release 24 of the TIMETRA-LLDP-MIB."
 
     REVISION    "201501010000Z"
     DESCRIPTION
@@ -86,20 +92,6 @@ TmnxLldpDestAddressTableIndex    ::= TEXTUAL-CONVENTION
          secondary index value in tables indexed by fields of type ifIndex, in
          order to associate a destination address with each row of the table."
     SYNTAX      Integer32 (1..4096)
-
-TmnxLldpManAddressIndex          ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION
-        "An Index value, used as the index to the table of local port
-         management addresses, tmnxLldpConfigManAddrPortsTable. The index
-         represents a specific local management address application on the
-         system which may, or may not exist."
-    SYNTAX      INTEGER {
-        oob        (0),
-        system     (1),
-        systemIpv6 (2),
-        oobIpv6    (3)
-    }
 
 tmnxLldpObjects                  OBJECT IDENTIFIER ::= { tmnxSRObjs 59 }
 
@@ -195,7 +187,10 @@ TmnxLldpPortConfigEntry          ::= SEQUENCE
     tmnxLldpPortCfgNotifyEnable      TruthValue,
     tmnxLldpPortCfgTLVsTxEnable      BITS,
     tmnxLldpPortCfgTunnelNearestBrg  INTEGER,
-    tmnxLldpPortCfgPortIdSubtype     LldpPortIdSubtype
+    tmnxLldpPortCfgPortIdSubtype     LldpPortIdSubtype,
+    tmnxLldpPortCfgOverride          TmnxPortID,
+    tmnxLldpPortCfgTunnelNearNonTpmr INTEGER,
+    tmnxLldpPortCfgTunnelNearestCust INTEGER
 }
 
 tmnxLldpPortCfgDestAddressIndex  OBJECT-TYPE
@@ -335,6 +330,54 @@ tmnxLldpPortCfgPortIdSubtype     OBJECT-TYPE
         "IEEE 802.1AB-2009 Section 8.5.3.2 and 8.5.3.3"
     DEFVAL      { local }
     ::= { tmnxLldpPortConfigEntry 6 }
+
+tmnxLldpPortCfgOverride          OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A non zero value of tmnxLldpPortCfgOverride indicates that the system
+         uses the configuration of another row instead, identified with the
+         value of tmnxLldpPortCfgOverride and tmnxLldpPortCfgDestAddressIndex."
+    ::= { tmnxLldpPortConfigEntry 7 }
+
+tmnxLldpPortCfgTunnelNearNonTpmr OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable (0),
+        enabled       (1),
+        disabled      (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLldpPortCfgTunnelNearNonTpmr specifies whether or not
+         the nearest non tpmr LLDP session is tunneled.
+
+         The default value on a nearest non tpmr session is 'enabled (1)'.
+
+         Attempts to set this object on a LLDP session that is not a nearest
+         non tmpr, are not permissible."
+    DEFVAL      { enabled }
+    ::= { tmnxLldpPortConfigEntry 8 }
+
+tmnxLldpPortCfgTunnelNearestCust OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable (0),
+        enabled       (1),
+        disabled      (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLldpPortCfgTunnelNearestCust specifies whether or not
+         the nearest customer LLDP session is tunneled.
+
+         The default value on a non tpmr session is 'enabled (1)'.
+
+         Attempts to set this object on a LLDP session that is not a nearest
+         customer, are not permissible."
+    DEFVAL      { enabled }
+    ::= { tmnxLldpPortConfigEntry 9 }
 
 tmnxLldpConfigManAddrPortsTable  OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxLldpConfigManAddrPortsEntry
@@ -551,7 +594,7 @@ tmnxLldpStatsTxLLDPDULengthErrs  OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The number of LLDPD Length Errors recorded for the Port."
+        "The number of LLDPDU Length Errors recorded for the Port."
     REFERENCE
         "IEEE Std 802.1AB-200X 10.2.7.2"
     ::= { tmnxLldpStatsTxPortEntry 3 }
@@ -1206,6 +1249,28 @@ tmnxLldpV16v0Compliance          MODULE-COMPLIANCE
         }
     ::= { tmnxLldpCompliances 4 }
 
+tmnxLldpV24v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement the LLDP
+         MIB for release 16.0 of the SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxLldpConfigV24v0Group
+        }
+    ::= { tmnxLldpCompliances 5 }
+
+tmnxLldpV25v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement the LLDP
+         MIB for release 25.0 of the SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxLldpConfigV25v0Group
+        }
+    ::= { tmnxLldpCompliances 6 }
+
 tmnxLldpGroups                   OBJECT IDENTIFIER ::= { tmnxLldpConformance 2 }
 
 tmnxLldpConfigGroup              OBJECT-GROUP
@@ -1366,6 +1431,31 @@ tmnxLldpNotifV16v0Group          NOTIFICATION-GROUP
         "The group of notifications supporting LLDP Remote Systems Information
          for Nokia SROS series systems for release 16.0."
     ::= { tmnxLldpV16v0Groups 2 }
+
+tmnxLldpV24v0Groups              OBJECT IDENTIFIER ::= { tmnxLldpGroups 14 }
+
+tmnxLldpConfigV24v0Group         OBJECT-GROUP
+    OBJECTS     {
+        tmnxLldpPortCfgOverride
+    }
+    STATUS      current
+    DESCRIPTION
+        "The additional collection of objects which are used to configure the
+         LLDP implementation behavior for Nokia SROS systems in Release 24."
+    ::= { tmnxLldpV24v0Groups 1 }
+
+tmnxLldpV25v0Groups              OBJECT IDENTIFIER ::= { tmnxLldpGroups 15 }
+
+tmnxLldpConfigV25v0Group         OBJECT-GROUP
+    OBJECTS     {
+        tmnxLldpPortCfgTunnelNearNonTpmr,
+        tmnxLldpPortCfgTunnelNearestCust
+    }
+    STATUS      current
+    DESCRIPTION
+        "The additional collection of objects which are used to configure the
+         LLDP implementation behavior for Nokia SROS systems in Release 25."
+    ::= { tmnxLldpV25v0Groups 1 }
 
 tmnxLldpNotifications            OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 59 }
 

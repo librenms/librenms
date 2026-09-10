@@ -1,4 +1,5 @@
 <?php
+
 /**
  * BingApi.php
  *
@@ -25,9 +26,9 @@
 
 namespace App\ApiClients;
 
+use App\Facades\LibrenmsConfig;
 use Exception;
 use Illuminate\Http\Client\Response;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Geocoder;
 
 class BingApi extends BaseApi implements Geocoder
@@ -43,19 +44,19 @@ class BingApi extends BaseApi implements Geocoder
     protected function parseLatLng(array $data): array
     {
         return [
-            'lat' => isset($data['resourceSets'][0]['resources'][0]['point']['coordinates'][0]) ? $data['resourceSets'][0]['resources'][0]['point']['coordinates'][0] : 0,
-            'lng' => isset($data['resourceSets'][0]['resources'][0]['point']['coordinates'][1]) ? $data['resourceSets'][0]['resources'][0]['point']['coordinates'][1] : 0,
+            'lat' => $data['resourceSets'][0]['resources'][0]['point']['coordinates'][0] ?? 0,
+            'lng' => $data['resourceSets'][0]['resources'][0]['point']['coordinates'][1] ?? 0,
         ];
     }
 
     /**
      * Build request option array
      *
-     * @throws \Exception you may throw an Exception if validation fails
+     * @throws Exception you may throw an Exception if validation fails
      */
     protected function buildGeocodingOptions(string $address): array
     {
-        $api_key = Config::get('geoloc.api_key');
+        $api_key = LibrenmsConfig::get('geoloc.api_key');
         if (! $api_key) {
             throw new Exception('Bing API key missing, set geoloc.api_key');
         }

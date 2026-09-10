@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Eltex-MES21xx SFP Temperature
  *
@@ -18,32 +19,42 @@
  * @package    LibreNMS
  * @link       https://www.librenms.org
  *
+ * @copyright  2025 Peca Nesovanovic
+ *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-
-$low_limit = $low_warn_limit = 5;
-$high_warn_limit = $high_limit = 70;
 $divisor = 1;
+$multiplier = 1;
 
-$oids = $pre_cache['eltex-mes21xx_rlPhyTestGetResult'];
-if ($oids) {
-    d_echo('Eltex-MES SFP temperature');
-    foreach (explode("\n", $oids) as $data) {
-        if ($data) {
-            $split = trim(explode(' ', $data)[0]);
-            $value = trim(explode(' ', $data)[1]);
-            $ifIndex = explode('.', $split)[13];
-            $type = explode('.', $split)[14];
+$oids = SnmpQuery::cache()->hideMib()->walk('RADLAN-PHY-MIB::rlPhyTestGetResult')->table(1);
 
-            //type5 = temperature
-            if ($type == 5) {
-                $value = $value / $divisor;
-                $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
-                $descr = $tmp['ifName'];
-                discover_sensor(
-                    null, 'temperature', $device, $split, 'SfpTemp' . $ifIndex, 'rlPhyTestTableTransceiverTemp', 'SfpTemp-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
-                );
-            }
-        }
+foreach ($oids as $ifIndex => $data) {
+    if (isset($data['rlPhyTestGetResult']['rlPhyTestTableTransceiverTemp'])) {
+        $value = $data['rlPhyTestGetResult']['rlPhyTestTableTransceiverTemp'] / $divisor;
+        $low_limit = $low_warn_limit = 5;
+        $high_warn_limit = $high_limit = 70;
+        $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+        $descr = $port?->ifName;
+        $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.5';
+
+        app('sensor-discovery')->discover(new \App\Models\Sensor([
+            'poller_type' => 'snmp',
+            'sensor_class' => 'temperature',
+            'sensor_oid' => $oid,
+            'sensor_index' => 'SfpTemp' . $ifIndex,
+            'sensor_type' => 'rlPhyTestTableTransceiverTemp',
+            'sensor_descr' => 'SfpTemp-' . $descr,
+            'sensor_divisor' => $divisor,
+            'sensor_multiplier' => $multiplier,
+            'sensor_limit_low' => $low_limit,
+            'sensor_limit_low_warn' => $low_warn_limit,
+            'sensor_limit_warn' => $high_warn_limit,
+            'sensor_limit' => $high_limit,
+            'sensor_current' => $value,
+            'entPhysicalIndex' => $ifIndex,
+            'entPhysicalIndex_measured' => 'port',
+            'user_func' => null,
+            'group' => 'transceiver',
+        ]));
     }
 }

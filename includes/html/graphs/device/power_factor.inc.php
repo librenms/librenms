@@ -1,8 +1,6 @@
 <?php
 
-$class = 'power_factor';
-$unit = '';
-$unit_long = '';
+$class = \LibreNMS\Enum\Sensor::PowerFactor;
 
-$rrd_options .= ' -o';
+$graph_params->logarithmic = true;
 require 'includes/html/graphs/device/sensor.inc.php';

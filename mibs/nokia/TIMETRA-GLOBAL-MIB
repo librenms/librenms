@@ -154,6 +154,8 @@ timetraDCCapModule               OBJECT IDENTIFIER ::= { timetraCapabilityModule
 
 timetraMGCapModule               OBJECT IDENTIFIER ::= { timetraCapabilityModule 7 }
 
+timetraAGCapModule               OBJECT IDENTIFIER ::= { timetraCapabilityModule 8 }
+
 alcatelCommonMIBModules          OBJECT IDENTIFIER ::= { timetraModules 5 }
 
 timetraServiceRouters            OBJECT IDENTIFIER ::= { timetraReg 3 }
@@ -374,6 +376,90 @@ tmnxModelIXRr6dlReg              OBJECT-IDENTITY
         "This objectId is to be used as the mib-2 sysObjectID to identify the
          Nokia 7250 IXR-R6dl device."
     ::= { timetraServiceRouters 33 }
+
+tmnxModelSR1xDDReg               OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia 7750 SR-1x-48D device."
+    ::= { timetraServiceRouters 34 }
+
+tmnxModelSR1DDHFReg              OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia 7750 SR-1-24D device."
+    ::= { timetraServiceRouters 35 }
+
+tmnxModelSR1DDReg                OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia 7750 SR-1-48D device."
+    ::= { timetraServiceRouters 36 }
+
+tmnxModelSR1SReg                 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia 7750 SR-1-92S device."
+    ::= { timetraServiceRouters 37 }
+
+tmnxModelSR1SHFReg               OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia 7750 SR-1-46S device."
+    ::= { timetraServiceRouters 38 }
+
+tmnxModelSR1xSReg                OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia 7750 SR-1x-92S device."
+    ::= { timetraServiceRouters 39 }
+
+tmnxModelSR1seReg                OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia 7750 SR-1se device."
+    ::= { timetraServiceRouters 40 }
+
+tmnxModelSR2seReg                OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia 7750 SR-2se device."
+    ::= { timetraServiceRouters 44 }
+
+tmnxModelIXRe2Reg                OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia 7250 IXR-E2."
+    ::= { timetraServiceRouters 45 }
+
+tmnxModelIXRe2cReg               OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia 7250 IXR-E2C."
+    ::= { timetraServiceRouters 46 }
+
+tmnxModelDMS1DDHFReg             OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia 7750 DMS-1-24D device."
+    ::= { timetraServiceRouters 47 }
+
+tmnxModelSAR1Reg                 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia 7705 SAR-1 device."
+    ::= { timetraServiceRouters 50 }
 
 timetraServiceSwitches           OBJECT IDENTIFIER ::= { timetraReg 6 }
 

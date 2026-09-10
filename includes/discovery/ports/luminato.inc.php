@@ -1,4 +1,5 @@
 <?php
+
 /**
  * luminato.inc.php
  *

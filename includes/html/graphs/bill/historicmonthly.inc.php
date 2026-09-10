@@ -12,7 +12,7 @@ $graph_data = Billing::getHistoricTransferGraphData($vars['id']);
 // Reformat date labels
 for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
     if ($graph_data['ticklabels'][$i]) {
-        $parts = explode(' - ', $graph_data['ticklabels'][$i]);
+        $parts = explode(' - ', (string) $graph_data['ticklabels'][$i]);
         $start = strtotime($parts[0]);
         $end = strtotime($parts[1]);
 
@@ -58,7 +58,7 @@ $graph->xgrid->SetColor('#e0e0e0', '#efefef');
 
 function YCallback($value)
 {
-    return Number::formatBase($value, \LibreNMS\Config::get('billing.base'), 1, 0);
+    return Number::formatBase($value, \App\Facades\LibrenmsConfig::get('billing.base'), 1, 0);
 }
 
 $graph->yaxis->SetFont(FF_FONT1);

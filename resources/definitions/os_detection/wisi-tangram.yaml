@@ -1,0 +1,12 @@
+os: wisi-tangram
+text: 'WISI Tangram'
+type: network
+icon: wisi
+mib_dir: wisi
+over:
+    - { graph: device_temperature, text: Temperature }
+    - { graph: device_fanspeed, text: Fans }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.7465

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Snmp.php
  *
@@ -29,7 +30,7 @@ use Cache;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidOidException;
 
-class Oid
+class Oid implements \Stringable
 {
     public function __construct(
         public readonly string $oid
@@ -59,6 +60,11 @@ class Oid
         return (bool) preg_match('/^[.\d]+$/', $this->oid);
     }
 
+    public function isFullTextualOid(): bool
+    {
+        return (bool) preg_match('/[-_A-Za-z0-9]+::[-_A-Za-z0-9]+/', $this->oid);
+    }
+
     public function hasMib(): bool
     {
         return str_contains($this->oid, '::');
@@ -79,6 +85,11 @@ class Oid
     public function hasNumericRoot(): bool
     {
         return (bool) preg_match('/^\.?1/', $this->oid);
+    }
+
+    public function isValid(string $oid): bool
+    {
+        return $this->isNumeric() || $this->isFullTextualOid();
     }
 
     public static function hasNumeric(array $oids): bool
@@ -105,9 +116,9 @@ class Oid
     /**
      * Converts an oid to numeric and caches the result
      *
-     * @throws \LibreNMS\Exceptions\InvalidOidException
+     * @throws InvalidOidException
      */
-    public function toNumeric(string $mib = 'ALL', int $cache = 1800): string
+    public function toNumeric(?string $mib = 'ALL'): string
     {
         if ($this->isNumeric()) {
             return $this->oid;
@@ -120,7 +131,8 @@ class Oid
 
         $key = 'Oid:toNumeric:' . $this->oid . '/' . $mib;
 
-        $numeric_oid = Cache::remember($key, $cache, function () use ($mib) {
+        // only cache for this runtime
+        $numeric_oid = Cache::driver('array')->remember($key, null, function () use ($mib) {
             $snmpQuery = \SnmpQuery::numeric();
 
             if ($mib) {
@@ -140,5 +152,53 @@ class Oid
     public function __toString(): string
     {
         return $this->oid;
+    }
+
+    /**
+     * Try to parse an oid into a string.
+     *
+     * @param  string  $oid  The OID to parse
+     * @param  string  $format  Format string: 'n' = numeric (1 part), 's' = string (length + data)
+     *                          Example: 'nns' = skip 2 numerics, then extract first string
+     *                          Example: 'ss' = skip first string, extract second string
+     *                          Example: 'nsns' = skip numeric, string, numeric, then extract string
+     * @return string The extracted string, or empty string if not found
+     */
+    public static function stringFromOid(string $oid, string $format = 's'): string
+    {
+        $parts = explode('.', $oid);
+        $count = count($parts);
+        $offset = 0;
+
+        for ($i = 0; $i < strlen($format); $i++) {
+            $type = $format[$i];
+
+            if ($offset >= $count) {
+                return ''; // ran out of parts
+            }
+
+            if ($type === 'n') {
+                // Numeric index - just skip one position
+                $offset++;
+            } elseif ($type === 's') {
+                // String - read length prefix and data
+                $length = (int) ($parts[$offset] ?? 0);
+                $offset++; // move past the length byte
+
+                // If this is the last 's' in the format, extract and return
+                if ($i === strlen($format) - 1) {
+                    if ($offset + $length > $count) {
+                        return ''; // not enough data
+                    }
+
+                    return pack('C*', ...array_slice($parts, $offset, $length));
+                }
+
+                // Otherwise skip this string's data
+                $offset += $length;
+            }
+        }
+
+        return '';
     }
 }

@@ -14,11 +14,14 @@ echo generate_link('Totals', $link_array) . ' | Instances: ';
 $sagan_instances = $app->data['instances'] ?? [];
 sort($sagan_instances);
 foreach ($sagan_instances as $index => $sinstance) {
-    $label = $vars['sinstance'] == $sinstance
-        ? '<span class="pagemenu-selected">' . $sinstance . '</span>'
-        : $sinstance;
+    $label = $sinstance;
+    $link = generate_link($label, $link_array, ['sinstance' => $sinstance]);
 
-    echo generate_link($label, $link_array, ['sinstance' => $sinstance]);
+    $link = $vars['sinstance'] == $sinstance
+        ? '<span class="pagemenu-selected">' . $link . '</span>'
+        : $link;
+
+    echo $link;
 
     if ($index < (count($sagan_instances) - 1)) {
         echo ', ';
@@ -49,7 +52,7 @@ foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 

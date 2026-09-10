@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FileNotFoundException.php
  *

@@ -1,0 +1,36 @@
+<?php
+
+return [
+    'slas' => [
+        'types' => [
+            'dhcp' => 'DHCP',
+            'dlsw' => 'DLSW',
+            'dns' => 'DNS',
+            'DnsQuery' => 'DNS 查詢',
+            'echo' => 'ICMP Ping',
+            'ethernetJitter' => '乙太網路抖動',
+            'ethernetPing' => '乙太網路 Ping',
+            'fileIO' => '檔案 I/O',
+            'ftp' => 'FTP',
+            'http' => 'HTTP',
+            'HttpGet' => 'HTTP Get',
+            'HttpGetMetadata' => 'HTTP Get 中繼資料',
+            'IcmpEcho' => 'ICMP Echo',
+            'icmpjitter' => 'ICMP 抖動',
+            'IcmpTimeStamp' => 'ICMP 時間戳記',
+            'jitter' => '抖動',
+            'lspGroup' => 'LSP 群組',
+            'lspPing' => 'LSP Ping',
+            'lspPingPseudowire' => 'LSP Pseudowire Ping',
+            'lspTrace' => 'LSP 追蹤',
+            'NtpQuery' => 'NTP 查詢',
+            'pathEcho' => '路徑 ICMP Ping',
+            'rtp' => 'RTP',
+            'script' => '指令碼',
+            'tcpConnect' => 'TCP 連線',
+            'udpEcho' => 'UDP Ping',
+            'UdpTimestamp' => 'UDP 時間戳記',
+            'voip' => 'VoIP',
+        ],
+    ],
+];

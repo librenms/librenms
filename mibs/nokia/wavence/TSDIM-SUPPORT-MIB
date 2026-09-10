@@ -1,0 +1,3919 @@
+--
+
+TSDIM-SUPPORT-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, OBJECT-IDENTITY,
+    NOTIFICATION-TYPE, IpAddress FROM SNMPv2-SMI
+    RowStatus, TruthValue, DisplayString, InstancePointer,
+    DateAndTime, TEXTUAL-CONVENTION FROM SNMPv2-TC
+    TsdimAlmSeverity, TsdimAPTAlmSeverity, TsdimAlmProbableCause,
+    TsdimObjectClassId, TsdimObjectInstanceId, TsdimNotificationId,
+    TsdimAlmSpecProblem, TsdimAdministrativeState, TsdimOperationalState,
+    TsdimUdpPort, TsdimEventTimeInt, OpticsIMUserLabel,
+    GenEventLogObj FROM TSDIM-SNMP-TC
+    OpticsIMSwdlStatusIndicator, OpticImFileTrasferProtocolList FROM OPTICSIM-COMMON-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF
+    tsdimBasicMib, tsdimBasicMC FROM TSDIM-BASICREG-MIB
+--    InetAddressIPv6 FROM INET-ADDRESS-MIB
+;
+
+tsdimSupportMib MODULE-IDENTITY
+
+    LAST-UPDATED "202503130000Z"
+    ORGANIZATION "Alcatel OND"
+    CONTACT-INFO "Alcatel OND"
+    DESCRIPTION
+      "TSD-IM Support MIB"
+
+    REVISION "202504070000Z"
+    DESCRIPTION
+    " Added 2 new values for opticsIMPasswordUpdateResult:
+      newPasswordNotComplyingWithMinPassLength and newPasswordNotComplyingComplexityRules.
+    "
+
+   REVISION "202504070000Z"
+    DESCRIPTION
+    " Added for Swdownload using HTTPS protocol the new objects:
+       -- xhaulSwdlSwNextFile
+       -- xhaulSwdlSwProcessFile
+       "
+
+    REVISION "202503120000Z"
+    DESCRIPTION
+    " Changed opticsIMEFDUserName on opticsIMEFDExtensionTable from read-only to read-write.
+       "
+
+    REVISION "202501080000Z"
+    DESCRIPTION
+    " Added new values to opticsIMRestoreState.
+       "
+
+    REVISION "202411250000Z"
+    DESCRIPTION
+    " Removed blank spaces for enumeration objects.
+       "
+
+    REVISION "202411200000Z"
+    DESCRIPTION
+    " Added opticsIMAlarmLogOperatorText to tsdIMAlarmLogTable.
+       "
+
+     REVISION "202411050000Z"
+     DESCRIPTION
+    " Added opticsIMSwPackageRelease to opticsIMSwPackageTable.
+       "
+
+     REVISION "202410140000Z"
+     DESCRIPTION
+    "Removed tsdimAlarmSevEnhTable table.
+       "
+
+     REVISION "202410030000Z"
+     DESCRIPTION
+    "Added opticsIMAlarmsSeveritySummaryTable table.
+       "
+
+     REVISION "202407290000Z"
+     DESCRIPTION
+    "Added opticsIMNeAltitude object.
+       "
+
+     REVISION "202404160000Z"
+     DESCRIPTION
+    "- Updated some mistakes on the followig:
+        -- deleted duplication of opticsIMAdditionalText  and opticsIMAlarmType.
+       "
+
+     REVISION "202403190000Z"
+     DESCRIPTION
+    "- Updated some mistakes on the followig:
+        -- tsdimObjectCreationNotification
+        -- opticsIMProtectionSwitchReporting, removing duplicated object inside (tsdimEventObjectInstanceIdentifier)
+        -- opticsIMRestoreState (removing spaces)
+       "
+
+     REVISION "202311020000Z"
+     DESCRIPTION
+     " - added object opticsImUalUploadServerIpv6Address.
+       "
+
+     REVISION "202310260000Z"
+     DESCRIPTION
+     " - added opticsIMSupportMibObjPswdUpdateServ
+          OBJECT IDENTIFIER with the following
+          SNMP scalar objects:
+             opticsImPasswordUpdateFilename,
+             opticsImPasswordUpdateFileHash and
+             opticsIMPasswordUpdateResult.
+       "
+
+    REVISION    "202304030000Z"
+    DESCRIPTION
+        " - Added opticsImSecureLogUploadTransferProtocolHostKey  scalar object to the GROUP tsdimSupportMibObjUALUploadServ.
+       "
+
+    REVISION    "202210140000Z"
+    DESCRIPTION
+        " - Added opticsIMSupportMibObjFileTransferServ OBJECT IDENTIFIER with  opticsIMFileTransferServerAddress, opticsIMFileTransferServerAddressIpv6  , opticsIMFileTransferServerPort, opticsIMFileTransferServerUserId, opticsIMFileTransferServerPassword, opticsIMFileTransferServerRootDir.
+opticsIMFileTransferState  scalar Objects.
+    - Added opticsIMRSLFileName e opticsIMIandCFileName scalar objects.
+       "
+    REVISION    "201905030000Z"
+    DESCRIPTION
+        " Added opticsIMBackupServerIPv6Address and  opticsIMRestoreServerIPv6Address scalar Objects.
+       "
+
+    REVISION    "201810160000Z"
+    DESCRIPTION
+        " Added opticsIMSupportMibObjAntiTheft Object Identifier.
+
+      Added the following scalar objects:
+        - opticsIMAntiTheftAdminStatus
+        - opticsIMAntiTheftTimerExpiration
+        - opticsIMAntiTheftManagerKeyCode
+
+    Added the following notification:
+        - opticsIMSendKeyCode
+       "
+
+    REVISION    "201605060000Z"
+    DESCRIPTION
+        "- SNMPIDL-519, added OpticsIMHttpsStatus object.
+      - SNMPIDL-520, added opticsIMEFDExtensionTable table.
+     "
+
+    REVISION    "201601200000Z"
+    DESCRIPTION
+        "- SNMPIDL-507, update LAST-UPDATED and REVISION date format adding the 2 digits missing (20) for yers after 1999.
+Added a REVISION block corresponding to the LAST-UPDATED timestamp.
+           - SNMPIDL-508, added a space between opening and closing braces and the enclosed content.
+    Added TEXTUAL-CONVENTION FROM SNMPv2-TC.
+        "
+
+    REVISION    "201410300000Z"
+    DESCRIPTION
+      "D.Spreafico:
+       Added
+       - opticsIMNeHttpServerPort
+      "
+
+    REVISION    "201405090000Z"
+    DESCRIPTION
+      "D.Spreafico:
+       Added
+       - opticsIMNeLongitude,
+       - opticsIMNeLatitude
+      "
+
+    REVISION    "201401060000Z"
+    DESCRIPTION
+      "D.Spreafico:
+       Added
+       - opticsIMFileTrasferProtocolType,
+       - opticsImSecureFileTrasferProtocolHostKey
+      "
+
+    REVISION    "201307060000Z"
+    DESCRIPTION
+      "D.Spreafico:
+       removed an accented u on a DESCRIPTION
+      "
+
+    REVISION    "201206080000Z"
+    DESCRIPTION
+      "OPTnm10120 - D.Spreafico:
+       Added
+       - tsdimEFDIPv6Dest on  tsdimEFDTable
+       - opticsImSwdlServerIPv6Address scalar object.
+      "
+
+    REVISION    "201204120000Z"
+    DESCRIPTION
+      "OPTnm07663 - D.Spreafico:
+       Added
+       - opticsImManagementProtocolsCapability
+       - opticsImSwdlServerTrasferProtocolType
+       - opticsImSwdlServerSecureTrasferProtocolHostKey
+      "
+
+    REVISION    "200911120000Z"
+    DESCRIPTION
+      "S.Torassa:
+       Inserted the tsdimAlarmSevEnhTable for extending the
+       TsdimAlmSeverity enumerate values adding notalarmed and
+       notreported.
+       These values are used for aligning SNMP to TL1. They are
+       not managed by the EML-IM software, that remains compliant
+       with the X721 and X733 standard documents."
+
+    REVISION    "200908080000Z"
+    DESCRIPTION
+    " To add following two objects:
+        opticsIMTelnetStatus
+        opticsIMSftpStatus
+      To support UAL features by adding the following objects:
+    - opticsImUALUploadServerAddress,
+      opticsImUALUploadServerPort,
+      opticsImUALUploadServerUserId,
+      opticsImUALUploadServerPassword,
+      opticsImUALUploadServerRootDir
+      opticsIMUalUploadFilename
+      opticsIMUalUploadRequestorAddress
+      opticsIMUalUploadState
+      (to the GROUP tsdimSupportMibObjUALUploadServ)
+    - opticsImUalLogFileSize
+      opticsImUalLogEvent
+      (to the GROUP tsdimSupportMibObjUalConfiguration)
+    - opticsImUalSECULog
+      opticsImUalCOMMLog
+      opticsImUalEQPTLog
+      opticsImUalDATALog
+      (to the GROUP opticsImUalLogEvent)
+    "
+
+
+    REVISION  "200802280000Z"
+    DESCRIPTION
+    "Updated the conformance statement of opticsIMSupportBckRstGroup by adding the
+    following objects:
+    - opticsImBackupServerAddress,
+    - opticsImBackupServerPort,
+    - opticsImBackupServerUserId,
+    - opticsImBackupServerPassword,
+    - opticsImBackupServerRootDir,
+    - opticsImRestoreServerAddress,
+    - opticsImRestoreServerPort,
+    - opticsImRestoreServerUserId,
+    - opticsImRestoreServerPassword,
+    - opticsImRestoreServerRootDir,
+    - opticsIMRestorePercentage,
+    - opticsIMRestoreTotalBytes,
+    - opticsIMRestoreCurrentFile
+    ."
+
+    REVISION  "200711290000Z"
+    DESCRIPTION
+    " The opticsIMSwLicense scalar object is added.
+    "
+
+    REVISION  "200707190000Z"
+    DESCRIPTION
+    " Thanks to VzB and AOI people, cosmetic changes are made
+      in order to fix some lacks in the source MIB.
+      - The opticsIMOptAbnCondGroupGroup has been renamed as opticsIMOptAbnCondGroup
+      - The tsdimAuxObjectsGroup has been renamed as tsdimOptAuxObjectsGroup
+      - The opticsIMSupportBckAndRstGroup has been renamed as opticsIMSupportBckRstGroup
+      - The tsdimAuxEventObjectGroup has been renamed as tsdimAuxEventObjectsGroup
+
+      Updated the object:
+      - opticsIMNERestartRequest
+         * added cold, warm and DBTruncate restart values
+     "
+    REVISION  "200610190000Z"
+    DESCRIPTION
+    " Ed. 20
+    Added the objects:
+      - opticsIMLicenseCode
+      - opticsIMLedsReset
+      - opticsIMLedsResetStatus
+    "
+
+    REVISION "200510270000Z"
+    DESCRIPTION
+    " Ed. 19
+      Added the objects:
+      - opticsImBackupServerAddress,
+        opticsImBackupServerPort,
+        opticsImBackupServerUserId,
+        opticsImBackupServerPassword,
+        opticsImBackupServerRootDir
+        (to the GROUP tsdimSupportMibObjBackupServ)
+      - opticsImRestoreServerAddress,
+        opticsImRestoreServerPort,
+        opticsImRestoreServerUserId,
+        opticsImRestoreServerPassword,
+        opticsImRestoreServerRootDir
+        (to the GROUP tsdimSupportMibObjRestoreServ)
+      - opticsIMRestorePercentage,
+        opticsIMRestoreTotalBytes,
+        opticsIMRestoreCurrentFile
+        (to the GROUP tsdimSupportMibObjRestoreOp)
+      - opticsImPMCollectionServerAddress,
+        opticsImPMCollectionServerPort,
+        opticsImPMCollectionServerUserId,
+        opticsImPMCollectionServerPassword,
+        opticsImPMCollectionServerRootDir
+        (to the GROUP tsdimSupportMibObjPMCollectionServ)
+      - opticsImMACAddressCollectionServerAddress
+        opticsImMACAddressCollectionServerPort,
+        opticsImMACAddressCollectionServerUserId,
+        opticsImMACAddressCollectionServerPassword,
+        opticsImMACAddressCollectionServerRootDir
+        (to the GROUP tsdimSupportMibObjMACAddressCollectionServ)
+      - opticsImFileTrasferProtocolsCapability
+      - opticsImFileTrasferProtocolConfigured
+    "
+    REVISION "200504070000Z"
+    DESCRIPTION
+    " Added the objects:
+      - opticsIMenableAutodiscovery
+      - opticsIMautoDiscoveryStatus
+      - opticsimSnmpMainOSIpAddress
+      - opticsimSnmpMainOSUdpPort
+      - opticsimSnmpSpareOSIpAddress
+      - opticsimSnmpSpareOSUdpPort
+    "
+    REVISION "200412140000Z"
+    DESCRIPTION
+        " In tsdimAlarmSevtable added clause IMPLIED on tsdimAlarmSevTrapId.
+      In opticsIMRestoreState scalar object updated the DESCRIPTION
+      to remove any reference to Q3 model"
+
+    REVISION "200404300000Z"
+    DESCRIPTION
+        " Added tsdimAllAlarms object.
+        Added columnar object tsdimAlarmSevProbableCause to tsdimAlarm
+     SevTable"
+
+    REVISION "200310100000Z"
+    DESCRIPTION
+        " Added the description object on abnormal condition table."
+    REVISION "200307250000Z"
+    DESCRIPTION
+        " Added the equipment software unit table."
+    REVISION "200303140000Z"
+    DESCRIPTION
+        " Added the backup state object and a time object on
+          APT, event and alarm log tables."
+    REVISION "200211050000Z"
+    DESCRIPTION
+        " The management of abnormal conditions and alarm service
+          dependency in ASAP definition have been added. "
+    REVISION "200207240000Z"
+    DESCRIPTION
+        "Added/modified the software download and IP routing features. "
+    REVISION "200205100000Z"
+    DESCRIPTION
+        "Modified the behaviour of maxNotification attribuite. "
+    REVISION "200201250000Z"
+    DESCRIPTION
+        "New event: NE Protection Switching notification
+         New wildcard event object for EFD "
+    REVISION "200104130000Z"
+    DESCRIPTION
+        "RowChangeNotification event has been added and
+         bug fixing in the Log object."
+    REVISION "200101290000Z"
+    DESCRIPTION
+        "UserLabel became OpticsIMUserLabel"
+    REVISION "2009290000Z"
+    DESCRIPTION
+        "The alarm optional objects have been deleted."
+    REVISION "2007010000Z"
+    DESCRIPTION
+        "It has been replace the Restore table with scalar objects.
+         Moreover the requestor information both for Backup and
+         Restore operation have been added."
+    REVISION "2005090000Z"
+    DESCRIPTION
+        "It has been deleted the event time string.Moreover it has been
+         changed the indexes order between Notification Identifier
+         and Event Time in all tables"
+    REVISION "2002290000Z"
+    DESCRIPTION
+        "The tsdimAbsoluteTime object has been deleted,
+         while the TsdimAPTAlmSeverity textual convention has been moved
+         from this MIB to the TSDIM-SNMP-TC.
+         The APT table has been changed as a consequence of the alarm
+         management proposal, moreover they have been defined a list
+         of objects needed for alarm and event creation and their logging
+         in a persistent way.
+         Furthermore the LAC objects have been moved to the SNMP-NE MIB."
+    REVISION "9906240000Z"
+    DESCRIPTION
+        "Changed the tsdimAPTAlarmRowStatus manager type of access"
+    REVISION "9906240000Z"
+    DESCRIPTION
+        "Initial Release TSD-IM Support MIB"
+
+::= { tsdimBasicMib 3 }
+
+tsdimSupportMibObject      OBJECT IDENTIFIER ::= { tsdimSupportMib 1 }
+tsdimSupportMibObjSwdlServ
+                      OBJECT IDENTIFIER ::= { tsdimSupportMibObject 500 }
+tsdimSupportMibObjSwdlOp
+                      OBJECT IDENTIFIER   ::= { tsdimSupportMibObject 515 }
+opticsIMSupportMibObjAbnCond
+                      OBJECT IDENTIFIER ::= { tsdimSupportMibObject 530 }
+
+
+-- TEXTUAL-CONVENTION
+
+InetAddressIPv6 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x"
+    STATUS       current
+    DESCRIPTION
+        "Represents an IPv6 network address:
+
+           Octets   Contents         Encoding
+            1-16    IPv6 address     network-byte order
+
+         The corresponding InetAddressType value is ipv6(2).
+
+         This textual convention SHOULD NOT be used directly in object
+         definitions, as it restricts addresses to a specific format.
+         However, if it is used, it MAY be used either on its own or in
+         conjunction with InetAddressType, as a pair."
+    SYNTAX       OCTET STRING (SIZE (16))
+
+
+
+-- tsdimMaxNotificationId
+
+tsdimMaxNotificationId OBJECT-TYPE
+    SYNTAX TsdimNotificationId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This is the maximum value of the notification identifier counter
+         generated by SNMP NE.
+         The next notification identifier value, after this maximum value
+         will be equal to one because the counter has wrapped."
+::= { tsdimSupportMibObject 1 }
+
+-- tsdimAPTTable
+
+tsdimAPTTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TsdimAPTEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "This table defines the TSDIM APT table.
+          This table is used by Agent in order to store the active alarms,
+          managing system can only read them."
+::= { tsdimSupportMibObject 2 }
+
+tsdimAPTEntry OBJECT-TYPE
+    SYNTAX TsdimAPTEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about a single alarm in the APT.
+         Entries in this table are created by SNMP NE and will be
+         automatically deleted by SNMP NE when it is
+         genereted a cleared-alarm."
+    INDEX { tsdimAPTAlarmTimeIndex, tsdimAPTAlarmNotificationId}
+::= { tsdimAPTTable 1 }
+
+TsdimAPTEntry ::= SEQUENCE {
+    tsdimAPTAlarmProbableCause TsdimAlmProbableCause,
+    tsdimAPTAlarmObjectClassIdentifier TsdimObjectClassId,
+    tsdimAPTAlarmObjectInstanceIdentifier TsdimObjectInstanceId,
+    tsdimAPTAlarmNotificationId TsdimNotificationId,
+    tsdimAPTAlarmSeverity TsdimAPTAlmSeverity,
+    tsdimAPTAlarmSpecificProb TsdimAlmSpecProblem,
+    tsdimAPTAlarmTimeIndex TsdimEventTimeInt,
+    opticsIMAPTAdditionalText DisplayString,
+    opticsIMAPTAlarmType DisplayString,
+    tsdimAPTAlarmTime  DateAndTime
+    }
+
+tsdimAPTAlarmProbableCause OBJECT-TYPE
+    SYNTAX TsdimAlmProbableCause
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "See textual conventions."
+::= { tsdimAPTEntry 1 }
+
+tsdimAPTAlarmObjectClassIdentifier OBJECT-TYPE
+     SYNTAX TsdimObjectClassId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimAPTEntry 2 }
+
+
+tsdimAPTAlarmObjectInstanceIdentifier OBJECT-TYPE
+    SYNTAX TsdimObjectInstanceId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimAPTEntry 3 }
+
+tsdimAPTAlarmNotificationId OBJECT-TYPE
+    SYNTAX TsdimNotificationId
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimAPTEntry 4 }
+
+tsdimAPTAlarmSeverity OBJECT-TYPE
+    SYNTAX TsdimAPTAlmSeverity
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimAPTEntry 6 }
+
+tsdimAPTAlarmSpecificProb OBJECT-TYPE
+    SYNTAX TsdimAlmSpecProblem
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions.
+         This object is only present if it was included in the
+         alarm trap corresponding to this APT entry."
+::= { tsdimAPTEntry 7 }
+
+tsdimAPTAlarmTimeIndex OBJECT-TYPE
+    SYNTAX TsdimEventTimeInt
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimAPTEntry 11 }
+
+opticsIMAPTAdditionalText OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        ""
+::= { tsdimAPTEntry 12 }
+
+opticsIMAPTAlarmType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        ""
+::= { tsdimAPTEntry 13 }
+
+tsdimAPTAlarmTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This optional object indicates when the alarm has been generated."
+::= { tsdimAPTEntry 14 }
+
+-- tsdimLogTable
+
+tsdimLogTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF    TsdimLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table defines the characteristics of the logs, both alarms
+         and events, currently maintained by the agent.
+         It is a common table that describes the behavior of the two logs,
+         in-fact it contains generic attributes not related to the type of
+         records stored inside logs."
+::= { tsdimSupportMibObject 3 }
+
+tsdimLogEntry OBJECT-TYPE
+    SYNTAX TsdimLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about the characteristics of a single log."
+    INDEX { tsdimLogIndex }
+::= {  tsdimLogTable 1 }
+
+TsdimLogEntry ::= SEQUENCE {
+     tsdimLogIndex Integer32,
+     tsdimLogObjectClassIdentifier OBJECT IDENTIFIER,
+     tsdimLogAdminStatus TsdimAdministrativeState,
+     tsdimLogOperStatus TsdimOperationalState,
+     tsdimLogMaxSize                  Integer32 }
+
+tsdimLogIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Indicates the index of the log."
+::= { tsdimLogEntry 1 }
+
+tsdimLogObjectClassIdentifier OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object defines the SNMP entry table object identity
+         of the log of which this row is referred to."
+::= { tsdimLogEntry 2 }
+
+tsdimLogAdminStatus OBJECT-TYPE
+    SYNTAX TsdimAdministrativeState
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "See textual conventions.
+"
+::= { tsdimLogEntry 3 }
+
+tsdimLogOperStatus OBJECT-TYPE
+    SYNTAX TsdimOperationalState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimLogEntry 4 }
+
+tsdimLogMaxSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates the maximum size of the log.
+         This value specifies the maximum number of records that can
+         be stored inside the log"
+::= { tsdimLogEntry 5 }
+
+-- tsdimEventLogTable
+
+tsdimEventLogTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF TsdimEventLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contain information about single event notification
+         not alarm. Entries in this table are created automatically by
+         Agent and they are never deleted because the Log behavior is
+         automatically set to Wrap, hence when no more entry will be
+         created (log full) new log entry will cause the deletion
+         of the oldest one."
+::= { tsdimSupportMibObject 4 }
+
+tsdimEventLogEntry OBJECT-TYPE
+    SYNTAX TsdimEventLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the tsdimEventLogTable"
+    INDEX { tsdimEventLogEventTimeIndex, tsdimEventLogNotificationId }
+::= { tsdimEventLogTable 1 }
+
+TsdimEventLogEntry ::= SEQUENCE {
+    tsdimEventLogEventType                INTEGER,
+    tsdimEventLogObjectClassIdentifier    TsdimObjectClassId,
+    tsdimEventLogObjectInstanceIdentifier TsdimObjectInstanceId,
+    tsdimEventLogNotificationId           TsdimNotificationId,
+    tsdimEventLogEventTimeIndex           TsdimEventTimeInt,
+    opticsIMEventLogAdditionalText        DisplayString,
+    tsdimEventLogTime                     DateAndTime
+    }
+
+tsdimEventLogEventType OBJECT-TYPE
+    SYNTAX INTEGER {
+        objectCreation       (1),
+        objectDeletion       (2),
+        attributeValueChange (3),
+        stateChange          (4) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object describes the type of the event logged."
+::= { tsdimEventLogEntry 1 }
+
+tsdimEventLogObjectClassIdentifier OBJECT-TYPE
+    SYNTAX TsdimObjectClassId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimEventLogEntry 2 }
+
+tsdimEventLogObjectInstanceIdentifier OBJECT-TYPE
+    SYNTAX TsdimObjectInstanceId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimEventLogEntry 3 }
+
+tsdimEventLogNotificationId OBJECT-TYPE
+    SYNTAX TsdimNotificationId
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimEventLogEntry 4 }
+
+tsdimEventLogEventTimeIndex OBJECT-TYPE
+    SYNTAX TsdimEventTimeInt
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimEventLogEntry 6 }
+
+opticsIMEventLogAdditionalText OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        ""
+::= { tsdimEventLogEntry 7 }
+
+tsdimEventLogTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This optional object indicates when the event has been generated."
+::= { tsdimEventLogEntry 9 }
+
+-- tsdimAlarmLogTable
+
+tsdimAlarmLogTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TsdimAlarmLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "This table defines the TSDIM Alarm Log table.
+          It is used to store the alarms generated by SNMP NE."
+::= { tsdimSupportMibObject 5 }
+
+
+tsdimAlarmLogEntry OBJECT-TYPE
+    SYNTAX TsdimAlarmLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information about single alarm notification.
+         Entries in this table are created automatically by
+         Agent and they are never deleted because the Log behavior is
+         automatically set to Wrap, hence when no more entry will be
+         created (log full) new log entry will cause the deletion
+         of the oldest one."
+    INDEX { tsdimAlarmLogTimeIndex, tsdimAlarmLogNotificationId }
+::= { tsdimAlarmLogTable 1 }
+
+TsdimAlarmLogEntry ::= SEQUENCE {
+    tsdimAlarmLogProbableCause TsdimAlmProbableCause,
+    tsdimAlarmLogObjectClassIdentifier TsdimObjectClassId,
+    tsdimAlarmLogObjectInstanceIdentifier TsdimObjectInstanceId,
+    tsdimAlarmLogNotificationId TsdimNotificationId,
+    tsdimAlarmLogSeverity                 TsdimAlmSeverity,
+    tsdimAlarmLogSpecificProb TsdimAlmSpecProblem,
+    tsdimAlarmLogTimeIndex TsdimEventTimeInt,
+    opticsIMAlarmLogAdditionalText DisplayString,
+    opticsIMAlarmLogAlarmType DisplayString,
+    tsdimAlarmLogTime  DateAndTime,
+    opticsIMAlarmLogOperatorText DisplayString
+    }
+
+tsdimAlarmLogProbableCause OBJECT-TYPE
+    SYNTAX TsdimAlmProbableCause
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "See textual conventions."
+::= { tsdimAlarmLogEntry 1 }
+
+tsdimAlarmLogObjectClassIdentifier OBJECT-TYPE
+    SYNTAX TsdimObjectClassId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimAlarmLogEntry 2 }
+
+
+tsdimAlarmLogObjectInstanceIdentifier OBJECT-TYPE
+    SYNTAX TsdimObjectInstanceId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimAlarmLogEntry 3 }
+
+tsdimAlarmLogNotificationId OBJECT-TYPE
+    SYNTAX TsdimNotificationId
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimAlarmLogEntry 4 }
+
+tsdimAlarmLogSeverity OBJECT-TYPE
+    SYNTAX TsdimAlmSeverity
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The perceived severity of the alarm, as specified by
+         the agent that generated it."
+::= { tsdimAlarmLogEntry 6 }
+
+tsdimAlarmLogSpecificProb OBJECT-TYPE
+    SYNTAX TsdimAlmSpecProblem
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions.
+         This object is only present if it was included in the
+         alarm trap corresponding to this AlarmLog entry."
+::= { tsdimAlarmLogEntry 7 }
+
+tsdimAlarmLogTimeIndex OBJECT-TYPE
+    SYNTAX TsdimEventTimeInt
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimAlarmLogEntry 11 }
+
+opticsIMAlarmLogAdditionalText OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        ""
+::= { tsdimAlarmLogEntry 12 }
+
+opticsIMAlarmLogAlarmType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        ""
+::= { tsdimAlarmLogEntry 13 }
+
+tsdimAlarmLogTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This optional object indicates when the alarm has been generated."
+::= { tsdimAlarmLogEntry 14 }
+
+opticsIMAlarmLogOperatorText OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object allows for operator to insert a text associated to this alarm."
+::= { tsdimAlarmLogEntry 15 }
+
+-- tsdimEFDAllTraps
+
+tsdimEFDAllTraps OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "This value is used as wildcard value inside tsdimEFDTrapId."
+::= { tsdimSupportMibObject 6 }
+
+-- tsdimEFDAllObjects
+
+tsdimEFDAllObjects OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "This value is used as wildcard value inside tsdimEFDTrapObject."
+::= { tsdimSupportMibObject 7 }
+
+
+-- tsdimEFDAllAlarms
+
+tsdimEFDAllAlarms OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "This value is used as alarms, not generic events, wildcard value
+      inside tsdimEFDTrapObject."
+::= { tsdimSupportMibObject 57 }
+
+
+-- tsdimEFDTable
+
+tsdimEFDTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TsdimEFDEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies which traps will be sent to
+         which management system.
+         This EFD object is locked, via administrative state, by Agent
+         when the first manager polling timeout expires and it is
+         deleted when the second timeout expires."
+::= { tsdimSupportMibObject 8 }
+
+tsdimEFDEntry OBJECT-TYPE
+    SYNTAX    TsdimEFDEntry
+    MAX-ACCESS not-accessible
+    STATUS    current
+    DESCRIPTION
+        "Information about a group of traps to be sent to
+         a particular IP address.
+
+         A new entry must have values for all attributes that
+         do not have default values before its RowStatus column
+         can be set to active(1)."
+    INDEX { tsdimEFDIndex }
+::= { tsdimEFDTable 1 }
+
+TsdimEFDEntry ::= SEQUENCE {
+     tsdimEFDIndex                   Integer32,
+     tsdimEFDDest                    IpAddress,
+     tsdimEFDTrapId                  OBJECT IDENTIFIER,
+     tsdimEFDTrapObject              OBJECT IDENTIFIER,
+     tsdimEFDPort                    TsdimUdpPort,
+     tsdimEFDLowestForwardedSeverity TsdimAlmSeverity,
+     tsdimEFDIndeterminate           TruthValue,
+     tsdimEFDOperStatus              TsdimOperationalState,
+     tsdimEFDRowStatus               RowStatus,
+     tsdimEFDManagerIndex            Integer32,
+     tsdimEFDIPv6Dest                InetAddressIPv6
+          }
+
+tsdimEFDIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A unique number identifying the table entry.
+         Each manager has its own index associated to it."
+::= { tsdimEFDEntry 1 }
+
+tsdimEFDDest OBJECT-TYPE
+    SYNTAX    IpAddress
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+          "The IP address to which traps identified by this
+          table entry should be sent."
+::= { tsdimEFDEntry 2 }
+
+tsdimEFDTrapId OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The ID of the trap type to which this entry applies.
+         It can be set to tsdimEFDAllTraps OID in order to identify all
+         traps."
+::= { tsdimEFDEntry 3 }
+
+tsdimEFDTrapObject OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The object class to which this entry applies.
+         The special value tsdimEFDAllObjects indicates that
+         traps of the type specified in tsdimEFDTrapId object can
+         be generated by all object instances."
+::= { tsdimEFDEntry 4 }
+
+tsdimEFDPort OBJECT-TYPE
+    SYNTAX TsdimUdpPort
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The UDP port on the specified management system to
+         which traps identified by this entry should be sent."
+::= { tsdimEFDEntry 5 }
+
+tsdimEFDLowestForwardedSeverity OBJECT-TYPE
+    SYNTAX TsdimAlmSeverity
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The lowest severity of traps of this type from
+         the specified object that should be sent to this
+         address.
+         This object has significance only if the trap type
+         specified has a severity associated with it."
+::= { tsdimEFDEntry 6 }
+
+tsdimEFDIndeterminate OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "When this object has the value TRUE, traps with indeterminate
+         severity will be forwarded to the specified destination.
+         This object has significance only if the trap type
+         specified has a severity associated with it."
+::= { tsdimEFDEntry 7 }
+
+tsdimEFDOperStatus OBJECT-TYPE
+    SYNTAX TsdimOperationalState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimEFDEntry 9 }
+
+tsdimEFDRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object is used to create a new row or to delete
+         an existing row in the table."
+::= { tsdimEFDEntry 10 }
+
+tsdimEFDManagerIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "A unique number identifying the manager description inside the
+         opticsIMMgrPollingInfoTable. It will have the same value as
+         the opticsIMMgrPollingInfoTable index columnar object."
+::= { tsdimEFDEntry 11 }
+
+tsdimEFDIPv6Dest OBJECT-TYPE
+    SYNTAX    InetAddressIPv6
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+          "The IP address in the IPv6 format to which traps identified by this
+          table entry should be sent."
+::= { tsdimEFDEntry 12 }
+
+
+-- tsdimEventObjectClassIdentifier
+
+tsdimEventObjectClassIdentifier OBJECT-TYPE
+    SYNTAX TsdimObjectClassId
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimSupportMibObject 9 }
+
+
+-- tsdimEventObjectInstanceIdentifier
+
+tsdimEventObjectInstanceIdentifier OBJECT-TYPE
+    SYNTAX TsdimObjectInstanceId
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimSupportMibObject 10 }
+
+-- tsdimEventNotificationId
+
+tsdimEventNotificationId OBJECT-TYPE
+    SYNTAX TsdimNotificationId
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimSupportMibObject 11 }
+
+-- tsdimEventTime
+
+tsdimEventTime OBJECT-TYPE
+    SYNTAX TsdimEventTimeInt
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimSupportMibObject 12 }
+
+-- tsdimAlarmSeverity
+
+tsdimAlarmSeverity OBJECT-TYPE
+    SYNTAX TsdimAlmSeverity
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimSupportMibObject 13 }
+
+-- tsdimAlarmSpecProblem
+
+tsdimAlarmSpecProblem OBJECT-TYPE
+    SYNTAX TsdimAlmSpecProblem
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimSupportMibObject 14 }
+
+opticsIMAdditionalText OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This optional object indicates when the alarm has been generated."
+::= { tsdimSupportMibObject 64 }
+
+opticsIMAlarmType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This optional object indicates when the alarm has been generated."
+::= { tsdimSupportMibObject 65 }
+
+-- tsdimObjectCreationNotification
+
+tsdimObjectCreationNotification NOTIFICATION-TYPE
+    OBJECTS { tsdimEventObjectClassIdentifier,
+              tsdimEventObjectInstanceIdentifier,
+              tsdimEventNotificationId,
+              tsdimEventTime,
+              opticsIMAdditionalText,
+              opticsIMAlarmType }
+    STATUS current
+    DESCRIPTION
+        "Indicates a generic Object Creation Event"
+::= { tsdimSupportMibObject 18 }
+
+
+-- tsdimObjectDeletionNotification
+
+tsdimObjectDeletionNotification NOTIFICATION-TYPE
+    OBJECTS { tsdimEventObjectClassIdentifier,
+              tsdimEventObjectInstanceIdentifier,
+              tsdimEventNotificationId,
+              tsdimEventTime,
+              opticsIMAdditionalText,
+              opticsIMAlarmType }
+    STATUS current
+    DESCRIPTION
+        "Indicates a generic Object Deletion Event"
+::= { tsdimSupportMibObject 19 }
+
+
+-- tsdimAVCNotification
+
+tsdimAVCNotification NOTIFICATION-TYPE
+    OBJECTS { tsdimEventObjectClassIdentifier,
+              tsdimEventObjectInstanceIdentifier,
+              tsdimEventNotificationId,
+              tsdimEventTime,
+              opticsIMAdditionalText,
+              opticsIMAlarmType }
+    STATUS current
+    DESCRIPTION
+        "Indicates a generic Attribute Value Change Event"
+::= { tsdimSupportMibObject 20 }
+
+
+-- tsdimStateChangeNotification
+
+tsdimStateChangeNotification NOTIFICATION-TYPE
+    OBJECTS { tsdimEventObjectClassIdentifier,
+              tsdimEventObjectInstanceIdentifier,
+              tsdimEventNotificationId,
+              tsdimEventTime,
+              opticsIMAdditionalText,
+              opticsIMAlarmType }
+    STATUS current
+    DESCRIPTION
+        "Indicates a generic State Change Event"
+::= { tsdimSupportMibObject 21 }
+
+
+-- tsdimAlertNotification
+
+tsdimAlertNotification NOTIFICATION-TYPE
+    OBJECTS { tsdimEventNotificationId,
+              tsdimEventTime,
+              opticsIMAdditionalText,
+              opticsIMAlarmType }
+    STATUS current
+    DESCRIPTION
+        "Indicates an alert notification used by Agent to highlight
+         to the managing systems the creation of new events.
+         The Agent itself (as sysORTable) emits this notification."
+::= { tsdimSupportMibObject 22 }
+
+
+-- tsdimAlertNotifTimeOut
+
+tsdimAlertNotifTimeOut OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "seconds"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This is the alert notification time-out value. It is used by
+         SNMP Agent in order to send the alert notification trap
+         each time this time-out expire "
+::= { tsdimSupportMibObject 23 }
+
+-- tsdimAlertNotifFreqCount
+
+tsdimAlertNotifFreqCount OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This is the alert notification frequency counter value, where
+         frequency is the number of events the SNMP Agent will
+         generate before the creation of an alert notification trap."
+::= { tsdimSupportMibObject 24 }
+
+-- tsdimAlarmSevDefault
+
+tsdimAlarmSevDefault OBJECT-TYPE
+     SYNTAX    TsdimAlmSeverity
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+          "The default severity value used for new profile
+          index/trap ID pairs that have not yet been modified.
+          This value is also used whenever an object's alarm
+          severity profile index is set to 0.  The default value
+          of this object is indeterminate(5)."
+::= { tsdimSupportMibObject 26 }
+
+-- tsdimAlarmSevProfileIndexNext
+
+tsdimAlarmSevProfileIndexNext OBJECT-TYPE
+     SYNTAX    Integer32
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This object contains an appropriate value to be used for
+          tsdimAlarmSevProfileIndex when creating entries in the
+          tsdimAlarmSevProfileTable.
+          The value -1 indicates that no unassigned entries are
+          available.
+          To obtain the index value for a new entry, the manager
+          issues a management protocol retrieval operation to obtain
+          the current value of this object.  After each retrieval, the
+          agent should modify the value to the next unassigned index
+          (or -1)."
+::= { tsdimSupportMibObject 27 }
+
+-- tsdimAlarmSevProfileTable
+
+tsdimAlarmSevProfileTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    TsdimAlarmSevProfileEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+         "This table specifies which profiles exist. Deleting an entry
+          in this table automatically deletes the corresponding entries
+          in the tsdimAlarmSeverityTable."
+::= { tsdimSupportMibObject 28 }
+
+tsdimAlarmSevProfileEntry OBJECT-TYPE
+     SYNTAX    TsdimAlarmSevProfileEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "A group of severities, one for each alarm type in
+          the communications alarm group."
+     INDEX          { tsdimAlarmSevProfileIndex }
+     ::= { tsdimAlarmSevProfileTable 1 }
+
+TsdimAlarmSevProfileEntry ::= SEQUENCE {
+     tsdimAlarmSevProfileIndex         Integer32,
+     tsdimAlarmSevProfileRowStatus     RowStatus,
+     tsdimAlarmSevProfileUserLabel     OpticsIMUserLabel
+          }
+
+tsdimAlarmSevProfileIndex OBJECT-TYPE
+     SYNTAX    Integer32 (1..2147483647)
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "A number identifying this alarm severity profile."
+::= { tsdimAlarmSevProfileEntry 1 }
+
+tsdimAlarmSevProfileRowStatus OBJECT-TYPE
+     SYNTAX    RowStatus
+     MAX-ACCESS     read-create
+     STATUS    current
+     DESCRIPTION
+          "This object is used to create a new row or to delete
+          an existing row in the table."
+::= { tsdimAlarmSevProfileEntry 2 }
+
+tsdimAlarmSevProfileUserLabel OBJECT-TYPE
+    SYNTAX OpticsIMUserLabel
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "See Textual Convention."
+::= { tsdimAlarmSevProfileEntry 3 }
+
+-- tsdimAlarmSevTable
+
+tsdimAlarmSevTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    TsdimAlarmSevEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+         "This table associates profile index and trap
+          ID pairs with severities to be used for
+          alarm traps that have occurred.
+          (Note that this table does not apply to cleared alarms.)"
+::= { tsdimSupportMibObject 29 }
+
+tsdimAlarmSevEntry OBJECT-TYPE
+     SYNTAX    TsdimAlarmSevEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+         "An entry in this table associates an alarm severity
+          profile index/trap ID pair with a severity.
+          Deleting a particular profile's row in the alarm severity
+          profile table deletes all rows in this table with the
+          same profile index."
+     INDEX          { tsdimAlarmSevProfileIndex,
+     IMPLIED          tsdimAlarmSevTrapId }
+     ::= { tsdimAlarmSevTable 1 }
+
+TsdimAlarmSevEntry ::= SEQUENCE {
+     tsdimAlarmSevTrapId    OBJECT IDENTIFIER,
+     tsdimAlarmSevSeverity  TsdimAlmSeverity,
+     tsdimAlarmSevRowStatus RowStatus,
+     tsdimAlarmSevSeverityNotServAff  TsdimAlmSeverity,
+     tsdimAlarmSevProbableCause  DisplayString
+     }
+
+tsdimAlarmSevTrapId OBJECT-TYPE
+     SYNTAX    OBJECT IDENTIFIER
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "The ID of the trap type to which this entry applies."
+     ::= { tsdimAlarmSevEntry 1 }
+
+tsdimAlarmSevSeverity OBJECT-TYPE
+     SYNTAX    TsdimAlmSeverity
+     MAX-ACCESS     read-create
+     STATUS    current
+     DESCRIPTION
+         "The severity to be used for this trap type when the TrapId
+          is selected.
+          When the agent supports the evaluation of alarm service
+          dependency (not service affecting/service affecting),
+          this object provides the alarm severity when it is evaluated
+          service affecting. Otherwise this object provides the
+          generic severity.
+          If no value for this object has ever been set since
+          the corresponding profile was created, the agent should
+          return the value of the object tsdimAlarmSevDefault."
+     ::= { tsdimAlarmSevEntry 2 }
+
+tsdimAlarmSevRowStatus OBJECT-TYPE
+     SYNTAX    RowStatus
+     MAX-ACCESS     read-create
+     STATUS    current
+     DESCRIPTION
+          "This object is used to create a new row or to delete
+          an existing row in the table."
+     ::= { tsdimAlarmSevEntry 3 }
+
+tsdimAlarmSevSeverityNotServAff OBJECT-TYPE
+     SYNTAX    TsdimAlmSeverity
+     MAX-ACCESS     read-create
+     STATUS    current
+     DESCRIPTION
+          "The severity to be used for this trap type when the TrapId
+          is selected and the agent evaluates the alarm not
+          Service Affecting.
+          If no value for this object has ever been set since
+          the corresponding profile was created, the agent should
+          return the value of the object tsdimAlarmSevDefault."
+     ::= { tsdimAlarmSevEntry 4 }
+
+tsdimAlarmSevProbableCause OBJECT-TYPE
+     SYNTAX    DisplayString
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+         "The readable format of the trap type to which this entry applies"
+     ::= { tsdimAlarmSevEntry  5 }
+
+-- opticsIMBackupFilename
+
+opticsIMBackupFilename OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute indicates name of the backup file."
+::= { tsdimSupportMibObject 30 }
+
+-- opticsIMBackupRequestorAddress
+
+opticsIMBackupRequestorAddress OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute indicates the address of the manager that has
+         requested the operation.
+         I will be used by the agent to provide checks to avoid multi
+         backup operations.
+         It is a unique number identifying the manager description
+         inside the opticsIMMgrPollingInfoTable.
+         It will have the same value as the
+         opticsIMMgrPollingInfoTable index columnar object."
+::= { tsdimSupportMibObject 31 }
+
+-- opticsIMBackupState
+
+opticsIMBackupState OBJECT-TYPE
+    SYNTAX INTEGER {
+           absent(0),
+           ongoing(1),
+           completed(2)
+           }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute is used to trace the backup phase. "
+::= { tsdimSupportMibObject 55 }
+
+-- opticsIMRestoreFilename
+
+opticsIMRestoreFilename OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute indicates the name of the chosen backup file."
+::= { tsdimSupportMibObject 32 }
+
+-- opticsIMRestoreSWVersion
+
+opticsIMRestoreSWVersion OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute indicates the software version of the NE that has
+         generated the file to backup. "
+::= { tsdimSupportMibObject 33 }
+
+-- opticsIMRestoreState
+
+opticsIMRestoreState OBJECT-TYPE
+    SYNTAX INTEGER {
+           absent(0),
+           downloading(1),
+           present(2),
+           apply(3),
+       failed (4),
+       fileNotPresent (5),
+       fileNotCorrect (6)
+           }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute can have one of the following values:
+         - absent(0)      -- meaning not present
+         - downloading(1) -- download in progress
+         - present(2)     -- download finished, the file is ready to apply
+         - apply(3)       -- file applied.
+         These are used to trace the download phase.
+      Other values:
+         - failed (4)          -- meaning a generic fail
+         - fileNotPresent (5)  -- meaning the file to restore is not present
+         - fileNotCorrect (6)  -- meaning the file to restore is not correct
+     "
+
+::= { tsdimSupportMibObject 34 }
+
+-- opticsIMRestoreRequestorAddress
+
+opticsIMRestoreRequestorAddress OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute indicates the address of the manager that has
+         requested the operation.
+         I will be used by the agent to provide checks to avoid multi
+         restore operations.
+         It is a unique number identifying the manager description
+         inside the opticsIMMgrPollingInfoTable.
+         It will have the same value as the
+         opticsIMMgrPollingInfoTable index columnar object."
+::= { tsdimSupportMibObject 35 }
+
+-- tsdimRowChangeNotification
+
+tsdimRowChangeNotification NOTIFICATION-TYPE
+    OBJECTS { tsdimEventObjectClassIdentifier,
+        tsdimEventObjectInstanceIdentifier,
+        tsdimEventNotificationId,
+        tsdimEventTime,
+        opticsIMAdditionalText,
+        opticsIMAlarmType }
+    STATUS current
+    DESCRIPTION
+        "Indicates a Row Change Event"
+::= { tsdimSupportMibObject 36 }
+
+-- tsdimGenEventLogTable
+
+tsdimGenEventLogTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF TsdimGenEventLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "This table contain information about single generic event
+        notification.
+        Entries in this table are created automatically by
+        Agent and they are never deleted because the Log behavior is
+        automatically set to Wrap, hence when no more entry will be
+        created (log full) new log entry will cause the deletion
+        of the oldest one.
+
+        The objects tsdimGenEventLogObj* form a static array of generic
+        objects.
+
+        When a Generic Event Notification is sent, all its objects are
+        mapped in an entry of this table.
+        The first five objects, called common objects, of this table have
+        the same name and type of the corresponding Generic Event
+        Notification.
+        The remaining tsdimGenEventLogObj* are particular: they form a
+        static array of generic objects; each of these object represent a
+        specific object of the corresponding Generic Event Notification.
+        Each object of the Generic Event Notification, with the
+        exception of the common ones, is translated to an OCTET STRING
+        form and then copied in the relative tsdimGenEventLogObj*
+        following the Object Identifier order."
+::= { tsdimSupportMibObject 37 }
+
+tsdimGenEventLogEntry OBJECT-TYPE
+    SYNTAX TsdimGenEventLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the tsdimGenEventLogTable"
+    INDEX { tsdimGenEventLogEventTimeIndex, tsdimGenEventLogNotificationId}
+::= { tsdimGenEventLogTable 1 }
+
+TsdimGenEventLogEntry ::= SEQUENCE {
+    tsdimGenEventLogEventType                INTEGER,
+    tsdimGenEventLogObjectClassIdentifier    TsdimObjectClassId,
+    tsdimGenEventLogObjectInstanceIdentifier TsdimObjectInstanceId,
+    tsdimGenEventLogNotificationId           TsdimNotificationId,
+    tsdimGenEventLogEventTimeIndex           TsdimEventTimeInt,
+    tsdimGenEventLogObj1                     GenEventLogObj,
+    tsdimGenEventLogObj2                     GenEventLogObj,
+    tsdimGenEventLogObj3                     GenEventLogObj,
+    tsdimGenEventLogObj4                     GenEventLogObj,
+    tsdimGenEventLogObj5                     GenEventLogObj,
+    tsdimGenEventLogObj6                     GenEventLogObj,
+    tsdimGenEventLogObj7                     GenEventLogObj,
+    tsdimGenEventLogObj8                     GenEventLogObj,
+    tsdimGenEventLogObj9                     GenEventLogObj,
+    tsdimGenEventLogObj10                    GenEventLogObj
+    }
+
+
+tsdimGenEventLogEventType OBJECT-TYPE
+    SYNTAX INTEGER {
+        pingSucceded            (1),
+        pingFailed              (2),
+        pingTimedOut            (3),
+        pingSessionComplete     (4),
+        ifConfigError           (5),
+        virtIfConfigError       (6),
+        lsdbOverflow            (7),
+        lsdbApproachingOverflow (8)
+}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object describes the type of the generic event logged."
+::= { tsdimGenEventLogEntry 1 }
+
+tsdimGenEventLogObjectClassIdentifier OBJECT-TYPE
+    SYNTAX TsdimObjectClassId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimGenEventLogEntry 2 }
+
+tsdimGenEventLogObjectInstanceIdentifier OBJECT-TYPE
+    SYNTAX TsdimObjectInstanceId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimGenEventLogEntry 3 }
+
+tsdimGenEventLogNotificationId OBJECT-TYPE
+    SYNTAX TsdimNotificationId
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimGenEventLogEntry 4 }
+
+tsdimGenEventLogEventTimeIndex OBJECT-TYPE
+    SYNTAX TsdimEventTimeInt
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimGenEventLogEntry 5 }
+
+tsdimGenEventLogObj1 OBJECT-TYPE
+    SYNTAX GenEventLogObj
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimGenEventLogEntry 6 }
+
+tsdimGenEventLogObj2 OBJECT-TYPE
+    SYNTAX GenEventLogObj
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimGenEventLogEntry 7 }
+
+tsdimGenEventLogObj3 OBJECT-TYPE
+    SYNTAX GenEventLogObj
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimGenEventLogEntry 8 }
+
+tsdimGenEventLogObj4 OBJECT-TYPE
+    SYNTAX GenEventLogObj
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimGenEventLogEntry 9 }
+
+tsdimGenEventLogObj5 OBJECT-TYPE
+    SYNTAX GenEventLogObj
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimGenEventLogEntry 10 }
+
+tsdimGenEventLogObj6 OBJECT-TYPE
+    SYNTAX GenEventLogObj
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimGenEventLogEntry 11 }
+
+tsdimGenEventLogObj7 OBJECT-TYPE
+    SYNTAX GenEventLogObj
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimGenEventLogEntry 12 }
+
+tsdimGenEventLogObj8 OBJECT-TYPE
+    SYNTAX GenEventLogObj
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimGenEventLogEntry 13 }
+
+tsdimGenEventLogObj9 OBJECT-TYPE
+    SYNTAX GenEventLogObj
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimGenEventLogEntry 14 }
+
+tsdimGenEventLogObj10 OBJECT-TYPE
+    SYNTAX GenEventLogObj
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { tsdimGenEventLogEntry 15 }
+
+-- opticsIMProtectionSwitchReporting
+
+opticsIMProtectionSwitchReporting NOTIFICATION-TYPE
+    OBJECTS  { tsdimEventObjectClassIdentifier,
+               tsdimEventObjectInstanceIdentifier,
+               tsdimEventNotificationId,
+               tsdimEventTime,
+               opticsIMAdditionalText,
+               opticsIMAlarmType
+             }
+     STATUS current
+     DESCRIPTION
+         "Indicates a generic protection switch event.
+          The object class identifies the type of protection unit.
+          Both the involved object instances are included in the
+          notification."
+::= {  tsdimSupportMibObject 38 }
+
+
+-- opticsIMEFDAllEvents
+
+opticsIMEFDAllEvents OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "This value is used as events, not alarms, wildcard value
+         inside tsdimEFDTrapId."
+::= { tsdimSupportMibObject 39 }
+
+-- opticsIMSwPackageTable
+
+opticsIMSwPackageTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    OpticsIMSwPackageEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+         "This table contains the information on the software packages
+          present in the equipment."
+::= { tsdimSupportMibObject 40 }
+
+opticsIMSwPackageEntry OBJECT-TYPE
+     SYNTAX    OpticsIMSwPackageEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "An entry of the opticsIMSwPackageTable. Each entry represents a
+           network element software release. It is created, by the managed
+           system during the commissioning phase or as a result of a
+           download operation. "
+     INDEX   { opticsIMSwPackageIndex }
+     ::= { opticsIMSwPackageTable 1 }
+
+OpticsIMSwPackageEntry ::= SEQUENCE {
+     opticsIMSwPackageIndex    Integer32,
+     opticsIMSwPackageCommand   INTEGER,
+     opticsIMSwPackageActivationResult   INTEGER,
+     opticsIMSwPackageActivationDate   DisplayString,
+     opticsIMSwPackageCurrentState   INTEGER,
+     opticsIMSwPackageLabel    DisplayString,
+     opticsIMSwPackageRelease    DisplayString,
+     opticsIMSwPackageVersion    DisplayString,
+     opticsIMSwPackageOperationalState TsdimOperationalState
+     }
+
+opticsIMSwPackageIndex OBJECT-TYPE
+     SYNTAX    Integer32
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "This object represents the index of the table."
+::= { opticsIMSwPackageEntry 1 }
+
+opticsIMSwPackageCommand OBJECT-TYPE
+     SYNTAX INTEGER {
+        none (1),
+        activation  (2),
+        forcedActivation (3),
+        commit (4) }
+     MAX-ACCESS    read-write
+     STATUS    current
+     DESCRIPTION
+          "This object is  used to activate a stand-by version or to
+           commit an activated one.
+           As consequence of an activation command, the stand-by
+           software package addressed by the command becomes active and,
+           viceversa,the active one becomes a stand-by version or a boot
+           one according to the previous state of the software package
+           (active or comitted, respectively).
+           If the  forced activation  is  required, the stand-by
+           software version is activated also if it is the same as the
+           active one.
+           The manager can read the result of the activation (forced or
+           not) in the SwPackageActivationResult object.
+           The commit command is used to indicate that the active
+           version has  to be used as the bootstrap software in case of
+           re-start.
+           This command can be addressed only on an active version.
+           In some NEs the commit command is not supported and
+           the commitment of the activated version takes place
+           implicitely
+           together with the activation itself, so that in case of
+           restart events the version used for rebooting is the
+           active version.
+           When the activation or commit command has been completed,
+           the agent has to change the value back to 'none'."
+::= { opticsIMSwPackageEntry 2 }
+
+opticsIMSwPackageActivationResult OBJECT-TYPE
+     SYNTAX INTEGER {
+        successful (1),
+        downloadInProgress (2),
+        onlyOneMemoryBankFull (3),
+        swReleaseCorrupted (4),
+        switchNotAllowedByNEState (5),
+        swUnitMissing (6),
+        internalError (7),
+        idle (8) }
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This object represents the result of a software package
+           activation (forced or not)."
+::= { opticsIMSwPackageEntry 3 }
+
+opticsIMSwPackageActivationDate OBJECT-TYPE
+     SYNTAX    DisplayString
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This object indicates the date and time of the last activation
+           of the software package.It is provided according to the
+           following format:yyyy/mm/dd hh:mm:ss.
+           If the software package has not been yet activated, the string
+           notYetActivated is used. "
+::= { opticsIMSwPackageEntry 4 }
+
+opticsIMSwPackageCurrentState OBJECT-TYPE
+     SYNTAX INTEGER {
+        activated  (1),
+        committed  (2),
+        boot       (3),
+        stand-by   (4) }
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This object represents the current state of the software
+           package."
+::= { opticsIMSwPackageEntry 5 }
+
+opticsIMSwPackageLabel OBJECT-TYPE
+     SYNTAX   DisplayString
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This object specifies the name of the software package."
+::= { opticsIMSwPackageEntry 6 }
+
+opticsIMSwPackageVersion OBJECT-TYPE
+     SYNTAX   DisplayString
+     MAX-ACCESS    read-only
+     STATUS    current
+     DESCRIPTION
+          "This object specifies the version of the software package (i.e.
+           V02.11.00)."
+::= { opticsIMSwPackageEntry 7 }
+
+opticsIMSwPackageOperationalState OBJECT-TYPE
+    SYNTAX  TsdimOperationalState
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+         "See textual conventions. It defines if the software package is
+          correctly loaded (enabled) or not (disabled). "
+::= { opticsIMSwPackageEntry 8 }
+
+opticsIMSwPackageRelease OBJECT-TYPE
+     SYNTAX   DisplayString
+     MAX-ACCESS    read-only
+     STATUS    current
+     DESCRIPTION
+          "This object specifies the version of the software package (i.e.
+           V02.11.00)."
+::= { opticsIMSwPackageEntry 9 }
+
+-- opticsIMSwUnitTable
+
+opticsIMSwUnitTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    OpticsIMSwUnitEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+         "This table contains the information on the software units present
+          in the software package."
+::= { tsdimSupportMibObject 41 }
+
+opticsIMSwUnitEntry OBJECT-TYPE
+     SYNTAX    OpticsIMSwUnitEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "An entry of the opticsIMSwUnitTable."
+     INDEX     { opticsIMSwPackageIndex, opticsIMSwUnitIndex }
+     ::= { opticsIMSwUnitTable 1 }
+
+OpticsIMSwUnitEntry ::= SEQUENCE {
+     opticsIMSwUnitIndex     Integer32,
+     opticsIMSwUnitLabel     DisplayString,
+     opticsIMSwUnitVersion     DisplayString,
+     opticsIMSwUnitSize     Integer32
+     }
+
+opticsIMSwUnitIndex OBJECT-TYPE
+     SYNTAX    Integer32
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "This object represents the index of the software unit table."
+::= { opticsIMSwUnitEntry 1 }
+
+opticsIMSwUnitLabel OBJECT-TYPE
+     SYNTAX   DisplayString
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This object specifies the name of the software unit (i.e EC)."
+::= { opticsIMSwUnitEntry 2 }
+
+opticsIMSwUnitVersion OBJECT-TYPE
+     SYNTAX   DisplayString
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This object specifies the version of the software unit (i.e.
+           V01.03.10)."
+::= { opticsIMSwUnitEntry 3 }
+
+opticsIMSwUnitSize OBJECT-TYPE
+     SYNTAX   Integer32
+     UNITS   "bytes"
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This object specifies the size of the software unit in bytes."
+::= { opticsIMSwUnitEntry 4 }
+
+-- opticsIMswdlStatusIndicator
+
+opticsIMswdlStatusIndicator OBJECT-TYPE
+SYNTAX OpticsIMSwdlStatusIndicator
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+    "See textual conventions."
+::=  { tsdimSupportMibObject 42 }
+
+-- opticsIMSwdlServerAddress
+
+opticsImSwdlServerAddress OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the Address of the SWDL Server.
+     This information is used by the SWDL Client to connect the
+     SWDL server."
+::=  { tsdimSupportMibObjSwdlServ 1}
+
+opticsImSwdlServerIPv6Address OBJECT-TYPE
+SYNTAX InetAddressIPv6
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the Address of the SWDL Server in the IPv6 format.
+     This information is used by the SWDL Client to connect the
+     SWDL server."
+::=  { tsdimSupportMibObjSwdlServ 6}
+
+-- opticsIMSwdlServerPort
+
+opticsImSwdlServerPort OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the Port of the SWDL Server. This information is
+     used by the SWDL Client to connect the SWDL server."
+::=  { tsdimSupportMibObjSwdlServ 2}
+
+-- opticsIMSwdlServerUserId
+
+opticsImSwdlServerUserId OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the UserId of SWDL Server.
+     This information is used by the SWDL Client to connect
+     the SWDL server."
+::=  { tsdimSupportMibObjSwdlServ 3}
+
+-- opticsIMSwdlServerPassword
+
+opticsImSwdlServerPassword OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the Password of Swdl Server.
+
+     This information is used by the SWDL Client to connect the
+     SWDL server."
+::=  { tsdimSupportMibObjSwdlServ 4}
+
+-- opticsIMSwdlServerRootDir
+
+opticsImSwdlServerRootDir OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the Root Directory of Swdl Server.
+     This information is used by the SWDL Client to connect
+     the SWDL server."
+::=  { tsdimSupportMibObjSwdlServ 5}
+
+-- opticsIMSwdlInitTable
+
+opticsIMSwdlInitTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF OpticsIMSwdlInitEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+    "This table contains information about software download
+      Initialization phase."
+::=  { tsdimSupportMibObject 48 }
+
+opticsIMSwdlInitEntry OBJECT-TYPE
+SYNTAX OpticsIMSwdlInitEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+    "An entry in the opticsIMSwdlInitTable."
+INDEX  { opticsImSwdlInitTableIndex }
+::=  { opticsIMSwdlInitTable 1 }
+
+OpticsIMSwdlInitEntry ::= SEQUENCE      {
+opticsImSwdlInitTableIndex Integer32,
+opticsImSwdlInitForcedDownload     TruthValue,
+opticsImSwdlInitSwPkgVersion    DisplayString,
+opticsImSwdlInitSwPkgLabel    DisplayString,
+opticsImSwdlInitDescrName DisplayString,
+opticsIMSwdlInitRowStatus   RowStatus
+}
+
+opticsImSwdlInitTableIndex OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+    "This object defines the index of the table."
+::=  { opticsIMSwdlInitEntry 1 }
+
+opticsImSwdlInitForcedDownload OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+    "This flag indicates whether the version indicated by the identifier
+     of the new software release has to be loaded entirely regardless
+     of the fact that some software units may already be present
+     in the NE."
+::=  { opticsIMSwdlInitEntry 2 }
+
+opticsImSwdlInitSwPkgVersion OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+    "This object contains the version of the new SW Release
+     to be delivered to the managed system."
+::=  { opticsIMSwdlInitEntry 3 }
+
+opticsImSwdlInitSwPkgLabel OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+    "This object contains the Label of the new SW Release to
+     be delivered to the managed system."
+::=  { opticsIMSwdlInitEntry 4 }
+
+opticsImSwdlInitDescrName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+    " This object contains the Name of the Description file to be
+     delivered to the managed system."
+::=  { opticsIMSwdlInitEntry 5 }
+
+opticsIMSwdlInitRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+    "This object is used to create / delete a row.
+     Delete is used to abort Software download Operation.
+     When a new row is created the opticsIMswdlStatusIndicator is
+     changed in Downloading, when the row is deleted the Swdl operation
+     is aborted or finished and the opticsIMswdlStatusIndicator is
+     changed in Idle."
+::=  { opticsIMSwdlInitEntry 6 }
+
+-- opticsIMSwdlPercentage
+
+opticsIMSwdlPercentage OBJECT-TYPE
+SYNTAX INTEGER (0..100)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+    "This object contains the percentage of SW Package transferred.
+     This value is used by the managing System to poll SWDL information."
+::=  {tsdimSupportMibObjSwdlOp 1}
+
+-- opticsIMSwdlTotalBytes
+
+opticsIMSwdlTotalBytes OBJECT-TYPE
+SYNTAX INTEGER
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+    "This object contains the total number of bytes of SW Package
+     transferred. This value is used by the managing System to
+     poll SWDL information."
+::=  { tsdimSupportMibObjSwdlOp 2 }
+
+-- opticsIMSwdlCurrentSwUnitVersion
+
+opticsIMSwdlCurrentSwUnitVersion OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+    "This object contains the Version of the SW Unit in transfer.
+     This value is used by the managing System to poll SWDL information."
+::=  { tsdimSupportMibObjSwdlOp 3 }
+
+-- opticsIMSwdlCurrentSwUnitLabel
+
+opticsIMSwdlCurrentSwUnitLabel OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+    "This object contains the Label of the SW Unit in transfer.
+     This value is used by the managing System to poll SWDL information."
+::=  { tsdimSupportMibObjSwdlOp  4 }
+
+-- opticsIMSwdlResult
+
+opticsImSwdlResult OBJECT-TYPE
+SYNTAX INTEGER {
+    successful (0) ,
+    invalidServerAddress (1) ,
+    unableToConnectToServer (2) ,
+    serverDoesNotHaveVersion (3) ,
+    incompatibleVersion (4) ,
+    networkFailure (5) ,
+    transferMechanismNotAvailable (6) ,
+    noSpaceAvailable (7) ,
+    alignmentFailure (8) ,
+    swUnitCheckFailure (9) ,
+    swReleaseCheckFailure (10) ,
+    abort (11) ,
+    internalError (12),
+    underDownloading (13),
+    idle (14)
+    }
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+    "This object contains the Result of Software Download operation.
+     This value is used by the managing System to poll SWDL
+     information. When Software Downwload is in progress
+     opticsImSwdlResult takes the value underDownloading,
+     otherwise it reports the Result of Software Download operation."
+::=  { tsdimSupportMibObjSwdlOp 5 }
+
+-- Begin OPTnm07663: D.Spreafico
+
+opticsImSwdlServerTrasferProtocolType OBJECT-TYPE
+SYNTAX INTEGER {
+    ftpServer (1),
+    sFtpServer (2)
+    }
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the type of Transfer Protocol of the SWDL Server.
+     This information is used by the NE to use the correct SWDL Client type to connect the SWDL server."
+::=  { tsdimSupportMibObjSwdlOp 6 }
+
+
+opticsImSwdlServerSecureTrasferProtocolHostKey OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the host key of the SWDL Server.
+     This information is used by the SWDL Client type to connect the SWDL server in case sFtp protocol
+     (opticsImSwdlServerTrasferProtocolType = sFerverFtp). The default value is a null string.
+    "
+::=  { tsdimSupportMibObjSwdlOp 7 }
+
+-- End OPTnm07663: D.Spreafico
+
+xhaulSwdlSwNextFile OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+    "This attribute indicates the name of the next file to be transferred to the node for Sw Download.
+    "
+::=  { tsdimSupportMibObjSwdlOp 8 }
+
+xhaulSwdlSwProcessFile OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This attribute indicates that the file for Sw Download has been transferred to the node and ready to be taken into account.
+    "
+::=  { tsdimSupportMibObjSwdlOp 9 }
+
+
+-- opticsIMNERestartRequest
+
+opticsIMNERestartRequest OBJECT-TYPE
+SYNTAX INTEGER {
+                restart (1),
+                idle (2),
+                coldRestart(3),
+                warmRestart(4),
+                dbTruncate(5)
+               }
+MAX-ACCESS     read-write
+STATUS    current
+DESCRIPTION
+    "This object is used to require the execution of the restart
+     procedure on the NE.
+     On the reception of this request, the agent will execute the committed
+     software version, in the same way of a spontaneous restart.
+     When the restart has been completed, the agent has to change
+     the value back to 'idle' and set the restart flag
+     (opticsIMInfoNERestartFlag attribute of the opticsIMInfoPolledTable).
+     Note: the restart(1) value should be used if there is no distinction
+     between cold and warm restart. If there is a distinction, then the correct
+     value i.e. coldRestart(3) or warmRestart(3) should be used, as appropriate.
+     dbTruncate option commands the Agent to 'shrink' the DB and automatically
+     perform a coldRestart."
+::= { tsdimSupportMibObject 54 }
+
+-- opticsIMActiveAbnCond
+
+opticsIMActiveAbnCond OBJECT-TYPE
+     SYNTAX TruthValue
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+         "This object specifies whether at least one abnormal condition is
+         present in the NE (TRUE)."
+::= { opticsIMSupportMibObjAbnCond 1 }
+
+-- opticsIMAbnCondAffectedObjectsListTable
+
+opticsIMAbnCondAffectedObjectsListTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF OpticsIMAbnCondAffectedObjectsListEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+          "This table contains the list of objects affected by an abnormal
+           condition. "
+::= { opticsIMSupportMibObjAbnCond 2 }
+
+opticsIMAbnCondAffectedObjectsListEntry OBJECT-TYPE
+       SYNTAX OpticsIMAbnCondAffectedObjectsListEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+          "An entry of the abnormal condition affected object list table."
+       INDEX    { opticsIMAbnCondAffectedObjectsListIndex }
+::= { opticsIMAbnCondAffectedObjectsListTable 1 }
+
+OpticsIMAbnCondAffectedObjectsListEntry ::= SEQUENCE {
+   opticsIMAbnCondAffectedObjectsListIndex Integer32,
+   opticsIMAbnCondAffectedObjectInstanceId InstancePointer,
+   opticsIMOffNormalDescription  DisplayString
+   }
+
+opticsIMAbnCondAffectedObjectsListIndex OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        " This object represents the index of the table."
+::= { opticsIMAbnCondAffectedObjectsListEntry 1 }
+
+opticsIMAbnCondAffectedObjectInstanceId OBJECT-TYPE
+     SYNTAX InstancePointer
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+        " This object represents the instance identifier of an object
+          affected by an abnormal condition."
+::= { opticsIMAbnCondAffectedObjectsListEntry 2 }
+
+opticsIMOffNormalDescription OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+        " This object represents the description of an abnormal (off
+          normal) condition."
+::= { opticsIMAbnCondAffectedObjectsListEntry 3 }
+
+-- opticsIMEqptSwUnitTable
+
+opticsIMEqptSwUnitTable OBJECT-TYPE
+     SYNTAX    SEQUENCE OF    OpticsIMEqptSwUnitEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+         "This table contains the information on the software units present
+          in the equipment."
+::= { tsdimSupportMibObject 56 }
+
+opticsIMEqptSwUnitEntry OBJECT-TYPE
+     SYNTAX    OpticsIMEqptSwUnitEntry
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "An entry of the opticsIMEqptSwUnitTable."
+     INDEX     { opticsIMEqptSwUnitPosition }
+     ::= { opticsIMEqptSwUnitTable 1 }
+
+OpticsIMEqptSwUnitEntry ::= SEQUENCE {
+     opticsIMEqptSwUnitPosition  OCTET STRING (SIZE(4)),
+     opticsIMEqptSwUnitLabel     DisplayString,
+     opticsIMEqptSwUnitVersion     DisplayString,
+     opticsIMEqptSwUnitSwdlStatus    INTEGER
+     }
+
+opticsIMEqptSwUnitPosition OBJECT-TYPE
+     SYNTAX    OCTET STRING (SIZE(4))
+     MAX-ACCESS     not-accessible
+     STATUS    current
+     DESCRIPTION
+          "This object represents the index of the equipment software unit
+           table."
+::= { opticsIMEqptSwUnitEntry 1 }
+
+opticsIMEqptSwUnitLabel OBJECT-TYPE
+     SYNTAX   DisplayString
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This object specifies the name of the software unit (i.e EC)."
+::= { opticsIMEqptSwUnitEntry 2 }
+
+opticsIMEqptSwUnitVersion OBJECT-TYPE
+     SYNTAX   DisplayString
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This object specifies the version of the software unit (i.e.
+           V01.03.10)."
+::= { opticsIMEqptSwUnitEntry 3 }
+
+opticsIMEqptSwUnitSwdlStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+              downloading (1) ,
+              idle (2) ,
+              notSupported (3)
+              }
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+          "This object specifies the status of the download of the software unit."
+::= { opticsIMEqptSwUnitEntry 4 }
+
+--  opticsIMAutoDiscoveryStatus
+
+opticsIMAutoDiscoveryStatus OBJECT-TYPE
+     SYNTAX INTEGER {
+          idle (0),
+        ongoing (1),
+        succeeded (2),
+        failed (3)
+              }
+     MAX-ACCESS     read-only
+     STATUS    current
+     DESCRIPTION
+         "The autoDiscoveryStatus indicates the current status of auto-discovery can be:
+           - idle (default): auto-discovery not enabled.
+           - auto-discovery ongoing: in this status the auto-discovery has been enabled, but no response message has been received from network management.
+           - auto-discovery succeeded: the auto-discovery succeeded. This status represents the receiving of the Acknowledge response from OS
+           - auto-discovery failed: the auto-discovery failed. This status represents the receiving of'Nack' message from OS."
+::= { tsdimSupportMibObject 58 }
+
+-- opticsIMenableAutodiscovery
+
+opticsIMEnableAutodiscovery OBJECT-TYPE
+     SYNTAX INTEGER {
+              enable (1) ,
+              disable (2)
+              }
+     MAX-ACCESS     read-write
+     STATUS    current
+     DESCRIPTION
+         "This object is used to activate and stop the auto-discovery mechanism in the NE.
+          It is possible to use the same action with different syntax:
+          - if activation is selected (enabled): once accepted this action, the NE starts sending the auto-discovery message
+            to the network management system.  The status reported in the autodiscoveryStatus attribute goes to ongoing.
+          The action is refused if either the local address or the network management address has not been configured.
+          - if stop is selected (disable): the auto-discovery mechanism is stopped. This option is always accepted and the status
+        (reported in the  autodiscoveryStatus object) comes back to idle."
+::= { tsdimSupportMibObject 59 }
+
+-- opticsimSnmpMainOSIpAddress
+
+opticsimSnmpMainOSIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This objects defines the IP address of the main OS.
+         The default value is 0.0.0.0 (no IP address configured)"
+::= { tsdimSupportMibObject 60 }
+
+-- opticsimSnmpMainOSUdpPort
+
+opticsimSnmpMainOSUdpPort OBJECT-TYPE
+    SYNTAX TsdimUdpPort
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This objects defines the UDP port of the main OS."
+::= { tsdimSupportMibObject 61 }
+
+-- opticsimSnmpSpareOSIpAddress
+
+opticsimSnmpSpareOSIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This objects defines the IP address of the spare OS.
+         The default value is 0.0.0.0 (no IP address configured)"
+::= { tsdimSupportMibObject 62 }
+
+-- opticsimSnmpSpareOSUdpPort
+
+opticsimSnmpSpareOSUdpPort OBJECT-TYPE
+    SYNTAX TsdimUdpPort
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This objects defines the UDP port of the spare OS."
+::= { tsdimSupportMibObject 63 }
+
+
+tsdimSupportMibObjBackupServ OBJECT IDENTIFIER ::= { tsdimSupportMibObject 66 }
+
+-- opticsIMBackupServerAddress
+
+opticsImBackupServerAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Address of the Backup Server.
+         This information is used by the Backup Client to connect the
+         server."
+::=  { tsdimSupportMibObjBackupServ 1 }
+
+-- opticsIMBackupServerPort
+
+opticsImBackupServerPort OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Port of the BACKUP Server. This information is
+         used by the BACKUP Client to connect the BACKUP server."
+::=  { tsdimSupportMibObjBackupServ 2 }
+
+-- opticsIMBackupServerUserId
+
+opticsImBackupServerUserId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the UserId of BACKUP Server.
+         This information is used by the BACKUP Client to connect
+         the BACKUP server."
+::=  { tsdimSupportMibObjBackupServ 3 }
+
+-- opticsIMBackupServerPassword
+
+opticsImBackupServerPassword OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Password of Backup Server.
+
+         This information is used by the BACKUP Client to connect the
+         BACKUP server."
+::=  { tsdimSupportMibObjBackupServ 4 }
+
+-- opticsIMBackupServerRootDir
+
+opticsImBackupServerRootDir OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Root Directory of Backup Server.
+         This information is used by the BACKUP Client to connect
+         the BACKUP server."
+::=  { tsdimSupportMibObjBackupServ 5 }
+
+opticsImBackupServerIPv6Address OBJECT-TYPE
+    SYNTAX InetAddressIPv6
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Address in IPv6 format of the Backup Server.
+         This information is used by the Backup Client to connect the
+         server."
+::=  { tsdimSupportMibObjBackupServ 6 }
+
+
+tsdimSupportMibObjRestoreServ OBJECT IDENTIFIER ::= { tsdimSupportMibObject 67 }
+
+-- opticsIMRestoreServerAddress
+
+opticsImRestoreServerAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Address of the RESTORE Server.
+         This information is used by the RESTORE Client to connect the
+         RESTORE server."
+::=  { tsdimSupportMibObjRestoreServ 1 }
+
+-- opticsIMRestoreServerPort
+
+opticsImRestoreServerPort OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Port of the RESTORE Server. This information is
+         used by the RESTORE Client to connect the RESTORE server."
+::=  { tsdimSupportMibObjRestoreServ 2 }
+
+-- opticsIMRestoreServerUserId
+
+opticsImRestoreServerUserId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the UserId of RESTORE Server.
+         This information is used by the RESTORE Client to connect
+         the RESTORE server."
+::=  { tsdimSupportMibObjRestoreServ 3 }
+
+-- opticsIMRestoreServerPassword
+
+opticsImRestoreServerPassword OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Password of Restore Server.
+
+         This information is used by the RESTORE Client to connect the
+         RESTORE server."
+::=  { tsdimSupportMibObjRestoreServ 4 }
+
+-- opticsIMRestoreServerRootDir
+
+opticsImRestoreServerRootDir OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Root Directory of Restore Server.
+         This information is used by the RESTORE Client to connect
+         the RESTORE server."
+::=  { tsdimSupportMibObjRestoreServ 5 }
+
+opticsImRestoreServerIPv6Address OBJECT-TYPE
+    SYNTAX InetAddressIPv6
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Address in IPv6 format of the RESTORE Server.
+         This information is used by the RESTORE Client to connect the
+         RESTORE server."
+::=  { tsdimSupportMibObjRestoreServ 6 }
+
+
+tsdimSupportMibObjRestoreOp OBJECT IDENTIFIER   ::= { tsdimSupportMibObject 68 }
+
+-- opticsIMRestorePercentage
+
+opticsIMRestorePercentage OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object contains the percentage of Restore file(s) transferred.
+         This value is used by the managing System to poll RESTORE information."
+::=  { tsdimSupportMibObjRestoreOp 1 }
+
+-- opticsIMRestoreTotalBytes
+
+opticsIMRestoreTotalBytes OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object contains the total number of bytes of Restore file(s)
+         transferred. This value is used by the managing System to
+         poll RESTORE information."
+::=  { tsdimSupportMibObjRestoreOp 2 }
+
+-- opticsIMRestoreCurrentFile
+
+opticsIMRestoreCurrentFile OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object contains the name of the File in transfer.
+         This value is used by the managing System to poll RESTORE information."
+::=  { tsdimSupportMibObjRestoreOp 3 }
+
+tsdimSupportMibObjPMCollectionServ OBJECT IDENTIFIER ::= { tsdimSupportMibObject 69 }
+
+-- opticsIMPMCollectionServerAddress
+
+opticsImPMCollectionServerAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Address of the PM collection Server.
+         This information is used by the PM collection Client to connect the
+         PM collection server."
+::=  { tsdimSupportMibObjPMCollectionServ 1 }
+
+-- opticsIMPMCollectionServerPort
+
+opticsImPMCollectionServerPort OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Port of the PM collection Server. This information is
+         used by the PM collection Client to connect the PM collection server."
+::=  { tsdimSupportMibObjPMCollectionServ 2 }
+
+-- opticsIMPMCollectionServerUserId
+
+opticsImPMCollectionServerUserId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the UserId of PM collection Server.
+         This information is used by the PM collection Client to connect
+         the PM collection server."
+::=  { tsdimSupportMibObjPMCollectionServ 3 }
+
+-- opticsIMPMCollectionServerPassword
+
+opticsImPMCollectionServerPassword OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Password of PM collection Server.
+
+         This information is used by the PM collection Client to connect the
+             PM collection server."
+::=  { tsdimSupportMibObjPMCollectionServ 4 }
+
+-- opticsIMPMCollectionServerRootDir
+
+opticsImPMCollectionServerRootDir OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Root Directory of PM collection Server.
+         This information is used by the PM collection Client to connect
+         the PM collection server."
+::=  { tsdimSupportMibObjPMCollectionServ 5 }
+
+tsdimSupportMibObjMACAddressCollectionServ OBJECT IDENTIFIER ::= { tsdimSupportMibObject 70 }
+
+-- opticsIMMACAddressCollectionServerAddress
+
+opticsImMACAddressCollectionServerAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Address of the Server.
+         This information is used by the MAC Address Collection Client to connect the
+         MAC Address Collection server."
+::=  { tsdimSupportMibObjMACAddressCollectionServ 1 }
+
+-- opticsIMMACAddressCollectionServerPort
+
+opticsImMACAddressCollectionServerPort OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Port of the MAC Address Collection Server. This information is
+         used by the MAC Address Collection Client to connect the MAC Address Collection server."
+::=  { tsdimSupportMibObjMACAddressCollectionServ 2 }
+
+-- opticsIMMACAddressCollectionServerUserId
+
+opticsImMACAddressCollectionServerUserId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the UserId of MAC Address Collection Server.
+         This information is used by the MAC Address Collection Client to connect
+         the MAC Address Collection server."
+::=  { tsdimSupportMibObjMACAddressCollectionServ 3 }
+
+-- opticsIMMACAddressCollectionServerPassword
+
+opticsImMACAddressCollectionServerPassword OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Password of MAC Address Collection Server.
+
+         This information is used by the MAC Address Collection Client to connect the
+         MAC Address Collection server."
+::=  { tsdimSupportMibObjMACAddressCollectionServ 4 }
+
+-- opticsIMMACAddressCollectionServerRootDir
+
+opticsImMACAddressCollectionServerRootDir OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Root Directory of MAC Address Collection Server.
+         This information is used by the MAC Address Collection Client to connect
+         the MAC Address Collection server."
+::=  { tsdimSupportMibObjMACAddressCollectionServ 5 }
+
+opticsImFileTrasferProtocolsCapability OBJECT-TYPE
+    SYNTAX OpticImFileTrasferProtocolList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A value that uniquely identifies the set of
+         supported file transfer protocols."
+::=  { tsdimSupportMibObject 71 }
+
+opticsImFileTrasferProtocolConfigured OBJECT-TYPE
+    SYNTAX OpticImFileTrasferProtocolList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A value that allows the configuration of the file transfer protocol used by the NE.
+             It is possible to set to 1 only a single bit of the bit mask (i.e. the NE accepts
+             the configuration of only one file transfer protocol).
+         The default value is NE type dependent."
+::=  { tsdimSupportMibObject 72 }
+
+-- Begin: 090805 by Wang Yun for TSS3 UAL features --
+
+tsdimSupportMibObjUalUploadServ OBJECT IDENTIFIER ::= { tsdimSupportMibObject 73 }
+
+-- opticsIMUalUploadServerAddress
+
+opticsImUalUploadServerAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Address of the UAL Upload Server.
+         This information is used by the UAL Upload Client to connect the
+         server."
+::=  { tsdimSupportMibObjUalUploadServ 1 }
+
+-- opticsIMUalUploadServerPort
+
+opticsImUalUploadServerPort OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Port of the UAL Upload Server. This information is
+         used by the UAL Upload Client to connect the UAL Upload server."
+::=  { tsdimSupportMibObjUalUploadServ 2 }
+
+-- opticsIMUalUploadServerUserId
+
+opticsImUalUploadServerUserId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the UserId of UAL Upload Server.
+         This information is used by the UAL Upload Client to connect
+         the UAL Upload server."
+::=  { tsdimSupportMibObjUalUploadServ 3 }
+
+-- opticsIMUalUploadServerPassword
+
+opticsImUalUploadServerPassword OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Password of UAL Upload Server.
+
+         This information is used by the UAL Upload Client to connect the
+         server."
+::=  { tsdimSupportMibObjUalUploadServ 4 }
+
+-- opticsIMUalUploadServerRootDir
+
+opticsImUalUploadServerRootDir OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Root Directory of UAL Upload Server.
+         This information is used by the UAL Upload Client to connect
+         the server."
+::=  { tsdimSupportMibObjUalUploadServ 5 }
+
+-- opticsIMUalUploadFilename
+
+opticsIMUalUploadFilename OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute indicates name of the UAL upload file."
+::= { tsdimSupportMibObjUalUploadServ 6 }
+
+-- opticsIMUalUploadRequestorAddress
+
+opticsIMUalUploadRequestorAddress OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute indicates the address of the manager that has
+         requested the operation.
+         I will be used by the agent to provide checks to avoid multi
+         upload operations.
+         It is a unique number identifying the manager description
+         inside the opticsIMMgrPollingInfoTable.
+         It will have the same value as the
+         opticsIMMgrPollingInfoTable index columnar object."
+::= { tsdimSupportMibObjUalUploadServ 7 }
+
+-- opticsIMUalUploadState
+
+opticsIMUalUploadState OBJECT-TYPE
+    SYNTAX INTEGER {
+           absent (0),
+           ongoing (1),
+           completed (2)
+           }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute is used to trace the upload phase. "
+::= { tsdimSupportMibObjUalUploadServ 8 }
+
+-- opticsImSecureLogUploadTransferProtocolHostKey
+
+opticsImSecureLogUploadTransferProtocolHostKey OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the host key of the UAL Upload Server.
+    This information is used by the UAL Upload Client to connect the Ftp server in case secureFtp protocol (opticsIMFileTrasferProtocolType = sFtpServer ). The default value is a null string.
+"
+::= { tsdimSupportMibObjUalUploadServ 9 }
+
+-- opticsImUalUploadServerIpv6Address
+
+opticsImUalUploadServerIpv6Address OBJECT-TYPE
+    SYNTAX InetAddressIPv6
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object contains the Address of the UAL Upload Server in Ipv6 format.
+         This information is used by the UAL Upload Client to connect the
+         server."
+::=  { tsdimSupportMibObjUalUploadServ 10 }
+
+
+tsdimSupportMibObjUalConfiguration OBJECT IDENTIFIER ::= { tsdimSupportMibObject 74 }
+
+-- opticsIMUalLogFileSize
+
+opticsImUalLogFileSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates size of UAL log file , in KiloByte blocks. "
+::=  { tsdimSupportMibObjUalConfiguration 1 }
+
+-- opticsIMUalLogEvent
+opticsImUalLogEvent OBJECT IDENTIFIER ::= { tsdimSupportMibObjUalConfiguration 2 }
+opticsImUalSECULog OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable        (1),
+        disable       (2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object is used to enable/disable SECU (security) events log , the default value is enabled ."
+::=  { opticsImUalLogEvent 1 }
+
+opticsImUalCOMMLog OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable        (1),
+        disable       (2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object is used to enable/disable COMM (communication & routing) events log , the default value is enabled ."
+::=  { opticsImUalLogEvent 2 }
+
+opticsImUalEQPTLog OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable        (1),
+        disable       (2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object is used to enable/disable EQPT (equipment) events log , the default value is enabled ."
+::=  { opticsImUalLogEvent 3 }
+
+opticsImUalDATALog OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable        (1),
+        disable       (2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object is used to enable/disable DATA (Ethernet Provision) events log , the default value is enabled ."
+::=  { opticsImUalLogEvent 4 }
+
+-- End: 090805 by Wang Yun for TSS3 UAL features --
+
+-- opticsIMEFDExtensionTable
+
+opticsIMEFDExtensionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OpticsIMEFDExtensionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table associate some extra parameters to the EFDtable to be used to send traps to a particular IP Address."
+::= { tsdimSupportMibObject 75 }
+
+opticsIMEFDExtensionEntry OBJECT-TYPE
+    SYNTAX    OpticsIMEFDExtensionEntry
+    MAX-ACCESS not-accessible
+    STATUS    current
+    DESCRIPTION
+        "Extra information about a group of traps to be sent             to a particular IP address, over the information already     defined on tsdimEFDtable."
+    AUGMENTS { tsdimEFDEntry}
+::= { opticsIMEFDExtensionTable 1 }
+
+OpticsIMEFDExtensionEntry ::= SEQUENCE {
+     opticsIMEFDUserName    DisplayString
+          }
+
+opticsIMEFDUserName    OBJECT-TYPE
+    SYNTAX    DisplayString
+    MAX-ACCESS read-write
+    STATUS  current
+    DESCRIPTION
+          "The username for the SNMPv3 traps identified by this table entry should be sent."
+::= { opticsIMEFDExtensionEntry 1 }
+
+-- end EFDExtention
+
+-- LicenseCode
+
+opticsImLicenseCode OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..1023))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to update by managing system the LicenseString that identifies the
+             features bought by the customer."
+::=  { tsdimSupportMibObject 100 }
+
+
+-- SW License  String
+
+opticsImSwLicense OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..511))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object allows to report in a clear text to the managing system the list of Licenses that identify
+             the features bougth by the customer."
+::=  { tsdimSupportMibObject 101 }
+
+
+-- LedsReset and Status
+
+opticsImLedsReset OBJECT-TYPE
+    SYNTAX INTEGER {
+         resetting (1),
+         notResetting (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to trigger a reset of all the Leds present on equipment.
+             As consequence, all the Leds are cleared and the opticsImAttendedStatus
+             objects is set to 'on' value.
+             When the reset has been completed, the agent has to change the value of
+             opticsImLedsReset object back to notResetting."
+::=  { tsdimSupportMibObject 105 }
+
+opticsImAttendedStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        on        (1),
+        off       (2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object specifies the status of the Leds Reset procedure (on or off).
+            When the opticsImLedsReset object is set to 'resetting' value the agent has
+            to set this object (opticsImAttendedStatus ) to 'on' value, clear all the
+            Leds present on equipment, and store the list of raised alarms (that highlighted
+            on Leds to clear).
+            When all the alarms present on stored list are cleared, the agent has to change the value
+            of opticsImAttendedStatus object to 'off' value."
+::=  { tsdimSupportMibObject 106 }
+
+-- Begin: 090625 by Michael Qiu for TSS3 security features --
+
+opticsIMTelnetStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable        (1),
+        disable       (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object is used to enable/disable telnet service, the default value is enabled"
+::=  { tsdimSupportMibObject 107 }
+
+opticsIMSftpStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable        (1),
+        disable       (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object is used to enable/disable Sftp service, the default value is enabled"
+::=  { tsdimSupportMibObject 108 }
+
+-- End: 090625 by Michael Qiu for TSS3 security features --
+
+
+-- Begin OPTnm07663: D.Spreafico
+opticsImManagementProtocolsCapability OBJECT-TYPE
+    SYNTAX BITS {
+            ftp(0),
+            telnet(1),
+            sFtp(2),
+            ssh(3),
+            http (4),
+            https (5)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "A value that uniquely identifies the set of the main supported management protocols"
+::=  { tsdimSupportMibObject 1110 }
+-- End OPTnm07663: D.Spreafico
+
+-- Begin OPTnm25221: D.Spreafico
+
+opticsIMFileTrasferProtocolType OBJECT-TYPE
+SYNTAX INTEGER {
+    ftpServer (1),
+    sFtpServer (2)
+    }
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the type of File Transfer Protocol to use on agent for file exchange with Server on manager side.
+     This information is used by the NE to use the correct ftp Client type to connect the ftp server."
+::=  { tsdimSupportMibObject 1111 }
+
+
+opticsImSecureFileTrasferProtocolHostKey OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the host key of the Ftp Server.
+     This information is used by the  Ftp Client to connect the Ftp server in case secureFtp protocol
+     (opticsIMFileTrasferProtocolType = sFtpServer ). The default value is a null string.
+    "
+::=  { tsdimSupportMibObject 1112 }
+
+-- End OPTnm25221: D.Spreafico
+
+-- Begin Anti Theft
+
+opticsIMSupportMibObjAntiTheft
+                      OBJECT IDENTIFIER ::= { tsdimSupportMibObject 1113 }
+
+opticsIMAntiTheftAdminStatus OBJECT-TYPE
+     SYNTAX INTEGER {
+              disable (1),
+          enable (2)
+              }
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object allows to enable/disable the Anti-Theft procedure by managing system.
+    "
+::=  { opticsIMSupportMibObjAntiTheft 1 }
+
+opticsIMAntiTheftTimerExpiration OBJECT-TYPE
+SYNTAX    Integer32 (24..168)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object allows to define the timer expiration, measured in units of hours, for the Anti-Theft procedure.
+    "
+::=  { opticsIMSupportMibObjAntiTheft 2 }
+
+opticsIMAntiTheftManagerKeyCode OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE(0..1024))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object allows to update, by managing system to the device, the Network Manager Key code  .
+    "
+::=  { opticsIMSupportMibObjAntiTheft 3 }
+
+opticsIMSendKeyCode NOTIFICATION-TYPE
+    OBJECTS { opticsIMAntiTheftManagerKeyCode
+          }
+    STATUS current
+    DESCRIPTION
+        "Indicates the notification to require the managing system to send the Network Manager key code. "
+::=  { opticsIMSupportMibObjAntiTheft 4 }
+
+-- End Anti Theft
+
+
+-- Begin OPTnmxxxx: D.Spreafico
+
+opticsIMNeLongitude OBJECT-TYPE
+SYNTAX DisplayString (SIZE (0..33))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the real number describing the              longitude encoded as a printable string. The precision is     limited by 32 characters within the range -90..90 degrees.     Positive numbers indicate locations north of the equator.
+    The value is encoded as strings as to avoid the precision     limitations imposed by encoding as unsigned integers.
+       Although this might not be considered optimal, it allows     for a very high degree of precision with an acceptable     average encoded record length.
+
+    "
+::=  { tsdimSupportMibObject 110 }
+
+opticsIMNeLatitude OBJECT-TYPE
+SYNTAX DisplayString (SIZE (0..33))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the real number describing the     latitude encoded as a printable string. The precision is     limited by 32 characters within the range -180..180     degrees. Positive numbers indicate locations east of the     prime meridian.
+    The value is encoded as strings as to avoid the precision     limitations imposed by encoding as unsigned integers.
+       Although this might not be considered optimal, it allows     for a very high degree of precision with an acceptable     average encoded record length.
+    "
+::=  { tsdimSupportMibObject 111 }
+
+-- Begin SNMPIDL-482: D.Spreafico
+
+opticsIMNeHttpServerPort OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the Port of the HTTP Server hosted on the NE.
+     This information is used by the HTTP Client to connect the HTTPserver.
+    "
+::= { tsdimSupportMibObject 112 }
+
+-- End SNMPIDL-482: D.Spreafico
+
+-- Begin SNMPIDL-xxx: D.Spreafico
+
+opticsIMHttpsStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable        (1),
+        disable       (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object is used to enable/disable HTTPS service for remote and local access, the default value is disabled."
+::=  { tsdimSupportMibObject 113 }
+
+-- End SNMPIDL-xxx: D.Spreafico
+
+opticsIMNeAltitude OBJECT-TYPE
+SYNTAX DisplayString (SIZE (0..33))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the real number describing the altitude (height from a reference 0 value) encoded as a printable string. The precision is limited by 32 characters within the range 0..5000 meters (the mesusre unit).
+    The value is encoded as strings as to avoid the precision limitations imposed by encoding as unsigned integers.
+       Although this might not be considered optimal, it allows for a very high degree of precision with an acceptable average encoded record length.
+    "
+::=  { tsdimSupportMibObject 114 }
+
+-- opticsIMAlarmsSeveritySummaryTable
+
+opticsIMAlarmsSeveritySummaryTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OpticsIMAlarmsSeveritySummaryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "This table gives the number of alarms currently
+          raised in the node per each severity level."
+::= { tsdimSupportMibObject 115 }
+
+opticsIMAlarmsSeveritySummaryEntry OBJECT-TYPE
+    SYNTAX OpticsIMAlarmsSeveritySummaryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about he number of alarms currently
+         raised in the node per severity level.
+         Entries in this table are created by the node at start-up."
+    INDEX { opticsIMAlarmsSeveritySummaryIndex}
+::= { opticsIMAlarmsSeveritySummaryTable 1 }
+
+OpticsIMAlarmsSeveritySummaryEntry ::= SEQUENCE {
+    opticsIMAlarmsSeveritySummaryIndex  TsdimAPTAlmSeverity,
+    opticsIMAlarmsSeveritySummaryTotal  Integer32
+    }
+
+opticsIMAlarmsSeveritySummaryIndex OBJECT-TYPE
+    SYNTAX TsdimAPTAlmSeverity
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "See textual conventions."
+::= { opticsIMAlarmsSeveritySummaryEntry 1 }
+
+opticsIMAlarmsSeveritySummaryTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of alarms currently raaised for this severity level."
+::= { opticsIMAlarmsSeveritySummaryEntry 2 }
+
+
+
+------------------------------------
+-- BEGIN FileTransfer Server Objects
+
+opticsIMSupportMibObjFileTransferServ
+                      OBJECT IDENTIFIER ::= { tsdimSupportMibObject 1114 }
+
+-- opticsIMFileTransferServerAddress
+
+opticsIMFileTransferServerAddress OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the Address of the SWDL Server.
+     This information is used by the SWDL Client to connect the
+     SWDL server."
+::=  { opticsIMSupportMibObjFileTransferServ 1}
+
+-- opticsIMFileTransferServerPort
+
+opticsIMFileTransferServerPort OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the Port of the SWDL Server. This information is
+     used by the SWDL Client to connect the SWDL server."
+::=  { opticsIMSupportMibObjFileTransferServ 2}
+
+-- opticsIMFileTransferServerUserId
+
+opticsIMFileTransferServerUserId OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the UserId of SWDL Server.
+     This information is used by the SWDL Client to connect
+     the SWDL server."
+::=  { opticsIMSupportMibObjFileTransferServ 3}
+
+-- opticsIMFileTransferServerPassword
+
+opticsIMFileTransferServerPassword OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the Password of Swdl Server.
+
+     This information is used by the SWDL Client to connect the
+     SWDL server."
+::=  { opticsIMSupportMibObjFileTransferServ 4}
+
+-- opticsIMFileTransferServerRootDir
+
+opticsIMFileTransferServerRootDir OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the Root Directory of Swdl Server.
+     This information is used by the SWDL Client to connect
+     the SWDL server."
+::=  { opticsIMSupportMibObjFileTransferServ 5}
+
+-- opticsIMFileTransferServerRootDir
+
+opticsIMFileTransferServerAddressIpv6  OBJECT-TYPE
+SYNTAX InetAddressIPv6
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+    "This object contains the Address of the SWDL Server in the IPv6 format.
+     This information is used by the SWDL Client to connect the
+     SWDL server."
+::=  { opticsIMSupportMibObjFileTransferServ 6}
+
+-- opticsIMFileTransferState
+
+opticsIMFileTransferState OBJECT-TYPE
+    SYNTAX INTEGER {
+           absent (0),
+           ongoing (1),
+           completed (2)
+           }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute is used to trace the file transfer phase. "
+::=  { opticsIMSupportMibObjFileTransferServ 7}
+
+
+-- END FileTransfer Server Objects
+----------------------------------
+
+opticsIMRSLFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute indicates name of the RSL file to be transferred."
+::= { tsdimSupportMibObject 1115 }
+
+opticsIMIANDCFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute indicates name of the Installation and Commisioning file to be transferred."
+::= { tsdimSupportMibObject 1116 }
+
+---------------------------------------
+-- BEGIN Password Update Server Objects
+
+opticsIMSupportMibObjPswdUpdateServ
+                      OBJECT IDENTIFIER ::= { tsdimSupportMibObject 1117 }
+
+-- opticsImPasswordUpdateFilename
+
+opticsImPasswordUpdateFilename OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute indicates the name of the file to be transferred for the password update process."
+::=  { opticsIMSupportMibObjPswdUpdateServ 1}
+
+opticsImPasswordUpdateFileHash OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute contains the hash of the file to be transferred for the password update process."
+::=  { opticsIMSupportMibObjPswdUpdateServ 2}
+
+opticsIMPasswordUpdateResult OBJECT-TYPE
+    SYNTAX INTEGER
+        {successful(1),
+         internalProcessingError (2),
+         fileTransferOperationFailed (3),
+         passwordUpdateOperationOngoing (4),
+         notExistingUser (5),
+         oldPasswordMismatch(6),
+         newPasswordNotComplyingAgeingRules (7),
+         newPasswordNotComplyingHistoryRules (8),
+         hashingChecksumFailure (9),
+         idle(10),
+         newPasswordNotComplyingWithMinPassLength (11),
+         newPasswordNotComplyingComplexityRules (12)
+        }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+        "This object represents the result of a Password Update process."
+::=  { opticsIMSupportMibObjPswdUpdateServ 3}
+
+
+-- END Password Update Server Objects
+------------------------------------
+
+
+-- END
+
+-- TSDIM-SUPPORT-MC DEFINITIONS ::= BEGIN
+--     IMPORTS
+--     MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY FROM SNMPv2-SMI
+--     MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+--     tsdim_basicMC FROM TSDIM-BASICREG-MIB;
+
+-- tsdimSupportMCCompl
+
+-- tsdimSupportMCCompl MODULE-IDENTITY
+--    LAST-UPDATED "0107180000Z"
+--    ORGANIZATION "Alcatel TND"
+--    CONTACT-INFO "Alcatel TND"
+--    DESCRIPTION
+--        "Added GEN Log object"
+--    REVISION "20009290000Z"
+--    DESCRIPTION
+--        "The alarm optional objects have been deleted."
+--    REVISION "20007010000Z"
+--    DESCRIPTION
+--        "It has been replace the Restore table with scalar objects.
+--         Moreover the requestor information both for Backup and
+--         Restore operation have been added."
+--    REVISION "20005090000Z"
+--    DESCRIPTION
+--        "It has been deleted the event time string.Moreover it has been
+--         changed the indexes order between Notification Identifier
+--         and Event Time in all tables"
+--    REVISION "20002290000Z"
+--    DESCRIPTION
+--        "The tsdimAbsoluteTime object has been deleted,
+--         while the TsdimAPTAlmSeverity textual convention has been moved
+--         from this MIB to the TSDIM-SNMP-TC.
+--         The APT table has been changed as a consequence of the alarm
+--         management proposal, moreover they have been defined a list
+--         of objects needed for alarm and event creation and their logging
+--         in a persistent way.
+--         Furthermore the LAC objects have been moved to the SNMP-NE MIB."
+--    REVISION "9906240000Z"
+--    DESCRIPTION
+--        "Changed the tsdimAPTAlarmRowStatus manager type of access"
+--    REVISION "9906240000Z"
+--    DESCRIPTION
+--        "Initial Release TSD-IM Support MIB"
+--
+-- ::= { tsdimSupportMCConf 1 }
+
+tsdimSupportMCConf       OBJECT IDENTIFIER ::= { tsdimBasicMC 1 }
+tsdimSupportMCCompl      OBJECT IDENTIFIER ::= { tsdimSupportMCConf 1 }
+tsdimSupportMCGroup      OBJECT IDENTIFIER ::= { tsdimSupportMCConf 2 }
+
+tsdimSupportMc MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "This module compliance describes a set of objects required for
+         TSD-IM SNMP Agent implementation.
+         These objects are defined inside tsdimSupportMib"
+
+    MODULE -- tsdimSupportMib
+
+MANDATORY-GROUPS { tsdimAlarmLogGroup,
+                   tsdimAPTGroup,
+                   tsdimLogMngmtGroup,
+                   tsdimEFDGroup,
+                   tsdimASAPGroup,
+                   tsdimAuxEventObjectsGroup,
+                   opticsIMSupportBckRstGroup }
+
+GROUP tsdimEventLogGroup
+    DESCRIPTION
+        "This group contains the Event Log objects"
+
+GROUP tsdimOptAuxObjectsGroup
+    DESCRIPTION
+        "This group contains the support management auxiliary objects"
+
+GROUP tsdimAuxEventObjectsGroup
+    DESCRIPTION
+        "This group contains the auxiliary alarm objects not mandatories
+         for alarm notifications"
+
+GROUP tsdimEventNotificationGroup
+    DESCRIPTION
+        "This group contains the event notifications, not alarms"
+
+GROUP tsdimAlertNotificationGroup
+    DESCRIPTION
+        "This group contains the alert notification"
+
+GROUP tsdimAlertObjectGroup
+    DESCRIPTION
+        "This group contains the alert configuration objects"
+
+GROUP tsdimOptEFDGroup
+    DESCRIPTION
+        "This group contains the optional objects for the
+         EFD functionality"
+
+GROUP tsdimGenEventLogGroup
+    DESCRIPTION
+        "This group contains the Generic Event Log objects"
+
+GROUP opticsIMSwPackageGroup
+    DESCRIPTION
+        "This group contains the objects related to the software package
+         management."
+
+GROUP opticsIMSwUnitGroup
+    DESCRIPTION
+        "This group contains the objects related to the software unit
+         management."
+
+GROUP opticsIMSwDwlGroup
+    DESCRIPTION
+        "This group contains the objects related to the software download
+         management."
+
+GROUP opticsIMNERestartGroup
+    DESCRIPTION
+        "This group describes the objects needed for the NE restart."
+
+GROUP opticsIMAbnCondGroup
+    DESCRIPTION
+        "This group describes the objects needed for the Abnormal Condition
+         management."
+
+GROUP tsdimASAPOptGroup
+    DESCRIPTION
+        "This group describes the optional objects used for ASAP
+         management."
+
+GROUP tsdimOptAPTGroup
+    DESCRIPTION
+        "This group contains the optional objects for the APT
+         functionality"
+
+GROUP tsdimOptEventLogGroup
+    DESCRIPTION
+        "This group contains the optional objects for the event log"
+
+GROUP tsdimOptAlarmLogGroup
+    DESCRIPTION
+        "This group contains the optional objects for the alarm log"
+
+GROUP opticsIMEqptSwUnitGroup
+    DESCRIPTION
+        "This group contains the objects related to the management of the
+         software unit present in the equipment."
+
+GROUP opticsIMOptAbnCondGroup
+    DESCRIPTION
+       "This group contains the optional objects for the abnormal condition
+     management."
+
+::= { tsdimSupportMCCompl 1 }
+
+-- Units of Conformance
+
+tsdimAlarmLogGroup OBJECT-GROUP
+    OBJECTS { tsdimAlarmLogProbableCause,
+        tsdimAlarmLogObjectClassIdentifier,
+        tsdimAlarmLogObjectInstanceIdentifier,
+        tsdimAlarmLogSeverity,
+        tsdimAlarmLogSpecificProb }
+    STATUS current
+    DESCRIPTION
+        "This group describes the mandatory objects needed for the
+         Alarm Log management configuration."
+::= { tsdimSupportMCGroup 1 }
+
+tsdimAPTGroup OBJECT-GROUP
+    OBJECTS { tsdimAPTAlarmProbableCause,
+        tsdimAPTAlarmObjectClassIdentifier,
+        tsdimAPTAlarmObjectInstanceIdentifier,
+        tsdimAPTAlarmSeverity,
+        tsdimAPTAlarmSpecificProb }
+    STATUS current
+    DESCRIPTION
+        "This group describes the mandatory objects needed for the
+         APT management configuration."
+::= { tsdimSupportMCGroup 2 }
+
+tsdimLogMngmtGroup OBJECT-GROUP
+    OBJECTS { tsdimLogObjectClassIdentifier,
+        tsdimLogAdminStatus,
+        tsdimLogOperStatus,
+        tsdimLogMaxSize }
+    STATUS current
+    DESCRIPTION
+        "This group lists objects needed for Log, both event and
+         alarm, configuration."
+::= { tsdimSupportMCGroup 3 }
+
+tsdimEventLogGroup OBJECT-GROUP
+    OBJECTS { tsdimEventLogEventType,
+        tsdimEventLogObjectClassIdentifier,
+        tsdimEventLogObjectInstanceIdentifier}
+    STATUS current
+    DESCRIPTION
+        "This group describes the mandatory objects needed for the
+         Event Log management configuration."
+::= { tsdimSupportMCGroup 6 }
+
+tsdimAuxEventObjectsGroup OBJECT-GROUP
+    OBJECTS { tsdimEventObjectClassIdentifier,
+        tsdimEventObjectInstanceIdentifier,
+        tsdimEventNotificationId,
+        tsdimEventTime,
+        tsdimAlarmSeverity,
+        tsdimAlarmSpecProblem }
+    STATUS current
+    DESCRIPTION
+        "This group describes the mandatory objects needed for the
+         notification, both events and alarms, management."
+::= { tsdimSupportMCGroup 7 }
+
+tsdimOptAuxObjectsGroup OBJECT-GROUP
+    OBJECTS { tsdimMaxNotificationId }
+    STATUS current
+    DESCRIPTION
+        "This group describes the mandatory objects needed for the
+         notification, both events and alarms, management."
+::= { tsdimSupportMCGroup 9 }
+
+tsdimEventNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { tsdimObjectCreationNotification,
+        tsdimObjectDeletionNotification,
+        tsdimAVCNotification,
+        tsdimStateChangeNotification ,
+        tsdimRowChangeNotification,
+        opticsIMProtectionSwitchReporting }
+    STATUS current
+    DESCRIPTION
+        "This group describes the SNMP NE notifications, not alarms."
+::= { tsdimSupportMCGroup 10 }
+
+tsdimAlertNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { tsdimAlertNotification }
+STATUS current
+    DESCRIPTION
+        "This group describes the SNMP NE alert notification."
+::= { tsdimSupportMCGroup 11 }
+
+tsdimAlertObjectGroup OBJECT-GROUP
+    OBJECTS { tsdimAlertNotifTimeOut,
+              tsdimAlertNotifFreqCount }
+STATUS current
+    DESCRIPTION
+        "This group describes the SNMP NE alert objects."
+::= { tsdimSupportMCGroup 12 }
+
+tsdimEFDGroup OBJECT-GROUP
+    OBJECTS { tsdimEFDDest ,
+        tsdimEFDTrapId,
+        tsdimEFDTrapObject,
+        tsdimEFDRowStatus,
+        tsdimEFDOperStatus ,
+        tsdimEFDManagerIndex }
+STATUS current
+    DESCRIPTION
+        "This group describes the EFD mandatory objects."
+::= { tsdimSupportMCGroup 13 }
+
+tsdimOptEFDGroup OBJECT-GROUP
+    OBJECTS { tsdimEFDPort,
+        tsdimEFDLowestForwardedSeverity,
+        tsdimEFDIndeterminate }
+STATUS current
+    DESCRIPTION
+        "This group describes the EFD optional objects."
+::= { tsdimSupportMCGroup 14 }
+
+tsdimASAPGroup OBJECT-GROUP
+    OBJECTS { tsdimAlarmSevProfileIndexNext,
+        tsdimAlarmSevDefault,
+        tsdimAlarmSevProfileRowStatus,
+        tsdimAlarmSevProfileUserLabel,
+        tsdimAlarmSevSeverity,
+        tsdimAlarmSevRowStatus }
+STATUS current
+    DESCRIPTION
+        "This group describes the ASAP mandatory objects."
+::= { tsdimSupportMCGroup 15 }
+
+opticsIMSupportBckRstGroup OBJECT-GROUP
+    OBJECTS { opticsIMBackupFilename,
+              opticsIMBackupRequestorAddress,
+              opticsIMRestoreFilename,
+              opticsIMRestoreSWVersion,
+              opticsIMRestoreState,
+              opticsIMRestoreRequestorAddress,
+-- CRB Mar2008 Begin
+              opticsImBackupServerAddress,
+              opticsImBackupServerPort,
+              opticsImBackupServerUserId,
+              opticsImBackupServerPassword,
+              opticsImBackupServerRootDir,
+              opticsImRestoreServerAddress,
+              opticsImRestoreServerPort,
+              opticsImRestoreServerUserId,
+              opticsImRestoreServerPassword,
+              opticsImRestoreServerRootDir,
+              opticsIMRestorePercentage,
+              opticsIMRestoreTotalBytes,
+              opticsIMRestoreCurrentFile
+-- CRB Mar2008 End
+               }
+    STATUS current
+    DESCRIPTION
+        "This group compounds object for backup and restore functionality"
+::= { tsdimSupportMCGroup 16 }
+
+tsdimGenEventLogGroup OBJECT-GROUP
+    OBJECTS { tsdimGenEventLogEventType,
+        tsdimGenEventLogObjectClassIdentifier,
+        tsdimGenEventLogObjectInstanceIdentifier,
+        tsdimGenEventLogObj1,
+        tsdimGenEventLogObj2,
+        tsdimGenEventLogObj3,
+        tsdimGenEventLogObj4,
+        tsdimGenEventLogObj5,
+        tsdimGenEventLogObj6,
+        tsdimGenEventLogObj7,
+        tsdimGenEventLogObj8,
+        tsdimGenEventLogObj9,
+        tsdimGenEventLogObj10
+        }
+    STATUS current
+    DESCRIPTION
+        "This group describes the mandatory objects needed for the
+         Event Log management configuration."
+::= { tsdimSupportMCGroup 17 }
+
+opticsIMSwPackageGroup OBJECT-GROUP
+    OBJECTS { opticsIMSwPackageCommand,
+        opticsIMSwPackageActivationResult,
+        opticsIMSwPackageActivationDate,
+        opticsIMSwPackageCurrentState,
+        opticsIMSwPackageLabel,
+        opticsIMSwPackageVersion,
+        opticsIMSwPackageOperationalState
+        }
+    STATUS current
+    DESCRIPTION
+        "This group describes the mandatory objects needed for the
+         Software Package management."
+::= { tsdimSupportMCGroup 18 }
+
+opticsIMSwUnitGroup OBJECT-GROUP
+    OBJECTS { opticsIMSwUnitLabel,
+        opticsIMSwUnitVersion,
+        opticsIMSwUnitSize
+        }
+    STATUS current
+    DESCRIPTION
+        "This group describes the mandatory objects needed for the
+         Sofwtare Unit management."
+::= { tsdimSupportMCGroup 19 }
+
+opticsIMSwDwlGroup OBJECT-GROUP
+    OBJECTS { opticsIMswdlStatusIndicator,
+       opticsImSwdlServerAddress,
+       opticsImSwdlServerPort,
+       opticsImSwdlServerUserId,
+       opticsImSwdlServerPassword,
+       opticsImSwdlServerRootDir,
+       opticsImSwdlInitForcedDownload,
+       opticsImSwdlInitSwPkgVersion,
+       opticsImSwdlInitSwPkgLabel,
+       opticsImSwdlInitDescrName,
+       opticsIMSwdlInitRowStatus,
+       opticsIMSwdlPercentage,
+       opticsIMSwdlTotalBytes,
+       opticsIMSwdlCurrentSwUnitVersion,
+       opticsIMSwdlCurrentSwUnitLabel,
+       opticsImSwdlResult
+       }
+    STATUS current
+    DESCRIPTION
+        "This group describes the mandatory objects needed for the
+         Sofwtare Download management."
+::= { tsdimSupportMCGroup 20 }
+
+opticsIMNERestartGroup OBJECT-GROUP
+    OBJECTS { opticsIMNERestartRequest
+        }
+    STATUS current
+    DESCRIPTION
+        "This group describes the objects needed for the NE restart."
+::= { tsdimSupportMCGroup 21 }
+
+opticsIMAbnCondGroup OBJECT-GROUP
+    OBJECTS { opticsIMActiveAbnCond,
+              opticsIMAbnCondAffectedObjectInstanceId
+              }
+    STATUS current
+    DESCRIPTION
+        "This group describes the objects needed for the Abnormal Condition
+         management."
+::= { tsdimSupportMCGroup 22 }
+
+tsdimASAPOptGroup OBJECT-GROUP
+    OBJECTS { tsdimAlarmSevSeverityNotServAff,
+tsdimAlarmSevProbableCause
+ }
+STATUS current
+    DESCRIPTION
+        "This group describes the ASAP optional objects."
+::= { tsdimSupportMCGroup 24 }
+
+tsdimOptAPTGroup OBJECT-GROUP
+    OBJECTS { opticsIMAPTAdditionalText,
+              opticsIMAPTAlarmType,
+          tsdimAPTAlarmTime }
+STATUS current
+    DESCRIPTION
+        "This group describes the APT optional objects."
+::= { tsdimSupportMCGroup 25 }
+
+tsdimOptEventLogGroup OBJECT-GROUP
+    OBJECTS { opticsIMEventLogAdditionalText,
+          tsdimEventLogTime }
+STATUS current
+    DESCRIPTION
+        "This group describes the event log optional objects."
+::= { tsdimSupportMCGroup 26 }
+
+tsdimOptAlarmLogGroup OBJECT-GROUP
+    OBJECTS { opticsIMAlarmLogAdditionalText,
+              opticsIMAlarmLogAlarmType,
+          tsdimAlarmLogTime }
+STATUS current
+    DESCRIPTION
+        "This group describes the alarm log optional objects."
+::= { tsdimSupportMCGroup 27 }
+
+opticsIMEqptSwUnitGroup OBJECT-GROUP
+    OBJECTS { opticsIMEqptSwUnitLabel,
+              opticsIMEqptSwUnitVersion,
+              opticsIMEqptSwUnitSwdlStatus
+            }
+    STATUS current
+    DESCRIPTION
+        "This group describes the objects needed for the management of the
+         Sofwtare Unit present i the equipment."
+::= { tsdimSupportMCGroup 28 }
+
+opticsIMOptAbnCondGroup OBJECT-GROUP
+    OBJECTS { opticsIMOffNormalDescription }
+STATUS current
+    DESCRIPTION
+        "This group describes the abnormal condition optional objects."
+::= { tsdimSupportMCGroup 29 }
+
+
+
+END

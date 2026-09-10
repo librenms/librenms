@@ -1,4 +1,5 @@
 <?php
+
 /*
  * PluginProvider.php
  *
@@ -26,22 +27,30 @@
 namespace App\Providers;
 
 use App\Exceptions\PluginDoesNotImplementHookException;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Plugins\PluginManagerInterface;
 
-class PluginProvider extends ServiceProvider
+class PluginProvider extends ServiceProvider implements DeferrableProvider
 {
     public function register(): void
     {
-        $this->app->singleton(PluginManagerInterface::class, function ($app) {
-            return new \App\Plugins\PluginManager;
-        });
+        $this->app->singleton(PluginManagerInterface::class, fn ($app) => new \App\Plugins\PluginManager);
     }
 
     public function boot(): void
     {
-        $this->loadLocalPlugins($this->app->make(PluginManagerInterface::class));
+        if (! $this->app->runningInConsole() && ! $this->app->runningUnitTests()) {
+            $this->loadLocalPlugins($this->app->make(PluginManagerInterface::class));
+        }
+    }
+
+    public function provides(): array
+    {
+        return [
+            PluginManagerInterface::class,
+        ];
     }
 
     /**
@@ -79,7 +88,7 @@ class PluginProvider extends ServiceProvider
      * @param  string  $class
      * @return string
      *
-     * @throws \App\Exceptions\PluginDoesNotImplementHookException
+     * @throws PluginDoesNotImplementHookException
      */
     protected function hookType(string $class): string
     {

@@ -25,33 +25,27 @@ IMPORTS
         ;
 
 timetraIsisMIBModule MODULE-IDENTITY
-     LAST-UPDATED    "201205040000Z"
-        ORGANIZATION    "Alcatel - Architects Of An Internet World"
-        CONTACT-INFO
-        "Please consult with Customer Service to insure the most appropriate
-         version of this document is used with the products in question:
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                 Alcatel-Lucent, Enterprise Solutions Division
-                (Formerly Alcatel Internetworking, Incorporated)
-                           26801 West Agoura Road
-                        Agoura Hills, CA  91301-5122
-                          United States Of America
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
     DESCRIPTION
      "This module describes an authoritative enterprise-specific Simple
         Network Management Protocol (SNMP) Management Information Base (MIB):
 
-             For the Birds Of Prey Product Line
+             For the OmniSwitch Product Line
              Configuration Of Global ISIS Configuration Parameters.
 
         This MIB has been taken from Alcatel 7x50 device ISIS MIB
@@ -76,12 +70,15 @@ timetraIsisMIBModule MODULE-IDENTITY
 
         This Specification is supplied 'as is', and Alcatel
         makes no warranty, either express or implied, as to the use,
-        operation, condition, or performance of the Specification."
-
-
+        operation, condition, or performance of the Specification.
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
 --
 --  Revision History
 --
+        REVISION        "201911270000Z"
+        DESCRIPTION     "Updated the latest contact and Copyright information for ALE USA Inc."
 
         REVISION        "200707020000Z"
         DESCRIPTION     "Rev 4.1                02 Aug 2007 00:00
@@ -118,7 +115,6 @@ timetraIsisMIBModule MODULE-IDENTITY
         REVISION        "0109210000Z"
         DESCRIPTION     "Rev 0.1                21 Sep 2001 00:00
                          Initial version of the TIMETRA-ISIS-MIB."
-
         ::= { routingIND1ISIS 1 }
 
 
@@ -284,7 +280,8 @@ VRtrIsisEntry ::=
             vRtrIsisActivateIPv6            TruthValue,
             vRtrIsisMTEnabled               TruthValue,
             vRtrIsisBfdStatus               TruthValue,
-            vRtrIsisBfdAllVlanStatus        TruthValue
+            vRtrIsisBfdAllVlanStatus        TruthValue,
+            vRtrIsisAuthKeyChainId          Unsigned32
          }
 
 vRtrIsisLastEnabledTime    OBJECT-TYPE
@@ -323,7 +320,8 @@ vRtrIsisAuthType        OBJECT-TYPE
         SYNTAX      INTEGER {
                         none (1),
                         password (2),
-                        md5 (3)
+                        md5 (3),
+                        cryptoAuth (4)
                     }
         MAX-ACCESS  read-write
         STATUS      current
@@ -703,6 +701,14 @@ vRtrIsisBfdAllVlanStatus     OBJECT-TYPE
     DEFVAL { false }
     ::= { vRtrIsisEntry 36}
 
+vRtrIsisAuthKeyChainId     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The key-chain ID which is used for authentication."
+    ::= { vRtrIsisEntry 37}
+
 --
 --  vRtrIsisLevelTable
 --
@@ -742,7 +748,8 @@ VRtrIsisLevelEntry ::=
             vRtrIsisLevelNumLSPs             Unsigned32,
             vRtrIsisLevelCsnpAuthentication  TruthValue,
             vRtrIsisLevelHelloAuthentication TruthValue,
-            vRtrIsisLevelPsnpAuthentication  TruthValue
+            vRtrIsisLevelPsnpAuthentication  TruthValue,
+            vRtrIsisLevelAuthKeyChainId      Unsigned32
 
         }
 
@@ -788,7 +795,8 @@ vRtrIsisLevelAuthType        OBJECT-TYPE
                         useGlobal (0),
                         none (1),
                         password (2),
-                        md5 (3)
+                        md5 (3),
+                        cryptoAuth (4)
                     }
         MAX-ACCESS  read-write
         STATUS      current
@@ -911,6 +919,14 @@ vRtrIsisLevelPsnpAuthentication       OBJECT-TYPE
              supresses authentication of PSNP packets at this level."
         DEFVAL { true }
         ::= { vRtrIsisLevelEntry 10 }
+
+vRtrIsisLevelAuthKeyChainId       OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The key-chain ID which is used for level authentication."
+        ::= { vRtrIsisLevelEntry 11 }
 --
 --  vRtrIsisStatsTable
 --
@@ -1691,7 +1707,8 @@ VRtrIsisIfEntry ::=
             vRtrIsisIfRetransmitInterval    Unsigned32,
             vRtrIsisIfTypeDefault           TruthValue,
             vRtrIsisIfAddressFamily         INTEGER,
-            vRtrIsisIfBfdStatus             TruthValue
+            vRtrIsisIfBfdStatus             TruthValue,
+            vRtrIsisIfHelloAuthKeyChainId   Unsigned32
         }
 
 
@@ -1788,7 +1805,8 @@ vRtrIsisIfHelloAuthType     OBJECT-TYPE
         SYNTAX      INTEGER {
                         none (1),
                         password (2),
-                        md5 (3)
+                        md5 (3),
+                        cryptoAuth (4)
                     }
         MAX-ACCESS  read-create
         STATUS      current
@@ -1884,6 +1902,14 @@ vRtrIsisIfBfdStatus     OBJECT-TYPE
     DEFVAL { false }
     ::= { vRtrIsisIfEntry 14}
 
+vRtrIsisIfHelloAuthKeyChainId     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The key-chain ID which is used for hello authentication."
+    ::= { vRtrIsisIfEntry 15}
+
 --
 --  vRtrIsisIfLevelTable  IS-IS Interfaces Level Table
 --
@@ -1923,7 +1949,8 @@ VRtrIsisIfLevelEntry ::=
             vRtrIsisIfLevelISPriority           Unsigned32,
             vRtrIsisIfLevelHelloTimer           Unsigned32,
             vRtrIsisIfLevelAdminMetric          Unsigned32,
-            vRtrIsisIfLevelOperMetric           Unsigned32
+            vRtrIsisIfLevelOperMetric           Unsigned32,
+            vRtrIsisIfLevelHelloAuthKeyChainId  Unsigned32
         }
 
 vRtrIsisIfLevel     OBJECT-TYPE
@@ -1976,7 +2003,8 @@ vRtrIsisIfLevelHelloAuthType        OBJECT-TYPE
                         useGlobal (0),
                         none (1),
                         password (2),
-                        md5 (3)
+                        md5 (3),
+                        cryptoAuth (4)
                     }
         MAX-ACCESS  read-create
         STATUS      current
@@ -2093,6 +2121,13 @@ vRtrIsisIfLevelOperMetric  OBJECT-TYPE
               circuit for this level."
         ::= { vRtrIsisIfLevelEntry 11 }
 
+vRtrIsisIfLevelHelloAuthKeyChainId  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "The key-chain ID which is used for level hello authentication."
+        ::= { vRtrIsisIfLevelEntry 12 }
 
 --
 --  Augmentation of the isisISAdjTable
@@ -3825,7 +3860,9 @@ vRtrIsisV4v0Group OBJECT-GROUP
                 vRtrIsisActivateIPv4,
                 vRtrIsisActivateIPv6,
                 vRtrIsisBfdStatus,
-                vRtrIsisBfdAllVlanStatus
+                vRtrIsisBfdAllVlanStatus,
+                vRtrIsisAuthKeyChainId,
+                vRtrIsisLevelAuthKeyChainId
             }
     STATUS    current
     DESCRIPTION
@@ -3913,7 +3950,9 @@ vRtrIsisIfV4v0Group OBJECT-GROUP
                 vRtrIsisIfLevelAdminMetric,
                 vRtrIsisIfLevelOperMetric,
                 vRtrIsisIfAddressFamily,
-                vRtrIsisIfBfdStatus
+                vRtrIsisIfBfdStatus,
+                vRtrIsisIfHelloAuthKeyChainId,
+                vRtrIsisIfLevelHelloAuthKeyChainId
             }
     STATUS    current
     DESCRIPTION

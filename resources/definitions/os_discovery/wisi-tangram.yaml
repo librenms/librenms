@@ -1,0 +1,58 @@
+modules:
+    os:
+        hardware: WISI-GTMODULES-MIB::gtModuleName.7
+        serial: WISI-GTMODULES-MIB::gtModuleSerNo.7
+        version: WISI-GTMODULES-MIB::gtModuleFWID.7
+    sensors:
+        fanspeed:
+            data:
+                -
+                    oid: WISI-GTSENSORS-MIB::gtFansTable
+                    value: WISI-GTSENSORS-MIB::gtFanSpeed
+                    num_oid: '.1.3.6.1.4.1.7465.20.2.9.1.3.1.4.1.4.{{ $index }}'
+                    descr: '{{ WISI-GTSENSORS-MIB::gtFanName }}'
+                    index: 'gtFanSpeed.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: WISI-GTSENSORS-MIB::gtTempsTable
+                    value: WISI-GTSENSORS-MIB::gtTempValue
+                    num_oid: '.1.3.6.1.4.1.7465.20.2.9.1.3.1.2.1.3.{{ $index }}'
+                    descr: '{{ WISI-GTSENSORS-MIB::gtTempName }}'
+                    index: 'gtTempValue.{{ $index }}'
+                    group: 'Chassis'
+                -
+                    oid: WISI-GTSENSORS-MIB::gtPSUsTable
+                    value: WISI-GTSENSORS-MIB::gtPSUTemperature
+                    num_oid: '.1.3.6.1.4.1.7465.20.2.9.1.3.1.6.1.8.{{ $index }}'
+                    descr: 'Power Supply ({{ WISI-GTSENSORS-MIB::gtPSUName }})'
+                    index: 'gtPSUTemperature.{{ $index }}'
+                    group: 'Power Supply'
+        voltage:
+            data:
+                -
+                    oid: WISI-GTSENSORS-MIB::gtPSUsTable
+                    value: WISI-GTSENSORS-MIB::gtPSUVoltageExt
+                    num_oid: '.1.3.6.1.4.1.7465.20.2.9.1.3.1.6.1.7.{{ $index }}'
+                    descr: 'Power Supply ({{ WISI-GTSENSORS-MIB::gtPSUName }})'
+                    index: 'gtPSUVoltageExt.{{ $index }}'
+                    divisor: 100
+                    group: 'External Voltage'
+                -
+                    oid: WISI-GTSENSORS-MIB::gtPSUsTable
+                    value: WISI-GTSENSORS-MIB::gtPSUVoltageInt
+                    num_oid: '.1.3.6.1.4.1.7465.20.2.9.1.3.1.6.1.5.{{ $index }}'
+                    descr: 'Power Supply ({{ WISI-GTSENSORS-MIB::gtPSUName }})'
+                    index: 'gtPSUVoltageInt.{{ $index }}'
+                    divisor: 100
+                    group: 'Internal Voltage'
+        current:
+            data:
+                -
+                    oid: WISI-GTSENSORS-MIB::gtPSUsTable
+                    value: WISI-GTSENSORS-MIB::gtPSUCurrent
+                    num_oid: '.1.3.6.1.4.1.7465.20.2.9.1.3.1.6.1.4.{{ $index }}'
+                    descr: 'Power Supply ({{ WISI-GTSENSORS-MIB::gtPSUName }})'
+                    index: 'gtTempValue.{{ $index }}'
+                    divisor: 1000
+                    group: 'Internal Current'

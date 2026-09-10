@@ -1,13 +1,13 @@
 # Rancid
 
 Librenms can generate a list of hosts that can be monitored by
-RANCID. We assume you have currently a running Rancid, and you just
+RANCID. This section assumes a running Rancid. You
 need to create and update the file 'router.db'
 
 ## Included Rancid script
 
 To generate the config file (maybe even add a cron to schedule
-this). We've assumed a few locations for Rancid, the config file you
+this). This section assumes some Rancid locations. The config file that you
 want to call it and where LibreNMS is:
 
 ```bash
@@ -28,13 +28,33 @@ $config['rancid_configs']['core'] = '/the/path/where/is/rancid/core';
 $config['rancid_ignorecomments'] = 0;
 ```
 
-After that, you should see some "config" tab on routers that have a rancid update.
+A "config" tab then appears on each router with a rancid update.
+
+## Rancid Bare Git Repository
+
+Rancid has capability to version the configuration files in Git, and it can push
+the commits to a remote repository which is bare, that is it lacks a
+worktree. GitWeb is a simple web frontend that visualizes bare
+repositories, and can be served by the same HTTP server as LibreNMS.
+
+If the bare repository follows the usual naming conventions, that is, the path to
+it looks like `/some/path/rancid.git` (ending in `.git`), the configuration files
+are in `configs` directory in Git, and GitWeb is configured under `/repo` on the
+same server, then that bare Git repository can be integrated by the following
+configuration:
+
+```
+$config['rancid_configs'][] = '/some/path/rancid.git/configs';
+$config['rancid_repo_type'] = 'git-bare';
+$config['rancid_repo_url'] = '/repo';
+```
 
 ## Ubuntu Rancid Install
 
 The options shown below also contains the default values.
 
-> NOTE - This is Only for Ubuntu 16.04 at this time, and may not work on other distros!
+> NOTE: this section applies only to Ubuntu 16.04. It can fail on
+> another distribution.
 
 `sudo apt-get install rancid subversion`
 
@@ -59,7 +79,7 @@ RCSSYS=svn; export RCSSYS
 ```
 
 NOTE - This only creates 1 group! You can of course make more when you
-get the hang of it, this is just a basic 'Need it to work" deal.
+learn the process. This example is a basic working setup.
 
 `sudo su -c /var/lib/rancid/bin/rancid-cvs -s /bin/bash -l rancid`
 > NOTE - do NOT change cvs to svn here! Leave command as is!
@@ -78,11 +98,11 @@ alphcr1:cisco:up will change to:
 alphcr1;cisco;up
 ```
 
-copy and past results into the below file:
+copy and paste results into the below file:
 `sudo vi /var/lib/rancid/librenms/router.db`
 
 NOTE - This ONLY applies to newer RANCID versions and Linux
-distros. Older versions will need to retain the : and not the ;
+distributions. An older version keeps the `:` and does not use the `;`
 
 Create/edit rancids login file:
 
@@ -107,11 +127,12 @@ sudo chmod 600 /var/lib/rancid/.cloginrc
 Test config:
 `sudo /usr/lib/rancid/bin/clogin -f /var/lib/rancid/.cloginrc <device hostname>`
 
-NOTE: IF you run into a 'diffie-hellmen' kind of error, then it is
+NOTE: IF you run into a 'diffie-hellman' kind of error, then it is
 because your Linux distro is using newer encryption methods
-etc. This is basically just letting you know that the device you
+and more. This message means that the device that you
 tested on is running an outdated encryption type. I recommend updating
-downstream device if able.  If not, the following should fix:
+downstream device where possible. If you cannot, this command corrects
+the problem:
 
 `sudo vi /etc/ssh/ssh_config`
 

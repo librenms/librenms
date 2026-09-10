@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CiscoPortSecurity.php
  *
@@ -24,7 +25,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class CiscoMacViolationTest extends SnmpTrapTestCase
+final class CiscoMacViolationTest extends SnmpTrapTestCase
 {
     /**
      * Test CiscoMacViolation trap handle

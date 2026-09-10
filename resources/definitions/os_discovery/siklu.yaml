@@ -1,0 +1,16 @@
+modules:
+  sensors:
+    voltage:
+      data:
+        -
+            oid: RADIO-BRIDGE-MIB::rbSysVoltage
+            num_oid: '.1.3.6.1.4.1.31926.1.1.{{ $index }}'
+            index: 'rbSysVoltage.{{ $index }}'
+            descr: 'System voltage'
+    temperature:
+      data:
+        -
+            oid: RADIO-BRIDGE-MIB::rbSysTemperature
+            num_oid: '.1.3.6.1.4.1.31926.1.2.{{ $index }}'
+            index: '.1.3.6.1.4.1.31926.1.2.{{ $index }}'
+            descr: 'System Temp'

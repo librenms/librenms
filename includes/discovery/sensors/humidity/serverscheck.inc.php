@@ -1,4 +1,5 @@
 <?php
+
 /**
  * serverscheck.inc.php
  *

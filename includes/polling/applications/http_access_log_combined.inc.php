@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -129,28 +130,28 @@ $gauge_rrd_def = RrdDefinition::make()
     ->addDataset('data', 'GAUGE', 0);
 
 // process total stats, .data.totals
-foreach ($stat_vars as $key => $stat) {
+foreach ($stat_vars as $stat) {
     $var_name = 'totals_' . $stat;
     $value = $data['totals'][$stat];
     $rrd_name = ['app', $name, $app->app_id, $var_name];
     $fields = ['data' => $value];
     $metrics[$var_name] = $value;
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 
 // process each log under .data.logs
 $logs = [];
 foreach ($data['logs'] as $logs_key => $log_stats) {
     $logs[] = $logs_key;
-    foreach ($stat_vars as $key => $stat) {
+    foreach ($stat_vars as $stat) {
         $var_name = 'logs___' . $logs_key . '___' . $stat;
         $value = $log_stats[$stat];
         $rrd_name = ['app', $name, $app->app_id, $var_name];
         $fields = ['data' => $value];
         $metrics[$var_name] = $value;
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
     }
 }
 
@@ -168,7 +169,7 @@ if (count($added_logs) > 0 || count($removed_logs) > 0) {
     $log_message = 'HTTP Access Log Set Change:';
     $log_message .= count($added_logs) > 0 ? ' Added ' . implode(',', $added_logs) : '';
     $log_message .= count($removed_logs) > 0 ? ' Removed ' . implode(',', $added_logs) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 // all done so update the app metrics

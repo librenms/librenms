@@ -21,8 +21,8 @@ if ($device['os'] == 'vrp') {
             'PortMaxPwrDrawn' => $this_port['hwPoePortPeakPower'],
         ];
 
-        $tags = compact('ifName', 'rrd_name', 'rrd_def');
-        data_update($device, 'poe', $tags, $fields);
+        $tags = ['ifName' => $ifName, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+        app('Datastore')->put($device, 'poe', $tags, $fields);
         echo 'PoE(vrp) ';
     }
 } elseif ($device['os'] == 'linksys-ss') {
@@ -37,16 +37,16 @@ if ($device['os'] == 'vrp') {
             'PortMaxPwrDrawn' => $this_port['rlPethPsePortPowerLimit'],
         ];
 
-        $tags = compact('ifName', 'rrd_name', 'rrd_def');
-        data_update($device, 'poe', $tags, $fields);
+        $tags = ['ifName' => $ifName, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+        app('Datastore')->put($device, 'poe', $tags, $fields);
         echo 'PoE(linksys) ';
     }
 } elseif (($device['os'] == 'ios') || ($device['os'] == 'iosxe')) {
     // Code for Cisco IOS and IOSXE, tested on 2960X
     if (isset($this_port['cpeExtPsePortPwrAllocated'])) {
         // if we have cpeExtPsePortPwrAllocated, we have the complete array so we can populate the RRD
-        $upd = "$polled:" . $port['cpeExtPsePortPwrAllocated'] . ':' . $port['cpeExtPsePortPwrAvailable'] . ':' .
-            $port['cpeExtPsePortPwrConsumption'] . ':' . $port['cpeExtPsePortMaxPwrDrawn'];
+        $upd = "$polled:" . $this_port['cpeExtPsePortPwrAllocated'] . ':' . $this_port['cpeExtPsePortPwrAvailable'] . ':' .
+            $this_port['cpeExtPsePortPwrConsumption'] . ':' . $this_port['cpeExtPsePortMaxPwrDrawn'];
         echo "$this_port[cpeExtPsePortPwrAllocated],$this_port[cpeExtPsePortPwrAvailable],$this_port[cpeExtPsePortPwrConsumption],$this_port[cpeExtPsePortMaxPwrDrawn]\n";
         $fields = [
             'PortPwrAllocated' => $this_port['cpeExtPsePortPwrAllocated'],
@@ -55,8 +55,8 @@ if ($device['os'] == 'vrp') {
             'PortMaxPwrDrawn' => $this_port['cpeExtPsePortMaxPwrDrawn'],
         ];
 
-        $tags = compact('ifName', 'rrd_name', 'rrd_def');
-        data_update($device, 'poe', $tags, $fields);
+        $tags = ['ifName' => $ifName, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+        app('Datastore')->put($device, 'poe', $tags, $fields);
         echo 'PoE(IOS) ';
     }//end if
 } elseif ($device['os'] == 'jetstream') {
@@ -69,8 +69,21 @@ if ($device['os'] == 'vrp') {
             'PortMaxPwrDrawn' => $this_port['tpPoePowerLimit'] * 100,
         ];
 
-        $tags = compact('ifName', 'rrd_name', 'rrd_def');
-        data_update($device, 'poe', $tags, $fields);
+        $tags = ['ifName' => $ifName, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+        app('Datastore')->put($device, 'poe', $tags, $fields);
         echo 'PoE(jetstream) ';
+    }
+} elseif ($device['os'] == 'ironware') {
+    if (isset($this_port['snAgentPoePortWattage'])) {
+        $fields = [
+            'PortPwrAllocated' => $this_port['snAgentPoePortWattage'],
+            'PortPwrAvailable' => $this_port['snAgentPoePortWattage'],
+            'PortConsumption' => $this_port['snAgentPoePortConsumed'],
+            'PortMaxPwrDrawn' => $this_port['snAgentPoePortWattage'],
+        ];
+
+        $tags = ['ifName' => $ifName, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+        app('Datastore')->put($device, 'poe', $tags, $fields);
+        echo 'PoE(ironware) ';
     }
 }

@@ -47,18 +47,17 @@ if (! function_exists('proxmox_vm_exists')) {
     }
 }
 
-if (\LibreNMS\Config::get('enable_proxmox') && ! empty($agent_data['app'][$name])) {
+if (\App\Facades\LibrenmsConfig::get('enable_proxmox') && ! empty($agent_data['app'][$name])) {
     $proxmox = $agent_data['app'][$name];
-} elseif (\LibreNMS\Config::get('enable_proxmox')) {
-    $options = '-Oqv';
+} elseif (\App\Facades\LibrenmsConfig::get('enable_proxmox')) {
     $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.7.112.114.111.120.109.111.120';
-    $proxmox = snmp_get($device, $oid, $options);
-    $proxmox = preg_replace('/^.+\n/', '', $proxmox);
+    $proxmox = SnmpQuery::get($oid)->value();
+    $proxmox = preg_replace('/^.+\n/', '', (string) $proxmox);
     $proxmox = str_replace("<<<app-proxmox>>>\n", '', $proxmox);
 }
 
-if ($proxmox) {
-    $pmxlines = explode("\n", $proxmox);
+if (! empty($proxmox)) {
+    $pmxlines = explode("\n", (string) $proxmox);
     $pmxcluster = array_shift($pmxlines);
     dbUpdate(
         ['device_id' => $device['device_id'], 'app_type' => $name, 'app_instance' => $pmxcluster],
@@ -72,9 +71,11 @@ if ($proxmox) {
         $pmxcache = [];
 
         foreach ($pmxlines as $vm) {
-            $vm = str_replace('"', '', $vm);
-            [$vmid, $vmport, $vmpin, $vmpout, $vmdesc] = explode('/', $vm, 5);
-            echo "Proxmox ($pmxcluster): $vmdesc: $vmpin/$vmpout/$vmport\n";
+            $vm = trim(str_replace('"', '', $vm));
+            if (! preg_match('#^([^/]+)/([^/]+)/([^/]+)/([^/]+)/(.+)$#', $vm, $matches)) {
+                continue;
+            }
+            [, $vmid, $vmport, $vmpin, $vmpout, $vmdesc] = $matches;
 
             $rrd_def = RrdDefinition::make()
                 ->addDataset('INOCTETS', 'DERIVE', 0, 12500000000)
@@ -99,7 +100,7 @@ if ($proxmox) {
                 ],
                 'rrd_def' => $rrd_def,
             ];
-            data_update($device, 'app', $tags, $fields);
+            app('Datastore')->put($device, 'app', $tags, $fields);
 
             if (proxmox_vm_exists($vmid, $pmxcluster, $pmxcache) === true) {
                 dbUpdate([

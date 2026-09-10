@@ -524,7 +524,7 @@ return [
         'nfsen_top_default' => [
             'description' => '默认 Top N',
         ],
-        'nfsen_stat_default' => [
+        'nfsen_stats_default' => [
             'description' => '默认统计',
         ],
         'nfsen_order_default' => [
@@ -543,9 +543,6 @@ return [
         'nfsen_suffix' => [
             'description' => '文件名称前缀',
             'help' => '这是非常关键的一点，因为在NfSen中，设备名称被限制为21个字符。这意味着设备的完整域名可能很难压缩进去，因此通常会移除这一部分。',
-        ],
-        'nmap' => [
-            'description' => 'nmap 路径',
         ],
         'own_hostname' => [
             'description' => 'LibreNMS 主机名称',
@@ -586,9 +583,6 @@ return [
                 'description' => '启用 PeeringDB 反查',
                 'help' => '起用 PeeringDB lookup (资料将于由 daily.sh 进行下载)',
             ],
-        ],
-        'ping' => [
-            'description' => 'ping 路径',
         ],
         'ports_fdb_purge' => [
             'description' => '连接端口 FDB 项目大于',
@@ -640,9 +634,6 @@ return [
         'rrdtool_tune' => [
             'description' => '调整所有 rrd 连接端口档案使用最大值',
             'help' => '自动调整 rrd 连接端口档案的最大值',
-        ],
-        'sfdp' => [
-            'description' => 'sfdp 路径',
         ],
         'shorthost_target_length' => [
             'description' => '缩短后的主机名最大长度',
@@ -797,9 +788,6 @@ return [
                 'description' => '设定图表最小高度',
                 'help' => '图表最小高度 (预设: 300)',
             ],
-        ],
-        'whois' => [
-            'description' => 'whois 路径',
         ],
     ],
     'twofactor' => [

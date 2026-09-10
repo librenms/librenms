@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('poller_name')->unique();
             $table->dateTime('last_polled');
             $table->unsignedInteger('devices');
-            $table->float('time_taken', 10, 0);
+            $table->double('time_taken');
         });
     }
 

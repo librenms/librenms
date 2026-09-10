@@ -1,4 +1,5 @@
 <?php
+
 /*
  * RolesController.php
  *
@@ -25,22 +26,46 @@
 
 namespace App\Http\Controllers\Select;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Silber\Bouncer\BouncerFacade as Bouncer;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
+/**
+ * @extends SelectController<Role>
+ */
 class RoleController extends SelectController
 {
     protected ?string $idField = 'name';
-    protected ?string $textField = 'title';
 
-    protected function searchFields(Request $request)
+    protected function searchFields(Request $request): array
     {
         return ['name'];
     }
 
-    protected function baseQuery(Request $request)
+    protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
-        return Bouncer::role()
-            ->whereRaw('1 = ' . ((int) $request->user()->can('viewAny', Bouncer::role())));
+        $this->authorize('viewAny', Role::class);
+
+        if (Role::exists()) {
+            return Role::query()->select('name');
+        }
+
+        // Create a query builder from a raw SQL that returns default values
+        return DB::table(DB::raw("(SELECT 'admin' as name UNION ALL SELECT 'global-read' UNION ALL SELECT 'user') as roles"));
+    }
+
+    /**
+     * @param  Role  $model
+     * @return array{id: int|string, text: string, icon?: string}
+     */
+    public function formatItem(Model $model): array
+    {
+        return [
+            'id' => $model->name,
+            'text' => Str::title(str_replace('-', ' ', $model->name)),
+        ];
     }
 }

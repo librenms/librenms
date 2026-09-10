@@ -1,0 +1,157 @@
+STORMSHIELD-OVPN-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64 FROM SNMPv2-SMI
+      DisplayString                                      FROM SNMPv2-TC
+      stormshieldMIB                                     FROM STORMSHIELD-SMI-MIB;
+
+   snsOVPN MODULE-IDENTITY
+      LAST-UPDATED  "202005250000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield OVPN Statistics"
+      REVISION      "202005250000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 17 }
+
+   snsOVPNStatsTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF SnsOVPNStatsEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION   "OVPN Clients Informations"
+      ::= { snsOVPN 1 }
+
+   snsOVPNStatsEntry OBJECT-TYPE
+      SYNTAX        SnsOVPNStatsEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION   "Each entry in the snsOVPNStatsTable holds an OpenVPN client information."
+      INDEX         { snsOVPNEntryIndex }
+      ::= { snsOVPNStatsTable 1 }
+
+   SnsOVPNStatsEntry ::=
+      SEQUENCE {
+         snsOVPNEntryIndex          Integer32,
+         snsOVPNEntryIpProto        DisplayString,
+         snsOVPNEntryUser           DisplayString,
+         snsOVPNEntryDomain         DisplayString,
+         snsOVPNEntryRealIp         DisplayString,
+         snsOVPNEntryVPNIp          DisplayString,
+         snsOVPNEntryVPNIpv6        DisplayString,
+         snsOVPNEntryPort           DisplayString,
+         snsOVPNEntryRecv           DisplayString,
+         snsOVPNEntrySent           DisplayString,
+         snsOVPNEntryDuration       Counter64,
+         snsOVPNEntryHostChecking   DisplayString,
+         snsOVPNEntryClientVersion  DisplayString,
+         snsOVPNEntryOsType         DisplayString
+      }
+
+   snsOVPNEntryIndex OBJECT-TYPE
+      SYNTAX        Integer32 (0..65535)
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Index of OpenVPN client in table"
+    ::= { snsOVPNStatsEntry 1 }
+
+   snsOVPNEntryIpProto OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "IP Protocol used"
+    ::= { snsOVPNStatsEntry 2 }
+
+   snsOVPNEntryUser OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "User name"
+    ::= { snsOVPNStatsEntry 3 }
+
+   snsOVPNEntryDomain OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Domain name"
+    ::= { snsOVPNStatsEntry 4 }
+
+   snsOVPNEntryRealIp OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Real IP Address"
+    ::= { snsOVPNStatsEntry 5 }
+
+   snsOVPNEntryVPNIp OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "VPN IP Address"
+    ::= { snsOVPNStatsEntry 6 }
+
+   snsOVPNEntryVPNIpv6 OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "VPN IPv6 Address"
+    ::= { snsOVPNStatsEntry 7 }
+
+   snsOVPNEntryPort OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Port number"
+    ::= { snsOVPNStatsEntry 8 }
+
+   snsOVPNEntryRecv OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Received traffic [Bytes]"
+    ::= { snsOVPNStatsEntry 9 }
+
+    snsOVPNEntrySent OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Sent traffic [Bytes]"
+    ::= { snsOVPNStatsEntry 10 }
+
+   snsOVPNEntryDuration OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Duration [seconds]"
+    ::= { snsOVPNStatsEntry 11 }
+
+    snsOVPNEntryHostChecking OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Host checking state"
+    ::= { snsOVPNStatsEntry 12 }
+
+    snsOVPNEntryClientVersion OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Client version"
+    ::= { snsOVPNStatsEntry 13 }
+
+    snsOVPNEntryOsType OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Operating system"
+    ::= { snsOVPNStatsEntry 14 }
+
+END

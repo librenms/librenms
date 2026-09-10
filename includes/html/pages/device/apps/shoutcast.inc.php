@@ -12,7 +12,7 @@ if (isset($total) && $total === true) {
         $graph_type = $key;
         $graph_array['height'] = '100';
         $graph_array['width'] = '215';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['id'] = $app['app_id'];
         $graph_array['type'] = 'application_' . $key;
 
@@ -29,7 +29,7 @@ if (isset($total) && $total === true) {
     }
 }
 
-$files = glob(Rrd::name($device['hostname'], ['app', 'shoutcast', $app['app_id']], '*.rrd'));
+$files = Rrd::getRrdFiles($device['hostname'], ['app', 'shoutcast', $app['app_id']]);
 foreach ($files as $file) {
     $pieces = explode('-', basename($file, '.rrd'));
     $hostname = end($pieces);
@@ -43,7 +43,7 @@ foreach ($files as $file) {
         $graph_type = $key;
         $graph_array['height'] = '100';
         $graph_array['width'] = '215';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['id'] = $app['app_id'];
         $graph_array['type'] = 'application_' . $key;
         $graph_array['hostname'] = $hostname;

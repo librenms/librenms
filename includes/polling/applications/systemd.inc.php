@@ -1,11 +1,12 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
-require_once Config::get('install_dir') . '/includes/systemd-shared.inc.php';
+require_once LibrenmsConfig::get('install_dir') . '/includes/systemd-shared.inc.php';
 
 $name = 'systemd';
 $output = 'OK';
@@ -39,9 +40,7 @@ if (! function_exists('systemd_data_update_helper')) {
         $state_type,
         $rrd_flattened_name
     ) {
-        $rrd_flattened_name = is_null($rrd_flattened_name)
-            ? $state_type
-            : $rrd_flattened_name;
+        $rrd_flattened_name ??= $state_type;
         $rrd_name = [$polling_type, $name, $app_id, $rrd_flattened_name];
 
         // This if block allows metric names to be kept consistent
@@ -60,7 +59,7 @@ if (! function_exists('systemd_data_update_helper')) {
             'rrd_def' => $rrd_def,
             'rrd_name' => $rrd_name,
         ];
-        data_update($device, $polling_type, $tags, $fields);
+        app('Datastore')->put($device, $polling_type, $tags, $fields);
 
         return $metrics;
     }
@@ -93,7 +92,7 @@ foreach ($systemd_mapper as $state_type => $state_statuses) {
     $flattened_type = $state_type;
 
     // Ternary-depth systemd type check.
-    if (preg_match('/^(.+)_(.+)$/', $state_type, $regex_matches)) {
+    if (preg_match('/^(.+)_(.+)$/', (string) $state_type, $regex_matches)) {
         if (! in_array($regex_matches[1], $state_type_ternary_depth)) {
             continue;
         }
@@ -123,7 +122,7 @@ foreach ($systemd_mapper as $state_type => $state_statuses) {
                 $state_status .
                 ' state status: ' .
                 $field_value;
-            log_event($log_message, $device, 'application');
+            Eventlog::log($log_message, $device['device_id'], 'application');
             continue;
         }
 

@@ -9,16 +9,19 @@ use Illuminate\View\Component;
 
 class QosTree extends Component
 {
+    /** @var Collection<int, \App\Models\Qos> */
     public Collection $listItems;
 
     /**
      * Create a new component instance.
+     *
+     * @param  Collection<int, \App\Models\Qos>  $qosItems
      */
     public function __construct(
         public Collection $qosItems,
-        public int|null $parentPortId = null,
-        public int|null $parentQosId = null,
-        public int|null $show = null,
+        public ?int $parentPortId = null,
+        public ?int $parentQosId = null,
+        public ?int $show = null,
     ) {
         if (! is_null($parentQosId)) {
             $this->listItems = $qosItems->where('parent_id', $parentQosId)->sortBy('title');

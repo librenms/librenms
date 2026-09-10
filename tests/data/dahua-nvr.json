@@ -481,14 +481,12 @@
                 {
                     "state_name": "deviceStatus",
                     "state_descr": "Bad",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "deviceStatus",
                     "state_descr": "Good",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 }

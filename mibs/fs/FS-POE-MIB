@@ -1,0 +1,166 @@
+-- *****************************************************************
+-- FS-POE-MIB.mib:  FS POE MIB file
+--
+-- Feb 2012, Hedong
+--
+-- Copyright © 2009-2020 FS.COM Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+--
+
+FS-POE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+        OBJECT-TYPE
+                FROM SNMPv2-SMI
+			  TruthValue
+			    			FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        fsMgmt
+                FROM FS-SMI;
+
+fsPoeMIB MODULE-IDENTITY
+        LAST-UPDATED "201202140000Z"
+        ORGANIZATION "FS.COM Inc."
+        CONTACT-INFO
+                "
+                Tel: 400-865-2852
+
+                E-mail: https://www.fs.com/live_chat_service_mail.html"
+        DESCRIPTION
+                "This module defines fs poe mibs."
+        REVISION      "201202140000Z"
+        DESCRIPTION
+                "Add a table about poe."
+        REVISION      "201202140000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { fsMgmt 110 }
+
+fsPoeConfigMIBObjects OBJECT IDENTIFIER ::= { fsPoeMIB 1 }
+
+fsIfPoeTable OBJECT-TYPE
+        SYNTAX 			SEQUENCE OF FSIfPoeEntry
+        MAX-ACCESS 	not-accessible
+        STATUS 			current
+        DESCRIPTION
+            " "
+        ::= { fsPoeConfigMIBObjects 1 }
+
+-- 6.1 配置信息		6.1.2 接口配置		表A.8 接口POE配置
+
+fsIfPoeEntry OBJECT-TYPE
+        SYNTAX 			FSIfPoeEntry
+        MAX-ACCESS 	not-accessible
+        STATUS 			current
+        DESCRIPTION
+            " "
+        INDEX { ifPoeIndex }
+        ::= { fsIfPoeTable 1 }
+
+FSIfPoeEntry ::=
+        SEQUENCE {
+            ifPoeIndex 			Integer32,
+            ifIsPoe 				TruthValue,
+            ifPoeEnable 		INTEGER,
+            ifPoePwrStatus 	INTEGER,
+            ifPoeMaxPwrSet 	Integer32,
+            ifPoePriority 	INTEGER,
+						ifPoeConsumingPwr	Integer32
+        }
+
+ifPoeIndex OBJECT-TYPE
+        SYNTAX 			Integer32 (1..2147483647)
+        MAX-ACCESS 	read-only
+        STATUS 			current
+        DESCRIPTION
+            " "
+        ::= { fsIfPoeEntry 1 }
+
+ifIsPoe OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " "
+        ::= { fsIfPoeEntry 2 }
+
+ifPoeEnable OBJECT-TYPE
+        SYNTAX INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " "
+        ::= { fsIfPoeEntry 3 }
+
+ifPoePwrStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            on(1),
+            off(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " "
+        ::= { fsIfPoeEntry 4 }
+
+ifPoeMaxPwrSet OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " "
+        ::= { fsIfPoeEntry 5 }
+
+ifPoePriority OBJECT-TYPE
+				SYNTAX INTEGER   {
+               critical(1),
+               high(2),
+               low(3)
+	     	}
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+              " "
+        ::= { fsIfPoeEntry 6 }
+
+-- 6.2 性能信息		6.2.2 接口性能信息		表A.16 接口性能统计
+
+ifPoeConsumingPwr OBJECT-TYPE
+				SYNTAX 			Integer32
+        MAX-ACCESS 	read-only
+        STATUS  		current
+        DESCRIPTION
+              " "
+        ::= { fsIfPoeEntry 7 }
+
+-- Notification
+fsPoeTraps OBJECT IDENTIFIER ::= { fsPoeMIB 2 }
+
+-- 6.3 告警及通告		表A.17 交换机系统告警及通告
+
+ifPoePowerOffTrap NOTIFICATION-TYPE
+    OBJECTS { ifPoeIndex }
+    STATUS  current
+    DESCRIPTION
+            " "
+    ::= { fsPoeTraps 1 }
+
+ifPoePowerOnTrap NOTIFICATION-TYPE
+    OBJECTS { ifPoeIndex }
+    STATUS  current
+    DESCRIPTION
+            " "
+    ::= { fsPoeTraps 2 }
+
+END

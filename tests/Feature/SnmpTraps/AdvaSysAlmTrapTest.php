@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AdvaSysAlmTrapest.php
  *
@@ -27,7 +28,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class AdvaSysAlmTrapTest extends SnmpTrapTestCase
+final class AdvaSysAlmTrapTest extends SnmpTrapTestCase
 {
     public function testCriticalAlarm(): void
     {

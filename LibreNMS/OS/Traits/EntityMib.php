@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EntityMib.php
  *
@@ -48,7 +49,7 @@ trait EntityMib
             $entityPhysical = new EntPhysical($data);
             $entityPhysical->entPhysicalIndex = $entityPhysicalIndex;
             // get ifIndex. also if parent has an ifIndex, set it too
-            $entityPhysical->ifIndex = $entPhysicalToIfIndexMap[$entityPhysicalIndex] ?? $entPhysicalToIfIndexMap[$entityPhysical->entPhysicalContainedIn] ?? null;
+            $entityPhysical->ifIndex = $entPhysicalToIfIndexMap[$entityPhysicalIndex] ?? $entPhysicalToIfIndexMap[(int) $entityPhysical->entPhysicalContainedIn] ?? null;
 
             return $entityPhysical;
         });
@@ -57,18 +58,32 @@ trait EntityMib
     /**
      * @return array<int, int>
      */
-    protected function getIfIndexEntPhysicalMap(): array
+    public function getIfIndexEntPhysicalMap(): array
     {
         $mapping = \SnmpQuery::cache()->walk('ENTITY-MIB::entAliasMappingIdentifier')->table(2);
         $map = [];
 
         foreach ($mapping as $entityPhysicalIndex => $data) {
             $id = $data[0]['ENTITY-MIB::entAliasMappingIdentifier'] ?? $data[1]['ENTITY-MIB::entAliasMappingIdentifier'] ?? null;
-            if ($id && preg_match('/ifIndex[\[.](\d+)/', $id, $matches)) {
+            if ($id && preg_match('/ifIndex[\[.](\d+)/', (string) $id, $matches)) {
                 $map[(int) $entityPhysicalIndex] = (int) $matches[1];
             }
         }
 
+        if (empty($map) && $this->useEntLogicalIndexAsIfIndex()) {
+            $mapping = \SnmpQuery::cache()->walk('ENTITY-MIB::entLPPhysicalIndex')->table();
+            foreach ($mapping['ENTITY-MIB::entLPPhysicalIndex'] ?? [] as $logicalIndex => $physicalEntries) {
+                foreach (array_keys($physicalEntries) as $entityPhysicalIndex) {
+                    $map[(int) $entityPhysicalIndex] = (int) $logicalIndex;
+                }
+            }
+        }
+
         return $map;
+    }
+
+    protected function useEntLogicalIndexAsIfIndex(): bool
+    {
+        return false;
     }
 }

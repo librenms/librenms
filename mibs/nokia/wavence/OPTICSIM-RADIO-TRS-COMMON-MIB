@@ -1,0 +1,3369 @@
+OPTICSIM-RADIO-TRS-COMMON-MIB DEFINITIONS ::= BEGIN
+       IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+       Integer32, Unsigned32 FROM SNMPv2-SMI
+       TruthValue, DisplayString, RowStatus, TEXTUAL-CONVENTION FROM SNMPv2-TC
+       ifIndex FROM IF-MIB
+       MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF
+       tsdimEventObjectClassIdentifier, tsdimEventObjectInstanceIdentifier,
+       tsdimEventNotificationId, tsdimEventTime, tsdimAlarmSeverity,
+       tsdimAlarmSpecProblem, opticsIMAdditionalText, opticsIMAlarmType FROM TSDIM-SUPPORT-MIB
+       opticsimRadioMib, opticsimRadioMC FROM OPTICSIM-RADIOREG-MIB
+       OpticsIMRadioChannelNumber, OpticsIMPmRetrievingTime FROM OPTICSIM-COMMON-TC
+       OpticsIMModulationTypeOrZero FROM OPTICSIM-RADIO-TRS-PDH-MIB;
+
+
+ opticsIMRadioTrsCommonMib MODULE-IDENTITY
+       LAST-UPDATED "202104070000Z"
+       ORGANIZATION "Alcatel TND"
+       CONTACT-INFO "Alcatel TND"
+      DESCRIPTION
+        "Radio Common SDH/PDH Transmission MIB.
+        "
+
+    REVISION "202104070000Z"
+      DESCRIPTION
+        "- Added radioPowerModeOptionAllowed on opticsIMRadioTxPowerTable.
+        "
+
+    REVISION "202103210000Z"
+      DESCRIPTION
+        "- Added analogueMeasuresLocalDivMSE and analogueMeasuresRemoteDivMSE.
+        "
+
+    REVISION "202102270000Z"
+      DESCRIPTION
+        "- Added radioPowerModeOption on opticsIMRadioTxPowerTable.
+         - Added radioPowerInsertionLoss on opticsIMRadioTxPowerTable.
+        "
+
+     REVISION "202105310000Z"
+      DESCRIPTION
+        "- Added radioATPCLockTimeout on opticsIMRadioATPCHighPowerTable.
+        "
+
+     REVISION "202104060000Z"
+      DESCRIPTION
+        "- Added analogueMeasuresLocalDivXpd and analogueMeasuresRemoteDivXpd objects on opticsIMRadioAnalogueMeasuresTable
+        "
+
+     REVISION "201704300000Z"
+      DESCRIPTION
+        "- Added analogueMeasuresRemoteXpd object on opticsIMRadioAnalogueMeasuresTable
+        "
+
+     REVISION "201702280000Z"
+      DESCRIPTION
+        "- SNMPIDL-535, Added the new alarm:
+               opticsIMAlarmRxOverloadRaise/Clear.
+        "
+
+      REVISION "201511130000Z"
+      DESCRIPTION
+        "- SNMPIDL-507, update LAST-UPDATED and REVISION date format adding the 2 digits missing (20) for yers after 1999.
+Added a REVISION block corresponding to the LAST-UPDATED timestamp.
+           - SNMPIDL-508, added a space between opening and closing braces and the enclosed content.
+        "
+       REVISION "201509040000Z"
+       DESCRIPTION
+              "- Extented max values from 150 to 1000 for the following objects:
+               analogueMeasuresLocalTxPowerBranchingLoss,
+                analogueMeasuresLocalRxMainPowerBranchingLoss,
+                analogueMeasuresLocalRxDivPowerBranchingLoss
+              "
+       REVISION "201410300000Z"
+       DESCRIPTION
+              "- Added the following objects to opticsIMRadioAnalogueMeasuresTable:
+               analogueMeasuresLocalTxPowerBranchingLoss,
+                analogueMeasuresLocalRxMainPowerBranchingLoss,
+                analogueMeasuresLocalRxDivPowerBranchingLoss
+              "
+       REVISION "201307060000Z"
+       DESCRIPTION
+              "- Added the new alarm opticsIMAlarmRadioEncryptionMismatchRaise/Clear
+              "
+       REVISION "201301100000Z"
+      DESCRIPTION
+              "- Added the following objects to opticsIMRadioAnalogueMeasuresTable:
+               analogueMeasuresLocalModulation
+            analogueMeasuresRemoteModulation
+            analogueMeasuresLocalMSE
+              analogueMeasuresRemoteMSE
+              "
+      REVISION "201209300000Z"
+      DESCRIPTION
+              "- Added radioPowerMode object to opticsIMRadioTxPowerTable
+              - Added on opticsIMEnhAllowedPowerCapabilitiesTable:
+            opticsIMEnhAllowedHighPowerAtpcLowPowerMinThr
+            opticsIMEnhAllowedHighPowerAtpcLowPowerMaxThr
+            opticsIMEnhAllowedHighPowerMinTxPower
+            opticsIMEnhAllowedHighPowerMaxTxPower
+            opticsIMEnhAllowedHighPowerMinAllowedAtpcTxPower
+            opticsIMEnhAllowedHighPowerMaxAllowedAtpcTxPower
+               "
+       REVISION "201009300000Z"
+       DESCRIPTION
+              "- Added opticsIMRadioAutoLocalTxMuteRemoteRequest object to OpticsIMRadioTxMuteTable
+              - Added analogueMeasuresLocalXpd and analogueMeasuresRetrievingTime objects to opticsIMRadioAnalogueMeasuresTable
+               "
+
+       REVISION "201005130000Z"
+       DESCRIPTION
+               "- Added the new table opticsIMEnhAllowedPowerCapabilitiesTable
+               "
+
+       REVISION "201004010000Z"
+       DESCRIPTION
+               "- Added the new alarm opticsIMAlarmATPCTimeoutRaise/Clear.
+               "
+
+       REVISION "200912170000Z"
+       DESCRIPTION
+               "- The Description field for opticsIMAdaptiveModulationRadioTxPowerTable and opticsIMAllowedPowerCapabilitiesTable
+                have been updated.
+               "
+
+       REVISION "200904230000Z"
+       DESCRIPTION
+               "- The name of opticsIMAlarmTemporaryCommunicationProblemRaise/Clear notification is changed to
+                    opticsIMAlarmDialogFailureRaise/Clear
+        - The name of opticsIMAlarmDemXpicLOSRaise/Clear notification is changed to
+                    opticsIMAlarmBandwidthOverFlowRaise/Clear
+                - Added  opticsIMAlarmDemXpicLOSRaise/Clear notification with a new OID
+               "
+
+       REVISION "200812180000Z"
+
+       DESCRIPTION
+               "Added the following probableCause:
+            - The name of opticsIMAlarmRxDivFailRaise/Clear notification is changed to
+                    opticsIMAlarmTemporaryCommunicationProblemRaise/Clear
+            - The name of opticsIMAlarmDemDivLOSRaise/Clear notification is changed to
+                    opticsIMAlarmCrossConnectionFailRaise/Clear
+                  - Added  opticsIMAlarmRxDivFailRaise/Clear notification with a new OID
+                  - Added  opticsIMAlarmDemDivLOSRaise/Clear notification with a new OID
+               "
+
+       REVISION "200808070000Z"
+       DESCRIPTION
+               "Added the following table:
+            - opticsIMAllowedPowerCapabilitiesTable
+            Added the following probableCause:
+            - opticsIMAlarmLoopProblemRaise/Clear
+                  - opticsIMAlarmIncompatibleModulationParamRaise/Clear
+                  - opticsIMAlarmIncompatiblePowerRaise/Clear
+                  - opticsIMAlarmIncompatibleChannelSpacingRaise/Clear
+                Added the following objects on opticsIMRadioFrequencyTable:
+                  - radioFreqShifterMinTxFrequency, radioFreqShifterMaxTxFrequency,
+                    radioFreqShifterMinRxFrequency, radioFreqShifterMaxRxFrequency
+                Added the following objects on opticsIMAllowedShifterTable:
+               - allowedMinTxFrequency, allowedMaxTxFrequency, allowedMinRxFrequency,
+                    allowedMaxRxFrequency
+               "
+
+       REVISION "200805290000Z"
+       DESCRIPTION
+               "Added the following object on opticsIMRadioTxPowerTable:
+             - radioDrivingRSL
+                Added the following objects on opticsIMAllowedShifterTable:
+             - minTxFreq,maxTxFreq,minRxFreq,maxRxFreq
+                Added the following objects on opticsIMRadioFrequencyTable:
+                - radioFreqShifterId , radioFreqShifterValue.
+            Added the following object on opticsIMRadioTxMuteTable:
+               - opticsIMRadioManLocalActivationDate
+               - opticsIMRadioManLocalTimeoutPeriod
+               - opticsIMRadioManRemoteActivationDate
+               - opticsIMRadioManRemoteTimeoutPeriod
+
+               "
+       REVISION "200710110000Z"
+       DESCRIPTION
+               "Added the following notification:
+             - opticsIMAlarmRPSPathFailRaise/Clear
+               "
+       REVISION "200710110000Z"
+       DESCRIPTION
+               "Added the following objects, related to Adaptive modulation:
+             - opticsIMAdaptiveModulationRadioTxPowerTable
+               "
+       REVISION "200707190000Z"
+       DESCRIPTION
+               "- The name of opticsIMAlarmDemDivLOSRaise/Clear notification is changed
+                to opticsIMAlarmIncompatibleModulationRaise/Clear name
+                - The name of opticsIMAlarmVcoExternalLOSRaise/Clear notification is changed
+                to opticsIMAlarmIncompatibleCapacityRaise/Clear name
+                - Inserted  opticsIMAlarmRxDivFailRaise/Clear notification with a new OID
+                - Inserted  opticsIMAlarmDemDivLOSRaise/Clear notification with a new OID.
+               "
+       REVISION "200610190000Z"
+       DESCRIPTION
+               "- The name of opticsIMAlarmRxDivFailRaise/Clear notification is changed
+                to opticsIMAlarmIncompatibleShifterRaise/Clear name.
+                - On opticsIMRadioShifterTable the MAX-ACCESS clause (access rigths) of
+                radioShifterValue and radioShifterCentralFrequency objects is changed
+                from read-only to read-write.
+                Also the behaviour both for radioShifterId, radioShifterValue and
+                radioShifterCentralFrequency objects is updated to include the new accesses."
+
+       REVISION "200506160000Z"
+       DESCRIPTION
+               "Added opticsIMradioInterferenceMeasuresTable new table."
+
+       REVISION "200504070000Z"
+       DESCRIPTION
+               "For each alarm notification (raise and clear) the following objects have been added:
+                - opticsIMAdditionalText
+                - opticsIMAlarmType"
+
+       REVISION "200410150000Z"
+       DESCRIPTION
+               "Added columnar object radioATPCLowPowerMode on opticsIMRadioATPCHighPowerTable"
+
+       REVISION "200409300000Z"
+       DESCRIPTION
+               "Added OpticsIMRadioShifterTable and OpticsIMAllowedShifterTable new tables."
+
+       REVISION "200404300000Z"
+       DESCRIPTION
+               "New  explanation for return codes on radioReturnCodeFrequency
+                (opticsIMRadioFrequencyTable)
+                Added new obj radioAtpcHighPowerTimeoutEnabled on
+                OpticsIMRadioATPCHighPowerEntry"
+
+       REVISION "200401230000Z"
+       DESCRIPTION
+               "The radioReturnCodeFrequency objects have been added to the
+                opticsIMRadioFrequencyEntry "
+
+       REVISION "200310100000Z"
+       DESCRIPTION
+                "Addition of opticsIMAnaloguePointsTable, opticsIMRadioATPCHighPowerTable and of the
+                 following alarms notifications: . opticsIMAlarmPathDistortion, opticsIMAlarmRadioDADE and
+                 opticsIMAlarmRingBroke.
+                 The radioMinRxFrequency and radioMaxRxFrequency objects have been added to the opticsIMRadioFrequencyEntry "
+
+       REVISION "200303140000Z"
+       DESCRIPTION
+                " Renaming of opticsIMRadioTTPBidFrequencyTable, opticsIMRadioTTPBidTxPowerTable
+                  and opticsIMRadioTTPBidGainTable tables."
+
+       REVISION "200211050000Z"
+       DESCRIPTION
+                " Addition of opticsIMIntrusiveTPCTable and opticsIMRadioTxMuteTable.
+                  Some alarms traps moved in TSDIM-SNMPNE-MIB."
+
+       REVISION "200207240000Z"
+       DESCRIPTION
+                "The MinAllowedAtpcTxPower and MaxAllowedAtpcTxPower objects have been added to the
+                  radioRadioTTPBidTxPower entry. "
+
+       REVISION "200205100000Z"
+       DESCRIPTION
+                "Deleted the LocalRxATPCPower and RemoteRxATPCPower objects from analogue
+                 measures entry.
+                 Added the RxLOS, HBER, LBER and EW alarms notifications."
+
+       REVISION "200201250000Z"
+       DESCRIPTION
+                "Initial Release of Radio Common SDH/PDH Transmission MIB."
+ ::= {  opticsimRadioMib 1 }
+
+opticsIMRadioTrsCommonMibObject     OBJECT IDENTIFIER ::= { opticsIMRadioTrsCommonMib 1 }
+
+
+OpticsIMManOpRxGainLevel ::= TEXTUAL-CONVENTION
+     STATUS current
+     DESCRIPTION
+          "This object specifies the gain level when a manual operation on gain level is active.
+           This value must be included in the allowed range (defined by the associated MinRxGain and
+           MaxRxGain) and is expressed in dB."
+     SYNTAX Integer32
+
+OpticsIMRadioTxMuteStatus ::= TEXTUAL-CONVENTION
+     STATUS current
+     DESCRIPTION
+          "This object specifies if a Radio Transmitter is squelched/mute (off) or not (on)."
+     SYNTAX INTEGER {
+         on (1),
+         off (2)
+         }
+
+opticsIMRadioFrequencyTable OBJECT-TYPE
+SYNTAX SEQUENCE OF   OpticsIMRadioFrequencyEntry
+     MAX-ACCESS                not-accessible
+     STATUS                          current
+     DESCRIPTION
+          " This table contains information used to manage the radio frequency. "
+::= { opticsIMRadioTrsCommonMibObject 1 }
+
+opticsIMRadioFrequencyEntry OBJECT-TYPE
+     SYNTAX                      OpticsIMRadioFrequencyEntry
+     MAX-ACCESS             not-accessible
+     STATUS                       current
+     DESCRIPTION
+          " An entry of the opticsIMRadioFrequencyTable table. Each entry corresponds to a Radio
+            Synchronous or Plesiochronous Physical Interface (RSPI or RPPI). "
+     INDEX   { ifIndex }
+::= { opticsIMRadioFrequencyTable 1 }
+
+OpticsIMRadioFrequencyEntry ::= SEQUENCE {
+  radioTxFrequency                 Unsigned32,
+  radioRxFrequency                Unsigned32,
+  radioMinTxFrequency               Unsigned32,
+  radioMaxTxFrequency             Unsigned32,
+  radioMinRxFrequency               Unsigned32,
+  radioMaxRxFrequency              Unsigned32,
+  radioReturnCodeFrequency           INTEGER,
+  radioFreqShifterId                 Integer32,
+  radioFreqShifterValue            Unsigned32,
+  radioFreqShifterMinTxFrequency    Unsigned32,
+  radioFreqShifterMaxTxFrequency    Unsigned32,
+  radioFreqShifterMinRxFrequency    Unsigned32,
+  radioFreqShifterMaxRxFrequency    Unsigned32
+
+  }
+
+radioTxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+          " This object specifies the transmission radio frequency. This value must be included in the allowed
+             tx local range (defined by the associated objects MinTxFrequency and MaxTxFrequency) and it
+             is expressed in KHz. "
+::= { opticsIMRadioFrequencyEntry 1 }
+
+radioRxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-write     STATUS                    current
+     DESCRIPTION
+          " This object specifies the receive radio frequency. This value is expressed in KHz.
+            The rx frequency is updated by the physical machine as a side effect of the change of the
+            transmit value according to an algorithm equipment dependent. "
+::= { opticsIMRadioFrequencyEntry 2 }
+
+radioMinTxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the minimum value allowed for the transmission frequency. This value is
+           expressed in KHz. "
+::= { opticsIMRadioFrequencyEntry 3 }
+
+radioMaxTxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the maximum value allowed for the transmission frequency. This value is
+           expressed in KHz. "
+::= { opticsIMRadioFrequencyEntry 4 }
+
+radioMinRxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the minimum value allowed for the receive frequency. This value is
+           expressed in KHz. "
+::= { opticsIMRadioFrequencyEntry 5 }
+
+radioMaxRxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the maximum value allowed for the receive frequency. This value is
+           expressed in KHz. "
+::= { opticsIMRadioFrequencyEntry 6 }
+
+radioReturnCodeFrequency OBJECT-TYPE
+ SYNTAX INTEGER {
+             setNoError (1),
+             setHWProblem (2),
+   setCrossProblem (3),
+   setDistProblem (4),
+   setNoUPDDisabled (5)
+         }
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          "This object is used to discriminate the reason of  failure on setting rx and tx frequency:
+           setNoError:                 the set operation on tx and rx frequency was successful;
+           setHWProblem:        generic hardware problems (tx and rx frequency are not supported by HW);
+           setCrossProblem:    the tx and rx frequency values, specified in set request, invert your relation respect to actual values (if before set request  txFreq > rxFreq, in the set request  txFreq < rxFreq, or vice-versa);
+setDistProblem:    problems related to the distance (spacing fail) between the tx and rx frequency values;
+           setNoUPDDisabled:    frequency change time-out expiration"
+::= { opticsIMRadioFrequencyEntry 7 }
+
+radioFreqShifterId OBJECT-TYPE
+     SYNTAX                    Integer32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+          " This object specifies the identifier of the shifter requested by the managing systems.
+          The identifier must be included in one of entries
+          of the opticsIMAllowedShifterTable if updated by managing system: in this case as a
+          side effect of setting this object, the agent must set the radioFreqShifterValue,
+          radioMinTxFrequency, radioMaxTxFrequency, radioMinRxFrequency and radioMaxRxFrequency
+          objects with the associated values on
+          opticsIMAllowedShifterTable (allowedShifterValue, allowedShifterMinTxFrequency, allowedShifterMaxTxFrequency,
+          allowedShifterMinRxFrequency allowedShifterMaxRxFrequency ).
+          Otherwise  the '-1' value means that the radioShifterValue, radioMinTxFrequency,
+          radioMaxTxFrequency, radioMinRxFrequency and radioMaxRxFrequency
+          objects are set directly by managing system"
+::= { opticsIMRadioFrequencyEntry 8 }
+
+radioFreqShifterValue OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+       " This object contains the shifter value requested by the managing systems. It is updated
+         or by the agent when the radioShifterId object is set by the managing systems or directly
+         by the managing system (in this case the agent must set the radioShifterId to '-1' value)."
+::= { opticsIMRadioFrequencyEntry 9 }
+
+radioFreqShifterMinTxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the minimum value allowed for the transmission frequency related to the shifter value.
+           This value is expressed in KHz.
+           It is updated or by the agent when the radioShifterId object is set by the managing systems or directly
+           by the managing system (in this case the agent must set the radioShifterId to '-1' value"
+::= { opticsIMRadioFrequencyEntry 10 }
+
+radioFreqShifterMaxTxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the maximum value allowed for the transmission frequency related to the shifter value.
+           This value is expressed in KHz.
+           It is updated or by the agent when the radioShifterId object is set by the managing systems or directly
+           by the managing system (in this case the agent must set the radioShifterId to '-1' value"
+::= { opticsIMRadioFrequencyEntry 11 }
+
+radioFreqShifterMinRxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the minimum value allowed for the receive frequency related to the shifter value.
+           This value is expressed in KHz.
+           It is updated by the agent when the radioShifterId object is set. "
+::= { opticsIMRadioFrequencyEntry 12 }
+
+radioFreqShifterMaxRxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the maximum value allowed for the receive frequency related to the shifter value.
+           This value is expressed in KHz.
+           It is updated by the agent when the radioShifterId object is set. "
+::= { opticsIMRadioFrequencyEntry 13 }
+
+
+opticsIMRadioPowerMngt OBJECT IDENTIFIER ::= { opticsIMRadioTrsCommonMibObject 2 }
+
+
+opticsIMRadioTxPowerTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMRadioTxPowerEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+          " This table contains information used to manage the transmitted power (included the ATPC
+            management). "
+::= { opticsIMRadioPowerMngt 1 }
+
+opticsIMRadioTxPowerEntry OBJECT-TYPE
+     SYNTAX                   OpticsIMRadioTxPowerEntry
+     MAX-ACCESS          not-accessible
+     STATUS                    current
+     DESCRIPTION
+          " An entry of the opticsIMRadioTxPowerTable table. Each entry corresponds to a Radio
+            Synchronous or Plesiochronous Physical Interface (RSPI or RPPI). "
+     INDEX   { ifIndex }
+::= { opticsIMRadioTxPowerTable 1 }
+
+OpticsIMRadioTxPowerEntry ::= SEQUENCE {
+  radioAtpcEnabled                                 TruthValue,
+  radioMinAtpcTxPower                           Integer32,
+  radioMaxAtpcTxPower                          Integer32,
+  radioAtpcLowPowerThr                         Integer32,
+  radioAtpcLowPowerMinThr                   Integer32,
+  radioAtpcLowPowerMaxThr                  Integer32,
+  radioAtpcExtraLowPowerThr                Integer32,
+  radioCurrentTxPower                            Integer32,
+  radioTxNominalPower                           Integer32,
+  radioMinTxPower                                  Integer32,
+  radioMaxTxPower                                 Integer32,
+  radioManOpTxPower                            INTEGER,
+  radioManOpTxPowerLevel                   Integer32,
+  radioMinAllowedAtpcTxPower              Integer32,
+  radioMaxAllowedAtpcTxPower             Integer32,
+  radioDrivingRSL               INTEGER,
+  radioPowerMode                    INTEGER,
+  radioPowerModeOption               INTEGER,
+  radioPowerInsertionLoss                  Integer32,
+  radioPowerModeOptionAllowed           BITS
+ }
+
+radioAtpcEnabled OBJECT-TYPE
+     SYNTAX                     TruthValue
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies whether the ATPC device is currently allowed to work or not. The true value
+             indicates that the ATPC device is allowed to work and the false value that the device is not
+             allowed to work (transmit power has a fixed value). This object is significant only if ATPC device
+             is implemented. "
+::= { opticsIMRadioTxPowerEntry 1 }
+
+radioMaxAtpcTxPower OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum power level to which the equipment is configured to transmit
+            when the ATPC device is allowed to work. According to the product, this value must be less than
+            (or equal to) associated maxTxPower or maxAllowedAtpcTxPower.
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 255 means
+            25.5 dBm)."
+::= { opticsIMRadioTxPowerEntry 2 }
+
+radioMinAtpcTxPower OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum power level to which the equipment is configured to transmit
+            when the ATPC device is allowed to work. According to the product, this value must be greater
+            than (or equal to) associated minTxPower or minAllowedAtpcTxPower (in this table in case of static modulation
+            setting or in the adaptivrModulationRadioTxPower in case of adaptive modulation setting) .
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 255
+            means 25.5 dBm). "
+::= { opticsIMRadioTxPowerEntry 3 }
+
+radioAtpcLowPowerThr OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          " This object  specifies the power threshold value that has to be compared with the power level
+            received on the remote receiver in order to define the power level to be used by the local
+            transmitter.
+            When the received power level value is less than the one provided in this object the local ATPC
+            device increases the transmitted power but only till the nominal value.
+            This value must be included in the allowed range (defined by the associated
+            AtpcLowPowerMinThr and AtpcLowPowerMaxThr).
+            It is expressed in decade of dBm (e.g. -300 means -30.0 dBm). "
+::= { opticsIMRadioTxPowerEntry 4 }
+
+radioAtpcLowPowerMinThr OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum value allowed for the associated AtpcLowPowerThreshold.
+             It is  expressed in decade of dBm."
+::= { opticsIMRadioTxPowerEntry 5 }
+
+radioAtpcLowPowerMaxThr OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum value allowed for the associated AtpcLowPowerThreshold
+            It is  expressed in decade of dBm."
+::= { opticsIMRadioTxPowerEntry 6 }
+
+radioAtpcExtraLowPowerThr OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object  specifies the power threshold value that has to be compared with the power level
+            received on the remote receiver in order to define the power level to be used by the local
+            transmitter.
+            When the received power level value is less than the one provided in this object the local ATPC
+            device increases the transmitted power also over the txNominalPower value.
+            This threshold value is expressed in decade of dBm."
+::= { opticsIMRadioTxPowerEntry 7 }
+
+radioCurrentTxPower OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the value of the transmitted power when the ATPC function is disabled and
+            the manual operation on transmitted power is not active.
+            It is a integer expressed as decade of dBm (e.g. 255 means 25.5 dBm).
+            This value has to be less than (or equal to) the transmitted nominal power."
+::= { opticsIMRadioTxPowerEntry 8 }
+
+radioTxNominalPower OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the value of the transmitted nominal power. This value is an integer
+           expressed as decade of dBm (e.g. 255 means 25.5 dBm)."
+::= { opticsIMRadioTxPowerEntry 9 }
+
+radioMinTxPower OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum value allowed for the transmitted power. This value is an
+            integer expressed as decade of dBm (e.g. 255 means 25.5 dBm). "
+::= { opticsIMRadioTxPowerEntry 10 }
+
+radioMaxTxPower OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum value allowed for the transmitted power. This value is an
+            integer expressed as decade of dBm (e.g. 255 means 25.5 dBm). "
+::= { opticsIMRadioTxPowerEntry 11 }
+
+radioManOpTxPower OBJECT-TYPE
+     SYNTAX INTEGER {
+         manOpActive (1),
+         manOpNotActive (2),
+         manOpForItpcActive (3)
+         }
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          "This object is used to initiate (manOpActive or manOpForItpcActive) or terminate
+            (manOpNotActive) a manual handling of the transmitted power.
+           When a manual handling of the transmitted power is initiated an Abnormal Condition indication is
+           generated. When it is terminated the Abnormal Condition indication is removed.
+           When the manOpActive or manOpForItpcActive value is selected, the manOpTxPowerLevel
+           object is updated with the current value of the transmitted power. "
+::= { opticsIMRadioTxPowerEntry 12 }
+
+radioManOpTxPowerLevel OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the transmitted power value when a manual operation on transmitted power
+            is active. This value is an integer expressed as decade of dBm (e.g. 255 means 25.5 dBm).
+            Requests to update this object coming from the Far End NE will be accepted only if a manual
+            management of the transmitted power for Intrusive BER is currently active (object
+            manOpTxPower previously updated to manOpForItpcActive value). "
+::= { opticsIMRadioTxPowerEntry 13 }
+
+radioMinAllowedAtpcTxPower OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum power level allowed for the ATPC device. This value must be
+            greater than (or equal to) the associated minTxPower.
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 255
+            means 25.5 dBm). "
+::= { opticsIMRadioTxPowerEntry 14 }
+
+radioMaxAllowedAtpcTxPower OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum power level allowed for the ATPC device. This value must be
+             less than (or equal to) the associated maxTxPower.
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 255 means
+            25.5 dBm)."
+::= { opticsIMRadioTxPowerEntry 15 }
+
+radioDrivingRSL OBJECT-TYPE
+     SYNTAX INTEGER {
+         notRelevant (0),
+       activeReceiver (1),
+         lowestRSL (2),
+         highestRSL (3)
+         }
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          "This object is used to indicate in case of 1+1HSB radio configurations which RSL (Remote Signal Level)
+           of the two remote receivers has to be used in the ATPC algorithm.
+           In all the other configurations this parameter is not significant and has to be set to 'notRelevant' value."
+::= { opticsIMRadioTxPowerEntry 16 }
+
+radioPowerMode OBJECT-TYPE
+     SYNTAX INTEGER {
+         lowPower (1),
+     highPower (2)
+         }
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          "This object is used to select the power mode on radio interface when both Low and High power modes
+           are supported on the radio interface. "
+::= { opticsIMRadioTxPowerEntry 17 }
+
+radioPowerModeOption OBJECT-TYPE
+     SYNTAX INTEGER {
+         notApplicable(0),
+         powerMode1Diplexer (1),
+     powerMode2ACCP (2),
+         powerMode3newACCP (3)
+         }
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          "This object is used to select the power mode option to use on radio interface when different flavour of power ranges
+           are supported by HW radio equipment. "
+::= { opticsIMRadioTxPowerEntry 18 }
+
+radioPowerInsertionLoss OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS                  read-only
+     STATUS                      current
+     DESCRIPTION
+          "This object is used to report the value of the power correction associated to the hw present on Radio equipment."
+::= { opticsIMRadioTxPowerEntry 19 }
+
+radioPowerModeOptionAllowed              OBJECT-TYPE
+    SYNTAX      BITS {
+                      notApplicable (0),
+                powerMode1Diplexer  (1),
+                powerMode2ACCP (2),
+           powerMode3newACCP (3)
+           }
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          "This object contains the power mode option supported on the radio interface by HW radio equipment. "
+::= { opticsIMRadioTxPowerEntry 20 }
+
+
+
+opticsIMRadioAtpcImplemented OBJECT-TYPE
+     SYNTAX                     TruthValue
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies whether the ATPC capability is present or not. The true value indicates that
+            the ATPC capability is present and the false value that the capability is not present. "
+::= { opticsIMRadioPowerMngt 2 }
+
+
+opticsIMRadioAtpcDirectionId OBJECT-TYPE
+     SYNTAX                     Unsigned32 (0..15)
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          "This object specifies the ATPC direction identifier used when all the radio channels transmit in
+           the same direction. The same value is used both for the expected identifier and for the identifier
+           to be sent.
+           If the value '0000' is selected the mismatch detection is disabled. "
+::= { opticsIMRadioPowerMngt 3 }
+
+
+opticsIMIntrusiveTPCTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMIntrusiveTPCEntry
+     MAX-ACCESS        not-accessible
+     STATUS            current
+     DESCRIPTION
+          " This table contains the information related to the management of the Transmitted Power Control
+            (TPC) during an Intrusive BER measurement. "
+::= { opticsIMRadioPowerMngt 4 }
+
+opticsIMIntrusiveTPCEntry OBJECT-TYPE
+     SYNTAX            OpticsIMIntrusiveTPCEntry
+     MAX-ACCESS        not-accessible
+     STATUS            current
+     DESCRIPTION
+          " An entry of the opticsIMIntrusiveTPCTable table. "
+     INDEX   { ifIndex }
+::= { opticsIMIntrusiveTPCTable 1 }
+
+OpticsIMIntrusiveTPCEntry ::= SEQUENCE {
+  intrusiveTPCRadioChannelNumber        OpticsIMRadioChannelNumber,
+  intrusiveTPCNearEndMinTxPower        Integer32,
+  intrusiveTPCNearEndMaxTxPower        Integer32,
+  intrusiveTPCFarEndControlled                TruthValue,
+  intrusiveTPCFarEndMinTxPower            Integer32,
+  intrusiveTPCFarEndMaxTxPower            Integer32,
+  intrusiveTPCFarEndManOpTxPowerLevel    Integer32
+  }
+
+intrusiveTPCRadioChannelNumber OBJECT-TYPE
+     SYNTAX            OpticsIMRadioChannelNumber
+     MAX-ACCESS    read-only
+     STATUS            current
+     DESCRIPTION
+         "See Textual Conventions."
+::= { opticsIMIntrusiveTPCEntry 1 }
+
+intrusiveTPCNearEndMinTxPower OBJECT-TYPE
+     SYNTAX            Integer32
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+          " This object specifies the minimum level of the transmitted power allowed during a BER
+            measurement activated on the corresponding radio channel of the Far End NE.
+            This value is an integer expressed as decade of dBm (e.g. 234 means 23.4 dBm). "
+::= { opticsIMIntrusiveTPCEntry 2 }
+
+intrusiveTPCNearEndMaxTxPower OBJECT-TYPE
+     SYNTAX            Integer32
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+          " This object specifies the maximum level of the transmitted power allowed during a BER
+            measurement activated on the corresponding radio channel of the Far End NE.
+            channel, during an Intrusive BER measurement activated on the Far End NE.
+            This value is an integer expressed as decade of dBm (e.g. 212 means 21.2 dBm). "
+::= { opticsIMIntrusiveTPCEntry 3 }
+
+intrusiveTPCFarEndControlled  OBJECT-TYPE
+     SYNTAX            TruthValue
+     MAX-ACCESS    read-write
+     STATUS            current
+     DESCRIPTION
+          " This object is used to assume the complete control of the transmitted power of the corresponding
+            Far End radio channel (TRUE value).
+            The Near End, according to a specific strategy product dependent, has to maintain the coherence
+            of the value of this object with the one of the associated object of the Far End NE radio channel
+            (TRUE only if the object manOpTxPower of the radioTTPBidTxPower table assumes the
+            manOpForItpcActive value). "
+::= { opticsIMIntrusiveTPCEntry 4 }
+
+intrusiveTPCFarEndMinTxPower OBJECT-TYPE
+     SYNTAX            Integer32
+     MAX-ACCESS    read-only
+     STATUS            current
+     DESCRIPTION
+          " This object specifies the minimum level of the transmitted power allowed on the corresponding
+            Far End radio channel during a BER measurement activated on the Near End NE.
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 237 means
+            23.7 dBm). "
+::= { opticsIMIntrusiveTPCEntry 5 }
+
+intrusiveTPCFarEndMaxTxPower OBJECT-TYPE
+     SYNTAX            Integer32
+     MAX-ACCESS    read-only
+     STATUS            current
+     DESCRIPTION
+          " This object specifies the maximum level of the transmitted power allowed on the corresponding
+            Far End radio channel during a BER measurement activated on the Near End NE.
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 251 means
+            25.1 dBm)."
+::= { opticsIMIntrusiveTPCEntry 6 }
+
+intrusiveTPCFarEndManOpTxPowerLevel OBJECT-TYPE
+     SYNTAX            Integer32
+     MAX-ACCESS    read-write
+     STATUS            current
+     DESCRIPTION
+          " This object specifies the transmitted power level used by the corresponding Far End radio
+            channel when an intrusive BER measurement is active.
+            This value is an integer expressed as decade of dBm (e.g. 262 means 26.2 dBm). "
+::= { opticsIMIntrusiveTPCEntry 7 }
+
+
+opticsIMRadioATPCHighPowerTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMRadioATPCHighPowerEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+          " This table contains information used to manage the ATPC device in high power mode. "
+::= { opticsIMRadioPowerMngt 5 }
+
+opticsIMRadioATPCHighPowerEntry OBJECT-TYPE
+     SYNTAX                               OpticsIMRadioATPCHighPowerEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+          " An entry of the opticsIMRadioATPCHighPowerTable table. Each entry corresponds to a Radio
+            Synchronous or Plesiochronous Physical Interface (RSPI or RPPI). "
+     INDEX   { ifIndex }
+::= { opticsIMRadioATPCHighPowerTable 1 }
+
+OpticsIMRadioATPCHighPowerEntry ::= SEQUENCE {
+  radioATPCHighPowerMode                       TruthValue,
+  radioATPCHighPowerTimeout                    TruthValue,
+  radioATPCHighPowerTimeoutEnabled           TruthValue,
+  radioATPCLowPowerMode                        TruthValue,
+  radioATPCLockTimeout                Integer32
+  }
+
+radioATPCHighPowerMode OBJECT-TYPE
+     SYNTAX                  TruthValue
+     MAX-ACCESS         read-write
+     STATUS                   current
+     DESCRIPTION
+          " This object specifies whether the ATPC device is locked in high-power mode or not. The true
+             value indicates that the ATPC device is locked in high-power mode and the false value that the it
+             is not locked. This object is significant only if ATPC device is implemented and enabled.  "
+::= { opticsIMRadioATPCHighPowerEntry 1 }
+
+radioATPCHighPowerTimeout OBJECT-TYPE
+     SYNTAX                   TruthValue
+     MAX-ACCESS         read-only
+     STATUS                   current
+     DESCRIPTION
+          " This object indicates that the ATPC device has been in high-power mode for over 5 minutes (true
+             value). This object is significant only if ATPC device is implemented, enabled and is locked in
+             high-power mode. "
+::= { opticsIMRadioATPCHighPowerEntry 2 }
+
+radioATPCHighPowerTimeoutEnabled OBJECT-TYPE
+     SYNTAX                     TruthValue
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          "This object specifies whether the ATPC device is currently allowed to work with a timeout.
+            The true value indicates that the ATPC activity in high power mode when both receivers are out
+            of lock is limited to timeout maximum, followed by other time at low power, then high power
+            for 10 seconds each hour until radio path is restored.
+            The false value that the ATPC device is allowed to work without timeout.
+            This object is significant only if ATPC device is implemented and enabled "
+::= { opticsIMRadioATPCHighPowerEntry 3 }
+
+radioATPCLowPowerMode OBJECT-TYPE
+     SYNTAX                  TruthValue
+     MAX-ACCESS         read-write
+     STATUS                   current
+     DESCRIPTION
+          " This object specifies whether the ATPC device is locked in low-power mode or not. The true
+             value indicates that the ATPC device is locked in low-power mode and the false value that the it
+             is not locked. The true value is allowed only if ATPC device is not locked in high-power mode
+            (true value on radioATPCHighPowerMode). This object is significant only if ATPC device is
+             implemented and enabled."
+::= { opticsIMRadioATPCHighPowerEntry 4 }
+
+radioATPCLockTimeout OBJECT-TYPE
+       SYNTAX            Integer32 (0..5760)
+       MAX-ACCESS    read-write
+       STATUS            current
+       DESCRIPTION
+           "This object indicates the time period, measured in units of minutes, from the lock on High Power mode (enabled with radioATPCHighPowerMode) or on  Low Power mode (enabled with radioATPCLowPowerMode).
+             After this timeout the agent remove the lock on ATPC device.
+The 0 value is used to have a permanent lock (disabled only by managing system).
+"
+::= { opticsIMRadioATPCHighPowerEntry 5 }
+
+
+-- AdaptiveModulationRadioTxPower
+
+opticsIMAdaptiveModulationRadioTxPowerTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMAdaptiveModulationRadioTxPowerEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+          " This table contains information used to manage the transmitted power (included the ATPC
+            management) in case of Adaptive Modulation (adaptiveModulationMode 'true'). The parameters usefull for trasmitted
+            power control not included in this table have to be retrieved from opticsIMRadioTxPowerTable for
+            static modulation setting (adaptiveModulationMode 'false').
+            For each modulation type supported on adaptive modulation (adaptiveModulationSchemeRange or adaptiveModulationSupported on
+            opticsIMAdaptiveModulationEntry) the managing system has to provide these trasmitted power parameters.
+          "
+::= { opticsIMRadioPowerMngt 6 }
+
+opticsIMAdaptiveModulationRadioTxPowerEntry OBJECT-TYPE
+     SYNTAX                   OpticsIMAdaptiveModulationRadioTxPowerEntry
+     MAX-ACCESS          not-accessible
+     STATUS                    current
+     DESCRIPTION
+          " An entry of the opticsIMAdaptiveModulationRadioTxPowerTable table. Each entry corresponds to a
+            modulation value whithin the Adaptive Modulation process is allowed to work for a Radio
+            Physical Interface.
+            Each entry is created as a side effect of setting of adaptiveModulationSchemeRangeId or adaptiveModulationSupported object
+            (on opticsIMAdaptiveModulationEntry) for each modulation value included in the range.
+          "
+     INDEX   { ifIndex , adaptiveModulation}
+::= { opticsIMAdaptiveModulationRadioTxPowerTable 1 }
+
+OpticsIMAdaptiveModulationRadioTxPowerEntry ::= SEQUENCE {
+  adaptiveModulation                           INTEGER,
+  adaptiveModulationRadioMaxAtpcTxPower        Integer32,
+  adaptiveModulationRadioMinAllowedAtpcTxPower Integer32,
+  adaptiveModulationRadioMaxAllowedAtpcTxPower Integer32,
+  adaptiveModulationRadioCurrentTxPower        Integer32,
+  adaptiveModulationRadioMinTxPower            Integer32,
+  adaptiveModulationRadioMaxTxPower            Integer32
+ }
+
+adaptiveModulation                           OBJECT-TYPE
+     SYNTAX                     INTEGER
+     MAX-ACCESS            not-accessible
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies for which modulation type the transmitter power parameters refer to.
+          "
+::= { opticsIMAdaptiveModulationRadioTxPowerEntry 1 }
+
+adaptiveModulationRadioMaxAtpcTxPower OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum power level to which the equipment is configured to transmit
+            when the ATPC device is allowed to work in case of Adaptive Modulation (adaptiveModulationMode 'true')
+            for the adaptiveModulation value in the index.                         .
+            According to the product, this value must be less than (or equal to) associated maxTxPower or
+            maxAllowedAtpcTxPower (in adaptive mode).
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 255 means
+            25.5 dBm).
+          "
+::= { opticsIMAdaptiveModulationRadioTxPowerEntry 2 }
+
+adaptiveModulationRadioMinAllowedAtpcTxPower OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum power level allowed for the ATPC device in case of Adaptive
+            Modulation (adaptiveModulationMode 'true') for the adaptiveModulation value in the index.
+            This value must be greater than (or equal to) the associated minTxPower.
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 255
+            means 25.5 dBm). "
+::= { opticsIMAdaptiveModulationRadioTxPowerEntry 3 }
+
+adaptiveModulationRadioMaxAllowedAtpcTxPower OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum power level allowed for the ATPC device in case of Adaptive
+            Modulation (adaptiveModulationMode 'true') for the adaptiveModulation value in the index.
+            This value must be less than (or equal to) the associated maxTxPower (in adaptive mode).
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 255 means
+            25.5 dBm)."
+::= { opticsIMAdaptiveModulationRadioTxPowerEntry 4 }
+
+adaptiveModulationRadioCurrentTxPower OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-write
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the value of the transmitted power when the ATPC function is disabled and
+            the manual operation on transmitted power is not active in case of Adaptive Modulation (adaptiveModulationMode
+            'true') for the adaptiveModulation value in the index.                         .
+            It is a integer expressed as decade of dBm (e.g. 255 means 25.5 dBm).
+            This value has to be less than (or equal to) the transmitted nominal power.
+          "
+::= { opticsIMAdaptiveModulationRadioTxPowerEntry 5 }
+
+
+adaptiveModulationRadioMinTxPower OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum value allowed for the transmitted power in case of Adaptive Modulation
+            (adaptiveModulationMode 'true') for the adaptiveModulation value in the index.
+            This value is an integer expressed as decade of dBm (e.g. 255 means 25.5 dBm).
+          "
+::= { opticsIMAdaptiveModulationRadioTxPowerEntry 6 }
+
+adaptiveModulationRadioMaxTxPower OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum value allowed for the transmitted power in case of Adaptive Modulation
+            (adaptiveModulationMode 'true') for the adaptiveModulation value in the index.
+            This value is an integer expressed as decade of dBm (e.g. 255 means 25.5 dBm). "
+::= { opticsIMAdaptiveModulationRadioTxPowerEntry 7 }
+
+
+
+--
+-- opticsIMAllowedPowerCapabilitiesTable
+--
+
+opticsIMAllowedPowerCapabilitiesTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMAllowedPowerCapabilitiesEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+
+          " This table contains all the power capabilities for all the modulation schemes supported for a specific radio interface type.
+            For each modulation type supported the managed system has to provide these trasmitted power parameters.
+          "
+::= { opticsIMRadioPowerMngt 7 }
+
+opticsIMAllowedPowerCapabilitiesEntry OBJECT-TYPE
+     SYNTAX                   OpticsIMAllowedPowerCapabilitiesEntry
+     MAX-ACCESS          not-accessible
+     STATUS                    current
+     DESCRIPTION
+          " An entry of the opticsIMAllowedPowerCapabilitiesTable table.
+            Each entry (row) corresponds to the power ranges for RTPC and ATPC mode
+            for each modulation scheme supported on a specific radio interface type.
+          "
+     INDEX   { opticsIMAllowedPowerRadioTypeId, opticsIMAllowedPowerModulation }
+::= { opticsIMAllowedPowerCapabilitiesTable 1 }
+
+OpticsIMAllowedPowerCapabilitiesEntry ::= SEQUENCE {
+  opticsIMAllowedPowerRadioTypeId        Integer32,
+  opticsIMAllowedPowerModulation                   INTEGER,
+  opticsIMAllowedPowerAtpcLowPowerMinThr    Integer32,
+  opticsIMAllowedPowerAtpcLowPowerMaxThr    Integer32,
+  opticsIMAllowedPowerMinTxPower        Integer32,
+  opticsIMAllowedPowerMaxTxPower        Integer32,
+  opticsIMAllowedPowerMinAllowedAtpcTxPower    Integer32,
+  opticsIMAllowedPowerMaxAllowedAtpcTxPower    Integer32
+ }
+
+opticsIMAllowedPowerRadioTypeId            OBJECT-TYPE
+     SYNTAX                     Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                      current
+     DESCRIPTION
+          " This object contains the identifier associated to a radio interface type.
+            It identifies a index of the table.
+            The value for each radio interface type is product dependent and defined
+            in each product specification."
+::= { opticsIMAllowedPowerCapabilitiesEntry 1 }
+
+opticsIMAllowedPowerModulation               OBJECT-TYPE
+     SYNTAX                     INTEGER
+     MAX-ACCESS            not-accessible
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies for which modulation type the transmitter power ranges refer to.
+          "
+::= { opticsIMAllowedPowerCapabilitiesEntry 2 }
+
+
+opticsIMAllowedPowerAtpcLowPowerMinThr        OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum value allowed for the associated Low Power Threshold used in ATPC mode
+            for the opticsIMAllowedPowerModulation value in the index.
+            It is  expressed in decade of dBm.
+          "
+::= { opticsIMAllowedPowerCapabilitiesEntry 3 }
+
+opticsIMAllowedPowerAtpcLowPowerMaxThr        OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum value allowed for the associated Low Power Threshold used in ATPC mode
+            for the opticsIMAllowedPowerModulation value in the index.
+            It is  expressed in decade of dBm."
+::= { opticsIMAllowedPowerCapabilitiesEntry 4 }
+
+opticsIMAllowedPowerMinTxPower            OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum value allowed for the transmitted power used in RTPC mode
+            for the opticsIMAllowedPowerModulation value in the index.
+            This value is an integer expressed as decade of dBm (e.g. 255 means 25.5 dBm). "
+::= { opticsIMAllowedPowerCapabilitiesEntry 5 }
+
+
+opticsIMAllowedPowerMaxTxPower            OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum value allowed for the transmitted power used in RTPC mode
+            for the opticsIMAllowedPowerModulation value in the index.
+            This value is an integer expressed as decade of dBm (e.g. 255 means 25.5 dBm). "
+::= { opticsIMAllowedPowerCapabilitiesEntry 6 }
+
+opticsIMAllowedPowerMinAllowedAtpcTxPower        OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum power level allowed for the ATPC device for
+            the opticsIMAllowedPowerModulation value in the index.
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 255
+            means 25.5 dBm). "
+::= { opticsIMAllowedPowerCapabilitiesEntry 7 }
+
+opticsIMAllowedPowerMaxAllowedAtpcTxPower        OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum power level allowed for the ATPC device for the
+            opticsIMAllowedPowerModulation value in the index.
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 255 means
+            25.5 dBm)."
+::= { opticsIMAllowedPowerCapabilitiesEntry 8 }
+
+
+--
+-- opticsIMEnhAllowedPowerCapabilitiesTable
+--
+
+opticsIMEnhAllowedPowerCapabilitiesTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMEnhAllowedPowerCapabilitiesEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+
+          " This table contains all the power capabilities depending on the channel spacing and modulation schemes supported for
+            a specific radio interface type.
+            For each channel spacing and modulation type supported the managed system has to provide these trasmitted power parameters.
+          "
+::= { opticsIMRadioPowerMngt 8 }
+
+opticsIMEnhAllowedPowerCapabilitiesEntry OBJECT-TYPE
+     SYNTAX                   OpticsIMEnhAllowedPowerCapabilitiesEntry
+     MAX-ACCESS          not-accessible
+     STATUS                    current
+     DESCRIPTION
+          " An entry of the opticsIMEnhAllowedPowerCapabilitiesTable table.
+            Each entry (row) corresponds to the power ranges for RTPC and ATPC mode
+            for each channel spacing and modulation scheme supported on a specific radio interface type.
+          "
+     INDEX   { opticsIMEnhAllowedPowerRadioTypeId,
+               opticsIMEnhAllowedPowerChannelSpacing,
+           opticsIMEnhAllowedPowerModulation }
+::= { opticsIMEnhAllowedPowerCapabilitiesTable 1 }
+
+OpticsIMEnhAllowedPowerCapabilitiesEntry ::= SEQUENCE {
+  opticsIMEnhAllowedPowerRadioTypeId        Integer32,
+  opticsIMEnhAllowedPowerChannelSpacing             INTEGER,
+  opticsIMEnhAllowedPowerModulation                 INTEGER,
+  opticsIMEnhAllowedPowerAtpcLowPowerMinThr        Integer32,
+  opticsIMEnhAllowedPowerAtpcLowPowerMaxThr        Integer32,
+  opticsIMEnhAllowedPowerMinTxPower            Integer32,
+  opticsIMEnhAllowedPowerMaxTxPower            Integer32,
+  opticsIMEnhAllowedPowerMinAllowedAtpcTxPower        Integer32,
+  opticsIMEnhAllowedPowerMaxAllowedAtpcTxPower        Integer32,
+  opticsIMEnhAllowedHighPowerAtpcLowPowerMinThr     Integer32,
+  opticsIMEnhAllowedHighPowerAtpcLowPowerMaxThr     Integer32,
+  opticsIMEnhAllowedHighPowerMinTxPower            Integer32,
+  opticsIMEnhAllowedHighPowerMaxTxPower            Integer32,
+  opticsIMEnhAllowedHighPowerMinAllowedAtpcTxPower     Integer32,
+  opticsIMEnhAllowedHighPowerMaxAllowedAtpcTxPower     Integer32
+ }
+
+opticsIMEnhAllowedPowerRadioTypeId            OBJECT-TYPE
+     SYNTAX                     Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                      current
+     DESCRIPTION
+          " This object contains the identifier associated to a radio interface type.
+            It identifies a index of the table.
+            The value for each radio interface type is product dependent and defined
+            in each product specification."
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 1 }
+
+opticsIMEnhAllowedPowerChannelSpacing         OBJECT-TYPE
+     SYNTAX                     INTEGER
+     MAX-ACCESS            not-accessible
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies for which channel spacing the transmitter power ranges refer to.
+          "
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 2 }
+
+opticsIMEnhAllowedPowerModulation               OBJECT-TYPE
+     SYNTAX                     INTEGER
+     MAX-ACCESS            not-accessible
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies for which modulation type the transmitter power ranges refer to.
+          "
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 3 }
+
+
+opticsIMEnhAllowedPowerAtpcLowPowerMinThr        OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum value allowed for the associated Low Power Threshold used in ATPC mode
+            for the opticsIMEnhAllowedPowerModulation value in the index.
+            It is  expressed in decade of dBm.
+          "
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 4 }
+
+opticsIMEnhAllowedPowerAtpcLowPowerMaxThr        OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum value allowed for the associated Low Power Threshold used in ATPC mode
+            for the opticsIMEnhAllowedPowerModulation value in the index.
+            It is  expressed in decade of dBm."
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 5 }
+
+opticsIMEnhAllowedPowerMinTxPower            OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum value allowed for the transmitted power used in RTPC mode
+            for the opticsIMEnhAllowedPowerModulation value in the index.
+            This value is an integer expressed as decade of dBm (e.g. 255 means 25.5 dBm). "
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 6 }
+
+
+opticsIMEnhAllowedPowerMaxTxPower            OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum value allowed for the transmitted power used in RTPC mode
+            for the opticsIMEnhAllowedPowerModulation value in the index.
+            This value is an integer expressed as decade of dBm (e.g. 255 means 25.5 dBm). "
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 7 }
+
+opticsIMEnhAllowedPowerMinAllowedAtpcTxPower        OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum power level allowed for the ATPC device for
+            the opticsIMEnhAllowedPowerModulation value in the index.
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 255
+            means 25.5 dBm). "
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 8 }
+
+opticsIMEnhAllowedPowerMaxAllowedAtpcTxPower        OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum power level allowed for the ATPC device for the
+            opticsIMEnhAllowedPowerModulation value in the index.
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 255 means
+            25.5 dBm)."
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 9 }
+
+opticsIMEnhAllowedHighPowerAtpcLowPowerMinThr        OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum value allowed in High Power mode for the associated Low Power Threshold used in ATPC mode
+            for the opticsIMEnhAllowedPowerModulation value in the index .
+            It is  expressed in decade of dBm.
+          "
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 10 }
+
+opticsIMEnhAllowedHighPowerAtpcLowPowerMaxThr        OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum value allowed in High Power mode for the associated Low Power Threshold used in ATPC mode
+            for the opticsIMEnhAllowedPowerModulation value in the index.
+            It is  expressed in decade of dBm."
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 11 }
+
+opticsIMEnhAllowedHighPowerMinTxPower            OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum value allowed in High Power mode for the transmitted power used in RTPC mode
+            for the opticsIMEnhAllowedPowerModulation value in the index.
+            This value is an integer expressed as decade of dBm (e.g. 255 means 25.5 dBm). "
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 12 }
+
+
+opticsIMEnhAllowedHighPowerMaxTxPower            OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum value allowed in High Power mode for the transmitted power used in RTPC mode
+            for the opticsIMEnhAllowedPowerModulation value in the index.
+            This value is an integer expressed as decade of dBm (e.g. 255 means 25.5 dBm). "
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 13 }
+
+opticsIMEnhAllowedHighPowerMinAllowedAtpcTxPower        OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the minimum power level allowed in High Power mode for the ATPC device for
+            the opticsIMEnhAllowedPowerModulation value in the index.
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 255
+            means 25.5 dBm). "
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 14 }
+
+opticsIMEnhAllowedHighPowerMaxAllowedAtpcTxPower        OBJECT-TYPE
+     SYNTAX                      Integer32
+     MAX-ACCESS            read-only
+     STATUS                      current
+     DESCRIPTION
+          " This object specifies the maximum power level allowed in High Power mode for the ATPC device for the
+            opticsIMEnhAllowedPowerModulation value in the index.
+            It is an integer with associated measure unit expressed in decade of dBm (e.g. 255 means
+            25.5 dBm)."
+::= { opticsIMEnhAllowedPowerCapabilitiesEntry 15 }
+
+
+----
+
+opticsIMRadioRxGainTable OBJECT-TYPE
+SYNTAX SEQUENCE OF   OpticsIMRadioRxGainEntry
+     MAX-ACCESS                not-accessible
+     STATUS                          current
+     DESCRIPTION
+          " This table contains information used to manage the Rx gain. "
+::= { opticsIMRadioTrsCommonMibObject 3 }
+
+opticsIMRadioRxGainEntry OBJECT-TYPE
+     SYNTAX                      OpticsIMRadioRxGainEntry
+     MAX-ACCESS             not-accessible
+     STATUS                       current
+     DESCRIPTION
+          " An entry of the opticsIMRadioRxGainTable table. Each entry corresponds to a Radio
+            Synchronous or Plesiochronous Physical Interface (RSPI or RPPI). "
+     INDEX   { ifIndex }
+::= { opticsIMRadioRxGainTable 1 }
+
+OpticsIMRadioRxGainEntry ::= SEQUENCE {
+  radioManOpRxGain                      INTEGER,
+  radioManOpRxGainLevel             OpticsIMManOpRxGainLevel,
+  radioManOpRxDivGainLevel        OpticsIMManOpRxGainLevel,
+  radioMinRxGain                            Integer32,
+  radioMaxRxGain                           Integer32
+  }
+
+radioManOpRxGain OBJECT-TYPE
+     SYNTAX INTEGER {
+         manOpActive (1),
+         manOpNotActive (2)
+         }
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+          "This object is used to initiate (manOpActive) or terminate (manOpNotActive) a manual handling of
+            the gain level.
+            When the manOpActive value is selected an Abnormal Condition indication is generated. When
+            the manOpNotActive value is selected the Abnormal Condition indication is removed.
+            When the manOpActive value is selected, the associated value is contained in the object
+            ManOpRxGainLevel and, but only in case of Space Diversity configuration, in the object
+            ManOpRxDivGainLevel. "
+::= { opticsIMRadioRxGainEntry 1 }
+
+radioManOpRxGainLevel OBJECT-TYPE
+     SYNTAX                    OpticsIMManOpRxGainLevel
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+          "See Textual Conventions.
+           When the Space Diversity configuration is supported this object refers to the gain level of the main
+           receiver. "
+::= { opticsIMRadioRxGainEntry 2 }
+
+radioManOpRxDivGainLevel OBJECT-TYPE
+     SYNTAX                    OpticsIMManOpRxGainLevel
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+          "See Textual Conventions.
+           This gain level refers to the diversity receiver and then it is used only when the Space Diversity
+           configuration is supported. "
+::= { opticsIMRadioRxGainEntry 3 }
+
+radioMinRxGain OBJECT-TYPE
+     SYNTAX                    Integer32
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          " This object specifies the minimum value allowed for the gain level and is expressed in dB. "
+::= { opticsIMRadioRxGainEntry 4 }
+
+radioMaxRxGain OBJECT-TYPE
+     SYNTAX                    Integer32
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          " This object specifies the maximum value allowed for the gain level and is expressed in dB."
+::= { opticsIMRadioRxGainEntry 5 }
+
+
+-------------------------------
+-- Analogue measurement table
+-------------------------------
+
+opticsIMRadioAnalogueMeasuresTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMRadioAnalogueMeasuresEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+          " This table contains the radio analogue measurements. "
+     ::= { opticsIMRadioTrsCommonMibObject 4 }
+
+opticsIMRadioAnalogueMeasuresEntry OBJECT-TYPE
+     SYNTAX                          OpticsIMRadioAnalogueMeasuresEntry
+     MAX-ACCESS                 not-accessible
+     STATUS                           current
+     DESCRIPTION
+          " An entry of the analogue measurements table. Each entry corresponds to a Radio
+            Synchronous or Plesiochronous Physical Interface (RSPI or RPPI). "
+     INDEX   { ifIndex }
+     ::= { opticsIMRadioAnalogueMeasuresTable 1 }
+
+OpticsIMRadioAnalogueMeasuresEntry ::= SEQUENCE {
+   analogueMeasuresRadioChannelNumber      OpticsIMRadioChannelNumber,
+   analogueMeasuresLocalTxPower                    Integer32,
+   analogueMeasuresLocalRxMainPower            Integer32,
+   analogueMeasuresLocalRxDivPower              Integer32,
+   analogueMeasuresRemoteTxPower                Integer32,
+   analogueMeasuresRemoteRxMainPower        Integer32,
+   analogueMeasuresRemoteRxDivPower           Integer32,
+   analogueMeasuresLocalXpd                   Integer32,
+   analogueMeasuresRetrievingTime             OpticsIMPmRetrievingTime,
+   analogueMeasuresLocalModulation        OpticsIMModulationTypeOrZero,
+   analogueMeasuresRemoteModulation        OpticsIMModulationTypeOrZero,
+   analogueMeasuresLocalMSE            Integer32,
+   analogueMeasuresRemoteMSE            Integer32,
+   analogueMeasuresLocalTxPowerBranchingLoss    Integer32,
+   analogueMeasuresLocalRxMainPowerBranchingLoss    Integer32,
+   analogueMeasuresLocalRxDivPowerBranchingLoss     Integer32,
+   analogueMeasuresRemoteXpd              Integer32,
+   analogueMeasuresLocalDivXpd                  Integer32,
+   analogueMeasuresRemoteDivXpd          Integer32,
+   analogueMeasuresLocalDivMSE                  Integer32,
+   analogueMeasuresRemoteDivMSE          Integer32
+   }
+
+analogueMeasuresRadioChannelNumber OBJECT-TYPE
+     SYNTAX                    OpticsIMRadioChannelNumber
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+         "See Textual Conventions."
+::= { opticsIMRadioAnalogueMeasuresEntry 1 }
+
+analogueMeasuresLocalTxPower OBJECT-TYPE
+     SYNTAX                    Integer32 (-1000..1000)
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object represents the local transmitted power level.
+           It is an integer with associated measure unit expressed in decade of dBm. "
+::= { opticsIMRadioAnalogueMeasuresEntry 2 }
+
+analogueMeasuresLocalRxMainPower  OBJECT-TYPE
+     SYNTAX                    Integer32 (-1000..0)
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          " This object represents the local received power level. In case of space diversity  configuration
+            with combiner function in base band it is used to represent the power at the input of the local
+            main receiver.
+            It is a negative integer with associated measure unit expressed in decade of dBm.  "
+     ::= { opticsIMRadioAnalogueMeasuresEntry 3 }
+
+analogueMeasuresLocalRxDivPower  OBJECT-TYPE
+     SYNTAX                    Integer32 (-1000..0)
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object is used to represent the power at the input of the local diversity receiver in case of
+           space diversity configuration with combiner function in base band.
+           It is a negative integer with associated measure unit expressed in decade of dBm. "
+::= { opticsIMRadioAnalogueMeasuresEntry 4 }
+
+analogueMeasuresRemoteTxPower OBJECT-TYPE
+     SYNTAX                    Integer32 (-1000..1000)
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object represents the remote transmitted power level.
+           It is an integer with associated measure unit expressed in decade of dBm. "
+::= { opticsIMRadioAnalogueMeasuresEntry 6 }
+
+analogueMeasuresRemoteRxMainPower OBJECT-TYPE
+     SYNTAX                    Integer32 (-1000..0)
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object represents the remote received power level. In case of space diversity configuration
+           with combiner function in base band it is used to represent the power at the input of the remote
+           main receiver.
+           It is a negative integer with associated measure unit expressed in decade of dBm. "
+::= { opticsIMRadioAnalogueMeasuresEntry 7 }
+
+analogueMeasuresRemoteRxDivPower OBJECT-TYPE
+     SYNTAX                    Integer32 (-1000..0)
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object is used to represent the power at the input of the remote diversity receiver in case of
+           space diversity configuration with combiner function in base band.
+           It is a negative integer with associated measure unit expressed in decade of dBm. "
+::= { opticsIMRadioAnalogueMeasuresEntry 8 }
+
+analogueMeasuresLocalXpd      OBJECT-TYPE
+     SYNTAX                    Integer32 (0..1000)
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object is used to represent the XPD value. It is a positive integer number with associated measure unit expressed in decade of dB"
+::= { opticsIMRadioAnalogueMeasuresEntry 9 }
+
+analogueMeasuresRetrievingTime           OBJECT-TYPE
+     SYNTAX                OpticsIMPmRetrievingTime
+     MAX-ACCESS                    read-only
+     STATUS                current
+     DESCRIPTION
+          "This object conatins the time of managed system when the measure is reported to the managing system"
+::= { opticsIMRadioAnalogueMeasuresEntry 10 }
+
+analogueMeasuresLocalModulation        OBJECT-TYPE
+     SYNTAX                OpticsIMModulationTypeOrZero
+     MAX-ACCESS                    read-only
+     STATUS                current
+     DESCRIPTION
+          "This object represents the modulation value as currently used by the local radio interface and
+           reported to the managing system.
+           It could follow the modulation value as provisioned by managing system on Fixed Modulation mode
+           or the one currently used by the system and computed by the Adaptive Modulation process.
+       The 'noModulationValue' is reported in case the modulation value is not available.
+           "
+::= { opticsIMRadioAnalogueMeasuresEntry 11 }
+
+
+analogueMeasuresRemoteModulation        OBJECT-TYPE
+     SYNTAX                OpticsIMModulationTypeOrZero
+     MAX-ACCESS                    read-only
+     STATUS                current
+     DESCRIPTION
+           "This object represents the modulation value as currently used by the remote radio interface and
+           reported to the managing system through the local radio interface.
+           It could be the modulation value as provisioned by managing system on Fixed Modulation mode
+           or the one currently used by the remote system and computed by the Adaptive Modulation process.
+       The 'noModulationValue' is reported in case the modulation value is not available.
+           "
+::= { opticsIMRadioAnalogueMeasuresEntry 12 }
+
+analogueMeasuresLocalMSE            OBJECT-TYPE
+     SYNTAX                Integer32 (-1000..0)
+     MAX-ACCESS                    read-only
+     STATUS                current
+     DESCRIPTION
+         "This object represents the local MSE value.
+          It is a negative integer with associated measure unit expressed in decade of dB.
+           "
+::= { opticsIMRadioAnalogueMeasuresEntry 13 }
+
+analogueMeasuresRemoteMSE            OBJECT-TYPE
+     SYNTAX                Integer32 (-1000..0)
+     MAX-ACCESS                    read-only
+     STATUS                current
+     DESCRIPTION
+        "This object represents the remote MSE value.
+         It is a negative integer with associated measure unit expressed in decade of dB.
+           "
+::= { opticsIMRadioAnalogueMeasuresEntry 14 }
+
+analogueMeasuresLocalTxPowerBranchingLoss OBJECT-TYPE
+     SYNTAX                    Integer32 (0..1000)
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+          "This object represents the correction value, provided by the managing system, to be applied to the local transmitted power level due to a loss on branching side.
+The getting on analogueMeasuresLocalTxPower will reflect this correction value.
+           It is an integer with associated measure unit expressed in tenths of dB(e.g. 150 means 15.0 dB)."
+::= { opticsIMRadioAnalogueMeasuresEntry 15 }
+
+analogueMeasuresLocalRxMainPowerBranchingLoss    OBJECT-TYPE
+     SYNTAX                    Integer32 (0..1000)
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+          "This object represents the correction value, provided by the managing system, to be applied to the local received level on the main receiver due to a loss on branching side.
+The getting on analogueMeasuresLocalRxMainPower            will reflect this correction value.
+           It is an integer with associated measure unit expressed in tenths of dB (e.g. 150 means 15.0 dB)."
+::= { opticsIMRadioAnalogueMeasuresEntry 16 }
+
+analogueMeasuresLocalRxDivPowerBranchingLoss OBJECT-TYPE
+     SYNTAX                    Integer32 (0..1000)
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+          "This object represents the correction value, provided by the managing system, to be applied to the local received level on the diversity receiver due to a loss on branching side.
+The getting on analogueMeasuresLocalRxDivPower              will reflect this correction value.
+           It is an integer with associated measure unit expressed in tenths of dB (e.g. 150 means 15.0 dB)."
+::= { opticsIMRadioAnalogueMeasuresEntry 17 }
+
+analogueMeasuresRemoteXpd      OBJECT-TYPE
+     SYNTAX                    Integer32 (0..1000)
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object is used to represent the remote XPD value. It is a positive integer number with associated measure unit expressed in decade of dB"
+::= { opticsIMRadioAnalogueMeasuresEntry 18 }
+
+analogueMeasuresLocalDivXpd OBJECT-TYPE
+     SYNTAX                    Integer32 (0..1000)
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object is used to represent the local XPD value for Diversity configuration. It is a positive integer number with associated measure unit expressed in decade of dB"
+::= { opticsIMRadioAnalogueMeasuresEntry 19 }
+
+analogueMeasuresRemoteDivXpd OBJECT-TYPE
+     SYNTAX                    Integer32 (0..1000)
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object is used to represent the remote XPD value for the Diversity configuration. It is a positive integer number with associated measure unit expressed in decade of dB"
+::= { opticsIMRadioAnalogueMeasuresEntry 20 }
+
+analogueMeasuresLocalDivMSE OBJECT-TYPE
+     SYNTAX                    Integer32 (-1000..0)
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object is used to represent the local MSE value for Diversity configuration.
+           It is a negative integer with associated measure unit expressed in decade of dB."
+::= { opticsIMRadioAnalogueMeasuresEntry 21 }
+
+analogueMeasuresRemoteDivMSE OBJECT-TYPE
+     SYNTAX                    Integer32 (-1000..0)
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object is used to represent the remote MSE value for the Diversity configuration.
+           It is a negative integer with associated measure unit expressed in decade of dB."
+::= { opticsIMRadioAnalogueMeasuresEntry 22 }
+
+-- ALARMS
+
+opticsIMRadioAlarms OBJECT IDENTIFIER ::= { opticsIMRadioTrsCommonMibObject 5 }
+
+-- atpcLoopCommunicationProblem alarm
+
+opticsIMAlarmAtpcLoopProblemRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the ATPC Loop Problem defect raise."
+::= { opticsIMRadioAlarms 15 }
+
+opticsIMAlarmAtpcLoopProblemClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the ATPC Loop Problem defect clear."
+::= { opticsIMRadioAlarms 16 }
+
+
+
+-- incompatibleShifter alarm
+
+opticsIMAlarmIncompatibleShifterRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatibleShifter (a mismatch between shifter provided and
+           shifter supported by HW) defect raise."
+::= { opticsIMRadioAlarms 17 }
+
+opticsIMAlarmIncompatibleShifterClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatibleShifter (a mismatch between shifter provided and
+           shifter supported by HW) defect clear."
+::= { opticsIMRadioAlarms 18 }
+
+-- IncompatibleModulationalarm
+
+opticsIMAlarmIncompatibleModulationRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatibility of modulation value defect raise."
+::= { opticsIMRadioAlarms 19 }
+
+opticsIMAlarmIncompatibleModulationClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatibility of modulation value defect clear."
+::= { opticsIMRadioAlarms 20 }
+
+-- Bandwidth OverFlow alarm
+
+opticsIMAlarmBandwidthOverFlowRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the overFlow of the bandwidth used over the allowed one defect raise."
+::= { opticsIMRadioAlarms 21 }
+
+opticsIMAlarmBandwidthOverFlowClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the overFlow of the bandwidth used over the allowed one defect clear."
+::= { opticsIMRadioAlarms 22 }
+
+
+
+-- atpcIdentifierMismatch alarm
+
+opticsIMAlarmAtpcIdentifierMismatchRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the ATPC Identifier Mismatch defect raise."
+::= { opticsIMRadioAlarms 23 }
+
+opticsIMAlarmAtpcIdentifierMismatchClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the ATPC Identifier Mismatch defect clear."
+::= { opticsIMRadioAlarms 24 }
+
+
+
+-- radioChannelIdentifierMismatch alarm
+
+opticsIMAlarmRadioChannelIdentifierMismatchRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the Radio Channel Identifier Mismatch (RCIM) defect raise."
+::= { opticsIMRadioAlarms 25 }
+
+opticsIMAlarmRadioChannelIdentifierMismatchClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the Radio Channel Identifier Mismatch (RCIM) defect clear."
+::= { opticsIMRadioAlarms 26 }
+
+
+-- incompatibleFrequency alarm
+
+opticsIMAlarmIncompatibleFrequencyRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatible frequency defect raise."
+::= { opticsIMRadioAlarms 27 }
+
+opticsIMAlarmIncompatibleFrequencyClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatible Frequency defect clear."
+::= { opticsIMRadioAlarms 28 }
+
+
+
+-- incompatible Tx Power alarm
+
+opticsIMAlarmIncompatiblePTXRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatible Tx Power defect raise."
+::= { opticsIMRadioAlarms 29 }
+
+opticsIMAlarmIncompatiblePTXClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatible Tx Power defect clear."
+::= { opticsIMRadioAlarms 30 }
+
+
+
+
+
+-- IncompatibleCapacity alarm
+
+opticsIMAlarmIncompatibleCapacityRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatibility of capacity value defect raise. "
+::= { opticsIMRadioAlarms 31 }
+
+opticsIMAlarmIncompatibleCapacityClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatibility of capacity value defect clear."
+::= { opticsIMRadioAlarms 32 }
+
+
+
+-- highBER alarm
+
+opticsIMAlarmHighBERRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the highBER defect raise. "
+::= { opticsIMRadioAlarms 35 }
+
+opticsIMAlarmHighBERClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the highBER defect clear."
+::= { opticsIMRadioAlarms 36 }
+
+
+
+
+
+-- lowBER alarm
+
+opticsIMAlarmLowBERRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the lowBER defect raise. "
+::= { opticsIMRadioAlarms 37 }
+
+opticsIMAlarmLowBERClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the lowBER defect clear."
+::= { opticsIMRadioAlarms 38 }
+
+
+
+-- Early Warning alarm
+
+opticsIMAlarmEarlyWarningRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the Early Warning defect raise. "
+::= { opticsIMRadioAlarms 39 }
+
+opticsIMAlarmEarlyWarningClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the Early Warning defect clear."
+::= { opticsIMRadioAlarms 40 }
+
+
+
+
+
+
+
+-- Path Distortion alarm
+
+opticsIMAlarmPathDistortionRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the Path Distortion defect raise. "
+::= { opticsIMRadioAlarms 41 }
+
+opticsIMAlarmPathDistortionClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the Path Distortion defect clear."
+::= { opticsIMRadioAlarms 42 }
+
+
+
+-- Radio Dade alarm
+
+opticsIMAlarmRadioDADERaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the Radio Dade defect raise. "
+::= { opticsIMRadioAlarms 43 }
+
+opticsIMAlarmRadioDADEClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the Radio Dade defect clear."
+::= { opticsIMRadioAlarms 44 }
+
+
+
+
+
+
+
+-- Ring Broke alarm
+
+opticsIMAlarmRingBrokeRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the Ring Broke defect raise. "
+::= { opticsIMRadioAlarms 45 }
+
+opticsIMAlarmRingBrokeClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the Ring Broke defect clear."
+::= { opticsIMRadioAlarms 46 }
+
+-- Dialog failure alarm
+
+opticsIMAlarmDialogFailureRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the Dialog Failure Problem (DF) defect raise."
+::= { opticsIMRadioAlarms 47 }
+
+opticsIMAlarmDialogFailureClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the Dialog Failure Problem (DF) defect clear."
+::= { opticsIMRadioAlarms 48 }
+
+-- CrossConnectionFail alarm
+
+opticsIMAlarmCrossConnectionFailRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the failure of the cross connection configuration (collision on ARL table) raise."
+::= { opticsIMRadioAlarms 49 }
+
+opticsIMAlarmCrossConnectionFailClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the failure of the cross connection configuration (collision on ARL table) clear."
+::= { opticsIMRadioAlarms 50 }
+
+
+-- RPSPathFail alarm
+
+opticsIMAlarmRPSPathFailRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the RPS path fail (RPS communication problem) defect raise."
+::= { opticsIMRadioAlarms 51 }
+
+opticsIMAlarmRPSPathFailClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the the RPS path fail (RPS communication problem) defect clear."
+::= { opticsIMRadioAlarms 52 }
+
+
+-- LoopProblem alarm
+
+opticsIMAlarmLoopProblemRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the generic Loop Problem defect raise."
+::= { opticsIMRadioAlarms 53 }
+
+opticsIMAlarmLoopProblemClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the generic Loop Problem defect clear."
+::= { opticsIMRadioAlarms 54 }
+
+-- IncompatibleModulationParameters alarm
+
+opticsIMAlarmIncompatibleModulationParamRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatibility of modulation parameters values defect raise."
+::= { opticsIMRadioAlarms 55 }
+
+opticsIMAlarmIncompatibleModulationParamClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatibility of modulation parameters values defect clear."
+::= { opticsIMRadioAlarms 56 }
+
+-- IncompatibleModulationParameters alarm
+
+opticsIMAlarmIncompatiblePowerRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatibility of the power value defect raise."
+::= { opticsIMRadioAlarms 57 }
+
+opticsIMAlarmIncompatiblePowerClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatibility of of the power value defect clear."
+::= { opticsIMRadioAlarms 58 }
+
+
+-- Incompatible Channel spacing alarm
+
+opticsIMAlarmIncompatibleChannelSpacingRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatibility of channel spacing value defect raise."
+::= { opticsIMRadioAlarms 59 }
+
+opticsIMAlarmIncompatibleChannelSpacingClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the incompatibility of channel spacing value defect clear."
+::= { opticsIMRadioAlarms 60 }
+
+
+-- Dem Div los alarm
+
+opticsIMAlarmDemDivLOSRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the demDivLOS (LOS of the incoming diversity signal for the
+           demodulation subfunction in case of Space Diversity configuration) defect raise."
+::= { opticsIMRadioAlarms 61 }
+
+opticsIMAlarmDemDivLOSClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType }
+      STATUS current
+      DESCRIPTION
+          "This notification reports the demDivLOS (LOS of the incoming diversity signal for the
+           demodulation subfunction, in case of Space Diversity configuration) defect clear."
+::= { opticsIMRadioAlarms 62 }
+
+
+-- Rx Div fail alarm
+
+opticsIMAlarmRxDivFailRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the rxDivFail (a fail of the Rx Diversity subfunction, in case of Space
+           Diversity configuration) defect raise."
+::= { opticsIMRadioAlarms 63 }
+
+opticsIMAlarmRxDivFailClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the rxDivFail (a fail of the Rx Diversity subfunction, in case of Space
+           Diversity configuration) defect clear."
+::= { opticsIMRadioAlarms 64 }
+
+
+-- DEM Xpic LOS alarm
+
+opticsIMAlarmDemXpicLOSRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the rxDivFail (a fail of the Rx Diversity subfunction, in case of Space
+           Diversity configuration) defect raise."
+::= { opticsIMRadioAlarms 65 }
+
+opticsIMAlarmDemXpicLOSClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the rxDivFail (a fail of the Rx Diversity subfunction, in case of Space
+           Diversity configuration) defect clear."
+::= { opticsIMRadioAlarms 66 }
+
+-- ATPC Time-out alarm
+
+opticsIMAlarmATPCTimeoutRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the ATPC timeout defect raise."
+::= { opticsIMRadioAlarms 67 }
+
+opticsIMAlarmATPCTimeoutClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+         "This notification reports the ATPC timeout defect clear."
+::= { opticsIMRadioAlarms 68 }
+
+-- Radio encryption mismatch
+
+opticsIMAlarmRadioEncryptionMismatchRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the mismatch on the traffic encryption on radio interface defect raise."
+::= { opticsIMRadioAlarms 69 }
+
+opticsIMAlarmRadioEncryptionMismatchClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the mismatch on the traffic encryption on radio interface defect clear."
+::= { opticsIMRadioAlarms 70 }
+
+
+-- Rx Overload
+
+opticsIMAlarmRxOverloadRaise NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the Rx Overload on radio interface defect raise."
+::= { opticsIMRadioAlarms 71 }
+
+opticsIMAlarmRxOverloadClear NOTIFICATION-TYPE
+      OBJECTS { tsdimEventObjectClassIdentifier,
+                          tsdimEventObjectInstanceIdentifier,
+                          tsdimEventNotificationId,
+                          tsdimEventTime,
+                          tsdimAlarmSeverity,
+                          tsdimAlarmSpecProblem ,
+                          opticsIMAdditionalText,
+                          opticsIMAlarmType}
+      STATUS current
+      DESCRIPTION
+          "This notification reports the Rx Overload on radio interface defect clear."
+::= { opticsIMRadioAlarms 72 }
+
+
+-- end ALARMS
+
+------------------------
+-- Radio Tx Mute table
+------------------------
+
+opticsIMRadioTxMuteTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    OpticsIMRadioTxMuteEntry
+     MAX-ACCESS                      not-accessible
+     STATUS                                current
+     DESCRIPTION
+          " This table contains the information related to the management of the radio TX Mute function
+            (local and remote). "
+     ::= { opticsIMRadioTrsCommonMibObject 7 }
+
+opticsIMRadioTxMuteEntry OBJECT-TYPE
+     SYNTAX                      OpticsIMRadioTxMuteEntry
+     MAX-ACCESS             not-accessible
+     STATUS                       current
+     DESCRIPTION
+          " An entry of the Radio Tx Mute table. Each entry corresponds to a Radio Synchronous or
+            Plesiochronous Physical Interface (RSPI or RPPI). "
+     INDEX   { ifIndex }
+     ::= { opticsIMRadioTxMuteTable 1 }
+
+OpticsIMRadioTxMuteEntry ::= SEQUENCE {
+   opticsIMRadioManLocalTxMute            OpticsIMRadioTxMuteStatus,
+   opticsIMRadioAutoLocalTxMute            OpticsIMRadioTxMuteStatus,
+   opticsIMRadioManRemoteTxMute        OpticsIMRadioTxMuteStatus,
+   opticsIMRadioAutoRemoteTxMute        OpticsIMRadioTxMuteStatus,
+   opticsIMRadioManLocalActivationDate        DisplayString,
+   opticsIMRadioManLocalTimeoutPeriod        Integer32,
+   opticsIMRadioManRemoteActivationDate        DisplayString,
+   opticsIMRadioManRemoteTimeoutPeriod        Integer32,
+   opticsIMRadioAutoLocalTxMuteRemoteRequest    OpticsIMRadioTxMuteStatus
+   }
+
+opticsIMRadioManLocalTxMute OBJECT-TYPE
+     SYNTAX                    OpticsIMRadioTxMuteStatus
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+          "This object allows to the managers to squelch the local transmitter. When the local transmitter is
+           squelched an Abnormal Condition indication is generated.
+           See Textual Conventions. "
+::= { opticsIMRadioTxMuteEntry 1 }
+
+opticsIMRadioAutoLocalTxMute OBJECT-TYPE
+     SYNTAX                     OpticsIMRadioTxMuteStatus
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object specifies if an automatic squelch of the local transmitter, performed directly by the
+           agent, is currently active. When the local transmitter is squelched an Abnormal Condition
+           indication is generated.
+           See Textual Conventions. "
+::= { opticsIMRadioTxMuteEntry 2 }
+
+opticsIMRadioManRemoteTxMute OBJECT-TYPE
+     SYNTAX                    OpticsIMRadioTxMuteStatus
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+          "This object allows to the managers to squelch the remote transmitter.
+           See Textual Conventions. "
+::= { opticsIMRadioTxMuteEntry 3 }
+
+opticsIMRadioAutoRemoteTxMute OBJECT-TYPE
+     SYNTAX                     OpticsIMRadioTxMuteStatus
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object specifies if an automatic squelch of the remote transmitter, performed directly by the
+           agent, is currently active.
+           See Textual Conventions. "
+::= { opticsIMRadioTxMuteEntry 4 }
+
+
+opticsIMRadioManLocalActivationDate OBJECT-TYPE
+       SYNTAX            DisplayString
+       MAX-ACCESS    read-only
+       STATUS            current
+       DESCRIPTION
+           "This object indicates the date and the time when the the local transmitter has been squelched.
+             It is provided according to the following format: yyy/mm/dd hh:mm:ss.
+             If the loopback has not been yet squelched, then the string notYetActivated is used."
+::= { opticsIMRadioTxMuteEntry 5 }
+
+opticsIMRadioManLocalTimeoutPeriod OBJECT-TYPE
+       SYNTAX            Integer32 (0..5760)
+       MAX-ACCESS    read-write
+       STATUS            current
+       DESCRIPTION
+           "This object indicates the time period, measured in units of minutes, from the squelched date
+             (specified on opticsIMRadioManLocalActivationDate object) during the local transmitter is squelched.
+             After this timeout the agent enables the local transmitter ('off' value on opticsIMRadioManLocalTxMute )."
+::= { opticsIMRadioTxMuteEntry 6 }
+
+opticsIMRadioManRemoteActivationDate OBJECT-TYPE
+       SYNTAX            DisplayString
+       MAX-ACCESS    read-only
+       STATUS            current
+       DESCRIPTION
+           "This object indicates the date and the time when the the remote transmitter has been squelched.
+             It is provided according to the following format: yyy/mm/dd hh:mm:ss.
+             If the loopback has not been yet squelched, then the string notYetActivated is used."
+::= { opticsIMRadioTxMuteEntry 7 }
+
+opticsIMRadioManRemoteTimeoutPeriod OBJECT-TYPE
+       SYNTAX            Integer32 (0..5760)
+       MAX-ACCESS    read-write
+       STATUS            current
+       DESCRIPTION
+           "This object indicates the time period, measured in units of minutes, from the squelched date
+             (specified on opticsIMRadioManRemoteActivationDate object) during the remote transmitter is squelched.
+             After this timeout the agent enables the remote transmitter ('off' value on opticsIMRadioManRemoteTxMute )."
+::= { opticsIMRadioTxMuteEntry 8 }
+
+opticsIMRadioAutoLocalTxMuteRemoteRequest OBJECT-TYPE
+     SYNTAX                    OpticsIMRadioTxMuteStatus
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object indicates XPIC local mute by remote request(XPIC auto remote tx mute)."
+::= { opticsIMRadioTxMuteEntry 9 }
+
+
+------------------------
+-- AnaloguePoint table
+------------------------
+
+
+opticsIMAnaloguePointsTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF        OpticsIMAnaloguePointsEntry
+     MAX-ACCESS                          not-accessible
+     STATUS                                    current
+     DESCRIPTION
+          " This table allows to provide the status assumed by generic analogue points. "
+     ::= { opticsIMRadioTrsCommonMibObject 6 }
+
+opticsIMAnaloguePointsEntry OBJECT-TYPE
+     SYNTAX                         OpticsIMAnaloguePointsEntry
+     MAX-ACCESS                not-accessible
+     STATUS                          current
+     DESCRIPTION
+          " An entry of the analogue points table. "
+     INDEX   {analoguePointsIndex }
+     ::= { opticsIMAnaloguePointsTable 1 }
+
+OpticsIMAnaloguePointsEntry ::= SEQUENCE {
+   analoguePointsIndex                  Integer32,
+   analoguePointsDescription         DisplayString,
+   analoguePointsStatus                 Integer32
+   }
+
+analoguePointsIndex  OBJECT-TYPE
+     SYNTAX                   Integer32
+     MAX-ACCESS          read-only
+     STATUS                    current
+     DESCRIPTION
+         "This object represents the index of the table."
+::= { opticsIMAnaloguePointsEntry 1 }
+
+analoguePointsDescription OBJECT-TYPE
+     SYNTAX                   DisplayString
+     MAX-ACCESS          read-only
+     STATUS                    current
+     DESCRIPTION
+          "This object contains the description of the meaning of the value provided by the
+           analoguePointsStatus object.  "
+::= { opticsIMAnaloguePointsEntry 2 }
+
+analoguePointsStatus  OBJECT-TYPE
+     SYNTAX                     Integer32
+     MAX-ACCESS           read-only
+     STATUS                     current
+     DESCRIPTION
+          "This object is used to provide the status of a analogue point whose meaning is provided by the
+            analoguePointsDescription object. "
+::= { opticsIMAnaloguePointsEntry 3 }
+
+
+opticsIMRadioShifterTable OBJECT-TYPE
+SYNTAX SEQUENCE OF   OpticsIMRadioShifterEntry
+     MAX-ACCESS                not-accessible
+     STATUS                          current
+     DESCRIPTION
+          " This table contains the shifter and central frequency values associated to installed equipment."
+::= { opticsIMRadioTrsCommonMibObject 8 }
+
+opticsIMRadioShifterEntry OBJECT-TYPE
+     SYNTAX                      OpticsIMRadioShifterEntry
+     MAX-ACCESS             not-accessible
+     STATUS                       current
+     DESCRIPTION
+          " An entry of the opticsIMRadioShifterTable table. Each entry corresponds to a shifter and central
+          frequency values for each Radio channel used by the algorithm equipment dependent managing
+          radio frequency."
+INDEX   { ifIndex }
+::= { opticsIMRadioShifterTable 1 }
+
+OpticsIMRadioShifterEntry::= SEQUENCE {
+  radioShifterId                         Integer32,
+  radioShifterValue                    Unsigned32,
+  radioShifterCentralFrequency    Unsigned32
+  }
+
+radioShifterId OBJECT-TYPE
+     SYNTAX                    Integer32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+          " This object specifies the identifier of the set of shifter and central radio frequency
+          requested by the managing systems. The identifier must be included in one of entries
+          of the opticsIMAllowedShifterTable if updated by managing system: in this case as a
+          side effect of setting this object, the agent must set the radioShifterValue and
+          radioShifterCentralFrequency objects with the associated values on
+          opticsIMAllowedShifterTable (allowedShifterValue and allowedShifterCentralFrequency).
+          Otherwise  the '-1' value means that the radioShifterValue and radioShifterCentralFrequency
+          objects are set directly by managing system"
+::= { opticsIMRadioShifterEntry 1 }
+
+radioShifterValue OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+       " This object contains the shifter value requested by the managing systems. It is updated
+       or by the agent when the radioShifterId object is set by the managing systems or directly
+       by the managing system (in this case the agent must set the radioShifterId to '-1' value)."
+::= { opticsIMRadioShifterEntry 2 }
+
+radioShifterCentralFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-write
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the central radio frequency requested by the managing systems.
+         It is updated or by the agent when the radioShifterId object is set by the managing systems or directly
+         by the managing system (in this case the agent must set the radioShifterId to '-1' value).
+         This value is expressed in KHz."
+::= { opticsIMRadioShifterEntry 3 }
+
+
+opticsIMAllowedShifterTable OBJECT-TYPE
+SYNTAX SEQUENCE OF   OpticsIMAllowedShifterEntry
+     MAX-ACCESS                not-accessible
+     STATUS                          current
+     DESCRIPTION
+          " This table contains the allowed shifter and central frequency values"
+::= { opticsIMRadioTrsCommonMibObject 9 }
+
+opticsIMAllowedShifterEntry OBJECT-TYPE
+     SYNTAX                      OpticsIMAllowedShifterEntry
+     MAX-ACCESS             not-accessible
+     STATUS                       current
+     DESCRIPTION
+          " An entry of the opticsIMAllowedShifterTable table. Each entry corresponds to
+          a set of shifter and central frequency allowed. "
+INDEX   { allowedShifterId }
+::= { opticsIMAllowedShifterTable 1 }
+
+OpticsIMAllowedShifterEntry::= SEQUENCE {
+  allowedShifterId            Integer32,
+  allowedShifterValue            Unsigned32,
+  allowedShifterCentralFrequency    Unsigned32,
+  allowedShifterMinTxFrequency      Unsigned32,
+  allowedShifterMaxTxFrequency         Unsigned32,
+  allowedShifterMinRxFrequency      Unsigned32,
+  allowedShifterMaxRxFrequency      Unsigned32,
+  allowedMinTxFrequency               Unsigned32,
+  allowedMaxTxFrequency             Unsigned32,
+  allowedMinRxFrequency              Unsigned32,
+  allowedMaxRxFrequency              Unsigned32
+  }
+
+allowedShifterId OBJECT-TYPE
+     SYNTAX                    Integer32
+     MAX-ACCESS            not-accessible
+     STATUS                    current
+     DESCRIPTION
+          " This object contains the index of the table. It identifies the set of shifters.
+            A shifter is identifed by a value and a central frequency or by a value and a min and max Tx frequency."
+::= { opticsIMAllowedShifterEntry 1 }
+
+allowedShifterValue OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          " This object contains the shifter value allowed."
+::= { opticsIMAllowedShifterEntry 2 }
+
+allowedShifterCentralFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+     " This object specifies the central frequency value associated to the shifter value.
+      This value is expressed in KHz."
+::= { opticsIMAllowedShifterEntry 3 }
+
+allowedShifterMinTxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the minimum value allowed for the transmission frequency
+           associated to the shifter value.
+           This value is expressed in KHz. "
+::= { opticsIMAllowedShifterEntry 4 }
+
+allowedShifterMaxTxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the maximum value allowed for the transmission frequency
+           associated to the shifter value.
+           This value is expressed in KHz. "
+::= { opticsIMAllowedShifterEntry 5 }
+
+allowedShifterMinRxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the minimum value allowed for the receive frequency
+           associated to this shifter (identified by the value and min and max Tx frequency).
+           This value is expressed in KHz. "
+::= { opticsIMAllowedShifterEntry 6 }
+
+allowedShifterMaxRxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the maximum value allowed for the receive frequency
+           associated to this shifter (identified by the value and min and max Tx frequency).
+           This value is expressed in KHz. "
+::= { opticsIMAllowedShifterEntry 7 }
+
+allowedMinTxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the minimum value allowed for the transmission frequency
+           associated to the shifter and the channel spacing values.
+           This value is expressed in KHz. "
+::= { opticsIMAllowedShifterEntry 8 }
+
+allowedMaxTxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the maximum value allowed for the transmission frequency
+           associated to the shifter and the channel spacing values.
+           This value is expressed in KHz. "
+::= { opticsIMAllowedShifterEntry 9 }
+
+allowedMinRxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the minimum value allowed for the receive frequency
+           associated to this shifter (identified by the value and min and max Tx frequency) and the channel spacing value.
+           This value is expressed in KHz. "
+::= { opticsIMAllowedShifterEntry 10 }
+
+allowedMaxRxFrequency OBJECT-TYPE
+     SYNTAX                    Unsigned32
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+         " This object specifies the maximum value allowed for the receive frequency
+           associated to this shifter (identified by the value and min and max Tx frequency)and the channel spacing values.
+           This value is expressed in KHz. "
+::= { opticsIMAllowedShifterEntry 11 }
+
+
+------
+
+opticsIMRadioInterferenceMeasuresTable OBJECT-TYPE
+SYNTAX SEQUENCE OF   OpticsIMRadioInterferenceMeasuresEntry
+     MAX-ACCESS                not-accessible
+     STATUS                          current
+     DESCRIPTION
+          " This table manages the radio interference measurements."
+::= { opticsIMRadioTrsCommonMibObject 10 }
+
+opticsIMRadioInterferenceMeasuresEntry OBJECT-TYPE
+     SYNTAX                      OpticsIMRadioInterferenceMeasuresEntry
+     MAX-ACCESS             not-accessible
+     STATUS                       current
+     DESCRIPTION
+          " An entry of the opticsIMRadioInterferenceMeasuresTable table. Each entry corresponds to
+          a Radio Synhronous or Plesiochronous Physical Interface (RSPI or RPPI)"
+INDEX   { ifIndex }
+::= { opticsIMRadioInterferenceMeasuresTable 1 }
+
+OpticsIMRadioInterferenceMeasuresEntry::= SEQUENCE {
+  interferenceMeasuresRxPowerFactoryMeasuredTo10E6Ber         Integer32,
+  interferenceMeasuresRowStatus RowStatus
+  }
+
+interferenceMeasuresRxPowerFactoryMeasuredTo10E6Ber OBJECT-TYPE
+     SYNTAX                    Integer32 (-1000..0)
+     MAX-ACCESS            read-only
+     STATUS                    current
+     DESCRIPTION
+          " This object specifies the factory designed rx power level value (in dBm) corresponding to 10-6 BER.
+           It is a negative integer with associated measure unit expressed in decade of dBm."
+::= { opticsIMRadioInterferenceMeasuresEntry 1 }
+
+interferenceMeasuresRowStatus OBJECT-TYPE
+     SYNTAX                    RowStatus
+     MAX-ACCESS            read-create
+     STATUS                    current
+     DESCRIPTION
+          " See textual conventions."
+::= { opticsIMRadioInterferenceMeasuresEntry 2 }
+
+
+-- OPTICSIM-RADIO-TRS-COMMON-MC DEFINITIONS ::= BEGIN
+--       IMPORTS
+--       MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY FROM SNMPv2-SMI
+--       MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP FROM SNMPv2-CONF
+--       opticsimRadioMC FROM OPTICSIM-RADIOREG-MIB;
+
+-- opticsIMRadioTrsCommonMCCompl MODULE-IDENTITY
+--       LAST-UPDATED "0207240000Z"
+--       ORGANIZATION "Alcatel TND"
+--       CONTACT-INFO "Alcatel TND"
+--       DESCRIPTION
+--            "The new group opticsIMOptRadioPowerGroup has been added. "
+--       REVISION "200205100000Z"
+--       DESCRIPTION
+--           "Deleted the LocalRxATPCPower and RemoteRxATPCPower objects from analogue
+--            measures entry.
+--            Added the RxLOS, HBER, LBER and EW alarms notifications."
+--       REVISION "200201250000Z"
+--       DESCRIPTION
+--           "Initial Release of Radio SDH/PDH Common Module Compliance."
+
+-- ::= { opticsIMRadioTrsCommonMCConf 1 }
+
+opticsIMRadioTrsCommonMCConf       OBJECT IDENTIFIER ::= { opticsimRadioMC 1 }
+opticsIMRadioTrsCommonMCCompl    OBJECT IDENTIFIER ::= { opticsIMRadioTrsCommonMCConf 1 }
+opticsIMRadioTrsCommonMCGroup    OBJECT IDENTIFIER ::= { opticsIMRadioTrsCommonMCConf 2 }
+
+opticsIMRadioTrsCommonMc MODULE-COMPLIANCE
+      STATUS current
+      DESCRIPTION
+          "This module compliance describes a set of objects required for Optics-IM Agent
+            implementation. These objects are defined inside opticsIMRadioTrsCommonMib. "
+
+       MODULE -- opticsIMRadioTrsCommonMib
+
+MANDATORY-GROUPS { opticsIMRadioFrequencyGroup,
+                                           opticsIMRadioTxPowerGroup,
+                                           opticsIMRadioAnalogueMeasuresGroup,
+                                           opticsIMRadioCommonAlarmsGroup }
+
+GROUP opticsIMOptRadioRxGainGroup
+      DESCRIPTION
+          " This group describes the optional objects related to the radio rx gain management. "
+
+GROUP opticsIMOptRadioPowerGroup
+      DESCRIPTION
+          " This group describes the optional objects related to the management of the radio tx power. "
+
+GROUP opticsIMOptIntrusiveTPCGroup
+      DESCRIPTION
+          " This group describes the optional objects related to the radio Intrusive TPC management. "
+
+GROUP opticsIMRadioTxMuteGroup
+DESCRIPTION
+          " This group describes the objects related to the radio Tx Mute function management. "
+
+GROUP opticsIMAnaloguePointsGroup
+DESCRIPTION
+          " This group describes the objects related to the analogue points management. "
+
+GROUP opticsIMRadioOptAlarmsGroup
+DESCRIPTION
+          " This group describes the radio optional alarm notifications. "
+
+GROUP opticsIMOptRadioATPCHighPowerGroup
+DESCRIPTION
+          " This group describes the objects related to the ATPC management in high-power mode. "
+
+GROUP opticsIMOptRadioFrequencyGroup
+DESCRIPTION
+          " This group describes optional objects related to the management of the receive radio
+            frequency."
+
+GROUP opticsIMOptRadioReturnCodeFrequencyGroup
+DESCRIPTION
+          " This group describes optional objects related to the management of the return code on setting  radio frequency."
+
+GROUP opticsIMOptRadioShifterGroup
+DESCRIPTION
+          " This group describes optional objects related to the management of shifter related to radio frequency."
+
+::= { opticsIMRadioTrsCommonMCCompl 1 }
+
+
+opticsIMRadioFrequencyGroup OBJECT-GROUP
+      OBJECTS { radioTxFrequency,
+                          radioRxFrequency,
+                          radioMinTxFrequency,
+                          radioMaxTxFrequency
+                         }
+      STATUS current
+      DESCRIPTION
+          " This group describes the mandatory objects related to the management of the radio frequency."
+::= { opticsIMRadioTrsCommonMCGroup 1 }
+
+opticsIMRadioTxPowerGroup OBJECT-GROUP
+      OBJECTS { radioAtpcEnabled,
+                          radioMinAtpcTxPower,
+                          radioMaxAtpcTxPower,
+                          radioAtpcLowPowerThr,
+                          radioAtpcLowPowerMinThr,
+                          radioAtpcLowPowerMaxThr,
+                          radioAtpcExtraLowPowerThr,
+                          radioCurrentTxPower,
+                          radioTxNominalPower,
+                          radioMinTxPower,
+                          radioMaxTxPower,
+                          radioManOpTxPower,
+                          radioManOpTxPowerLevel,
+                          opticsIMRadioAtpcImplemented,
+                          opticsIMRadioAtpcDirectionId,
+--                          adaptiveModulation,
+                          adaptiveModulationRadioMaxAtpcTxPower,
+                          adaptiveModulationRadioCurrentTxPower,
+                          adaptiveModulationRadioMinTxPower,
+                          adaptiveModulationRadioMaxTxPower
+                          }
+      STATUS current
+      DESCRIPTION
+          " This group describes the mandatory objects related to the management of the radio tx power."
+::= { opticsIMRadioTrsCommonMCGroup 2 }
+
+
+opticsIMOptRadioPowerGroup OBJECT-GROUP
+      OBJECTS { radioMinAllowedAtpcTxPower,
+                radioMaxAllowedAtpcTxPower,
+                adaptiveModulationRadioMinAllowedAtpcTxPower,
+                adaptiveModulationRadioMaxAllowedAtpcTxPower
+              }
+      STATUS current
+      DESCRIPTION
+          " This group describes the optional objects related to the management of the radio tx power."
+::= { opticsIMRadioTrsCommonMCGroup 7 }
+
+
+opticsIMOptRadioRxGainGroup OBJECT-GROUP
+      OBJECTS { radioManOpRxGain,
+                          radioManOpRxGainLevel,
+                          radioManOpRxDivGainLevel,
+                          radioMinRxGain,
+                          radioMaxRxGain
+                          }
+      STATUS current
+      DESCRIPTION
+          " This group describes the optional objects related to the radio rx gain management."
+::= { opticsIMRadioTrsCommonMCGroup 3 }
+
+opticsIMRadioAnalogueMeasuresGroup OBJECT-GROUP
+      OBJECTS { analogueMeasuresRadioChannelNumber,
+                          analogueMeasuresLocalTxPower,
+                          analogueMeasuresLocalRxMainPower,
+                          analogueMeasuresLocalRxDivPower,
+                          analogueMeasuresRemoteTxPower,
+                          analogueMeasuresRemoteRxMainPower,
+                          analogueMeasuresRemoteRxDivPower
+                          }
+      STATUS current
+      DESCRIPTION
+          " This group describes the mandatory objects related to the reporting of the radio analogue
+            measures."
+::= { opticsIMRadioTrsCommonMCGroup 4 }
+
+
+opticsIMRadioCommonAlarmsGroup NOTIFICATION-GROUP
+      NOTIFICATIONS { opticsIMAlarmAtpcLoopProblemRaise,
+                                     opticsIMAlarmAtpcLoopProblemClear,
+                                     opticsIMAlarmIncompatibleShifterRaise,
+                                     opticsIMAlarmIncompatibleShifterClear,
+                                     opticsIMAlarmDemDivLOSRaise,
+                                     opticsIMAlarmDemDivLOSClear,
+                                     opticsIMAlarmDemXpicLOSRaise,
+                                     opticsIMAlarmDemXpicLOSClear,
+                                     opticsIMAlarmAtpcIdentifierMismatchRaise,
+                                     opticsIMAlarmAtpcIdentifierMismatchClear,
+                                     opticsIMAlarmRadioChannelIdentifierMismatchRaise,
+                                     opticsIMAlarmRadioChannelIdentifierMismatchClear,
+                                     opticsIMAlarmIncompatibleFrequencyRaise,
+                                     opticsIMAlarmIncompatibleFrequencyClear,
+                                     opticsIMAlarmIncompatiblePTXRaise,
+                                     opticsIMAlarmIncompatiblePTXClear,
+                             opticsIMAlarmIncompatibleCapacityRaise,
+                                     opticsIMAlarmIncompatibleCapacityClear,
+                                     opticsIMAlarmHighBERRaise,
+                                     opticsIMAlarmHighBERClear,
+                                     opticsIMAlarmLowBERRaise,
+                                     opticsIMAlarmLowBERClear,
+                                     opticsIMAlarmEarlyWarningRaise,
+                                     opticsIMAlarmEarlyWarningClear
+                                     }
+      STATUS current
+      DESCRIPTION
+          " This group describes the Radio alarms notifications."
+::= { opticsIMRadioTrsCommonMCGroup 6 }
+
+
+opticsIMOptIntrusiveTPCGroup OBJECT-GROUP
+      OBJECTS { intrusiveTPCRadioChannelNumber,
+                          intrusiveTPCNearEndMinTxPower,
+                          intrusiveTPCNearEndMaxTxPower,
+                          intrusiveTPCFarEndControlled,
+                          intrusiveTPCFarEndMinTxPower,
+                          intrusiveTPCFarEndMaxTxPower,
+                          intrusiveTPCFarEndManOpTxPowerLevel
+                          }
+      STATUS current
+      DESCRIPTION
+          " This group describes the optional objects related to the management of  the radio Intrusive
+            Transmitted Power Control management."
+::= { opticsIMRadioTrsCommonMCGroup 8 }
+
+
+opticsIMRadioTxMuteGroup OBJECT-GROUP
+      OBJECTS { opticsIMRadioManLocalTxMute,
+                          opticsIMRadioAutoLocalTxMute,
+                          opticsIMRadioManRemoteTxMute,
+                          opticsIMRadioAutoRemoteTxMute
+                          }
+      STATUS current
+      DESCRIPTION
+          " This group describes the objects related to the management of the radio Tx Mute function."
+::= { opticsIMRadioTrsCommonMCGroup 9 }
+
+
+opticsIMRadioOptAlarmsGroup NOTIFICATION-GROUP
+      NOTIFICATIONS { opticsIMAlarmPathDistortionRaise,
+                                     opticsIMAlarmPathDistortionClear,
+                                     opticsIMAlarmRadioDADERaise,
+                                     opticsIMAlarmRadioDADEClear,
+                                     opticsIMAlarmRingBrokeRaise,
+                                     opticsIMAlarmRingBrokeClear
+                                     }
+      STATUS current
+      DESCRIPTION
+          " This group describes the Radio optional alarms notifications."
+::= { opticsIMRadioTrsCommonMCGroup 10 }
+
+
+opticsIMAnaloguePointsGroup OBJECT-GROUP
+      OBJECTS { analoguePointsDescription,
+                          analoguePointsStatus
+                          }
+      STATUS current
+      DESCRIPTION
+          " This group describes the objects related to the management of the analogue points."
+::= { opticsIMRadioTrsCommonMCGroup 11 }
+
+
+opticsIMOptRadioATPCHighPowerGroup OBJECT-GROUP
+      OBJECTS { radioATPCHighPowerMode,
+                          radioATPCHighPowerTimeout,
+                          radioATPCHighPowerTimeoutEnabled,
+                          radioATPCLowPowerMode
+                          }
+      STATUS current
+      DESCRIPTION
+          " This group describes the objects related to the ATPC management in high-power mode."
+::= { opticsIMRadioTrsCommonMCGroup 12 }
+
+
+
+opticsIMOptRadioFrequencyGroup OBJECT-GROUP
+      OBJECTS { radioMinRxFrequency,
+                          radioMaxRxFrequency
+                         }
+      STATUS current
+      DESCRIPTION
+          " This group describes optional objects related to the management of the receive radio
+            frequency."
+::= { opticsIMRadioTrsCommonMCGroup 13 }
+
+
+opticsIMOptRadioReturnCodeFrequencyGroup OBJECT-GROUP
+      OBJECTS { radioReturnCodeFrequency}
+      STATUS current
+      DESCRIPTION
+          " This group describes optional objects related to the management of the return code on setting  radio frequency."
+::= { opticsIMRadioTrsCommonMCGroup 14 }
+
+
+opticsIMOptRadioShifterGroup OBJECT-GROUP
+      OBJECTS { radioShifterId,
+                          radioShifterValue,
+                          radioShifterCentralFrequency,
+                         allowedShifterValue,
+                         allowedShifterCentralFrequency
+                          }
+      STATUS current
+      DESCRIPTION
+           " This group describes optional objects related to the management of shifter related to radio
+            frequency."
+::= { opticsIMRadioTrsCommonMCGroup 15 }
+
+opticsIMOptRadioInterferenceMeasuresGroup OBJECT-GROUP
+      OBJECTS { interferenceMeasuresRxPowerFactoryMeasuredTo10E6Ber,
+                interferenceMeasuresRowStatus
+              }
+      STATUS current
+      DESCRIPTION
+           " This group describes optional objects related to the management of Radio Interference
+             Measures."
+::= { opticsIMRadioTrsCommonMCGroup 16 }
+
+END

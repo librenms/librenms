@@ -1,0 +1,8 @@
+os: fluidfs
+text: 'Dell FluidFS'
+type: storage
+icon: dell
+group: dell
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.2.1.1.1

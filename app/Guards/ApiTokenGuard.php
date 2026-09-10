@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ApiTokenGuard.php
  *
@@ -34,7 +35,7 @@ class ApiTokenGuard extends TokenGuard
      *
      * @return string
      */
-    public function getTokenForRequest()
+    public function getTokenForRequest(): string
     {
         $token = $this->request->header('X-Auth-Token');
 
@@ -42,6 +43,6 @@ class ApiTokenGuard extends TokenGuard
             $token = parent::getTokenForRequest();
         }
 
-        return $token;
+        return (string) $token;
     }
 }

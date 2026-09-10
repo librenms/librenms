@@ -1,7 +1,5 @@
 <?php
 
-$class = 'current';
-$unit = 'A';
-$graph_type = 'sensor_current';
+$class = \LibreNMS\Enum\Sensor::Current;
 
 require 'sensors.inc.php';

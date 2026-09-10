@@ -678,315 +678,270 @@
                 {
                     "state_name": "ntpSysStaCurrentMode",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ntpSysStaCurrentMode",
                     "state_descr": "notRunning",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ntpSysStaCurrentMode",
                     "state_descr": "notSynchonized",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ntpSysStaCurrentMode",
                     "state_descr": "synchronized",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ptpbaseClockParentDSEntry",
                     "state_descr": "<25ns",
-                    "state_draw_graph": 1,
                     "state_value": 32,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ptpbaseClockParentDSEntry",
                     "state_descr": "<100ns",
-                    "state_draw_graph": 1,
                     "state_value": 33,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ptpbaseClockParentDSEntry",
                     "state_descr": "<250ns",
-                    "state_draw_graph": 1,
                     "state_value": 34,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ptpbaseClockParentDSEntry",
                     "state_descr": "<1μs",
-                    "state_draw_graph": 1,
                     "state_value": 35,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ptpbaseClockParentDSEntry",
                     "state_descr": "<2.5μs",
-                    "state_draw_graph": 1,
                     "state_value": 36,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ptpbaseClockParentDSEntry",
                     "state_descr": "<10μs",
-                    "state_draw_graph": 1,
                     "state_value": 37,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ptpbaseClockParentDSEntry",
                     "state_descr": "<25μs",
-                    "state_draw_graph": 1,
                     "state_value": 38,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ptpbaseClockParentDSEntry",
                     "state_descr": "<100μs",
-                    "state_draw_graph": 1,
                     "state_value": 39,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ptpbaseClockParentDSEntry",
                     "state_descr": "<250μs",
-                    "state_draw_graph": 1,
                     "state_value": 40,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ptpbaseClockParentDSEntry",
                     "state_descr": "<1ms",
-                    "state_draw_graph": 1,
                     "state_value": 41,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ptpbaseClockParentDSEntry",
                     "state_descr": "<2-5ms",
-                    "state_draw_graph": 1,
                     "state_value": 42,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ptpbaseClockParentDSEntry",
                     "state_descr": "<10ms",
-                    "state_draw_graph": 1,
                     "state_value": 43,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ptpbaseClockParentDSEntry",
                     "state_descr": "<25ms",
-                    "state_draw_graph": 1,
                     "state_value": 44,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ptpbaseClockParentDSEntry",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 254,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ssGpsRefAntennaState",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ssGpsRefAntennaState",
                     "state_descr": "short",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ssGpsRefAntennaState",
                     "state_descr": "open",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ssGpsRefAntennaState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ssGpsRefTimeValid",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ssGpsRefTimeValid",
                     "state_descr": "nok",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ssSysStaBshJammingState",
                     "state_descr": "active",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ssSysStaBshJammingState",
                     "state_descr": "inactive",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ssSysStaBshSpoofingState",
                     "state_descr": "active",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ssSysStaBshSpoofingState",
                     "state_descr": "inactive",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ssSysStaDisciplining",
                     "state_descr": "none",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ssSysStaDisciplining",
                     "state_descr": "warmup",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ssSysStaDisciplining",
                     "state_descr": "calibration",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ssSysStaDisciplining",
                     "state_descr": "trackSetup",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "ssSysStaDisciplining",
                     "state_descr": "trackLock",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ssSysStaDisciplining",
                     "state_descr": "freerun",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ssSysStaDisciplining",
                     "state_descr": "fault",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ssSysStaHoldoverState",
                     "state_descr": "inHoldover",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ssSysStaHoldoverState",
                     "state_descr": "notInHoldover",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ssSysStaPowerDC",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ssSysStaPowerDC",
                     "state_descr": "nok",
-                    "state_draw_graph": 2,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ssSysStaPowerDC",
                     "state_descr": "none",
-                    "state_draw_graph": 3,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "ssSysStaSyncState",
                     "state_descr": "sync",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ssSysStaSyncState",
                     "state_descr": "nosync",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "ssSysStaTimeScale",
                     "state_descr": "utc",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ssSysStaTimeScale",
                     "state_descr": "tai",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "ssSysStaTimeScale",
                     "state_descr": "gps",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 }

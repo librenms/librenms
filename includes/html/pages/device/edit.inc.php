@@ -1,12 +1,16 @@
 <?php
 
+use App\Models\BgpPeer;
+use App\Models\Sensor;
+use App\Models\WirelessSensor;
+
 $no_refresh = true;
 
 $link_array = ['page' => 'device',
     'device' => $device['device_id'],
     'tab' => 'edit', ];
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('device.update')) {
     print_error('Insufficient Privileges');
 } else {
     $panes['device'] = 'Device Settings';
@@ -15,11 +19,11 @@ if (! Auth::user()->hasGlobalAdmin()) {
         $panes['ports'] = 'Port Settings';
     }
 
-    if (dbFetchCell('SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ? LIMIT 1', [$device['device_id']]) > 0) {
+    if (BgpPeer::where('device_id', $device['device_id'])->exists()) {
         $panes['routing'] = 'Routing';
     }
 
-    if (count(\LibreNMS\Config::get("os.{$device['os']}.icons", []))) {
+    if (count(\App\Facades\LibrenmsConfig::get("os.{$device['os']}.icons", []))) {
         $panes['icon'] = 'Icon';
     }
 
@@ -31,17 +35,17 @@ if (! Auth::user()->hasGlobalAdmin()) {
         $panes['modules'] = 'Modules';
     }
 
-    if (\LibreNMS\Config::get('show_services')) {
+    if (\App\Facades\LibrenmsConfig::get('show_services')) {
         $panes['services'] = 'Services';
     }
 
     $panes['ipmi'] = 'IPMI';
 
-    if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `sensor_deleted`='0' LIMIT 1", [$device['device_id']]) > 0) {
+    if (Sensor::where('device_id', $device['device_id'])->where('sensor_deleted', 0)->exists()) {
         $panes['health'] = 'Health';
     }
 
-    if (dbFetchCell("SELECT COUNT(*) FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_deleted`='0' LIMIT 1", [$device['device_id']]) > 0) {
+    if (WirelessSensor::where('device_id', $device['device_id'])->where('sensor_deleted', 0)->exists()) {
         $panes['wireless-sensors'] = 'Wireless Sensors';
     }
 
@@ -66,10 +70,14 @@ if (! Auth::user()->hasGlobalAdmin()) {
         echo $sep;
         if ($vars['section'] == $type) {
             echo "<span class='pagemenu-selected'>";
-        } else {
         }
 
-        echo generate_link($text, $link_array, ['section' => $type]);
+        echo match ($type) {
+            'device' => '<a href="' . route('device.edit', [$device['device_id']]) . "\">$text</a>",
+            'misc' => '<a href="' . route('device.edit.misc', [$device['device_id']]) . "\">$text</a>",
+            'health' => '<a href="' . route('device.edit.health', [$device['device_id']]) . "\">$text</a>",
+            default => generate_link($text, $link_array, ['section' => $type]),
+        };
 
         if ($vars['section'] == $type) {
             echo '</span>';
@@ -79,7 +87,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 
     print_optionbar_end();
 
-    $section = basename($vars['section']);
+    $section = basename((string) $vars['section']);
     if (is_file("includes/html/pages/device/edit/$section.inc.php")) {
         require "includes/html/pages/device/edit/$section.inc.php";
     }

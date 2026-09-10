@@ -44,7 +44,7 @@ foreach ($loadbalancer_tabs as $type) {
 
 print_optionbar_end();
 
-$type = basename($vars['type']);
+$type = basename((string) $vars['type']);
 if (is_file("includes/html/pages/device/loadbalancer/$type.inc.php")) {
     include "includes/html/pages/device/loadbalancer/$type.inc.php";
 } else {
@@ -52,10 +52,10 @@ if (is_file("includes/html/pages/device/loadbalancer/$type.inc.php")) {
         if ($type != 'overview') {
             if (is_file('includes/html/pages/device/loadbalancer/overview/' . $type . '.inc.php')) {
                 $g_i++;
-                if (! is_integer($g_i / 2)) {
-                    $row_colour = \LibreNMS\Config::get('list_colour.even');
+                if (! is_int($g_i / 2)) {
+                    $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
                 } else {
-                    $row_colour = \LibreNMS\Config::get('list_colour.odd');
+                    $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
                 }
 
                 echo '<div style="background-color: ' . $row_colour . ';">';

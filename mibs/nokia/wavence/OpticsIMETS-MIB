@@ -1,0 +1,4430 @@
+OpticsIMETS-MIB DEFINITIONS ::= BEGIN
+  IMPORTS
+    opticsimEthMib, opticsimEthMC          FROM OPTICSIM-ETHREG-MIB
+    OBJECT-GROUP                           FROM SNMPv2-CONF
+    Integer32, Unsigned32, OBJECT-TYPE,
+    MODULE-IDENTITY, Gauge32               FROM SNMPv2-SMI
+    RowStatus, TruthValue,
+      TEXTUAL-CONVENTION                   FROM SNMPv2-TC
+    ifIndex                                FROM IF-MIB
+    OpticsIMUserLabel                      FROM TSDIM-SNMP-TC;
+
+  opticsIMETSMib MODULE-IDENTITY
+    LAST-UPDATED "1105200000Z"
+    ORGANIZATION
+      "Alcatel Optics"
+    CONTACT-INFO
+      "Alcatel Optics"
+
+    DESCRIPTION
+      " TSDnm93270 (change by D. Ricco)
+      Changes the definition of the following modes:
+      - OpticsIMETSInFlowServiceType,
+      - OpticsIMETSOutFlowServerType
+      - OpticsIMETSFlowServiceType
+      with addition of new values (ces, ces-pb, ces-pw) to the enumerative set
+      (applicability for Circuit emulation service).
+      Changed description of opticsIMETSCrossConnectServiceTypeIndex of
+      opticsIMETSCrossConnectServiceTypeEntry for XConnected table per service type
+      "
+
+    REVISION "1101270000Z"
+    DESCRIPTION
+      "Changes in OpticsIMLayer2ProtocolList"
+    REVISION "1005130000Z"
+    DESCRIPTION
+      "TSDnm81262 - M.Gallina
+       OpticsIMETSTrafficDescrType has been enlaged with the
+       anyServiceClass(10):
+       - It is used to handle TSS-10 egress flow restriction (e.g. only one flow
+         egressing all traffic classes is supported).
+      "
+    REVISION "1004010000Z"
+    DESCRIPTION
+      "Ed. 14 - TDSnm80132 - A.Rossi - Wider range for ATM object.
+       The range of object corrisponding to the max number of ATM Concatenated
+       Cell Group that it is possible to create is to be enlarged.
+
+       The range of the object opticsIMETSOutFlowServerIDAtmConcGroupNumber is
+       to be changed from (0 ..4096) to (0..65536)
+
+       The range of the object opticsIMATMCellConcGroupIndex is to be changed
+       from (0 ..4096) to (0..65536)
+
+       The range of the object opticsIMETSOutFlowAtmConcGroupNumber is to be
+       changed from (0 ..4096) to (0..65536).
+
+       X. Ma
+       Add the following IPv4 src/dest, L4 TCP/UDP src/dest, IPv6 src/dest into opticsIMEth2ETSFlowClassifierTable:
+                opticsIEth2ETSFlowClassifierSourceIPV4Addr ,
+                    opticsIEth2ETSFlowClassifierSourceIPV4AddrBitmask,
+                    opticsIEth2ETSFlowClassifierDestIPV4Addr,
+                    opticsIEth2ETSFlowClassifierDestIPV4AddrBitmask,
+
+                opticsIEth2ETSFlowClassifierSourceIPV6Addr,
+                    opticsIEth2ETSFlowClassifierSourceIPV6AddrBitmask,
+                    opticsIEth2ETSFlowClassifierDestIPV6Addr,
+                    opticsIEth2ETSFlowClassifierDestIPV6AddrBitmask,
+
+                opticsIEth2ETSFlowClassifierL4PortType,
+                    opticsIEth2ETSFlowClassifierSourceL4PortNumber,
+                    opticsIEth2ETSFlowClassifierMaxSourceL4PortNumber,
+                    opticsIEth2ETSFlowClassifierDestL4PortNumber,
+                    opticsIEth2ETSFlowClassifierMaxDestL4PortNumber"
+
+    REVISION "0912170000Z"
+    DESCRIPTION
+      "Ed.13  ATM on PW added.
+       Changes from previous version:
+       1) pw-atm added as OpticsIMETSInFlowServiceType, OpticsIMETSOutFlowServerType,
+          OpticsIMETSFlowServiceType;
+       2) opticsIMETSOutFlowAtmVpiOut, opticsIMETSOutFlowAtmVciOut,
+          opticsIMETSOutFlowAtmConcGroupNumber added to opticsIMETSOutFlowAtmTable;
+          opticsIMETSOutFlowServerIDAtmVpiOut,opticsIMETSOutFlowServerIDAtmVciOut,
+          opticsIMETSOutFlowServerIDAtmConcGroupNumber added to
+          opticsIMETSOutFlowServerIDTable;
+       3) opticsIMEth2ETSFlowClassifierVpi, opticsIMEth2ETSFlowClassifierMaxVpi,
+          opticsIMEth2ETSFlowClassifierVci, opticsIMEth2ETSFlowClassifierMaxVci
+          deprecated from opticsIMEth2ETSFlowClassifierTable;
+       4) opticsIMETSOutFlowServerIDGroup changed;
+       5) opticsIMATMCellConcGroupTable added;
+       6) opticsIMATM2ETSFlowClassifierTable added;
+       7) opticsIMETSOutFlowAtmGroup, opticsIMATMCellConcGroupGroup,
+          opticsIMATM2ETSFlowClassifierGroup added"
+
+    REVISION"0908060000Z"
+    DESCRIPTION
+      "Ed. 12 Changes from previous version:
+       - upgraded OpticsIMETSInFlowServiceType, OpticsIMETSOutFlowServerType,
+         OpticsIMETSFlowServiceType
+       - upgraded behaviour of opticsIMETSInFlowServiceID and
+         opticsIMETSOutFlowServerID"
+    REVISION "0903300000Z"
+    DESCRIPTION
+      "Ed. 11 Changes from previous version:
+       - updated OpticsIMETSInFlowServiceType, OpticsIMETSOutFlowServerType and
+         OpticsIMETSFlowServiceType
+       - updated behavior of opticsIMETSInFlowServiceID and opticsIMETSOutFlowServerID"
+
+    REVISION "0902190000Z"
+    DESCRIPTION
+      "Ed. 10 Changes from previous version:
+       - addition of opticsIMETSCrossConnectServiceTypeTable,
+         opticsIMETSCrossConnectServiceTypeGroup"
+
+    REVISION "0812180000Z"
+    DESCRIPTION
+      "Ed. 9 Changes from previous version:
+       - addition of opticsIMEth2ETSFlowClassifierInnerVlan,
+         opticsIMEth2ETSFlowClassifierMaxInnerVlan
+         opticsIMEth2ETSFlowClassifierInnerPriority,
+         opticsIMEth2ETSFlowClassifierMaxInnerPriority to
+         OpticsIMEth2ETSFlowClassifierEntry"
+
+    REVISION "0807100000Z"
+    DESCRIPTION
+      "Added opticsIEth2ETSFlowClassifierSourceMacAddr,
+       opticsIEth2ETSFlowClassifierSourceMacAddrBitmask,
+       opticsIEth2ETSFlowClassifierDestMacAddr,
+       opticsIEth2ETSFlowClassifierDestMacAddrBitmask
+       to OpticsIMEth2ETSFlowClassifierEntry"
+
+    REVISION "0803060000Z"
+    DESCRIPTION
+      "Ed. 8.2 Changes from previous version:
+       - addition of opticsIMETSTrafficDescrAdmittedMcRate,
+         opticsIMETSTrafficDescrAdmittedUnknRate,
+         opticsIMETSTrafficDescrMcType,
+         opticsIMETSTrafficDescrUnknType to OpticsIMETSTrafficDescrEntry
+       - changes to OpticsIMLayer2ProtocolList with addition of vrrp"
+
+    REVISION "0711290000Z"
+    DESCRIPTION
+      "Ed. 8.1 Changes from previous version:
+       - Added opticsIMEth2ETSFlowClassifierVrid,opticsIMEth2ETSFlowClassifierMaxVrid,
+         opticsIMEth2ETSFlowClassifierVpi, opticsIMEth2ETSFlowClassifierMaxVpi,
+         opticsIMEth2ETSFlowClassifierVci, opticsIMEth2ETSFlowClassifierMaxVci
+         to OpticsIMEth2ETSFlowClassifierEntry
+       - Changes to OpticsIMETSInFlowServiceType and OpticsIMETSOutFlowServerType"
+
+    REVISION "0707190000Z"
+    DESCRIPTION
+      "Ed. 8 Changes from previous version:
+       - Updated OpticsmIMETSPriority. The new value is targeted for use by the
+         objects 'opticsIMETSVlanStackConfPriority' and
+         'opticsIMETSVlanStackConfPriorityYellow'."
+    REVISION "0602160000Z"
+    DESCRIPTION
+      "Ed. 7 Changes from previous version:
+       - Added opticsIMETSInFlowControlWord to OpticsIMETSInFlowEntry
+       - Added opticsIMETSInFlowServiceIDControlWord to OpticsIMETSInFlowServiceIDEntry
+       - Added opticsIMETSOutFlowControlWord to OpticsIMETSOutFlowEntry
+       - Added opticsIMETSOutFlowServerIDControlWord to OpticsIMETSOutFlowServerIDEntry"
+    REVISION "0510270000Z"
+
+    DESCRIPTION
+      "Ed. 6 Changes from previous version:
+       1) Change in opticsIMEth2ETSFlowClassifierTable Description
+       1a) Added opticsIMEth2ETSFlowClassifierEthType to opticsIMEth2ETSFlowClassifierEntry
+       2) added new 5 ETS traffic Descriptor types to OpticsIMETSTrafficDescrType
+       3) added opticsIMETSInFlowUseDEI to  OpticsIMETSInFlowEntry
+       4) added opticsIMETSInFlowServiceIDUseDEI  to  OpticsIMETSInFlowServiceIDEntry
+       5) added opticsIMETSVlanStackConfUseDEI to OpticsIMETSVlanStackConfEntry"
+    REVISION "0506070000Z"
+    DESCRIPTION
+      "Ed. 5 Changes from previous version:
+       1) Added opticsIMETSFlowGroupColorProfilePointer to opticsIMETSFloGroupTable
+       2) Added OpticsIMETSIpDscp in textual convention
+       3) Added OpticsIMETSclassMode in textual convention
+       4) Change in opticsIMETSInFlowTable:
+          Added one new element to OpticsIMETSInFlowEntry
+          Sequence:  opticsIMETSInFlowClassificationMode
+       4a) Change in opticsIMETSInFlowServiceIDTable:
+          Added one new element to OpticsIMETSInFlowServiceIDEntry
+          Sequence:  opticsIMETSInFlowServiceIDClassificationMode
+       5) Change in opticsIMEth2ETSFlowClassifierTable Description
+       5a) Added two new elements in opticsIMEth2ETSFlowClassifierEntry
+          Sequence:  opticsIMEth2ETSFlowClassifierIpDscp and
+          opticsIMEth2ETSFlowClassifierMaxIpDscp
+       6) Change in opticsIMETSColorProfileTable Description
+       6a) Added 65 new elements in OpticsIMETSColorProfileEntry
+          Sequence:  opticsIMETSColorProfileMode and
+          opticsIMETSColorProfileDscp0..63
+       7) Changed opticsIMETSInFlowGroup, opticsIMETSInFlowServiceIDGroup,
+          opticsIMETSColorProfileGroup, opticsIMEth2ETSFlowClassifierGroup
+          adding new objects
+       8) Added definition of opticsIMETSGroupFlowGroup    "
+    REVISION "0504070000Z"
+    DESCRIPTION
+      "Ed. 4 Changes from previous version:
+       1) Updating OpticsIMLayer2ProtocolList textual convention;
+       2) Adding opticsIMETSInFlowL2ActualProtocolList in opticsIMETSInFlowTable;
+       3) Adding  opticsIMETSInFlowServiceIDL2ActualProtocolList in
+          opticsIMETSInFlowServiceIDTable;
+       4) Adding opticsIMETSInFlowGroupID in opticsIMETSInFlowTable;
+       5) Adding opticsIMETSInFlowServiceIDGroupID in opticsIMETSInFlowServiceIDTable;
+       6) Adding opticsIMETSFloGroupTable;
+       7) Updating OpticsIMETSPolicingMode textual convention;
+       8) Updating OpticsIMETSTrafficDescrType textual convention"
+    REVISION "0403310000Z"
+    DESCRIPTION
+     "Ed. 3.5 Changes from previous version:
+        1) Adding 'providerBridge(3)' in
+           opticsIMETSInFlowServiceType;
+        2) Adding 'providerBridge(3)' in
+           opticsIMETSOutFlowServerType;
+        3) Adding opticsIMETSInFlowLayer2ProtocolList in
+           opticsIMETSInFlowTable;
+        4) Adding
+           opticsIMETSInFlowServiceIDLayer2ProtocolList in
+           opticsIMETSInFlowServiceIDTable;
+        5) Adding OpticsIMLayer2ProtocolList textual
+           convention;"
+      REVISION "0307250000Z"
+      DESCRIPTION
+        "Ed. 2.2. Changes from previous version:
+        1) Removing opticsIMETSOutFlowVlanPush from
+           opticsIMETSOutFlowTable;
+        2) Removing opticsIMETSOutFlowServerIDVlanPush from
+           opticsIMETSOutFlowServerIDTable;
+        3) Adding opticsIMETSOutFlowVlanStackPointer in
+           opticsIMETSOutFlowTable;
+        4) Adding opticsIMETSOutFlowServerIDVlanStackPointer in
+           opticsIMETSOutFlowServerIDTable;
+        5) Change opticsIMETSVlanStackConfOutFlowIndex with
+           opticsIMETSVlanStackConfIndex as first index of
+           opticsIMETSVlanStackConfTable;
+        6) Adding opticsIMETSVlanStackConfIndexNext;"
+      REVISION "190212051630Z"
+      DESCRIPTION
+        "Ed. 1.1. Initial release of OpticsIM-ETS-MIB."
+      REVISION "190303041603Z"
+      DESCRIPTION
+        "Ed. 1.2. Changes from Ed. 1.1:
+        1) Change syntax of CrossConnectIdentifier and
+           CrossConnectIndex objects from Integer32 to
+           Unsigned32;
+        2) Editorial changes for the description clause of the
+           OpticsIMETSTrafficDescrType (Regulated Service must
+           have CIR and CBS parameters greater or equal to zero);
+        3) Editorial changes for the description clause of the
+           OpticsIMETSVlanCfg;"
+      REVISION "190303111648Z"
+      DESCRIPTION
+        "Ed. 1.3. Changes from previous version:
+        1) Editorial changes for the description clause of the
+           OpticsIMETSTrafficDescrType;
+        2) Removing 'enabled' value in OpticsIMETSPolicingMode;
+        3) Adding 'colorBlind' and 'colorAware' values in
+           OpticsIMETSPolicingMode;
+        4) Changing default value of opticsIMETSInFlowPolicingMode
+           from 'enabled' to 'colorBlind';
+        5) Editorial changes for opticsIMETSInFlowServiceID and
+           opticsIMETSOutFlowServerID;"
+      REVISION "190305051540Z"
+      DESCRIPTION
+        "Ed. 1.4. Changes from previous version:
+        1) Change 'colorAware' and ' disabled' values in
+           OpticsIMETSPolicingMode;
+        2) Syntax change from Unsigned32 to Integer32 for the
+           following objects:
+           - opticsIMETSCrossConnectIndex,
+           - opticsIMETSInFlowCrossConnectIdentifier,
+           - opticsIMETSOutFlowCrossConnectIdentifier,
+           - opticsIMETSInFlowServiceIDCrossConnectIdentifier,
+           - opticsIMETSOutFlowServerIDCrossConnectIdentifier"
+      REVISION "190307110000Z"
+      DESCRIPTION
+        "Ed. 2.1. VLAN interworking Management.
+        Changes from previous version:
+        1) Adding TC: OpticsIMVlanConfiguration, OpticsIMColorType,
+           OpticsIMPriorityMode;
+        2) Adding opticsIMETSInFlowVlanPop and
+           opticsIMETSInFlowColorProfilePointer in
+           opticsIMETSInFlowTable;
+        3) Adding opticsIMETSInFlowServiceIDVlanPop and
+           opticsIMETSInFlowServiceIDColorProfilePointer in
+           opticsIMETSInFlowServiceIDTable;
+        4) Adding opticsIMETSOutFlowVlanPush in
+           opticsIMETSOutFlowTable;
+        5) Adding opticsIMETSOutFlowServerIDVlanPush in
+           opticsIMETSOutFlowServerIDTable;
+        6) Adding opticsIMETSVlanStackConfTable and
+           opticsIMETSColorProfileTable;
+        7) Adding opticsIMETSVlanStackConfGroup and
+           opticsIMETSColorProfileGroup;"
+      ::= { opticsimEthMib 3 }
+
+
+--
+-- Textual conventions
+--
+
+    OpticsIMETSTrafficDescrIndex ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "The value of this object identifies a row in the
+        opticsIMETSTrafficDescrTable."
+      SYNTAX Unsigned32 (1..2147483647)
+
+    OpticsIMETSTrafficDescrType ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "The value of this object identifies the
+        type of the ETS Traffic Descriptor.
+
+        The use of the parameter vector is the following:
+        - Parameter 1 : CIR (Committed Information Rate) in
+                             Kbits/sec
+        - Parameter 2 : PIR (Peak Information Rate) in
+                             Kbits/sec
+        - Parameter 3 : CBS (Committed Burst Size) in
+                 bytes.
+        - Parameter 4 : PBS (Peak Burst Size) in bytes.
+
+        The bestEffortService value is intended
+        to allow the client to implement the
+        Best Effort Service (BES): low priority
+        traffic with no guarantee not on bandwidth
+        nor on delay.
+
+        The regulatedService value is intended
+        to allow the client to implement the
+        Regulated Service (RS): guaranteed minimum
+        bandwidth, excess bandwidth as low priority,
+        not-guaranteed delay.
+
+        The guaranteedService value is intended
+        to allow the client to implemented
+        the Guaranteed Service (GS): high priority
+        traffic with guaranteed bandwidth,
+        bounded (low) delay and low jitter.
+
+        The grouped value is intended
+        to allow the defining bandwidth profile
+        for ETS Flow Groups."
+      REFERENCE
+        "'A Two Rate Three Color Marker' RFC 2698,
+        September 1999."
+      SYNTAX INTEGER
+        {
+        bestEffortService(1),
+        regulatedService(2),
+        guaranteedService(3),
+        grouped(4),
+        backGroundService(5),
+        regulatedService4(6),
+        regulatedService3(7),
+        regulatedService1(8),
+        guaranteedService2(9),
+-- TSDnm81262 start
+        anyServiceClass(10)
+-- TSDnm81262 end
+        }
+
+
+    OpticsIMETSFlowIndex ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "Ingress Flow Index. Locally unique index for indexing
+        several MIB tables associated with a particular flow."
+      SYNTAX Unsigned32 (1..2147483647)
+
+    OpticsIMETSInFlowServiceType ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "It indicates the service type (i.e. the carried service)."
+      SYNTAX INTEGER
+        {
+        other(0),
+        ethernet(1),
+        mpls(2),
+        providerBridge(3),
+        pw(4),
+        vpls(5),
+        atm(6),
+        pbb(7),
+--- begin adding for ATM on PW Nov 30, 2009
+        pw-atm(8),
+--- end adding for ATM on PW Nov 30, 2009
+--  begin TSDnm93270 CRB May 2011  for CES on pw/pb
+        ces(9),
+        ces-pb(10),
+        ces-pw(11)
+--  end TSDnm93270 CRB May 2011
+        }
+
+    OpticsIMETSFlowType ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "It indicates the flow type."
+      SYNTAX INTEGER
+        {
+        unicastNoAutolearning(0),
+        unicastAutolearning(1),
+        multicastOptionA(2),
+        multicastOptionB(3)
+        }
+
+    OpticsIMETSPolicingMode ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "The value of this object defines
+        the ETS Policing Mode."
+      SYNTAX INTEGER
+        {
+        colorBlind(1),
+        disabled(2),
+        colorAware(3),
+        colorAwareNoCoupling(4),
+        colorAwareWithCoupling(5)
+        }
+
+    OpticsIMVlanConfiguration ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "This TC is used for enable and disable the VLAN Pop and
+        Push operations."
+      SYNTAX INTEGER
+        {
+        enabled(1),
+        disabled(2)
+        }
+
+    OpticsIMETSOutFlowServerType ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "It indicates the server type on which this flow will be
+        carried."
+      SYNTAX INTEGER
+        {
+        other(0),
+        ethernet(1),
+        mpls(2),
+        providerBridge(3),
+        pw(4),
+        vpls(5),
+        atm(6),
+        pbb(7),
+--- begin adding for ATM on PW Nov 30, 2009
+        pw-atm(8),
+--- end adding for ATM on PW Nov 30, 2009
+--  begin TSDnm93270 CRB May 2011  for CES on pw/pb
+        ces(9),
+        ces-pb(10),
+        ces-pw(11)
+--  end TSDnm93270 CRB May 2011
+        }
+
+        -- Begin   OpticsIMETSFlowServiceType
+        OpticsIMETSFlowServiceType ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "It indicates the server type on which this flow will be
+        carried."
+      SYNTAX INTEGER
+        {
+        other(0),
+        ethernet(1),
+        mpls(2),
+        providerBridge(3),
+        pw(4),
+        vpls(5),
+        atm(6),
+        pbb(7),
+--- begin adding for ATM on PW Nov 30, 2009
+        pw-atm(8),
+--- end adding for ATM on PW Nov 30, 2009
+--  begin TSDnm93270 CRB May 2011  for CES on pw/pb
+        ces(9),
+        ces-pb(10),
+        ces-pw(11)
+--  end TSDnm93270 CRB May 2011
+        }
+
+
+    -- End  OpticsIMETSFlowServerType
+
+    OpticsIMETSVlanCfg ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "VLAN configuration for Ethernet Service.
+        Values between 0 to 4095 indicate the actual VLAN field
+        value.
+        A value of 4096 indicates that the object refer to
+        untagged frames, i.e. frames without 802.1Q field.
+        A value of 4097 indicates that the VLAN field is not
+        relevant, both if valued and if not present."
+      SYNTAX Unsigned32 (0..4097)
+
+    OpticsmIMETSPriority ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "This TC defines the groups of user PRI mapped into
+        this flow. Each bit set indicates that this user priority
+        is assigned to this flow.
+        The value 'untagged' is used to indicate that untagged
+        frames are also associated to this flow.
+        The value 'dontCare' is used to indicate that the
+        Priority field is not relevant, both if valued and if
+        not present.
+                                The value 'preserveFromIngress' is used to indicate
+                                that the Priority field in the pushed VLAN at
+                                the egress must be same as ingress."
+      SYNTAX INTEGER
+        {
+        pri000(0),
+        pri001(1),
+        pri010(2),
+        pri011(3),
+        pri100(4),
+        pri101(5),
+        pri110(6),
+        pri111(7),
+        untagged(8),
+        dontCare(9),
+        preservePriorityFromIngress(10),
+        preserveTDPriority(11)
+        }
+
+    OpticsIMPriorityMode ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "This TC defines the way to interpret the priority bits."
+      SYNTAX INTEGER
+        {
+        colorBlind(1),
+        colorAware(2)
+        }
+
+    OpticsIMColorType ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "This TC is used for define a color to be associated with
+        incoming frames."
+      SYNTAX INTEGER
+        {
+        green(1),
+        yellow(2),
+        red(3)
+        }
+
+    OpticsIMLayer2ProtocolList ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "Each Layer 2 Control Protocol is represented by
+        a single bit within the value of this object.
+        The bit 0 represents data frames.
+        Only the first 50 bits are defined
+        (from 0 to 49); the remaining bits (from 50 to 63)
+        have not been defined yet.
+---        Only the first 33 bits are defined
+---        (from 0 to 32); the remaining bits (from 33 to 63)
+---        have not been defined yet.
+
+        Following the list of the actual managed frame
+        types:
+         1) bit 0: data frames
+         2) bit 1: Customer BPDU
+         3) bit 2: Provider BPDU
+         4) bit  3: Slow Protocols
+         5) bit  4: 802.1X PAE
+         6) bit  5: Reserved (MAC applications)
+         7) bit  6: Reserved (MAC applications)
+         8) bit  7: Reserved (bridge operations)
+         9) bit  8: Reserved (bridge operations)
+        10) bit  9: Reserved (bridge operations)
+        11) bit 10: Reserved (bridge operations)
+        12) bit 11: Reserved (Provider bridge operations)
+        13) bit 12: Reserved (Provider bridge operations)
+        14) bit 13: Provider GVRP
+        15) bit 14: Reserved (Customer bridge operations)
+        16) bit 15: Reserved (Customer bridge operations)
+        17) bit 16: Bridge Management
+        18) bit 17: Customer GMRP
+        19) bit 18: Customer GVRP
+        20) bit 19: Reserved (GARP applications)
+        21) bit 20: Reserved (GARP applications)
+        22) bit 21: Reserved (GARP applications)
+        23) bit 22: Reserved (GARP applications)
+        24) bit 23: Reserved (GARP applications)
+        25) bit 24: Reserved (GARP applications)
+        26) bit 25: Reserved (GARP applications)
+        27) bit 26: Reserved (GARP applications)
+        28) bit 27: Reserved (GARP applications)
+        29) bit 28: Reserved (GARP applications)
+        30) bit 29: Reserved (GARP applications)
+        31) bit 30: Reserved (GARP applications)
+        32) bit 31: Reserved (GARP applications)
+        33) bit 32: Reserved (GARP applications)
+        34) bit 33: Reserved MAC Destination Address for VRRP
+
+        35) bit 34: Reserved (MEF GARP applications)
+        36) bit 35: Reserved (MEF GARP applications)
+        37) bit 36: Reserved (MEF GARP applications)
+        38) bit 37: Reserved (MEF GARP applications)
+        39) bit 38: Reserved (MEF GARP applications)
+        40) bit 39: Reserved (MEF GARP applications)
+        41) bit 40: Reserved (MEF GARP applications)
+        42) bit 41: Reserved (MEF GARP applications)
+        43) bit 42: Reserved (MEF GARP applications)
+        44) bit 43: Reserved (MEF GARP applications)
+        45) bit 44: Reserved (MEF GARP applications)
+        46) bit 45: Reserved (MEF GARP applications)
+        47) bit 46: Reserved (MEF GARP applications)
+        48) bit 47: Reserved (MEF GARP applications)
+        49) bit 48: Reserved (MEF GARP applications)
+        50) bit 49: Reserved (MEF GARP applications)
+"
+      SYNTAX BITS
+        {
+        data(0),
+        customerBPDU(1),
+        providerBPDU(2),
+        slowProtocols(3),
+        pae-8021x(4),
+        reserved1(5),
+        reserved2(6),
+        reserved3(7),
+        reserved4(8),
+        reserved5(9),
+        reserved6(10),
+        reserved7(11),
+        reserved8(12),
+        providerGVRP(13),
+        reserved9(14),
+        reserved10(15),
+        bridgeManagement(16),
+        customerGMRP(17),
+        customerGVRP(18),
+        reserved11(19),
+        reserved12(20),
+        reserved13(21),
+        reserved14(22),
+        reserved15(23),
+        reserved16(24),
+        reserved17(25),
+        reserved18(26),
+        reserved19(27),
+        reserved20(28),
+        reserved21(29),
+        reserved22(30),
+        reserved23(31),
+        reserved24(32),
+        vrrp(33),
+        mefgarpreserved1(34),
+        mefgarpreserved2(35),
+        mefgarpreserved3(36),
+        mefgarpreserved4(37),
+        mefgarpreserved5(38),
+        mefgarpreserved6(39),
+        mefgarpreserved7(40),
+        mefgarpreserved8(41),
+        mefgarpreserved9(42),
+        mefgarpreserved10(43),
+        mefgarpreserved11(44),
+        mefgarpreserved12(45),
+        mefgarpreserved13(46),
+        mefgarpreserved14(47),
+        mefgarpreserved15(48),
+        mefgarpreserved16(49)
+        }
+
+    OpticsIMETSIpDscp ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "This TC defines the groups of user IP DSCP values mapped into
+        this flow. Each bit set indicates that this IP DSCP
+        is assigned to this flow.
+        The value 'notIpPacket' is used to indicate that ethernet  frames
+        not encapsulating Ip packet are also associated to this flow.
+        The value 'dontCare' is used to indicate that the
+        IP DSCP field is not relevant, both if valued and if
+        not present."
+      SYNTAX INTEGER
+        {
+        dscp000000(0),
+        dscp000001(1),
+        dscp000010(2),
+        dscp000011(3),
+        dscp000100(4),
+        dscp000101(5),
+        dscp000110(6),
+        dscp000111(7),
+        dscp001000(8),
+        dscp001001(9),
+        dscp001010(10),
+        dscp001011(11),
+        dscp001100(12),
+        dscp001101(13),
+        dscp001110(14),
+        dscp001111(15),
+        dscp010000(16),
+        dscp010001(17),
+        dscp010010(18),
+        dscp010011(19),
+        dscp010100(20),
+        dscp010101(21),
+        dscp010110(22),
+        dscp010111(23),
+        dscp011000(24),
+        dscp011001(25),
+        dscp011010(26),
+        dscp011011(27),
+        dscp011100(28),
+        dscp011101(29),
+        dscp011110(30),
+        dscp011111(31),
+        dscp100000(32),
+        dscp100001(33),
+        dscp100010(34),
+        dscp100011(35),
+        dscp100100(36),
+        dscp100101(37),
+        dscp100110(38),
+        dscp100111(39),
+        dscp101000(40),
+        dscp101001(41),
+        dscp101010(42),
+        dscp101011(43),
+        dscp101100(44),
+        dscp101101(45),
+        dscp101110(46),
+        dscp101111(47),
+        dscp110000(48),
+        dscp110001(49),
+        dscp110010(50),
+        dscp110011(51),
+        dscp110100(52),
+        dscp110101(53),
+        dscp110110(54),
+        dscp110111(55),
+        dscp111000(56),
+        dscp111001(57),
+        dscp111010(58),
+        dscp111011(59),
+        dscp111100(60),
+        dscp111101(61),
+        dscp111110(62),
+        dscp111111(63),
+        notIpPacket(64),
+        dontCare(65)
+        }
+
+    OpticsIMETSclassMode ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "This TC defines the type of classification on incoming
+        frames: either by priority bits or by Ip Dscp bits.
+        The value 0 represents classification based on priority bits.
+        The value 1 represents classification based on DSCP field.
+        Other values are reserved for future use.
+        The default value is 0."
+      SYNTAX Integer32
+
+
+--
+-- Node definitions
+--
+
+    opticsIMETSObjects OBJECT IDENTIFIER ::= { opticsIMETSMib 1 }
+
+    opticsIMETSTrafficDescrIndexNext OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object contains an appropriate value to be used for
+        opticsIMETSTrafficDescrIndex when creating entries in
+        the opticsIMETSTrafficDescrTable.
+        The value 0 indicates that no unassigned entries are
+        available.
+        To obtain the opticsIMETSTrafficDescrIndex value for a
+        new entry, the manager issues a management protocol
+        retrieval operation to obtain the current value of this
+        object.  After each retrieval, the agent should modify
+        the value to the next unassigned index."
+      ::= { opticsIMETSObjects 1 }
+
+
+    opticsIMETSTrafficDescrTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OpticsIMETSTrafficDescrEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "This table contains information on ETS Traffic Descriptor
+        type and the associated parameters."
+      ::= { opticsIMETSObjects 2 }
+
+    opticsIMETSTrafficDescrEntry OBJECT-TYPE
+      SYNTAX OpticsIMETSTrafficDescrEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "An entry of the opticsIMETSTrafficDescrTable."
+      INDEX { opticsIMETSTrafficDescrIndex }
+      ::= { opticsIMETSTrafficDescrTable 1 }
+
+    OpticsIMETSTrafficDescrEntry ::=
+      SEQUENCE {
+        opticsIMETSTrafficDescrIndex
+          OpticsIMETSTrafficDescrIndex,
+        opticsIMETSTrafficDescrType
+          OpticsIMETSTrafficDescrType,
+        opticsIMETSTrafficDescrParam1
+          Unsigned32,
+        opticsIMETSTrafficDescrParam2
+          Unsigned32,
+        opticsIMETSTrafficDescrParam3
+          Unsigned32,
+        opticsIMETSTrafficDescrParam4
+          Unsigned32,
+        opticsIMETSTrafficDescrParam5
+          Unsigned32,
+        opticsIMETSTrafficDescrUserLabel
+          OpticsIMUserLabel,
+        opticsIMETSTrafficDescrRowStatus
+          RowStatus,
+                                opticsIMETSTrafficDescrAdmittedMcRate
+                                        Gauge32,
+                                opticsIMETSTrafficDescrAdmittedUnknRate
+                                        Gauge32,
+                                opticsIMETSTrafficDescrMcType
+                                        OpticsIMETSTrafficDescrType,
+                                opticsIMETSTrafficDescrUnknType
+                                        OpticsIMETSTrafficDescrType
+       }
+
+    opticsIMETSTrafficDescrIndex OBJECT-TYPE
+      SYNTAX OpticsIMETSTrafficDescrIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "This object is used by the opticsIMETSInFlowTable to
+        identify the row of this table.
+        When creating a new row in the table the value of this
+        index may be obtained by retrieving the value of
+        opticsIMETSTrafficDescrIndexNext.
+        The range is 1..MAXTrafficDescr, where MAXTrafficDescr
+        is product dependent and it will be specified in the
+        product specification document."
+      ::= { opticsIMETSTrafficDescrEntry 1 }
+
+    opticsIMETSTrafficDescrType OBJECT-TYPE
+      SYNTAX OpticsIMETSTrafficDescrType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "The value of this object identifies the type of ETS
+        Traffic Descriptor with one or more parameters.
+        These parameters are specified as a parameter vector,
+        in the corresponding instances of the objects:
+                    opticsIMETSTrafficDescrParam1
+                    opticsIMETSTrafficDescrParam2
+                    opticsIMETSTrafficDescrParam3
+                    opticsIMETSTrafficDescrParam4
+                    opticsIMETSTrafficDescrParam5."
+      ::= { opticsIMETSTrafficDescrEntry 2 }
+
+    opticsIMETSTrafficDescrParam1 OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "The first parameter of the ETS Traffic used according to
+        the value of opticsIMETSTrafficDescrType."
+      DEFVAL { '0'b }
+      ::= { opticsIMETSTrafficDescrEntry 3 }
+
+    opticsIMETSTrafficDescrParam2 OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "The second parameter of the ETS Traffic used according
+        to the value of opticsIMETSTrafficDescrType."
+      DEFVAL { '0'b }
+      ::= { opticsIMETSTrafficDescrEntry 4 }
+
+    opticsIMETSTrafficDescrParam3 OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "The third parameter of the ETS Traffic used according to
+        the value of opticsIMETSTrafficDescrType."
+      DEFVAL { '0'b }
+      ::= { opticsIMETSTrafficDescrEntry 5 }
+
+    opticsIMETSTrafficDescrParam4 OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "The fourth parameter of the ETS Traffic used according
+        to the value of opticsIMETSTrafficDescrType."
+      DEFVAL { '0'b }
+      ::= { opticsIMETSTrafficDescrEntry 6 }
+
+    opticsIMETSTrafficDescrParam5 OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "The fifth parameter of the ETS Traffic used according to
+        the value of opticsIMETSTrafficDescrType."
+      DEFVAL { '0'b }
+      ::= { opticsIMETSTrafficDescrEntry 7 }
+
+    opticsIMETSTrafficDescrUserLabel OBJECT-TYPE
+      SYNTAX OpticsIMUserLabel
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "The canonical name assigned to the traffic descriptor."
+      ::= { opticsIMETSTrafficDescrEntry 8 }
+
+    opticsIMETSTrafficDescrRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object is used to create a new row or modify or
+        delete an existing row in this table."
+      ::= { opticsIMETSTrafficDescrEntry 9 }
+
+                opticsIMETSTrafficDescrAdmittedMcRate OBJECT-TYPE
+                        SYNTAX Gauge32
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This attribute carries out 'on per flow basis' ingress
+                                 admitted multicast rate (the threshold value of admitted
+                                 bandwidth for NE generated multicast traffic as admitted
+                                 on per <ingress interface, ingress flow> basis) and is
+                                 specified in kilobits per second (Kbps).
+                                 This value is requested to trigger discarding of NE
+                                 generated multicast traffic received on this ingress interface
+                                 and is minor or equal to that specified in ifSpeed for this
+                                 interface.
+                                 ifSpeed value for this attribute means that the multicast
+                                 rate limitation on <ingress interface, ingress flow> basis
+                                 is disabled; this is the default value.
+                                 Null value for this attribute means discarding of NE generated
+                                 multicast traffic associated to <ingress interface,
+                                 ingress flow> logical pair"
+                        ::= { opticsIMETSTrafficDescrEntry   10 }
+
+                 opticsIMETSTrafficDescrAdmittedUnknRate OBJECT-TYPE
+                         SYNTAX Gauge32
+                         MAX-ACCESS read-create
+                         STATUS current
+                         DESCRIPTION
+                                 "This attribute carries out 'on per flow basis' ingress
+                                  admitted unknown traffic rate (the threshold value of admitted
+                                  bandwidth for unknown traffic as admitted on per <ingress
+                                  interface, ingress flow> basis) and is specified in kilobits  per second (Kbps).
+                                  This value is requested to trigger discarding of unknown
+                                  traffic on this ingress interface and is minor or equal to
+                                  that specified in ifSpeed for this interface.
+                                  ifSpeed value for this attribute means that the unknown traffic
+                                  rate limitation on <ingress interface, ingress flow> basis
+                                  is disabled; this is the default value.
+                                  Null value for this attribute means discarding of NE
+                                  unknown traffic associated to <ingress interface,
+                                  ingress flow> logical pair"
+                         ::= { opticsIMETSTrafficDescrEntry   11 }
+
+                  opticsIMETSTrafficDescrMcType  OBJECT-TYPE
+                          SYNTAX OpticsIMETSTrafficDescrType
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                      "The value of this object identifies the type of ETS
+                       Traffic Descriptor for Multicast Traffic. Default value:
+                                   ETS Traffic descriptor type assigned to Unicast Traffic"
+              ::= { opticsIMETSTrafficDescrEntry 12 }
+
+                  opticsIMETSTrafficDescrUnknType  OBJECT-TYPE
+                    SYNTAX OpticsIMETSTrafficDescrType
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                      "The value of this object identifies the type of ETS
+                       Traffic Descriptor for Unknown Traffic. Default value:
+                                   ETS Traffic descriptor type assigned to Unicast Traffic"
+              ::= { opticsIMETSTrafficDescrEntry 13 }
+
+
+    opticsIMETSInFlowIndexNext OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object contains an appropriate value to be used
+        for opticsIMETSInFlowIndex when creating entries in the
+        opticsIMETSInFlowTable. The value 0 indicates that no
+        unassigned entries are available.  To obtain the
+        opticsIMETSInFlowIndex value for a new entry, the
+        manager issues a management protocol retrieval operation
+        to obtain the current value of this object.  After each
+        retrieval operation, the agent should modify the value
+        to reflect the next unassigned index."
+      ::= { opticsIMETSObjects 3 }
+
+    opticsIMETSInFlowTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OpticsIMETSInFlowEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "This table specifies informations regarding ETS ingress
+        flow."
+      ::= { opticsIMETSObjects 4 }
+
+    opticsIMETSInFlowEntry OBJECT-TYPE
+      SYNTAX OpticsIMETSInFlowEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "An entry of the opticsIMETSInFlowTable."
+      INDEX { opticsIMETSInFlowIndex }
+      ::= { opticsIMETSInFlowTable 1 }
+
+    OpticsIMETSInFlowEntry ::=
+      SEQUENCE {
+        opticsIMETSInFlowIndex
+          OpticsIMETSFlowIndex,
+        opticsIMETSInFlowServiceType
+          OpticsIMETSInFlowServiceType,
+        opticsIMETSInFlowServiceID
+          Unsigned32,
+        opticsIMETSInFlowUserLabel
+          OpticsIMUserLabel,
+        opticsIMETSInFlowTrafficDescr
+          OpticsIMETSTrafficDescrIndex,
+        opticsIMETSInFlowType
+          OpticsIMETSFlowType,
+        opticsIMETSInFlowPolicingMode
+          OpticsIMETSPolicingMode,
+        opticsIMETSInFlowCrossConnectIdentifier
+          Integer32,
+        opticsIMETSInFlowRowStatus
+          RowStatus,
+        opticsIMETSInFlowVlanPop
+          OpticsIMVlanConfiguration,
+        opticsIMETSInFlowColorProfilePointer
+          Unsigned32,
+        opticsIMETSInFlowLayer2ProtocolList
+          OpticsIMLayer2ProtocolList,
+        opticsIMETSInFlowL2ActualProtocolList
+          OpticsIMLayer2ProtocolList,
+        opticsIMETSInFlowGroupID
+          Integer32,
+        opticsIMETSInFlowClassificationMode
+          OpticsIMETSclassMode,
+                                opticsIMETSInFlowUseDEI
+                                       TruthValue,
+                                opticsIMETSInFlowControlWord
+               TruthValue
+                      }
+
+    opticsIMETSInFlowIndex OBJECT-TYPE
+      SYNTAX OpticsIMETSFlowIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "Index for the conceptual row identifying a flow
+        within this ETS ingress flow table.
+        The range is 1..MAXInFlow, where MAXInFlow is product
+        dependent and it will be specified in the product
+        specification document."
+      ::= { opticsIMETSInFlowEntry 1 }
+
+    opticsIMETSInFlowServiceType OBJECT-TYPE
+      SYNTAX OpticsIMETSInFlowServiceType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "It indicates the service type to be carried over this
+        flow.
+        The default value is 'ethernet'."
+      ::= { opticsIMETSInFlowEntry 2 }
+
+    opticsIMETSInFlowServiceID OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object contains an appropriate value service type
+        dependent.
+        If the opticsIMInFlowServiceType is equal to 'ethernet',
+        this object is used to specify the ifIndex of the
+        Ethernet port associated with this flow.
+        If the opticsIMInFlowServiceType is equal to 'mpls',
+        this object is used to specify the
+        opticsIMMPLS2ETSMappingIndex of the
+        opticsIMMPLS2ETSMappingTable.
+        If the opticsIMInFlowServiceType is equal to
+        'providerBridge',this object is used to
+        specify the opticsIMSVLAN2ETSMappingIndex of the
+        opticsIMSVLAN2ETSMappingTable.
+
+                                If the opticsIMInFlowServiceType is equal to 'pbb',
+              this object is used to specify PBB Instance Entry
+                                associated with this flow.
+
+        The default value is 0 and indicates that
+                                this object is not yet set."
+      ::= { opticsIMETSInFlowEntry 3 }
+
+    opticsIMETSInFlowUserLabel OBJECT-TYPE
+      SYNTAX OpticsIMUserLabel
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "The canonical user label assigned to the flow."
+      ::= { opticsIMETSInFlowEntry 4 }
+
+    opticsIMETSInFlowTrafficDescr OBJECT-TYPE
+      SYNTAX OpticsIMETSTrafficDescrIndex
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "It identifies the row in the
+        opticsIMETSTrafficDescrTable which applies to the
+        ETS flow, both in input and output direction."
+      ::= { opticsIMETSInFlowEntry 5 }
+
+    opticsIMETSInFlowType OBJECT-TYPE
+      SYNTAX OpticsIMETSFlowType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object is used to specify the flow type.
+        The value 'unicastAutolearning(1)' is possible only
+        if opticsIMETSInFlowServiceType is equal to 'ethernet(1)'.
+        The default value is 'unicastNoAutolearning'."
+      ::= { opticsIMETSInFlowEntry 6 }
+
+    opticsIMETSInFlowPolicingMode OBJECT-TYPE
+      SYNTAX OpticsIMETSPolicingMode
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "It defines the ETS Policing Mode. By default, policing
+        is 'colorBlind'."
+      ::= { opticsIMETSInFlowEntry 7 }
+
+    opticsIMETSInFlowCrossConnectIdentifier OBJECT-TYPE
+      SYNTAX Integer32 (0..2147483647)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object indicates that an ingress flow
+        is cross-connected to other egress flows that
+        belong to the same flow. All such associated ingress
+        and egress flows have the same value of this object,
+        and all their cross-connections are identified by
+        entries in the opticsIMETSCrossConnectTable for which
+        opticsIMETSCrossConnectIndex has the same value.
+        The value of this object is initialized by the agent
+        after the associated entries in the
+        opticsIMETSCrossConnectTable have been created.
+        The value '0' indicates that this object in not yet
+        used in a cross-connection."
+      ::= { opticsIMETSInFlowEntry 8 }
+
+    opticsIMETSInFlowRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "For creating, modifying, and deleting this row."
+      ::= { opticsIMETSInFlowEntry 9 }
+
+    opticsIMETSInFlowVlanPop OBJECT-TYPE
+      SYNTAX OpticsIMVlanConfiguration
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "It enables/ disables the VLAN Pop Configuration.
+        The value of this object is meaningful only if
+        opticsIMETSInFlowServiceType is 'ethernet'.
+        The default value is 'disabled'."
+      ::= { opticsIMETSInFlowEntry 10 }
+
+    opticsIMETSInFlowColorProfilePointer OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object points to a row in the
+        opticsIMColorProfileTable. It defines the Color Profile
+        associated with priority bits in the 'colorAware' mode.
+        The value of this object is meaningful only if
+        opticsIMETSInFlowServiceType is 'ethernet'.
+        A value of 0 indicates that no Color Profile has been
+        associated with this InFlow and then the 'colorBlind' mode
+        is used.
+        The default value is 0."
+      ::= { opticsIMETSInFlowEntry 11 }
+
+    opticsIMETSInFlowLayer2ProtocolList OBJECT-TYPE
+      SYNTAX OpticsIMLayer2ProtocolList
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This parameter enables to choose  if to tunnel,
+        toward a Provider Network, or filter data and
+        Layer 2 Control frames.
+        If the bit is 1 it indicates that the relative
+        frame will be tunneled otherwise if 0 it will be
+        discarded.
+        Default value is all bits set to 1, so tunneling
+        everything.
+        This parameter is significant only if the ServiceType
+        is 'ethernet'."
+      ::= { opticsIMETSInFlowEntry 12 }
+
+    opticsIMETSInFlowL2ActualProtocolList OBJECT-TYPE
+      SYNTAX OpticsIMLayer2ProtocolList
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This parameter reports weather a Data or
+        a Layer 2 Control frame will be tunneled,
+        toward a Provider Network, or filtered.
+
+        If the bit is 1 it indicates that the relative
+        frame will be tunneled otherwise if 0 it will be
+        discarded.
+
+        This parameter is significant only if the
+        ServiceType is 'ethernet'.
+        In this case, the value is obtained as
+        a logical AND between the object
+        opticsIMETSInFlowLayer2ProtocolList
+        and the object opticsIMEthLayer2ProtocolList
+        in the OpticsIMEthConfTable in the
+        row with ifIndex=opticsIMETSInFlowServiceID."
+      ::= { opticsIMETSInFlowEntry 13 }
+
+    opticsIMETSInFlowGroupID OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This parameter defines the ETS Flow Group
+        this ETS Input Flow belongs to.
+
+        The value 0 represents the case where
+        the ETS Flow does not belong to any ETS Flow Group.
+
+        The default value is 0."
+      ::= { opticsIMETSInFlowEntry 14 }
+
+    opticsIMETSInFlowClassificationMode OBJECT-TYPE
+      SYNTAX OpticsIMETSclassMode
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object is used to define the type of
+        classification on incoming frames:
+        either by priority bits or by Ip Dscp bits.
+        It also allows a related classification check
+        between the values written in
+        opticsIMEth2ETSFlowClassifierTable and in
+        opticsIMETSColorProfileTable.
+        The default value is priority(0)."
+      ::= { opticsIMETSInFlowEntry 15 }
+
+                opticsIMETSInFlowUseDEI OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object contains information about DEI Use (Default value: false)
+                                 on incoming S-Tagged frames. The value of this object is meaningful only
+                                 if opticsIMETSInFlowServiceType is 'ethernet'"
+      ::= {  opticsIMETSInFlowEntry 16 }
+
+           opticsIMETSInFlowControlWord OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This parameter enables the usage of
+         the Martini Control Word when decapsulating
+         Ethernet over MPLS.
+         Default value is False.
+         This parameter is significant only if the
+         ServiceType is 'mpls'        "
+      ::= { opticsIMETSInFlowEntry 17 }
+
+    opticsIMETSOutFlowIndexNext OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object contains an appropriate value to be used for
+        opticsIMETSOutFlowIndex when creating entries in the
+        opticsIMETSOutFlowTable. The value 0 indicates that no
+        unassigned entries are available. To obtain the
+        opticsIMETSOutFlowIndex value for a new entry, the manager
+        issues a management protocol retrieval operation to obtain
+        the current value of this object.  After each retrieval,
+        the agent should modify the value to reflect the next
+        unassigned index."
+      ::= { opticsIMETSObjects 5 }
+
+    opticsIMETSOutFlowTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OpticsIMETSOutFlowEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "This table contains information about ETS egress flow."
+      ::= { opticsIMETSObjects 6 }
+
+    opticsIMETSOutFlowEntry OBJECT-TYPE
+      SYNTAX OpticsIMETSOutFlowEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "An entry of the opticsIMETSOutFlowTable."
+      INDEX { opticsIMETSOutFlowIndex }
+      ::= { opticsIMETSOutFlowTable 1 }
+
+    OpticsIMETSOutFlowEntry ::=
+      SEQUENCE {
+        opticsIMETSOutFlowIndex
+          OpticsIMETSFlowIndex,
+        opticsIMETSOutFlowServerType
+          OpticsIMETSOutFlowServerType,
+        opticsIMETSOutFlowServerID
+          Unsigned32,
+        opticsIMETSOutFlowUserLabel
+          OpticsIMUserLabel,
+        opticsIMETSOutFlowCrossConnectIdentifier
+          Integer32,
+        opticsIMETSOutFlowRowStatus
+          RowStatus,
+        opticsIMETSOutFlowVlanStackPointer
+          Unsigned32,
+        opticsIMETSOutFlowControlWord
+          TruthValue
+       }
+
+    opticsIMETSOutFlowIndex OBJECT-TYPE
+      SYNTAX OpticsIMETSFlowIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "A unique value to identify the egress flow.
+        The range is 1..MAXOutFlow, where MAXOutFlow is product
+        dependent and it will be specified in the product
+        specification document."
+      ::= { opticsIMETSOutFlowEntry 1 }
+
+    opticsIMETSOutFlowServerType OBJECT-TYPE
+      SYNTAX OpticsIMETSOutFlowServerType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate the PSN type on which
+        this flow will be carried.
+        The default value is 'ethernet'."
+      ::= { opticsIMETSOutFlowEntry 2 }
+
+    opticsIMETSOutFlowServerID OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object contains an appropriate value server type
+        dependent.
+        If the opticsIMOutFlowServerType is equal to 'ethernet',
+        this object is used to specify the ifIndex of the
+        Ethernet port associated with this flow.
+        If the opticsIMOutFlowServerType is equal to 'mpls',
+        this object is used to specify the
+        opticsIMETS2MPLSMappingIndex of the
+        opticsIMETS2MPLSMappingTable.
+        If the opticsIMOutFlowServerType is equal to
+        'providerBridge',this object is used to
+        specify the opticsIMETS2SVLANMappingIndex
+        of the opticsIMETS2SVLANMappingTable.
+
+                                If the opticsIMOutFlowServerType is equal to 'pbb',
+                this object is used to specify Optics PBB Instance Entry
+                                associated with this flow.
+
+        The default value is 0 and indicates that
+        this object is not yet set."
+      ::= { opticsIMETSOutFlowEntry 3 }
+
+    opticsIMETSOutFlowUserLabel OBJECT-TYPE
+      SYNTAX OpticsIMUserLabel
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "The canonical user label assigned to the flow."
+      ::= { opticsIMETSOutFlowEntry 4 }
+
+    opticsIMETSOutFlowCrossConnectIdentifier OBJECT-TYPE
+      SYNTAX Integer32 (0..2147483647)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object indicates that an egress flow
+        is cross-connected to another ingress flow that
+        belong to the same flow. All such associated ingress and
+        egress flows have the same value of this object, and all
+        their cross-connections are identified by entries in the
+        opticsIMETSCrossConnectTable for which
+        opticsIMETSCrossConnectIndex has the same value.
+        The value of this object is initialized by the agent
+        after the associated entries in the
+        opticsIMETSCrossConnectTable have been created.
+        The value '0' indicates that this object in not yet
+        used in a cross-connection."
+      ::= { opticsIMETSOutFlowEntry 5 }
+
+    opticsIMETSOutFlowRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "For creating, modifying, and deleting this row."
+      ::= { opticsIMETSOutFlowEntry 6 }
+
+    opticsIMETSOutFlowVlanStackPointer OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object points to a row in the
+        opticsIMETSVlanStackConfTable. It defines the Vlan Stack
+        Configuration.
+        The value of this object is meaningful only if
+        opticsIMETSOutFlowServerType is 'ethernet'.
+        A value of 0 indicates that no Vlan Push has been
+        associated with this OutFlow.
+        The default value is 0."
+      ::= { opticsIMETSOutFlowEntry 7 }
+
+      opticsIMETSOutFlowControlWord OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This parameter enables the usage of
+         the Martini Control Word when encapsulating
+         Ethernet over MPLS.
+         Default value is False.
+         This parameter is significant only if the
+         ServerType is 'mpls'        "
+      ::= { opticsIMETSOutFlowEntry 8 }
+
+
+
+
+    opticsIMETSCrossConnectIndexNext OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object contains an appropriate value to be used for
+        opticsIMETSCrossConnectIndex when creating entries in the
+        opticsIMETSCrossConnectTable. The value 0 indicates that
+        no unassigned entries are available. To obtain the
+        opticsIMETSCrossConnectIndex value for a new entry, the
+        manager issues a management protocol retrieval operation
+        to obtain the current value of this object. After each
+        retrieval, the agent should modify the value to replect
+        the next unassigned index."
+      ::= { opticsIMETSObjects 7 }
+
+    opticsIMETSCrossConnectTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OpticsIMETSCrossConnectEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "The ETS Cross Connect table.  An ETS cross-connection
+        which cross-connects an ingress and one or more egress
+        flow is modeled as one entry in this table."
+      ::= { opticsIMETSObjects 8 }
+
+    opticsIMETSCrossConnectEntry OBJECT-TYPE
+      SYNTAX OpticsIMETSCrossConnectEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "An entry of the opticsIMETSCrossConnectTable."
+      INDEX { opticsIMETSCrossConnectIndex, opticsIMETSCrossConnectInFlowIndex, opticsIMETSCrossConnectOutFlowIndex }
+      ::= { opticsIMETSCrossConnectTable 1 }
+
+    OpticsIMETSCrossConnectEntry ::=
+      SEQUENCE {
+        opticsIMETSCrossConnectIndex
+          Integer32,
+        opticsIMETSCrossConnectInFlowIndex
+          OpticsIMETSFlowIndex,
+        opticsIMETSCrossConnectOutFlowIndex
+          OpticsIMETSFlowIndex,
+        opticsIMETSCrossConnectRowStatus
+          RowStatus
+       }
+
+    opticsIMETSCrossConnectIndex OBJECT-TYPE
+      SYNTAX Integer32 (1..2147483647)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "A unique value to identify this ETS cross-connect.
+        The range is 1..MAXCrossConnect, where MAXCrossConnect
+        is product dependent and it will be specified in the
+        product specification document."
+      ::= { opticsIMETSCrossConnectEntry 1 }
+
+    opticsIMETSCrossConnectInFlowIndex OBJECT-TYPE
+      SYNTAX OpticsIMETSFlowIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "The value of this object is equal to
+        opticsIMETSInFlowIndex value of opticsIMETSInFlowTable."
+      ::= { opticsIMETSCrossConnectEntry 2 }
+
+    opticsIMETSCrossConnectOutFlowIndex OBJECT-TYPE
+      SYNTAX OpticsIMETSFlowIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "The value of this object is equal to
+        opticsIMETSOutFlowIndex value of opticsIMETSOutFlowTable."
+      ::= { opticsIMETSCrossConnectEntry 3 }
+
+    opticsIMETSCrossConnectRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "For creating, modifying, and deleting this row."
+      ::= { opticsIMETSCrossConnectEntry 4 }
+
+    opticsIMEth2ETSFlowClassifierIndexNext OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object contains an appropriate value to be used for
+        opticsIMEth2ETSFlowClassifierIndex when creating entries
+        in the opticsIMEth2ETSFlowClassifierTable. The value 0
+        indicates that no unassigned entries are available.
+        To obtain the opticsIMEth2ETSFlowClassifierIndex value
+        for a new entry, the manager issues a management protocol
+        retrieval operation to obtain the current value of this
+        object. After each retrieval, the agent should modify
+        the value to replect the next unassigned index."
+      ::= { opticsIMETSObjects 9 }
+
+    opticsIMEth2ETSFlowClassifierTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OpticsIMEth2ETSFlowClassifierEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "This table provides Ethernet port mapping, Ethernet type content
+                                 value, VLAN
+        and priority or IpDscp configuration for each
+        Ethernet ingress flow.
+        This table is indexed by the same index that was created
+        for the associated entry of the opticsIMETSInFlowTable.
+        The opticsIMETSInFlowIndex and the
+        opticsIMEth2ETSFlowClassifierIndex are used as
+        indexes.
+        One or more entries are created in this table by the
+        manager only if there is an antry in the
+        opticsIMETSInFlowTable with an
+        opticsIMETSInFlowServiceType equal to 'ethernet'."
+      ::= { opticsIMETSObjects 10 }
+
+    opticsIMEth2ETSFlowClassifierEntry OBJECT-TYPE
+      SYNTAX OpticsIMEth2ETSFlowClassifierEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "An entry of the opticsIMEth2ETSFlowClassifierTable."
+      INDEX { opticsIMEth2ETSFlowClassifierInFlowIndex, opticsIMEth2ETSFlowClassifierIndex }
+      ::= { opticsIMEth2ETSFlowClassifierTable 1 }
+
+    OpticsIMEth2ETSFlowClassifierEntry ::=
+      SEQUENCE {
+        opticsIMEth2ETSFlowClassifierInFlowIndex
+          OpticsIMETSFlowIndex,
+        opticsIMEth2ETSFlowClassifierIndex
+          Unsigned32,
+        opticsIMEth2ETSFlowClassifierVlan
+          OpticsIMETSVlanCfg,
+        opticsIMEth2ETSFlowClassifierMaxVlan
+          Unsigned32,
+        opticsIMEth2ETSFlowClassifierPriority
+          OpticsmIMETSPriority,
+        opticsIMEth2ETSFlowClassifierMaxPriority
+          INTEGER,
+        opticsIMEth2ETSFlowClassifierRowStatus
+          RowStatus,
+        opticsIMEth2ETSFlowClassifierIpDscp
+          OpticsIMETSIpDscp,
+        opticsIMEth2ETSFlowClassifierMaxIpDscp
+          INTEGER,
+        opticsIMEth2ETSFlowClassifierEthType
+          INTEGER,
+        opticsIMEth2ETSFlowClassifierVrid    Unsigned32,
+        opticsIMEth2ETSFlowClassifierMaxVrid Unsigned32,
+
+-- begin part to be deprecated for ATM on PW Nov 30, 2009
+
+
+        opticsIMEth2ETSFlowClassifierVpi     Unsigned32,
+        opticsIMEth2ETSFlowClassifierMaxVpi  Unsigned32,
+        opticsIMEth2ETSFlowClassifierVci     Unsigned32,
+        opticsIMEth2ETSFlowClassifierMaxVci  Unsigned32,
+
+-- end part to be deprecated for ATM on PW Nov 30, 2009
+
+
+-- Begin New Extensions for CBR July 2008
+        opticsIEth2ETSFlowClassifierSourceMacAddr          OCTET STRING,
+        opticsIEth2ETSFlowClassifierSourceMacAddrBitmask   OCTET STRING,
+        opticsIEth2ETSFlowClassifierDestMacAddr            OCTET STRING,
+        opticsIEth2ETSFlowClassifierDestMacAddrBitmask     OCTET STRING,
+-- End New Extensions for CBR July 2008
+
+-- Begin New Extensions for CBR Nov 2008
+        opticsIMEth2ETSFlowClassifierInnerVlan OpticsIMETSVlanCfg,
+        opticsIMEth2ETSFlowClassifierMaxInnerVlan Unsigned32,
+        opticsIMEth2ETSFlowClassifierInnerPriority OpticsmIMETSPriority,
+        opticsIMEth2ETSFlowClassifierMaxInnerPriority INTEGER,
+-- End New Extensions for CBR Nov 2008
+
+-- Begin New Extensions for 2010
+    opticsIEth2ETSFlowClassifierSourceIPV4Addr         OCTET STRING,
+        opticsIEth2ETSFlowClassifierSourceIPV4AddrBitmask  OCTET STRING,
+        opticsIEth2ETSFlowClassifierDestIPV4Addr           OCTET STRING,
+        opticsIEth2ETSFlowClassifierDestIPV4AddrBitmask    OCTET STRING,
+        opticsIEth2ETSFlowClassifierL4PortType               INTEGER,
+        opticsIEth2ETSFlowClassifierSourceL4PortNumber     Unsigned32,
+        opticsIEth2ETSFlowClassifierMaxSourceL4PortNumber  Unsigned32,
+        opticsIEth2ETSFlowClassifierDestL4PortNumber       Unsigned32,
+        opticsIEth2ETSFlowClassifierMaxDestL4PortNumber    Unsigned32,
+        opticsIEth2ETSFlowClassifierSourceIPV6Addr         OCTET STRING,
+        opticsIEth2ETSFlowClassifierSourceIPV6AddrBitmask  OCTET STRING,
+        opticsIEth2ETSFlowClassifierDestIPV6Addr           OCTET STRING,
+        opticsIEth2ETSFlowClassifierDestIPV6AddrBitmask    OCTET STRING
+-- End New Extensions for 2010
+       }
+
+    opticsIMEth2ETSFlowClassifierInFlowIndex OBJECT-TYPE
+      SYNTAX OpticsIMETSFlowIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "The value of this object is equal to
+        opticsIMETSInFlowIndex value of opticsIMETSInFlowTable."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 1 }
+
+    opticsIMEth2ETSFlowClassifierIndex OBJECT-TYPE
+      SYNTAX Unsigned32 (1..2147483647)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "A unique value to identify this Flow Classifier.
+        The range is 1..MAXFlowClassifier, where
+        MAXFlowClassifier is product dependent and it will be
+        specified in the product specification document."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 2 }
+
+    opticsIMEth2ETSFlowClassifierVlan OBJECT-TYPE
+      SYNTAX OpticsIMETSVlanCfg
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object defines the VLAN on the ETS flow.
+        The default value is 4097."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 3 }
+
+    opticsIMEth2ETSFlowClassifierMaxVlan OBJECT-TYPE
+      SYNTAX Unsigned32 (0..4095)
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object is used to define the MAX value of VLAN range
+        for this ETS ingress flow and must be greater than
+        opticsIMEth2ETSFlowClassifierVlan.
+        If a range is not used the value must be set to 0.
+        The default value is 0."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 4 }
+
+    opticsIMEth2ETSFlowClassifierPriority OBJECT-TYPE
+      SYNTAX OpticsmIMETSPriority
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object defines the groups of user priority mapped
+        into the ingress flow.
+        The default value is 'dontCare'."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 5 }
+
+    opticsIMEth2ETSFlowClassifierMaxPriority OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        pri000(0),
+        pri001(1),
+        pri010(2),
+        pri011(3),
+        pri100(4),
+        pri101(5),
+        pri110(6),
+        pri111(7)
+        }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object is used to define the MAX value of priority
+        range for this ETS ingress flow and must be greater than
+        opticsIMEth2ETSFlowClassifierPriority.
+        If a range is not used the value must be set to 0.
+        The default value is 0."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 6 }
+
+    opticsIMEth2ETSFlowClassifierRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Enable creating, deleting and modifying this row."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 7 }
+
+    opticsIMEth2ETSFlowClassifierIpDscp OBJECT-TYPE
+      SYNTAX OpticsIMETSIpDscp
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object defines the groups of user Ip Dscp values mapped
+        into the ingress flow.
+        The default value is 'dontCare'."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 8 }
+
+    opticsIMEth2ETSFlowClassifierMaxIpDscp OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        dscp000000(0),
+        dscp000001(1),
+        dscp000010(2),
+        dscp000011(3),
+        dscp000100(4),
+        dscp000101(5),
+        dscp000110(6),
+        dscp000111(7),
+        dscp001000(8),
+        dscp001001(9),
+        dscp001010(10),
+        dscp001011(11),
+        dscp001100(12),
+        dscp001101(13),
+        dscp001110(14),
+        dscp001111(15),
+        dscp010000(16),
+        dscp010001(17),
+        dscp010010(18),
+        dscp010011(19),
+        dscp010100(20),
+        dscp010101(21),
+        dscp010110(22),
+        dscp010111(23),
+        dscp011000(24),
+        dscp011001(25),
+        dscp011010(26),
+        dscp011011(27),
+        dscp011100(28),
+        dscp011101(29),
+        dscp011110(30),
+        dscp011111(31),
+        dscp100000(32),
+        dscp100001(33),
+        dscp100010(34),
+        dscp100011(35),
+        dscp100100(36),
+        dscp100101(37),
+        dscp100110(38),
+        dscp100111(39),
+        dscp101000(40),
+        dscp101001(41),
+        dscp101010(42),
+        dscp101011(43),
+        dscp101100(44),
+        dscp101101(45),
+        dscp101110(46),
+        dscp101111(47),
+        dscp110000(48),
+        dscp110001(49),
+        dscp110010(50),
+        dscp110011(51),
+        dscp110100(52),
+        dscp110101(53),
+        dscp110110(54),
+        dscp110111(55),
+        dscp111000(56),
+        dscp111001(57),
+        dscp111010(58),
+        dscp111011(59),
+        dscp111100(60),
+        dscp111101(61),
+        dscp111110(62),
+        dscp111111(63)
+        }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object is used to define the MAX value of Ip Dscp
+        range for this ETS ingress flow and must be greater than
+        opticsIMEth2ETSFlowClassifierIpDscp.
+        If a range is not used the value must be set to 0.
+        The default value is 0."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 9 }
+
+
+                opticsIMEth2ETSFlowClassifierEthType OBJECT-TYPE
+                        SYNTAX INTEGER
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object defines the group of Ethernet Type
+                                 mapped into the ingress flow. The possible values and the related
+                                 meanings for them are contained in the Functionality Specification document.
+                                 The default value is 0, that means 'dontCare'."
+                        ::= { opticsIMEth2ETSFlowClassifierEntry 10 }
+
+    opticsIMEth2ETSFlowClassifierVrid OBJECT-TYPE
+                        SYNTAX Unsigned32 (0..256)
+---      SYNTAX Unsigned32 (1..255)
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object defines the VRID [Configurable item in the range
+                                 1-255 (decimal)] on the ETS flow. VRID is last byte in
+                                 virtual router MAC address as in rfc3768.
+                                 The virtual router MAC address associated with a virtual router is an
+                                 IEEE 802 MAC Address in the following format:
+
+                                 0-00-5E-00-01-{VRID} (in hex in internet standard bit-order)
+
+                                 The first three octets are derived from the IANA's OUI.
+                                 The next two octets (00-01) indicate the address block assigned
+                                  to the VRRP protocol.
+                                 {VRID} is the VRRP Virtual Router Identifier. This mapping
+                                 provides for up to 255 VRRP routers on a network.
+                                 Default value is 256"
+      ::= { opticsIMEth2ETSFlowClassifierEntry 11 }
+
+    opticsIMEth2ETSFlowClassifierMaxVrid OBJECT-TYPE
+      SYNTAX Unsigned32 (0..255)
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object is used to define the MAX value of VRID range
+        for this ETS ingress flow and must be greater than
+        opticsIMEth2ETSFlowClassifierVrid.
+        If a range is not used the value must be set to 0.
+        The default value is 0."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 12 }
+
+-- begin to be deprecated for ATM on PW Nov 30, 2009
+
+    opticsIMEth2ETSFlowClassifierVpi OBJECT-TYPE
+      SYNTAX Unsigned32 (0..4095)
+      MAX-ACCESS read-create
+      --STATUS current
+      STATUS      deprecated
+      DESCRIPTION
+        "This object defines ATM VPI on the ETS flow.
+        The default value is 4096."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 13 }
+
+    opticsIMEth2ETSFlowClassifierMaxVpi OBJECT-TYPE
+      SYNTAX Unsigned32 (0..4095)
+      MAX-ACCESS read-create
+      --STATUS current
+      STATUS      deprecated
+      DESCRIPTION
+        "This object is used to define the MAX value of ATM VPI range
+        for this ETS ingress flow and must be greater than
+        opticsIMEth2ETSFlowClassifierVpi.
+        If a range is not used the value must be set to 0.
+        The default value is 0."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 14 }
+
+    opticsIMEth2ETSFlowClassifierVci OBJECT-TYPE
+      SYNTAX Unsigned32 (0..65535)
+      MAX-ACCESS read-create
+      --STATUS current
+      STATUS      deprecated
+      DESCRIPTION
+        "This object defines ATM VCI on the ETS flow.
+         The default value is 65536."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 15 }
+
+    opticsIMEth2ETSFlowClassifierMaxVci OBJECT-TYPE
+      SYNTAX Unsigned32 (0..65535)
+      MAX-ACCESS read-create
+      --STATUS current
+      STATUS      deprecated
+      DESCRIPTION
+        "This object is used to define the MAX value of ATM VCI range
+        for this ETS ingress flow and must be greater than
+        opticsIMEth2ETSFlowClassifierVci.
+        If a range is not used the value must be set to 0.
+        The default value is 0."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 16 }
+
+-- end to be deprecated for ATM on PW Nov 30, 2009
+
+
+    opticsIEth2ETSFlowClassifierSourceMacAddr OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (6))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "It indicates the 48 bits source MAC address.
+               The specified source mac of the packet
+         The packet's source mac address is AND-ed with the
+         value of FlowClassifierSourceMacAddrBitmask and then compared
+               against the value of this object."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 17 }
+    opticsIEth2ETSFlowClassifierSourceMacAddrBitmask OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (6))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "The specified source mac address mask.
+          If it is not configured, the default value is all 1"
+      ::= { opticsIMEth2ETSFlowClassifierEntry 18 }
+    opticsIEth2ETSFlowClassifierDestMacAddr OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (6))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "It indicates the 48 bits destination MAC address.
+               The specified destination mac of the packet The packet's destination
+               mac address is
+               AND-ed with the value of FlowClassifierDestMacAddrBitmask and then compared
+               against the value of this object."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 19 }
+    opticsIEth2ETSFlowClassifierDestMacAddrBitmask OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (6))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "The specified destination mac address mask.
+           If it is not  configured, the default value is all 1"
+      ::= { opticsIMEth2ETSFlowClassifierEntry 20 }
+
+          opticsIMEth2ETSFlowClassifierInnerVlan OBJECT-TYPE
+      SYNTAX OpticsIMETSVlanCfg
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object defines the Inner VLAN on the ETS flow.
+         The default value is 4097."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 21 }
+
+    opticsIMEth2ETSFlowClassifierMaxInnerVlan OBJECT-TYPE
+      SYNTAX Unsigned32 (0..4095)
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object is used to define the MAX value of Inner VLAN range
+        for this ETS ingress flow and must be greater than
+        opticsIMEth2ETSFlowClassifierVlan.
+        If a range is not used the value must be set to 0.
+        The default value is 0."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 22 }
+
+    opticsIMEth2ETSFlowClassifierInnerPriority OBJECT-TYPE
+      SYNTAX OpticsmIMETSPriority
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object defines the groups of Inner user
+                                 priority mapped into the ingress flow.
+        The default value is 'dontCare'."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 23 }
+
+    opticsIMEth2ETSFlowClassifierMaxInnerPriority OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        pri000(0),
+        pri001(1),
+        pri010(2),
+        pri011(3),
+        pri100(4),
+        pri101(5),
+        pri110(6),
+        pri111(7)
+        }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+      "This object is used to define the MAX value of Inner
+               priority range for this ETS ingress flow and must
+               be greater than opticsIMEth2ETSFlowClassifierPriority.
+         If a range is not used the value must be set to 0.
+         The default value is 0."
+      ::= { opticsIMEth2ETSFlowClassifierEntry 24 }
+
+--Begin New Extensions for 2010
+        opticsIEth2ETSFlowClassifierSourceIPV4Addr OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (4))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It indicates the 32 bits source IP address.
+                     The specified source IP of the packet
+                 The packet's source IP address is AND-ed with the
+                 value of FlowClassifierSourceIPV4AddrBitmask and then compared
+                     against the value of this object."
+            ::= { opticsIMEth2ETSFlowClassifierEntry 25 }
+
+        opticsIEth2ETSFlowClassifierSourceIPV4AddrBitmask OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (4))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The specified source IPv4 address mask.
+                  If it is not configured, the default value is all 0."
+            ::= { opticsIMEth2ETSFlowClassifierEntry 26 }
+
+        opticsIEth2ETSFlowClassifierDestIPV4Addr OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (4))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It indicates the 32 bits destination IPv4 address.
+                     The specified destination mac of the packet The packet's destination
+                     IPv4 address is
+                     AND-ed with the value of FlowClassifierDestIPV4AddrBitmask and then compared
+                     against the value of this object."
+            ::= { opticsIMEth2ETSFlowClassifierEntry 27 }
+
+        opticsIEth2ETSFlowClassifierDestIPV4AddrBitmask OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (4))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The specified destination IPv4 address mask.
+                   If it is not  configured, the default value is all 0."
+            ::= { opticsIMEth2ETSFlowClassifierEntry 28 }
+
+        opticsIEth2ETSFlowClassifierL4PortType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                tcpOrudp(0),
+                tcp(1),
+                udp(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object specifies L4 port protocol type.
+
+                The default value is product-specific."
+            ::= { opticsIMEth2ETSFlowClassifierEntry 29 }
+
+        opticsIEth2ETSFlowClassifierSourceL4PortNumber OBJECT-TYPE
+            SYNTAX Unsigned32 (0..65537)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It indicates the 16 bits source L4 port number.
+
+                The default value is 65537 (don't care)."
+            ::= { opticsIMEth2ETSFlowClassifierEntry 30 }
+
+        opticsIEth2ETSFlowClassifierMaxSourceL4PortNumber OBJECT-TYPE
+            SYNTAX Unsigned32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to define the MAX value of source L4 Port number range
+                for this ETS ingress flow and must be greater than
+                opticsIEth2ETSFlowClassifierSourceTCPPortNumber.
+                If a range is not used the value must be set to 0.
+                The default value is 0."
+            ::= { opticsIMEth2ETSFlowClassifierEntry 31 }
+
+        opticsIEth2ETSFlowClassifierDestL4PortNumber OBJECT-TYPE
+            SYNTAX Unsigned32 (0..65537)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It indicates the 16 bits destination L4 port number.
+
+                The default value is 65537 (don't care)."
+            ::= { opticsIMEth2ETSFlowClassifierEntry 32 }
+
+        opticsIEth2ETSFlowClassifierMaxDestL4PortNumber OBJECT-TYPE
+            SYNTAX Unsigned32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to define the MAX value of destination L4 Port number range
+                for this ETS ingress flow and must be greater than
+                opticsIEth2ETSFlowClassifierDestTCPPortNumber.
+                If a range is not used the value must be set to 0.
+                The default value is 0."
+            ::= { opticsIMEth2ETSFlowClassifierEntry 33 }
+
+        opticsIEth2ETSFlowClassifierSourceIPV6Addr OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (16))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It indicates the 128 bits source IP address.
+                     The specified source IP of the packet
+                 The packet's source IP address is AND-ed with the
+                 value of FlowClassifierSourceIPV6AddrBitmask and then compared
+                     against the value of this object."
+            ::= { opticsIMEth2ETSFlowClassifierEntry 34 }
+
+        opticsIEth2ETSFlowClassifierSourceIPV6AddrBitmask OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (16))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The specified source IPv6 address mask.
+                  If it is not configured, the default value is all 0."
+            ::= { opticsIMEth2ETSFlowClassifierEntry 35 }
+
+        opticsIEth2ETSFlowClassifierDestIPV6Addr OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (16))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It indicates the 138 bits destination IPv6 address.
+                     The specified destination mac of the packet The packet's destination
+                     IPv4 address is
+                     AND-ed with the value of FlowClassifierDestIPV6AddrBitmask and then compared
+                     against the value of this object."
+            ::= { opticsIMEth2ETSFlowClassifierEntry 36 }
+
+        opticsIEth2ETSFlowClassifierDestIPV6AddrBitmask OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (16))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The specified destination IPv6 address mask.
+                   If it is not  configured, the default value is all 0."
+            ::= { opticsIMEth2ETSFlowClassifierEntry 37 }
+
+
+
+--End New Extensions for 2010
+
+
+          opticsIMETSInFlowServiceIDTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OpticsIMETSInFlowServiceIDEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "This table is a read-only version of the
+        opticsIMETSInFlowTable.
+        It is ordered by ServiceID and InFlow.
+        An entry is created, in this table, automatically by
+        the agent, when an entry is activated by the manager in
+        the opticsIMETSInFlowTable with
+        opticsIMETSInFlowRowStatus equal to 'active'.
+        An entry is deleted, in this table, automatically by the
+        agent, when an entry is deactivated or deleted
+        by the manager in the opticsIMETSInFlowTable
+        with opticsIMETSInFlowRowStatus equal to 'destroy' or
+        'notInService'."
+      ::= { opticsIMETSObjects 11 }
+
+    opticsIMETSInFlowServiceIDEntry OBJECT-TYPE
+      SYNTAX OpticsIMETSInFlowServiceIDEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "An entry of opticsIMETSInFlowServiceIDTable."
+      INDEX { opticsIMETSInFlowServiceIDServiceTypeIndex, opticsIMETSInFlowServiceIDServiceIDIndex, opticsIMETSInFlowServiceIDInFlowIndex }
+      ::= { opticsIMETSInFlowServiceIDTable 1 }
+
+    OpticsIMETSInFlowServiceIDEntry ::=
+      SEQUENCE {
+        opticsIMETSInFlowServiceIDServiceTypeIndex
+          OpticsIMETSInFlowServiceType,
+        opticsIMETSInFlowServiceIDServiceIDIndex
+          Unsigned32,
+        opticsIMETSInFlowServiceIDInFlowIndex
+          OpticsIMETSFlowIndex,
+        opticsIMETSInFlowServiceIDUserLabel
+          OpticsIMUserLabel,
+        opticsIMETSInFlowServiceIDTrafficDescr
+          OpticsIMETSTrafficDescrIndex,
+        opticsIMETSInFlowServiceIDFlowType
+          OpticsIMETSFlowType,
+        opticsIMETSInFlowServiceIDPolicingMode
+          OpticsIMETSPolicingMode,
+        opticsIMETSInFlowServiceIDCrossConnectIdentifier
+          Integer32,
+        opticsIMETSInFlowServiceIDVlanPop
+          OpticsIMVlanConfiguration,
+        opticsIMETSInFlowServiceIDColorProfilePointer
+          Unsigned32,
+        opticsIMETSInFlowServiceIDLayer2ProtocolList
+          OpticsIMLayer2ProtocolList,
+        opticsIMETSInFlowServiceIDL2ActualProtocolList
+          OpticsIMLayer2ProtocolList,
+        opticsIMETSInFlowServiceIDGroupID
+          Integer32,
+                                opticsIMETSInFlowServiceIDClassificationMode
+          OpticsIMETSclassMode,
+                                opticsIMETSInFlowServiceIDUseDEI
+                                        TruthValue,
+        opticsIMETSInFlowServiceIDControlWord
+                                        TruthValue
+       }
+
+    opticsIMETSInFlowServiceIDServiceTypeIndex OBJECT-TYPE
+      SYNTAX OpticsIMETSInFlowServiceType
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "The value of this object is equal to
+        opticsIMETSInFlowServiceType in the
+        opticsIMETSInFlowTable."
+      ::= { opticsIMETSInFlowServiceIDEntry 1 }
+
+    opticsIMETSInFlowServiceIDServiceIDIndex OBJECT-TYPE
+      SYNTAX Unsigned32 (1..2147483647)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "The value of this object is equal to
+        opticsIMETSInFlowServiceID value of
+        opticsIMETSInFlowTable."
+      ::= { opticsIMETSInFlowServiceIDEntry 2 }
+
+    opticsIMETSInFlowServiceIDInFlowIndex OBJECT-TYPE
+      SYNTAX OpticsIMETSFlowIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "The value of this object is equal to
+        opticsIMETSInFlowIndex value of opticsIMETSInFlowTable."
+      ::= { opticsIMETSInFlowServiceIDEntry 3 }
+
+    opticsIMETSInFlowServiceIDUserLabel OBJECT-TYPE
+      SYNTAX OpticsIMUserLabel
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+        opticsIMETSInFlowUserLabel in the
+        opticsIMETSInFlowTable."
+      ::= { opticsIMETSInFlowServiceIDEntry 4 }
+
+    opticsIMETSInFlowServiceIDTrafficDescr OBJECT-TYPE
+      SYNTAX OpticsIMETSTrafficDescrIndex
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+        opticsIMETSInFlowTrafficDescr in the
+        opticsIMETSInFlowTable."
+      ::= { opticsIMETSInFlowServiceIDEntry 5 }
+
+    opticsIMETSInFlowServiceIDFlowType OBJECT-TYPE
+      SYNTAX OpticsIMETSFlowType
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+        opticsIMETSInFlowType in the
+        opticsIMETSInFlowTable."
+      ::= { opticsIMETSInFlowServiceIDEntry 6 }
+
+    opticsIMETSInFlowServiceIDPolicingMode OBJECT-TYPE
+      SYNTAX OpticsIMETSPolicingMode
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+        opticsIMETSInFlowPolicingMode in the
+        opticsIMETSInFlowTable."
+      ::= { opticsIMETSInFlowServiceIDEntry 7 }
+
+    opticsIMETSInFlowServiceIDCrossConnectIdentifier OBJECT-TYPE
+      SYNTAX Integer32 (0..2147483647)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+        opticsIMETSInFlowCrossConnectIdentifier in the
+        opticsIMETSInFlowTable."
+      ::= { opticsIMETSInFlowServiceIDEntry 8 }
+
+    opticsIMETSInFlowServiceIDVlanPop OBJECT-TYPE
+      SYNTAX OpticsIMVlanConfiguration
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+        opticsIMETSInFlowVlanPop in the
+        opticsIMETSInFlowTable."
+      ::= { opticsIMETSInFlowServiceIDEntry 9 }
+
+    opticsIMETSInFlowServiceIDColorProfilePointer OBJECT-TYPE
+      SYNTAX Unsigned32 (0..256)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+        opticsIMETSInFlowColorProfilePointer in the
+        opticsIMETSInFlowTable."
+      ::= { opticsIMETSInFlowServiceIDEntry 10 }
+
+    opticsIMETSInFlowServiceIDLayer2ProtocolList OBJECT-TYPE
+      SYNTAX OpticsIMLayer2ProtocolList
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+        opticsIMETSInFlowLayer2ProtocolList in the
+        opticsIMETSInFlowTable."
+      ::= { opticsIMETSInFlowServiceIDEntry 11 }
+
+    opticsIMETSInFlowServiceIDL2ActualProtocolList OBJECT-TYPE
+      SYNTAX OpticsIMLayer2ProtocolList
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+         opticsIMETSInFlowL2ProtocolList in the
+         opticsIMETSInFlowTable."
+      ::= { opticsIMETSInFlowServiceIDEntry 12 }
+
+    opticsIMETSInFlowServiceIDGroupID OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+         opticsIMETSInFlowGroupID in the
+         opticsIMETSInFlowTable."
+      ::= { opticsIMETSInFlowServiceIDEntry 13 }
+
+          opticsIMETSInFlowServiceIDClassificationMode OBJECT-TYPE
+      SYNTAX OpticsIMETSclassMode
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is read-only version of the
+         opticsIMETSInFlowClassificationMode in the
+         opticsIMETSInFlowTable"
+      ::= { opticsIMETSInFlowServiceIDEntry 14 }
+
+
+          opticsIMETSInFlowServiceIDUseDEI OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+        opticsIMETSInFlowUseDEI in the
+        opticsIMETSInFlowTable."
+      ::= {  opticsIMETSInFlowServiceIDEntry 15 }
+
+    opticsIMETSInFlowServiceIDControlWord OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+         opticsIMETSInFlowControlWord in the
+         opticsIMETSInFlowTable."
+      ::= { opticsIMETSInFlowServiceIDEntry 16 }
+
+
+    opticsIMETSOutFlowServerIDTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OpticsIMETSOutFlowServerIDEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "This table is a read-only version of the
+        opticsIMETSOutFlowTable.
+        It is ordered by ServerID and OutFlow.
+        An entry is created, in this table, automatically by
+        the agent, when an entry is activated by the manager in
+        the opticsIMETSOutFlowTable with
+        opticsIMETSOutFlowRowStatus equal to 'active'.
+        An entry is deleted, in this table, automatically by the
+        agent, when an entry is deactivated or deleted
+        by the manager in the opticsIMETSOutFlowTable
+        with opticsIMETSInFlowRowStatus equal to 'destroy' or
+        'notInService'."
+      ::= { opticsIMETSObjects 12 }
+
+    opticsIMETSOutFlowServerIDEntry OBJECT-TYPE
+      SYNTAX OpticsIMETSOutFlowServerIDEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "An entry of opticsIMETSOutFlowServerIDTable."
+      INDEX { opticsIMETSOutFlowServerIDServerTypeIndex, opticsIMETSOutFlowServerIDServerIDIndex, opticsIMETSOutFlowServerIDOutFlowIndex }
+      ::= { opticsIMETSOutFlowServerIDTable 1 }
+
+    OpticsIMETSOutFlowServerIDEntry ::=
+      SEQUENCE {
+        opticsIMETSOutFlowServerIDServerTypeIndex
+          OpticsIMETSOutFlowServerType,
+        opticsIMETSOutFlowServerIDServerIDIndex
+          Unsigned32,
+        opticsIMETSOutFlowServerIDOutFlowIndex
+          OpticsIMETSFlowIndex,
+        opticsIMETSOutFlowServerIDUserLabel
+          OpticsIMUserLabel,
+        opticsIMETSOutFlowServerIDCrossConnectIdentifier
+          Integer32,
+        opticsIMETSOutFlowServerIDVlanStackPointer
+          Unsigned32,
+        opticsIMETSOutFlowServerIDControlWord
+            TruthValue,
+                                opticsIMETSOutFlowServerIDAtmVpiOut
+            Unsigned32,
+                    opticsIMETSOutFlowServerIDAtmVciOut
+            Unsigned32,
+                    opticsIMETSOutFlowServerIDAtmConcGroupNumber
+            Unsigned32
+       }
+
+
+    opticsIMETSOutFlowServerIDServerTypeIndex OBJECT-TYPE
+      SYNTAX OpticsIMETSOutFlowServerType
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "The value of this object is equal to
+        opticsIMETSOutFlowServerType in the
+        opticsIMETSOutFlowTable."
+      ::= { opticsIMETSOutFlowServerIDEntry 1 }
+
+    opticsIMETSOutFlowServerIDServerIDIndex OBJECT-TYPE
+      SYNTAX Unsigned32 (1..2147483647)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "The value of this object is equal to
+        opticsIMETSOutFlowServiceID value of
+        opticsIMETSOutFlowTable."
+      ::= { opticsIMETSOutFlowServerIDEntry 2 }
+
+    opticsIMETSOutFlowServerIDOutFlowIndex OBJECT-TYPE
+      SYNTAX OpticsIMETSFlowIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "The value of this object is equal to
+        opticsIMETSOutFlowIndex value of opticsIMETSOutFlowTable."
+      ::= { opticsIMETSOutFlowServerIDEntry 3 }
+
+    opticsIMETSOutFlowServerIDUserLabel OBJECT-TYPE
+      SYNTAX OpticsIMUserLabel
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+        opticsIMETSOutFlowUserLabel in the
+        opticsIMETSOutFlowTable."
+      ::= { opticsIMETSOutFlowServerIDEntry 4 }
+
+    opticsIMETSOutFlowServerIDCrossConnectIdentifier OBJECT-TYPE
+      SYNTAX Integer32 (0..2147483647)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+        opticsIMETSOutFlowCrossConnectIdentifier in the
+        opticsIMETSOutFlowTable."
+      ::= { opticsIMETSOutFlowServerIDEntry 5 }
+
+    opticsIMETSOutFlowServerIDVlanStackPointer OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+        opticsIMETSOutFlowVlanStackPointer in the
+        opticsIMETSOutFlowTable."
+      ::= { opticsIMETSOutFlowServerIDEntry 6 }
+
+    opticsIMETSOutFlowServerIDControlWord OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object is the read-only version of the
+        opticsIMETSOutFlowCrossControlWord in the
+        opticsIMETSOutFlowTable."
+      ::= { opticsIMETSOutFlowServerIDEntry 7 }
+
+-- begin adding for ATM on PW Nov 30, 2009
+        opticsIMETSOutFlowServerIDAtmVpiOut OBJECT-TYPE
+          SYNTAX Unsigned32 (0..4096)
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+        "This object, applicable to ATM Flow, is the read-only version of the opticsIMETSOutFlowAtmVpiOut
+         in the opticsIMETSOutFlowAtmTable AUGMENT of opticsIMETSOutFlowTable."
+          ::= { opticsIMETSOutFlowServerIDEntry 8 }
+
+        opticsIMETSOutFlowServerIDAtmVciOut OBJECT-TYPE
+         SYNTAX Unsigned32 (0..65536)
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+        "This object, applicable to ATM Flow, is the read-only version of the opticsIMETSOutFlowAtmVciOut
+         in the opticsIMETSOutFlowAtmTable AUGMENT of opticsIMETSOutFlowTable."
+         ::= { opticsIMETSOutFlowServerIDEntry 9 }
+
+-- begin TDSnm80132 Apr.1st, 2010
+        opticsIMETSOutFlowServerIDAtmConcGroupNumber OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+      "This object, applicable to ATM Flow, is the read-only version of the opticsIMETSOutFlowAtmConcGroupNumber
+         in the opticsIMETSOutFlowAtmTable AUGMENT of opticsIMETSOutFlowTable."
+         ::= { opticsIMETSOutFlowServerIDEntry 10 }
+-- end TDSnm80132 Apr.1st, 2010
+
+-- End adding for ATM on PW Nov 30, 2009
+
+    opticsIMETSVlanStackConfIndexNext OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object contains an appropriate value to be used for
+        opticsIMETSVlanStackConfIndex when creating entries
+        in the opticsIMETSVlanStackConfTable. The value 0
+        indicates that no unassigned entries are available.
+        To obtain the opticsIMETSVlanStackConfIndex value
+        for a new entry, the manager issues a management protocol
+        retrieval operation to obtain the current value of this
+        object. After each retrieval, the agent should modify
+        the value to replect the next unassigned index."
+      ::= { opticsIMETSObjects 13 }
+
+    opticsIMETSVlanStackConfTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OpticsIMETSVlanStackConfEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "The opticsIMETSVlanStackConfOutFlowIndex and the
+        opticsIMETSVlanStackConfVlanIndex are used as indexes.
+        The manager creates an entry in this table for each
+        OutFlow with VLAN Push operation enabled.
+        One or more entries are created in this table by the
+        manager for each OutFlow in opticsIMETSOutFlowTable."
+      ::= { opticsIMETSObjects 14 }
+
+    opticsIMETSVlanStackConfEntry OBJECT-TYPE
+      SYNTAX OpticsIMETSVlanStackConfEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "An entry of the opticsIMETSVlanStackConfTable."
+      INDEX { opticsIMETSVlanStackConfIndex, opticsIMETSVlanStackConfVlanIndex }
+      ::= { opticsIMETSVlanStackConfTable 1 }
+
+    OpticsIMETSVlanStackConfEntry ::=
+      SEQUENCE {
+        opticsIMETSVlanStackConfIndex
+          Unsigned32,
+        opticsIMETSVlanStackConfVlanIndex
+          Unsigned32,
+        opticsIMETSVlanStackConfVlanID
+          OpticsIMETSVlanCfg,
+        opticsIMETSVlanStackConfPriorityMode
+          OpticsIMPriorityMode,
+        opticsIMETSVlanStackConfPriority
+          OpticsmIMETSPriority,
+        opticsIMETSVlanStackConfPriorityYellow
+          OpticsmIMETSPriority,
+        opticsIMETSVlanStackConfRowStatus
+          RowStatus,
+                                opticsIMETSVlanStackConfUseDEI
+                                        TruthValue
+       }
+
+    opticsIMETSVlanStackConfIndex OBJECT-TYPE
+      SYNTAX Unsigned32 (1..2147483647)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "A unique value to identify the VLAN Stack Configuration.
+        When creating a new row in the table, the value of this
+        index may be obtained by retrieving the value of
+        opticsIMETSVlanStackConfIndexNext.
+        The range is 1..MAXVlanStackConf, where MAXVlanStackConf
+        is product dependent and it will be specified in the
+        product specification document."
+      ::= { opticsIMETSVlanStackConfEntry 1 }
+
+    opticsIMETSVlanStackConfVlanIndex OBJECT-TYPE
+      SYNTAX Unsigned32 (1..2147483647)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "A value to identify the VLAN number.
+        The range is 1..3."
+      ::= { opticsIMETSVlanStackConfEntry 2 }
+
+    opticsIMETSVlanStackConfVlanID OBJECT-TYPE
+      SYNTAX OpticsIMETSVlanCfg
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object defines the VLAN value to be set for VLAN tag
+        to be pushed.
+        The range is 0..4095.
+        The default value is 0."
+      ::= { opticsIMETSVlanStackConfEntry 3 }
+
+    opticsIMETSVlanStackConfPriorityMode OBJECT-TYPE
+      SYNTAX OpticsIMPriorityMode
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object represents the way by which priority bits of
+        VLAN tag have to be managed, by
+        opticsIMETSVlanStackConfPriority and
+        opticsIMETSVlanStackConfPriorityYellow.
+        The default value is 'colorBlind'."
+      ::= { opticsIMETSVlanStackConfEntry 4 }
+
+    opticsIMETSVlanStackConfPriority OBJECT-TYPE
+      SYNTAX OpticsmIMETSPriority
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object defines value of the priority bits to be set
+        in VLAN tag to be pushed.
+        In the 'colorBlind' mode, it is the value to be set for
+        all outgoing frames in the flow.
+        In the 'colorAware' mode, it is the value to be set only
+        for green frames.
+        The range is 'pri000(0)'..'pri111(7)'.
+        The default value is 0."
+      ::= { opticsIMETSVlanStackConfEntry 5 }
+
+    opticsIMETSVlanStackConfPriorityYellow OBJECT-TYPE
+      SYNTAX OpticsmIMETSPriority
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object defines value of the priority bits to be set
+        in VLAN tag to be pushed.
+        It is the value to be set for yellow frames in the flow.
+        The value of this object is meaningful only if the mode
+        is 'colorAware'.
+        The range is 'pri000(0)'..'pri111(7)'.
+        The default value is 0."
+      ::= { opticsIMETSVlanStackConfEntry 6 }
+
+    opticsIMETSVlanStackConfRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Enable creating, deleting and modifying this row."
+      ::= { opticsIMETSVlanStackConfEntry 7 }
+
+                opticsIMETSVlanStackConfUseDEI OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object contains information about DEI Use (Default value: false)
+                                 on outgoing S-Tagged frames. It is the value to be set for yellow frames in the flow.
+                                 The value of this object is meaningful only if the mode
+         is 'colorAware'. "
+      ::= { opticsIMETSVlanStackConfEntry  8 }
+
+
+    opticsIMETSColorProfileIndexNext OBJECT-TYPE
+      SYNTAX Unsigned32 (0..256)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object contains an appropriate value to be used for
+        opticsIMETSColorProfileIndex when creating entries
+        in the opticsIMETSColorProfileTable. The value 0
+        indicates that no unassigned entries are available.
+        To obtain the opticsIMETSColorProfileIndex value
+        for a new entry, the manager issues a management protocol
+        retrieval operation to obtain the current value of this
+        object. After each retrieval, the agent should modify
+        the value to replect the next unassigned index."
+      ::= { opticsIMETSObjects 15 }
+
+    opticsIMETSColorProfileTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OpticsIMETSColorProfileEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "This table contains information about ETS Color Profiles
+        either referred to Priority bits or to IP-Dscp bits."
+      ::= { opticsIMETSObjects 16 }
+
+    opticsIMETSColorProfileEntry OBJECT-TYPE
+      SYNTAX OpticsIMETSColorProfileEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "An entry of the opticsIMETSColorProfileTable."
+      INDEX { opticsIMETSColorProfileIndex }
+      ::= { opticsIMETSColorProfileTable 1 }
+
+    OpticsIMETSColorProfileEntry ::=
+      SEQUENCE {
+        opticsIMETSColorProfileIndex
+          Unsigned32,
+        opticsIMETSColorProfilePriority0
+          OpticsIMColorType,
+        opticsIMETSColorProfilePriority1
+          OpticsIMColorType,
+        opticsIMETSColorProfilePriority2
+          OpticsIMColorType,
+        opticsIMETSColorProfilePriority3
+          OpticsIMColorType,
+        opticsIMETSColorProfilePriority4
+          OpticsIMColorType,
+        opticsIMETSColorProfilePriority5
+          OpticsIMColorType,
+        opticsIMETSColorProfilePriority6
+          OpticsIMColorType,
+        opticsIMETSColorProfilePriority7
+          OpticsIMColorType,
+        opticsIMETSColorProfileUserLabel
+          OpticsIMUserLabel,
+        opticsIMETSColorProfileRowStatus
+          RowStatus,
+        opticsIMETSColorProfileMode
+          OpticsIMETSclassMode,
+        opticsIMETSColorProfileDscp0
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp1
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp2
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp3
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp4
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp5
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp6
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp7
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp8
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp9
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp10
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp11
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp12
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp13
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp14
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp15
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp16
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp17
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp18
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp19
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp20
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp21
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp22
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp23
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp24
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp25
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp26
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp27
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp28
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp29
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp30
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp31
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp32
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp33
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp34
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp35
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp36
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp37
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp38
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp39
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp40
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp41
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp42
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp43
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp44
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp45
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp46
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp47
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp48
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp49
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp50
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp51
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp52
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp53
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp54
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp55
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp56
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp57
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp58
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp59
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp60
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp61
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp62
+          OpticsIMColorType,
+        opticsIMETSColorProfileDscp63
+          OpticsIMColorType
+       }
+
+    opticsIMETSColorProfileIndex OBJECT-TYPE
+      SYNTAX Unsigned32 (1..2147483647)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "A unique value to identify the color profile.
+        When creating a new row in the table, the value of this
+        index may be obtained by retrieving the value of
+        opticsIMETSColorProfileIndexNext.
+        The range is 1..MAXColorProfile, where MAXColorProfile is
+        product dependent and it will be specified in the product
+        specification document."
+      ::= { opticsIMETSColorProfileEntry 1 }
+
+    opticsIMETSColorProfilePriority0 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming tagged frames with priority bits equal to 0.
+        The default value is 'green'."
+      ::= { opticsIMETSColorProfileEntry 2 }
+
+    opticsIMETSColorProfilePriority1 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming tagged frames with priority bits equal to 1.
+        The default value is 'green'."
+      ::= { opticsIMETSColorProfileEntry 3 }
+
+    opticsIMETSColorProfilePriority2 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming tagged frames with priority bits equal to 2.
+        The default value is 'green'."
+      ::= { opticsIMETSColorProfileEntry 4 }
+
+    opticsIMETSColorProfilePriority3 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming tagged frames with priority bits equal to 3.
+        The default value is 'green'."
+      ::= { opticsIMETSColorProfileEntry 5 }
+
+    opticsIMETSColorProfilePriority4 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming tagged frames with priority bits equal to 4.
+        The default value is 'green'."
+      ::= { opticsIMETSColorProfileEntry 6 }
+
+    opticsIMETSColorProfilePriority5 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming tagged frames with priority bits equal to 5.
+        The default value is 'green'."
+      ::= { opticsIMETSColorProfileEntry 7 }
+
+    opticsIMETSColorProfilePriority6 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming tagged frames with priority bits equal to 6.
+        The default value is 'green'."
+      ::= { opticsIMETSColorProfileEntry 8 }
+
+    opticsIMETSColorProfilePriority7 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming tagged frames with priority bits equal to 7.
+        The default value is 'green'."
+      ::= { opticsIMETSColorProfileEntry 9 }
+
+    opticsIMETSColorProfileUserLabel OBJECT-TYPE
+      SYNTAX OpticsIMUserLabel
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "The canonical user label assigned to the Color Profile."
+      ::= { opticsIMETSColorProfileEntry 10 }
+
+    opticsIMETSColorProfileRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "For creating, modifying, and deleting this row."
+      ::= { opticsIMETSColorProfileEntry 11 }
+
+    opticsIMETSColorProfileMode OBJECT-TYPE
+      SYNTAX OpticsIMETSclassMode
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object is used to select the type of color
+        profile set on incoming frames: either by
+        priority bits or by Ip Dscp bits.
+        The default value is priority(0)."
+      ::= { opticsIMETSColorProfileEntry 12 }
+
+    opticsIMETSColorProfileDscp0 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 000000.
+        The default value is yellow."
+      ::= { opticsIMETSColorProfileEntry 13 }
+
+    opticsIMETSColorProfileDscp1 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 000001.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 14 }
+
+    opticsIMETSColorProfileDscp2 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 000010.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 15 }
+
+    opticsIMETSColorProfileDscp3 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 000011.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 16 }
+
+    opticsIMETSColorProfileDscp4 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 000100.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 17 }
+
+    opticsIMETSColorProfileDscp5 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 000101.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 18 }
+
+    opticsIMETSColorProfileDscp6 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 000110.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 19 }
+
+    opticsIMETSColorProfileDscp7 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 000111.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 20 }
+
+    opticsIMETSColorProfileDscp8 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 001000.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 21 }
+
+    opticsIMETSColorProfileDscp9 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 001001.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 22 }
+
+    opticsIMETSColorProfileDscp10 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 001010.
+        The default value is red."
+      ::= { opticsIMETSColorProfileEntry 23 }
+
+    opticsIMETSColorProfileDscp11 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 001011.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 24 }
+
+    opticsIMETSColorProfileDscp12 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 001100.
+        The default value is yellow."
+      ::= { opticsIMETSColorProfileEntry 25 }
+
+    opticsIMETSColorProfileDscp13 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 001101.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 26 }
+
+    opticsIMETSColorProfileDscp14 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 001110.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 27 }
+
+    opticsIMETSColorProfileDscp15 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 001111.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 28 }
+
+    opticsIMETSColorProfileDscp16 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 010000.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 29 }
+
+    opticsIMETSColorProfileDscp17 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 010001.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 30 }
+
+    opticsIMETSColorProfileDscp18 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 010010.
+        The default value is red."
+      ::= { opticsIMETSColorProfileEntry 31 }
+
+    opticsIMETSColorProfileDscp19 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 010011.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 32 }
+
+    opticsIMETSColorProfileDscp20 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 010100.
+        The default value is yellow."
+      ::= { opticsIMETSColorProfileEntry 33 }
+
+    opticsIMETSColorProfileDscp21 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 010101.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 34 }
+
+    opticsIMETSColorProfileDscp22 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 010110.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 35 }
+
+    opticsIMETSColorProfileDscp23 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 010111.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 36 }
+
+    opticsIMETSColorProfileDscp24 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 011000.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 37 }
+
+    opticsIMETSColorProfileDscp25 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 011001.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 38 }
+
+    opticsIMETSColorProfileDscp26 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 011010.
+        The default value is red."
+      ::= { opticsIMETSColorProfileEntry 39 }
+
+    opticsIMETSColorProfileDscp27 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 011011.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 40 }
+
+    opticsIMETSColorProfileDscp28 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 011100.
+        The default value is yellow."
+      ::= { opticsIMETSColorProfileEntry 41 }
+
+    opticsIMETSColorProfileDscp29 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 011101.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 42 }
+
+    opticsIMETSColorProfileDscp30 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 011110.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 43 }
+
+    opticsIMETSColorProfileDscp31 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 011111.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 44 }
+
+    opticsIMETSColorProfileDscp32 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 100000.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 45 }
+
+    opticsIMETSColorProfileDscp33 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 100001.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 46 }
+
+    opticsIMETSColorProfileDscp34 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 100010.
+        The default value is red."
+      ::= { opticsIMETSColorProfileEntry 47 }
+
+    opticsIMETSColorProfileDscp35 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 100011.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 48 }
+
+    opticsIMETSColorProfileDscp36 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 100100.
+        The default value is yellow."
+      ::= { opticsIMETSColorProfileEntry 49 }
+
+    opticsIMETSColorProfileDscp37 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 100101.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 50 }
+
+    opticsIMETSColorProfileDscp38 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 100110.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 51 }
+
+    opticsIMETSColorProfileDscp39 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 100111.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 52 }
+
+    opticsIMETSColorProfileDscp40 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 101000.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 53 }
+
+    opticsIMETSColorProfileDscp41 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 101001.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 54 }
+
+    opticsIMETSColorProfileDscp42 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 101010.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 55 }
+
+    opticsIMETSColorProfileDscp43 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 101011.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 56 }
+
+    opticsIMETSColorProfileDscp44 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 101100.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 57 }
+
+    opticsIMETSColorProfileDscp45 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 101101
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 58 }
+
+    opticsIMETSColorProfileDscp46 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 101110.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 59 }
+
+    opticsIMETSColorProfileDscp47 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 101111.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 60 }
+
+    opticsIMETSColorProfileDscp48 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 110000.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 61 }
+
+    opticsIMETSColorProfileDscp49 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 110001.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 62 }
+
+    opticsIMETSColorProfileDscp50 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 110010.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 63 }
+
+    opticsIMETSColorProfileDscp51 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 110101.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 64 }
+
+        opticsIMETSColorProfileDscp52 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 110100.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 65 }
+
+    opticsIMETSColorProfileDscp53 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 110101.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 66 }
+
+    opticsIMETSColorProfileDscp54 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 110110.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 67 }
+
+    opticsIMETSColorProfileDscp55 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 110111.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 68 }
+
+    opticsIMETSColorProfileDscp56 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 111000.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 69 }
+
+    opticsIMETSColorProfileDscp57 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 111001.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 70 }
+
+    opticsIMETSColorProfileDscp58 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 111010.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 71 }
+
+    opticsIMETSColorProfileDscp59 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 111011.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 72 }
+
+    opticsIMETSColorProfileDscp60 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 111100.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 73 }
+
+    opticsIMETSColorProfileDscp61 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 111101.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 74 }
+
+    opticsIMETSColorProfileDscp62 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 111110.
+        The default value is green."
+      ::= { opticsIMETSColorProfileEntry 75 }
+
+    opticsIMETSColorProfileDscp63 OBJECT-TYPE
+      SYNTAX OpticsIMColorType
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Set by the operator to indicate drop precedence value for
+        the incoming frames with Ip Dscp bits equal to 111111.
+        The default value is 'green'."
+      ::= { opticsIMETSColorProfileEntry 76 }
+
+    opticsIMETSFlowGroupIndexNext OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object contains an appropriate value to be
+        used for opticsIMETSFlowGroupIndex when
+        creating entries in the opticsIMETSFlowGroupTable.
+
+        The value 0 indicates that no unassigned
+        entries are available.
+
+        To obtain the opticsIMETSFlowGroupIndex value
+        for a new entry, the manager issues a
+        management protocol retrieval operation to
+        obtain the current value of this object.
+        After each retrieval operation, the agent
+        should modify the value to reflect the
+        next unassigned index."
+      ::= { opticsIMETSObjects 17 }
+
+    opticsIMETSFlowGroupTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OpticsIMETSFlowGroupEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "This table contains information about
+        ETS Flow Group configuration."
+      ::= { opticsIMETSObjects 18 }
+
+    opticsIMETSFlowGroupEntry OBJECT-TYPE
+      SYNTAX OpticsIMETSFlowGroupEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "An entry of the opticsIMETSFlowGroupTable.
+
+        The ifIndex represents the Ethernet
+        interface with client type='ets' associated
+        with all the flows belonging to the group
+        (i.e. all the flows belonging to this
+        group must have the opticsIMETSInFlowServiceID
+        equal to ifIndex).
+
+        In any case the opticsIMETSFlowGroupIndex
+        should be a globally unique index."
+      INDEX { ifIndex, opticsIMETSFlowGroupIndex }
+      ::= { opticsIMETSFlowGroupTable 1 }
+
+    OpticsIMETSFlowGroupEntry ::=
+      SEQUENCE {
+        opticsIMETSFlowGroupIndex
+          Unsigned32,
+        opticsIMETSFlowGroupPolicingMode
+          OpticsIMETSPolicingMode,
+        opticsIMETSFlowGroupTrafficDescrIndex
+          OpticsIMETSTrafficDescrIndex,
+        opticsIMETSFlowGroupUserLabel
+          OpticsIMUserLabel,
+        opticsIMETSFlowGroupRowStatus
+          RowStatus,
+        opticsIMETSFlowGroupColorProfilePointer
+          Unsigned32
+       }
+
+    opticsIMETSFlowGroupIndex OBJECT-TYPE
+      SYNTAX Unsigned32 (1..2147483647)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "A unique value to identify the ETS Flow Group.
+        When creating a new row in the table, the
+        value of this index may be obtained by
+        retrieving the value of opticsIMETSFlowGroupIndex.
+
+        The range is 1..MAXFlowGroup, where
+        MAXFlowGroup is product dependent and it
+        will be specified in the product
+        specification document."
+      ::= { opticsIMETSFlowGroupEntry 1 }
+
+    opticsIMETSFlowGroupPolicingMode OBJECT-TYPE
+      SYNTAX OpticsIMETSPolicingMode
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "It defines the Policing Mode.
+        By default, policing is 'colorBlind'."
+      ::= { opticsIMETSFlowGroupEntry 2 }
+
+    opticsIMETSFlowGroupTrafficDescrIndex OBJECT-TYPE
+      SYNTAX OpticsIMETSTrafficDescrIndex
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "It identifies the row in the
+        opticsIMETSTrafficDescrTable which applies to the
+        ETS flow group, both in input and
+        output direction."
+      ::= { opticsIMETSFlowGroupEntry 3 }
+
+    opticsIMETSFlowGroupUserLabel OBJECT-TYPE
+      SYNTAX OpticsIMUserLabel
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "The canonical user label assigned to
+        the flow group."
+      ::= { opticsIMETSFlowGroupEntry 4 }
+
+    opticsIMETSFlowGroupRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "For creating, modifying, and deleting this row."
+      ::= { opticsIMETSFlowGroupEntry 5 }
+
+    opticsIMETSFlowGroupColorProfilePointer OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "This object points to a row in
+        the opticsIMColorProfileTable.
+        It defines the Color Profile associated
+        with priority bits in the 'colorAware' mode.
+
+        A value of 0 indicates that no Color Profile
+        has been associated with this Flow Group and
+        then the 'colorBlind' mode is used.
+
+        The default value is 0."
+      ::= { opticsIMETSFlowGroupEntry 6 }
+
+        -- Begin Enhanced cross-connect table by  service type
+
+            opticsIMETSCrossConnectServiceTypeTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OpticsIMETSCrossConnectServiceTypeEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "This table is read-only version of ETS Cross Connect table.
+                 It is organized by service Type and it contains useful data for the manager"
+      ::= { opticsIMETSObjects 19 }
+
+    opticsIMETSCrossConnectServiceTypeEntry OBJECT-TYPE
+      SYNTAX OpticsIMETSCrossConnectServiceTypeEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "An entry of the opticsIMETSCrossConnectServiceTypeTable."
+      INDEX { opticsIMETSCrossConnectServiceTypeIndex, opticsIMETSCrossConnectIndex, opticsIMETSCrossConnectInFlowIndex, opticsIMETSCrossConnectOutFlowIndex }
+      ::= { opticsIMETSCrossConnectServiceTypeTable 1 }
+
+    OpticsIMETSCrossConnectServiceTypeEntry ::=
+      SEQUENCE {
+                opticsIMETSCrossConnectServiceTypeIndex
+                    OpticsIMETSFlowServiceType,
+                opticsIMETSCrossConnectServiceTypeInFlowUserLabel
+          OpticsIMUserLabel,
+                opticsIMETSCrossConnectServiceTypeInFlowServiceID
+          Unsigned32,
+                opticsIMETSCrossConnectServiceTypeOutFlowUserLabel
+          OpticsIMUserLabel,
+                opticsIMETSCrossConnectServiceTypeOutFlowServerID
+          Unsigned32
+       }
+
+        opticsIMETSCrossConnectServiceTypeIndex OBJECT-TYPE
+      SYNTAX OpticsIMETSFlowServiceType
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "The value of this object is equal to the Flow Service Type:
+         value specified opticsIMETSInFlowServiceType  of  the
+         opticsIMETSInFlowTable or opticsIMETSOutFlowServiceType of
+         opticsIMETSOutFlowTable. The rule is the following one:
+         if one of two Flow legs has the value of service type different from Ethernet, this
+         value is assigned to opticsIMETSCrossConnectServiceTypeIndex.
+         In case of atm service or pw on atm, atm service type is identified.
+         In case of circuit emulation (ces, ces on provider bridge, ces on pw),
+         the service type value (ces-pw or ces-pb) is identified"
+      ::= { opticsIMETSCrossConnectServiceTypeEntry 1 }
+
+        opticsIMETSCrossConnectServiceTypeInFlowUserLabel OBJECT-TYPE
+      SYNTAX OpticsIMUserLabel
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "The canonical user label assigned to the Inflow.
+                 This attribute value is equal to opticsIMETSInFlowUserLabel of
+                 opticsIMETSInFlowTable"
+      ::= { opticsIMETSCrossConnectServiceTypeEntry 2 }
+
+    opticsIMETSCrossConnectServiceTypeInFlowServiceID OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object contains an appropriate value service type
+        dependent.
+                This attribute value is equal to opticsIMETSInFlowServiceID
+                of opticsIMETSInFlowTable"
+      ::= { opticsIMETSCrossConnectServiceTypeEntry 3 }
+
+        opticsIMETSCrossConnectServiceTypeOutFlowUserLabel OBJECT-TYPE
+      SYNTAX OpticsIMUserLabel
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "The canonical user label assigned to the Outflow.
+                 This attribute value is equal to opticsIMETSOutFlowUserLabel of
+                 opticsIMETSOutFlowTable"
+      ::= { opticsIMETSCrossConnectServiceTypeEntry 4 }
+
+    opticsIMETSCrossConnectServiceTypeOutFlowServerID OBJECT-TYPE
+      SYNTAX Unsigned32 (0..2147483647)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object contains an appropriate value service type
+        dependent.
+                This attribute value is equal to opticsIMETSOutFlowServerID
+                of opticsIMETSOutFlowTable"
+      ::= { opticsIMETSCrossConnectServiceTypeEntry 5 }
+
+
+
+        -- End  Enhanced cross-connect table
+
+-- begin adding for ATM on PW Nov 30, 2009
+
+
+  opticsIMATMCellConcGroupIndexNext OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object contains an appropriate value to be used for
+        opticsIMATMCellConcGroupIndex when creating entries in the
+        opticsIMATMCellConcGroupTable. The value 0 indicates that no
+        unassigned entries are available. To obtain the opticsIMATMCellConcGroupIndex value for a new entry, the           manager issues a management protocol retrieval operation to         obtain the current value of this object.  After each retrieval,
+        the agent should modify the value to reflect the next
+        unassigned index."
+      ::= { opticsIMETSObjects 20 }
+
+
+    opticsIMATMCellConcGroupTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OpticsIMATMCellConcGroupEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "This table contains configurations for the CellConcGroup"
+      ::= { opticsIMETSObjects 21 }
+
+    opticsIMATMCellConcGroupEntry OBJECT-TYPE
+      SYNTAX OpticsIMATMCellConcGroupEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "An entry of the opticsIMATMCellConcGroupTable."
+      INDEX { opticsIMATMCellConcGroupIndex }
+      ::= { opticsIMATMCellConcGroupTable 1 }
+
+
+    OpticsIMATMCellConcGroupEntry::=
+      SEQUENCE {
+        opticsIMATMCellConcGroupIndex
+               Unsigned32,
+        opticsIMATMCellConcGroupMaxConcCells
+              Unsigned32,
+        opticsIMATMCellConcGroupTimeOut
+            Unsigned32,
+        opticsIMATMCellConcGroupCLPTrigger
+              TruthValue,
+        opticsIMATMCellConcGroupCoS
+            OpticsIMETSTrafficDescrType,
+        opticsIMATMCellConcGroupRowStatus
+          RowStatus
+            }
+
+-- begin TDSnm80132 Apr.1st, 2010
+    opticsIMATMCellConcGroupIndex OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "A unique value to identify the CONC_GROUP.
+        The range is 1..65535."
+      ::= { opticsIMATMCellConcGroupEntry 1 }
+-- end TDSnm80132 Apr.1st, 2010
+
+    opticsIMATMCellConcGroupMaxConcCells OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "Max number of Concatenated Cells in a CONC_GROUP
+        The range is 1..32.
+        The default value is 16."
+      ::= { opticsIMATMCellConcGroupEntry 2 }
+
+    opticsIMATMCellConcGroupTimeOut OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "Timeout for the generation of a MPLS packet containing concatenated ATM cells.
+        The range is 1..100.
+        The default value is 50."
+      ::= { opticsIMATMCellConcGroupEntry 3 }
+
+    opticsIMATMCellConcGroupCLPTrigger OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      "This object indicate if the CLP (Cell Loss Priority) bit changing in the ATM cells is used (true) or not (false) as trigger for the generation of the MPLS packet containing concatenated ATM cells.
+         The default value is false?"
+      ::= { opticsIMATMCellConcGroupEntry 4 }
+
+    opticsIMATMCellConcGroupCoS OBJECT-TYPE
+      SYNTAX OpticsIMETSTrafficDescrType
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "CoS of all the ATM Flow in the CONC_GROUP."
+      ::= { opticsIMATMCellConcGroupEntry 5 }
+
+    opticsIMATMCellConcGroupRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "For creating, modifying, and deleting this row."
+      ::= { opticsIMATMCellConcGroupEntry 6 }
+
+
+    opticsIMATM2ETSFlowClassifierIndexNext OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "This object contains an appropriate value to be used for
+        opticsIMATM2ETSFlowClassifierIndex when creating entries
+        in the opticsIMATM2ETSFlowClassifierTable. The value 0
+        indicates that no unassigned entries are available.
+        To obtain the opticsIMATM2ETSFlowClassifierIndex value
+        for a new entry, the manager issues a management protocol
+        retrieval operation to obtain the current value of this
+        object. After each retrieval, the agent should modify
+        the value to replect the next unassigned index."
+      ::= { opticsIMETSObjects 22 }
+
+
+    opticsIMATM2ETSFlowClassifierTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OpticsIMATM2ETSFlowClassifierEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "This table provides ATM configuration for each
+        ATM ingress flow.
+        This table is indexed by the same index that was created
+        for the associated entry of the opticsIMETSInFlowTable.
+        The opticsIMETSInFlowIndex and the
+        opticsIMATM2ETSFlowClassifierIndex are used as
+        indexes.
+        One or more entries are created in this table by the
+        manager only if there is an antry in the
+        opticsIMETSInFlowTable with an
+        opticsIMETSInFlowServiceType equal to 'ATM' or PW-ATM?"
+      ::= { opticsIMETSObjects 23 }
+
+    opticsIMATM2ETSFlowClassifierEntry OBJECT-TYPE
+      SYNTAX OpticsIMATM2ETSFlowClassifierEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "An entry of the opticsIMATM2ETSFlowClassifierTable."
+      INDEX { opticsIMATM2ETSFlowClassifierInFlowIndex, opticsIMATM2ETSFlowClassifierIndex }
+      ::= { opticsIMATM2ETSFlowClassifierTable 1 }
+
+    OpticsIMATM2ETSFlowClassifierEntry ::=
+      SEQUENCE {
+        opticsIMATM2ETSFlowClassifierInFlowIndex
+          OpticsIMETSFlowIndex,
+        opticsIMATM2ETSFlowClassifierIndex
+          Unsigned32,
+        opticsIMATM2ETSFlowClassifierVpi
+          Unsigned32,
+        opticsIMATM2ETSFlowClassifierMaxVpi
+          Unsigned32,
+        opticsIMATM2ETSFlowClassifierVci
+          Unsigned32,
+        opticsIMATM2ETSFlowClassifierMaxVci
+          Unsigned32,
+        opticsIMATM2ETSFlowClassifierRowStatus
+          RowStatus
+       }
+
+    opticsIMATM2ETSFlowClassifierInFlowIndex OBJECT-TYPE
+      SYNTAX OpticsIMETSFlowIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "The value of this object is equal to
+        opticsIMETSInFlowIndex value of opticsIMETSInFlowTable."
+      ::= { opticsIMATM2ETSFlowClassifierEntry 1 }
+
+    opticsIMATM2ETSFlowClassifierIndex OBJECT-TYPE
+      SYNTAX Unsigned32 (1..2147483647)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "A unique value to identify this Flow Classifier.
+        The range is 1..MAXFlowClassifier, where
+        MAXFlowClassifier is product dependent and it will be
+        specified in the product specification document."
+      ::= { opticsIMATM2ETSFlowClassifierEntry 2 }
+
+
+    opticsIMATM2ETSFlowClassifierVpi OBJECT-TYPE
+      SYNTAX Unsigned32 (0..4096)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "This object defines ATM VPI on the ETS flow.
+        The default value is 4096."
+      ::= { opticsIMATM2ETSFlowClassifierEntry 3 }
+
+    opticsIMATM2ETSFlowClassifierMaxVpi OBJECT-TYPE
+      SYNTAX Unsigned32 (0..4095)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "This object is used to define the MAX value of ATM VPI range
+        for this ETS ingress flow and must be greater than
+        opticsIMATM2ETSFlowClassifierVpi.
+        If a range is not used the value must be set to 0.
+        The default value is 0."
+      ::= { opticsIMATM2ETSFlowClassifierEntry 4 }
+
+    opticsIMATM2ETSFlowClassifierVci OBJECT-TYPE
+      SYNTAX Unsigned32 (0..65536)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "This object defines ATM VCI on the ETS flow.
+         The default value is 65536."
+      ::= { opticsIMATM2ETSFlowClassifierEntry 5 }
+
+    opticsIMATM2ETSFlowClassifierMaxVci OBJECT-TYPE
+      SYNTAX Unsigned32 (0..65535)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "This object is used to define the MAX value of ATM VCI range
+        for this ETS ingress flow and must be greater than
+        opticsIMATM2ETSFlowClassifierVci.
+        If a range is not used the value must be set to 0.
+        The default value is 0."
+      ::= { opticsIMATM2ETSFlowClassifierEntry 6 }
+
+    opticsIMATM2ETSFlowClassifierRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "Enable creating, deleting and modifying this row."
+      ::= { opticsIMATM2ETSFlowClassifierEntry 7 }
+
+
+
+
+opticsIMETSOutFlowAtmTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMETSOutFlowAtmEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "This table contains information about ATM ETS egress flow."
+  ::= { opticsIMETSObjects 24 }
+
+opticsIMETSOutFlowAtmEntry OBJECT-TYPE
+  SYNTAX OpticsIMETSOutFlowAtmEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry of the opticsIMETSOutFlowAtmTable."
+  AUGMENTS {opticsIMETSOutFlowEntry}
+  ::= { opticsIMETSOutFlowAtmTable 1 }
+
+OpticsIMETSOutFlowAtmEntry ::=
+  SEQUENCE {
+    opticsIMETSOutFlowAtmVpiOut          Unsigned32,
+    opticsIMETSOutFlowAtmVciOut          Unsigned32,
+    opticsIMETSOutFlowAtmConcGroupNumber Unsigned32
+    }
+
+opticsIMETSOutFlowAtmVpiOut OBJECT-TYPE
+  SYNTAX Unsigned32 (0..4096)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This object is used to define the Vpi in output (to be  included in the PW-ATM or at egress in the ATM port).
+    If the value is 4096 (out of range) the value of the Vpi is not changed.
+    The default value is 4096."
+  ::= { opticsIMETSOutFlowAtmEntry 1 }
+
+opticsIMETSOutFlowAtmVciOut OBJECT-TYPE
+  SYNTAX Unsigned32 (0..65536)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This object is used to define the Vci in output (to be included in the PW-ATM or at egress in the ATM port).
+    If the value is 65536 (out of range) the value of the Vci is not changed.
+    The default value is 65536 "
+  ::= { opticsIMETSOutFlowAtmEntry 2 }
+
+-- begin TDSnm80132 Apr.1st, 2010
+
+opticsIMETSOutFlowAtmConcGroupNumber OBJECT-TYPE
+  SYNTAX Unsigned32 (0..65535)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This object is used to define the number of the CONC-GROUP the OutFlow belongs to. If 0 the Outflow is not concatenated.
+    The default value is 0 "
+  ::= { opticsIMETSOutFlowAtmEntry 3 }
+
+-- end TDSnm80132 Apr.1st, 2010
+
+-- end adding for ATM on PW Nov 30, 2009
+
+
+
+    opticsimETSMCConf OBJECT IDENTIFIER ::= { opticsimEthMC 3 }
+
+    opticsimETSMCCompl OBJECT IDENTIFIER ::= { opticsimETSMCConf 1 }
+
+    opticsimETSMCGroup OBJECT IDENTIFIER ::= { opticsimETSMCConf 2 }
+
+    opticsIMETSTrafficDescrGroup OBJECT-GROUP
+      OBJECTS { opticsIMETSTrafficDescrIndexNext, opticsIMETSTrafficDescrType, opticsIMETSTrafficDescrParam1, opticsIMETSTrafficDescrParam2, opticsIMETSTrafficDescrParam3,
+        opticsIMETSTrafficDescrParam4, opticsIMETSTrafficDescrParam5, opticsIMETSTrafficDescrUserLabel, opticsIMETSTrafficDescrRowStatus }
+      STATUS current
+      DESCRIPTION
+        "Collection of objects of opticsIMETSTrafficDescrTable."
+      ::= { opticsimETSMCGroup 1 }
+
+    opticsIMETSInFlowGroup OBJECT-GROUP
+      OBJECTS { opticsIMETSInFlowIndexNext, opticsIMETSInFlowServiceType, opticsIMETSInFlowServiceID, opticsIMETSInFlowUserLabel, opticsIMETSInFlowTrafficDescr,
+        opticsIMETSInFlowType, opticsIMETSInFlowPolicingMode, opticsIMETSInFlowCrossConnectIdentifier, opticsIMETSInFlowRowStatus, opticsIMETSInFlowVlanPop,
+        opticsIMETSInFlowColorProfilePointer, opticsIMETSInFlowLayer2ProtocolList,
+        opticsIMETSInFlowL2ActualProtocolList,
+        opticsIMETSInFlowGroupID,
+        opticsIMETSInFlowClassificationMode }
+
+      STATUS current
+      DESCRIPTION
+        "Collection of objects of opticsIMETSInFlowTable."
+      ::= { opticsimETSMCGroup 2 }
+
+    opticsIMETSOutFlowGroup OBJECT-GROUP
+      OBJECTS { opticsIMETSOutFlowIndexNext, opticsIMETSOutFlowServerType, opticsIMETSOutFlowRowStatus, opticsIMETSOutFlowServerID, opticsIMETSOutFlowCrossConnectIdentifier,
+        opticsIMETSOutFlowUserLabel, opticsIMETSOutFlowVlanStackPointer,opticsIMETSOutFlowControlWord }
+      STATUS current
+      DESCRIPTION
+        "Collection of objects of opticsIMETSOutFlowTable."
+      ::= { opticsimETSMCGroup 3 }
+
+    opticsIMETSCrossConnectGroup OBJECT-GROUP
+      OBJECTS { opticsIMETSCrossConnectIndexNext, opticsIMETSCrossConnectRowStatus }
+      STATUS current
+      DESCRIPTION
+        "Collection of objects of opticsIMETSCrossCopnnectTable."
+      ::= { opticsimETSMCGroup 4 }
+
+    opticsIMEth2ETSFlowClassifierGroup OBJECT-GROUP
+      OBJECTS { opticsIMEth2ETSFlowClassifierIndexNext, opticsIMEth2ETSFlowClassifierVlan, opticsIMEth2ETSFlowClassifierMaxVlan, opticsIMEth2ETSFlowClassifierPriority, opticsIMEth2ETSFlowClassifierMaxPriority,
+        opticsIMEth2ETSFlowClassifierRowStatus,
+                                opticsIMEth2ETSFlowClassifierIpDscp,
+        opticsIMEth2ETSFlowClassifierMaxIpDscp }
+      STATUS current
+      DESCRIPTION
+        "Collection of objects of
+        opticsIMEth2ETSFlowClassifierTable."
+      ::= { opticsimETSMCGroup 5 }
+
+    opticsIMETSInFlowServiceIDGroup OBJECT-GROUP
+      OBJECTS { opticsIMETSInFlowServiceIDUserLabel, opticsIMETSInFlowServiceIDTrafficDescr, opticsIMETSInFlowServiceIDFlowType, opticsIMETSInFlowServiceIDPolicingMode, opticsIMETSInFlowServiceIDCrossConnectIdentifier,
+        opticsIMETSInFlowServiceIDVlanPop, opticsIMETSInFlowServiceIDColorProfilePointer, opticsIMETSInFlowServiceIDLayer2ProtocolList,
+        opticsIMETSInFlowServiceIDL2ActualProtocolList,
+        opticsIMETSInFlowServiceIDGroupID,
+                                opticsIMETSInFlowServiceIDClassificationMode }
+      STATUS current
+      DESCRIPTION
+        "Collection of objects of
+        opticsIMETSInFlowServiceIDTable."
+      ::= { opticsimETSMCGroup 6 }
+
+    opticsIMETSOutFlowServerIDGroup OBJECT-GROUP
+      OBJECTS { opticsIMETSOutFlowServerIDUserLabel, opticsIMETSOutFlowServerIDCrossConnectIdentifier, opticsIMETSOutFlowServerIDVlanStackPointer,opticsIMETSOutFlowServerIDControlWord,
+                opticsIMETSOutFlowServerIDAtmVpiOut, opticsIMETSOutFlowServerIDAtmVciOut, opticsIMETSOutFlowServerIDAtmConcGroupNumber
+            }
+      STATUS current
+      DESCRIPTION
+        "Collection of objects of
+        opticsIMETSOutFlowServiceIDTable."
+      ::= { opticsimETSMCGroup 7 }
+
+    opticsIMETSVlanStackConfGroup OBJECT-GROUP
+      OBJECTS { opticsIMETSVlanStackConfPriorityMode, opticsIMETSVlanStackConfPriority, opticsIMETSVlanStackConfPriorityYellow, opticsIMETSVlanStackConfRowStatus, opticsIMETSVlanStackConfVlanID,
+        opticsIMETSVlanStackConfIndexNext }
+      STATUS current
+      DESCRIPTION
+        "Collection of objects of
+        opticsIMETSVlanStackConfTable."
+      ::= { opticsimETSMCGroup 8 }
+
+    opticsIMETSColorProfileGroup OBJECT-GROUP
+      OBJECTS { opticsIMETSColorProfileIndexNext, opticsIMETSColorProfilePriority0, opticsIMETSColorProfilePriority1, opticsIMETSColorProfilePriority2, opticsIMETSColorProfilePriority3,
+        opticsIMETSColorProfilePriority4, opticsIMETSColorProfilePriority5, opticsIMETSColorProfilePriority6, opticsIMETSColorProfilePriority7, opticsIMETSColorProfileUserLabel,
+        opticsIMETSColorProfileRowStatus,
+                opticsIMETSColorProfileMode,
+        opticsIMETSColorProfileDscp0,
+        opticsIMETSColorProfileDscp1,
+        opticsIMETSColorProfileDscp2,
+        opticsIMETSColorProfileDscp3,
+        opticsIMETSColorProfileDscp4,
+        opticsIMETSColorProfileDscp5,
+        opticsIMETSColorProfileDscp6,
+        opticsIMETSColorProfileDscp7,
+        opticsIMETSColorProfileDscp8,
+        opticsIMETSColorProfileDscp9,
+        opticsIMETSColorProfileDscp10,
+        opticsIMETSColorProfileDscp11,
+        opticsIMETSColorProfileDscp12,
+        opticsIMETSColorProfileDscp13,
+        opticsIMETSColorProfileDscp14,
+        opticsIMETSColorProfileDscp15,
+        opticsIMETSColorProfileDscp16,
+        opticsIMETSColorProfileDscp17,
+        opticsIMETSColorProfileDscp18,
+        opticsIMETSColorProfileDscp19,
+        opticsIMETSColorProfileDscp20,
+        opticsIMETSColorProfileDscp21,
+        opticsIMETSColorProfileDscp22,
+        opticsIMETSColorProfileDscp23,
+        opticsIMETSColorProfileDscp24,
+        opticsIMETSColorProfileDscp25,
+        opticsIMETSColorProfileDscp26,
+        opticsIMETSColorProfileDscp27,
+        opticsIMETSColorProfileDscp28,
+        opticsIMETSColorProfileDscp29,
+        opticsIMETSColorProfileDscp30,
+        opticsIMETSColorProfileDscp31,
+        opticsIMETSColorProfileDscp32,
+        opticsIMETSColorProfileDscp33,
+        opticsIMETSColorProfileDscp34,
+        opticsIMETSColorProfileDscp35,
+        opticsIMETSColorProfileDscp36,
+        opticsIMETSColorProfileDscp37,
+        opticsIMETSColorProfileDscp38,
+        opticsIMETSColorProfileDscp39,
+        opticsIMETSColorProfileDscp40,
+        opticsIMETSColorProfileDscp41,
+        opticsIMETSColorProfileDscp42,
+        opticsIMETSColorProfileDscp43,
+        opticsIMETSColorProfileDscp44,
+        opticsIMETSColorProfileDscp45,
+        opticsIMETSColorProfileDscp46,
+        opticsIMETSColorProfileDscp47,
+        opticsIMETSColorProfileDscp48,
+        opticsIMETSColorProfileDscp49,
+        opticsIMETSColorProfileDscp50,
+        opticsIMETSColorProfileDscp51,
+        opticsIMETSColorProfileDscp52,
+        opticsIMETSColorProfileDscp53,
+        opticsIMETSColorProfileDscp54,
+        opticsIMETSColorProfileDscp55,
+        opticsIMETSColorProfileDscp56,
+        opticsIMETSColorProfileDscp57,
+        opticsIMETSColorProfileDscp58,
+        opticsIMETSColorProfileDscp59,
+        opticsIMETSColorProfileDscp60,
+        opticsIMETSColorProfileDscp61,
+        opticsIMETSColorProfileDscp62,
+        opticsIMETSColorProfileDscp63 }
+      STATUS current
+      DESCRIPTION
+        "Collection of objects of
+        opticsIMETSColorProfileTable."
+      ::= { opticsimETSMCGroup 9 }
+
+                opticsIMETSGroupFlowGroup OBJECT-GROUP
+      OBJECTS { opticsIMETSFlowGroupIndexNext,
+          opticsIMETSFlowGroupPolicingMode,
+          opticsIMETSFlowGroupTrafficDescrIndex,
+          opticsIMETSFlowGroupUserLabel,
+          opticsIMETSFlowGroupRowStatus,
+          opticsIMETSFlowGroupColorProfilePointer }
+      STATUS current
+      DESCRIPTION
+        "Collection of objects of
+         opticsIMETSFlowGroup."
+      ::= { opticsimETSMCGroup 10 }
+
+       -- Begin opticsIMETSCrossConnectServiceTypeGroup by  service type
+    opticsIMETSCrossConnectServiceTypeGroup OBJECT-GROUP
+      OBJECTS {
+          -- opticsIMETSCrossConnectServiceTypeIndex,
+                                  opticsIMETSCrossConnectServiceTypeInFlowUserLabel,
+          opticsIMETSCrossConnectServiceTypeInFlowServiceID,
+          opticsIMETSCrossConnectServiceTypeOutFlowUserLabel,
+                                  opticsIMETSCrossConnectServiceTypeOutFlowServerID}
+      STATUS current
+      DESCRIPTION
+        "Collection of objects of opticsIMETSCrossConnectServiceTypeTable."
+      ::= { opticsimETSMCGroup 11 }
+
+      -- End opticsIMETSCrossConnectServiceTypeGroup
+
+       -- Begin opticsIMATMCellConcGroupGroup
+     opticsIMATMCellConcGroupGroup  OBJECT-GROUP
+      OBJECTS {
+          opticsIMATMCellConcGroupIndexNext,
+                opticsIMATMCellConcGroupMaxConcCells,
+        opticsIMATMCellConcGroupTimeOut,
+        opticsIMATMCellConcGroupCLPTrigger,
+        opticsIMATMCellConcGroupCoS,
+        opticsIMATMCellConcGroupRowStatus}
+      STATUS current
+      DESCRIPTION
+        "Collection of objects of opticsIMATMCellConcGroupTable."
+      ::= { opticsimETSMCGroup 12 }
+
+      -- End opticsIMATMCellConcGroupGroup
+
+    -- Begin opticsIMATM2ETSFlowClassifierGroup
+     opticsIMATM2ETSFlowClassifierGroup  OBJECT-GROUP
+      OBJECTS {
+          opticsIMATM2ETSFlowClassifierIndexNext,
+        opticsIMATM2ETSFlowClassifierVpi,
+        opticsIMATM2ETSFlowClassifierMaxVpi,
+        opticsIMATM2ETSFlowClassifierVci,
+        opticsIMATM2ETSFlowClassifierMaxVci,
+        opticsIMATM2ETSFlowClassifierRowStatus}
+      STATUS current
+      DESCRIPTION
+        "Collection of objects of opticsIMATM2ETSFlowClassifierTable."
+      ::= { opticsimETSMCGroup 13 }
+
+      -- End opticsIMATM2ETSFlowClassifierGroup
+
+    -- Begin opticsIMETSOutFlowAtmGroup
+     opticsIMETSOutFlowAtmGroup  OBJECT-GROUP
+      OBJECTS {
+          opticsIMETSOutFlowAtmVpiOut,
+            opticsIMETSOutFlowAtmVciOut,
+            opticsIMETSOutFlowAtmConcGroupNumber
+         }
+      STATUS current
+      DESCRIPTION
+        "Collection of objects of the opticsIMETSOutFlowAtmTable."
+      ::= { opticsimETSMCGroup 14 }
+
+      -- End opticsIMETSOutFlowAtmGroup
+
+  END
+
+--
+-- OpticsIMETS-MIB091217.mib
+--

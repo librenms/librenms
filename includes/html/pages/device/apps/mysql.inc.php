@@ -10,13 +10,10 @@ $app_sections = [
     'innodb' => 'InnoDB',
 ];
 
-unset($sep);
+$sep = '';
 foreach ($app_sections as $app_section => $app_section_text) {
     echo $sep;
-
-    if (! $vars['app_section']) {
-        $vars['app_section'] = $app_section;
-    }
+    $vars['app_section'] ??= $app_section; // if no section use first
 
     if ($vars['app_section'] == $app_section) {
         echo "<span class='pagemenu-selected'>";
@@ -66,7 +63,7 @@ foreach ($graphs[$vars['app_section']] as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 

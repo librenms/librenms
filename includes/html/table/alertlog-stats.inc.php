@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -12,6 +13,8 @@
  * @copyright  2018 LibreNMS
  * @author     LibreNMS Contributors
 */
+
+use App\Models\Alert;
 
 $where = 1;
 
@@ -31,11 +34,11 @@ if (isset($vars['min_severity'])) {
     $where .= get_sql_filter_min_severity($vars['min_severity'], 'R');
 }
 
-if (Auth::user()->hasGlobalRead()) {
+if (Gate::allows('viewAll', Alert::class)) {
     $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where";
 } else {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    // @phpstan-ignore-next-line
+    // @phpstan-ignore function.deprecated
     $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where AND E.device_id IN " . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }

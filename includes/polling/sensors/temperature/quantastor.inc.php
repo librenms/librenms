@@ -1,4 +1,5 @@
 <?php
+
 /**
  * quantastor.inc.php
  *
@@ -22,5 +23,5 @@
  * @copyright  2020 Cercel Valentin
  * @author     Cercel Valentin <crc@nuamchefazi.ro>
  */
-preg_match('/([0-9]+)/', $sensor_value, $temps);
+preg_match('/([0-9]+)/', (string) $sensor_value, $temps);
 $sensor_value = $temps[0];

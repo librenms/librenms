@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -12,8 +13,9 @@
 
 header('Content-type: application/json');
 
-$device_hostname = strip_tags($_POST['device_hostname']);
-if (Auth::user()->hasGlobalAdmin() && isset($device_hostname)) {
+$device_hostname = strip_tags((string) $_POST['device_hostname']);
+$device = DeviceCache::get($device_hostname);
+if ($device && Gate::allows('configBackupRefresh', $device)) {
     if ((new \App\ApiClients\Oxidized())->updateNode($device_hostname, 'LibreNMS GUI refresh', Auth::user()->username)) {
         $status = 'ok';
         $message = 'Queued refresh in oxidized for device ' . $device_hostname;

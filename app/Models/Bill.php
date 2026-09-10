@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Bill.php
  *
@@ -25,11 +26,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Bill extends Model
+class Bill extends BaseModel
 {
     use HasFactory;
 
@@ -38,20 +40,42 @@ class Bill extends Model
 
     // ---- Query Scopes ----
 
-    public function scopeHasAccess($query, User $user)
+    protected function scopeHasAccess(Builder $query, User $user): Builder
     {
-        if ($user->hasGlobalRead()) {
-            return $query;
-        }
-
-        return $query->join('bill_perms', 'bill_perms.bill_id', 'bills.bill_id')
-            ->where('bill_perms.user_id', $user->user_id);
+        return $this->hasBillAccess($query, $user);
     }
 
     // ---- Define Relationships ----
 
+    /**
+     * @return HasMany<BillData, $this>
+     */
+    public function data(): HasMany
+    {
+        return $this->hasMany(BillData::class, 'bill_id', 'bill_id');
+    }
+
+    /**
+     * @return HasMany<BillHistory, $this>
+     */
+    public function history(): HasMany
+    {
+        return $this->hasMany(BillHistory::class, 'bill_id', 'bill_id');
+    }
+
+    /**
+     * @return HasMany<BillPortCounter, $this>
+     */
+    public function portCounters(): HasMany
+    {
+        return $this->hasMany(BillPortCounter::class, 'bill_id', 'bill_id');
+    }
+
+    /**
+     * @return BelongsToMany<Port, $this>
+     */
     public function ports(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Port::class, 'bill_ports', 'bill_id', 'port_id');
+        return $this->belongsToMany(Port::class, 'bill_ports', 'bill_id', 'port_id');
     }
 }

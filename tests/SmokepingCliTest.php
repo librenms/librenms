@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SmokepingCliTest.php
  *
@@ -31,7 +32,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
-class SmokepingCliTest extends DBTestCase
+final class SmokepingCliTest extends DBTestCase
 {
     use DatabaseTransactions;
 
@@ -99,7 +100,7 @@ class SmokepingCliTest extends DBTestCase
         // We need an app instance available for these tests to load the translation machinary
         $this->app = $this->createApplication();
 
-        $this->instance = new SmokePingGenerateCommand();
+        $this->instance = new SmokepingGenerateCommand();
         $this->instance->disableDNSLookup();
         parent::setUp();
     }
@@ -388,7 +389,7 @@ class SmokepingCliTest extends DBTestCase
 
     public function canonicalise($input)
     {
-        $input = explode(PHP_EOL, $input);
+        $input = explode(PHP_EOL, (string) $input);
 
         $output = [];
 

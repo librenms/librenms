@@ -32,7 +32,7 @@ if (! empty($agent_data['munin'])) {
 
         d_echo("\n[$plugin_data]\n");
 
-        foreach (explode("\n", $plugin_data) as $line) {
+        foreach (explode("\n", (string) $plugin_data) as $line) {
             [$key, $value] = explode(' ', $line, 2);
             if (preg_match('/^graph_/', $key)) {
                 [,$key] = explode('_', $key);
@@ -97,7 +97,7 @@ if (! empty($agent_data['munin'])) {
                     'rrd_def' => RrdDefinition::make()->addDataset('val', $data['type']),
                     'rrd_name' => $base_rrd_name . '_' . $name,
                 ];
-                data_update($device, 'munin-plugins', $tags, $fields);
+                app('Datastore')->put($device, 'munin-plugins', $tags, $fields);
 
                 if (empty($ds_list[$ds_uniq])) {
                     $insert = [

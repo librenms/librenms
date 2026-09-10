@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Procurve.php
  *
@@ -25,9 +26,9 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\PortsNac;
 use App\Models\Transceiver;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
@@ -50,7 +51,7 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling, Transceive
                 'value' => $FdbAddressCount,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'fdb_count', $tags, $fields);
 
             $this->enableGraph('fdb_count');
@@ -67,7 +68,6 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling, Transceive
         }
 
         $rowSet = [];
-        $ifIndex_map = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
         $table = SnmpQuery::mibDir('hp')->mibs(['HP-DOT1X-EXTENSIONS-MIB'])->hideMib()->enumStrings()->walk('hpicfDot1xSMAuthConfigTable')->table(2);
 
@@ -107,7 +107,7 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling, Transceive
                 default => $row['dot1xAuthAuthControlledPortStatus']
             };
 
-            $rowSet[$ifIndex]['port_id'] = $ifIndex_map->get($ifIndex, 0);
+            $rowSet[$ifIndex]['port_id'] = (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice());
         }
 
         $table = SnmpQuery::mibs(['HP-DOT1X-EXTENSIONS-MIB'])->mibDir('hp')->hideMib()->enumStrings()->walk('hpicfDot1xAuthSessionStatsTable')->table(2);
@@ -141,22 +141,18 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling, Transceive
 
     public function discoverTransceivers(): Collection
     {
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
-        return SnmpQuery::cache()->walk('HP-ICF-TRANSCEIVER-MIB::hpicfXcvrInfoTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
-            return new Transceiver([
-                'port_id' => $ifIndexToPortId->get($ifIndex, 0),
-                'index' => $ifIndex,
-                'entity_physical_index' => $ifIndex,
-                'type' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrType'] ?? null,
-                'date' => isset($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrManufacDate']) ? Carbon::createFromFormat('mdy', $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrManufacDate'])->toDateString() : null,
-                'model' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrModel'] ?? null,
-                'serial' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrSerial'] ?? null,
-                'ddm' => empty($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrDiagnostics']) ? 0 : 1,
-                'distance' => isset($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrTxDist']) ? Number::extract($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrTxDist']) : null,
-                'wavelength' => isset($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrWavelength']) ? Number::extract($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrTxDist']) : null,
-                'connector' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrConnectorType'] ?? null,
-            ]);
-        });
+        return SnmpQuery::cache()->walk('HP-ICF-TRANSCEIVER-MIB::hpicfXcvrInfoTable')->mapTable(fn ($data, $ifIndex) => new Transceiver([
+            'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+            'index' => $ifIndex,
+            'entity_physical_index' => $ifIndex,
+            'type' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrType'] ?? null,
+            'date' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrManufacDate'] ?? null,
+            'model' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrModel'] ?? null,
+            'serial' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrSerial'] ?? null,
+            'ddm' => empty($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrDiagnostics']) ? 0 : 1,
+            'distance' => isset($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrTxDist']) ? Number::extract($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrTxDist']) : null,
+            'wavelength' => isset($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrWavelength']) ? Number::extract($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrTxDist']) : null,
+            'connector' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrConnectorType'] ?? null,
+        ]));
     }
 }

@@ -77,6 +77,7 @@ A3COM0352-STACK-CONFIG DEFINITIONS ::= BEGIN
 
 
    IMPORTS
+      a3Com FROM A3Com-products-MIB
       superStackIIconfig FROM A3COM0004-GENERIC
       PhysAddress, DisplayString FROM RFC1213-MIB
       OBJECT-TYPE FROM RFC-1212

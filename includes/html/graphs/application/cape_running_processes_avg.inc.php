@@ -15,14 +15,7 @@ if (isset($vars['package'])) {
 } else {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'running_processes']);
 }
-
-$rrd_list = [];
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $filename = $rrd_filename;
-    $descr = 'Average';
-    $ds = 's3running_processes';
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
+$descr = 'Average';
+$ds = 's3running_processes';
 
 require 'includes/html/graphs/generic_stats.inc.php';

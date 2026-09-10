@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FgTrapVpnTunTest.php
  *
@@ -31,7 +32,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class FgTrapVpnTunTest extends SnmpTrapTestCase
+final class FgTrapVpnTunTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

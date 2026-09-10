@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2015 Daniel Preussker <f0o@librenms.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +35,7 @@ class Clickatell extends Transport
         $url = 'https://platform.clickatell.com/messages/http/send';
         $params = [
             'apiKey' => $this->config['clickatell-token'],
-            'to' => implode(',', preg_split('/([,\r\n]+)/', $this->config['clickatell-numbers'])),
+            'to' => implode(',', preg_split('/([,\r\n]+)/', (string) $this->config['clickatell-numbers'])),
             'content' => $alert_data['title'],
         ];
 

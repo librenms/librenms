@@ -1,4 +1,5 @@
 <?php
+
 /**
  * JnxCmCfgChangeTest.php
  *
@@ -27,7 +28,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class JnxCmCfgChangeTest extends SnmpTrapTestCase
+final class JnxCmCfgChangeTest extends SnmpTrapTestCase
 {
     public function testConfigChangeTrap(): void
     {

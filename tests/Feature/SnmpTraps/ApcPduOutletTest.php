@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ApcPduOutletTest.php
  *
@@ -24,7 +25,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class ApcPduOutletTest extends SnmpTrapTestCase
+final class ApcPduOutletTest extends SnmpTrapTestCase
 {
     public function testOutletOff(): void
     {

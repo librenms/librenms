@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CiscoErrDisableInterfaceEventTest.php
  *
@@ -31,7 +32,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class CiscoErrDisableInterfaceEventTest extends SnmpTrapTestCase
+final class CiscoErrDisableInterfaceEventTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

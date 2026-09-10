@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Device.php
  *
@@ -121,6 +122,11 @@ class Device
     public function has(int $device_id): bool
     {
         return isset($this->devices[$device_id]);
+    }
+
+    public function fake(\App\Models\Device $device): void
+    {
+        $this->devices[$device->device_id] = $device;
     }
 
     private function load(mixed $value, string $field = 'device_id'): \App\Models\Device

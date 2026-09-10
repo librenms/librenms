@@ -1,4 +1,5 @@
 <?php
+
 /*
  * FgTrapIpsTest.php
  *
@@ -31,7 +32,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class FgTrapIpsTest extends SnmpTrapTestCase
+final class FgTrapIpsTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

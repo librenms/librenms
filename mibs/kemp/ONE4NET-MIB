@@ -1,17 +1,14 @@
 ONE4NET-MIB DEFINITIONS ::= BEGIN
 IMPORTS
-    OBJECT-TYPE, MODULE-IDENTITY, enterprises FROM SNMPv2-SMI;
+    MODULE-IDENTITY, enterprises FROM SNMPv2-SMI;
  
 
 one4net MODULE-IDENTITY
-    LAST-UPDATED "200201120000Z"
-    ORGANIZATION "One4net GmbH"
-    CONTACT-INFO
-        "email:      support@one4net.com"
-    DESCRIPTION
-	"one4net MIB."
-    REVISION	 "200201120000Z"
-    DESCRIPTION
-	"initial version"
-    ::= { enterprises 12196 }
+	LAST-UPDATED "201812070310Z"
+	ORGANIZATION "Kemp Technologies"
+	CONTACT-INFO "email: supportteam@kemptechnologies.com"
+	DESCRIPTION "one4net MIB."
+	REVISION "201812070310Z"
+	DESCRIPTION "Version 1.8"
+	::= { enterprises 12196 }
 END

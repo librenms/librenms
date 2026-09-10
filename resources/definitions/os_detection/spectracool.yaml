@@ -1,0 +1,13 @@
+os: spectracool
+group: nvent-hoffman
+text: 'nVent SpectraCool'
+type: environment
+over:
+    - { graph: device_temperature, text: 'Temperature' }
+icon: nvent-hoffman
+discovery:
+    -
+        sysObjectID:
+            - .0.0
+        sysDescr_regex:
+            - '/^RTCS /'

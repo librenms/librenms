@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2015 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2021 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description:  This MIB module defines MIB objects of hwIBTable, hw3GTable and hwSPRTrap.
 -- Reference:
--- Version: V1.12
+-- Version: V1.31
 -- History:
 -- V1.0 2007-10-21 publish
 -- ==================================================================
@@ -17,7 +17,7 @@
                 FROM SNMPv2-CONF            
             InterfaceIndex
                 FROM IF-MIB              
-            TimeTicks,Integer32, OBJECT-TYPE, MODULE-IDENTITY, Counter64, NOTIFICATION-TYPE           
+            TimeTicks, Unsigned32, Integer32, OBJECT-TYPE, MODULE-IDENTITY, Counter64, NOTIFICATION-TYPE           
   --           FROM SNMPv2-SMI;
   --       DisplayString,TruthValue,RowStatus   
   --           FROM SNMPv2-TC;
@@ -25,7 +25,7 @@
                 FROM SNMPv2-SMI;
                       
           hwWANMIB MODULE-IDENTITY 
-          LAST-UPDATED "201505251601Z"
+          LAST-UPDATED "202108161627Z"
           ORGANIZATION 
               "Huawei Technologies Co.,Ltd."
           CONTACT-INFO 
@@ -39,52 +39,97 @@
           DESCRIPTION 
               "The private mib file includes the general extent 
               information of the device.hwDatacomm(241).hwWANMIB" 
-             REVISION   "201505251601Z"
-          
-          DESCRIPTION    "V1.12, update version"
+          REVISION   "202108161627Z"
+          DESCRIPTION    "V1.31, update version"
 
-           REVISION   "201505151601Z"
-          
+          REVISION   "202106240957Z"
+          DESCRIPTION    "V1.30, update version"
+
+          REVISION   "202106151657Z"
+          DESCRIPTION    "V1.29, update version"
+
+          REVISION   "202104082001Z"
+          DESCRIPTION    "V1.28, update version"
+ 
+          REVISION   "202103261509Z"
+          DESCRIPTION    "V1.27, update version"
+
+          REVISION   "202103171138Z"
+          DESCRIPTION    "V1.26, update version"
+
+          REVISION   "202102021454Z"
+          DESCRIPTION    "V1.25, update version"
+
+          REVISION   "202102011631Z"
+          DESCRIPTION    "V1.24, update version"
+
+          REVISION   "202101201022Z"
+          DESCRIPTION    "V1.23, update version"
+
+          REVISION   "202012221146Z"
+          DESCRIPTION    "V1.22, update version"
+
+          REVISION   "202012091146Z"
+          DESCRIPTION    "V1.21, update version"
+
+          REVISION   "202009151601Z"
+          DESCRIPTION    "V1.20, update version"
+
+          REVISION   "202006221530Z"
+          DESCRIPTION    "V1.19, update version"
+
+          REVISION   "202006051042Z"
+          DESCRIPTION    "V1.18, update version"
+			  
+          REVISION   "202005301933Z"
+          DESCRIPTION    "V1.17, update version"
+		  
+          REVISION   "202003061741Z"
+          DESCRIPTION    "V1.16, update version"
+
+          REVISION   "202002071035Z"
+          DESCRIPTION    "V1.15, update version"
+		  
+          REVISION   "202001071501Z"
+          DESCRIPTION    "V1.14, update version"
+		  
+          REVISION   "201905151601Z"
+          DESCRIPTION    "V1.13, update version"
+
+          REVISION   "201904151601Z"
+          DESCRIPTION    "V1.12, update version"
+		  
+          REVISION   "201505151601Z"
           DESCRIPTION    "V1.11, update version"
  
-         REVISION   "201503171451Z"
-          
+          REVISION   "201503171451Z"
           DESCRIPTION    "V1.10, update version"
 	  
           REVISION   "201410071451Z"
-          
           DESCRIPTION    "V1.09, update version"
 
           REVISION   "201408081451Z"
-          
           DESCRIPTION    "V1.08, update version"
 
           REVISION   "201406201451Z"
-          
           DESCRIPTION    "V1.07, update version"
 
           REVISION   "201401091451Z"
-          
           DESCRIPTION    "V1.06, update version"
-
+		  
           REVISION   "201310162047Z"
-          
           DESCRIPTION    "V1.05, update version"
                     
           REVISION   "201309111647Z"
-          
           DESCRIPTION    "V1.04, update version"
 
           REVISION   "201308261942Z"
-          
           DESCRIPTION    "V1.03, update version"
 
           REVISION   "201306242018Z"
-          
           DESCRIPTION    "V1.02, update version"
-
+		  
           REVISION   "201304261142Z"
-          
           DESCRIPTION    "V1.01, update version"
 
           ::= { hwDatacomm 241 }
@@ -308,9 +353,9 @@
               hw3GRxRate
                   Integer32,  
               hw3GBytesSent
-                  Integer32,       
+                  Counter64,       
               hw3GBytesReceived
-                  Integer32,
+                  Counter64,
               hw3GBytesRateSent
                   Integer32, 
               hw3GBytesRateReceived
@@ -366,7 +411,13 @@
               hw3GNetworkConnectionSubType
                       OCTET STRING,
               hw3GUpTime
-                     TimeTicks
+                     TimeTicks,
+              hw3GCurrentNrRSRP
+                  OCTET STRING,
+              hw3GCurrentNrSINR
+                  OCTET STRING,
+              hw3GCurrentNrRSRQ
+                  OCTET STRING
                   }
     
      hw3GIfIndex OBJECT-TYPE
@@ -374,7 +425,7 @@
           MAX-ACCESS accessible-for-notify
           STATUS current
           DESCRIPTION
-              "3G or LTE index(es) of port(s) present on the device ."
+              "Index(es) of port(s) present on the device ."
           ::= { hw3GEntry 1 }
           
       hw3GModemStatus OBJECT-TYPE
@@ -385,7 +436,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-            "The ModemState of cellular interface is used to test 3G or LTE whether online or not"  
+            "The ModemState of cellular interface is used to test whether online or not"  
          ::= { hw3GEntry 11 }
     
       hw3GDeviceNumber OBJECT-TYPE
@@ -409,7 +460,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "3G or LTE License"
+              "License"
           ::= { hw3GEntry 14 }         
           
       hw3GDeviceSerialNumber OBJECT-TYPE
@@ -417,7 +468,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "3G or LTE Device Serial Number"
+              "Device Serial Number"
           ::= { hw3GEntry 15 }
           
       hw3GUIMStatus OBJECT-TYPE
@@ -429,7 +480,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-            "The Status of 3G or LTE UIM"  
+            "The Status of UIM"  
          ::= { hw3GEntry 16 }
 
        hw3GIMSI OBJECT-TYPE
@@ -437,7 +488,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "3G or LTE IMSI"
+              "IMSI"
           ::= { hw3GEntry 17 }
       
        hw3GMV OBJECT-TYPE
@@ -453,7 +504,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "3G or LTE Oper"
+              "Oper"
           ::= { hw3GEntry 19 } 
           
       hw3GCSQ OBJECT-TYPE
@@ -461,7 +512,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "3G or LTE Signal Intensity"
+              "Signal Intensity"
           ::= { hw3GEntry 20 }  
           
        hw3GAPNName OBJECT-TYPE
@@ -469,7 +520,7 @@
 	       MAX-ACCESS read-write
            STATUS current
            DESCRIPTION
-              "3G or LTE APN Name"
+              "APN Name"
            ::= { hw3GEntry 21 } 
            
         hw3GNetworkConnectionType OBJECT-TYPE
@@ -488,7 +539,7 @@
            MAX-ACCESS read-only
            STATUS current
            DESCRIPTION
-              "3G or LTE Network Connection Type"
+              "Network Connection Type"
            ::= { hw3GEntry 22 }  
             
         hw3GTotalConnectionTime  OBJECT-TYPE
@@ -496,7 +547,7 @@
            MAX-ACCESS read-only
            STATUS current
            DESCRIPTION
-              "3G or LTE Total Connection Time"
+              "Total Connection Time"
            ::= { hw3GEntry 23 }   
               
        hw3GTxRate  OBJECT-TYPE
@@ -504,7 +555,7 @@
            MAX-ACCESS read-only
            STATUS current
            DESCRIPTION
-              "3G or LTE sent Rate (packets/s)"
+              "Sent Rate (packets/s)"
            ::= { hw3GEntry 24 }   
 
         hw3GRxRate  OBJECT-TYPE
@@ -512,23 +563,23 @@
            MAX-ACCESS read-only
            STATUS current
            DESCRIPTION
-              "3G or LTE Receive Rate (packets/s)"
+              "Receive Rate (packets/s)"
            ::= { hw3GEntry 25 }   
              
       hw3GBytesSent OBJECT-TYPE
-          SYNTAX Integer32
+          SYNTAX Counter64
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "3G or LTE Bytes Sent (bytes)"
+              "Bytes Sent (bytes)"
           ::= { hw3GEntry 26 } 
               
       hw3GBytesReceived OBJECT-TYPE
-          SYNTAX Integer32
+          SYNTAX Counter64
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "3G or LTE Bytes Received (bytes)"
+              "Bytes Received (bytes)"
           ::= { hw3GEntry 27 }                              
  
       hw3GBytesRateSent OBJECT-TYPE
@@ -536,7 +587,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "3G or LTE Sent Bytes Rate (bytes/s)"
+              "Sent Bytes Rate (bytes/s)"
           ::= { hw3GEntry 28 } 
               
       hw3GBytesRateReceived OBJECT-TYPE
@@ -544,7 +595,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "3G or LTE Receive Bytes Rate (bytes/s)"
+              "Receive Bytes Rate (bytes/s)"
           ::= { hw3GEntry 29 }   
           
       hw3GUpBand OBJECT-TYPE
@@ -552,7 +603,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "3G or LTE Up Band"
+              "Up Band"
           ::= { hw3GEntry 30 } 
               
       hw3GDownBand OBJECT-TYPE
@@ -560,7 +611,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "3G or LTE Down Band"
+              "Down Band"
           ::= { hw3GEntry 31 }  
           
       hw3GPacketSessionStatus OBJECT-TYPE
@@ -587,7 +638,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "3G or LTE Network Current Connection Type"
+              "Network Current Connection Type"
           ::= { hw3GEntry 34 }
 
       hw3GCurrentRSSI OBJECT-TYPE
@@ -595,7 +646,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "Received Signal Strength Indicator, Only for LTE or WCDMA Network"           
+              "Received Signal Strength Indicator"           
           ::= { hw3GEntry 35 }
 
       hw3GCurrentRSCP OBJECT-TYPE
@@ -603,7 +654,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "Received Signal Code Power, Only for LTE or WCDMA Network"           
+              "Received Signal Code Power, only for 3G Network"           
           ::= { hw3GEntry 36 }
 
       hw3GCurrentECIO OBJECT-TYPE
@@ -611,7 +662,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "Energy Per Chip to Interference of Other Cell Ratio, Only for LTE or WCDMA Network"           
+              "Energy Per Chip to Interference of Other Cell Ratio, only for 3G Network"           
           ::= { hw3GEntry 37 }
 
       hw3GCurrentLteRSRP OBJECT-TYPE
@@ -619,7 +670,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "Reference Signal Received Power, Only for LTE or WCDMA Network"           
+              "Reference Signal Received Power, only for LTE Network"           
           ::= { hw3GEntry 38 }
 
       hw3GCurrentLteSINR OBJECT-TYPE
@@ -627,7 +678,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "Signal to Interference Plus Noise Ratio, Only for LTE or WCDMA Network"           
+              "Signal to Interference Plus Noise Ratio, only for LTE Network"           
           ::= { hw3GEntry 39 }
 
       hw3GCurrentLteRSRQ OBJECT-TYPE
@@ -635,7 +686,7 @@
           MAX-ACCESS read-only
           STATUS current
           DESCRIPTION
-              "Reference Signal Received Quality, Only for LTE or WCDMA Network"           
+              "Reference Signal Received Quality, only for LTE Network"           
           ::= { hw3GEntry 40 }
 
 -- 1.3.6.1.4.1.2011.5.25.241.1.2.1.1.41
@@ -644,7 +695,7 @@
 		MAX-ACCESS read-only
 		STATUS current
 		DESCRIPTION
-			"3G or LTE Network Current IMEI "
+			"Network Current IMEI "
 		::= { hw3GEntry 41 }
 
 -- 1.3.6.1.4.1.2011.5.25.241.1.2.1.1.42
@@ -653,7 +704,7 @@
 		MAX-ACCESS read-only
 		STATUS current
 		DESCRIPTION
-			"3G or LTE Network Current MSISDN "
+			"Network Current MSISDN "
 		::= { hw3GEntry 42 }
 
 -- 1.3.6.1.4.1.2011.5.25.241.1.2.1.1.43
@@ -662,7 +713,7 @@
 		MAX-ACCESS read-only
 		STATUS current
 		DESCRIPTION
-			"3G or LTE Network Current MCC "
+			"Network Current MCC "
 		::= { hw3GEntry 43 }
 	
 -- 1.3.6.1.4.1.2011.5.25.241.1.2.1.1.44
@@ -671,7 +722,7 @@
 		MAX-ACCESS read-only
 		STATUS current
 		DESCRIPTION
-			"3G or LTE Network Current MNC "
+			"Network Current MNC "
 		::= { hw3GEntry 44 }
 
 -- 1.3.6.1.4.1.2011.5.25.241.1.2.1.1.45
@@ -680,7 +731,7 @@
 		MAX-ACCESS read-write
 		STATUS current
 		DESCRIPTION
-			"3G or LTE APN User name"
+			"APN User name"
 		::= { hw3GEntry 45 }
 
 -- 1.3.6.1.4.1.2011.5.25.241.1.2.1.1.46
@@ -689,7 +740,7 @@
 		MAX-ACCESS read-write
 		STATUS current
 		DESCRIPTION
-			"3G or LTE APN password"
+			"APN password"
 		::= { hw3GEntry 46 }
 -- 1.3.6.1.4.1.2011.5.25.241.1.2.1.1.47
 	hw3GBER OBJECT-TYPE
@@ -697,7 +748,7 @@
 		MAX-ACCESS read-only
 		STATUS current
 		DESCRIPTION
-			"3G or LTE Network Current BER "
+			"Network Current BER "
 		::= { hw3GEntry 47 }
 
 -- 1.3.6.1.4.1.2011.5.25.241.1.2.1.1.48
@@ -706,7 +757,7 @@
 		MAX-ACCESS read-only
 		STATUS current
 		DESCRIPTION
-			"3G or LTE Network Current cellid "
+			"Network Current cellid "
 		::= { hw3GEntry 48 }
 
 -- 1.3.6.1.4.1.2011.5.25.241.1.2.1.1.49
@@ -715,7 +766,7 @@
 		MAX-ACCESS read-only
 		STATUS current
 		DESCRIPTION
-			"3G or LTE sim card switch counts "
+			"Sim card switch counts "
 		::= { hw3GEntry 49 }
 
 -- 1.3.6.1.4.1.2011.5.25.241.1.2.1.1.50
@@ -765,7 +816,7 @@
 		MAX-ACCESS read-only
 		STATUS current
 		DESCRIPTION
-		                    "3G or LTE Connection Status"
+		                    "Connection Status"
 		::= { hw3GEntry 53 }
 		
 	hw3GNetworkConnectionSubType OBJECT-TYPE
@@ -773,7 +824,7 @@
 		MAX-ACCESS read-only
 		STATUS current
 		DESCRIPTION
-		                    "3G or LTE Network Connection SubType"
+		                    "Network Connection SubType"
 		::= { hw3GEntry 54 }
 		
 	hw3GUpTime OBJECT-TYPE
@@ -781,8 +832,32 @@
 		MAX-ACCESS read-only
 		STATUS current
 		DESCRIPTION
-		                      "3G or LTE Connect Time"
-		::= { hw3GEntry 55 }                          
+		                      "Connection Time"
+		::= { hw3GEntry 55 }  
+ 
+      hw3GCurrentNrRSRP OBJECT-TYPE
+          SYNTAX OCTET STRING(SIZE (0..16))
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "Reference Signal Received Power, Only for NR Network"           
+          ::= { hw3GEntry 56 }
+
+      hw3GCurrentNrSINR OBJECT-TYPE
+          SYNTAX OCTET STRING(SIZE (0..16))
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "Signal to Interference Plus Noise Ratio, Only for NR Network"           
+          ::= { hw3GEntry 57 }
+
+      hw3GCurrentNrRSRQ OBJECT-TYPE
+          SYNTAX OCTET STRING(SIZE (0..16))
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "Reference Signal Received Quality, Only for NR Network"           
+          ::= { hw3GEntry 58 }                       
           
       hwSPRMIBTrap OBJECT IDENTIFIER ::= { hwWANMIB 2 }
       hwSPRTrapOid OBJECT IDENTIFIER ::= { hwSPRMIBTrap 1 }
@@ -909,8 +984,327 @@
                 The notification indicates that the current link of SPR service map was changed.
                 "
             ::= { hwSPRTraps 1 }
-            
-            
+
+      hwSPRInstanceReport NOTIFICATION-TYPE
+            OBJECTS { hwSPRSiteIndex,
+                      hwSPRPolicyName,
+                      hwSPRPreviousLink,
+                      hwSPRPreviousLinkLoss,
+                      hwSPRPreviousLinkDelay,
+                      hwSPRPreviousLinkJitter,
+                      hwSPRPreviousLinkCMI,
+                      hwSPRCurrentLink,
+                      hwSPRCurrentLinkLoss,
+                      hwSPRCurrentLinkDelay,
+                      hwSPRCurrentLinkJitter,
+                      hwSPRCurrentLinkCMI,
+                      hwSPRChangedReason }
+            STATUS current
+            DESCRIPTION
+                "
+                The notification indicates that the current link of SPR instacne was changed.
+                "
+            ::= { hwSPRTraps 2 }
+
+      hwSPRSiteLinkDegrade NOTIFICATION-TYPE
+            OBJECTS { hwSPRSiteIndex,
+                      hwSPRVpnInstance,
+                      hwSPRPolicyIndex,
+                      hwSPRWorstLinkLoss,
+                      hwSPRWorstLinkDelay,
+                      hwSPRWorstLinkJitter,
+                      hwSPRBestLinkLoss,
+                      hwSPRBestLinkDelay,
+                      hwSPRBestLinkJitter }
+            STATUS current
+            DESCRIPTION
+                "
+                The notification indicates that SPR detects site link degrade.
+                "
+            ::= { hwSPRTraps 3 }
+
+      hwSPRSiteLinkResume NOTIFICATION-TYPE
+            OBJECTS { hwSPRSiteIndex,
+                      hwSPRVpnInstance,
+                      hwSPRPolicyIndex,
+                      hwSPRWorstLinkLoss,
+                      hwSPRWorstLinkDelay,
+                      hwSPRWorstLinkJitter,
+                      hwSPRBestLinkLoss,
+                      hwSPRBestLinkDelay,
+                      hwSPRBestLinkJitter }
+            STATUS current
+            DESCRIPTION
+                "
+                The notification indicates that SPR detects site link resume.
+                "
+            ::= { hwSPRTraps 4 }
+
+      hwSPRInstanceChangedStatistics NOTIFICATION-TYPE
+            OBJECTS { hwSPRSiteIndex,
+                      hwSPRPolicyName,
+                      hwSPRChangedReason,
+                      hwSPRChangedCount,
+                      hwSPRStatisticalTime }
+            STATUS current
+            DESCRIPTION
+                "
+                The notification indicates that the current link of SPR instacne was changed in a period of time.
+                "
+            ::= { hwSPRTraps 5 }
+
+--  ============== spr instacne ==============
+      hwSPRInstanceTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwSPRInstanceEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the attribute of the SPR instance."
+          ::= { hwSPR 2 }
+
+      hwSPRInstanceEntry OBJECT-TYPE
+          SYNTAX HwSPRInstanceEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+                "Indicates the attribute of the SPR instance."
+          INDEX  { hwSPRSiteIndex, hwSPRPolicyName}    
+          ::= { hwSPRInstanceTable 1 } 
+
+      HwSPRInstanceEntry  ::= 
+          SEQUENCE{
+              hwSPRSiteIndex
+                  Unsigned32,
+              hwSPRVpnInstance
+                  OCTET STRING,
+              hwSPRPolicyName
+                  OCTET STRING,
+              hwSPRPreviousLink 
+                  OCTET STRING,
+              hwSPRPreviousLinkLoss
+                  Unsigned32,
+              hwSPRPreviousLinkDelay
+                  Unsigned32,
+              hwSPRPreviousLinkJitter
+                  Unsigned32,
+              hwSPRPreviousLinkCMI
+                  Unsigned32,
+              hwSPRCurrentLink
+                  OCTET STRING,
+              hwSPRChangedReason
+                  OCTET STRING,
+              hwSPRPolicyIndex
+                  Unsigned32,
+              hwSPRWorstLinkLoss
+                  Unsigned32,
+              hwSPRWorstLinkDelay
+                  Unsigned32,
+              hwSPRWorstLinkJitter
+                  Unsigned32,
+              hwSPRBestLinkLoss
+                  Unsigned32,
+              hwSPRBestLinkDelay
+                  Unsigned32,
+              hwSPRBestLinkJitter
+                  Unsigned32,
+              hwSPRChangedCount
+                  Unsigned32,
+              hwSPRStatisticalTime
+                  Unsigned32,
+              hwSPRCurrentLinkLoss
+                  Unsigned32,
+              hwSPRCurrentLinkDelay
+                  Unsigned32,
+              hwSPRCurrentLinkJitter
+                  Unsigned32,
+              hwSPRCurrentLinkCMI
+                  Unsigned32
+            }
+
+      hwSPRSiteIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the destination site of SPR instance."
+            ::= { hwSPRInstanceEntry 1 }  
+
+      hwSPRVpnInstance OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE (0..32))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VPN instance of SPR instance."
+            ::= { hwSPRInstanceEntry 2 }  
+
+      hwSPRPolicyName OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE (0..128))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the policy name of SPR instance."
+            ::= { hwSPRInstanceEntry 3 } 
+
+      hwSPRPreviousLink OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the previous link of SPR instance."
+            ::= { hwSPRInstanceEntry 4 }  
+
+      hwSPRPreviousLinkLoss OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the loss value of previous link."
+            ::= { hwSPRInstanceEntry 5 }  
+
+      hwSPRPreviousLinkDelay OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the delay value of previous link."
+            ::= { hwSPRInstanceEntry 6 }  
+
+      hwSPRPreviousLinkJitter OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the jitter value of previous link."
+            ::= { hwSPRInstanceEntry 7 }  
+
+      hwSPRPreviousLinkCMI OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the CMI(Composite Measure Indicator) value of previous link."
+            ::= { hwSPRInstanceEntry 8 }  
+
+      hwSPRCurrentLink OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the current link of SPR instance."
+            ::= { hwSPRInstanceEntry 9 }  
+
+      hwSPRChangedReason OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the changed reason of SPR instance."
+            ::= { hwSPRInstanceEntry 10 }
+
+      hwSPRPolicyIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the policy index of SPR instance."
+            ::= { hwSPRInstanceEntry 11 }
+
+      hwSPRWorstLinkLoss OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the loss value of worst link."
+            ::= { hwSPRInstanceEntry 12 }
+
+      hwSPRWorstLinkDelay OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the delay value of worst link."
+            ::= { hwSPRInstanceEntry 13 }
+
+      hwSPRWorstLinkJitter OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the jitter value of worst link."
+            ::= { hwSPRInstanceEntry 14 }
+
+      hwSPRBestLinkLoss OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the loss value of best link."
+            ::= { hwSPRInstanceEntry 15 }
+
+      hwSPRBestLinkDelay OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the delay value of best link."
+            ::= { hwSPRInstanceEntry 16 }
+
+      hwSPRBestLinkJitter OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the jitter value of best link."
+            ::= { hwSPRInstanceEntry 17 }
+
+      hwSPRChangedCount OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the changed count of SPR instance."
+            ::= { hwSPRInstanceEntry 18 }
+
+      hwSPRStatisticalTime OBJECT-TYPE
+            SYNTAX Unsigned32 (120..86400)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the statistic time of SPR instance."
+            ::= { hwSPRInstanceEntry 19 }
+
+      hwSPRCurrentLinkLoss OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the loss value of current link."
+            ::= { hwSPRInstanceEntry 20 }  
+
+      hwSPRCurrentLinkDelay OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the delay value of current link."
+            ::= { hwSPRInstanceEntry 21 }  
+
+      hwSPRCurrentLinkJitter OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the jitter value of current link."
+            ::= { hwSPRInstanceEntry 22 }  
+
+      hwSPRCurrentLinkCMI OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the CMI(Composite Measure Indicator) value of current link."
+            ::= { hwSPRInstanceEntry 23 }  
+
 --  ============== conformance information ==============
         hwWANConformance OBJECT IDENTIFIER ::= { hwWANMIB 3 }
         
@@ -1000,7 +1394,10 @@
                hw3GFirmwareVersion,
                 hw3GConnectionStatus, 
                 hw3GNetworkConnectionSubType ,
-                hw3GUpTime
+                hw3GUpTime,
+                hw3GCurrentNrRSRP,
+                hw3GCurrentNrSINR,
+                hw3GCurrentNrRSRQ
             }          
             STATUS current
             DESCRIPTION 
@@ -1041,8 +1438,12 @@
                     
         hwSPRTrapsGroup NOTIFICATION-GROUP
             NOTIFICATIONS {
-                hwSPRServiceReport
-                    }            
+                hwSPRServiceReport,
+                hwSPRInstanceReport,
+                hwSPRSiteLinkDegrade,
+                hwSPRSiteLinkResume,
+                hwSPRInstanceChangedStatistics
+                    }
             STATUS current
             DESCRIPTION 
                 "The SPR Traps group."
@@ -1073,7 +1474,34 @@
 		STATUS current
 		DESCRIPTION 
 			"The 3G MIB Traps group."
-		::= { hwWANGroups 9 }                       
+		::= { hwWANGroups 9 }
+
+    hwSPRInstanceGroup OBJECT-GROUP
+            OBJECTS { 
+              hwSPRSiteIndex,
+              hwSPRVpnInstance,
+              hwSPRPolicyName,
+              hwSPRPreviousLink,
+              hwSPRPreviousLinkLoss,
+              hwSPRPreviousLinkDelay,
+              hwSPRPreviousLinkJitter,
+              hwSPRPreviousLinkCMI,
+              hwSPRCurrentLink,
+              hwSPRChangedReason,
+              hwSPRPolicyIndex,
+              hwSPRWorstLinkLoss,
+              hwSPRWorstLinkDelay,
+              hwSPRWorstLinkJitter,
+              hwSPRBestLinkLoss,
+              hwSPRBestLinkDelay,
+              hwSPRBestLinkJitter,
+              hwSPRChangedCount,
+              hwSPRStatisticalTime
+            }
+            STATUS current
+            DESCRIPTION 
+                "The SPR Instance group."
+            ::= { hwWANGroups 10 }
 
 -- 1.3.6.1.4.1.2011.5.25.241.4
         hwWANMIBNotifications OBJECT IDENTIFIER ::= { hwWANMIB 4 }
@@ -1120,7 +1548,7 @@
             ::= { hw3GMIBTrapOid 1 }  
             
         hw3GMIBTrapOldCellId  OBJECT-TYPE
-            SYNTAX Integer32 
+            SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -1128,7 +1556,7 @@
             ::= { hw3GMIBTrapOid 2 }   
               
         hw3GMIBTrapNewCellId  OBJECT-TYPE
-            SYNTAX Integer32 
+            SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -1145,8 +1573,525 @@
                 The notification indicates that interface  cellId was changed.
                 "
             ::= { hw3GMIBTraps 1 }      
-END
 
+--  ============== evpn trap ==============
+
+	  hwConnectionMIBTrap OBJECT IDENTIFIER ::= { hwWANMIB 6 }
+      hwConnectionTrapDefine OBJECT IDENTIFIER ::= { hwConnectionMIBTrap 1 }
+      
+      hwConnection OBJECT IDENTIFIER ::= { hwConnectionMIBTrap 2 }
+ 
+      hwConnectionTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwConnectionEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the attribute of the connection."
+          ::= { hwConnection 1 }
+            
+      hwConnectionEntry OBJECT-TYPE
+          SYNTAX HwConnectionEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+                "Indicates the attribute of the connection."
+          INDEX  { hwConnectionIndex }    
+          ::= { hwConnectionTable 1 }           
+    
+      HwConnectionEntry  ::= 
+          SEQUENCE{
+              hwConnectionIndex
+                  Unsigned32,   
+              hwConnectionDestSite
+                  Unsigned32,   
+              hwConnectionSrcSite
+                  Unsigned32,   
+              hwConnectionDestTnp
+                  Unsigned32,   
+              hwConnectionSrcTnp
+                  Unsigned32,
+              hwConnectionDownReason
+                  OCTET STRING
+                  }
+                
+      hwConnectionIndex  OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the index of connection."
+            ::= { hwConnectionEntry 1 }     
+            
+      hwConnectionDestSite OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the destination site of connection."
+            ::= { hwConnectionEntry 2 }         
+            
+      hwConnectionSrcSite OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the source site of connection."
+            ::= { hwConnectionEntry 3 }    
+                                                  
+      hwConnectionDestTnp OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the destination transport network point of connection."
+            ::= { hwConnectionEntry 4 }    
+                                                  
+      hwConnectionSrcTnp OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the source transport network point of connection."
+            ::= { hwConnectionEntry 5 }
+
+      hwConnectionDownReason OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the reason of the connection down."
+            ::= { hwConnectionEntry 6 }
+
+--  ============== Connection Spec ==============		
+	
+      hwConnectionSpecTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwConnectionSpecEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "Indicates the attribute of the connection."
+          ::= { hwConnection 2 }
+            
+      hwConnectionSpecEntry OBJECT-TYPE
+          SYNTAX HwConnectionSpecEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+                "Indicates the attribute of the connection."
+          INDEX  { hwConnectionMaxLimit }    
+          ::= { hwConnectionSpecTable 1 }           
+    
+      HwConnectionSpecEntry::= 
+          SEQUENCE{
+              hwConnectionMaxLimit
+                  Unsigned32,
+              hwConnectionKaInterval 
+                  Unsigned32,	
+              hwConnectionCurrentNumber
+                  Unsigned32,	
+              hwConnectionThreshold
+                  Unsigned32,
+              hwConnectionResumeThreshold
+                  Unsigned32
+                  }
+
+      hwConnectionMaxLimit OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the maximum number of connections."
+            ::= { hwConnectionSpecEntry 1 }
+
+      hwConnectionKaInterval OBJECT-TYPE
+            SYNTAX Unsigned32 (10..2000)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the maximum number of connections."
+            ::= { hwConnectionSpecEntry 2 }
+			
+      hwConnectionCurrentNumber OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the current number of connections."
+            ::= { hwConnectionSpecEntry 3 }
+			
+      hwConnectionThreshold OBJECT-TYPE
+            SYNTAX Unsigned32 (0..100)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the threshold of connections."
+            ::= { hwConnectionSpecEntry 4 }
+
+      hwConnectionResumeThreshold OBJECT-TYPE
+            SYNTAX Unsigned32 (0..100)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the resuming threshold of connections."
+            ::= { hwConnectionSpecEntry 5 }
+			
+      hwConnectionTraps OBJECT IDENTIFIER ::= { hwConnectionMIBTrap 3 }
+      
+         hwConnectionUpReport NOTIFICATION-TYPE
+            OBJECTS {hwConnectionIndex, hwConnectionDestSite, hwConnectionSrcSite, hwConnectionDestTnp, hwConnectionSrcTnp}
+            STATUS current
+            DESCRIPTION
+                "
+                The notification indicates that the connection has entered UP state.
+                "
+            ::= { hwConnectionTraps 1 }
+			
+         hwConnectionDownReport NOTIFICATION-TYPE
+            OBJECTS {hwConnectionIndex, hwConnectionDestSite, hwConnectionSrcSite, hwConnectionDestTnp, hwConnectionSrcTnp, hwConnectionDownReason}
+            STATUS current
+            DESCRIPTION
+                "
+                The notification indicates that the connection has entered DOWN state.
+                "
+            ::= { hwConnectionTraps 2 }			
+			
+         hwConnectionMaxExceed NOTIFICATION-TYPE
+            OBJECTS {hwConnectionMaxLimit}
+            STATUS current
+            DESCRIPTION
+                "This notification is generated when the number of connections exceeds the maximum number."
+            ::= { hwConnectionTraps 3 }		
+
+         hwConnectionMaxClear NOTIFICATION-TYPE
+            OBJECTS {hwConnectionMaxLimit}
+            STATUS current
+            DESCRIPTION
+                "This notification is generated when the number of connections decreases below the maximum number."
+            ::= { hwConnectionTraps 4 }	
+
+         hwConnectionThresholdExceed NOTIFICATION-TYPE
+            OBJECTS {hwConnectionMaxLimit, hwConnectionCurrentNumber, hwConnectionThreshold, hwConnectionResumeThreshold}
+            STATUS current
+            DESCRIPTION
+                "This notification is generated when the number of connections exceeds the threshold number."
+            ::= { hwConnectionTraps 5 }		
+
+         hwConnectionThresholdClear NOTIFICATION-TYPE
+            OBJECTS {hwConnectionMaxLimit, hwConnectionCurrentNumber, hwConnectionThreshold, hwConnectionResumeThreshold}
+            STATUS current
+            DESCRIPTION
+                "This notification is generated when the number of connections decreases below the resuming threshold number."
+            ::= { hwConnectionTraps 6 }				
+            
+--  ============== conformance information ==============
+        hwConnectionConformance OBJECT IDENTIFIER ::= { hwWANMIB 7 }
+        
+        
+        hwConnectionCompliances OBJECT IDENTIFIER ::= { hwConnectionConformance 1 }
+        hwConnectionCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    { hwConnectionGroup, hwConnectionTrapsGroup }  
+                                               
+              ::= { hwConnectionCompliances 1 }  
+              
+       
+        --  ============== groups ==============  
+        hwEVPNGroups OBJECT IDENTIFIER ::= { hwConnectionConformance 2 } 
+        
+        hwConnectionGroup OBJECT-GROUP
+            OBJECTS { 
+                hwConnectionIndex,
+                hwConnectionDestSite,
+                hwConnectionSrcSite,
+                hwConnectionDestTnp,
+                hwConnectionSrcTnp,
+                hwConnectionMaxLimit, 
+                hwConnectionKaInterval,
+                hwConnectionCurrentNumber,
+                hwConnectionThreshold,
+                hwConnectionResumeThreshold,
+                hwConnectionDownReason
+                    }            
+            STATUS current
+            DESCRIPTION 
+                "The connection group."
+            ::= { hwEVPNGroups 1 }
+
+                    
+        hwConnectionTrapsGroup NOTIFICATION-GROUP
+            NOTIFICATIONS {
+                hwConnectionUpReport,hwConnectionDownReport,hwConnectionMaxExceed,hwConnectionMaxClear,hwConnectionThresholdExceed,hwConnectionThresholdClear
+                    }            
+            STATUS current
+            DESCRIPTION 
+                "The connection Traps group."
+            ::= { hwEVPNGroups 2 }            
+
+--  ============== ms-channel trap ==============
+
+	  hwMschannelMIBTrap OBJECT IDENTIFIER ::= { hwWANMIB 8 }      			
+      hwMschannelTraps OBJECT IDENTIFIER ::= { hwMschannelMIBTrap 1 }
+      
+         hwMschannelUpReport NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "
+                The notification indicates that the ms-channel has entered UP state.
+                "
+            ::= { hwMschannelTraps 1 }
+			
+         hwMschannelDownReport NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "
+                The notification indicates that the ms-channel has entered DOWN state.
+                "
+            ::= { hwMschannelTraps 2 }			
+						
+--  ============== conformance information ==============
+        hwMschannelConformance OBJECT IDENTIFIER ::= { hwWANMIB 9 }
+   
+        hwMschannelCompliances OBJECT IDENTIFIER ::= { hwMschannelConformance 1 }
+        hwMschannelCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    { hwMschannelTrapsGroup }  
+                                               
+              ::= { hwMschannelCompliances 1 }  
+
+        --  ============== groups ==============  
+        hwMschannelGroups OBJECT IDENTIFIER ::= { hwMschannelConformance 2 } 
+                           
+        hwMschannelTrapsGroup NOTIFICATION-GROUP
+            NOTIFICATIONS {
+                hwMschannelUpReport,hwMschannelDownReport
+                    }            
+            STATUS current
+            DESCRIPTION 
+                "The mschannel Traps group."
+            ::= { hwMschannelGroups 1 }                  
+       --  ==============fpm ==============
+       -- 1.3.6.1.4.1.2011.5.25.241.10
+	hwTcpFpm OBJECT IDENTIFIER ::= { hwWANMIB 10 }
+
+	
+	-- 1.3.6.1.4.1.2011.5.25.241.10.1
+	hwTcpFpmTrapObject OBJECT IDENTIFIER ::= { hwTcpFpm 1 }
+
+	
+	-- 1.3.6.1.4.1.2011.5.25.241.10.1.1
+	hwTcpfpmSessionMaxNumber OBJECT-TYPE
+		SYNTAX Unsigned32 (0..4294967295)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Tcp fpm session max number."
+		::= { hwTcpFpmTrapObject 1 }
+
+	
+	-- 1.3.6.1.4.1.2011.5.25.241.10.2
+	hwTcpfpmTraps OBJECT IDENTIFIER ::= { hwTcpFpm 2 }
+
+	
+	-- 1.3.6.1.4.1.2011.5.25.241.10.2.1
+	hwTcpfpmSessionMaxExceed NOTIFICATION-TYPE
+		OBJECTS { hwTcpfpmSessionMaxNumber }
+		STATUS current
+		DESCRIPTION 
+			 "This notification is generated when the number of tcp fpm session number exceeds the maximum number."
+		::= { hwTcpfpmTraps 1 }
+
+	
+	-- 1.3.6.1.4.1.2011.5.25.241.10.2.2
+	hwTcpfpmSessionMaxClear NOTIFICATION-TYPE
+		OBJECTS { hwTcpfpmSessionMaxNumber }
+		STATUS current
+		DESCRIPTION 
+			"This notification is generated when the number of tcp fpm session number decreases below the resuming threshold number."
+		::= { hwTcpfpmTraps 2 }
+
+	
+	-- 1.3.6.1.4.1.2011.5.25.241.10.3
+	hwTcpFpmConformance OBJECT IDENTIFIER ::= { hwTcpFpm 3 }
+
+	
+	-- 1.3.6.1.4.1.2011.5.25.241.10.3.1
+	hwTcpFpmCompliances OBJECT IDENTIFIER ::= { hwTcpFpmConformance 1 }
+
+	
+	-- 1.3.6.1.4.1.2011.5.25.241.10.3.1.1
+	hwTcpFpmCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION 
+			"The compliance statement for systems supporting 
+			the this module."
+		MODULE -- this module
+			MANDATORY-GROUPS { hwTcpFpmTrapsGroup}
+		::= { hwTcpFpmCompliances 1 }
+
+	
+	-- 1.3.6.1.4.1.2011.5.25.241.10.3.2
+	hwTcpFpmGroups OBJECT IDENTIFIER ::= { hwTcpFpmConformance 2 }
+
+	
+	-- 1.3.6.1.4.1.2011.5.25.241.10.3.2.1
+	hwTcpFpmTrapsGroup NOTIFICATION-GROUP
+		NOTIFICATIONS { hwTcpfpmSessionMaxExceed, hwTcpfpmSessionMaxClear }
+		STATUS current
+		DESCRIPTION 
+			"The fpm traps group."
+		::= { hwTcpFpmGroups 1 }
+
+	
+	-- 1.3.6.1.4.1.2011.5.25.241.10.3.2.2
+	hwTcpFpmTrapsObjectGroup OBJECT-GROUP
+		OBJECTS { hwTcpfpmSessionMaxNumber }
+		STATUS current
+		DESCRIPTION 
+			"The fpm traps object group."
+		::= { hwTcpFpmGroups 2 }
+
+		
+	hwRuMIBTrap OBJECT IDENTIFIER ::= { hwWANMIB 11 }
+        hwRuMIBTrapObject OBJECT IDENTIFIER ::= { hwRuMIBTrap 1 } 
+			hwRuMIBTrapIfName  OBJECT-TYPE
+				SYNTAX OCTET STRING(SIZE (0..64))
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Interface Name"
+				::= { hwRuMIBTrapObject 1 }  
+				
+			hwRuMIBTrapRuIndex  OBJECT-TYPE
+				SYNTAX Integer32 
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Remote Unit index"
+				::= { hwRuMIBTrapObject 2 }   
+				  
+			hwRuMIBTrapRuType  OBJECT-TYPE
+				SYNTAX OCTET STRING(SIZE (0..64))
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Remote Unit type"
+				::= { hwRuMIBTrapObject 3 }
+				
+			hwRuMIBTrapRuESN  OBJECT-TYPE
+				SYNTAX OCTET STRING(SIZE (0..64))
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Remote Unit ESN"
+				::= { hwRuMIBTrapObject 4 }
+			
+			hwRuMIBTrapRuIP  OBJECT-TYPE
+				SYNTAX OCTET STRING(SIZE (0..64))
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Remote Unit IP"
+				::= { hwRuMIBTrapObject 5 }
+				
+			hwRuMIBTrapAlarmType  OBJECT-TYPE
+				SYNTAX OCTET STRING(SIZE (0..64))
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Remote Unit alarm type"
+				::= { hwRuMIBTrapObject 6 }
+				
+			hwRuMIBTrapAlarmID  OBJECT-TYPE
+				SYNTAX Integer32 
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Remote Unit alarm ID"
+				::= { hwRuMIBTrapObject 7 }
+				
+			hwRuMIBTrapAlarmDesc  OBJECT-TYPE
+				SYNTAX OCTET STRING(SIZE (0..256))
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Remote Unit alarm description"
+				::= { hwRuMIBTrapObject 8 }
+                
+        hwRuMIBTraps   OBJECT IDENTIFIER ::= { hwRuMIBTrap 2 }   
+			hwRuMIBTrapRuOnline NOTIFICATION-TYPE
+				OBJECTS {hwRuMIBTrapIfName, hwRuMIBTrapRuIndex, hwRuMIBTrapRuType, hwRuMIBTrapRuESN, hwRuMIBTrapRuIP}
+				STATUS current
+				DESCRIPTION
+					" The notification indicates that Remote Unit is online."
+				::= { hwRuMIBTraps 1 }
+
+		    hwRuMIBTrapRuOffline NOTIFICATION-TYPE
+				OBJECTS {hwRuMIBTrapIfName, hwRuMIBTrapRuIndex, hwRuMIBTrapRuType, hwRuMIBTrapRuESN, hwRuMIBTrapRuIP}
+				STATUS current
+				DESCRIPTION
+					" The notification indicates that Remote Unit is offline."
+				::= { hwRuMIBTraps 2 }
+
+			hwRuMIBTrapReportAlarm NOTIFICATION-TYPE
+				OBJECTS {hwRuMIBTrapIfName, hwRuMIBTrapRuESN, hwRuMIBTrapAlarmType, hwRuMIBTrapAlarmID, hwRuMIBTrapAlarmDesc}
+				STATUS current
+				DESCRIPTION
+					" The notification indicates that Remote Unit report one alarm."
+				::= { hwRuMIBTraps 3 }
+
+			hwRuMIBTrapReportResume NOTIFICATION-TYPE
+				OBJECTS {hwRuMIBTrapIfName, hwRuMIBTrapRuESN, hwRuMIBTrapAlarmType, hwRuMIBTrapAlarmID, hwRuMIBTrapAlarmDesc}
+				STATUS current
+				DESCRIPTION
+					" The notification indicates that Remote Unit report one alarm resumed."
+				::= { hwRuMIBTraps 4 }                  
+
+        --  ==============IEC101==============
+        -- 1.3.6.1.4.1.2011.5.25.241.12
+        hwIEC101 OBJECT IDENTIFIER ::= { hwWANMIB 12 }
+
+        -- 1.3.6.1.4.1.2011.5.25.241.12.1
+        hwIEC101MIBTrapObject OBJECT IDENTIFIER ::= { hwIEC101 1 } 
+                
+        -- 1.3.6.1.4.1.2011.5.25.241.12.1.1
+        hwIEC101SlaveLinkAddress  OBJECT-TYPE
+            SYNTAX Unsigned32 (1..65535)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The iec101 slave link address."
+            ::= { hwIEC101MIBTrapObject 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.241.12.2
+        hwIEC101MIBTraps   OBJECT IDENTIFIER ::= { hwIEC101 2 }   
+        
+        -- 1.3.6.1.4.1.2011.5.25.241.12.2.1
+        hwIEC101SlaveConnected  NOTIFICATION-TYPE
+            OBJECTS {hwIEC101SlaveLinkAddress}
+            STATUS current
+            DESCRIPTION
+                "The iec101 slave is connected."
+            ::= { hwIEC101MIBTraps 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.241.12.2.2
+        hwIEC101SlaveDisconnected  NOTIFICATION-TYPE
+            OBJECTS {hwIEC101SlaveLinkAddress}
+            STATUS current
+            DESCRIPTION
+                "The iec101 slave is disconnected."
+            ::= { hwIEC101MIBTraps 2 }
+
+
+END
 --
 -- HUAWEI-WAN-MIB.mib
---

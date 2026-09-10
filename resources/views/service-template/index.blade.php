@@ -41,7 +41,7 @@
                             <td>{{ $template->name }}</td>
                             <td>{{ $template->desc }}</td>
                             <td>
-                                <a href="{{ url("/devices/serviceTemplates=$template->id") }}">{{ $template->devices_count }}</a>
+                                <a href="{{ route('devices', ['filter' => ['serviceTemplates.id' => ['eq' => $template->id]]]) }}">{{ $template->devices_count }}</a>
                             </td>
                             <td>
                                 <a href="{{ url("/device-groups/serviceTemplates=$template->id") }}">{{ $template->groups_count }}</a>

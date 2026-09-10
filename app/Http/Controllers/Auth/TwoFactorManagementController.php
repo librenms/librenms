@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TwoFactorManagementController.php
  *
@@ -38,7 +39,7 @@ class TwoFactorManagementController extends Controller
         $twofactor['fails'] = 0;
 
         if (UserPref::setPref($user, 'twofactor', $twofactor)) {
-            return response()->json(['msg' => __('Two-Factor unlocked.')]);
+            return response()->json(['status' => 'ok', 'msg' => __('Two-Factor unlocked.')]);
         }
 
         return response()->json(['error' => __('Failed to unlock Two-Factor.')]);

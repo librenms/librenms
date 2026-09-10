@@ -16,6 +16,7 @@ version 3. See https://www.gnu.org/licenses/gpl-3.0.txt
 
 */
 
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -27,7 +28,7 @@ try {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []);
     // Set empty metrics and error message
-    log_event('application ' . $name . ' caught JsonAppException');
+    Eventlog::log('application ' . $name . ' caught JsonAppException');
 
     return;
 }
@@ -46,7 +47,7 @@ $fields = [
 ];
 
 /*
-log_event(
+Eventlog::log(
       "watts-gauage: " . $result['data']['reading']
     . ", watts-abs: " . $result['data']['reading']
 );
@@ -58,5 +59,5 @@ $tags = [
     'rrd_name' => ['app', $name, $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, 'OK', $fields);

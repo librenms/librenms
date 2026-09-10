@@ -6,15 +6,17 @@ Route: `/api/v0/services`
 
 Input:
 
-- state: only which have a certain state (valid options are 0=Ok, 1=Warning, 2=Critical).
-- type: service type, used sql LIKE to find services, so for tcp, use type=tcp for http use type=http
+- state: it returns only the services in this state. The valid values
+  are 0=Ok, 1=Warning, and 2=Critical.
+- type: the service type. The search uses SQL LIKE. For tcp, use
+  `type=tcp`. For http, use `type=http`.
 
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services?state=2
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services?state=0&type=tcp
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services?state=2
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services?state=0&type=tcp
 ```
 
 Output:
@@ -38,7 +40,7 @@ Output:
                 "service_changed": "1470962470",
                 "service_message": "NTP OK: Offset -0.000717 secs",
                 "service_disabled": "0",
-                "service_ds": "{\"offset\":\"s\"}"
+                "service_ds": "{\"offset\":{ \"uom\":\"s\", \"full_name\": \"offset\" } }"
             }
         ],
         [
@@ -78,9 +80,9 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:hostname
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:hostname?state=2
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:hostname?state=0&type=tcp
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services/:hostname
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services/:hostname?state=2
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services/:hostname?state=0&type=tcp
 ```
 
 Output:
@@ -123,14 +125,15 @@ Input:
 
 - type: service type
 - ip: ip of the service
-- desc: description for the service
-- param: parameters for the service
-- ignore: ignore the service for checks
+- name: (Optional) name of the service
+- desc: (Optional) description for the service
+- param: (Optional) parameters for the service
+- ignore: (Optional) ignore the service for checks
 
 Example:
 
 ```curl
-curl -X POST -d '{"type":"ping","ip": "192.168.1.10","desc":"test ping","param": "-t 10 -c 5"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/192.168.1.10
+curl -X POST -d '{"type":"ping","ip": "192.168.1.10","desc":"test ping","param": "-t 10 -c 5"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services/192.168.1.10
 ```
 
 Output:
@@ -157,7 +160,7 @@ Input:
 Example:
 
 ```curl
-curl -X PATCH -d '{"service_disabled":"1"}' 'X-Auth-Token:YOUR-API-TOKEN' https://librenms.org/api/v0/services/5
+curl -X PATCH -d '{"service_disabled":"1"}' 'X-Auth-Token:YOUR-API-TOKEN' https://foo.example/api/v0/services/5
 ```
 
 Output:
@@ -185,7 +188,7 @@ Input:
 Example:
 
 ```curl
-curl -X DELETE -H 'X-Auth-Token:YOUR-API-TOKEN' https://librenms.org/api/v0/services/35
+curl -X DELETE -H 'X-Auth-Token:YOUR-API-TOKEN' https://foo.example/api/v0/services/35
 ```
 
 Output:

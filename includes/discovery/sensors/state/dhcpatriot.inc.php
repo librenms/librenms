@@ -86,9 +86,9 @@ foreach ($oids as $index => $entry) {
         }
 
         $states = [
-            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'serviceUp'],
-            ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'serviceNotUpdatedWithinLast5Min'],
-            ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'serviceDown'],
+            ['value' => 1, 'generic' => 0, 'descr' => 'serviceUp'],
+            ['value' => 2, 'generic' => 2, 'descr' => 'serviceNotUpdatedWithinLast5Min'],
+            ['value' => 3, 'generic' => 2, 'descr' => 'serviceDown'],
         ];
     }
 
@@ -117,7 +117,6 @@ foreach ($oids as $index => $entry) {
             $group
         );
     }
-    create_sensor_to_state_index($device, $type, $index);
 }
 
 unset($class, $oid, $index, $type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, $poller_type, $entPhysicalIndex, $entPhysicalIndex_measured, $user_func, $group, $oids, $current_time, $tmp_snmp_multi, $tmp_data, $states);

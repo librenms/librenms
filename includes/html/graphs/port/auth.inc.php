@@ -1,19 +1,26 @@
 <?php
 
+use App\Facades\DeviceCache;
+use App\Facades\PortCache;
+use LibreNMS\Exceptions\RrdGraphException;
+use LibreNMS\Util\Clean;
+use LibreNMS\Util\Rewrite;
+
 if (is_numeric($vars['id']) && ($auth || port_permitted($vars['id']))) {
-    $port = cleanPort(get_port_by_id($vars['id']));
-    $device = device_by_id_cache($port['device_id']);
-    $title = generate_device_link($device);
-    $title .= ' :: Port  ' . generate_port_link($port);
+    $port = PortCache::get($vars['id']);
+    $device = DeviceCache::get((int) $port['device_id']);
 
-    $graph_title = DeviceCache::get($device['device_id'])->shortDisplayName() . '::' . strtolower(makeshortif($port['ifDescr']));
+    if ($device === null) {
+        throw new RrdGraphException('Device not found', 'No Device');
+    }
 
-    if (($port['ifAlias'] != '') && ($port['ifAlias'] != $port['ifDescr'])) {
-        $title .= ', ' . \LibreNMS\Util\Clean::html($port['ifAlias'], []);
-        $graph_title .= '::' . \LibreNMS\Util\Clean::html($port['ifAlias'], []);
+    $graph_title = $device->shortDisplayName() . '::' . strtolower(Rewrite::shortenIfName($port->ifDescr));
+
+    if (($port->ifAlias != '') && ($port->ifAlias != $port->ifDescr)) {
+        $graph_title .= '::' . Clean::html($port->ifAlias, []);
     }
 
     $auth = true;
 
-    $rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id']);
+    $rrd_filename = get_port_rrdfile_path($device->hostname, $port->port_id);
 }

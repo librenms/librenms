@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Ipv4Address.php
  *
@@ -21,14 +22,17 @@
  *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use LibreNMS\Interfaces\Models\Keyable;
 
-class Ipv4Address extends PortRelatedModel
+class Ipv4Address extends PortRelatedModel implements Keyable
 {
     use HasFactory;
 
@@ -42,8 +46,27 @@ class Ipv4Address extends PortRelatedModel
         'context_name',
     ];
 
+    /**
+     * @return BelongsTo<Ipv4Network, $this>
+     */
     public function network(): BelongsTo
     {
         return $this->belongsTo(Ipv4Network::class, 'ipv4_network_id', 'ipv4_network_id');
+    }
+
+    /**
+     * This is not a standard relationship it is a shortcut to generate an aggregate for sorting.
+     * Use port.device nested relationship to access device.
+     *
+     * @return HasOneThrough<Device, Port, $this>
+     */
+    public function deviceViaPort(): HasOneThrough
+    {
+        return $this->hasOneThrough(Device::class, Port::class, 'port_id', 'device_id', 'port_id', 'device_id');
+    }
+
+    public function getCompositeKey(): string
+    {
+        return "$this->ipv4_address-$this->ipv4_prefixlen-$this->port_id-$this->context_name";
     }
 }

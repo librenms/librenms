@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2015 James Campbell <neokjames@gmail.com>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +47,7 @@ class Pushover extends Transport
 {
     public function deliverAlert(array $alert_data): bool
     {
-        $options = $this->parseUserOptions($this->config['options']);
+        $options = $this->parseUserOptions($this->config['options'] ?? '');
 
         $url = 'https://api.pushover.net/1/messages.json';
         $data = [];
@@ -54,28 +55,26 @@ class Pushover extends Transport
         $data['user'] = $this->config['userkey'];
         // Entities are html encoded so this will cause them to be displayed correctly in pushover alerts
         $data['html'] = '1';
-        switch ($alert_data['severity']) {
-            case 'critical':
-                $data['priority'] = 1;
-                if (! empty($options['sound_critical'])) {
-                    $data['sound'] = $options['sound_critical'];
-                }
-                break;
-            case 'warning':
-                $data['priority'] = 1;
-                if (! empty($options['sound_warning'])) {
-                    $data['sound'] = $options['sound_warning'];
-                }
-                break;
+
+        if ($alert_data['severity'] == 'critical') {
+            $data['priority'] = 1;
+            if (! empty($options['sound_critical'])) {
+                $data['sound'] = $options['sound_critical'];
+            }
+        } elseif ($alert_data['severity'] == 'warning') {
+            $data['priority'] = 0;
+            if (! empty($options['sound_warning'])) {
+                $data['sound'] = $options['sound_warning'];
+            }
         }
-        switch ($alert_data['state']) {
-            case AlertState::RECOVERED:
-                $data['priority'] = 0;
-                if (! empty($options['sound_ok'])) {
-                    $data['sound'] = $options['sound_ok'];
-                }
-                break;
+
+        if ($alert_data['state'] == AlertState::RECOVERED) {
+            $data['priority'] = 0;
+            if (! empty($options['sound_ok'])) {
+                $data['sound'] = $options['sound_ok'];
+            }
         }
+
         $data['title'] = $alert_data['title'];
         $data['message'] = $alert_data['msg'];
         if ($options) {
@@ -102,9 +101,9 @@ class Pushover extends Transport
                     'type' => 'password',
                 ],
                 [
-                    'title' => 'User Key',
+                    'title' => 'User/Group Key',
                     'name' => 'userkey',
-                    'descr' => 'User Key',
+                    'descr' => 'User/Group Key',
                     'type' => 'password',
                 ],
                 [

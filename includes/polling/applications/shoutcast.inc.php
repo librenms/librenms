@@ -6,14 +6,13 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'shoutcast';
 
-$options = '-Oqv';
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.9.115.104.111.117.116.99.97.115.116';
-$shoutcast = snmp_get($device, $oid, $options);
+$shoutcast = SnmpQuery::get($oid)->value();
 
-$servers = explode("\n", $shoutcast);
+$servers = explode("\n", (string) $shoutcast);
 
 $metrics = [];
-foreach ($servers as $item => $server) {
+foreach ($servers as $server) {
     $server = trim($server);
 
     if (! empty($server)) {
@@ -50,7 +49,7 @@ foreach ($servers as $item => $server) {
             'rrd_name' => ['app', $name, $app->app_id, $host . '_' . $port],
             'rrd_def' => $rrd_def,
         ];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
     }//end if
 }//end foreach
 

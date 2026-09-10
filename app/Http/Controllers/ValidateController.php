@@ -12,30 +12,49 @@ class ValidateController extends Controller
 {
     public function index(): View
     {
-        return view('validate.index');
+        $this->authorize('settings.view');
+
+        $validationGroups = (new Validator())->getValidationGroups();
+
+        $groups = collect($validationGroups)
+            ->map(fn (bool $enabled, string $group) => [
+                'group' => $group,
+                'enabled' => $enabled,
+                'name' => trans("validation.validations.groups.{$group}"),
+            ])
+            ->values()
+            ->all();
+
+        return view('validate.index', [
+            'groups' => $groups,
+        ]);
     }
 
-    public function runValidation(): JsonResponse
+    public function runValidation(?string $group = null): JsonResponse
     {
+        $this->authorize('settings.view');
+
         $validator = new Validator();
-        $validator->validate();
+        $validator->validate($group ? [$group] : []);
 
         return response()->json($validator->toArray());
     }
 
     public function runFixer(Request $request): JsonResponse
     {
+        $this->authorize('settings.update');
+
         $this->validate($request, [
             'fixer' => [
                 'starts_with:LibreNMS\Validations',
-                function ($attribute, $value, $fail) {
+                function ($attribute, $value, $fail): void {
                     if (! class_exists($value) || ! in_array(ValidationFixer::class, class_implements($value))) {
                         $fail(trans('validation.results.invalid_fixer'));
                     }
                 },
             ],
         ]);
-        $fixer = $request->get('fixer');
+        $fixer = $request->input('fixer');
 
         return response()->json([
             'result' => (new $fixer)->fix(),

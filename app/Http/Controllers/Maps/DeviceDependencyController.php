@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DependencyController.php
  *
@@ -25,37 +26,38 @@
 
 namespace App\Http\Controllers\Maps;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
+use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use LibreNMS\Config;
 
 class DeviceDependencyController extends Controller
 {
     // Device Dependency Map
     public function dependencyMap(Request $request): View
     {
-        $group_id = $request->get('group');
+        $this->authorize('viewAny', Device::class);
 
-        $group_name = DeviceGroup::where('id', '=', $group_id)->first('name');
-        if (! empty($group_name)) {
-            $group_name = $group_name->name;
-        }
+        $group_id = $request->integer('group');
+        $deviceGroup = $group_id ? DeviceGroup::hasAccess($request->user())
+            ->select(['id', 'name'])
+            ->firstWhere('id', $group_id) : null;
 
         $data = [
-            'page_refresh' => Config::get('page_refresh', 300),
-            'group_id' => $group_id,
-            'options' => Config::get('network_map_dependencymap_vis_options') ?? Config::get('network_map_vis_options'),
-            'group_name' => $group_name,
+            'page_refresh' => LibrenmsConfig::get('page_refresh', 300),
+            'group_id' => $deviceGroup?->id,
+            'options' => LibrenmsConfig::get('network_map_dependencymap_vis_options') ?? LibrenmsConfig::get('network_map_vis_options'),
+            'group_name' => $deviceGroup?->name,
             'highlight_style' => [
                 'color' => [
                     'highlight' => [
-                        'border' => Config::get('network_map_legend.highlight.border'),
+                        'border' => LibrenmsConfig::get('network_map_legend.highlight.border'),
                     ],
-                    'border' => Config::get('network_map_legend.highlight.border'),
+                    'border' => LibrenmsConfig::get('network_map_legend.highlight.border'),
                 ],
-                'borderWidth' => Config::get('network_map_legend.highlight.borderWidth'),
+                'borderWidth' => LibrenmsConfig::get('network_map_legend.highlight.borderWidth'),
             ],
         ];
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * airos-af-ltu.inc.php
  *
@@ -31,13 +32,13 @@ foreach ($oids as $index => $entry) {
     $rxrate_state_name = 'afLTUStaRxRate';
 
     $rate_states = [
-        ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => '1X (QPSK+SFBC)'],
-        ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => '2X (QPSK)'],
-        ['value' => 4, 'generic' => 1, 'graph' => 1, 'descr' => '4X (16QAM)'],
-        ['value' => 6, 'generic' => 1, 'graph' => 1, 'descr' => '6X (64QAM)'],
-        ['value' => 8, 'generic' => 0, 'graph' => 1, 'descr' => '8X (256QAM)'],
-        ['value' => 10, 'generic' => 0, 'graph' => 1, 'descr' => '10X (1024QAM)'],
-        ['value' => 12, 'generic' => 0, 'graph' => 1, 'descr' => '12X (4096QAM)'],
+        ['value' => 1, 'generic' => 2, 'descr' => '1X (QPSK+SFBC)'],
+        ['value' => 2, 'generic' => 2, 'descr' => '2X (QPSK)'],
+        ['value' => 4, 'generic' => 1, 'descr' => '4X (16QAM)'],
+        ['value' => 6, 'generic' => 1, 'descr' => '6X (64QAM)'],
+        ['value' => 8, 'generic' => 0, 'descr' => '8X (256QAM)'],
+        ['value' => 10, 'generic' => 0, 'descr' => '10X (1024QAM)'],
+        ['value' => 12, 'generic' => 0, 'descr' => '12X (4096QAM)'],
     ];
 
     create_state_index($txrate_state_name, $rate_states);
@@ -46,11 +47,6 @@ foreach ($oids as $index => $entry) {
     //Discover Sensors
     discover_sensor(null, 'state', $device, '.1.3.6.1.4.1.41112.1.10.1.4.1.1.' . $index, 1, $txrate_state_name, 'TX Modulation Rate', '1', '1', null, null, null, null, $entry['afLTUStaTxRate']);
     discover_sensor(null, 'state', $device, '.1.3.6.1.4.1.41112.1.10.1.4.1.2.' . $index, 2, $rxrate_state_name, 'RX Modulation Rate', '1', '1', null, null, null, null, $entry['afLTUStaRxRate']);
-
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $txrate_state_name, 1);
-    create_sensor_to_state_index($device, $rxrate_state_name, 2);
-
     break;
 }
 

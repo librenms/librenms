@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -18,7 +19,7 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'nfs-server';
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.110.102.115.45.115.101.114.118.101.114';
 
-$nfsstats = snmp_get($device, $oid, '-Oqv');
+$nfsstats = SnmpQuery::get($oid)->value();
 
 // rrd names
 $rrd_name = [];
@@ -260,7 +261,7 @@ foreach ($lines as $line) {
                 // create or push data to rrd
                 $tags = ['name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name[$line_id], 'rrd_def' => $rrd_def_array[$line_id]];
                 $metrics[$line_id] = $fields;
-                data_update($device, 'app', $tags, $fields);
+                app('Datastore')->put($device, 'app', $tags, $fields);
             }
             break;
     }
@@ -269,7 +270,7 @@ $metrics['none'] = $default_fields;
 
 // push the default nfs server data to rrd
 $tags = ['name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name['default'], 'rrd_def' => $rrd_def_array['default']];
-data_update($device, 'app', $tags, $default_fields);
+app('Datastore')->put($device, 'app', $tags, $default_fields);
 update_application($app, $nfsstats, $metrics);
 
 // clean up scope

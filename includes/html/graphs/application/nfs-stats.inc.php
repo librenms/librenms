@@ -9,7 +9,7 @@ $bigdescrlen = 15;
 $smalldescrlen = 15;
 $dostack = 0;
 $printtotal = 0;
-$rrd_filename = Rrd::dirFromHost($device['hostname']) . '/app-nfsstats-' . $app->app_id . '.rrd';
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfsstats', $app->app_id]);
 $array = [
     'total' => [
         'descr' => 'Total',
@@ -84,7 +84,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         $i++;
     }
 } else {
-    echo "file missing: $file";
+    throw new \LibreNMS\Exceptions\RrdGraphException("No Data file $rrd_filename");
 }
 
 require 'includes/html/graphs/generic_multi_line_exact_numbers.inc.php';

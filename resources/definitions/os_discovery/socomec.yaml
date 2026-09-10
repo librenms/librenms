@@ -1,0 +1,65 @@
+modules:
+    os:
+        hardware: SOCOMECPDU-MIB::dpduIdentModel.0
+        serial: SOCOMECPDU-MIB::dpduIdentSerialNumber.0
+        version: 
+            - SOCOMECPDU-MIB::dpduIdentPDUFirmwareVersion.0
+            - SOCOMECPDU-MIB::dpduIdentAgentSoftwareVersion.0
+        version_template: 'FW {{ SOCOMECPDU-MIB::dpduIdentPDUFirmwareVersion.0 }} / SW {{ SOCOMECPDU-MIB::dpduIdentAgentSoftwareVersion.0 }}'
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: SOCOMECPDU-MIB::dpduOutput
+                    value: SOCOMECPDU-MIB::dpduOutputVoltage1
+                    num_oid: '.1.3.6.1.4.1.4555.2.30.2.2.{{ $index }}'
+                    descr: 'Line 1 Voltage'
+                    divisor: 10
+                    index: 'dpduOutputVoltage1'
+                -
+                    oid: SOCOMECPDU-MIB::dpduOutput
+                    value: SOCOMECPDU-MIB::dpduOutputVoltage2
+                    num_oid: '.1.3.6.1.4.1.4555.2.30.2.4.{{ $index }}'
+                    descr: 'Line 2 Voltage'
+                    divisor: 10
+                    index: 'dpduOutputVoltage2'
+                -
+                    oid: SOCOMECPDU-MIB::dpduOutput
+                    value: SOCOMECPDU-MIB::dpduOutputVoltage3
+                    num_oid: '.1.3.6.1.4.1.4555.2.30.2.6.{{ $index }}'
+                    descr: 'Line 3 Voltage'
+                    divisor: 10
+                    index: 'dpduOutputVoltage3'
+
+        current:
+            data:
+                -
+                    oid: SOCOMECPDU-MIB::dpduOutput
+                    value: SOCOMECPDU-MIB::dpduOutputCurrent1
+                    num_oid: '.1.3.6.1.4.1.4555.2.30.2.3.{{ $index }}'
+                    descr: 'Line 1 Current'
+                    divisor: 10
+                    index: 'dpduOutputCurrent1'
+                -
+                    oid: SOCOMECPDU-MIB::dpduOutput
+                    value: SOCOMECPDU-MIB::dpduOutputCurrent2
+                    num_oid: '.1.3.6.1.4.1.4555.2.30.2.5.{{ $index }}'
+                    descr: 'Line 2 Current'
+                    divisor: 10
+                    index: 'dpduOutputCurrent2'
+                -
+                    oid: SOCOMECPDU-MIB::dpduOutput
+                    value: SOCOMECPDU-MIB::dpduOutputCurrent3
+                    num_oid: '.1.3.6.1.4.1.4555.2.30.2.7.{{ $index }}'
+                    descr: 'Line 3 Current'
+                    divisor: 10
+                    index: 'dpduOutputCurrent3'
+
+        frequency:
+              data:
+                  -
+                    oid: SOCOMECPDU-MIB::dpduOutput
+                    value: SOCOMECPDU-MIB::dpduOutputFrequency
+                    num_oid: '.1.3.6.1.4.1.4555.2.30.2.1.{{ $index }}'
+                    divisor: 10
+                    descr: 'Output frequency'

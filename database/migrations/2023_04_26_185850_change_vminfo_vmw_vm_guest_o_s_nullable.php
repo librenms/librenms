@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('vminfo', function (Blueprint $table) {
             $table->string('vmwVmGuestOS', 128)->nullable()->change();
@@ -23,7 +23,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('vminfo', function (Blueprint $table) {
             $table->string('vmwVmGuestOS', 128)->nullable(false)->change();

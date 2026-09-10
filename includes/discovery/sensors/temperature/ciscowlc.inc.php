@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS Cisco wireless controller temperature monitoring module
  *

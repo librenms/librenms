@@ -17,8 +17,8 @@ header('Content-type: text/plain');
 
 // FUA
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    exit('ERROR: You need to be admin');
+if (Gate::denies('wireless-sensor.update')) {
+    exit('ERROR: You need permission');
 }
 
 for ($x = 0; $x < count($_POST['sensor_id']); $x++) {

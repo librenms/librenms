@@ -1,0 +1,57 @@
+modules:
+    os:
+        sysDescr_regex: '/(?<hardware>.*), iBOS Version ibos-.*?-(?<version>.*)\s+Copyright/'
+    sensors:
+        temperature:
+            data:
+                -
+                    descr: Temperature {{ $index }}
+                    oid: WAYSTREAM-MIB::wsTempEntry
+                    value: WAYSTREAM-MIB::wsTempMeasured
+                    num_oid: '.1.3.6.1.4.1.9303.4.1.2.1.1.2.{{ $index }}'
+                    low_warn_limit: WAYSTREAM-MIB::wsTempThresholdLow
+                    warn_limit:     WAYSTREAM-MIB::wsTempThresholdHigh
+                    divisor: 100
+
+        voltage:
+            data:
+                -
+                    descr: Voltage {{ $index }}
+                    oid: WAYSTREAM-MIB::wsVoltEntry
+                    value: WAYSTREAM-MIB::wsVoltMeasured
+                    num_oid: '.1.3.6.1.4.1.9303.4.1.2.2.1.3.{{ $index }}'
+                    low_warn_limit: WAYSTREAM-MIB::wsVoltThresholdLow
+                    warn_limit: WAYSTREAM-MIB::wsVoltThresholdHigh
+                    divisor: 1000
+                    skip_values: 0
+
+        fanspeed:
+            data:
+                -
+                    descr: Fan speed {{ $index }}
+                    oid: WAYSTREAM-MIB::wsFanEntry
+                    value: WAYSTREAM-MIB::wsFanRPM
+                    num_oid: '.1.3.6.1.4.1.9303.4.1.2.3.1.2.{{ $index }}'
+
+        dbm:
+            options:
+                divisor: 1000
+                skip_values: 0
+            data:
+                -
+                    oid: WAYSTREAM-MIB::wsSFPEntry
+                    descr: Receive power {{ $index }}
+                    value: WAYSTREAM-MIB::wsSFPRXdBmPower
+                    index: 'wsSFPRXdBmPower.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.9303.4.1.4.1.23.{{ $index }}'
+                    low_warn_limit: WAYSTREAM-MIB::wsSFPRXInputPowNormalLowdBm
+                    warn_limit: WAYSTREAM-MIB::wsSFPRXInputPowNormalHighdBm
+
+                -
+                    oid: WAYSTREAM-MIB::wsSFPEntry
+                    descr: Transmit power {{ $index }}
+                    value: WAYSTREAM-MIB::wsSFPTXdBmPower
+                    index: 'wsSFPTXdBmPower.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.9303.4.1.4.1.22.{{ $index }}'
+                    low_warn_limit: WAYSTREAM-MIB::wsSFPTXOutputPowNormalLowdBm
+                    warn_limit: WAYSTREAM-MIB::wsSFPTXOutputPowNormalHighdBm

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * smartax.inc.php
  *

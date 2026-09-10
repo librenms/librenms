@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,24 +36,30 @@ class Api extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        $request_body = $this->config['api-body'];
+        $request_body = $this->config['api-body'] ?? '';
         $username = $this->config['api-auth-username'];
         $password = $this->config['api-auth-password'];
+        $as_form = $this->config['api-as-form'] ?? false;
 
-        $method = strtolower($this->config['api-method']);
-        $host = explode('?', $this->config['api-url'], 2)[0]; //we don't use the parameter part, cause we build it out of options.
+        $method = strtolower((string) $this->config['api-method']);
+        $host = explode('?', (string) $this->config['api-url'], 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
         //get each line of key-values and process the variables for Options
-        $query = $this->parseUserOptions($this->config['api-options'], $alert_data);
-        $request_headers = $this->parseUserOptions($this->config['api-headers'], $alert_data);
+        $query = $this->parseUserOptions($this->config['api-options'] ?? '', $alert_data);
+        $request_headers = $this->parseUserOptions($this->config['api-headers'] ?? '', $alert_data);
         $client = Http::client()
         ->withHeaders($request_headers); //get each line of key-values and process the variables for Headers
 
         if ($method !== 'get') {
-            $request_body = SimpleTemplate::parse($this->config['api-body'], $alert_data);
-            // withBody always overrides Content-Type so we compute a proper set (with 'Content-Type' => 'text/plain'
-            // as default value, and replace all headers with our computed headers
-            $client->withBody($request_body)->replaceHeaders(array_merge(['Content-Type' => 'text/plain'], $request_headers));
+            $request_body = SimpleTemplate::parse($request_body, $alert_data);
+            if ($as_form == true) {
+                $request_body = $this->parseUserOptions($request_body);
+                $method = 'postform';
+            } else {
+                // withBody always overrides Content-Type so we compute a proper set (with 'Content-Type' => 'text/plain'
+                // as default value, and replace all headers with our computed headers
+                $client->withBody($request_body)->replaceHeaders(array_merge(['Content-Type' => 'text/plain'], $request_headers));
+            }
         }
 
         if ($username) {
@@ -66,6 +73,7 @@ class Api extends Transport
         $res = match ($method) {
             'get' => $client->get($host),
             'put' => $client->put($host),
+            'postform' => $client->asForm()->post($host, $request_body),
             default => $client->post($host),
         };
 
@@ -73,7 +81,7 @@ class Api extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $request_body ?? $query, [
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $request_body, [
             'query' => $query,
         ]);
     }
@@ -92,6 +100,13 @@ class Api extends Transport
                         'POST' => 'POST',
                         'PUT' => 'PUT',
                     ],
+                ],
+                [
+                    'title' => 'Send as form',
+                    'name' => 'api-as-form',
+                    'descr' => 'Send post data as form',
+                    'type' => 'checkbox',
+                    'default' => false,
                 ],
                 [
                     'title' => 'API URL',

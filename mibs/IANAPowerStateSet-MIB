@@ -1,0 +1,109 @@
+IANAPowerStateSet-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+ 	 MODULE-IDENTITY, mib-2     FROM SNMPv2-SMI
+	 TEXTUAL-CONVENTION         FROM SNMPv2-TC;
+
+ianaPowerStateSet MODULE-IDENTITY
+
+	 LAST-UPDATED "201502090000Z"    -- 9 February 2015
+	 ORGANIZATION "IANA"
+	 CONTACT-INFO "
+	               Internet Assigned Numbers Authority
+	               Postal: ICANN
+	               12025 Waterfront Drive, Suite 300
+	               Los Angeles, CA 90094
+	               United States
+	               Tel: +1-310-301 5800
+	               EMail: iana&iana.org"
+
+DESCRIPTION
+	    "Copyright (c) 2015 IETF Trust and the persons identified as
+	     authors of the code.  All rights reserved.
+
+	     Redistribution and use in source and binary forms, with or
+	     without modification, is permitted pursuant to, and subject
+	     to the license terms contained in, the Simplified BSD License
+	     set forth in Section 4.c of the IETF Trust's Legal Provisions
+	     Relating to IETF Documents
+	     (http://trustee.ietf.org/license-info).
+
+	     This MIB module defines the PowerStateSet Textual
+	     Convention, which specifies the Power State Sets and
+	     Power State Set Values an Energy Object supports.
+
+	     The initial version of this MIB module was published in
+	     RFC 7460; for full legal notices see the RFC itself."
+
+	 -- revision history
+	 REVISION "201502090000Z"     -- 9 February 2015
+	 DESCRIPTION
+	     "Initial version of this MIB module, as published as RFC
+	     7460."
+
+	::= { mib-2 228 }
+
+PowerStateSet ::= TEXTUAL-CONVENTION
+	 STATUS current
+	 DESCRIPTION
+	     "IANAPowerState is a textual convention that describes
+	     Power State Sets and Power State Set Values an Energy
+	     Object supports.  IANA has created a registry of Power
+	     State supported by an Energy Object and IANA shall
+	     administer the list of Power State Sets and Power
+	     States.
+
+	     The Textual Convention assumes that Power States in a
+	     Power State Set are limited to 255 distinct values.  For
+	     a Power State Set S, the named number with the value S *
+	     256 is allocated to indicate the Power State Set.  For a
+	     Power State X in the Power State Set S, the named number
+	     with the value S * 256 + X + 1 is allocated to represent
+	     the Power State.
+
+	     Requests for new values should be made to IANA via email
+	     (iana&iana.org)."
+	 REFERENCE
+	    "http://www.iana.org/assignments/power-state-sets"
+
+	 SYNTAX      INTEGER {
+	     other(0),        -- indicates other set
+	     unknown(255),    -- unknown
+
+	     ieee1621(256),    -- indicates IEEE1621 set
+	     ieee1621Off(257),
+	     ieee1621Sleep(258),
+	     ieee1621On(259),
+
+	     dmtf(512),        -- indicates DMTF set
+	     dmtfOn(513),
+	     dmtfSleepLight(514),
+	     dmtfSleepDeep(515),
+	     dmtfOffHard(516),
+	     dmtfOffSoft(517),
+	     dmtfHibernate(518),
+	     dmtfPowerOffSoft(519),
+	     dmtfPowerOffHard(520),
+	     dmtfMasterBusReset(521),
+	     dmtfDiagnosticInterrapt(522),
+	     dmtfOffSoftGraceful(523),
+	     dmtfOffHardGraceful(524),
+	     dmtfMasterBusResetGraceful(525),
+	     dmtfPowerCycleOffSoftGraceful(526),
+	     dmtfPowerCycleHardGraceful(527),
+
+	     eman(1024),       -- indicates EMAN set
+	     emanMechOff(1025),
+	     emanSoftOff(1026),
+	     emanHibernate(1027),
+	     emanSleep(1028),
+	     emanStandby(1029),
+	     emanReady(1030),
+	     emanLowMinus(1031),
+	     emanLow(1032),
+	     emanMediumMinus(1033),
+	     emanMedium(1034),
+	     emanHighMinus(1035),
+	     emanHigh(1036)
+	          }
+END

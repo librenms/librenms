@@ -1,7 +1,5 @@
 <?php
 
-$class = 'cooling';
-$unit = 'W';
-$graph_type = 'sensor_cooling';
+$class = \LibreNMS\Enum\Sensor::Cooling;
 
 require 'sensors.inc.php';

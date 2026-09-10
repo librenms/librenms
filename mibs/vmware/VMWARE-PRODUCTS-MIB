@@ -1,5 +1,5 @@
 -- **********************************************************
--- Copyright 2007-2021 VMware, Inc.  All rights reserved.
+-- Copyright 2023 VMware, Inc.  All rights reserved.
 -- **********************************************************
 
 VMWARE-PRODUCTS-MIB DEFINITIONS ::= BEGIN
@@ -11,7 +11,7 @@ IMPORTS
         FROM VMWARE-ROOT-MIB;
 
 vmwProducts MODULE-IDENTITY
-       LAST-UPDATED "202104290000Z"
+       LAST-UPDATED "202308010000Z"
        ORGANIZATION "VMware, Inc"
        CONTACT-INFO
                "VMware, Inc
@@ -26,7 +26,10 @@ vmwProducts MODULE-IDENTITY
                 which are returned from SNMPv2-MIB sysObjectId for
                 agents in specific VMware products.
                "
-       REVISION      "202104290000Z"
+       REVISION      "202308010000Z"
+       DESCRIPTION
+               "Add Horizon v2 sysObjectId value."
+       REVISION      "202307280000Z"
        DESCRIPTION
                "Add Horizon Cloud Connector sysObjectId value."
        REVISION      "201808300000Z"
@@ -108,6 +111,9 @@ vmwTunnelServer OBJECT IDENTIFIER
 
 vmwHorizonCloudConnector OBJECT IDENTIFIER
     ::= { vmwProductSpecific 350 }
+
+vmwHorizonV2Titan OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 450 }
 
 oidESX OBJECT IDENTIFIER
     ::= { vmwOID 1 }

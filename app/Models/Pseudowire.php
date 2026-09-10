@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Pseudowire.php
  *
@@ -25,13 +26,35 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pseudowire extends PortRelatedModel
 {
+    use HasFactory;
     public $timestamps = false;
     protected $primaryKey = 'pseudowire_id';
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
+     */
+    public function device(): BelongsTo
+    {
+        return $this->belongsTo(Device::class, 'device_id', 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
+     */
+    public function peerDevice(): BelongsTo
+    {
+        return $this->belongsTo(Device::class, 'peer_device_id', 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Pseudowire, $this>
+     */
     public function endpoints(): HasMany
     {
         return $this->hasMany(Pseudowire::class, 'cpwVcId', 'cpwVcId');

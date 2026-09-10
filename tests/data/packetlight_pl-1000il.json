@@ -3263,63 +3263,54 @@
                 {
                     "state_name": "edfaRedBlueType",
                     "state_descr": "Red",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "edfaRedBlueType",
                     "state_descr": "Blue",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "edfaRedBlueType",
                     "state_descr": "None",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "edfaRole",
                     "state_descr": "booster",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "edfaRole",
                     "state_descr": "boosterInline",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "edfaRole",
                     "state_descr": "preamp",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "edfaRole",
                     "state_descr": "inline",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "edfaRole",
                     "state_descr": "raman",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "edfaRole",
                     "state_descr": "other",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 0
                 }
@@ -3347,6 +3338,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "PacketLight Networks",
+                    "entPhysicalMfgDate": "3744-11-4,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3361,11 +3353,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3380,11 +3373,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3399,11 +3393,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3418,11 +3413,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3437,11 +3433,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3456,11 +3453,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3475,11 +3473,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3494,11 +3493,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3513,11 +3513,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3532,11 +3533,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3551,11 +3553,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 501,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3570,11 +3573,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 502,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3589,11 +3593,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 503,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3608,11 +3613,12 @@
                     "entPhysicalAssetID": "FFFFFFFFFFFFFFFFFFFF",
                     "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "AS3371A00",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "170800653",
                     "entPhysicalContainedIn": 3101,
                     "entPhysicalParentRelPos": 501,
                     "entPhysicalMfgName": "PacketLight Networks",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3627,11 +3633,12 @@
                     "entPhysicalAssetID": "FFFFFFFFFFFFFFFFFFFF",
                     "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "AS3371A00",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "170800637",
                     "entPhysicalContainedIn": 3102,
                     "entPhysicalParentRelPos": 502,
                     "entPhysicalMfgName": "PacketLight Networks",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3646,11 +3653,12 @@
                     "entPhysicalAssetID": "WOCUAJJMAA",
                     "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "FAN UNIT",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "--",
                     "entPhysicalContainedIn": 3103,
                     "entPhysicalParentRelPos": 503,
                     "entPhysicalMfgName": "PacketLight Networks",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3665,11 +3673,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "FOA-S7300CD-EVG1",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "D7807",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 208,
                     "entPhysicalMfgName": "--",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3684,11 +3693,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 101,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3703,11 +3713,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 102,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3722,11 +3733,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 103,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3741,11 +3753,12 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "NULL",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 104,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 }
             ]

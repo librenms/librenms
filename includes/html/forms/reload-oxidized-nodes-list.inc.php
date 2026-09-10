@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -10,9 +11,9 @@
  * the source code distribution for details.
  */
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('config-backup.refresh')) {
     $status = 'error';
-    $message = 'ERROR: You need to be admin to reload Oxidized node list';
+    $message = 'ERROR: You need permission to reload Oxidized node list';
 } else {
     (new \App\ApiClients\Oxidized())->reloadNodes();
     $status = 'ok';

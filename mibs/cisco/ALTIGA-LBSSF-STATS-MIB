@@ -1,0 +1,309 @@
+-- *------------------------------------------------------------------
+-- * ALTIGA-LBSSF-STATS-MIB.my:
+-- * Altiga Load Balancing and Secure Session Failover Statistics MIB.
+-- *
+-- * Altiga Networks was acquired by Cisco Systems on March 29, 2000
+-- *
+-- * Copyright (c) 2002 by Cisco Systems, Inc.
+-- * All rights reserved.
+-- *
+-- *------------------------------------------------------------------
+
+ALTIGA-LBSSF-STATS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, TimeTicks, Integer32, Gauge32,
+      IpAddress
+         FROM SNMPv2-SMI
+      TruthValue, RowStatus, TEXTUAL-CONVENTION
+         FROM SNMPv2-TC
+      OBJECT-GROUP, MODULE-COMPLIANCE
+         FROM SNMPv2-CONF
+      alStatsLBSSF, alLBSSFGroup
+         FROM ALTIGA-MIB
+      alLBSSFMibModule
+         FROM ALTIGA-GLOBAL-REG;
+
+   altigaLBSSFStatsMibModule MODULE-IDENTITY
+      LAST-UPDATED   "200209051300Z"
+      ORGANIZATION   "Cisco Systems, Inc."
+      CONTACT-INFO
+         "Cisco Systems
+          170 W Tasman Drive
+          San Jose, CA  95134
+          USA
+
+          Tel: +1 800 553-NETS
+          E-mail: cs-cvpn3000@cisco.com"
+
+      DESCRIPTION
+         "The Altiga Load Balancing and Secure Session Failover 
+          Statistics MIB models counters and objects that are of 
+          management interest for LBSSF.
+         
+          Acronyms
+          The following acronyms are used in this document:
+
+            LBSSF:      Load Balancing and Secure Session Failover
+
+            MIB:        Management Information Base
+
+         "
+
+      REVISION "200209051300Z"
+      DESCRIPTION
+         "Added module compliance."
+
+      REVISION "200207100000Z"
+      DESCRIPTION
+         "Updated with new header"
+
+      ::= { alLBSSFMibModule 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+DeviceType     ::= TEXTUAL-CONVENTION
+   STATUS         current
+   DESCRIPTION
+      "LBSSF Device Type."
+   SYNTAX         INTEGER {
+                     unknown(1),
+                     vpn3005(3),
+                     vpn3015(4),
+                     vpn3030(5),
+                     vpn3060(6),
+                     vpn3080(7),
+                     vpn3002(8)
+                  }
+
+DeviceRole     ::= TEXTUAL-CONVENTION
+   STATUS         current
+   DESCRIPTION
+      "Load balancing device roles within a LBSSF cluster.
+      
+       virtualMaster: master of load balancing cluster
+       slave        : slave in load balancing cluster
+      "
+   SYNTAX         INTEGER {
+                     virtualMaster(1),
+                     slave(2)
+                  }
+
+alStatsLBSSFGlobal   OBJECT IDENTIFIER ::= { alStatsLBSSF 1 }
+
+alLBSSFRole OBJECT-TYPE
+   SYNTAX         DeviceRole
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The role of this device."
+   ::= { alStatsLBSSFGlobal 1 }
+
+alLBSSFDeviceType OBJECT-TYPE
+   SYNTAX         DeviceType
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "Device type of this device."
+   ::= { alStatsLBSSFGlobal 2 }
+
+alLBSSFActive     OBJECT-TYPE
+   SYNTAX         TruthValue
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "Indicates if device is active or not."
+   ::= { alStatsLBSSFGlobal 3 }
+
+alLBSSFNumberOfPeers OBJECT-TYPE
+   SYNTAX         Gauge32 (0..25)
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of total current peers."
+   ::= { alStatsLBSSFGlobal 4 }
+
+alLBSSFLoad    OBJECT-TYPE
+   SYNTAX         Gauge32 (0..100)
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The current calculated load of this device in percentage."
+   ::= { alStatsLBSSFGlobal 5 }
+
+alLBSSFPeerTable     OBJECT-TYPE
+   SYNTAX         SEQUENCE OF AlLBSSFPeerEntry
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+      "List of LBSSF peers within a LBSSF cluster."
+   ::= { alStatsLBSSF 2 }
+
+alLBSSFPeerEntry     OBJECT-TYPE
+   SYNTAX         AlLBSSFPeerEntry
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+      "An entry in the alLBSSFStatsPeerTable."
+   INDEX    { alLBSSFPeerPrivIpAddress }
+   ::= { alLBSSFPeerTable 1 }
+
+AlLBSSFPeerEntry ::= SEQUENCE {
+   alLBSSFPeerRowStatus            RowStatus,
+   alLBSSFPeerPrivIpAddress        IpAddress,
+   alLBSSFPeerPubIpAddress         IpAddress,
+   alLBSSFPeerMappedPubIpAddress   IpAddress,
+   alLBSSFPeerActive               TruthValue,
+   alLBSSFPeerFaultZone            Integer32,
+   alLBSSFPeerRole                 DeviceRole,
+   alLBSSFPeerDeviceType           DeviceType,
+   alLBSSFPeerLoad                 Gauge32,
+   alLBSSFPeerPriority             Integer32,
+   alLBSSFPeerActiveSessions       Gauge32,
+   alLBSSFPeerJoinTime             TimeTicks
+}
+
+alLBSSFPeerRowStatus OBJECT-TYPE
+   SYNTAX         RowStatus
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The status of this row."
+   ::= { alLBSSFPeerEntry 1 }
+
+alLBSSFPeerPrivIpAddress   OBJECT-TYPE
+   SYNTAX         IpAddress
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "Private LAN Ip address of this peer entry."
+   ::= { alLBSSFPeerEntry 2 }
+
+alLBSSFPeerPubIpAddress OBJECT-TYPE
+   SYNTAX         IpAddress
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "Public LAN Ip address of this peer entry."
+   ::= { alLBSSFPeerEntry 3 }
+
+alLBSSFPeerMappedPubIpAddress OBJECT-TYPE
+   SYNTAX         IpAddress
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The NAT'ed Public Ip address of this peer entry."
+   ::= { alLBSSFPeerEntry 4 }
+
+alLBSSFPeerActive    OBJECT-TYPE
+   SYNTAX         TruthValue
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "Indicates if this peer is active or not."
+   ::= { alLBSSFPeerEntry 5 }
+
+alLBSSFPeerFaultZone OBJECT-TYPE
+   SYNTAX         Integer32 (0..25)
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "Indicates which fault zone this peer belongs."
+   ::= { alLBSSFPeerEntry 6 }
+
+alLBSSFPeerRole      OBJECT-TYPE
+   SYNTAX         DeviceRole
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "Role of current peer"
+   ::= { alLBSSFPeerEntry 7 }
+
+alLBSSFPeerDeviceType      OBJECT-TYPE
+   SYNTAX         DeviceType
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "Device type of this peer."
+   ::= { alLBSSFPeerEntry 8 }
+
+alLBSSFPeerLoad      OBJECT-TYPE
+   SYNTAX         Gauge32 (0..100)
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "Current load of the peer in percentage."
+   ::= { alLBSSFPeerEntry 9 }
+
+alLBSSFPeerPriority     OBJECT-TYPE
+   SYNTAX         Integer32 (0..10)
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "Priority of the peer."
+   ::= { alLBSSFPeerEntry 10 }
+
+alLBSSFPeerActiveSessions     OBJECT-TYPE
+   SYNTAX         Gauge32 (0..100000)
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "Number of current active sessions on this peer"
+   ::= { alLBSSFPeerEntry 11 }
+
+alLBSSFPeerJoinTime     OBJECT-TYPE
+   SYNTAX         TimeTicks
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "Time in time-ticks when this peer join the virtual cluster"
+   ::= { alLBSSFPeerEntry 12 }
+
+
+altigaLBSSFStatsMibConformance OBJECT IDENTIFIER 
+   ::= { altigaLBSSFStatsMibModule 1 }
+
+altigaLBSSFStatsMibCompliances OBJECT IDENTIFIER 
+   ::= { altigaLBSSFStatsMibConformance 1 }
+
+altigaLBSSFStatsMibCompliance MODULE-COMPLIANCE
+   STATUS         current
+   DESCRIPTION
+      "The compliance statement for agents which implement the Altiga
+       Load Balancing and Secure Session Failover Statistics MIB."
+   MODULE
+   MANDATORY-GROUPS { 
+      altigaStatsLBSSFGroup
+   }
+   ::= { altigaLBSSFStatsMibCompliances 1 }
+
+altigaStatsLBSSFGroup OBJECT-GROUP
+   OBJECTS
+   {
+      alLBSSFRole,
+      alLBSSFDeviceType,
+      alLBSSFActive,
+      alLBSSFNumberOfPeers,
+      alLBSSFLoad,
+      alLBSSFPeerRowStatus,
+      alLBSSFPeerPrivIpAddress,
+      alLBSSFPeerPubIpAddress,
+      alLBSSFPeerMappedPubIpAddress,
+      alLBSSFPeerActive,
+      alLBSSFPeerFaultZone,
+      alLBSSFPeerRole,
+      alLBSSFPeerDeviceType,
+      alLBSSFPeerLoad,
+      alLBSSFPeerPriority,
+      alLBSSFPeerActiveSessions,
+      alLBSSFPeerJoinTime
+   }
+   STATUS   current
+   DESCRIPTION
+      "The objects for the LBSSF statistics."
+   ::= { alLBSSFGroup 3 }
+
+END
+

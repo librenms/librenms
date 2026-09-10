@@ -1,0 +1,48 @@
+--
+-- All Rights Reserved, Copyright (c) 2013, 2016, ALAXALA Networks Corp.
+--
+-- AX-SMI-MIB.my : Switching Router System information MIB file
+--
+
+AX-SMI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    enterprises
+        FROM SNMPv2-SMI
+    ;
+
+alaxala MODULE-IDENTITY
+    LAST-UPDATED    "201512250000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+         "The MIB module for the ALAXALA enterprise Structure of Management Information."
+    REVISION        "201512250000Z"
+    DESCRIPTION
+        "+Added ax8300s under axSwitch."
+    REVISION        "201405120000Z"
+    DESCRIPTION
+        "Added Switch."
+    REVISION        "201304150000Z"
+    DESCRIPTION
+        "Initial release."
+    ::= { enterprises 21839 }
+
+
+--------------------------------------------------
+-- common definitions
+--------------------------------------------------
+
+alaxalaProductId    OBJECT IDENTIFIER ::= { alaxala 1 }
+axRouter    OBJECT IDENTIFIER ::= { alaxalaProductId 1 }
+axSwitch    OBJECT IDENTIFIER ::= { alaxalaProductId 2 }
+ax8600r     OBJECT IDENTIFIER ::= { axRouter 19 }
+ax8600s     OBJECT IDENTIFIER ::= { axSwitch 19 }
+ax8300s     OBJECT IDENTIFIER ::= { axSwitch 22 }
+
+alaxalaMib  OBJECT IDENTIFIER ::= { alaxala 2 }
+axEx        OBJECT IDENTIFIER ::= { alaxalaMib 4 }
+axMib       OBJECT IDENTIFIER ::= { axEx 1 }
+
+END

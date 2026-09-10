@@ -4,7 +4,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'drbd';
 $drbd_data = $agent_data['app'][$name][$app->app_instance];
-foreach (explode('|', $drbd_data) as $part) {
+foreach (explode('|', (string) $drbd_data) as $part) {
     [$stat, $val] = explode('=', $part);
     if (! empty($stat)) {
         $drbd[$stat] = $val;
@@ -40,7 +40,7 @@ $fields = [
 ];
 
 $tags = ['name', 'app_id', 'rrd_name', 'rrd_def'];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, $drbd_data, $fields);
 
 unset($drbd, $drbd_data);

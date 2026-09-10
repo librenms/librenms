@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class PortStp extends PortRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $table = 'ports_stp';
     protected $primaryKey = 'port_stp_id';
     public $timestamps = false;
@@ -26,15 +28,17 @@ class PortStp extends PortRelatedModel implements Keyable
         'forwardTransitions',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return "$this->vlan-$this->port_index";
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
+     */
     public function device(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
+        return $this->belongsTo(Device::class, 'device_id', 'device_id');
     }
 }

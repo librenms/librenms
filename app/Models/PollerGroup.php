@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PollerGroup.php
  *
@@ -25,11 +26,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PollerGroup extends Model
 {
+    use HasFactory;
     public $timestamps = false;
     protected $primaryKey = 'id';
     protected $fillable = ['group_name', 'descr'];
@@ -41,9 +44,9 @@ class PollerGroup extends Model
     {
         parent::boot();
 
-        static::deleting(function (PollerGroup $pollergroup) {
+        static::deleting(function (PollerGroup $pollergroup): void {
             // handle device poller group fallback to default poller
-            $default_poller_id = \LibreNMS\Config::get('default_poller_group');
+            $default_poller_id = \App\Facades\LibrenmsConfig::get('default_poller_group');
             $pollergroup->devices()->update(['poller_group' => $default_poller_id]);
         });
     }
@@ -53,8 +56,11 @@ class PollerGroup extends Model
         return self::query()->pluck('group_name', 'id')->prepend(__('General'), 0);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Device, $this>
+     */
     public function devices(): HasMany
     {
-        return $this->hasMany(\App\Models\Device::class, 'poller_group', 'id');
+        return $this->hasMany(Device::class, 'poller_group', 'id');
     }
 }

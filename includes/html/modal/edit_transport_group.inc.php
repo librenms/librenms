@@ -11,7 +11,6 @@
  * the source code distribution for details.
  */
 
-if (Auth::user()->hasGlobalAdmin()) {
     ?>
 <!--Modal for adding or updating a transport group -->
     <div class="modal fade" id="edit-transport-group" tabindex="-1" role="dialog"
@@ -140,14 +139,8 @@ if (Auth::user()->hasGlobalAdmin()) {
         width: "100%",
         placeholder: "Transport Name",
         ajax: {
-            url: 'ajax_list.php',
-            delay: 250,
-            data: function(params) {
-                return {
-                    type: "transports",
-                    search: params.term
-                }
-            }
+            url: '<?php echo route('ajax.select.alert-transport') ?>',
+            delay: 150
         }
     });
 
@@ -162,9 +155,8 @@ if (Auth::user()->hasGlobalAdmin()) {
         event.preventDefault();
         var group_id = $("#delete_group_id").val();
         $.ajax({
-            type: "POST",
-            url: "ajax_form.php",
-            data: { type: "delete-transport-group", group_id: group_id},
+            type: "DELETE",
+            url: '<?php echo route("alert.transport-groups.destroy", ["alert_transport_group" => ":alert_transport_group"]) ?>'.replace(':alert_transport_group', group_id),
             dataType: "json",
             success: function(data) {
                 if (data.status == 'ok') {
@@ -182,6 +174,3 @@ if (Auth::user()->hasGlobalAdmin()) {
     });
 
     </script>
-
-    <?php
-}

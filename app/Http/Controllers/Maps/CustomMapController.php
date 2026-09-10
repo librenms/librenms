@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CustomMapController.php
  *
@@ -25,43 +26,49 @@
 
 namespace App\Http\Controllers\Maps;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CustomMapSettingsRequest;
 use App\Models\CustomMap;
 use App\Models\CustomMapNodeImage;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use LibreNMS\Config;
 
 class CustomMapController extends Controller
 {
-    public function __construct()
+    public function index(Request $request): View
     {
-        $this->authorizeResource(CustomMap::class, 'map');
-    }
+        $this->authorize('viewAny', CustomMap::class);
 
-    public function index(): View
-    {
+        $request->validate([
+            ...CustomMap::filterValidationRules(),
+        ]);
+
         return view('map.custom-manage', [
-            'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name', 'menu_group'])->groupBy('menu_group')->sortKeys(),
+            'maps' => CustomMap::orderBy('name')
+                ->when($request->array('filter'), fn (Builder $query, $filters) => $query->applyFilters($filters))
+                ->get(['custom_map_id', 'name', 'menu_group'])->groupBy('menu_group')->sortKeys(),
+            'filter' => $request->array('filter'),
+            'filterFields' => $this->filterFields(),
             'name' => 'New Map',
             'menu_group' => null,
-            'node_align' => Config::get('custom_map.node_align', 10),
-            'edge_separation' => Config::get('custom_map.edge_seperation', 10),
-            'reverse_arrows' => Config::get('custom_map.reverse_arrows', false) ? 'true' : 'false',
+            'node_align' => LibrenmsConfig::get('custom_map.node_align', 10),
+            'edge_separation' => LibrenmsConfig::get('custom_map.edge_seperation', 10),
+            'reverse_arrows' => LibrenmsConfig::get('custom_map.reverse_arrows', false) ? 'true' : 'false',
             'legend' => [
                 'x' => -1,
                 'y' => -1,
             ],
-            'background_type' => Config::get('custom_map.background_type', 'none'),
-            'background_data' => Config::get('custom_map.background_data'),
+            'background_type' => LibrenmsConfig::get('custom_map.background_type', 'none'),
+            'background_data' => LibrenmsConfig::get('custom_map.background_data'),
             'map_conf' => [
-                'width' => Config::get('custom_map.width', '1800px'),
-                'height' => Config::get('custom_map.height', '800px'),
+                'width' => LibrenmsConfig::get('custom_map.width', '1800px'),
+                'height' => LibrenmsConfig::get('custom_map.height', '800px'),
                 'interaction' => [
                     'dragNodes' => true,
                     'dragView' => false,
@@ -93,6 +100,8 @@ class CustomMapController extends Controller
 
     public function destroy(CustomMap $map): Response
     {
+        $this->authorize('delete', $map);
+
         $map->delete();
 
         return response('Success', 200)
@@ -101,6 +110,8 @@ class CustomMapController extends Controller
 
     public function show(Request $request, CustomMap $map): View
     {
+        $this->authorize('view', $map);
+
         $request->validate([
             'screenshot' => 'nullable|in:yes',
         ]);
@@ -120,9 +131,9 @@ class CustomMapController extends Controller
             'legend' => $this->legendConfig($map),
             'background_type' => $map->background_type,
             'background_config' => $map->getBackgroundConfig(),
-            'page_refresh' => Config::get('page_refresh', 300),
+            'page_refresh' => LibrenmsConfig::get('page_refresh', 300),
             'map_conf' => $map_conf,
-            'base_url' => Config::get('base_url'),
+            'base_url' => LibrenmsConfig::get('base_url'),
             'newedge_conf' => $map->newedgeconfig,
             'newnode_conf' => $map->newnodeconfig,
             'vmargin' => 20,
@@ -133,6 +144,8 @@ class CustomMapController extends Controller
 
     public function edit(CustomMap $map): View
     {
+        $this->authorize('update', $map);
+
         $data = [
             'map_id' => $map->custom_map_id,
             'name' => $map->name,
@@ -150,7 +163,7 @@ class CustomMapController extends Controller
             'edit' => true,
             'vmargin' => 20,
             'hmargin' => 20,
-            'base_url' => Config::get('base_url'),
+            'base_url' => LibrenmsConfig::get('base_url'),
             'images' => $this->listNodeImages(),
             'maps' => CustomMap::orderBy('name')->where('custom_map_id', '<>', $map->custom_map_id)->get(['custom_map_id', 'name']),
         ];
@@ -167,6 +180,8 @@ class CustomMapController extends Controller
 
     public function store(CustomMapSettingsRequest $request): JsonResponse
     {
+        $this->authorize('create', CustomMap::class);
+
         // create a new map with default values
         $map = new CustomMap;
         $map->options = [
@@ -185,18 +200,18 @@ class CustomMapController extends Controller
         $map->newnodeconfig = [
             'borderWidth' => 1,
             'color' => [
-                'border' => Config::get('custom_map.node_border', '#2B7CE9'),
-                'background' => Config::get('custom_map.node_background', '#D2E5FF'),
+                'border' => LibrenmsConfig::get('custom_map.node_border', '#2B7CE9'),
+                'background' => LibrenmsConfig::get('custom_map.node_background', '#D2E5FF'),
             ],
             'font' => [
-                'color' => Config::get('custom_map.node_font_color', '#343434'),
-                'size' => Config::get('custom_map.node_font_size', 14),
-                'face' => Config::get('custom_map.node_font_face', 'arial'),
+                'color' => LibrenmsConfig::get('custom_map.node_font_color', '#343434'),
+                'size' => LibrenmsConfig::get('custom_map.node_font_size', 14),
+                'face' => LibrenmsConfig::get('custom_map.node_font_face', 'arial'),
             ],
             'icon' => [],
             'label' => true,
-            'shape' => Config::get('custom_map.node_type', 'box'),
-            'size' => Config::get('custom_map.node_size', 25),
+            'shape' => LibrenmsConfig::get('custom_map.node_type', 'box'),
+            'size' => LibrenmsConfig::get('custom_map.node_size', 25),
         ];
         $map->newedgeconfig = [
             'arrows' => [
@@ -208,15 +223,15 @@ class CustomMapController extends Controller
                 'type' => 'dynamic',
             ],
             'font' => [
-                'color' => Config::get('custom_map.edge_font_color', '#343434'),
-                'size' => Config::get('custom_map.edge_font_size', 12),
-                'face' => Config::get('custom_map.edge_font_face', 'arial'),
-                'align' => Config::get('custom_map.edge_font_align', 'horizontal'),
+                'color' => LibrenmsConfig::get('custom_map.edge_font_color', '#343434'),
+                'size' => LibrenmsConfig::get('custom_map.edge_font_size', 12),
+                'face' => LibrenmsConfig::get('custom_map.edge_font_face', 'arial'),
+                'align' => LibrenmsConfig::get('custom_map.edge_font_align', 'horizontal'),
             ],
             'label' => true,
         ];
-        $map->background_type = Config::get('custom_map.background_type', 'none');
-        $map->background_data = Config::get('custom_map.background_data');
+        $map->background_type = LibrenmsConfig::get('custom_map.background_type', 'none');
+        $map->background_data = LibrenmsConfig::get('custom_map.background_data');
         $map->legend_colours = $this->getDefaultLegendColours();
         if ($map->legend_colours) {
             $map->legend_steps = count($map->legend_colours) - 2;
@@ -227,6 +242,8 @@ class CustomMapController extends Controller
 
     public function update(CustomMapSettingsRequest $request, CustomMap $map): JsonResponse
     {
+        $this->authorize('update', $map);
+
         $map->fill($request->validated());
         $map->options = json_decode($request->options);
         $map->save(); // save to get ID
@@ -245,6 +262,9 @@ class CustomMapController extends Controller
 
     public function clone(CustomMap $map): JsonResponse
     {
+        $this->authorize('create', CustomMap::class);
+        $this->authorize('view', $map);
+
         $newmap = $map->replicate();
         $newmap->name .= ' - Clone';
 
@@ -257,7 +277,7 @@ class CustomMapController extends Controller
         $nodes = $map->nodes()->get();
         $edges = $map->edges()->get();
 
-        DB::transaction(function () use ($newmap, $newbackground, $nodes, $edges) {
+        DB::transaction(function () use ($newmap, $newbackground, $nodes, $edges): void {
             $newmap->save();
 
             if ($newbackground) {
@@ -266,7 +286,7 @@ class CustomMapController extends Controller
             }
 
             $node_id_map = collect();
-            foreach ($nodes as $id => $node) {
+            foreach ($nodes as $node) {
                 $newnode = $node->replicate();
                 $newnode->custom_map_id = $newmap->custom_map_id;
                 $newnode->save();
@@ -274,7 +294,7 @@ class CustomMapController extends Controller
                 $node_id_map->put($node->custom_map_node_id, $newnode->custom_map_node_id);
             }
 
-            foreach ($edges as $id => $edge) {
+            foreach ($edges as $edge) {
                 $newedge = $edge->replicate();
                 $newedge->custom_map_id = $newmap->custom_map_id;
                 $newedge->custom_map_node1_id = $node_id_map->get($edge->custom_map_node1_id);
@@ -286,6 +306,38 @@ class CustomMapController extends Controller
         return response()->json([
             'id' => $newmap->custom_map_id,
         ]);
+    }
+
+    /**
+     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[]|array<string, string>, params?: array<string, string>}>
+     */
+    private function filterFields(): array
+    {
+        return [
+            [
+                'key' => 'name',
+                'label' => __('Name'),
+                'type' => 'text',
+            ],
+            [
+                'key' => 'menu_group',
+                'label' => __('map.custom.edit.map.menu_group'),
+                'type' => 'select',
+                'endpoint' => route('ajax.select.custom-map-menu-group'),
+            ],
+            [
+                'key' => 'nodes.device_id',
+                'label' => __('Device'),
+                'type' => 'select',
+                'endpoint' => route('ajax.select.device'),
+            ],
+            [
+                'key' => 'edges.port_id',
+                'label' => __('Interface'),
+                'type' => 'select',
+                'endpoint' => route('ajax.select.port'),
+            ],
+        ];
     }
 
     /**
@@ -335,9 +387,9 @@ class CustomMapController extends Controller
     /**
      * Return the default legend colours
      */
-    private function getDefaultLegendColours(): array|null
+    private function getDefaultLegendColours(): ?array
     {
-        $ret = Config::get('custom_map.legend_colours', null);
+        $ret = LibrenmsConfig::get('custom_map.legend_colours', null);
 
         // Return null if there is no config
         if (! $ret) {
@@ -348,7 +400,7 @@ class CustomMapController extends Controller
             if (! is_numeric($key)) {
                 // Delete keys that are not numeric
                 unset($ret[$key]);
-            } elseif (! preg_match('/^#[A-Fa-f0-0]{6}$/', $ret[$key])) {
+            } elseif (! preg_match('/^#[A-Fa-f0-0]{6}$/', (string) $ret[$key])) {
                 // Delete keys that are not a valid hex HTML colour
                 unset($ret[$key]);
             }

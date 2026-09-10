@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OspfIfStateChange.php
  *

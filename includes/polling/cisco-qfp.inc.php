@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -30,8 +31,9 @@ $options = [
 ];
 
 $component = new LibreNMS\Component();
-$components = $component->getComponents($device['device_id'], $options);
-$components = $components[$device['device_id']];
+if ($components = $component->getComponents($device['device_id'], $options)) {
+    $components = $components[$device['device_id']];
+}
 
 /*
  * SNMP makes available multiple datapoints dependnet on the time interval
@@ -126,8 +128,8 @@ if (! empty($components) && is_array($components)) {
                 $rrd_def->addDataset($name, 'GAUGE', 0);
                 $rrd[$name] = $util_data[$util_oids[$name]];
             }
-            $tags = compact('module', 'rrd_name', 'rrd_def', 'qfp_index');
-            data_update($device, $module, $tags, $rrd);
+            $tags = ['module' => $module, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'qfp_index' => $qfp_index];
+            app('Datastore')->put($device, $module, $tags, $rrd);
             unset($filename, $rrd_filename, $rrd_name, $rrd_def, $rrd);
 
             /*
@@ -139,8 +141,8 @@ if (! empty($components) && is_array($components)) {
                 $rrd_def->addDataset($name, 'GAUGE', 0);
                 $rrd[$name] = $memory_data[$memory_oids[$name]];
             }
-            $tags = compact('module', 'rrd_name', 'rrd_def', 'qfp_index');
-            data_update($device, $module, $tags, $rrd);
+            $tags = ['module' => $module, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'qfp_index' => $qfp_index];
+            app('Datastore')->put($device, $module, $tags, $rrd);
             unset($filename, $rrd_filename, $rrd_name, $rrd_def, $rrd);
         }
     }

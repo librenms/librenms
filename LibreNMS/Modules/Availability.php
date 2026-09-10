@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Availability.php
  *
@@ -25,11 +26,12 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Time;
@@ -44,7 +46,7 @@ class Availability implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
         return false;
     }
@@ -59,9 +61,9 @@ class Availability implements Module
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabled();
+        return $status->isEnabled() && $connectivity->hasAvailability();
     }
 
     /**
@@ -72,7 +74,7 @@ class Availability implements Module
         $os->enableGraph('availability');
 
         $valid_ids = [];
-        foreach (Config::get('graphing.availability') as $duration) {
+        foreach (LibrenmsConfig::get('graphing.availability') as $duration) {
             // update database with current calculation
             $avail = \App\Models\Availability::updateOrCreate([
                 'device_id' => $os->getDeviceId(),

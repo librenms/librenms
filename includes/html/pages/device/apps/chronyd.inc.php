@@ -14,12 +14,15 @@ echo ' | Sources: ';
 $sources = $app->data['sources'] ?? [];
 sort($sources);
 foreach ($sources as $index => $source) {
-    $source = htmlspecialchars($source);
-    $label = $vars['source'] == $source
-        ? '<span class="pagemenu-selected">' . $source . '</span>'
-        : $source;
+    $source = htmlspecialchars((string) $source);
 
-    echo generate_link($label, $link_array, ['source' => $source]);
+    $link = generate_link($source, $link_array, ['source' => $source]);
+
+    $link = $vars['source'] == $source
+        ? '<span class="pagemenu-selected">' . $link . '</span>'
+        : $link;
+
+    echo $link;
 
     if ($index < (count($sources) - 1)) {
         echo ', ';
@@ -50,7 +53,7 @@ foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 

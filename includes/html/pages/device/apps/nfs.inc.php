@@ -5,7 +5,7 @@ use App\Models\Ipv6Address;
 use App\Models\Port;
 use App\Models\Storage;
 
-include 'includes/nfs-shared.inc.php';
+require base_path('includes/nfs-shared.inc.php');
 
 if (! isset($vars['flat_mount_options'])) {
     $vars['flat_mount_options'] = 1;
@@ -53,38 +53,55 @@ if ($is_server || $is_client) {
     echo generate_link('General', $link_array);
 
     if ($is_client && isset($app->data['mounts']) && isset($app->data['mounts'][0])) {
-        $label = $vars['app_page'] == 'mounts'
-            ? '<span class="pagemenu-selected">Mounts</span>'
-            : 'Mounts';
-        echo ', ' . generate_link($label, $link_array, ['app_page' => 'mounts']) . "\n";
+        $label = 'Mounts';
+        $link = generate_link($label, $link_array, ['app_page' => 'mounts']);
+
+        $link = $vars['app_page'] == 'mounts'
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+
+        echo ', ' . $link . "\n";
     }
 
     // showmount -a only works for NFSv2 and NFSv3... unfortunately no NFSv4 equivalent
     // this means no mount info if v4
     if ($is_server && isset($app->data['mounted_by']) && isset($app->data['mounted_by'][0])) {
-        $label = $vars['app_page'] == 'mounted_by'
-            ? '<span class="pagemenu-selected">Mounted By</span>'
-            : 'Mounted By';
-        echo ', ' . generate_link($label, $link_array, ['app_page' => 'mounted_by']) . "\n";
+        $label = 'Mounted By';
+        $link = generate_link($label, $link_array, ['app_page' => 'mounted_by']);
+
+        $link = $vars['app_page'] == 'mounted_by'
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+
+        echo ', ' . $link . "\n";
     }
 
     if ($vars['app_page'] == 'mounts') {
         echo '<br>Display Options :: ';
-        $label = $vars['flat_mount_options'] == '1'
-            ? '<span class="pagemenu-selected">Flat</span>'
-            : 'Flat';
+
+        $label = 'Flat';
         $new_link_array_extra = $link_array_extra;
         $new_link_array_extra['flat_mount_options'] = $vars['flat_mount_options'] == '1'
             ? '0' : '1';
-        echo generate_link($label, $link_array, $new_link_array_extra) . ', ';
+        $link = generate_link($label, $link_array, $new_link_array_extra);
 
-        $label = $vars['show_mount_options'] == '1'
-            ? '<span class="pagemenu-selected">Show Mount Options</span>'
-            : 'Show Mount Options';
+        $link = $vars['flat_mount_options'] == '1'
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+
+        echo $link . ', ';
+
+        $label = 'Show Mount Options';
         $new_link_array_extra = $link_array_extra;
         $new_link_array_extra['show_mount_options'] = $vars['show_mount_options'] == '1'
             ? '0' : '1';
-        echo generate_link($label, $link_array, $new_link_array_extra);
+        $link = generate_link($label, $link_array, $new_link_array_extra);
+
+        $link = $vars['show_mount_options'] == '1'
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+
+        echo $link;
     }
     print_optionbar_end();
 }
@@ -194,7 +211,7 @@ if ($vars['app_page'] == 'general') {
         'rows' => [],
     ];
     $mounted_by = $app->data['mounted_by'] ?? [];
-    foreach ($mounted_by as $array_location => $data) {
+    foreach ($mounted_by as $data) {
         $new_host = ['data' => ''];
         $new_path = ['data' => ''];
         if (isset($data['host'])) {
@@ -253,10 +270,10 @@ if ($vars['app_page'] == 'general') {
                     $path_graph_array = [];
                     $path_graph_array['height'] = '100';
                     $path_graph_array['width'] = '210';
-                    $path_graph_array['to'] = \LibreNMS\Config::get('time.now');
+                    $path_graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
                     $path_graph_array['id'] = $storage_info['storage_id'];
                     $path_graph_array['type'] = 'storage_usage';
-                    $path_graph_array['from'] = \LibreNMS\Config::get('time.day');
+                    $path_graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
                     $path_graph_array['legend'] = 'no';
 
                     $path_link_array = $path_graph_array;
@@ -304,7 +321,7 @@ if ($vars['app_page'] == 'general') {
         $table_info['headers'][] = 'Mount Options';
     }
     $mounts = $app->data['mounts'] ?? [];
-    foreach ($mounts as $array_location => $data) {
+    foreach ($mounts as $data) {
         $new_host = ['data' => ''];
         $new_rpath = ['data' => ''];
         $new_lpath = ['data' => ''];
@@ -356,10 +373,10 @@ if ($vars['app_page'] == 'general') {
                     $rpath_graph_array = [];
                     $rpath_graph_array['height'] = '100';
                     $rpath_graph_array['width'] = '210';
-                    $rpath_graph_array['to'] = \LibreNMS\Config::get('time.now');
+                    $rpath_graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
                     $rpath_graph_array['id'] = $storage_info['storage_id'];
                     $rpath_graph_array['type'] = 'storage_usage';
-                    $rpath_graph_array['from'] = \LibreNMS\Config::get('time.day');
+                    $rpath_graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
                     $rpath_graph_array['legend'] = 'no';
 
                     $rpath_link_array = $rpath_graph_array;
@@ -451,7 +468,7 @@ foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 

@@ -16,8 +16,8 @@ return new class extends Migration
             $table->timestamps();
             $table->boolean('historical')->default(0);
         });
-        DB::table('ports_nac')->update(['created_at' => \Carbon\Carbon::now()]);
-        DB::table('ports_nac')->update(['updated_at' => \Carbon\Carbon::now()]);
+        DB::table('ports_nac')->update(['created_at' => Carbon\Carbon::now()]);
+        DB::table('ports_nac')->update(['updated_at' => Carbon\Carbon::now()]);
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * unix.inc.php
  *
@@ -53,17 +54,14 @@ if (! empty($snmpData)) {
             $state_name = $sensor['state_name'];
             $descr = $sensor['descr'];
             $states = [
-                ['value' => 0, 'generic' => $sensor['genericF'], 'graph' => 1, 'descr' => 'False'],
-                ['value' => 1, 'generic' => $sensor['genericT'], 'graph' => 1, 'descr' => 'True'],
+                ['value' => 0, 'generic' => $sensor['genericF'], 'descr' => 'False'],
+                ['value' => 1, 'generic' => $sensor['genericT'], 'descr' => 'True'],
             ];
 
             create_state_index($state_name, $states);
 
             //Discover Sensors
             discover_sensor(null, 'state', $device, $oid, $sensor_oid, $state_name, $descr, '1', '1', null, null, null, null, $value, 'snmp', null, null, null, 'ups-nut');
-
-            //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $sensor_oid);
         }
     }
 }

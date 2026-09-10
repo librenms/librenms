@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OspfPort.php
  *
@@ -66,9 +67,11 @@ class OspfPort extends PortRelatedModel
     ];
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
+     */
     public function device(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Device::class, 'device_id');
+        return $this->belongsTo(Device::class, 'device_id');
     }
 }

@@ -1,0 +1,3025 @@
+-- Namespace: http://viptela.com/policy
+
+VIPTELA-POLICY DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    viptela
+        FROM VIPTELA-GLOBAL
+;
+
+viptela-policy MODULE-IDENTITY
+    LAST-UPDATED "202007010000Z"
+    ORGANIZATION "Viptela, Inc."
+    CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
+    DESCRIPTION "This module defines the data model for route and forwarding policy management"
+    REVISION "202007010000Z"
+    DESCRIPTION "Viptela Revision 20.3"
+    REVISION "202002240000Z"
+    DESCRIPTION "Viptela Revision 20.1"
+    REVISION "201911150000Z"
+    DESCRIPTION "Viptela Revision 19.3"
+    REVISION "201908150000Z"
+    DESCRIPTION "Viptela Revision 19.2"
+    REVISION "201811010000Z"
+    DESCRIPTION "Viptela Revision 18.4"
+    REVISION "201808200000Z"
+    DESCRIPTION "Viptela Revision 18.3.1"
+    REVISION "201806250000Z"
+    DESCRIPTION "Viptela Revision 18.3"
+    REVISION "201804250000Z"
+    DESCRIPTION "Viptela Revision 18.2"
+    REVISION "201803150000Z"
+    DESCRIPTION "Viptela Revision 18.1.1"
+    REVISION "201801160000Z"
+    DESCRIPTION "Viptela Revision 17.2.3"
+    REVISION "201711010000Z"
+    DESCRIPTION "Viptela Revision 17.2.1"
+    REVISION "201708010000Z"
+    DESCRIPTION "Viptela Revision 17.2"
+    REVISION "201705250000Z"
+    DESCRIPTION "Viptela Revision 17.1.1"
+    REVISION "201704060000Z"
+    DESCRIPTION "Viptela Revision 17.1"
+    REVISION "201702150000Z"
+    DESCRIPTION "Viptela Revision 16.3.2"
+    REVISION "201702060000Z"
+    DESCRIPTION "Viptela Revision 16.3.1"
+    REVISION "201611160000Z"
+    DESCRIPTION "Viptela Revision 16.3"
+    REVISION "201610250000Z"
+    DESCRIPTION "Viptela Revision 16.2.10"
+    REVISION "201610240000Z"
+    DESCRIPTION "Viptela Revision 16.2.4"
+    REVISION "201608100000Z"
+    DESCRIPTION "Viptela Revision 16.2.2"
+    REVISION "201608010000Z"
+    DESCRIPTION "Viptela Revision 16.2.1"
+    REVISION "201606090000Z"
+    DESCRIPTION "Viptela Revision 16.2"
+    REVISION "201604220000Z"
+    DESCRIPTION "Viptela Revision 16.1.1"
+    REVISION "201603150000Z"
+    DESCRIPTION "Viptela Revision 16.1"
+    REVISION "201601300000Z"
+    DESCRIPTION "Viptela Revision 15.4.3"
+    REVISION "201512280000Z"
+    DESCRIPTION "Viptela Revision 15.4.1"
+    REVISION "201512010000Z"
+    DESCRIPTION "Viptela Revision 15.4.0"
+    REVISION "201510310000Z"
+    DESCRIPTION "Viptela Revision 15.3.5"
+    REVISION "201509270000Z"
+    DESCRIPTION "Viptela Revision 15.3.3"
+    REVISION "201509010000Z"
+    DESCRIPTION "Viptela Revision 15.3.1"
+    REVISION "201507010000Z"
+    DESCRIPTION "Viptela Revision 15.3"
+    ::= { viptela 8 }
+
+UnsignedByte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedByte"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+Ipv4Prefix ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d/1d"
+    STATUS      current
+    DESCRIPTION "confd:ipv4Prefix"
+    SYNTAX      OCTET STRING (SIZE (5))
+
+InetAddressIP ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "confd:inetAddressIP"
+    SYNTAX      OCTET STRING (SIZE (4|16))
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+SourcePort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+DestinationIp ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+Protocol ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+Dscp1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+TcpFlags ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      BITS {syn(0)}
+
+DestinationIp1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+SourceIp ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+Protocol1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+Protocol2 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+Protocol3 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+Protocol4 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+Protocol5 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+DestinationPort1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+Community1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+DestinationPort2 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+DestinationPort3 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+DestinationPort4 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+DestinationPort5 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+PacketLength ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+TransportProtocol ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {transport-tcp(0),transport-udp(1)}
+
+ActionDataEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {accept(0),drop(1)}
+
+BgpOriginEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {egp(0),igp(1),incomplete(2)}
+
+Dscp ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+ActionEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {accept(0),reject(1)}
+
+PacketLength1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+PacketLength2 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+PacketLength3 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+Community ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+DataPolicyDirectionEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {from-service(0),from-tunnel(1),all(2)}
+
+SourcePort1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+SourcePort2 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+SourcePort3 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+SourcePort4 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+SourcePort5 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+DirectionEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {in(0),out(1)}
+
+SourceIp1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+DestinationPort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+ColorList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+EncapsulationList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+LossProtectEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {fec-adaptive(1),fec-always(2),pkt-dup(3)}
+
+-- tagpath /policy/snmp-policy
+policy OBJECT IDENTIFIER ::= { viptela-policy 4 }
+
+-- tagpath /policy/snmp-policy/data-policy
+policyDataPolicyFilter OBJECT IDENTIFIER ::= { policy 1 }
+
+-- tagpath /policy/snmp-policy/app-route-policy
+policyAppRoutePolicy OBJECT IDENTIFIER ::= { policy 2 }
+
+-- tagpath /policy/snmp-policy/access-list-names
+policyAccessListNames OBJECT IDENTIFIER ::= { policy 3 }
+
+-- tagpath /policy/snmp-policy/access-list-counters
+policyAccessListCounters OBJECT IDENTIFIER ::= { policy 4 }
+
+-- tagpath /policy/snmp-policy/access-list-policers
+policyAccessListPolicers OBJECT IDENTIFIER ::= { policy 5 }
+
+-- tagpath /policy/snmp-policy/qos-scheduler-info
+policyQosSchedulerInfo OBJECT IDENTIFIER ::= { policy 6 }
+
+-- tagpath /policy/snmp-policy/qos-map-info
+policyQosMapInfo OBJECT IDENTIFIER ::= { policy 7 }
+
+-- tagpath /policy/snmp-policy/access-list-associations
+policyAccessListAssociations OBJECT IDENTIFIER ::= { policy 8 }
+
+-- tagpath /policy/snmp-policy/rewrite-associations
+policyRewriteAssociations OBJECT IDENTIFIER ::= { policy 9 }
+
+-- tagpath /policy/from-vsmart
+policyFromVsmart OBJECT IDENTIFIER ::= { policy 10 }
+
+-- tagpath /policy/snmp-policy/device-access-policy-counters
+policyDeviceAccessPolicyCounters OBJECT IDENTIFIER ::= { policy 11 }
+
+-- tagpath /policy/snmp-policy/device-access-policy-names
+policyDeviceAccessPolicyNames OBJECT IDENTIFIER ::= { policy 12 }
+
+-- Display zbfw
+-- tagpath /zbfw
+zbfw OBJECT IDENTIFIER ::= { viptela-policy 7}
+
+-- tagpath /policer
+policerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display policers"
+    ::= { viptela-policy 5 }
+
+-- tagpath /policer
+policerEntry OBJECT-TYPE
+    SYNTAX      PolicerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policerName, policerIndex, policerDirection }
+        ::= { policerTable 1 }
+
+PolicerEntry ::=
+    SEQUENCE {
+        policerName String,
+        policerIndex Unsigned32,
+        policerDirection DirectionEnum,
+        policerRate Counter64,
+        policerBurst Unsigned32,
+        policerOosAction String,
+        policerOosPkts Counter64,
+        policerOosBytes Counter64
+    }
+
+-- tagpath /policer/name
+policerName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Name of policer"
+    ::= { policerEntry 1 }
+
+-- tagpath /policer/index
+policerIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Policer index"
+    ::= { policerEntry 2 }
+
+-- tagpath /policer/direction
+policerDirection OBJECT-TYPE
+    SYNTAX      DirectionEnum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Direction"
+    ::= { policerEntry 3 }
+
+-- tagpath /policer/rate
+policerRate OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Bandwidth, in bps"
+    ::= { policerEntry 4 }
+
+-- tagpath /policer/burst
+policerBurst OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Burst size, in bytes"
+    ::= { policerEntry 5 }
+
+-- tagpath /policer/oos-action
+policerOosAction OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Out-of-specification action"
+    ::= { policerEntry 6 }
+
+-- tagpath /policer/oos-pkts
+policerOosPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Out-of-specification packets"
+    ::= { policerEntry 7 }
+
+-- tagpath /policer/oos-bytes
+policerOosBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Out-of-specification packet bytes"
+    ::= { policerEntry 8 }
+
+-- tagpath /zone-policy-filter
+policyZonePolicyFilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyZonePolicyFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Zone policy filters"
+    ::= { zbfw 3 }
+
+-- tagpath /zone-policy-filter
+policyZonePolicyFilterEntry OBJECT-TYPE
+    SYNTAX      PolicyZonePolicyFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyZonePolicyFilterName }
+        ::= { policyZonePolicyFilterTable 1 }
+
+PolicyZonePolicyFilterEntry ::=
+    SEQUENCE {
+        policyZonePolicyFilterName String
+    }
+
+-- tagpath /zone-policy-filter/name
+policyZonePolicyFilterName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Zone policy name"
+    ::= { policyZonePolicyFilterEntry 1 }
+
+-- tagpath /zone-policy-filter/zbfw-policy-counter
+policyZonePolicyFilterCounterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyZonePolicyFilterCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Filter Zone Counter"
+    ::= { zbfw 4 }
+
+-- tagpath /zone-policy-filter/zbfw-policy-counter
+policyZonePolicyFilterCounterEntry OBJECT-TYPE
+    SYNTAX      PolicyZonePolicyFilterCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyZonePolicyFilterName, policyZonePolicyFilterCounterName }
+        ::= { policyZonePolicyFilterCounterTable 1 }
+
+PolicyZonePolicyFilterCounterEntry ::=
+    SEQUENCE {
+        policyZonePolicyFilterCounterName String,
+        policyZonePolicyFilterCounterPackets Counter64,
+        policyZonePolicyFilterCounterBytes Counter64
+    }
+
+-- tagpath /zone-policy-filter/zbfw-policy-counter/counter-name
+policyZonePolicyFilterCounterName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Counter name"
+    ::= { policyZonePolicyFilterCounterEntry 1 }
+
+-- tagpath /zone-policy-filter/zbfw-policy-counter/packets
+policyZonePolicyFilterCounterPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyZonePolicyFilterCounterEntry 2 }
+
+-- tagpath /zone-policy-filter/zone-policy-counter/bytes
+policyZonePolicyFilterCounterBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyZonePolicyFilterCounterEntry 3 }
+
+-- tagpath /policy/data-policy-filter
+policyDataPolicyFilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyDataPolicyFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Data policy filters"
+    ::= { policyDataPolicyFilter 1 }
+
+-- tagpath /policy/data-policy-filter
+policyDataPolicyFilterEntry OBJECT-TYPE
+    SYNTAX      PolicyDataPolicyFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyDataPolicyFilterName }
+        ::= { policyDataPolicyFilterTable 1 }
+
+PolicyDataPolicyFilterEntry ::=
+    SEQUENCE {
+        policyDataPolicyFilterName String
+    }
+
+-- tagpath /policy/data-policy-filter/name
+policyDataPolicyFilterName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Data policy name"
+    ::= { policyDataPolicyFilterEntry 1 }
+
+-- tagpath /policy/data-policy-filter/data-policy-vpnlist
+policyDataPolicyFilterVpnlistTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyDataPolicyFilterVpnlistEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Filter VPN list"
+    ::= { policyDataPolicyFilter 2 }
+
+-- tagpath /policy/data-policy-filter/data-policy-vpnlist
+policyDataPolicyFilterVpnlistEntry OBJECT-TYPE
+    SYNTAX      PolicyDataPolicyFilterVpnlistEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyDataPolicyFilterName, policyDataPolicyFilterVpnlistName }
+        ::= { policyDataPolicyFilterVpnlistTable 1 }
+
+PolicyDataPolicyFilterVpnlistEntry ::=
+    SEQUENCE {
+        policyDataPolicyFilterVpnlistName String
+    }
+
+-- tagpath /policy/data-policy-filter/data-policy-vpnlist/name
+policyDataPolicyFilterVpnlistName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VPN list name"
+    ::= { policyDataPolicyFilterVpnlistEntry 1 }
+
+-- tagpath /policy/data-policy-filter/data-policy-vpnlist/data-policy-counter
+policyDataPolicyFilterVpnlistCounterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyDataPolicyFilterVpnlistCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Filter counters"
+    ::= { policyDataPolicyFilter 3 }
+
+-- tagpath /policy/data-policy-filter/data-policy-vpnlist/data-policy-counter
+policyDataPolicyFilterVpnlistCounterEntry OBJECT-TYPE
+    SYNTAX      PolicyDataPolicyFilterVpnlistCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyDataPolicyFilterName, policyDataPolicyFilterVpnlistName, policyDataPolicyFilterVpnlistCounterName }
+        ::= { policyDataPolicyFilterVpnlistCounterTable 1 }
+
+PolicyDataPolicyFilterVpnlistCounterEntry ::=
+    SEQUENCE {
+        policyDataPolicyFilterVpnlistCounterName String,
+        policyDataPolicyFilterVpnlistCounterPackets Counter64,
+        policyDataPolicyFilterVpnlistCounterBytes Counter64
+    }
+
+-- tagpath /policy/data-policy-filter/data-policy-vpnlist/data-policy-counter/counter-name
+policyDataPolicyFilterVpnlistCounterName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Counter name"
+    ::= { policyDataPolicyFilterVpnlistCounterEntry 1 }
+
+-- tagpath /policy/data-policy-filter/data-policy-vpnlist/data-policy-counter/packets
+policyDataPolicyFilterVpnlistCounterPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyDataPolicyFilterVpnlistCounterEntry 2 }
+
+-- tagpath /policy/data-policy-filter/data-policy-vpnlist/data-policy-counter/bytes
+policyDataPolicyFilterVpnlistCounterBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyDataPolicyFilterVpnlistCounterEntry 3 }
+
+-- tagpath /policy/data-policy-filter/data-policy-vpnlist/data-policy-policer
+policyDataPolicyFilterVpnlistPolicerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyDataPolicyFilterVpnlistPolicerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Filter policers"
+    ::= { policyDataPolicyFilter 4 }
+
+-- tagpath /policy/data-policy-filter/data-policy-vpnlist/data-policy-policer
+policyDataPolicyFilterVpnlistPolicerEntry OBJECT-TYPE
+    SYNTAX      PolicyDataPolicyFilterVpnlistPolicerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyDataPolicyFilterName, policyDataPolicyFilterVpnlistName, policyDataPolicyFilterVpnlistPolicerName }
+        ::= { policyDataPolicyFilterVpnlistPolicerTable 1 }
+
+PolicyDataPolicyFilterVpnlistPolicerEntry ::=
+    SEQUENCE {
+        policyDataPolicyFilterVpnlistPolicerName String,
+        policyDataPolicyFilterVpnlistPolicerOosPackets Counter64,
+        policyDataPolicyFilterVpnlistPolicerOosBytes Counter64
+    }
+
+-- tagpath /policy/data-policy-filter/data-policy-vpnlist/data-policy-policer/policer-name
+policyDataPolicyFilterVpnlistPolicerName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Policer name"
+    ::= { policyDataPolicyFilterVpnlistPolicerEntry 1 }
+
+-- tagpath /policy/data-policy-filter/data-policy-vpnlist/data-policy-policer/oos-packets
+policyDataPolicyFilterVpnlistPolicerOosPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyDataPolicyFilterVpnlistPolicerEntry 2 }
+
+-- tagpath /policy/data-policy-filter/data-policy-vpnlist/data-policy-policer/oos-bytes
+policyDataPolicyFilterVpnlistPolicerOosBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyDataPolicyFilterVpnlistPolicerEntry 3 }
+
+-- tagpath /policy/app-route-policy-filter
+policyAppRoutePolicyFilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyAppRoutePolicyFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Application-aware routing policy filters"
+    ::= { policyAppRoutePolicy 1 }
+
+-- tagpath /policy/app-route-policy-filter
+policyAppRoutePolicyFilterEntry OBJECT-TYPE
+    SYNTAX      PolicyAppRoutePolicyFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyAppRoutePolicyFilterName }
+        ::= { policyAppRoutePolicyFilterTable 1 }
+
+PolicyAppRoutePolicyFilterEntry ::=
+    SEQUENCE {
+        policyAppRoutePolicyFilterName String
+    }
+
+-- tagpath /policy/app-route-policy-filter/name
+policyAppRoutePolicyFilterName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Application-aware routing policy name"
+    ::= { policyAppRoutePolicyFilterEntry 1 }
+
+-- tagpath /policy/app-route-policy-filter/app-route-policy-vpnlist
+policyAppRoutePolicyFilterVpnlistTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyAppRoutePolicyFilterVpnlistEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Filter VPN list"
+    ::= { policyAppRoutePolicy 2 }
+
+-- tagpath /policy/app-route-policy-filter/app-route-policy-vpnlist
+policyAppRoutePolicyFilterVpnlistEntry OBJECT-TYPE
+    SYNTAX      PolicyAppRoutePolicyFilterVpnlistEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyAppRoutePolicyFilterName, policyAppRoutePolicyFilterVpnlistName }
+        ::= { policyAppRoutePolicyFilterVpnlistTable 1 }
+
+PolicyAppRoutePolicyFilterVpnlistEntry ::=
+    SEQUENCE {
+        policyAppRoutePolicyFilterVpnlistName String
+    }
+
+-- tagpath /policy/app-route-policy-filter/app-route-policy-vpnlist/name
+policyAppRoutePolicyFilterVpnlistName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VPN list name"
+    ::= { policyAppRoutePolicyFilterVpnlistEntry 1 }
+
+-- tagpath /policy/app-route-policy-filter/app-route-policy-vpnlist/app-route-policy-counter
+policyAppRoutePolicyFilterVpnlistCounterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyAppRoutePolicyFilterVpnlistCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Filter counters"
+    ::= { policyAppRoutePolicy 3 }
+
+-- tagpath /policy/app-route-policy-filter/app-route-policy-vpnlist/app-route-policy-counter
+policyAppRoutePolicyFilterVpnlistCounterEntry OBJECT-TYPE
+    SYNTAX      PolicyAppRoutePolicyFilterVpnlistCounterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyAppRoutePolicyFilterName, policyAppRoutePolicyFilterVpnlistName, policyAppRoutePolicyFilterVpnlistCounterName }
+        ::= { policyAppRoutePolicyFilterVpnlistCounterTable 1 }
+
+PolicyAppRoutePolicyFilterVpnlistCounterEntry ::=
+    SEQUENCE {
+        policyAppRoutePolicyFilterVpnlistCounterName String,
+        policyAppRoutePolicyFilterVpnlistCounterPackets Counter64,
+        policyAppRoutePolicyFilterVpnlistCounterBytes Counter64
+    }
+
+-- tagpath /policy/app-route-policy-filter/app-route-policy-vpnlist/app-route-policy-counter/counter-name
+policyAppRoutePolicyFilterVpnlistCounterName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Counter name"
+    ::= { policyAppRoutePolicyFilterVpnlistCounterEntry 1 }
+
+-- tagpath /policy/app-route-policy-filter/app-route-policy-vpnlist/app-route-policy-counter/packets
+policyAppRoutePolicyFilterVpnlistCounterPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyAppRoutePolicyFilterVpnlistCounterEntry 2 }
+
+-- tagpath /policy/app-route-policy-filter/app-route-policy-vpnlist/app-route-policy-counter/bytes
+policyAppRoutePolicyFilterVpnlistCounterBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyAppRoutePolicyFilterVpnlistCounterEntry 3 }
+
+-- tagpath /policy/access-list-names
+policyAccessListNamesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyAccessListNamesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "ACL names"
+    ::= { policyAccessListNames 1 }
+
+-- tagpath /policy/access-list-names
+policyAccessListNamesEntry OBJECT-TYPE
+    SYNTAX      PolicyAccessListNamesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyAccessListNamesName }
+        ::= { policyAccessListNamesTable 1 }
+
+PolicyAccessListNamesEntry ::=
+    SEQUENCE {
+        policyAccessListNamesName String
+    }
+
+-- tagpath /policy/access-list-names/name
+policyAccessListNamesName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ACL name"
+    ::= { policyAccessListNamesEntry 1 }
+
+-- tagpath /policy/access-list-counters
+policyAccessListCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyAccessListCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "ACL counters"
+    ::= { policyAccessListCounters 1 }
+
+-- tagpath /policy/access-list-counters
+policyAccessListCountersEntry OBJECT-TYPE
+    SYNTAX      PolicyAccessListCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyAccessListCountersName }
+        ::= { policyAccessListCountersTable 1 }
+
+PolicyAccessListCountersEntry ::=
+    SEQUENCE {
+        policyAccessListCountersName String
+    }
+
+-- tagpath /policy/access-list-counters/name
+policyAccessListCountersName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ACL name"
+    ::= { policyAccessListCountersEntry 1 }
+
+-- tagpath /policy/access-list-counters/access-policy-counter-list
+policyAccessListCountersAccessPolicyCounterListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyAccessListCountersAccessPolicyCounterListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Access policy counter list"
+    ::= { policyAccessListCounters 2 }
+
+-- tagpath /policy/access-list-counters/access-policy-counter-list
+policyAccessListCountersAccessPolicyCounterListEntry OBJECT-TYPE
+    SYNTAX      PolicyAccessListCountersAccessPolicyCounterListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyAccessListCountersName, policyAccessListCountersAccessPolicyCounterListCounterName }
+        ::= { policyAccessListCountersAccessPolicyCounterListTable 1 }
+
+PolicyAccessListCountersAccessPolicyCounterListEntry ::=
+    SEQUENCE {
+        policyAccessListCountersAccessPolicyCounterListCounterName String,
+        policyAccessListCountersAccessPolicyCounterListPackets Counter64,
+        policyAccessListCountersAccessPolicyCounterListBytes Counter64
+    }
+
+-- tagpath /policy/access-list-counters/access-policy-counter-list/counter-name
+policyAccessListCountersAccessPolicyCounterListCounterName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Counter name"
+    ::= { policyAccessListCountersAccessPolicyCounterListEntry 1 }
+
+-- tagpath /policy/access-list-counters/access-policy-counter-list/packets
+policyAccessListCountersAccessPolicyCounterListPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyAccessListCountersAccessPolicyCounterListEntry 2 }
+
+-- tagpath /policy/access-list-counters/access-policy-counter-list/bytes
+policyAccessListCountersAccessPolicyCounterListBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyAccessListCountersAccessPolicyCounterListEntry 3 }
+
+-- tagpath /policy/device-access-policy-names
+policyDeviceAccessPolicyNamesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyDeviceAccessPolicyNamesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Device Access Policy names"
+    ::= { policyDeviceAccessPolicyNames 1 }
+
+-- tagpath /policy/device-access-policy-names
+policyDeviceAccessPolicyNamesEntry OBJECT-TYPE
+    SYNTAX      PolicyDeviceAccessPolicyNamesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyDeviceAccessPolicyNamesName }
+        ::= { policyDeviceAccessPolicyNamesTable 1 }
+
+PolicyDeviceAccessPolicyNamesEntry ::=
+    SEQUENCE {
+        policyDeviceAccessPolicyNamesName String
+    }
+
+-- tagpath /policy/device-access-policy-names/name
+policyDeviceAccessPolicyNamesName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device Access Policy name"
+    ::= { policyDeviceAccessPolicyNamesEntry 1 }
+
+-- tagpath /policy/device-access-policy-counters
+policyDeviceAccessPolicyCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyDeviceAccessPolicyCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Device Access Policy counters"
+    ::= { policyDeviceAccessPolicyCounters 1 }
+
+-- tagpath /policy/device-access-policy-counters
+policyDeviceAccessPolicyCountersEntry OBJECT-TYPE
+    SYNTAX      PolicyDeviceAccessPolicyCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyDeviceAccessPolicyCountersName }
+        ::= { policyDeviceAccessPolicyCountersTable 1 }
+
+PolicyDeviceAccessPolicyCountersEntry ::=
+    SEQUENCE {
+        policyDeviceAccessPolicyCountersName String
+    }
+
+-- tagpath /policy/device-access-policy-counters/name
+policyDeviceAccessPolicyCountersName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device Access Policy name"
+    ::= { policyDeviceAccessPolicyCountersEntry 1 }
+
+-- tagpath /policy/device-access-policy-counters/device-access-policy-counter-list
+policyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Device access policy counter list"
+    ::= { policyDeviceAccessPolicyCounters 2 }
+
+-- tagpath /policy/device-access-policy-counters/device-access-policy-counter-list
+policyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListEntry OBJECT-TYPE
+    SYNTAX      PolicyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyDeviceAccessPolicyCountersName, policyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListCounterName }
+        ::= { policyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListTable 1 }
+
+PolicyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListEntry ::=
+    SEQUENCE {
+        policyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListCounterName String,
+        policyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListPackets Counter64,
+        policyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListBytes Counter64
+    }
+
+-- tagpath /policy/device-access-policy-counters/device-access-policy-counter-list/counter-name
+policyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListCounterName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Counter name"
+    ::= { policyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListEntry 1 }
+
+-- tagpath /policy/device-access-policy-counters-device-access-policy-counter-list/packets
+policyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListEntry 2 }
+
+-- tagpath /policy/device-access-policy-counters/device-access-policy-counter-list/bytes
+policyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyDeviceAccessPolicyCountersDeviceAccessPolicyCounterListEntry 3 }
+
+-- tagpath /policy/access-list-policers
+policyAccessListPolicersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyAccessListPolicersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "ACL policer"
+    ::= { policyAccessListPolicers 1 }
+
+-- tagpath /policy/access-list-policers
+policyAccessListPolicersEntry OBJECT-TYPE
+    SYNTAX      PolicyAccessListPolicersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyAccessListPolicersName }
+        ::= { policyAccessListPolicersTable 1 }
+
+PolicyAccessListPolicersEntry ::=
+    SEQUENCE {
+        policyAccessListPolicersName String
+    }
+
+-- tagpath /policy/access-list-policers/name
+policyAccessListPolicersName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Access policy name"
+    ::= { policyAccessListPolicersEntry 1 }
+
+-- tagpath /policy/access-list-policers/access-policy-policer-list
+policyAccessListPolicersAccessPolicyPolicerListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyAccessListPolicersAccessPolicyPolicerListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Access policy policer list"
+    ::= { policyAccessListPolicers 2 }
+
+-- tagpath /policy/access-list-policers/access-policy-policer-list
+policyAccessListPolicersAccessPolicyPolicerListEntry OBJECT-TYPE
+    SYNTAX      PolicyAccessListPolicersAccessPolicyPolicerListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyAccessListPolicersName, policyAccessListPolicersAccessPolicyPolicerListPolicerName }
+        ::= { policyAccessListPolicersAccessPolicyPolicerListTable 1 }
+
+PolicyAccessListPolicersAccessPolicyPolicerListEntry ::=
+    SEQUENCE {
+        policyAccessListPolicersAccessPolicyPolicerListPolicerName String,
+        policyAccessListPolicersAccessPolicyPolicerListOosPackets Counter64,
+        policyAccessListPolicersAccessPolicyPolicerListOosBytes Counter64
+    }
+
+-- tagpath /policy/access-list-policers/access-policy-policer-list/policer-name
+policyAccessListPolicersAccessPolicyPolicerListPolicerName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Policer name"
+    ::= { policyAccessListPolicersAccessPolicyPolicerListEntry 1 }
+
+-- tagpath /policy/access-list-policers/access-policy-policer-list/oos-packets
+policyAccessListPolicersAccessPolicyPolicerListOosPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyAccessListPolicersAccessPolicyPolicerListEntry 2 }
+
+-- tagpath /policy/access-list-policers/access-policy-policer-list/oos-bytes
+policyAccessListPolicersAccessPolicyPolicerListOosBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyAccessListPolicersAccessPolicyPolicerListEntry 3 }
+
+-- tagpath /policy/qos-scheduler-info
+policyQosSchedulerInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyQosSchedulerInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Scheduler information"
+    ::= { policyQosSchedulerInfo 1 }
+
+-- tagpath /policy/qos-scheduler-info
+policyQosSchedulerInfoEntry OBJECT-TYPE
+    SYNTAX      PolicyQosSchedulerInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyQosSchedulerInfoQosSchedulerName }
+        ::= { policyQosSchedulerInfoTable 1 }
+
+PolicyQosSchedulerInfoEntry ::=
+    SEQUENCE {
+        policyQosSchedulerInfoQosSchedulerName String,
+        policyQosSchedulerInfoBandwidthPercent Unsigned32,
+        policyQosSchedulerInfoBufferPercent Unsigned32,
+        policyQosSchedulerInfoQueue Integer32
+    }
+
+-- tagpath /policy/qos-scheduler-info/qos-scheduler-name
+policyQosSchedulerInfoQosSchedulerName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "QoS scheduler name"
+    ::= { policyQosSchedulerInfoEntry 1 }
+
+-- tagpath /policy/qos-scheduler-info/bandwidth-percent
+policyQosSchedulerInfoBandwidthPercent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyQosSchedulerInfoEntry 2 }
+
+-- tagpath /policy/qos-scheduler-info/buffer-percent
+policyQosSchedulerInfoBufferPercent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyQosSchedulerInfoEntry 3 }
+
+-- tagpath /policy/qos-scheduler-info/queue
+policyQosSchedulerInfoQueue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyQosSchedulerInfoEntry 4 }
+
+-- tagpath /policy/qos-scheduler-info/qos-scheduler-map-association
+policyQosSchedulerInfoQosSchedulerMapAssociationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyQosSchedulerInfoQosSchedulerMapAssociationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "QoS map associated with this scheduler"
+    ::= { policyQosSchedulerInfo 2 }
+
+-- tagpath /policy/qos-scheduler-info/qos-scheduler-map-association
+policyQosSchedulerInfoQosSchedulerMapAssociationEntry OBJECT-TYPE
+    SYNTAX      PolicyQosSchedulerInfoQosSchedulerMapAssociationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyQosSchedulerInfoQosSchedulerName, policyQosSchedulerInfoQosSchedulerMapAssociationQosMapName }
+        ::= { policyQosSchedulerInfoQosSchedulerMapAssociationTable 1 }
+
+PolicyQosSchedulerInfoQosSchedulerMapAssociationEntry ::=
+    SEQUENCE {
+        policyQosSchedulerInfoQosSchedulerMapAssociationQosMapName String
+    }
+
+-- tagpath /policy/qos-scheduler-info/qos-scheduler-map-association/qos-map-name
+policyQosSchedulerInfoQosSchedulerMapAssociationQosMapName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "QoS map name"
+    ::= { policyQosSchedulerInfoQosSchedulerMapAssociationEntry 1 }
+
+-- tagpath /policy/qos-map-info
+policyQosMapInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyQosMapInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "QoS map information"
+    ::= { policyQosMapInfo 1 }
+
+-- tagpath /policy/qos-map-info
+policyQosMapInfoEntry OBJECT-TYPE
+    SYNTAX      PolicyQosMapInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyQosMapInfoQosMapName }
+        ::= { policyQosMapInfoTable 1 }
+
+PolicyQosMapInfoEntry ::=
+    SEQUENCE {
+        policyQosMapInfoQosMapName String
+    }
+
+-- tagpath /policy/qos-map-info/qos-map-name
+policyQosMapInfoQosMapName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "QoS Map Name"
+    ::= { policyQosMapInfoEntry 1 }
+
+-- tagpath /policy/qos-map-info/qos-map-interface-associations
+policyQosMapInfoQosMapInterfaceAssociationsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyQosMapInfoQosMapInterfaceAssociationsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "QoS map intrface associations"
+    ::= { policyQosMapInfo 2 }
+
+-- tagpath /policy/qos-map-info/qos-map-interface-associations
+policyQosMapInfoQosMapInterfaceAssociationsEntry OBJECT-TYPE
+    SYNTAX      PolicyQosMapInfoQosMapInterfaceAssociationsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyQosMapInfoQosMapName, policyQosMapInfoQosMapInterfaceAssociationsInterfaceName }
+        ::= { policyQosMapInfoQosMapInterfaceAssociationsTable 1 }
+
+PolicyQosMapInfoQosMapInterfaceAssociationsEntry ::=
+    SEQUENCE {
+        policyQosMapInfoQosMapInterfaceAssociationsInterfaceName String
+    }
+
+-- tagpath /policy/qos-map-info/qos-map-interface-associations/interface-name
+policyQosMapInfoQosMapInterfaceAssociationsInterfaceName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { policyQosMapInfoQosMapInterfaceAssociationsEntry 1 }
+
+-- tagpath /policy/access-list-associations
+policyAccessListAssociationsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyAccessListAssociationsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Access policy interfaces"
+    ::= { policyAccessListAssociations 1 }
+
+-- tagpath /policy/access-list-associations
+policyAccessListAssociationsEntry OBJECT-TYPE
+    SYNTAX      PolicyAccessListAssociationsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyAccessListAssociationsName }
+        ::= { policyAccessListAssociationsTable 1 }
+
+PolicyAccessListAssociationsEntry ::=
+    SEQUENCE {
+        policyAccessListAssociationsName String
+    }
+
+-- tagpath /policy/access-list-associations/name
+policyAccessListAssociationsName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Access policy name"
+    ::= { policyAccessListAssociationsEntry 1 }
+
+-- tagpath /policy/access-list-associations/access-policy-interface-list
+policyAccessListAssociationsAccessPolicyInterfaceListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyAccessListAssociationsAccessPolicyInterfaceListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Access policy interface association"
+    ::= { policyAccessListAssociations 2 }
+
+-- tagpath /policy/access-list-associations/access-policy-interface-list
+policyAccessListAssociationsAccessPolicyInterfaceListEntry OBJECT-TYPE
+    SYNTAX      PolicyAccessListAssociationsAccessPolicyInterfaceListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyAccessListAssociationsName, policyAccessListAssociationsAccessPolicyInterfaceListIntName, policyAccessListAssociationsAccessPolicyInterfaceListIntDir }
+        ::= { policyAccessListAssociationsAccessPolicyInterfaceListTable 1 }
+
+PolicyAccessListAssociationsAccessPolicyInterfaceListEntry ::=
+    SEQUENCE {
+        policyAccessListAssociationsAccessPolicyInterfaceListIntName String,
+        policyAccessListAssociationsAccessPolicyInterfaceListIntDir DirectionEnum
+    }
+
+-- tagpath /policy/access-list-associations/access-policy-interface-list/interface-name
+policyAccessListAssociationsAccessPolicyInterfaceListIntName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { policyAccessListAssociationsAccessPolicyInterfaceListEntry 1 }
+
+-- tagpath /policy/access-list-associations/access-policy-interface-list/interface-direction
+policyAccessListAssociationsAccessPolicyInterfaceListIntDir OBJECT-TYPE
+    SYNTAX      DirectionEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface direction"
+    ::= { policyAccessListAssociationsAccessPolicyInterfaceListEntry 2 }
+
+-- tagpath /policy/rewrite-associations
+policyRewriteAssociationsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyRewriteAssociationsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Rewrite rule to interface bindings"
+    ::= { policyRewriteAssociations 1 }
+
+-- tagpath /policy/rewrite-associations
+policyRewriteAssociationsEntry OBJECT-TYPE
+    SYNTAX      PolicyRewriteAssociationsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyRewriteAssociationsName }
+        ::= { policyRewriteAssociationsTable 1 }
+
+PolicyRewriteAssociationsEntry ::=
+    SEQUENCE {
+        policyRewriteAssociationsName String
+    }
+
+-- tagpath /policy/rewrite-associations/name
+policyRewriteAssociationsName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of rewrite rule"
+    ::= { policyRewriteAssociationsEntry 1 }
+
+-- tagpath /policy/rewrite-associations/rewrite-interface-list
+policyRewriteAssociationsRewriteInterfaceListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyRewriteAssociationsRewriteInterfaceListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Rewrite rule to interface association"
+    ::= { policyRewriteAssociations 2 }
+
+-- tagpath /policy/rewrite-associations/rewrite-interface-list
+policyRewriteAssociationsRewriteInterfaceListEntry OBJECT-TYPE
+    SYNTAX      PolicyRewriteAssociationsRewriteInterfaceListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyRewriteAssociationsName, policyRewriteAssociationsRewriteInterfaceListInterfaceName }
+        ::= { policyRewriteAssociationsRewriteInterfaceListTable 1 }
+
+PolicyRewriteAssociationsRewriteInterfaceListEntry ::=
+    SEQUENCE {
+        policyRewriteAssociationsRewriteInterfaceListInterfaceName String
+    }
+
+-- tagpath /policy/rewrite-associations/rewrite-interface-list/interface-name
+policyRewriteAssociationsRewriteInterfaceListInterfaceName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { policyRewriteAssociationsRewriteInterfaceListEntry 1 }
+
+-- tagpath /policy/from-vsmart/sla-class
+policyFromVsmartSlaClassTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartSlaClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Configure SLA classes for application-aware routing"
+    ::= { policyFromVsmart 2 }
+
+-- tagpath /policy/from-vsmart/sla-class
+policyFromVsmartSlaClassEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartSlaClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED policyFromVsmartSlaClassName }
+        ::= { policyFromVsmartSlaClassTable 1 }
+
+PolicyFromVsmartSlaClassEntry ::=
+    SEQUENCE {
+        policyFromVsmartSlaClassName String,
+        policyFromVsmartSlaClassLoss UnsignedByte,
+        policyFromVsmartSlaClassLatency UnsignedShort,
+        policyFromVsmartSlaClassJitter  UnsignedShort
+    }
+
+-- tagpath /policy/from-vsmart/sla-class/name
+policyFromVsmartSlaClassName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Name of SLA class"
+    ::= { policyFromVsmartSlaClassEntry 1 }
+
+-- tagpath /policy/from-vsmart/sla-class/loss
+policyFromVsmartSlaClassLoss OBJECT-TYPE
+    SYNTAX      UnsignedByte (0 .. 100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Loss percentage"
+    ::= { policyFromVsmartSlaClassEntry 2 }
+
+-- tagpath /policy/from-vsmart/sla-class/latency
+policyFromVsmartSlaClassLatency OBJECT-TYPE
+    SYNTAX      UnsignedShort (1 .. 1000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Latency, in milliseconds"
+    ::= { policyFromVsmartSlaClassEntry 3 }
+
+-- tagpath /policy/from-vsmart/sla-class/latency
+policyFromVsmartSlaClassJitter OBJECT-TYPE
+    SYNTAX      UnsignedShort (1 .. 1000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Jitter, in milliseconds"
+    ::= { policyFromVsmartSlaClassEntry 4 }
+
+-- tagpath /policy/from-vsmart/data-policy
+policyFromVsmartDataPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartDataPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display data policy"
+    ::= { policyFromVsmart 3 }
+
+-- tagpath /policy/from-vsmart/data-policy
+policyFromVsmartDataPolicyEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartDataPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED policyFromVsmartDataPolicyName }
+        ::= { policyFromVsmartDataPolicyTable 1 }
+
+PolicyFromVsmartDataPolicyEntry ::=
+    SEQUENCE {
+        policyFromVsmartDataPolicyName String,
+        policyFromVsmartDataPolicyDirection DataPolicyDirectionEnum
+    }
+
+-- tagpath /policy/from-vsmart/data-policy/name
+policyFromVsmartDataPolicyName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Data policy name"
+    ::= { policyFromVsmartDataPolicyEntry 1 }
+
+-- tagpath /policy/from-vsmart/data-policy/direction
+policyFromVsmartDataPolicyDirection OBJECT-TYPE
+    SYNTAX      DataPolicyDirectionEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Data policy direction"
+    ::= { policyFromVsmartDataPolicyEntry 2 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list
+policyFromVsmartDataPolicyVpnListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartDataPolicyVpnListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Name of VPN list"
+    ::= { policyFromVsmart 4 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list
+policyFromVsmartDataPolicyVpnListEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartDataPolicyVpnListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyFromVsmartDataPolicyName, IMPLIED policyFromVsmartDataPolicyVpnListName }
+        ::= { policyFromVsmartDataPolicyVpnListTable 1 }
+
+PolicyFromVsmartDataPolicyVpnListEntry ::=
+    SEQUENCE {
+        policyFromVsmartDataPolicyVpnListName String,
+        policyFromVsmartDataPolicyVpnListDefaultAction ActionDataEnum
+    }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/name
+policyFromVsmartDataPolicyVpnListName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN list name"
+    ::= { policyFromVsmartDataPolicyVpnListEntry 1 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/default-action
+policyFromVsmartDataPolicyVpnListDefaultAction OBJECT-TYPE
+    SYNTAX      ActionDataEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Accept or drop"
+    DEFVAL { drop }
+    ::= { policyFromVsmartDataPolicyVpnListEntry 2 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence
+policyFromVsmartDataPolicyVpnListSequenceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartDataPolicyVpnListSequenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of sequences"
+    ::= { policyFromVsmart 5 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence
+policyFromVsmartDataPolicyVpnListSequenceEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartDataPolicyVpnListSequenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyFromVsmartDataPolicyName, policyFromVsmartDataPolicyVpnListName, policyFromVsmartDataPolicyVpnListSequenceSeqValue }
+        ::= { policyFromVsmartDataPolicyVpnListSequenceTable 1 }
+
+PolicyFromVsmartDataPolicyVpnListSequenceEntry ::=
+    SEQUENCE {
+        policyFromVsmartDataPolicyVpnListSequenceSeqValue UnsignedShort,
+        policyFromVsmartDataPolicyVpnListSequenceMatchSrcDataPrLst String,
+        policyFromVsmartDataPolicyVpnListSequenceMatchSrcDataV6PrLst String,
+        policyFromVsmartDataPolicyVpnListSequenceMatchDestDataPrLst String,
+        policyFromVsmartDataPolicyVpnListSequenceMatchDestDataV6PrLst String,
+        policyFromVsmartDataPolicyVpnListSequenceMatchTcp TcpFlags,
+        policyFromVsmartDataPolicyVpnListSequenceActionActionValue ActionDataEnum,
+        policyFromVsmartDataPolicyVpnListSequenceActionCount String,
+        policyFromVsmartDataPolicyVpnListSequenceActionNatUseVpn Unsigned32,
+        policyFromVsmartDataPolicyVpnListSequenceActionCflowd TruthValue,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetLocalTlocColor INTEGER,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetLocalTlocEncap INTEGER,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetNextHop String,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetPolicer String,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetVpn Unsigned32,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetVpnLabel Unsigned32,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetTlocIp InetAddressIP,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetTlocColor INTEGER,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetTlocList String,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetServiceSvcType INTEGER,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetServiceVpn Unsigned32,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetServiceTlocIp InetAddressIP,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetSvcTlocClr INTEGER,
+        policyFromVsmartDataPolicyVpnListSequencActionSetSvcTlocLst String,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetServiceLocal TruthValue,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetServiceRestrict TruthValue,
+        policyFromVsmartDataPolicyVpnListSequenceActionLog TruthValue,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetLocalTlocListColor ColorList,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetLocalTlocListEncap EncapsulationList,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetLocalTlocListRestrict TruthValue,
+        policyFromVsmartDataPolicyVpnListSequenceActionTcpOptimization TruthValue,
+        policyFromVsmartDataPolicyVpnListSequenceActionLossProtect LossProtectEnum,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetNextHopIpv6 String
+    }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/seq-value
+policyFromVsmartDataPolicyVpnListSequenceSeqValue OBJECT-TYPE
+    SYNTAX      UnsignedShort (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 1 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/match/source-data-prefix-list
+policyFromVsmartDataPolicyVpnListSequenceMatchSrcDataPrLst OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Source prefix list"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 4 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/match/source-data-ipv6-prefix-list
+policyFromVsmartDataPolicyVpnListSequenceMatchSrcDataV6PrLst OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Source IPv6 prefix list"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 5 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/match/destination-data-prefix-list
+policyFromVsmartDataPolicyVpnListSequenceMatchDestDataPrLst OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Destination prefix list"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 7 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/match/destination-data-ipv6-prefix-list
+policyFromVsmartDataPolicyVpnListSequenceMatchDestDataV6PrLst OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Destination IPv6 prefix list"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 8 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/match/tcp
+policyFromVsmartDataPolicyVpnListSequenceMatchTcp OBJECT-TYPE
+    SYNTAX      TcpFlags
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "TCP flags"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 10 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/action-value
+policyFromVsmartDataPolicyVpnListSequenceActionActionValue OBJECT-TYPE
+    SYNTAX      ActionDataEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    DEFVAL { drop }
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 11 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/count
+policyFromVsmartDataPolicyVpnListSequenceActionCount OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Count packets/bytes matching this rule"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 12 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/nat/use-vpn
+policyFromVsmartDataPolicyVpnListSequenceActionNatUseVpn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VPN ID (only 0 is allowed)"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 13 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/cflowd
+policyFromVsmartDataPolicyVpnListSequenceActionCflowd OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Apply cflowd"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 14 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/local-tloc/color
+policyFromVsmartDataPolicyVpnListSequenceActionSetLocalTlocColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 15 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/local-tloc/encap
+policyFromVsmartDataPolicyVpnListSequenceActionSetLocalTlocEncap OBJECT-TYPE
+    SYNTAX      INTEGER {gre(1),ipsec(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 16 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/next-hop
+policyFromVsmartDataPolicyVpnListSequenceActionSetNextHop OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next-hop address"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 17 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/policer
+policyFromVsmartDataPolicyVpnListSequenceActionSetPolicer OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Policer"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 18 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/vpn
+policyFromVsmartDataPolicyVpnListSequenceActionSetVpn OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 19 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/vpn-label
+policyFromVsmartDataPolicyVpnListSequenceActionSetVpnLabel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VPN label"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 20 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/tloc/ip
+policyFromVsmartDataPolicyVpnListSequenceActionSetTlocIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 21 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/tloc/color
+policyFromVsmartDataPolicyVpnListSequenceActionSetTlocColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 22 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/tloc-list
+policyFromVsmartDataPolicyVpnListSequenceActionSetTlocList OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of TLOC list"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 23 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service/svc-type
+policyFromVsmartDataPolicyVpnListSequenceActionSetServiceSvcType OBJECT-TYPE
+    SYNTAX      INTEGER {fW(1),iDS(2),iDP(3),netsvc1(4),netsvc2(5),netsvc3(6),netsvc4(7)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Service type"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 24 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service/vpn
+policyFromVsmartDataPolicyVpnListSequenceActionSetServiceVpn OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 25 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service/tloc/ip
+policyFromVsmartDataPolicyVpnListSequenceActionSetServiceTlocIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 26 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service/tloc/color
+policyFromVsmartDataPolicyVpnListSequenceActionSetSvcTlocClr OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 27 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service/tloc-list
+policyFromVsmartDataPolicyVpnListSequencActionSetSvcTlocLst OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of TLOC list"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 28 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service/local
+policyFromVsmartDataPolicyVpnListSequenceActionSetServiceLocal OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Local service"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 29 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service/restrict
+policyFromVsmartDataPolicyVpnListSequenceActionSetServiceRestrict OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Drop packet if local service unreachable"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 30 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/log
+policyFromVsmartDataPolicyVpnListSequenceActionLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Log this packet header"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 31 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/local-tloc-list/color
+policyFromVsmartDataPolicyVpnListSequenceActionSetLocalTlocListColor OBJECT-TYPE
+    SYNTAX      ColorList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Local color list"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 32 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/local-tloc-list/encap
+policyFromVsmartDataPolicyVpnListSequenceActionSetLocalTlocListEncap OBJECT-TYPE
+    SYNTAX      EncapsulationList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Local encapsulation list"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 33 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/local-tloc-list/restrict
+policyFromVsmartDataPolicyVpnListSequenceActionSetLocalTlocListRestrict OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Drop packet if local color or encapsulation is not found"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 34 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/tcp-optimization
+policyFromVsmartDataPolicyVpnListSequenceActionTcpOptimization OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Send TCP traffic for optimization"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 35 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/loss-protect
+policyFromVsmartDataPolicyVpnListSequenceActionLossProtect OBJECT-TYPE
+    SYNTAX      LossProtectEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Protect data from loss"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 36 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/next-hop-ipv6
+policyFromVsmartDataPolicyVpnListSequenceActionSetNextHopIpv6 OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next-hop IPv6 address"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 37 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/vip-tloc-pref-list
+policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyFromVsmart 6 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/vip-tloc-pref-list
+policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyFromVsmartDataPolicyName, policyFromVsmartDataPolicyVpnListName, policyFromVsmartDataPolicyVpnListSequenceSeqValue, policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstListNum }
+        ::= { policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstTable 1 }
+
+PolicyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstEntry ::=
+    SEQUENCE {
+        policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstListNum Unsigned32,
+        policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstTlocLbl Unsigned32,
+        policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstTlocIp InetAddressIP,
+        policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstTlocClr INTEGER,
+        policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstTlocEn INTEGER,
+        policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstTlocPrf Unsigned32
+    }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/vip-tloc-pref-list/list-num
+policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstListNum OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 100)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstEntry 1 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/vip-tloc-pref-list/tloc-label
+policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstTlocLbl OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VPN label"
+    ::= { policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstEntry 2 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/vip-tloc-pref-list/tloc-ip
+policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstTlocIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstEntry 3 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/vip-tloc-pref-list/tloc-color
+policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstTlocClr OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstEntry 4 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/vip-tloc-pref-list/tloc-encap
+policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstTlocEn OBJECT-TYPE
+    SYNTAX      INTEGER {gre(1),ipsec(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstEntry 5 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/vip-tloc-pref-list/tloc-preference
+policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstTlocPrf OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Preference"
+    ::= { policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstEntry 6 }
+
+-- tagpath /policy/from-vsmart/cflowd-template
+policyFromVsmartCflowdTemplateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartCflowdTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display cflowd templates"
+    ::= { policyFromVsmart 7 }
+
+-- tagpath /policy/from-vsmart/cflowd-template
+policyFromVsmartCflowdTemplateEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartCflowdTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED policyFromVsmartCflowdTemplateName }
+        ::= { policyFromVsmartCflowdTemplateTable 1 }
+
+PolicyFromVsmartCflowdTemplateEntry ::=
+    SEQUENCE {
+        policyFromVsmartCflowdTemplateName String,
+        policyFromVsmartCflowdTemplateFlowActiveTimeout Unsigned32,
+        policyFromVsmartCflowdTemplateFlowInactiveTimeout Unsigned32,
+        policyFromVsmartCflowdTemplateTemplateRefresh Unsigned32,
+        policyFromVsmartCflowdTemplateFlowSamplingInterval Unsigned32
+    }
+
+-- tagpath /policy/from-vsmart/cflowd-template/name
+policyFromVsmartCflowdTemplateName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Name of cflowd"
+    ::= { policyFromVsmartCflowdTemplateEntry 1 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/flow-active-timeout
+policyFromVsmartCflowdTemplateFlowActiveTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32 (30 .. 3600)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Timeout value for active flows"
+    DEFVAL { 30 }
+    ::= { policyFromVsmartCflowdTemplateEntry 2 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/flow-inactive-timeout
+policyFromVsmartCflowdTemplateFlowInactiveTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32 (1 .. 3600)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Timeout value for inactive flows"
+    DEFVAL { 30 }
+    ::= { policyFromVsmartCflowdTemplateEntry 3 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/template-refresh
+policyFromVsmartCflowdTemplateTemplateRefresh OBJECT-TYPE
+    SYNTAX      Unsigned32 (60 .. 86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Refresh value for template"
+    DEFVAL { 600 }
+    ::= { policyFromVsmartCflowdTemplateEntry 4 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/flow-sampling-interval
+policyFromVsmartCflowdTemplateFlowSamplingInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (1 .. 65536)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Cflowd flow sampling interval"
+    DEFVAL { 1024 }
+    ::= { policyFromVsmartCflowdTemplateEntry 5 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/collector
+policyFromVsmartCflowdTemplateCollectorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartCflowdTemplateCollectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Cflowd collector"
+    ::= { policyFromVsmart 8 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/collector
+policyFromVsmartCflowdTemplateCollectorEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartCflowdTemplateCollectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyFromVsmartCflowdTemplateName, policyFromVsmartCflowdTemplateCollectorVpn, policyFromVsmartCflowdTemplateCollectorAddress, policyFromVsmartCflowdTemplateCollectorPort, policyFromVsmartCflowdTemplateCollectorTransport }
+        ::= { policyFromVsmartCflowdTemplateCollectorTable 1 }
+
+PolicyFromVsmartCflowdTemplateCollectorEntry ::=
+    SEQUENCE {
+        policyFromVsmartCflowdTemplateCollectorVpn ConfdString,
+        policyFromVsmartCflowdTemplateCollectorAddress InetAddressIP,
+        policyFromVsmartCflowdTemplateCollectorPort UnsignedShort,
+        policyFromVsmartCflowdTemplateCollectorTransport TransportProtocol,
+        policyFromVsmartCflowdTemplateCollectorSourceInterface String
+    }
+
+-- tagpath /policy/from-vsmart/cflowd-template/collector/vpn
+policyFromVsmartCflowdTemplateCollectorVpn OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { policyFromVsmartCflowdTemplateCollectorEntry 1 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/collector/address
+policyFromVsmartCflowdTemplateCollectorAddress OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { policyFromVsmartCflowdTemplateCollectorEntry 2 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/collector/port
+policyFromVsmartCflowdTemplateCollectorPort OBJECT-TYPE
+    SYNTAX      UnsignedShort (1024 .. 65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyFromVsmartCflowdTemplateCollectorEntry 3 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/collector/transport
+policyFromVsmartCflowdTemplateCollectorTransport OBJECT-TYPE
+    SYNTAX      TransportProtocol
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Transport Protocol type"
+    ::= { policyFromVsmartCflowdTemplateCollectorEntry 4 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/collector/source-interface
+policyFromVsmartCflowdTemplateCollectorSourceInterface OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32)) 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IPFIX Source Interface"
+    ::= { policyFromVsmartCflowdTemplateCollectorEntry 5 }
+
+-- tagpath /policy/from-vsmart/app-route-policy
+policyFromVsmartAppRoutePolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartAppRoutePolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Configure application-aware routing policy"
+    ::= { policyFromVsmart 9 }
+
+-- tagpath /policy/from-vsmart/app-route-policy
+policyFromVsmartAppRoutePolicyEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartAppRoutePolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED policyFromVsmartAppRoutePolicyName }
+        ::= { policyFromVsmartAppRoutePolicyTable 1 }
+
+PolicyFromVsmartAppRoutePolicyEntry ::=
+    SEQUENCE {
+        policyFromVsmartAppRoutePolicyName String
+    }
+
+-- tagpath /policy/from-vsmart/app-route-policy/name
+policyFromVsmartAppRoutePolicyName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of application-aware routing policy"
+    ::= { policyFromVsmartAppRoutePolicyEntry 1 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list
+policyFromVsmartAppRoutePolicyVpnListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartAppRoutePolicyVpnListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Name of VPN list"
+    ::= { policyFromVsmart 10 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list
+policyFromVsmartAppRoutePolicyVpnListEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartAppRoutePolicyVpnListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyFromVsmartAppRoutePolicyName, IMPLIED policyFromVsmartAppRoutePolicyVpnListName }
+        ::= { policyFromVsmartAppRoutePolicyVpnListTable 1 }
+
+PolicyFromVsmartAppRoutePolicyVpnListEntry ::=
+    SEQUENCE {
+        policyFromVsmartAppRoutePolicyVpnListName String,
+        policyFromVsmartAppRoutePolicyVpnListDefActSlaClassName String
+    }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/name
+policyFromVsmartAppRoutePolicyVpnListName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN list name"
+    ::= { policyFromVsmartAppRoutePolicyVpnListEntry 1 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/default-action/sla-class/sla-class-name
+policyFromVsmartAppRoutePolicyVpnListDefActSlaClassName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyFromVsmartAppRoutePolicyVpnListEntry 13 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence
+policyFromVsmartAppRoutePolicyVpnListSequenceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartAppRoutePolicyVpnListSequenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of sequences"
+    ::= { policyFromVsmart 11 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence
+policyFromVsmartAppRoutePolicyVpnListSequenceEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartAppRoutePolicyVpnListSequenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyFromVsmartAppRoutePolicyName, policyFromVsmartAppRoutePolicyVpnListName, policyFromVsmartAppRoutePolicyVpnListSequenceSeqValue }
+        ::= { policyFromVsmartAppRoutePolicyVpnListSequenceTable 1 }
+
+PolicyFromVsmartAppRoutePolicyVpnListSequenceEntry ::=
+    SEQUENCE {
+        policyFromVsmartAppRoutePolicyVpnListSequenceSeqValue UnsignedShort,
+        policyFromVsmartAppRoutePolicyVpnListSequenceMatchSrcDtPrLst String,
+        policyFromVsmartAppRoutePolicyVpnListSequenceMatchSrcDtV6PrLst String,
+        policyFromVsmartAppRoutePolicyVpnListSequenceMatchDestDtPrLst String,
+        policyFromVsmartAppRoutePolicyVpnListSequenceMatchDestDtV6PrLst String,
+        policyFromVsmartAppRoutePolicyVpnListSequenceActionCount String,
+        policyFromVsmartAppRoutePolicyVpnListSequenceActionSlaClName String,
+        policyFromVsmartAppRoutePolicyVpnListSequenceActionSlaClStrict TruthValue,
+        policyFromVsmartAppRoutePolicyVpnListSequenceActionSlaClPrefClr ColorList,
+        policyFromVsmartAppRoutePolicyVpnListSequenceActionLog TruthValue,
+        policyFromVsmartAppRoutePolicyVpnListSequenceActionBackupSlaPrefClr ColorList
+    }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence/seq-value
+policyFromVsmartAppRoutePolicyVpnListSequenceSeqValue OBJECT-TYPE
+    SYNTAX      UnsignedShort (1 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Sequence value"
+    ::= { policyFromVsmartAppRoutePolicyVpnListSequenceEntry 1 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence/match/source-data-prefix-list
+policyFromVsmartAppRoutePolicyVpnListSequenceMatchSrcDtPrLst OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Source prefix list"
+    ::= { policyFromVsmartAppRoutePolicyVpnListSequenceEntry 4 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence/match/source-data-ipv6-prefix-list
+policyFromVsmartAppRoutePolicyVpnListSequenceMatchSrcDtV6PrLst OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Source prefix IPv6 list"
+    ::= { policyFromVsmartAppRoutePolicyVpnListSequenceEntry 5 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence/match/destination-data-prefix-list
+policyFromVsmartAppRoutePolicyVpnListSequenceMatchDestDtPrLst OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Destination prefix list"
+    ::= { policyFromVsmartAppRoutePolicyVpnListSequenceEntry 7 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence/match/destination-data-ipv6-prefix-list
+policyFromVsmartAppRoutePolicyVpnListSequenceMatchDestDtV6PrLst OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Destination prefix Ipv6 list"
+    ::= { policyFromVsmartAppRoutePolicyVpnListSequenceEntry 8 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence/action/count
+policyFromVsmartAppRoutePolicyVpnListSequenceActionCount OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Count packets/bytes matching this rule"
+    ::= { policyFromVsmartAppRoutePolicyVpnListSequenceEntry 10 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence/action/sla-class/sla-class-name
+policyFromVsmartAppRoutePolicyVpnListSequenceActionSlaClName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyFromVsmartAppRoutePolicyVpnListSequenceEntry 11 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence/action/sla-class/strict
+policyFromVsmartAppRoutePolicyVpnListSequenceActionSlaClStrict OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Drop traffic if preferred SLA class is unavailable"
+    ::= { policyFromVsmartAppRoutePolicyVpnListSequenceEntry 12 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence/action/sla-class/preferred-color
+policyFromVsmartAppRoutePolicyVpnListSequenceActionSlaClPrefClr OBJECT-TYPE
+    SYNTAX      ColorList
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of preferred colors when SLA is met"
+    ::= { policyFromVsmartAppRoutePolicyVpnListSequenceEntry 14 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence/action/log
+policyFromVsmartAppRoutePolicyVpnListSequenceActionLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Syslog a sampled set of packets matching this rule with SLA-class information"
+    ::= { policyFromVsmartAppRoutePolicyVpnListSequenceEntry 15 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence/action/sla-class/backup-preferred-color
+policyFromVsmartAppRoutePolicyVpnListSequenceActionBackupSlaPrefClr OBJECT-TYPE
+    SYNTAX      ColorList
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of preferred colors for ECMP when primary SLA is not met"
+    ::= { policyFromVsmartAppRoutePolicyVpnListSequenceEntry 16 }
+
+-- tagpath /policy/from-vsmart/policer
+policyFromVsmartPolicerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartPolicerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Configure policer"
+    ::= { policyFromVsmart 12 }
+
+-- tagpath /policy/from-vsmart/policer
+policyFromVsmartPolicerEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartPolicerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED policyFromVsmartPolicerName }
+        ::= { policyFromVsmartPolicerTable 1 }
+
+PolicyFromVsmartPolicerEntry ::=
+    SEQUENCE {
+        policyFromVsmartPolicerName String,
+        policyFromVsmartPolicerRate Counter64,
+        policyFromVsmartPolicerBurst Unsigned32,
+        policyFromVsmartPolicerExceed INTEGER
+    }
+
+-- tagpath /policy/from-vsmart/policer/name
+policyFromVsmartPolicerName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Name of policer"
+    ::= { policyFromVsmartPolicerEntry 1 }
+
+-- tagpath /policy/from-vsmart/policer/rate
+policyFromVsmartPolicerRate OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Bandwidth for 1g interfaces: <8..1000000000>bps;
+  for 10g interfaces: <8..10000000000>bps"
+    ::= { policyFromVsmartPolicerEntry 2 }
+
+-- tagpath /policy/from-vsmart/policer/burst
+policyFromVsmartPolicerBurst OBJECT-TYPE
+    SYNTAX      Unsigned32 (15000 .. 10000000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Burst rate, in bytes"
+    ::= { policyFromVsmartPolicerEntry 3 }
+
+-- tagpath /policy/from-vsmart/policer/exceed
+policyFromVsmartPolicerExceed OBJECT-TYPE
+    SYNTAX      INTEGER {drop(0),remark(1)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Action for nonconforming packets"
+    ::= { policyFromVsmartPolicerEntry 4 }
+
+-- tagpath /policy/from-vsmart/lists/vpn-list
+policyFromVsmartListsVpnListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartListsVpnListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of VPN IDs"
+    ::= { policyFromVsmart 13 }
+
+-- tagpath /policy/from-vsmart/lists/vpn-list
+policyFromVsmartListsVpnListEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartListsVpnListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED policyFromVsmartListsVpnListName }
+        ::= { policyFromVsmartListsVpnListTable 1 }
+
+PolicyFromVsmartListsVpnListEntry ::=
+    SEQUENCE {
+        policyFromVsmartListsVpnListName String
+    }
+
+-- tagpath /policy/from-vsmart/lists/vpn-list/name
+policyFromVsmartListsVpnListName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of VPN list"
+    ::= { policyFromVsmartListsVpnListEntry 1 }
+
+-- tagpath /policy/from-vsmart/lists/vpn-list/vpn
+policyFromVsmartListsVpnListVpnTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartListsVpnListVpnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { policyFromVsmart 14 }
+
+-- tagpath /policy/from-vsmart/lists/vpn-list/vpn
+policyFromVsmartListsVpnListVpnEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartListsVpnListVpnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyFromVsmartListsVpnListName, IMPLIED policyFromVsmartListsVpnListVpnId }
+        ::= { policyFromVsmartListsVpnListVpnTable 1 }
+
+PolicyFromVsmartListsVpnListVpnEntry ::=
+    SEQUENCE {
+        policyFromVsmartListsVpnListVpnId String
+    }
+
+-- tagpath /policy/from-vsmart/lists/vpn-list/vpn/id
+policyFromVsmartListsVpnListVpnId OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyFromVsmartListsVpnListVpnEntry 1 }
+
+-- tagpath /policy/from-vsmart/lists/data-prefix-list
+policyFromVsmartListsDataPrefixListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartListsDataPrefixListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of prefixes"
+    ::= { policyFromVsmart 15 }
+
+-- tagpath /policy/from-vsmart/lists/data-prefix-list
+policyFromVsmartListsDataPrefixListEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartListsDataPrefixListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED policyFromVsmartListsDataPrefixListName }
+        ::= { policyFromVsmartListsDataPrefixListTable 1 }
+
+PolicyFromVsmartListsDataPrefixListEntry ::=
+    SEQUENCE {
+        policyFromVsmartListsDataPrefixListName String
+    }
+
+-- tagpath /policy/from-vsmart/lists/data-prefix-list/name
+policyFromVsmartListsDataPrefixListName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of prefix list"
+    ::= { policyFromVsmartListsDataPrefixListEntry 1 }
+
+-- tagpath /policy/from-vsmart/lists/data-prefix-list/ip-prefix
+policyFromVsmartListsDataPrefixListIpPrefixTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartListsDataPrefixListIpPrefixEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Prefix"
+    ::= { policyFromVsmart 16 }
+
+-- tagpath /policy/from-vsmart/lists/data-prefix-list/ip-prefix
+policyFromVsmartListsDataPrefixListIpPrefixEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartListsDataPrefixListIpPrefixEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyFromVsmartListsDataPrefixListName, policyFromVsmartListsDataPrefixListIpPrefixIp }
+        ::= { policyFromVsmartListsDataPrefixListIpPrefixTable 1 }
+
+PolicyFromVsmartListsDataPrefixListIpPrefixEntry ::=
+    SEQUENCE {
+        policyFromVsmartListsDataPrefixListIpPrefixIp Ipv4Prefix
+    }
+
+-- tagpath /policy/from-vsmart/lists/data-prefix-list/ip-prefix/ip
+policyFromVsmartListsDataPrefixListIpPrefixIp OBJECT-TYPE
+    SYNTAX      Ipv4Prefix
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyFromVsmartListsDataPrefixListIpPrefixEntry 1 }
+
+-- tagpath /policy/from-vsmart/lists/tloc-list
+policyFromVsmartListsTlocListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartListsTlocListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of TLOCs"
+    ::= { policyFromVsmart 17 }
+
+-- tagpath /policy/from-vsmart/lists/tloc-list
+policyFromVsmartListsTlocListEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartListsTlocListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED policyFromVsmartListsTlocListName }
+        ::= { policyFromVsmartListsTlocListTable 1 }
+
+PolicyFromVsmartListsTlocListEntry ::=
+    SEQUENCE {
+        policyFromVsmartListsTlocListName String
+    }
+
+-- tagpath /policy/from-vsmart/lists/tloc-list/name
+policyFromVsmartListsTlocListName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of TLOC list"
+    ::= { policyFromVsmartListsTlocListEntry 1 }
+
+-- tagpath /policy/from-vsmart/lists/tloc-list/tloc
+policyFromVsmartListsTlocListTlocTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartListsTlocListTlocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Transport location"
+    ::= { policyFromVsmart 18 }
+
+-- tagpath /policy/from-vsmart/lists/tloc-list/tloc
+policyFromVsmartListsTlocListTlocEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartListsTlocListTlocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policyFromVsmartListsTlocListName, policyFromVsmartListsTlocListTlocIp, policyFromVsmartListsTlocListTlocColor, policyFromVsmartListsTlocListTlocEncap }
+        ::= { policyFromVsmartListsTlocListTlocTable 1 }
+
+PolicyFromVsmartListsTlocListTlocEntry ::=
+    SEQUENCE {
+        policyFromVsmartListsTlocListTlocIp InetAddressIP,
+        policyFromVsmartListsTlocListTlocColor INTEGER,
+        policyFromVsmartListsTlocListTlocEncap INTEGER,
+        policyFromVsmartListsTlocListTlocPreference Unsigned32
+    }
+
+-- tagpath /policy/from-vsmart/lists/tloc-list/tloc/ip
+policyFromVsmartListsTlocListTlocIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { policyFromVsmartListsTlocListTlocEntry 1 }
+
+-- tagpath /policy/from-vsmart/lists/tloc-list/tloc/color
+policyFromVsmartListsTlocListTlocColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { policyFromVsmartListsTlocListTlocEntry 2 }
+
+-- tagpath /policy/from-vsmart/lists/tloc-list/tloc/encap
+policyFromVsmartListsTlocListTlocEncap OBJECT-TYPE
+    SYNTAX      INTEGER {gre(1),ipsec(2)}
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { policyFromVsmartListsTlocListTlocEntry 3 }
+
+-- tagpath /policy/from-vsmart/lists/tloc-list/tloc/preference
+policyFromVsmartListsTlocListTlocPreference OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Route preference"
+    ::= { policyFromVsmartListsTlocListTlocEntry 4 }
+
+-- Display zone based firewall statistics
+-- tagpath /zone-based-firewall-statistics
+zoneBasedFirewallStatistics OBJECT IDENTIFIER ::= { zbfw 2 }
+
+
+-- tagpath /zone-based-firewall-statistics/frag-fail
+zoneBasedFirewallStatisticsFragFail OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 1 }
+
+--tagpath /zone-based-firewall-statistics/state-check-fail
+zoneBasedFirewallStatisticsStateCheckFail OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 2 }
+
+--tagpath /zone-based-firewall-statistics/flow-add-fail
+zoneBasedFirewallStatisticsFlowAddFail OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 3 }
+
+--tagpath /zone-based-firewall-statistics/unsupported-proto
+zoneBasedFirewallStatisticsUnsupportedProto OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 4 }
+
+--tagpath /zone-based-firewall-statistics/num-flow-entries
+zoneBasedFirewallStatisticsNumFlowEntries OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 5 }
+
+--tagpath /zone-based-firewall-statistics/max-halfopen-exceeded
+zoneBasedFirewallStatisticsMaxHalfOpenExceeded OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 6 }
+
+--tagpath /zone-based-firewall-statistics/fragments
+zoneBasedFirewallStatisticsFragments OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 7 }
+
+--tagpath /zone-based-firewall-statistics/policy-change-dropped
+zoneBasedFirewallStatisticsPolicyChangeDropped OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 8 }
+
+--tagpath /zone-based-firewall-statistics/no-pair-same-zone-allowed
+zoneBasedFirewallStatisticsNoPairSameZoneAllowed OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 9 }
+
+--tagpath /zone-based-firewall-statistics/no-pair-diff-zone-dropped
+zoneBasedFirewallStatisticsNoPairDiffZoneDropped OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 10 }
+
+--tagpath /zone-based-firewall-statistics/zone-no-zone-dropped
+zoneBasedFirewallStatisticsZoneNoZoneDropped OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 11 }
+
+--tagpath /zone-based-firewall-statistics/no-zone-no-zone-allowed
+zoneBasedFirewallStatisticsNoZoneNoZoneAllowed OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 12 }
+
+--tagpath /zone-based-firewall-statistics/zone-no-zone-inet-allowed
+zoneBasedFirewallStatisticsZoneNoZoneInetAllowed OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 13 }
+
+--tagpath /zone-based-firewall-statistics/zone-no-zone-inet-denied
+zoneBasedFirewallStatisticsZoneNoZoneInetDenied OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 14 }
+
+--tagpath /zone-based-firewall-statistics/tcp-retrans-seg
+zoneBasedFirewallStatisticsTcpRetransSeg OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 15 }
+
+--tagpath /zone-based-firewall-statistics/tcp-ooo-seg
+zoneBasedFirewallStatisticsTcpOooSeg OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 16 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-internal-invalid-tcp-state
+zoneBasedFirewallStatisticsTcpDropInternalInvalidTcpState OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 17 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-stray-seg
+zoneBasedFirewallStatisticsTcpDropStraySeg OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 18 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-invalid-flags
+zoneBasedFirewallStatisticsTcpDropInvalidFlags OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 19 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-syn-with-data
+zoneBasedFirewallStatisticsTcpDropSynWithData OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 20 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-invalid-win-scale-option
+zoneBasedFirewallStatisticsTcpDropInvalidWinScaleOption OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 21 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-invalid-seg-synsent-state
+zoneBasedFirewallStatisticsTcpDropInvalidSegSynsentState OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 22 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-invalid-ack-num
+zoneBasedFirewallStatisticsTcpDropInvalidAckNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 23 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-invalid-ack-flag
+zoneBasedFirewallStatisticsTcpDropInvalidAckFlag OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 24 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-rst-to-resp
+zoneBasedFirewallStatisticsTcpDropRstToResp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 25 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-retrans-invalid-flags
+zoneBasedFirewallStatisticsTcpDropRetransInvalidFlags OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 26 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-rst-in-win
+zoneBasedFirewallStatisticsTcpDropRstInWin OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 27 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-invalid-seq
+zoneBasedFirewallStatisticsTcpDropInvalidSeq OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 28 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-invalid-seg-synrcvd-state
+zoneBasedFirewallStatisticsTcpDropInvalidSegSynrcvdState OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 29 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-syn-in-win
+zoneBasedFirewallStatisticsTcpDropSynInWin OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 30 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-unexpect-tcp-pyld
+zoneBasedFirewallStatisticsTcpDropUnexpectTcpPyld OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 31 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-invalid-seg-pkt-too-old
+zoneBasedFirewallStatisticsTcpDropInvalidSegPktTooOld OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 32 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-invalid-seg-pkt-win-overflow
+zoneBasedFirewallStatisticsTcpDropInvalidSegPktWinOverflow OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 33 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-invalid-seg-pyld-after-fin-send
+zoneBasedFirewallStatisticsTcpDropInvalidSegPyldAfterFinSend OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 34 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-no-syn-in-listen-state
+zoneBasedFirewallStatisticsTcpDropNoSynInListenState OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 35 }
+
+--tagpath /zone-based-firewall-statistics/tcp-drop-invalid-dir
+zoneBasedFirewallStatisticsTcpDropInvalidDir OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 36 }
+
+--tagpath /zone-based-firewall-statistics/zbf-pkts
+zoneBasedFirewallStatisticsZbfPkts OBJECT-TYPE
+    SYNTAX      Counter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 37 }
+
+--tagpath /zone-based-firewall-statistics/invalid-filter-dropped
+zoneBasedFirewallStatisticsInvalidFilterDropped OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 38 }
+
+--tagpath /zone-based-firewall-statistics/mbox-msg-full
+zoneBasedFirewallStatisticsMboxMsgFull OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 39 }
+
+--tagpath /zone-based-firewall-statistics/frag-state-check-fail
+zoneBasedFirewallStatisticsFragStateCheckFail OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 40 }
+
+--tagpath /zone-based-firewall-statistics/self-pkts
+zoneBasedFirewallStatisticsSelfPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 41 }
+
+--tagpath /zone-based-firewall-statistics/self-pkts-allowed
+zoneBasedFirewallStatisticsSelfPktsAllowed OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 42 }
+
+--tagpath /zone-based-firewall-statistics/umbrella-registr-pkts-allowed
+zoneBasedFirewallStatisticsUmbrellaRegistrPktsAllowed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { zoneBasedFirewallStatistics 43 }
+
+-- tagpath /zonepair
+zonepairInspectSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ZonepairInspectSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "inspect session"
+    ::= {  zbfw 1 }
+
+-- tagpath /zonepair/inspect-session
+zonepairInspectSessionEntry OBJECT-TYPE
+    SYNTAX      ZonepairInspectSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { zonepairInspectSessionZonepairName, zonepairInspectSessionVpn, zonepairInspectSessionSourceIpAddress,zonepairInspectSessionDestinationIpAddress, zonepairInspectSessionSourcePort, zonepairInspectSessionDestinationPort,zonepairInspectSessionProtocol }
+         ::= { zonepairInspectSessionTable 1 }
+
+ZonepairInspectSessionEntry ::=
+    SEQUENCE {
+        zonepairInspectSessionZonepairName String,
+        zonepairInspectSessionVpn Unsigned32,
+        zonepairInspectSessionSourceIpAddress IpAddress,
+        zonepairInspectSessionDestinationIpAddress IpAddress,
+        zonepairInspectSessionSourcePort Unsigned32,
+        zonepairInspectSessionDestinationPort Unsigned32,
+        zonepairInspectSessionProtocol INTEGER,
+        zonepairInspectSessionSourceVpn Unsigned32,
+        zonepairInspectSessionDestinationVpn Unsigned32,
+        zonepairInspectSessionIdleTimeout String,
+        zonepairInspectSessionOutboundPackets Counter32,
+        zonepairInspectSessionOutboundOctets Counter64,
+        zonepairInspectSessionInboundPackets Counter32,
+        zonepairInspectSessionInboundOctets Counter64,
+        zonepairInspectSessionFilterState INTEGER     
+    }
+
+--tagpath /zonepair/inspect-session/zonepair-name
+zonepairInspectSessionZonepairName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Zonepair Name"
+    ::= { zonepairInspectSessionEntry 1 }
+
+--tagpath /zonepair/inspect-session/vpn
+zonepairInspectSessionVpn OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN"
+    ::= { zonepairInspectSessionEntry 2 }
+
+--tagpath /zonepair/inspect-session/source-ip-address
+zonepairInspectSessionSourceIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Source IP address"
+    ::= { zonepairInspectSessionEntry 3 }
+
+--tagpath /zonepair/inspect-session/destination-ip-address
+zonepairInspectSessionDestinationIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Destination IP address"
+    ::= { zonepairInspectSessionEntry 4 }
+
+--tagpath /zonepair/inspect-session/source-port
+zonepairInspectSessionSourcePort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Source port"
+    ::= { zonepairInspectSessionEntry 5 }
+
+--tagpath /zonepair/inspect-session/destination-port
+zonepairInspectSessionDestinationPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Destination port"
+    ::= { zonepairInspectSessionEntry 6 }
+
+--tagpath /zonepair/inspect-session/protocol
+zonepairInspectSessionProtocol OBJECT-TYPE
+    SYNTAX      INTEGER {icmp(1),tcp(6),udp(17)}
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Protocol"
+    ::= { zonepairInspectSessionEntry 7 }
+
+--tagpath /zonepair/inspect-session/source-vpn
+zonepairInspectSessionSourceVpn OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Source VPN"
+    ::= { zonepairInspectSessionEntry 8 }
+
+--tagpath /zonepair/inspect-session/destination-vpn
+zonepairInspectSessionDestinationVpn OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Destination VPN"
+    ::= { zonepairInspectSessionEntry 9 }
+
+--tagpath /zonepair/inspect-session/idle-timeout
+zonepairInspectSessionIdleTimeout OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Idle timeout"
+    ::= { zonepairInspectSessionEntry 10 }
+
+--tagpath /zonepair/inspect-session/outbound-packets
+zonepairInspectSessionOutboundPackets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound Packets"
+    ::= { zonepairInspectSessionEntry 11 }
+
+--tagpath /zonepair/inspect-session/outbound-octets
+zonepairInspectSessionOutboundOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound Octets"
+    ::= { zonepairInspectSessionEntry 12 }
+
+--tagpath /zonepair/inspect-session/inbound-packets
+zonepairInspectSessionInboundPackets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound Packets"
+    ::= { zonepairInspectSessionEntry 13 }
+
+--tagpath /zonepair/inspect-session/inbound-octets
+zonepairInspectSessionInboundOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound Octets"
+    ::= { zonepairInspectSessionEntry 14 }
+
+--tagpath /zonepair/inspect-session/filter-state
+zonepairInspectSessionFilterState OBJECT-TYPE
+    SYNTAX      INTEGER {close(0),listen(1),syn-sent(2),syn-received(3),established(4),close-wait(5),last-ack(6),timewait(7)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Filter State"
+    ::= { zonepairInspectSessionEntry 15 }
+END
+

@@ -553,98 +553,84 @@
                 {
                     "state_name": "lgpAgentTelnetEnabled",
                     "state_descr": "yes",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpAgentTelnetEnabled",
                     "state_descr": "no",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "lgpAgentVelocityServerEnabled",
                     "state_descr": "yes",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpAgentVelocityServerEnabled",
                     "state_descr": "no",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "lgpAgentWebServerMode",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "lgpAgentWebServerMode",
                     "state_descr": "http",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "lgpAgentWebServerMode",
                     "state_descr": "https",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpPduEntrySysStatus",
                     "state_descr": "normalOperation",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpPduEntrySysStatus",
                     "state_descr": "startUp",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "lgpPduEntrySysStatus",
                     "state_descr": "unknownNoSupport",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "lgpPduEntrySysStatus",
                     "state_descr": "normalWithWarning",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "lgpPduEntrySysStatus",
                     "state_descr": "normalWithAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "lgpPduEntrySysStatus",
                     "state_descr": "abnormalOperation",
-                    "state_draw_graph": 0,
                     "state_value": 32,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "lgpPduEntrySysStatus",
                     "state_descr": "unknownCommFailure",
-                    "state_draw_graph": 0,
                     "state_value": 64,
                     "state_generic_value": 2
                 }
@@ -1182,98 +1168,84 @@
                 {
                     "state_name": "lgpAgentTelnetEnabled",
                     "state_descr": "yes",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpAgentTelnetEnabled",
                     "state_descr": "no",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "lgpAgentVelocityServerEnabled",
                     "state_descr": "yes",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpAgentVelocityServerEnabled",
                     "state_descr": "no",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "lgpAgentWebServerMode",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "lgpAgentWebServerMode",
                     "state_descr": "http",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "lgpAgentWebServerMode",
                     "state_descr": "https",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpPduEntrySysStatus",
                     "state_descr": "normalOperation",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "lgpPduEntrySysStatus",
                     "state_descr": "startUp",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "lgpPduEntrySysStatus",
                     "state_descr": "unknownNoSupport",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "lgpPduEntrySysStatus",
                     "state_descr": "normalWithWarning",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "lgpPduEntrySysStatus",
                     "state_descr": "normalWithAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "lgpPduEntrySysStatus",
                     "state_descr": "abnormalOperation",
-                    "state_draw_graph": 0,
                     "state_value": 32,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "lgpPduEntrySysStatus",
                     "state_descr": "unknownCommFailure",
-                    "state_draw_graph": 0,
                     "state_value": 64,
                     "state_generic_value": 2
                 }

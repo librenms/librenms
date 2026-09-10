@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Ptp500.php
  *
@@ -26,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSsrDiscovery;
@@ -49,7 +51,7 @@ class Ptp500 extends OS implements
 
         return [
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 $transmit,
                 'ptp500-tx',
@@ -60,7 +62,7 @@ class Ptp500 extends OS implements
                 10
             ),
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 $receive,
                 'ptp500-rx',
@@ -87,7 +89,7 @@ class Ptp500 extends OS implements
 
         return [
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 $receive,
                 'ptp500-rx-rate',
@@ -98,7 +100,7 @@ class Ptp500 extends OS implements
                 1
             ),
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 $transmit,
                 'ptp500-tx-rate',
@@ -109,7 +111,7 @@ class Ptp500 extends OS implements
                 1
             ),
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 $aggregate,
                 'ptp500-ag-rate',
@@ -134,7 +136,7 @@ class Ptp500 extends OS implements
 
         return [
             new WirelessSensor(
-                'ssr',
+                WirelessSensorType::Ssr,
                 $this->getDeviceId(),
                 $ssr,
                 'ptp500-ssr',

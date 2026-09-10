@@ -1,0 +1,91 @@
+modules:
+    os:
+        version: .1.3.6.1.4.1.318.1.4.2.4.1.4.1
+        hardware_mib: NETBOTZ410-MIB
+    sensors:
+        airflow:
+            data:
+                -
+                    oid: NETBOTZV2-MIB::airFlowSensorTable
+                    value: NETBOTZV2-MIB::airFlowSensorValue
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.1.5.1.2.{{ $index }}'
+                    descr: NETBOTZV2-MIB::airFlowSensorLabel
+                    group: Airflow
+                    index: 'airFlowSensorValue.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: NETBOTZV2-MIB::dewPointSensorTable
+                    value: NETBOTZV2-MIB::dewPointSensorValue
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.1.3.1.2.{{ $index }}'
+                    descr: NETBOTZV2-MIB::dewPointSensorLabel
+                    group: Dew Point
+                    index: 'dewPointSensorValue.{{ $index }}'
+                -
+                    oid: NETBOTZV2-MIB::tempSensorTable
+                    value: NETBOTZV2-MIB::tempSensorValueInt
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.1.1.1.8.{{ $index }}'
+                    descr: NETBOTZV2-MIB::tempSensorLabel
+                    index: '{{ $index }}'
+        humidity:
+            data:
+                -
+                    oid: NETBOTZV2-MIB::humiSensorTable
+                    value: NETBOTZV2-MIB::humiSensorValue
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.1.2.1.8.{{ $index }}'
+                    descr: NETBOTZV2-MIB::humiSensorLabel
+                    index: '{{ $index }}'
+        state:
+            data:
+                -
+                    oid: NETBOTZV2-MIB::dryContactSensorTable
+                    value: NETBOTZV2-MIB::dryContactSensorValue
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.2.1.1.2.{{ $index }}'
+                    descr: NETBOTZV2-MIB::dryContactSensorLabel
+                    group: Dry Contacts
+                    index: 'dryContactSensor.{{ $index }}'
+                    state_name: dryContactSensor
+                    states:
+                        - { descr: 'null', value: -1, generic: 3 }
+                        - { descr: open, value: 0, generic: 0 }
+                        - { descr: closed, value: 1, generic: 2 }
+                -
+                    oid: NETBOTZV2-MIB::doorSwitchSensorTable
+                    value: NETBOTZV2-MIB::doorSwitchSensorValue
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.2.2.1.2.{{ $index }}'
+                    descr: NETBOTZV2-MIB::doorSwitchSensorLabel
+                    group: Door Switches
+                    index: 'doorSwitchSensor.{{ $index }}'
+                    state_name: doorSwitchSensor
+                    states:
+                        - { descr: 'null', value: -1, generic: 3 }
+                        - { descr: open, value: 0, generic: 0 }
+                        - { descr: closed, value: 1, generic: 2 }
+                -
+                    oid: NETBOTZV2-MIB::cameraMotionSensorTable
+                    value: NETBOTZV2-MIB::cameraMotionSensorValue
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.2.3.1.2.{{ $index }}'
+                    descr: NETBOTZV2-MIB::cameraMotionSensorLabel
+                    group: Camera Motion Sensors
+                    index: 'cameraMotionSensor.{{ $index }}'
+                    state_name: cameraMotionSensor
+                    states:
+                        - { descr: 'null', value: -1, generic: 3 }
+                        - { descr: noMotion, value: 0, generic: 0 }
+                        - { descr: motionDetected, value: 1, generic: 2 }
+                -
+                    oid: NETBOTZV2-MIB::otherStateSensorTable
+                    value: NETBOTZV2-MIB::otherStateSensorErrorStatus
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.2.10.1.3.{{ $index }}'
+                    descr: NETBOTZV2-MIB::otherStateSensorLabel
+                    index: '{{ $index }}'
+                    state_name: otherStateSensorErrorStatus
+                    states:
+                        - { descr: normal, value: 0, generic: 0 }
+                        - { descr: info, value: 1, generic: 1 }
+                        - { descr: warning, value: 2, generic: 1 }
+                        - { descr: error, value: 3, generic: 2 }
+                        - { descr: critical, value: 4, generic: 2 }
+                        - { descr: failure, value: 5, generic: 2 }

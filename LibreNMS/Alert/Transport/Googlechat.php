@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LibreNMS Google Chat alerting transport
  *

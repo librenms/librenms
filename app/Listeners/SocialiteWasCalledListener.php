@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use Log;
 
 class SocialiteWasCalledListener
@@ -25,7 +25,7 @@ class SocialiteWasCalledListener
      */
     public function handle(\SocialiteProviders\Manager\SocialiteWasCalled $event): void
     {
-        foreach (Config::get('auth.socialite.configs', []) as $provider => $config) {
+        foreach (LibrenmsConfig::get('auth.socialite.configs', []) as $provider => $config) {
             // Treat not set as "disabled"
             if (! isset($config['listener'])) {
                 continue;

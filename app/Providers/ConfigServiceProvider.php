@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\ConfigRepository;
 use App\Facades\LibrenmsConfig;
+use App\Listeners\RegenerateDeviceDisplayNames;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,16 +18,22 @@ class ConfigServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton('librenms-config', function () {
-            return new ConfigRepository;
-        });
+        $this->app->singleton('librenms-config', fn () => new ConfigRepository);
 
         // if we skipped loading the DB the first time config was called, load it when it is available
-        $this->callAfterResolving('db', function () {
+        $this->callAfterResolving('db', function (): void {
             if ($this->app->resolved('librenms-config')) {
                 Log::error('Loaded config twice due to bad initialization order');
                 LibrenmsConfig::reload();
             }
         });
+    }
+
+    /**
+     * Bootstrap services.
+     */
+    public function boot(): void
+    {
+        Event::listen('setting.changed.device_display_default', RegenerateDeviceDisplayNames::class);
     }
 }

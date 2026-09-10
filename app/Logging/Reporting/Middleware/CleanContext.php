@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CleanContext.php
  *
@@ -56,7 +57,7 @@ class CleanContext implements \Spatie\FlareClient\FlareMiddleware\FlareMiddlewar
             $context['headers']['referer'] = null;
 
             $report->userProvidedContext($context);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
 
         return $next($report);

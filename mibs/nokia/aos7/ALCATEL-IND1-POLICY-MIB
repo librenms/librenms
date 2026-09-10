@@ -27,34 +27,28 @@ IMPORTS
 --
 
 alcatelIND1PolicyMIB MODULE-IDENTITY
-        LAST-UPDATED    "201005130000Z"
-        ORGANIZATION    "Alcatel-Lucent"
-        CONTACT-INFO
-            "Please consult with Customer Service to ensure the most appropriate
-             version of this document is used with the products in question:
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
 
         DESCRIPTION
             "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  Configuration and monitoring of policy manager parameters
 
              The right to make changes in specification and other information
@@ -68,13 +62,17 @@ alcatelIND1PolicyMIB MODULE-IDENTITY
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201911270000Z"
+        DESCRIPTION
+            "Updated the latest contact and Copyright information for ALE USA Inc."
 
         REVISION      "201005130000Z"
         DESCRIPTION
             "Fixed the Notifications to use MIB Module OID.0 as Notifications root."
-
         ::= { softentIND1Policy 1 }
 
 
@@ -171,7 +169,7 @@ alcatelIND1PolicyMIB MODULE-IDENTITY
                                          pyEventDispositionError(45),
                                          pyEventNameLengthError(46),
                      pyEventTableResize(47),
-                     pyEvent48(48),
+                     pyEventUnsupportedAttribute(48),
                      pyEvent49(49),
                      pyEvent50(50),
                      pyEvent51(51),
@@ -596,7 +594,7 @@ policyRuleNamesName OBJECT-TYPE
 
 policyRuleNamesRowStatus OBJECT-TYPE
     SYNTAX RowStatus
-    MAX-ACCESS read-only
+    MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
       "Deprecated (to avoid proliferation of control planes) - rules
@@ -827,6 +825,24 @@ policyManagerSwitchIdentifier OBJECT-TYPE
                  Example: xx:xx:xx:xx:xx:xx:yyyymmdd:hhmmss "
     ::= { alcatelIND1PolicyMIBObjects 9 }
 
+serverPolicyDecisionStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                       recacheNone(0),
+                       recacheInit(1),
+                       recacheInprogress(2),
+                       recacheConfigDwnld(3),
+                       recachingNItables(4),
+                       recacheSuccess(5),
+                       recacheFailed(6)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Used to get the status of previous request"
+
+    ::= { alcatelIND1PolicyMIBObjects 11 }
+
+
 --
 -- Traps definitions
 --
@@ -898,7 +914,8 @@ policyMIBGlobalGroup OBJECT-GROUP
         OBJECTS {
         serverPolicyDecision,
         policyManagerEventTableSize,
-        policyManagerSwitchIdentifier
+        policyManagerSwitchIdentifier,
+        serverPolicyDecisionStatus
         }
         STATUS  current
         DESCRIPTION

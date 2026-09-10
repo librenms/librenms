@@ -1,16 +1,22 @@
 <?php
 
-use App\Models\Port;
+use App\Models\Bill;
+use App\Models\JuniAtmVp;
+use App\Models\MacAccounting;
 use App\Models\PortAdsl;
 use App\Models\PortsNac;
 use App\Models\PortVdsl;
+use App\Models\PortVlan;
+use App\Models\Sensor;
 use App\Plugins\Hooks\PortTabHook;
+use Illuminate\Support\Facades\Gate;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
 $vars['view'] = basename($vars['view'] ?? 'graphs');
 
-$port = \App\Models\Port::find($vars['port']);
+$port = \App\Facades\PortCache::get($vars['port']);
 
 $port_details = 1;
 
@@ -26,15 +32,15 @@ if ($port->ifPhysAddress) {
 }
 
 $color = 'black';
-if ($port->ifAdminStatus == 'down') {
+if ($port->ifAdminStatus == IfOperStatus::Down) {
     $status = "<span class='grey'>Disabled</span>";
 }
 
-if ($port->ifAdminStatus == 'up' && $port->ifOperStatus != 'up') {
+if ($port->ifAdminStatus == IfOperStatus::Up && $port->ifOperStatus != IfOperStatus::Up) {
     $status = "<span class='red'>Enabled / Disconnected</span>";
 }
 
-if ($port->ifAdminStatus == 'up' && $port->ifOperStatus == 'up') {
+if ($port->ifAdminStatus == IfOperStatus::Up && $port->ifOperStatus == IfOperStatus::Up) {
     $status = "<span class='green'>Enabled / Connected</span>";
 }
 
@@ -51,23 +57,25 @@ echo view('device.tabs.ports.includes.port_row', [
     'port' => $port,
     'data' => [
         'neighbors' => [$port->port_id => (new \App\Http\Controllers\Device\Tabs\PortsController())->findPortNeighbors($port)],
+        'neighbor_ports' => null,
         'graphs' => [
             'bits' => [['type' => 'port_bits', 'title' => trans('Traffic'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
             'upkts' => [['type' => 'port_upkts', 'title' => trans('Packets (Unicast)'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
             'errors' => [['type' => 'port_errors', 'title' => trans('Errors'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
         ],
+        'tab' => $vars['tab'] ?? 'detail',
     ],
     'collapsing' => false,
 ]);
 
 echo '</table></div>';
 
-$pos = strpos(strtolower($ifname), 'vlan');
+$pos = strpos(strtolower((string) $ifname), 'vlan');
 if ($pos !== false) {
     $broke = 'yes';
 }
 
-$pos = strpos(strtolower($ifname), 'loopback');
+$pos = strpos(strtolower((string) $ifname), 'loopback');
 
 if ($pos !== false) {
     $broke = 'yes';
@@ -91,6 +99,10 @@ if ($port->macs()->exists()) {
     $menu_options['arp'] = 'ARP Table';
 }
 
+if ($port->nd()->exists()) {
+    $menu_options['nd'] = 'IPv6 ND';
+}
+
 if ($port->fdbEntries()->exists()) {
     $menu_options['fdb'] = 'FDB Table';
 }
@@ -101,7 +113,7 @@ if ($port->transceivers()->exists()) {
     $menu_options['transceiver'] = __('port.transceiver');
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ?  AND entPhysicalIndex_measured = 'ports'", [$device['device_id'], $port->ifIndex])) {
+if (Sensor::where('device_id', $device['device_id'])->where('entPhysicalIndex', $port->ifIndex)->where('entPhysicalIndex_measured', 'ports')->exists()) {
     $menu_options['sensors'] = 'Health';
 }
 
@@ -119,7 +131,7 @@ if (DeviceCache::getPrimary()->ports()->where('pagpGroupIfIndex', $port->ifIndex
     $menu_options['pagp'] = 'PAgP';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports_vlans` WHERE `port_id` = '" . $port->port_id . "' and `device_id` = '" . $device['device_id'] . "'")) {
+if (PortVlan::where('port_id', $port->port_id)->where('device_id', $device['device_id'])->exists()) {
     $menu_options['vlans'] = 'VLANs';
 }
 
@@ -127,9 +139,7 @@ if ($port->qos()->count() > 0) {
     $menu_options['qos'] = 'QoS';
 }
 
-$portModel = Port::find($port->port_id);
-
-if (LibreNMS\Plugins::countHooks('port_container') || \PluginManager::hasHooks(PortTabHook::class, ['port' => $portModel])) {
+if (LibreNMS\Plugins::countHooks('port_container') || \PluginManager::hasHooks(PortTabHook::class, ['port' => $port])) {
     // Checking if any plugin implements the port_container. If yes, allow to display the menu_option
     $menu_options['plugins'] = 'Plugins';
 }
@@ -151,10 +161,8 @@ foreach ($menu_options as $option => $text) {
 
 unset($sep);
 
-if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE port_id = '" . $port->port_id . "'") > '0') {
-    echo generate_link($descr, $link_array, ['view' => 'macaccounting', 'graph' => $type]);
-
-    echo ' | Mac Accounting : ';
+if (MacAccounting::where('port_id', $port->port_id)->exists()) {
+    echo ' | MAC Accounting : ';
     if ($vars['view'] == 'macaccounting' && $vars['graph'] == 'bits' && $vars['subview'] == 'graphs') {
         echo "<span class='pagemenu-selected'>";
     }
@@ -219,7 +227,7 @@ if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE port_id = '" . $port-
     echo ')';
 }//end if
 
-if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port->port_id . "'") > '0') {
+if (JuniAtmVp::where('port_id', $port->port_id)->exists()) {
     // FIXME ATM VPs
     // FIXME URLs BROKEN
     echo ' | ATM VPs : ';
@@ -263,13 +271,15 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port->port
     }
 }//end if
 
-if (Auth::user()->hasGlobalAdmin() && \LibreNMS\Config::get('enable_billing') == 1) {
-    $bills = dbFetchRows('SELECT `bill_id` FROM `bill_ports` WHERE `port_id`=?', [$port->port_id]);
-    if (count($bills) === 1) {
-        echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bill', 'bill_id' => $bills[0]['bill_id']]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bill</a></span>";
-    } elseif (count($bills) > 1) {
+if (\App\Facades\LibrenmsConfig::get('enable_billing') == 1) {
+    if ($port->bills->count() == 1) {
+        $bill = $port->bills->first();
+        if (Gate::allows('view', $bill)) {
+            echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bill', 'bill_id' => $bill->bill_id]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bill</a></span>";
+        }
+    } elseif ($port->bills->isNotEmpty()) {
         echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bills']) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bills</a></span>";
-    } else {
+    } elseif (Gate::allows('create', Bill::class)) {
         echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bills', 'view' => 'add', 'port' => $port->port_id]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> Create Bill</a></span>";
     }
 }

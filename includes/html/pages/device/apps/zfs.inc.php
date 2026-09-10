@@ -22,12 +22,16 @@ $status_info = $app->data['status_info'] ?? [];
 $version = $app->data['version'] ?? 2;
 sort($pools);
 foreach ($pools as $index => $pool) {
-    $pool = htmlspecialchars($pool);
-    $label = $vars['pool'] == $pool
-        ? '<span class="pagemenu-selected">' . $pool . '</span>'
-        : $pool;
+    $pool = htmlspecialchars((string) $pool);
 
-    echo generate_link($label, $link_array, ['pool' => $pool]);
+    $label = $pool;
+    $link = generate_link($label, $link_array, ['pool' => $pool]);
+
+    $label = $vars['pool'] == $pool
+        ? '<span class="pagemenu-selected">' . $link . '</span>'
+        : $link;
+
+    echo $link;
 
     if ($index < (count($pools) - 1)) {
         echo ', ';
@@ -70,7 +74,6 @@ if (isset($vars['pool'])) {
         'zfs_l2_d_to_m_ratio' => 'L2 Data To Meta Ratio',
         'zfs_l2_access_total' => 'L2 Total Hits And Misses Per Second',
         'zfs_l2_errors' => 'L2 Errors Per Second',
-        'zfs_l2_errors' => 'L2 Error Types Per Second',
         'zfs_l2_sizes' => 'L2 Sizes',
         'zfs_l2_asize' => 'L2 Asize',
         'zfs_l2_bufc_d_asize' => 'L2 BufC Data Asize',
@@ -102,7 +105,7 @@ foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 

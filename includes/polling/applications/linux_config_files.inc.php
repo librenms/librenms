@@ -36,6 +36,6 @@ $tags = [
     'rrd_name' => $rrd_name,
 ];
 
-data_update($device, $polling_type, $tags, $fields);
+app('Datastore')->put($device, $polling_type, $tags, $fields);
 
 update_application($app, $output_success, $fields);

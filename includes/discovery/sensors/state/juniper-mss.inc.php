@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -17,11 +18,11 @@ if (is_array($temp)) {
     //Create State Index
     $state_name = 'trpzSysPowerSupplyStatus';
     $states = [
-        ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'other'],
-        ['value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-        ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'ac-failed'],
-        ['value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'dc-failed'],
-        ['value' => 5, 'generic' => 0, 'graph' => 0, 'descr' => 'ac-ok-dc-ok'],
+        ['value' => 1, 'generic' => 1, 'descr' => 'other'],
+        ['value' => 2, 'generic' => 3, 'descr' => 'unknown'],
+        ['value' => 3, 'generic' => 2, 'descr' => 'ac-failed'],
+        ['value' => 4, 'generic' => 2, 'descr' => 'dc-failed'],
+        ['value' => 5, 'generic' => 0, 'descr' => 'ac-ok-dc-ok'],
     ];
     create_state_index($state_name, $states);
 
@@ -29,8 +30,5 @@ if (is_array($temp)) {
         $descr = $temp[$index]['trpzSysPowerSupplyDescr'];
         //Discover Sensors
         discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index]['trpzSysPowerSupplyStatus'], 'snmp', $index);
-
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $index);
     }
 }

@@ -2,23 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Alert;
 use App\Models\Eventlog;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 
 class AlertController extends Controller
 {
     public function ack(Request $request, Alert $alert): \Illuminate\Http\JsonResponse
     {
+        $this->authorize('update', $alert);
+
         $this->validate($request, [
             'state' => 'required|int',
             'ack_msg' => 'nullable|string',
             'ack_until_clear' => 'nullable|in:0,1,true,false',
         ]);
 
-        $state = $request->get('state');
+        $state = $request->input('state');
         $state_description = '';
         if ($state == 2) {
             $alert->state = 1;
@@ -31,19 +33,18 @@ class AlertController extends Controller
         }
 
         $info = $alert->info;
-        $info['until_clear'] = filter_var($request->get('ack_until_clear'), FILTER_VALIDATE_BOOLEAN);
+        $info['until_clear'] = filter_var($request->input('ack_until_clear'), FILTER_VALIDATE_BOOLEAN);
         $alert->info = $info;
 
-        $timestamp = date(Config::get('dateformat.long'));
+        $timestamp = date(LibrenmsConfig::get('dateformat.long'));
         $username = $request->user()->username;
-        $ack_msg = $request->get('ack_msg');
+        $ack_msg = $request->input('ack_msg');
         $alert->note = trim($alert->note . PHP_EOL . "$timestamp - $state_description ($username) " . $ack_msg);
 
         if ($alert->save()) {
-            if (in_array($state, [2, 22])) {
-                $rule_name = $alert->rule->name;
-                Eventlog::log("$username acknowledged alert $rule_name note: $ack_msg", $alert->device_id, 'alert', Severity::Info, $alert->id);
-            }
+            $rule_name = $alert->rule->name;
+            $act = strtolower($state_description) . 'nowledged';
+            Eventlog::log("$username {$act} alert $rule_name note: $ack_msg", $alert->device_id, 'alert', Severity::Info, $alert->id);
 
             return response()->json([
                 'message' => "Alert {$state_description}nowledged.",

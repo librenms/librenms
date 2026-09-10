@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Saf-IntegraX.php
  *
@@ -26,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -49,7 +51,7 @@ class SafIntegraX extends OS implements
         return [
             // SAF-INTEGRAX-MIB::integraXradioAtxFrequency
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.10.2.1.2.0',
                 'saf-integrax-a-tx',
@@ -61,7 +63,7 @@ class SafIntegraX extends OS implements
             ),
             // SAF-INTEGRAX-MIB::integraXradioBtxFrequency
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.10.2.2.2.0',
                 'saf-integrax-b-tx',
@@ -73,7 +75,7 @@ class SafIntegraX extends OS implements
             ),
             // SAF-INTEGRAX-MIB::integraXradioArxFrequency
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.10.2.1.9.0',
                 'saf-integrax-a-rx',
@@ -85,7 +87,7 @@ class SafIntegraX extends OS implements
             ),
             // SAF-INTEGRAX-MIB::integraXradioBrxFrequency
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.10.2.2.9.0',
                 'saf-integrax-b-rx',
@@ -109,7 +111,7 @@ class SafIntegraX extends OS implements
         return [
             // SAF-INTEGRAX-MIB::integraXmodemAnormalizedMse
             new WirelessSensor(
-                'mse',
+                WirelessSensorType::Mse,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.10.3.1.2.0',
                 'saf-integrax-a-mse',
@@ -121,7 +123,7 @@ class SafIntegraX extends OS implements
             ),
             // SAF-INTEGRAX-MIB::integraXmodemBnormalizedMse
             new WirelessSensor(
-                'mse',
+                WirelessSensorType::Mse,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.10.3.2.2.0',
                 'saf-integrax-b-mse',
@@ -145,7 +147,7 @@ class SafIntegraX extends OS implements
         return [
             // SAF-INTEGRAX-MIB::integraXradioAtxPower
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.10.2.1.1.0',
                 'saf-integrax-a-tx-power',
@@ -154,7 +156,7 @@ class SafIntegraX extends OS implements
             ),
             // SAF-INTEGRAX-MIB::integraXradioBtxPower
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.10.2.2.1.0',
                 'saf-integrax-b-tx-power',
@@ -163,7 +165,7 @@ class SafIntegraX extends OS implements
             ),
             // SAF-INTEGRAX-MIB::integraXradioArxLevel
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.10.2.1.3.0',
                 'saf-integrax-a-rx-level',
@@ -172,7 +174,7 @@ class SafIntegraX extends OS implements
             ),
             // SAF-INTEGRAX-MIB::integraXradioBrxLevel
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.10.2.2.3.0',
                 'saf-integrax-b-rx-level',
@@ -193,7 +195,7 @@ class SafIntegraX extends OS implements
         return [
             // SAF-INTEGRAX-MIB::integraXmodemArxCapacity
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.10.3.1.9.0',
                 'saf-integrax-a-rx-capacity',
@@ -204,7 +206,7 @@ class SafIntegraX extends OS implements
             ),
             // SAF-INTEGRAX-MIB::integraXmodemBrxCapacity
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.10.3.2.9.0',
                 'saf-integrax-b-rx-capacity',
@@ -215,7 +217,7 @@ class SafIntegraX extends OS implements
             ),
             // SAF-INTEGRAX-MIB::integraXmodemAtxCapacity
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.10.3.1.10.0',
                 'saf-integrax-a-tx-capacity',
@@ -226,7 +228,7 @@ class SafIntegraX extends OS implements
             ),
             // SAF-INTEGRAX-MIB::integraXmodemBtxCapacity
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.10.3.2.10.0',
                 'saf-integrax-b-tx-capacity',

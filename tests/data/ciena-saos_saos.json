@@ -11157,6 +11157,406 @@
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.813695132.33",
+                    "sensor_index": "nnOpticalPmRecentTable.813695132.33",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPRN-OCH NEND RCV",
+                    "group": "ETH10G-1-4-1",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": -100,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.813695132.35",
+                    "sensor_index": "nnOpticalPmRecentTable.813695132.35",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPTN-OCH NEND TRMT",
+                    "group": "ETH10G-1-4-1",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.813695260.33",
+                    "sensor_index": "nnOpticalPmRecentTable.813695260.33",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPRN-OCH NEND RCV",
+                    "group": "ETH10G-1-4-2",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 33,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.813695260.35",
+                    "sensor_index": "nnOpticalPmRecentTable.813695260.35",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPTN-OCH NEND TRMT",
+                    "group": "ETH10G-1-4-2",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.813695387.33",
+                    "sensor_index": "nnOpticalPmRecentTable.813695387.33",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPRN-OCH NEND RCV",
+                    "group": "OTM2-1-4-3",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 52,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.813695387.35",
+                    "sensor_index": "nnOpticalPmRecentTable.813695387.35",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPTN-OCH NEND TRMT",
+                    "group": "OTM2-1-4-3",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.813695644.33",
+                    "sensor_index": "nnOpticalPmRecentTable.813695644.33",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPRN-OCH NEND RCV",
+                    "group": "ETH10G-1-4-5",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 46,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.813695644.35",
+                    "sensor_index": "nnOpticalPmRecentTable.813695644.35",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPTN-OCH NEND TRMT",
+                    "group": "ETH10G-1-4-5",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.813695772.33",
+                    "sensor_index": "nnOpticalPmRecentTable.813695772.33",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPRN-OCH NEND RCV",
+                    "group": "ETH10G-1-4-6",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 50,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.813695772.35",
+                    "sensor_index": "nnOpticalPmRecentTable.813695772.35",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPTN-OCH NEND TRMT",
+                    "group": "ETH10G-1-4-6",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.813695899.33",
+                    "sensor_index": "nnOpticalPmRecentTable.813695899.33",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPRN-OCH NEND RCV",
+                    "group": "OTM2-1-4-7",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 43,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.813695899.35",
+                    "sensor_index": "nnOpticalPmRecentTable.813695899.35",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPTN-OCH NEND TRMT",
+                    "group": "OTM2-1-4-7",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.817889436.33",
+                    "sensor_index": "nnOpticalPmRecentTable.817889436.33",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPRN-OCH NEND RCV",
+                    "group": "ETH10G-1-6-1",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 55,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.817889436.35",
+                    "sensor_index": "nnOpticalPmRecentTable.817889436.35",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPTN-OCH NEND TRMT",
+                    "group": "ETH10G-1-6-1",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.817889947.33",
+                    "sensor_index": "nnOpticalPmRecentTable.817889947.33",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPRN-OCH NEND RCV",
+                    "group": "OTM2-1-6-5",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 52,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "percent",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.817889947.35",
+                    "sensor_index": "nnOpticalPmRecentTable.817889947.35",
+                    "sensor_type": "ciena-saos",
+                    "sensor_descr": "OPTN-OCH NEND TRMT",
+                    "group": "OTM2-1-6-5",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
                 }
             ]
         },
@@ -11182,6 +11582,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11201,6 +11602,7 @@
                     "entPhysicalContainedIn": 671220736,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11220,6 +11622,7 @@
                     "entPhysicalContainedIn": 671221760,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11239,6 +11642,7 @@
                     "entPhysicalContainedIn": 671222784,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11258,6 +11662,7 @@
                     "entPhysicalContainedIn": 671223808,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11277,6 +11682,7 @@
                     "entPhysicalContainedIn": 671223809,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11296,6 +11702,7 @@
                     "entPhysicalContainedIn": 671223810,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11315,6 +11722,7 @@
                     "entPhysicalContainedIn": 671223811,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11334,6 +11742,7 @@
                     "entPhysicalContainedIn": 671223813,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11353,6 +11762,7 @@
                     "entPhysicalContainedIn": 671223814,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11372,6 +11782,7 @@
                     "entPhysicalContainedIn": 671223815,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11391,6 +11802,7 @@
                     "entPhysicalContainedIn": 671224832,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11410,6 +11822,7 @@
                     "entPhysicalContainedIn": 671225856,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11429,6 +11842,7 @@
                     "entPhysicalContainedIn": 671225857,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11448,6 +11862,7 @@
                     "entPhysicalContainedIn": 671225858,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11467,6 +11882,7 @@
                     "entPhysicalContainedIn": 671225861,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11486,6 +11902,7 @@
                     "entPhysicalContainedIn": 671225862,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11505,6 +11922,7 @@
                     "entPhysicalContainedIn": 671226880,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11524,6 +11942,7 @@
                     "entPhysicalContainedIn": 671235072,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11543,6 +11962,7 @@
                     "entPhysicalContainedIn": 671235073,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11562,6 +11982,7 @@
                     "entPhysicalContainedIn": 671238144,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11581,6 +12002,7 @@
                     "entPhysicalContainedIn": 671240192,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11600,6 +12022,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11619,6 +12042,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11638,6 +12062,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11657,6 +12082,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11676,6 +12102,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11695,6 +12122,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11714,6 +12142,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11733,6 +12162,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11752,6 +12182,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11771,6 +12202,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11790,6 +12222,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11809,6 +12242,7 @@
                     "entPhysicalContainedIn": 537006080,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11828,6 +12262,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11847,6 +12282,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11866,6 +12302,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11885,6 +12322,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11904,6 +12342,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11923,6 +12362,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11942,6 +12382,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11961,6 +12402,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11980,6 +12422,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11999,6 +12442,7 @@
                     "entPhysicalContainedIn": 537008128,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12018,6 +12462,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12037,6 +12482,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12056,6 +12502,7 @@
                     "entPhysicalContainedIn": 537017344,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12075,6 +12522,7 @@
                     "entPhysicalContainedIn": 537017344,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12094,6 +12542,7 @@
                     "entPhysicalContainedIn": 537020416,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12113,6 +12562,7 @@
                     "entPhysicalContainedIn": 537022464,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12132,6 +12582,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 83,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12151,6 +12602,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 84,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12170,6 +12622,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 85,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12189,6 +12642,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 86,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12208,6 +12662,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 87,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12227,6 +12682,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 88,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12246,6 +12702,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 89,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12265,6 +12722,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 90,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12284,6 +12742,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 91,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12303,6 +12762,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 92,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12322,6 +12782,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 93,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12341,6 +12802,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 94,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12360,6 +12822,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 95,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12379,6 +12842,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 96,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12398,6 +12862,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 97,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12417,6 +12882,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 98,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12436,6 +12902,7 @@
                     "entPhysicalContainedIn": 537001984,
                     "entPhysicalParentRelPos": 99,
                     "entPhysicalMfgName": "CIENA",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

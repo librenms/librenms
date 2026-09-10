@@ -612,8 +612,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Учет',
+            'mac-accounting' => [
+                'description' => 'MAC Учет',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -1023,9 +1023,21 @@ return [
                 'description' => 'Имя пользователя',
                 'help' => 'Имя пользователя для подключения к InfluxDB, если требуется',
             ],
+            'batch_size' => [
+                'description' => 'Batch Size',
+                'help' => 'Number of metrics to send in a single batch, 0 means no batching',
+            ],
+            'measurements' => [
+                'description' => 'Measurements',
+                'help' => 'List of measurements to send to InfluxDB, leave empty to send all',
+            ],
             'verifySSL' => [
                 'description' => 'Проверка SSL',
                 'help' => 'Проверяет, что SSL-сертификат действителен и доверен',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
             ],
         ],
         'influxdbv2' => [
@@ -1134,7 +1146,7 @@ return [
         'nfsen_top_default' => [
             'description' => 'Топ N по умолчанию',
         ],
-        'nfsen_stat_default' => [
+        'nfsen_stats_default' => [
             'description' => 'Статистика по умолчанию',
         ],
         'nfsen_order_default' => [
@@ -1157,9 +1169,6 @@ return [
         'nfsen_suffix' => [
             'description' => 'Суффикс имени файла',
             'help' => 'Это очень важный момент, так как имена устройств в NfSen ограничены 21 символом. Это означает, что полные доменные имена для устройств могут быть проблематичными для втиснуть, поэтому этот фрагмент обычно удаляется.',
-        ],
-        'nmap' => [
-            'description' => 'Путь к nmap',
         ],
         'no_proxy' => [
             'description' => 'Исключения прокси',
@@ -1261,10 +1270,6 @@ return [
         'ping' => [
             'description' => 'Путь к ping',
         ],
-        'ping_rrd_step' => [
-            'description' => 'Частота пинга',
-            'help' => 'Как часто проверять. Устанавливает значение по умолчанию для всех узлов. Внимание! Если вы измените это, вам нужно будет внести дополнительные изменения. Ознакомьтесь с документацией по Fast Ping.',
-        ],
         'poller_modules' => [
             'unix-agent' => [
                 'description' => 'Unix-агент',
@@ -1317,6 +1322,9 @@ return [
             'ospf' => [
                 'description' => 'OSPF',
             ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
+            ],
             'isis' => [
                 'description' => 'ISIS',
             ],
@@ -1332,8 +1340,8 @@ return [
             'slas' => [
                 'description' => 'Отслеживание соглашений об уровне обслуживания',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Учет MAC Cisco',
+            'mac-accounting' => [
+                'description' => 'Учет MAC',
             ],
             'cipsec-tunnels' => [
                 'description' => 'Туннели Cipsec',
@@ -1343,9 +1351,6 @@ return [
             ],
             'cisco-ace-serverfarms' => [
                 'description' => 'Серверные фермы Cisco ACE',
-            ],
-            'cisco-asa-firewall' => [
-                'description' => 'Firewall Cisco ASA',
             ],
             'cisco-cbqos' => [
                 'description' => 'Cisco CBQOS',
@@ -1552,7 +1557,7 @@ return [
                 'help' => 'Метод планирования задач обнаружения. Устаревший метод будет использовать cron, если запись crontab существует, и службу диспетчера, если устаревшая конфигурация service_discovery_enabled установлена в true.',
                 'options' => [
                     'legacy' => 'Устаревший (Без ограничений)',
-                    'cron' => 'Cron (discovery.php)',
+                    'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Служба диспетчера',
                 ],
             ],
@@ -1648,9 +1653,6 @@ return [
         'service_watchdog_log' => [
             'description' => 'Файл журнала для мониторинга',
             'help' => 'По умолчанию это файл журнала LibreNMS. Устанавливает значение по умолчанию для всех узлов.',
-        ],
-        'sfdp' => [
-            'description' => 'Путь к sfdp',
         ],
         'shorthost_target_length' => [
             'description' => 'Максимальная длина сокращенного имени хоста',
@@ -1875,9 +1877,6 @@ return [
         'device_location_map_show_device_dependencies' => [
             'description' => 'Показать зависимости устройств на карте местоположения',
             'help' => 'Показать связи между устройствами на карте местоположения на основе родительских зависимостей',
-        ],
-        'whois' => [
-            'description' => 'Путь к whois',
         ],
         'smokeping.integration' => [
             'description' => 'Включить',

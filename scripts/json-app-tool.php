@@ -7,12 +7,12 @@ function data_flatten($array, $prefix = '', $joiner = '_')
     $return = [];
     foreach ($array as $key => $value) {
         if (is_array($value)) {
-            if (strcmp($prefix, '')) {
+            if (strcmp((string) $prefix, '')) {
                 $key = $prefix . $joiner . $key;
             }
             $return = array_merge($return, data_flatten($value, $key, $joiner));
         } else {
-            if (strcmp($prefix, '')) {
+            if (strcmp((string) $prefix, '')) {
                 $key = $prefix . $joiner . $key;
             }
             $return[$key] = $value;
@@ -25,8 +25,8 @@ function data_flatten($array, $prefix = '', $joiner = '_')
 // Pulled from includes/snmp.inc.php
 function string_to_oid($string)
 {
-    $oid = strlen($string);
-    for ($i = 0; $i != strlen($string); $i++) {
+    $oid = strlen((string) $string);
+    for ($i = 0; $i != strlen((string) $string); $i++) {
         $oid .= '.' . ord($string[$i]);
     }
 
@@ -114,7 +114,7 @@ if ((isset($options['l'])) || (
 $data = $json['data'];
 $metrics = data_flatten($data);
 $metrics_keys = array_keys($metrics);
-usort($metrics_keys, 'strcasecmp'); //orders them in the manner in which the test script compares them
+usort($metrics_keys, strcasecmp(...)); //orders them in the manner in which the test script compares them
 //print metrics if needed
 if (isset($options['m'])) {
     if (isset($options['k'])) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Time.php
  *
@@ -25,9 +26,11 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use Carbon\CarbonInterval;
+use Carbon\Exceptions\InvalidFormatException;
+use Illuminate\Support\Facades\Config;
 
 class Time
 {
@@ -62,23 +65,12 @@ class Time
             return '';
         }
 
-        $parts = $parts ?? ($short ? 3 : -1);
-
         try {
-            // handle negative seconds correctly
-            if ($seconds < 0) {
-                return CarbonInterval::seconds($seconds)->invert()->cascade()->forHumans([
-                    'syntax' => CarbonInterface::DIFF_RELATIVE_TO_NOW,
-                    'parts' => $parts,
-                    'short' => $short,
-                ]);
-            }
-
-            return CarbonInterval::seconds($seconds)->cascade()->forHumans([
-                'syntax' => CarbonInterface::DIFF_ABSOLUTE,
-                'parts' => $parts,
-                'short' => $short,
-            ]);
+            return Carbon::now()->subSeconds(abs($seconds))->diffForHumans(
+                syntax: $seconds < 0 ? CarbonInterface::DIFF_RELATIVE_TO_NOW : CarbonInterface::DIFF_ABSOLUTE,
+                short: $short,
+                parts: $parts ?? ($short ? 3 : 4),
+            );
         } catch (\Exception) {
             return '';
         }
@@ -97,17 +89,19 @@ class Time
             return $time < 0 ? time() + $time : intval($time);
         }
 
-        if (preg_match('/^[+-]\d+[hdmy]$/', $time)) {
+        if (preg_match('/^([+-])(\d+)(mo|[smhdwy])$/', $time, $matches)) {
             $units = [
+                's' => 1,
                 'm' => 60,
                 'h' => 3600,
                 'd' => 86400,
+                'w' => 604800,
+                'mo' => 2592000,
                 'y' => 31557600,
             ];
-            $value = Number::cast(substr($time, 1, -1));
-            $unit = substr($time, -1);
+            $value = Number::cast($matches[2]);
 
-            $offset = ($time[0] == '-' ? -1 : 1) * $units[$unit] * $value;
+            $offset = ($matches[1] == '-' ? -1 : 1) * $units[$matches[3]] * $value;
 
             return time() + $offset;
         }
@@ -116,12 +110,149 @@ class Time
     }
 
     /**
+     * Parse flexible time input into a Unix timestamp (seconds).
+     * Accepts:
+     * - null/empty: returns null
+     * - Numeric seconds or milliseconds since epoch
+     * - Relative offsets like 6h, -1d, +2w, 1m, 1y (sign optional => defaults to past)
+     * - Parsable date/time strings (Carbon::parse)
+     * Returns null on invalid input.
+     */
+    public static function parseInput(string|int|null $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            return Carbon::createFromTimestampUTC($value)->getTimestamp();
+        }
+
+        // adapt relative like 6h, -1d, +2m, 1y
+        if (preg_match('/^([+-])?(\d+)([hdmwys]|mo)$/', $value, $matches)) {
+            $sign = $matches[1] ?: '-';
+            $unit = match ($matches[3]) {
+                's' => 'second',
+                'm' => 'minute',
+                'h' => 'hour',
+                'd' => 'day',
+                'w' => 'week',
+                'mo' => 'month',
+                'y' => 'year',
+            };
+
+            $value = "$sign$matches[2] $unit";
+        }
+
+        try {
+            return Carbon::parse($value)->getTimestamp();
+        } catch (InvalidFormatException) {
+            return null;
+        }
+    }
+
+    /**
      * Take a date and return the number of days from now
      */
-    public static function dateToDays(string|int $date): int
+    public static function dateToMinutes(string|int $date): int
     {
         $carbon = new Carbon();
 
-        return $carbon->diffInDays($date, false);
+        return (int) $carbon->diffInMinutes($date);
+    }
+
+    public static function durationToSeconds(string $duration): int
+    {
+        if (! preg_match('/(\d+)([mhd]?)/', $duration, $matches)) {
+            return $duration === '' ? 0 : 300;
+        }
+
+        $multipliers = [
+            'm' => 60,
+            'h' => 3600,
+            'd' => 86400,
+        ];
+
+        $multiplier = $multipliers[$matches[2]] ?? 1;
+
+        return $matches[1] * $multiplier;
+    }
+
+    /**
+     * Return a random time between the two given times.
+     */
+    public static function randomBetween(string|int $min, string|int $max): Carbon
+    {
+        $time = new Carbon($min);
+
+        $time->addSeconds(mt_rand(0, (int) $time->diffInSeconds(new Carbon($max), true)));
+
+        return $time;
+    }
+
+    /**
+     * Return a psedudo random time between the two given times.
+     * The same time will always be returned for a given APP_KEY
+     */
+    public static function pseudoRandomBetween(string|int $min, string|int $max, string $format = 'H:i'): string
+    {
+        // Seed the random number generator to get consistent results for a given APP_KEY
+        mt_srand(crc32(Config::get('app.key') . $min . $max));
+
+        $time = self::randomBetween($min, $max);
+
+        // Need to restore the seed after
+        mt_srand();
+
+        return $time->format($format);
+    }
+
+    /**
+     * Format a timestamp for display to users in their selected timezone
+     */
+    public static function format(Carbon|string|int $input, string $format): string
+    {
+        if (is_string($input)) {
+            $input = Carbon::parse($input);
+        } elseif (is_numeric($input)) {
+            $input = Carbon::createFromTimestamp($input);
+        }
+
+        $format = match ($format) {
+            'long', 'compact', 'byminute', 'time', 'date' => LibrenmsConfig::get("dateformat.$format"),
+            default => throw new \Exception('Format needs to be one of log, compact, byminute, date or time'),
+        };
+
+        $timezone = session('preferences.timezone');
+        if ($timezone) {
+            $input = $input->setTimezone($timezone);
+        }
+
+        return $input->format($format);
+    }
+
+    public static function now(): Carbon
+    {
+        return Carbon::now(session('preferences.timezone'));
+    }
+
+    public static function toRelativeOffset(int $seconds): string
+    {
+        $timeUnits = [
+            'y' => 31536000,
+            'mo' => 2678400, // 31 days, matching LibreNMS's month period (see legacyTimeSpecToSecs)
+            'w' => 604800,
+            'd' => 86400,
+            'h' => 3600,
+            'm' => 60,
+        ];
+
+        foreach ($timeUnits as $unit => $size) {
+            if ($seconds >= $size && $seconds % $size === 0) {
+                return '-' . ($seconds / $size) . $unit;
+            }
+        }
+
+        return '-' . $seconds . 's';
     }
 }

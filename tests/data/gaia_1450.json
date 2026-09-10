@@ -4279,418 +4279,442 @@
                 {
                     "state_name": "advancedUrlFilteringSubscriptionStatus",
                     "state_descr": "valid",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "advancedUrlFilteringSubscriptionStatus",
                     "state_descr": "expired",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "advancedUrlFilteringSubscriptionStatus",
                     "state_descr": "about-to-expire",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "advancedUrlFilteringSubscriptionStatus",
                     "state_descr": "not-associated",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "advancedUrlFilteringSubscriptionStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "advancedUrlFilteringUpdateStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "advancedUrlFilteringUpdateStatus",
                     "state_descr": "up-to-date",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "advancedUrlFilteringUpdateStatus",
                     "state_descr": "new",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "advancedUrlFilteringUpdateStatus",
                     "state_descr": "degrade",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "advancedUrlFilteringUpdateStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "amwABUpdateStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "amwABUpdateStatus",
                     "state_descr": "up-to-date",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "amwABUpdateStatus",
                     "state_descr": "new",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "amwABUpdateStatus",
                     "state_descr": "degrade",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "amwABUpdateStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "amwAVUpdateStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "amwAVUpdateStatus",
                     "state_descr": "up-to-date",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "amwAVUpdateStatus",
                     "state_descr": "new",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "amwAVUpdateStatus",
                     "state_descr": "degrade",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "amwAVUpdateStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "antiBotSubscriptionStatus",
                     "state_descr": "valid",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "antiBotSubscriptionStatus",
                     "state_descr": "expired",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "antiBotSubscriptionStatus",
                     "state_descr": "about-to-expire",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "antiBotSubscriptionStatus",
                     "state_descr": "not-associated",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "antiBotSubscriptionStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "antiSpamSubscriptionStatus",
                     "state_descr": "valid",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "antiSpamSubscriptionStatus",
                     "state_descr": "expired",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "antiSpamSubscriptionStatus",
                     "state_descr": "about-to-expire",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "antiSpamSubscriptionStatus",
                     "state_descr": "not-associated",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "antiSpamSubscriptionStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "antiVirusSubscriptionStatus",
                     "state_descr": "valid",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "antiVirusSubscriptionStatus",
                     "state_descr": "expired",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "antiVirusSubscriptionStatus",
                     "state_descr": "about-to-expire",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "antiVirusSubscriptionStatus",
                     "state_descr": "not-associated",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "antiVirusSubscriptionStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "applicationControlSubscriptionStatus",
                     "state_descr": "valid",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "applicationControlSubscriptionStatus",
                     "state_descr": "expired",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "applicationControlSubscriptionStatus",
                     "state_descr": "about-to-expire",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "applicationControlSubscriptionStatus",
                     "state_descr": "not-associated",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "applicationControlSubscriptionStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "applicationControlUpdateStatus",
                     "state_descr": "failed",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "applicationControlUpdateStatus",
                     "state_descr": "up-to-date",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "applicationControlUpdateStatus",
                     "state_descr": "new",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "applicationControlUpdateStatus",
                     "state_descr": "degrade",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "applicationControlUpdateStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "fwLocalLoggingStat",
                     "state_descr": "To log servers",
-                    "state_draw_graph": 3,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "fwLocalLoggingStat",
                     "state_descr": "Local configured",
-                    "state_draw_graph": 2,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "fwLocalLoggingStat",
                     "state_descr": "Local due to connectivity",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "fwLocalLoggingStat",
                     "state_descr": "Local due to high rate",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "fwLSConnOverall",
                     "state_descr": "Ok",
-                    "state_draw_graph": 2,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "fwLSConnOverall",
                     "state_descr": "Warning",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "fwLSConnOverall",
                     "state_descr": "Error",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "fwSXLStatus",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "fwSXLStatus",
                     "state_descr": "Enabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "haStarted",
                     "state_descr": "no",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "haStarted",
                     "state_descr": "yes",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "haStatCode",
                     "state_descr": "Up",
-                    "state_draw_graph": 2,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "haStatCode",
                     "state_descr": "Attention",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "haStatCode",
                     "state_descr": "Down",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 }
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.60.1.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.60.1.0/24",
+                    "ifIndex": 7
+                },
+                {
+                    "ipv4_address": "10.60.104.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.60.104.0/24",
+                    "ifIndex": 18
+                },
+                {
+                    "ipv4_address": "10.60.64.1",
+                    "ipv4_prefixlen": 21,
+                    "context_name": "",
+                    "ipv4_network": "10.60.64.0/21",
+                    "ifIndex": 15
+                },
+                {
+                    "ipv4_address": "10.60.72.1",
+                    "ipv4_prefixlen": 21,
+                    "context_name": "",
+                    "ipv4_network": "10.60.72.0/21",
+                    "ifIndex": 16
+                },
+                {
+                    "ipv4_address": "10.60.80.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.60.80.0/24",
+                    "ifIndex": 17
+                },
+                {
+                    "ipv4_address": "10.60.84.1",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "10.60.84.0/22",
+                    "ifIndex": 12
+                },
+                {
+                    "ipv4_address": "10.60.88.1",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "10.60.88.0/22",
+                    "ifIndex": 13
+                },
+                {
+                    "ipv4_address": "10.60.96.1",
+                    "ipv4_prefixlen": 21,
+                    "context_name": "",
+                    "ipv4_network": "10.60.96.0/21",
+                    "ifIndex": 14
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "149.3.168.15",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "149.3.168.0/24",
+                    "ifIndex": 4
+                },
+                {
+                    "ipv4_address": "46.145.182.108",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "46.145.182.104/29",
+                    "ifIndex": 2
+                }
+            ]
+        }
     }
 }

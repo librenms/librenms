@@ -1,7 +1,7 @@
 --
 -- Accedian Enterprise Specific MIB
 --
--- Copyright (c) 2005-2008, Accedian Networks, Inc.
+-- Copyright (c) 2005-2015, Accedian Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document is subject to change without notice.
@@ -24,16 +24,29 @@ IMPORTS
 
 acdDesc MODULE-IDENTITY
 
-    LAST-UPDATED "201011100100Z"
+    LAST-UPDATED "201512250100Z"
     ORGANIZATION "Accedian Networks, Inc."
     CONTACT-INFO
             "Accedian Technical Assistance Center
              Accedian Networks, Inc.
-             4878 Levy, suite 202
-             Saint-Laurent, Quebec Canada H4R 2P1
+             2351 Alfred-Nobel blvd., Suite N-410
+             Saint-Laurent, Quebec Canada H4S 2A9
              E-mail: support@accedian.com"
     DESCRIPTION
             "The Accedian Networks device Description MIB."
+
+    REVISION "201512250100Z"        -- 25 Dec 2015
+    DESCRIPTION
+            "Added hardware options information."
+	
+    REVISION "201407020100Z"        -- 2 July 2014
+    DESCRIPTION
+            "Added system uptime in seconds."
+
+    REVISION "201308100100Z"        -- 10 August 2013
+    DESCRIPTION
+            "Add label for Temperature sensors. Add note about LT 
+             products truncating of values"
 
     REVISION "201011100100Z"        -- 10 November 2010
     DESCRIPTION
@@ -113,6 +126,14 @@ acdDescSerialNumber  OBJECT-TYPE
         "Indicates the serial number."
     ::= { acdDesc 6 }
 
+acdDescHardwareOptions  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Hardware options."
+    ::= { acdDesc 7 }
+
 acdDescCpuUsageCurrent  OBJECT-TYPE
     SYNTAX      Gauge32 (0..100)
     UNITS       "percent"
@@ -162,6 +183,13 @@ acdDescCpuUsageAverage900  OBJECT-TYPE
          seconds. This object range from (0..100)."
     ::= { acdDesc 24 }
 
+acdDescUptime  OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION    
+        "Number of seconds elapsed since boot."
+    ::= { acdDesc 25 }
 
 ---------------------------------------------------------------------------
  -- The connector table
@@ -334,14 +362,15 @@ AcdDescTsEntry ::= SEQUENCE {
     acdDescTsFirstThres         Integer32,
     acdDescTsFisrtThresPass     TruthValue,
     acdDescTsSecondThres        Integer32,
-    acdDescTsSecondThresPass    TruthValue
+    acdDescTsSecondThresPass    TruthValue,
+    acdDescTsLabel              DisplayString
 }
 
 acdDescTsID  OBJECT-TYPE
     SYNTAX      Unsigned32(1..4294967295)
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION    
         "Unique value for each Temperature Sensor."
     ::= { acdDescTsEntry 1 }
 
@@ -350,7 +379,9 @@ acdDescTsCurrentTemp  OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Current temperature in Celsius around the temperature sensor."
+        "Current temperature in Celsius around the temperature sensor.
+         On LT and LT-S units this value is truncated and does not
+         include the decimals."
     ::= { acdDescTsEntry 2 }
 
 acdDescTsFirstThres  OBJECT-TYPE
@@ -358,7 +389,9 @@ acdDescTsFirstThres  OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Temperature value in Celsius to declare this threshold crossed."
+        "Temperature value in Celsius to declare this threshold crossed.
+         On LT and LT-S units this value is truncated and does not
+         include the decimals."
     ::= { acdDescTsEntry 3 }
 
 acdDescTsFisrtThresPass  OBJECT-TYPE
@@ -374,7 +407,9 @@ acdDescTsSecondThres  OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Temperature value in Celsius to declare this second threshold crossed."
+        "Temperature value in Celsius to declare this second threshold crossed.
+         On LT and LT-S units this value is truncated and does not
+         include the decimals."
    ::= { acdDescTsEntry 5 }
 
 acdDescTsSecondThresPass  OBJECT-TYPE
@@ -385,6 +420,13 @@ acdDescTsSecondThresPass  OBJECT-TYPE
         "This is to indicate if the temperature cross the second threshold."
     ::= { acdDescTsEntry 6 }
 
+acdDescTsLabel  OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Label of the temperature sensor."
+    ::= { acdDescTsEntry 7 }
 
 -- ****************************************************************************
 -- NOTIFICATIONS (TRAPS)
@@ -423,11 +465,13 @@ acdDescGenGroup OBJECT-GROUP
         acdDescFirmwareVersion,
         acdDescHardwareVersion,
         acdDescSerialNumber,
+        acdDescHardwareOptions,
         acdDescCpuUsageCurrent,
         acdDescCpuUsageAverage15,
         acdDescCpuUsageAverage30,
         acdDescCpuUsageAverage60,
-        acdDescCpuUsageAverage900
+        acdDescCpuUsageAverage900,
+        acdDescUptime
     }
     STATUS      current
     DESCRIPTION
@@ -462,7 +506,8 @@ acdDescTsGroup OBJECT-GROUP
         acdDescTsFirstThres,
         acdDescTsFisrtThresPass,
         acdDescTsSecondThres,
-        acdDescTsSecondThresPass
+        acdDescTsSecondThresPass,
+        acdDescTsLabel
     }
     STATUS      current
     DESCRIPTION
@@ -481,7 +526,7 @@ acdDescNotificationsGroup NOTIFICATION-GROUP
 ---------------------------------------------------------------------------
 -- MIB Module Compliance statements
 ---------------------------------------------------------------------------
-acdAlarmCompliance MODULE-COMPLIANCE
+acdDescCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION
        "The compliance statement for support of the ACD-DESC-MIB module."

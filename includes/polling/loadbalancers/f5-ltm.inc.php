@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to display F5 LTM Details
  *
@@ -135,6 +136,9 @@ if (! empty($components)) {
             d_echo("\n\nComponent: " . $key . "\n");
             d_echo('    Type: ' . $type . "\n");
             d_echo('    Label: ' . $label . "\n");
+
+            $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'type' => $type, 'hash' => $hash, 'label' => $label];
+            app('Datastore')->put($device, $type, $tags, $fields);
         } elseif ($type == 'f5-ltm-vs') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('pktsin', 'COUNTER', 0)
@@ -167,6 +171,9 @@ if (! empty($components)) {
                 $array['status'] = 0;
                 $array['error'] = '';
             }
+
+            $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'type' => $type, 'hash' => $hash, 'label' => $label];
+            app('Datastore')->put($device, $type, $tags, $fields);
         } elseif ($type == 'f5-ltm-pool') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('minup', 'GAUGE', 0)
@@ -197,6 +204,9 @@ if (! empty($components)) {
                 $array['status'] = 0;
                 $array['error'] = '';
             }
+
+            $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'type' => $type, 'hash' => $hash, 'label' => $label];
+            app('Datastore')->put($device, $type, $tags, $fields);
         } elseif ($type == 'f5-ltm-poolmember') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('pktsin', 'COUNTER', 0)
@@ -232,13 +242,12 @@ if (! empty($components)) {
                 $array['status'] = 0;
                 $array['error'] = '';
             }
+
+            $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'type' => $type, 'hash' => $hash, 'label' => $label];
+            app('Datastore')->put($device, $type, $tags, $fields);
         } else {
             d_echo('Type is unknown: ' . $type . "\n");
-            continue;
         }
-
-        $tags = compact('rrd_name', 'rrd_def', 'type', 'hash', 'label');
-        data_update($device, $type, $tags, $fields);
     } // End foreach components
 
     unset($f5_stats);

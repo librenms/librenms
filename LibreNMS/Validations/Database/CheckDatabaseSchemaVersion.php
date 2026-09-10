@@ -1,4 +1,5 @@
 <?php
+
 /*
  * CheckSchemaVersion.php
  *
@@ -45,7 +46,7 @@ class CheckDatabaseSchemaVersion implements Validation, ValidationFixer
 
         if (! Schema::isCurrent()) {
             return ValidationResult::fail(trans('validation.validations.database.CheckSchemaVersion.fail_outdated'), './lnms migrate')
-                ->setFixer(__CLASS__);
+                ->setFixer(self::class);
         }
 
         $migrations = Schema::getUnexpectedMigrations();

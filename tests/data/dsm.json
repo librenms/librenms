@@ -1303,273 +1303,234 @@
                 {
                     "state_name": "cpuFanStatusState",
                     "state_descr": "Normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cpuFanStatusState",
                     "state_descr": "Failed",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "diskStatusState",
                     "state_descr": "Normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "diskStatusState",
                     "state_descr": "Initialized",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "diskStatusState",
                     "state_descr": "NotInitialized",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "diskStatusState",
                     "state_descr": "SystemPartitionFailed",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "diskStatusState",
                     "state_descr": "Crashed",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerStatusState",
                     "state_descr": "Normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "powerStatusState",
                     "state_descr": "Failed",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "Normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "Repairing",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "Migrating",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "Expanding",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "Deleting",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "Creating",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "RaidSyncing",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "RaidParityChecking",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "RaidAssembling",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "Canceling",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "Degrade",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "Crashed",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "DataScrubbing",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "RaidDeploying",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "RaidUnDeploying",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "RaidMountCache",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "RaidUnmountCache",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "RaidExpandingUnfinishedSHR",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "RaidConvertSHRToPool",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "RaidMigrateSHR1ToSHR2",
-                    "state_draw_graph": 0,
                     "state_value": 20,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "raidStatusState",
                     "state_descr": "RaidUnknownStatus",
-                    "state_draw_graph": 0,
                     "state_value": 21,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "systemFanStatusState",
                     "state_descr": "Normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemFanStatusState",
                     "state_descr": "Failed",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "systemStatusState",
                     "state_descr": "Normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "systemStatusState",
                     "state_descr": "Failed",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "upgradeAvailableState",
                     "state_descr": "Available",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upgradeAvailableState",
                     "state_descr": "Unavailable",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upgradeAvailableState",
                     "state_descr": "Connecting",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "upgradeAvailableState",
                     "state_descr": "Disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "upgradeAvailableState",
                     "state_descr": "Others",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 }
@@ -2769,190 +2730,121 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "31",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/",
                     "storage_size": 2442780672,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 881020928,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.31",
+                    "storage_free": 1561759744,
+                    "storage_free_oid": null,
+                    "storage_perc": 36,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "36",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/tmp",
                     "storage_size": 518352896,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 21966848,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.36",
+                    "storage_free": 496386048,
+                    "storage_free_oid": null,
+                    "storage_perc": 4,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "37",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/run",
                     "storage_size": 518352896,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 18292736,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.37",
+                    "storage_free": 500060160,
+                    "storage_free_oid": null,
+                    "storage_perc": 4,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "38",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/dev/shm",
                     "storage_size": 518352896,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 4096,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.38",
+                    "storage_free": 518348800,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "39",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/sys/fs/cgroup",
-                    "storage_size": 4096,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "40",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/run/cgmanager/fs",
                     "storage_size": 102400,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 0,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.40",
+                    "storage_free": 102400,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "51",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/volume1",
                     "storage_size": 94178937405440,
+                    "storage_size_oid": null,
                     "storage_units": 65536,
                     "storage_used": 64566361194496,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.51",
+                    "storage_free": 29612576210944,
+                    "storage_free_oid": null,
+                    "storage_perc": 69,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
+        "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "31",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/",
-                    "storage_size": 2442780672,
-                    "storage_units": 4096,
-                    "storage_used": 881020928,
-                    "storage_free": 1561759744,
-                    "storage_perc": 36,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "36",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/tmp",
-                    "storage_size": 518352896,
-                    "storage_units": 4096,
-                    "storage_used": 21966848,
-                    "storage_free": 496386048,
-                    "storage_perc": 4,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "37",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run",
-                    "storage_size": 518352896,
-                    "storage_units": 4096,
-                    "storage_used": 18292736,
-                    "storage_free": 500060160,
-                    "storage_perc": 4,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "38",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/dev/shm",
-                    "storage_size": 518352896,
-                    "storage_units": 4096,
-                    "storage_used": 4096,
-                    "storage_free": 518348800,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "39",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/sys/fs/cgroup",
-                    "storage_size": 4096,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 4096,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "40",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run/cgmanager/fs",
-                    "storage_size": 102400,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 102400,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "51",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/volume1",
-                    "storage_size": 94178937405440,
-                    "storage_units": 65536,
-                    "storage_used": 64566361194496,
-                    "storage_free": 29612576210944,
-                    "storage_perc": 69,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "172.26.10.248",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.26.10.0/24",
+                    "ifIndex": 7
                 }
             ]
         }

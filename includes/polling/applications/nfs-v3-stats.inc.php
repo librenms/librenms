@@ -62,7 +62,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('proc3_pathconf', 'GAUGE', 0)
     ->addDataset('proc3_commit', 'GAUGE', 0);
 
-$data = explode("\n", $nfsstats);
+$data = explode("\n", (string) $nfsstats);
 $fields = [
     'rc_hits' => $data[1],
     'rc_misses' => $data[2],
@@ -125,7 +125,7 @@ $tags = [
     'rrd_name' => ['app', 'nfs-stats', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, $nfsstats, $fields);
 
 unset($nfsstats, $rrd_def, $data, $fields, $tags);

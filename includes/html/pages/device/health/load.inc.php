@@ -1,7 +1,5 @@
 <?php
 
-$class = 'load';
-$unit = '%';
-$graph_type = 'sensor_load';
+$class = \LibreNMS\Enum\Sensor::Load;
 
 require 'sensors.inc.php';

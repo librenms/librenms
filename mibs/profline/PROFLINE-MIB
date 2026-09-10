@@ -1,0 +1,103 @@
+-- ===========================================================================
+-- File Identification:
+-- ===========================================================================
+-- 
+-- Rev: 7 of Profline.mib
+--
+-- =====================
+-- Revision Information:
+-- =====================
+--
+-- Please refer to MODULE-IDENTITY for file revision information. 
+--
+-- =============
+-- File Summary:
+-- =============
+--
+-- PROFLINE MIB SMIv2
+-- This MIB contains definitions for the upper layers of the PROFline private tree.
+-- ===========================================================================
+
+PROFLINE-MIB DEFINITIONS ::= BEGIN
+
+-- IMPORTS section 
+IMPORTS
+    enterprises, MODULE-IDENTITY
+        FROM SNMPv2-SMI;
+
+    profline MODULE-IDENTITY
+        LAST-UPDATED "201203231034Z"
+        ORGANIZATION "profline BV"
+        CONTACT-INFO "+31-26-3236969"
+        DESCRIPTION  " The profline main mib"
+        REVISION     "201203231034Z"
+        DESCRIPTION  "Rev: 7
+                      Added Receivers sub-tree star"
+        REVISION     "201106241230Z"
+        DESCRIPTION  "Rev: 6
+                      Added Receivers sub-tree str"
+        REVISION     "201011231124Z"
+        DESCRIPTION  "Rev: 5
+                      Added Switchers sub-tree
+                      Added Switchers sub-tree rsw"
+        REVISION     "200811070932Z"
+        DESCRIPTION  "Rev: 4
+                      Added Receivers sub-tree dmm"
+        REVISION     "200809180930Z"
+        DESCRIPTION  "Rev: 3
+                      Added Receivers sub-tree sdv"
+        REVISION     "200804161106Z"
+        DESCRIPTION  "Rev: 2
+                      Added Experimental sub-tree expDemodulator
+                      Added De-Modulator sub-tree sfd
+                      Added Processor sub-tree sfp
+                      Changed File Identification header layout."
+        REVISION     "200108071435Z"
+        DESCRIPTION  "Rev: 1
+                      The Initial revision of this MIB"
+        ::= { enterprises 21222 }
+
+-- Top level nodes
+products                OBJECT IDENTIFIER ::= {profline 1}
+proflineExperimental    OBJECT IDENTIFIER ::= {profline 2}
+
+--Experimental sub-tree
+expReceivers    OBJECT IDENTIFIER ::= {proflineExperimental 1}
+expModulators   OBJECT IDENTIFIER ::= {proflineExperimental 2}
+expProcessors   OBJECT IDENTIFIER ::= {proflineExperimental 3}
+expDemodulators OBJECT IDENTIFIER ::= {proflineExperimental 4}
+expSwitchers    OBJECT IDENTIFIER ::= {proflineExperimental 5}
+
+-- Products sub-tree
+receivers     OBJECT IDENTIFIER ::= {products 1}
+modulators    OBJECT IDENTIFIER ::= {products 2}
+processors    OBJECT IDENTIFIER ::= {products 3}
+demodulators  OBJECT IDENTIFIER ::= {products 4}
+switchers     OBJECT IDENTIFIER ::= {products 5}
+
+-- Receivers sub-tree
+-- NOTE: nodes that are in the experimental sub-tree will be moved
+-- to the products sub-tree before release.
+--trses   OBJECT IDENTIFIER ::= {receivers 1}
+--trs     OBJECT IDENTIFIER ::= {receivers 2}
+--tra     OBJECT IDENTIFIER ::= {receivers 3}
+--sdv     OBJECT IDENTIFIER ::= {receivers 4}
+--str     OBJECT IDENTIFIER ::= {receivers 5}
+--star    OBJECT IDENTIFIER ::= {receivers 6}
+
+-- Processors sub-tree
+--sfp     OBJECT IDENTIFIER ::= {processors 1}
+
+-- Modulator sub-tree
+--sfy     OBJECT IDENTIFIER ::= {modulators 1}
+--rdy     OBJECT IDENTIFIER ::= {modulators 2}
+--dmm     OBJECT IDENTIFIER ::= {modulators 3}
+
+-- De-Modulator sub-tree
+--sfd     OBJECT IDENTIFIER ::= {demodulators 1}
+
+-- Switchers sub-tree
+--rsw     OBJECT IDENTIFIER ::= {switchers 1}
+
+END
+

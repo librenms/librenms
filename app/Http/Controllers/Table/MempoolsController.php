@@ -1,4 +1,5 @@
 <?php
+
 /*
  * MempoolsController.php
  *
@@ -25,22 +26,36 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Mempool;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use LibreNMS\Config;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
 
+/**
+ * @extends TableController<Mempool>
+ */
 class MempoolsController extends TableController
 {
-    protected function searchFields($request)
+    protected function rules(): array
     {
-        return ['hostname', 'mempool_descr'];
+        return [
+            'status' => 'nullable|string',
+        ];
     }
 
-    protected function sortFields($request)
+    protected function searchFields(Request $request): array
+    {
+        return ['hostname', 'display', 'mempool_descr'];
+    }
+
+    protected function sortFields(Request $request): array
     {
         return ['mempool_descr', 'mempool_perc', 'mempool_used', 'hostname'];
     }
@@ -48,32 +63,41 @@ class MempoolsController extends TableController
     /**
      * @inheritdoc
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
-        if ($request->get('view') == 'graphs') {
-            return Device::hasAccess($request->user())->has('mempools')->with('mempools');
+        $this->authorize('viewAny', Mempool::class);
+
+        if ($request->input('view') == 'graphs') {
+            $query = Device::hasAccess($request->user())->has('mempools')->with('mempools');
+        } else {
+            $query = Mempool::hasAccess($request->user())
+                ->with(['device', 'device.location']);
+
+            // join devices table to sort by hostname or search
+            if (array_key_exists('hostname', $request->input('sort', $this->default_sort)) || $request->input('searchPhrase')) {
+                $query->join('devices', 'mempools.device_id', 'devices.device_id')
+                    ->select('mempools.*');
+            }
         }
 
-        $query = Mempool::hasAccess($request->user())
-            ->with(['device', 'device.location']);
-
-        // join devices table to sort by hostname or search
-        if (array_key_exists('hostname', $request->get('sort', $this->default_sort)) || $request->get('searchPhrase')) {
-            $query->join('devices', 'mempools.device_id', 'devices.device_id')
-                ->select('mempools.*');
-        }
+        $query->when($request->input('status') == 'warning', function ($q): void {
+            // show only entries in warning state
+            $q->where('mempool_perc_warn', '>', 0)
+                ->whereColumn('mempool_perc', '>=', 'mempool_perc_warn');
+        });
 
         return $query;
     }
 
     /**
-     * @param  Device|Mempool  $mempool
+     * @param  Mempool  $model
+     * @return array<string, scalar>
      */
-    public function formatItem($mempool)
+    public function formatItem(Model $model): array
     {
-        if ($mempool instanceof Device) {
-            $device = $mempool;
-            $graphs = \LibreNMS\Util\Html::graphRow([
+        if ($model instanceof Device) {
+            $device = $model;
+            $graphs = Html::graphRow([
                 'device' => $device->device_id,
                 'type' => 'device_mempool',
                 'height' => 100,
@@ -81,7 +105,7 @@ class MempoolsController extends TableController
             ]);
 
             return [
-                'hostname' => Url::deviceLink($device),
+                'hostname' => Blade::render('<x-device-link :device="$device"/>', ['device' => $device]),
                 'mempool_descr' => $graphs[0],
                 'graph' => $graphs[1],
                 'mempool_used' => $graphs[2],
@@ -89,13 +113,13 @@ class MempoolsController extends TableController
             ];
         }
 
-        /** @var Mempool $mempool */
+        /** @var Mempool $model */
         return [
-            'hostname' => Url::deviceLink($mempool->device),
-            'mempool_descr' => $mempool->mempool_descr,
-            'graph' => $this->miniGraph($mempool),
-            'mempool_used' => $this->barLink($mempool),
-            'mempool_perc' => $mempool->mempool_perc . '%',
+            'hostname' => Blade::render('<x-device-link :device="$device"/>', ['device' => $model->device]),
+            'mempool_descr' => htmlspecialchars((string) $model->mempool_descr),
+            'graph' => $this->miniGraph($model),
+            'mempool_used' => $this->barLink($model),
+            'mempool_perc' => $model->mempool_perc . '%',
         ];
     }
 
@@ -104,7 +128,7 @@ class MempoolsController extends TableController
         $graph = [
             'type' => 'mempool_usage',
             'id' => $mempool->mempool_id,
-            'from' => Config::get('time.day'),
+            'from' => LibrenmsConfig::get('time.day'),
             'height' => 20,
             'width' => 80,
         ];
@@ -119,7 +143,7 @@ class MempoolsController extends TableController
         $graph = [
             'type' => 'mempool_usage',
             'id' => $mempool->mempool_id,
-            'from' => Config::get('time.day'),
+            'from' => LibrenmsConfig::get('time.day'),
             'height' => 150,
             'width' => 400,
         ];
@@ -129,9 +153,48 @@ class MempoolsController extends TableController
         $used = $is_percent ? $mempool->mempool_used : Number::formatBi($mempool->mempool_used);
         $total = $is_percent ? $mempool->mempool_total : Number::formatBi($mempool->mempool_total);
 
-        $percent = Html::percentageBar(400, 20, $mempool->mempool_perc, "$used / $total", $free, $mempool->mempool_perc_warn);
+        $percent = Html::percentageBar(400, 10, $mempool->mempool_perc, "$used / $total", $total !== $free ? $free : $free, $mempool->mempool_perc_warn);
         $link = Url::generate(['page' => 'graphs'], Arr::only($graph, ['id', 'type', 'from']));
 
         return Url::overlibLink($link, $percent, Url::graphTag($graph));
+    }
+
+    /**
+     * Get headers for CSV export
+     */
+    protected function getExportHeaders(): array
+    {
+        return [
+            'Device ID',
+            'Hostname',
+            'Description',
+            'Used',
+            'Free',
+            'Total',
+            'Percentage',
+            'Warning Threshold',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Mempool  $mempool
+     * @return array<string, scalar>
+     */
+    protected function formatExportRow(Model $mempool): array
+    {
+        $is_percent = $mempool->mempool_total == 100;
+
+        return [
+            'device_id' => $mempool->device_id,
+            'hostname' => $mempool->device->displayName(),
+            'description' => $mempool->mempool_descr,
+            'used' => $is_percent ? $mempool->mempool_used : Number::formatBi($mempool->mempool_used),
+            'free' => $is_percent ? $mempool->mempool_free : Number::formatBi($mempool->mempool_free),
+            'total' => $is_percent ? $mempool->mempool_total : Number::formatBi($mempool->mempool_total),
+            'percentage' => $mempool->mempool_perc . '%',
+            'warning_threshold' => $mempool->mempool_perc_warn ?? '-',
+        ];
     }
 }

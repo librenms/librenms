@@ -19563,21 +19563,18 @@
                 {
                     "state_name": "InterfaceStatus",
                     "state_descr": "idle",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "InterfaceStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "InterfaceStatus",
                     "state_descr": "up",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 }
@@ -19605,6 +19602,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19624,6 +19622,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19643,6 +19642,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19662,6 +19662,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19681,6 +19682,7 @@
                     "entPhysicalContainedIn": 20,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19700,6 +19702,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19719,6 +19722,7 @@
                     "entPhysicalContainedIn": 30,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19738,6 +19742,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19757,6 +19762,7 @@
                     "entPhysicalContainedIn": 40,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19776,6 +19782,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19795,6 +19802,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19814,6 +19822,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19833,6 +19842,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19852,6 +19862,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19871,6 +19882,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19890,6 +19902,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19909,6 +19922,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19928,6 +19942,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19947,6 +19962,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19966,6 +19982,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -19985,6 +20002,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20004,6 +20022,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20023,6 +20042,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20042,6 +20062,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20061,6 +20082,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20080,6 +20102,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20099,6 +20122,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20118,6 +20142,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20137,6 +20162,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20156,6 +20182,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20175,6 +20202,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20194,6 +20222,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20213,6 +20242,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20232,6 +20262,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20251,6 +20282,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20270,6 +20302,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20289,6 +20322,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20308,6 +20342,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20327,6 +20362,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20346,6 +20382,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 29,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20365,6 +20402,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 30,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20384,6 +20422,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20403,6 +20442,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 32,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20422,6 +20462,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 33,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20441,6 +20482,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 34,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20460,6 +20502,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 35,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20479,6 +20522,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 36,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20498,6 +20542,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 37,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20517,6 +20562,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 38,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20536,6 +20582,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 39,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -20555,6 +20602,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 40,
                     "entPhysicalMfgName": "Smartoptics",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 }
             ]

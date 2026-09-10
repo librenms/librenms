@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ApcSmartAvrReducingTest.php
  *
@@ -26,7 +27,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class ApcSmartAvrReducingTest extends SnmpTrapTestCase
+final class ApcSmartAvrReducingTest extends SnmpTrapTestCase
 {
     /**
      * Test ApcSmartAvrReducing handle

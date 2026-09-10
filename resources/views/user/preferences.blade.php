@@ -68,7 +68,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="site_style" class="col-sm-4 control-label">{{ __('CSS Style') }}</label>
+                <label for="site_style" class="col-sm-4 control-label">{{ __('preferences.theme') }}</label>
                 <div class="col-sm-4">
                     <select class="form-control ajax-select" name="site_style" data-pref="site_style" data-previous="{{ $site_style }}">
                         <option value="default">{{ __('Default') }} ({{ $site_style_default }})</option>
@@ -104,15 +104,18 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="notetodevice" class="col-sm-4 control-label">{{ __('Add schedule notes to devices notes') }}</label>
+                <label for="temp_units" class="col-sm-4 control-label">{{ __('Temperature Units') }}</label>
                 <div class="col-sm-4">
-                    <input id="notetodevice" type="checkbox" name="notetodevice" @if($note_to_device) checked @endif>
+                    <select class="form-control ajax-select" name="temperature" data-pref="temp_units" data-previous="{{ $temp_units }}">
+                        <option value="default">{{ __('Celsius') }}</option>
+                        <option value="f" @if($temp_units == 'f') selected @endif>{{ __('Fahrenheit') }}</option>
+                    </select>
                 </div>
             </div>
             <div class="form-group">
-                <label for="global_search_ctrlf_focus" class="col-sm-4 control-label">{{ __('Ctrl-F to focus the global search bar') }}</label>
+                <label for="notetodevice" class="col-sm-4 control-label">{{ __('Add schedule notes to devices notes') }}</label>
                 <div class="col-sm-4">
-                    <input id="global_search_ctrlf_focus" type="checkbox" name="global_search_ctrlf_focus" @if($global_search_ctrlf_focus) checked @endif>
+                    <input id="notetodevice" type="checkbox" name="notetodevice" @if($note_to_device) checked @endif>
                 </div>
             </div>
         </form>
@@ -120,7 +123,7 @@
 
     @config('auth.socialite.configs')
     <x-panel title="{{ __('OAuth/SAML Authentication') }}">
-        @foreach (\LibreNMS\Config::get('auth.socialite.configs', []) as $provider => $config)
+        @foreach (\App\Facades\LibrenmsConfig::get('auth.socialite.configs', []) as $provider => $config)
         <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post">
             {{ csrf_field() }}
             <button type="submit" id="login" class="btn btn-success btn-block">
@@ -134,10 +137,14 @@
     @config('twofactor')
     <x-panel title="{{ __('Two-Factor Authentication') }}">
         @if($twofactor)
-            <div id="twofactorqrcontainer">
-                <div id="twofactorqr"></div>
-                <script>$("#twofactorqr").qrcode({"text": "{{ $twofactor_uri }}"});</script>
-                <button class="btn btn-default" onclick="$('#twofactorkeycontainer').show(); $('#twofactorqrcontainer').hide();">{{ __('Manual') }}</button>
+            <div class="tw:text-center" id="twofactorqrcontainer">
+                <div class="tw:inline-block tw:bg-white tw:p-4 tw:pb-2 tw:rounded-lg tw:mb-2">
+                    <div id="twofactorqr"></div>
+                    <script>$("#twofactorqr").qrcode({"text": "{{ $twofactor_uri }}"});</script>
+                </div>
+                <div>
+                    <button class="btn btn-default" onclick="$('#twofactorkeycontainer').show(); $('#twofactorqrcontainer').hide();">{{ __('Manual') }}</button>
+                </div>
             </div>
             <div id="twofactorkeycontainer">
                 <form id="twofactorkey" class="form-horizontal" role="form">
@@ -187,17 +194,17 @@
     @endconfig
 
     <x-panel title="{{ __('Roles') }}">
-        @forelse(auth()->user()->roles->pluck('title') as $role)
-            <span class="label label-info tw-mr-1">{{ $role }}</span>
+        @forelse($user->roles->map(fn($r) => Str::title(str_replace('-', ' ', $r->name))) as $role)
+            <span class="label label-info tw:mr-1">{{ $role }}</span>
         @empty
             <strong class="red">{{ __('No roles!') }}</strong>
         @endforelse
     </x-panel>
 
     <x-panel title="{{ __('Device Permissions') }}">
-        @if(auth()->user()->hasGlobalAdmin())
+        @if(auth()->user()->hasRole('admin'))
             <strong class="blue">{{ __('Global Administrative Access') }}</strong>
-        @elseif(auth()->user()->hasGlobalRead())
+        @elseif(Gate::allows('viewAll', \App\Models\Device::class))
             <strong class="green">{{ __('Global Viewing Access') }}</strong>
         @else
             @forelse($devices as $device)
@@ -226,34 +233,6 @@
                     type: 'POST',
                     data: {
                         pref: 'add_schedule_note_to_device',
-                        value: state ? 1 : 0
-                    },
-                    success: function () {
-                        $this.closest('.form-group').addClass('has-success');
-                        setTimeout(function () {
-                            $this.closest('.form-group').removeClass('has-success');
-                        }, 2000);
-                    },
-                    error: function () {
-                        $this.bootstrapSwitch('toggleState', true);
-                        $this.closest('.form-group').addClass('has-error');
-                        setTimeout(function(){
-                            $this.closest('.form-group').removeClass('has-error');
-                        }, 2000);
-                    }
-                });
-            });
-
-        $("[name='global_search_ctrlf_focus']")
-            .bootstrapSwitch('offColor', 'danger')
-            .on('switchChange.bootstrapSwitch', function (e, state) {
-                var $this = $(this);
-                $.ajax({
-                    url: '{{ route('preferences.store') }}',
-                    dataType: 'json',
-                    type: 'POST',
-                    data: {
-                        pref: 'global_search_ctrlf_focus',
                         value: state ? 1 : 0
                     },
                     success: function () {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Validate.php
  *
@@ -54,7 +55,7 @@ class Validate
 
     public static function ascDesc($direction, $default = 'ASC')
     {
-        return in_array(strtolower($direction), ['asc', 'desc'], true)
+        return in_array(strtolower((string) $direction), ['asc', 'desc'], true)
             ? $direction
             : $default;
     }

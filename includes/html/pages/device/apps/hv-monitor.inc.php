@@ -11,23 +11,29 @@ $link_array = [
 
 print_optionbar_start();
 
+$label = 'Totals';
+$link = generate_link($label, $link_array);
 if (! isset($vars['vm'])) {
-    echo generate_link('<span class="pagemenu-selected"><b>Totals</b></span>', $link_array);
+    $link = '<span class="pagemenu-selected">' . $link . '</span>';
 } else {
     $vars['vm'] = htmlspecialchars($vars['vm']);
-    echo generate_link('<b>Totals</b>', $link_array);
 }
+echo $link;
+
 echo '<b> | VMs: </b>';
 $vm_links = [];
+
 foreach ($app->data['VMs'] as $vm) {
-    $vm = htmlspecialchars($vm);
+    $vm = htmlspecialchars((string) $vm);
     $label = $vm;
 
+    $link = generate_link($label, $link_array, ['vm' => $vm]);
+
     if ($vars['vm'] == $vm) {
-        $label = '<span class="pagemenu-selected">' . $vm . '</span>';
+        $link = '<span class="pagemenu-selected">' . $link . '</span>';
     }
 
-    $vm_links[] = generate_link($label, $link_array, ['vm' => $vm]);
+    $vm_links[] = $link;
 }
 echo implode(', ', $vm_links);
 
@@ -45,43 +51,54 @@ if (! isset($vars['vmif']) && ! isset($vars['vmdisk'])) {
 }
 
 echo '<br><b>Pages: </b>';
+
+$label = 'General';
+$link = generate_link($label, $link_array, ['vm' => $vars['vm'], 'vmpage' => 'general']);
+
 if ($vars['vmpage'] == 'general') {
-    $page_links[] = '<span class="pagemenu-selected">General</span>';
-} else {
-    $page_links[] = generate_link('General', $link_array, ['vm' => $vars['vm'], 'vmpage' => 'general']);
+    $link = '<span class="pagemenu-selected">' . $link . '</span>';
 }
+$page_links[] = $link;
+
+$label = 'Disk';
+$link = generate_link($label, $link_array, ['vm' => $vars['vm'], 'vmpage' => 'disk']);
+
 if ($vars['vmpage'] == 'disk') {
-    $page_links[] = '<span class="pagemenu-selected">Disk</span>';
-} else {
-    $page_links[] = generate_link('Disk', $link_array, ['vm' => $vars['vm'], 'vmpage' => 'disk']);
+    $link = '<span class="pagemenu-selected">' . $link . '</span>';
 }
+$page_links[] = $link;
+
+$label = 'Network';
+$link = generate_link($label, $link_array, ['vm' => $vars['vm'], 'vmpage' => 'network']);
+
 if ($vars['vmpage'] == 'network') {
-    $page_links[] = '<span class="pagemenu-selected">Network</span>';
-} else {
-    $page_links[] = generate_link('Network', $link_array, ['vm' => $vars['vm'], 'vmpage' => 'network']);
+    $link = '<span class="pagemenu-selected">' . $link . '</span>';
 }
-if ($vars['vmpage'] == 'Snapshots') {
-    $page_links[] = '<span class="pagemenu-selected">Network</span>';
-} else {
-    $page_links[] = generate_link('Snapshots', $link_array, ['vm' => $vars['vm'], 'vmpage' => 'snapshots']);
+$page_links[] = $link;
+
+$label = 'Snapshots';
+$link = generate_link($label, $link_array, ['vm' => $vars['vm'], 'vmpage' => 'snapshots']);
+
+if ($vars['vmpage'] == 'snapshots') {
+    $link = '<span class="pagemenu-selected">' . $link . '</span>';
 }
+$page_links[] = $link;
+
 echo implode(', ', $page_links);
 
 if (isset($vars['vm'])) {
     echo '<br><b>Disks:</b> ';
     $disk_links = [];
-    foreach ($app->data['VMdisks'][$vars['vm']] as $index => $disk) {
-        $disk = htmlspecialchars($disk);
+    foreach ($app->data['VMdisks'][$vars['vm']] as $disk) {
+        $disk = htmlspecialchars((string) $disk);
         $label = $disk;
 
+        $iink = generate_link($label, $link_array, ['vm' => $vars['vm'], 'vmdisk' => $disk]);
+
         if ($vars['vmdisk'] == $disk) {
-            $label = '<span class="pagemenu-selected">' . $disk . '</span>';
+            $link = '<span class="pagemenu-selected">' . $link . '</span>';
         }
-        if ($vars['vmdisk'] == $disk) {
-            $disk_links[] = $label;
-        } else {
-            $disk_links[] = generate_link($label, $link_array, ['vm' => $vars['vm'], 'vmdisk' => $disk]);
-        }
+        $disk_links[] = $link;
     }
     echo implode(', ', $disk_links);
 
@@ -89,18 +106,18 @@ if (isset($vars['vm'])) {
     $if_links = [];
     foreach ($app->data['VMifs'][$vars['vm']] as $vmif => $if_info) {
         $label = $vmif;
+        $link = generate_link($label, $link_array, ['vm' => $vars['vm'], 'vmif' => $vmif]);
 
         if ($vars['vmif'] == $vmif) {
-            $if_links[] = '<span class="pagemenu-selected">' . $vmif . '</span>';
-        } else {
-            $if_links[] = generate_link($label, $link_array, ['vm' => $vars['vm'], 'vmif' => $vmif]);
+            $link = '<span class="pagemenu-selected">' . $link . '</span>';
         }
+        $if_links[] = $link;
     }
     echo implode(', ', $if_links);
 }
 
 if (isset($vars['vmif']) and isset($vars['vm'])) {
-    $mac = htmlspecialchars($app->data['VMifs'][$vars['vm']][$vars['vmif']]['mac']);
+    $mac = htmlspecialchars((string) $app->data['VMifs'][$vars['vm']][$vars['vmif']]['mac']);
     $port = Port::with('device')->firstWhere(['ifPhysAddress' => str_replace(':', '', $mac)]);
 
     echo "\n<br>\n" .
@@ -129,7 +146,7 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
     // Mainly for CBSD
     $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $app->data['VMifs'][$vars['vm']][$vars['vmif']]['if']]);
     if (! isset($port)) {
-        echo '<b>HV if:</b> ' . htmlspecialchars($app->data['VMifs'][$vars['vm']][$vars['vmif']]['if']) . "\n";
+        echo '<b>HV if:</b> ' . htmlspecialchars((string) $app->data['VMifs'][$vars['vm']][$vars['vmif']]['if']) . "\n";
     } else {
         echo '<b>HV if:</b> ' .
             generate_port_link([
@@ -246,7 +263,7 @@ foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 

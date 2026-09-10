@@ -20,7 +20,7 @@ return new class extends Migration
             $table->tinyInteger('discovered')->default(0);
             $table->string('app_state_prev', 32)->nullable();
             $table->string('app_status', 8);
-            if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+            if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
                 $table->timestamp('timestamp')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
             } else {
                 $table->timestamp('timestamp')->useCurrent();

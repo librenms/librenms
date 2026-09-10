@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('access_points', function (Blueprint $table) {
-            $table->integer('nummonbssid')->change();
+            $table->integer('nummonbssid')->default(0)->change();
         });
     }
 

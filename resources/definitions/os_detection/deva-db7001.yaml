@@ -1,0 +1,11 @@
+os: deva-db7001
+text: 'DB7001 - FM Radio Re-Broadcast Receiver'
+type: appliance
+icon: deva
+group: deva
+over:
+    - { graph: device_dbm, text: RF Level (dBµV) }
+    - { graph: device_ber, text: 'RDS BER' }
+    - { graph: device_percent, text: 'Multipath (%)' }
+discovery:
+    - sysObjectID: .1.3.6.1.4.1.35833.37

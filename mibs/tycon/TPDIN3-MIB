@@ -1,0 +1,415 @@
+TPDIN3-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY, enterprises, 
+	Integer32
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC;
+
+
+tpdin3 MODULE-IDENTITY
+	LAST-UPDATED "202106100730Z"
+	ORGANIZATION 
+		"Tycon Systems"
+	CONTACT-INFO 
+		"https://www.tyconsystems.com/"
+	DESCRIPTION 
+		"TPDIN-Monitor-WEB3 V2 custom MIB"
+::= { tycon 3 }
+
+-- TPDIN-Monitor-WEB3
+
+tycon                OBJECT IDENTIFIER ::= { enterprises 45621 }
+product              OBJECT IDENTIFIER ::= { tpdin3 1 }
+monitor              OBJECT IDENTIFIER ::= { tpdin3 3 }
+mppt                 OBJECT IDENTIFIER ::= { tpdin3 10 }
+
+-- product properties
+
+
+Tenths ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION
+            "tenths"
+    SYNTAX       INTEGER (0..10000)
+    
+			
+
+model  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Model Number"
+	::= { product 1 }
+
+firmwareVersion  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Firmware Version"
+	::= { product 2 }
+
+buildDate  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Firmware Build Date"
+	::= { product 3 }
+
+
+-- monitor properties
+
+relay1  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 1 control. 0: Off, 1: On, 2: cycle"
+	::= { monitor 1 }
+
+relay2  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 2 control. 0: Off, 1: On, 2: cycle"
+	::= { monitor 2 }
+
+relay3  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 3 control. 0: Off, 1: On, 2: cycle"
+	::= { monitor 3 }
+
+relay4  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 4 control. 0: Off, 1: On, 2: cycle"
+	::= { monitor 4 }
+
+v1  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Voltage 1"
+	::= { monitor 5 }
+
+v2  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Voltage 2"
+	::= { monitor 6 }
+
+v3  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Voltage 3"
+	::= { monitor 7 }
+
+v4  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Voltage 4"
+	::= { monitor 8 }
+
+i1  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 1"
+	::= { monitor 9 }
+	
+i2  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 2"
+	::= { monitor 10 }
+	
+i3  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 3"
+	::= { monitor 11 }
+	
+i4  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 4"
+	::= { monitor 12 }
+	
+t1  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"External Temperature"
+	::= { monitor 13 }
+	
+t2  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Internal Temperature"
+	::= { monitor 14 }
+	
+v1int  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Voltage 1"
+	::= { monitor 15 }
+
+v2int  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Voltage 2"
+	::= { monitor 16 }
+	
+v3int  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Voltage 3"
+	::= { monitor 17 }
+	
+v4int  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Voltage 4"
+	::= { monitor 18 }
+	
+i1int  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 1"
+	::= { monitor 19 }
+	
+i2int  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 2"
+	::= { monitor 20 }
+	
+i3int  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 3"
+	::= { monitor 21 }
+	
+i4int  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 4"
+	::= { monitor 22 }
+	
+t1int  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"External Temperature"
+	::= { monitor 23 }
+	
+t2int  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Internal Temperature"
+	::= { monitor 24 }
+	
+mpptmodel  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MPPT Model"
+	::= { mppt 1 }
+	
+batv  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Battery Voltage"
+	::= { mppt 2 }
+
+bati  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Battery Current"
+	::= { mppt 3 }
+	
+btemp  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Battery Temperature"
+	::= { mppt 4 }
+	
+itemp  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Internal Temperature"
+	::= { mppt 5 }
+	
+loadv  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Load Voltage"
+	::= { mppt 6 }
+	
+loadi  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Load Current"
+	::= { mppt 7 }
+	
+pvv  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"PV Voltage"
+	::= { mppt 8 }
+	
+pvi  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"PV Current"
+	::= { mppt 9 }
+	
+loadstate  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Load State"
+	::= { mppt 10 }
+	
+batvint  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Battery Voltage"
+	::= { mppt 11 }
+	
+batiint  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Battery Current"
+	::= { mppt 12 }
+	
+btempint  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Battery Temperature"
+	::= { mppt 13 }
+	
+itempint  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Internal Temperature"
+	::= { mppt 14 }
+	
+loadvint  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Load Voltage"
+	::= { mppt 15 }
+	
+loadiint  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Load Current"
+	::= { mppt 16 }
+	
+pvvint  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"PV Voltage"
+	::= { mppt 17 }
+	
+pviint  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"PV Current"
+	::= { mppt 18 }
+	
+load  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Load Power 0: Off, 1: On"
+	::= { mppt 19 }
+
+
+	
+	
+	
+END

@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.232.165.5",
+                    "sysDescr": "HP Intelligent Modular PDU , revision W-J, firmware version 2.0.22",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": null,
+                    "os": "hpe-ipdu",
+                    "type": "power",
+                    "serial": null,
+                    "icon": "hpe.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

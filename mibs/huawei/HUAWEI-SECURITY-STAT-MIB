@@ -4,7 +4,7 @@
 -- 
 -- Description:
 -- Reference:
--- Version: V1.47
+-- Version: V1.48
 -- History:
 -- shaoyu,2009-03-12,<contents>
 -- =================================================================
@@ -26,7 +26,7 @@
 	
 		-- 1.3.6.1.4.1.2011.6.122.15.1
 		hwSecStatGlobal MODULE-IDENTITY 
-			LAST-UPDATED "202203181007Z"		-- March 18, 2022 at 10:07 GMT
+			LAST-UPDATED "202211051138Z"		-- November 05, 2022 at 11:38 GMT
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO
@@ -38,10 +38,12 @@
                                  Email: support@huawei.com"
 			DESCRIPTION 
 				"
-				V1.20
+				V1.48
 				The HUAWEI-SECSTAT-MIB contains objects to manage the security statistics for firewall product.
 				"
 			--  Revision history
+                                REVISION   "202211051138Z"       
+                                DESCRIPTION "V1.48 add hwSecStatDevDynResTraps node."   
                                 REVISION   "202203181007Z"       
                                 DESCRIPTION "V1.47 add hwSecStatDevicePerfObjects  node."     
                                 REVISION   "202105201507Z"       
@@ -2943,6 +2945,24 @@
 			DESCRIPTION 
 				"The number of dynamic-resource below the alarm threshold."
 			::= { hwSecStatDynamicResourceTraps 2 }
+                                       -- 1.3.6.1.4.1.2011.6.122.15.3.9
+		hwSecStatDevDynResTraps OBJECT IDENTIFIER ::= { hwSecStatTraps 9}
+		-- 1.3.6.1.4.1.2011.6.122.15.3.9.1
+		hwSecStatDevDynResOverThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatDynamicResourceName, hwSecStatDynamicResourceCurrentNum, hwSecStatDynamicResourceThreshold}
+			STATUS current
+			DESCRIPTION 
+				"The number of dynamic resources on the device exceeds the threshold."
+			::= { hwSecStatDevDynResTraps 1 }
+			
+		-- 1.3.6.1.4.1.2011.6.122.15.3.9.2
+		 hwSecStatDevDynResBelowThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatDynamicResourceName, hwSecStatDynamicResourceCurrentNum, hwSecStatDynamicResourceThreshold}
+			STATUS current
+			DESCRIPTION 
+				"The number of dynamic resources on the device below the threshold."
+			::= { hwSecStatDevDynResTraps 2 }
+
 			
 --      AQ4D79760
 		-- 1.3.6.1.4.1.2011.6.122.15.4

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Eloquent.php
  *
@@ -26,6 +27,7 @@
 namespace LibreNMS\DB;
 
 use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\Laravel;
 use PDOException;
@@ -57,7 +59,7 @@ class Eloquent
 
                 return true;
             }
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             return false;
         }
 
@@ -68,7 +70,7 @@ class Eloquent
      * Access the Database Manager for Fluent style queries. Like the Laravel DB facade.
      *
      * @param  string|null  $name
-     * @return \Illuminate\Database\Connection|null
+     * @return Connection|null
      */
     public static function DB(?string $name = null): ?Connection
     {
@@ -101,7 +103,7 @@ class Eloquent
      */
     public static function setConnection($name, $db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null): void
     {
-        \Config::set("database.connections.$name", [
+        Config::set("database.connections.$name", [
             'driver' => 'mysql',
             'host' => $db_host,
             'port' => $db_port,
@@ -115,6 +117,6 @@ class Eloquent
             'strict' => true,
             'engine' => null,
         ]);
-        \Config::set('database.default', $name);
+        Config::set('database.default', $name);
     }
 }

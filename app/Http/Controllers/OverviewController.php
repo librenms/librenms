@@ -2,24 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeer;
+use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Service;
 use App\Models\Syslog;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use LibreNMS\Config;
 
 class OverviewController extends Controller
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\Contracts\View\View
      */
     public function index(Request $request)
     {
-        $view = Config::get('front_page');
+        $this->authorize('viewAny', Dashboard::class);
+
+        $view = LibrenmsConfig::get('front_page');
 
         if (view()->exists("overview.custom.$view")) {
             return view("overview.custom.$view");
@@ -32,65 +34,65 @@ class OverviewController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\Contracts\View\View
      */
     public function simple(Request $request)
     {
+        $this->authorize('viewAny', Dashboard::class);
+
         //TODO: All below missing D.ignore = '0' check
         $ports_down = [];
         $bgp_down = [];
         $devices_uptime = [];
         $syslog = [];
 
-        $devices_down = Device::hasAccess(Auth::user())
+        $devices_down = Device::hasAccess($request->user())
             ->isDown()
-            ->limit(Config::get('front_page_down_box_limit'))
+            ->limit(LibrenmsConfig::get('front_page_down_box_limit'))
             ->get();
 
-        if (Config::get('warn.ifdown')) {
-            $ports_down = Port::hasAccess(Auth::user())
+        if (LibrenmsConfig::get('warn.ifdown')) {
+            $ports_down = Port::hasAccess($request->user())
                 ->isDown()
-                ->limit(Config::get('front_page_down_box_limit'))
+                ->limit(LibrenmsConfig::get('front_page_down_box_limit'))
                 ->with('device')
                 ->get();
         }
 
-        $services_down = Service::hasAccess(Auth::user())
+        $services_down = Service::hasAccess($request->user())
             ->isCritical()
-            ->limit(Config::get('front_page_down_box_limit'))
+            ->limit(LibrenmsConfig::get('front_page_down_box_limit'))
             ->with('device')
             ->get();
 
         // TODO: is inAlarm() equal to: bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != ''  ?
-        $bgp_down = BgpPeer::hasAccess(Auth::user())
+        $bgp_down = BgpPeer::hasAccess($request->user())
             ->inAlarm()
-            ->limit(Config::get('front_page_down_box_limit'))
+            ->limit(LibrenmsConfig::get('front_page_down_box_limit'))
             ->with('device')
             ->get();
 
-        if (filter_var(Config::get('uptime_warning'), FILTER_VALIDATE_FLOAT) !== false
-            && Config::get('uptime_warning') > 0
+        if (filter_var(LibrenmsConfig::get('uptime_warning'), FILTER_VALIDATE_FLOAT) !== false
+            && LibrenmsConfig::get('uptime_warning') > 0
         ) {
-            $devices_uptime = Device::hasAccess(Auth::user())
+            $devices_uptime = Device::hasAccess($request->user())
                 ->isUp()
-                ->whereUptime(Config::get('uptime_warning'))
-                ->limit(Config::get('front_page_down_box_limit'))
+                ->whereUptime(LibrenmsConfig::get('uptime_warning'))
+                ->limit(LibrenmsConfig::get('front_page_down_box_limit'))
                 ->get();
 
-            $devices_uptime = $devices_uptime->reject(function ($device) {
-                return Config::getOsSetting($device->os, 'bad_uptime') == true;
-            });
+            $devices_uptime = $devices_uptime->reject(fn ($device) => LibrenmsConfig::getOsSetting($device->os, 'bad_uptime') == true);
         }
 
-        if (Config::get('enable_syslog')) {
-            $syslog = Syslog::hasAccess(Auth::user())
+        if (LibrenmsConfig::get('enable_syslog')) {
+            $syslog = Syslog::hasAccess($request->user())
                 ->orderBy('timestamp', 'desc')
                 ->limit(20)
                 ->with('device')
                 ->get();
         }
 
-        return view('overview.simple', compact('devices_down', 'ports_down', 'services_down', 'bgp_down', 'devices_uptime', 'syslog'));
+        return view('overview.simple', ['devices_down' => $devices_down, 'ports_down' => $ports_down, 'services_down' => $services_down, 'bgp_down' => $bgp_down, 'devices_uptime' => $devices_uptime, 'syslog' => $syslog]);
     }
 }

@@ -6,27 +6,28 @@ IMPORTS
         FROM CADANT-PRODUCTS-MIB
     AdminState, 
     CardId, 
-    CardSubType, 
-    CardType, 
+    CerCardSubType, 
+    CerCardType, 
     DiskVolumeUsageLevel,
     DuplexStatus, 
     EqActionType, 
     FirmwareSource, 
     FlowControlMode,
-    PicType, 
+    PicType, CerPicType, 
     PortId,
     PortMode,
     PortDetectedMode,
-    PortType, 
+    PortType, CerPortType, 
     PrimaryState, 
-    SecondaryState, 
-    ShelfId,
-    UnknownState
+    SecondaryState
         FROM CADANT-TC
     TenthdBmV
         FROM DOCS-IF-MIB
-    InterfaceIndexOrZero
+    InterfaceIndexOrZero,
+    ifIndex
         FROM IF-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
     Counter32, 
@@ -48,50 +49,173 @@ IMPORTS
         FROM SNMPv2-TC;
 
 cadEquipmentMib MODULE-IDENTITY
-    LAST-UPDATED "200903030000Z" -- March 3, 2009
+    LAST-UPDATED "201510060000Z" -- Oct 6, 2015
     ORGANIZATION 
-        "Arris International, Inc."
+        "ARRIS Group, Inc."
     CONTACT-INFO 
         "Arris Technical Support
          Phone: +1 630 281 3000
-         E-Mail: support@arrisi.com"
+         E-Mail: support@arris.com"
     DESCRIPTION 
         "This MIB is intended to describe all objects which are used to
-         control and report on the state of a Cadant CMTS. These objects
-         are used to perform the following functions on a Cadant CMTS:
+         control and report on the state of an Arris E6 CMTS. These objects
+         are used to perform the following functions on an Arris E6 CMTS:
 
          a) provision the cards, ports, and the CMTS itself
          b) run dianostic tests
          c) configure auditing parameters
          d) receive equipment-related traps "
+
+
+
+    REVISION "201510060000Z" -- Oct 6, 2015
+    DESCRIPTION
+        "Add cerCamFaultNotification."
+    REVISION "201508260000Z" -- August 26, 2015
+    DESCRIPTION
+        "Add cerLicenseTypeStr to the noLicenseNotification trap."
+    REVISION "201508120000Z" -- August 12, 2015
+    DESCRIPTION
+        "Modify list of allowed FPGA faults."
+    REVISION "201507210000Z" -- July 21, 2015
+    DESCRIPTION
+        "Change upper limit of cerCardDataAllowedPorts and cerCardDataLicensePorts
+         from 1000 to 5000 and updated the range to all values between 0 and 5000."
+    REVISION "201507120000Z" -- July 12, 2015
+    DESCRIPTION
+        "Change cerCardDataRamSize units from bytes to megabytes."
+    REVISION "201507070000Z" -- July 7, 2015
+    DESCRIPTION
+        "Add cerSpareModeExtTable"
+    REVISION "201506030000Z" -- June 3, 2015
+    DESCRIPTION
+        "Change upper limit of cerCardDataAllowedPorts and cerCardDataLicensePorts
+         from 256 to 1000."
+    REVISION "201506010000Z" -- June 1, 2015
+    DESCRIPTION
+        "Remove CerCardSubType dcamOfdmAnnexB"
+    REVISION "201412010000Z" -- Dec 1st, 2014
+    DESCRIPTION
+        "rename dchannelVod to dchannelVideo in PortType"
+    REVISION "201410140000Z" -- Oct 14, 2014
+    DESCRIPTION
+        "Support 384 downstream channels per DCAM-B"
+    REVISION "201408010000Z" -- Aug 1, 2014
+    DESCRIPTION
+        "PortType change:
+         remove dchannelSdv(13) and dchannelBroadcast(14)"
+    REVISION "201403160000Z" -- March 16, 2014
+    DESCRIPTION 
+        "Add new video channel types."
+    REVISION "201305160000Z" -- May 16, 2013
+    DESCRIPTION 
+        "Add new SFP types."
+    REVISION "201304120000Z" -- April 12, 2013
+    DESCRIPTION 
+        "Change units of Pem sensors to decivolts and deciamps"
+    REVISION "201302190000Z" -- February 8, 2013
+    DESCRIPTION 
+        "Change OID of cardTempOutOfRangeNotification to equipmentTraps.19"
+    REVISION "201301080000Z" -- January 8, 2013
+    DESCRIPTION 
+        "Remove patch control support."
+    REVISION "201301070000Z" -- January 7, 2013
+    DESCRIPTION 
+        "Add cerCardDataPicModelName, cerCardDataPicMfgRevision, cerCardDataPicMfg, and cerCardDataPicMfgDateTime."
+    REVISION "201209070000Z" -- September 7, 2012
+    DESCRIPTION 
+        "Modify no license notification to include additional information."
+    REVISION "201207100000Z" -- July 10, 2012
+    DESCRIPTION 
+        "Set valid defaults for cerCardDataEntry."
+    REVISION "201207030000Z" -- July 3, 2012
+    DESCRIPTION 
+        "Change syntax of cerCardDataMfgDateTime to DateAndTime."
+    REVISION "201205210000Z" -- May 21, 2012
+    DESCRIPTION 
+        "Add additional patch control support."
+    REVISION "201205080000Z" -- May 8, 2012
+    DESCRIPTION 
+        "Add initial patch support."
+    REVISION "201205030000Z" -- May 3, 2012
+    DESCRIPTION 
+        "Add cerFanAmbientTemperature."
+    REVISION "201205020000Z" -- May 2, 2012
+    DESCRIPTION 
+        "Remove cerPortMacIfIndex and change cerPortDocsIfIndex to ifIndex for noLicenseNotification."
+    REVISION "201204250000Z" -- Apr 25, 2012
+    DESCRIPTION 
+        "Add noLicenseNotification."
+    REVISION "201204110000Z" -- Apr 11, 2012
+    DESCRIPTION 
+        "Change cerCardTemperature, cerCardTemperatureHighWarn, cerCardTemperatureHighError from Celsius to value from 1 to 10"
+    REVISION "201203220000Z" -- Mar 22, 2012
+    DESCRIPTION 
+        "Add cerCardDataAllowedPorts."
+    REVISION "201201050000Z" -- Jan 5, 2012
+    DESCRIPTION 
+        "Add cerCardDataFeedAPresent and cerCardDataFeedBPresent."
+    REVISION "201109130000Z" -- Sep 13, 2011
+    DESCRIPTION 
+        "Add cerPemStatusEntry"
+    REVISION "201108050000Z" -- Aug 5, 2011
+    DESCRIPTION 
+        "Replace cerCardId with errEvCardId as the index in fpgaErrorEventEntry."
+    REVISION "201107190000Z" -- July 19, 2011
+    DESCRIPTION 
+        "Move RSM admin ports."
+    REVISION "201107180000Z" -- July 18, 2011
+    DESCRIPTION 
+        "Remove cardEntry, portEntry and diskVolumeEntry"
+    REVISION "201107080000Z" -- July 8, 2011
+    DESCRIPTION 
+        "Add more support for fans."
+    REVISION "201106280000Z" -- June 28, 2011
+    DESCRIPTION 
+        "Add support for committed software versions."
+    REVISION "201106140000Z" -- June 14, 2011
+    DESCRIPTION 
+        "Add initial fan support."
+    REVISION "201103180000Z" -- March 18, 2011
+    DESCRIPTION 
+        "Add trap inhibit for card overload."
+    REVISION "201103170000Z" -- March 17, 2011
+    DESCRIPTION 
+        "Incorporate new chassis structure."
+    REVISION "201101270000Z" -- January 27, 2011
+    DESCRIPTION 
+        "Move card version information into a separate table."
+    REVISION "200907100000Z" -- July 10, 2009
+    DESCRIPTION 
+	"Initial changes for E6."
     REVISION "200903030000Z" -- March 3, 2009
     DESCRIPTION 
-	"Change syntax of cmIpAddress from IpAddress to OCTET STRING to handle IPv4 and v6."
+        "Change syntax of cmIpAddress from IpAddress to OCTET STRING to handle IPv4 and v6."
     REVISION "200901050000Z" -- January 5, 2009
     DESCRIPTION 
-	"Add restrictions on the size of some strings in card table."
+        "Add restrictions on the size of some strings in card table."
     REVISION "200810140000Z" -- October 14, 2008
     DESCRIPTION 
-	"Add shelf id back into trap messages."
+        "Add shelf id back into trap messages."
     REVISION "200810010000Z" -- October 1, 2008
     DESCRIPTION 
-	"Add ranges for allowable card temperatures."
+        "Add ranges for allowable card temperatures."
     REVISION "200807030000Z" -- July 3, 2008
     DESCRIPTION 
-	"Remove portGroupId since cable-mac replaced this MIB object.
-	Add shelfNumber to portPrStateChange, portSecStateChange and portDplxStatusChange to match the variable binding list seen on trap monitor."
+        "Remove portGroupId since cable-mac replaced this MIB object.
+        Add shelfNumber to portPrStateChange, portSecStateChange and portDplxStatusChange to match the variable binding list seen on trap monitor."
     REVISION "200806180000Z" -- June 18, 2008
     DESCRIPTION 
-	"Additional support for disk sizes."
+        "Additional support for disk sizes."
     REVISION "200804280000Z" -- April 28, 2008
     DESCRIPTION 
-	"Initial support for MPM carrier cards."
+        "Initial support for MPM carrier cards."
     REVISION "200804020000Z" -- April 2, 2008
     DESCRIPTION 
-	"Support various levels of temperature warnings."
+        "Support various levels of temperature warnings."
     REVISION "200802250000Z" -- Feb 25, 2008
     DESCRIPTION 
-	"Allowed Event Ids to range 0x00000000 to 0xFFFFFFFF for fpgaErrorEvent Table."
+        "Allowed Event Ids to range 0x00000000 to 0xFFFFFFFF for fpgaErrorEvent Table."
     REVISION "200711050000Z" -- Nov 5, 2007
     DESCRIPTION 
         "Add port flow control parameters and remove gbic support."
@@ -201,6 +325,9 @@ cadEquipmentMib MODULE-IDENTITY
     ::= { cadEquipment 1 }
 
 
+--
+-- Textual conventions
+--
 TestId ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION 
@@ -282,6 +409,16 @@ TestTransactionId ::= TEXTUAL-CONVENTION
          result coming back.  "
     SYNTAX      Integer32 (0..2147483647)
 
+
+CerCamFaultTrapType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "The types of CAM faults that will be logged and a trap sent."
+        SYNTAX INTEGER {
+            fpgaFatalError(12)
+        }
+
+
 equipmentTraps OBJECT IDENTIFIER
     ::= { cadEquipmentMib 0 }
 
@@ -346,7 +483,7 @@ cardNumber OBJECT-TYPE
         STATUS      current
         DESCRIPTION
             " Card Id used in traps. A value 99 indicates an invalid cardNumber. "
-        DEFVAL { 99 }
+        DEFVAL { 0 }
         ::= { systemGeneral 98 }
 
 portNumber OBJECT-TYPE
@@ -355,7 +492,7 @@ portNumber OBJECT-TYPE
         STATUS      current
         DESCRIPTION
             " Port Id used in traps. A value of 99 indicates an invalid portNumber. "
-        DEFVAL { 99 }
+        DEFVAL { 0 }
         ::= { systemGeneral 99 }
 
 diskDriveNumber OBJECT-TYPE
@@ -376,22 +513,47 @@ diskVolumeNumber OBJECT-TYPE
         DEFVAL { 99 }
         ::= { systemGeneral 101 }
 
+cerCardNumber OBJECT-TYPE
+        SYNTAX      CardId
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            " Card Id used in traps. A value 0 indicates an invalid cardNumber. "
+        DEFVAL { 0 }
+        ::= { systemGeneral 200 }
+
+cerPortNumber OBJECT-TYPE
+        SYNTAX  PortId
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            " Port Id used in traps. A value of 0 indicates an invalid portNumber. "
+        DEFVAL { 0 }
+        ::= { systemGeneral 201 }
+
+cerDiskDriveNumber OBJECT-TYPE
+        SYNTAX      Integer32 (0..99)
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            " Disk drive ID use in a Cadant trap. A value of 0 indicates an invalid diskDriveNumber"
+        DEFVAL { 0 }
+        ::= { systemGeneral 202 }
+
+cerDiskVolumeNumber OBJECT-TYPE
+        SYNTAX      Integer32 (0..99)
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            " Disk volume ID use in a Cadant trap. A value of 0 indicates an invalid diskVolumeNumber"
+        DEFVAL { 0 }
+        ::= { systemGeneral 203 }
+
 --
 -- Shelf Object Group
 --
 shelfObjects OBJECT IDENTIFIER
     ::= { cadEquipmentMib 2 }
-
-shelfNumber OBJECT-TYPE
-        SYNTAX  ShelfId
-        MAX-ACCESS read-only
-        STATUS      deprecated
-        DESCRIPTION
-            " The instance identifier of a Cadant CMTS in a multi-Cadant CMTS
-            configuration. This shelfNumber is used in traps.  A value of 99 
-            indicates an invalid shelfNumber. "
-        DEFVAL { 1 }
-        ::= { shelfObjects 1 }
 
 shelfName OBJECT-TYPE
         SYNTAX  DisplayString
@@ -400,7 +562,7 @@ shelfName OBJECT-TYPE
         DESCRIPTION
             " A string that represents the name of this machine and may uniquely
             identify it from other network devices. "
-        DEFVAL { "Cadant C4 CMTS" }
+        DEFVAL { "Arris CER CMTS" }
         ::= { shelfObjects 2 }
 
 shelfSwVersion OBJECT-TYPE
@@ -442,82 +604,61 @@ equipmentTbl OBJECT IDENTIFIER
     ::= { cadEquipmentMib 4 }
 
 --
--- Card table
+-- Card table is removed, this MIB table is only supported by C4 CMTS
+--        ::= { equipmentTbl 2 }
+
+
 --
-cardTable OBJECT-TYPE
-        SYNTAX  SEQUENCE OF CardEntry
+-- Cer Card table
+--
+cerCardTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CerCardEntry
         MAX-ACCESS      not-accessible
         STATUS  current
         DESCRIPTION
             "A table of card or circuit pack information."
-        ::= { equipmentTbl 2 }
+        ::= { equipmentTbl 12 }
 
-cardEntry OBJECT-TYPE
-        SYNTAX  CardEntry
+cerCardEntry OBJECT-TYPE
+        SYNTAX  CerCardEntry
         MAX-ACCESS      not-accessible
         STATUS  current
         DESCRIPTION
             "A conceptual row containing pertinent information about a card or
             a circuit pack. "
-        INDEX   { cardShelfId, cardId }
-        ::= { cardTable 1 }
+        INDEX   { cerCardId }
+        ::= { cerCardTable 1 }
         
-CardEntry ::= SEQUENCE {
-                cardShelfId             ShelfId,
-                cardId                  CardId,
-                cardName                DisplayString,
-                cardType                CardType,
-                cardSubType             CardSubType,
-                cardSerialNum           DisplayString,
-                cardFwVersion           DisplayString,
-                cardHwVersion           DisplayString,
-                cardSwVersion           DisplayString,
-                cardAdminState          AdminState,
-                cardPrState             PrimaryState,
-                cardSecState            SecondaryState,
-                cardDplxStatus          DuplexStatus,
-                cardAction              EqActionType,
-                cardTrapInh             BITS,
-                cardNumPorts            Integer32,
-                cardDetected            CardType,
-                cardSubDetected         CardSubType,
-                cardFwUpdateStatus      TruthValue,
-                cardSpareGroupId        CardId,
-                cardSpareGroupMode      INTEGER,
-                cardUpTime              TimeTicks,
-                cardTemperature         Integer32,
-                cardCpuType             DisplayString,
-                cardCpuSpeed            Unsigned32,
-                cardBusSpeed            Unsigned32,
-                cardRamSize             Unsigned32,
-                cardFlashSize           Unsigned32,
-                cardCPLDVersion         DisplayString,
-                cardFpgaSource          FirmwareSource,
-                cardBootVersion         DisplayString,
-                cardLastBootVersion     DisplayString,
-                cardLastBootSource      FirmwareSource,
-                cardPicDetected         PicType,
-                cardPicSerialNum        DisplayString,
-                cardPicHwVersion        DisplayString,
-                cardLastResetReason     DisplayString,
-                cardTemperatureHighWarn Integer32,
-                cardTemperatureHighError Integer32,
-                cardCarrierSerialNum    DisplayString,
-                cardCarrierFwVersion    DisplayString,
-                cardCarrierHwVersion    DisplayString
+CerCardEntry ::= SEQUENCE {
+                cerCardId                  CardId,
+                cerCardName                DisplayString,
+                cerCardType                CerCardType,
+                cerCardSubType             CerCardSubType,
+                cerCardAdminState          AdminState,
+                cerCardPrState             PrimaryState,
+                cerCardSecState            SecondaryState,
+                cerCardDplxStatus          DuplexStatus,
+                cerCardAction              EqActionType,
+                cerCardTrapInh             BITS,
+                cerCardNumPorts            Integer32,
+                cerCardDetected            CerCardType,
+                cerCardSubDetected         CerCardSubType,
+                cerCardFwUpdateStatus      TruthValue,
+                cerCardSpareGroupId        CardId,
+                cerCardSpareGroupMode      INTEGER,
+                cerCardUpTime              TimeTicks,
+                cerCardTemperature         Integer32,
+                cerCardPicDetected         CerPicType,
+                cerCardLastResetReason     DisplayString,
+                cerCardTemperatureHighWarn Integer32,
+                cerCardTemperatureHighError Integer32,
+                cerCardAnnex               INTEGER,
+                cerCardNumRfConnectors     Integer32
                 }
         
-cardShelfId OBJECT-TYPE
-        SYNTAX      ShelfId
-    MAX-ACCESS  read-only
-    STATUS      obsolete
-        DESCRIPTION
-            "The unique id the shelf that contains this card."
-        ::= { cardEntry 1 }
-
-cardId OBJECT-TYPE
+cerCardId OBJECT-TYPE
         SYNTAX      CardId
-        MAX-ACCESS  not-accessible
+        MAX-ACCESS  accessible-for-notify
         STATUS      current
         DESCRIPTION
             "The unique id of this card within the shelf. The 
@@ -525,31 +666,30 @@ cardId OBJECT-TYPE
             - Indices from 1 to 50 [1 - 50] are reserved for Circuit Packs. 
               In this case, the cardId is 1 plus the 0-based slot number. 
             - Indices from 51 to 98 [51 - 98] are reserved for Auxilliary Devices in within
-              a shelf. Auxilliary Devices or Modules could be Fan Module, Power Module,
-              Tape Drive and or Disc-Drive. In this case, the cardName and cardType
-              indentify the Auxilliary Devices. Not all of row attributes are applicable
-              for Auxilliary Devices. "
-        ::= { cardEntry 2 }
+              a shelf. Auxilliary Devices or Modules could be Fan Module, Power Module.
+              In this case, the cerCardName and cerCardType indentify the Auxilliary Devices. 
+              Not all of row attributes are applicable for Auxilliary Devices. "
+        ::= { cerCardEntry 2 }
 
-cardName OBJECT-TYPE
+cerCardName OBJECT-TYPE
         SYNTAX      DisplayString (SIZE(0..64))
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
-        " This is the name of the card, if it has one. "
-        ::= { cardEntry 3 }
+            " This is the name of the card, if it has one. "
+        ::= { cerCardEntry 3 }
 
-cardType OBJECT-TYPE
-        SYNTAX      CardType
+cerCardType OBJECT-TYPE
+        SYNTAX      CerCardType
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
                 " The type of card, if any. For example Ecard, Fcard, Dcard or Ucard
                  If the slot is empty, the value would be 'empty'. "
-        ::= { cardEntry 4 }
+        ::= { cerCardEntry 4 }
 
-cardSubType OBJECT-TYPE
-        SYNTAX      CardSubType
+cerCardSubType OBJECT-TYPE
+        SYNTAX      CerCardSubType
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
@@ -558,115 +698,84 @@ cardSubType OBJECT-TYPE
              might have a more  specific type of 1D8U with integrated upconverter.
              If the card needs no further specificication that the cardType, then
              the value of cardSubType is 'none'. Not yet implemented. "
-        ::= { cardEntry 5 }
+        ::= { cerCardEntry 5 }
 
-cardSerialNum OBJECT-TYPE
-        SYNTAX      DisplayString (SIZE(0..32))
-        MAX-ACCESS  read-only
-        STATUS      current
-        DESCRIPTION
-            " This is the serial number of the card. "
-        ::= { cardEntry 6 }
-
-cardFwVersion OBJECT-TYPE
-        SYNTAX      DisplayString (SIZE(0..128))
-        MAX-ACCESS  read-only
-        STATUS      current
-        DESCRIPTION
-            " This is the firmware or FPGA version number of the card. "
-        ::= { cardEntry 7 }
-
-cardHwVersion OBJECT-TYPE
-        SYNTAX      DisplayString (SIZE(0..128))
-        MAX-ACCESS  read-only
-        STATUS      current
-        DESCRIPTION
-            " This is the hardware version of the card. "
-        ::= { cardEntry 8 }
-
-cardSwVersion OBJECT-TYPE
-        SYNTAX      DisplayString (SIZE(0..64))
-        MAX-ACCESS  read-only
-        STATUS      current
-        DESCRIPTION
-            " This is the software version of the card. "
-        ::= { cardEntry 9 }
-
-cardAdminState OBJECT-TYPE
+cerCardAdminState OBJECT-TYPE
         SYNTAX      AdminState
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
             " This is the administrative state of this card. "
-        ::= { cardEntry 12 }
+        ::= { cerCardEntry 12 }
 
-cardPrState OBJECT-TYPE
+cerCardPrState OBJECT-TYPE
         SYNTAX      PrimaryState
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
             " This is the primary state of this card. "
-        ::= { cardEntry 13 }
+        ::= { cerCardEntry 13 }
 
-cardSecState OBJECT-TYPE
+cerCardSecState OBJECT-TYPE
         SYNTAX      SecondaryState
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
             " This is the secondary state of this card. "
-        ::= { cardEntry 14 }
+        ::= { cerCardEntry 14 }
 
-cardDplxStatus OBJECT-TYPE
+cerCardDplxStatus OBJECT-TYPE
         SYNTAX      DuplexStatus
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
             " This is the duplexing status of this card. "
-        ::= { cardEntry 15 }
+        ::= { cerCardEntry 15 }
 
-cardAction OBJECT-TYPE
+cerCardAction OBJECT-TYPE
         SYNTAX      EqActionType
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
             " Write-only action performed on this card. "
-        ::= { cardEntry 17 }
+        ::= { cerCardEntry 17 }
 
-cardTrapInh OBJECT-TYPE
+cerCardTrapInh OBJECT-TYPE
         SYNTAX      BITS { primary(0), secondary(1), duplex(2), detected(3), 
-                    tempoutofrange(4), tempnoreport(5), tempoverheat(6) }
+                    tempoutofrange(4), tempnoreport(5), tempoverheat(6),
+                    overload(7) }
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
             " If a bit is set, the corresponding state change trap
             will not be sent. "
-        ::= { cardEntry 18 }
+        ::= { cerCardEntry 18 }
 
-cardNumPorts OBJECT-TYPE
-        SYNTAX      Integer32 (0..50)
+cerCardNumPorts OBJECT-TYPE
+        SYNTAX      Integer32 (0..1000)
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
             " Number of ports this card contains. "
-        ::= { cardEntry 19 }
+        ::= { cerCardEntry 19 }
 
-cardDetected OBJECT-TYPE
-        SYNTAX      CardType
+cerCardDetected OBJECT-TYPE
+        SYNTAX      CerCardType
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
             " CardType dectected automatically by the CMTS. "
-        ::= { cardEntry 20 }
+        ::= { cerCardEntry 20 }
 
-cardSubDetected OBJECT-TYPE
-        SYNTAX      CardSubType
+cerCardSubDetected OBJECT-TYPE
+        SYNTAX      CerCardSubType
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
             " CardSubType dectected automatically by the CMTS. "
-        ::= { cardEntry 21 }
+        ::= { cerCardEntry 21 }
 
-cardFwUpdateStatus OBJECT-TYPE
+cerCardFwUpdateStatus OBJECT-TYPE
         SYNTAX      TruthValue
         MAX-ACCESS  read-only
         STATUS      current
@@ -674,9 +783,9 @@ cardFwUpdateStatus OBJECT-TYPE
             " Set to TRUE if a firmware update is in progress or has been done,
             else set to FALSE. "
         DEFVAL { false }
-        ::= { cardEntry 23 }
+        ::= { cerCardEntry 23 }
 
-cardSpareGroupId OBJECT-TYPE
+cerCardSpareGroupId OBJECT-TYPE
         SYNTAX CardId
         MAX-ACCESS read-write
         STATUS current
@@ -684,13 +793,13 @@ cardSpareGroupId OBJECT-TYPE
             " The cardId of the spare group leader for this sparing group.  
             This value will be set to the invalid card id for all cards not
             associated with a sparing group. "
-        ::= { cardEntry 24 }
+        ::= { cerCardEntry 24 }
 
-cardSpareGroupMode OBJECT-TYPE
+cerCardSpareGroupMode OBJECT-TYPE
         SYNTAX INTEGER {
+          invalid(0),
           manual(1),
-          auto(2),
-          invalid(99)
+          auto(2)
         }
         MAX-ACCESS read-write
         STATUS current
@@ -698,105 +807,280 @@ cardSpareGroupMode OBJECT-TYPE
             " The admin mode of the spare group leader for this sparing group.
             This value will be set to the invalid card id for all cards not
             associated with a sparing group. "
-        ::= { cardEntry 25 }
+        ::= { cerCardEntry 25 }
 
-cardUpTime OBJECT-TYPE
+cerCardUpTime OBJECT-TYPE
         SYNTAX TimeTicks
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
             " The value of sysUpTime when the primary state for this card 
             made a transition from OOS to IS. "
-        ::= { cardEntry 26 }
+        ::= { cerCardEntry 26 }
 
-cardTemperature OBJECT-TYPE
-        SYNTAX Integer32 (-30..120|999)
-        UNITS "degrees Centigrade"
+cerCardTemperature OBJECT-TYPE
+        SYNTAX Integer32 (1..10|999)
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            " The current operational temperature of the card. "
+            " The current relative temperature of the card. (1=coolest, 10=hottest)"
         DEFVAL { 999 }
-        ::= { cardEntry 29 }
+        ::= { cerCardEntry 29 }
 
-cardCpuType OBJECT-TYPE
-        SYNTAX DisplayString (SIZE(0..25))
+cerCardPicDetected OBJECT-TYPE
+        SYNTAX CerPicType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The type of PIC detected in this slot. "
+        DEFVAL { invalid }
+        ::= { cerCardEntry 40 }
+
+cerCardLastResetReason OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The reason for the latest card recovery. "
+        DEFVAL { "" }
+        ::= { cerCardEntry 43 }
+
+cerCardTemperatureHighWarn OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " The relative temperature of the card at which warnings are generated. "
+        DEFVAL { 7 }
+        ::= { cerCardEntry 44 }
+
+cerCardTemperatureHighError OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " The relative temperature of the card at which recoveries are initiated. "
+        DEFVAL { 10 }
+        ::= { cerCardEntry 45 }
+
+cerCardAnnex OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            other(2),
+            annexA(3),
+            annexB(4),
+            annexC(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The annex of the downstream channels associated with the card."
+        DEFVAL { unknown }
+        ::= { cerCardEntry 46 }
+
+cerCardNumRfConnectors OBJECT-TYPE
+        SYNTAX      Integer32 (0..48)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " Number of RF ports this card contains. "
+        ::= { cerCardEntry 47 }
+
+--
+-- The version table extends the card table with version information of 
+-- the installed modules
+--
+
+cerCardDataTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CardDataEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table shows the contains version information for the modules installed."
+        ::= { equipmentTbl 16 }
+
+cerCardDataEntry OBJECT-TYPE
+        SYNTAX  CardDataEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A conceptual row containing pertinent information about a card or
+            a circuit pack. "
+        AUGMENTS   { cerCardEntry }
+        ::= { cerCardDataTable 1 }
+        
+CardDataEntry ::= SEQUENCE {
+                cerCardDataSerialNum           SnmpAdminString,
+                cerCardDataFwVersion           SnmpAdminString,
+                cerCardDataHwVersion           SnmpAdminString,
+                cerCardDataHwDeviations        SnmpAdminString,
+                cerCardDataSwVersion           SnmpAdminString,
+                cerCardDataCpuType             SnmpAdminString,
+                cerCardDataCpuSpeed            Unsigned32,
+                cerCardDataBusSpeed            Unsigned32,
+                cerCardDataRamSize             Unsigned32,
+                cerCardDataNorFlashSize        Unsigned32,
+                cerCardDataNandFlashSize       Unsigned32,
+                cerCardDataFpgaSource          FirmwareSource,
+                cerCardDataBootVersion         SnmpAdminString,
+                cerCardDataLastBootVersion     SnmpAdminString,
+                cerCardDataLastBootSource      FirmwareSource,
+                cerCardDataPicSerialNum        SnmpAdminString,
+                cerCardDataPicHwVersion        SnmpAdminString,
+                cerCardDataPicHwDeviations     SnmpAdminString,
+                cerCardDataPicModelNum         SnmpAdminString,
+                cerCardDataMfgDateTime         DateAndTime,
+                cerCardDataMfg                 SnmpAdminString,
+                cerCardDataProductName         SnmpAdminString,
+                cerCardDataPartModelNum        SnmpAdminString,
+                cerCardDataProductVersion      SnmpAdminString,
+                cerCardDataAssetTag            SnmpAdminString,
+                cerCardDataCommittedSwVersion  SnmpAdminString,
+                cerCardDataFeedAPresent        TruthValue,
+                cerCardDataFeedBPresent        TruthValue,
+                cerCardDataAllowedPorts        Unsigned32,
+                cerCardDataLicenseAnnex        INTEGER,
+                cerCardDataLicensePorts        Unsigned32,
+                cerCardDataLicenseDate         DateAndTime,
+                cerCardDataPatchVersions       SnmpAdminString,
+                cerCardDataPicModelName        SnmpAdminString,
+                cerCardDataPicMfgRevision      SnmpAdminString,
+                cerCardDataPicMfg              SnmpAdminString,
+                cerCardDataPicMfgDateTime      DateAndTime
+                }
+
+cerCardDataSerialNum OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the serial number of the card. "
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 1 }
+
+cerCardDataFwVersion OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the firmware or FPGA version number of the card. "
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 2 }
+
+cerCardDataHwVersion OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the hardware version of the card. "
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 3 }
+
+cerCardDataHwDeviations OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the set of hardware deviations for the card. "
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 4 }
+
+cerCardDataSwVersion OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the software version of the card. "
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 5 }
+
+cerCardDataCpuType OBJECT-TYPE
+        SYNTAX SnmpAdminString (SIZE(0..25))
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
             " The current CPU type of the card. "
-        ::= { cardEntry 30 }
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 6 }
 
-cardCpuSpeed OBJECT-TYPE
+cerCardDataCpuSpeed OBJECT-TYPE
         SYNTAX Unsigned32
         UNITS "MHz"
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
             " The current CPU speed of the card. "
-        ::= { cardEntry 31 }
+        DEFVAL { 0 }
+        ::= { cerCardDataEntry 7 }
 
-cardBusSpeed OBJECT-TYPE
+cerCardDataBusSpeed OBJECT-TYPE
         SYNTAX Unsigned32
         UNITS "hertz"
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
             " The current bus speed of the card. "
-        ::= { cardEntry 32 }
+        DEFVAL { 0 }
+        ::= { cerCardDataEntry 8 }
 
-cardRamSize OBJECT-TYPE
+cerCardDataRamSize OBJECT-TYPE
         SYNTAX Unsigned32
-        UNITS "bytes"
+        UNITS "megabytes"
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
             " The current size of installed RAM of the card. "
-        ::= { cardEntry 33 }
+        DEFVAL { 0 }
+        ::= { cerCardDataEntry 9 }
 
-cardFlashSize OBJECT-TYPE
+cerCardDataNorFlashSize OBJECT-TYPE
         SYNTAX Unsigned32
         UNITS "bytes"
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
             " The current size of installed FLASH of the card. "
-        ::= { cardEntry 34 }
+        DEFVAL { 0 }
+        ::= { cerCardDataEntry 10 }
 
-cardCPLDVersion OBJECT-TYPE
-        SYNTAX DisplayString (SIZE(0..32))
+cerCardDataNandFlashSize OBJECT-TYPE
+        SYNTAX Unsigned32
+        UNITS "bytes"
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            " The current version of CPLD installed on the card. "
-        ::= { cardEntry 35 }
+            " The current size of installed FLASH of the card. "
+        DEFVAL { 0 }
+        ::= { cerCardDataEntry 11 }
 
-cardFpgaSource OBJECT-TYPE
+cerCardDataFpgaSource OBJECT-TYPE
         SYNTAX FirmwareSource
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
             " The source of the running version of the FPGAs on the card. "
         DEFVAL { committed }
-        ::= { cardEntry 36 }
+        ::= { cerCardDataEntry 12 }
 
-cardBootVersion OBJECT-TYPE
-        SYNTAX DisplayString (SIZE(0..90))
+cerCardDataBootVersion OBJECT-TYPE
+        SYNTAX SnmpAdminString (SIZE(0..90))
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
             " The current versions of the boot loaders installed on the card. "
-        ::= { cardEntry 37 }
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 13 }
 
-cardLastBootVersion OBJECT-TYPE
-        SYNTAX DisplayString (SIZE(0..20))
+cerCardDataLastBootVersion OBJECT-TYPE
+        SYNTAX SnmpAdminString (SIZE(0..90))
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
             " The last version of the boot loader used on the card. "
-        ::= { cardEntry 38 }
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 14 }
 
-cardLastBootSource OBJECT-TYPE
+cerCardDataLastBootSource OBJECT-TYPE
         SYNTAX FirmwareSource
         MAX-ACCESS read-only
         STATUS current
@@ -804,309 +1088,422 @@ cardLastBootSource OBJECT-TYPE
             " The source of the version of the bootloader last
               used on the card. "
         DEFVAL { boot1 }
-        ::= { cardEntry 39 }
+        ::= { cerCardDataEntry 15 }
 
-cardPicDetected OBJECT-TYPE
-        SYNTAX PicType
-        MAX-ACCESS read-only
-        STATUS current
-        DESCRIPTION
-            " The type of PIC detected in this slot. "
-        DEFVAL { invalid }
-        ::= { cardEntry 40 }
-
-cardPicSerialNum OBJECT-TYPE
-        SYNTAX      DisplayString (SIZE(0..32))
+cerCardDataPicSerialNum OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..32))
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
             " This is the serial number of the PIC. "
         DEFVAL { "" }
-        ::= { cardEntry 41 }
+        ::= { cerCardDataEntry 16 }
 
-cardPicHwVersion OBJECT-TYPE
-        SYNTAX      DisplayString (SIZE(0..20))
+cerCardDataPicHwVersion OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..20))
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
             " This is the hardware version of the PIC. "
         DEFVAL { "" }
-        ::= { cardEntry 42 }
+        ::= { cerCardDataEntry 17 }
 
-cardLastResetReason OBJECT-TYPE
-        SYNTAX      DisplayString (SIZE(0..64))
+cerCardDataPicHwDeviations OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..20))
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            " The reason for the latest card recovery. "
+            " This is the set of hardware deviations for the PIC. "
         DEFVAL { "" }
-        ::= { cardEntry 43 }
+        ::= { cerCardDataEntry 18 }
 
-cardTemperatureHighWarn OBJECT-TYPE
-        SYNTAX Integer32
-        UNITS "degrees Centigrade"
-        MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            " The temperature of the card at which warnings are generated. "
-        DEFVAL { 70 }
-        ::= { cardEntry 44 }
-
-cardTemperatureHighError OBJECT-TYPE
-        SYNTAX Integer32
-        UNITS "degrees Centigrade"
-        MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            " The temperature of the card at which recoveries are initiated. "
-        DEFVAL { 90 }
-        ::= { cardEntry 45 }
-
-cardCarrierSerialNum OBJECT-TYPE
-        SYNTAX      DisplayString (SIZE(0..32))
+cerCardDataPicModelNum OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..20))
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            " This is the serial number of the carrier card, and valid only for DMM/MPM cards. "
+            " This is the model number of the PIC. "
         DEFVAL { "" }
-        ::= { cardEntry 46 }
+        ::= { cerCardDataEntry 19 }
 
-cardCarrierFwVersion OBJECT-TYPE
-        SYNTAX      DisplayString (SIZE(0..128))
+cerCardDataMfgDateTime OBJECT-TYPE
+        SYNTAX      DateAndTime
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            " This is the firmware version of the carrier card, and valid only for DMM/MPM cards. "
-        DEFVAL { "" }
-        ::= { cardEntry 47 }
+            " Date of the module's manufacture (FRU). "
+        DEFVAL { '0000000000000000'H }
+        ::= { cerCardDataEntry 20 }
 
-cardCarrierHwVersion OBJECT-TYPE
-        SYNTAX      DisplayString (SIZE(0..128))
+cerCardDataMfg OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..32))
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            " This is the hardwarer versioin of the carrier card, and valid only for DMM/MPM cards. "
+            " Name of the manufacturer (FRU). "
         DEFVAL { "" }
-        ::= { cardEntry 48 }
+        ::= { cerCardDataEntry 21 }
+
+cerCardDataProductName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " Name of the product (FRU). "
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 22 }
+
+cerCardDataPartModelNum OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " Name of the model of this product (FRU). "
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 23 }
+
+cerCardDataProductVersion OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " Version of the model of this product (FRU). "
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 24 }
+
+cerCardDataAssetTag OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " Asset tag of this part (FRU). "
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 25 }
+
+cerCardDataCommittedSwVersion OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the software version of the card. "
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 26 }
+
+cerCardDataFeedAPresent OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This object indicates whether power feed A is present or not. "
+        DEFVAL { false }
+        ::= { cerCardDataEntry 27 }
+
+cerCardDataFeedBPresent OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This object indicates whether power feed B is present or not. "
+        DEFVAL { false }
+        ::= { cerCardDataEntry 28 }
+
+cerCardDataAllowedPorts OBJECT-TYPE
+        SYNTAX      Unsigned32(0..5000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This object indicates the allowed number of licensed ports."
+        DEFVAL { 0 }
+        ::= { cerCardDataEntry 29 }
+
+cerCardDataLicenseAnnex OBJECT-TYPE
+        SYNTAX      INTEGER {
+          unknown(1),
+          other(2),
+          annexA(3),
+          annexB(4),
+          annexC(5)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This object shows the annex associated with the license."
+        DEFVAL { unknown }
+        ::= { cerCardDataEntry 30 }
+
+cerCardDataLicensePorts OBJECT-TYPE
+        SYNTAX      Unsigned32(0..5000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This object indicates the number of ports associated with the license."
+        DEFVAL { 0 }
+        ::= { cerCardDataEntry 31 }
+
+cerCardDataLicenseDate OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This object indicates the date associated with the license."
+        DEFVAL { '0000000000000000'H }
+        ::= { cerCardDataEntry 32 }
+
+cerCardDataPatchVersions OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the patch version(s) running on the card. "
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 33 }
+
+cerCardDataPicModelName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the model name of the PIC. "
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 34 }
+
+cerCardDataPicMfgRevision OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the manufacture revision of the PIC. "
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 35 }
+
+cerCardDataPicMfg OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This is the manufacturer of the PIC. "
+        DEFVAL { "" }
+        ::= { cerCardDataEntry 36 }
+
+cerCardDataPicMfgDateTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This object indicates the date associated with the PIC."
+        DEFVAL { '0000000000000000'H }
+        ::= { cerCardDataEntry 37 }
 
 --
--- Port table
+-- Port table is removed, , this MIB table is only supported by C4 CMTS
+--        ::= { equipmentTbl 3 }
+
 --
-portTable OBJECT-TYPE
-        SYNTAX  SEQUENCE OF PortEntry
+-- CER Port table
+--
+cerPortTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CerPortEntry
         MAX-ACCESS      not-accessible
         STATUS  current
         DESCRIPTION
-            "A table of Ports information."
-        ::= { equipmentTbl 3 }
+            "A table of Port information."
+        ::= { equipmentTbl 13 }
 
-portEntry OBJECT-TYPE
-        SYNTAX  PortEntry
+cerPortEntry OBJECT-TYPE
+        SYNTAX  CerPortEntry
         MAX-ACCESS      not-accessible
         STATUS  current
         DESCRIPTION
-            "A conceptual row containing pertinent information about a port 
+            "A conceptual row containing pertinent information about a cerPort 
              owned by a card."
-        INDEX   { portShelfId, portCardId, portId }
-        ::= { portTable 1 }
+        INDEX   { cerPortCardId, cerPortId }
+        ::= { cerPortTable 1 }
         
-PortEntry ::= SEQUENCE {
-                portShelfId             ShelfId,
-                portCardId              CardId,
-                portId                  PortId,
-                portType                PortType,
-                portAdminState          AdminState,
-                portPrState             PrimaryState,
-                portSecState            SecondaryState,
-                portDplxStatus          DuplexStatus,
-                portAction              EqActionType,
-                portTrapInh             BITS,
-                portNumChans            Integer32,
-                portDocsIfIndex         InterfaceIndexOrZero,
-                portMacAddress          MacAddress,
-                portMode                PortMode,
-                portDetectedMode        PortDetectedMode,
-                portBgpId               Integer32,
-                portConnectorId         PortId,
-                portCardSubType         CardSubType,
-                portDescription         DisplayString,
-                portCurrDsPower         TenthdBmV,
-                portMinDsPower          TenthdBmV,
-                portMaxDsPower          TenthdBmV,
-                portTxFlowControlMode   FlowControlMode,
-                portRxFlowControlMode   FlowControlMode,
-                portTxFlowControlDetected    FlowControlMode,
-                portRxFlowControlDetected    FlowControlMode,
-                portMacIfIndex          InterfaceIndexOrZero
+CerPortEntry ::= SEQUENCE {
+                cerPortCardId              CardId,
+                cerPortId                  PortId,
+                cerPortType                CerPortType,
+                cerPortAdminState          AdminState,
+                cerPortPrState             PrimaryState,
+                cerPortSecState            SecondaryState,
+                cerPortDplxStatus          DuplexStatus,
+                cerPortAction              EqActionType,
+                cerPortTrapInh             BITS,
+                cerPortNumChans            Integer32,
+                cerPortDocsIfIndex         InterfaceIndexOrZero,
+                cerPortMacAddress          MacAddress,
+                cerPortMode                PortMode,
+                cerPortDetectedMode        PortDetectedMode,
+                cerPortBgpId               Integer32,
+                cerPortConnectorId         PortId,
+                cerPortCardSubType         CerCardSubType,
+                cerPortDescription         DisplayString,
+                cerPortCurrDsPower         TenthdBmV,
+                cerPortMinDsPower          TenthdBmV,
+                cerPortMaxDsPower          TenthdBmV,
+                cerPortTxFlowControlMode   FlowControlMode,
+                cerPortRxFlowControlMode   FlowControlMode,
+                cerPortTxFlowControlDetected    FlowControlMode,
+                cerPortRxFlowControlDetected    FlowControlMode,
+                cerPortMacIfIndex          InterfaceIndexOrZero,
+                cerPortGroupId             PortId,
+                cerPortGroupPortId         PortId
         }
 
-portShelfId OBJECT-TYPE
-        SYNTAX  ShelfId
-        MAX-ACCESS  read-only
-        STATUS      deprecated
-        DESCRIPTION
-                "The unique id of the shelf this port belongs to."
-        ::= { portEntry 1 }
-
-portCardId OBJECT-TYPE
+cerPortCardId OBJECT-TYPE
         SYNTAX  CardId
         MAX-ACCESS      not-accessible
         STATUS  current
         DESCRIPTION
-            "The unique id of the card this port belongs to."
-        ::= { portEntry 2 }
+            "The unique id of the card this cerPort belongs to."
+        ::= { cerPortEntry 2 }
 
-portId OBJECT-TYPE
+cerPortId OBJECT-TYPE
         SYNTAX PortId
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-            "The unique id of this port within a card.
-             the shelfId, the cardId and portId uniquely identify a port "   
-        ::= { portEntry 3 }
+            "The unique id of this cerPort within a card.
+             the the cardId and cerPortId uniquely identify a port "   
+        ::= { cerPortEntry 3 }
 
-portType OBJECT-TYPE
-        SYNTAX  PortType
-        MAX-ACCESS      read-only
+cerPortType OBJECT-TYPE
+        SYNTAX  CerPortType
+        MAX-ACCESS      read-write
         STATUS  current
         DESCRIPTION
-             " Type of this port. "
-        ::= { portEntry 4 }
+             " Type of this cerPort. "
+        ::= { cerPortEntry 4 }
 
-portAdminState OBJECT-TYPE
+cerPortAdminState OBJECT-TYPE
         SYNTAX  AdminState
         MAX-ACCESS      read-write
         STATUS  current
         DESCRIPTION
-            "The Admin state of this port"
-        ::= { portEntry 6 }
+            "The Admin state of this cerPort"
+        ::= { cerPortEntry 6 }
 
-portPrState OBJECT-TYPE
+cerPortPrState OBJECT-TYPE
         SYNTAX  PrimaryState
         MAX-ACCESS      read-only
         STATUS  current
         DESCRIPTION
-            "The primary state of this port"
-        ::= { portEntry 7 }
+            "The primary state of this cerPort"
+        ::= { cerPortEntry 7 }
 
-portSecState OBJECT-TYPE
+cerPortSecState OBJECT-TYPE
         SYNTAX  SecondaryState
         MAX-ACCESS      read-only
         STATUS  current
         DESCRIPTION
-            "The secondary state of this port"
-        ::= { portEntry 8 }
+            "The secondary state of this cerPort"
+        ::= { cerPortEntry 8 }
 
-portDplxStatus OBJECT-TYPE
+cerPortDplxStatus OBJECT-TYPE
         SYNTAX  DuplexStatus
         MAX-ACCESS      read-only
         STATUS  current
         DESCRIPTION
             "The port Duplexing status."
-        ::= { portEntry 9 }
+        ::= { cerPortEntry 9 }
 
-portAction OBJECT-TYPE
+cerPortAction OBJECT-TYPE
         SYNTAX EqActionType
         MAX-ACCESS      read-write
         STATUS  current
         DESCRIPTION
             " Write-only action performed on a Port. "
-        ::= { portEntry 11 }
+        ::= { cerPortEntry 11 }
 
-portTrapInh OBJECT-TYPE
-    SYNTAX      BITS { primary(0), secondary(1), duplex(2), 
-                    linkUpLinkDown(3) }
+cerPortTrapInh OBJECT-TYPE
+    SYNTAX      BITS { primary(0), secondary(1), duplex(2), linkUpLinkDown(3) }
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
             " If a bit is set, the corresponding state change trap
             will not be sent. "
-        ::= { portEntry 12 }
+        ::= { cerPortEntry 12 }
 
-portNumChans OBJECT-TYPE
+cerPortNumChans OBJECT-TYPE
         SYNTAX Integer32 (0..50)
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            " Number of channels this port contains. "
-        ::= { portEntry 13 }
+            " Number of channels this cerPort contains. "
+        ::= { cerPortEntry 13 }
 
-portDocsIfIndex OBJECT-TYPE
+cerPortDocsIfIndex OBJECT-TYPE
         SYNTAX InterfaceIndexOrZero
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            " This object is here just in case a Port component does
-            have a one to one correspondent with the IfTable. Example: D card
-            in Cadant's CMTS system contains 8 ports, 1 for downstream channel and
-            up to 3 upstream channels. Each channel will correspond to an ifIndex as
-            specified in the ipcdn-rf-interface-mib. In this case, this object MUST
-            have the same value as of ifIndex. A -1 indicates that this port does not
-            have an association in the Iftable. "
-        ::= { portEntry 14 }
+            " This object indicates the location of an interface in the
+            cerPort table that represents this port.  A value of 0 indicates that 
+            this cerPort does not have an association in the Iftable. "
+        ::= { cerPortEntry 14 }
 
-portMacAddress OBJECT-TYPE
+cerPortMacAddress OBJECT-TYPE
         SYNTAX MacAddress
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
             " The physical address value for this card. This value is used to
             populate the ifPhysAddress field in the IfTable and other Tables in docsis RFC MIBs."           
-        ::= { portEntry 15 }
+        ::= { cerPortEntry 15 }
 
-portMode OBJECT-TYPE
+cerPortMode OBJECT-TYPE
         SYNTAX PortMode
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            " The desired operating mode of an ethernet port. Not yet implemented. "
+            " The desired operating mode of an ethernet cerPort. Not yet implemented. "
         DEFVAL { autoNegotiate }
-        ::= { portEntry 16 }
+        ::= { cerPortEntry 16 }
 
-portDetectedMode OBJECT-TYPE
+cerPortDetectedMode OBJECT-TYPE
         SYNTAX PortDetectedMode
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            " The current operating mode of an ethernet port. "
-        ::= { portEntry 17 }
+            " The current operating mode of an ethernet cerPort. "
+        ::= { cerPortEntry 17 }
 
 
-portBgpId OBJECT-TYPE
+cerPortBgpId OBJECT-TYPE
         SYNTAX Integer32 (-2147483647..2147483647)
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            " The bridge group port id for this port. "
-        ::= { portEntry 19 }
+            " The bridge group cerPort id for this port. "
+        ::= { cerPortEntry 19 }
 
-portConnectorId OBJECT-TYPE
+cerPortConnectorId OBJECT-TYPE
         SYNTAX PortId
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            " For portType = uport, the rear pic connector this port is mapped to.
-            Otherwise, the value of this object is invalid(99). "
-        DEFVAL { 99 }
-        ::= { portEntry 20 }
+            " For a DOCSIS or EQAM type port, this is the rear PIC connector.
+              Otherwise, the value of this object is invalid."
+        DEFVAL { 0 }
+        ::= { cerPortEntry 20 }
 
-portCardSubType OBJECT-TYPE
-        SYNTAX CardSubType
+cerPortCardSubType OBJECT-TYPE
+        SYNTAX CerCardSubType
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            " The CardSubType of the card this port belongs to."
-        ::= { portEntry 21 }
+            " The CardSubType of the card this cerPort belongs to."
+        ::= { cerPortEntry 21 }
 
-portDescription OBJECT-TYPE
+cerPortDescription OBJECT-TYPE
         SYNTAX      DisplayString (SIZE(0..64))
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
             " A persistent copy of ifAlias for this interface."
-        ::= { portEntry 27 }
+        ::= { cerPortEntry 27 }
 
-portCurrDsPower OBJECT-TYPE
+cerPortCurrDsPower OBJECT-TYPE
         SYNTAX      TenthdBmV 
         MAX-ACCESS  read-only
         STATUS      current
@@ -1114,229 +1511,239 @@ portCurrDsPower OBJECT-TYPE
             " The latest downstream power level reported by the port.
               This is valid on for ports of type dport."
         DEFVAL { 0 }
-        ::= { portEntry 28 }
+        ::= { cerPortEntry 28 }
 
-portMinDsPower OBJECT-TYPE
+cerPortMinDsPower OBJECT-TYPE
         SYNTAX      TenthdBmV 
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            " The latest downstream power level reported by the port.
-              This is valid on for ports of type dport."
+            " The latest downstream power level recerPorted by the port.
+              This is valid only for downstream ports."
         DEFVAL { 0 }
-        ::= { portEntry 29 }
+        ::= { cerPortEntry 29 }
 
-portMaxDsPower OBJECT-TYPE
+cerPortMaxDsPower OBJECT-TYPE
         SYNTAX      TenthdBmV 
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            " The latest downstream power level reported by the port.
-              This is valid on for ports of type dport."
+            " The latest downstream power level recerPorted by the port.
+              This is valid only for downstream ports."
         DEFVAL { 0 }
-        ::= { portEntry 30 }
+        ::= { cerPortEntry 30 }
 
-portTxFlowControlMode OBJECT-TYPE
+cerPortTxFlowControlMode OBJECT-TYPE
         SYNTAX      FlowControlMode 
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
             " The transmit flow control settings for this port (network ports only)."
         DEFVAL { desired }
-        ::= { portEntry 31 }
+        ::= { cerPortEntry 31 }
 
-portRxFlowControlMode OBJECT-TYPE
+cerPortRxFlowControlMode OBJECT-TYPE
         SYNTAX      FlowControlMode 
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
             " The receive flow control settings for this port (network ports only)."
         DEFVAL { desired }
-        ::= { portEntry 32 }
+        ::= { cerPortEntry 32 }
 
-portTxFlowControlDetected OBJECT-TYPE
+cerPortTxFlowControlDetected OBJECT-TYPE
         SYNTAX      FlowControlMode 
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            " The reported transmit flow control settings for this port (network ports only)."
+            " The recerPorted transmit flow control settings for this port (network ports only)."
         DEFVAL { unknown }
-        ::= { portEntry 33 }
+        ::= { cerPortEntry 33 }
 
-portRxFlowControlDetected OBJECT-TYPE
+cerPortRxFlowControlDetected OBJECT-TYPE
         SYNTAX      FlowControlMode 
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            " The reported receive flow control settings for this port (network ports only)."
+            " The recerPorted receive flow control settings for this port (network ports only)."
         DEFVAL { unknown }
-        ::= { portEntry 34 }
+        ::= { cerPortEntry 34 }
 
-portMacIfIndex OBJECT-TYPE
+cerPortMacIfIndex OBJECT-TYPE
         SYNTAX      InterfaceIndexOrZero 
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            " The MAC IfIndex currently associcated with the RF port."
+            " The MAC IfIndex currently associcated with the upstream or downstream port."
         DEFVAL { 0 }
-        ::= { portEntry 35 }
+        ::= { cerPortEntry 35 }
 
+cerPortGroupId OBJECT-TYPE
+        SYNTAX PortId
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The unique id of port group associated with this port."
+        ::= { cerPortEntry 36 }
+
+cerPortGroupPortId OBJECT-TYPE
+        SYNTAX PortId
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The unique id of this port in the port group."
+        ::= { cerPortEntry 37 }
+
+--
+-- Disk volume table is removed, this MIB table is only supported by C4 CMTS
+-- ::= { equipmentTbl 4 } 
 
 
 --
--- Disk volume tables
+-- CER Disk volume table
 --
-diskVolumeTable OBJECT-TYPE
-        SYNTAX  SEQUENCE OF DiskVolumeEntry
+cerDiskVolumeTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CerDiskVolumeEntry
         MAX-ACCESS      not-accessible
         STATUS  current
         DESCRIPTION
                 "A table of disk volume information."
-        ::= { equipmentTbl 4 }
+        ::= { equipmentTbl 14 }
 
-diskVolumeEntry OBJECT-TYPE
-        SYNTAX  DiskVolumeEntry
+cerDiskVolumeEntry OBJECT-TYPE
+        SYNTAX  CerDiskVolumeEntry
         MAX-ACCESS      not-accessible
         STATUS  current
         DESCRIPTION
             "A conceptual row containing pertinent information about a disk volume "
-        INDEX   { diskVolumeShelfId, diskVolumeCardId, diskVolumeDriveId, diskVolumeId }
-        ::= { diskVolumeTable 1 }
+        INDEX   { cerDiskVolumeCardId, cerDiskVolumeDriveId, cerDiskVolumeId }
+        ::= { cerDiskVolumeTable 1 }
         
-DiskVolumeEntry ::= SEQUENCE {
-                diskVolumeShelfId                 ShelfId,
-                diskVolumeCardId                  CardId,
-                diskVolumeDriveId                 Integer32,
-                diskVolumeId                      Integer32,
-                diskVolumeName                    DisplayString,
-                diskVolumeSize                    Integer32,
-                diskVolumeUsageLevel              DiskVolumeUsageLevel,
-                diskVolumeUsagePercentage         Integer32,
-                diskVolumeUsageCriticalThreshold  Integer32,
-                diskVolumeUsageMajorThreshold     Integer32,
-                diskVolumeUsageMinorThreshold     Integer32,
-                diskVolumeAutoDeleteUnusedFile    TruthValue,
-                diskVolumeTrapInh                 BITS,
-                diskVolumeDiskSize                Integer32
+CerDiskVolumeEntry ::= SEQUENCE {
+                cerDiskVolumeCardId                  CardId,
+                cerDiskVolumeDriveId                 Integer32,
+                cerDiskVolumeId                      Integer32,
+                cerDiskVolumeName                    DisplayString,
+                cerDiskVolumeSize                    Integer32,
+                cerDiskVolumeUsageLevel              DiskVolumeUsageLevel,
+                cerDiskVolumeUsagePercentage         Integer32,
+                cerDiskVolumeUsageCriticalThreshold  Integer32,
+                cerDiskVolumeUsageMajorThreshold     Integer32,
+                cerDiskVolumeUsageMinorThreshold     Integer32,
+                cerDiskVolumeAutoDeleteUnusedFile    TruthValue,
+                cerDiskVolumeTrapInh                 BITS,
+                cerDiskVolumeDiskSize                Integer32
                 }
 
-diskVolumeShelfId OBJECT-TYPE
-        SYNTAX  ShelfId
-        MAX-ACCESS  read-only
-        STATUS      deprecated
-        DESCRIPTION
-            "The unique id of the shelf this disk volume belongs to."
-        ::= { diskVolumeEntry 1 }
-
-diskVolumeCardId OBJECT-TYPE
+cerDiskVolumeCardId OBJECT-TYPE
         SYNTAX  CardId
         MAX-ACCESS      not-accessible
         STATUS  current
         DESCRIPTION
             "The unique id of the card this disk volume belongs to."
-        ::= { diskVolumeEntry 2 }
+        ::= { cerDiskVolumeEntry 2 }
 
-diskVolumeDriveId OBJECT-TYPE
+cerDiskVolumeDriveId OBJECT-TYPE
         SYNTAX Integer32 (1..99)
         MAX-ACCESS     not-accessible
         STATUS  current
         DESCRIPTION
             "The unique id of the disk drive this disk volume belongs to.
              A value of 99 indicates an invalid disk drive"
-        ::= { diskVolumeEntry 3 }
+        ::= { cerDiskVolumeEntry 3 }
 
-diskVolumeId OBJECT-TYPE
+cerDiskVolumeId OBJECT-TYPE
         SYNTAX Integer32 (1..99)
         MAX-ACCESS     not-accessible
         STATUS  current
         DESCRIPTION
             "The unique id of this disk volume.
-             the diskVolumeShelfId, the diskVolumeCardId, the diskVolumeDiskId, 
+             the cerDiskVolumeCardId, the diskVolumeDiskId, 
              and the. A value of 99 indicate an invalid volume "
-        ::= { diskVolumeEntry 4 }
+        ::= { cerDiskVolumeEntry 4 }
 
-diskVolumeName OBJECT-TYPE
+cerDiskVolumeName OBJECT-TYPE
         SYNTAX      DisplayString
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
             "The name of the disk volume."
-        ::= { diskVolumeEntry 5 }
+        ::= { cerDiskVolumeEntry 5 }
 
-diskVolumeSize OBJECT-TYPE
+cerDiskVolumeSize OBJECT-TYPE
         SYNTAX      Integer32
         UNITS       "bytes"
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The disk volume size in units of 512 bytes."
-        ::= { diskVolumeEntry 6 }
+            "The disk volume size in units of 2048 bytes."
+        ::= { cerDiskVolumeEntry 6 }
 
-diskVolumeUsageLevel OBJECT-TYPE
+cerDiskVolumeUsageLevel OBJECT-TYPE
         SYNTAX      DiskVolumeUsageLevel
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
             "The disk volume usage level."
-        ::= { diskVolumeEntry 7 }
+        ::= { cerDiskVolumeEntry 7 }
 
-diskVolumeUsagePercentage OBJECT-TYPE
+cerDiskVolumeUsagePercentage OBJECT-TYPE
         SYNTAX      Integer32 (0..100)
         UNITS       "percent"
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
             "The disk volume usage percentage."
-        ::= { diskVolumeEntry 8 }
+        ::= { cerDiskVolumeEntry 8 }
 
-diskVolumeUsageCriticalThreshold OBJECT-TYPE
+cerDiskVolumeUsageCriticalThreshold OBJECT-TYPE
         SYNTAX      Integer32 (0..100)
         UNITS       "percent"
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
             "Usage percentage level when exceed will cause a
-             diskVolumeUsageNotification trap to be sent with 
-             diskVolumeUsageLevel of diskVolumeUsageCritical."
+             cerDiskVolumeUsageNotification trap to be sent with 
+             cerDiskVolumeUsageLevel of diskVolumeUsageCritical."
         DEFVAL { 90 }
-        ::= { diskVolumeEntry 9 }
+        ::= { cerDiskVolumeEntry 9 }
 
-diskVolumeUsageMajorThreshold OBJECT-TYPE
+cerDiskVolumeUsageMajorThreshold OBJECT-TYPE
         SYNTAX      Integer32 (0..100)
         UNITS       "percent"
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
             "Usage percentage level when exceed will cause a
-             diskVolumeUsageNotification trap to be sent with 
-             diskVolumeUsageLevel of diskVolumeUsageMajor."
+             cerDiskVolumeUsageNotification trap to be sent with 
+             cerDiskVolumeUsageLevel of diskVolumeUsageMajor."
         DEFVAL { 80 }
-        ::= { diskVolumeEntry 10 }
+        ::= { cerDiskVolumeEntry 10 }
 
-diskVolumeUsageMinorThreshold OBJECT-TYPE
+cerDiskVolumeUsageMinorThreshold OBJECT-TYPE
         SYNTAX      Integer32 (0..100)
         UNITS       "percent"
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
             "Usage percentage level when exceed will cause a
-             diskVolumeUsageNotification trap to be sent with 
-             diskVolumeUsageLevel of diskVolumeUsageMinor."
+             cerDiskVolumeUsageNotification trap to be sent with 
+             cerDiskVolumeUsageLevel of diskVolumeUsageMinor."
         DEFVAL { 70 }
-        ::= { diskVolumeEntry 11 }
+        ::= { cerDiskVolumeEntry 11 }
 
-diskVolumeAutoDeleteUnusedFile OBJECT-TYPE
+cerDiskVolumeAutoDeleteUnusedFile OBJECT-TYPE
         SYNTAX      TruthValue
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
             "When set to TRUE to the system will automatically delete 
-             unused files when diskVolumeUsage exceed the 
-             diskVolumeUsageCriticalThreshold value."
+             unused files when cerDiskVolumeUsage exceed the 
+             cerDiskVolumeUsageCriticalThreshold value."
         DEFVAL { false }
-        ::= { diskVolumeEntry 12 }
+        ::= { cerDiskVolumeEntry 12 }
 
-diskVolumeTrapInh OBJECT-TYPE
+cerDiskVolumeTrapInh OBJECT-TYPE
         SYNTAX      BITS { criticalUsageLevel(0), majorUsageLevel(1), 
                            minorUsageLevel(2), autoDeleteFiles(3) }
         MAX-ACCESS read-write
@@ -1345,9 +1752,9 @@ diskVolumeTrapInh OBJECT-TYPE
             "If a bit is set, the corresponding trap
              will not be sent. "
         DEFVAL      { {} }
-        ::= { diskVolumeEntry 13 }
+        ::= { cerDiskVolumeEntry 13 }
 
-diskVolumeDiskSize OBJECT-TYPE
+cerDiskVolumeDiskSize OBJECT-TYPE
         SYNTAX      Integer32
         UNITS       "bytes"
         MAX-ACCESS  read-only
@@ -1355,16 +1762,222 @@ diskVolumeDiskSize OBJECT-TYPE
         DESCRIPTION
             "Total physical disk capacity in bytes."
         DEFVAL { 0 }
-        ::= { diskVolumeEntry 14 }
+        ::= { cerDiskVolumeEntry 14 }
 
-diskVolumeFileName  OBJECT-TYPE
+cerDiskVolumeFileName  OBJECT-TYPE
         SYNTAX      DisplayString
         MAX-ACCESS  accessible-for-notify
         STATUS      current
         DESCRIPTION
             "The name of a file on the disk volume use for trap notification."
-        ::= { equipmentTbl 5 }
+        ::= { equipmentTbl 15 }
 
+--
+-- CER fan speed table
+--
+cerFanStatusTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CerFanStatusEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Status information for the E6 fans."
+        ::= { equipmentTbl 17 }
+
+cerFanStatusEntry OBJECT-TYPE
+        SYNTAX  CerFanStatusEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A conceptual row containing information about one of the fans."
+        INDEX   { cerCardId }
+        ::= { cerFanStatusTable 1 }
+        
+CerFanStatusEntry ::= SEQUENCE {
+                cerFan1Speed        Integer32,
+                cerFan2Speed        Integer32,
+                cerFan3Speed        Integer32,
+                cerFanLevel         Integer32,
+                cerFanAmbientTemperature    Integer32
+                }
+
+cerFan1Speed OBJECT-TYPE
+        SYNTAX  Integer32(0..2147483647)
+        UNITS "rpm"
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "The last measured speed of fan1."
+        DEFVAL { 0 }
+        ::= { cerFanStatusEntry 1 }
+
+cerFan2Speed OBJECT-TYPE
+        SYNTAX  Integer32(0..2147483647)
+        UNITS "rpm"
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "The last measured speed of fan2."
+        DEFVAL { 0 }
+        ::= { cerFanStatusEntry 2 }
+
+cerFan3Speed OBJECT-TYPE
+        SYNTAX  Integer32(0..2147483647)
+        UNITS "rpm"
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "The last measured speed of fan3."
+        DEFVAL { 0 }
+        ::= { cerFanStatusEntry 3 }
+
+cerFanLevel OBJECT-TYPE
+        SYNTAX  Integer32(0..255)
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "The last measured speed level of fans."
+        DEFVAL { 0 }
+        ::= { cerFanStatusEntry 4 }
+
+cerFanAmbientTemperature OBJECT-TYPE
+        SYNTAX  Integer32
+        UNITS   "degrees C"
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "The last measured ambient temperature of fans."
+        DEFVAL { 0 }
+        ::= { cerFanStatusEntry 5 }
+--
+-- CER PEM Status table
+--
+cerPemStatusTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CerPemStatusEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+                "PEM Status information for the E6 power modules."
+        ::= { equipmentTbl 18 }
+
+cerPemStatusEntry OBJECT-TYPE
+        SYNTAX  CerPemStatusEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A conceptual row containing information about one of the power modules."
+        INDEX   { cerCardId }
+        ::= { cerPemStatusTable 1 }
+        
+CerPemStatusEntry ::= SEQUENCE {
+                cerPemLedStatus                 INTEGER,
+                cerPemFeed1Voltage              Integer32,
+                cerPemFeed1Current              Integer32,
+                cerPemFeed2Voltage              Integer32,
+                cerPemFeed2Current              Integer32,
+                cerPemFeed1Present              TruthValue,
+                cerPemFeed2Present              TruthValue,
+                cerPemCircuitBreaker1Enable     TruthValue,
+                cerPemCircuitBreaker2Enable     TruthValue,
+                cerPemBranchPresent             BITS
+                }
+
+cerPemLedStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    normal(1),
+                    alarm(2)
+                }
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "LED status of the PEM"
+        ::= { cerPemStatusEntry 1 }
+
+cerPemFeed1Voltage OBJECT-TYPE
+        SYNTAX  Integer32
+        UNITS   "decivolt"
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "Feed 1 voltage"
+        ::= { cerPemStatusEntry 2 }
+
+cerPemFeed1Current OBJECT-TYPE
+        SYNTAX  Integer32
+        UNITS   "deciiamp"
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "Feed 1 current"
+        ::= { cerPemStatusEntry 3 }
+
+cerPemFeed2Voltage OBJECT-TYPE
+        SYNTAX  Integer32
+        UNITS   "decivolt"
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "Feed 2 voltage"
+        ::= { cerPemStatusEntry 4 }
+
+cerPemFeed2Current OBJECT-TYPE
+        SYNTAX  Integer32
+        UNITS   "deciamp"
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "Feed 2 current"
+        ::= { cerPemStatusEntry 5 }
+
+cerPemFeed1Present OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "Feed 1 presence"
+        ::= { cerPemStatusEntry 6 }
+
+cerPemFeed2Present OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "Feed 2 presence"
+        ::= { cerPemStatusEntry 7 }
+
+cerPemCircuitBreaker1Enable OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "circuit breaker 1 presence"
+        ::= { cerPemStatusEntry 8 }
+
+cerPemCircuitBreaker2Enable OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "circuit breaker 2 presence"
+        ::= { cerPemStatusEntry 9 }
+
+cerPemBranchPresent OBJECT-TYPE
+        SYNTAX  BITS {
+                a(0),
+                b(1),
+                c(2),
+                d(3),
+                e(4),
+                f(5),
+                g(6),
+                h(7),
+                i(8)
+        }
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "brach A through I presence"
+        ::= { cerPemStatusEntry 10 } 
+                       
 --============= DIAGNOSTIC/TEST GROUP =================--
 -- This group contains objects defined for the purpose of diagnostic and test.
 -- The disctinction between diagnostic and test is that: The resource must be in
@@ -1449,11 +2062,10 @@ cardTestEntry OBJECT-TYPE
         DESCRIPTION
             "A conceptual row containing information about tests or dignostics available for
              a card. "
-        INDEX   { cardShelfTestIndex, cardTestIndex, cardTestId }
+        INDEX   { cardTestIndex, cardTestId }
         ::= { cardTestTable 1 }
         
 CardTestEntry ::= SEQUENCE {
-                cardShelfTestIndex      ShelfId,
                 cardTestIndex           CardId,
                 cardTestId              TestId,
                 cardTestName            DisplayString,
@@ -1467,14 +2079,6 @@ CardTestEntry ::= SEQUENCE {
                 cardTestResultDesc      DisplayString,
                 cardTestTransId         TestTransactionId
                 }
-
-cardShelfTestIndex OBJECT-TYPE
-        SYNTAX ShelfId
-        MAX-ACCESS  read-only
-        STATUS      deprecated
-        DESCRIPTION
-            " Shelf Identification Number taken from the Shelf Table. Used as index. "
-        ::= { cardTestEntry 1 }
 
 cardTestIndex OBJECT-TYPE
         SYNTAX CardId
@@ -1625,11 +2229,10 @@ auditEntry OBJECT-TYPE
         STATUS  current
         DESCRIPTION
             " A conceptual row contains information about Audits. "
-        INDEX   { auditShelfId, auditCardId, auditId }
+        INDEX   { auditCardId, auditId }
         ::= { auditTable 1 }
         
 AuditEntry ::= SEQUENCE {
-                auditShelfId            ShelfId,
                 auditCardId             CardId,
                 auditId                 Unsigned32,
                 auditName               DisplayString,
@@ -1644,14 +2247,6 @@ AuditEntry ::= SEQUENCE {
                 auditTotalPassedCount   Unsigned32,
                 auditTotalFailedCount   Unsigned32
                 }
-
-auditShelfId OBJECT-TYPE
-        SYNTAX      ShelfId
-        MAX-ACCESS  read-only
-        STATUS      deprecated
-        DESCRIPTION
-            " Shelf Identification Number taken from the Shelf Table. Used as index. "
-        ::= { auditEntry 1 }
 
 auditCardId OBJECT-TYPE
         SYNTAX CardId
@@ -1871,7 +2466,7 @@ fpgaErrorEventEntry OBJECT-TYPE
         STATUS  current
         DESCRIPTION
             "A conceptual row containing information about FPGA error event handling."
-        INDEX   { cardId, errEventId }
+        INDEX   { errEvCardId, errEventId }
         ::= { fpgaErrorEventTable 1 }
         
 FpgaErrorEventEntry ::= SEQUENCE {
@@ -1879,7 +2474,8 @@ FpgaErrorEventEntry ::= SEQUENCE {
                 errEvRecoveryEnabled      TruthValue,
                 errEvLoggingEnabled       TruthValue,
                 errEvLogLevel             Integer32,
-                errEvRowStatus            RowStatus
+                errEvRowStatus            RowStatus,
+                errEvCardId               CardId
                 }
 
 errEventId  OBJECT-TYPE
@@ -1937,6 +2533,128 @@ errEvRowStatus  OBJECT-TYPE
               createAndGo(4) and destroy(6). "
         ::= { fpgaErrorEventEntry 5 }
 
+errEvCardId OBJECT-TYPE
+        SYNTAX      CardId
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The unique id of this card within the shelf. "
+        ::= { fpgaErrorEventEntry 6 }
+
+--
+-- Card sparing mode event override extension
+--
+cerSpareModeExt OBJECT IDENTIFIER
+    ::= { cadEquipmentMib 11 }
+
+cerSpareModeExtTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CerSpareModeExtEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Allows overriding the configured sparing mode for a spare group
+             based on the fault type that caused the sparing event."
+        ::= { cerSpareModeExt 1 }
+
+cerSpareModeExtEntry OBJECT-TYPE
+        SYNTAX  CerSpareModeExtEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A conceptual row containing information about sparing overrides for a spare group."
+        INDEX   { cerSpareModeCardId, cerSpareModeFaultId }
+        ::= { cerSpareModeExtTable 1 }
+        
+CerSpareModeExtEntry ::= SEQUENCE {
+                cerSpareModeCardId        CardId,
+                cerSpareModeFaultId       INTEGER,
+                cerSpareModeMode          INTEGER,
+                cerSpareModeRowStatus     RowStatus
+                }
+
+cerSpareModeCardId  OBJECT-TYPE
+        SYNTAX CardId
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The cardId of the spare group leader for this override."
+        ::= { cerSpareModeExtEntry 1 }
+
+cerSpareModeFaultId  OBJECT-TYPE
+        SYNTAX INTEGER {
+            none(0),
+            pingFault(1),
+            initTimeout(2),
+            ersmFault(3),
+            swException(4),
+            bcm3142Err(5),
+            dulFailure(6),
+            dataplaneFailure(7),
+            dsUnderPower(8),
+            dsOverPower(9),
+            sbecOverflow(10),
+            deviceFatal(11),
+            fpgaFatalError(12),
+            clockLost(13),
+            pwrSensorHighFault(14),
+            pwrSensorLowFault(15),
+            fpgaBufferPoolFault(16),
+            dataplaneLinkFault(17),
+            monitoredTaskFailure(18)
+        }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The fault group associated with the override behavior.
+             When an event occurs that would normally trigger a card
+             reset and a sparing event and that event is in the configured
+             fault group, the mode configured in the cerCard table is 
+             overriden.
+
+             pingFault - Communications failure with active controller
+             initTimeout - Timeout during card initialization
+             ersmFault - Card ERSM failure
+             swException - Software exception failure
+             bcm3142Err - Upstream CAM PHY device fatal fault condition
+             dulFailure - Upstream CAM periodic packet loop detected uncorrectable fault
+             dataplaneFailrue - Fatal errors originating in dataplane processor
+             dsUnderPower - Downstream CAM detected power on a connector is below operational threshold
+             dsOverPower - Downstream CAM detected power on a connector is above operational threshold
+             sbecOverflow - Excessive number of single bit ECC errors
+             deviceFatal - General device fatal error.  For example in internal datapaths or pci controller.
+             fpgaFatalError - Fatal CRC errors detected in FPGA device
+             clockLost - Loss of clock or loss of clock lock
+             pwrSensorHighFault - Detected voltage is above operational threshold
+             pwrSensorLowFault - Detected voltage is below operational threshold
+             fpgaBufferPoolFault - Number of available buffers in MAC fpga is below threshold
+             dataplaneLinkFault - Card has lost dataplane connectivity
+             monitoredTaskFailure - Monitored software task has failed"
+        ::= { cerSpareModeExtEntry 2 }
+
+cerSpareModeMode OBJECT-TYPE
+        SYNTAX INTEGER {
+            invalid(0),
+            manual(1),
+            auto(2)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            " The sparing mode that should be enforced when an error in the
+              configured catagory occurs that results in a sparing event."
+        DEFVAL { invalid }
+        ::= { cerSpareModeExtEntry 3 }
+
+cerSpareModeRowStatus  OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            " The only set actions supported on this table are
+              createAndGo(4) and destroy(6). "
+        ::= { cerSpareModeExtEntry 4 }
+
+
 --
 -- Arris Equipment MIB conformance statements
 --
@@ -1950,122 +2668,165 @@ cadEquipmentMibGroup OBJECT IDENTIFIER
     ::= { cadEquipmentMibConformance 2 }
 
 --
+-- License notifications
+-- 
+licenseError OBJECT IDENTIFIER
+    ::= { cadEquipmentMib 12 }
+
+cerLicenseTypeStr OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..40))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The license type that caused the notification."
+        ::= { licenseError 1 }
+
+--
 -- Equipment state change notifications
 -- 
-cardPrStateChange NOTIFICATION-TYPE
-        OBJECTS     { trapCounter, trapSeverity,shelfNumber, cardNumber, 
-                      cardType, cardSubType, cardPrState }
+-- cardPrStateChange NOTIFICATION-TYPE is only supported by C4 CMTS
+--        ::= { equipmentTraps 5 }
+
+-- cardSecStateChange NOTIFICATION-TYPE is only supported by C4 CMTS
+--        ::= { equipmentTraps 6 }
+
+-- cardDetectedChange NOTIFICATION-TYPE is only supported by C4 CMTS
+--        ::= { equipmentTraps 7 }         
+
+-- cardDplxStatusChange NOTIFICATION-TYPE is only supported by C4 CMTS
+--        ::= { equipmentTraps 8 }
+
+-- portPrStateChange NOTIFICATION-TYPE is only supported by C4 CMTS
+--        ::= { equipmentTraps 9 }
+
+--portSecStateChange NOTIFICATION-TYPE is only supported by C4 CMTS
+--        ::= { equipmentTraps 10 }
+
+--portDplxStatusChange NOTIFICATION-TYPE is only supported by C4 CMTS
+--        ::= { equipmentTraps 11 }
+
+cerCardPrStateChange NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, cerCardNumber, 
+                      cerCardType, cerCardSubType, cerCardPrState }
         STATUS current
         DESCRIPTION
-            " This trap is sent whenever the card's Primary
-            state changes. "
-        ::= { equipmentTraps 5 }
+            " This trap is sent whenever the card's Primary state changes. "
+        ::= { equipmentTraps 25 }
 
-cardSecStateChange NOTIFICATION-TYPE
-        OBJECTS     { trapCounter, trapSeverity,shelfNumber, cardNumber, 
-                      cardType, cardSubType, cardSecState }
+cerCardSecStateChange NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, cerCardNumber, 
+                      cerCardType, cerCardSubType, cerCardSecState }
         STATUS current
         DESCRIPTION
-            " This trap is sent whenever the card's Secondary
-            state changes. "
-        ::= { equipmentTraps 6 }
+            " This trap is sent whenever the card's Secondary state changes. "
+        ::= { equipmentTraps 26 }
 
-cardDetectedChange NOTIFICATION-TYPE
-        OBJECTS     { trapCounter, trapSeverity,shelfNumber, cardNumber, 
-                      cardDetected, cardSubDetected }
+cerCardDetectedChange NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, cerCardNumber, 
+                      cerCardDetected, cerCardSubDetected }
         STATUS current
         DESCRIPTION
             " This trap is sent whenever a new card is detected. "
-        ::= { equipmentTraps 7 }         
+        ::= { equipmentTraps 27 }         
 
-cardDplxStatusChange NOTIFICATION-TYPE
-        OBJECTS     { trapCounter, trapSeverity,shelfNumber, cardNumber, 
-                      cardType, cardSubType, cardDplxStatus }
+cerCardDplxStatusChange NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, cerCardNumber, 
+                      cerCardType, cerCardSubType, cerCardDplxStatus }
         STATUS current
         DESCRIPTION
             " This trap is sent whenever the card's Duplex
             status changes. "
-        ::= { equipmentTraps 8 }
+        ::= { equipmentTraps 28 }
 
-portPrStateChange NOTIFICATION-TYPE
-        OBJECTS     { trapCounter, trapSeverity, shelfNumber, cardNumber, 
-                      portNumber, portType, portPrState, portCardSubType, 
-                      portDocsIfIndex }
+cerPortPrStateChange NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, cerCardNumber, cerPortNumber, 
+                      cerPortType, cerPortPrState, cerPortCardSubType, cerPortDocsIfIndex }
         STATUS current
         DESCRIPTION
-            " This trap is sent whenever the port's Primary
-            state changes. "
-        ::= { equipmentTraps 9 }
+            " This trap is sent whenever the port's Primary state changes. "
+        ::= { equipmentTraps 29 }
 
-portSecStateChange NOTIFICATION-TYPE
-        OBJECTS     { trapCounter, trapSeverity, shelfNumber, cardNumber, 
-                      portNumber, portType, portSecState, portCardSubType, 
-                      portDocsIfIndex }
+cerPortSecStateChange NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, cerCardNumber, cerPortNumber, 
+                      cerPortType, cerPortSecState, cerPortCardSubType, cerPortDocsIfIndex }
         STATUS current
         DESCRIPTION
-            " This trap is sent whenever the port's Secondary
-            state changes. "
-        ::= { equipmentTraps 10 }
+            " This trap is sent whenever the port's Secondary state changes. "
+        ::= { equipmentTraps 30 }
 
-portDplxStatusChange NOTIFICATION-TYPE
-        OBJECTS     { trapCounter, trapSeverity, shelfNumber, cardNumber, 
-                      portNumber, portType, cardDplxStatus }
+cerPortDplxStatusChange NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, cerCardNumber, cerPortNumber,
+                      cerPortType, cerPortDplxStatus }
         STATUS current
         DESCRIPTION
-            " This trap is sent whenever the port's Duplex
-            status changes. "
-        ::= { equipmentTraps 11 }
+            " This trap is sent whenever the port's Duplex status changes. "
+        ::= { equipmentTraps 31 }
 
 cardTestResultNotification NOTIFICATION-TYPE
-        OBJECTS     { trapCounter, trapSeverity,shelfNumber, cardNumber, 
+        OBJECTS     { trapCounter, trapSeverity, cerCardNumber, 
                       diagTestId, cardTestName, cardTestResult, 
                       cardTestResultDesc, cardTestTransId }
         STATUS current
         DESCRIPTION
             " This trap is sent when a test or diagnostic completed on a card. "
-        ::= { equipmentTraps 13 }
+        ::= { equipmentTraps 33 }
 
+--
+-- Cablemodem reset definition
+--
 cmResetClearNotification        NOTIFICATION-TYPE
         OBJECTS     { trapCounter, systemClock, trapSeverity, cmMacAddress, 
-                      cmUChannelID, cardNumber }
+                      cmUChannelID, cerCardNumber }
         STATUS current
         DESCRIPTION
             " This trap is sent when a CM is on-line from previous flap."
         ::= { equipmentTraps 15 }
 
---
--- Cablemodem reset definition
---
 cmResetNotification     NOTIFICATION-TYPE
         OBJECTS     { trapCounter, systemClock, trapSeverity, cmMacAddress, 
                       cmVendor, cmResetReason, cmUChannelID, cmPrimarySID, 
-                      cmResetStatus, cmResetUpTime, cardNumber, cmResetInfo }
+                      cmResetStatus, cmResetUpTime, cerCardNumber, cmResetInfo }
         STATUS current
         DESCRIPTION
             " This trap is sent when a CM is reset."
         ::= { equipmentTraps 16 }
 
-diskVolumeUsageNotification NOTIFICATION-TYPE
-        OBJECTS     { trapCounter, trapSeverity, shelfNumber, cardNumber, 
-                      diskDriveNumber, diskVolumeNumber, 
-                      diskVolumeUsageLevel, diskVolumeName }
+
+
+--
+-- Disk usage notifications
+--
+
+cerDiskVolumeUsageNotification NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, cerCardNumber, 
+                      cerDiskDriveNumber, cerDiskVolumeNumber, 
+                      cerDiskVolumeUsageLevel, cerDiskVolumeName }
         STATUS current
         DESCRIPTION
             "This trap is sent when a disk volume usage level 
              exceed a disk usage threshold."
-        ::= { equipmentTraps 17 }
+        ::= { equipmentTraps 35 }
 
-diskVolumeAutoDeleteFileNotification NOTIFICATION-TYPE
-        OBJECTS     { trapCounter, trapSeverity, shelfNumber, cardNumber, 
-                      diskDriveNumber, diskVolumeNumber, diskVolumeName, 
-                      diskVolumeFileName }
+cerDiskVolumeAutoDeleteFileNotification NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, cerCardNumber, 
+                      cerDiskDriveNumber, cerDiskVolumeNumber, 
+                      cerDiskVolumeName, cerDiskVolumeFileName }
         STATUS current
         DESCRIPTION
             "This trap is sent when a file is automatically
              deleted by the system in respond to disk volume
              usage exceed critical thresholh."
-        ::= { equipmentTraps 18 }
+        ::= { equipmentTraps 36 }
 
+-- diskVolumeUsageNotification NOTIFICATION-TYPE  already used by C4 CMTS
+--        ::= { equipmentTraps 37 }
+
+-- diskVolumeAutoDeleteFileNotification NOTIFICATION-TYPE already used by C4 CMTS
+--        ::= { equipmentTraps 38 }
+
+--
+-- Card temperature notifications
+--
 cardTempOutOfRangeNotification NOTIFICATION-TYPE
         OBJECTS     { trapCounter, trapSeverity, cardNumber }
         STATUS current
@@ -2087,8 +2848,11 @@ cardTempOverHeatNotification NOTIFICATION-TYPE
             "This trap is sent when the card is overheat, card is being shut down."
         ::= { equipmentTraps 21 }
 
+--
+-- Downstream power notifications
+--
 downstreamPowerLoss NOTIFICATION-TYPE
-    OBJECTS     { trapCounter, trapSeverity, cardNumber, portNumber }
+        OBJECTS     { trapCounter, trapSeverity, cardNumber, portNumber }
         STATUS current
         DESCRIPTION
             " This trap is sent when c4 detects the loss of downstream power."
@@ -2104,6 +2868,70 @@ cmRegistrationNotification      NOTIFICATION-TYPE
         DESCRIPTION
             " This trap is sent when a CM is registered."
         ::= { equipmentTraps 23 }
+
+--
+-- insufficient license level notifications
+--
+noLicenseNotification NOTIFICATION-TYPE
+        OBJECTS     { trapCounter, trapSeverity, cerCardNumber, cerPortNumber, 
+                      cerPortType, cerPortCardSubType, cerPortDocsIfIndex, cerLicenseTypeStr }
+        STATUS current
+        DESCRIPTION
+            " This trap is sent when a channel cannot be activated due to insufficient license level."
+        ::= { equipmentTraps 24 }
+
+--
+-- CAM fault Notification
+-- 
+cerCamFaultInfo OBJECT IDENTIFIER ::= { equipmentTraps 40 }
+
+cerCamFaultId         OBJECT-TYPE
+        SYNTAX        CerCamFaultTrapType
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+          "Type of CAM fault trigging the trap."
+    ::= {  cerCamFaultInfo 1 }
+
+cerCamFaultRecovery   OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "True if recovery for this event is enabled."
+        ::= { cerCamFaultInfo 2 }    
+
+cerCamFaultAutoFailback  OBJECT-TYPE
+        SYNTAX           TruthValue
+        MAX-ACCESS       accessible-for-notify
+        STATUS           current
+        DESCRIPTION
+            "True if autofailback is enabled and the maximum failbacks have
+             not occurred."
+        ::= { cerCamFaultInfo 3 }    
+
+cerCamFaultErrorStr   OBJECT-TYPE
+        SYNTAX         DisplayString (SIZE(0..100))
+        MAX-ACCESS     accessible-for-notify
+        STATUS         current
+        DESCRIPTION
+          "Extra information about this error. Null string if no extra info."
+        ::= {  cerCamFaultInfo 4 }
+
+cerCamFaultNotification NOTIFICATION-TYPE
+        OBJECTS  { trapCounter, trapSeverity, 
+                   cerCamFaultId,
+                   cerCamFaultRecovery, 
+                   cerCamFaultAutoFailback,
+                   cerCardNumber,
+                   cerCardSubType,
+                   cerCamFaultErrorStr }
+        STATUS     current
+        DESCRIPTION
+            "This trap is sent when a CAM has a fault of the specified type,
+             even if fault recovery is inhibited for that fault type."
+        ::= { equipmentTraps 41 }
+
 
 --
 -- MIB conformance object groups
@@ -2132,38 +2960,52 @@ equipmentShelfGroup     OBJECT-GROUP
               objects. "
     ::= { cadEquipmentMibGroup 3 }
 
-equipmentCardGroup      OBJECT-GROUP
-        OBJECTS     { cardName, cardType, cardSubType, cardSerialNum, 
-                      cardFwVersion, cardHwVersion, cardSwVersion, 
-                      cardAdminState, cardPrState, cardSecState, 
-                      cardDplxStatus, cardAction, 
-                      cardTrapInh, cardNumPorts, cardDetected, 
-                      cardSubDetected, cardFwUpdateStatus, cardSpareGroupId, 
-                      cardSpareGroupMode, cardUpTime, cardTemperature, 
-                      cardCpuType, cardCpuSpeed, cardBusSpeed, cardRamSize, 
-                      cardFlashSize, cardCPLDVersion, cardFpgaSource, 
-                      cardBootVersion, cardLastBootVersion, 
-                      cardLastBootSource, cardPicDetected, cardPicSerialNum, 
-                      cardPicHwVersion, cardTemperatureHighWarn, cardTemperatureHighError }
+-- equipmentCardGroup      OBJECT-GROUP
+--    ::= { cadEquipmentMibGroup 4 }
+
+equipmentCerCardGroup      OBJECT-GROUP
+        OBJECTS     { cerCardName, cerCardType, cerCardSubType,
+                      cerCardAdminState, cerCardPrState, cerCardSecState, 
+                      cerCardDplxStatus, cerCardAction, 
+                      cerCardTrapInh, cerCardNumPorts, cerCardDetected, 
+                      cerCardSubDetected, cerCardFwUpdateStatus, cerCardSpareGroupId, 
+                      cerCardSpareGroupMode, cerCardUpTime, cerCardTemperature, 
+                      cerCardTemperatureHighWarn, cerCardTemperatureHighError,
+                      cerCardAnnex, cerCardNumRfConnectors, 
+                      cerCardDataSerialNum, cerCardDataFwVersion, 
+                      cerCardDataHwVersion, cerCardDataHwDeviations,
+                      cerCardDataSwVersion, cerCardDataCpuType, 
+                      cerCardDataCpuSpeed, cerCardDataBusSpeed, cerCardDataRamSize,
+                      cerCardDataNorFlashSize, cerCardDataNandFlashSize, 
+                      cerCardDataFpgaSource, cerCardDataBootVersion, 
+                      cerCardDataLastBootVersion, cerCardDataLastBootSource,
+                      cerCardDataPicSerialNum, cerCardDataPicHwVersion, 
+                      cerCardDataPicHwDeviations, cerCardDataPicModelNum, 
+                      cerCardDataMfgDateTime, cerCardDataMfg, cerCardDataProductName,
+                      cerCardDataPartModelNum, cerCardDataProductVersion, cerCardDataAssetTag,
+                      cerCardDataCommittedSwVersion, cerCardDataFeedAPresent, 
+                      cerCardDataFeedBPresent, cerCardDataAllowedPorts }
         STATUS  current
         DESCRIPTION
-            " This group contains a collection of objects general specific to Card 
-            table. "
-    ::= { cadEquipmentMibGroup 4 }
+            " This group contains a collection of objects general specific to Card tables. "
+    ::= { cadEquipmentMibGroup 14 }
 
-equipmentPortGroup      OBJECT-GROUP
-        OBJECTS     { portType, portAdminState, portPrState, portSecState, 
-                      portDplxStatus, portAction, 
-                      portTrapInh, portNumChans, portMacAddress, portMode, 
-                      portDetectedMode, portDocsIfIndex, portBgpId, 
-                      portConnectorId, portCardSubType,
-                      portDescription, portCurrDsPower, portMinDsPower, portMaxDsPower,
-                      portTxFlowControlMode, portRxFlowControlMode, 
-                      portTxFlowControlDetected, portRxFlowControlDetected }
+-- equipmentPortGroup      OBJECT-GROUP
+--    ::= { cadEquipmentMibGroup 5 }
+
+equipmentCerPortGroup      OBJECT-GROUP
+        OBJECTS     { cerPortType, cerPortAdminState, cerPortPrState, cerPortSecState, 
+                      cerPortDplxStatus, cerPortAction, 
+                      cerPortTrapInh, cerPortNumChans, cerPortMacAddress, cerPortMode, 
+                      cerPortDetectedMode, cerPortDocsIfIndex, cerPortBgpId, 
+                      cerPortConnectorId, cerPortCardSubType,
+                      cerPortDescription, cerPortCurrDsPower, cerPortMinDsPower, cerPortMaxDsPower,
+                      cerPortTxFlowControlMode, cerPortRxFlowControlMode, 
+                      cerPortTxFlowControlDetected, cerPortRxFlowControlDetected }
         STATUS  current
         DESCRIPTION
             " This group contains a collection of objects specific to Port table. "
-    ::= { cadEquipmentMibGroup 5 }
+    ::= { cadEquipmentMibGroup 15 }
 
 equipmentDiagGroup  OBJECT-GROUP
         OBJECTS     { remainInDiagMode, verboseLevel }
@@ -2193,18 +3035,21 @@ equipmentAuditGroup  OBJECT-GROUP
             " This group contains a collection of objects specific audit group. "
     ::= { cadEquipmentMibGroup 10 }
 
-diskVolumeGroup  OBJECT-GROUP
-        OBJECTS     { diskVolumeName, diskVolumeSize, diskVolumeUsageLevel, 
-                    diskVolumeUsagePercentage,
-                    diskVolumeUsageCriticalThreshold,
-                    diskVolumeUsageMajorThreshold,
-                    diskVolumeUsageMinorThreshold,
-                    diskVolumeAutoDeleteUnusedFile, diskVolumeTrapInh, 
-                    diskVolumeFileName }
+-- diskVolumeGroup  OBJECT-GROUP
+--    ::= { cadEquipmentMibGroup 11 }
+
+cerDiskVolumeGroup  OBJECT-GROUP
+        OBJECTS     { cerDiskVolumeName, cerDiskVolumeSize, cerDiskVolumeUsageLevel, 
+                    cerDiskVolumeUsagePercentage,
+                    cerDiskVolumeUsageCriticalThreshold,
+                    cerDiskVolumeUsageMajorThreshold,
+                    cerDiskVolumeUsageMinorThreshold,
+                    cerDiskVolumeAutoDeleteUnusedFile, cerDiskVolumeTrapInh, 
+                    cerDiskVolumeFileName }
         STATUS  current
         DESCRIPTION
             " This group contains a collection of objects specific to disk volume objects. "
-    ::= { cadEquipmentMibGroup 11 }
+    ::= { cadEquipmentMibGroup 21 }
 
 fpgaErrorEventGroup  OBJECT-GROUP
         OBJECTS     { errEvRecoveryEnabled, errEvLoggingEnabled, 
@@ -2222,12 +3067,13 @@ cadEquipmentMibCompliance MODULE-COMPLIANCE
 
         MODULE      -- this module
 
-        MANDATORY-GROUPS        { systemGeneralGroup, 
+        MANDATORY-GROUPS        { 
+                  systemGeneralGroup, 
                   equipmentStateGroup, equipmentShelfGroup, 
-                  equipmentCardGroup, equipmentPortGroup, 
+                  equipmentCerCardGroup, equipmentCerPortGroup, 
                   equipmentDiagGroup, equipmentCardTestGroup, 
-                  equipmentAuditGroup, 
-                  diskVolumeGroup, fpgaErrorEventGroup }
+                  cerDiskVolumeGroup, 
+                  equipmentAuditGroup, fpgaErrorEventGroup }
 
     ::= { cadEquipmentMibCompliances 1 }
 

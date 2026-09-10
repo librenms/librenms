@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class MplsSap extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $primaryKey = 'sap_id';
     public $timestamps = false;
     protected $fillable = [
@@ -29,23 +32,34 @@ class MplsSap extends DeviceRelatedModel implements Keyable
 
     /**
      * Get a string that can identify a unique instance of this model
-     *
-     * @return string
      */
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return $this->svc_oid . '-' . $this->sapPortId . '-' . $this->sapEncapValue;
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return HasMany<MplsSdpBind, $this>
+     */
     public function binds(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsSdpBind::class, 'svc_id');
+        return $this->hasMany(MplsSdpBind::class, 'svc_id');
     }
 
-    public function services(): HasMany
+    /**
+     * @return BelongsTo<MplsService, $this>
+     */
+    public function service(): BelongsTo
     {
-        return $this->hasMany(\App\Models\MplsService::class, 'svc_id');
+        return $this->belongsTo(MplsService::class, 'svc_id');
+    }
+
+    /**
+     * @return BelongsTo<Port, $this>
+     */
+    public function port(): BelongsTo
+    {
+        return $this->belongsTo(Port::class, 'ifName', 'ifName');
     }
 }

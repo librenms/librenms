@@ -1,0 +1,56 @@
+modules:
+    os:
+        hardware: ICT-INVERTER-MIB::deviceHardware.0
+        version: ICT-INVERTER-MIB::deviceFirmware.0
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: ICT-INVERTER-MIB::batteryVoltage
+                    num_oid: '.1.3.6.1.4.1.39145.12.6.{{ $index }}'
+                    descr: 'Battery Voltage (VDC)'
+                    index: 'batteryVoltage.{{ $index }}'
+                -
+                    oid: ICT-INVERTER-MIB::inverterVoltage
+                    num_oid: '.1.3.6.1.4.1.39145.12.7.{{ $index }}'
+                    descr: 'Inverter Voltage (VAC)'
+                    index: 'inverterVoltage.{{ $index }}'
+        load:
+            data:
+                -
+                    oid: ICT-INVERTER-MIB::inverterPower
+                    num_oid: '.1.3.6.1.4.1.39145.12.8.{{ $index }}'
+                    descr: 'Inverter Load'
+                    index: 'inverterPower.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: ICT-INVERTER-MIB::inverterStatus
+                    value: ICT-INVERTER-MIB::inverterStatus
+                    num_oid: '.1.3.6.1.4.1.39145.12.9.{{ $index }}'
+                    state_name: inverterStatus
+                    descr: 'Inverter Status'
+                    index: 'inverterStatus.{{ $index }}'
+                    states:
+                        - { value: 1, generic: 0, descr: enabled }
+                        - { value: 2, generic: 1, descr: disabled }
+                -
+                    oid: ICT-INVERTER-MIB::inverterControl
+                    value: ICT-INVERTER-MIB::inverterControl
+                    num_oid: '.1.3.6.1.4.1.39145.12.10.{{ $index }}'
+                    state_name: inverterControl
+                    descr: 'Inverter Control'
+                    index: 'inverterControl.{{ $index }}'
+                    states:
+                        - { value: 1, generic: 0, descr: enabled }
+                        - { value: 2, generic: 1, descr: disabled }
+                -
+                    oid: ICT-INVERTER-MIB::transferRelayStatus
+                    value: ICT-INVERTER-MIB::transferRelayStatus
+                    num_oid: '.1.3.6.1.4.1.39145.12.11.{{ $index }}'
+                    state_name: transferRelayStatus
+                    descr: 'Transfer Relay Status'
+                    index: 'transferRelayStatus.{{ $index }}'
+                    states:
+                        - { value: 1, generic: 0, descr: inverter }
+                        - { value: 2, generic: 1, descr: grid }

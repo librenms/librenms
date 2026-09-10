@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Rewrite.php
  *
@@ -25,11 +26,44 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Config;
 
 class Rewrite
 {
+    public static function ipmiSensorName(?string $hardware, string $sensor): string
+    {
+        $names = [
+            'HP ProLiant BL460c G6' => [
+                'Temp 1' => 'Ambient zone',
+                'Temp 2' => 'CPU 1',
+                'Temp 3' => 'CPU 2',
+                'Temp 4' => 'Memory zone',
+                'Temp 5' => 'Memory zone',
+                'Temp 6' => 'Memory zone',
+                'Temp 7' => 'System zone',
+                'Temp 8' => 'System zone',
+                'Temp 9' => 'System zone',
+                'Temp 10' => 'Storage zone',
+                'Power Meter' => 'Power usage',
+            ],
+            'HP ProLiant BL460c G1' => [
+                'Temp 1' => 'System zone',
+                'Temp 2' => 'CPU 1 zone',
+                'Temp 3' => 'CPU 1',
+                'Temp 4' => 'CPU 1',
+                'Temp 5' => 'CPU 2 zone',
+                'Temp 6' => 'CPU 2',
+                'Temp 7' => 'CPU 2',
+                'Temp 8' => 'Memory zone',
+                'Temp 9' => 'Ambient zone',
+                'Power Meter' => 'Power usage',
+            ],
+        ];
+
+        return $names[$hardware][$sensor] ?? $sensor;
+    }
+
     public static function normalizeIfType($type)
     {
         $rewrite_iftype = [
@@ -51,11 +85,7 @@ class Rewrite
             'propPointToPointSerial' => 'PtP Serial',
         ];
 
-        if (isset($rewrite_iftype[$type])) {
-            return $rewrite_iftype[$type];
-        }
-
-        return $type;
+        return $rewrite_iftype[$type] ?? $type;
     }
 
     public static function shortenIfType($type)
@@ -108,9 +138,11 @@ class Rewrite
         return str_ireplace(array_keys($rewrite_ifname), array_values($rewrite_ifname), $name);
     }
 
-    public static function shortenIfName($name)
+    public static function shortenIfName($name): string
     {
         $rewrite_shortif = [
+            'hundredgige' => 'Hu',
+            'twentyfivegige' => 'Twe',
             'tengigabitethernet' => 'Te',
             'ten-gigabitethernet' => 'Te',
             'tengige' => 'Te',
@@ -132,7 +164,7 @@ class Rewrite
             'bridge-aggregation' => 'BA',
         ];
 
-        return str_ireplace(array_keys($rewrite_shortif), array_values($rewrite_shortif), $name);
+        return str_ireplace(array_keys($rewrite_shortif), array_values($rewrite_shortif), (string) $name);
     }
 
     /**
@@ -142,33 +174,33 @@ class Rewrite
      * @param  bool  $short
      * @return string
      */
-    public static function ciscoHardware(&$device, $short = false)
+    public static function ciscoHardware(&$device, bool $short = false): string
     {
         if ($device['os'] == 'ios') {
-            if ($device['hardware']) {
-                if (preg_match('/^WS-C([A-Za-z0-9]+)/', $device['hardware'], $matches)) {
+            if (! empty($device['hardware'])) {
+                if (preg_match('/^WS-C([A-Za-z0-9]+)/', (string) $device['hardware'], $matches)) {
                     if (! $short) {
                         $device['hardware'] = 'Catalyst ' . $matches[1] . ' (' . $device['hardware'] . ')';
                     } else {
                         $device['hardware'] = 'Catalyst ' . $matches[1];
                     }
-                } elseif (preg_match('/^CISCO([0-9]+)(.*)/', $device['hardware'], $matches)) {
+                } elseif (preg_match('/^CISCO([0-9]+)(.*)/', (string) $device['hardware'], $matches)) {
                     if (! $short && $matches[2]) {
                         $device['hardware'] = 'Cisco ' . $matches[1] . ' (' . $device['hardware'] . ')';
                     } else {
                         $device['hardware'] = 'Cisco ' . $matches[1];
                     }
                 }
-            } elseif (preg_match('/Cisco IOS Software, C([A-Za-z0-9]+) Software.*/', $device['sysDescr'], $matches)) {
+            } elseif (preg_match('/Cisco IOS Software, C([A-Za-z0-9]+) Software.*/', (string) $device['sysDescr'], $matches)) {
                 $device['hardware'] = 'Catalyst ' . $matches[1];
-            } elseif (preg_match('/Cisco IOS Software, ([0-9]+) Software.*/', $device['sysDescr'], $matches)) {
+            } elseif (preg_match('/Cisco IOS Software, ([0-9]+) Software.*/', (string) $device['sysDescr'], $matches)) {
                 $device['hardware'] = 'Cisco ' . $matches[1];
             }
         }
 
         if ($device['os'] == 'iosxe') {
             if ($device['hardware']) {
-                if (preg_match('/CAT9K/', $device['sysDescr'], $matches) && preg_match('/^C(9[A-Za-z0-9]+)/', $device['hardware'], $matches2)) {
+                if (preg_match('/CAT9K/', (string) $device['sysDescr'], $matches) && preg_match('/^C(9[A-Za-z0-9]+)/', (string) $device['hardware'], $matches2)) {
                     if (! $short) {
                         $device['hardware'] = 'Catalyst ' . $matches2[1] . ' (' . $device['hardware'] . ')';
                     } else {
@@ -178,15 +210,15 @@ class Rewrite
             }
         }
 
-        return $device['hardware'];
+        return $device['hardware'] ?? '';
     }
 
     public static function location($location)
     {
         $location = str_replace(["\n", '"'], '', $location);
 
-        if (is_array(Config::get('location_map_regex'))) {
-            foreach (Config::get('location_map_regex') as $reg => $val) {
+        if (is_array(LibrenmsConfig::get('location_map_regex'))) {
+            foreach (LibrenmsConfig::get('location_map_regex') as $reg => $val) {
                 if (preg_match($reg, $location)) {
                     $location = $val;
                     break;
@@ -194,8 +226,8 @@ class Rewrite
             }
         }
 
-        if (is_array(Config::get('location_map_regex_sub'))) {
-            foreach (Config::get('location_map_regex_sub') as $reg => $val) {
+        if (is_array(LibrenmsConfig::get('location_map_regex_sub'))) {
+            foreach (LibrenmsConfig::get('location_map_regex_sub') as $reg => $val) {
                 if (preg_match($reg, $location)) {
                     $location = preg_replace($reg, $val, $location);
                     break;
@@ -203,8 +235,8 @@ class Rewrite
             }
         }
 
-        if (Config::has("location_map.$location")) {
-            $location = Config::get("location_map.$location");
+        if (LibrenmsConfig::has("location_map.$location")) {
+            $location = LibrenmsConfig::get("location_map.$location");
         }
 
         return $location;
@@ -391,11 +423,6 @@ class Rewrite
         return $guests[$guest_id] ?? $guest_id;
     }
 
-    public static function zeropad($num, $length = 2)
-    {
-        return str_pad($num, $length, '0', STR_PAD_LEFT);
-    }
-
     /**
      * If given input is an IPv6 address, wrap it in [] for use in applications that require it
      *
@@ -405,5 +432,29 @@ class Rewrite
     public static function addIpv6Brackets($ip): ?string
     {
         return IPv6::isValid($ip) ? "[$ip]" : $ip;
+    }
+
+    public static function celsiusToFahrenheit(float $celsius): float
+    {
+        return round($celsius * 1.8 + 32, 2);
+    }
+
+    /**
+     * Take a BGP error code and subcode to return a string representation of it
+     * https://www.iana.org/assignments/bgp-parameters/bgp-parameters.xhtml#bgp-parameters-3
+     */
+    public static function bgpErrorCode(int|string $code, int|string $subcode): string
+    {
+        $codeKey = "bgp.error_codes.$code";
+        $subcodeKey = "bgp.error_subcodes.$code.$subcode";
+
+        $codeMessage = __($codeKey);
+        $subcodeMessage = __($subcodeKey);
+
+        if ($subcodeMessage !== $subcodeKey) {
+            return "$codeMessage - $subcodeMessage";
+        }
+
+        return $codeMessage !== $codeKey ? $codeMessage : 'Unknown';
     }
 }

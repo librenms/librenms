@@ -31,14 +31,20 @@ theme:
     - navigation.path
     - content.tabs.link
     - content.action.edit
+    - content.code.copy
+    - search.share
 site_dir: out
 site_url: https://docs.librenms.org
 markdown_extensions:
   - tables
   - admonition
+  - pymdownx.snippets
   - pymdownx.tasklist
   - pymdownx.tilde
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.details
@@ -52,10 +58,11 @@ plugins:
   - macros:
       j2_variable_start_string: '@='
       j2_variable_end_string: '=@'
+  - markdown-exec
   - search
+  - include_dir_to_nav
   - exclude:
       glob:
-        - "General/Changelogs/*"
         - "Dockerfile"
   - redirects:
       redirect_maps:
@@ -66,6 +73,7 @@ plugins:
         'Extensions/Graphite.md': 'Extensions/metrics/Graphite.md'
         'Extensions/InfluxDB.md': 'Extensions/metrics/InfluxDB.md'
         'Extensions/InfluxDBv2.md': 'Extensions/metrics/InfluxDBv2.md'
+        'Extensions/Kafka.md': 'Extensions/metrics/Kafka.md'
         'Extensions/OpenTSDB.md': 'Extensions/metrics/OpenTSDB.md'
         'Extensions/Poller-Service.md': 'Extensions/Dispatcher-Service.md'
         'Extensions/Port-Description-Parser.md': 'Extensions/Interface-Description-Parsing.md'
@@ -108,7 +116,8 @@ extra:
   article_nav_top: false
   article_nav_bottom: true
   php:
-    version_min: 8.2
+    version_min: 8.4
+    version_recommended: 8.5
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/librenms/
@@ -140,7 +149,9 @@ nav:
   - General:
     - Home: index.md
     - Features: Support/Features.md
-    - Changelog: General/Changelog.md
+    - Changelog:
+      - Current Changelog: General/Changelog.md
+      - Historical: General/Changelogs
     - Welcome to Observium users: General/Welcome-to-Observium-users.md
     - 3rd Party Libraries: General/Acknowledgement.md
 
@@ -158,8 +169,11 @@ nav:
       - Migrating from Observium: Installation/Migrating-from-Observium.md
 
   - Setup:
-    - Applications: Extensions/Applications.md
+    - Applications overview: Extensions/Applications.md
+      # Uses plugin include_dir_to_nav
+    - Applications: Extensions/Applications
     - Billing Module: Extensions/Billing-Module.md
+    - Configuration: Support/Configuration.md
     - Dashboards: Extensions/Dashboards.md
     - Interface Description Parsing: Extensions/Interface-Description-Parsing.md
     - Network Maps:
@@ -173,18 +187,20 @@ nav:
     - Advanced Setup:
       - 1 Minute Polling: Support/1-Minute-Polling.md
       - Authentication Options: Extensions/Authentication.md
+      - Authorization: Extensions/Authorization.md
       - Auto-discovery Setup: Extensions/Auto-Discovery.md
       - Bare Dashboard: Support/Bare-Dashboard.md
       - Cleanup Options: Support/Cleanup-options.md
-      - Configuration Docs: Support/Configuration.md
       - Customizing the Web UI: Extensions/Customizing-the-Web-UI.md
-      - Dispatcher Service (RC): Extensions/Dispatcher-Service.md
+      - Dispatcher Service: Extensions/Dispatcher-Service.md
       - Environment Variables: Support/Environment-Variables.md
       - Fast Ping Checking: Extensions/Fast-Ping-Check.md
       - Galera Database Cluster: Extensions/Galera-Cluster.md
+      - High Availability: Support/High-Availability.md
       - IRC Bot Extensions: Extensions/IRC-Bot-Extensions.md
       - IRC Bot: Extensions/IRC-Bot.md
       - Oauth/SAML support: Extensions/OAuth-SAML.md
+      - Redis Sentinel: Extensions/Redis-Sentinel.md
       - RRDCached: Extensions/RRDCached.md
       - RRDTune: Extensions/RRDTune.md
       - Scaling LibreNMS: Extensions/Distributed-Poller.md
@@ -194,40 +210,44 @@ nav:
       - Two-Factor Auth: Extensions/Two-Factor-Auth.md
       - Varnish: Extensions/Varnish.md
   - 3rd Party Integration:
-    - Integrations:
-      - Check_MK Setup: Extensions/Agent-Setup.md
-      - Gateone: Extensions/Gateone.md
-      - Graylog: Extensions/Graylog.md
-      - Nagios Plugins: Extensions/Services.md
-      - NFSen: Extensions/NFSen.md
-      - Oxidized: Extensions/Oxidized.md
-      - PeeringDB: Extensions/PeeringDB.md
-      - Proxmox: Extensions/Proxmox.md
-      - Rancid: Extensions/Rancid.md
-      - Smokeping: Extensions/Smokeping.md
-      - Weathermap: Extensions/Weathermap.md
-      - Storing Metrics:
-        - Intro: Extensions/Metric-Storage.md
-        - Graphite: Extensions/metrics/Graphite.md
-        - InfluxDB: Extensions/metrics/InfluxDB.md
-        - InfluxDBv2: Extensions/metrics/InfluxDBv2.md
-        - OpenTSDB: Extensions/metrics/OpenTSDB.md
-        - Prometheus: Extensions/metrics/Prometheus.md
+    - Check_MK Setup: Extensions/Agent-Setup.md
+    - Gateone: Extensions/Gateone.md
+    - Graylog: Extensions/Graylog.md
+    - Nagios Plugins: Extensions/Services.md
+    - NFSen: Extensions/NFSen.md
+    - Oxidized: Extensions/Oxidized.md
+    - PeeringDB: Extensions/PeeringDB.md
+    - Proxmox: Extensions/Proxmox.md
+    - Rancid: Extensions/Rancid.md
+    - Smokeping: Extensions/Smokeping.md
+    - Unimus: Extensions/Unimus.md
+    - Weathermap: Extensions/Weathermap.md
+    - Storing Metrics:
+      - Intro: Extensions/Metric-Storage.md
+      - Graphite: Extensions/metrics/Graphite.md
+      - InfluxDB: Extensions/metrics/InfluxDB.md
+      - InfluxDBv2: Extensions/metrics/InfluxDBv2.md
+      - OpenTSDB: Extensions/metrics/OpenTSDB.md
+      - Prometheus: Extensions/metrics/Prometheus.md
+      - Kafka: Extensions/metrics/Kafka.md
 
   - Alerting:
     - Introduction: Alerting/index.md
-    - Setup:
-      - Rules: Alerting/Rules.md
-      - Templates: Alerting/Templates.md
-      - Transports: Alerting/Transports.md
-      - Creating Transports: Alerting/Creating-Transport.md
-      - Entities: Alerting/Entities.md
-      - Macros: Alerting/Macros.md
-      - Testing: Alerting/Testing.md
-      - Device Dependencies: Alerting/Device-Dependencies.md
+    - Operations: Alerting/Operations.md
+    - Rules: Alerting/Rules.md
+    - Templates: Alerting/Templates.md
+    - Transport Overview: Alerting/Transports.md
+    - Transports: Alerting/Transports
+    - Creating Transports: Alerting/Creating-Transport.md
+    - Entities: Alerting/Entities.md
+    - Macros: Alerting/Macros.md
+    - Testing: Alerting/Testing.md
+    - Device Dependencies: Alerting/Device-Dependencies.md
+    - Scheduled Maintenances: Alerting/Scheduled-Maintenances.md
 
   - API:
     - Using the API: API/index.md
+    - API v1 (Beta): API/v1.md
     - Endpoints:
       - Alerts: API/Alerts.md
       - ARP: API/ARP.md
@@ -237,9 +257,11 @@ nav:
       - Inventory: API/Inventory.md
       - Locations: API/Locations.md
       - Logs: API/Logs.md
+      - Pollers: API/Pollers.md
       - PollerGroups: API/PollerGroups.md
       - Port_Groups: API/Port_Groups.md
       - PortGroups: API/PortGroups.md
+      - PortSecurity: API/PortSecurity.md
       - Ports: API/Ports.md
       - Routing: API/Routing.md
       - Services: API/Services.md
@@ -265,20 +287,23 @@ nav:
       - Using Git: Developing/Using-Git.md
       - Validating Code: Developing/Validating-Code.md
       - Code Structure: Developing/Code-Structure.md
+      - Fetching SNMP Data: Developing/Using-SnmpQuery.md
       - Creating Documentation: Developing/Creating-Documentation.md
       - Component: Extensions/Component.md
     - Support for a new OS:
       - Intro: Developing/Support-New-OS.md
       - Initial Detection: Developing/os/Initial-Detection.md
       - Mem/CPU Information: Developing/os/Mem-CPU-Information.md
-      - Test Units: Developing/os/Test-Units.md
       - Health Information: Developing/os/Health-Information.md
       - Wireless Sensors: Developing/os/Wireless-Sensors.md
       - Custom Graphs: Developing/os/Custom-Graphs.md
       - Settings: Developing/os/Settings.md
+      - Unit Tests: Developing/os/Test-Units.md
       - Sensor State Support: Developing/Sensor-State-Support.md
     - SNMP Traps: Developing/SNMP-Traps.md
     - Dynamic Config: Developing/Dynamic-Config.md
+    - Localization: Developing/Localization.md
+    - Time Handling: Developing/Time-Handling.md
     - Plugin System: Extensions/Plugin-System.md
     - Developer notes:
       - Merging Pull Requests: Developing/Merging-Pull-Requests.md
@@ -294,5 +319,6 @@ nav:
       - Dell OpenManage: Extensions/Dell-OpenManage.md
       - Fortigate: Support/Device-Notes/Fortigate.md
       - OpenWRT: Support/Device-Notes/Openwrt.md
+      - Raritan: Support/Device-Notes/Raritan.md
       - RouterOS: Support/Device-Notes/Routeros.md
       - Supermicro: Extensions/Supermicro.md

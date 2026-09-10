@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,6 +16,8 @@
 
 /* FIXME: is there a central place we can put this? */
 
+use Illuminate\Support\Facades\Gate;
+
 $alert_states = [
     // divined from librenms/alerts.php
     'recovered' => 0,
@@ -22,6 +25,7 @@ $alert_states = [
     'acknowledged' => 2,
     'worse' => 3,
     'better' => 4,
+    'changed' => 5,
 ];
 
 $alert_severities = [
@@ -33,19 +37,20 @@ $alert_severities = [
     'warning only' => 5,
     'critical only' => 6,
 ];
-if (Auth::user()->hasGlobalAdmin()) {
+$admin_verbose_details = '';
+if (Gate::allows('alert.detail')) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 
 //if( defined('SHOW_SETTINGS') || empty($widget_settings) ) {
 if (defined('SHOW_SETTINGS')) {
-    $current_acknowledged = isset($widget_settings['acknowledged']) ? $widget_settings['acknowledged'] : '';
-    $current_fired = isset($widget_settings['fired']) ? $widget_settings['fired'] : '';
-    $current_severity = isset($widget_settings['severity']) ? $widget_settings['severity'] : '';
-    $current_state = isset($widget_settings['state']) ? $widget_settings['state'] : '';
-    $current_group = isset($widget_settings['group']) ? $widget_settings['group'] : '';
-    $current_proc = isset($widget_settings['proc']) ? $widget_settings['proc'] : '';
-    $current_sorting = isset($widget_settings['sort']) ? $widget_settings['sort'] : '';
+    $current_acknowledged = $widget_settings['acknowledged'] ?? '';
+    $current_fired = $widget_settings['fired'] ?? '';
+    $current_severity = $widget_settings['severity'] ?? '';
+    $current_state = $widget_settings['state'] ?? '';
+    $current_group = $widget_settings['group'] ?? '';
+    $current_proc = $widget_settings['proc'] ?? '';
+    $current_sorting = $widget_settings['sort'] ?? '';
 
     $common_output[] = '
 <form class="form" onsubmit="widget_settings(this); return false;">
@@ -174,7 +179,7 @@ if (defined('SHOW_SETTINGS')) {
     $group = $widget_settings['group'] ?? '';
     $proc = $widget_settings['proc'] ?? '';
     $sort = $widget_settings['sort'] ?? '';
-    $unique_id = $unique_id ?? '';
+    $unique_id ??= '';
 
     $title = 'Alerts';
 
@@ -256,7 +261,6 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
     post: function ()
     {
         return {
-            id: "alerts",
 ';
 
     if (is_numeric($rule_id)) {
@@ -286,15 +290,12 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
         $common_output[] = "proc: '$proc',\n";
     }
 
-    if (isset($sort) && $sort != '') {
-        $common_output[] = "sort: '$sort',\n";
-    }
-
     $common_output[] = '
             device_id: \'' . $device['device_id'] . '\'
         }
     },
-    url: "ajax_table.php",
+    url: "' . route('table.alerts') . '",
+    sort: ' . ($sort === 'severity' || $sort == 1 ? '{ severity: "desc" }' : '{ timestamp: "desc" }') . ',
     rowCount: [50, 100, 250, -1],
 
 }).on("loaded.rs.jquery.bootgrid", function() {

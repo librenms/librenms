@@ -1,11 +1,12 @@
-@extends('device.index')
+@extends('layouts.librenmsv1')
 
-@section('tab')
+@section('content')
+<x-device.page :device="$device">
     @if($data['smokeping']->hasGraphs())
         <x-panel class="with-nav-tabs">
             <x-slot name="heading">
-                @if(\LibreNMS\Config::get('smokeping.url'))
-                    <a href="{{ \LibreNMS\Config::get('smokeping.url') }}?target={{ $device->type }}.{{ str_replace('.','_',$device->hostname) }}" target="_blank"><span class="panel-title">{{ __('Smokeping') }} <i class="glyphicon glyphicon-share-alt"></i></span></a>
+                @if(\App\Facades\LibrenmsConfig::get('smokeping.url'))
+                    <a href="{{ \App\Facades\LibrenmsConfig::get('smokeping.url') }}?target={{ $device->type }}.{{ str_replace('.','_',$device->hostname) }}" target="_blank"><span class="panel-title">{{ __('Smokeping') }} <i class="glyphicon glyphicon-share-alt"></i></span></a>
                 @else
                     <span class="panel-title">{{ __('Smokeping') }}</span>
                 @endif
@@ -24,7 +25,7 @@
                     </div>
                     <div class="row"><x-graph-row :type="'device_smokeping_' . $direction . '_all'" title="Aggregate" :device="$device" columns="responsive"></x-graph-row>
                         @foreach($data['smokeping']->otherGraphs($direction) as $info)
-                            <x-graph-row :type="$info['graph']" :device="$info['device']" columns="responsive">
+                            <x-graph-row :type="$info['graph']['type']" :device="$info['graph']['device']" columns="responsive">
                                 <x-slot name="title"><x-device-link device="$info['device']" /></x-slot>
                             </x-graph-row>
                         @endforeach
@@ -33,31 +34,10 @@
             </div>
         </x-panel>
     @endif
-    <x-panel title="{{ __('Performance') }}">
-        <x-slot name="heading">
-            <span class="panel-title" style="line-height: 34px">{{ __('Performance') }}</span>
-                <span style="text-align: center">
-                    <form method="post" role="form" id="map" class="form-inline">
-                            @csrf
-                            <div class="form-group">
-                                <label for="dtpickerfrom">{{ __('From') }}</label>
-                                <input type="text" class="form-control" id="dtpickerfrom" name="dtpickerfrom" maxlength="16"
-                                       value="{{ $data['from'] }}" data-date-format="YYYY-MM-DD HH:mm">
-                            </div>
-                            <div class="form-group">
-                                <label for="dtpickerto">{{ __('To') }}</label>
-                                <input type="text" class="form-control" id="dtpickerto" name="dtpickerto" maxlength=16
-                                       value="{{ $data['to'] }} " data-date-format="YYYY-MM-DD HH:mm">
-                            </div>
-                            <input type="submit" class="btn btn-default" id="submit" value="Update">
-                    </form>
-                </span>
-        </x-slot>
-
-        <div id="performance">
-            <x-graph type="device_icmp_perf" legend="yes" :device="$device" width="600" height="240" :from="$data['from']" :to="$data['to']"></x-graph>
-        </div>
+    <x-panel title="{{ __('ICMP Performance') }}">
+        <x-graph-row type="device_icmp_perf" :device="$device" columns="responsive"></x-graph-row>
     </x-panel>
+</x-device.page>
 @endsection
 
 @push('scripts')

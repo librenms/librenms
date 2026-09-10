@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
-class MplsSdp extends Model implements Keyable
+class MplsSdp extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $primaryKey = 'sdp_id';
     public $timestamps = false;
     protected $fillable = [
@@ -31,18 +32,18 @@ class MplsSdp extends Model implements Keyable
 
     /**
      * Get a string that can identify a unique instance of this model
-     *
-     * @return int
      */
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
-        return $this->sdp_oid;
+        return (string) $this->sdp_oid;
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return HasMany<MplsSdpBind, $this>
+     */
     public function binds(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsSdpBind::class, 'sdp_id');
+        return $this->hasMany(MplsSdpBind::class, 'sdp_id');
     }
 }

@@ -1,26 +1,27 @@
 # Updating an Install
 
-By default, LibreNMS is set to automatically update. If you have
-disabled this feature then you can perform a manual update.
+By default, LibreNMS updates one time each day at 00:19 hours.
+If you disabled this feature, you can do a manual update.
 
 ## Manual update
 
-If you would like to perform a manual update then you can do this by
-running the following command as the `librenms` user:
+To do a manual update, run this command as the `librenms` user:
 
-`./daily.sh`
+```bash
+./daily.sh
+```
 
-This will update both the core LibreNMS files but also update the database
-structure if updates are available.
+This command updates the core LibreNMS files. It also updates the
+database structure when a new structure is available.
 
 ## Advanced users
 
-If you absolutely must update manually without using `./daily.sh` then
-you can do so by running the following commands:
+If you must update without `./daily.sh`, run these commands:
 
 ```bash
 cd /opt/librenms
 git pull
+rm bootstrap/cache/*.php
 ./scripts/composer_wrapper.php install --no-dev
 ./lnms migrate
 ./validate.php
@@ -28,14 +29,27 @@ git pull
 
 ## Disabling automatic updates
 
-LibreNMS by default performs updates on a daily basis.
-This can be disabled in the WebUI Global Settings under System -> Updates, or using lnms
+By default, LibreNMS updates each day.
+You can disable the updates in the web interface.
 
 !!! warning
-    You should never remove daily.sh from the cronjob!
-    This does database cleanup and other processes in addition to updating.
+    Do not remove `daily.sh` from the cronjob.
+    This script also does database cleanup and other processes.
 
-!!! setting "settings/system/updates"
+!!! setting "system/updates"
     ```bash
     lnms config:set update false
+    ```
+
+## Updating on set days
+
+You can configure LibreNMS to update only on set days. This configuration is an
+array. The array is empty by default.
+
+!!! setting "system/updates"
+    ```bash
+    lnms config:get update_on_days
+    ```
+    ```bash
+    lnms config:set update_on_days.+ "monday"
     ```

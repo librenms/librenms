@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DiscoveryModule.php
  *

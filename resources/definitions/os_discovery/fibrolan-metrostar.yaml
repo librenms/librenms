@@ -1,0 +1,42 @@
+modules:
+
+    processors:
+        data:
+            -
+                oid: FIBROLAN-DEVICE-MIB::flDeviceCpuStatusEntry
+                value: FIBROLAN-DEVICE-MIB::flDeviceCpuUtilization
+                num_oid: '.1.3.6.1.4.1.4467.1000.10.1.120.1.2.{{ $index }}'
+                descr: 'CPU Usage'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: FIBROLAN-MIB-METRO-STAR-MV::flMsChassisMvEntry
+                    value: FIBROLAN-MIB-METRO-STAR-MV::flMsChassisMvTemperature
+                    num_oid: '.1.3.6.1.4.1.4467.100.500.20.1.4.{{ $index }}'
+                    descr: 'Chassis {{ $index }}'
+                    index: flMsChassisMvTemperature.{{ $index }}
+                    group: 'Chassis'
+        state:
+            data:
+                -
+                    oid: FIBROLAN-MIB-METRO-STAR-MV::flMsChassisModuleMvEntry
+                    value: FIBROLAN-MIB-METRO-STAR-MV::flMsChassisModuleMvReset
+                    num_oid: '.1.3.6.1.4.1.4467.100.500.10.20.1.4.{{ $index }}'
+                    descr: 'Module {{ $index }} State - {{ FIBROLAN-MIB-METRO-STAR-MV::flMsChassisModuleMvDeviceType }}'
+                    state_name: flMsChassisModuleMvReset
+                    states:
+                        - { value: 1, generic: 0, descr: 'running' }
+                        - { value: 2, generic: 1, descr: 'reset' }
+                    group: 'Modules'
+                -
+                    oid: FIBROLAN-MIB-METRO-STAR-MV::flMsChassisPsuMvTable
+                    value: FIBROLAN-MIB-METRO-STAR-MV::flMsChassisPsuMvStatus
+                    num_oid: '.1.3.6.1.4.1.4467.100.500.10.10.1.2.{{ $index }}'
+                    descr: 'PS {{ FIBROLAN-MIB-METRO-STAR-MV::flMsChassisPsuMvIndex }}'
+                    state_name: flMsChassisPsuMvStatus
+                    states:
+                        - { value: 1, generic: 2, descr: 'fail' }
+                        - { value: 2, generic: 0, descr: 'ok' }
+                        - { value: 3, generic: 3, descr: 'uninstalled' }
+                    group: 'Power Supplies'

@@ -1,0 +1,707 @@
+-- ****************************************************************
+-- *  Moxa Poe Bt - POE BT PRIVATE MIB
+-- *
+-- *  Copyright (c) 2019 by Moxa Inc.
+-- *  All rights reserved.
+-- *****************************************************************
+
+MOXA-POE-BT-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, IpAddress, Unsigned32, enterprises,
+        Integer32
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, RowStatus, DisplayString, TruthValue
+            FROM SNMPv2-TC;
+
+    poe MODULE-IDENTITY
+        LAST-UPDATED "202203100000Z"
+        ORGANIZATION "Moxa Inc."
+        CONTACT-INFO
+            "
+            Postal: Moxa Inc.
+            13F., No. 3, Sec. 4, New Taipei Blvd.
+            Xinzhuang Dist., New Taipei City 242032, Taiwan, R.O.C.
+
+            Tel: +866-2-89191230
+            Web: http://www.moxa.com/
+            "
+        DESCRIPTION
+            "The MIB module defines Moxa PoE"
+
+        REVISION    "202208220000Z"
+        DESCRIPTION "
+                    Added notification type:
+                        poeBtNotifyNonPdOrPdShortCircuit
+                    Modified poeBtStatDeviceType syntax nic(5) to nonPdOrPdShortCircuit(5)
+                    "
+
+        REVISION    "202203100000Z"
+        DESCRIPTION "
+                    Added objects:
+                        poeBtConfigPowerManagementMode
+                        poeBtStatAllocatedPower
+                    "
+
+        REVISION    "202202230000Z"
+        DESCRIPTION "Changed the syntax for poeBtConfigSystemPowerBudget,
+                     poeBtStatMaxInputPower, poeBtStatActualPower,
+                     poeBtStatBudgetLimit, poeBtStatConsumedPower and
+                     poeBtStatRemainingAvailablePower."
+
+        REVISION    "202202170000Z"
+        DESCRIPTION "update CONTACT-INFO"
+
+        REVISION    "202007200000Z"
+        DESCRIPTION "Initial Revision"
+
+        ::= { moxa 608 }
+
+        moxa        OBJECT IDENTIFIER ::= { enterprises 8691 }
+
+-- -------------------------------------------------------------
+-- groups in the MOXA-POE-MIB MIB
+-- -------------------------------------------------------------
+
+    mxPoeBt                 OBJECT IDENTIFIER ::= { poe 2 }
+
+    poeBtNotification       OBJECT IDENTIFIER ::= { mxPoeBt 0 }
+    poeBtConfiguration      OBJECT IDENTIFIER ::= { mxPoeBt 1 }
+    poeBtStatus             OBJECT IDENTIFIER ::= { mxPoeBt 2 }
+    -- poeBtExtensions         OBJECT IDENTIFIER ::= { mxPoeBt 3 }
+
+-- -------------------------------------------------------------
+-- configuration group
+-- -------------------------------------------------------------
+
+    poeBtConfigGeneral             OBJECT IDENTIFIER ::= {poeBtConfiguration 1}
+    poeBtConfigFailureCheck        OBJECT IDENTIFIER ::= {poeBtConfiguration 2}
+    poeBtConfigScheduling          OBJECT IDENTIFIER ::= {poeBtConfiguration 3}
+
+-- -------------------------------------------------------------
+-- poe general
+-- -------------------------------------------------------------
+
+    poeBtConfigPowerOutput OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Users configure power output to control PoE power output on or off."
+        ::= { poeBtConfigGeneral 1 }
+
+    poeBtConfigAutoPowerCutting OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Users enable Auto Power Cutting make the lowest and the less port number port be cut if consumption over system budget"
+        ::= { poeBtConfigGeneral 2 }
+
+    poeBtConfigSystemPowerBudget OBJECT-TYPE
+        SYNTAX      Integer32 (30..300)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Users configure system power budget to limit maximun available power for all PoE devices. Please refer to EPS abilities to configure this value."
+        ::= { poeBtConfigGeneral 3 }
+
+    poeBtConfigPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PoeBtConfigPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table contains general port configuration infomations."
+        ::= { poeBtConfigGeneral 4 }
+
+    poeBtConfigPowerManagementMode OBJECT-TYPE
+        SYNTAX INTEGER {
+            allocatedPower(0),
+            consumedPower(1)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Users configure power management mode according to power usage of powered devices."
+        ::= { poeBtConfigGeneral 5 }
+
+    poeBtConfigPortEntry OBJECT-TYPE
+        SYNTAX PoeBtConfigPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table entry contains general port configuration infomations."
+        INDEX { poeBtConfigPortIndex }
+        ::= { poeBtConfigPortTable 1 }
+
+    PoeBtConfigPortEntry ::=
+        SEQUENCE {
+            poeBtConfigPortIndex
+                INTEGER,
+            poeBtConfigPortPowerOutput
+                TruthValue,
+            poeBtConfigOutputMode
+                INTEGER,
+            poeBtConfigPowerAllocation
+                Integer32,
+            poeBtConfigLegacyPdDetection
+                TruthValue,
+            poeBtConfigPriority
+                INTEGER
+        }
+
+    poeBtConfigPortIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Index of  poeBtConfigPortTable."
+         ::= { poeBtConfigPortEntry 1 }
+
+    poeBtConfigPortPowerOutput OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Users configure port power output to control PoE power output on or off per ports."
+        ::= { poeBtConfigPortEntry 2 }
+
+    poeBtConfigOutputMode OBJECT-TYPE
+        SYNTAX INTEGER {
+            auto(0),
+            highPower(1),
+            force(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Users configure output mode according to the type of PoE devices."
+        ::= { poeBtConfigPortEntry 3 }
+
+    poeBtConfigPowerAllocation OBJECT-TYPE
+        SYNTAX      Integer32 (0..90)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Users configure power allocation to set power output limit per ports."
+        ::= { poeBtConfigPortEntry 4 }
+
+    poeBtConfigLegacyPdDetection OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable Legacy PD Detection to loose PoE detection signature."
+        ::= { poeBtConfigPortEntry 5 }
+
+    poeBtConfigPriority OBJECT-TYPE
+        SYNTAX INTEGER {
+            critical(0),
+            high(1),
+            low(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Users configure priority to change Auto Cutting priority of ports"
+        ::= { poeBtConfigPortEntry 6 }
+
+-- -------------------------------------------------------------
+-- poe bt failureCheck
+-- -------------------------------------------------------------
+
+    poeBtConfigFcPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PoeBtConfigFcPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table contains PD Failure Check port configuration infomations."
+        ::= { poeBtConfigFailureCheck 1 }
+
+    poeBtConfigFcPortEntry OBJECT-TYPE
+        SYNTAX PoeBtConfigFcPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table entry contains PD Failure Check port configuration infomations."
+        INDEX { poeBtConfigFcPortIndex }
+        ::= { poeBtConfigFcPortTable 1 }
+
+    PoeBtConfigFcPortEntry ::=
+        SEQUENCE {
+            poeBtConfigFcPortIndex
+                INTEGER,
+            poeBtConfigFcEnable
+                TruthValue,
+            poeBtConfigFcDeviceIp
+                IpAddress,
+            poeBtConfigFcNoResponseTimes
+                Integer32,
+            poeBtConfigFcCheckFrequency
+                Integer32,
+            poeBtConfigFcAction
+                INTEGER
+        }
+
+    poeBtConfigFcPortIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index of  poeBtConfigFcPortTable."
+        ::= { poeBtConfigFcPortEntry 1 }
+
+    poeBtConfigFcEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Users configure PD Failure Check enabled to enable PD Failure Check on the port."
+        ::= { poeBtConfigFcPortEntry 2 }
+
+    poeBtConfigFcDeviceIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Users configure check IP for PD Failure Check to check the IP periodically."
+        ::= { poeBtConfigFcPortEntry 3 }
+
+    poeBtConfigFcNoResponseTimes OBJECT-TYPE
+        SYNTAX      Integer32 (1..10)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Users configure no response timeout to set action trigger threshold."
+        ::= { poeBtConfigFcPortEntry 4 }
+
+    poeBtConfigFcCheckFrequency OBJECT-TYPE
+        SYNTAX      Integer32 (5..300)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Users configure check period to change IP check interval."
+        ::= { poeBtConfigFcPortEntry 5 }
+
+    poeBtConfigFcAction OBJECT-TYPE
+        SYNTAX INTEGER {
+            noAction(0),
+            restartPd(1),
+            shutdownPd(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Users configure action to set trigger action if fail times hits threshold"
+        ::= { poeBtConfigFcPortEntry 6 }
+
+-- -------------------------------------------------------------
+-- poe bt scheduling
+-- -------------------------------------------------------------
+
+poeBtConfigScheRuleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PoeBtConfigScheRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table contains Scheduling rule configuration infomations."
+        ::= { poeBtConfigScheduling 1 }
+
+    poeBtConfigScheRuleEntry OBJECT-TYPE
+        SYNTAX PoeBtConfigScheRuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table entry contains Scheduling rule configuration infomations."
+        INDEX { poeBtConfigRuleIndex }
+        ::= { poeBtConfigScheRuleTable 1 }
+
+    PoeBtConfigScheRuleEntry ::=
+        SEQUENCE {
+            poeBtConfigRuleIndex
+                INTEGER,
+            poeBtConfigScheName
+                DisplayString,
+            poeBtConfigScheEnable
+                TruthValue,
+            poeBtConfigScheStartDateYear
+                Integer32,
+            poeBtConfigScheStartDateMonth
+                Integer32,
+            poeBtConfigScheStartDateDay
+                Integer32,
+            poeBtConfigScheStartTimeHour
+                Integer32,
+            poeBtConfigScheStartTimeMin
+                Integer32,
+            poeBtConfigScheEndTimeHour
+                Integer32,
+            poeBtConfigScheEndTimeMin
+                Integer32,
+            poeBtConfigScheRepeatOn
+                OCTET STRING,
+            poeBtConfigScheAppliedPorts
+                OCTET STRING,
+            poeBtConfigScheRowStatus
+                RowStatus
+        }
+    poeBtConfigRuleIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index of  poeBtConfigScheRuleTable."
+        ::= { poeBtConfigScheRuleEntry 1 }
+
+    poeBtConfigScheName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..63))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Rule name"
+        ::= { poeBtConfigScheRuleEntry 2}
+
+    poeBtConfigScheEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Users enable rule to make the rule valid."
+        ::= { poeBtConfigScheRuleEntry 3 }
+
+    poeBtConfigScheStartDateYear OBJECT-TYPE
+        SYNTAX      Integer32 (1970..2038)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Users configure year of rule start date."
+        ::= { poeBtConfigScheRuleEntry 4 }
+
+    poeBtConfigScheStartDateMonth OBJECT-TYPE
+        SYNTAX      Integer32 (1..12)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Users configure month of rule start date."
+        ::= { poeBtConfigScheRuleEntry 5 }
+
+    poeBtConfigScheStartDateDay OBJECT-TYPE
+        SYNTAX      Integer32 (1..31)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Users configure day of rule state date."
+        ::= { poeBtConfigScheRuleEntry 6 }
+
+    poeBtConfigScheStartTimeHour OBJECT-TYPE
+        SYNTAX      Integer32 (0..24)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Users configure hour of rule start time."
+        ::= { poeBtConfigScheRuleEntry 7 }
+
+    poeBtConfigScheStartTimeMin OBJECT-TYPE
+        SYNTAX      Integer32 (0..59)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Users configure minute of rule start time."
+        ::= { poeBtConfigScheRuleEntry 8 }
+
+    poeBtConfigScheEndTimeHour OBJECT-TYPE
+        SYNTAX      Integer32 (0..24)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Users configure hour of rule end time."
+        ::= { poeBtConfigScheRuleEntry 9 }
+
+    poeBtConfigScheEndTimeMin OBJECT-TYPE
+        SYNTAX      Integer32 (0..59)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Users configure minute of rule end time."
+        ::= { poeBtConfigScheRuleEntry 10 }
+
+    poeBtConfigScheRepeatOn OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Users configure the rule repeat on which days."
+        ::= { poeBtConfigScheRuleEntry 11 }
+
+    poeBtConfigScheAppliedPorts OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Users configure the rule also applied on which ports."
+        ::= { poeBtConfigScheRuleEntry 12 }
+
+    poeBtConfigScheRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The status column used for creating, modifying,
+             and deleting entries of poeBtConfigScheRuleTable"
+        ::= { poeBtConfigScheRuleEntry 13 }
+
+-- -------------------------------------------------------------
+-- Status group
+-- -------------------------------------------------------------
+
+    poeBtStatMonitor             OBJECT IDENTIFIER ::= {poeBtStatus 1}
+
+-- -------------------------------------------------------------
+-- Monitor
+-- -------------------------------------------------------------
+
+    poeBtStatMaxInputPower OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PoE total input power."
+        ::= { poeBtStatMonitor 1 }
+
+    poeBtStatActualPower OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PoE actual input power from power supply."
+        ::= { poeBtStatMonitor 2 }
+
+    poeBtStatBudgetLimit OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PoE power budget."
+        ::= { poeBtStatMonitor 3 }
+
+    poeBtStatConsumedPower OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PoE current total consumption."
+        ::= { poeBtStatMonitor 4 }
+
+    poeBtStatRemainingAvailablePower OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PoE remaining power."
+        ::= { poeBtStatMonitor 5 }
+
+    poeBtStatPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PoeBtStatPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table contains port status infomations."
+        ::= { poeBtStatMonitor 6 }
+
+    poeBtStatAllocatedPower OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PoE current total budget."
+        ::= { poeBtStatMonitor 7 }
+
+    poeBtStatPortEntry OBJECT-TYPE
+        SYNTAX PoeBtStatPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table entry contains port status infomations."
+        INDEX { poeBtStatPortIndex }
+        ::= { poeBtStatPortTable 1 }
+
+    PoeBtStatPortEntry ::=
+        SEQUENCE {
+            poeBtStatPortIndex
+                INTEGER,
+            poeBtStatPowerOutput
+                TruthValue,
+            poeBtStatClassification
+                OCTET STRING,
+            poeBtStatCurrent
+                DisplayString,
+            poeBtStatVoltage
+                DisplayString,
+            poeBtStatConsumption
+                DisplayString,
+            poeBtStatDeviceType
+                INTEGER,
+            poeBtStatConfigSuggestion
+                INTEGER,
+            poeBtStatPdFailureCheckStatus
+                INTEGER
+        }
+
+    poeBtStatPortIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port index."
+        ::= { poeBtStatPortEntry 1 }
+
+    poeBtStatPowerOutput OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Power output of the port."
+        ::= { poeBtStatPortEntry 2 }
+
+    poeBtStatClassification OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PD classification of the port.
+             class0(0), class1(1), class2(2), class3(3), class4(4),
+             class5(5), class6(6), class7(7), class8(8), unknown(10),
+             overCurrent(11)"
+        ::= { poeBtStatPortEntry 3 }
+
+    poeBtStatCurrent OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PD current of the port."
+        ::= { poeBtStatPortEntry 4 }
+
+    poeBtStatVoltage OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PD voltage of the port."
+        ::= { poeBtStatPortEntry 5 }
+
+    poeBtStatConsumption OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PD consumption of the port."
+        ::= { poeBtStatPortEntry 6 }
+
+    poeBtStatDeviceType OBJECT-TYPE
+        SYNTAX INTEGER {
+            notPresent(0),
+            legacy(1),
+            dot3af(2),
+            dot3at(3),
+            reserved(4),
+            nonPdOrPdShortCircuit(5),
+            unknown(6),
+			na(7),
+            dot3btss(8),
+            dot3btds(9)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PD device type of the port."
+        ::= { poeBtStatPortEntry 7 }
+
+    poeBtStatConfigSuggestion OBJECT-TYPE
+        SYNTAX INTEGER {
+            noSuggestion(0),
+            enablePoe(1),
+            disablePoe(2),
+            selectAuto(3),
+            selectHighPower(4),
+            selectForce(5),
+            enableLegacy(6),
+            raiseEpsVoltage(7)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Configuration suggestion of the port."
+        ::= { poeBtStatPortEntry 8 }
+
+    poeBtStatPdFailureCheckStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            notAlive(0),
+            alive(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PD Failure Check operating status."
+        ::= { poeBtStatPortEntry 9 }
+
+-- -------------------------------------------------------------
+-- Notification group
+-- -------------------------------------------------------------
+
+    poeBtNotifyPdPowerOn NOTIFICATION-TYPE
+        OBJECTS     { poeBtStatPortIndex }
+        STATUS      current
+        DESCRIPTION
+            "Notification indicates power output is on."
+        ::= { poeBtNotification 1 }
+
+    poeBtNotifyPdPowerOff NOTIFICATION-TYPE
+        OBJECTS     { poeBtStatPortIndex }
+        STATUS      current
+        DESCRIPTION
+            "Notification indicates power output is off."
+        ::= { poeBtNotification 2 }
+
+    poeBtNotifyLowInputVoltage NOTIFICATION-TYPE
+        STATUS      current
+        DESCRIPTION
+            "Notification indicates input voltage is lower than 46 V."
+        ::= { poeBtNotification 3 }
+
+    poeBtNotifyPdOverCurrent NOTIFICATION-TYPE
+        OBJECTS     { poeBtStatPortIndex }
+        STATUS      current
+        DESCRIPTION
+            "Notification indicates current is over power mode limitation."
+        ::= { poeBtNotification 4 }
+
+    poeBtNotifyPdNoResponse NOTIFICATION-TYPE
+        OBJECTS     { poeBtStatPortIndex }
+        STATUS      current
+        DESCRIPTION
+            "Notification indicates check IP does not response to PD Failure Check."
+        ::= { poeBtNotification 5 }
+
+    poeBtNotifyOverBudgetLimit NOTIFICATION-TYPE
+        OBJECTS     { poeBtStatConsumedPower, poeBtStatMaxInputPower }
+        STATUS      current
+        DESCRIPTION
+            "Notification indicates power consumption is over budget."
+        ::= { poeBtNotification 6 }
+
+    poeBtNotifyPdDetectionFailure NOTIFICATION-TYPE
+        OBJECTS     { poeBtStatPortIndex, poeBtStatDeviceType, poeBtStatConfigSuggestion }
+        STATUS      current
+        DESCRIPTION
+            "Notification indicates PD detection fail due to invalid signature."
+        ::= { poeBtNotification 7 }
+
+    poeBtNotifyNonPdOrPdShortCircuit NOTIFICATION-TYPE
+        OBJECTS     { poeBtStatPortIndex }
+        STATUS      current
+        DESCRIPTION
+            "Notification indicates Non-PD or PD short circuited."
+        ::= { poeBtNotification 8 }
+
+END

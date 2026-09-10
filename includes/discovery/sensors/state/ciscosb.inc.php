@@ -1,4 +1,5 @@
 <?php
+
 /*
  * ciscosb.inc.php
  *
@@ -21,30 +22,28 @@
  */
 
 use Illuminate\Support\Str;
+use LibreNMS\Enum\IfOperStatus;
 
 $temp = SnmpQuery::hideMib()->walk('CISCOSB-rlInterfaces::swIfOperSuspendedStatus')->table(0);
 
 $cur_oid = '.1.3.6.1.4.1.9.6.1.101.43.1.1.24.';
 
-if (is_array($temp)) {
+if (! empty($temp)) {
     //Create State Index
     $state_name = 'swIfOperSuspendedStatus';
     $states = [
-        ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'true'],
-        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'false'],
+        ['value' => 1, 'generic' => 2, 'descr' => 'true'],
+        ['value' => 2, 'generic' => 0, 'descr' => 'false'],
     ];
     create_state_index($state_name, $states);
 
     foreach ($temp[$state_name] as $index => $value) {
-        $port_data = get_port_by_index_cache($device['device_id'], preg_replace('/^\d+\./', '', $index));
+        $port = PortCache::getByIfIndex(preg_replace('/^\d+\./', '', (string) $index), $device['device_id']);
+        $descr = trim($port?->ifDescr . ' Suspended Status');
 
-        $descr = trim(($port_data['ifDescr'] ?? '') . ' Suspended Status');
-        if (Str::contains($descr, ['ethernet', 'Ethernet']) && $port_data['ifOperStatus'] !== 'notPresent') {
+        if (Str::contains($descr, ['ethernet', 'Ethernet']) && $port?->ifOperStatus != IfOperStatus::NotPresent) {
             //Discover Sensors
             discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp', $index);
-
-            //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $index);
         }
     }
 }

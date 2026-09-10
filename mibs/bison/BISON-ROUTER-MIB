@@ -1,0 +1,927 @@
+-- ----------------------------------------------------------------------
+-- MIB file for Bison Router
+-- ----------------------------------------------------------------------
+
+BISON-ROUTER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64,
+    Integer32, TimeTicks, mib-2, enterprises,
+    NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString,
+    PhysAddress, TruthValue, RowStatus,
+    TimeStamp, AutonomousType, TestAndIncr   FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB;
+
+bisonrouter MODULE-IDENTITY
+    LAST-UPDATED "202109300001Z"
+    ORGANIZATION "Bison Router"
+    CONTACT-INFO "info@bisonrouter.com"
+    DESCRIPTION
+       "Bison Router"
+
+    REVISION "202109300000Z"
+    DESCRIPTION "Initial revision."
+
+    ::= { bison 1 }
+
+-- We are hosted under FreeBSD
+freebsd			OBJECT IDENTIFIER ::= { enterprises 2238 }
+bison			OBJECT IDENTIFIER ::= { freebsd 240 }
+
+pppoeNumber  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of PPPoE IPv4 subscriber interfaces (regardless of their
+            current state) present on this system."
+    ::= { bisonrouter 1 }
+
+-- the Interfaces table
+
+-- The Interfaces table contains information on the entity's
+
+-- interfaces.  Each sub-layer below the internetwork-layer
+-- of a network interface is considered to be an interface.
+
+pppoeIpv4Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF pppoeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of PPPoE IPv4 interface entries.  The number of entries is
+            given by the value of pppoeNumber."
+    ::= { bisonrouter 2 }
+
+pppoeEntry OBJECT-TYPE
+    SYNTAX      pppoeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular PPPoE IPv4 interface."
+    INDEX   { pppoeIndex }
+    ::= { pppoeIpv4Table 1 }
+
+pppoeEntry ::=
+    SEQUENCE {
+        pppoeIndex                InterfaceIndex,
+        pppoeUsername             DisplayString,
+        pppoeMac                  PhysAddress,
+        pppoeSvid                 INTEGER,
+        pppoeCvid                 INTEGER,
+        pppoeSessionId            DisplayString,
+        pppoeIpv4                 IpAddress,
+        pppoeMtu                  Integer32,
+        pppoeIngressCir           DisplayString,
+        pppoeEgressCir            DisplayString,
+        pppoeRxPkts               Counter64,
+        pppoeTxPkts               Counter64,
+        pppoeRxOctets             Counter64,
+        pppoeTxOctets             Counter64,
+        pppoePort                 INTEGER,      
+    }
+
+pppoeIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PPPoE VIF id. A unique value, greater than zero, for each interface."
+    ::= { pppoeEntry 1 }
+
+pppoeUsername OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the
+            PPPoE subscriber's username."
+    ::= { pppoeEntry 2 }
+
+pppoeMac OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The Link-layer address of the PPPoE subscriber."
+    ::= { pppoeEntry 3 }
+
+pppoeSvid OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Service VID (outer VLAN id)."
+    ::= { pppoeEntry 4 }
+
+pppoeCvid OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Customer VID (inner VLAN id)."
+    ::= { pppoeEntry 5 }
+
+pppoeSessionId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique string value identifying subscriber's sesssion"
+    ::= { pppoeEntry 6 }
+
+pppoeIpv4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IPv4 address of the subscriber."
+    ::= { pppoeEntry 7 }
+
+pppoeMtu OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The size of the largest packet which can be sent/received
+            on the interface, specified in octets.  For interfaces that
+            are used for transmitting network datagrams, this is the
+            size of the largest network datagram that can be sent on the
+            interface."
+    ::= { pppoeEntry 8 }
+
+pppoeIngressCir OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the
+            Ingress CIR."
+    ::= { pppoeEntry 9 }
+    
+pppoeEgressCir OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the
+            Egress CIR."
+    ::= { pppoeEntry 10 }
+
+pppoeRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of packets received on the interface."
+    ::= { pppoeEntry 11 }
+
+pppoeTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of packets transmitted out of the interface."
+    ::= { pppoeEntry 12 }
+
+pppoeRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of octets received on the interface."
+    ::= { pppoeEntry 13 }
+
+pppoeTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of octets transmitted out of the
+            interface."
+    ::= { pppoeEntry 14 }
+
+pppoePort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Physical port number."
+    ::= { pppoeEntry 15 }
+
+--
+-- VIF table
+--
+vifTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF vifEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of virtual interface (VIF) entries."
+    ::= { bisonrouter 3 }
+
+vifEntry OBJECT-TYPE
+    SYNTAX      vifEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing information applicable to a
+            particular VIF."
+    INDEX   { vifIndex }
+    ::= { vifTable 1 }
+
+vifEntry ::=
+    SEQUENCE {
+        vifIndex                  InterfaceIndex,
+        vifName                   DisplayString,
+        vifPort                   INTEGER,
+        vifSvid                   INTEGER,
+        vifCvid                   INTEGER,
+        vifRxPkts                 Counter64,
+        vifTxPkts                 Counter64,
+        vifRxOctets               Counter64,
+        vifTxOctets               Counter64,
+    }
+
+vifIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "VIF ID. A unique value, greater than zero, for each interface."
+    ::= { vifEntry 1 }
+
+vifName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing VIF name."
+    ::= { vifEntry 2 }
+
+vifPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Physical port number."
+    ::= { vifEntry 3 }
+
+vifSvid OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Service VID (outer VLAN id)."
+    ::= { vifEntry 4 }
+
+vifCvid OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Customer VID (inner VLAN id)."
+    ::= { vifEntry 5 }
+
+vifRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of packets received on the interface."
+    ::= { vifEntry 6 }
+
+vifTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of packets transmitted out of the interface."
+    ::= { vifEntry 7 }
+
+vifRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of octets received on the interface."
+    ::= { vifEntry 8 }
+
+vifTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of octets transmitted out of the
+            interface."
+    ::= { vifEntry 9 }
+
+--
+-- Deterministic NAT statistic.
+--
+detSnatStat OBJECT-TYPE
+    SYNTAX      detSnatStat
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Deterministic SNAT statistic."
+    ::= { bisonrouter 4 }
+
+detSnatStat ::=
+    SEQUENCE {
+        detSSTotalMaps            INTEGER,
+        detSSTotalSessions        Counter64,
+        detSSPortmapFailures      Counter64,
+        detSSPortmapFailures2     Counter64,
+        detSSSessionOverflow      Counter64,
+        detSSNoFreePortmapPorts   Counter64,
+    }
+
+detSSTotalMaps OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of Deterministic SNAT maps."
+    ::= { detSnatStat 1 }
+
+detSSTotalSessions OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of sessions in all maps."
+    ::= { detSnatStat 2 }
+
+detSSPortmapFailures OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of interal failures."
+    ::= { detSnatStat 3 }
+
+detSSPortmapFailures2 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of interal failures of type 2."
+    ::= { detSnatStat 4 }
+
+detSSSessionOverflow OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of session overflow events."
+    ::= { detSnatStat 5 }
+
+detSSNoFreePortmapPorts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of no free portmap ports events."
+    ::= { detSnatStat 6 }
+
+--
+-- Port RX queue utilization.
+--
+
+portRxQueueUtilization OBJECT-TYPE
+    SYNTAX      SEQUENCE OF portRxQueueUtilizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Ports RX queues utilization statistic"
+    ::= { bisonrouter 5 }
+
+portRxQueueUtilizationEntry OBJECT-TYPE
+    SYNTAX      portRxQueueUtilizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing port RX queue utilization statistic"
+    INDEX   { prquIndex }
+    ::= { portRxQueueUtilization 1 }
+
+portRxQueueUtilizationEntry ::=
+    SEQUENCE {
+		  prquIndex                 INTEGER,
+        prquLcore                 INTEGER,
+        prquPort                  INTEGER,
+        prquRxQueue               INTEGER,
+        prquEmptyPolls            INTEGER,
+        prquPktsPerPoll           INTEGER,
+    }
+
+prquIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "entry index"
+    ::= { portRxQueueUtilizationEntry 1 }
+
+prquLcore OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Lcore ID"
+    ::= { portRxQueueUtilizationEntry 2 }
+
+prquPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "port number"
+    ::= { portRxQueueUtilizationEntry 3 }
+
+prquRxQueue OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "RX queue number"
+    ::= { portRxQueueUtilizationEntry 4 }
+
+prquEmptyPolls OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "number of empty queue polls, percentage"
+    ::= { portRxQueueUtilizationEntry 5 }
+
+prquPktsPerPoll OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "average number of dequeued packets per queue poll"
+    ::= { portRxQueueUtilizationEntry 6 }
+
+--
+-- NAT translation state counters
+--
+natTranslationStateCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF natTranslationStateCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table with NAT map's translation state counters."
+    ::= { bisonrouter 6 }
+
+natTranslationStateCountersEntry OBJECT-TYPE
+    SYNTAX      natTranslationStateCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing translation state counters of a 
+             specific NAT map"
+    INDEX   { natTscMapId, natTscMapType }
+    ::= { natTranslationStateCountersTable 1 }
+
+natTranslationStateCountersEntry ::=
+    SEQUENCE {
+        natTscMapId               INTEGER,
+        natTscMapType             INTEGER,
+        natStateUnknown           Counter32,
+        natStateActive            Counter32,
+        natStateSynSent           Counter32,
+        natStateEstablished       Counter32,
+        natStateFinWait           Counter32,
+        natStateCloseWait         Counter32,
+        natStateClosing           Counter32,
+        natStateLastAck           Counter32,
+        natStateClosed            Counter32,
+        natStateIcmpActive        Counter32,
+        natStateDns               Counter32,
+        natStateGre               Counter32
+    }
+
+natTscMapId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NAT map ID"
+    ::= { natTranslationStateCountersEntry 1 }
+
+natTscMapType OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NAT map type"
+    ::= { natTranslationStateCountersEntry 2 }
+
+natStateUnknown OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT translations with state Unknown"
+    ::= { natTranslationStateCountersEntry 3 }
+
+natStateActive OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT translations with state Active"
+    ::= { natTranslationStateCountersEntry 4 }
+
+natStateSynSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT translations with state SynSent"
+    ::= { natTranslationStateCountersEntry 5 }
+
+natStateEstablished OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT translations with state Established"
+    ::= { natTranslationStateCountersEntry 6 }
+
+natStateFinWait OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT translations with state FinWait"
+    ::= { natTranslationStateCountersEntry 7 }
+
+natStateCloseWait OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT translations with state CloseWait"
+    ::= { natTranslationStateCountersEntry 8 }
+
+natStateClosing OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT translations with state Closing"
+    ::= { natTranslationStateCountersEntry 9 }
+
+natStateLastAck OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT translations with state LastAck"
+    ::= { natTranslationStateCountersEntry 10 }
+
+natStateClosed OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT translations with state Closed"
+    ::= { natTranslationStateCountersEntry 11 }
+
+natStateIcmpActive OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT translations with state IcmpActive"
+    ::= { natTranslationStateCountersEntry 12 }
+
+natStateDns OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT translations with state Dns"
+    ::= { natTranslationStateCountersEntry 13 }
+
+natStateGre OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of NAT translations with state Gre"
+    ::= { natTranslationStateCountersEntry 14 }
+
+--
+-- IPoE subscribers table
+--
+
+ipoeNumber  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of IPoE IPv4 subscriber interfaces (regardless of their
+            current state) present on this system."
+    ::= { bisonrouter 7 }
+
+ipoeIpv4Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ipoeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of IPoE IPv4 interface entries.  The number of entries is
+            given by the value of ipoeNumber."
+    ::= { bisonrouter 8 }
+
+ipoeEntry OBJECT-TYPE
+    SYNTAX      ipoeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular IPoE IPv4 interface."
+    INDEX   { ipoeIndex }
+    ::= { ipoeIpv4Table 1 }
+
+ipoeEntry ::=
+    SEQUENCE {
+        ipoeIndex                InterfaceIndex,
+        ipoeUsername             DisplayString,
+        ipoeMac                  PhysAddress,
+        ipoeSvid                 INTEGER,
+        ipoeCvid                 INTEGER,
+        ipoeSessionId            DisplayString,
+        ipoeIpv4                 IpAddress,
+        ipoeIngressCir           DisplayString,
+        ipoeEgressCir            DisplayString,
+        ipoeRxPkts               Counter64,
+        ipoeTxPkts               Counter64,
+        ipoeRxOctets             Counter64,
+        ipoeTxOctets             Counter64,
+        ipoePort                 INTEGER,
+        ipoeTtl                  INTEGER
+    }
+
+ipoeIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IPoE VIF id. A unique value, greater than zero, for each interface."
+    ::= { ipoeEntry 1 }
+
+ipoeUsername OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the
+            IPoE subscriber's username."
+    ::= { ipoeEntry 2 }
+
+ipoeMac OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The Link-layer address of the IPoE subscriber."
+    ::= { ipoeEntry 3 }
+
+ipoeSvid OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Service VID (outer VLAN id)."
+    ::= { ipoeEntry 4 }
+
+ipoeCvid OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Customer VID (inner VLAN id)."
+    ::= { ipoeEntry 5 }
+
+ipoeSessionId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique string value identifying subscriber's session"
+    ::= { ipoeEntry 6 }
+
+ipoeIpv4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IPv4 address of the subscriber."
+    ::= { ipoeEntry 7 }
+
+ipoeIngressCir OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the
+            Ingress CIR."
+    ::= { ipoeEntry 8 }
+    
+ipoeEgressCir OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the
+            Egress CIR."
+    ::= { ipoeEntry 9 }
+
+ipoeRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of packets received on the interface."
+    ::= { ipoeEntry 10 }
+
+ipoeTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of packets transmitted out of the interface."
+    ::= { ipoeEntry 11 }
+
+ipoeRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of octets received on the interface."
+    ::= { ipoeEntry 12 }
+
+ipoeTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of octets transmitted out of the
+            interface."
+    ::= { ipoeEntry 13 }
+
+ipoePort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Physical port number."
+    ::= { ipoeEntry 14 }
+
+ipoeTtl OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "subscriber session TTL."
+    ::= { ipoeEntry 15 }
+
+--
+-- License info
+--
+
+licenseInfo OBJECT-TYPE
+    SYNTAX      licenseInfo
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "BisonRouter license information."
+    ::= { bisonrouter 9 }
+
+licenseInfo ::=
+    SEQUENCE {
+        licStatus                 INTEGER,
+        licStatusDesc             DisplayString,
+        licForwBandwidth          INTEGER
+    }
+
+licStatus OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Status code."
+    ::= { licenseInfo 1 }
+
+licStatusDesc OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Status description."
+    ::= { licenseInfo 2 }
+
+licForwBandwidth OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Forwarding bandwidth."
+    ::= { licenseInfo 3 }
+
+--
+-- SNAT44 maps usage stat
+--
+
+snat44UsageStat OBJECT-TYPE
+    SYNTAX      SEQUENCE OF snat44UsageStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "SNAT44 maps usage statistic."
+    ::= { bisonrouter 10 }
+
+snat44UsageStatEntry OBJECT-TYPE
+    SYNTAX      snat44UsageStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "SNAT44 maps usage statistic entry."
+    INDEX   { snat44UsageStatIndex }
+    ::= { snat44UsageStat 1 }
+
+snat44UsageStatEntry ::=
+    SEQUENCE {
+        snat44UsageStatIndex     InterfaceIndex,
+        snat44UsageStatIpStart   IpAddress,
+        snat44UsageStatIpEnd     IpAddress,
+        snat44UsageStatUsed      INTEGER,
+        snat44UsageStatTotal     INTEGER,
+        snat44UsageStatPerc      INTEGER,
+        snat44UsageStatMapId     INTEGER
+    }
+
+snat44UsageStatIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Index value."
+    ::= { snat44UsageStatEntry 1 }
+
+snat44UsageStatIpStart OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IP range start."
+    ::= { snat44UsageStatEntry 2 }
+
+snat44UsageStatIpEnd OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IP range end."
+    ::= { snat44UsageStatEntry 3 }
+
+snat44UsageStatUsed OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of used objects."
+    ::= { snat44UsageStatEntry 4 }
+
+snat44UsageStatTotal OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of objects."
+    ::= { snat44UsageStatEntry 5 }
+
+snat44UsageStatPerc OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of used objects in %."
+    ::= { snat44UsageStatEntry 6 }
+
+snat44UsageStatMapId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "SNAT44 map ID."
+    ::= { snat44UsageStatEntry 7 }
+
+END

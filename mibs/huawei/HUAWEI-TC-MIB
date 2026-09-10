@@ -1,12 +1,12 @@
 -- ============================================================================
--- Copyright (C) 2022 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2023 by HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: This module defines TEXTUAL-CONVENTION that is used by Huawei devices,
 -- including HWFrameType, HWPCBType,HWSubPCBType, and HWPortType. The following talbe
 -- lists the code area used by each product.
 
 -- Reference:
--- Version: V13.30
+-- Version: V13.65
 -- History:562051
 
 -- ============================================================================
@@ -21,7 +21,7 @@
                         FROM HUAWEI-MIB;
 
         huaweiTCMIB MODULE-IDENTITY
-            LAST-UPDATED "202211040000Z"
+            LAST-UPDATED "202302090000Z"
             ORGANIZATION "Huawei Technologies Co.,Ltd."
             CONTACT-INFO
                 "Huawei Industrial Base
@@ -31,8 +31,512 @@
                    Website: http://www.huawei.com
                    Email: support@huawei.com
                 "
-        DESCRIPTION
+        
+		DESCRIPTION
          "Huawei text conventions and common defination."
+            REVISION    "202302090000Z"
+              DESCRIPTION "V13.65
+               Add:virent8090DEVCR8DMPUF8BF3(820122),   -- V8R22C10 for CR8DMPUF8BF3(SBOM) NetEngine 8000 F Main Processing Unit B1(MPUB1)
+               Add:virent8090DEVCR8DMPUF8BF2(560449),   -- V8R22C10 for CR8DMPUF8BF2(SBOM) NetEngine 8000 F Main Processing Unit B2(MPUB2)
+               Add:virent8090DEVCR8DMPUF8AZ2(333932),   -- V8R22C10 for CR8DMPUF8AZ2(SBOM) NetEngine 8000E F Main Processing Unit B1Z(MPUB1Z)
+               Add:virent8090DEVCR8DSFUIK0D0(278498),   -- V8R22C10 for CR8DSFUIK0D0(SBOM) NetEngine 8000 F 2T Switch Routing Unit(SRU-2T-A)
+               Add:virent8090DEVCR8DSFUIK0D1(333202),   -- V8R22C10 for CR8DSFUIK0D1(SBOM) NetEngine 8000E F 2T Switch Routing Unit(SRUA-2T-A)
+               Add:virent8090DEVCR8D00EKNIC0(437814),   -- V8R22C10 for CR8D00EKNIC0(SBOM) 40-Port 100GBase-QSFP28 Integrated Line Processing Unit(LPUIA-4T)
+               Add:virent8090DEVCR8D00EINBC2(142863),   -- V8R22C10 for CR8D00EINBC2(SBOM) 32-Port 100GBase-QSFP28 Integrated Line Processing Unit CM(LPUI-3T2A-CM)
+               Add:virent8090DEVCR8D00LRXIC0(544919),   -- V8R22C10 for CR8D00LRXIC0(SBOM) 72-Port 10GE(SFP+)/GE(SFP) Integrated Line Processing Unit(LPUIA-2T)
+               Add:virent8090DEVCR8D00EENBCY(218591),   -- V8R22C10 for CR8D00EENBCY(SBOM) 20-Port 100GBase-QSFP28 Integrated Line Processing Unit CM(LPUI-2TA-CM)
+               Add:virent8090DEVCR8D00LRXFCY(142985),   -- V8R22C10 for CR8D00LRXFCY(SBOM) 72-Port 10GE-SFP+ Integrated Line Processing Unit(LPUI-1TA-CM)
+               Add:virent8090DEVIG2DLPUFT003(200560),   -- V8R22C10 for IG2DLPUFT003(SBOM) Flexible Card Line Processing Unit(LPUF-1T2A)
+               Add:virent8090DEVIG2DLPUFM306(641528),   -- V8R22C10 for IG2DLPUFM306(SBOM) Flexible Card Line Processing Unit(LPUF-483A)
+               Add:virent8090DEVCR5DEDVE8N7C(492102),   -- V8R22C10 for CR5DEDVE8N7C(SBOM) 16-Port 50G/8-Port 100GBase-QSFP28 FlexE Integrated Line Processing Unit L(LPUI-1T2-L)
+               Add:virent8090DEVCR5DEDVE8N7D(956150),   -- V8R22C10 for CR5DEDVE8N7D(SBOM) 16-Port 50G/8-Port 100GBase-QSFP28 FlexE/MACsec Integrated Line Processing Unit CM(LPUI-1T2-CM)
+               Add:virent8090DEVCR5DLPUFT07H(135161),   -- V8R22C10 for CR5DLPUFT07H(SBOM) Flexible Card Line Processing Unit(LPUF-1T2)
+               Add:virent8090DEVCR5DLPUF537G(163641),   -- V8R22C10 for CR5DLPUF537G(SBOM) Flexible Card Line Processing Unit(LPUF-53)
+               Add:virent8090DEVCR5DLPUFF397(540645),   -- V8R22C10 for CR5DLPUFF397(SBOM) Flexible Card Line Processing Unit(LPUF-243)
+               Add:virent8090DEVCR5DLPUFF37I(981704),   -- V8R22C10 for CR5DLPUFF37I(SBOM) 8-Port GE-SFP/10GE-SFP+ and 16-Port GE-SFP Flexible Card Line Processing Unit(LPUI-243-CM, 4*10GE+20*GE by default, one sub-slot for flexible card)
+               Add:virent8090DEVCR5DLPUFM37G(441838),   -- V8R22C10 for CR5DLPUFM37G(SBOM) Flexible Card Line Processing Unit(LPUF-483)
+               Add:virent8090DEVCR5DLPUFM37J(576508),   -- V8R22C10 for CR5DLPUFM37J(SBOM) Flexible Card Line Processing Unit(LPUF-483-CM, enable slot 0 by default)
+               Add:virent8090DEVCR5DLPUFM37I(505713),   -- V8R22C10 for CR5DLPUFM37I(SBOM) Flexible Card Line Processing Unit(LPUF-483-E-CM, enable slot 0 by default)
+               Add:virent8090DEVCR5DLPUFM37M(848667),   -- V8R22C10 for CR5DLPUFM37M(SBOM) 24-Port GE-SFP/10GE-SFP+ Flexible Card Line Processing Unit(LPUI-483-CM, Enable 12*10GE+12*GE by default, Supporting one sub-slot for flexible card)
+               Add:virent8090DEVCR5DLPUF537D(776113),   -- V8R22C10 for CR5DLPUF537D(SBOM) Flexible Card Line Processing Unit(LPUF-53)
+               Add:virent8090DEVCR5DLPUFF37X(900536),   -- V8R22C10 for CR5DLPUFF37X(SBOM) Flexible Card Line Processing Unit(LPUF-243)
+               Add:virent8090DEVCR5DLPUFF37W(620808),   -- V8R22C10 for CR5DLPUFF37W(SBOM) 8-Port GE-SFP/10GE-SFP+ and 16-Port GE-SFP Flexible Card Line Processing Unit(LPUI-243-CM, 4*10GE+20*GE by default, one sub-slot for flexible card)
+               Add:virent8090DEVCR5DLPUFM37Y(575487),   -- V8R22C10 for CR5DLPUFM37Y(SBOM) Flexible Card Line Processing Unit(LPUF-483)
+               Add:virent8090DEVCR5DLPUFM37Q(560576),   -- V8R22C10 for CR5DLPUFM37Q(SBOM) Flexible Card Line Processing Unit(LPUF-483-CM, enable slot 0 by default)
+               Add:virent8090DEVCR5DLPUFM37S(924968),   -- V8R22C10 for CR5DLPUFM37S(SBOM) Flexible Card Line Processing Unit(LPUF-483-E-CM, enable slot 0 by default)
+               Add:virent8090DEVCR5DLPUFM37U(822545),   -- V8R22C10 for CR5DLPUFM37U(SBOM) 24-Port GE-SFP/10GE-SFP+ Flexible Card Line Processing Unit(LPUI-483-CM, Enable 12*10GE+12*GE by default, Supporting one sub-slot for flexible card)
+               Add:virent8090DEVCR5DLPUFT07G(157738),   -- V8R22C10 for CR5DLPUFT07G(SBOM) Flexible Card Line Processing Unit(LPUF-1T2A)
+               Add:virent8090DEVCR5D00E8NB7T(477667),   -- V8R22C10 for CR5D00E8NB7T(SBOM) 16-Port 50G/8-Port 100GBase-QSFP28 FlexE/MACsec Integrated Line Processing Unit CM(LPUI-1T2A-CM)
+               Add:virent8090DEVCR5DLPUFT07K(558494),   -- V8R22C10 for CR5DLPUFT07K(SBOM) Flexible Card Line Processing Unit(LPUF-1T2A-E)
+               Add:virent8090DEVCR5DLPUF537H(248937),   -- V8R22C10 for CR5DLPUF537H(SBOM) Flexible Card Line Processing Unit(LPUF-53A)
+               Add:virent8090DEVCR5DLPUFF396(632083),   -- V8R22C10 for CR5DLPUFF396(SBOM) Flexible Card Line Processing Unit(LPUF-243A)
+               Add:virent8090DEVCR5DLPUFF39A(827356),   -- V8R22C10 for CR5DLPUFF39A(SBOM) 8-Port GE-SFP/10GE-SFP+ and 16-Port GE-SFP Flexible Card Line Processing Unit(LPUI-243A-CM, 4*10GE+20*GE by default, one sub-slot for flexible card)
+               Add:virent8090DEVCR5DLPUFM37H(530429),   -- V8R22C10 for CR5DLPUFM37H(SBOM) Flexible Card Line Processing Unit(LPUF-483A)
+               Add:virent8090DEVCR5DLPUFM37W(495978),   -- V8R22C10 for CR5DLPUFM37W(SBOM) Flexible Card Line Processing Unit(LPUF-483A)
+               Add:virent8090DEVCR5DLPUFM37K(715222),   -- V8R22C10 for CR5DLPUFM37K(SBOM) 24-Port GE-SFP/10GE-SFP+ Flexible Card Line Processing Unit(LPUI-483A-CM, Enable 12*10GE+12*GE by default, Supporting one sub-slot for flexible card)
+               Add:virent8090DEVME0DMSUFT07G(706119),   -- V8R22C10 for ME0DMSUFT07G(SBOM) Flexible Card Multi Service Unit(MSUF-1T2,2 sub-slots)
+               Add:virent8090DEVME0DBSUFT07F(165590),   -- V8R22C10 for ME0DBSUFT07F(SBOM) Flexible Card Broadband Service Unit(BSUF-1T2A,2 sub-slots)
+               Add:virent8090DEVME0DBSUFT07M(768000),   -- V8R22C10 for ME0DBSUFT07M(SBOM) Flexible Card Broadband Service Unit(BSUF-1T2-E,2 sub-slots)
+               Add:virent8090DEVME0DMSUFT07M(315631),   -- V8R22C10 for ME0DMSUFT07M(SBOM) Flexible Card Multi Service Unit(MSUF-1T2-E,2 sub-slots)
+               Add:virent8090DEVME0DBSUFT07N(995118),   -- V8R22C10 for ME0DBSUFT07N(SBOM) Flexible Card Broadband Service Unit(BSUF-1T2A-E,2 sub-slots)
+               Add:virent8090DEVME0DMSUFT07N(834245),   -- V8R22C10 for ME0DMSUFT07N(SBOM) Flexible Card Multi Service Unit(MSUF-1T2A-E,2 sub-slots)
+               Add:virent8090DEVME0DBSUFM07B(466368),   -- V8R22C10 for ME0DBSUFM07B(SBOM) Flexible Card Broadband Service Unit(BSUF-243-E,2 sub-slots)
+               Add:virent8090DEVME0DBSUFM07K(458457),   -- V8R22C10 for ME0DBSUFM07K(SBOM) Flexible Card Broadband Service Unit(BSUF-483-E,2 sub-slots)
+               Add:virent8090DEVME0DBSUFM07E(919145),   -- V8R22C10 for ME0DBSUFM07E(SBOM) Flexible Card Broadband Service Unit(BSUF-243-E,2 sub-slots)
+               Add:virent8090DEVME0DBSUFM07G(333879),   -- V8R22C10 for ME0DBSUFM07G(SBOM) Flexible Card Broadband Service Unit(BSUF-483-E,2 sub-slots)
+               Add:virent8090DEVCX6DISUFT014(390887),   -- V8R22C10 for CX6DISUFT014(SBOM) Flexible Card Integrated Service Unit(ISUF-1TA)
+               Add:virent8090DEVCX6DISUFT016(392871),   -- V8R22C10 for CX6DISUFT016(SBOM) Flexible Card Integrated Service Unit(ISUF-1T)
+               Add:virent8090DEVCX6DISUFM312(440866),   -- V8R22C10 for CX6DISUFM312(SBOM) Flexible Card Line Processing Unit(ISUF-483A)
+			   Add:virent8090DEVCR8PM1DBADM1(226170),  --NetEngine 8000 M1D, DC Power (Port Capacity 4*100GE/50GE+16*25GE/10GE/GE/FE+8*10GE/GE/FE,exclude auxiliary materials)
+               Add:virent8090DEVCR8PM1DBADM0(226171),  --NetEngine 8000 M1D, DC Power (Port Capacity 4*100GE/50GE+16*25GE/10GE/GE/FE+8*10GE/GE/FE,exclude auxiliary materials)
+               Add:virent8090DEVCR8PM1DBAAM1(226172),  --NetEngine 8000 M1D, AC Power (Port Capacity 4*100GE/50GE+16*25GE/10GE/GE/FE+8*10GE/GE/FE,exclude auxiliary materials)
+               Add:virent8090DEVCR8PM1DBAAM0(226173),  --NetEngine 8000 M1D, AC Power (Port Capacity 4*100GE/50GE+16*25GE/10GE/GE/FE+8*10GE/GE/FE,exclude auxiliary materials)
+               Add:virent8090DEVCR8PM1DBADM5(226174),  --NetEngine 8000 M1D, DC Power (Port Capacity 4*100GE/50GE+16*25GE/10GE/GE/FE+8*10GE/GE/FE,exclude auxiliary materials)
+               Add:virent8090DEVCR8PM1DBAAM5(226175),  --NetEngine 8000 M1D, AC Power (Port Capacity 4*100GE/50GE+16*25GE/10GE/GE/FE+8*10GE/GE/FE,exclude auxiliary materials)
+               Add:virent8090DEVANRD00CXPB02(226159),  --System Control, Cross-connect and Multi-protocol Process Unit with 160G
+               Add:virent8090DEVCR8PM1CBASC7(226199),  --NetEngine 8000 M1C, 2*AC Power, Port Capacity 16*10GE+8*GE(o)+4*GE(e), None of the ports are available by default
+               Add:virent8090DEVCR8PM1CBASA6(226200),  --NetEngine 8000 M1C(A), 2*DC Power, Port Capacity 16*10GE+8*GE(o)+4*GE(e), None of the ports are available by default
+               Add:virent8090DEVCR8PM1CBASA7(226201),  --NetEngine 8000 M1C(A), 2*AC Power, Port Capacity 16*10GE+8*GE(o)+4*GE(e), None of the ports are available by default
+               Add:virent8090DEVANGMHSTH0100(226206),  --ATN 910C-H DC Basic Configuration(Includes Fixed Enable Interface (4*10GE/GE/FE(o)+4*GE/FE(o)+4*GE/FE(e))/Dual Power/FAN/Chassis)
+               Add:virent8090DEVANGMHSTH0200(226208),  --ATN 910C-H AC Basic Configuration(Includes Fixed Enable Interface (4*10GE/GE/FE(o)+4*GE/FE(o)+4*GE/FE(e))/Power/FAN/Chassis)
+               Add:virent8090DEVANGMHSTS0200(226209),  --ATN 910C-S AC Basic Configuration(Includes Fixed Enable Interface (4*10GE/GE/FE(o)+4*GE/FE(o)+4*GE/FE(e))/Power/FAN/Chassis)
+               Add:virent8090DEVCP8PHST20A06(226214),  --NetEngine A821 AC System (2*10GE/GE/FE+8*GE/FE(o)+8*GE/FE€
+               Add:virent8090DEVCP8PHST20A08(226215),  --NetEngine A821 AC System (2*10GE/GE/FE+8*GE/FE(o)+8*GE/FE(e))
+               Add:virent8090DEVCP8PHST10A10(226216),  --NetEngine A813 AC System (6*GE/FE(o)+8*GE/FE(e))
+               Add:virent8090DEVCP8PHSB2EA04(226217),  --NetEngine A821 E AC Chassis(A) (6*10GE/GE/FE(o)+4*GE/FE(o)+8*GE/FE(e), Default 2*10GE/GE/FE(o)+8*GE/FE(o)+8*GE/FE(e))
+               Add:virent8090DEVCP8PHSB2EA05(226218),  --NetEngine A821 E AC Chassis (6*10GE/GE/FE(o)+4*GE/FE(o)+8*GE/FE(e), Default 2*10GE/GE/FE(o)+8*GE/FE(o)+8*GE/FE(e))
+               Add:virent8090DEVCP8PHST2EA29(226219),  --NetEngine A822 E AC Chassis(A)(2*10GE/GE/FE(o)+4*GE/FE(o)+8*GE/FE(e))
+               Add:virent8090DEVCP8PHST2EA28(226220),  --NetEngine A822 E AC Chassis (2*10GE/GE/FE(o)+4*GE/FE(o)+8*GE/FE(e))
+               Add:virent8090DEVCP8PHST1EA0A(226223),  --NetEngine A813 E AC Chassis (A)(6*GE/FE(o)+8*GE/FE(e))
+               Add:virent8090DEVCP8PHST1EAAB(226224),  --NetEngine A813 E AC Chassis (6*GE/FE(o)+8*GE/FE(e))
+               Add:virent8090DEVANPM01HOST7(226225),  --ATN 905-S System,AC,4*GE/FE(o),4*GE/FE(e)
+               Add:virent8090DEVCR5D0SRUAI7A(226160),  --Switch and Route Processing Unit A21A(SRUA-1TA-H, 32G Memory)
+               Add:virent8090DEVCR5D0SRUAI7B(226161),  --Switch and Route Processing Unit A21(SRUA-1T-H, 32G Memory)
+               Add:virent8090DEVCX6D0SRUAI7A(226162),  --Switch and Route Processing Unit A21(SRUA-1T-H, 32G Memory)
+               Add:virent8090DEVCX6D0SRUAI1B(226163),  --Switch and Route Processing Unit A21(SRUA-1T-H, 32G Memory)
+               Add:virent8090DEVTNRD0SRUAI7A(226164),  --Switch and Route Processing Unit A21(SRUA-1T-H, 32G Memory)
+               Add:virent8090DEVME0D0SRUAI7B(226165),  --Switch and Route Processing Unit A21A(SRUA-1TA-H, 32G Memory)
+               Add:virent8090DEVME0D0SRUAI7C(226166),  --Switch and Route Processing Unit A21(SRUA-1T-H, 32G Memory)
+               Add:virent8090DEVIG2D0SRUAI7A(226167),  --Switch and Route Processing Unit A21A(SRUA-1TA-H, 32G Memory)
+               Add:virent8090DEVCR5D0SRUAH7C(226168),  --Switch and Route Processing Unit A20A(SRUA-480A-I, 32G Memory)
+               Add:virent8090DEVCR5D0SRUAH7D(226169),  --Switch and Route Processing Unit A20(SRUA-480-I, 32G Memory)
+               Add:virent8090DEVCX6D0SRUAH7B(226176),  --Switch and Route Processing Unit A20(SRUA-480-I, 32G Memory)
+               Add:virent8090DEVCX6D0SRUAH1A(226177),  --Switch and Route Processing Unit A20(SRUA-480-I, 32G Memory)
+               Add:virent8090DEVTNRD0SRUAH7B(226178),  --Switch and Route Processing Unit A20(SRUA-480-I, 32G Memory)
+               Add:virent8090DEVME0D0SRUAH7D(226179),  --Switch and Route Processing Unit A20A(SRUA-480A-I, 32G Memory)
+               Add:virent8090DEVME0D0SRUAH7E(226180),  --Switch and Route Processing Unit A20(SRUA-480-I, 32G Memory)
+               Add:virent8090DEVME0D0SRUAH7A(226181),  --Switch and Route Processing Unit A22A(SRUA-480A-J, 32G Memory)
+               Add:virent8090DEVME0D0SRUAH7P(226182),  --Switch and Route Processing Unit A22(SRUA-480-J, 32G Memory)
+            "
+                    REVISION    "202302081134Z"
+              DESCRIPTION "V13.64
+                Add virent8090DEVCR5D00E8KB61(562132),    -- V8R23C00 for CR5D00E8KB61(SBOM) 8-Port 400GBase QSFP-DD Integrated Line Process Unit(NE5000E LPUI-3T2-C) 
+                Add virent8090DEVCR5D00E8KB62(562133),    -- V8R23C00 for CR5D00E8KB62(SBOM) 8-Port 400GBase QSFP-DD Integrated Line Process Unit CM(NE5000E LPUI-3T2-C-CM)(2 ports enable)
+                Add virent8090DEVCR5D00EINB61(562134),    -- V8R23C00 for CR5D00EINB61(SBOM) 32-Port 100GBase QSFP28 Integrated Line Process Unit(NE5000E LPUI-3T2-C) 
+                Add virent8090DEVCR5D00EINB62(562135),    -- V8R23C00 for CR5D00EINB62(SBOM) 32-Port 100GBase QSFP28 Integrated Line Process Unit CM(NE5000E LPUI-3T2-C-CM)(8 ports enable)
+                Add virent8090DEVCR5D00EDNB68(562136),    -- V8R23C00 for CR5D00EDNB68(SBOM) 16-Port 100GBase QSFP28 Integrated Line Process Unit(NE5000E LPUI-1T6-G) 
+                Add virent8090DEVCR5D00EDNB69(562137),    -- V8R23C00 for CR5D00EDNB69(SBOM) 16-Port 100GBase QSFP28 Integrated Line Process Unit CM(NE5000E LPUI-1T6-G-CM)(4 ports enable)
+                Add virent8090DEVCR5D00LRXF65(562138),    -- V8R23C00 for CR5D00LRXF65(SBOM) 72-Port 10GBase LAN/WAN-SFP+ Integrated Line Process Unit(NE5000E LPUI-1T6-G)
+                Add virent8090DEVCR5D00LRXF66(562139),    -- V8R23C00 for CR5D00LRXF66(SBOM) 72-Port 10GBase LAN/WAN-SFP+ Integrated Line Process Unit CM(NE5000E LPUI-1T6-G-CM)(24 ports enable)
+            "
+
+		    REVISION    "202302070001Z"
+              DESCRIPTION "V13.63
+				Add:subbname8090DEVGPR8CQ20YSD(650885),   -- 8-Port 100GBase-QSFP28 + 20-Port 25GBase-Y-SFP+
+                Add:subbname8090DEVTNR1E4NBIYFS(258025),   -- 4-Port 100GBase-QSFP28 or 16-Port 25GBase-SFP28 Combo + 16-Port 25GBase-SFP28
+                Add:subbname8090DEVCR81E4NBIYFS(258026),   -- 4-Port 100GBase-QSFP28 or 16-Port 25GBase-SFP28 Combo + 16-Port 25GBase-SFP28
+                Add:subbname8090DEVCR81E4NBIYF(258027),    -- 4-Port 100GBase-QSFP28 or 16-Port 25GBase-SFP28 Combo + 16-Port 25GBase-SFP28
+            "
+		 
+		    REVISION    "202302040001Z"
+              DESCRIPTION "V13.62
+                Add: virent8090DEVCR8DIPU1T214(658303),  -- V8R22C10 for CR8DIPU1T214(SBOM) Integrated Network Processing Unit (IPUA-1T2-F)
+                Add: virent8090DEVCR8DE8KE8ND9(578779),  -- V8R22C10 for 8-Port 400GBase-QSFP-DD + 8-Port 100GBase-QSFP28 Integrated Line Processing Unit CM(LPUI-4T-E-CM,Enable 16*100GE by default)
+                Add: virent8090DEVCR8DE4KEFND9(734940),  -- V8R22C10 for 4-Port 400GBase-QSFP-DD + 24-Port 100GBase-QSFP28 Integrated Line Processing Unit CM (LPUI-4T-E-CM)
+                Add: virent8090DEVCR8DEKNBFED9(193229),  -- V8R22C10 for 40-Port 100GBase-QSFP28 Integrated Line Processing Unit CM(LPUI-4T-E-CM)
+                Add: virent8090DEVCR8DEENBFED9(263591),  -- V8R22C10 for 20-Port 100GBase-QSFP28 Integrated Line Processing Unit CM(LPUI-2T-E-CM)
+                Add: virent8090DEVCR8DERYBFED9(623955),  -- V8R22C10 for 72-Port 25GE(SFP28)/10GE(SFP+)/GE(SFP) Integrated Line Processing Unit CM(LPUI-2T-E-CM)
+                Add: virent8090DEVCR8DEANEJYD9(245429),  -- V8R22C10 for 10-Port 100GBase-QSFP28 + 36-Port 25GE(SFP28)/10GE(SFP+)/GE(SFP) Integrated Line Processing Unit CM(LPUI-2T-E-CM)
+                Add: virent8090DEVCR8DEANEJXDQ(818320),  -- V8R22C10 for 10-Port 100GBase-QSFP28 MACsec + 36-Port 10GE(SFP+)/GE(SFP) MACsec Integrated Line Processing Unit CM(LPUI-1T-CM)
+                Add: virent8090DEVCR8DEANEJXD9(236875),  -- V8R22C10 for 10-Port 100GBase-QSFP28 + 36-Port 10GE(SFP+)/GE(SFP) Integrated Line Processing Unit CM(LPUI-1T-CM)
+                Add: virent8090DEVCR8DIPU480M3(115244),  -- V8R22C10 for CR8DIPU480M3(SBOM) Integrated Network Processing Unit (IPU-480-E)
+            "
+		 
+
+            REVISION    "202302040000Z"
+            DESCRIPTION "V13.61,
+            Add:fnameCE688248S8CQ(688251) to fnameCE5811S48T4S(688264),
+            Add:bnameCE688248S8CQ(688496) to bnameCE5811S48T4S(688529),
+            "
+            REVISION    "202302030000Z"
+              DESCRIPTION "V13.60
+                Add bnameTNRMM42FBXC1(564538),    --V8R22C10 PTN 6900-2-M4 TNRMM42FBXC1
+                Add virent8090DEVCR5DSFUIT27V(465407),   --  for CR5DSFUIT27V(SBOM) Finished Board Unit,NetEngine40E,CR57SFU2TES01,2Tbps Switch Fabric Unit I(SFUI-2T-I)
+                Add virent8090DEVCR5DSFUIT27W(606864),   --  for CR5DSFUIT27W(SBOM) Finished Board Unit,NetEngine40E,CR57SFU2TEA01,2Tbps Switch Fabric Unit I(SFUI-2TA-I)
+                Add virent8090DEVCX6DSFUIT27U(440925),   --  for CX6DSFUIT27U(SBOM) Finished Board Unit,CX600,CX61SFU2TES00,2Tbps Switch Fabric Unit I(SFUI-2T-I)
+                Add virent8090DEVTNRDSFUIT27U(978034),   --  for TNRDSFUIT27U(SBOM) Finished Board Unit,PTN6900,TNR1SFU2TES00,2Tbps Switch Fabric Unit I(SFUI-2T-I)
+                Add virent8090DEVIG2DSFUIT214(310202),   --  for IG2DSFUIT214(SBOM) Finished Board Unit,SIG9800,IG21SFU2TE03,2Tbps Switch Fabric Unit E1(SFUI-2TA-I)
+                Add virent8090DEVCR5DSFUIT27T(721887),   --  for CR5DSFUIT27T(SBOM) Finished Board Unit,NetEngine40E,CR57SFU2TFS1,2Tbps Switch Fabric Unit J(SFUI-2T-J)
+                Add virent8090DEVCR5DSFUIT27U(413155),   --  for CR5DSFUIT27U(SBOM) Finished Board Unit,NetEngine40E,CR57SFU2TFA1,2Tbps Switch Fabric Unit J(SFUI-2TA-J)
+                Add virent8090DEVCX6DSFUIT27T(471946),   --  for CX6DSFUIT27T(SBOM) Finished Board Unit,CX600,CX61SFU2TFS1,2Tbps Switch Fabric Unit J(SFUI-2T-J)
+                Add virent8090DEVTNRDSFUIT27T(448824),   --  for TNRDSFUIT27T(SBOM) Finished Board Unit,PTN6900,CR57SFU2TFS1,2Tbps Switch Fabric Unit J(SFUI-2T-J)
+                Add virent8090DEVIG2DSFUIT213(137349),   --  for IG2DSFUIT213(SBOM) Finished Board Unit,SIG9800,IG21SFU2TFA1,2Tbps Switch Fabric Unit F1(SFUI-2TA-J)
+            "
+
+			REVISION    "202302010000Z"
+              DESCRIPTION "V13.59,
+				add AirEngine8771-X1T(692411),   -- WLAN R23C00 New AP
+                add AirEngine5562-17W(692412),   -- WLAN R22C10 New AP
+				add AirEngine5562-10(692413),    -- WLAN R22C10 New AP
+				add AirEngine5562-10SW(692414),  -- WLAN R22C10 New AP
+				add AC650-128AP(692415),         -- WLAN R22C10 New AC
+				add AC650-256AP(692416),         -- WLAN R22C10 New AC
+            "
+            REVISION    "202301310000Z"
+              DESCRIPTION "V13.58,
+                modify: virent8090DEVCR5DSFUIT365(562189),    -- V8R21C10 for CR5DSFUIT365(SBOM) NE5000E-20 3.2T CLC Integrated Switch Fabric Unit for Multi-Chassis (SFUI-3T2-M2)
+                modify: virent8090DEVCR5DSFUIT364(562190),    -- V8R21C10 for CR5DSFUIT364(SBOM) NE5000E-20 3.2T CLC Switch Fabric Unit for Single Chassis (SFU-3T2-S2)
+            "
+             
+            REVISION "202301301000Z"
+              DESCRIPTION "V13.57,
+                add: virent8090DEVCR8D0MPUAXC0(688760),    -- V8R23C00 for CR8D0MPUAXC0(SBOM) NetEngine 8000 Main Processing Unit A10(MPUA10)
+                add: virent8090DEVCR8D0MPUAXC2(688761),    -- V8R23C00 for CR8D0MPUAXC2(SBOM) NetEngine 8000 Main Processing Unit A10B(MPUA10B)
+                add: virent8090DEVCR8D0MPUAXCA(688762),    -- V8R23C00 for CR8D0MPUAXCA(SBOM) NetEngine 8000 Main Processing Unit A10A(MPUA10A)
+                add: virent8090DEVCR8D0MPUA8C6(688763),    -- V8R23C00 for CR8D0MPUA8C6(SBOM) NetEngine 8000 Main Processing Unit A9A(MPUA9A)
+                add: virent8090DEVCR8D0MPUAXC1(688764),    -- V8R23C00 for CR8D0MPUAXC1(SBOM) NetEngine 8000 Main Processing Unit A11(MPUA11)
+                add: virent8090DEVCR8D0MPUAXC3(688765),    -- V8R23C00 for CR8D0MPUAXC3(SBOM) NetEngine 8000 Main Processing Unit A11B(MPUA11B)
+            "
+
+            REVISION    "202301291000Z"	
+              DESCRIPTION "V13.56,	
+                add: fnameAR6510-L11T1X2(668048),   --AR6510-L11T1X2 FRAME
+                add: fnameAR6510-L5T4S4(668049),   --AR6510-L5T4S4 FRAME
+                add: fnameAR5510-H8P2TW1(668050),   --AR5510-H8P2TW1 FRAME
+                add: fnameAR5510-H10T1(668051),   --AR5510-H10T1 FRAME
+                add: fnameAR5510-L5T-LTE4EA(668052),   --AR5510-L5T-LTE4EA FRAME
+                add: fnameAR5510-L5T(668053),   --AR5510-L5T FRAME
+                add: fnameAR6500-10(668054),   --AR6500-10 FRAME
+
+                add: bnameAR6510-L11T1X2(668163),   --AR6510-L11T1X2 Main Control Unit
+                add: bnameAR6510-L5T4S4(668164),   --AR6510-L5T4S4 Main Control Unit
+                add: bnameAR5510-H8P2TW1(668165),   --AR5510-H8P2TW1 Main Control Unit
+                add: bnameAR5510-H10T1(668166),   --AR5510-H10T1 Main Control Unit
+                add: bnameAR5510-L5T-LTE4EA(668167),   --AR5510-L5T-LTE4EA Main Control Unit
+                add: bnameAR5510-L5T(668168),   --AR5510-L5T Main Control Unit
+
+            "
+
+		    REVISION    "202301290000Z"
+              DESCRIPTION "V13.55,
+                add: fname8031S5331-H48HB4XZ(537806),   -- S5331-H48HB4XZ
+                add: bname8031S5331-H48HB4XZ(537990),   -- S5331-H48HB4XZ
+            "
+
+            REVISION "202301191000Z"
+              DESCRIPTION "V13.54,
+                add: fname8031S3710-H24T4S-A(537794),    -- S3710-H24T4S-A
+                add: fname8031S3710-H24P4S-A(537795),    -- S3710-H24P4S-A
+                add: fname8031S3710-H48T4S-A(537796),    -- S3710-H48T4S-A
+                add: fname8031S3710-H48LP4S-A(537797),   -- S3710-H48LP4S-A
+                add: fname8031S5331-S24T4X-A-V1(537798), -- S5331-S24T4X-A-V1
+                add: fname8031S5331-H24P4XC-V1(537799),  -- S5331-H24P4XC-V1
+                add: fname8031S5331-H48T4XC-V1(537800),  -- S5331-H48T4XC-V1
+                add: fname8031S310-24P4S(537801),        -- S310-24P4S
+                add: fname8031S310-24T4S(537802),        -- S310-24T4S
+                add: fname8031S310-48T4S(537803),        -- S310-48T4S
+                add: bname8031S3710-H24T4S-A(537978),    -- S3710-H24T4S-A
+                add: bname8031S3710-H24P4S-A(537979),    -- S3710-H24P4S-A
+                add: bname8031S3710-H48T4S-A(537980),    -- S3710-H48T4S-A
+                add: bname8031S3710-H48LP4S-A(537981),   -- S3710-H48LP4S-A
+                add: bname8031S5331-S24T4X-A-V1(537982), -- S5331-S24T4X-A-V1
+                add: bname8031S5331-H24P4XC-V1(537983),  -- S5331-H24P4XC-V1
+                add: bname8031S5331-H48T4XC-V1(537984),  -- S5331-H48T4XC-V1
+                add: bname8031S310-24P4S(537985),        -- S310-24P4S
+                add: bname8031S310-24T4S(537986),        -- S310-24T4S
+                add: bname8031S310-48T4S(537987),        -- S310-48T4S"
+
+			REVISION    "202301181000Z"	
+              DESCRIPTION "V13.53,	
+                add: fname8031S5331-S24S8T4X-A(537804),   -- S5331-S24S8T4X-A
+                add: fname8031S5331-S24S8T4X-D(537805),   -- S5331-S24S8T4X-D
+                add: bname8031S5331-S24S8T4X-A(537988),   -- S5331-S24S8T4X-A
+                add: bname8031S5331-S24S8T4X-D(537989),   -- S5331-S24S8T4X-D
+            "
+
+			REVISION    "202301141000Z"	
+              DESCRIPTION "V13.36,	
+                Add:virent8090DEVCR8B0BKP03D4(689110),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Intake)
+                Add:virent8090DEVCR8B0BKP03D5(689111),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Exhaust)
+                Add:virent8090DEVCR8B0BKP03D0(689112),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Intake)
+                Add:virent8090DEVCR8B0BKP03D2(689113),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Exhaust)
+                Add:virent8090DEVCR8B0BKP03D6(689114),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Intake)
+                Add:virent8090DEVCR8B0BKP03D7(689115),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Exhaust)
+                Add:virent8090DEVCR8B0BKP03D1(689116),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Intake)
+                Add:virent8090DEVCR8B0BKP03D3(689117),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Exhaust)
+            "
+			
+			REVISION    "202301130000Z"
+              DESCRIPTION "V13.51,
+               		add: virent8090DEVCR5DVSUIK07M(894575),   -- V8R22C10 for CR5DVSUIK07M(SBOM) Integrated Service Unit 400(VSUI-400B)
+               		add: virent8090DEVIG2D00SPUG0F(829027),   -- V8R22C10 for IG2D00SPUG0F(SBOM) High Performance X8A&X16A Service Processing Unit-SPUGA,with HW Service Inspection Gateway Software
+               		add: virent8090DEVIG2D00SPUG0E(836270),   -- V8R22C10 for IG2D00SPUG0E(SBOM) High Performance X8A&X16A Enhanced Service Processing Unit-SPUGEA,with HW Service Inspection Gateway Software
+               		add: virent8090DEVCR8DSFUI2TC1(676895),   -- V8R23C00 for CR8DSFUI2TC1(SBOM) NetEngine 8000 X16 14.4Tbps Switch Fabric Unit(SFUI-2T-C)
+               		add: virent8090DEVCR8DSFUI2TC2(676896),   -- V8R23C00 for CR8DSFUI2TC2(SBOM) NetEngine 8000 X16 2Tbps Switch Fabric Unit(SFUIA-2T-C)
+              		add: virent8090DEVCR5D0SRUAK72(183685),   --  for CR5D0SRUAK72(SBOM) Switch and Route Processing Unit A113(SRUA-2T-G, 32G Memory)
+              		add: virent8090DEVCR5D0SRUAK73(959601),   --  for CR5D0SRUAK73(SBOM) Switch and Route Processing Unit A113A(SRUA-2TA-G, 32G Memory)
+              		add: virent8090DEVCX6D0SRUAK72(125962),   --  for CX6D0SRUAK72(SBOM) Switch and Route Processing Unit A113(SRUA-2T-G, 32G Memory)
+              		add: virent8090DEVTNRD0SRUAK72(300854),   --  for TNRD0SRUAK72(SBOM) Switch and Route Processing Unit A113(SRUA-2T-G, 32G Memory)
+              		add: virent8090DEVIG2D0SRUAK72(135469),   --  for IG2D0SRUAK72(SBOM) Switch and Route Processing Unit A113A(SRUA-2TA-G, 32G Memory)
+              "
+
+			REVISION    "202301090000Z"
+              DESCRIPTION "V13.50,
+				add: fname8031S6330-H24X4Y(537793),   -- S6330-H24X4Y (24*10GE SFP+ ports, 4*25GE SFP28 ports, optional RTU upgrade to 4*100GE QSFP28, without power module)
+              "
+			REVISION    "202301090000Z"
+              DESCRIPTION "V13.49,
+				add: subbname8090DEVME0D00E1KB71(542988),   -- 1-Port 400GBase-QSFP-DD + 2-Port External OA Flexible Card(BP1T)
+              "
+
+			REVISION    "202212190000Z"
+              DESCRIPTION "V13.48,
+				add: subbnamePTN7900TPA7FH2E(229705),   -- PTN7900TPA7FH2E
+                add: subbnamePTN7900TPA7FH4E(229706),   -- PTN7900TPA7FH4E
+              "
+			
+		   REVISION    "202212160000Z"
+              DESCRIPTION "V13.47,
+				add: subbname8090DEVGPLI10CQ36XSES1(582393),   -- 36-Port 10GE(SFP+)/GE(SFP) 10-Port 100GBase QSFP28 Integrated Line Process Unit
+                add: subbname8090DEVGPLI10CQ36XSE2(582394),   -- 36-Port 10GE(SFP+)/GE(SFP) 10-Port 100GBase QSFP28 Integrated Line Process Unit
+                add: subbname8090DEVGFL72GSFB(548674),      -- 72-port GE MACsec Physical Interface Card(PIC)
+				add: subbname8090DEVCR8DERGF00F1(548774),   -- NetEngine 8000 F 2T Switch Routing Unit(SRU-2T-A)
+              "
+			
+           REVISION    "202212060000Z"
+              DESCRIPTION "V13.46,
+                add: S5735I-L8P4X-A-V2(537791),        --S5735I-L8P4X-A-V2
+                add: S5735I-L10T4X-A-V2(537792),       --S5735I-L10T4X-A-V2
+                add: 16700,       ---HUAWEI S16700
+              "
+
+           REVISION    "202211300000Z"	
+              DESCRIPTION "V13.45,	
+               Add: fnameNETENGINE-A820-M(229517),       -- V8R21C00 for NETENGINE-A820-M chassis
+               Add: virent8090DEVME0D0SRUAH78(553461),   --  for ME0D0SRUAH78(SBOM) Switch and Route Processing Unit A22A(SRUA-480A-J, 32G Memory)
+               Add: virent8090DEVME0D0SRUAH79(553462),   --  for ME0D0SRUAH79(SBOM) Switch and Route Processing Unit A22(SRUA-480-J, 32G Memory)
+               Add: virent8090DEVCR8DE2UB00D1(676980),   -- V8R22C10 for CR8DE2UB00D1(SBOM) 2-Port 1.2TBase Integrated Line Processing Unit(LPUI-2T4A)
+               Add: virent8090DEVTPND02CXPB01(901611),   --  for TPND02CXPB01(SBOM) OptiX PTN 980, TPN2CXPA3, System Control,Cross-connect and Multi-protocol Process Unit
+               Add: virent8090DEVTPND02CXPB02(932124),   --  for TPND02CXPB02(SBOM) OptiX PTN 980, TPN2CXPA4, System Control,Cross-connect and Multi-protocol Process Unit
+               Add: virent8090DEVTPQD01CXPB01(852453),   --  for TPQD01CXPB01(SBOM) OptiX PTN 990E, TPQ1CXPA4, System Control,Cross-connect and Multi-protocol Process Unit
+               Add: virent8090DEVTPQD01CXPB02(967204),   --  for TPQD01CXPB02(SBOM) OptiX PTN 990E, TPQ1CXPA4, System Control,Cross-connect and Multi-protocol Process Unit
+              "
+
+           REVISION    "202211280000Z"	
+              DESCRIPTION "V13.44,	
+               Add: subbname8090DEVCR5D0LEXFM20(483067),   -- 20-Port 10GBase LAN/WAN-SFP+ Flexible Card(P483)
+              "
+
+           REVISION    "202211260000Z"	
+              DESCRIPTION "V13.43,	
+               virent8090DEVCR5D0MPUB97A(689102),  -- V8R22C10 for CR5D0MPUB97A(SBOM) Main Processing Unit B12(32G Memory)
+               virent8090DEVCR5D0MPUB97B(689103),  -- V8R22C10 for CR5D0MPUB97B(SBOM) Main Processing Unit B12A(32G Memory)
+               virent8090DEVCX6DMPUX867A(689104),  -- V8R22C10 for CX6DMPUX867A(SBOM) Main Processing Unit B12(32G Memory)
+               virent8090DEVCX6DMPUB121A(689105),  -- V8R22C10 for CX6DMPUB121A(SBOM) Main Processing Unit B12A(32G Memory)
+               virent8090DEVTNRDMPUX867A(689106),  -- V8R22C10 for TNRDMPUX867A(SBOM) Main Processing Unit B12(32G Memory)
+               virent8090DEVME0DMPUX867A(689107),  -- V8R22C10 for ME0DMPUX867A(SBOM) Main Processing Unit B12(32G Memory)
+               virent8090DEVME0DMPUX867B(689108),  -- V8R22C10 for ME0DMPUX867B(SBOM) Main Processing Unit B12A(32G Memory)
+               virent8090DEVIG2D0MPUB97B(689109),  -- V8R22C10 for IG2D0MPUB97B(SBOM) Main Processing Unit B12A(32G Memory)
+              "
+
+		   REVISION    "202211240000Z"	
+              DESCRIPTION "V13.42,	
+              Add: subbnameH901CPCDE(148525),       -- Clock subboard of EA5800-X2 H901MPSDE.
+              Add: subbnameH903CKUF(148526),        -- CLock subboard of MA5800.
+		      Add: bnameV921FLHFE(148787),          --  16*GPON board of EA5801E_FL16_H1.
+			  Add: bnameV921MPCBE(148788),          --  control board of EA5801E_FL16_H1.
+              Add: bnameH903PISB(148789),           --  AC Power board of MA5800-X2.
+			  Add: bnameH901MPSDE(148797),          -- control board of EA5800-X2.
+              Add: bnameH907MPLB(148798),           -- control board of MA5800.
+              Add: bnameH907MPLBE(148799),          -- control board of EA5800.
+			  Add: bnameH902MPLG(148802),           -- control board of MA5800.
+              Add: bnameH902MPLGE(148803),          -- control board of EA5800.
+              Add: bnameORCSF2(148806),             -- 16*XGS combo board of EA5800.
+              Add: bnameH902CSPDE(148807),          -- 8*XGS combo board of EA5800.
+              Add: bnameH902CGPDE(148808),          -- 8*XG/G combo board of EA5800.
+              "
+		   
+		   REVISION    "202211230000Z"	
+              DESCRIPTION "V13.41,	
+              Add:subbname8090DEVCR5D0LFXFM76(303393),   -- 24-Port 10GBase LAN/WAN-SFP+ MACsec Flexible Card(P483D)
+              Add:subbname8090DEVCR5DE1NBFM76(656681),   -- 2-Port 50GBase/1-Port 100GBase-QSFP28 FlexE/MACsec Flexible Card(P243D)
+			  Add:subbname8090DEVCR5D0LBXFM76(878564),   -- 12-Port 10GBase LAN/WAN-SFP+ MACsec Flexible Card (P243D)
+			  Add:subbname8090DEVCR5D0EFGFM76(945736),   -- 24-Port 100/1000Base-X-SFP MACsec Flexible Card (P53D)
+			  Add:subbname8090DEVCR57L8XEDI0(295993),    --8-Port GE-SFP/10GE-SFP+ and 16-Port GE-SFP Unflexible Card(P243)
+              "
+			  
+		   REVISION    "202211220000Z"	
+              DESCRIPTION "V13.36,	
+              Add:virent8090DEVCR5DLPUF5371(689091),  --Flexible Card Line Processing Unit(LPUF-53)
+              Add:virent8090DEVCR5DLPUF5373(689092),  --Flexible Card Line Processing Unit(LPUF-53)
+			  Add:virent8090DEVCR5DLPUF5370(689093),  --Flexible Card Line Processing Unit(LPUF-53A)
+			  Add:virent8090DEVCR5DLPUF5374(689094),  --Flexible Card Line Processing Unit(LPUF-53A)
+			  Add:virent8090DEVCR5DLPUF5372(689095),  --Flexible Card Line Processing Unit(LPUF-53A)
+			  Add:virent8090DEVCR5DLPUF5375(689096),  --Flexible Card Line Processing Unit(LPUF-53)
+			  Add:virent8090DEVCR5DLPUFF370(689097),  --Flexible Card Line Processing Unit(LPUF-243)
+			  Add:virent8090DEVCR5DLPUFF371(689098),  --Flexible Card Line Processing Unit(LPUF-243A)
+			  Add:virent8090DEVCR5DLPUFF374(689099),  --Flexible Card Line Processing Unit(LPUF-243A)
+			  Add:virent8090DEVCR5DLPUFF377(689100),  --Flexible Card Line Processing Unit(LPUF-243A-CM)
+			  Add:virent8090DEVCR5DLPUFF378(689101),  --Flexible Card Line Processing Unit(LPUF-243A-CM)
+              "
+		   
+		   REVISION    "202211210000Z"	
+              DESCRIPTION "V13.39,	
+              bnameCEL24XS12CQFDE(688515),   -- V3R22C10 for CEL24XS12CQFD-E
+              "
+			  
+           REVISION    "202211170000Z"	
+              DESCRIPTION "V13.38,	
+              virent8090DEVME0DBSUFT07C(493006),   -- V8R22C10 for ME0DBSUFT07C(SBOM) Flexible Card Broadband Service Unit(BSUF-1T2A-E,2 sub-slots)
+              virent8090DEVME0DBSUFT07E(493007),   -- V8R22C10 for ME0DBSUFT07E(SBOM) Flexible Card Broadband Service Unit(BSUF-1T2-E,2 sub-slots)
+              "
+
+           REVISION    "202211160000Z"	
+              DESCRIPTION "V13.37,	
+               virent8090DEVCR8PM4BASDC6(689008),  -- V8R22C10 for CR8PM4BASDC6(SBOM) NetEngine 8000 M4 Basic Configuration CM (Enable Fixed Interface(2*100GE or 8*25GE combo+16*10GE,#4~19 enable GE), DC Power, without Software Charge,Document and auxiliary materials)
+               virent8090DEVCR8PM4BASDC7(689009),  -- V8R22C10 for CR8PM4BASDC7(SBOM) NetEngine 8000 M4 Basic Configuration CM (Includes NetEngine 8000 M4 Chassis, Enable Fixed Interface, DC Power,without Software Charge,Document and auxiliary materials)
+               virent8090DEVCR8PM4BASAC6(689010),  -- V8R22C10 for CR8PM4BASAC6(SBOM) NetEngine 8000 M4 Basic Configuration CM (Enable Fixed Interface(2*100GE or 8*25GE combo+16*10GE,#4~19 enable GE),AC Power,without Software Charge,Document and auxiliary materials)
+               virent8090DEVCR8PM4BASAC7(689011),  -- V8R22C10 for CR8PM4BASAC7(SBOM) NetEngine 8000 M4 Basic Configuration CM (Includes NetEngine 8000 M4 Chassis, Enable Fixed Interface, AC Power,without Software Charge,Document and auxiliary materials)
+               virent8090DEVCR8PM9BASACQ(689012),  -- V8R22C10 for CR8PM9BASACQ(SBOM) Integrated Network Processing Unit (IPUA-1T2-F)
+               virent8090DEVCR8DIPU640C9(689013),  -- V8R22C10 for CR8DIPU640C9(SBOM) Integrated Network Processing Unit (IPUA-640)
+               virent8090DEVTNRDIPU1T292(689014),  -- V8R22C10 for TNRDIPU1T292(SBOM) Integrated Network Processing Unit (IPU-1T2-F)
+               virent8090DEVTNRDIPU48091(689015),  -- V8R22C10 for TNRDIPU48091(SBOM) Integrated Network Processing Unit (IPU-480-F)
+               virent8090DEVCR8DIPU1T213(689016),  -- V8R22C10 for CR8DIPU1T213(SBOM) Integrated Network Processing Unit (IPUA-1T2-F)
+               virent8090DEVCR8DIPU480MA(689017),  -- V8R22C10 for CR8DIPU480MA(SBOM) Integrated Network Processing Unit (IPU-480-CN)
+               virent8090DEVCR8DIPU480MB(689018),  -- V8R22C10 for CR8DIPU480MB(SBOM) Integrated Network Processing Unit (IPUA-480-CN)
+               virent8090DEVCR8DIPU1T2M6(689019),  -- V8R22C10 for CR8DIPU1T2M6(SBOM) Integrated Network Processing Unit (IPU-1T2-E)
+               virent8090DEVCR8DIPU480M2(689020),  -- V8R22C10 for CR8DIPU480M2(SBOM) Integrated Network Processing Unit (IPU-480-E)
+               virent8090DEVCR8D0IPU1T2MG(689021),  -- V8R22C10 for CR8D0IPU1T2MG(SBOM) Integrated Network Processing Unit (IPUA-1T2-E)
+               virent8090DEVCR8D0IPU480MB(689022),  -- V8R22C10 for CR8D0IPU480MB(SBOM) Integrated Network Processing Unit (IPUA-480-E)
+               virent8090DEVCR8DIPU480MC(689023),  -- V8R22C10 for CR8DIPU480MC(SBOM) Integrated Network Processing Unit (IPUA-480-E)
+               virent8090DEVCR8D0IPU1T2MP(689024),  -- V8R22C10 for CR8D0IPU1T2MP(SBOM) Integrated Network Processing Unit (IPUA-1T2-E)
+               virent8090DEVCR8DIPU1T2MT(689025),  -- V8R22C10 for CR8DIPU1T2MT(SBOM) Integrated Network Processing Unit (IPU-1T2-DA)
+               virent8090DEVCR8DIPU480MG(689026),  -- V8R22C10 for CR8DIPU480MG(SBOM) Integrated Network Processing Unit (IPU-480-DA)
+               virent8090DEVCR8DIPU1T2M4(689027),  -- V8R22C10 for CR8DIPU1T2M4(SBOM) Integrated Network Processing Unit (IPUA-1T2-DA)
+               virent8090DEVCR8DIPU480M1(689028),  -- V8R22C10 for CR8DIPU480M1(SBOM) Integrated Network Processing Unit (IPUA-480-DA)
+               virent8090DEVCR8D0IPU2TD2(689029),  -- V8R22C10 for CR8D0IPU2TD2(SBOM) Integrated Network Processing Unit (IPUA-2T-F)
+               virent8090DEVCR8D0IPU2TM1(689030),  -- V8R22C10 for CR8D0IPU2TM1(SBOM) Integrated Network Processing Unit (IPU-2T-E)
+               virent8090DEVCR8DIPUT2TM1(689031),  -- V8R22C10 for CR8DIPUT2TM1(SBOM) Integrated Network Processing Unit (IPU-1T2-E)
+               virent8090DEVTNRD0IPU2T90(689032),  -- V8R22C10 for TNRD0IPU2T90(SBOM) Integrated Network Processing Unit (IPU-2T-F)
+               virent8090DEVTNRDIPUT2T90(689033),  -- V8R22C10 for TNRDIPUT2T90(SBOM) Integrated Network Processing Unit (IPU-1T2-F)
+               virent8090DEVCR5D0IPU2T91(689034),  -- V8R22C10 for CR5D0IPU2T91(SBOM) Integrated Network Processing Unit (IPU-2T-E)
+               virent8090DEVCR5DIPUT2T91(689035),  -- V8R22C10 for CR5DIPUT2T91(SBOM) Integrated Network Processing Unit (IPU-1T2-E)
+               virent8090DEVCR8D0IPU2TM2(689036),  -- V8R22C10 for CR8D0IPU2TM2(SBOM) Integrated Network Processing Unit (IPUA-2T-E)
+               virent8090DEVCR8DIPU1T2M3(689037),  -- V8R22C10 for CR8DIPU1T2M3(SBOM) Integrated Network Processing Unit (IPU-1T2-EN)
+               virent8090DEVTNRDIPU1T290(689038),  -- V8R22C10 for TNRDIPU1T290(SBOM) Integrated Network Processing Unit (IPU-1T2-FN)
+               virent8090DEVCR5DIPU1T291(689039),  -- V8R22C10 for CR5DIPU1T291(SBOM) Integrated Network Processing Unit (IPU-1T2-EN)
+               virent8090DEVCR8D0IPU1T2ME(689040),  -- V8R22C10 for CR8D0IPU1T2ME(SBOM) Integrated Network Processing Unit (IPUA-1T2-EN)
+               virent8090DEVCR8D0IPU1T2MK(689041),  -- V8R22C10 for CR8D0IPU1T2MK(SBOM) Integrated Network Processing Unit (IPUA-1T2-EN)
+               virent8090DEVCR8DIPU1T2MS(689042),  -- V8R22C10 for CR8DIPU1T2MS(SBOM) Integrated Network Processing Unit (IPU-1T2-DA)
+               virent8090DEVCR8DIPU1T2M2(689043),  -- V8R22C10 for CR8DIPU1T2M2(SBOM) Integrated Network Processing Unit (IPUA-1T2-DA)
+               virent8090DEVANND00CXPC00(689044),  -- V8R22C10 for ANND00CXPC00(SBOM) System Control,Cross-connect and Multi-protocol Process Unit with 800G
+               virent8090DEVANND00CXPC03(689045),  -- V8R22C10 for ANND00CXPC03(SBOM) System Control,Cross-connect and Multi-protocol Process Unit with 360G
+               virent8090DEVANND00CXPB01(689046),  -- V8R22C10 for ANND00CXPB01(SBOM) System Control,Cross-connect and Multi-protocol Process Unit with 320G
+               virent8090DEVANND00CXPB02(689047),  -- V8R22C10 for ANND00CXPB02(SBOM) System Control,Cross-connect and Multi-protocol Process Unit with 360G
+               virent8090DEVANND01CXPB01(689048),  -- V8R22C10 for ANND01CXPB01(SBOM) System Control,Cross-connect and Multi-protocol Process Unit with 800G
+               virent8090DEVANRD00CXPC00(689049),  -- V8R22C10 for ANRD00CXPC00(SBOM) System Control, Cross-connect and Multi-protocol Process Unit with 160G
+               virent8090DEVANRD00CXPA21(689050),  -- V8R22C10 for ANRD00CXPA21(SBOM) System Control, Cross-connect and Multi-protocol Process Unit with 160G
+               virent8090DEVANRD01CXPD00(689051),  -- V8R22C10 for ANRD01CXPD00(SBOM) System Control, Cross-connect and Multi-protocol Process Unit with 400G
+               virent8090DEVANRD01CXPE00(689052),  -- V8R22C10 for ANRD01CXPE00(SBOM) System Control, Cross-connect and Multi-protocol Process Unit with 800G
+               virent8090DEVCR8DCXP160C6(689053),  -- V8R22C10 for CR8DCXP160C6(SBOM) System Control,Cross-connect and Multi-protocol Process Unit (CXP-160-C)
+               virent8090DEVCR8DCXP160C7(689054),  -- V8R22C10 for CR8DCXP160C7(SBOM) System Control,Cross-connect and Multi-protocol Process Unit (CXPA-160-C)
+               virent8090DEVANHMHSTA0101(689055),  -- V8R22C10 for ANHMHSTA0101(SBOM) ATN 910D-A, DC Power, Port Capacity 4*100GE/50GE + 16*25GE/10GE/GE/FE + 8*10GE/GE/FE, default all the GE/FE ports is enabled
+               virent8090DEVANHMHSTA0201(689056),  -- V8R22C10 for ANHMHSTA0201(SBOM) ATN 910D-A, AC Power, Port Capacity 4*100GE/50GE + 16*25GE/10GE/GE/FE + 8*10GE/GE/FE, default all the GE/FE ports is enabled
+               virent8090DEVANHMHSTA0122(689057),  -- V8R22C10 for ANHMHSTA0122(SBOM) ATN 910D-A, DC Power, Port Capacity 4*100GE/50GE + 16*25GE/10GE/GE/FE + 8*10GE/GE/FE, default all the GE/FE ports is enabled
+               virent8090DEVANHMHSTA0222(689058),  -- V8R22C10 for ANHMHSTA0222(SBOM) ATN 910D-A, AC Power, Port Capacity 4*100GE/50GE + 16*25GE/10GE/GE/FE + 8*10GE/GE/FE, default all the GE/FE ports is enabled
+               virent8090DEVANHMHSTA0332(689059),  -- V8R22C10 for ANHMHSTA0332(SBOM) ATN 910D-A, AC+DC Power, Port Capacity 4*100GE/50GE + 16*25GE/10GE/GE/FE + 8*10GE/GE/FE, default all the GE/FE ports is enabled
+               virent8090DEVCR8PM1DBASCFP(689060),  -- V8R22C10 for CR8PM1DBASCFP(SBOM) NetEngine 8000 M1D-B DC(Port Capacity 2*50GE+2*25GE/10GE+2*10GE+14*GE,default 2*25GE&all GE,no aux material)
+               virent8090DEVCR8PM1DBASCQ(689061),  -- V8R22C10 for CR8PM1DBASCQ(SBOM) NetEngine 8000 M1D-B DC(A)(Port Capacity 2*50GE+2*25GE/10GE+2*10GE+14*GE,default 2*25GE&all GE,no aux material)
+               virent8090DEVCR8PM1DBASCR(689062),  -- V8R22C10 for CR8PM1DBASCR(SBOM) NetEngine 8000 M1D-B AC(Port Capacity 2*50GE+2*25GE/10GE+2*10GE+14*GE,default 2*25GE&all GE,no aux material)
+               virent8090DEVCR8PM1DBASCS(689063),  -- V8R22C10 for CR8PM1DBASCS(SBOM) NetEngine 8000 M1D-B AC(A)(Port Capacity 2*50GE+2*25GE/10GE+2*10GE+14*GE,default 2*25GE&all GE,no aux material)
+               virent8090DEVANHMHSTA0502(689064),  -- V8R22C10 for ANHMHSTA0502(SBOM) ATN 910D-B, DC Power, Port Capacity 2*50GE+2*25GE/10GE/GE+2*10GE/GE+10*GE(o)+4*GE(e), default 2*25GE and all GE/FE ports
+               virent8090DEVANHMHSTA0602(689065),  -- V8R22C10 for ANHMHSTA0602(SBOM) ATN 910D-B, AC Power, Port Capacity 2*50GE+2*25GE/10GE/GE+2*10GE/GE+10*GE(o)+4*GE(e), default 2*25GE and all GE/FE ports
+               virent8090DEVANGMHSTG0105(689066),  -- V8R22C10 for ANGMHSTG0105(SBOM) ATN 910C-G, DC Power, Port Capacity 16*10GE/GE/FE(o)+12*GE/FE(o)+4*GE/FE(e), Default 2*10GE+8*GE
+               virent8090DEVANGMHSTG0204(689067),  -- V8R22C10 for ANGMHSTG0204(SBOM) ATN 910C-G, AC Power, Port Capacity 16*10GE/GE/FE(o)+12*GE/FE(o)+4*GE/FE(e), Default 2*10GE+8*GE
+               virent8090DEVCR8PM1ABASD0(689068),  -- V8R22C10 for CR8PM1ABASD0(SBOM) NetEngine 8000 M1A, DC Power,Port Capacity 16*10GE+12*GE(o)+4*GE(e)
+               virent8090DEVCR8PM1ABASA0(689069),  -- V8R22C10 for CR8PM1ABASA0(SBOM) NetEngine 8000 M1A, AC Power,Port Capacity 16*10GE+12*GE(o)+4*GE(e)
+               virent8090DEVCR8PM1ABASD1(689070),  -- V8R22C10 for CR8PM1ABASD1(SBOM) NetEngine 8000 M1A, DC Power,Port Capacity 16*10GE+12*GE(o)+4*GE(e)
+               virent8090DEVCR8PM1ABASA1(689071),  -- V8R22C10 for CR8PM1ABASA1(SBOM) NetEngine 8000 M1A, AC Power,Port Capacity 16*10GE+12*GE(o)+4*GE(e)
+               virent8090DEVANGMHSTK0103(689072),  -- V8R22C10 for ANGMHSTK0103(SBOM) ATN 910C-K, DC Power, Port Capacity 16*10GE/GE/FE+8*GE/FE(o)+4*GE/FE(e)+16*E1,None of the ports are available by default
+               virent8090DEVANGMHSTK0203(689073),  -- V8R22C10 for ANGMHSTK0203(SBOM) ATN 910C-K, AC Power, Port Capacity 16*10GE/GE/FE+8*GE/FE(o)+4*GE/FE(e)+16*E1,None of the ports are available by default
+               virent8090DEVANGMHSTM0103(689074),  -- V8R22C10 for ANGMHSTM0103(SBOM) ATN 910C-M, DC Power, Port Capacity 16*10GE/GE/FE+8*GE/FE(o)+4*GE/FE(e),None of the ports are available by default
+               virent8090DEVANGMHSTM0203(689075),  -- V8R22C10 for ANGMHSTM0203(SBOM) ATN 910C-M, AC Power, Port Capacity 16*10GE/GE/FE+8*GE/FE(o)+4*GE/FE(e),None of the ports are available by default
+               virent8090DEVANGMHSTM0301(689076),  -- V8R22C10 for ANGMHSTM0301(SBOM) ATN 910C-M, AC+DC Power, Port Capacity 16*10GE/GE/FE+8*GE/FE(o)+4*GE/FE(e),None of the ports are available by default
+               virent8090DEVCR8PM1CBASD0(689077),  -- V8R22C10 for CR8PM1CBASD0(SBOM) NetEngine 8000 M1C, 2*DC Power, Port Capacity 16*10GE+8*GE(o)+4*GE(e), None of the ports are available by default
+               virent8090DEVCR8PM1CBASAQ(689078),  -- V8R22C10 for CR8PM1CBASAQ(SBOM) NetEngine 8000 M1C, 2*AC Power, Port Capacity 16*10GE+8*GE(o)+4*GE(e), None of the ports are available by default
+               virent8090DEVCR8PM1CBASD1(689079),  -- V8R22C10 for CR8PM1CBASD1(SBOM) NetEngine 8000 M1C(A), 2*DC Power, Port Capacity 16*10GE+8*GE(o)+4*GE(e), None of the ports are available by default
+               virent8090DEVCR8PM1CBASAS(689080),  -- V8R22C10 for CR8PM1CBASAS(SBOM) NetEngine 8000 M1C(A), 2*AC Power, Port Capacity 16*10GE+8*GE(o)+4*GE(e), None of the ports are available by default
+               virent8090DEVANGMHSTH0110(689081),  -- V8R22C10 for ANGMHSTH0110(SBOM) ATN 910C-H DC Basic Configuration(Includes Fixed Enable Interface (4*10GE/GE/FE(o)+4*GE/FE(o)+4*GE/FE(e))/Dual Power/FAN/Chassis)
+               virent8090DEVANGMHSTS0110(689082),  -- V8R22C10 for ANGMHSTS0110(SBOM) ATN 910C-S DC Basic Configuration(Includes Fixed Enable Interface (5*10GE/GE/FE(o)+3*GE/FE(o)+4*GE/FE(e))/Dual Power/FAN/Chassis)
+               virent8090DEVANGMHSTH0210(689083),  -- V8R22C10 for ANGMHSTH0210(SBOM) ATN 910C-H AC Basic Configuration(Includes Fixed Enable Interface (4*10GE/GE/FE(o)+4*GE/FE(o)+4*GE/FE(e))/Power/FAN/Chassis)
+               virent8090DEVANGMHSTS0210(689084),  -- V8R22C10 for ANGMHSTS0210(SBOM) ATN 910C-S AC Basic Configuration(Includes Fixed Enable Interface (5*10GE/GE/FE(o)+3*GE/FE(o)+4*GE/FE(e))/Power/FAN/Chassis)
+               virent8090DEVCR5DLPUFM397(689085),  -- V8R22C10 for CR5DLPUFM397(SBOM) Flexible Card Line Processing Unit(LPUF-483D)
+               virent8090DEVCR5DLPUFF394(689086),  -- V8R22C10 for CR5DLPUFF394(SBOM) Flexible Card Line Processing Unit(LPUF-243D)
+               virent8090DEVCR5DLPUF5376(689087),  -- V8R22C10 for CR5DLPUF5376(SBOM) Flexible Card Line Processing Unit(LPUF-53D)
+               virent8090DEVME0DVSUIK07F(689088),  -- V8R22C10 for ME0DVSUIK07F(SBOM) Integrated Service Unit 400(VSUI-400D)
+               virent8090DEVANGMHSTM03D0(689089),  -- V8R22C10 for ANGMHSTM03D0(SBOM) ATN 910C-M,2*DC Power, Port Capacity 6*10GE+4*GE/FE(o)+4*GE/FE(e)
+               virent8090DEVANGMHSTM03A0(689090),  -- V8R22C10 for ANGMHSTM03A0(SBOM) ATN 910C-M, 2*AC Power, Port Capacity 6*10GE+4*GE/FE(o)+4*GE/FE(e)
+              "
+
+           REVISION    "202211140000Z"	
+              DESCRIPTION "V13.36,	
+              Add:fnameEA5801SFL16H2(148540),     -- Backplane of the EA5801S-FL16-H2.			
+              Add:bnameH907CIUA(148724),          --  GPIO board of MA5800.
+              Add:bnameV932MPBAE(148800),         -- control board of EA5801S-FL16-H2.			
+              Add:bnameV932FLHFE(148801),         -- 16*flex-PON board of EA5801S-FL16-H2.			
+              "
+
+		REVISION    "202211102000Z"
+            DESCRIPTION "V13.35,
+            Add: fnameET1BS12704EZ0(700427),               -- S12700E-4-Z Assembly Chassis for V2R22C10
+            Add: fnameET1BS12708EZ0(700428),               -- S12700E-4-Z Assembly Chassis for V2R22C10
+            Add: bnameLST7MPUE000Z0(700546),    		 -- S12700E main control unit E(Z) for V2R22C10
+            Add: bnameLST7SFUEX10Z0(700547),    		   -- S12700E switch fabric unit E(Z) for V2R22C10
+            Add: bnameLST7SFUHX10Z0(700548),    		   -- S12700E switch fabric unit H(Z) for V2R22C10
+            Add: bnameLST7G48SX6EZ0(700549),    		   -- 48-port GE SFP interface card (Z,SFP) for V2R22C10
+            Add: bnameLST7X24BX6EZ0(700550),    		   -- 24-port 10GE SFP+ interface and 24-port GE SFP interface card (Z,SFP+) for V2R22C10
+            Add: bnameLST7X48SX6EZ0(700551),    		   -- 48-Port 10GE SFP+ interface card (Z,SFP+) for V2R22C10
+            Add: bnameLST7C06HX6EZ0(700553),    		   -- 6-port 100GE QSFP28 interface card (Z,QSFP28) for V2R22C10
+            Add: bnameLST7C24HX6EZ0(700554),    		   -- 6-port 100GE QSFP28 interface card (Z,QSFP28) for V2R22C10
+            Add: bnameLST7G48TX5EZ0(700552),    		   -- 6-port 100GE QSFP28 interface card (Z,QSFP28) for V2R22C10
+            Add: bnameLST7G48TX6EZ0(700564),    		   -- 48-port 100/1000BASE-T interface card (Z,RJ45) for V2R22C10
+            "
+        
+		REVISION    "202211100000Z"
+            DESCRIPTION "V13.34,
+            Add:subbname8090DEVCX6DE4NE8VA0(229729),   -- 4-Port 100GBase-QSFP28 FlexE Flexible Card(S1T)
+            "
+
+        REVISION    "202211080000Z"
+            DESCRIPTION "V13.33,
+            Add:subbname8090DEVCR2D0LBXFME0(784745),
+            Add:subbname8090DEVCR2DE1NBFME0(784746),
+            Add:virent8090DEVTPZM0HOSTA00(229537),
+            Add:virent8090DEVTPZM0HOSTA02(229538),
+            Add:fnamePTN907-AC(229547),
+            "
+
+        REVISION    "202211080000Z"
+            DESCRIPTION "V13.31,
+            Add:virent8090DEVCR8DMPUF8AF2(468786),   -- V8R22C10 for CR8DMPUF8AF2(SBOM) NetEngine 8000E F Main Processing Unit B2A(MPUB2A)
+            Add:virent8090DEVCR8DMPUF8BF1(468787),   -- V8R22C10 for CR8DMPUF8BF1(SBOM) NetEngine 8000 F Main Processing Unit B2(MPUB2)
+            "
+		
+		REVISION    "202211070000Z"
+            DESCRIPTION "V13.31,
+            Add:subbname8090DEVDPE1E4NBIYF(258024),   -- 4-Port 100GBase-QSFP28 or 16-Port 25GBase-SFP28 Combo + 16-Port 25GBase-SFP28
+            Add:subbname8090DEVDPE1E4NBIYFS(258023),   -- 4-Port 100GBase-QSFP28 or 16-Port 25GBase-SFP28 Combo + 16-Port 25GBase-SFP28
+            "
 
         REVISION    "202211040000Z"
         DESCRIPTION "V13.30,
@@ -11012,7 +11516,7 @@ REVISION    "201909200000Z"
                fnameEA5801SGP16H2(148537),       -- Backplane of the EA5801S-GP16-H2.
                fnameEA5801EFL16H1(148538),       -- Backplane of the EA5801E-FL16-H1.
                fnameMA5801SFL16H2(148539),       -- Backplane of the MA5801S-FL16-H2.
-               fnameMA5800Reserve40(148540),     -- Backplane of the MA5800, reserve for support new frame in old version.
+               fnameEA5801SFL16H2(148540),       -- Backplane of the EA5801S-FL16-H2.
                fnameMA5800Reserve41(148541),     -- Backplane of the MA5800, reserve for support new frame in old version.
                fnameMA5800Reserve42(148542),     -- Backplane of the MA5800, reserve for support new frame in old version.
                fnameMA5800Reserve43(148543),     -- Backplane of the MA5800, reserve for support new frame in old version.
@@ -12254,6 +12758,23 @@ REVISION    "201909200000Z"
                 fname8031S5735I-S8T4XN-T-V2(537742),       --S5735I-S8T4XN-T-V2   for V6R22C01
                 fname8031S5735I-S8T4SN-V2(537743),         --S5735I-S8T4SN-V2     for V6R22C01
                 fname8031S5735I-S8U4XN-V2(537744),         --S5735I-S8U4XN-V2     for V6R22C01
+                fname8031S5735I-L8P4X-A-V2(537791),        --S5735I-L8P4X-A-V2    for V6R22C10
+                fname8031S5735I-L10T4X-A-V2(537792),       --S5735I-L10T4X-A-V2   for V6R22C10
+                fname8031S6330-H24X4Y(537793),             --S6330-H24X4Y    for V2R22C10
+                fname8031S3710-H24T4S-A(537794),           -- S3710-H24T4S-A     for V6R22C10
+                fname8031S3710-H24P4S-A(537795),           -- S3710-H24P4S-A     for V6R22C10
+                fname8031S3710-H48T4S-A(537796),           -- S3710-H48T4S-A     for V6R22C10
+                fname8031S3710-H48LP4S-A(537797),          -- S3710-H48LP4S-A    for V6R22C10
+                fname8031S5331-S24T4X-A-V1(537798),        -- S5331-S24T4X-A-V1  for V6R22C10
+                fname8031S5331-H24P4XC-V1(537799),         -- S5331-H24P4XC-V1   for V6R22C10
+                fname8031S5331-H48T4XC-V1(537800),         -- S5331-H48T4XC-V1   for V6R22C10
+                fname8031S310-24P4S(537801),               -- S310-24P4S         for V6R22C10
+                fname8031S310-24T4S(537802),               -- S310-24T4S         for V6R22C10
+                fname8031S310-48T4S(537803),               -- S310-48T4S         for V6R22C10
+                fname8031S5331-S24S8T4X-A(537804),         --S5331-S24S8T4X-A for V2R22C10
+                fname8031S5331-S24S8T4X-D(537805),         --S5331-S24S8T4X-D for V2R22C10
+				fname8031S5331-H48HB4XZ(537806),           --S5331-H48HB4XZ for V2R22C10
+
 -- 8090:
                 fname8090Unknown(561152),            -- Quidway unknown FRAME,
                 fname8090Whole(561153),              -- Quidway NE80E FRAME, NE5000E FRAME,
@@ -12392,6 +12913,7 @@ REVISION    "201909200000Z"
               subbname8090DEVCR57LFXFF1(225757),        --24-Port 10GBase LAN/WAN-SFP+ MACsec Integrated Line Processing Unit-A
               subbname8090DEVCR57E8YFA1(225758),        --8-Port 25GBase-SFP28 MACsec Integrated Line Processing Unit A
 			  subbname8090DEVCR5D0LFXFM20(482067),   -- 20-Port 10GBase LAN/WAN-SFP+ Flexible Card(P483)
+			  subbname8090DEVCR5D0LEXFM20(483067),   -- 20-Port 10GBase LAN/WAN-SFP+ Flexible Card(P483)
               subbname8090DEVME0M0LEXFB76(108199),   -- 20-Port 10GBase LAN/WAN-SFP+ Flexible Card(P483)
               subbname8090DEVCR8D00E4XFD0(998318),   -- 4-Port 10GE-SFP+ FlexE MACsec Physical Interface Card(PIC)
               subbname8090DEVGPLI36YS10CQES1(582391),   -- 36-Port 25GE(SFP28)/10GE(SFP+)/GE(SFP) 10-Port 100GBase QSFP28 Integrated Line Process Unit
@@ -12399,8 +12921,12 @@ REVISION    "201909200000Z"
               subbname8090DEVGPLI72YSE8(778133),   -- 72-Port 25GE(SFP28)/10GE(SFP+)/GE(SFP) Integrated Line Processing Unit
               subbname8090DEVGPLI72YSES7(464797),   -- 72-Port 25GE(SFP28)/10GE(SFP+)/GE(SFP) Integrated Line Processing Unit
               subbname8090DEVCR8D00E4XFC5(582390),   -- 4-Port 10GE-SFP+ FlexE MACsec Physical Interface Card(PIC)
+              subbname8090DEVDPE1E4NBIYF(258024),   -- 4-Port 100GBase-QSFP28 or 16-Port 25GBase-SFP28 Combo + 16-Port 25GBase-SFP28
+              subbname8090DEVDPE1E4NBIYFS(258023),   -- 4-Port 100GBase-QSFP28 or 16-Port 25GBase-SFP28 Combo + 16-Port 25GBase-SFP28
+              subbname8090DEVCR5D00E8GF80(215300),   -- 8 Channels GE/FE Optical Interface Board
               subbname8090DEVCR5D0L6XFA71(591763),   -- 6-Port 10GBase LAN/WAN-SFP+ Flexible Card A(P120-A)
               subbname8090DEVCR5DE4NE8V73(513209),   -- 4-Port 100GBase-QSFP28 FlexE Flexible Card(P1T)
+			  subbname8090DEVCX6DE4NE8VA0(229729),   -- 4-Port 100GBase-QSFP28 FlexE Flexible Card(S1T)
               subbname8090DEVCR5DE2NBFM72(973460),   -- 2-Port 100GBase-QSFP28 Flexible Card(P483)
               subbname8090DEVANKD00EX4S01(225762),      --4 Channels 10GE Optical Interface Board(SFP+)
               subbname8090DEVANKD00EX2S01(225763),      --2 Channels 10GE Optical Interface Board(SFP+)
@@ -12423,6 +12949,23 @@ REVISION    "201909200000Z"
 			  subbname8090DEVGPLI8KQ8CQES4(824727),   -- 8-Port 400GBase QSFPDD 8-Port 100GBase QSFP28 Integrated Line Process Unit
 			  subbname8090DEVGPLI8KQ8CQE5(806150),   -- 8-Port 400GBase QSFPDD 8-Port 100GBase QSFP28 Integrated Line Process Unit
 			  subbname8090DEVGPI2KFE1(675384),   -- 20-Port 100GBase-QSFP28 FlexE/MACsec Integrated Line Processing Unit
+              subbname8090DEVCR2D0LBXFME0(784745),   -- 12-Port 10GBase LAN/WAN-SFP+ MACsec Flexible Card(P243G)
+              subbname8090DEVCR2DE1NBFME0(784746),   -- 2-Port 50GBase/1-Port 100GBase-QSFP28 MACsec Flexible Card (P243G)
+			  subbname8090DEVCR5D0LFXFM76(303393),   -- 24-Port 10GBase LAN/WAN-SFP+ MACsec Flexible Card(P483D)
+              subbname8090DEVCR5DE1NBFM76(656681),   -- 2-Port 50GBase/1-Port 100GBase-QSFP28 FlexE/MACsec Flexible Card(P243D)
+              subbname8090DEVCR5D0LBXFM76(878564),   -- 12-Port 10GBase LAN/WAN-SFP+ MACsec Flexible Card (P243D)
+              subbname8090DEVCR5D0EFGFM76(945736),   -- 24-Port 100/1000Base-X-SFP MACsec Flexible Card (P53D)
+			  subbname8090DEVCR57L8XEDI0(295993),    --8-Port GE-SFP/10GE-SFP+ and 16-Port GE-SFP Unflexible Card(P243)
+			  subbname8090DEVGPLI10CQ36XSES1(582393),   -- 36-Port 10GE(SFP+)/GE(SFP) 10-Port 100GBase QSFP28 Integrated Line Process Unit
+              subbname8090DEVGPLI10CQ36XSE2(582394),   -- 36-Port 10GE(SFP+)/GE(SFP) 10-Port 100GBase QSFP28 Integrated Line Process Unit
+			  subbname8090DEVGFL72GSFB(548674),      -- 72-port GE MACsec Physical Interface Card(PIC)
+			  subbname8090DEVCR8DERGF00F1(548774),   -- NetEngine 8000 F 2T Switch Routing Unit(SRU-2T-A)
+			  subbname8090DEVME0D00E1KB71(542988),   -- 1-Port 400GBase-QSFP-DD + 2-Port External OA Flexible Card(BP1T)
+			  subbname8090DEVGPR8CQ20YSD(650885),   -- 8-Port 100GBase-QSFP28 + 20-Port 25GBase-Y-SFP+
+              subbname8090DEVTNR1E4NBIYFS(258025),   -- 4-Port 100GBase-QSFP28 or 16-Port 25GBase-SFP28 Combo + 16-Port 25GBase-SFP28
+              subbname8090DEVCR81E4NBIYFS(258026),   -- 4-Port 100GBase-QSFP28 or 16-Port 25GBase-SFP28 Combo + 16-Port 25GBase-SFP28
+              subbname8090DEVCR81E4NBIYF(258027),    -- 4-Port 100GBase-QSFP28 or 16-Port 25GBase-SFP28 Combo + 16-Port 25GBase-SFP28
+
 -- ME60:
                 fnameME60Unknown(159744),           -- Quidway unknown FRAME,
                 fnameME60Whole(159745),            -- Quidway ME60-16 FRAME,
@@ -12554,6 +13097,8 @@ REVISION    "201909200000Z"
                 fnameET1BS12708E0(700424),               -- HUAWEI S12708 FRAME Speed-up for V2R19C00
                 fnameET1BS12712E0(700425),               -- HUAWEI S12712 FRAME Speed-up for V2R19C00
                 fnameET1BS12712E1(700426),               --S12700E-12 assembly chassis for V2R19C00
+                fnameET1BS12704EZ0(700427),				 -- S12700E-4-Z Assembly Chassis for V2R22C10
+                fnameET1BS12708EZ0(700428),				 -- S12700E-8-Z Assembly Chassis for V2R22C10
 
 
 -- S7900:       0x000AE000~0x000AEfff(712704~716799)
@@ -12564,6 +13109,12 @@ REVISION    "201909200000Z"
                 fnameES1BS8706SP0(713472),              -- HUAWEI S8706 FRAME
                 fnameES1BS8710SP0(713473),              -- HUAWEI S8710 FRAME
                 fnameLSS8704SP0(713474),                -- HUAWEI S8704 FRAME
+
+-- S16700:      0x00AE400~0x000AE4ff(713728~713983)
+                fnameEX1BS16704SA0(713728),              -- HUAWEI S16704 FRAME
+                fnameEX1BS16704SD0(713729),              -- HUAWEI S16704 FRAME
+                fnameEX1BS16708SA0(713730),              -- HUAWEI S16708 FRAME
+                fnameEX1BS16708SD0(713731),              -- HUAWEI S16708 FRAME
 
 -- NSE:
                 fnameNSEUnknown(570152),            -- Quidway unknown FRAME,
@@ -13146,6 +13697,13 @@ REVISION    "201909200000Z"
                 fnameAR631I-LTE4CN(668045),   --AR631I-LTE4CN FRAME
                 fnameAR631I-LTE4EA(668046),   --AR631I-LTE4EA FRAME
                 fnameAR8700-8(668047),        --AR8700-8 FRAME
+                fnameAR6510-L11T1X2(668048),         --AR6510-L11T1X2 FRAME
+                fnameAR6510-L5T4S4(668049),          --AR6510-L5T4S4 FRAME
+                fnameAR5510-H8P2TW1(668050),      --AR5510-H8P2TW1 FRAME
+                fnameAR5510-H10T1(668051),            --AR5510-H10T1 FRAME
+                fnameAR5510-L5T-LTE4EA(668052),   --AR5510-L5T-LTE4EA FRAME
+                fnameAR5510-L5T(668053),                 --AR5510-L5T FRAME
+                fnameAR6500-10(668054),                   --AR6500-10 FRAME
 
 -- NE20E-X6:
                fnameNE20EX6DC(675840),        --NE20E-X6 chassis
@@ -13269,16 +13827,19 @@ REVISION    "201909200000Z"
 				fnameCE98604CEIA(688248),  -- CE V2R22C10
 				fnameDX511(688249),     -- DX511	
 				fnameDX112(688250),     -- DX112			
-				fnameCE6882H48S8CQ(688251),			-- CE V3R23C00
-				fnameCE6867ULL(688252),				-- CE V3R23C00
-				fnameCE6867H48S8CQ(688253),			-- CE V3R23C00
-				fnameCE6867H48S8CQT(688254),		-- CE V3R23C00
+				fnameCE688248S8CQ(688251),			-- CE V3R23C00
+				fnameCE6867LL(688252),				-- CE V3R23C00
+				fnameCE686748S8CQ(688253),			-- CE V3R23C00
+				fnameCE686748S8CQT(688254),		    -- CE V3R23C00
 				fnameCE6867HAM(688255),				-- CE V3R23C00
 				fnameCE6867SAN(688256),				-- CE V3R23C00
-				fnameCE885236CQ(688257),			-- CE V3R23C00
-				fnameCE16804H(688258),				-- CE V3R23C00
-				fnameCE16808H(688259),				-- CE V3R23C00
-				fnameCE16816H(688260),				-- CE V3R23C00
+				fnameCE885232CQ4BQ(688257),			-- CE V3R23C00
+				fnameCE16800X4(688258),				-- CE V3R23C00
+				fnameCE16800X8(688259),				-- CE V3R23C00
+				fnameCE16800X16(688260),			-- CE V3R23C00
+				fnameCE582048T4S(688262),			-- CE V3R23C00
+				fnameCE5820S48T4S(688263),			-- CE V3R23C00
+				fnameCE5811S48T4S(688264),			-- CE V3R23C00
 
 -- wlan:       0x000A9000~0x000A9fff(692224~696319)
                fnameES02acu(692224),               --Quidway S9300 ACU FRAME
@@ -13441,6 +14002,12 @@ REVISION    "201909200000Z"
                fnameAirEngine5762-10(692408),
                fnameAirEngine5762-10SW(692409),
                fnameAirEngine6761-23T(692410),
+			   fnameAirEngine8771-X1T(692411),
+			   fnameAirEngine5562-17W(692412),
+			   fnameAirEngine5562-10(692413),
+			   fnameAirEngine5562-10SW(692414),
+               fnameAC650-128AP(692415),
+               fnameAC650-256AP(692416),
                      
 -- T8010:      0x000AA200~0x000AA7FF(696832~698367)
                fnameBT81BP2HT8010(696832),   --Frame BT81BP2H of the T8010 bits device.
@@ -13699,6 +14266,7 @@ REVISION    "201909200000Z"
                fnameNETENGINE-NE20-X3(229690),        -- V8R22C00 for NETENGINE-NE20-X3 chassis
                fnameNETENGINE-A820-M-AC(229518),       -- V8R21C00 for NETENGINE-A820-M chassis
                 fnameNETENGINE-A811-M-AC(229516),       -- V8R21C00 for NETENGINE-A811-M-AC chassis
+                fnameNETENGINE-A820-M(229517),       -- V8R21C00 for NETENGINE-A820-M chassis
                 fnameNETENGINE-A811-AC(229519),       -- V8R21C00 for NETENGINE-A811 chassis
                 fnameHG-FM-CPE-02-AC(229521),         -- V8R21C00 for HG-FM-CPE-02 chassis
                 fnameNETENGINE-A821-AC(226372),       -- V8R21C10 for NETENGINE-A821-AC chassis
@@ -15539,7 +16107,7 @@ fnameASG5000-D3100        (16716065),    --00FF1121
                 bnameTM62HPXCL(148721),               --  control board of OSN1600IIM.
                 bnameTM62HPCS8(148722),               --  8 port dual-channel service board of OSN1600IIM.
                 bnameH906CIUA(148723),                -- GPIO board of MA5800.
-                bnameMA5800Reserve124(148724),        --  Board of MA5800, reserve for support new board in old version.
+                bnameH907CIUA(148724),                --  GPIO board of MA5800.
                 bnameH901OTEF(148725),                --  DN_ODN baseboard of MA5800.
                 bnameH901CSPD(148726),                --  8*XGS/G combo board of MA5800.
                 bnameORCSF1(148727),                    --  16*XGS GPON and GPON combo board of EA5800.
@@ -15602,9 +16170,9 @@ fnameASG5000-D3100        (16716065),    --00FF1121
                 bnameH901DQHT(148784),                --  DQ ODN OAI board of MA5800 and EA5800.
                 bnameH902CSPD(148785),                --  8*XGS combo board of MA5800.
                 bnameH907CGHD(148786),                --  8*XG combo board of MA5800.
-                bnameMA5800Reserve187(148787),        --  Board of MA5800, reserve for support new board in old version.
-                bnameMA5800Reserve188(148788),        --  Board of MA5800, reserve for support new board in old version.
-                bnameMA5800Reserve189(148789),        --  Board of MA5800, reserve for support new board in old version.
+                bnameV921FLHFE(148787),               --  16*GPON board of EA5801E_FL16_H1.
+                bnameV921MPCBE(148788),               --  control board of EA5801E_FL16_H1.
+				bnameH903PISB(148789),                --  AC Power board of MA5800-X2.
                 bnameH908CGHF(148790),                --  16*XG/G combo board of MA5800.
                 bnameH902DQHF(148791),                --  DQ ODN OAI board of MA5800 and EA5800.
                 bnameH905CGUD(148792),                --  8*XG/G combo board of MA5800.
@@ -15612,18 +16180,18 @@ fnameASG5000-D3100        (16716065),    --00FF1121
                 bnameV935NXHC(148794),                --  4*10GE board of MA5801S-FL16-H2.
                 bnameV932FLHF(148795),                --  16*flex-PON board of MA5801S-FL16-H2.
                 bnameH905XEHF(148796),                --  16*10G EPON board of MA5800.
-                bnameMA5800Reserve197(148797),        --  Board of MA5800, reserve for support new board in old version.
-                bnameMA5800Reserve198(148798),        --  Board of MA5800, reserve for support new board in old version.
-                bnameMA5800Reserve199(148799),        --  Board of MA5800, reserve for support new board in old version.
-                bnameMA5800Reserve200(148800),        --  Board of MA5800, reserve for support new board in old version.
-                bnameMA5800Reserve201(148801),        --  Board of MA5800, reserve for support new board in old version.
-                bnameMA5800Reserve202(148802),        --  Board of MA5800, reserve for support new board in old version.
-                bnameMA5800Reserve203(148803),        --  Board of MA5800, reserve for support new board in old version.
+                bnameH901MPSDE(148797),               --  control board of EA5800-X2.
+                bnameH907MPLB(148798),                --  control board of MA5800.
+                bnameH907MPLBE(148799),               --  control board of EA5800.
+                bnameV932MPBAE(148800),               --  control board of EA5801S-FL16-H2.
+                bnameV932FLHFE(148801),               --  16*flex-PON board of EA5801S-FL16-H2.
+                bnameH902MPLG(148802),                --  control board of MA5800.
+                bnameH902MPLGE(148803),               --  control board of EA5800.
                 bnameMA5800Reserve204(148804),        --  Board of MA5800, reserve for support new board in old version.
                 bnameMA5800Reserve205(148805),        --  Board of MA5800, reserve for support new board in old version.
-                bnameMA5800Reserve206(148806),        --  Board of MA5800, reserve for support new board in old version.
-                bnameMA5800Reserve207(148807),        --  Board of MA5800, reserve for support new board in old version.
-                bnameMA5800Reserve208(148808),        --  Board of MA5800, reserve for support new board in old version.
+                bnameORCSF2(148806),                  --  16*XGS combo board of EA5800.
+                bnameH902CSPDE(148807),               --  8*XGS combo board of EA5800.
+                bnameH902CGPDE(148808),               --  8*XG/G combo board of EA5800.
                 bnameMA5800Reserve209(148809),        --  Board of MA5800, reserve for support new board in old version.
                 bnameMA5800Reserve210(148810),        --  Board of MA5800, reserve for support new board in old version.
                 bnameMA5800Reserve211(148811),        --  Board of MA5800, reserve for support new board in old version.
@@ -17510,12 +18078,28 @@ fnameASG5000-D3100        (16716065),    --00FF1121
                bname8031S5335-S24U4XE-V2(537920),         --S5335-S24U4XE-V2    for V6R22C01
                bname8031S5735-S48U4XE-V2(537921),         --S5735-S48U4XE-V2    for V6R22C01
                bname8031S5335-S48U4XE-V2(537922),         --S5335-S48U4XE-V2    for V6R22C01
-               bname8031S5735I-S24U4XE-V2(537923),        --S5335I-S24U4XE-V2   for V6R22C01
-               bname8031S5735I-S24U4XE-T-V2(537924),      --S5335I-S24U4XE-T-V2 for V6R22C01
-               bname8031S5735I-S8T4XN-V2(537925),         --S5335I-S8T4XN-V2    for V6R22C01
-               bname8031S5735I-S8T4XN-T-V2(537926),       --S5335I-S8T4XN-T-V2  for V6R22C01
-               bname8031S5735I-S8T4SN-V2(537927),         --S5335I-S8T4SN-V2    for V6R22C01
-               bname8031S5735I-S8U4XN-V2(537928),         --S5335I-S8U4XN-V2    for V6R22C01
+               bname8031S5735I-S24U4XE-V2(537923),        --S5735I-S24U4XE-V2   for V6R22C01
+               bname8031S5735I-S24U4XE-T-V2(537924),      --S5735I-S24U4XE-T-V2 for V6R22C01
+               bname8031S5735I-S8T4XN-V2(537925),         --S5735I-S8T4XN-V2    for V6R22C01
+               bname8031S5735I-S8T4XN-T-V2(537926),       --S5735I-S8T4XN-T-V2  for V6R22C01
+               bname8031S5735I-S8T4SN-V2(537927),         --S5735I-S8T4SN-V2    for V6R22C01
+               bname8031S5735I-S8U4XN-V2(537928),         --S5735I-S8U4XN-V2    for V6R22C01
+               bname8031S5735I-L8P4X-A-V2(537975),        --S5735I-L8P4X-A-V2     for V6R22C10
+               bname8031S5735I-L10T4X-A-V2(537976),       --S5735I-L10T4X-A-V2    for V6R22C10
+               bname8031S6330-H24X4Y(537977),             --S6330-H24X4Y    for V2R22C10
+               bname8031S3710-H24T4S-A(537978),           --S3710-H24T4S-A       for V6R22C10
+               bname8031S3710-H24P4S-A(537979),           --S3710-H24P4S-A       for V6R22C10
+               bname8031S3710-H48T4S-A(537980),           --S3710-H48T4S-A       for V6R22C10
+               bname8031S3710-H48LP4S-A(537981),          --S3710-H48LP4S-A      for V6R22C10
+               bname8031S5331-S24T4X-A-V1(537982),        --S5331-S24T4X-A-V1    for V6R22C10
+               bname8031S5331-H24P4XC-V1(537983),         --S5331-H24P4XC-V1     for V6R22C10
+               bname8031S5331-H48T4XC-V1(537984),         --S5331-H48T4XC-V1     for V6R22C10
+               bname8031S310-24P4S(537985),               --S310-24P4S           for V6R22C10
+               bname8031S310-24T4S(537986),               --S310-24T4S           for V6R22C10
+               bname8031S310-48T4S(537987),               --S310-48T4S           for V6R22C10
+               bname8031S5331-S24S8T4X-A(537988),         --S5331-S24S8T4X-A for V2R22C10
+               bname8031S5331-S24S8T4X-D(537989),         --S5331-S24S8T4X-D for V2R22C10
+			   bname8031S5331-H48HB4XZ(537990),           --S5331-H48HB4XZ for V2R22C10
  
 -- 8090:
                 bname8090DEVUNKNOWN(561152),         -- Unknown board type
@@ -17637,6 +18221,7 @@ fnameASG5000-D3100        (16716065),    --00FF1121
                 bnameNE8KF8APIU(564537),       --V8R22C00 NetEngine-8000E-F8 NE8KF8APIU
                 bnameDP22PDC1K2A1(229013),    --V8R22C00 NetEngine-8000-M4 DP22PDC1K2A1
                 bnameANRD000FAN00(229015),    --V8R22C00 NetEngine-8000-M4 ANR1FAN01
+                bnameTNRMM42FBXC1(564538),    --V8R22C10 PTN 6900-2-M4 TNRMM42FBXC1
 -- ME60:
                 bnameME60UNKNOWN(159744),
                 bnameME60MPUA(159745),                -- ME60-16 MPU Module
@@ -18365,6 +18950,16 @@ fnameASG5000-D3100        (16716065),    --00FF1121
 
                 bnameLST7MPUE0001(700544),   --S12700E main control unit E for v2r20c10 12700E
                 bnameLST7MPUE000K1(700545), --S12700E main control unit E(AK) for v2r20c10 12700E
+                bnameLST7MPUE000Z0(700546),    		   -- S12700E main control unit E(Z) for V2R22C10
+                bnameLST7SFUEX10Z0(700547),    		   -- S12700E switch fabric unit E(Z) for V2R22C10
+                bnameLST7SFUHX10Z0(700548),    		   -- S12700E switch fabric unit H(Z) for V2R22C10
+                bnameLST7G48SX6EZ0(700549),    		   -- 48-port GE SFP interface card (Z,SFP) for V2R22C10
+                bnameLST7X24BX6EZ0(700550),    		   -- 24-port 10GE SFP+ interface and 24-port GE SFP interface card (Z,SFP+) for V2R22C10
+                bnameLST7X48SX6EZ0(700551),    		   -- 48-Port 10GE SFP+ interface card (Z,SFP+) for V2R22C10
+                bnameLST7G48TX5EZ0(700552),    		   -- 6-port 100GE QSFP28 interface card (Z,QSFP28) for V2R22C10
+                bnameLST7C06HX6EZ0(700553),    		   -- 6-port 100GE QSFP28 interface card (Z,QSFP28) for V2R22C10
+                bnameLST7C24HX6EZ0(700554),    		   -- 6-port 100GE QSFP28 interface card (Z,QSFP28) for V2R22C10
+                bnameLST7G48TX6EZ0(700564),    		   -- 48-port 100/1000BASE-T interface card (Z,RJ45) for V2R22C10                
                 bnameLST7L12QX6E0(700561), --12-port 40GE QSFP+ inferface card (X6E,QSFP28) for v2r21c00
                 bnameLST7L12QX6EK0(700562), --12-port 40GE QSFP+ inferface card (AK,QSFP28) for v2r21c00
                 bnameLST7M24BX6E0(700557), --24-port 100M/1G/2.5G/5G/10G and 24-port 100M/1G interface card (X6E,RJ45) for v2r21c00
@@ -18421,6 +19016,19 @@ fnameASG5000-D3100        (16716065),    --00FF1121
                bnamePAC600S56-EB(713499),  --Function Module,AC&240VDC PSU,PAC600S56-EB,600W AC&240V DC Power Module (66mm Width Case,Back to Front,Power panel side exhaust)
                bnamePAC1000S56-EB(713500),  --Function Module,AC&240VDC PSU,PAC1000S56-EB,1000W AC&240V DC Power Module(66mm Width Case,Back to Front, Power panel side exhaust)
                bnamePDC1000S56-EB(713501),  --Function Module,DC PSU,PDC1000S56-EB,POE1000W DC Power Module (66mm Width Case, Back to Front, Power panel side exhaust)
+
+-- S16700:   0x00AE400~0x000AE4ff(713728~713983)
+               banmeLSH7MPUAX1C0(713728), --S16700 Main Processing Unit A
+               banmeLSH7MPUAX1T0(713729), --S16700 Main Processing Unit A (HTM)
+               banmeLSH7SFUAX100(713730), --S16700-4 Switch Fabric Unit A (X1)
+               banmeLSH7SFUBX100(713731), --S16700-4 Switch Fabric Unit B (X1)
+               banmeLSH7SFUGX100(713732), --S16700-8 Switch Fabric Unit G (X1)
+               banmeLSH7SFUHX100(713733), --S16700-8 Switch Fabric Unit H (X1)
+               banmeLSH7X48SX1E0(713734), --48-Port 10G Optical Interface Card (X1E, SFP+)
+               banmeLSH7L24QX1E0(713735), --24-Port 40G Optical Interface Card (X1E, QSFP+)
+               banmeLSH7L36QX1E0(713736), --36-Port 40G Optical Interface Card (X1E, QSFP+)
+               banmeLSH7C18HX1E0(713737), --18-Port 100G Optical Interface Card (X1E, QSFP28)
+               banmeLSH7C36HX1E0(713738), --36-Port 100G Optical Interface Card (X1E, QSFP28)
 
    -- NE0508E:  0x000AC000~0x000ACFFF(704512~708607)
                 bnameNEDD000PIU00(704512),            --NE08E, Power
@@ -19332,6 +19940,12 @@ fnameASG5000-D3100        (16716065),    --00FF1121
                 bnameMIC-LTE4-EA-V2(668160),            --MIC-LTE4-EA-V2 Lpu Control Unit
                 bnameMIC-LTE4-AU-V2(668161),            --MIC-LTE4-AU-V2 Lpu Control Unit
                 bnameSIC-4E1-V2(668162),                     --SIC-4E1-V2 Lpu Control Unit
+                bnameAR6510-L11T1X2(668163),         --AR6510-L11T1X2 Main Control Unit
+                bnameAR6510-L5T4S4(668164),          --AR6510-L5T4S4 Main Control Unit
+                bnameAR5510-H8P2TW1(668165),      --AR5510-H8P2TW1 Main Control Unit
+                bnameAR5510-H10T1(668166),            --AR5510-H10T1 Main Control Unit
+                bnameAR5510-L5T-LTE4EA(668167),   --AR5510-L5T-LTE4EA Main Control Unit
+                bnameAR5510-L5T(668168),                 --AR5510-L5T Main Control Unit
 
 -- vRGW:        0x000A6000~0x000A6fff(679936~684031)
                 bnameVRGWDEVUNKNOWN(679936),           -- Unknown board type
@@ -19680,26 +20294,33 @@ fnameASG5000-D3100        (16716065),    --00FF1121
 				bnameDX511(688493),     	-- DX511	
 				bnameDX112(688494),     	-- DX112
 				bnameCESFU16FG1(688495),			-- CE V2R22C10
-				bnameCE6882H48S8CQ(688496),			-- CE V3R23C00
-				bnameCE6867ULL(688497),				-- CE V3R23C00
-				bnameCE6867H48S8CQ(688498),			-- CE V3R23C00
-				bnameCE6867H48S8CQT(688499),		-- CE V3R23C00
+				bnameCE688248S8CQ(688496),			-- CE V3R23C00
+				bnameCE6867LL(688497),				-- CE V3R23C00
+				bnameCE686748S8CQ(688498),			-- CE V3R23C00
+				bnameCE686748S8CQT(688499),		    -- CE V3R23C00
 				bnameCE6867HAM(688500),				-- CE V3R23C00
 				bnameCE6867SAN(688501),				-- CE V3R23C00
-				bnameCE885236CQ(688502),			-- CE V3R23C00
+				bnameCE885232CQ4BQ(688502),			-- CE V3R23C00
 				bnameCEL36CQHGP1(688503),			-- CE V3R23C00
 				bnameCEL48XSHGP1(688504),			-- CE V3R23C00
 				bnameCEL48XSHGAP1(688505),			-- CE V3R23C00
-				bnameCE16804H(688506),				-- CE V3R23C00
-				bnameCE16808H(688507),				-- CE V3R23C00
-				bnameCE16816H(688508),				-- CE V3R23C00
+				bnameCE16800X4(688506),				-- CE V3R23C00
+				bnameCE16800X8(688507),				-- CE V3R23C00
+				bnameCE16800X16(688508),				-- CE V3R23C00
 				bnameCEL36LQHGP1(688509),			-- CE V3R23C00
 				bnameCEL24CQHGP1(688510),			-- CE V3R23C00
 				bnameCESFU08DL2E(688511),			-- CE V3R23C00
 				bnameCESFU04DL2E(688512),			-- CE V3R23C00
 				bnameCESFU04DH2E(688513),			-- CE V3R23C00
 				bnameCESFU16DL2E(688514),			-- CE V3R23C00
-
+				bnameCEL24XS12CQFDE(688515),		-- CE V3R22C10
+				bnameCEXMPUDHALF2(688523),			-- CE V3R23C00
+				bnameCEXMPUDFULL2(688524),			-- CE V3R23C00
+				bnameCEXMPUDHALF3(688525),			-- CE V3R23C00
+				bnameCEXMPUDFULL3(688526),			-- CE V3R23C00	
+				bnameCE582048T4S(688527),			-- CE V3R23C00
+				bnameCE5820S48T4S(688528),			-- CE V3R23C00
+				bnameCE5811S48T4S(688529),			-- CE V3R23C00
 
 				
 -- wlan:        0x000A9000~0x000A9fff(692224~696319)
@@ -19863,8 +20484,13 @@ fnameASG5000-D3100        (16716065),    --00FF1121
                 bnameAirEngine5762-10(692408),
                 bnameAirEngine5762-10SW(692409),
                 bnameAirEngine6761-23T(692410),
-               
-               
+				bnameAirEngine8771-X1T(692411),
+                bnameAirEngine5562-17W(692412),				
+                bnameAirEngine5562-10(692413),               
+                bnameAirEngine5562-10SW(692414),
+                bnameAC650-128AP(692415),
+                bnameAC650-256AP(692416),
+				
 -- T8010:       0x000AA200~0x000AA7FF(696832~698367)
                 bnameBT81CPOHT8010(696832),         --main control board of T8010 bits, with one slot.
                 bnameBT81CPRHT8010(696833),         --main control board of T8010 bits, with two slots.
@@ -21025,8 +21651,8 @@ bnamePAC1K2S12-PB    (16716065),    --00FF1121
                 subbnameReserve22(148522),          -- subboard of MA5800, reserve for support new subboard in old version.
                 subbnameH901CPCG(148523),           -- Clock subboard of MA5800-X2 H901MPSG.
                 subbnameReserve24(148524),          -- subboard of MA5800, reserve for support new subboard in old version.
-                subbnameReserve25(148525),          -- subboard of MA5800, reserve for support new subboard in old version.
-                subbnameReserve26(148526),          -- subboard of MA5800, reserve for support new subboard in old version.
+                subbnameH901CPCDE(148525),          -- Clock subboard of EA5800-X2 H901MPSDE.
+                subbnameH903CKUF(148526),           -- CLock subboard of MA5800.
                 subbnameReserve27(148527),          -- subboard of MA5800, reserve for support new subboard in old version.
                 subbnameReserve29(148529),          -- subboard of MA5800, reserve for support new subboard in old version.
                 subbnameReserve30(148530),          -- subboard of MA5800, reserve for support new subboard in old version.
@@ -24859,6 +25485,8 @@ subbnameSPCB-ADS-02       (16728151),      --0xff4057
               virent8090DEVTPWM0HOSTB02(229535),           -- V8R22C00 for TPWM0HOSTB02(SBOM) PTN 910D-F DC Power,with 2*50GE(o),6*10GE/GE/FE(o),10*GE/FE(o),4*GE/FE(e)
               virent8090DEVTPXM01HSTA01(229536),           -- V8R22C00 for TPXM01HSTA01(SBOM) PTN 91A-F,3*10G/GE/FE(o)+7*GE/FE(o)+4*GE/FE(e)
               virent8090DEVTPXM0HOSTA01(229543),           -- V8R22C00 for TPXM0HOSTA01(SBOM) PTN 91A-F,3*10G/GE/FE(o)+7*GE/FE(o)+4*GE/FE(e)
+               virent8090DEVTPZM0HOSTA00(229537),           -- V8R22C10 for TPZM0HOSTA00(SBOM) SPN 907 - AC Power,with 4*GE/FE(o),4*GE/FE(e)
+               virent8090DEVTPZM0HOSTA02(229538),           -- V8R22C10 for TPZM0HOSTA02(SBOM) SPN 907 - AC Power,with 4*GE/FE(o),4*GE/FE(e)
               virent8090DEVCR8PM4BASDC2(468761),   -- V8R21C10 for CR8PM4BASDC2(SBOM) NetEngine 8000 M4 Integrated DC Chassis Components(Including DC Power,Fan Box)
               virent8090DEVCR8PM4BASDC3(468762),   -- V8R21C10 for CR8PM4BASDC3(SBOM) NetEngine 8000 M4 Integrated AC Chassis Components(Including AC Power,Fan Box)
               virent8090DEVCR8PM4BASAC2(468764),   -- V8R21C10 for CR8PM4BASAC2(SBOM) NetEngine 8000 M4 Integrated DC Chassis Components(Including DC Power,Fan Box)
@@ -25525,6 +26153,14 @@ subbnameSPCB-ADS-02       (16728151),      --0xff4057
                virent600DEVCR8B0BKP03C3(688335),    --V8R12C00 NetEngine-8000-F1A CR8B0BKP03C3(SBOM), F1A-8H20Q
                virent600DEVCR8B0BKP03C4(676976),    --V8R12C11 NetEngine-8000-F1A CR8B0BKP03C4(SBOM), F1A-8H20Q
                virent600DEVCR8B0BKP03C5(676977),    --V8R12C11 NetEngine-8000-F1A CR8B0BKP03C5(SBOM), F1A-8H20Q
+			   virent8090DEVCR8B0BKP03D4(689110),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Intake)
+               virent8090DEVCR8B0BKP03D5(689111),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Exhaust)
+               virent8090DEVCR8B0BKP03D0(689112),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Intake)
+               virent8090DEVCR8B0BKP03D2(689113),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Exhaust)
+               virent8090DEVCR8B0BKP03D6(689114),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Intake)
+               virent8090DEVCR8B0BKP03D7(689115),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Exhaust)
+               virent8090DEVCR8B0BKP03D1(689116),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Intake)
+               virent8090DEVCR8B0BKP03D3(689117),  --NetEngine 8000 F1A-8H20Q Intergrated Chassis Components(Port-side Exhaust)
                virent600DEVCR8PM1ABASC5(688336),    --V8R12C00 NetEngine-8000-M1A CR8PM1ABASC5(SBOM), M1A-8H20Q
                virent600DEVCR8PM1ABASC4(688337),    --V8R12C00 NetEngine-8000-M1A CR8PM1ABASC4(SBOM), M1A-8H20Q
                virent600DEVCR8PM1ABASC0(688338),    --V8R12C00 NetEngine-8000-M1A CR8PM1ABASC0(SBOM), M1A-8H20Q
@@ -25858,15 +26494,26 @@ subbnameSPCB-ADS-02       (16728151),      --0xff4057
                virent8090DEVCR5D00EDNB67(562121),    -- V8R22C00 for CR5D00EDNB67(SBOM) 16-Port 100GBase QSFP28 Integrated Line Process Unit C CM(NE5000E LPUI-1T6-C-CM)(4 ports enable)
                virent8090DEVCR5D00LRXF63(562122),    -- V8R22C00 for CR5D00LRXF63(SBOM) 72-Port 10GBase LAN/WAN-SFP+ Integrated Line Process Unit C(NE5000E LPUI-1T6-C)
                virent8090DEVCR5D00LRXF64(562123),    -- V8R22C00 for CR5D00LRXF64(SBOM) 72-Port 10GBase LAN/WAN-SFP+ Integrated Line Process Unit C CM(NE5000E LPUI-1T6-C-CM)(24 ports enable) 
-               virent8090DEVCR5DSFUIT362(562190),    -- V8R22C00 for CR5DSFUIT362(SBOM) NE5000E-20 3.2T CLC Switch Fabric Unit for Single Chassis(SFU-3T2-S2)       
 
                virent8090DEVCR5DSFUIT351(562188),    -- V8R21C10 for CR5DSFUIT351(SBOM) NE5000E CCC-A 3.2T Cluster Central Switch Fabric Unit (SFUI-3T2-C2)
-               virent8090DEVCR5DSFUIT363(562189),    -- V8R21C10 for CR5DSFUIT363(SBOM) NE5000E-20 3.2T CLC Integrated Switch Fabric Unit for Multi-Chassis (SFUI-3T2-M2)
+               virent8090DEVCR5DSFUIT365(562189),    -- V8R21C10 for CR5DSFUIT365(SBOM) NE5000E-20 3.2T CLC Integrated Switch Fabric Unit for Multi-Chassis (SFUI-3T2-M2)
+               virent8090DEVCR5DSFUIT364(562190),    -- V8R21C10 for CR5DSFUIT364(SBOM) NE5000E-20 3.2T CLC Switch Fabric Unit for Single Chassis (SFU-3T2-S2)
 
                 virent8090DEVCR5D5KBASN61(562124),    -- V8R22C00 for CR5D5KBASN61(SBOM) NetEngine5000E 8-Port 400GBase QSFP-DD Integrated Line Process Unit(NE5000E LPUI-3T2)
                 virent8090DEVCR5D5KBASN62(562125),    -- V8R22C00 for CR5D5KBASN62(SBOM) NetEngine5000E 32-Port 100GBase QSFP28 Integrated Line Process Unit(NE5000E LPUI-3T2)
                 virent8090DEVCR5D5KHALN63(562126),    -- V8R22C00 for CR5D5KHALN63(SBOM) NetEngine5000E 8-Port 400GBase QSFP-DD Integrated Line Process Unit CM(NE5000E LPUI-3T2-CM) (Including 2*400GE Setup Port)
                 virent8090DEVCR5D5KHALN64(562127),    -- V8R22C00 for CR5D5KHALN64(SBOM) NetEngine5000E 32-Port 100GBase QSFP28 Integrated Line Process Unit CM(NE5000E LPUI-3T2-CM) (Including 8*100GE Setup Port)
+                
+                --BEGIN for V8R23C00
+                virent8090DEVCR5D00E8KB61(562132),    -- V8R23C00 for CR5D00E8KB61(SBOM) 8-Port 400GBase QSFP-DD Integrated Line Process Unit(NE5000E LPUI-3T2-C) 
+                virent8090DEVCR5D00E8KB62(562133),    -- V8R23C00 for CR5D00E8KB62(SBOM) 8-Port 400GBase QSFP-DD Integrated Line Process Unit CM(NE5000E LPUI-3T2-C-CM)(2 ports enable)
+                virent8090DEVCR5D00EINB61(562134),    -- V8R23C00 for CR5D00EINB61(SBOM) 32-Port 100GBase QSFP28 Integrated Line Process Unit(NE5000E LPUI-3T2-C) 
+                virent8090DEVCR5D00EINB62(562135),    -- V8R23C00 for CR5D00EINB62(SBOM) 32-Port 100GBase QSFP28 Integrated Line Process Unit CM(NE5000E LPUI-3T2-C-CM)(8 ports enable)
+                virent8090DEVCR5D00EDNB68(562136),    -- V8R23C00 for CR5D00EDNB68(SBOM) 16-Port 100GBase QSFP28 Integrated Line Process Unit(NE5000E LPUI-1T6-G) 
+                virent8090DEVCR5D00EDNB69(562137),    -- V8R23C00 for CR5D00EDNB69(SBOM) 16-Port 100GBase QSFP28 Integrated Line Process Unit CM(NE5000E LPUI-1T6-G-CM)(4 ports enable)
+                virent8090DEVCR5D00LRXF65(562138),    -- V8R23C00 for CR5D00LRXF65(SBOM) 72-Port 10GBase LAN/WAN-SFP+ Integrated Line Process Unit(NE5000E LPUI-1T6-G)
+                virent8090DEVCR5D00LRXF66(562139),    -- V8R23C00 for CR5D00LRXF66(SBOM) 72-Port 10GBase LAN/WAN-SFP+ Integrated Line Process Unit CM(NE5000E LPUI-1T6-G-CM)(24 ports enable)
+                --END
 
               --BEGIN for V8R21C00 
                virent8090DEVCR8D00EJKBCP(676978),          -- V8R21C00 for CR8D00EJKBCP(SBOM) 36-Port 400GBase-QSFP-DD Integrated Line Processing Unit CM(LPUI-14T4-CM,Enable 36*100GE by default)
@@ -26008,6 +26655,8 @@ subbnameSPCB-ADS-02       (16728151),      --0xff4057
 				virent8090DEVTNRD0SRUAH73(727642),   --  for TNRD0SRUAH73(SBOM) Switch and Route Processing Unit A20(SRUA-480-I, 32G Memory)
                 virent8090DEVME0D0SRUAH76(256575),   --  for ME0D0SRUAH76(SBOM) Switch and Route Processing Unit A20A(SRUA-480A-I, 32G Memory)
                 virent8090DEVME0D0SRUAH77(553460),   --  for ME0D0SRUAH77(SBOM) Switch and Route Processing Unit A20(SRUA-480-I, 32G Memory)
+               virent8090DEVME0D0SRUAH78(553461),   --  for ME0D0SRUAH78(SBOM) Switch and Route Processing Unit A22A(SRUA-480A-J, 32G Memory)
+               virent8090DEVME0D0SRUAH79(553462),   --  for ME0D0SRUAH79(SBOM) Switch and Route Processing Unit A22(SRUA-480-J, 32G Memory)
                 virent8090DEVCR5D0SRUAI72(872979),   --  for CR5D0SRUAI72(SBOM) Switch and Route Processing Unit A21A(SRUA-1TA-H, 32G Memory)
                 virent8090DEVCR5D0SRUAI73(179748),   --  for CR5D0SRUAI73(SBOM) Switch and Route Processing Unit A21(SRUA-1T-H, 32G Memory)
                 virent8090DEVCX6D0SRUAI73(394380),   --  for CX6D0SRUAI73(SBOM) Switch and Route Processing Unit A21(SRUA-1T-H, 32G Memory)
@@ -26046,6 +26695,12 @@ subbnameSPCB-ADS-02       (16728151),      --0xff4057
                virent8090DEVCR8D0MPUA7C4(736463),    -- V1R21C10 for CR8D0MPUA7C4(SBOM) NetEngine 8000E Main Processing Unit A7A(MPUA7A)
                virent8090DEVCR8D0MPUA6C2(329596),    -- V8R21C10 for CR8D0MPUA6C2(SBOM) NetEngine 8000 Main Processing Unit A6B(MPUA6B)
                virent8090DEVCR8D0MPUA4C2(517066),    -- V8R21C10 for CR8D0MPUA4C2(SBOM) NetEngine 8000 Main Processing Unit A4B(MPUA4B)
+               virent8090DEVCR8D0MPUAXC0(688760),    -- V8R23C00 for CR8D0MPUAXC0(SBOM) NetEngine 8000 Main Processing Unit A10(MPUA10)
+               virent8090DEVCR8D0MPUAXC2(688761),    -- V8R23C00 for CR8D0MPUAXC2(SBOM) NetEngine 8000 Main Processing Unit A10B(MPUA10B)
+               virent8090DEVCR8D0MPUAXCA(688762),    -- V8R23C00 for CR8D0MPUAXCA(SBOM) NetEngine 8000 Main Processing Unit A10A(MPUA10A)
+               virent8090DEVCR8D0MPUA8C6(688763),    -- V8R23C00 for CR8D0MPUA8C6(SBOM) NetEngine 8000 Main Processing Unit A9A(MPUA9A)
+               virent8090DEVCR8D0MPUAXC1(688764),    -- V8R23C00 for CR8D0MPUAXC1(SBOM) NetEngine 8000 Main Processing Unit A11(MPUA11)
+               virent8090DEVCR8D0MPUAXC3(688765),    -- V8R23C00 for CR8D0MPUAXC3(SBOM) NetEngine 8000 Main Processing Unit A11B(MPUA11B)
                 --END
 
                --BEGIN for V8R21C10 NE40E X86 SRU
@@ -26194,6 +26849,7 @@ subbnameSPCB-ADS-02       (16728151),      --0xff4057
                virent8090DEVCP8DCXP16001(525149),   -- V8R22C00 for CP8DCXP16001(SBOM) NetEngine A835 T, CP8DCXP16001, System Control,Cross-connect and Multi-protocol Process Unit (CXPA-160)
                fnamePTN910D-F-AC(229540),           -- V8R22C00 for PTN910D-F-AC chassis
                fnamePTN910D-F-DC(229542),           -- V8R22C00 for PTN910D-F-DC chassis
+               fnamePTN907-AC(229547), -- V8R22C10 for PTN907-AC chassis
                fnameATN910D-B-AC(229666),           -- V8R22C00 for ATN910D-B AC chassis
                fnameATN910D-B-DC(229667),           -- V8R22C00 for ATN910D-B DC chassis
                fnameNETENGINE-8000-M1D-B-AC(229668), -- V8R22C00 for NetEngine-8000-M1D-B-AC chassis
@@ -26209,6 +26865,8 @@ subbnameSPCB-ADS-02       (16728151),      --0xff4057
                virent8090DEVCR8PM1DBASCK(525141),   -- V8R22C00 for CR8PM1DBASCK(SBOM) NetEngine 8000 M1D-B, AC Power (Port Capacity 2*50GE(convertible into 10*10GE)+2*25GE(convertible into 4*10GE/GE)+2*10GE/GE+10*GE(0)+4*GE(e), default 2*25GE ports and all the GE/FE ports are enabled,exclude auxiliary materials)
                virent8090DEVCR8PM1DBASCF(525142),   -- V8R22C00 for CR8PM1DBASCF(SBOM) NetEngine 8000 M1D-B, DC Power (Port Capacity 2*50GE(convertible into 10*10GE)+2*25GE(convertible into 4*10GE/GE)+2*10GE/GE+10*GE(0)+4*GE(e), default 2*25GE ports and all the GE/FE ports are enabled,exclude auxiliary materials)
                virent8090DEVCR8PM1DBASCH(525143),   -- V8R22C00 for CR8PM1DBASCH(SBOM) NetEngine 8000 M1D-B, DC Power (Port Capacity 2*50GE(convertible into 10*10GE)+2*25GE(convertible into 4*10GE/GE)+2*10GE/GE+10*GE(0)+4*GE(e), default 2*25GE ports and all the GE/FE ports are enabled,exclude auxiliary materials)
+               virent8090DEVCR8DSFUI2TC1(676895),   -- V8R23C00 for CR8DSFUI2TC1(SBOM) NetEngine 8000 X16 14.4Tbps Switch Fabric Unit(SFUI-2T-C)
+               virent8090DEVCR8DSFUI2TC2(676896),   -- V8R23C00 for CR8DSFUI2TC2(SBOM) NetEngine 8000 X16 2Tbps Switch Fabric Unit(SFUIA-2T-C)
                virent8090DEVCR8D00LRXFC5(120022),   -- V8R22C00 for CR8D00LRXFC5(SBOM) 72-Port 25GE(SFP28)/10GE(SFP+)/GE(SFP) Integrated Line Processing Unit CM(LPUI-2TA-CM)
                virent8090DEVCR8DE4KEFNC0(629166),   -- V8R22C00 for CR8DE4KEFNC0(SBOM) 4-Port 400GBase-QSFP-DD + 24-Port 100GBase-QSFP28 Integrated Line Processing Unit CM (LPUI-4T-CM)
                virent8090DEVCR8DE4KFBNC2(629167),   --  for CR8DE4KFBNC2(SBOM) 4-Port 400GBase-QSFP-DD + 24-Port 100GBase-QSFP28 Integrated Line Processing Unit CM (LPUI-4T-L-CM)
@@ -26304,6 +26962,8 @@ subbnameSPCB-ADS-02       (16728151),      --0xff4057
                virent8090DEVCR5D00EENB7E(843286),   -- V8R22C10 for CR5D00EENB7E(SBOM) 20-Port 100GBase-QSFP28 Integrated Line Processing Unit (LPUI-2TA-E)
                virent8090DEVCR5D00EENB7S(608128),   -- V8R22C10 for CR5D00EENB7S(SBOM) 20-Port 100GBase-QSFP28 FlexE/MACsec Integrated Line Processing Unit CM(LPUI-2T-E-CM)
                virent8090DEVME0DBSUFT07A(493005),   -- V8R22C10 for ME0DBSUFT07A(SBOM) Integrated Broadband Service Unit(BSUI-2T-CM)
+               virent8090DEVME0DBSUFT07C(493006),   -- V8R22C10 for ME0DBSUFT07C(SBOM) Flexible Card Broadband Service Unit(BSUF-1T2A-E,2 sub-slots)
+               virent8090DEVME0DBSUFT07E(493007),   -- V8R22C10 for ME0DBSUFT07E(SBOM) Flexible Card Broadband Service Unit(BSUF-1T2-E,2 sub-slots)
                virent8090DEVME0DMSUFT07A(482951),   -- V8R22C10 for ME0DMSUFT07A(SBOM) Integrated Multi Service Unit(MSUI-2T-CM)
                virent8090DEVME0DMSUFT07E(482952),   -- V8R22C10 for ME0DMSUFT07E(SBOM) Flexible Card Broadband Service Unit(BSUF-1T2-E,2 sub-slots)
                virent8090DEVME0DMSUFT07B(482953),   -- V8R22C10 for ME0DMSUFT07B(SBOM) Flexible Card Multi Service Unit(MSUF-1T2-E,2 sub-slots)
@@ -26317,10 +26977,17 @@ subbnameSPCB-ADS-02       (16728151),      --0xff4057
                virent8090DEVCR8DSFU14TD2(175391),   -- V8R22C10 for CR8DSFU14TD2(SBOM) NetEngine 8000 X4 14.4Tbps Switch Fabric Unit(SFUIA-14T4-D)
                virent8090DEVCR8DSFUI4TD2(175392),   -- V8R22C10 for CR8DSFUI4TD2(SBOM) NetEngine 8000 X8 4Tbps Switch Fabric Unit(SFUIA-4T-G)
                virent8090DEVCR8DSFU14TD3(175393),   -- V8R22C10 for CR8DSFU14TD3(SBOM) NetEngine 8000 X8 14.4Tbps Switch Fabric Unit(SFUIA-14T4-E)
+               virent8090DEVCR8DE2UB00D1(676980),   -- V8R22C10 for CR8DE2UB00D1(SBOM) 2-Port 1.2TBase Integrated Line Processing Unit(LPUI-2T4A)
+               virent8090DEVTPND02CXPB01(901611),   --  for TPND02CXPB01(SBOM) OptiX PTN 980, TPN2CXPA3, System Control,Cross-connect and Multi-protocol Process Unit
+               virent8090DEVTPND02CXPB02(932124),   --  for TPND02CXPB02(SBOM) OptiX PTN 980, TPN2CXPA4, System Control,Cross-connect and Multi-protocol Process Unit
+               virent8090DEVTPQD01CXPB01(852453),   --  for TPQD01CXPB01(SBOM) OptiX PTN 990E, TPQ1CXPA4, System Control,Cross-connect and Multi-protocol Process Unit
+               virent8090DEVTPQD01CXPB02(967204),   --  for TPQD01CXPB02(SBOM) OptiX PTN 990E, TPQ1CXPA4, System Control,Cross-connect and Multi-protocol Process Unit
                virent8090DEVCR8DSFUI2TDA(175394),   -- V8R22C10 for CR8DSFUI2TDA(SBOM) NetEngine 8000 X4 2Tbps Switch Fabric Unit(SFUI-2T-A)
                virent8090DEVCR8DSFUI2TDB(175395),   -- V8R22C10 for CR8DSFUI2TDB(SBOM) NetEngine 8000 X8 2Tbps Switch Fabric Unit(SFUI-2T-B)
                virent8090DEVCR8DSFUI2TD1(175396),   -- V8R22C10 for CR8DSFUI2TD1(SBOM) NetEngine 8000 X4 2Tbps Switch Fabric Unit(SFUIA-2T-A)
                virent8090DEVCR8DSFUI2TD2(175397),   -- V8R22C10 for CR8DSFUI2TD2(SBOM) NetEngine 8000 X8 2Tbps Switch Fabric Unit(SFUIA-2T-B)
+			   virent8090DEVCR8DMPUF8AF2(468786),   -- V8R22C10 for CR8DMPUF8AF2(SBOM) NetEngine 8000E F Main Processing Unit B2A(MPUB2A)
+               virent8090DEVCR8DMPUF8BF1(468787),   -- V8R22C10 for CR8DMPUF8BF1(SBOM) NetEngine 8000 F Main Processing Unit B2(MPUB2)
                virent8090DEVCR2D0MPUD4E1(468800),   -- V8R22C10 for CR2D0MPUD4E1(SBOM) Main Processing Unit D4(16G Memory)
                virent8090DEVCR2DLPUFF3E1(468801),   -- V8R22C10 for CR2DLPUFF3E1(SBOM) Flexible Card Line Processing Unit(LPUF-243G)
                virent8090DEVCR2D0LBXFME0(468802),   -- V8R22C10 for CR2D0LBXFME0(SBOM) 12-Port 10GBase LAN/WAN-SFP+ MACsec Flexible Card(P243G)
@@ -26328,8 +26995,218 @@ subbnameSPCB-ADS-02       (16728151),      --0xff4057
                virent8090DEVCR2B0BKP03EB(468804),   -- V8R22C10 for CR2B0BKP03EB(SBOM) NE20-X3 Enhanced Integrated DC Chassis Components (Including Dual DC Power)
                virent8090DEVCR2B0BKP03E9(468805),   -- V8R22C10 for CR2B0BKP03E9(SBOM) NE20-X3 Enhanced Integrated AC/HVDC Chassis Components (Including Dual AC&240VHVDC Power)
                subbname8090DEVNetEngine-A815-T(115921),   --CARD NetEngine A815 T
-               subbname8090DEVNetEngine-A825-T(115922)   --CARD NetEngine A825 T
-               }
+               subbname8090DEVNetEngine-A825-T(115922),   --CARD NetEngine A825 T
+               virent8090DEVCR8PM4BASDC6(689008),  -- V8R22C10 for CR8PM4BASDC6(SBOM) NetEngine 8000 M4 Basic Configuration CM (Enable Fixed Interface(2*100GE or 8*25GE combo+16*10GE,#4~19 enable GE), DC Power, without Software Charge,Document and auxiliary materials)
+               virent8090DEVCR8PM4BASDC7(689009),  -- V8R22C10 for CR8PM4BASDC7(SBOM) NetEngine 8000 M4 Basic Configuration CM (Includes NetEngine 8000 M4 Chassis, Enable Fixed Interface, DC Power,without Software Charge,Document and auxiliary materials)
+               virent8090DEVCR8PM4BASAC6(689010),  -- V8R22C10 for CR8PM4BASAC6(SBOM) NetEngine 8000 M4 Basic Configuration CM (Enable Fixed Interface(2*100GE or 8*25GE combo+16*10GE,#4~19 enable GE),AC Power,without Software Charge,Document and auxiliary materials)
+               virent8090DEVCR8PM4BASAC7(689011),  -- V8R22C10 for CR8PM4BASAC7(SBOM) NetEngine 8000 M4 Basic Configuration CM (Includes NetEngine 8000 M4 Chassis, Enable Fixed Interface, AC Power,without Software Charge,Document and auxiliary materials)
+               virent8090DEVCR8PM9BASACQ(689012),  -- V8R22C10 for CR8PM9BASACQ(SBOM) Integrated Network Processing Unit (IPUA-1T2-F)
+               virent8090DEVCR8DIPU640C9(689013),  -- V8R22C10 for CR8DIPU640C9(SBOM) Integrated Network Processing Unit (IPUA-640)
+               virent8090DEVTNRDIPU1T292(689014),  -- V8R22C10 for TNRDIPU1T292(SBOM) Integrated Network Processing Unit (IPU-1T2-F)
+               virent8090DEVTNRDIPU48091(689015),  -- V8R22C10 for TNRDIPU48091(SBOM) Integrated Network Processing Unit (IPU-480-F)
+               virent8090DEVCR8DIPU1T213(689016),  -- V8R22C10 for CR8DIPU1T213(SBOM) Integrated Network Processing Unit (IPUA-1T2-F)
+               virent8090DEVCR8DIPU480MA(689017),  -- V8R22C10 for CR8DIPU480MA(SBOM) Integrated Network Processing Unit (IPU-480-CN)
+               virent8090DEVCR8DIPU480MB(689018),  -- V8R22C10 for CR8DIPU480MB(SBOM) Integrated Network Processing Unit (IPUA-480-CN)
+               virent8090DEVCR8DIPU1T2M6(689019),  -- V8R22C10 for CR8DIPU1T2M6(SBOM) Integrated Network Processing Unit (IPU-1T2-E)
+               virent8090DEVCR8DIPU480M2(689020),  -- V8R22C10 for CR8DIPU480M2(SBOM) Integrated Network Processing Unit (IPU-480-E)
+               virent8090DEVCR8D0IPU1T2MG(689021),  -- V8R22C10 for CR8D0IPU1T2MG(SBOM) Integrated Network Processing Unit (IPUA-1T2-E)
+               virent8090DEVCR8D0IPU480MB(689022),  -- V8R22C10 for CR8D0IPU480MB(SBOM) Integrated Network Processing Unit (IPUA-480-E)
+               virent8090DEVCR8DIPU480MC(689023),  -- V8R22C10 for CR8DIPU480MC(SBOM) Integrated Network Processing Unit (IPUA-480-E)
+               virent8090DEVCR8D0IPU1T2MP(689024),  -- V8R22C10 for CR8D0IPU1T2MP(SBOM) Integrated Network Processing Unit (IPUA-1T2-E)
+               virent8090DEVCR8DIPU1T2MT(689025),  -- V8R22C10 for CR8DIPU1T2MT(SBOM) Integrated Network Processing Unit (IPU-1T2-DA)
+               virent8090DEVCR8DIPU480MG(689026),  -- V8R22C10 for CR8DIPU480MG(SBOM) Integrated Network Processing Unit (IPU-480-DA)
+               virent8090DEVCR8DIPU1T2M4(689027),  -- V8R22C10 for CR8DIPU1T2M4(SBOM) Integrated Network Processing Unit (IPUA-1T2-DA)
+               virent8090DEVCR8DIPU480M1(689028),  -- V8R22C10 for CR8DIPU480M1(SBOM) Integrated Network Processing Unit (IPUA-480-DA)
+               virent8090DEVCR8D0IPU2TD2(689029),  -- V8R22C10 for CR8D0IPU2TD2(SBOM) Integrated Network Processing Unit (IPUA-2T-F)
+               virent8090DEVCR8D0IPU2TM1(689030),  -- V8R22C10 for CR8D0IPU2TM1(SBOM) Integrated Network Processing Unit (IPU-2T-E)
+               virent8090DEVCR8DIPUT2TM1(689031),  -- V8R22C10 for CR8DIPUT2TM1(SBOM) Integrated Network Processing Unit (IPU-1T2-E)
+               virent8090DEVTNRD0IPU2T90(689032),  -- V8R22C10 for TNRD0IPU2T90(SBOM) Integrated Network Processing Unit (IPU-2T-F)
+               virent8090DEVTNRDIPUT2T90(689033),  -- V8R22C10 for TNRDIPUT2T90(SBOM) Integrated Network Processing Unit (IPU-1T2-F)
+               virent8090DEVCR5D0IPU2T91(689034),  -- V8R22C10 for CR5D0IPU2T91(SBOM) Integrated Network Processing Unit (IPU-2T-E)
+               virent8090DEVCR5DIPUT2T91(689035),  -- V8R22C10 for CR5DIPUT2T91(SBOM) Integrated Network Processing Unit (IPU-1T2-E)
+               virent8090DEVCR8D0IPU2TM2(689036),  -- V8R22C10 for CR8D0IPU2TM2(SBOM) Integrated Network Processing Unit (IPUA-2T-E)
+               virent8090DEVCR8DIPU1T2M3(689037),  -- V8R22C10 for CR8DIPU1T2M3(SBOM) Integrated Network Processing Unit (IPU-1T2-EN)
+               virent8090DEVTNRDIPU1T290(689038),  -- V8R22C10 for TNRDIPU1T290(SBOM) Integrated Network Processing Unit (IPU-1T2-FN)
+               virent8090DEVCR5DIPU1T291(689039),  -- V8R22C10 for CR5DIPU1T291(SBOM) Integrated Network Processing Unit (IPU-1T2-EN)
+               virent8090DEVCR8D0IPU1T2ME(689040),  -- V8R22C10 for CR8D0IPU1T2ME(SBOM) Integrated Network Processing Unit (IPUA-1T2-EN)
+               virent8090DEVCR8D0IPU1T2MK(689041),  -- V8R22C10 for CR8D0IPU1T2MK(SBOM) Integrated Network Processing Unit (IPUA-1T2-EN)
+               virent8090DEVCR8DIPU1T2MS(689042),  -- V8R22C10 for CR8DIPU1T2MS(SBOM) Integrated Network Processing Unit (IPU-1T2-DA)
+               virent8090DEVCR8DIPU1T2M2(689043),  -- V8R22C10 for CR8DIPU1T2M2(SBOM) Integrated Network Processing Unit (IPUA-1T2-DA)
+               virent8090DEVANND00CXPC00(689044),  -- V8R22C10 for ANND00CXPC00(SBOM) System Control,Cross-connect and Multi-protocol Process Unit with 800G
+               virent8090DEVANND00CXPC03(689045),  -- V8R22C10 for ANND00CXPC03(SBOM) System Control,Cross-connect and Multi-protocol Process Unit with 360G
+               virent8090DEVANND00CXPB01(689046),  -- V8R22C10 for ANND00CXPB01(SBOM) System Control,Cross-connect and Multi-protocol Process Unit with 320G
+               virent8090DEVANND00CXPB02(689047),  -- V8R22C10 for ANND00CXPB02(SBOM) System Control,Cross-connect and Multi-protocol Process Unit with 360G
+               virent8090DEVANND01CXPB01(689048),  -- V8R22C10 for ANND01CXPB01(SBOM) System Control,Cross-connect and Multi-protocol Process Unit with 800G
+               virent8090DEVANRD00CXPC00(689049),  -- V8R22C10 for ANRD00CXPC00(SBOM) System Control, Cross-connect and Multi-protocol Process Unit with 160G
+               virent8090DEVANRD00CXPA21(689050),  -- V8R22C10 for ANRD00CXPA21(SBOM) System Control, Cross-connect and Multi-protocol Process Unit with 160G
+               virent8090DEVANRD01CXPD00(689051),  -- V8R22C10 for ANRD01CXPD00(SBOM) System Control, Cross-connect and Multi-protocol Process Unit with 400G
+               virent8090DEVANRD01CXPE00(689052),  -- V8R22C10 for ANRD01CXPE00(SBOM) System Control, Cross-connect and Multi-protocol Process Unit with 800G
+               virent8090DEVCR8DCXP160C6(689053),  -- V8R22C10 for CR8DCXP160C6(SBOM) System Control,Cross-connect and Multi-protocol Process Unit (CXP-160-C)
+               virent8090DEVCR8DCXP160C7(689054),  -- V8R22C10 for CR8DCXP160C7(SBOM) System Control,Cross-connect and Multi-protocol Process Unit (CXPA-160-C)
+               virent8090DEVANHMHSTA0101(689055),  -- V8R22C10 for ANHMHSTA0101(SBOM) ATN 910D-A, DC Power, Port Capacity 4*100GE/50GE + 16*25GE/10GE/GE/FE + 8*10GE/GE/FE, default all the GE/FE ports is enabled
+               virent8090DEVANHMHSTA0201(689056),  -- V8R22C10 for ANHMHSTA0201(SBOM) ATN 910D-A, AC Power, Port Capacity 4*100GE/50GE + 16*25GE/10GE/GE/FE + 8*10GE/GE/FE, default all the GE/FE ports is enabled
+               virent8090DEVANHMHSTA0122(689057),  -- V8R22C10 for ANHMHSTA0122(SBOM) ATN 910D-A, DC Power, Port Capacity 4*100GE/50GE + 16*25GE/10GE/GE/FE + 8*10GE/GE/FE, default all the GE/FE ports is enabled
+               virent8090DEVANHMHSTA0222(689058),  -- V8R22C10 for ANHMHSTA0222(SBOM) ATN 910D-A, AC Power, Port Capacity 4*100GE/50GE + 16*25GE/10GE/GE/FE + 8*10GE/GE/FE, default all the GE/FE ports is enabled
+               virent8090DEVANHMHSTA0332(689059),  -- V8R22C10 for ANHMHSTA0332(SBOM) ATN 910D-A, AC+DC Power, Port Capacity 4*100GE/50GE + 16*25GE/10GE/GE/FE + 8*10GE/GE/FE, default all the GE/FE ports is enabled
+               virent8090DEVCR8PM1DBASCFP(689060),  -- V8R22C10 for CR8PM1DBASCFP(SBOM) NetEngine 8000 M1D-B DC(Port Capacity 2*50GE+2*25GE/10GE+2*10GE+14*GE,default 2*25GE&all GE,no aux material)
+               virent8090DEVCR8PM1DBASCQ(689061),  -- V8R22C10 for CR8PM1DBASCQ(SBOM) NetEngine 8000 M1D-B DC(A)(Port Capacity 2*50GE+2*25GE/10GE+2*10GE+14*GE,default 2*25GE&all GE,no aux material)
+               virent8090DEVCR8PM1DBASCR(689062),  -- V8R22C10 for CR8PM1DBASCR(SBOM) NetEngine 8000 M1D-B AC(Port Capacity 2*50GE+2*25GE/10GE+2*10GE+14*GE,default 2*25GE&all GE,no aux material)
+               virent8090DEVCR8PM1DBASCS(689063),  -- V8R22C10 for CR8PM1DBASCS(SBOM) NetEngine 8000 M1D-B AC(A)(Port Capacity 2*50GE+2*25GE/10GE+2*10GE+14*GE,default 2*25GE&all GE,no aux material)
+               virent8090DEVANHMHSTA0502(689064),  -- V8R22C10 for ANHMHSTA0502(SBOM) ATN 910D-B, DC Power, Port Capacity 2*50GE+2*25GE/10GE/GE+2*10GE/GE+10*GE(o)+4*GE(e), default 2*25GE and all GE/FE ports
+               virent8090DEVANHMHSTA0602(689065),  -- V8R22C10 for ANHMHSTA0602(SBOM) ATN 910D-B, AC Power, Port Capacity 2*50GE+2*25GE/10GE/GE+2*10GE/GE+10*GE(o)+4*GE(e), default 2*25GE and all GE/FE ports
+               virent8090DEVANGMHSTG0105(689066),  -- V8R22C10 for ANGMHSTG0105(SBOM) ATN 910C-G, DC Power, Port Capacity 16*10GE/GE/FE(o)+12*GE/FE(o)+4*GE/FE(e), Default 2*10GE+8*GE
+               virent8090DEVANGMHSTG0204(689067),  -- V8R22C10 for ANGMHSTG0204(SBOM) ATN 910C-G, AC Power, Port Capacity 16*10GE/GE/FE(o)+12*GE/FE(o)+4*GE/FE(e), Default 2*10GE+8*GE
+               virent8090DEVCR8PM1ABASD0(689068),  -- V8R22C10 for CR8PM1ABASD0(SBOM) NetEngine 8000 M1A, DC Power,Port Capacity 16*10GE+12*GE(o)+4*GE(e)
+               virent8090DEVCR8PM1ABASA0(689069),  -- V8R22C10 for CR8PM1ABASA0(SBOM) NetEngine 8000 M1A, AC Power,Port Capacity 16*10GE+12*GE(o)+4*GE(e)
+               virent8090DEVCR8PM1ABASD1(689070),  -- V8R22C10 for CR8PM1ABASD1(SBOM) NetEngine 8000 M1A, DC Power,Port Capacity 16*10GE+12*GE(o)+4*GE(e)
+               virent8090DEVCR8PM1ABASA1(689071),  -- V8R22C10 for CR8PM1ABASA1(SBOM) NetEngine 8000 M1A, AC Power,Port Capacity 16*10GE+12*GE(o)+4*GE(e)
+               virent8090DEVANGMHSTK0103(689072),  -- V8R22C10 for ANGMHSTK0103(SBOM) ATN 910C-K, DC Power, Port Capacity 16*10GE/GE/FE+8*GE/FE(o)+4*GE/FE(e)+16*E1,None of the ports are available by default
+               virent8090DEVANGMHSTK0203(689073),  -- V8R22C10 for ANGMHSTK0203(SBOM) ATN 910C-K, AC Power, Port Capacity 16*10GE/GE/FE+8*GE/FE(o)+4*GE/FE(e)+16*E1,None of the ports are available by default
+               virent8090DEVANGMHSTM0103(689074),  -- V8R22C10 for ANGMHSTM0103(SBOM) ATN 910C-M, DC Power, Port Capacity 16*10GE/GE/FE+8*GE/FE(o)+4*GE/FE(e),None of the ports are available by default
+               virent8090DEVANGMHSTM0203(689075),  -- V8R22C10 for ANGMHSTM0203(SBOM) ATN 910C-M, AC Power, Port Capacity 16*10GE/GE/FE+8*GE/FE(o)+4*GE/FE(e),None of the ports are available by default
+               virent8090DEVANGMHSTM0301(689076),  -- V8R22C10 for ANGMHSTM0301(SBOM) ATN 910C-M, AC+DC Power, Port Capacity 16*10GE/GE/FE+8*GE/FE(o)+4*GE/FE(e),None of the ports are available by default
+               virent8090DEVCR8PM1CBASD0(689077),  -- V8R22C10 for CR8PM1CBASD0(SBOM) NetEngine 8000 M1C, 2*DC Power, Port Capacity 16*10GE+8*GE(o)+4*GE(e), None of the ports are available by default
+               virent8090DEVCR8PM1CBASAQ(689078),  -- V8R22C10 for CR8PM1CBASAQ(SBOM) NetEngine 8000 M1C, 2*AC Power, Port Capacity 16*10GE+8*GE(o)+4*GE(e), None of the ports are available by default
+               virent8090DEVCR8PM1CBASD1(689079),  -- V8R22C10 for CR8PM1CBASD1(SBOM) NetEngine 8000 M1C(A), 2*DC Power, Port Capacity 16*10GE+8*GE(o)+4*GE(e), None of the ports are available by default
+               virent8090DEVCR8PM1CBASAS(689080),  -- V8R22C10 for CR8PM1CBASAS(SBOM) NetEngine 8000 M1C(A), 2*AC Power, Port Capacity 16*10GE+8*GE(o)+4*GE(e), None of the ports are available by default
+               virent8090DEVANGMHSTH0110(689081),  -- V8R22C10 for ANGMHSTH0110(SBOM) ATN 910C-H DC Basic Configuration(Includes Fixed Enable Interface (4*10GE/GE/FE(o)+4*GE/FE(o)+4*GE/FE(e))/Dual Power/FAN/Chassis)
+               virent8090DEVANGMHSTS0110(689082),  -- V8R22C10 for ANGMHSTS0110(SBOM) ATN 910C-S DC Basic Configuration(Includes Fixed Enable Interface (5*10GE/GE/FE(o)+3*GE/FE(o)+4*GE/FE(e))/Dual Power/FAN/Chassis)
+               virent8090DEVANGMHSTH0210(689083),  -- V8R22C10 for ANGMHSTH0210(SBOM) ATN 910C-H AC Basic Configuration(Includes Fixed Enable Interface (4*10GE/GE/FE(o)+4*GE/FE(o)+4*GE/FE(e))/Power/FAN/Chassis)
+               virent8090DEVANGMHSTS0210(689084),  -- V8R22C10 for ANGMHSTS0210(SBOM) ATN 910C-S AC Basic Configuration(Includes Fixed Enable Interface (5*10GE/GE/FE(o)+3*GE/FE(o)+4*GE/FE(e))/Power/FAN/Chassis)
+               virent8090DEVCR5DLPUFM397(689085),  -- V8R22C10 for CR5DLPUFM397(SBOM) Flexible Card Line Processing Unit(LPUF-483D)
+               virent8090DEVCR5DLPUFF394(689086),  -- V8R22C10 for CR5DLPUFF394(SBOM) Flexible Card Line Processing Unit(LPUF-243D)
+               virent8090DEVCR5DLPUF5376(689087),  -- V8R22C10 for CR5DLPUF5376(SBOM) Flexible Card Line Processing Unit(LPUF-53D)
+               virent8090DEVME0DVSUIK07F(689088),  -- V8R22C10 for ME0DVSUIK07F(SBOM) Integrated Service Unit 400(VSUI-400D)
+               virent8090DEVANGMHSTM03D0(689089),  -- V8R22C10 for ANGMHSTM03D0(SBOM) ATN 910C-M,2*DC Power, Port Capacity 6*10GE+4*GE/FE(o)+4*GE/FE(e)
+               virent8090DEVANGMHSTM03A0(689090),  -- V8R22C10 for ANGMHSTM03A0(SBOM) ATN 910C-M, 2*AC Power, Port Capacity 6*10GE+4*GE/FE(o)+4*GE/FE(e)
+               virent8090DEVCR5D0MPUB97A(689102),  -- V8R22C10 for CR5D0MPUB97A(SBOM) Main Processing Unit B12(32G Memory)
+               virent8090DEVCR5D0MPUB97B(689103),  -- V8R22C10 for CR5D0MPUB97B(SBOM) Main Processing Unit B12A(32G Memory)
+               virent8090DEVCX6DMPUX867A(689104),  -- V8R22C10 for CX6DMPUX867A(SBOM) Main Processing Unit B12(32G Memory)
+               virent8090DEVCX6DMPUB121A(689105),  -- V8R22C10 for CX6DMPUB121A(SBOM) Main Processing Unit B12A(32G Memory)
+               virent8090DEVTNRDMPUX867A(689106),  -- V8R22C10 for TNRDMPUX867A(SBOM) Main Processing Unit B12(32G Memory)
+               virent8090DEVME0DMPUX867A(689107),  -- V8R22C10 for ME0DMPUX867A(SBOM) Main Processing Unit B12(32G Memory)
+               virent8090DEVME0DMPUX867B(689108),  -- V8R22C10 for ME0DMPUX867B(SBOM) Main Processing Unit B12A(32G Memory)
+               virent8090DEVIG2D0MPUB97B(689109),  -- V8R22C10 for IG2D0MPUB97B(SBOM) Main Processing Unit B12A(32G Memory)
+               virent8090DEVCR5DVSUIK07M(894575),   -- V8R22C10 for CR5DVSUIK07M(SBOM) Integrated Service Unit 400(VSUI-400B)
+               virent8090DEVIG2D00SPUG0F(829027),   -- V8R22C10 for IG2D00SPUG0F(SBOM) High Performance X8A&X16A Service Processing Unit-SPUGA,with HW Service Inspection Gateway Software
+               virent8090DEVIG2D00SPUG0E(836270),   -- V8R22C10 for IG2D00SPUG0E(SBOM) High Performance X8A&X16A Enhanced Service Processing Unit-SPUGEA,with HW Service Inspection Gateway Software
+               virent8090DEVCR5D0SRUAK72(183685),   --  for CR5D0SRUAK72(SBOM) Switch and Route Processing Unit A113(SRUA-2T-G, 32G Memory)
+               virent8090DEVCR5D0SRUAK73(959601),   --  for CR5D0SRUAK73(SBOM) Switch and Route Processing Unit A113A(SRUA-2TA-G, 32G Memory)
+               virent8090DEVCX6D0SRUAK72(125962),   --  for CX6D0SRUAK72(SBOM) Switch and Route Processing Unit A113(SRUA-2T-G, 32G Memory)
+               virent8090DEVTNRD0SRUAK72(300854),   --  for TNRD0SRUAK72(SBOM) Switch and Route Processing Unit A113(SRUA-2T-G, 32G Memory)
+               virent8090DEVIG2D0SRUAK72(135469),   --  for IG2D0SRUAK72(SBOM) Switch and Route Processing Unit A113A(SRUA-2TA-G, 32G Memory)
+               virent8090DEVCR5DSFUIT27V(465407),   --  for CR5DSFUIT27V(SBOM) Finished Board Unit,NetEngine40E,CR57SFU2TES01,2Tbps Switch Fabric Unit I(SFUI-2T-I)
+               virent8090DEVCR5DSFUIT27W(606864),   --  for CR5DSFUIT27W(SBOM) Finished Board Unit,NetEngine40E,CR57SFU2TEA01,2Tbps Switch Fabric Unit I(SFUI-2TA-I)
+               virent8090DEVCX6DSFUIT27U(440925),   --  for CX6DSFUIT27U(SBOM) Finished Board Unit,CX600,CX61SFU2TES00,2Tbps Switch Fabric Unit I(SFUI-2T-I)
+               virent8090DEVTNRDSFUIT27U(978034),   --  for TNRDSFUIT27U(SBOM) Finished Board Unit,PTN6900,TNR1SFU2TES00,2Tbps Switch Fabric Unit I(SFUI-2T-I)
+               virent8090DEVIG2DSFUIT214(310202),   --  for IG2DSFUIT214(SBOM) Finished Board Unit,SIG9800,IG21SFU2TE03,2Tbps Switch Fabric Unit E1(SFUI-2TA-I)
+               virent8090DEVCR5DSFUIT27T(721887),   --  for CR5DSFUIT27T(SBOM) Finished Board Unit,NetEngine40E,CR57SFU2TFS1,2Tbps Switch Fabric Unit J(SFUI-2T-J)
+               virent8090DEVCR5DSFUIT27U(413155),   --  for CR5DSFUIT27U(SBOM) Finished Board Unit,NetEngine40E,CR57SFU2TFA1,2Tbps Switch Fabric Unit J(SFUI-2TA-J)
+               virent8090DEVCX6DSFUIT27T(471946),   --  for CX6DSFUIT27T(SBOM) Finished Board Unit,CX600,CX61SFU2TFS1,2Tbps Switch Fabric Unit J(SFUI-2T-J)
+               virent8090DEVTNRDSFUIT27T(448824),   --  for TNRDSFUIT27T(SBOM) Finished Board Unit,PTN6900,CR57SFU2TFS1,2Tbps Switch Fabric Unit J(SFUI-2T-J)
+               virent8090DEVIG2DSFUIT213(137349),   --  for IG2DSFUIT213(SBOM) Finished Board Unit,SIG9800,IG21SFU2TFA1,2Tbps Switch Fabric Unit F1(SFUI-2TA-J)
+               virent8090DEVCR8DIPU1T214(658303),  -- V8R22C10 for CR8DIPU1T214(SBOM) Integrated Network Processing Unit (IPUA-1T2-F)
+               virent8090DEVCR8DE8KE8ND9(578779),  -- V8R22C10 for 8-Port 400GBase-QSFP-DD + 8-Port 100GBase-QSFP28 Integrated Line Processing Unit CM(LPUI-4T-E-CM,Enable 16*100GE by default)
+               virent8090DEVCR8DE4KEFND9(734940),  -- V8R22C10 for 4-Port 400GBase-QSFP-DD + 24-Port 100GBase-QSFP28 Integrated Line Processing Unit CM (LPUI-4T-E-CM)
+               virent8090DEVCR8DEKNBFED9(193229),  -- V8R22C10 for 40-Port 100GBase-QSFP28 Integrated Line Processing Unit CM(LPUI-4T-E-CM)
+               virent8090DEVCR8DEENBFED9(263591),  -- V8R22C10 for 20-Port 100GBase-QSFP28 Integrated Line Processing Unit CM(LPUI-2T-E-CM)
+               virent8090DEVCR8DERYBFED9(623955),  -- V8R22C10 for 72-Port 25GE(SFP28)/10GE(SFP+)/GE(SFP) Integrated Line Processing Unit CM(LPUI-2T-E-CM)
+               virent8090DEVCR8DEANEJYD9(245429),  -- V8R22C10 for 10-Port 100GBase-QSFP28 + 36-Port 25GE(SFP28)/10GE(SFP+)/GE(SFP) Integrated Line Processing Unit CM(LPUI-2T-E-CM)
+               virent8090DEVCR8DEANEJXDQ(818320),  -- V8R22C10 for 10-Port 100GBase-QSFP28 MACsec + 36-Port 10GE(SFP+)/GE(SFP) MACsec Integrated Line Processing Unit CM(LPUI-1T-CM)
+               virent8090DEVCR8DEANEJXD9(236875),  -- V8R22C10 for 10-Port 100GBase-QSFP28 + 36-Port 10GE(SFP+)/GE(SFP) Integrated Line Processing Unit CM(LPUI-1T-CM)
+               virent8090DEVCR8DIPU480M3(115244),  -- V8R22C10 for CR8DIPU480M3(SBOM) Integrated Network Processing Unit (IPU-480-E)
+               virent8090DEVCR8DMPUF8BF3(820122),   -- V8R22C10 for CR8DMPUF8BF3(SBOM) NetEngine 8000 F Main Processing Unit B1(MPUB1)
+               virent8090DEVCR8DMPUF8BF2(560449),   -- V8R22C10 for CR8DMPUF8BF2(SBOM) NetEngine 8000 F Main Processing Unit B2(MPUB2)
+               virent8090DEVCR8DMPUF8AZ2(333932),   -- V8R22C10 for CR8DMPUF8AZ2(SBOM) NetEngine 8000E F Main Processing Unit B1Z(MPUB1Z)
+               virent8090DEVCR8DSFUIK0D0(278498),   -- V8R22C10 for CR8DSFUIK0D0(SBOM) NetEngine 8000 F 2T Switch Routing Unit(SRU-2T-A)
+               virent8090DEVCR8DSFUIK0D1(333202),   -- V8R22C10 for CR8DSFUIK0D1(SBOM) NetEngine 8000E F 2T Switch Routing Unit(SRUA-2T-A)
+               virent8090DEVCR8D00EKNIC0(437814),   -- V8R22C10 for CR8D00EKNIC0(SBOM) 40-Port 100GBase-QSFP28 Integrated Line Processing Unit(LPUIA-4T)
+               virent8090DEVCR8D00EINBC2(142863),   -- V8R22C10 for CR8D00EINBC2(SBOM) 32-Port 100GBase-QSFP28 Integrated Line Processing Unit CM(LPUI-3T2A-CM)
+               virent8090DEVCR8D00LRXIC0(544919),   -- V8R22C10 for CR8D00LRXIC0(SBOM) 72-Port 10GE(SFP+)/GE(SFP) Integrated Line Processing Unit(LPUIA-2T)
+               virent8090DEVCR8D00EENBCY(218591),   -- V8R22C10 for CR8D00EENBCY(SBOM) 20-Port 100GBase-QSFP28 Integrated Line Processing Unit CM(LPUI-2TA-CM)
+               virent8090DEVCR8D00LRXFCY(142985),   -- V8R22C10 for CR8D00LRXFCY(SBOM) 72-Port 10GE-SFP+ Integrated Line Processing Unit(LPUI-1TA-CM)
+               virent8090DEVIG2DLPUFT003(200560),   -- V8R22C10 for IG2DLPUFT003(SBOM) Flexible Card Line Processing Unit(LPUF-1T2A)
+               virent8090DEVIG2DLPUFM306(641528),   -- V8R22C10 for IG2DLPUFM306(SBOM) Flexible Card Line Processing Unit(LPUF-483A)
+               virent8090DEVCR5DEDVE8N7C(492102),   -- V8R22C10 for CR5DEDVE8N7C(SBOM) 16-Port 50G/8-Port 100GBase-QSFP28 FlexE Integrated Line Processing Unit L(LPUI-1T2-L)
+               virent8090DEVCR5DEDVE8N7D(956150),   -- V8R22C10 for CR5DEDVE8N7D(SBOM) 16-Port 50G/8-Port 100GBase-QSFP28 FlexE/MACsec Integrated Line Processing Unit CM(LPUI-1T2-CM)
+               virent8090DEVCR5DLPUFT07H(135161),   -- V8R22C10 for CR5DLPUFT07H(SBOM) Flexible Card Line Processing Unit(LPUF-1T2)
+               virent8090DEVCR5DLPUF537G(163641),   -- V8R22C10 for CR5DLPUF537G(SBOM) Flexible Card Line Processing Unit(LPUF-53)
+               virent8090DEVCR5DLPUFF397(540645),   -- V8R22C10 for CR5DLPUFF397(SBOM) Flexible Card Line Processing Unit(LPUF-243)
+               virent8090DEVCR5DLPUFF37I(981704),   -- V8R22C10 for CR5DLPUFF37I(SBOM) 8-Port GE-SFP/10GE-SFP+ and 16-Port GE-SFP Flexible Card Line Processing Unit(LPUI-243-CM, 4*10GE+20*GE by default, one sub-slot for flexible card)
+               virent8090DEVCR5DLPUFM37G(441838),   -- V8R22C10 for CR5DLPUFM37G(SBOM) Flexible Card Line Processing Unit(LPUF-483)
+               virent8090DEVCR5DLPUFM37J(576508),   -- V8R22C10 for CR5DLPUFM37J(SBOM) Flexible Card Line Processing Unit(LPUF-483-CM, enable slot 0 by default)
+               virent8090DEVCR5DLPUFM37I(505713),   -- V8R22C10 for CR5DLPUFM37I(SBOM) Flexible Card Line Processing Unit(LPUF-483-E-CM, enable slot 0 by default)
+               virent8090DEVCR5DLPUFM37M(848667),   -- V8R22C10 for CR5DLPUFM37M(SBOM) 24-Port GE-SFP/10GE-SFP+ Flexible Card Line Processing Unit(LPUI-483-CM, Enable 12*10GE+12*GE by default, Supporting one sub-slot for flexible card)
+               virent8090DEVCR5DLPUF537D(776113),   -- V8R22C10 for CR5DLPUF537D(SBOM) Flexible Card Line Processing Unit(LPUF-53)
+               virent8090DEVCR5DLPUFF37X(900536),   -- V8R22C10 for CR5DLPUFF37X(SBOM) Flexible Card Line Processing Unit(LPUF-243)
+               virent8090DEVCR5DLPUFF37W(620808),   -- V8R22C10 for CR5DLPUFF37W(SBOM) 8-Port GE-SFP/10GE-SFP+ and 16-Port GE-SFP Flexible Card Line Processing Unit(LPUI-243-CM, 4*10GE+20*GE by default, one sub-slot for flexible card)
+               virent8090DEVCR5DLPUFM37Y(575487),   -- V8R22C10 for CR5DLPUFM37Y(SBOM) Flexible Card Line Processing Unit(LPUF-483)
+               virent8090DEVCR5DLPUFM37Q(560576),   -- V8R22C10 for CR5DLPUFM37Q(SBOM) Flexible Card Line Processing Unit(LPUF-483-CM, enable slot 0 by default)
+               virent8090DEVCR5DLPUFM37S(924968),   -- V8R22C10 for CR5DLPUFM37S(SBOM) Flexible Card Line Processing Unit(LPUF-483-E-CM, enable slot 0 by default)
+               virent8090DEVCR5DLPUFM37U(822545),   -- V8R22C10 for CR5DLPUFM37U(SBOM) 24-Port GE-SFP/10GE-SFP+ Flexible Card Line Processing Unit(LPUI-483-CM, Enable 12*10GE+12*GE by default, Supporting one sub-slot for flexible card)
+               virent8090DEVCR5DLPUFT07G(157738),   -- V8R22C10 for CR5DLPUFT07G(SBOM) Flexible Card Line Processing Unit(LPUF-1T2A)
+               virent8090DEVCR5D00E8NB7T(477667),   -- V8R22C10 for CR5D00E8NB7T(SBOM) 16-Port 50G/8-Port 100GBase-QSFP28 FlexE/MACsec Integrated Line Processing Unit CM(LPUI-1T2A-CM)
+               virent8090DEVCR5DLPUFT07K(558494),   -- V8R22C10 for CR5DLPUFT07K(SBOM) Flexible Card Line Processing Unit(LPUF-1T2A-E)
+               virent8090DEVCR5DLPUF537H(248937),   -- V8R22C10 for CR5DLPUF537H(SBOM) Flexible Card Line Processing Unit(LPUF-53A)
+               virent8090DEVCR5DLPUFF396(632083),   -- V8R22C10 for CR5DLPUFF396(SBOM) Flexible Card Line Processing Unit(LPUF-243A)
+               virent8090DEVCR5DLPUFF39A(827356),   -- V8R22C10 for CR5DLPUFF39A(SBOM) 8-Port GE-SFP/10GE-SFP+ and 16-Port GE-SFP Flexible Card Line Processing Unit(LPUI-243A-CM, 4*10GE+20*GE by default, one sub-slot for flexible card)
+               virent8090DEVCR5DLPUFM37H(530429),   -- V8R22C10 for CR5DLPUFM37H(SBOM) Flexible Card Line Processing Unit(LPUF-483A)
+               virent8090DEVCR5DLPUFM37W(495978),   -- V8R22C10 for CR5DLPUFM37W(SBOM) Flexible Card Line Processing Unit(LPUF-483A)
+               virent8090DEVCR5DLPUFM37K(715222),   -- V8R22C10 for CR5DLPUFM37K(SBOM) 24-Port GE-SFP/10GE-SFP+ Flexible Card Line Processing Unit(LPUI-483A-CM, Enable 12*10GE+12*GE by default, Supporting one sub-slot for flexible card)
+               virent8090DEVME0DMSUFT07G(706119),   -- V8R22C10 for ME0DMSUFT07G(SBOM) Flexible Card Multi Service Unit(MSUF-1T2,2 sub-slots)
+               virent8090DEVME0DBSUFT07F(165590),   -- V8R22C10 for ME0DBSUFT07F(SBOM) Flexible Card Broadband Service Unit(BSUF-1T2A,2 sub-slots)
+               virent8090DEVME0DBSUFT07M(768000),   -- V8R22C10 for ME0DBSUFT07M(SBOM) Flexible Card Broadband Service Unit(BSUF-1T2-E,2 sub-slots)
+               virent8090DEVME0DMSUFT07M(315631),   -- V8R22C10 for ME0DMSUFT07M(SBOM) Flexible Card Multi Service Unit(MSUF-1T2-E,2 sub-slots)
+               virent8090DEVME0DBSUFT07N(995118),   -- V8R22C10 for ME0DBSUFT07N(SBOM) Flexible Card Broadband Service Unit(BSUF-1T2A-E,2 sub-slots)
+               virent8090DEVME0DMSUFT07N(834245),   -- V8R22C10 for ME0DMSUFT07N(SBOM) Flexible Card Multi Service Unit(MSUF-1T2A-E,2 sub-slots)
+               virent8090DEVME0DBSUFM07B(466368),   -- V8R22C10 for ME0DBSUFM07B(SBOM) Flexible Card Broadband Service Unit(BSUF-243-E,2 sub-slots)
+               virent8090DEVME0DBSUFM07K(458457),   -- V8R22C10 for ME0DBSUFM07K(SBOM) Flexible Card Broadband Service Unit(BSUF-483-E,2 sub-slots)
+               virent8090DEVME0DBSUFM07E(919145),   -- V8R22C10 for ME0DBSUFM07E(SBOM) Flexible Card Broadband Service Unit(BSUF-243-E,2 sub-slots)
+               virent8090DEVME0DBSUFM07G(333879),   -- V8R22C10 for ME0DBSUFM07G(SBOM) Flexible Card Broadband Service Unit(BSUF-483-E,2 sub-slots)
+               virent8090DEVCX6DISUFT014(390887),   -- V8R22C10 for CX6DISUFT014(SBOM) Flexible Card Integrated Service Unit(ISUF-1TA)
+               virent8090DEVCX6DISUFT016(392871),   -- V8R22C10 for CX6DISUFT016(SBOM) Flexible Card Integrated Service Unit(ISUF-1T)
+               virent8090DEVCX6DISUFM312(440866),   -- V8R22C10 for CX6DISUFM312(SBOM) Flexible Card Line Processing Unit(ISUF-483A)
+			   virent8090DEVCR8PM1DBADM1(226170),  --NetEngine 8000 M1D, DC Power (Port Capacity 4*100GE/50GE+16*25GE/10GE/GE/FE+8*10GE/GE/FE,exclude auxiliary materials)
+               virent8090DEVCR8PM1DBADM0(226171),  --NetEngine 8000 M1D, DC Power (Port Capacity 4*100GE/50GE+16*25GE/10GE/GE/FE+8*10GE/GE/FE,exclude auxiliary materials)
+               virent8090DEVCR8PM1DBAAM1(226172),  --NetEngine 8000 M1D, AC Power (Port Capacity 4*100GE/50GE+16*25GE/10GE/GE/FE+8*10GE/GE/FE,exclude auxiliary materials)
+               virent8090DEVCR8PM1DBAAM0(226173),  --NetEngine 8000 M1D, AC Power (Port Capacity 4*100GE/50GE+16*25GE/10GE/GE/FE+8*10GE/GE/FE,exclude auxiliary materials)
+               virent8090DEVCR8PM1DBADM5(226174),  --NetEngine 8000 M1D, DC Power (Port Capacity 4*100GE/50GE+16*25GE/10GE/GE/FE+8*10GE/GE/FE,exclude auxiliary materials)
+               virent8090DEVCR8PM1DBAAM5(226175),  --NetEngine 8000 M1D, AC Power (Port Capacity 4*100GE/50GE+16*25GE/10GE/GE/FE+8*10GE/GE/FE,exclude auxiliary materials)
+               virent8090DEVANRD00CXPB02(226159),  --System Control, Cross-connect and Multi-protocol Process Unit with 160G
+               virent8090DEVCR8PM1CBASC7(226199),  --NetEngine 8000 M1C, 2*AC Power, Port Capacity 16*10GE+8*GE(o)+4*GE(e), None of the ports are available by default
+               virent8090DEVCR8PM1CBASA6(226200),  --NetEngine 8000 M1C(A), 2*DC Power, Port Capacity 16*10GE+8*GE(o)+4*GE(e), None of the ports are available by default
+               virent8090DEVCR8PM1CBASA7(226201),  --NetEngine 8000 M1C(A), 2*AC Power, Port Capacity 16*10GE+8*GE(o)+4*GE(e), None of the ports are available by default
+               virent8090DEVANGMHSTH0100(226206),  --ATN 910C-H DC Basic Configuration(Includes Fixed Enable Interface (4*10GE/GE/FE(o)+4*GE/FE(o)+4*GE/FE(e))/Dual Power/FAN/Chassis)
+               virent8090DEVANGMHSTH0200(226208),  --ATN 910C-H AC Basic Configuration(Includes Fixed Enable Interface (4*10GE/GE/FE(o)+4*GE/FE(o)+4*GE/FE(e))/Power/FAN/Chassis)
+               virent8090DEVANGMHSTS0200(226209),  --ATN 910C-S AC Basic Configuration(Includes Fixed Enable Interface (4*10GE/GE/FE(o)+4*GE/FE(o)+4*GE/FE(e))/Power/FAN/Chassis)
+               virent8090DEVCP8PHST20A06(226214),  --NetEngine A821 AC System (2*10GE/GE/FE+8*GE/FE(o)+8*GE/FE€
+               virent8090DEVCP8PHST20A08(226215),  --NetEngine A821 AC System (2*10GE/GE/FE+8*GE/FE(o)+8*GE/FE(e))
+               virent8090DEVCP8PHST10A10(226216),  --NetEngine A813 AC System (6*GE/FE(o)+8*GE/FE(e))
+               virent8090DEVCP8PHSB2EA04(226217),  --NetEngine A821 E AC Chassis(A) (6*10GE/GE/FE(o)+4*GE/FE(o)+8*GE/FE(e), Default 2*10GE/GE/FE(o)+8*GE/FE(o)+8*GE/FE(e))
+               virent8090DEVCP8PHSB2EA05(226218),  --NetEngine A821 E AC Chassis (6*10GE/GE/FE(o)+4*GE/FE(o)+8*GE/FE(e), Default 2*10GE/GE/FE(o)+8*GE/FE(o)+8*GE/FE(e))
+               virent8090DEVCP8PHST2EA29(226219),  --NetEngine A822 E AC Chassis(A)(2*10GE/GE/FE(o)+4*GE/FE(o)+8*GE/FE(e))
+               virent8090DEVCP8PHST2EA28(226220),  --NetEngine A822 E AC Chassis (2*10GE/GE/FE(o)+4*GE/FE(o)+8*GE/FE(e))
+               virent8090DEVCP8PHST1EA0A(226223),  --NetEngine A813 E AC Chassis (A)(6*GE/FE(o)+8*GE/FE(e))
+               virent8090DEVCP8PHST1EAAB(226224),  --NetEngine A813 E AC Chassis (6*GE/FE(o)+8*GE/FE(e))
+               virent8090DEVANPM01HOST7(226225),  --ATN 905-S System,AC,4*GE/FE(o),4*GE/FE(e)
+               virent8090DEVCR5D0SRUAI7A(226160),  --Switch and Route Processing Unit A21A(SRUA-1TA-H, 32G Memory)
+               virent8090DEVCR5D0SRUAI7B(226161),  --Switch and Route Processing Unit A21(SRUA-1T-H, 32G Memory)
+               virent8090DEVCX6D0SRUAI7A(226162),  --Switch and Route Processing Unit A21(SRUA-1T-H, 32G Memory)
+               virent8090DEVCX6D0SRUAI1B(226163),  --Switch and Route Processing Unit A21(SRUA-1T-H, 32G Memory)
+               virent8090DEVTNRD0SRUAI7A(226164),  --Switch and Route Processing Unit A21(SRUA-1T-H, 32G Memory)
+               virent8090DEVME0D0SRUAI7B(226165),  --Switch and Route Processing Unit A21A(SRUA-1TA-H, 32G Memory)
+               virent8090DEVME0D0SRUAI7C(226166),  --Switch and Route Processing Unit A21(SRUA-1T-H, 32G Memory)
+               virent8090DEVIG2D0SRUAI7A(226167),  --Switch and Route Processing Unit A21A(SRUA-1TA-H, 32G Memory)
+               virent8090DEVCR5D0SRUAH7C(226168),  --Switch and Route Processing Unit A20A(SRUA-480A-I, 32G Memory)
+               virent8090DEVCR5D0SRUAH7D(226169),  --Switch and Route Processing Unit A20(SRUA-480-I, 32G Memory)
+               virent8090DEVCX6D0SRUAH7B(226176),  --Switch and Route Processing Unit A20(SRUA-480-I, 32G Memory)
+               virent8090DEVCX6D0SRUAH1A(226177),  --Switch and Route Processing Unit A20(SRUA-480-I, 32G Memory)
+               virent8090DEVTNRD0SRUAH7B(226178),  --Switch and Route Processing Unit A20(SRUA-480-I, 32G Memory)
+               virent8090DEVME0D0SRUAH7D(226179),  --Switch and Route Processing Unit A20A(SRUA-480A-I, 32G Memory)
+               virent8090DEVME0D0SRUAH7E(226180),  --Switch and Route Processing Unit A20(SRUA-480-I, 32G Memory)
+               virent8090DEVME0D0SRUAH7A(226181),  --Switch and Route Processing Unit A22A(SRUA-480A-J, 32G Memory)
+               virent8090DEVME0D0SRUAH7P(226182)  --Switch and Route Processing Unit A22(SRUA-480-J, 32G Memory)
+            }
 
         HWAdditionalEntityType ::= TEXTUAL-CONVENTION
             STATUS current
@@ -26474,11 +27351,3 @@ subbnameSPCB-ADS-02       (16728151),      --0xff4057
             ::= { huaweiTCMIB 16}
 
     END
-
-
-
-
-
-
-
-

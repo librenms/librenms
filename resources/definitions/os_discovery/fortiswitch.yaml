@@ -1,0 +1,46 @@
+modules:
+    mempools:
+        data:
+            -
+                total: FORTINET-FORTISWITCH-MIB::fsSysMemCapacity
+                used: FORTINET-FORTISWITCH-MIB::fsSysMemUsage
+                descr: 'Main Memory'
+                precision: 1024
+    os:
+        serial:
+            - FORTINET-CORE-MIB::fnSysSerial.0
+            - ENTITY-MIB::entPhysicalSerialNum.1
+        version: FORTINET-FORTISWITCH-MIB::fsSysVersion.0
+        version_regex: '/v(?<version>[\d.]+)/'
+        hardware: FORTINET-FORTISWITCH-MIB::fsSysVersion.0
+        hardware_regex: '/^(?<hardware>\S+)/'
+    processors:
+        data:
+            -
+                oid: FORTINET-FORTISWITCH-MIB::fsSysCpuUsage
+                num_oid: '.1.3.6.1.4.1.12356.106.4.1.2.{{ $index }}'
+                index: 1
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - ENTITY-MIB::entPhysicalName
+        state:
+            data:
+                -
+                    oid: ENTITY-SENSOR-MIB::entPhySensorTable
+                    num_oid: '.1.3.6.1.2.1.99.1.1.1.5.{{ $index }}'
+                    state_name: entPhySensorTable
+                    index: 'entPhySensorTable.{{ $index }}'
+                    descr: ENTITY-MIB::entPhysicalName
+                    value: ENTITY-SENSOR-MIB::entPhySensorOperStatus
+                    skip_values:
+                        -
+                            oid: ENTITY-SENSOR-MIB::entPhySensorType
+                            op: '!='
+                            value: 12
+                    states:
+                        - { value: 1, descr: OK, generic: 0 }
+                        - { value: 2, descr: Unavailable, generic: 2 }
+                        - { value: 3, descr: Non Operational, generic: 2 }

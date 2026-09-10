@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DeviceTest.php
  *
@@ -31,7 +32,7 @@ use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\DBTestCase;
 
-class DeviceTest extends DBTestCase
+final class DeviceTest extends DBTestCase
 {
     use DatabaseTransactions;
 

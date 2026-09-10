@@ -52,8 +52,8 @@ if (isset($ss[0])) {
             'idle' => $ss['ssCpuRawIdle'],
         ];
 
-        $tags = compact('rrd_def');
-        data_update($device, 'ucd_cpu', $tags, $fields);
+        $tags = ['rrd_def' => $rrd_def];
+        app('Datastore')->put($device, 'ucd_cpu', $tags, $fields);
 
         $os->enableGraph('ucd_cpu');
     }
@@ -74,7 +74,6 @@ if (isset($ss[0])) {
         'ssRawContexts',
         'ssRawSwapIn',
         'ssRawSwapOut',
-        'ssCpuRawWait',
         'ssCpuRawSteal',
     ];
 
@@ -87,8 +86,8 @@ if (isset($ss[0])) {
                 'value' => $ss[$oid],
             ];
 
-            $tags = compact('oid', 'rrd_name', 'rrd_def');
-            data_update($device, 'ucd_cpu', $tags, $fields);
+            $tags = ['oid' => $oid, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+            app('Datastore')->put($device, 'ucd_cpu', $tags, $fields);
 
             $os->enableGraph('ucd_cpu');
         }
@@ -140,8 +139,8 @@ if (is_numeric($load_raw[2]['laLoadInt'] ?? null)) {
         '15min' => $load_raw[3]['laLoadInt'],
     ];
 
-    $tags = compact('rrd_def');
-    data_update($device, 'ucd_load', $tags, $fields);
+    $tags = ['rrd_def' => $rrd_def];
+    app('Datastore')->put($device, 'ucd_load', $tags, $fields);
 
     $os->enableGraph('ucd_load');
 }

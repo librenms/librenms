@@ -1,7 +1,5 @@
 <?php
 
-$class = 'loss';
-$unit = '%';
-$graph_type = 'sensor_loss';
+$class = \LibreNMS\Enum\Sensor::Loss;
 
 require 'sensors.inc.php';

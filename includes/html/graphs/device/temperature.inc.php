@@ -1,9 +1,7 @@
 <?php
 
-$rrd_options = ' --alt-y-grid';
+$graph_params->alt_y_grid = true;
 
-$class = 'temperature';
-$unit = 'C';
-$unit_long = 'Degree C';
+$class = \LibreNMS\Enum\Sensor::Temperature;
 
 require 'includes/html/graphs/device/sensor.inc.php';

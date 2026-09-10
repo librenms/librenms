@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VmwPowerStateTest.php
  * -Description-
@@ -33,7 +34,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\PowerState;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class VmwPowerStateTest extends SnmpTrapTestCase
+final class VmwPowerStateTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

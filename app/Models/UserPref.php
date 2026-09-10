@@ -1,4 +1,5 @@
 <?php
+
 /**
  * UserPref.php
  *
@@ -25,13 +26,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class UserPref extends BaseModel
 {
     public $timestamps = false;
     public $incrementing = false;
     protected $table = 'users_prefs';
-    /** @var array */
-    protected $primaryKey = ['user_id', 'pref'];
+    protected $primaryKey = 'user_id';
+    /** @var string[] */
+    protected array $compositeKey = ['user_id', 'pref'];
     protected $fillable = ['user_id', 'pref', 'value'];
 
     // ---- Helper Functions ----
@@ -58,7 +62,7 @@ class UserPref extends BaseModel
 
     public function getValueAttribute($value)
     {
-        $decoded = json_decode($value, true);
+        $decoded = json_decode((string) $value, true);
         if (json_last_error() == JSON_ERROR_NONE) {
             return $decoded;
         }
@@ -83,10 +87,12 @@ class UserPref extends BaseModel
     }
 
     // ---- Define Relationships ----
-
-    public function user()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     */
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
@@ -97,32 +103,10 @@ class UserPref extends BaseModel
      */
     protected function setKeysForSaveQuery($query)
     {
-        /** @var array */
-        $keys = $this->getKeyName();
-
-        foreach ($keys as $keyName) {
-            $query->where($keyName, '=', $this->getKeyForSaveQuery($keyName));
+        foreach ($this->compositeKey as $keyName) {
+            $query->where($keyName, '=', $this->original[$keyName] ?? $this->getAttribute($keyName));
         }
 
         return $query;
-    }
-
-    /**
-     * Get the primary key value for a save query. (no primary key)
-     *
-     * @param  mixed  $keyName
-     * @return mixed
-     */
-    protected function getKeyForSaveQuery($keyName = null)
-    {
-        if (is_null($keyName)) {
-            $keyName = $this->getKeyName();
-        }
-
-        if (isset($this->original[$keyName])) {
-            return $this->original[$keyName];
-        }
-
-        return $this->getAttribute($keyName);
     }
 }

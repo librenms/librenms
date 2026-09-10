@@ -3,6 +3,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
@@ -16,7 +17,7 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
         $sensors = [];
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'errors',
+                WirelessSensorType::Errors,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.1429.2.2.5.5.3.1.1.12.' . $index,
                 'ciscosat',
@@ -34,7 +35,7 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
         $sensors = [];
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'rssi',
+                WirelessSensorType::Rssi,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.1429.2.2.5.5.3.1.1.7.' . $index,
                 'ciscosat',
@@ -54,13 +55,13 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
         $cnmargin = snmpwalk_cache_oid($this->getDeviceArray(), 'satSignalCnMargin', [], 'CISCO-DMN-DSG-TUNING-MIB', null, '-OQUsb');
         foreach ($cnmargin as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'snr',
+                WirelessSensorType::Snr,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.1429.2.2.5.5.3.1.1.6.' . $index,
                 'ciscosat-cn-margin',
                 $index,
                 'C/N Link Margin  ' . $index,
-                $entry
+                $entry['satSignalCnMargin']
             );
         }
 
@@ -68,13 +69,13 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
         $cnratio = snmpwalk_cache_oid($this->getDeviceArray(), 'satSignalCndisp', [], 'CISCO-DMN-DSG-TUNING-MIB', null, '-OQUsb');
         foreach ($cnratio as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'snr',
+                WirelessSensorType::Snr,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.1429.2.2.5.5.3.1.1.5.' . $index,
                 'ciscosat-cn-ratio',
                 $index,
                 'C/N Ratio ' . $index,
-                $entry
+                $entry['satSignalCndisp']
             );
         }
 

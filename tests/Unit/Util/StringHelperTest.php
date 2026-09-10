@@ -1,4 +1,5 @@
 <?php
+
 /*
  * StringHelperTest.php
  *
@@ -28,8 +29,14 @@ namespace LibreNMS\Tests\Unit\Util;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\StringHelpers;
 
-class StringHelperTest extends TestCase
+final class StringHelperTest extends TestCase
 {
+    public function testValidUtf8(): void
+    {
+        $this->assertTrue(StringHelpers::isValidUtf8('Øverbyvegen'));
+        $this->assertFalse(StringHelpers::isValidUtf8("\xD8verbyvegen"));
+    }
+
     /**
      * A basic feature test example.
      *
@@ -41,9 +48,11 @@ class StringHelperTest extends TestCase
         $this->assertEquals('', StringHelpers::inferEncoding(''));
         $this->assertEquals('~null', StringHelpers::inferEncoding('~null'));
         $this->assertEquals('Øverbyvegen', StringHelpers::inferEncoding('Øverbyvegen'));
+        $this->assertEquals("first\nsecond", StringHelpers::inferEncoding("first\xDAsecond"));
 
         $this->assertEquals('Øverbyvegen', StringHelpers::inferEncoding(base64_decode('w5h2ZXJieXZlZ2Vu')));
         $this->assertEquals('Øverbyvegen', StringHelpers::inferEncoding(base64_decode('2HZlcmJ5dmVnZW4=')));
+        $this->assertEquals('教科网IPv4', StringHelpers::inferEncoding(base64_decode('vcy/xs34SVB2NA==')));
 
         config(['app.charset' => 'Shift_JIS']);
         $this->assertEquals('コンサート', StringHelpers::inferEncoding(base64_decode('g1KDk4NUgVuDZw==')));
@@ -73,5 +82,30 @@ class StringHelperTest extends TestCase
         $nonstringable = new class {
         };
         $this->assertFalse(StringHelpers::isStringable($nonstringable));
+    }
+
+    public function testIsHexString(): void
+    {
+        $this->assertTrue(StringHelpers::isHex('af'));
+        $this->assertTrue(StringHelpers::isHex('28'));
+        $this->assertTrue(StringHelpers::isHex('aF28'));
+        $this->assertFalse(StringHelpers::isHex('a'));
+        $this->assertFalse(StringHelpers::isHex('aF 28'));
+        $this->assertFalse(StringHelpers::isHex('aF 2'));
+        $this->assertFalse(StringHelpers::isHex('aG'));
+    }
+
+    public function testIsHexWithDelimiters(): void
+    {
+        $this->assertTrue(StringHelpers::isHex('af 28 02', ' '));
+        $this->assertTrue(StringHelpers::isHex('aF 28 02 CE', ' '));
+        $this->assertFalse(StringHelpers::isHex('a5 fj 53', ' '));
+        $this->assertFalse(StringHelpers::isHex('a5fe53', ' '));
+
+        $this->assertFalse(StringHelpers::isHex('af 28 02', ':'));
+        $this->assertTrue(StringHelpers::isHex('af:28:02', ':'));
+        $this->assertTrue(StringHelpers::isHex('aF:28:02:CE', ':'));
+        $this->assertFalse(StringHelpers::isHex('a5:fj:53', ':'));
+        $this->assertFalse(StringHelpers::isHex('a5fe53', ':'));
     }
 }

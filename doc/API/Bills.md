@@ -1,6 +1,6 @@
 ### `list_bills`
 
-Retrieve the list of bills currently in the system.
+Retrieve the list of the bills in the system.
 
 Route: `/api/v0/bills`
        `/api/v0/bills?period=previous`
@@ -10,8 +10,8 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills?period=previous
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills?period=previous
 ```
 
 Output:
@@ -75,7 +75,7 @@ Route: `/api/v0/bills/:id`
 - id is the specific bill id
 - ref is the billing reference
 - custid is the customer reference
-- period=previous indicates you would like the data for the last
+- period=previous returns the data of the last
   complete period rather than the current period
 
 Input:
@@ -83,9 +83,9 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills?ref=:customerref
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills?custid=:custid
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills?ref=:customerref
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills?custid=:custid
 ```
 
 Output:
@@ -139,18 +139,18 @@ Output:
 
 Retrieve a graph image associated with a bill.
 
-NB: The graphs returned from this will always be png as they do not
-come from rrdtool, even if you have SVG set.
+NB: this call always returns a png graph, even with the SVG setting.
+The graph does not come from rrdtool.
 
 Route: `/api/v0/bills/:id/graphs/:graph_type
 
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphs/bits
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphs/bits?from=1517443200
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphs/bits?from=1517443200&to=1517788800
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphs/monthly
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/graphs/bits
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/graphs/bits?from=1517443200
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/graphs/bits?from=1517443200&to=1517788800
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/graphs/monthly
 ```
 
 Output:
@@ -165,19 +165,19 @@ Route: `/api/v0/bills/:id/graphdata/:graph_type`
 
 Input:
 
-The `reducefactor` parameter is used to reduce the number of data
-points. Billing data has 5 minute granularity, so requesting a graph
-for a long time period will result in many data points.  If not
-supplied, it will be automatically calculated.  A reducefactor of 1
-means return all items, 2 means half of the items etc.
+The `reducefactor` parameter reduces the number of data points. The
+billing data has a granularity of 5 minutes. A graph over a long period
+therefore has many data points. Without this parameter, LibreNMS
+calculates the value. A reducefactor of 1 returns all items, and 2
+returns half of the items.
 
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphdata/bits
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphdata/bits?from=1517443200
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphdata/bits?from=1517443200&to=1517788800
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/graphdata/bits?from=1517443200&to=1517788800&reducefactor=5
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/graphdata/bits
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/graphdata/bits?from=1517443200
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/graphdata/bits?from=1517443200&to=1517788800
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/graphdata/bits?from=1517443200&to=1517788800&reducefactor=5
 ```
 
 Output:
@@ -227,7 +227,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/history
 ```
 
 Output:
@@ -270,8 +270,8 @@ Output:
 
 Retrieve a graph of a previous period of a bill
 
-NB: The graphs returned from this will always be png as they do not
-come from rrdtool, even if you have SVG set.
+NB: this call always returns a png graph, even with the SVG setting.
+The graph does not come from rrdtool.
 
 Route: `/api/v0/bills/:id/history/:bill_hist_id/graphs/:graph_type`
 
@@ -280,9 +280,9 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history/1/graphs/bits
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history/1/graphs/hour
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history/1/graphs/day
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/history/1/graphs/bits
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/history/1/graphs/hour
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/history/1/graphs/day
 ```
 
 Output:
@@ -301,9 +301,9 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history/1/graphdata/bits
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history/1/graphdata/hour
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history/1/graphdata/day
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/history/1/graphdata/bits
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/history/1/graphdata/hour
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1/history/1/graphdata/day
 ```
 
 Output:
@@ -321,7 +321,7 @@ Input:
 Example:
 
 ```curl
-curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1
+curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills/1
 ```
 
 Output:
@@ -342,7 +342,7 @@ Route: `/api/v0/bills`
 Method: `POST`
 
 - If you send an existing bill_id the call replaces all values it
-  receives. For example if you send 2 ports it will delete the
+  receives. For example, 2 ports in the request remove the
   existing ports and add the the 2 new ports. So to add ports you have
   to get the current ports first and add them to your update call.
 
@@ -351,13 +351,13 @@ Input:
 Example (create):
 
 ```curl
-curl -X POST -d '{"ports":[ 1021 ],"bill_name":"NEWBILL","bill_day":"1","bill_type":"quota","bill_quota":"2000000000000","bill_custid":"1337","bill_ref":"reference1","bill_notes":"mynote"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills
+curl -X POST -d '{"ports":[ 1021 ],"bill_name":"NEWBILL","bill_day":"1","bill_type":"quota","bill_quota":"2000000000000","bill_custid":"1337","bill_ref":"reference1","bill_notes":"mynote"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills
 ```
 
 Example (set):
 
 ```curl
-curl -X POST -d '{"bill_id":"32","ports":[ 1021 ],"bill_name":"NEWNAME","bill_quota":"1000000000000"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills
+curl -X POST -d '{"bill_id":"32","ports":[ 1021 ],"bill_name":"NEWNAME","bill_quota":"1000000000000"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bills
 ```
 
 Output:

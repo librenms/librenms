@@ -1,4 +1,5 @@
 <?php
+
 /**
  * eltek-webpower.inc.php
  *
@@ -56,11 +57,11 @@ foreach ($count as &$countValue) {
 
         $state_name = 'batteryBanksSymmetry' . $countValue . 'status.0';
         $states = [
-            ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'],
-            ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'minorAlarm'],
-            ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'majorAlarm'],
-            ['value' => 3, 'generic' => 3, 'graph' => 0, 'descr' => 'disabled'],
-            ['value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'error'],
+            ['value' => 0, 'generic' => 0, 'descr' => 'ok'],
+            ['value' => 1, 'generic' => 1, 'descr' => 'minorAlarm'],
+            ['value' => 2, 'generic' => 2, 'descr' => 'majorAlarm'],
+            ['value' => 3, 'generic' => 3, 'descr' => 'disabled'],
+            ['value' => 4, 'generic' => 2, 'descr' => 'error'],
         ];
         create_state_index($state_name, $states);
 
@@ -71,6 +72,5 @@ foreach ($count as &$countValue) {
         $state = $state_numeric / $divisor;
         $descr = 'Battery banks symmetry ' . $countValue;
         discover_sensor(null, 'state', $device, $num_oid, $index, $state_name, $descr, $divisor, '1', null, null, null, $limit, $state);
-        create_sensor_to_state_index($device, $state_name, $index);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -20,8 +21,6 @@
 * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
 *
 */
-$class = 'bitrate';
-$unit = 'bps';
-$unit_long = 'bps';
+$class = \LibreNMS\Enum\Sensor::Bitrate;
 
 require 'includes/html/graphs/device/sensor.inc.php';

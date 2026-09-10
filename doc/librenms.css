@@ -55,6 +55,15 @@
     -webkit-mask-image: var(--md-admonition-icon--setting);
     mask-image: var(--md-admonition-icon--setting);
 }
+
+.md-nav__link {
+  padding-top: 0.4em;
+}
+
+.md-ellipsis {
+  padding-top: 0.4em;
+}
+
 .url-edit-link > svg {
     float: right;
     height: 1rem;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CpUpsOnBattery.php
  *

@@ -1,0 +1,1404 @@
+-- INOVONICS MODEL 640 SMIV2 SPECIFICATION MIB 
+
+INOVONICS-MODEL640-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,OBJECT-TYPE,
+    NOTIFICATION-TYPE,enterprises,
+    Integer32,IpAddress                     FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,DisplayString        FROM SNMPv2-TC;
+
+model640 MODULE-IDENTITY
+    LAST-UPDATED "201602020000Z"
+    ORGANIZATION "Inovonics, Inc."
+    CONTACT-INFO
+                  "www.inovonicsbroadcast.com"
+    DESCRIPTION
+        "The MIB for the Model 640 AARON FM Rebroadcast Receiver."
+
+	REVISION 	"201602020000Z"
+	DESCRIPTION
+        "Second MIB version. Entire MIB overhauled to add OID for every parameter."
+    ::= { inovonicsBroadcast 640 }   
+   
+inovonicsBroadcast          OBJECT IDENTIFIER ::=  { enterprises 42111 }
+
+traps                       OBJECT IDENTIFIER ::=  { model640 1 }
+    notifications			OBJECT IDENTIFIER ::=  { traps 0 }
+product                     OBJECT IDENTIFIER ::=  { model640 2 }
+nowPlaying                  OBJECT IDENTIFIER ::=  { model640 3 }
+receptionTools              OBJECT IDENTIFIER ::=  { model640 4 }
+    bandwidthIF             OBJECT IDENTIFIER ::=  { receptionTools 1 }
+    stereoBlend             OBJECT IDENTIFIER ::=  { receptionTools 2 }
+    highBlend               OBJECT IDENTIFIER ::=  { receptionTools 3 }
+    bandBlend               OBJECT IDENTIFIER ::=  { receptionTools 4 }
+    highcut                 OBJECT IDENTIFIER ::=  { receptionTools 5 }
+rds							OBJECT IDENTIFIER ::=  { model640 5 }
+alarms                      OBJECT IDENTIFIER ::=  { model640 6 }
+    alarmStatus             OBJECT IDENTIFIER ::=  { alarms 1 }
+    audioLoss               OBJECT IDENTIFIER ::=  { alarms 2 }
+    lowSignal               OBJECT IDENTIFIER ::=  { alarms 3 }
+    rdsLoss                 OBJECT IDENTIFIER ::=  { alarms 4 }
+    pilotLoss               OBJECT IDENTIFIER ::=  { alarms 5 }
+setup                       OBJECT IDENTIFIER ::=  { model640 7 }
+    outputs                 OBJECT IDENTIFIER ::=  { setup 1 }
+    network                 OBJECT IDENTIFIER ::=  { setup 2 }
+    dynDNS                  OBJECT IDENTIFIER ::=  { setup 3 }
+    time                    OBJECT IDENTIFIER ::=  { setup 4 }
+    snmp                    OBJECT IDENTIFIER ::=  { setup 5 }
+    email                   OBJECT IDENTIFIER ::=  { setup 6 }
+    alarmLog                OBJECT IDENTIFIER ::=  { setup 7 }
+    alarmPolarity           OBJECT IDENTIFIER ::=  { setup 8 }
+    region                  OBJECT IDENTIFIER ::=  { setup 9 }
+    testOscillator          OBJECT IDENTIFIER ::=  { setup 10 }                  
+passwords                   OBJECT IDENTIFIER ::=  { model640 8 } 
+    
+-- Custom defined textual-conventions
+
+OnOff ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Represents a boolean value."
+    SYNTAX INTEGER { off(0), on(1) }
+    
+----------------------------------
+-- Traps
+----------------------------------
+
+audioLossTrap NOTIFICATION-TYPE
+    OBJECTS { audioLossAlarm }
+    STATUS current
+    DESCRIPTION 
+        "This trap occurs when the Audio Loss alarm is triggered on OR off. 
+        The status of the alarm is included as a variable binding in the form 
+        of the audioLossAlarm object."
+    ::= {notifications 1}
+    
+lowSignalTrap NOTIFICATION-TYPE
+    OBJECTS { lowSignalAlarm }
+    STATUS current
+    DESCRIPTION 
+        "This trap occurs when the Low Signal alarm is triggered on OR off. 
+        The status of the alarm is included as a variable binding in the form 
+        of the lowSignalAlarm object."
+    ::= {notifications 2}
+    
+rdsErrorTrap NOTIFICATION-TYPE
+    OBJECTS { rdsErrorAlarm }
+    STATUS current
+    DESCRIPTION 
+        "This trap occurs when the RDS Error/Mismatch alarm is triggered on OR off. 
+        The status of the alarm is included as a variable binding in the form 
+        of the rdsErrorAlarm object."
+    ::= {notifications 3}
+    
+pilotLossTrap NOTIFICATION-TYPE
+    OBJECTS { pilotLossAlarm }
+    STATUS current
+    DESCRIPTION 
+        "This trap occurs when the Pilot Loss alarm is triggered on OR off. 
+        The status of the alarm is included as a variable binding in the form 
+        of the pilotLossAlarm object."
+    ::= {notifications 4}   
+
+----------------------------------
+-- Product Info
+----------------------------------
+
+serial    OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Serial number."
+   ::= { product 1 }
+
+version    OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Current firmware version."
+   ::= { product 2 }
+   
+date    OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Date of firmware version."
+   ::= { product 3 }
+
+----------------------------------
+-- Now Playing
+----------------------------------
+
+frequency OBJECT-TYPE
+    SYNTAX  Integer32 (6500..10800)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Currently tuned frequency, in 10kHz steps. Can be set
+        between 6500 and 10800."
+    ::= { nowPlaying 1 }
+
+currentPreset OBJECT-TYPE
+    SYNTAX  Integer32 (1..10)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Currently selected preset. The preset can
+        also be set to 1-10. A value of 0 means a 
+        preset is not selected."
+    ::= { nowPlaying 2 }
+
+rssi OBJECT-TYPE
+    SYNTAX  Integer32 (0..120)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Relative Signal Strength Indicator
+        (RF strength). The range is 0-120dBuV."
+    ::= { nowPlaying 3 }
+    
+bandwidth OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IF Bandwidth (units: kHz)."
+    ::= { nowPlaying 4 }
+
+multipath OBJECT-TYPE
+    SYNTAX  Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Amount of Multipath. The Range is 0-100%."
+    ::= { nowPlaying 5 }
+    
+noise OBJECT-TYPE
+    SYNTAX  Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Amount of Ultrasonic Noise. The Range is 0-100%."
+    ::= { nowPlaying 6 }
+
+leftLeveldB OBJECT-TYPE
+    SYNTAX  Integer32 (-128..6)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Left channel level (units: dB)."
+    ::= { nowPlaying 7 }
+
+rightLeveldB OBJECT-TYPE
+    SYNTAX  Integer32 (-128..6)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Right channel level (units: dB)."
+    ::= { nowPlaying 8 }
+
+leftPlusRightLeveldB OBJECT-TYPE
+    SYNTAX  Integer32 (-128..6)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Left+Right level (units: dB)."
+    ::= { nowPlaying 9 }
+
+leftMinusRightLeveldB OBJECT-TYPE
+    SYNTAX  Integer32 (-128..6)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Left-Right level (units: dB)."
+    ::= { nowPlaying 10 }
+
+----------------------------------
+-- RECEPTION TOOLS
+----------------------------------
+
+bandwidthMode OBJECT-TYPE
+    SYNTAX INTEGER { fixed(0), auto(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "IF Bandwidth Mode - set to automatically adjust IF bandwidth, or
+        used a fixed bandwidth set by the fixedBandwidth OID."
+    ::= { bandwidthIF 1 }
+
+fixedBandwidth OBJECT-TYPE
+    SYNTAX INTEGER { bw56kHz(0), bw64kHz(1), bw72kHz(2), bw84kHz(3), bw97kHz(4), bw114kHz(5), bw133kHz(6), bw151kHz(7), bw168kHz(8), bw184kHz(9),
+                     bw200kHz(10), bw217kHz(11), bw236kHz(12), bw254kHz(13), bw287kHz(14), bw311kHz(15) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "IF Bandwidth used when the mode is set to fixed."
+    ::= { bandwidthIF 2 }    
+
+----------------------------------
+-- Reception Tools - Stereo Blend
+----------------------------------
+
+stereoBlendAmount OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Amount of stereo blend processing applied (Units: %)."
+    ::= { stereoBlend 1 }
+
+stereoBlendAuto OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "If set to auto, the blend processing is handled automatically.
+        the other stereo blend settings are not used."
+    ::= { stereoBlend 2 }
+
+stereoBlendUseRSSI OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Set ON to use RSSI as a metric for blend processing."
+    ::= { stereoBlend 3 }
+
+stereoBlendThresholdRSSI OBJECT-TYPE
+    SYNTAX Integer32 (30..60)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "As the RSSI drops below this set value, more blending will occur (Units: dBuV)."
+    ::= { stereoBlend 4 }
+
+stereoBlendUseUSN OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Set ON to use USN as a metric for blend processing."
+    ::= { stereoBlend 5 }
+
+stereoBlendThresholdUSN OBJECT-TYPE
+    SYNTAX Integer32 (0..50)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "As the USN goes above this set value, more blending will occur (Units: %)."
+    ::= { stereoBlend 6 }
+
+stereoBlendUseMultipath OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Set ON to use multipath as a metric for blend processing."
+    ::= { stereoBlend 7 }
+
+stereoBlendThresholdMultipath OBJECT-TYPE
+    SYNTAX Integer32 (0..50)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "As the multipath goes above this set value, more blending will occur (Units: %)."
+    ::= { stereoBlend 8 }
+
+----------------------------------
+-- Reception Tools - High Blend
+----------------------------------
+
+highBlendAmount OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Amount of stereo blend processing applied (Units: %)."
+    ::= { highBlend 1 }
+
+highBlendAuto OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "If set to auto, the high blend processing is handled automatically.
+        the other high blend settings are not used."
+    ::= { highBlend 2 }
+
+highBlendUseRSSI OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Set ON to use RSSI as a metric for high blend processing."
+    ::= { highBlend 3 }
+
+highBlendThresholdRSSI OBJECT-TYPE
+    SYNTAX Integer32 (30..60)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "As the RSSI drops below this set value, more high blending will occur (Units: dBuV)."
+    ::= { highBlend 4 }
+
+highBlendUseUSN OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Set ON to use USN as a metric for high blend processing."
+    ::= { highBlend 5 }
+
+highBlendThresholdUSN OBJECT-TYPE
+    SYNTAX Integer32 (0..50)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "As the USN goes above this set value, more high blending will occur (Units: %)."
+    ::= { highBlend 6 }
+
+highBlendUseMultipath OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Set ON to use multipath as a metric for high blend processing."
+    ::= { highBlend 7 }
+
+highBlendThresholdMultipath OBJECT-TYPE
+    SYNTAX Integer32 (0..50)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "As the multipath goes above this set value, more high blending will occur (Units: %)."
+    ::= { highBlend 8 }
+
+----------------------------------
+-- Reception Tools - Band Blend
+----------------------------------
+
+bandBlendEnable OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Enable or disable 4 band blend processing."
+    ::= { bandBlend 1 }
+
+bandBlendControl OBJECT-TYPE
+    SYNTAX Integer32 (50..150)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Controls the agressiveness of the 4 band blend."
+    ::= { bandBlend 2 }
+
+bandBlendLF OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "The amount of blending in the Low Frequency band (Units: %)."
+    ::= { bandBlend 3 }
+
+bandBlend2k OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "The amount of blending in the 2kHz band (Units: %)."
+    ::= { bandBlend 4 }
+
+bandBlend5k OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "The amount of blending in the 5kHz band (Units: %)."
+    ::= { bandBlend 5 }
+    
+bandBlendHF OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "The amount of blending in the High Frequency band (Units: %)."
+    ::= { bandBlend 6 }
+
+----------------------------------
+-- Reception Tools - Highcut
+----------------------------------
+
+highcutAmount OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Amount of highcut processing applied (Units: %)."
+    ::= { highcut 1 }
+
+highcutAuto OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "If set to auto, the highcut processing is handled automatically.
+        the other high blend settings are not used."
+    ::= { highcut 2 }
+
+highcutUseRSSI OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Set ON to use RSSI as a metric for highcut processing."
+    ::= { highcut 3 }
+
+highcutThresholdRSSI OBJECT-TYPE
+    SYNTAX Integer32 (30..60)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "As the RSSI drops below this set value, more highcut will occur (Units: dBuV)."
+    ::= { highcut 4 }
+
+highcutUseUSN OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Set ON to use USN as a metric for highcut processing."
+    ::= { highcut 5 }
+
+highcutThresholdUSN OBJECT-TYPE
+    SYNTAX Integer32 (0..50)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "As the USN goes above this set value, more highcut will occur (Units: %)."
+    ::= { highcut 6 }
+
+highcutUseMultipath OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Set ON to use multipath as a metric for highcut processing."
+    ::= { highcut 7 }
+
+highcutThresholdMultipath OBJECT-TYPE
+    SYNTAX Integer32 (0..50)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "As the multipath goes above this set value, more highcut will occur (Units: %)."
+    ::= { highcut 8 }
+
+----------------------------------
+-- Reception Tools - Misc
+----------------------------------
+    
+monoStereo OBJECT-TYPE
+    SYNTAX INTEGER { forcedMono(0), stereo(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Set to forced mono or stereo (auto)."
+    ::= { receptionTools 6 }
+    
+multipathSuppression OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Controls the use of Multipath Suppression processing."
+    ::= { receptionTools 7 }
+    
+channelEqualizer OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Controls the use of the Channel Equalizer."
+    ::= { receptionTools 8 }
+
+----------------------------------
+-- RDS
+----------------------------------
+
+pi OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "PI (Program Identification) Code."
+    ::= { rds 1 }
+	
+call OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Callsign/Call Letters for the received PI Code."
+    ::= { rds 2 }
+	
+ps OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "PS (Program Service)."
+    ::= { rds 3 }
+	
+rt OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "RT (Radio Text)."
+    ::= { rds 4 }
+	
+pty OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "PTY (Program Type)."
+    ::= { rds 5 }
+	
+ptyn OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "PTYN (Program Type Name)."
+    ::= { rds 6 }
+	
+rdsTime OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "RDS time received."
+    ::= { rds 7 }
+	
+ms OBJECT-TYPE
+    SYNTAX  INTEGER { speech(0), music(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Music/Speech flag."
+    ::= { rds 8 }
+	
+di OBJECT-TYPE
+    SYNTAX  INTEGER { mono(0), stereo(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Mono/Stereo flag."
+    ::= { rds 9 }
+	
+tp OBJECT-TYPE
+    SYNTAX  INTEGER { off(0), on(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Traffic Programming flag."
+    ::= { rds 10 }
+	
+ta OBJECT-TYPE
+    SYNTAX  OnOff
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Traffic Alert flag."
+    ::= { rds 11 }	
+	
+----------------------------------
+-- ALARMS
+----------------------------------
+----------------------------------
+-- Alarms - Status
+----------------------------------
+            
+audioLossAlarm OBJECT-TYPE
+    SYNTAX  OnOff
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Status of the Audio Loss alarm."
+    ::= { alarmStatus 1 }
+    
+lowSignalAlarm OBJECT-TYPE
+    SYNTAX  OnOff
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Status of the Low Signal alarm."
+    ::= { alarmStatus 2 }
+
+rdsErrorAlarm OBJECT-TYPE
+   SYNTAX  OnOff
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Status of the RDS Error/Mismatch alarm."
+   ::= { alarmStatus 3 }
+   
+pilotLossAlarm OBJECT-TYPE
+   SYNTAX  OnOff
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Status of the Pilot Loss alarm."
+   ::= { alarmStatus 4 }
+
+----------------------------------
+-- Alarms - Audio Loss
+----------------------------------
+
+audioLossEnable OBJECT-TYPE
+    SYNTAX  OnOff
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable the Audio Loss alarm."
+    ::= { audioLoss 1 }
+    
+audioLossThreshOn OBJECT-TYPE
+    SYNTAX  Integer32 (-40..0)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Threshold for alarm turning on (units: dB)."
+    ::= { audioLoss 2 }
+    
+audioLossThreshOff OBJECT-TYPE
+    SYNTAX  Integer32 (-40..0)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Threshold for alarm turning off (units: dB)."
+    ::= { audioLoss 3 }
+    
+audioLossTimeOn OBJECT-TYPE
+    SYNTAX  Integer32 (1..120)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Amount of time the audio level must be below the Threshold On 
+        value before the alarm turns on (units: seconds)."
+    ::= { audioLoss 4 }
+    
+audioLossTimeOff OBJECT-TYPE
+    SYNTAX  Integer32 (1..120)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Amount of time the audio level must be above the Threshold On 
+        value before the alarm turns on (units: seconds)."
+    ::= { audioLoss 5 }
+
+----------------------------------
+-- Alarms - Low Signal
+----------------------------------
+
+lowSignalEnable OBJECT-TYPE
+    SYNTAX  OnOff
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable the Low Signal alarm."
+    ::= { lowSignal 1 }
+    
+lowSignalMute OBJECT-TYPE
+    SYNTAX  OnOff
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If enabled, radio will mute when Low Signal alarm is on."
+    ::= { lowSignal 2 }
+    
+lowSignalThreshOn OBJECT-TYPE
+    SYNTAX  Integer32 (0..80)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Threshold for alarm turning on (units: dBuV)."
+    ::= { lowSignal 3 }
+    
+lowSignalThreshOff OBJECT-TYPE
+    SYNTAX  Integer32 (0..80)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Threshold for alarm turning off (units: dBuV)."
+    ::= { lowSignal 4 }
+      
+lowSignalTimeOn OBJECT-TYPE
+    SYNTAX  Integer32 (1..120)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Amount of time the RSSI level must be below the Threshold On 
+        value before the alarm turns on (units: seconds)."
+    ::= { lowSignal 5 }
+    
+lowSignalTimeOff OBJECT-TYPE
+    SYNTAX  Integer32 (1..120)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Amount of time the RSSI level must be above the Threshold Off 
+        value before the alarm turns off (units: seconds)."
+    ::= { lowSignal 6 }
+
+----------------------------------
+-- Alarms - RDS Loss
+----------------------------------
+
+rdsLossEnable OBJECT-TYPE
+    SYNTAX  OnOff
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable the RDS Error alarm."
+    ::= { rdsLoss 1 }
+    
+rdsPIErrorEnable OBJECT-TYPE
+    SYNTAX  OnOff
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "If enabled, the alarm will occur if RDS is present but the received PI does 
+        not match that set in rdsPICode."
+    ::= { rdsLoss 2 }
+    
+rdsPICode OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (4))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Set PI Code to compare with received PI."
+    ::= { rdsLoss 3 }
+      
+rdsLossTimeOn OBJECT-TYPE
+    SYNTAX  Integer32 (1..120)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Amount of time the RDS must be gone/PI Code incorrect
+        before the alarm turns on (units: seconds)."
+    ::= { rdsLoss 4 }
+    
+rdsLossTimeOff OBJECT-TYPE
+    SYNTAX  Integer32 (1..120)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Amount of time the RDS must be present/PI Code correct
+        before the alarm turns off (units: seconds)."
+    ::= { rdsLoss 5 }
+    
+----------------------------------
+-- Alarms - Pilot Loss
+----------------------------------
+
+pilotLossEnable OBJECT-TYPE
+    SYNTAX  OnOff
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable the Pilot Loss alarm."
+    ::= { pilotLoss 1 }
+      
+pilotLossTimeOn OBJECT-TYPE
+    SYNTAX  Integer32 (1..120)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Amount of time the pilot must be gone 
+        before the alarm turns on (units: seconds)."
+    ::= { pilotLoss 2 }
+    
+pilotLossTimeOff OBJECT-TYPE
+    SYNTAX  Integer32 (1..120)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Amount of time the pilot must be present 
+        before the alarm turns off (units: seconds)."
+    ::= { pilotLoss 3 }
+
+----------------------------------
+-- SETUP
+----------------------------------
+----------------------------------
+-- Setup - Outputs
+----------------------------------
+
+analogLevel OBJECT-TYPE
+    SYNTAX Integer32 (-200..180)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Analog Output level 
+        (Units: 0.1dB, Ex. -100 = -10.0dB)."
+    ::= { outputs 1 }
+
+analogDeemphasis OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "De-emphasis applied to analog outputs."
+    ::= { outputs 2 }
+
+digitalLevel OBJECT-TYPE
+    SYNTAX Integer32 (-300..0)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Digital Output level 
+        (Units: 0.1dB, Ex. -200 = -20.0dB)."
+    ::= { outputs 3 }
+
+digitalDeemphasis OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "De-emphasis applied to AES output."
+    ::= { outputs 4 }
+
+mpxLevel OBJECT-TYPE
+    SYNTAX Integer32 (1000..6000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "MPX Output level (Units: mVpp, Ex. 3100 = 3.10Vpp). 
+        Though the units are mVpp, the resolution is less than 1mVpp. 
+        When this value is set, it will round to the closest possible value."
+    ::= { outputs 5 }
+
+mpxClipping OBJECT-TYPE
+    SYNTAX Integer32 (-20..30)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "MPX Clipping amount (Units: 0.1dB, Ex. 16 = 1.6dB. 
+        This can be set in 0.2dB steps."
+    ::= { outputs 6 }
+
+----------------------------------
+-- Setup - Network
+----------------------------------
+
+dhcp OBJECT-TYPE
+    SYNTAX INTEGER { staticIP(0), dhcpEnabled(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "DHCP enabled, or disabled (static IP)."
+    ::= { network 1 }
+
+ip OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Device IP Address."
+    ::= { network 2 }
+
+gateway OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Gateway IP Address."
+    ::= { network 3 }
+
+subnet OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Device subnet mask."
+    ::= { network 4 }
+
+dns OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Device DNS address."
+    ::= { network 5 }
+
+httpPort OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "HTTP port for webserver."
+    ::= { network 6 }
+    
+hostname OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..16))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "NBNS hostname."
+    ::= { network 7 }
+    
+mac OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC address of this device."
+    ::= { network 8 } 
+
+----------------------------------
+-- Setup - Dynamic DNS
+----------------------------------
+
+ddnsMode OBJECT-TYPE
+    SYNTAX INTEGER { disabled(0), dyn(1), noip(2), dnsomatic(3) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Dynamic DNS provider/mode."
+    ::= { dynDNS 1 }
+    
+ddnsHostname OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..63))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Your DDNS hostname (proper web addess)."
+    ::= { dynDNS 2 }
+    
+ddnsUsername OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..63))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The username for your DDNS account."
+    ::= { dynDNS 3 }
+    
+ddnsPassword OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..63))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The password for your DDNS account."
+    ::= { dynDNS 4 }
+    
+ddnsStatus OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of the DDNS service."
+    ::= { dynDNS 5 }
+    
+----------------------------------
+-- Setup - Time
+----------------------------------
+
+timezone OBJECT-TYPE
+    SYNTAX Integer32 (-120..140)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "UTC offset (Units: 0.1hours). EX: -80 = UTC-8.0. 
+        Can be set in 0.5 hour increments."
+    ::= { time 1 }
+
+dst OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Whether Daylight Saving Time is currently in effect."
+    ::= { time 2 }
+
+autodst OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable to automatically follow US Daylight Saving Time."
+    ::= { time 3 }
+
+timeServer OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "URL for a custom NTP time server."
+    ::= { time 4 }
+
+----------------------------------
+-- Setup - SNMP
+----------------------------------
+
+snmpMode OBJECT-TYPE
+    SYNTAX INTEGER { disabled(0), readOnly(1), readWrite(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "SNMP mode. Restrict SNMP read or write."
+    ::= { snmp 1 }
+
+snmpReadCommunity OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..31))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "SNMP read community string for read access."
+    ::= { snmp 2 }    
+
+snmpWriteCommunity OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..31))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "SNMP write community string for write access."
+    ::= { snmp 3 }    
+
+snmpPort OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "UDP port for SNMP communication. 
+        SNMP standard is UDP port 161."
+    ::= { snmp 4 }    
+
+snmpTrapsPort OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "UDP port for SNMP traps. 
+        SNMP standard is UDP port 162."
+    ::= { snmp 5 }    
+
+snmpTrapDestination1 OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "IP address 1 to send traps to."
+    ::= { snmp 6 }
+    
+snmpTrapDestination2 OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "IP address 2 to send traps to."
+    ::= { snmp 7 }
+    
+snmpTrapDestination3 OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "IP address 3 to send traps to."
+    ::= { snmp 8 }
+
+----------------------------------
+-- Setup - Email
+----------------------------------
+
+smtpServer OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "URL or IP of SMTP server."
+    ::= { email 1 }
+
+smtpPort OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "TCP port for SMTP (depends on server)."
+    ::= { email 2 }
+
+ssl OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable SSL security for connection 
+        to SMTP server."
+    ::= { email 3 }
+
+emailFrom OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This will show as the 'From' when you receive
+        emails from this unit."
+    ::= { email 4 }
+
+emailUsername OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The email address to send from."
+    ::= { email 5 }
+
+emailPassword OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..31))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The password to the email address to send from."
+    ::= { email 6 }
+
+recipientTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RecipientEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of 10 email recipients."
+    ::= { email 7 }
+
+recipientEntry OBJECT-TYPE
+    SYNTAX RecipientEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Single recipient entry."
+    INDEX { recipientIndex }
+    ::= { recipientTable 1 }
+ 
+RecipientEntry ::= SEQUENCE {
+    recipientIndex Integer32,
+    emailAddress DisplayString,
+    audioLossEmail OnOff,
+    lowSignalEmail OnOff,
+    rdsLossEmail OnOff,
+    pilotLossEmail OnOff,
+    dailyLogEmail OnOff,
+    weeklyLogEmail OnOff,
+    monthlyLogEmail OnOff
+}
+
+recipientIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..10)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of recipient (recipients 1 through 10)."
+    ::= { recipientEntry 1 }
+
+emailAddress OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Email address for the recipient of email notifications."
+    ::= { recipientEntry 2 }
+    
+audioLossEmail OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This recipient will receive Audio Loss emails."
+    ::= { recipientEntry 3 }
+
+lowSignalEmail OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This recipient will receive Low Signal emails."
+    ::= { recipientEntry 4 }
+
+rdsLossEmail OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This recipient will receive RDS Loss emails."
+    ::= { recipientEntry 5 }
+
+pilotLossEmail OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This recipient will receive Pilot Loss emails."
+    ::= { recipientEntry 6 }
+
+dailyLogEmail OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This recipient will receive daily log emails."
+    ::= { recipientEntry 7 }
+
+weeklyLogEmail OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This recipient will receive weekly log emails."
+    ::= { recipientEntry 8 }
+
+monthlyLogEmail OBJECT-TYPE
+    SYNTAX OnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This recipient will receive monthly log emails."
+    ::= { recipientEntry 9 }
+
+----------------------------------
+-- Setup - Alarm Log Settings
+----------------------------------
+
+alarmLogStatus OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Fullness of alarm log (units: %). Set to 0 to clear the alarm log."
+    ::= { alarmLog 1 }
+
+alarmLogFullEmail OBJECT-TYPE
+    SYNTAX Integer32 (1..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Send an email reminder when the log is (%) full."
+    ::= { alarmLog 2 }
+
+----------------------------------
+-- Setup - Alarm Polarity
+----------------------------------
+
+audioLossPolarity OBJECT-TYPE
+    SYNTAX INTEGER { activeGround(0), activeOpen(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Polarity of the Audio Loss alarm output."
+    ::= { alarmPolarity 1 }
+
+lowSignalPolarity OBJECT-TYPE
+    SYNTAX INTEGER { activeGround(0), activeOpen(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Polarity of the Low Signal alarm output."
+    ::= { alarmPolarity 2 }
+
+rdsLossPolarity OBJECT-TYPE
+    SYNTAX INTEGER { activeGround(0), activeOpen(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Polarity of the RDS Loss alarm output."
+    ::= { alarmPolarity 3 }
+
+pilotLossPolarity OBJECT-TYPE
+    SYNTAX INTEGER { activeGround(0), activeOpen(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Polarity of the Pilot Loss alarm output."
+    ::= { alarmPolarity 4 }
+
+----------------------------------
+-- Setup - Region
+----------------------------------
+
+tuningSteps OBJECT-TYPE
+    SYNTAX INTEGER { tune10kHz(0), tune100kHz(1), tune200kHz(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The step size used when tuning from the front panel and web."
+    ::= { region 1 }
+
+deemphasis OBJECT-TYPE
+    SYNTAX INTEGER { deemph50us(0), deemph75us(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Set deemphasis to 50us or 75us."
+    ::= { region 2 }
+
+rdsDecodeMode OBJECT-TYPE
+    SYNTAX INTEGER { rds(0), rbds(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Set RDS decoding mode to RDS (Europe) or RBDS (North America)."
+    ::= { region 3 }
+
+----------------------------------
+-- Setup - Test Oscillator
+----------------------------------
+
+oscMode OBJECT-TYPE
+    SYNTAX INTEGER { oscOff(0), oscLeft(1), oscRight(2), oscLeftRight(3) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable the internal tone generator for testing purposes."
+    ::= { testOscillator 1 }
+
+oscFrequency OBJECT-TYPE
+    SYNTAX Integer32 (10..20000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Frequency of the test oscillator (Units: Hz). 
+        Can be set in multiples of 10Hz."
+    ::= { testOscillator 2 }
+
+oscLevel OBJECT-TYPE
+    SYNTAX Integer32 (-30..0)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Level of the test oscillator (Units: dB)."
+    ::= { testOscillator 3 }
+
+----------------------------------
+-- Passwords
+----------------------------------
+    
+frontPanelPassword OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..31))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The password for restricting front panel access."
+    ::= { passwords 1 }
+    
+webpagesPassword OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..31))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The password for restricting webpage access."
+    ::= { passwords 2 }
+
+END

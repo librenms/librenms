@@ -27,7 +27,7 @@ if (isset($vars['package'])) {
     $vars['package'] = htmlspecialchars($vars['package']);
 }
 
-if (sizeof($packages) > 0) {
+if (count($packages) > 0) {
     print_optionbar_start();
 
     if (isset($vars['package'])) {
@@ -43,10 +43,6 @@ if (sizeof($packages) > 0) {
         $package = htmlspecialchars($packages[$packages_int]);
         $label = $package;
 
-        if ($vars['package'] == $package) {
-            $label = '<span class="pagemenu-selected">' . $package . '</span>';
-        }
-
         $packages_int++;
 
         $append = '';
@@ -54,7 +50,13 @@ if (sizeof($packages) > 0) {
             $append = ', ';
         }
 
-        echo generate_link($label, $link_array, ['app' => 'cape', 'stddev' => $vars['stddev'], 'bypkg' => $vars['bypkg'], 'bytimeslot' => $vars['bytimeslot'], 'package' => $package, 'statsavg' => $vars['statsavg'], 'runstats' => $vars['runstats']]) . $append;
+        $link = generate_link($package, $link_array, ['app' => 'cape', 'stddev' => $vars['stddev'], 'bypkg' => $vars['bypkg'], 'bytimeslot' => $vars['bytimeslot'], 'package' => $package, 'statsavg' => $vars['statsavg'], 'runstats' => $vars['runstats']]) . $append;
+
+        if ($vars['package'] == $package) {
+            $link = '<span class="pagemenu-selected">' . $link . '</span>';
+        }
+
+        echo $link;
     }
 
     echo "<br>\n";
@@ -159,7 +161,7 @@ if (isset($vars['package'])) {
         $graphs['cape_signatures_total_avg'] = 'Signatures Total Per Run Average';
     }
 } else {
-    if (sizeof($packages) > 0) {
+    if (count($packages) > 0) {
         $graphs = [
             'cape_status' => 'Run Statuses',
             'cape_pending' => 'Pending',

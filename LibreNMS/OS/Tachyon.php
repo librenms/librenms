@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tachyon.php
  *
@@ -22,6 +23,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -49,7 +51,7 @@ class Tachyon extends OS implements
         $oid = '.1.3.6.1.4.1.57344.1.2.5.0';
 
         $sensors[] = new WirelessSensor(
-            'clients',
+            WirelessSensorType::Clients,
             $this->getDeviceId(),
             $oid,
             'tachyon-clients',
@@ -73,9 +75,8 @@ class Tachyon extends OS implements
 
         foreach ($data as $index => $entry) {
             if (! empty($entry['wirelessRadioFrequency'])) {
-                $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
-                    'frequency',
+                    WirelessSensorType::Frequency,
                     $this->getDeviceId(),
                     ".1.3.6.1.4.1.57344.1.2.2.1.5.$index",
                     'tachyon-freq',
@@ -104,9 +105,8 @@ class Tachyon extends OS implements
 
         foreach ($data as $index => $entry) {
             if (! empty($entry['wirelessRadioTxPower'])) {
-                $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
-                    'power',
+                    WirelessSensorType::Power,
                     $this->getDeviceId(),
                     ".1.3.6.1.4.1.57344.1.2.2.1.3.$index",
                     'tachyon-tx-power',
@@ -137,7 +137,7 @@ class Tachyon extends OS implements
             if (! empty($entry['wirelessPeerRxPower'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
-                    'rssi',
+                    WirelessSensorType::Rssi,
                     $this->getDeviceId(),
                     ".1.3.6.1.4.1.57344.1.2.6.1.6.$index",
                     'tachyon-rx-rssi',
@@ -168,7 +168,7 @@ class Tachyon extends OS implements
             if (! empty($entry['wirelessPeerTxRate'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
-                    'rate',
+                    WirelessSensorType::Rate,
                     $this->getDeviceId(),
                     ".1.3.6.1.4.1.57344.1.2.6.1.7.$index",
                     'tachyon-tx-rate',
@@ -182,7 +182,7 @@ class Tachyon extends OS implements
             if (! empty($entry['wirelessPeerRxRate'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
-                    'rate',
+                    WirelessSensorType::Rate,
                     $this->getDeviceId(),
                     ".1.3.6.1.4.1.57344.1.2.6.1.9.$index",
                     'tachyon-rx-rate',
@@ -213,7 +213,7 @@ class Tachyon extends OS implements
             if (! empty($entry['wirelessPeerLinkDistance'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
-                    'distance',
+                    WirelessSensorType::Distance,
                     $this->getDeviceId(),
                     ".1.3.6.1.4.1.57344.1.2.6.1.13.$index",
                     'tachyon-distance',
@@ -244,7 +244,7 @@ class Tachyon extends OS implements
             if (! empty($entry['wirelessPeerSnr'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
-                    'snr',
+                    WirelessSensorType::Snr,
                     $this->getDeviceId(),
                     ".1.3.6.1.4.1.57344.1.2.6.1.8.$index",
                     'tachyon-snr',

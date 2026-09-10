@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DeviceFieldController.php
  *
@@ -25,17 +26,21 @@
 
 namespace App\Http\Controllers\Select;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Config;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<Device>
+ */
 class DeviceFieldController extends SelectController
 {
     /**
      * Defines validation rules (will override base validation rules for select2 responses too)
-     *
-     * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'field' => 'required|in:features,hardware,os,type,version',
@@ -44,28 +49,24 @@ class DeviceFieldController extends SelectController
 
     /**
      * Defines search fields will be searched in order
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    protected function searchFields($request)
+    protected function searchFields(Request $request): array
     {
-        return [$request->get('field')];
+        return [$request->input('field')];
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
-        $field = $request->get('field');
+        $this->authorize('viewAny', Device::class);
+
+        $field = $request->input('field');
         $query = Device::hasAccess($request->user())
             ->select($field)->orderBy($field)->distinct();
 
-        if ($device_id = $request->get('device')) {
+        if ($device_id = $request->input('device')) {
             $query->where('ports.device_id', $device_id);
         }
 
@@ -73,22 +74,22 @@ class DeviceFieldController extends SelectController
     }
 
     /**
-     * @param  Device  $device
-     * @return array
+     * @param  Device  $model
+     * @return array{id: int|string, text: string, icon?: string}
      */
-    public function formatItem($device)
+    public function formatItem(Model $model): array
     {
-        $field = \Request::get('field');
+        $field = \Request::input('field');
 
-        $text = $device[$field];
+        $text = $model->$field;
         if ($field == 'os') {
-            $text = Config::getOsSetting($text, 'text');
+            $text = LibrenmsConfig::getOsSetting($text, 'text');
         } elseif ($field == 'type') {
-            $text = ucfirst($text);
+            $text = ucfirst((string) $text);
         }
 
         return [
-            'id' => $device[$field],
+            'id' => $model->$field,
             'text' => $text,
         ];
     }

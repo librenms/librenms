@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use LibreNMS\Config;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -20,7 +20,6 @@ class MaintenanceFetchOuis extends LnmsCommand
 
     protected string $mac_oui_url = 'https://www.wireshark.org/download/automated/data/manuf';
     protected int $min_refresh_days = 6;
-    protected int $max_wait_seconds = 900;
     protected int $upsert_chunk_size = 1000;
 
     public function __construct()
@@ -28,7 +27,6 @@ class MaintenanceFetchOuis extends LnmsCommand
         parent::__construct();
 
         $this->addOption('force', null, InputOption::VALUE_NONE);
-        $this->addOption('wait', null, InputOption::VALUE_NONE);
     }
 
     /**
@@ -38,14 +36,14 @@ class MaintenanceFetchOuis extends LnmsCommand
     {
         $force = $this->option('force');
 
-        if (Config::get('mac_oui.enabled') !== true && ! $force) {
+        if (LibrenmsConfig::get('mac_oui.enabled') !== true && ! $force) {
             $this->line(trans('commands.maintenance:fetch-ouis.disabled', ['setting' => 'mac_oui.enabled']));
 
             if (! $this->confirm(trans('commands.maintenance:fetch-ouis.enable_question'))) {
                 return 0;
             }
 
-            Config::persist('mac_oui.enabled', true);
+            LibrenmsConfig::persist('mac_oui.enabled', true);
         }
 
         // We want to refresh after at least 6 days
@@ -54,14 +52,6 @@ class MaintenanceFetchOuis extends LnmsCommand
             $this->warn(trans('commands.maintenance:fetch-ouis.recently_fetched'));
 
             return 0;
-        }
-
-        // wait for 0-15 minutes to prevent stampeding herd
-        if ($this->option('wait')) {
-            $seconds = rand(1, $this->max_wait_seconds);
-            $minutes = (int) round($seconds / 60);
-            $this->info(trans_choice('commands.maintenance:fetch-ouis.waiting', $minutes, ['minutes' => $minutes]));
-            sleep($seconds);
         }
 
         $this->line(trans('commands.maintenance:fetch-ouis.starting'));
@@ -85,7 +75,7 @@ class MaintenanceFetchOuis extends LnmsCommand
             return 0;
         } catch (\Exception|\ErrorException $e) {
             $this->error(trans('commands.maintenance:fetch-ouis.error'));
-            $this->error('Exception: ' . get_class($e));
+            $this->error('Exception: ' . $e::class);
             $this->error($e);
 
             $lock->release(); // We did not succeed, so we'll try again next time
@@ -119,7 +109,7 @@ class MaintenanceFetchOuis extends LnmsCommand
 
                 $oui = substr($oui, 0, $substring_length);
             }
-            $vendor = trim($vendor);
+            $vendor = trim((string) $vendor);
             $oui = trim($oui);
 
             // Add to the list of vendor ids

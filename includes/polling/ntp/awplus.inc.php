@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to capture statistics from the AT-NTP-MIB
  *
@@ -55,13 +56,13 @@ if ($components) {
         $rrd['stratum'] = $array['stratum'];
         $rrd['offset'] = $atNtpAssociationEntry[$array['UID']]['atNtpAssociationOffset'];
         $rrd['offset'] = str_replace(' milliseconds', '', $rrd['offset']);
-        $rrd['offset'] = $rrd['offset'] / 1000; // Convert to seconds
+        $rrd['offset'] /= 1000; // Convert to seconds
         $rrd['delay'] = $atNtpAssociationEntry[$array['UID']]['atNtpAssociationDelay'];
         $rrd['delay'] = str_replace(' milliseconds', '', $rrd['delay']);
-        $rrd['delay'] = $rrd['delay'] / 1000; // Convert to seconds
+        $rrd['delay'] /= 1000; // Convert to seconds
         $rrd['dispersion'] = $atNtpAssociationEntry[$array['UID']]['atNtpAssociationDisp'];
-        $tags = compact('type', 'rrd_name', 'rrd_def', 'peer');
-        data_update($device, 'ntp', $tags, $rrd);
+        $tags = ['type' => $type, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'peer' => $peer];
+        app('Datastore')->put($device, 'ntp', $tags, $rrd);
 
         // Let's print some debugging info.
         d_echo("\n\nComponent: " . $key . "\n");

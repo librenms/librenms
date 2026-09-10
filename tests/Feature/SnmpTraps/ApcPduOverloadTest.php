@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ApcPduOverloadTest.php
  *
@@ -24,7 +25,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class ApcPduOverloadTest extends SnmpTrapTestCase
+final class ApcPduOverloadTest extends SnmpTrapTestCase
 {
     /**
      * Test ApcPduNearOverload trap handle

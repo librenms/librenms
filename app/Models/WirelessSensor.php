@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WirelessSensor.php
  *
@@ -25,22 +26,144 @@
 
 namespace App\Models;
 
-class WirelessSensor extends DeviceRelatedModel
+use App\Facades\LibrenmsConfig;
+use App\Observers\WirelessSensorObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Arr;
+use LibreNMS\Enum\WirelessSensorType;
+use LibreNMS\Interfaces\Models\Keyable;
+use LibreNMS\Util\Number;
+
+#[ObservedBy([WirelessSensorObserver::class])]
+class WirelessSensor extends SensorModel implements Keyable
 {
-    public $timestamps = false;
+    use HasFactory;
+
+    const CREATED_AT = null;
+    const UPDATED_AT = 'lastupdate';
     protected $primaryKey = 'sensor_id';
+    protected $fillable = [
+        'sensor_class',
+        'sensor_index',
+        'sensor_type',
+        'sensor_descr',
+        'sensor_divisor',
+        'sensor_multiplier',
+        'sensor_aggregator',
+        'sensor_current',
+        'sensor_prev',
+        'sensor_limit',
+        'sensor_limit_warn',
+        'sensor_limit_low',
+        'sensor_limit_low_warn',
+        'sensor_alert',
+        'sensor_custom',
+        'entPhysicalIndex',
+        'entPhysicalIndex_measured',
+        'lastupdate',
+        'sensor_oids',
+        'access_point_id',
+        'rrd_type',
+    ];
+
+    /**
+     * @return array{sensor_class: 'LibreNMS\Enum\WirelessSensorType', sensor_oids: 'array'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'sensor_class' => WirelessSensorType::class,
+            'sensor_oids' => 'array',
+        ];
+    }
 
     // ---- Helper Functions ----
 
-    public function classDescr()
+    public function classDescr(): string
     {
-        return __("wireless.$this->sensor_class.short");
+        return __('wireless.' . $this->sensor_class->value . '.short');
     }
 
-    public function icon()
+    public function classDescrLong(): string
     {
-        return collect(collect(\LibreNMS\Device\WirelessSensor::getTypes())
-            ->get($this->sensor_class, []))
-            ->get('icon', 'signal');
+        return $this->classDescr(); // FIXME stub
+    }
+
+    public function icon(): string
+    {
+        return $this->sensor_class->icon();
+    }
+
+    public function unit(): string
+    {
+        return __('wireless.' . $this->sensor_class->value . '.unit');
+    }
+
+    public function unitLong(): string
+    {
+        return $this->unit(); // FIXME stub
+    }
+
+    public function getGraphType(): string
+    {
+        return 'wireless_' . $this->sensor_class->value;
+    }
+
+    public function formatValue($field = 'sensor_current'): string
+    {
+        $value = $this->$field;
+
+        if ($value === null) {
+            return $field == 'sensor_current' ? 'NaN' : '-';
+        }
+
+        if (in_array($this->rrd_type, ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
+            //compute and display an approx rate for this sensor
+            $value = Number::formatSi(max(0, $value - $this->sensor_prev) / LibrenmsConfig::get('rrd.step', 300), 2, 3, '');
+        }
+
+        return match ($this->sensor_class) {
+            WirelessSensorType::Power, WirelessSensorType::Rate => Number::formatSi($value, 3, 0, $this->unit()),
+            WirelessSensorType::Frequency => Number::formatSi($value * 1000000, 3, 0, 'Hz'),
+            WirelessSensorType::Distance => Number::formatSi($value * 1000, 2, 3, 'm'),
+            default => $value . ' ' . $this->unit(),
+        };
+    }
+
+    public function getCompositeKey(): string
+    {
+        return "{$this->sensor_class->value}-$this->sensor_type-$this->sensor_index";
+    }
+
+    public function fillValue(array $values): self
+    {
+        if (empty($values)) {
+            $this->sensor_current = null;
+
+            return $this;
+        }
+
+        if (count($values) > 1) {
+            // aggregate data
+            if ($this->sensor_aggregator == 'avg') {
+                $sensor_value = array_sum($values) / count($values);
+            } else {
+                // sum
+                $sensor_value = array_sum($values);
+            }
+        } else {
+            $sensor_value = Arr::first($values);
+        }
+
+        $sensor_value = Number::extract($sensor_value);
+
+        if ($this->sensor_divisor) {
+            $sensor_value /= $this->sensor_divisor;
+        }
+
+        $this->sensor_current = $sensor_value * $this->sensor_multiplier;
+
+        return $this;
     }
 }

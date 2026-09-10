@@ -1,4 +1,5 @@
 <?php
+
 /**
  * websensor.inc.php
  *

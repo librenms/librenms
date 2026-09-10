@@ -1,4 +1,5 @@
 <?php
+
 /**
  * GoogleGeocodeApi.php
  *
@@ -25,9 +26,9 @@
 
 namespace App\ApiClients;
 
+use App\Facades\LibrenmsConfig;
 use Exception;
 use Illuminate\Http\Client\Response;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Geocoder;
 
 class GoogleMapsApi extends BaseApi implements Geocoder
@@ -43,8 +44,8 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     protected function parseLatLng(array $data): array
     {
         return [
-            'lat' => isset($data['results'][0]['geometry']['location']['lat']) ? $data['results'][0]['geometry']['location']['lat'] : 0,
-            'lng' => isset($data['results'][0]['geometry']['location']['lng']) ? $data['results'][0]['geometry']['location']['lng'] : 0,
+            'lat' => $data['results'][0]['geometry']['location']['lat'] ?? 0,
+            'lng' => $data['results'][0]['geometry']['location']['lng'] ?? 0,
         ];
     }
 
@@ -54,7 +55,7 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     protected function parseMessages(array $data): array
     {
         return [
-            'error' => isset($data['error_message']) ? $data['error_message'] : '',
+            'error' => $data['error_message'] ?? '',
             'response' => $data,
         ];
     }
@@ -62,11 +63,11 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     /**
      * Build request option array
      *
-     * @throws \Exception you may throw an Exception if validation fails
+     * @throws Exception you may throw an Exception if validation fails
      */
     protected function buildGeocodingOptions(string $address): array
     {
-        $api_key = Config::get('geoloc.api_key');
+        $api_key = LibrenmsConfig::get('geoloc.api_key');
         if (! $api_key) {
             throw new Exception('Google Maps API key missing, set geoloc.api_key');
         }

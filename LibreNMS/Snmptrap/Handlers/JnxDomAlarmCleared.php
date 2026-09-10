@@ -1,4 +1,5 @@
 <?php
+
 /**
  * JnxDomAlarmCleared.php
  *

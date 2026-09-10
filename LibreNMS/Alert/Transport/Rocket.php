@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,9 +34,9 @@ class Rocket extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        $rocket_opts = $this->parseUserOptions($this->config['rocket-options']);
+        $rocket_opts = $this->parseUserOptions($this->config['rocket-options'] ?? '');
 
-        $rocket_msg = strip_tags($alert_data['msg']);
+        $rocket_msg = strip_tags((string) $alert_data['msg']);
         $data = [
             'attachments' => [
                 0 => [

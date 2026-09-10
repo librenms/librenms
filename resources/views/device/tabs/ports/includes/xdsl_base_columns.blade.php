@@ -1,7 +1,7 @@
 <td>
     <x-port-link :port="$dslPort->port">{{ $dslPort->port->ifIndex }}. {{ $dslPort->port->getLabel() }}</x-port-link>
     @if($dslPort->port->ifInErrors_delta > 0 || $dslPort->port->ifOutErrors_delta > 0)
-        <a href="{{ \LibreNMS\Util\Url::portUrl($dslPort->port, ['graph_type' => 'port_errors']) }}"><i class='fa fa-flag fa-lg tw-text-red-600'></i></a>
+        <a href="{{ \LibreNMS\Util\Url::portUrl($dslPort->port, ['graph_type' => 'port_errors']) }}"><i class='fa fa-flag fa-lg tw:text-red-600'></i></a>
     @endif
     @if($dslPort->port->getLabel() !== $dslPort->port->getDescription())
         <br/>{{ $dslPort->port->getDescription() }}

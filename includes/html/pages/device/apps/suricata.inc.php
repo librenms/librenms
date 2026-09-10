@@ -23,26 +23,34 @@ if (! isset($vars['suricata_graph_set'])) {
 }
 
 // print the link to the totals
-$total_label = isset($vars['sinstance'])
-    ? 'Totals'
-    : '<span class="pagemenu-selected">Totals</span>';
+
+$label = 'Totals';
 if (isset($vars['suricata_graph_set'])) {
-    echo generate_link($total_label, $link_array, ['suricata_graph_set' => $vars['suricata_graph_set']]);
+    $link = generate_link($label, $link_array, ['suricata_graph_set' => $vars['suricata_graph_set']]);
 } else {
-    echo generate_link($total_label, $link_array);
+    $link = generate_link($label, $link_array);
 }
+
+$link = isset($vars['sinstance'])
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+
+echo $link;
 
 // print links to instances
 echo ' | Instances: ';
 $suricata_instances = $app->data['instances'] ?? [];
 sort($suricata_instances);
 foreach ($suricata_instances as $index => $sinstance) {
-    $sinstance = htmlspecialchars($sinstance);
-    $label = $vars['sinstance'] == $sinstance
-        ? '<span class="pagemenu-selected">' . $sinstance . '</span>'
-        : $sinstance;
+    $sinstance = htmlspecialchars((string) $sinstance);
+    $label = $sinstance;
+    $link = generate_link($label, $link_array, ['sinstance' => $sinstance, 'suricata_graph_set' => $vars['suricata_graph_set']]);
 
-    echo generate_link($label, $link_array, ['sinstance' => $sinstance, 'suricata_graph_set' => $vars['suricata_graph_set']]);
+    $link = $vars['sinstance'] == $sinstance
+        ? '<span class="pagemenu-selected">' . $link . '</span>'
+        : $link;
+
+    echo $link;
 
     if ($index < (count($suricata_instances) - 1)) {
         echo ', ';
@@ -67,15 +75,18 @@ if ($app_data['version'] == 2) {
         if (preg_match('/^\#/', $page)) {
             echo $page_description;
         } else {
-            $label = $vars['suricata_graph_set'] == $page
-                ? '<span class="pagemenu-selected">' . $page_description . '</span>'
-                : $page_description;
-
+            $label = $page_description;
             if (isset($vars['sinstance'])) {
-                echo generate_link($label, $link_array, ['sinstance' => $vars['sinstance'], 'suricata_graph_set' => $page]);
+                $link = generate_link($label, $link_array, ['sinstance' => $vars['sinstance'], 'suricata_graph_set' => $page]);
             } else {
-                echo generate_link($label, $link_array, ['suricata_graph_set' => $page]);
+                $link = generate_link($label, $link_array, ['suricata_graph_set' => $page]);
             }
+
+            $link = $vars['suricata_graph_set'] == $page
+                ? '<span class="pagemenu-selected">' . $link . '</span>'
+                : $link;
+
+            echo $link;
 
             if ($page_count < (count($suricata_pages) - 1) && ! isset($suricata_pages_no_comma[$page])) {
                 echo ', ';
@@ -829,7 +840,7 @@ foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 

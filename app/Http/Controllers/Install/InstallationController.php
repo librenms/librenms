@@ -1,4 +1,5 @@
 <?php
+
 /**
  * InstallationController.php
  *
@@ -34,10 +35,10 @@ class InstallationController extends Controller
     protected $connection = 'setup';
     protected $step;
     protected $steps = [
-        'checks' => \App\Http\Controllers\Install\ChecksController::class,
-        'database' => \App\Http\Controllers\Install\DatabaseController::class,
-        'user' => \App\Http\Controllers\Install\MakeUserController::class,
-        'finish' => \App\Http\Controllers\Install\FinalizeController::class,
+        'checks' => ChecksController::class,
+        'database' => DatabaseController::class,
+        'user' => MakeUserController::class,
+        'finish' => FinalizeController::class,
     ];
 
     public function redirectToFirst()
@@ -141,9 +142,7 @@ class InstallationController extends Controller
 
     protected function hydrateControllers()
     {
-        $this->steps = array_map(function ($class) {
-            return is_object($class) ? $class : app()->make($class);
-        }, $this->steps);
+        $this->steps = array_map(fn ($class) => is_object($class) ? $class : app()->make($class), $this->steps);
 
         return $this->steps;
     }
@@ -152,11 +151,9 @@ class InstallationController extends Controller
     {
         $this->hydrateControllers();
 
-        return array_map(function (InstallerStep $controller) {
-            return [
-                'enabled' => $controller->enabled(),
-                'complete' => $controller->complete(),
-            ];
-        }, $this->steps);
+        return array_map(fn (InstallerStep $controller) => [
+            'enabled' => $controller->enabled(),
+            'complete' => $controller->complete(),
+        ], $this->steps);
     }
 }

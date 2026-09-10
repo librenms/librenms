@@ -1,0 +1,2162 @@
+
+OPTICSIM-ETHNE-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+  MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32,
+    Unsigned32                                       FROM SNMPv2-SMI
+  RowStatus, TruthValue, AutonomousType, TEXTUAL-CONVENTION          FROM SNMPv2-TC
+  ifIndex, InterfaceIndexOrZero                      FROM IF-MIB
+  opticsimEthMib, opticsimEthMC                      FROM OPTICSIM-ETHREG-MIB
+  ifMauIfIndex, ifMauIndex                           FROM MAU-MIB
+  OpticsIMLayer2ProtocolList, OpticsIMETSVlanCfg     FROM OpticsIMETS-MIB
+  OpticsIMUserLabel                                  FROM TSDIM-SNMP-TC
+  OpticsIMETSIpDscp                                  FROM OpticsIMETS-MIB
+  Gauge                                              FROM RFC1155-SMI;
+
+opticsimEthNEMib MODULE-IDENTITY
+  LAST-UPDATED "202006080000Z"
+  ORGANIZATION "Alcatel Optics"
+  CONTACT-INFO "Alcatel Optics"
+    DESCRIPTION
+    "Optics-IM Ethernet NE MIB "
+
+
+  REVISION "202006080000Z"
+    DESCRIPTION
+      "Added to opticsIMifMauExtTable:
+       - opticsIMifMauExtSynchRoleResult
+       "
+
+  REVISION "201702280000Z"
+  DESCRIPTION
+      "-SNMPIDL-523 -L.Cai -V5.13
+       Added to opticsIMEthConfTable:
+       - opticsIMEthAFRCompensation
+       "
+
+  REVISION "201604130000Z"
+  DESCRIPTION
+    "-SNMPIDL-515, added the object opticsIMEthHwFailConsAct to OpticsIMEthConfEntry.
+     "
+
+  REVISION "201511130000Z"
+  DESCRIPTION
+    "-SNMPIDL-507, update LAST-UPDATED and REVISION date format adding the 2 digits missing (20) for yers after 1999.
+Added a REVISION block corresponding to the LAST-UPDATED timestamp.
+       - SNMPIDL-508, added a space between opening and closing braces and the enclosed content.
+    "
+
+  REVISION "201407310000Z"
+  DESCRIPTION
+    "OPTnm26875 and OPTnm26874: D. Spreafico:
+     Added opticsIMifMauExtOpticalTransmittedSignalLevel and
+           opticsIMifMauExtEthernetCompliance on
+           opticsIMifMauExtTable.
+     "
+
+  REVISION "201405090000Z"
+  DESCRIPTION
+    "OPTnm26601: C. Addeo:
+     Added opticsIMifMauExtDirectionMode on OpticsIMifMauExtTable.
+     "
+
+  REVISION "201307060000Z"
+  DESCRIPTION
+    "OPTnm18364: D. Spreafico:
+     Added opticsIMifMauExtOpticalReceivedSignalLevel    to opticsIMifMauExtTable
+     OPTnm18366: D. Spreafico:
+     Added opticsIMEthHoldOffMode        on opticsIMEthConfTable.
+     "
+
+  REVISION "201303140000Z"
+  DESCRIPTION
+    "OPTnm18364: D. Spreafico:
+     Added opticsIMifMauExtOpticalReceivedSignalLevel    to opticsIMifMauExtTable
+     OPTnm18366: D. Spreafico:
+     Added opticsIMEthHoldOffMode        on opticsIMEthConfTable.
+     "
+
+  REVISION "201301100000Z"
+  DESCRIPTION
+    "ONDnm15848: Linhai Qiu.
+     Added opticsIMaclPortIndicatorAssociation in opticsIMaclTable."
+
+  REVISION "201206080000Z"
+  DESCRIPTION
+    "ONDnm09837: P.Villa.
+     Added opticsIMEthForcedOutgoingSSM."
+
+  REVISION "201111030000Z"
+  DESCRIPTION
+    "OPTnm02748: P.Villa
+     Added opticsIMaclMacAceProtocolId and opticsIMaclActualMacAceProtocolId"
+
+  REVISION "201107270000Z"
+  DESCRIPTION
+    "OPTnm00305: P.Villa
+     Added opticsIMaclMacAceSourceTcpPort,   opticsIMaclMacAceMaxSourceTcpPort,
+           opticsIMaclMacAceDestTcpPort,     opticsIMaclMacAceMaxDestTcpPort,
+           opticsIMaclMacAceSourceUdpPort,   opticsIMaclMacAceMaxSourceUdpPort,
+           opticsIMaclMacAceDestUdpPort,     opticsIMaclMacAceMaxDestUdpPort,
+           opticsIMaclMacAceSourceIPV6Addr,  opticsIMaclMacAceSourceIPV6AddrBitmask,
+           opticsIMaclMacAceDestIPV6Addr,    opticsIMaclMacAceDestIPV6AddrBitmask
+
+     Added opticsIMaclActualMacAceSourceTcpPort,   opticsIMaclActualMacAceMaxSourceTcpPort,
+           opticsIMaclActualMacAceDestTcpPort,     opticsIMaclActualMacAceMaxDestTcpPort,
+           opticsIMaclActualMacAceSourceUdpPort,   opticsIMaclActualMacAceMaxSourceUdpPort,
+           opticsIMaclActualMacAceDestUdpPort,     opticsIMaclActualMacAceMaxDestUdpPort,
+           opticsIMaclActualMacAceSourceIPV6Addr,  opticsIMaclActualMacAceSourceIPV6AddrBitmask,
+           opticsIMaclActualMacAceDestIPV6Addr,    opticsIMaclActualMacAceDestIPV6AddrBitmask
+    "
+
+  REVISION "201105200000Z"
+
+  DESCRIPTION
+    "TSDnm93666: P.Villa.
+     Upgraded opticsIMEthConfExtMirrorType"
+
+  REVISION "1005130000Z"
+  DESCRIPTION
+   "Added opticsIMaclMacAceSourceIPV4Addr,opticsIMaclMacAceSourceIPV4AddrBitmask,
+          opticsIMaclMacAceDestIPV4Addr,opticsIMaclMacAceDestIPV4AddrBitmask,
+          opticsIMaclMacAceIpDscp,opticsIMaclMacAceIpDscpRange,opticsIMaclMacAceIpDscpBitMask
+
+    Added opticsIMaclActualMacAceSourceIPV4Addr,opticsIMaclActualMacAceSourceIPV4AddrBitmask,
+          opticsIMaclActualMacAceDestIPV4Addr,opticsIMaclActualMacAceDestIPV4AddrBitmask,
+          opticsIMaclActualMacAceIpDscp,opticsIMaclActualMacAceIpDscpRange,
+          opticsIMaclActualMacAceIpDscpBitMask"
+
+  REVISION "201004010000Z"
+  DESCRIPTION
+   "Linhai Qiu: Add opticsIMStormcontrolPointer/opticsIMPacketFilteringPointer into opticsIMEthConfTable"
+  REVISION "0909300000Z"
+  DESCRIPTION
+   "D.Spreafico:
+    notRelevant enumerated value is inserted in opticsIMifMauExtSynchRole"
+  REVISION "0908060000Z"
+  DESCRIPTION
+    "Upgraded opticsIMEthClientType"
+  REVISION "0904230000Z"
+  DESCRIPTION
+    "Added opticsIMifMauExtSynchOperationMode and opticsIMifMauExtSynchRole
+     to OpticsIMifMauExtEntry"
+  REVISION "0812180000Z"
+  DESCRIPTION
+    "Added opticsIMaclMacAcePriority and opticsIMaclMacAcePriorityBitMask
+     to opticsIMaclMacAceEntry
+     Added opticsIMaclActualMacAcePriority and
+     opticsIMaclActualMacAcePriorityBitMask to opticsIMaclActualMacAceEntry
+     Added linkagg value to opticsIMEthClientType"
+  REVISION
+    "0711290000Z"
+  DESCRIPTION
+    "Added opticsIMEthConfExtCsfMAUAction and opticsIMEthConfExtSsfMAUAction
+     to OpticsIMEthConfExtEntry
+     Added opticsIMaclMacAceVidBitmask and opticsIMaclMacAceEtherTypeBitmask to
+     OpticsIMAclMacAceEntry"
+
+  REVISION
+    "200710110000Z"
+  DESCRIPTION
+    "Added to opticsIMMauExtEntry:
+     - opticsIMifMauExtOpticalLinkLength.
+    "
+
+  REVISION
+    "200707190000Z"
+  DESCRIPTION
+    "Ed. 14
+     Added to opticsIMEthConfEntry:
+     - opticsIMEthCirOverbookingFactor
+     - opticsIMEthEirOverbookingFactor
+   ."
+  REVISION
+    "200702280000Z"
+  DESCRIPTION
+    "Ed. 13
+     Added OpticsIMEthETSServiceStatus to opticsIMEthConfExtEntry"
+  REVISION
+    "200612210000Z"
+  DESCRIPTION
+    "Ed. 12
+     Added OpticsIMEthETSServiceType to opticsIMEthConfExtEntry"
+  REVISION
+    "200602160000Z"
+  DESCRIPTION
+    "Ed. 11
+     Added to opticsIMEthConfExtEntry:
+     - opticsIMEthConfExtMirrorType
+     - opticsIMEthConfExtMirrorPortSelect
+    "
+  REVISION
+    "200510270000Z"
+  DESCRIPTION
+    "Ed. 10
+     Added to OpticsIMEthConfEntry:
+     - opticsIMEthPortProfile
+     Added textual convention of PortProfile
+     Added to OpticsIMifMauExtEntry
+     - opticsIMifMauExtCrossoverMode,
+     - opticsIMifMauExtCrossoverState
+    "
+  REVISION
+    "200506070000Z"
+  DESCRIPTION
+    "Ed. 9
+     Added linkagg value to opticsIMEthClientType
+     Added to opticsIMifMauExtTable:
+     - opticsIMifMauExtOpticalChannelType
+     - opticsIMifMauExtOpticalChannelLambda
+     - opticsIMifMauExtOpticalChannelSpacing
+     Added opticsIMEthMaclIndex to OpticsIMEthConfEntry
+     Added opticsIMaclIndexNext, opticsIMaclMacAceIndexNext
+     Added opticsIMaclMacAceEntry, opticsIMaclMacAceTable, opticsIMaclMacEntry,
+     opticsIMaclTable.
+     Added read-only table opticsIMaclActualMacAceEntry,
+     opticsIMaclActualMacAceTable
+    "
+    REVISION
+      "200504070000Z"
+    DESCRIPTION
+      "Ed. 8.1
+       Added opticsIMEthLayer2ProtocolList"
+    REVISION
+      "200409100000Z"
+    DESCRIPTION
+      "Ed. 7.3
+       Added opticsIMEthConfExtTable
+       Changed opticsIMEthConfExtRemCsfMAUAction"
+    REVISION
+      "200406150000Z"
+    DESCRIPTION
+      "Ed. 6.2
+       Added to opticsIMEthConfTable:
+       - opticsIMEthAdmittedFractionalRate
+      "
+    REVISION
+      "200403240000Z"
+    DESCRIPTION
+      "Ed. 5.1
+       Clarification of behavior of
+       - opticsIMEthConfVLANEtherType
+      "
+    REVISION
+      "200311140000Z"
+    DESCRIPTION
+      "Ed. 4.1
+       Added the following object
+       - opticsIMEthClientType
+      "
+    REVISION
+      "200309260000Z"
+    DESCRIPTION
+      "Ed. 3.2
+       Added to opticsIMEthConfTable:
+       - opticsIMEthFCSDiscardErroredFrames
+       - opticsIMEthDefaultPause
+       Added the following table:
+       - opticsIMifMauExtTable
+      "
+    REVISION
+      "200307250000Z"
+    DESCRIPTION
+      "Ed. 2.2
+       Added the following objects:
+       - opticsIMEthVLANTypeTable
+       - opticsIMEthVLANTypeIndexNext
+       Added to opticsIMEthConfTable:
+       - opticsIMEthConfVLANEtherType
+      "
+    REVISION
+      "200306050000Z"
+    DESCRIPTION
+      "Ed. 2.1
+       Added to opticsIMEthConfTable:
+       - opticsIMEthAvailableBandwidth
+       Changed MAX-ACCESS (from read-create to read-write):
+       - opticsIMEthConfEncaps
+      "
+    REVISION
+      "200211280000Z"
+    DESCRIPTION
+      "Initial Release Optics-IM Ethernet NE MIB"
+::= { opticsimEthMib 2 }
+
+opticsimEthNEMibObject OBJECT IDENTIFIER ::= { opticsimEthNEMib 1 }
+
+PortProfile ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+    "An octet string containing a list of tag values.
+     A tag value is an arbitrary string of octets, but it does not contain
+     a delimiter character, which delimits the tags in the list. The delimiter
+     character is the ASCII space character (0x20).
+     The empty string is a valid list.
+     The tag indicates a functionality, which behaviour has been commonly
+     agreed.
+     Example of valid tags are: port2port, l2switch."
+  SYNTAX OCTET STRING
+
+-- opticsIMEthConfTable
+
+opticsIMEthConfTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMEthConfEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "This media-specific interface table is used to define the proprietary
+    configuration parameters for the Ethernet interfaces."
+::= { opticsimEthNEMibObject 1 }
+
+opticsIMEthConfEntry OBJECT-TYPE
+  SYNTAX OpticsIMEthConfEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    ""
+  INDEX { ifIndex }
+::= { opticsIMEthConfTable 1 }
+
+OpticsIMEthConfEntry ::= SEQUENCE {
+  opticsIMEthMauIndex                Integer32,
+  opticsIMEthJackIndex               Integer32,
+  opticsIMEthConfEncaps              INTEGER,
+  opticsIMEthAvailableBandwidth      Integer32,
+  opticsIMEthConfVLANEtherType       Unsigned32,
+  opticsIMEthFCSDiscardErroredFrames TruthValue,
+  opticsIMEthDefaultPause            INTEGER,
+  opticsIMEthClientType              INTEGER,
+  opticsIMEthAdmittedFractionalRate  Integer32,
+  opticsIMEthLayer2ProtocolList      OpticsIMLayer2ProtocolList,
+  opticsIMEthMaclIndex               Integer32,
+  opticsIMEthPortProfile             PortProfile,
+  opticsIMEthETSServiceType          INTEGER,
+  opticsIMEthETSServiceStatus        Unsigned32,
+  opticsIMEthCirOverbookingFactor    Unsigned32,
+  opticsIMEthEirOverbookingFactor    Unsigned32,
+-- Begin CRB Nov 2008
+  opticsIMEthAutomaticTxShutdown     TruthValue,
+  opticsIMEthWaitForDetection        Gauge32,
+-- End CRB Nov 2008
+
+-- Begin 20100401 --
+   opticsIMStormcontrolPointer        INTEGER,
+   opticsIMPacketFilteringPointer     INTEGER,
+-- End 20100401 --
+
+-- Begin ONDnm09837 - P.Villa - V5.00.
+   opticsIMEthForcedOutgoingSSM       INTEGER,
+-- End ONDnm09837.
+
+-- Begin xxx - D.Spreafico - V5.03.
+   opticsIMEthHoldOffMode        INTEGER,
+-- End xxx.
+
+-- Begin xxx - D.Spreafico - V5.04.
+   opticsIMEthLosEPSSwitchCriteria    INTEGER,
+-- End xxx.
+
+-- Begin SNMPIDL-515 - F.Ruggi - V5.12.
+  opticsIMEthHwFailConsAct    INTEGER,
+-- End SNMPIDL-515
+
+-- Begin SNMPIDL-523 - L. Cai - V5.13
+    opticsIMEthAFRCompensation    Integer32
+-- Begin SNMPIDL-523 20160628 --
+
+}
+
+opticsIMEthMauIndex OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This attribute contains the number of the MAU port that is associated
+     to an internal interface at MAU creation time.
+     This object must be 0 if the interface has not a 'Mau' Underlie Layer."
+::= { opticsIMEthConfEntry 1 }
+
+opticsIMEthJackIndex OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This attribute contains the number of the MAU connector that is associated
+    to a MAU port at MAU and hence to an internal interface at MAU creation
+    time.
+    This object must be 0 if the interface has not a 'Mau' Underlie Layer."
+::= { opticsIMEthConfEntry 2 }
+
+opticsIMEthConfEncaps OBJECT-TYPE
+  SYNTAX INTEGER {
+    ethernetV2(1),
+    llc-snap (2)
+    }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The encapsulation method used by the local Ethernet entity."
+  DEFVAL { 1 }
+::= { opticsIMEthConfEntry 3 }
+
+opticsIMEthAvailableBandwidth OBJECT-TYPE
+  SYNTAX Integer32 (1..2147483647)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This value indicates the total amount of available bandwidth available on
+     this interface and is specified in kilobits per second (Kbps).
+     This value is calculated as the difference between the amount of bandwidth
+     currently in use and that specified in ifSpeed (converted in Kbps).
+     When this value cannot be measured, this value should contain the nominal
+     bandwidth."
+::= { opticsIMEthConfEntry 4 }
+
+opticsIMEthConfVLANEtherType OBJECT-TYPE
+  SYNTAX Unsigned32 (0..2147483647)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This object points to an entry in the opticsIMEthVLANTypeTable that
+     represents the EtherType value used to detect VLAN tagged frames
+     received from this interface as well as to insert VLAN tag(s) to the
+     frames to be transmitted (when applicable).
+     The value 0 is reserved to represent the IEEE 802.1Q standard EtherType
+     (i.e. 0x8100).
+     The default value is 0 (IEEE 802.1Q standard EtherType).
+     The value of this object is meaningless for MAC bridge (IEEE 802.1D)
+     ports.
+     The value of this object MUST be equal to 0 for Virtual bridge (IEEE
+     802.1Q) ports.
+     The value of this object MUST be the same for all Provider bridge
+     (pre-IEEE 802.1ad) ports."
+::= { opticsIMEthConfEntry 5 }
+
+opticsIMEthFCSDiscardErroredFrames OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "If this object is set to TRUE, the incoming errored Ethernet frames are
+    discarded, if it is set to FALSE the incoming errored Ethernet frames are
+    forwarded as the correct ones."
+::= { opticsIMEthConfEntry 6 }
+
+opticsIMEthDefaultPause OBJECT-TYPE
+  SYNTAX INTEGER   {
+    disabled         (0),
+    asymmetric-PAUSE (1),
+    symmetric-PAUSE  (2)
+    }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This object identifies the default administrative PAUSE type.
+     When the underlying layer is mau, this object represent the
+     administratively-configured type of Flow Control operations supported by
+     the Ethernet port. If auto-negotiation is not enabled or is not
+     implemented for this MAU, the value of this object determines the
+     operational type of the Flow Control. In this case, a set to this object
+     will force the Flow Control into the specified operating mode.
+     If auto-negotiation is implemented and enabled for this MAU, the
+     operational type of the Flow Control is determined by the
+     auto-negotiation, and the value of this object denotes the type to which
+     the Flow Control will automatically revert if/when auto-negotiation is
+     later disabled.
+     When the underlying layer is not mau, this object can be set only to the
+     disabled (0) value."
+::= { opticsIMEthConfEntry 7 }
+
+opticsIMEthClientType OBJECT-TYPE
+  SYNTAX INTEGER  {
+    ets     (1),
+    etb     (2),
+    linkagg (3),
+    elp     (4),
+    pnp     (5)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+   "It is used to determine the transmission direction of the frames received
+    from the Ethernet Port.
+    - ETS (1) the frame will be sent to ETS Layer.
+    - ETB (2) the frame will be sent to Ethernet Switch Layer.
+    - LINKAGG (3) the frame will be sent to Link Aggregation Layer.
+    - ELP (4) the frame will be sent to Link Protection Group.
+    - PNP (5) the frame will be sent to PBB Provider Network Port
+   "
+
+::= { opticsIMEthConfEntry 8 }
+
+opticsIMEthAdmittedFractionalRate OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This value indicates the threshold value of admitted bandwidth on this
+     interface and is specified in kilobits per second (Kbps).
+     This value is requested to trigger PAUSE frame generation and is minor
+     or equal to  that specified in ifSpeed."
+::= { opticsIMEthConfEntry 9 }
+
+opticsIMEthLayer2ProtocolList OBJECT-TYPE
+  SYNTAX OpticsIMLayer2ProtocolList
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This parameter enables to choose  if to tunnel, toward a Provider Network,
+     or filter Layer 2 Control frames.
+     If the bit is 1 it indicates that the relative frame will be tunneled
+     otherwise if 0 it will be discarded.
+     Default value is all bits set to 1, so tunneling everything.
+     This parameter is significant only if the opticsIMEthClientType is 'ets'."
+::= { opticsIMEthConfEntry 10 }
+
+opticsIMEthMaclIndex  OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This object value is the pointer to an entry of opticsIMaclMacTable,
+     representing MACL table.By default the value is zero, indicating no
+     pointer to MACL table"
+::= { opticsIMEthConfEntry 11 }
+
+opticsIMEthPortProfile OBJECT-TYPE
+  SYNTAX PortProfile
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The opticsIMEthPortProfile indicates the capabilities and specific or
+     particular behaviour provided by the Ethernet port which managers have to
+     take into account.
+     The default value is the empty string, it means that no peculiarities are
+     present."
+::= { opticsIMEthConfEntry 12 }
+
+opticsIMEthETSServiceType OBJECT-TYPE
+  SYNTAX INTEGER  {
+    other            (0),
+    etsVirtualSwitch (1),
+    portToPort       (2)
+  }
+  MAX-ACCESS read-write
+  STATUS     current
+  DESCRIPTION
+    "It is used to specify Ethernet Service configuration for an Ethernet Port
+     with ets as Client Type.
+     - Other (0)            Ethernet Port supports a generic ETS-flow based
+                            Ethernet service with any InFlow Service Type
+                value and any OutFlow Server Type value
+     - ETSVirtualSwitch (1) Ethernet Port supports a 2-Ports ETS Virtual
+                            Switch service with Ethernet as unique admitted
+                InFlow Service Type and unique admitted OutFlow
+                Server Type
+     - PortToPort (2)       Ethernet Port supports a Port-to-Port Service with
+                            Ethernet as Service Type of unique admitted InFlow
+                            and Ethernet as Server Type of unique admitted
+                            OutFlow.
+     Default value is Other(0)"
+::= { opticsIMEthConfEntry 13 }
+
+opticsIMEthETSServiceStatus OBJECT-TYPE
+  SYNTAX Unsigned32 (0..2147483647)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This attribute reports the actual status of those ETS Service types
+     defined over Ethernet Ports with ets as Client Type.
+     This attribute is meaningless in case of Other as ETS Service type.
+     When opticsIMEthETSServiceType is different from Other, the value of this
+     object is:
+     - 0 if ETS Service Type over this EthernetPort is not yet active;
+     - the ifIndex of the peer ETS Service aware port, if ETS Service Type
+       over that Ethernet Port is active."
+::= { opticsIMEthConfEntry 14 }
+
+opticsIMEthCirOverbookingFactor OBJECT-TYPE
+  SYNTAX Unsigned32 (0|100..10000)
+  UNITS "percentile"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This attribute defines the overbooking (OB) factor for the CIR BW.
+     The overbooking factor is defined as a percentile. The overbooked CIR BW
+     is calculated as OB CIR BW = (CIR BW * 'opticsIMEthCirOverbookingFactor/
+     100). When the value of 'opticsIMEthCirOverbookingFactor' is equal to 100
+     it means that the OB CIR BW = CIR BW. When the value of
+     'opticsIMEthCirOverbookingFactor' is equal to 0 it means unlimited
+     overbooking i.e. effectively CoS is set as Best Effort."
+  DEFVAL { 0 }
+::= { opticsIMEthConfEntry 15 }
+
+opticsIMEthEirOverbookingFactor OBJECT-TYPE
+  SYNTAX Unsigned32 (0|100..10000)
+  UNITS "percentile"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This attribute defines the overbooking (OB) factor for the EIR BW. EIR BW
+     is calculated as EIR = PIR BW - CIR BW.
+     The overbooking factor is defined as a percentile. The overbooked EIR BW
+     is calculated as OB EIR BW = (EIR BW * 'opticsIMEthEirOverbookingFactor/
+     100). When the value of 'opticsIMEthEirOverbookingFactor' is equal to 100
+     it means that the OB CIR BW = CIR BW. When the value of
+     'opticsIMEthEirOverbookingFactor' is equal to 0 it means unlimited
+     overbooking i.e. effectively CoS is set as Best Effort."
+  DEFVAL { 0 }
+::= { opticsIMEthConfEntry 16 }
+
+-- Begin CRB Nov 2008
+
+opticsIMEthAutomaticTxShutdown OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This parameter enable the automatic shutdown of the Tx in case a LOS is
+     detected in Rx."
+  DEFVAL { false }
+::= { opticsIMEthConfEntry 17 }
+
+opticsIMEthWaitForDetection OBJECT-TYPE
+  SYNTAX Gauge32 (1..100)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This parameter specifies how long the Tx is maintained down after LOS is
+    detected in Rx; the parameter is expressed in number of 100ms (the admitted
+    WTR range is 100ms - 10s)."
+  DEFVAL { 50 }
+::= { opticsIMEthConfEntry 18 }
+
+-- End CRB Nov 2008
+
+-- Begin 20100401 --
+opticsIMStormcontrolPointer OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object is pointed to opticsIMStormcontrolIndex. By default the value is zero, indicating no
+     pointer to opticsIMStormCtlTable"
+::= { opticsIMEthConfEntry 19 }
+
+opticsIMPacketFilteringPointer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The index of packet filtering profile. By default the value is zero, indicating no
+     pointer to opticsIMPksFilteringTable "
+::= { opticsIMEthConfEntry 20 }
+
+-- End 20100401 --
+
+-- Begin ONDnm09837 - P.Villa - V5.00.
+opticsIMEthForcedOutgoingSSM OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "This object indicates outgoing SSM value for a local Ethernet port.
+       The following values shall be supported:
+       100: NONE (Disabled Transmission of ESMC Messages) - Default value
+       0:   AUTO (Automatic outgoing SSM value)
+       In case of forced outgoing SSM value
+       - 1: QL-PRC
+       - 2: QL-SSU_A
+       - 3: QL-SSU_B
+       - 4: QL-EEC Option 1
+       - 5: DNU"
+      ::= { opticsIMEthConfEntry 21 }
+-- End ONDnm09837
+
+
+-- Begin xxxx - D.Spreafico - V5.03.
+opticsIMEthHoldOffMode        OBJECT-TYPE
+    SYNTAX INTEGER {
+        disable (0),
+        enable (1)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "This object indicates if for the Ethernet interface, involved on a ERP Topology, it has to be applied the hold off time
+       for the ERP protection."
+      ::= { opticsIMEthConfEntry 22 }
+-- End xxxx
+
+-- Begin xxxx - D.Spreafico - V5.04.
+opticsIMEthLosEPSSwitchCriteria     OBJECT-TYPE
+  SYNTAX      INTEGER {
+    enabled   (0),
+    disabled  (1)
+  }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "This object specifies if the LOS of         the Ethernet interface, hosted by a board involved on a Equipment Protection
+     Group, is used as switch criteria."
+      ::= { opticsIMEthConfEntry 23 }
+-- End xxxx
+
+-- Begin SNMPIDL-515 - F. Ruggi - V5.12.
+opticsIMEthHwFailConsAct OBJECT-TYPE
+  SYNTAX INTEGER {
+    holdon (0),
+    shutdown (1)
+  }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "This object specifies the behaviour of the Ethernet interface in case the hosted equipment item is in hardware fail condition.
+     In this case the Ethernet interface can try going on trasmitting signal, i.e. holdon (0) value, or shutting down the transmitter, i.e. shutdown (1) value.
+     Default value is holdon (0). This object applies to the physical interface, either optical or electrical."
+      ::= { opticsIMEthConfEntry 24 }
+-- End SNMPIDL-515
+
+-- Begin SNMPIDL-523 - L. Cai -V5.13
+
+opticsIMEthAFRCompensation OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "
+        The data encapsulation of traffic from UNI to MPLS NNI, will be processed by NE to remove or add some overhead according to flow
+    classification and related policy. Below is key Ethernet data encapsulation used with whole data path from UNI to MPLS NNI:
+
+        L1 Ethernet Packet include: Preamble,SFD, L2 Ethernet Frame, IPG. This is typical characteristics at physical Ethernet Interface for UNI.
+
+        L2 Ethernet Frame include: MAC DA/SA,optional 802.1ad/8021q VLAN tag,EtherType,Payload and FCS fields. This is typical characteristics
+    processed by Switch.
+
+        L1 MPLS Packet include: Preamble, SFD, MAC DA/SA, optional VLAN Tag,EtherType, TUNNEL label, PW label,Optional CW,
+    L2 Ethernet Frame (with optional VLAN operation), IPG. This is typical characteristics at physical Ethernet Interface for MPLS NNI.
+
+        AFR (admitted fractional Rate),referred as opticsIMEthAdmittedFractionalRate, is based on the traffic metering to trigger
+    pause generation when AFR is reached.
+
+        The default metering of traffic is applicable for L2 Ethernet frame, which remove 20bytes Preamble/SFD/IPG packet
+    from L1 Ethernet Packet at physical interface, i.e. not based on metering of ifSpeed (refer to opticsIMEthAdmittedFractionalRate
+    description). This de facto behaviour is deviated from AFR original definition.
+
+        When AFR is applicable for bandwidth shaping with Ingress or Egress physical interface, the removed or appended Overhead versus
+    Ethernet Frame shall be compensated to calibrate the traffic metering mechanism to reflect the traffic rate at Ingress or Egress
+    interface based on the measurement of Ethernet Frames of ingress traffic per port.
+
+        The value of opticsIMEthAFRCompensation, is defined to indicate the additional byte number shall be taken into account of metering of traffic rate.
+
+        In order to calibration of traffic rate to ingress physical interface speed, i.e. Ethernet packet rate, 20 bytes (Preamble/SFD/IPG)
+    shall be compensated;
+
+        In order to calibration of traffic rate to Egress MPLS physical interface speed, i.e. MPLSIF packet rate, below added bytes shall be compensated:
+            Ingress ETS flow VLAN operation (Optional)
+                    +4 bytes/VLAN Push
+                    -4 bytes/VLAN PoP
+            PW CW (Optional)
+                    +4 bytes/enable mode
+            MPLS frame
+                    +22bytes(DA/SA/EtherType/TUNNEL label/PW label)
+            L2 encapsulation (Optional)
+                    +4 bytes(802.1Q or 802.1ad VLAN tag)
+            Ethernet Packet Overhead
+                    +20bytes(Preamble/SFD/IPG)
+
+        Without the compensation of this value, the AFR indicates the threshold value of admitted bandwidth for Ingress traffic measured with Ethernet Frame.
+
+        With the compensation of this value, the Admitted fractional rate indicates the threshold value of admitted bandwidth for ingress or
+    egress traffic measured with Ethernet Packet on the associated Ingress or Egress physical Interface.
+
+        The default value shall be 0 to compatible with previous MIB definition.
+        "
+
+::= { opticsIMEthConfEntry 25 }
+
+-- End SNMPIDL-523 20160623 --
+
+-- opticsIMEthVLANTypeTable
+
+-- opticsIMEthVLANTypeTable
+opticsIMEthVLANTypeIndexNext OBJECT-TYPE
+  SYNTAX Unsigned32 (0..2147483647)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This object contains an appropriate value to be used for
+     opticsIMEthVLANTypeIndex when creating entries in the
+     opticsIMEthVLANTypeTable.
+     The value 0 indicates that no unassigned entries are available.
+     To obtain the opticsIMEthVLANTypeIndex value for a new entry, the manager
+     issues a management protocol retrieval operation to obtain the current
+     value of this object. After each retrieval, the agent should modify the
+     value to the next unassigned index."
+::= { opticsimEthNEMibObject 2 }
+
+opticsIMEthVLANTypeTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMEthVLANTypeEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "A table containing vendor-specific profiles of the EtherType values used
+     to support provider-bridge VLAN tags (or stacked VLAN)."
+::= { opticsimEthNEMibObject 3 }
+
+opticsIMEthVLANTypeEntry OBJECT-TYPE
+  SYNTAX OpticsIMEthVLANTypeEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    ""
+  INDEX { opticsIMEthVLANTypeIndex }
+::= { opticsIMEthVLANTypeTable 1 }
+
+OpticsIMEthVLANTypeEntry ::= SEQUENCE {
+  opticsIMEthVLANTypeIndex     Unsigned32,
+  opticsIMEthVLANTypeEtherType Unsigned32,
+  opticsIMEthVLANTypeUserLabel OpticsIMUserLabel,
+  opticsIMEthVLANTypeRowStatus RowStatus
+}
+
+opticsIMEthVLANTypeIndex OBJECT-TYPE
+  SYNTAX Unsigned32 (1..2147483647)
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "Index for a row in the opticsIMEthVLANTypeTable.
+     The range is 1...MAXVlanType, where MAXVlanType is product dependent."
+::= { opticsIMEthVLANTypeEntry 1 }
+
+opticsIMEthVLANTypeEtherType OBJECT-TYPE
+  SYNTAX Unsigned32
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+    "The value of the EtherType field.
+     The default value is the IEEE 802.1Q standard value 0x8100."
+::= { opticsIMEthVLANTypeEntry 2 }
+
+opticsIMEthVLANTypeUserLabel OBJECT-TYPE
+  SYNTAX OpticsIMUserLabel
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+    "The user label assigned to this EtherType profile."
+::= { opticsIMEthVLANTypeEntry 3 }
+
+opticsIMEthVLANTypeRowStatus OBJECT-TYPE
+  SYNTAX RowStatus
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+    "It is used to create, delete, activate and deactivate a row in the
+     opticsIMEthVLANTypeTable."
+::= { opticsIMEthVLANTypeEntry 4 }
+
+opticsIMifMauExtTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMifMauExtEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "This table contains extension objects of the ifMauTable."
+::= { opticsimEthNEMibObject 4 }
+
+opticsIMifMauExtEntry OBJECT-TYPE
+  SYNTAX OpticsIMifMauExtEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry of the opticsIMifMauExtTable."
+  INDEX { ifMauIfIndex, ifMauIndex }
+::= { opticsIMifMauExtTable 1 }
+
+OpticsIMifMauExtEntry ::= SEQUENCE {
+  opticsIMifMauExtAsapIndex                 Integer32,
+  opticsIMifMauExtOpticalChannelType        INTEGER,
+  opticsIMifMauExtOpticalChannelLambda      Integer32,
+  opticsIMifMauExtOpticalChannelSpacing     Integer32,
+  opticsIMifMauExtCrossoverMode             INTEGER,
+  opticsIMifMauExtCrossoverState            INTEGER,
+  opticsIMifMauExtOpticalLinkLength         Integer32,
+  opticsIMifMauExtSynchOperationMode        INTEGER,
+  opticsIMifMauExtSynchRole                 INTEGER,
+  opticsIMifMauExtOpticalReceivedSignalLevel    INTEGER,
+  opticsIMifMauExtDirectionMode                INTEGER,
+  opticsIMifMauExtOpticalTransmittedSignalLevel    INTEGER,
+  opticsIMifMauExtEthernetCompliance       AutonomousType,
+  opticsIMifMauExtSynchRoleResult        INTEGER
+}
+
+opticsIMifMauExtAsapIndex OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This object defines tha ASAP object associated to the MAU interface."
+::= { opticsIMifMauExtEntry 1 }
+
+opticsIMifMauExtOpticalChannelType OBJECT-TYPE
+  SYNTAX INTEGER {
+    blackWhite (1),
+    colored  (2)
+  }
+
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "It is used to determine the type of Optical Channel carrying Ethernet
+     interface and associated to the MAU interface"
+::= { opticsIMifMauExtEntry 2 }
+
+opticsIMifMauExtOpticalChannelLambda OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This object reports lambda (in nm) for optical channel (BlackWhite optical
+     channel, Lambda optical channel)  carrying  Ethernet interface and
+     associated to the MAU interface."
+::= { opticsIMifMauExtEntry 3 }
+
+opticsIMifMauExtOpticalChannelSpacing OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This object reports channel spacing (in nm) for colored optical channels
+     carrying Ethernet interface"
+::= { opticsIMifMauExtEntry 4 }
+
+opticsIMifMauExtCrossoverMode OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-write
+  STATUS    current
+  DESCRIPTION
+    "The opticsIMifMauExtCrossoverMode configures the mode of the positioning
+     of trasmitter and receiver respect to the line:
+     - automatic, with value equal to 1 (default value) means the positioning
+       is performed in automatic way;
+     - mdI, with value equal to 2, means tx and rx are as for DCE (e.g. Hub or
+       switch);
+     - mDIX, with value equal to 3, means they are reverted just as for DTE
+       (e.g. PC)."
+::= { opticsIMifMauExtEntry 5 }
+
+opticsIMifMauExtCrossoverState OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS  read-only
+  STATUS    current
+  DESCRIPTION
+    "The opticsIMifMauExtCrossoverMode indicates, if possible, the positioning
+     of trasmitter and receiver respect to the line:
+     - unknown, with value equal to 1, if not identifiable
+     - mdI, with value equal to 2, means tx and rx are as for DCE (e.g. Hub or
+       switch)
+     - mDIX, with value equal to 3, means they are reverted just as  for DTE
+       (e.g. PC)."
+::= { opticsIMifMauExtEntry 6 }
+
+opticsIMifMauExtOpticalLinkLength OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This object reports the link length (in m) supported for optical channel
+     carrying  Ethernet interface and associated to the MAU interface"
+::= { opticsIMifMauExtEntry 7 }
+
+opticsIMifMauExtSynchOperationMode OBJECT-TYPE
+  SYNTAX INTEGER {
+    synchronous  (1),
+    asynchronous (2)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "It is used to define the Operation Mode  (G.8264) of an Ethernet interface
+     with the following values:
+     - synchronous (1)
+       the interface is belonging to a NE with system clock (EEC) and it should
+       be used for synchronization purpose; in this case the
+       opticsIMifMauExtSynchRole object has to be defined as 'master' or 'slave'
+       value.
+     - asynchronous (2)
+       the interface is not belonging to a NE with system clock (EEC); in this
+       case the opticsIMifMauExtSynchRole object could assume any value
+       incuding 'auto' value (default)."
+::= { opticsIMifMauExtEntry 8 }
+
+opticsIMifMauExtSynchRole OBJECT-TYPE
+  SYNTAX INTEGER {
+    notRelevant (0),
+    master      (1),
+    slave       (2),
+    auto        (3)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "A value that uniquely identifies the synchronization role of the Ethernet
+     interface (1000Base-T) advertised by the local auto-negotiation entity.
+     The 'auto' value is not allowed in case the
+     opticsIMifMauExtSynchOperationMode is set to 'synchronous' value."
+::= { opticsIMifMauExtEntry 9 }
+
+opticsIMifMauExtOpticalReceivedSignalLevel    OBJECT-TYPE
+  SYNTAX INTEGER (-1000..0)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This object represents the local received power level.
+     It is a negative integer with associated measure unit expressed in one tenth of dBm."
+
+::= { opticsIMifMauExtEntry 10 }
+
+opticsIMifMauExtDirectionMode OBJECT-TYPE
+  SYNTAX INTEGER {
+    unidirectional (1),
+    bidirectional (2)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "It is used to define the Interface Direction Mode (IEEE 802.3 clause 66)
+     of an Ethernet interface with the following values:
+     - unidirectional (1)
+       When the interface detects an incoming failure (e.g., LOS),
+       it keeps transmitting traffic in the outgoing direction
+       and also inserts a remote failure indication,
+       if such an indication is defined for that type of MAU
+       (e.g., an RFI signal), to the remote interface.
+     - bidirectional (2)
+       When the interface detects an incoming failure (e.g., LOS),
+       it stops transmitting traffic in the outgoing direction
+       and also inserts a remote failure indication,
+       if such an indication is defined for that type of MAU
+       (e.g., an RFI signal), to the remote interface."
+::= { opticsIMifMauExtEntry 11 }
+
+opticsIMifMauExtOpticalTransmittedSignalLevel    OBJECT-TYPE
+  SYNTAX INTEGER (-1000..1000)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This object represents the local transmitted power level.
+     It is an integer with associated measure unit expressed in one tenth of dBm."
+
+::= { opticsIMifMauExtEntry 12 }
+
+opticsIMifMauExtEthernetCompliance       OBJECT-TYPE
+  SYNTAX AutonomousType
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This object reports the Ethernet Compliance (MAU type)
+     supported by the physical module hosting this interface."
+
+::= { opticsIMifMauExtEntry 13 }
+
+opticsIMifMauExtSynchRoleResult OBJECT-TYPE
+
+  SYNTAX INTEGER {
+    notRelevant (0),
+    master      (1),
+    slave       (2),
+    none        (3)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "A value that uniquely identifies the synchronization role of the Ethernet interface as the result of the auto-negotiatiation between local and peer entities.
+     'none' value in case auto-negotiation fail.
+     'notRelevant' in case of syncronization role not meaning the the Ethernet interface (optical)."
+::= { opticsIMifMauExtEntry 14 }
+
+
+-- opticsIMEthConfExtTable
+
+opticsIMEthConfExtTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF OpticsIMEthConfExtEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "This table contains extension objects of the opticsIMEthConfTable."
+::= { opticsimEthNEMibObject 5 }
+
+opticsIMEthConfExtEntry OBJECT-TYPE
+  SYNTAX OpticsIMEthConfExtEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry of the opticsIMEthConfExtTable."
+  INDEX { ifIndex }
+::= { opticsIMEthConfExtTable 1 }
+
+OpticsIMEthConfExtEntry ::= SEQUENCE {
+  opticsIMEthConfExtlbLine           TruthValue,
+  opticsIMEthConfExtlbInternal         TruthValue,
+  opticsIMEthConfExtRemCsfMAUAction  INTEGER,
+  opticsIMEthConfExtMirrorType       INTEGER,
+  opticsIMEthConfExtMirrorPortSelect InterfaceIndexOrZero,
+-- CRB Oct2007 Begin
+  opticsIMEthConfExtCsfMAUAction     INTEGER,
+  opticsIMEthConfExtSsfMAUAction     INTEGER
+-- CRB Oct2007 End
+}
+
+opticsIMEthConfExtlbLine OBJECT-TYPE
+  SYNTAX     TruthValue
+  MAX-ACCESS read-write
+  STATUS     current
+  DESCRIPTION
+    "This object specifies if the line loopback is active or not.
+     The default value is FALSE"
+::= { opticsIMEthConfExtEntry 1 }
+
+opticsIMEthConfExtlbInternal OBJECT-TYPE
+  SYNTAX     TruthValue
+  MAX-ACCESS read-write
+  STATUS     current
+  DESCRIPTION
+    "This object specifies if the internal loopback is active or not.
+     The default value is FALSE"
+::= { opticsIMEthConfExtEntry 2 }
+
+opticsIMEthConfExtRemCsfMAUAction OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This object identifies the consequent action triggered on local Interface
+     egress port in front of Client failures detection for port-to-port
+     application.
+     - disabled (0)
+       is defined to perform no consequent actions.
+     - transmitter_shutdown (1) is defined to trigger forced transmitter
+       shut-down action.
+     If the interface is not involved in a port-to-port application this
+     consequent action will never be triggered.
+     The default value is disabled"
+::= { opticsIMEthConfExtEntry 3 }
+
+opticsIMEthConfExtMirrorType OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The port can be configured acting as a mirroring port: the available
+     values are:
+     0 = no mirroring (the default value)
+     1 = mirroring a port input
+     2 = mirroring a port output
+-- TSDnm93666:P.Villa Begin
+     3 = BOTH input and output mirroring
+-- TSDnm93666:P.Villa End
+"
+  ::= { opticsIMEthConfExtEntry 4 }
+
+opticsIMEthConfExtMirrorPortSelect OBJECT-TYPE
+  SYNTAX InterfaceIndexOrZero
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This object points to an entry in the ifTable that represents the the port
+     that is mirrored by the port identified by this entry of the
+     opticsIMEthConfExtTable.
+     The default value is 0 (zero) that means no port mirrored"
+::= { opticsIMEthConfExtEntry 5 }
+
+-- CRB Oct2007 Begin
+opticsIMEthConfExtCsfMAUAction OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This object identifies the consequent action triggered on local Interface
+     egress port for port-to-port application in front of received CSF Frame
+     indications (due to detected remote Ethernet PHY Interface failures).
+     The choice of enabled CSF consequent actions is allowed to be different
+     from SSF consequent actions (consequent actions coping with SDH network
+     failures).
+     disabled             (0) is defined to perform no consequent actions.
+     transmitter_shutdown (1) is defined to trigger forced transmitter
+                              shut-down action.
+     If the interface is not involved in a port-to-port application, this
+     consequent action will never be triggered. The default value is disabled"
+::= { opticsIMEthConfExtEntry 6 }
+
+opticsIMEthConfExtSsfMAUAction OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This object identifies the consequent action triggered on local Interface
+     egress port for port-to-port application in front of Server Layer (e.g.SDH
+     network) failures.
+     The choice of enabled SSF consequent actions is allowed to be different
+     from CSF consequent actions (consequent actions coping with in front of
+     'Far-end Client Signal Fail (CSF) indications').
+     disabled             (0) is defined to perform no consequent actions.
+     transmitter_shutdown (1) is defined to trigger forced transmitter shut-down
+                              action.
+     If the interface is not involved in a port-to-port application, this
+     consequent action will never be triggered. The default value is disabled"
+::= { opticsIMEthConfExtEntry 7 }
+-- CRB Oct2007 End
+
+-- opticsIMEthConfExtTable
+--  END
+
+--   opticsIMaclIndexNext
+opticsIMaclNextIndex OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This object contains an appropriate value to be used for opticsIMaclIndex
+     when creating entries in the opticsIMaclTable.
+     The value 0 indicates that no unassigned entries are available.
+     To obtain the opticsIMaclIndex value for a new entry, the manager issues
+     a management protocol retrieval operation to obtain the current value of
+     this object. After each retrieval, the agent should modify the value to
+     the next unassigned index."
+::= { opticsimEthNEMibObject 6 }
+
+-- opticsIMaclMacAceIndexNext
+opticsIMaclMacAceIndexNext OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This object contains an appropriate value to be used for
+     opticsIMaclMacAceIndex when creating entries in the opticsIMaclMacAceTable.
+     The value 0 indicates that no unassigned entries are available.
+     To obtain the opticsIMaclMacAceIndex value for a new entry, the manager
+     issues a management protocol retrieval operation to obtain the current
+     value of this object.  After each retrieval, the agent should modify the
+     value to the next unassigned "
+::= { opticsimEthNEMibObject 7 }
+
+-- Start  opticsIMaclTable
+opticsIMaclTable OBJECT-TYPE
+  SYNTAX   SEQUENCE OF OpticsIMAclMacEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "The table representing the MAC acl.
+     The table references through the index ifIndex the classifier entry
+     associated to the Ethernet port(interface) which the MAC acl applies to."
+::= { opticsimEthNEMibObject 8 }
+
+opticsIMAclMacEntry OBJECT-TYPE
+  SYNTAX      OpticsIMAclMacEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "MAC acl entry "
+  INDEX       { opticsIMaclIndex }
+::= { opticsIMaclTable 1 }
+
+OpticsIMAclMacEntry ::= SEQUENCE
+{
+  opticsIMaclIndex       Integer32,
+  opticsIMaclName        OpticsIMUserLabel,
+  opticsIMaclApplyChange TruthValue,
+  opticsIMaclStatus      RowStatus,
+  opticsIMaclPortIndicatorAssociation   TruthValue
+}
+
+opticsIMaclIndex OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "The unique index of an ACE within an ACL"
+::= { opticsIMAclMacEntry 1 }
+
+opticsIMaclName OBJECT-TYPE
+  SYNTAX      OpticsIMUserLabel
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "The name of an ACL. Within a feature the name is unique used to identifies
+     the list to which the entry belongs in the device"
+::= { opticsIMAclMacEntry 2 }
+
+opticsIMaclApplyChange OBJECT-TYPE
+  SYNTAX      TruthValue
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "A flag to indicate when the changes to the acl are terminated and are
+     applied.
+     When an acl modification is on going, the attribute is equal to false
+     for indicating that the on going changes are not applied."
+::= { opticsIMAclMacEntry 3 }
+
+opticsIMaclStatus OBJECT-TYPE
+  SYNTAX      RowStatus
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "The status of this ACL conceptual row entry.
+     This object is used to manage creation, deletion and modification of rows
+     in this table.
+     An entry may not exist in the active state unless all objects in the entry
+     have an appropriate value.
+     Once a row becomes active, value in any other column within such row
+     cannot be modified."
+::= { opticsIMAclMacEntry 4 }
+
+opticsIMaclPortIndicatorAssociation OBJECT-TYPE
+  SYNTAX      TruthValue
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "The indication of  any interface association. The default value is false. When any port is associated to ACL entry,
+     the agent changes this value to true. This value is changed again to false, when the ACL entry is nomore associated to any interface"
+::= { opticsIMAclMacEntry 5 }
+
+-- End  opticsIMaclTable
+
+-- Start opticsIMaclMacAceTable
+opticsIMaclMacAceTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF OpticsIMAclMacAceEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "The conceptual table of all of aclMacAceEntry "
+::= { opticsimEthNEMibObject 9 }
+
+opticsIMaclMacAceEntry OBJECT-TYPE
+  SYNTAX      OpticsIMAclMacAceEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "The conceptual row for aclMacAceTable. "
+  INDEX       { opticsIMaclIndex, opticsIMaclMacAceIndex }
+::= { opticsIMaclMacAceTable 1 }
+
+OpticsIMAclMacAceEntry ::= SEQUENCE
+{
+  opticsIMaclMacAceIndex                  Integer32,
+  opticsIMaclMacAceOrder            Integer32,
+  opticsIMaclMacAceAction                 INTEGER,
+  opticsIMaclMacAceSourceMacAddr          OCTET STRING,
+  opticsIMaclMacAceSourceMacAddrBitmask   OCTET STRING,
+  opticsIMaclMacAceDestMacAddr            OCTET STRING,
+  opticsIMaclMacAceDestMacAddrBitmask     OCTET STRING,
+  opticsIMaclMacAceVid                   OpticsIMETSVlanCfg,
+  opticsIMaclMacAceVidRange               Gauge32,
+  opticsIMaclMacAceEtherType              Unsigned32,
+  opticsIMaclMacAceEtherTypeRange         Unsigned32,
+  opticsIMaclMacAceStatus                 RowStatus,
+  opticsIMaclMacAceVidBitmask             OCTET STRING,
+  opticsIMaclMacAceEtherTypeBitmask       OCTET STRING,
+  opticsIMaclMacAcePriority          INTEGER,
+  opticsIMaclMacAcePriorityBitMask      OCTET STRING,
+
+  opticsIMaclMacAceSourceIPV4Addr         OCTET STRING,
+  opticsIMaclMacAceSourceIPV4AddrBitmask  OCTET STRING,
+  opticsIMaclMacAceDestIPV4Addr           OCTET STRING,
+  opticsIMaclMacAceDestIPV4AddrBitmask    OCTET STRING,
+  opticsIMaclMacAceIpDscp                 OpticsIMETSIpDscp,
+  opticsIMaclMacAceIpDscpRange            Gauge,
+  opticsIMaclMacAceIpDscpBitMask          OCTET STRING,
+-- BEGIN OPTnm00305
+  opticsIMaclMacAceSourceTcpPort          Unsigned32,
+  opticsIMaclMacAceMaxSourceTcpPort       Unsigned32,
+  opticsIMaclMacAceDestTcpPort            Unsigned32,
+  opticsIMaclMacAceMaxDestTcpPort         Unsigned32,
+  opticsIMaclMacAceSourceUdpPort          Unsigned32,
+  opticsIMaclMacAceMaxSourceUdpPort       Unsigned32,
+  opticsIMaclMacAceDestUdpPort            Unsigned32,
+  opticsIMaclMacAceMaxDestUdpPort         Unsigned32,
+
+  opticsIMaclMacAceSourceIPV6Addr         OCTET STRING,
+  opticsIMaclMacAceSourceIPV6AddrBitmask  OCTET STRING,
+  opticsIMaclMacAceDestIPV6Addr           OCTET STRING,
+  opticsIMaclMacAceDestIPV6AddrBitmask    OCTET STRING,
+-- END OPTnm00305
+
+-- BEGIN OPTnm02748
+  opticsIMaclMacAceProtocolId             Unsigned32
+-- END OPTnm02748
+}
+
+
+opticsIMaclMacAceIndex OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "The unique index of an ACE within an ACL"
+::= { opticsIMaclMacAceEntry 1}
+
+opticsIMaclMacAceOrder OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "Specifies the order of execution of ACE within an ACL"
+::= { opticsIMaclMacAceEntry 2 }
+
+opticsIMaclMacAceAction OBJECT-TYPE
+  SYNTAX INTEGER {
+    permit (1),
+    deny   (2)
+  }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "The action to be executed, if the condition of the ace is verified"
+::= { opticsIMaclMacAceEntry 3 }
+
+opticsIMaclMacAceSourceMacAddr OBJECT-TYPE
+  SYNTAX      OCTET STRING (SIZE (6))
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "It indicates the 48 bits source MAC address.
+     The specified source mac of the packet.
+     The packet's source mac address is AND-ed with the value of
+     aceMacSourceMacAddrBitmask and then compared against the value of this
+     object."
+::= { opticsIMaclMacAceEntry 4 }
+
+opticsIMaclMacAceSourceMacAddrBitmask OBJECT-TYPE
+  SYNTAX      OCTET STRING (SIZE (6))
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "The specified source mac address mask.
+     If it is not configured, the default value is all 1 "
+::= { opticsIMaclMacAceEntry 5 }
+
+opticsIMaclMacAceDestMacAddr OBJECT-TYPE
+  SYNTAX      OCTET STRING (SIZE (6))
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "It indicates the 48 bits destination MAC address.
+     The specified destination mac of the packet The packet's destination mac
+     address is AND-ed with the value of aceMacDestMacAddrBitmask and then
+     compared against the value of this object."
+::= { opticsIMaclMacAceEntry 6 }
+
+opticsIMaclMacAceDestMacAddrBitmask OBJECT-TYPE
+  SYNTAX      OCTET STRING (SIZE (6))
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "The specified destination mac address mask.
+     If it is not  configured, the default value is all 1 "
+::= { opticsIMaclMacAceEntry 7 }
+
+opticsIMaclMacAceVid OBJECT-TYPE
+  SYNTAX      OpticsIMETSVlanCfg
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "Indicates the 12 bits of the VLAN Identifier value."
+::= { opticsIMaclMacAceEntry 8 }
+
+opticsIMaclMacAceVidRange OBJECT-TYPE
+  SYNTAX      Gauge32 (0..4095)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "The specified VLAN Identifier offset.
+     The packet's VLAN Identifier has to be included between aclMacAceVid and
+     this value plus aclMacAceVidRange; if VLAN Identifier range is not
+     configured, 0 is the value of this object."
+::= { opticsIMaclMacAceEntry 9 }
+
+opticsIMaclMacAceEtherType OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "Indicates the 16 bits of the EtherType value."
+::= { opticsIMaclMacAceEntry 10 }
+
+opticsIMaclMacAceEtherTypeRange OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "The specified EthernetType offset: the packet's Ethertype has to be
+     included between aclMacEhtertype and this value plus
+     aclMacAceEtherTypeRange; if the Ethertype range is not configured, 0 is
+     the value of this object."
+::= { opticsIMaclMacAceEntry 11 }
+
+opticsIMaclMacAceStatus OBJECT-TYPE
+  SYNTAX      RowStatus
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "The status of this mac ACE conceptual row entry.
+     This object is used to manage creation, deletion and modification of rows
+     in this table.
+     An entry may not exist in the active state unless all objects in the entry
+     have an appropriate value.
+     Once a row becomes active, value in any other column within such row
+     cannot be modified."
+::= { opticsIMaclMacAceEntry 12 }
+
+opticsIMaclMacAceVidBitmask OBJECT-TYPE
+  SYNTAX      OCTET STRING (SIZE (2))
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "The specified Vid mask.
+     If it is not  configured, the default value is all 1 "
+::= { opticsIMaclMacAceEntry 13 }
+
+opticsIMaclMacAceEtherTypeBitmask OBJECT-TYPE
+  SYNTAX      OCTET STRING (SIZE (1))
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "The specified EtherType mask.
+     If it is not  configured, the default value is all 1 "
+::= { opticsIMaclMacAceEntry 14 }
+
+opticsIMaclMacAcePriority OBJECT-TYPE
+  SYNTAX INTEGER {
+    pri000 (0),
+    pri001 (1),
+    pri010 (2),
+    pri011 (3),
+    pri100 (4),
+    pri101 (5),
+    pri110 (6),
+    pri111 (7)
+  }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "Indicates the 8 bits of the 802.1p priority bits value.
+     The specified 802.1p priority bits value of the packet. The packet's
+     802.1p priority bits value is AND-ed with the value of
+     opticsIMaclMacAcePriorityBitMask and then compared against the value of
+     this object."
+::= { opticsIMaclMacAceEntry 15 }
+
+opticsIMaclMacAcePriorityBitMask OBJECT-TYPE
+  SYNTAX      OCTET STRING (SIZE (2))
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+    "The specified 802.1p Priority mask.
+     If it is not  configured, the default value is all 1 "
+::= { opticsIMaclMacAceEntry 16 }
+
+
+opticsIMaclMacAceSourceIPV4Addr OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (4))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "It indicates the 32 bits source IP address.
+         The specified source IP of the packet is AND-ed with the
+     value of opticsIMaclMacAceSourceIPV4AddrBitmask  and then compared
+         against the value of this object."
+    ::= { opticsIMaclMacAceEntry  17 }
+
+opticsIMaclMacAceSourceIPV4AddrBitmask OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (4))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The specified source IPv4 address mask.
+    If it is not configured, the default value is all 1."
+    ::= { opticsIMaclMacAceEntry  18 }
+
+opticsIMaclMacAceDestIPV4Addr OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (4))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "It indicates the 32 bits destination IPv4 address.
+         The specified destination IPv4 address is
+         AND-ed with the value of opticsIMaclMacAceDestIPV4AddrBitmask and then compared
+         against the value of this object."
+    ::= { opticsIMaclMacAceEntry  19 }
+
+opticsIMaclMacAceDestIPV4AddrBitmask OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (4))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The specified destination IPv4 address mask.
+    If it is not  configured, the default value is all 1."
+    ::= { opticsIMaclMacAceEntry  20 }
+
+opticsIMaclMacAceIpDscp OBJECT-TYPE
+      SYNTAX OpticsIMETSIpDscp
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "It indicates IP DSCP value"
+      ::= { opticsIMaclMacAceEntry  21 }
+
+opticsIMaclMacAceIpDscpRange OBJECT-TYPE
+      SYNTAX Gauge (0..63)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "The specified DSCP Identifier offset.
+         The packet's DSCP has to be included between aclMacAceIpDscp and
+         this value plus aclMacAceIpDscpRange; if IP DSCP range is not
+         configured, 0 is the value of this object."
+      ::= { opticsIMaclMacAceEntry  22 }
+
+opticsIMaclMacAceIpDscpBitMask OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (2))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "The specified DSCP  mask. If it is not  configured, the default value is all 1"
+      ::= { opticsIMaclMacAceEntry 23 }
+
+
+-- BEGIN OPTnm00305
+opticsIMaclMacAceSourceTcpPort OBJECT-TYPE
+  SYNTAX      Unsigned32  (0..65537)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "Indicates the Source TCP Port value.The default value is 65537(don't care)"
+::= { opticsIMaclMacAceEntry 24 }
+
+opticsIMaclMacAceMaxSourceTcpPort OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..65535)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "Indicates the max value of Source TCP Port. Default value:0."
+::= { opticsIMaclMacAceEntry 25 }
+
+opticsIMaclMacAceDestTcpPort OBJECT-TYPE
+  SYNTAX      Unsigned32  (0..65537)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "Indicates the Dest TCP Port value.The default value is 65537(don't care)"
+::= { opticsIMaclMacAceEntry 26 }
+
+opticsIMaclMacAceMaxDestTcpPort OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..65535)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "Indicates the max value of Dest TCP Port. Default value:0."
+::= { opticsIMaclMacAceEntry 27 }
+
+opticsIMaclMacAceSourceUdpPort OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..65537)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "Indicates the Source UDP Port value.The default value is 65537(don't care)"
+::= { opticsIMaclMacAceEntry 28 }
+
+opticsIMaclMacAceMaxSourceUdpPort OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..65535)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "Indicates the max value of Source UDP Port. Default value:0."
+::= { opticsIMaclMacAceEntry 29 }
+
+opticsIMaclMacAceDestUdpPort OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..65537)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "Indicates the Dest UDP Port value.The default value is 65537(don't care)"
+::= { opticsIMaclMacAceEntry 30 }
+
+opticsIMaclMacAceMaxDestUdpPort OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..65535)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "Indicates the max value of Dest UDP Port. Default value:0."
+::= { opticsIMaclMacAceEntry 31 }
+
+opticsIMaclMacAceSourceIPV6Addr OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (16))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "It indicates the 128 bits source IPV6 address.
+         The specified source IP of the packet is AND-ed with the
+     value of opticsIMaclMacAceSourceIPV6AddrBitmask  and then compared
+         against the value of this object."
+    ::= { opticsIMaclMacAceEntry  32 }
+
+opticsIMaclMacAceSourceIPV6AddrBitmask OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (16))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The specified source IPv6 address mask.
+    If it is not configured, the default value is all 1."
+    ::= { opticsIMaclMacAceEntry  33 }
+
+opticsIMaclMacAceDestIPV6Addr OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (16))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "It indicates the 128 bits destination IPv6 address.
+         The specified destination IPv6 address is
+         AND-ed with the value of opticsIMaclMacAceDestIPV6AddrBitmask and then compared
+         against the value of this object."
+    ::= { opticsIMaclMacAceEntry  34 }
+
+opticsIMaclMacAceDestIPV6AddrBitmask OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (16))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The specified destination IPv6 address mask.
+    If it is not  configured, the default value is all 1."
+    ::= { opticsIMaclMacAceEntry  35 }
+
+-- END OPTnm00305
+
+-- BEGIN OPTnm02748
+opticsIMaclMacAceProtocolId OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "8 bits Protocol Identifier value in IPV4 Header (or 8 bits Next Header value in IPv6 Header).
+     Default value:255"
+::= { opticsIMaclMacAceEntry 36 }
+-- END OPTnm02748
+
+
+
+
+-- End opticsIMaclMacAceTable
+
+-- Start opticsIMaclActualMacAceTable
+
+opticsIMaclActualMacAceTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF OpticsIMAclActualMacAceEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "The conceptual read-only table of all of aclMacAceEntry "
+::= { opticsimEthNEMibObject 10 }
+
+opticsIMAclActualMacAceEntry OBJECT-TYPE
+  SYNTAX      OpticsIMAclActualMacAceEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "The conceptual read-only row for aclMacAceTable."
+  INDEX       { opticsIMaclIndex, opticsIMAclActualMacAceIndex }
+::= { opticsIMaclActualMacAceTable 1 }
+
+OpticsIMAclActualMacAceEntry ::= SEQUENCE
+{
+  opticsIMAclActualMacAceIndex                 Integer32,
+  opticsIMAclActualMacAceOrder               Integer32,
+  opticsIMAclActualMacAceAction                INTEGER,
+  opticsIMAclActualMacAceSourceMacAddr         OCTET STRING,
+  opticsIMAclActualMacAceSourceMacAddrBitmask  OCTET STRING,
+  opticsIMAclActualMacAceDestMacAddr           OCTET STRING,
+  opticsIMAclActualMacAceDestMacAddrBitmask    OCTET STRING,
+  opticsIMAclActualMacAceVid                OpticsIMETSVlanCfg,
+  opticsIMAclActualMacAceVidRange              Gauge32,
+  opticsIMAclActualMacAceEtherType             Unsigned32,
+  opticsIMAclActualMacAceEtherTypeRange        Unsigned32,
+  opticsIMaclActualMacAceVidBitmask            OCTET STRING,
+  opticsIMaclActualMacAceEtherTypeBitmask      OCTET STRING,
+  opticsIMaclActualMacAcePriority              INTEGER,
+  opticsIMaclActualMacAcePriorityBitMask       OCTET STRING,
+  opticsIMaclActualMacAceSourceIPV4Addr        OCTET STRING,
+  opticsIMaclActualMacAceSourceIPV4AddrBitmask OCTET STRING,
+  opticsIMaclActualMacAceDestIPV4Addr          OCTET STRING,
+  opticsIMaclActualMacAceDestIPV4AddrBitmask   OCTET STRING,
+  opticsIMaclActualMacAceIpDscp                OpticsIMETSIpDscp,
+  opticsIMaclActualMacAceIpDscpRange           Gauge,
+  opticsIMaclActualMacAceIpDscpBitMask         OCTET STRING,
+
+-- BEGIN OPTnm00305
+  opticsIMaclActualMacAceSourceTcpPort         Unsigned32,
+  opticsIMaclActualMacAceMaxSourceTcpPort      Unsigned32,
+  opticsIMaclActualMacAceDestTcpPort           Unsigned32,
+  opticsIMaclActualMacAceMaxDestTcpPort        Unsigned32,
+  opticsIMaclActualMacAceSourceUdpPort         Unsigned32,
+  opticsIMaclActualMacAceMaxSourceUdpPort      Unsigned32,
+  opticsIMaclActualMacAceDestUdpPort           Unsigned32,
+  opticsIMaclActualMacAceMaxDestUdpPort        Unsigned32,
+
+  opticsIMaclActualMacAceSourceIPV6Addr        OCTET STRING,
+  opticsIMaclActualMacAceSourceIPV6AddrBitmask OCTET STRING,
+  opticsIMaclActualMacAceDestIPV6Addr          OCTET STRING,
+  opticsIMaclActualMacAceDestIPV6AddrBitmask   OCTET STRING,
+-- END OPTnm00305
+
+-- BEGIN OPTnm02748
+  opticsIMAclActualMacAceProtocolId            Unsigned32
+-- END OPTnm02748
+}
+
+opticsIMAclActualMacAceIndex OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "The unique index of an ACE within an ACL"
+::= { opticsIMAclActualMacAceEntry 1 }
+
+opticsIMAclActualMacAceOrder OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Specifies the order of execution of ACE within an ACL"
+::= { opticsIMAclActualMacAceEntry 2 }
+
+opticsIMAclActualMacAceAction OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        permit(1),
+                        deny(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+      "The action to be executed, if the condition of the ace is verified"
+::= { opticsIMAclActualMacAceEntry 3 }
+
+
+opticsIMAclActualMacAceSourceMacAddr OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (6))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+     "It indicates the 48 bits source MAC address.
+         The specified source mac of the packet
+     The packet's source mac address is AND-ed with the
+     value of aceMacSourceMacAddrBitmask and then compared
+         against the value of this object."
+::= { opticsIMAclActualMacAceEntry 4 }
+
+opticsIMAclActualMacAceSourceMacAddrBitmask OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (6))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+     "The specified source mac address mask.
+      If it is not configured, the default value is all 1 "
+::= { opticsIMAclActualMacAceEntry 5 }
+
+opticsIMAclActualMacAceDestMacAddr OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (6))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+     "It indicates the 48 bits destination MAC address.
+          The specified destination mac of the packet The packet's destination
+          mac address is AND-ed with the value of aceMacDestMacAddrBitmask and
+      then compared against the value of this object."
+::= { opticsIMAclActualMacAceEntry 6 }
+
+opticsIMAclActualMacAceDestMacAddrBitmask OBJECT-TYPE
+  SYNTAX      OCTET STRING (SIZE (6))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "The specified destination mac address mask.
+     If it is not configured, the default value is all 1 "
+::= { opticsIMAclActualMacAceEntry 7 }
+
+opticsIMAclActualMacAceVid OBJECT-TYPE
+  SYNTAX      OpticsIMETSVlanCfg
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Indicates the 12 bits of the VLAN Identifier value."
+::= { opticsIMAclActualMacAceEntry 8 }
+
+opticsIMAclActualMacAceVidRange OBJECT-TYPE
+  SYNTAX      Gauge32 (0..4095)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "The specified VLAN Identifier offset.
+     The packet's VLAN Identifier has to be included between aclMacAceVid and
+     this value plus aclMacAceVidRange; if VLAN Identifier range is not
+     configured, 0 is the value of this object."
+::= { opticsIMAclActualMacAceEntry 9 }
+
+opticsIMAclActualMacAceEtherType OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Indicates the 16 bits of the EtherType value."
+::= { opticsIMAclActualMacAceEntry 10 }
+
+opticsIMAclActualMacAceEtherTypeRange OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "The specified EthernetType offset: the packet's Ethertype has to be
+     included between aclMacEhtertype and this value plus
+     aclMacAceEtherTypeRange; if the Ethertype range is not configured, 0 is
+     the value of this object."
+::= { opticsIMAclActualMacAceEntry 11 }
+
+opticsIMaclActualMacAceVidBitmask OBJECT-TYPE
+  SYNTAX      OCTET STRING (SIZE (2))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "The specified Vid mask"
+::= { opticsIMAclActualMacAceEntry 12 }
+
+opticsIMaclActualMacAceEtherTypeBitmask OBJECT-TYPE
+  SYNTAX      OCTET STRING (SIZE (2))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "The specified EtherType mask."
+::= { opticsIMAclActualMacAceEntry 13 }
+
+opticsIMaclActualMacAcePriority OBJECT-TYPE
+  SYNTAX INTEGER {
+    pri000 (0),
+    pri001 (1),
+    pri010 (2),
+    pri011 (3),
+    pri100 (4),
+    pri101 (5),
+    pri110 (6),
+    pri111 (7)
+  }
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Indicates the 8 bits of the 802.1p priority bits value.
+     The specified 802.1p priority bits value of the packet. The packet's
+     802.1p priority bits value is AND-ed with the value of
+     opticsIMaclMacAcePriorityBitMask and then compared against the value of
+     this object."
+::= { opticsIMAclActualMacAceEntry 14 }
+
+opticsIMaclActualMacAcePriorityBitMask OBJECT-TYPE
+  SYNTAX      OCTET STRING (SIZE (2))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "The specified 802.1p Priority mask.
+     If it is not  configured, the default value is all 1 "
+::= { opticsIMAclActualMacAceEntry 15 }
+
+
+opticsIMaclActualMacAceSourceIPV4Addr OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (4))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "It indicates the 32 bits source IP address."
+::= { opticsIMAclActualMacAceEntry  16 }
+
+opticsIMaclActualMacAceSourceIPV4AddrBitmask OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (4))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The specified source IPv4 address mask."
+    ::= { opticsIMAclActualMacAceEntry  17 }
+
+opticsIMaclActualMacAceDestIPV4Addr OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (4))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "It indicates the 32 bits destination IPv4 address."
+    ::= { opticsIMAclActualMacAceEntry  18 }
+
+opticsIMaclActualMacAceDestIPV4AddrBitmask OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (4))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The specified destination IPv4 address mask."
+    ::= { opticsIMAclActualMacAceEntry  19 }
+
+opticsIMaclActualMacAceIpDscp OBJECT-TYPE
+      SYNTAX OpticsIMETSIpDscp
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "It indicates IP DSCP value"
+      ::= { opticsIMAclActualMacAceEntry  20 }
+
+opticsIMaclActualMacAceIpDscpRange OBJECT-TYPE
+      SYNTAX Gauge (0..63)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "The specified DSCP Identifier offset."
+      ::= { opticsIMAclActualMacAceEntry  21 }
+
+opticsIMaclActualMacAceIpDscpBitMask OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (2))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "The specified DSCP  mask."
+      ::= { opticsIMAclActualMacAceEntry 22 }
+
+
+-- BEGIN OPTnm00305
+opticsIMaclActualMacAceSourceTcpPort OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..65537)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Indicates the Source TCP Port value."
+::= { opticsIMAclActualMacAceEntry 23 }
+
+opticsIMaclActualMacAceMaxSourceTcpPort OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..65535)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Indicates the max value of Source TCP Port."
+::= { opticsIMAclActualMacAceEntry 24 }
+
+opticsIMaclActualMacAceDestTcpPort OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..65537)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Indicates the Dest TCP Port value."
+::= { opticsIMAclActualMacAceEntry 25 }
+
+opticsIMaclActualMacAceMaxDestTcpPort OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..65535)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Indicates the max value of Dest TCP Port."
+::= { opticsIMAclActualMacAceEntry 26 }
+
+
+opticsIMaclActualMacAceSourceUdpPort OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..65537)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Indicates the Source UDP Port value."
+::= { opticsIMAclActualMacAceEntry 27 }
+
+opticsIMaclActualMacAceMaxSourceUdpPort OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..65535)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Indicates the max value of Source UDP Port"
+::= { opticsIMAclActualMacAceEntry 28 }
+
+opticsIMaclActualMacAceDestUdpPort OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..65537)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Indicates the Dest UDP Port value."
+::= { opticsIMAclActualMacAceEntry 29 }
+
+opticsIMaclActualMacAceMaxDestUdpPort OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..65535)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Indicates the max value of Dest UDP Port"
+::= { opticsIMAclActualMacAceEntry 30 }
+
+opticsIMaclActualMacAceSourceIPV6Addr OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "It indicates the 128 bits source IPV6 address.
+         The specified source IP of the packet is AND-ed with the
+     value of opticsIMaclMacAceSourceIPV6AddrBitmask  and then compared
+         against the value of this object."
+    ::= { opticsIMAclActualMacAceEntry  31 }
+
+opticsIMaclActualMacAceSourceIPV6AddrBitmask OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The specified source IPv6 address mask."
+    ::= { opticsIMAclActualMacAceEntry  32 }
+
+opticsIMaclActualMacAceDestIPV6Addr OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "It indicates the 128 bits destination IPv6 address.
+         The specified destination IPv6 address is
+         AND-ed with the value of opticsIMaclMacAceDestIPV6AddrBitmask and then compared
+         against the value of this object."
+    ::= { opticsIMAclActualMacAceEntry  33 }
+
+opticsIMaclActualMacAceDestIPV6AddrBitmask OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The specified destination IPv6 address mask."
+    ::= { opticsIMAclActualMacAceEntry  34 }
+-- END OPTnm00305
+
+-- BEGIN OPTnm02748
+opticsIMAclActualMacAceProtocolId OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Indicates 8 bits Protocol Identifier value in IPV4 Header
+     (or 8 bits Next Header value in IPv6 Header)"
+::= { opticsIMAclActualMacAceEntry 35 }
+-- END OPTnm02748
+
+-- End opticsIMAclActualMacAceTable
+
+-- OPTICSIM-ETHNE-MC DEFINITIONS ::= BEGIN
+--     IMPORTS
+--     MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+--     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP FROM SNMPv2-CONF
+--     opticsimMib, opticsimIpMC FROM OPTICSIM-IPREG-MIB;
+
+-- opticsimEthNEMCCompl
+
+-- opticsimEthNEMCCompl MODULE-IDENTITY
+-- LAST-UPDATED "200211280000Z"
+-- ORGANIZATION "Alcatel Optics"
+-- CONTACT-INFO "Alcatel Optics"
+-- DESCRIPTION
+--     "Initial Release OPTICS-IM Ethernet NE MODULE COMPLIANCE"
+-- ::= { tsdimSnmpNEMCConf 1 }
+
+opticsimEthNEMCConf   OBJECT IDENTIFIER ::= { opticsimEthMC 2 }
+opticsimEthNEMCCompl  OBJECT IDENTIFIER ::= { opticsimEthNEMCConf 1 }
+opticsimEthNEMCGroup  OBJECT IDENTIFIER ::= { opticsimEthNEMCConf 2 }
+
+END

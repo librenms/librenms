@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DynamicConfigItem.php
  *
@@ -31,7 +32,6 @@ use Validator;
 #[\AllowDynamicProperties]
 class DynamicConfigItem implements \ArrayAccess
 {
-    public $name;
     public $group;
     public $section;
     public $value;
@@ -47,9 +47,8 @@ class DynamicConfigItem implements \ArrayAccess
     public $validate;
     public $units;
 
-    public function __construct($name, $settings = [])
+    public function __construct(public $name, $settings = [])
     {
-        $this->name = $name;
         $this->value = LibrenmsConfig::get($this->name, $this->default);
 
         foreach ($settings as $key => $value) {
@@ -77,35 +76,40 @@ class DynamicConfigItem implements \ArrayAccess
             return in_array($value, array_keys($this->options));
         } elseif ($this->type == 'email') {
             // allow email format that includes display text
-            if (preg_match('/.* <(.*)>/', $value, $matches)) {
+            if (preg_match('/.* <(.*)>/', (string) $value, $matches)) {
                 $value = $matches[1];
             }
 
             return filter_var($value, FILTER_VALIDATE_EMAIL);
-        } elseif ($this->type == 'array') {
+        } elseif (in_array($this->type, ['array', 'password-array'])) {
             return is_array($value); // this should probably have more complex validation via validator rules
         } elseif ($this->type == 'array-sub-keyed') {
             if (! is_array($value)) {
                 return false;
             }
 
-            foreach ($value as $v) {
+            foreach ($value as $key => $v) {
                 if (! is_array($v)) {
+                    return false;
+                }
+
+                // check keys not empty
+                if (is_string($key) && strlen(trim($key)) == 0) {
                     return false;
                 }
             }
 
             return true;
         } elseif ($this->type == 'color') {
-            return (bool) preg_match('/^#?[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/', $value);
+            return (bool) preg_match('/^#?[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/', (string) $value);
         } elseif (in_array($this->type, ['text', 'password'])) {
             return ! is_array($value);
         } elseif ($this->type === 'executable') {
-            $value == $this->sanitizePath($value);
+            $value = $this->sanitizePath($value);
 
             return $value !== false && is_file($value) && is_executable($value);
         } elseif ($this->type === 'directory') {
-            $value == $this->sanitizePath($value);
+            $value = $this->sanitizePath($value);
 
             return $value !== false && is_dir($value);
         }
@@ -232,7 +236,7 @@ class DynamicConfigItem implements \ArrayAccess
     #[\ReturnTypeWillChange]
     public function offsetGet($offset): mixed
     {
-        return isset($this->$offset) ? $this->$offset : null;
+        return $this->$offset ?? null;
     }
 
     public function offsetSet($offset, $value): void

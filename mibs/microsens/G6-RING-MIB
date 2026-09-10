@@ -1,0 +1,975 @@
+G6-RING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32, enterprises,NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	DisplayString, MacAddress
+		FROM SNMPv2-TC
+	g6	FROM MICROSENS-G6-MIB
+	;
+
+protocol MODULE-IDENTITY --Category
+	LAST-UPDATED "202302141127Z"
+	ORGANIZATION "MICROSENS GmbH & Co. KG"
+	CONTACT-INFO
+		"Kueferstrasse 16
+		D-59067 Hamm
+		Germany
+		support@microsens.de
+		http://www.microsens.de"
+	DESCRIPTION
+		"Microsens private MIB for Generation 6 Ethernet Switches"
+
+	REVISION "202302141127Z"
+	DESCRIPTION
+		"File creation"
+	::= { g6 2 }
+
+ring  OBJECT IDENTIFIER ::= { protocol 45 }
+
+
+
+-- *************************** CONFIGURATION SECTION ********************************
+
+
+-- ******************* Begin of configTable *************************
+
+configTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF ConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This section is used to configure the MICROSENS ring protocol which provides fast network redundancy."
+	::= { ring 1 }
+
+configEntry	OBJECT-TYPE
+	SYNTAX ConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { configIndex }
+	::= { configTable 1 }
+
+
+	ConfigEntry ::= SEQUENCE {
+	configIndex INTEGER,
+	configName DisplayString,
+	configEnableRing INTEGER ,
+	configRingMaster INTEGER ,
+	configNumber Integer32 ,
+	configPortA Integer32 ,
+	configPortB Integer32 ,
+	configFailureDetection INTEGER 
+	}
+
+configIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..3)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { configEntry 1 }
+
+configName OBJECT-TYPE   -- name
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"User defined ring name is purely informational."
+	::= { configEntry 2 }
+
+configEnableRing OBJECT-TYPE   -- enable_ring
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Used to enable the redundant ring function."
+	::= { configEntry 3 }
+
+configRingMaster OBJECT-TYPE   -- ring_master
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When enabled this unit is designated as ring master. There can only be one master in a ring."
+	::= { configEntry 4 }
+
+configNumber OBJECT-TYPE   -- number
+	SYNTAX Integer32 (0..255)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Ring number must be set identical for each member of a ring. When left unassigned the default setting 1 for index 1 and 2 for index 2 and so on is used."
+	::= { configEntry 5 }
+
+configPortA OBJECT-TYPE   -- port_a
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Port number for ring side A"
+	::= { configEntry 6 }
+
+configPortB OBJECT-TYPE   -- port_b
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Port number for ring side B. Ring master blocks port B when ring is ok."
+	::= { configEntry 7 }
+
+configFailureDetection OBJECT-TYPE   -- failure_detection
+	SYNTAX INTEGER 
+		{
+		bothPorts (0),
+		portA (1),
+		portB (2),
+		none (3)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"For normal ring applications set detection to BOTH_PORTS. Other settings are required when two rings are coupled with 2 parallel links for redundant inter-ring traffic. In this case not all links should be monitored in order to avoid a possible loop condition. Careful planning is advised."
+	::= { configEntry 8 }
+
+
+-- ********************* End of configTable ***********************
+
+
+-- ******************* Begin of mrpConfigTable *************************
+
+mrpConfigTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF MrpConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This section is used to configure the MRP  ring protocol."
+	::= { ring 2 }
+
+mrpConfigEntry	OBJECT-TYPE
+	SYNTAX MrpConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { mrpConfigIndex }
+	::= { mrpConfigTable 1 }
+
+
+	MrpConfigEntry ::= SEQUENCE {
+	mrpConfigIndex INTEGER,
+	mrpConfigEnableMrp INTEGER ,
+	mrpConfigDomainName DisplayString,
+	mrpConfigExpectedRole INTEGER ,
+	mrpConfigReactOnLinkChange INTEGER ,
+	mrpConfigRecoveryTime INTEGER ,
+	mrpConfigPort1 Integer32 ,
+	mrpConfigPort2 Integer32 ,
+	mrpConfigVlanId Integer32 ,
+	mrpConfigResetRoundTripDelays DisplayString,
+	mrpConfigResetStatistics DisplayString
+	}
+
+mrpConfigIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { mrpConfigEntry 1 }
+
+mrpConfigEnableMrp OBJECT-TYPE   -- enable_mrp
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Used to enable the MRP ring function. Only enable when all MRP and VLAN settings have been set. Only close cable connections of the ring when all nodes have been enabled."
+	::= { mrpConfigEntry 2 }
+
+mrpConfigDomainName OBJECT-TYPE   -- domain_name
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"User defined ring name is purely informational. When specified, the name will be inserted in all MRP related events. When left blank, the UUID of the MRP ring is inserted instead."
+	::= { mrpConfigEntry 3 }
+
+mrpConfigExpectedRole OBJECT-TYPE   -- expected_role
+	SYNTAX INTEGER 
+		{
+		client (0),
+		manager (1)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Determines role of this node in the ring. Configure only one master per ring."
+	::= { mrpConfigEntry 4 }
+
+mrpConfigReactOnLinkChange OBJECT-TYPE   -- react_on_link_change
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When enabled the manager reacts to link change messages from a client. Disable this feature only when any member of the ring does not support react on link change feature. Also known as Advanced Mode. Only applies to manager role."
+	::= { mrpConfigEntry 5 }
+
+mrpConfigRecoveryTime OBJECT-TYPE   -- recovery_time
+	SYNTAX INTEGER 
+		{
+		recoveryTime500Ms (0),
+		recoveryTime200Ms (1)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Specifies the guaranteed maximum recovery time (i.e. Time from the fault event to the time when the network regains its required communication function). Only applies to manager role."
+	::= { mrpConfigEntry 6 }
+
+mrpConfigPort1 OBJECT-TYPE   -- port_1
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Port number for ring side 1"
+	::= { mrpConfigEntry 7 }
+
+mrpConfigPort2 OBJECT-TYPE   -- port_2
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Port number for ring side 2. Ring master blocks B when ring is ok"
+	::= { mrpConfigEntry 8 }
+
+mrpConfigVlanId OBJECT-TYPE   -- vlan_id
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When using a VLAN ensure that the rings ports are configured as member of the VLAN in the vlan settings. Leave this field blank or set to 0 when no VLAN is used."
+	::= { mrpConfigEntry 9 }
+
+mrpConfigResetRoundTripDelays OBJECT-TYPE   -- reset_round_trip_delays
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When executed the min_round_trip_delay and max_round_trip_delay values are reset to 0. This has no service implications."
+	::= { mrpConfigEntry 10 }
+
+mrpConfigResetStatistics OBJECT-TYPE   -- reset_statistics
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When executed statistics related to this MRP ring are cleared. This has no service implications."
+	::= { mrpConfigEntry 11 }
+
+
+-- ********************* End of mrpConfigTable ***********************
+
+
+
+-- ****************************** STATUS SECTION ********************************
+
+
+-- ******************* Begin of statusTable *************************
+
+statusTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF StatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Status values display the current condition of the ring network."
+	::= { ring 100 }
+
+statusEntry	OBJECT-TYPE
+	SYNTAX StatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { statusIndex }
+	::= { statusTable 1 }
+
+
+	StatusEntry ::= SEQUENCE {
+	statusIndex INTEGER,
+	statusState INTEGER ,
+	statusLastStateChange DisplayString,
+	statusRingInterrupt INTEGER ,
+	statusGlobalRingAlarm INTEGER ,
+	statusErrorDetected INTEGER ,
+	statusRingPortAInterrupted INTEGER ,
+	statusRingPortBInterrupted INTEGER ,
+	statusRingPortANeighbor INTEGER ,
+	statusRingPortBNeighbor INTEGER 
+	}
+
+statusIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..3)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { statusEntry 1 }
+
+statusState OBJECT-TYPE   -- state
+	SYNTAX INTEGER 
+		{
+		unused (0),
+		normal (1),
+		backup (2),
+		error (3),
+		remoteConfigMismatch (4)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	""
+	::= { statusEntry 2 }
+
+statusLastStateChange OBJECT-TYPE   -- last_state_change
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Time and date string indication when the state of the ring protocol has last changed to the state now indicated."
+	::= { statusEntry 3 }
+
+statusRingInterrupt OBJECT-TYPE   -- ring_interrupt
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This indicates that at least one of the two ring ports is blocked. It is an OR of the port_a and port_b interrupt status fields. Note that the name may be misleading. Interrupted is to be understood as the port being actively blocked by the protocol to interrupt the traffic to prevent a network loop. This is part of normal operation."
+	::= { statusEntry 4 }
+
+statusGlobalRingAlarm OBJECT-TYPE   -- global_ring_alarm
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This indicates that somewhere in the overall ring a failure exists. It does not neccessarily indicate loss of data. Observe the overall state to determine this."
+	::= { statusEntry 5 }
+
+statusErrorDetected OBJECT-TYPE   -- error_detected
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Applies to the ring master. Indicates that the master has detected an error on one of the ports."
+	::= { statusEntry 6 }
+
+statusRingPortAInterrupted OBJECT-TYPE   -- ring_port_a_interrupted
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates that ring port_a is blocked. See parameter ring_interrupt for details."
+	::= { statusEntry 7 }
+
+statusRingPortBInterrupted OBJECT-TYPE   -- ring_port_b_interrupted
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates that ring port_a is blocked. See parameter ring_interrupt for details."
+	::= { statusEntry 8 }
+
+statusRingPortANeighbor OBJECT-TYPE   -- ring_port_a_neighbor
+	SYNTAX INTEGER 
+		{
+		unused (0),
+		ok (1),
+		localLldpDisabled (2),
+		waitingForRemoteLldp (3),
+		remoteLldpDisabled (4),
+		illegalDeviceDetected (5),
+		remoteOlderFwVersion (6),
+		remoteRingDisbled (7),
+		wrongRemotePort (8),
+		wrongRemoteRingId (9),
+		differentProtocolVersions (10),
+		multipleMasterError (11)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This field indicates problems associated with the device connect to ring port_a. The issue may be located in the connected device, not locally!"
+	::= { statusEntry 9 }
+
+statusRingPortBNeighbor OBJECT-TYPE   -- ring_port_b_neighbor
+	SYNTAX INTEGER 
+		{
+		unused (0),
+		ok (1),
+		localLldpDisabled (2),
+		waitingForRemoteLldp (3),
+		remoteLldpDisabled (4),
+		illegalDeviceDetected (5),
+		remoteOlderFwVersion (6),
+		remoteRingDisbled (7),
+		wrongRemotePort (8),
+		wrongRemoteRingId (9),
+		differentProtocolVersions (10),
+		multipleMasterError (11)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This field indicates problems associated with the device connect to ring port_b. The issue may be located in the connected device, not locally!"
+	::= { statusEntry 10 }
+
+
+-- ********************* End of statusTable ***********************
+
+
+-- ******************* Begin of statisticsTable *************************
+
+statisticsTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF StatisticsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Statistics of the ring network performance."
+	::= { ring 101 }
+
+statisticsEntry	OBJECT-TYPE
+	SYNTAX StatisticsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { statisticsIndex }
+	::= { statisticsTable 1 }
+
+
+	StatisticsEntry ::= SEQUENCE {
+	statisticsIndex INTEGER,
+	statisticsNumberOfBackups Unsigned32,
+	statisticsCurrentBackupDuration Counter32,
+	statisticsLastBackupDuration Counter32,
+	statisticsTotalBackupDuration Counter32
+	}
+
+statisticsIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..3)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { statisticsEntry 1 }
+
+statisticsNumberOfBackups OBJECT-TYPE   -- number_of_backups
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Counts the number of backups engaged since the last power up."
+	::= { statisticsEntry 2 }
+
+statisticsCurrentBackupDuration OBJECT-TYPE   -- current_backup_duration
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates since how long a currently active backup is established. When no backup is active a 0 is displayed."
+	::= { statisticsEntry 3 }
+
+statisticsLastBackupDuration OBJECT-TYPE   -- last_backup_duration
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates since how long the last backup was established. Indicates 0 if there was no backup since last reboot."
+	::= { statisticsEntry 4 }
+
+statisticsTotalBackupDuration OBJECT-TYPE   -- total_backup_duration
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Total time the ring was in backup since last reboot. "
+	::= { statisticsEntry 5 }
+
+
+-- ********************* End of statisticsTable ***********************
+
+
+-- ******************* Begin of couplingStatusTable *************************
+
+couplingStatusTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF CouplingStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Indicates status of ring coupling function. "
+	::= { ring 102 }
+
+couplingStatusEntry	OBJECT-TYPE
+	SYNTAX CouplingStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { couplingStatusIndex }
+	::= { couplingStatusTable 1 }
+
+
+	CouplingStatusEntry ::= SEQUENCE {
+	couplingStatusIndex INTEGER,
+	couplingStatusControllerState INTEGER ,
+	couplingStatusCportLink INTEGER ,
+	couplingStatusCportForward INTEGER ,
+	couplingStatusCportTimeout INTEGER ,
+	couplingStatusConnectionValid INTEGER ,
+	couplingStatusValidPartnerIp INTEGER ,
+	couplingStatusValidPartnerId INTEGER 
+	}
+
+couplingStatusIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { couplingStatusEntry 1 }
+
+couplingStatusControllerState OBJECT-TYPE   -- controller_state
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		blocking (1),
+		link (2),
+		forwarding (3),
+		standby (4)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Data transmission state."
+	::= { couplingStatusEntry 2 }
+
+couplingStatusCportLink OBJECT-TYPE   -- cport_link
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Coupling port is in linkup condition."
+	::= { couplingStatusEntry 3 }
+
+couplingStatusCportForward OBJECT-TYPE   -- cport_forward
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Coupling port is in forwarding state."
+	::= { couplingStatusEntry 4 }
+
+couplingStatusCportTimeout OBJECT-TYPE   -- cport_timeout
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates that no ring coupling frames were received within defined period."
+	::= { couplingStatusEntry 5 }
+
+couplingStatusConnectionValid OBJECT-TYPE   -- connection_valid
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates that source ip address of received frame matches configured partner ip."
+	::= { couplingStatusEntry 6 }
+
+couplingStatusValidPartnerIp OBJECT-TYPE   -- valid_partner_ip
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates that received ring number matches expected locally configured ring number."
+	::= { couplingStatusEntry 7 }
+
+couplingStatusValidPartnerId OBJECT-TYPE   -- valid_partner_id
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	""
+	::= { couplingStatusEntry 8 }
+
+
+-- ********************* End of couplingStatusTable ***********************
+
+
+-- ******************* Begin of mrpStatusTable *************************
+
+mrpStatusTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF MrpStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Status common to manager and client"
+	::= { ring 103 }
+
+mrpStatusEntry	OBJECT-TYPE
+	SYNTAX MrpStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { mrpStatusIndex }
+	::= { mrpStatusTable 1 }
+
+
+	MrpStatusEntry ::= SEQUENCE {
+	mrpStatusIndex INTEGER,
+	mrpStatusOperation INTEGER ,
+	mrpStatusAdminRole INTEGER ,
+	mrpStatusOperationalRole INTEGER ,
+	mrpStatusPort1State INTEGER ,
+	mrpStatusPort2State INTEGER ,
+	mrpStatusDomainId DisplayString,
+	mrpStatusDomainError INTEGER 
+	}
+
+mrpStatusIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { mrpStatusEntry 1 }
+
+mrpStatusOperation OBJECT-TYPE   -- operation
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		enabled (1)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates if MRP function is enabled."
+	::= { mrpStatusEntry 2 }
+
+mrpStatusAdminRole OBJECT-TYPE   -- admin_role
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		client (1),
+		manager (2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Mirrors expected role configuration."
+	::= { mrpStatusEntry 3 }
+
+mrpStatusOperationalRole OBJECT-TYPE   -- operational_role
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		client (1),
+		manager (2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"real_role ??"
+	::= { mrpStatusEntry 4 }
+
+mrpStatusPort1State OBJECT-TYPE   -- port_1_state
+	SYNTAX INTEGER 
+		{
+		unused (0),
+		blocking (1),
+		forwarding (3),
+		notConnected (4)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	""
+	::= { mrpStatusEntry 5 }
+
+mrpStatusPort2State OBJECT-TYPE   -- port_2_state
+	SYNTAX INTEGER 
+		{
+		unused (0),
+		blocking (1),
+		forwarding (3),
+		notConnected (4)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	""
+	::= { mrpStatusEntry 6 }
+
+mrpStatusDomainId OBJECT-TYPE   -- domain_id
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"When left blank the default id of all bits 1 is used."
+	::= { mrpStatusEntry 7 }
+
+mrpStatusDomainError OBJECT-TYPE   -- domain_error
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		noError (1),
+		invalidVlan (2),
+		invalid (3),
+		multiMgr (4),
+		singleSide (5),
+		linkError (6)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	""
+	::= { mrpStatusEntry 8 }
+
+
+-- ********************* End of mrpStatusTable ***********************
+
+
+-- ******************* Begin of mrpManagerStatusTable *************************
+
+mrpManagerStatusTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF MrpManagerStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Status that applies to manager only. Invalid when in client mode."
+	::= { ring 104 }
+
+mrpManagerStatusEntry	OBJECT-TYPE
+	SYNTAX MrpManagerStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { mrpManagerStatusIndex }
+	::= { mrpManagerStatusTable 1 }
+
+
+	MrpManagerStatusEntry ::= SEQUENCE {
+	mrpManagerStatusIndex INTEGER,
+	mrpManagerStatusRingState INTEGER ,
+	mrpManagerStatusManagerPriority Unsigned32,
+	mrpManagerStatusRingOpenCount Unsigned32,
+	mrpManagerStatusTimeSinceLastRingOpen Counter32,
+	mrpManagerStatusMaxRoundTripDelay Unsigned32,
+	mrpManagerStatusMinRoundTripDelay Unsigned32,
+	mrpManagerStatusTopologyChangeInterval Integer32 ,
+	mrpManagerStatusTopoChangeRepeatCount Integer32 ,
+	mrpManagerStatusShortTestInterval Integer32 ,
+	mrpManagerStatusDefaultTestInterval Integer32 ,
+	mrpManagerStatusTestMonitorCount Integer32 ,
+	mrpManagerStatusTestMonitorExtCount Integer32 ,
+	mrpManagerStatusNonblockingSupport INTEGER 
+	}
+
+mrpManagerStatusIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { mrpManagerStatusEntry 1 }
+
+mrpManagerStatusRingState OBJECT-TYPE   -- ring_state
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		ringClosed (1),
+		ringOpen (2),
+		undefined (3)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates of MRP is enabled on this device."
+	::= { mrpManagerStatusEntry 2 }
+
+mrpManagerStatusManagerPriority OBJECT-TYPE   -- manager_priority
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The priority of this MRP entity."
+	::= { mrpManagerStatusEntry 3 }
+
+mrpManagerStatusRingOpenCount OBJECT-TYPE   -- ring_open_count
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Counts how many times was the ring broken."
+	::= { mrpManagerStatusEntry 4 }
+
+mrpManagerStatusTimeSinceLastRingOpen OBJECT-TYPE   -- time_since_last_ring_open
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Seconds since the ring was last opened."
+	::= { mrpManagerStatusEntry 5 }
+
+mrpManagerStatusMaxRoundTripDelay OBJECT-TYPE   -- max_round_trip_delay
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The longest round trip delay that was measured since value reset. Value in microseconds"
+	::= { mrpManagerStatusEntry 6 }
+
+mrpManagerStatusMinRoundTripDelay OBJECT-TYPE   -- min_round_trip_delay
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The shortest round trip delay that was measured since value reset. Value in microseconds"
+	::= { mrpManagerStatusEntry 7 }
+
+mrpManagerStatusTopologyChangeInterval OBJECT-TYPE   -- topology_change_interval
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Interval for sending of MRP_TopologyChange messages"
+	::= { mrpManagerStatusEntry 8 }
+
+mrpManagerStatusTopoChangeRepeatCount OBJECT-TYPE   -- topo_change_repeat_count
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Topology change repeat count for repeated transmission of MRP_TopologyChange messages"
+	::= { mrpManagerStatusEntry 9 }
+
+mrpManagerStatusShortTestInterval OBJECT-TYPE   -- short_test_interval
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Short interval for sending of MRP_Test messages after link changes on the ring"
+	::= { mrpManagerStatusEntry 10 }
+
+mrpManagerStatusDefaultTestInterval OBJECT-TYPE   -- default_test_interval
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Default interval for sending of MRP_Test messages on the ring"
+	::= { mrpManagerStatusEntry 11 }
+
+mrpManagerStatusTestMonitorCount OBJECT-TYPE   -- test_monitor_count
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Count for monitoring the reception of MRP_Test messages"
+	::= { mrpManagerStatusEntry 12 }
+
+mrpManagerStatusTestMonitorExtCount OBJECT-TYPE   -- test_monitor_ext_count
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The extended interval count for monitoring the reception of MRP_Test messages"
+	::= { mrpManagerStatusEntry 13 }
+
+mrpManagerStatusNonblockingSupport OBJECT-TYPE   -- nonblocking_support
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"False indicates that the manager requires ring clients that support port blocking. This is standard behavior of any modern switch."
+	::= { mrpManagerStatusEntry 14 }
+
+
+-- ********************* End of mrpManagerStatusTable ***********************
+
+
+-- ******************* Begin of mrpClientStatusTable *************************
+
+mrpClientStatusTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF MrpClientStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Status that applies to client only. Invalid when in manager mode."
+	::= { ring 105 }
+
+mrpClientStatusEntry	OBJECT-TYPE
+	SYNTAX MrpClientStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { mrpClientStatusIndex }
+	::= { mrpClientStatusTable 1 }
+
+
+	MrpClientStatusEntry ::= SEQUENCE {
+	mrpClientStatusIndex INTEGER,
+	mrpClientStatusLinkDownTimer Integer32 ,
+	mrpClientStatusLinkUpTimer Integer32 ,
+	mrpClientStatusLinkChangeCount Integer32 ,
+	mrpClientStatusBlockedSupport INTEGER 
+	}
+
+mrpClientStatusIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { mrpClientStatusEntry 1 }
+
+mrpClientStatusLinkDownTimer OBJECT-TYPE   -- link_down_timer
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The interval for sending of MRP_linkDown messages"
+	::= { mrpClientStatusEntry 2 }
+
+mrpClientStatusLinkUpTimer OBJECT-TYPE   -- link_up_timer
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The interval for sending of MRP_linkUp messages"
+	::= { mrpClientStatusEntry 3 }
+
+mrpClientStatusLinkChangeCount OBJECT-TYPE   -- link_change_count
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The count for repeated transmission of MRP_LinkChange messages"
+	::= { mrpClientStatusEntry 4 }
+
+mrpClientStatusBlockedSupport OBJECT-TYPE   -- blocked_support
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"True indicates that this client supports port blocking. The value is always true."
+	::= { mrpClientStatusEntry 5 }
+
+
+-- ********************* End of mrpClientStatusTable ***********************
+
+
+
+END
+

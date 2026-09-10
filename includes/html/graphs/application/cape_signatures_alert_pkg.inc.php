@@ -26,8 +26,8 @@ foreach ($packages as $index => $package) {
     $packages_int++;
 }
 
-if (sizeof($rrd_list)) {
-    d_echo('No relevant package RRDs found');
+if (count($rrd_list)) {
+    throw new \LibreNMS\Exceptions\RrdGraphException('No relevant package RRDs found');
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

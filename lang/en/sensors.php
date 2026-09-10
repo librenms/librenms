@@ -100,7 +100,7 @@ return [
         'short' => 'Percent',
         'long' => 'Loss Percentage',
         'unit' => '%',
-        'unit_long' => 'percentage',
+        'unit_long' => 'Percent',
     ],
     'power' => [
         'short' => 'Power',
@@ -142,13 +142,19 @@ return [
         'short' => 'Signal',
         'long' => 'Signal',
         'unit' => 'dBm',
-        'unit_long' => 'Decibal-Milliwatts',
+        'unit_long' => 'Decibel-Milliwatts',
     ],
     'tv_signal' => [
         'short' => 'Signal',
         'long' => 'TV signal',
         'unit' => 'dBmV',
         'unit_long' => 'Decibel-Millivolts',
+    ],
+    'printer-supply' => [
+        'short' => 'Printer',
+        'long' => 'Printer Supplies',
+        'unit' => '%',
+        'unit_long' => 'Percent',
     ],
     'bitrate' => [
         'short' => 'Bitrate',
@@ -172,10 +178,12 @@ return [
         'long' => 'Temperature',
         'unit' => '°C',
         'unit_long' => '° Celsius',
+        'unit_f' => '°F',
+        'unit_long_f' => '° Fahrenheit',
     ],
     'voltage' => [
         'short' => 'Voltage',
-        'long' => 'voltage',
+        'long' => 'Voltage',
         'unit' => 'V',
         'unit_long' => 'Volts',
     ],
@@ -190,5 +198,11 @@ return [
         'long' => 'Percent',
         'unit' => '%',
         'unit_long' => 'Percent',
+    ],
+    'signal_loss' => [
+        'short' => 'SL',
+        'long' => 'Signal Loss',
+        'unit' => 'dB',
+        'unit_long' => 'Decibels',
     ],
 ];

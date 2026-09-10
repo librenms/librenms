@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Snmpsim.php
  *
@@ -63,12 +64,20 @@ class Snmpsim extends Process
             return $type == Process::ERR && str_contains($buffer, $listen);
         });
 
-        return trim($last);
+        return trim((string) $last);
     }
 
     public function isVenvSetUp(): bool
     {
-        return is_executable($this->getVenvPath('bin/snmpsim-command-responder-lite'));
+        if (! is_executable($this->getVenvPath('bin/snmpsim-command-responder-lite'))) {
+            return false;
+        }
+
+        // check that snmpsim package actually exists
+        $pipCheck = new Process([$this->getVenvPath('bin/pip'), 'show', 'snmpsim']);
+        $pipCheck->run();
+
+        return $pipCheck->isSuccessful();
     }
 
     public function setupVenv($print_output = false): void
@@ -87,7 +96,7 @@ class Snmpsim extends Process
                 Log::error($setupProcess->getErrorOutput());
             }
 
-            $installProcess = new Process([$snmpsim_venv_path . '/bin/pip', 'install', 'snmpsim>=1.1.7']);
+            $installProcess = new Process([$snmpsim_venv_path . '/bin/pip', 'install', 'snmpsim==1.1.7']);
             $installProcess->setTty($print_output);
             $installProcess->run();
 

@@ -1,6 +1,6 @@
 <?php
 
-$vm = proxmox_vm_info(Request::get('vmid'), Request::get('instance'));
+$vm = proxmox_vm_info($vars['vmid'], $vars['instance']);
 
 $graphs = [
     'proxmox_traffic' => 'Traffic',
@@ -12,7 +12,7 @@ foreach ($vm['ports'] as $port) {
 
         $graph_array['height'] = '100';
         $graph_array['width'] = '215';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['id'] = $vm['app_id'];
         $graph_array['device_id'] = $vm['device_id'];
         $graph_array['type'] = 'application_' . $key;

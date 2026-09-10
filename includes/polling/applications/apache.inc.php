@@ -8,12 +8,11 @@ $name = 'apache';
 if (! empty($agent_data['app'][$name])) {
     $apache = $agent_data['app'][$name];
 } else {
-    $options = '-Oqv';
     $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.6.97.112.97.99.104.101';
-    $apache = snmp_get($device, $oid, $options);
+    $apache = SnmpQuery::get($oid)->value();
 }
 
-$apache_data = explode("\n", $apache);
+$apache_data = explode("\n", (string) $apache);
 if (count($apache_data) !== 20) {
     echo " Incorrect number of datapoints returned from device, skipping\n";
 
@@ -76,5 +75,5 @@ $tags = [
     'rrd_name' => ['app', $name, $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, $apache, $fields);

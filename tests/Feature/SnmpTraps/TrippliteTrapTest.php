@@ -1,4 +1,5 @@
 <?php
+
 /*
  * TrippliteTrapTest.php
  *
@@ -27,7 +28,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class TrippliteTrapTest extends SnmpTrapTestCase
+final class TrippliteTrapTest extends SnmpTrapTestCase
 {
     public function testTlpNotificationsAlarmEntryAdded(): void
     {

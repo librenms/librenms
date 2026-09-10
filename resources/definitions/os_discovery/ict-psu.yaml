@@ -1,0 +1,4 @@
+modules:
+    os:
+        hardware: ICT-PLATINUM-MIB::deviceModel.0
+        version: ICT-PLATINUM-MIB::deviceFirmware.0

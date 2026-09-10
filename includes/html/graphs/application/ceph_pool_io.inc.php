@@ -7,11 +7,7 @@ $out_text = 'Write';
 
 $format = 'bytes';
 
-$ceph_pool_rrd = Rrd::name($device['hostname'], ['app', 'ceph', $app->app_id, 'pool', $vars['pool']]);
-
-if (Rrd::checkRrdExists($ceph_pool_rrd)) {
-    $rrd_filename = $ceph_pool_rrd;
-}
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'ceph', $app->app_id, 'pool', $vars['pool']]);
 
 $colour_area_in = 'FF3300';
 $colour_line_in = 'FF0000';

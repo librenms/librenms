@@ -13,7 +13,7 @@ IMPORTS
         FROM ARICENT-ISS-MIB;
 
 eltMesIssEnvMIB MODULE-IDENTITY
-    LAST-UPDATED "202106230000Z"
+    LAST-UPDATED "202412040000Z"
     ORGANIZATION "Eltex Enterprise, Ltd."
     CONTACT-INFO
         "eltex-co.ru"
@@ -28,6 +28,8 @@ eltMesIssEnvMIB MODULE-IDENTITY
     DESCRIPTION "Added eltMesIssEnvFan object."
     REVISION "202106230000Z"
     DESCRIPTION "Added eltMesIssEnvFanThresholdTable object."
+    REVISION "202412040000Z"
+    DESCRIPTION "Added eltMesIssEnvOverheatStatus, eltMesIssEnvOverheatDeviceTemp, eltMesIssEnvOverheatThreshold objects."
     ::= { eltMesIss 12 }
 
 -- Top level MIB structure
@@ -43,6 +45,7 @@ eltMesIssEnvBattery     OBJECT IDENTIFIER ::= { eltMesIssEnvObjects 3 }
 eltMesIssEnvDyingGasp   OBJECT IDENTIFIER ::= { eltMesIssEnvObjects 4 }
 eltMesIssEnvFan         OBJECT IDENTIFIER ::= { eltMesIssEnvObjects 5 }
 eltMesIssEnvPowerSource OBJECT IDENTIFIER ::= { eltMesIssEnvObjects 6 }
+eltMesIssEnvTempSensor  OBJECT IDENTIFIER ::= { eltMesIssEnvObjects 7 }
 
 eltMesIssEnvNotificationsPrefix  OBJECT IDENTIFIER ::= { eltMesIssEnvNotifications 0 }
 
@@ -62,6 +65,43 @@ EltMesIssBatteryState ::= TEXTUAL-CONVENTION
         discharge(5),
         operational(6)
     }
+
+EltMesIssOverheatState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "States of the overheat process."
+    SYNTAX  INTEGER {
+        overheat(1),
+        cooldown(2)
+    }
+
+-- -----------------------------------------------------------------------------
+-- Overheat global configuration
+-- -----------------------------------------------------------------------------
+
+eltMesIssEnvOverheatStatus OBJECT-TYPE
+    SYNTAX      EltMesIssOverheatState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Status of the overheat process."
+    ::= { eltMesIssEnvTempSensor 2 }
+
+eltMesIssEnvOverheatDeviceTemp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current device temperature from max heated sensor."
+    ::= { eltMesIssEnvTempSensor 3 }
+
+eltMesIssEnvOverheatThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed temperature for device."
+    ::= { eltMesIssEnvTempSensor 4 }
 
 -- -----------------------------------------------------------------------------
 -- Dry Contacts global configuration
@@ -429,5 +469,20 @@ eltMesIssEnvFanStatusTrap NOTIFICATION-TYPE
     DESCRIPTION
         "Fan status notification trap message."
     ::= { eltMesIssEnvNotificationsPrefix 3 }
+
+-- -----------------------------------------------------------------------------
+-- Overheat trap notify
+-- -----------------------------------------------------------------------------
+
+eltMesIssEnvOverheatTrap NOTIFICATION-TYPE
+    OBJECTS  {
+        eltMesIssEnvOverheatStatus,
+        eltMesIssEnvOverheatDeviceTemp,
+        eltMesIssEnvOverheatThreshold
+    }
+    STATUS   current
+    DESCRIPTION
+        "Device overheat trap message."
+    ::= { eltMesIssEnvNotificationsPrefix 5 }
 
 END

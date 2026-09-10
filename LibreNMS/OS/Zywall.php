@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Zywall.php
  *
@@ -53,7 +54,7 @@ class Zywall extends Zyxel implements OSDiscovery, OSPolling
             $fields = [
                 'sessions' => $sessions,
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'zywall-sessions', $tags, $fields);
             $this->enableGraph('zywall_sessions');
         }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Categorizer.php
  *
@@ -27,17 +28,13 @@ namespace LibreNMS\Util;
 
 class Categorizer
 {
-    protected $items;
     protected $categorized = [];
     protected $categories = [];
     protected $skippable;
 
-    public function __construct($items = [])
+    public function __construct(protected $items = [])
     {
-        $this->skippable = function ($item) {
-            return false;
-        };
-        $this->items = $items;
+        $this->skippable = (fn ($item) => false);
     }
 
     public function addCategory(string $category, callable $function)

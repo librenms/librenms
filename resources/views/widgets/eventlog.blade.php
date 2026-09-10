@@ -22,6 +22,8 @@
             post: function ()
             {
                 return {
+                    @if($message_filter) message: "{{ $message_filter }}", @endif
+                    @if($age) age: "{{ LibreNMS\Util\Time::durationToSeconds($age) }}", @endif
                     device: "{{ $device }}",
                     device_group: "{{ $device_group }}",
                     eventtype: "{{ $eventtype }}"

@@ -27,49 +27,65 @@ ksort($interface_client_map);
 
 print_optionbar_start();
 
-$label =
+$label = 'All Interfaces';
+$link = generate_link($label, $link_array);
+
+$link =
     (! isset($vars['wg_page']) && ! isset($vars['interface']))
-            ? '<span class="pagemenu-selected">All Interfaces</span>'
-            : 'All Interfaces';
-echo generate_link($label, $link_array);
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+echo $link;
+
 if (count($returned_data) > 0) {
     echo ' | ';
-    $label =
+    $label = 'Details';
+    $link = generate_link($label, $link_array, ['wg_page' => 'details']);
+
+    $link =
         $vars['wg_page'] == 'details'
-        ? '<span class="pagemenu-selected">Details</span>'
-        : 'Details';
-    echo generate_link($label, $link_array, ['wg_page' => 'details']);
+        ? '<span class="pagemenu-selected">' . $link . '</span>'
+        : $link;
+    echo $link;
 }
 echo ' | Interfaces: ';
 
 // generate interface links on the host application page
 $i = 0;
 foreach ($interface_client_map as $interface => $client_list) {
-    $interface = htmlspecialchars($interface);
+    $interface = htmlspecialchars((string) $interface);
+    $label = $interface;
+    $link = generate_link($label, $link_array, ['interface' => $interface]);
 
-    $label =
+    $link =
         ($vars['interface'] == $interface && ! isset($vars['wg_page']))
-            ? '<span class="pagemenu-selected">' . $interface . '</span>'
-            : $interface;
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
 
-    echo generate_link($label, $link_array, ['interface' => $interface]);
+    echo $link;
 
     echo '(';
 
-    $label =
-        ($vars['interface'] == $interface && $vars['wg_page'] == 'peer_bw')
-            ? '<span class="pagemenu-selected">' . 'BW' . '</span>'
-            : 'BW';
+    $label = 'BW';
+    $link = generate_link($label, $link_array, ['interface' => $interface, 'wg_page' => 'peer_bw']);
 
-    echo generate_link($label, $link_array, ['interface' => $interface, 'wg_page' => 'peer_bw']);
+    $link =
+        ($vars['interface'] == $interface && $vars['wg_page'] == 'peer_bw')
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+
+    echo $link;
 
     echo ', ';
 
-    $label =
+    $label = 'Last';
+    $link = generate_link($label, $link_array, ['interface' => $interface, 'wg_page' => 'peer_last']);
+
+    $link =
         ($vars['interface'] == $interface && $vars['wg_page'] == 'peer_last')
-            ? '<span class="pagemenu-selected">' . 'Last' . '</span>'
-            : 'Last';
-    echo generate_link($label, $link_array, ['interface' => $interface, 'wg_page' => 'peer_last']);
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+
+    echo $link;
 
     echo ')';
 
@@ -86,14 +102,18 @@ if (isset($vars['interface']) && isset($interface_client_map[$vars['interface']]
 
     $i = 0;
     echo '<br>Peers: ';
-    foreach ($interface_client_map[$vars['interface']] as $peer_key => $peer) {
-        $peer = htmlspecialchars($peer);
+    foreach ($interface_client_map[$vars['interface']] as $peer) {
+        $peer = htmlspecialchars((string) $peer);
 
-        $label =
+        $label = $peer;
+        $link = generate_link($label, $link_array, ['interface' => $interface, 'client' => $peer]);
+
+        $link =
             $vars['client'] == $peer
-            ? '<span class="pagemenu-selected">' . $peer . '</span>'
-            : $peer;
-        echo generate_link($label, $link_array, ['interface' => $interface, 'client' => $peer]);
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+
+        echo $link;
 
         if ($i < count(array_keys($interface_client_map[$vars['interface']])) - 1) {
             echo ', ';
@@ -138,12 +158,12 @@ if (isset($vars['interface']) &&
             'device_id' => $port->device_id,
         ]) . "<br>\n";
     } else {
-        echo htmlspecialchars($vars['interface']) . "<br>\n";
+        echo htmlspecialchars((string) $vars['interface']) . "<br>\n";
     }
     echo 'Endpoint Host: ';
-    if (preg_match('/^[\:A-Fa-f0-9]+$/', $peer['endpoint_host'])) {
+    if (preg_match('/^[\:A-Fa-f0-9]+$/', (string) $peer['endpoint_host'])) {
         $ip_info = Ipv6Address::firstWhere(['ipv6_address' => $peer['endpoint_host']]);
-    } elseif (preg_match('/^[\.0-9]+$/', $peer['endpoint_host'])) {
+    } elseif (preg_match('/^[\.0-9]+$/', (string) $peer['endpoint_host'])) {
         $ip_info = Ipv4Address::firstWhere(['ipv4_address' => $peer['endpoint_host']]);
     }
     if (isset($ip_info)) {
@@ -156,21 +176,21 @@ if (isset($vars['interface']) &&
                 'device_id' => $port->device_id,
             ]) . ")<br>\n";
     } else {
-        echo htmlspecialchars($peer['endpoint_host']) . "<br>\n";
+        echo htmlspecialchars((string) $peer['endpoint_host']) . "<br>\n";
     }
-    echo 'Endpoint Port: ' . htmlspecialchars($peer['endpoint_port']) . "<br>\n";
-    echo 'Minutes Since Last Handshake: ' . htmlspecialchars($peer['minutes_since_last_handshake']) . "<br>\n";
+    echo 'Endpoint Port: ' . htmlspecialchars((string) $peer['endpoint_port']) . "<br>\n";
+    echo 'Minutes Since Last Handshake: ' . htmlspecialchars((string) $peer['minutes_since_last_handshake']) . "<br>\n";
     echo 'Allowed IPs: ';
     $allowed_ips = '';
     if (isset($peer['allowed_ips']) && ! is_null($peer['allowed_ips']) && is_array($peer['allowed_ips'])) {
-        foreach ($peer['allowed_ips'] as $allowed_ips_key => $allowed_ip) {
+        foreach ($peer['allowed_ips'] as $allowed_ip) {
             $ip_found = false;
-            if (preg_match('/^[\:A-Fa-f0-9]+$/', $allowed_ip)) {
+            if (preg_match('/^[\:A-Fa-f0-9]+$/', (string) $allowed_ip)) {
                 $ip_info = Ipv6Address::firstWhere(['ipv6_address' => $allowed_ip]);
                 if (isset($ip_info)) {
                     $ip_found = true;
                 }
-            } elseif (preg_match('/^[\.0-9]+$/', $allowed_ip)) {
+            } elseif (preg_match('/^[\.0-9]+$/', (string) $allowed_ip)) {
                 $ip_info = Ipv4Address::firstWhere(['ipv4_address' => $allowed_ip]);
                 if (isset($ip_info)) {
                     $ip_found = true;
@@ -192,9 +212,9 @@ if (isset($vars['interface']) &&
                 }
             } else {
                 if ($allowed_ips == '') {
-                    $allowed_ips = htmlspecialchars($allowed_ip);
+                    $allowed_ips = htmlspecialchars((string) $allowed_ip);
                 } else {
-                    $allowed_ips = $allowed_ips . ', ' . htmlspecialchars($allowed_ip);
+                    $allowed_ips = $allowed_ips . ', ' . htmlspecialchars((string) $allowed_ip);
                 }
             }
         }
@@ -278,14 +298,14 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
             // build string of allowed IPs
             $allowed_ips = '';
             if (isset($peer['allowed_ips']) && ! is_null($peer['allowed_ips']) && is_array($peer['allowed_ips'])) {
-                foreach ($peer['allowed_ips'] as $allowed_ips_key => $allowed_ip) {
+                foreach ($peer['allowed_ips'] as $allowed_ip) {
                     $ip_found = false;
-                    if (preg_match('/^[\:A-Fa-f0-9]+$/', $allowed_ip)) {
+                    if (preg_match('/^[\:A-Fa-f0-9]+$/', (string) $allowed_ip)) {
                         $ip_info = Ipv6Address::firstWhere(['ipv6_address' => $allowed_ip]);
                         if (isset($ip_info)) {
                             $ip_found = true;
                         }
-                    } elseif (preg_match('/^[\.0-9]+$/', $allowed_ip)) {
+                    } elseif (preg_match('/^[\.0-9]+$/', (string) $allowed_ip)) {
                         $ip_info = Ipv4Address::firstWhere(['ipv4_address' => $allowed_ip]);
                         if (isset($ip_info)) {
                             $ip_found = true;
@@ -307,14 +327,14 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
                         }
                     } else {
                         if ($allowed_ips == '') {
-                            $allowed_ips = htmlspecialchars($allowed_ip);
+                            $allowed_ips = htmlspecialchars((string) $allowed_ip);
                         } else {
-                            $allowed_ips = $allowed_ips . ', ' . htmlspecialchars($allowed_ip);
+                            $allowed_ips = $allowed_ips . ', ' . htmlspecialchars((string) $allowed_ip);
                         }
                     }
                 }
             }
-            $peer['pubkey'] = generate_link(htmlspecialchars($peer['pubkey']), $link_array, ['interface' => $returned_data_key, 'client' => $interface_key]);
+            $peer['pubkey'] = generate_link(htmlspecialchars((string) $peer['pubkey']), $link_array, ['interface' => $returned_data_key, 'client' => $interface_key]);
             $row = [
                 ['data' => $name, 'raw' => $name_raw],
                 ['data' => $interface_info, 'raw' => $interface_info_raw],
@@ -345,7 +365,7 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
             'interface' => $vars['interface'],
         ],
     ];
-    foreach ($interface_client_map[$vars['interface']] as $peer_key => $peer) {
+    foreach ($interface_client_map[$vars['interface']] as $peer) {
         $graphs['peer_bw_' . $peer] = [
             'type' => 'wireguard_traffic',
             'description' => 'Peer Traffic, ' . $vars['interface'] . ' - ' . $peer,
@@ -355,7 +375,7 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
     }
 } elseif (isset($vars['interface']) && ! isset($vars['client']) && $vars['wg_page'] == 'peer_last') {
     $graphs = [];
-    foreach ($interface_client_map[$vars['interface']] as $peer_key => $peer) {
+    foreach ($interface_client_map[$vars['interface']] as $peer) {
         $graphs['peer_last_' . $peer] = [
             'type' => 'wireguard_time',
             'description' => 'Peer Minutes Since Last Handshake , ' . $vars['interface'] . ' - ' . $peer,

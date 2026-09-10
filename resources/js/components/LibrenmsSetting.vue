@@ -51,7 +51,9 @@
 </template>
 
 <script>
-    export default {
+import _ from "lodash";
+
+export default {
         name: "LibrenmsSetting",
         props: {
             'setting': {type: Object, required: true},
@@ -79,7 +81,9 @@
                     .catch((error) => {
                         this.feedback = 'has-error';
                         this.updateStatus = 'error';
-                        toastr.error(error.response.data.message);
+                        let span = document.createElement('span');
+                        span.textContent = error.response.data.message;
+                        toastr.error(span);
 
                         // don't reset certain types back to actual value on error
                         const ignore = [
@@ -161,7 +165,7 @@
                 const component = 'Setting' +  this.setting.type.toString()
                     .replace(/(-[a-z]|^[a-z])/g, (group) => group.toUpperCase().replace('-', ''));
 
-                return typeof Vue.options.components[component] !== 'undefined' ? component : 'SettingNull';
+                return typeof this.$options.components[component] !== 'undefined' ? component : SettingNull;
             }
         }
     }

@@ -14,7 +14,7 @@ echo generate_link('Stats', $link_array, ['nfsen' => 'stats']);
 
 $printedChannel = false;
 $nfsen_hostname = nfsen_hostname($device['hostname']);
-foreach (\LibreNMS\Config::get('nfsen_rrds') as $nfsenDir) {
+foreach (\App\Facades\LibrenmsConfig::get('nfsen_rrds') as $nfsenDir) {
     $hostDir = $nfsenDir . '/' . $nfsen_hostname . '/';
     if (is_dir($hostDir)) {
         $nfsenRRDchannelGlob = $hostDir . '*.rrd';
@@ -39,12 +39,10 @@ foreach (\LibreNMS\Config::get('nfsen_rrds') as $nfsenDir) {
 
 print_optionbar_end();
 
-if (! $vars['nfsen']) {
-    $vars['nfsen'] = 'general';
-}
+$nfsen = basename((string) ($vars['nfsen'] ?? 'general'));
 
-if (is_file('includes/html/pages/device/nfsen/' . $vars['nfsen'] . '.inc.php')) {
-    include 'includes/html/pages/device/nfsen/' . $vars['nfsen'] . '.inc.php';
+if (is_file('includes/html/pages/device/nfsen/' . $nfsen . '.inc.php')) {
+    include 'includes/html/pages/device/nfsen/' . $nfsen . '.inc.php';
 } else {
     include 'includes/html/pages/device/nfsen/general.inc.php';
 }

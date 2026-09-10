@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Aos6CfgSavedTrap.php
  *

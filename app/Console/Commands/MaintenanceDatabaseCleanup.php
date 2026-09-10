@@ -9,7 +9,7 @@ use Exception;
 
 class MaintenanceDatabaseCleanup extends LnmsCommand
 {
-    protected $name = 'maintenance:database-cleanup';
+    protected $name = 'maintenance:cleanup-database';
 
     /**
      * Create a new command instance.
@@ -26,7 +26,7 @@ class MaintenanceDatabaseCleanup extends LnmsCommand
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         try {
             // Delete all orphaned alerts and return the number of rows deleted

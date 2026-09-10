@@ -20,7 +20,7 @@ try {
 } catch (JsonAppMissingKeysException $e) {
     $dhcpstats = $e->getParsedJson();
     $output = 'ERROR';
-} catch (JsonAppException $e) {
+} catch (JsonAppException) {
     $dhcpstats = snmp_walk($device, $oid, $options, $mib);
 }
 
@@ -37,7 +37,7 @@ if ($version == 1) {
 $metrics = [];
 $category = 'stats';
 if (intval($version) == 1) {
-    [$dhcp_total, $dhcp_active, $dhcp_expired, $dhcp_released, $dhcp_abandoned, $dhcp_reset, $dhcp_bootp, $dhcp_backup, $dhcp_free] = explode("\n", $dhcpstats);
+    [$dhcp_total, $dhcp_active, $dhcp_expired, $dhcp_released, $dhcp_abandoned, $dhcp_reset, $dhcp_bootp, $dhcp_backup, $dhcp_free] = explode("\n", (string) $dhcpstats);
 } elseif ($version >= 2) {
     $lease_data = $dhcpstats['leases'];
 
@@ -78,7 +78,7 @@ $fields = [
 $metrics[$name . '_' . $category] = $fields;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 if ($version >= 2) {
     $category = 'pools';
@@ -105,7 +105,7 @@ if ($version >= 2) {
 
         $metrics[$dhcp_pool_name . '_' . $category] = $fields;
         $tags = ['name' => $dhcp_pool_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
     }
 
     $category = 'networks';
@@ -132,7 +132,7 @@ if ($version >= 2) {
 
         $metrics[$dhcp_network_name . '_' . $category] = $fields;
         $tags = ['name' => $dhcp_network_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
     }
 }
 

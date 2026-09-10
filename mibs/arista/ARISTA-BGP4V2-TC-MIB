@@ -11,7 +11,7 @@
          TEXTUAL-CONVENTION FROM SNMPv2-TC;
 
          aristaBgp4V2TC MODULE-IDENTITY
-             LAST-UPDATED "201408150000Z"
+             LAST-UPDATED "202012290000Z"
              ORGANIZATION "Arista Networks, Inc."
              CONTACT-INFO
                  "Arista Networks, Inc.
@@ -27,15 +27,19 @@
                       This version was published in
                       draft-ietf-idr-bgp4-mibv2-13, and
                       modified to be homed inside the Arista
-                      enterprise.  There were no other
-                      modifications.
-
+                      enterprise.
 
                       Copyright (C) The IETF Trust (2011).  This
                       version of this MIB module is part of
                       draft-ietf-idr-bgp4-mibv2-13.txt;
                       see the draft itself for full legal notices."
 
+            REVISION "202012290000Z"
+            DESCRIPTION
+                   "Added AFI and SAFI for EVPN for use in
+                    aristaBgp4V2PrefixGaugesTable and
+                    AristaBgp4V2EvpnNlriTC for use in
+                    aristaBgp4V2PrefixEvpnNlriGaugesTable."
              REVISION "201408150000Z"
              DESCRIPTION
                     "Updated postal and e-mail addresses."
@@ -74,20 +78,42 @@
              "RFC 4760, Section 3"
          SYNTAX INTEGER {
                  ipv4(1),
-                 ipv6(2)
+                 ipv6(2),
+                 l2vpn(25)
              }
 
      AristaBgp4V2SubsequentAddressFamilyIdentifierTC ::= TEXTUAL-CONVENTION
          STATUS       current
          DESCRIPTION
-             "The representation of a BGP SAFI"
+             "The representation of a BGP SAFI."
          REFERENCE
              "RFC 4760, Section 3.  The value of this object should be
               restricted to be between the values of 0 and 255."
          SYNTAX INTEGER {
                  unicast(1),
                  multicast(2),
-                 mpls(4)
+                 mpls(4),
+                 evpn(70)
+             }
+
+     AristaBgp4V2EvpnNlriTC ::= TEXTUAL-CONVENTION
+         STATUS       current
+         DESCRIPTION
+             "The representation of an EVPN NLRI type."
+         REFERENCE
+             "RFC 4760, Section 3. For EVPN route types see
+              https://www.iana.org/assignments/evpn/evpn.xhtml."
+         SYNTAX INTEGER {
+                 autoDiscovery(1),
+                 macIp(2),
+                 imet(3),
+                 ethernetSegment(4),
+                 ipPrefixIpv4(5),
+                 ipPrefixIpv6(6),
+                 smet(7),
+                 joinSync(8),
+                 leaveSync(9),
+                 spmsi(10)
              }
 
  END

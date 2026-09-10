@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DatabaseController.php
  *
@@ -58,12 +59,12 @@ class DatabaseController extends InstallationController implements InstallerStep
     {
         Eloquent::setConnection(
             'setup',
-            $request->get('host', 'localhost'),
-            $request->get('username', 'librenms'),
-            $request->get('password', ''),
-            $request->get('database', 'librenms'),
-            $request->get('port', 3306),
-            $request->get('unix_socket')
+            $request->input('host', 'localhost'),
+            $request->input('username', 'librenms'),
+            $request->input('password', ''),
+            $request->input('database', 'librenms'),
+            $request->input('port', 3306),
+            $request->input('unix_socket')
         );
 
         session()->put('db', Arr::only(config('database.connections.setup', []), self::KEYS));
@@ -98,12 +99,13 @@ class DatabaseController extends InstallationController implements InstallerStep
 
     public function migrate(Request $request)
     {
-        $response = new StreamedResponse(function () {
+        $response = new StreamedResponse(function (): void {
             try {
                 $this->configureDatabase();
                 $output = new StreamedOutput(fopen('php://stdout', 'w'));
                 echo "Starting Update...\n";
-                $ret = \Artisan::call('migrate', ['--seed' => true, '--force' => true, '--no-ansi' => true, '--no-interaction' => true, '--schema-path' => database_path('schema/mysql-schema.dump')], $output);
+                $schema_file = database_path('schema/mysql-schema.sql');
+                $ret = \Artisan::call('migrate', ['--seed' => true, '--force' => true, '--no-ansi' => true, '--no-interaction' => true, '--schema-path' => $schema_file], $output);
                 if ($ret !== 0) {
                     throw new \RuntimeException('Migration failed');
                 }

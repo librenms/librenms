@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OspfNbrStateChangeTest.php
  *
@@ -35,7 +36,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class OspfNbrStateChangeTest extends SnmpTrapTestCase
+final class OspfNbrStateChangeTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

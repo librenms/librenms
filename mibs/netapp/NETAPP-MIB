@@ -6,9 +6,9 @@
 	-- not included in this file.                               --
 	-- =======================================================  --
 
-	-- Version 2.13, February 2021 (See NOTE below)
+	-- Version 2.22, January 2023 (See NOTE below)
 
-	-- Copyright (c) 1995-2021 NetApp, Inc.
+	-- Copyright (c) 1995-2023 NetApp, Inc.
 	-- All rights reserved.
 
 	-- This NetApp SNMP Management Information Base
@@ -93,7 +93,7 @@
 		        FROM SNMP-FRAMEWORK-MIB;
 
         netappModuleId  MODULE-IDENTITY
-	LAST-UPDATED      "202102030000Z"
+	LAST-UPDATED      "202301170000Z"
         ORGANIZATION      "NetApp"
         CONTACT-INFO      "www.netapp.com"
         DESCRIPTION       "The mib module for NetApp SNMPv2 entities"
@@ -1077,6 +1077,8 @@
 	productVendor                   OBJECT-TYPE
 	SYNTAX                          INTEGER {
                                              netapp(1),
+                                             ibm(2),
+                                             dell(3),
                                              lenovo(4),
                                              fujitsu(5)
                                         }
@@ -21987,7 +21989,20 @@
 					    finalizing(9),
 					    resyncing(10),
 					    aborting(11),
-					    breaking(12)
+					    breaking(12),
+					    deleting(13),
+					    releasing(14),
+					    outOfSync(15),
+					    preCutover(16),
+					    cutover(17),
+					    inSync(18),
+					    transitioning(19),
+					    fastTransferring(20),
+					    inSyncDuplex(21),
+					    readyForCutoverPreCommit(22),
+					    cutoverPreCommitting(23),
+					    cuttingOver(24),
+					    waitingForAbort(25)
                                         }
 	MAX-ACCESS                      read-only
 	STATUS                          current

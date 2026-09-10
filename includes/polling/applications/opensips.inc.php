@@ -11,11 +11,11 @@ if (! empty($agent_data[$name])) {
     $mib = 'NET-SNMP-EXTEND-MIB';
 
     $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.111.112.101.110.115.105.112.115';
-    $rawdata = snmp_get($device, $oid, $options, $mib);
+    $rawdata = SnmpQuery::get($oid)->value();
 }
 
 // Format Data
-$lines = explode("\n", $rawdata);
+$lines = explode("\n", (string) $rawdata);
 
 $opensips = [];
 
@@ -48,6 +48,6 @@ $tags = [
     'rrd_def' => $rrd_def,
 ];
 
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 update_application($app, $rawdata, $fields);

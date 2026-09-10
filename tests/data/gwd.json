@@ -3883,33 +3883,49 @@
                 {
                     "state_name": "devFanAlarmStatus",
                     "state_descr": "Normal",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "devFanAlarmStatus",
                     "state_descr": "Abnormal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerRunStatus",
                     "state_descr": "Normal",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "powerRunStatus",
                     "state_descr": "Abnormal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 }
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.200.12.2",
+                    "ipv4_prefixlen": 23,
+                    "context_name": "",
+                    "ipv4_network": "10.200.12.0/23",
+                    "ifIndex": 135938048
+                },
+                {
+                    "ipv4_address": "172.16.1.1",
+                    "ipv4_prefixlen": 17,
+                    "context_name": "",
+                    "ipv4_network": "172.16.0.0/17",
+                    "ifIndex": 134266880
+                }
+            ]
+        }
     }
 }

@@ -21,7 +21,7 @@ if (is_numeric($hrSystemProcesses)) {
         'procs' => $hrSystemProcesses,
     ];
 
-    data_update($device, 'hr_processes', $tags, $fields);
+    app('Datastore')->put($device, 'hr_processes', $tags, $fields);
 
     $os->enableGraph('hr_processes');
     echo ' Processes';
@@ -35,7 +35,7 @@ if (is_numeric($hrSystemNumUsers)) {
         'users' => $hrSystemNumUsers,
     ];
 
-    data_update($device, 'hr_users', $tags, $fields);
+    app('Datastore')->put($device, 'hr_users', $tags, $fields);
 
     HrSystem::updateOrCreate(['device_id' => $device['device_id']], [
         'hrSystemNumUsers' => $hrSystemNumUsers,

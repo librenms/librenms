@@ -1,7 +1,5 @@
 <?php
 
-$class = 'load';
-$unit = '%%';
-$unit_long = 'Load';
+$class = \LibreNMS\Enum\Sensor::Load;
 
 require 'includes/html/graphs/device/sensor.inc.php';

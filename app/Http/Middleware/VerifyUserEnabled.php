@@ -12,12 +12,12 @@ class VerifyUserEnabled
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && ! Auth::user()->enabled) {
+        if ($request->user() !== null && ! $request->user()->enabled) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();

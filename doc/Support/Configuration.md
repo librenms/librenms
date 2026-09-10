@@ -1,38 +1,78 @@
 # Configuration Docs
 
-LibreNMS configuration is a set of key values.
+## Configuration location
 
-The config is stored in two places:
-Database: This applies to all pollers and can be set with either `lnms config:set` or in the Web UI. Database config takes precedence over config.php.
-config.php: This applies to the local poller only.  Configs set here will be disabled in the Web UI to prevent unexpected behaviour.
+LibreNMS keeps the configuration in one of two places:
 
-The LibreNMS uses dot notation for config items:
+- Database: this configuration applies to all pollers. Set it with
+`lnms config:set <setting> <value>` or in the web interface. The
+database configuration has preference over `config.php`. It is the
+preferred option.
 
-| Database | config.php |
-| -------- | ---------- |
-| `snmp.community` | `$config['snmp']['community']` |
-| `snmp.community.+` | `$config['snmp']['community'][]` |
-| `snmp.v3.0.authalgo` | `$config['snmp']['v3'][0]['authalgo']` |
+- `config.php`: this configuration applies only to the local poller. A
+setting here becomes read-only in the web interface. This behaviour
+prevents an unexpected result.
 
-> The documentation has not been updated to reflect using `lnms config:set` to
-> set config items, but it will work for all settings.  Not all settings have
-> been defined in LibreNMS, but they can still be set with the `--ignore-checks`
-> option.  Without that option input is checked for correctness, that does not
-> mean it is not possible to set bad values.  Please report missing settings.
+## Configuration format
+
+In the database, LibreNMS uses dot notation for the configuration
+items. In `config.php`, LibreNMS uses a PHP array under `$config`. The
+example below shows some SNMP configuration in both formats:
+
+=== "Database"
+    `snmp.community`
+
+    `snmp.community.+`
+
+    `snmp.v3.0.authalgo`
+
+=== "config.php"
+    `$config['snmp']['community']`
+
+    `$config['snmp']['community'][]`
+
+    `$config['snmp']['v3'][0]['authalgo']`
 
 ## CLI
-`lnms config:get` will fetch the current config settings (composite of database, config.php, and defaults).  
-`lnms config:set` will set the config setting in the database.  Calling `lnms config:set` on a setting with no value will reset it to the default value.
+`lnms config:get <setting>` returns the current configuration settings.
+These settings combine the database, `config.php`, and the defaults.  
+`lnms config:set <setting> <value>` sets the configuration setting in the database.
+`lnms config:set <setting>` without a value asks you to reset the
+setting to its default.
 
-If you set up bash completion, you can use tab completion to find config settings.
+Parameters are:
+```
+    <setting>   dot notation of config item
+                trailing .+ instructs to append <value> to existing value
+
+    <value>     JSON formatted config value
+                string, number, true and false are all valid JSON value
+```
+
+With bash completion, you can use the tab key to find configuration settings.
+
+!!! note
+    Some documentation still shows `config.php` instead of
+    `lnms config:set`. The `lnms config:set` command works and is the
+    preferred option.
+
+    LibreNMS does not define all configuration settings. You can set an
+    undefined setting with the `--ignore-checks` option. Without this
+    option, LibreNMS validates the input. With `--ignore-checks`, take
+    care with bad values.
+
+    Please report a missing setting.
 
 ### Getting a list of all current values
 
-To get a complete list of all the current values, you can use the command `lnms config:get --dump`. The output may not be desirable, so you can use the `jq` package to pretty print it. Then it would be `lnms config:get --dump | jq`.
+For a complete list of the current values, run `lnms config:get --dump`.
+For a more readable output, use the `jq` package:
+`lnms config:get --dump | jq`.
 
 Example output:
-```
-librenms@librenms:~$ lnms config:get --dump | jq 
+
+```bash
+lnms config:get --dump | jq 
 {
   "install_dir": "/opt/librenms",
   "active_directory": {
@@ -60,12 +100,13 @@ librenms@librenms:~$ lnms config:get --dump | jq
 
 ### Examples
 
+These are some examples:
+
 ```bash
 lnms config:get snmp.community
   [
       "public"
   ]
-
 
 lnms config:set snmp.community.+ testing
 
@@ -107,13 +148,33 @@ lnms config:get snmp.community
   ]
 ```
 
+Use `| jq -c` to put a multi-line configuration item on a single line. This format helps with the set commands. For example:
+
+```bash
+lnms config:get snmp.community | jq -c
+["public","testing"]
+```
+
+To keep a multi-line item in the format of `lnms config:get`, use this format. It is easier to read:
+```bash
+lnms config:set snmp.community \
+'
+[
+    "public",
+    "testing"
+]
+'
+```
+
 ## Pre-load configuration
 
-This feature is primarily for docker images and other automation.
-When installing LibreNMS for the first time with a new database you can place yaml key value files
-in `database/seeders/config` to pre-populate the config database.
+This feature is mainly for docker images and other automation.
+At the first installation of LibreNMS with a new database, you can put
+YAML key value files in `database/seeders/config`. These files fill the
+configuration database.
 
-Example snmp.yaml
+Example snmp.yaml:
+
 ```yaml
 snmp.community:
     - public
@@ -121,24 +182,32 @@ snmp.community:
 snmp.max_repeaters: 30
 ```
 
+!!! danger
+    The example above uses the correct flat notation. Do **NOT** create a
+    block for `snmp` with the subkeys `community` and `max_repeaters`.
+    Such a block overwrites the whole `snmp` block and leaves only those
+    two subkeys. The configuration keys in your `seeders` file must match
+    the keys in `resources/definitions/config_definitions.json`.
+
 ## Directories
 
 ```bash
 lnms config:set temp_dir /tmp
 ```
 
-The temporary directory is where images and other temporary files are
-created on your filesystem.
+LibreNMS creates images and other temporary files in the temporary
+directory on your filesystem.
 
 ```bash
 lnms config:set log_dir /opt/librenms/logs
 ```
 
-Log files created by LibreNMS will be stored within this directory.
+LibreNMS keeps its log files in this directory.
 
 ## Database config
 
-Set these variables either in .env (/opt/librenms/.env by default) or in the environment.
+Set these variables in the `.env` file or in the environment. The
+default location of the file is `/opt/librenms/.env`.
 
 ```dotenv
 DB_HOST=127.0.0.1
@@ -147,13 +216,13 @@ DB_USERNAME=DBUSER
 DB_PASSWORD="DBPASS"
 ```
 
-Use non-standard port:
+To use a non-standard port:
 
 ```dotenv
 DB_PORT=3306
 ```
 
-Use a unix socket:
+To use a unix socket:
 
 ```dotenv
 DB_SOCKET=/run/mysqld/mysqld.sock
@@ -163,31 +232,27 @@ DB_SOCKET=/run/mysqld/mysqld.sock
 
 ### PHP Settings
 
-You can change the memory limits for php within `config.php`. The
-value is in Megabytes and should just be an int value:
+You can change the PHP memory limit in LibreNMS. The value is an
+integer in megabytes:
 
 `lnms config:set php_memory_limit 128`
 
 ### Programs
 
-A lot of these are self explanatory so no further information may be
-provided. Any extensions that have dedicated  documentation page will
-be linked to rather than having the config provided.
+Most of these settings need no more information. An extension with its
+own documentation page has a link instead of its configuration.
 
 #### RRDTool
 
-> You can configure these options within the WebUI now, please avoid
-> setting these options within config.php
->
-> Settings -> External Settings -> RRDTool Setup
+You can configure these options in the web interface:
 
 !!! setting "external/binaries"
     ```bash
     lnms config:set rrdtool /usr/bin/rrdtool
     ```
 
-Please see [1 Minute polling](1-Minute-Polling.md) for information on
-configuring your install to record data more frequently.
+To record data more often, read [1 Minute
+polling](1-Minute-Polling.md).
 
 #### fping
 
@@ -207,48 +272,53 @@ configuring your install to record data more frequently.
 
 `fping` configuration options:
 
-* `timeout` (`fping` parameter `-t`): Amount of time that fping waits
-  for a response to its first request (in milliseconds). **See note
-  below**
-* `count` (`fping` parameter `-c`): Number of request packets to send
-  to each target.
-* `interval` (`fping` parameter `-p`): Time in milliseconds that fping
-  waits between successive packets to an individual target.
-* `tos` (`fping`parameter `-O`): Set the type of service flag (TOS). Value can be either decimal or hexadecimal (0xh) format. Can be used to ensure that ping packets are queued in following QOS mecanisms in the network. Table is accessible in the [TOS Wikipedia page](https://en.wikipedia.org/wiki/Type_of_service).
+* `timeout` (the `fping` parameter `-t`): the time in milliseconds that
+  fping waits for a response to its first request. **Read the note
+  below.**
+* `count` (the `fping` parameter `-c`): the number of request packets
+  to send to each target.
+* `interval` (the `fping` parameter `-p`): the time in milliseconds
+  that fping waits between two packets to the same target.
+* `tos` (the `fping` parameter `-O`): the type of service flag (TOS).
+  The value is in decimal or hexadecimal (0xh) format. Use this flag to
+  put the ping packets into a QOS queue in the network. The [TOS
+  Wikipedia page](https://en.wikipedia.org/wiki/Type_of_service) holds
+  the table of values.
 
-> NOTE: Setting a higher timeout value than the interval value can
-> lead to slowing down poller. Example:
->
-> timeout: 3000
->
-> count: 3
->
-> interval: 500
->
-> In this example, interval will be overwritten by the timeout value
-> of 3000 which is 3 seconds. As we send three icmp packets (count:
-> 3), each one is delayed by 3 seconds which will result in fping
-> taking > 6 seconds to return results.
+!!! note
+    A timeout value that is higher than the interval value makes the
+    poller slower. For example:
 
-You can disable the fping / icmp check that is done for a device to be
-determined to be up on a global or per device basis. **We don't advise
-disabling the fping / icmp check unless you know the impact, at worst
-if you have a large number of devices down then it's possible that the
-poller would no longer complete in 5 minutes due to waiting for snmp
-to timeout.**
+    timeout: 3000
 
-Globally disable fping / icmp check:
+    count: 3
 
-```bash
-lnms config:set icmp_check false
-```
+    interval: 500
 
-If you would like to do this on a per device basis then you can do so
-under Device -> Edit -> Misc -> Disable ICMP Test? On
+    In this example, the timeout value of 3000 overwrites the interval.
+    3000 milliseconds is 3 seconds. LibreNMS sends three ICMP packets
+    (count: 3), and each packet has a delay of 3 seconds. fping
+    therefore needs more than 6 seconds to return a result.
+
+LibreNMS uses an fping ICMP check to decide whether a device is up. You
+can disable this check globally or for one device. **Do not disable the
+ICMP check without full knowledge of the result. With many devices
+down, the poller waits for the SNMP timeouts. The poller can then take
+more than 5 minutes.**
+
+To disable the fping ICMP check globally:
+
+!!! setting "poller/ping"
+    ```bash
+    lnms config:set icmp_check false
+    ```
+
+To disable the check for one device, go to
+Device -> Edit -> Misc -> Disable ICMP Test and set it to On.
 
 #### SNMP
 
-SNMP program locations.
+These settings give the locations of the SNMP programs.
 
 !!! setting "external/binaries"
     ```bash
@@ -261,32 +331,32 @@ SNMP program locations.
 
 #### Misc binaries
 !!! setting "external/binaries"
-```bash
-lnms config:set whois /usr/bin/whois
-lnms config:set ping /bin/ping
-lnms config:set mtr /usr/bin/mtr
-lnms config:set nmap /usr/bin/nmap
-lnms config:set nagios_plugins /usr/lib/nagios/plugins
-lnms config:set ipmitool /usr/bin/ipmitool
-lnms config:set virsh /usr/bin/virsh
-lnms config:set dot /usr/bin/dot
-lnms config:set sfdp /usr/bin/sfdp
-```
+    ```bash
+    lnms config:set whois /usr/bin/whois
+    lnms config:set ping /bin/ping
+    lnms config:set mtr /usr/bin/mtr
+    lnms config:set nmap /usr/bin/nmap
+    lnms config:set nagios_plugins /usr/lib/nagios/plugins
+    lnms config:set ipmitool /usr/bin/ipmitool
+    lnms config:set virsh /usr/bin/virsh
+    ```
 
 ## Authentication
 
-Generic Authentication settings.
+These are the generic authentication settings.
 
-Password minimum length for auth that allows user creation
+This setting gives the minimum password length. It applies to the
+authentication methods that create users.
 
-```bash
-lnms config:set password.min_length 8
-```
+!!! setting "auth/general"
+    ```bash
+    lnms config:set password.min_length 8
+    ```
 
 ## Proxy support
 
-For alerting and the callback functionality, we support the use of a
-http proxy setting. These can be any one of the following:
+Alerting and the callback function support an HTTP proxy. Use one of
+these settings:
 
 !!! setting "system/proxy"
     ```bash
@@ -294,7 +364,7 @@ http proxy setting. These can be any one of the following:
     lnms config:set http_proxy proxy.domain.com
     ```
 
-We can also make use of one of these environment variables which can be set in `/etc/environment`:
+LibreNMS also accepts these environment variables. You can set them in `/etc/environment`:
 
 ```bash
 http_proxy=proxy.domain.com
@@ -303,101 +373,120 @@ https_proxy=proxy.domain.com
 
 ## RRDCached
 
-Please refer to [RRDCached](../Extensions/RRDCached.md)
+Read [RRDCached](../Extensions/RRDCached.md).
 
 ## WebUI Settings
 
-```bash
-lnms config:set base_url http://demo.librenms.org
-```
+!!! setting "system/server"
+    ```bash
+    lnms config:set base_url http://demo.librenms.org
+    ```
 
-LibreNMS will attempt to detect the URL you are using but you can override that here.
+LibreNMS tries to detect your URL. This setting overrides the detected value.
 
 !!! setting "webui/style"
     ```bash
     lnms config:set site_style light
     ```
 
-Currently we have a number of styles which can be set which will alter
-the navigation bar look. dark, light and mono with light being the default.
+Several styles change the look of the navigation bar. The styles are
+`device`, `blue`, `dark`, `light`, and `mono`. The default style is
+`light`.
 
-```bash
-lnms config:set webui.custom_css.+ css/custom/styles.css
-```
+Your own CSS stylesheet can override many visual elements. Put each
+custom CSS file into `html/css/custom`. The automatic updates then
+ignore these files. You can give any number of CSS files. The browser
+loads them in the order of your configuration.
 
-You can override a large number of visual elements by creating your
-own css stylesheet and referencing it here, place any custom css files
-into  `html/css/custom` so they will be ignored by auto updates. You
-can specify as many css files as you like, the order they are within
-your config will be the order they are loaded in the browser.
+!!! setting "webui/style"
+    ```bash
+    lnms config:set webui.custom_css.+ css/custom/styles.css
+    ```
+
+You can replace the default logo with your own logo. Put each custom
+image file into `html/images/custom`. The automatic updates then ignore
+these files.
 
 !!! setting "webui/style"
     ```bash
     lnms config:set title_image images/custom/yourlogo.png
     ```
 
-You can override the default logo with yours, place any custom images
-files into `html/images/custom` so they will be ignored by auto updates.
+This setting gives the page refresh interval in seconds. The default is
+5 minutes. Some pages never refresh, by design.
 
-```bash
-lnms config:set page_refresh 300
-```
+!!! setting "webui/general"
+    ```bash
+    lnms config:set page_refresh 300
+    ```
 
-Set how often pages are refreshed in seconds. The default is every 5
-minutes. Some pages don't refresh at all by design.
+To create your own front page, add a blade file in
+`resources/views/overview/custom/`. Then set `front_page` to the name
+of the file. For example, for the file
+`resources/views/overview/custom/foobar.blade.php`, set `front_page` to
+`foobar`.
 
+!!! setting "webui/front-page"
 ```bash
 lnms config:set front_page default
 ```
 
-You can create your own front page by adding a blade file in `resources/views/overview/custom/`
-and setting `front_page` to it's name.
-For example, if you create `resources/views/overview/custom/foobar.blade.php`, set `front_page` to `foobar`.
+This setting gives a global default dashboard page. It applies to each
+user without a dashboard in their user preferences. Set it to the
+`dashboard_id` of an existing dashboard with the state Shared, Shared
+(read), or Shared (Admin RW). Without this setting, LibreNMS creates an
+empty dashboard with the name `Default` for each user at their first
+login.
 
 !!! setting "webui/dashboard"
     ```bash
     lnms config:set webui.default_dashboard_id 0
     ```
 
-Allows the specification of a global default dashboard page for any user who
-has not set one in their user preferences.  Should be set to dashboard_id of an
-existing dashboard that is shared or shared(read).  Otherwise, the system will
-automatically create each user an empty dashboard called `Default` on their
-first login.
+This is the default message on the login page.
 
-```bash
-lnms config:set login_message "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution."
-```
+!!! setting "auth/general"
+    ```bash
+    lnms config:set login_message "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution."
+    ```
 
-This is the default message on the login page displayed to users.
+With the value true, the login page shows an overview of the devices and their status.
 
-```bash
-lnms config:set public_status true
-```
+!!! setting "auth/general"
+    ```bash
+    lnms config:set public_status true
+    ```
 
-If this is set to true then an overview will be shown on the login page of devices and the status.
+These settings enable and disable menus in the web interface.
 
-```bash
-lnms config:set show_locations true  # Enable Locations on menu
-lnms config:set show_locations_dropdown true  # Enable Locations dropdown on menu
-lnms config:set show_services false  # Disable Services on menu
-lnms config:set int_customers true  # Enable Customer Port Parsing
-lnms config:set summary_errors false  # Show Errored ports in summary boxes on the dashboard
-lnms config:set customers_descr '["cust"]'  # The description to look for in ifDescr. Can have multiple '["cust","cid"]'
-lnms config:set transit_descr '["transit"]'  # Add custom transit descriptions (array)
-lnms config:set peering_descr '["peering"]'  # Add custom peering descriptions (array)
-lnms config:set core_descr '["core"]'  # Add custom core descriptions  (array)
-lnms config:set custom_descr '["This is Custom"]'  # Add custom interface descriptions (array)
-lnms config:set int_transit true  # Enable Transit Types
-lnms config:set int_peering true  # Enable Peering Types
-lnms config:set int_core true  # Enable Core Port Types
-lnms config:set int_l2tp false  # Disable L2TP Port Types
-```
+!!! setting "webui/menu"
+    ```bash
+    lnms config:set show_locations true  # Enable Locations on menu
+    lnms config:set show_locations_dropdown true  # Enable Locations dropdown on menu
+    lnms config:set show_services false  # Disable Services on menu
+    lnms config:set int_customers true  # Enable Customer Port Parsing
+    lnms config:set int_transit true  # Enable Transit Types
+    lnms config:set int_peering true  # Enable Peering Types
+    lnms config:set int_core true  # Enable Core Port Types
+    lnms config:set int_l2tp false  # Disable L2TP Port Types
+    ```
 
-Enable / disable certain menus from being shown in the WebUI.
+!!! setting "webui/dashboard"
+    ```bash
+    lnms config:set summary_errors false  # Show Errored ports in summary boxes on the dashboard
+    ```
 
-You are able to adjust the number and time frames of the quick select
-time options for graphs and the mini graphs shown per row.
+!!! setting "webui/port-descr"
+    ```bash
+    lnms config:set customers_descr '["cust"]'  # The description to look for in ifDescr. Can have multiple '["cust","cid"]'
+    lnms config:set transit_descr '["transit"]'  # Add custom transit descriptions (array)
+    lnms config:set peering_descr '["peering"]'  # Add custom peering descriptions (array)
+    lnms config:set core_descr '["core"]'  # Add custom core descriptions  (array)
+    lnms config:set custom_descr '["This is Custom"]'  # Add custom interface descriptions (array)
+    ```
+
+You can change the number and the time frames of the quick select
+options for graphs. You can also change the mini graphs in each row.
 
 Quick select:
 
@@ -438,114 +527,135 @@ lnms config:set graphs.row.normal '{
 }'
 ```
 
-```bash
-lnms config:set web_mouseover true
-```
+The value false disables the mouseover popover for the mini graphs.
 
-You can disable the mouseover popover for mini graphs by setting this to false.
+!!! setting "webui/general"
+    ```bash
+    lnms config:set web_mouseover true
+    ```
 
-```bash
-lnms config:set enable_lazy_load true
-```
+The value false disables the lazy load of images.
 
-You can disable image lazy loading by setting this to false.
+!!! setting "webui/general"
+    ```bash
+    lnms config:set enable_lazy_load true
+    ```
 
-```bash
-lnms config:set overview_show_sysDescr true
-```
+This setting enables and disables the sysDescr output of a device.
 
-Enable or disable the sysDescr output for a device.
+!!! setting "webui/general"
+    ```bash
+    lnms config:set overview_show_sysDescr true
+    ```
+
+This template controls the default display of the device names. To
+override this setting for one device, edit the device in the web
+interface.
+
+You can enter free text with one or more of these template
+replacements:
+
+| Template                    | Replacement                                                          |
+|-----------------------------|----------------------------------------------------------------------|
+| `{{ $hostname }}`           | The hostname or IP address of the device at the time you added it. This is the default. |
+| `{{ $sysName_fallback }}`   | The hostname. If the hostname is an IP address, the sysName.         |
+| `{{ $sysName }}`            | The SNMP sysName of the device. If the sysName is absent, the hostname or the IP address. |
+| `{{ $ip }}`                 | The polled IP address of the device. It never shows a hostname.      |
+
+For example, `{{ $sysName_fallback }} ({{ $ip }})` shows
+`server (192.168.1.1)`.
 
 !!! setting "webui/device"
     ```bash
     lnms config:set device_display_default '{{ $hostname }}'
     ```
 
-This is a simple template to control the display of device names by default.
-You can override this setting per-device.
+This setting lists the interface types that the graphs in the web
+interface do not show. The default array holds more items. For the full
+list, read `resources/definitions/config_definitions.json`.
 
-You may enter any free-form text including one or more of the following template replacements:
+!!! setting "webui/graph"
+    ```bash
+    lnms config:set device_traffic_iftype.+ '/loopback/'
+    ```
 
-| Template                    | Replacement                                                          |
-|-----------------------------|----------------------------------------------------------------------|
-| `{{ $hostname }}`           | The hostname or IP of the device that was set when added  *default   |
-| `{{ $sysName_fallback }}`   | The hostname or sysName if hostname is an IP                         |
-| `{{ $sysName }}`            | The SNMP sysName of the device, falls back to hostname/IP if missing |
-| `{{ $ip }}`                 | The actual polled IP of the device, will not display a hostname      |
+An administrator can clear the last discovery time of a device. This
+action forces a full discovery run in the configured time window.
 
-For example, `{{ $sysName_fallback }} ({{ $ip }})` will display something like `server (192.168.1.1)`
-
-```bash
-lnms config:set device_traffic_iftype.+ '/loopback/'
-```
-
-Interface types that aren't graphed in the WebUI. The default array
-contains more items, please see misc/config_definitions.json for the full list.
-
-```bash
-lnms config:set enable_clear_discovery true
-```
-
-Administrators are able to clear the last discovered time of a device
-which will force a full discovery run within the configured 5 minute cron window.
-
-```bash
-lnms config:set enable_footer true
-```
-
-Disable the footer of the WebUI by setting `enable_footer` to 0.
-
-You can enable the old style network map (only available for
-individual devices with links discovered via xDP) by setting:
-
-```bash
-lnms config:set gui.network-map.style old
-```
-
-```bash
-lnms config:set percentile_value 90
-```
+!!! setting "webui/device"
+    ```bash
+    lnms config:set enable_clear_discovery true
+    ```
 
 Show the `X`th percentile in the graph instead of the default 95th percentile.
+
+!!! setting "webui/graph"
+    ```bash
+    lnms config:set percentile_value 90
+    ```
+
+This setting gives the target maximum hostname length for the
+`shorthost()` function. Increase the value to show more of the hostname
+in a graph title. The default value is 12. A very long value can break
+the graph generation.
 
 !!! setting "webui/graph"
     ```bash
     lnms config:set shorthost_target_length 15
     ```
 
-The target maximum hostname length when applying the shorthost() function.
-You can increase this if you want to try and fit more of the hostname in graph titles.
-The default value is 12 However, this can possibly break graph
-generation if this is very long.
+Dynamic graphs let you zoom in, zoom out, and scroll through the
+timeline of a graph.
 
-You can enable dynamic graphs within the WebUI under Global Settings
--> Webui Settings -> Graph Settings.
+!!! setting "webui/graph"
+    ```bash
+    lnms config:set webui.dynamic_graphs true
+    ```
 
-Graphs will be movable/scalable without reloading the page:
+You can then move and scale a graph without a page reload:
 ![Example dynamic graph usage](img/dynamic-graph-usage.gif)
+
+## Availability Thresholds
+
+These thresholds set the ok, warning, and error states on several
+screens. One example is the 90 day availability widget of a device.
+
+- **Green**: availability >= availablity.threshold_ok (default: 99.9%)
+- **Orange**: availability >= availablity.threshold_warning (default: 95%)
+- **Red**: availability < availablity.threshold_warning
+
+!!! setting "webui/device"
+    ```bash
+    lnms config:set availablity.threshold_ok 99.99
+    lnms config:set availablity.threshold_warning 95
+    ```
 
 ## Stacked Graphs
 
-You can enable stacked graphs instead of the default inverted
-graphs. Enabling them is possible via webui Global Settings -> Webui
-Settings -> Graph settings -> Use stacked graphs
+You can enable stacked graphs in place of the default inverted graphs.
+
+!!! setting "webui/graph"
+    ```bash
+    lnms config:set webui.graph_stacked true
+    ```
 
 ## Add host settings
 
-The following setting controls how hosts are added.  If a host is
-added as an ip address it is checked to ensure the ip is not already
-present. If the ip is present the host is not added. If host is added
-by hostname this check is not performed.  If the setting is true
-hostnames are resolved and the check is also performed.  This helps
+This setting controls how LibreNMS adds hosts. For a host with an IP
+address, LibreNMS tests whether the IP address is already present. If
+the IP address is present, LibreNMS does not add the host. For a host
+with a hostname, LibreNMS does not do this test. With the value true,
+LibreNMS resolves the hostname and does the test. This behaviour
 prevents accidental duplicate hosts.
 
-```bash
-lnms config:set addhost_alwayscheckip false # true - check for duplicate ips even when adding host by name.
-                                            # false- only check when adding host by ip.
-```
+!!! setting "discovery/general"
+    ```bash
+    lnms config:set addhost_alwayscheckip false # true - check for duplicate ips even when adding host by name.
+                                                # false- only check when adding host by ip.
+    ```
 
-By default we allow hosts to be added with duplicate sysName's, you
-can disable this with the following config:
+By default, LibreNMS accepts hosts with a duplicate sysName. This
+setting disables that behaviour:
 
 !!! setting "discovery/general"
 ```bash
@@ -554,34 +664,42 @@ lnms config:set allow_duplicate_sysName false
 
 ## Global poller and discovery modules
 
-Enable or disable discovery or poller modules.
+These settings enable and disable the discovery modules and the poller
+modules.
 
-This setting has an order of precedence Device > OS > Global.
-So if the module is set at a more specific level, it will override the
-less specific settings.
+The settings have an order of precedence. A device setting overrides an
+OS setting. An OS setting overrides a global setting. The order is
+device, then OS, then global.
+
+A setting at a more specific level therefore overrides a setting at a
+less specific level.
 
 Global:
 
-```bash
-lnms config:set discovery_modules.arp-table false
+!!! setting "discovery/discovery_modules"
+    ```bash
+    lnms config:set discovery_modules.arp-table false
+    lnms config:set discovery_modules.entity-state true
+    ```
 
-lnms config:set discovery_modules.entity-state true
-lnms config:set poller_modules.entity-state true
-```
+!!! setting "poller/poller_modules"
+    ```bash
+    lnms config:set poller_modules.entity-state true
+    ```
 
 Per OS:
 
 ```bash
 lnms config:set os.ios.discovery_modules.arp-table false
-
 lnms config:set os.ios.discovery_modules.entity-state true
+
 lnms config:set os.ios.poller_modules.entity-state true
 ```
 
 ## SNMP Settings
 
-Default SNMP options including retry and timeout settings and also
-default version and port.
+These are the default SNMP options. They hold the retry setting, the
+timeout setting, the default version, and the default port.
 
 !!! setting "poller/snmp"
     ```bash
@@ -593,21 +711,24 @@ default version and port.
     lnms config:set snmp.exec_timeout 1200                 # execution time limit in seconds
     ```
 
-> NOTE: `timeout` is the time to wait for an answer and `exec_timeout`
-> is the max time to run a query.
+> NOTE: `timeout` is the time to wait for an answer. `exec_timeout` is
+> the maximum time for a query.
 
-The default v1/v2c snmp community to use, you can expand this array
-with `[1]`, `[2]`, `[3]`, etc.
+This is the default SNMP community for v1 and v2c. You can add more
+entries to this array with `[1]`, `[2]`, and `[3]`.
 
 !!! setting "poller/snmp"
     ```bash
     lnms config:set snmp.community.0 public
     ```
 
->NOTE: This list of SNMP communities is used for auto discovery, and as a default set for any manually added device.
+!!! note
+    Auto discovery uses this list of SNMP communities, when it is
+    enabled. The list is also the default set for a manually added
+    device.
 
-The default v3 snmp details to use, you can expand this array with
-`[1]`, `[2]`, `[3]`, etc.
+These are the default SNMP v3 details. You can add more entries to this
+array with `[1]`, `[2]`, and `[3]`.
 
 !!! setting "poller/snmp"
     ```bash
@@ -630,14 +751,72 @@ cryptopass  Privacy (Encryption) Passphrase
 cryptoalgo  AES | AES-192 | AES-256 | AES-256-C | DES
 ```
 
+## MTU Settings
+
+LibreNMS can test for MTU problems. The test works only on devices with
+pings enabled. The setting below enables the MTU check:
+
+!!! setting "poller/mtu"
+    ```bash
+    lnms config:set mtu_options.bytes 1500
+    ```
+
+To disable the MTU test, set the packet size to null (the default).
+
+The MTU check does not test whether the packets cross the network
+without fragmentation. It tests two-way communication. The packets can
+still need fragmentation at any point on the path.
+
 ## Auto discovery settings
 
-Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)
+Read [Auto-Discovery](../Extensions/Auto-Discovery.md).
+
+
+## SSL Certificates
+
+!!! note
+    This feature is disabled by default.
+
+LibreNMS can discover and monitor the SSL and TLS certificates of your
+devices, for example HTTPS on port 443. You can then track the expiry
+dates and get an alert before a certificate expires.
+
+**Using the feature:** in the web interface, open Overview -> Tools ->
+SSL Certificates. On this page you can see the discovered certificates,
+add an entry with a host and a port, pause or enable the monitoring of
+a certificate, and remove an entry. The alert rule **Expiring SSL
+Certificates** alerts you 14 days before a certificate expires.
+
+**Behaviour:**
+
+- **Discovery:** the scheduled maintenance job `lnms maintenance:discover-ssl-certificates` runs each day. It connects to each active device on port 443 (HTTPS). If the device presents a certificate, LibreNMS stores or updates it. You can also run the discovery manually for all devices or for one device.
+- **Refresh:** the scheduled job `lnms maintenance:refresh-ssl-certificates` runs each day. It reads the existing certificates again and updates the expiry date and the other details. You can refresh all enabled certificates, or one certificate by its ID.
+
+**Configuration options:** set these options in the web interface or on the command line with `lnms config:set`.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `ssl_certificates.auto_discover` | boolean | `false` | With the value `true`, the scheduled SSL discovery job runs each day. Set it to `false` to disable the automatic discovery, for example when you add all certificates manually. |
+| `ssl_certificates.skip_hosts` | array (strings) | `[]` | A list of the hostnames and IP addresses to skip in the discovery and in the refresh. The match ignores the case. Use this list to exclude the hosts without SSL. Examples are a load balancer with a different certificate, and a host that blocks or rate-limits connections. |
+
+!!! setting "system/ssl-certificates"
+    ```bash
+    # Enable automatic SSL discovery
+    lnms config:set ssl_certificates.auto_discover true
+
+    # Skip discovery and refresh for specific hosts (add one per line)
+    lnms config:set ssl_certificates.skip_hosts.+ internal-lb.example.com
+    lnms config:set ssl_certificates.skip_hosts.+ 192.168.1.1
+    ```
+
+To set the whole array at once:
+
+!!! setting "system/ssl-certificates"
+    ```bash
+    lnms config:set ssl_certificates.skip_hosts '["host1.example.com", "host2.example.com"]'
+    ```
 
 ## Email configuration
-
-> You can configure these options within the WebUI now, please avoid
-> setting these options within config.php
 
 !!! setting "alerting/email"
     ```bash
@@ -654,30 +833,47 @@ Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)
     lnms config:set email_smtp_password NULL
     ```
 
-What type of mail transport to use for delivering emails. Valid
-options for `email_backend` are mail, sendmail or smtp. The varying
-options after that are to support the different transports.
+`email_backend` sets the mail transport for the delivery of emails. The
+valid values are `mail`, `sendmail`, and `smtp`. The other options
+support these different transports.
+
+For security, a TLS connection to the SMTP server validates the
+certificate. To disable this validation, use the option
+`email_smtp_verifypeer`, which is true by default. You can also use
+`email_smtp_allowselfsigned`, which is false by default.
+
+!!! setting "alerting/email"
+    ```bash
+        lnms config:set email_smtp_verifypeer false
+        lnms config:set email_smtp_allowselfsigned true
+    ```
 
 ## Alerting
 
-Please refer to [Alerting](../Alerting/index.md)
+Read [Alerting](../Alerting/index.md).
 
 ## Billing
 
-Please refer to [Billing](../Extensions/Billing-Module.md)
+Read [Billing](../Extensions/Billing-Module.md).
 
 ## Global module support
 
+!!! setting "webui/menu"
+    ```bash
+    lnms config:set enable_syslog false # Enable Syslog
+    lnms config:set enable_inventory true # Enable Inventory
+    lnms config:set enable_pseudowires true # Enable Pseudowires
+    ```
+
 ```bash
-lnms config:set enable_syslog false # Enable Syslog
-lnms config:set enable_inventory true # Enable Inventory
-lnms config:set enable_pseudowires true # Enable Pseudowires
 lnms config:set enable_vrfs true # Enable VRFs
 ```
 
 ## Port extensions
 
-Please refer to [Port-Description-Parser](../Extensions/Interface-Description-Parsing.md)
+Read [Port-Description-Parser](../Extensions/Interface-Description-Parsing.md).
+
+These settings enable and disable the additional port statistics.
 
 ```bash
 lnms config:set enable_ports_etherlike false
@@ -685,14 +881,12 @@ lnms config:set enable_ports_junoseatmvp false
 lnms config:set enable_ports_poe false
 ```
 
-Enable / disable additional port statistics.
-
 ## Port Group
 
-Assign a new discovered Port automatically to Port Group with this Port Group ID
-(0 means no Port Group assignment)
+LibreNMS puts each newly discovered port into the port group with this
+port group ID. The value 0 means no port group.
 
-!!! setting "discovery/networks"
+!!! setting "discovery/ports"
     ```bash
     lnms config:set default_port_group 0
     ```
@@ -701,30 +895,47 @@ Assign a new discovered Port automatically to Port Group with this Port Group ID
 
 ### Rancid
 
-```bash
-lnms config:set rancid_configs.+ /var/lib/rancid/network/configs/
-lnms config:set rancid_repo_type svn
-lnms config:set rancid_ignorecomments false
-```
+`rancid_configs` is an array with the locations of your rancid files.
+`rancid_ignorecomments` hides the lines that start with `#`.
 
-Rancid configuration, `rancid_configs` is an array containing all of
-the locations of your rancid files. Setting `rancid_ignorecomments`
-will disable showing lines that start with #
+!!! setting "external/rancid"
+    ```bash
+    lnms config:set rancid_configs.+ /var/lib/rancid/network/configs/
+    lnms config:set rancid_repo_type svn
+    lnms config:set rancid_ignorecomments false
+    ```
+
+A bare Git rancid repository must be in a directory with a name that
+ends in `.git`. Add the path to the rancid files in Git to the end of
+the repository path:
+
+!!! setting "external/rancid"
+    ```bash
+    lnms config:set rancid_configs.+ /var/lib/rancid/git/rancid.git/configs/
+    lnms config:set rancid_repo_type git-bare
+    lnms config:set rancid_repo_url /rancid
+    lnms config:set rancid_ignorecomments false
+    ```
+
+Set the parameter `rancid_repo_url` to the URL of GitWeb or of a
+similar tool. This tool shows the content of the bare Git repository.
 
 ### Oxidized
 
-Please refer to [Oxidized](../Extensions/Oxidized.md)
+Read [Oxidized](../Extensions/Oxidized.md).
 
 ### CollectD
 
-```bash
-lnms config:set collectd_dir /var/lib/collectd/rrd
-```
+This setting gives the location of the collectd rrd files. The location
+in LibreNMS must match the location in `/etc/collectd.conf` and in
+`/etc/collectd.d/rrdtool.conf`.
 
-Specify the location of the collectd rrd files. Note that the location
-in config.php should be consistent with the location set in
-/etc/collectd.conf and etc/collectd.d/rrdtool.conf
+!!! setting "external/collectd"
+    ```bash
+    lnms config:set collectd_dir /var/lib/collectd/rrd
+    ```
 
+`/etc/collectd.conf`
 ```bash
 <Plugin rrdtool>
         DataDir "/var/lib/collectd/rrd"
@@ -735,8 +946,7 @@ in config.php should be consistent with the location set in
 </Plugin>
 ```
 
-/etc/collectd.conf
-
+`/etc/collectd.d/rrdtool.conf`
 ```bash
 LoadPlugin rrdtool
 <Plugin rrdtool>
@@ -746,43 +956,53 @@ LoadPlugin rrdtool
 </Plugin>
 ```
 
-/etc/collectd.d/rrdtool.conf
+This setting gives the location of the collectd unix socket. With a
+socket, collectd writes the graph data to the disk before LibreNMS
+draws the graph. Your web server needs write permission on this socket.
 
-```bash
-lnms config:set collectd_sock unix:///var/run/collectd.sock
-```
-
-Specify the location of the collectd unix socket. Using a socket
-allows the collectd graphs to be flushed to disk before being
-drawn. Be sure that your web server has permissions to write to this socket.
+!!! setting "external/collectd"
+    ```bash
+    lnms config:set collectd_sock unix:///var/run/collectd.sock
+    ```
 
 ### Smokeping
 
-Please refer to [Smokeping](../Extensions/Smokeping.md)
+Read [Smokeping](../Extensions/Smokeping.md).
 
 ### NFSen
 
-Please refer to [NFSen](../Extensions/NFSen.md)
+Read [NFSen](../Extensions/NFSen.md).
 
 ### Location parsing
 
-LibreNMS can interpret sysLocation information and map the device loction based on GeoCoordinates or GeoCoding information.
+LibreNMS can read the sysLocation information. It then maps the device
+location from geocoordinates or from geocoding information.
 
-- Info-keywords
-  - `[]` contains optional Latitude and Longitude information if manual GeoCoordinate positioning is desired.
-  - `()` contains optional information that is ignored during GeoCoding lookups.
+- Info keywords
+  - `[]` holds optional latitude and longitude information for manual geocoordinate positioning.
+  - `()` holds optional information. A geocoding lookup ignores this information.
 
 
-#### **GeoCoordinates** 
-If device sysLocation information contains [lat, lng] (note the comma and square brackets), that is used to determin the GeoCoordinates.
+#### GeoCoordinates
+
+If the sysLocation of the device holds `[lat, lng]`, LibreNMS uses
+these values as the geocoordinates. Note the comma and the square
+brackets.
 
 Example:
 ```bash
 name_that_can_not_be_looked_up [40.424521, -86.912755]
 ```
 
-#### **GeoCoding**
-Next it will attempt to look up the sysLocation with a map engine provided you have configured one under $config['geoloc']['engine']. The information has to be accurate or no result is returned, when it does it will ignore any information inside parentheses, allowing you to add details that would otherwise interfeeer with the lookup.
+The latitude is then 40.424521 and the longitude is -86.912755.
+
+#### GeoCoding
+
+LibreNMS then looks up the sysLocation with a map engine. You must
+configure an engine under `lnms config:get geoloc.engine`. The
+information must be accurate, or the lookup returns no result. The
+lookup ignores the information in parentheses. You can therefore add
+details that break a lookup.
 
 Example:
 ```bash
@@ -790,268 +1010,368 @@ Example:
 Geocoding lookup is:
 1100 Congress Ave, Austin, TX 78701
 ```
-#### **Overrides**
-1. You can overwrite each device sysLocation information in the webGUI under "Device settings".
-2. You can overwrite the location coordinates n in the webGUI under Device>GEO Locations
 
+#### Overrides
 
+1. To override the sysLocation of a device, open "Device settings" for that device in the web interface.
+2. To set the coordinates of a location, go to Device > Geo Locations > All Locations in the web interface.
 
 ### Location mapping
 
-If you just want to set GPS coordinates on a location, you should
-visit Devices > Geo Locations > All Locations and edit the coordinates
-there.
+To set the GPS coordinates of a location, go to Devices > Geo Locations
+> All Locations. Then edit the coordinates.
+
+You can also replace the sysLocation value of one device or of many
+devices.
+
+For example, 100 devices have the sysLocation value `Under the Sink`.
+This value is not the real address. A mapping overrides the sysLocation
+value of all these devices. You do not need to edit each device.
 
 Exact Matching:
 
-```bash
-lnms config:set location_map '{"Under the Sink": "Under The Sink, The Office, London, UK"}'
-```
+`Under the Sink` becomes `Under The Sink, The Office, London, UK`.
+
+!!! setting "webui/device"
+    ```bash
+    lnms config:set location_map '{"Under the Sink": "Under The Sink, The Office, London, UK"}'
+    ```
 
 Regex Matching:
 
-```bash
-lnms config:set location_map_regex '{"/Sink/": "Under The Sink, The Office, London, UK"}'
-```
+`Not Under the Sink` becomes `Not Under The Sink, The Office, London, UK`.
+
+!!! setting "webui/device"
+    ```bash
+    lnms config:set location_map_regex '{"/Sink/": "Not Under The Sink, The Office, London, UK"}'
+    ```
 
 Regex Match Substitution:
 
-```bash
-lnms config:set location_map_regex_sub '{"/Sink/": "Under The Sink, The Office, London, UK [lat, long]"}'
-```
+`Rack10,Rm-314,Sink` becomes `Rack10,Rm-314,Under The Sink, The Office, London, UK [lat, lng]`.
 
-If you have an SNMP SysLocation of "Rack10,Rm-314,Sink", Regex Match
-Substition yields "Rack10,Rm-314,Under The Sink, The Office, London,
-UK [lat, long]". This allows you to keep the SysLocation string short
-and keeps Rack/Room/Building information intact after the substitution.
+!!! setting "webui/device"
+    ```bash
+    lnms config:set location_map_regex_sub '{"/Sink/": "Under The Sink, The Office, London, UK [lat, long]"}'
+    ```
 
-The above are examples, these will rewrite device snmp locations so
-you don't need to configure full location within snmp.
+These examples rewrite the SNMP location of a device. You therefore do
+not need the full location in SNMP.
 
 ## Interfaces to be ignored
 
-Interfaces can be automatically ignored during discovery by modifying
-bad_if\* entries in a default array, unsetting a default array and
-customizing it, or creating an OS specific array. The preferred method
-for ignoring interfaces is to use an OS specific array. The default
-arrays can be found in misc/config_definitions.json. OS specific
-definitions (includes/definitions/\_specific_os_.yaml) can contain
-bad_if\* arrays, but should only be modified via pull-request as
-manipulation of the definition files will block updating:
+Discovery can ignore an interface automatically. There are three
+methods. You can change a configuration option, you can unset a default
+option and set your own value, or you can create an OS specific option.
+The OS specific option is the preferred method. The default options are
+in `resources/definitions/config_definitions.json`. The default OS
+specific definitions are in
+`resources/definitions/os_detection/\_specific_os_.yaml`. These files
+can hold bad_if\* options. Change them only with a pull request,
+because a local change to a definition file blocks the updates.
 
 Examples:
 
-**Add entries to default arrays**
-```bash
-lnms config:set bad_if.+ voip-null
-lnms config:set bad_iftype.+ voiceEncap
-lnms config:set bad_if_regexp.+ '/^lo[0-9].*/'    # loopback
-```
+#### Add entries to default option
 
-**Override default bad_if values**
-```bash
-lnms config:set bad_if '["voip-null", "voiceEncap", "voiceFXO"]'
-```
+!!! setting "discovery/ports"
+    ```bash
+    lnms config:set bad_if.+ voip-null
+    lnms config:set bad_iftype.+ voiceEncap
+    lnms config:set bad_if_regexp.+ '/^lo[0-9].*/'    # loopback
+    ```
 
-**Create an OS specific array**
-```bash
-lnms config:set os.iosxe.bad_iftype.+ macSecControlledIF
-lnms config:set os.iosxe.bad_iftype.+ macSecUncontrolledIF
-```
+#### Override default bad_if values
 
-**Various bad_if\* selection options available**
+!!! setting "discovery/ports"
+    ```bash
+    lnms config:set bad_if '["voip-null", "voiceEncap", "voiceFXO"]'
+    ```
 
-`bad_if` is matched against the ifDescr value.
+#### Create an OS specific array
 
-`bad_iftype` is matched against the ifType value.
+!!! setting "discovery/ports"
+    ```bash
+    lnms config:set os.iosxe.bad_iftype.+ macSecControlledIF
+    lnms config:set os.iosxe.bad_iftype.+ macSecUncontrolledIF
+    ```
 
-`bad_if_regexp` is matched against the ifDescr value as a regular expression.
+#### Various bad_if\* selection options available
 
-`bad_ifname_regexp` is matched against the ifName value as a regular expression.
+`bad_if` matches the ifDescr value.
 
-`bad_ifalias_regexp` is matched against the ifAlias value as a regular expression.
+`bad_iftype` matches the ifType value.
 
-## Interfaces that shouldn't be ignored
+`bad_if_regexp` matches the ifDescr value as a regular expression.
 
-Examples:
+`bad_ifname_regexp` matches the ifName value as a regular expression.
 
-```bash
-lnms config:set good_if.+ FastEthernet
-lnms config:set os.ios.good_if.+ FastEthernet
-```
+`bad_ifalias_regexp` matches the ifAlias value as a regular expression.
 
-`good_if` is matched against ifDescr value. This can be a bad_if value
-as well which would stop that port from being ignored. i.e. if bad_if
-and good_if both contained FastEthernet then ports with this value in
-the ifDescr will be valid.
+## Interfaces that must not be ignored
+
+You can also add a port to an allow list. LibreNMS then does not ignore
+that port. You can configure `good_if` globally and for one OS, in the
+same way as `bad_if`.
+
+For example, `bad_if_regexp` ignores the `Ethernet` ports. You want the
+`FastEthernet` ports but no other Ethernet ports. Add a `good_if`
+option for `FastEthernet`:
+
+!!! setting "discovery/ports"
+    ```bash
+    lnms config:set good_if.+ FastEthernet
+    lnms config:set os.ios.good_if.+ FastEthernet
+    ```
+
+`good_if` matches the ifDescr value. A value in `good_if` can also be
+in `bad_if`. LibreNMS then does not ignore that port. For example,
+`bad_if` and `good_if` both hold `FastEthernet`. The ports with this
+ifDescr value are then valid.
 
 ## Interfaces to be rewritten
 
-```bash
-lnms config:set rewrite_if '{"cpu": "Management Interface"}'
-lnms config:set rewrite_if_regexp '{"/cpu /": "Management "}'
+These options rewrite an interface label automatically.
+
+`rewrite_if` replaces the whole label. `rewrite_if_regexp` replaces
+only the matched text. The match ignores the case.
+
+!!! setting "discovery/ports"
+    ```bash
+    lnms config:set rewrite_if '{"cpu": "Management Interface"}'
+    lnms config:set rewrite_if_regexp '{"/cpu /": "Management "}'
+    ```
+
+## VLANs to ignore
+
+Some devices report VLANs that are not relevant or that the system
+reserves. This setting ignores specific VLAN IDs for one OS.
+
+For example, Cisco IOS reports these VLANs, and you want to ignore
+them:
+
+```text
+VLAN 1002 (fddi-default)
+VLAN 1003 (token-ring-default)
+VLAN 1004 (fddinet-default)
+VLAN 1005 (trnet-default)
 ```
 
-Entries defined in `rewrite_if` are being replaced completely.
-Entries defined in `rewrite_if_regexp` only replace the match.
-Matches are compared case-insensitive.
+!!! setting "discovery/vlans"
+    ```bash
+    lnms config:set os.ios.ignore_vlans '[1002, 1003, 1004, 1005]'
+    ```
 
 ## Entity sensors to be ignored
 
-Some devices register bogus sensors as they are returned via SNMP but
-either don't exist or just don't return data. This allows you to
-ignore those based on the descr field in the database. You can either
-ignore globally or on a per os basis.
+Some devices return bad sensors over SNMP. These sensors do not exist
+or return no data. This setting ignores such a sensor by its `descr`
+field in the database. You can ignore a sensor globally or for one OS.
+We recommend the OS method.
 
-```bash
-lnms config:set bad_entity_sensor_regex.+ '/Physical id [0-9]+/'
-lnms config:set os.ios.bad_entity_sensor_regex '["/Physical id [0-9]+/"]'
+For example, some sensors have these descriptions:
+
+```text
+Physical id 1
+Physical id 2
+...
+Physical id 4
 ```
+
+!!! setting "discovery/sensors"
+    ```bash
+    lnms config:set bad_entity_sensor_regex.+ '/Physical id [0-9]+/'
+    lnms config:set os.ios.bad_entity_sensor_regex '["/Physical id [0-9]+/"]'
+    ```
 
 ## Entity sensors limit values
 
-Vendors may give some limit values (or thresholds) for the discovered
-sensors. By default, when no such value is given, both high and low
-limit values are guessed, based on the value measured during the initial discovery.
+A vendor can supply limit values, also called thresholds, for the
+discovered sensors. By default, LibreNMS estimates the high limit and
+the low limit when the vendor gives no value or when LibreNMS has no
+support for the limits. The estimate uses the value from the first
+discovery.
 
-When it is preferred to have no high and/or low limit values at all if
-these are not provided by the vendor, the guess method can be disabled:
+To have no high limit and no low limit without a vendor value, disable
+the estimate:
 
-```bash
-lnms config:set sensors.guess_limits false
-```
+!!! settings "discovery/sensors"
+    ```bash
+    lnms config:set sensors.guess_limits false
+    ```
 
 ## Ignoring Health Sensors
 
-It is possible to filter some sensors from the configuration:
+The configuration can filter out some sensors:
 
-* Ignore all temperature sensors
+### Ignore all temperature sensors
 
-```bash
-lnms config:set disabled_sensors.current true
-```
+!!! settings "discovery/sensors"
+    ```bash
+    lnms config:set disabled_sensors.temperature true
+    ```
 
-* Filter all sensors matching regexp ```'/PEM Iout/'```.
+### Filter all sensors matching regexp ```'/PEM Iout/'```.
 
-```bash
-lnms config:set disabled_sensors_regex.+ '/PEM Iout/'
-```
+!!! settings "discovery/sensors"
+    ```bash
+    lnms config:set disabled_sensors_regex.+ '/PEM Iout/'
+    ```
 
-* Filter all 'current' sensors for Operating System 'vrp'.
+### Filter all 'current' sensors for Operating System 'vrp'.
 
 ```bash
 lnms config:set os.vrp.disabled_sensors.current true
 ```
 
-* Filter all sensors matching regexp ```'/PEM Iout/'``` for Operating System iosxe.
+### Filter all sensors matching regexp ```'/PEM Iout/'``` for Operating System iosxe.
 
 ```bash
 lnms config:set os.iosxe.disabled_sensors_regex '/PEM Iout/'
 ```
 
+## Processor configuration
+
+This setting gives your own warning percentage for a processor.
+LibreNMS applies the value at the discovery of the processor
+information.
+
+!!! setting "discovery/processor"
+    ```bash
+    lnms config:set processor.default_perc_warn 75
+    ```
+
 ## Storage configuration
 
-Mounted storage / mount points to ignore in discovery and polling.
+These settings list the storage and the mount points to ignore in
+discovery and in polling.
 
 !!! setting "discovery/storage"
+    ```bash
+    lnms config:set ignore_mount_removable true
+    lnms config:set ignore_mount_network true
+    lnms config:set ignore_mount_optical true
+
+    lnms config:set ignore_mount.+ /kern
+    lnms config:set ignore_mount.+ /mnt/cdrom
+    lnms config:set ignore_mount.+ /proc
+    lnms config:set ignore_mount.+ /dev
+
+    lnms config:set ignore_mount_string.+ packages
+    lnms config:set ignore_mount_string.+ devfs
+    lnms config:set ignore_mount_string.+ procfs
+    lnms config:set ignore_mount_string.+ UMA
+    lnms config:set ignore_mount_string.+ MALLOC
+
+    lnms config:set ignore_mount_regexp.+ '/on: \/packages/'
+    lnms config:set ignore_mount_regexp.+ '/on: \/dev/'
+    lnms config:set ignore_mount_regexp.+ '/on: \/proc/'
+    lnms config:set ignore_mount_regexp.+ '/on: \/junos^/'
+    lnms config:set ignore_mount_regexp.+ '/on: \/junos\/dev/'
+    lnms config:set ignore_mount_regexp.+ '/on: \/jail\/dev/'
+    lnms config:set ignore_mount_regexp.+ '/^(dev|proc)fs/'
+    lnms config:set ignore_mount_regexp.+ '/^\/dev\/md0/'
+    lnms config:set ignore_mount_regexp.+ '/^\/var\/dhcpd\/dev,/'
+    lnms config:set ignore_mount_regexp.+ '/UMA/'
+    ```
+
+This setting gives your own warning percentage for storage. LibreNMS
+applies the value at the discovery of the storage information.
+
+!!! setting "discovery/storage"
+    ```bash
+    lnms config:set storage_perc_warn 60
+    ```
+
+## Averaging Factor
+
+LibreNMS keeps average values in the database for some metrics. These
+averages make an alert on a change possible. For example, the ping time
+can increase above the average. The average must move slowly after a
+change in the recorded values, so that there is time for an alert. The
+alerts must also stop when the new value becomes the normal value.
+
+Change the configuration variable below when the average values change
+too quickly or too slowly. A larger value, closer to 1, makes the
+averages change faster. A smaller value, closer to 0, makes the
+averages change slower.
 
 ```bash
-lnms config:set ignore_mount_removable true
-lnms config:set ignore_mount_network true
-lnms config:set ignore_mount_optical true
-
-lnms config:set ignore_mount.+ /kern
-lnms config:set ignore_mount.+ /mnt/cdrom
-lnms config:set ignore_mount.+ /proc
-lnms config:set ignore_mount.+ /dev
-
-lnms config:set ignore_mount_string.+ packages
-lnms config:set ignore_mount_string.+ devfs
-lnms config:set ignore_mount_string.+ procfs
-lnms config:set ignore_mount_string.+ UMA
-lnms config:set ignore_mount_string.+ MALLOC
-
-lnms config:set ignore_mount_regexp.+ '/on: \/packages/'
-lnms config:set ignore_mount_regexp.+ '/on: \/dev/'
-lnms config:set ignore_mount_regexp.+ '/on: \/proc/'
-lnms config:set ignore_mount_regexp.+ '/on: \/junos^/'
-lnms config:set ignore_mount_regexp.+ '/on: \/junos\/dev/'
-lnms config:set ignore_mount_regexp.+ '/on: \/jail\/dev/'
-lnms config:set ignore_mount_regexp.+ '/^(dev|proc)fs/'
-lnms config:set ignore_mount_regexp.+ '/^\/dev\/md0/'
-lnms config:set ignore_mount_regexp.+ '/^\/var\/dhcpd\/dev,/'
-lnms config:set ignore_mount_regexp.+ '/UMA/'
+lnms config:set device_stats_avg_factor 0.05
 ```
 
-Custom storage warning percentage
-
-```bash
-lnms config:set storage_perc_warn 60
-```
+The device statistics use an exponential weighted moving average
+function. This function updates the average without a store of many
+values. For more information, read about this function.
 
 ## IRC Bot
 
-Please refer to [IRC Bot](../Extensions/IRC-Bot.md)
+Read [IRC Bot](../Extensions/IRC-Bot.md).
 
 ## Authentication
 
-Please refer to [Authentication](../Extensions/Authentication.md)
+Read [Authentication](../Extensions/Authentication.md).
 
 ## Cleanup options
 
-Please refer to [Cleanup Options](../Support/Cleanup-options.md)
+Read [Cleanup Options](../Support/Cleanup-options.md).
 
 ## Syslog options
 
-Please refer to [Syslog](../Extensions/Syslog.md)
+Read [Syslog](../Extensions/Syslog.md).
 
 ## Virtualization
 
-```bash
-lnms config:set enable_libvirt true
-lnms config:set libvirt_protocols '["qemu+ssh","xen+ssh"]'
-lnms config:set libvirt_username root
-```
+This setting enables libvirt support. `libvirt_protocols` gives the
+connection method for libvirt. You must also do these steps:
 
-Enable this to switch on support for libvirt along with `libvirt_protocols`
-to indicate how you connect to libvirt.  You also need to:
+1. Generate an ssh key without a password for LibreNMS. Use the user
+    that runs the polling and the discovery, usually `librenms`.
+2. On each VM host to monitor:
+   1. Configure public key authentication from your LibreNMS server or
+      poller. Add the librenms public key to
+      `~root/.ssh/authorized_keys`.
+   2. For xen+ssh only, let libvirtd collect data from xend. Set
+      `(xend-unix-server yes)` in `/etc/xen/xend-config.sxp`. Then
+      restart xend and libvirtd.
 
-1. Generate a non-password-protected ssh key for use by LibreNMS, as the
-    user which runs polling & discovery (usually `librenms`).
-1. On each VM host you wish to monitor:
-   1. Configure public key authentication from your LibreNMS server/poller by
-      adding the librenms public key to `~root/.ssh/authorized_keys`.
-   1. (xen+ssh only) Enable libvirtd to gather data from xend by setting
-      `(xend-unix-server yes)` in `/etc/xen/xend-config.sxp` and
-      restarting xend and libvirtd.
+To test your setup, become the librenms polling user. Then run
+`virsh -c qemu+ssh://vmhost/system list` or
+`virsh -c xen+ssh://vmhost list`.
 
-To test your setup, run `virsh -c qemu+ssh://vmhost/system list` or
-`virsh -c xen+ssh://vmhost list` as your librenms polling user.
+!!! setting "external/virtualization"
+    ```bash
+    lnms config:set enable_libvirt true
+    lnms config:set libvirt_protocols '["qemu+ssh","xen+ssh"]'
+    lnms config:set libvirt_username root
+    ```
 
 ## BGP Support
 
-```bash
-lnms config:set astext.65332 "Cymru FullBogon Feed"
-```
+This configuration option rewrites the description of a discovered AS.
 
-You can use this array to rewrite the description of ASes that you have discovered.
+!!! setting "discovery/general"
+    ```bash
+    lnms config:set astext.65332 "Cymru FullBogon Feed"
+    ```
 
 ## Auto updates
 
-Please refer to [Updating](../General/Updating.md)
+Read [Updating](../General/Updating.md).
 
 ## IPMI
 
-Setup the types of IPMI protocols to test a host for and in what
-order. Don't forget to install ipmitool on the monitoring host.
+This setting gives the IPMI protocols to test on a host, and their
+order. Also install ipmitool on the monitoring host.
 
-```bash
-lnms config:set ipmi.type '["lanplus", "lan", "imb", "open"]'
-```
+!!! setting "discovery/ipmi"
+    ```bash
+    lnms config:set ipmi.type '["lanplus", "lan", "imb", "open"]'
+    ```
 
 ## Distributed poller settings
 
-Please refer to [Distributed Poller](../Extensions/Distributed-Poller.md)
+Read [Distributed Poller](../Extensions/Distributed-Poller.md).
 
 ## API Settings
 
@@ -1059,18 +1379,19 @@ Please refer to [Distributed Poller](../Extensions/Distributed-Poller.md)
 
 <https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS>
 
-CORS support for the API is disabled by default. Below you will find
-the standard options, all of which you can configure.
+By default, the API has no CORS support. The standard options are
+below. You can configure each option.
 
-```bash
-lnms config:set api.cors.enabled false
-lnms config:set api.cors.origin '["*"]'
-lnms config:set api.cors.maxage '86400'
-lnms config:set api.cors.allowmethods '["POST", "GET", "PUT", "DELETE", "PATCH"]'
-lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Auth-Token"]'
-lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
-lnms config:set api.cors.allowmethods '["POST", "GET", "PUT", "DELETE", "PATCH"]'
-lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Auth-Token"]'
-lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
-lnms config:set api.cors.allowcredentials false
-```
+!!! setting "api/cors"
+    ```bash
+    lnms config:set api.cors.enabled false
+    lnms config:set api.cors.origin '["*"]'
+    lnms config:set api.cors.maxage '86400'
+    lnms config:set api.cors.allowmethods '["POST", "GET", "PUT", "DELETE", "PATCH"]'
+    lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Auth-Token"]'
+    lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
+    lnms config:set api.cors.allowmethods '["POST", "GET", "PUT", "DELETE", "PATCH"]'
+    lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Auth-Token"]'
+    lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
+    lnms config:set api.cors.allowcredentials false
+    ```

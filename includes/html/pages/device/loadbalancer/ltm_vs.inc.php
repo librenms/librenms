@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to Display data from F5 BigIP LTM Devices
  *
@@ -29,7 +30,7 @@ foreach ($components as $k => $v) {
 }
 $components = $keep;
 
-$subtype = basename($vars['subtype']);
+$subtype = basename((string) $vars['subtype']);
 if (is_file("includes/html/pages/device/loadbalancer/$subtype.inc.php")) {
     include "includes/html/pages/device/loadbalancer/$subtype.inc.php";
 } else {

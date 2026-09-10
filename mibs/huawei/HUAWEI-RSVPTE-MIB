@@ -1,10 +1,13 @@
 --   =================================================================
---  Copyright (C) 2007 by HUAWEI TECHNOLOGIES. All rights reserved
+--  Copyright (C) 2022 by HUAWEI TECHNOLOGIES. All rights reserved
 --  
 --  Description the HUAWEI-RSVPTE-MIB provides information about RSVPTE. 
 --  Reference:
---  Version: V1.0
+--  Version: V3.04
 --  History:
+--  V3.04 liugeer, 2022-05-19, add hwRsvpTeAddrConflict, hwRsvpTeAddrConflictRecovery, hwAddrConflictNode, hwAddrConflictNodeRecovery, hwRsvpTeConflictAddr, hwRsvpTeSuspiciousAddr1, hwRsvpTeSuspiciousAddr2, hwRsvpTeSuspiciousAddr3, hwRsvpTeSuspiciousAddr4, hwRsvpTeSuspiciousAddr5, hwRsvpTeSuspiciousAddr6, hwRsvpTeSuspiciousAddr7, hwRsvpTeSuspiciousAddr8
+--  V3.03 wanghailong, 2021-05-25, add hwRsvpTeIfAuthType, hwRsvpTePeerTable
+--  V3.00  wenjing, 2014-10-25, hwRsvpTeIfStatus from read-only to read-create
 --  zhuguangdong 2007-04-16 publish
 --  =================================================================
 -- 
@@ -13,35 +16,56 @@
  
                 IMPORTS
                         hwDatacomm                        
-                                FROM HUAWEI-MIB                        
-                        ifIndex                        
-                                FROM IF-MIB                        
+                                FROM HUAWEI-MIB
+                        ifIndex
+                                FROM IF-MIB                   
                         SessionType, BitRate, BurstSize, MessageSize, QosService                        
                                 FROM INTEGRATED-SERVICES-MIB                        
-                        OBJECT-GROUP, MODULE-COMPLIANCE                        
+                        OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE                       
                                 FROM SNMPv2-CONF                        
-                        IpAddress, Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY            
+                        IpAddress, Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
                                 FROM SNMPv2-SMI                        
-                        TruthValue, TimeStamp, RowStatus, TimeInterval                        
+                        TruthValue, TimeStamp, RowStatus, TimeInterval, DisplayString    
                                 FROM SNMPv2-TC;
         
         
 --  Thu Apri 16 15:03:53 PDT 2007
                 hwRsvpTe MODULE-IDENTITY 
-                        LAST-UPDATED "200704101000Z"        -- April 10, 2007 at 10:00 GMT
-                        ORGANIZATION 
+                        LAST-UPDATED "202205191610Z"     
+                          ORGANIZATION 
                                 "Huawei Technologies Co.,Ltd."
                         CONTACT-INFO 
-                                "R&D BeiJing, Huawei Technologies co.,Ltd.
-                                Huawei Bld.,NO.3 Xinxi Rd., 
-                                Shang-Di Information Industry Base,
-                                Hai-Dian District Beijing P.R. China
-                                Zip:100085 
-                                Http://www.huawei.com                                       
-                                E-mail:support@huawei.com
+                                "Huawei Industrial Base
+                                  Bantian, Longgang
+                                   Shenzhen 518129
+                                   People's Republic of China
+                                   Website: http://www.huawei.com
+                                   Email: support@huawei.com
                                  "
                         DESCRIPTION 
                                 "The MIB module to describe the RSVP Protocol"
+                   
+                        --  Revision history
+                        REVISION   "202205191610Z"
+                        DESCRIPTION "V3.03, add: hwRsvpTeAddrConflict, hwRsvpTeAddrConflictRecovery, hwAddrConflictNode, hwAddrConflictNodeRecovery, hwRsvpTeConflictAddr, hwRsvpTeSuspiciousAddr1, hwRsvpTeSuspiciousAddr2, hwRsvpTeSuspiciousAddr3, hwRsvpTeSuspiciousAddr4, hwRsvpTeSuspiciousAddr5, hwRsvpTeSuspiciousAddr6, hwRsvpTeSuspiciousAddr7, hwRsvpTeSuspiciousAddr8."
+
+                        REVISION   "202105251610Z"
+                        DESCRIPTION "V3.03, add: hwRsvpTeIfAuthType, hwRsvpTePeerTable."
+ 
+                        REVISION   "201809151446Z"
+                        DESCRIPTION "V3.01, add traps: hwRsvpTeIpAddress, hwRsvpTePreviousHop, hwRsvpTeNextHop, hwRsvpTeIpConflict, hwRsvpTeIpConflictClear."
+
+                        REVISION   "201710271943Z"
+                        DESCRIPTION "V3.01, minor modification to keep omsys mib file same as code mib."
+
+                       REVISION   "201410251736Z"
+                       DESCRIPTION "V3.00, hwRsvpTeIfStatus from read-only to read-create."            
+
+                       REVISION   "201406161455Z"
+                       DESCRIPTION "V2.02, add traps: hwRsvpTeIfNbrThresholdExceed, hwRsvpTeIfNbrThresholdExceedClear, hwRsvpTeIfNbrTotalCountExceed, hwRsvpTeIfNbrTotalCountExceedClear."
+
+                       REVISION   "201308281755Z"
+                       DESCRIPTION "V2.01, modify the hwRsvpTeTrapObjectGroup of MODULE-COMPLIANCE hwRsvpTeCompliance."
                         ::= { hwDatacomm 148 }
 
                 
@@ -1199,8 +1223,8 @@
                                 taking resources, in the range of 0 to 7.  The 
                                 value 0 is the highest priority. The Setup 
                                 Priority is used in deciding whether this 
-                                session can preempt another session."
-                        DEFVAL { 7 }
+                                session can preempt another session. The default
+                                value is 7."
                         ::= { hwRsvpTeSenderEntry 57 }
 
                 
@@ -1213,8 +1237,8 @@
                                 holding resources, in the range of 0 to 7.  The
                                  value 0 is the highest priority. Holding 
                                 Priority is used in deciding whether this 
-                                session can be preempted by another session."
-                        DEFVAL { 7 }
+                                session can be preempted by another session. 
+                                The default value is 7."
                         ::= { hwRsvpTeSenderEntry 58 }
 
                 
@@ -1288,8 +1312,7 @@
                                 value 0 is the highest priority.  Setup Priority
                                  is used in deciding whether this session can 
                                 preempt another session.  See [RSVP-TE] for the 
-                                usage on priority."
-                        DEFVAL { 7 }
+                                usage on priority.  The default value is 7."
                         ::= { hwRsvpTeSenderEntry 64 }
 
                 
@@ -1302,8 +1325,8 @@
                                  holding resources, in the range 0 to 7.  The 
                                 value 0 is the highest priority.  Holding 
                                 Priority is used in deciding whether this 
-                                session can be preempted by another session.  "
-                        DEFVAL { 7 }
+                                session can be preempted by another session. 
+                                The default value is 7. "
                         ::= { hwRsvpTeSenderEntry 65 }
 
                 
@@ -1316,8 +1339,8 @@
                                  is allowed to take, from current node (a PLR) 
                                 to an MP, with PLR and MP excluded from the count.
                                   For example, hop-limit of 0 means that only 
-                                direct links between PLR and MP can be considered."
-                        DEFVAL { 16 }
+                                direct links between PLR and MP can be considered. 
+                                The default value is 16."
                         ::= { hwRsvpTeSenderEntry 66 }
 
                 
@@ -1708,7 +1731,7 @@
 
                 
                 hwRsvpTeResvScope OBJECT-TYPE
-                        SYNTAX OCTET STRING (SIZE (0..65536))
+                        SYNTAX OCTET STRING (SIZE (0..65535))
                         MAX-ACCESS read-only
                         STATUS current
                         DESCRIPTION
@@ -1760,7 +1783,7 @@
 
                 
                 hwRsvpTeResvPolicy OBJECT-TYPE
-                        SYNTAX OCTET STRING (SIZE (0..65536))
+                        SYNTAX OCTET STRING (SIZE (0..65535))
                         MAX-ACCESS read-only
                         STATUS current
                         DESCRIPTION
@@ -2086,7 +2109,7 @@
 
                 
                 hwRsvpTeResvFwdScope OBJECT-TYPE
-                        SYNTAX OCTET STRING (SIZE (0..65536))
+                        SYNTAX OCTET STRING (SIZE (0..65535))
                         MAX-ACCESS read-only
                         STATUS current
                         DESCRIPTION
@@ -2135,7 +2158,7 @@
 
                 
                 hwRsvpTeResvFwdPolicy OBJECT-TYPE
-                        SYNTAX OCTET STRING (SIZE (0..65536))
+                        SYNTAX OCTET STRING (SIZE (0..65535))
                         MAX-ACCESS read-only
                         STATUS current
                         DESCRIPTION
@@ -2263,7 +2286,9 @@
                                 hwRsvpTeIfAuthKey
                                         OCTET STRING,
                                 hwRsvpTeIfWindowSize
-                                        Integer32
+                                        Integer32,
+                                hwRsvpTeIfAuthType
+                                        INTEGER
                          }
 
                 hwRsvpTeIfUdpNbrs OBJECT-TYPE
@@ -2343,8 +2368,8 @@
                         DESCRIPTION
                                 "The value of the RSVP value 'R', which is  the
                                 minimum period between refresh transmissions of
-                                a given PATH or RESV message on an interface."
-                        DEFVAL { 30000 }
+                                a given PATH or RESV message on an interface. 
+                                The default value is 30000."
                         ::= { hwRsvpTeIfEntry 7 }
 
                 
@@ -2357,8 +2382,7 @@
                         DESCRIPTION
                                 "The approximate period from the time  a  route
                                 is  changed to the time a resulting message ap-
-                                pears on the interface."
-                        DEFVAL { 200 }
+                                pears on the interface. The default value is 200."
                         ::= { hwRsvpTeIfEntry 8 }
 
                 
@@ -2386,7 +2410,7 @@
                 
                 hwRsvpTeIfStatus OBJECT-TYPE
                         SYNTAX RowStatus
-                        MAX-ACCESS read-only
+                        MAX-ACCESS read-create
                         STATUS current
                         DESCRIPTION
                                 "'active' on interfaces that are configured for
@@ -2423,8 +2447,7 @@
                         STATUS current
                         DESCRIPTION
                                 "The srefresh interval. I.e. time difference 
-                                between 2 refreshes."
-                        DEFVAL { 30000 }
+                                between 2 refreshes.  The default value is 30000."
                         ::= { hwRsvpTeIfEntry 14 }
 
                 
@@ -2446,8 +2469,8 @@
                         MAX-ACCESS read-only
                         STATUS current
                         DESCRIPTION
-                                "The retransmission interval."
-                        DEFVAL { 500 }
+                                "The retransmission interval.  The default value 
+                                is 5000."
                         ::= { hwRsvpTeIfEntry 16 }
 
                 
@@ -2487,18 +2510,19 @@
                         MAX-ACCESS read-only
                         STATUS current
                         DESCRIPTION
-                                "Authentication life time."
-                        DEFVAL { 1800000 }
+                                "Authentication life time.  The default value is 
+                                1800000."
                         ::= { hwRsvpTeIfEntry 20 }
 
                 
                 hwRsvpTeIfAuthKey OBJECT-TYPE
-                        SYNTAX OCTET STRING (SIZE (0..64))
+                        SYNTAX OCTET STRING (SIZE (0..392))
                         MAX-ACCESS read-only
                         STATUS current
                         DESCRIPTION
                                 "Authentication key, used for authentication 
-                                processing. "
+                                processing. For security purposes, a get on 
+                                this returns a zero length string."
                         ::= { hwRsvpTeIfEntry 21 }
 
                 
@@ -2513,11 +2537,28 @@
                                 packets reordered within a 32 message window 
                                 would be accepted.  If no reordering can occur, 
                                 the window is set to one. The maximum value is 
-                                64."
-                        DEFVAL { 1 }
+                                64.  The default value is 1."
                         ::= { hwRsvpTeIfEntry 22 }
 
-                
+
+                 hwRsvpTeIfAuthType OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                null(1),
+                                md5(2),
+                                keychain(3)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Authentication type of RSVP-TE interface,
+                                null (1): authentication is not configured.
+                                md5 (2): authentication type is md5.
+                                keychain (3): authentication type is keychain.
+                                The default value is 1."
+                        ::= { hwRsvpTeIfEntry 23 }
+ 
+              
 --       The RSVP Neighbor Database lists the neighbors the RSVP
 -- process currently is receiving messages from.
                 hwRsvpTeNbrTable OBJECT-TYPE
@@ -2607,7 +2648,7 @@
                 
                 hwRsvpTeNbrStatus OBJECT-TYPE
                         SYNTAX RowStatus
-                        MAX-ACCESS read-only
+                        MAX-ACCESS read-create
                         STATUS current
                         DESCRIPTION
                                 "'active' for all neighbors.  This  object  may
@@ -2753,7 +2794,9 @@
                         DESCRIPTION
                                 "Neighbor's authentication key, used for 
                                 authentication processing. A return of null
-                                string indicates the absence of the item."
+                                string indicates the absence of the item.
+                                For security purposes, a get on this returns 
+                                a zero length string."
                         ::= { hwRsvpTeNbrEntry 15 }
 
                 
@@ -2792,7 +2835,8 @@
                         MAX-ACCESS not-accessible
                         STATUS current
                         DESCRIPTION
-                                "Description."
+                                "Information describes the MessageIds of an 
+                                RSVP system."
                         INDEX { ifIndex, hwRsvpTeNbrAddress, hwRsvpTeMessageIdEpoch, hwRsvpTeMessageIdNumber  }
                         ::= { hwRsvpTeMessageIdTable 1 }
 
@@ -2863,7 +2907,8 @@
                         MAX-ACCESS not-accessible
                         STATUS current
                         DESCRIPTION
-                                "Description."
+                                "Information describes the FilterSpecs of an 
+                                RSVP system."
                         INDEX { hwRsvpTeSessionNumber, hwRsvpTeResvNumber, hwRsvpTeFilterSpecNumber  }
                         ::= { hwRsvpTeFilterSpecTable 1 }
 
@@ -2937,7 +2982,8 @@
                         MAX-ACCESS not-accessible
                         STATUS current
                         DESCRIPTION
-                                "Description."
+                                "Information describes the RRO sub-objects of 
+                                an RSVP system."
                         INDEX { hwRsvpTeSessionNumber, hwRsvpTeSenderNumber, hwRsvpTeRroNumber  }
                         ::= { hwRsvpTeRroTable 1 }
 
@@ -3050,7 +3096,8 @@
                         MAX-ACCESS not-accessible
                         STATUS current
                         DESCRIPTION
-                                "Description."
+                                "Information describes the ERO sub-objects 
+                                of an RSVP system."
                         INDEX { hwRsvpTeSessionNumber, hwRsvpTeSenderNumber, hwRsvpTeEroNumber  }
                         ::= { hwRsvpTeEroTable 1 }
 
@@ -3109,9 +3156,280 @@
                         DESCRIPTION
                                 "IP prefix length for this sub-object."
                         ::= { hwRsvpTeEroEntry 4 }
+                
+                hwRsvpTeExtendObjects OBJECT IDENTIFIER ::= { hwRsvpTeObjects 11 }
+
+                hwRsvpTeExtendTrap OBJECT IDENTIFIER ::= { hwRsvpTeObjects 12 }
+
+                hwRsvpTeTrapObjects OBJECT IDENTIFIER ::= { hwRsvpTeExtendTrap 1 }
+
+                hwRsvpTeNbr OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "IP address of RSVP neighbour."
+                        ::= { hwRsvpTeTrapObjects 1 }
+
+                hwRsvpTeIfNbrCurrentCount OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "Number of existing neighbors of the RSVP interface."
+                        ::= { hwRsvpTeTrapObjects 2 }
+           
+                hwRsvpTeIfNbrThreshold OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "Threshold for the number of neighbors of the RSVP interface."
+                        ::= { hwRsvpTeTrapObjects 3 }
+        
+                hwRsvpTeIfNbrTotalCount OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "Maximum number of allowed neighbors of the RSVP interface."
+                        ::= { hwRsvpTeTrapObjects 4 }
+
+               hwRsvpTeIfName OBJECT-TYPE
+                        SYNTAX DisplayString
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "The name of the RSVP interface."
+                        ::= { hwRsvpTeTrapObjects 5 }
+			   
+               hwRsvpTeIpAddress OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "The IP address."
+                        ::= { hwRsvpTeTrapObjects 6 }
+			
+               hwRsvpTePreviousHop OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "The previous hop."
+                        ::= { hwRsvpTeTrapObjects 7 }
+			
+               hwRsvpTeNextHop OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "The next hop."
+                        ::= { hwRsvpTeTrapObjects 8 }
+
+               hwRsvpTeSuspiciousAddr1 OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "The fourth address in the upstream of the conflict address."
+                        ::= { hwRsvpTeTrapObjects 9 }
+
+               hwRsvpTeSuspiciousAddr2 OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "The third address in the upstream of the conflict address."
+                        ::= { hwRsvpTeTrapObjects 10 }
+
+               hwRsvpTeSuspiciousAddr3 OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "The second address in the upstream of the conflict address."
+                        ::= { hwRsvpTeTrapObjects 11 }
+
+               hwRsvpTeSuspiciousAddr4 OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "The first address in the upstream of the conflict address."
+                        ::= { hwRsvpTeTrapObjects 12 }
+
+               hwRsvpTeSuspiciousAddr5 OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "The first address in the downstream of the conflict address."
+                        ::= { hwRsvpTeTrapObjects 13 }
+
+               hwRsvpTeSuspiciousAddr6 OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "The second address in the downstream of the conflict address."
+                        ::= { hwRsvpTeTrapObjects 14 }
+
+               hwRsvpTeSuspiciousAddr7 OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "The third address in the downstream of the conflict address."
+                        ::= { hwRsvpTeTrapObjects 15 }
+
+               hwRsvpTeSuspiciousAddr8 OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "The fourth address in the downstream of the conflict address."
+                        ::= { hwRsvpTeTrapObjects 16 }
+
+               hwRsvpTeConflictAddr OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION "The conflict address."
+                        ::= { hwRsvpTeTrapObjects 17 }
+
+                hwRsvpTeTrap OBJECT IDENTIFIER ::= { hwRsvpTeExtendTrap 2 }
+                
+--   1.3.6.1.4.1.2011.5.25.148.1.12.2.1
+                hwRsvpTeHelloLost NOTIFICATION-TYPE
+                        OBJECTS { hwRsvpTeNbr }
+                        STATUS current
+                        DESCRIPTION "Indicates neighbour of RSVP hello lost."
+                        ::= { hwRsvpTeTrap 1 }
+
+--   1.3.6.1.4.1.2011.5.25.148.1.12.2.2
+                hwRsvpTeHelloLostRecovery NOTIFICATION-TYPE
+                        OBJECTS { hwRsvpTeNbr }
+                        STATUS current
+                        DESCRIPTION "Indicates neighbour of RSVP hello lost."
+                        ::= { hwRsvpTeTrap 2 }
+
+--   1.3.6.1.4.1.2011.5.25.148.1.12.2.3
+                hwRsvpTeAuthFail NOTIFICATION-TYPE
+                        OBJECTS { hwRsvpTeNbr }
+                        STATUS current
+                        DESCRIPTION "Indicates neighbour of RSVP hello lost."
+                        ::= { hwRsvpTeTrap 3 }
+
+--   1.3.6.1.4.1.2011.5.25.148.1.12.2.4
+                hwRsvpTeAuthSuccess NOTIFICATION-TYPE
+                        OBJECTS { hwRsvpTeNbr }
+                        STATUS current
+                        DESCRIPTION "Indicates neighbour of RSVP hello lost."
+                        ::= { hwRsvpTeTrap 4 }
+                        
+                hwRsvpTeIfNbrThresholdExceed NOTIFICATION-TYPE
+                        OBJECTS { hwRsvpTeIfName, hwRsvpTeIfNbrCurrentCount, hwRsvpTeIfNbrThreshold, hwRsvpTeIfNbrTotalCount }
+                        STATUS current
+                        DESCRIPTION "Indicates that the number of RSVP interface neighbors has exceeded the upper threshold."
+                        ::= { hwRsvpTeTrap 5 }
+
+                hwRsvpTeIfNbrThresholdExceedClear NOTIFICATION-TYPE
+                        OBJECTS { hwRsvpTeIfName }
+                        STATUS current
+                        DESCRIPTION "Indicates that the number of RSVP interface neighbors has fallen below the lower threshold."
+                        ::= { hwRsvpTeTrap 6 }
+
+                hwRsvpTeIfNbrTotalCountExceed NOTIFICATION-TYPE
+                        OBJECTS { hwRsvpTeIfName, hwRsvpTeIfNbrTotalCount }
+                        STATUS current
+                        DESCRIPTION "Indicates that the number of RSVP interface neighbors has reached the maximum number."
+                        ::= { hwRsvpTeTrap 7 }
+
+                hwRsvpTeIfNbrTotalCountExceedClear NOTIFICATION-TYPE
+                        OBJECTS { hwRsvpTeIfName }
+                        STATUS current
+                        DESCRIPTION "Indicates that the number of RSVP interface neighbors has fallen below the recovery number."
+                        ::= { hwRsvpTeTrap 8 }
+
+				
+                hwRsvpTeIpConflict NOTIFICATION-TYPE
+                        OBJECTS { hwRsvpTeIpAddress, hwRsvpTePreviousHop, hwRsvpTeNextHop }
+                        STATUS current
+                        DESCRIPTION "Indicates that RSVP detected a conflicting IP address."
+                        ::= { hwRsvpTeTrap 9 }
+						
+                hwRsvpTeIpConflictClear NOTIFICATION-TYPE
+                        OBJECTS { hwRsvpTeIpAddress }
+                        STATUS current
+                        DESCRIPTION "Indicates that RSVP remove a conflicting IP address alarm."
+                        ::= { hwRsvpTeTrap 10 }
+
+                hwRsvpTeAddrConflict NOTIFICATION-TYPE
+                        OBJECTS { hwRsvpTeConflictAddr, hwRsvpTeSuspiciousAddr1, hwRsvpTeSuspiciousAddr2, hwRsvpTeSuspiciousAddr3, hwRsvpTeSuspiciousAddr4, hwRsvpTeSuspiciousAddr5, hwRsvpTeSuspiciousAddr6, hwRsvpTeSuspiciousAddr7, hwRsvpTeSuspiciousAddr8 }
+                        STATUS current
+                        DESCRIPTION "Indicates that RSVP detected a conflicting IP address."
+                        ::= { hwRsvpTeTrap 11 }
+						
+                hwRsvpTeAddrConflictRecovery NOTIFICATION-TYPE
+                        OBJECTS { hwRsvpTeConflictAddr, hwRsvpTeSuspiciousAddr1, hwRsvpTeSuspiciousAddr2, hwRsvpTeSuspiciousAddr3, hwRsvpTeSuspiciousAddr4, hwRsvpTeSuspiciousAddr5, hwRsvpTeSuspiciousAddr6, hwRsvpTeSuspiciousAddr7, hwRsvpTeSuspiciousAddr8 }
+                        STATUS current
+                        DESCRIPTION "Indicates that RSVP remove a conflicting IP address alarm."
+                        ::= { hwRsvpTeTrap 12 }
+
+                hwAddrConflictNode NOTIFICATION-TYPE
+                        OBJECTS { hwRsvpTeConflictAddr }
+                        STATUS current
+                        DESCRIPTION "Indicates that the ingress of the RSVP tunnel detected a conflicting IP address."
+                        ::= { hwRsvpTeTrap 13 }
+						
+                hwAddrConflictNodeRecovery NOTIFICATION-TYPE
+                        OBJECTS { hwRsvpTeConflictAddr }
+                        STATUS current
+                        DESCRIPTION "Indicates that the ingress of the RSVP tunnel remove a conflicting IP address alarm."
+                        ::= { hwRsvpTeTrap 14 }
+
+--  traps
+                hwRsvpTePeerTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwRsvpTePeerEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information describing the configured Neighbors of an
+                                RSVP system."
+                        ::= { hwRsvpTeObjects 13 }
 
                 
---  traps
+                hwRsvpTePeerEntry OBJECT-TYPE
+                        SYNTAX HwRsvpTePeerEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Information describing a single RSVP configured Neigh-
+                                bor."
+                        INDEX { hwRsvpTePeerAddress }
+                        ::= { hwRsvpTePeerTable 1 }
+
+                
+                HwRsvpTePeerEntry ::=
+                        SEQUENCE { 
+                                hwRsvpTePeerAddress
+                                        IpAddress,
+                                hwRsvpTePeerAuthType
+                                        INTEGER
+                         }
+
+                hwRsvpTePeerAddress OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The IP4 Address used by this configured neighbor."
+                        ::= { hwRsvpTePeerEntry 1 }
+
+                hwRsvpTePeerAuthType OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                null(1),
+                                md5(2),
+                                keychain(3)
+                                }
+
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Authentication type of configured neighbor,
+                                null (1): authentication is not configured.
+                                md5 (2): authentication type is md5.
+                                keychain (3): authentication type is keychain.
+                                The default value is 1."
+                        ::= { hwRsvpTePeerEntry 2 }
+
+
                 hwRsvpTeConformance OBJECT IDENTIFIER ::= { hwRsvpTe 2 }
 
                 
@@ -3182,7 +3500,7 @@
                                 hwRsvpTeIfTtl, hwRsvpTeIfRefreshInterval, hwRsvpTeIfRouteDelay, hwRsvpTeIfEnabled, hwRsvpTeIfUdpRequired, 
                                 hwRsvpTeIfStatus, hwRsvpTeIfHelloEnabled, hwRsvpTeIfSrefreshEnabled, hwRsvpTeIfSrefreshInterval, hwRsvpTeIfRetranIncDelta, 
                                 hwRsvpTeIfRetranInterval, hwRsvpTeIfAuthEnabled, hwRsvpTeIfAuthEncrypted , hwRsvpTeIfAuthHandshake, hwRsvpTeIfAuthKey, 
-                                hwRsvpTeIfWindowSize, hwRsvpTeIfAuthLifeTime }
+                                hwRsvpTeIfWindowSize, hwRsvpTeIfAuthLifeTime, hwRsvpTeIfAuthType }
                         STATUS current
                         DESCRIPTION 
                                 "These objects are required for RSVP Systems."
@@ -3231,8 +3549,30 @@
                         DESCRIPTION 
                                 "Description."
                         ::= { hwRsvpTeGroups 10 }
-
                 
+                hwRsvpTeTrapObjectsGroup OBJECT-GROUP
+                        OBJECTS { hwRsvpTeNbr, hwRsvpTeIfNbrCurrentCount, hwRsvpTeIfNbrThreshold, hwRsvpTeIfNbrTotalCount, hwRsvpTeIfName, hwRsvpTeIpAddress, hwRsvpTePreviousHop, hwRsvpTeNextHop, hwRsvpTeSuspiciousAddr1, hwRsvpTeSuspiciousAddr2, hwRsvpTeSuspiciousAddr3, hwRsvpTeSuspiciousAddr4, 
+                                hwRsvpTeSuspiciousAddr5, hwRsvpTeSuspiciousAddr6, hwRsvpTeSuspiciousAddr7, hwRsvpTeSuspiciousAddr8, hwRsvpTeConflictAddr }
+                        STATUS current
+                        DESCRIPTION 
+                                "Description."
+                        ::= { hwRsvpTeGroups 11 }    
+                
+                hwRsvpTeTrapGroup NOTIFICATION-GROUP
+                        NOTIFICATIONS { hwRsvpTeHelloLost, hwRsvpTeHelloLostRecovery, hwRsvpTeAuthFail, hwRsvpTeAuthSuccess,
+                                hwRsvpTeIfNbrThresholdExceed, hwRsvpTeIfNbrThresholdExceedClear, hwRsvpTeIfNbrTotalCountExceed, hwRsvpTeIfNbrTotalCountExceedClear, hwRsvpTeIpConflict, hwRsvpTeIpConflictClear, hwRsvpTeAddrConflict, hwRsvpTeAddrConflictRecovery, hwAddrConflictNode, hwAddrConflictNodeRecovery }
+                        STATUS current
+                        DESCRIPTION 
+                                "Description."
+                        ::= { hwRsvpTeGroups 12 }
+
+                hwRsvpTePeerGroup OBJECT-GROUP
+                        OBJECTS { hwRsvpTePeerAuthType }
+                        STATUS current
+                        DESCRIPTION 
+                                "These objects are required for RSVP Systems."
+                        ::= { hwRsvpTeGroups 13 }
+
                 hwRsvpTeCompliances OBJECT IDENTIFIER ::= { hwRsvpTeConformance 2 }
 
                 
@@ -3246,7 +3586,7 @@
                                 tation of the Integrated Services MIB as well."
                         MODULE HUAWEI-RSVPTE-MIB
                                 MANDATORY-GROUPS { hwRsvpTeSessionGroup, hwRsvpTeSenderGroup, hwRsvpTeResvGroup, hwRsvpTeIfGroup, hwRsvpTeNbrGroup, 
-                                        hwRsvpTeFilterSpecGroup, hwRsvpTeRroGroup, hwRsvpTeEroGroup }
+                                        hwRsvpTeFilterSpecGroup, hwRsvpTeRroGroup, hwRsvpTeEroGroup, hwRsvpTeTrapObjectsGroup, hwRsvpTeTrapGroup, hwRsvpTePeerGroup }
                                 GROUP hwRsvpTeResvFwdGroup
                                         DESCRIPTION 
                                                 "The Reservation Requests table  is  appropriate

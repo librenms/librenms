@@ -32,11 +32,12 @@
                 </thead>
                 <tbody id="users_rows">
                     @foreach($users as $user)
+                        @php /** @var \App\Models\User $user */ @endphp
                         <tr>
                             <td>{{ $user->user_id }}</td>
                             <td>{{ $user->username }}</td>
                             <td>{{ $user->realname }}</td>
-                            <td>{{ $user->roles->pluck('title') }}</td>
+                            <td>{{ $user->roles->map(fn($r) => Str::title(str_replace('-', ' ', $r->name))) }}</td>
                             <td>{{ $user->auth_type }}</td>
                             <td>{{ $user->email }}</td>
                             <td>{{ \App\Models\UserPref::getPref($user, 'timezone') ?: "Browser Timezone" }}</td>
@@ -93,10 +94,8 @@
                         var delete_button = '<button type="button" title="{{ __('Delete') }}" class="btn btn-sm btn-danger" onclick="return delete_user(' + row['user_id'] + ', \'' + row['username'] + '\');">' +
                             '<i class="fa fa-trash"></i></button> ';
 
-                        // FIXME don't show for super admin
-                        var manage_button = '<form action="{{ url('edituser') }}/" method="GET"';
-                        manage_button += '>@csrf<input type="hidden" name="user_id" value="' + row['user_id'] +
-                            '"><button type="submit" title="{{ __('Manage Access') }}" class="btn btn-sm btn-primary"><i class="fa fa-tasks"></i></button>' +
+                        var manage_button = '<form action="{{ route('users.permissions.edit', ':user_id') }}'.replace(':user_id', row['user_id']) + '" method="GET"';
+                        manage_button += '><button type="submit" title="{{ __('Manage Access') }}" class="btn btn-sm btn-primary"><i class="fa fa-tasks"></i></button>' +
                             '</form> ';
 
                         var output = manage_button + edit_button;
@@ -112,7 +111,7 @@
 
                         roles.forEach((role) => {
                             let label = document.createElement('span');
-                            label.className = 'label label-info tw-mr-1';
+                            label.className = 'label label-info tw:mr-1';
                             label.innerText = role;
                             div.appendChild(label);
                         })
@@ -124,6 +123,9 @@
 
             @can('create', \App\Models\User::class)
                 $('.actionBar').append('<div class="pull-left"><a href="{{ route('users.create') }}" type="button" class="btn btn-primary">{{ __('Add User') }}</a></div>');
+            @endcan
+            @can('viewAny', \Spatie\Permission\Models\Role::class)
+                $('.actionBar').append('<div class="pull-left tw:ml-2"><a href="{{ route('roles.index') }}" type="button" class="btn btn-default">{{ __('permissions.rbac.manage_roles') }}</a></div>');
             @endcan
 
             user_grid.css('display', 'table'); // done loading, show

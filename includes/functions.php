@@ -8,123 +8,12 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Models\StateTranslation;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
-use LibreNMS\Enum\Severity;
-
-/**
- * Parse cli discovery or poller modules and set config for this run
- *
- * @param  string  $type  discovery or poller
- * @param  array  $options  get_opts array (only m key is checked)
- * @return bool
- */
-function parse_modules($type, $options)
-{
-    $override = false;
-
-    if (! empty($options['m'])) {
-        Config::set("{$type}_modules", []);
-        foreach (explode(',', $options['m']) as $module) {
-            // parse submodules (only supported by some modules)
-            if (Str::contains($module, '/')) {
-                [$module, $submodule] = explode('/', $module, 2);
-                $existing_submodules = Config::get("{$type}_submodules.$module", []);
-                $existing_submodules[] = $submodule;
-                Config::set("{$type}_submodules.$module", $existing_submodules);
-            }
-
-            $dir = $type == 'poller' ? 'polling' : $type;
-            if (is_file("includes/$dir/$module.inc.php")) {
-                Config::set("{$type}_modules.$module", 1);
-                $override = true;
-            }
-        }
-
-        // display selected modules
-        $modules = array_map(function ($module) use ($type) {
-            $submodules = Config::get("{$type}_submodules.$module");
-
-            return $module . ($submodules ? '(' . implode(',', $submodules) . ')' : '');
-        }, array_keys(Config::get("{$type}_modules", [])));
-
-        d_echo("Override $type modules: " . implode(', ', $modules) . PHP_EOL);
-    }
-
-    return $override;
-}
-
-function logfile($string)
-{
-    $file = Config::get('log_file');
-    $fd = fopen($file, 'a');
-
-    if ($fd === false) {
-        print_error("Error: Could not write to log file: $file");
-
-        return;
-    }
-
-    fputs($fd, $string . "\n");
-    fclose($fd);
-}
-
-function percent_colour($perc)
-{
-    return \LibreNMS\Util\Color::percent(percent: $perc);
-}
-
-/**
- * @param  $device
- * @return string the path to the icon image for this device.  Close to square.
- */
-function getIcon($device)
-{
-    return 'images/os/' . getImageName($device);
-}
-
-/**
- * @param  $device
- * @return string an image tag with the icon for this device.  Close to square.
- */
-function getIconTag($device)
-{
-    return '<img src="' . getIcon($device) . '" title="' . getImageTitle($device) . '"/>';
-}
-
-function getImageTitle($device)
-{
-    return $device['icon'] ? str_replace(['.svg', '.png'], '', $device['icon']) : $device['os'];
-}
-
-function getImageName($device, $use_database = true, $dir = 'images/os/')
-{
-    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'] ?? '', $use_database ? $device['icon'] : null, $dir);
-}
-
-function renamehost($id, $new, $source = 'console')
-{
-    $host = gethostbyid($id);
-    $new_rrd_dir = Rrd::dirFromHost($new);
-
-    if (is_dir($new_rrd_dir)) {
-        log_event("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', 5);
-
-        return "Renaming of $host failed due to existing RRD folder for $new\n";
-    }
-
-    if (! is_dir($new_rrd_dir) && rename(Rrd::dirFromHost($host), $new_rrd_dir) === true) {
-        dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
-        log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
-
-        return '';
-    }
-
-    log_event("Renaming of $host failed", $id, 'system', 5);
-
-    return "Renaming of $host failed\n";
-}
 
 function device_discovery_trigger($id)
 {
@@ -168,89 +57,22 @@ function isDomainResolves($domain)
     return ! empty($records);
 }
 
-function match_network($nets, $ip, $first = false)
-{
-    $return = false;
-    if (! is_array($nets)) {
-        $nets = [$nets];
-    }
-    foreach ($nets as $net) {
-        $rev = (preg_match("/^\!/", $net)) ? true : false;
-        $net = preg_replace("/^\!/", '', $net);
-        $ip_arr = explode('/', $net);
-        $net_long = ip2long($ip_arr[0]);
-        $x = ip2long($ip_arr[1]);
-        $mask = long2ip($x) == $ip_arr[1] ? $x : 0xFFFFFFFF << (32 - $ip_arr[1]);
-        $ip_long = ip2long($ip);
-        if ($rev) {
-            if (($ip_long & $mask) == ($net_long & $mask)) {
-                return false;
-            }
-        } else {
-            if (($ip_long & $mask) == ($net_long & $mask)) {
-                $return = true;
-            }
-            if ($first && $return) {
-                return true;
-            }
-        }
-    }
-
-    return $return;
-}
-
 // FIXME port to LibreNMS\Util\IPv6 class
 function snmp2ipv6($ipv6_snmp)
 {
     // Workaround stupid Microsoft bug in Windows 2008 -- this is fixed length!
     // < fenestro> "because whoever implemented this mib for Microsoft was ignorant of RFC 2578 section 7.7 (2)"
-    $ipv6 = array_slice(explode('.', $ipv6_snmp), -16);
+    $ipv6 = array_slice(explode('.', (string) $ipv6_snmp), -16);
     $ipv6_2 = [];
 
     for ($i = 0; $i <= 15; $i++) {
-        $ipv6[$i] = zeropad(dechex($ipv6[$i]));
+        $ipv6[$i] = Str::padLeft(dechex($ipv6[$i]), 2, '0');
     }
     for ($i = 0; $i <= 15; $i += 2) {
         $ipv6_2[] = $ipv6[$i] . $ipv6[$i + 1];
     }
 
     return implode(':', $ipv6_2);
-}
-
-/**
- * Log events to the event table
- *
- * @param  string  $text  message describing the event
- * @param  array|int  $device  device array or device_id
- * @param  string  $type  brief category for this event. Examples: sensor, state, stp, system, temperature, interface
- * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
- * @param  int  $reference  the id of the referenced entity.  Supported types: interface
- */
-function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
-{
-    // handle legacy device array
-    if (is_array($device) && isset($device['device_id'])) {
-        $device = $device['device_id'];
-    }
-
-    \App\Models\Eventlog::log($text, $device, $type, Severity::tryFrom((int) $severity) ?? Severity::Info, $reference);
-}
-
-function hex2str($hex)
-{
-    $string = '';
-
-    for ($i = 0; $i < strlen($hex) - 1; $i += 2) {
-        $string .= chr(hexdec(substr($hex, $i, 2)));
-    }
-
-    return $string;
-}
-
-// Convert an SNMP hex string to regular string
-function snmp_hexstring($hex)
-{
-    return hex2str(str_replace(' ', '', str_replace(' 00', '', $hex)));
 }
 
 /**
@@ -267,14 +89,14 @@ function is_port_valid($port, $device)
     if (empty($port['ifDescr'])) {
         // If these are all empty, we are just going to show blank names in the ui
         if (empty($port['ifAlias']) && empty($port['ifName'])) {
-            d_echo("ignored: empty ifDescr, ifAlias and ifName\n");
+            Log::debug('ignored: empty ifDescr, ifAlias and ifName');
 
             return false;
         }
 
         // ifDescr should not be empty unless it is explicitly allowed
-        if (! Config::getOsSetting($device['os'], 'empty_ifdescr', Config::get('empty_ifdescr', false))) {
-            d_echo("ignored: empty ifDescr\n");
+        if (! LibrenmsConfig::getOsSetting($device['os'], 'empty_ifdescr', LibrenmsConfig::get('empty_ifdescr', false))) {
+            Log::debug('ignored: empty ifDescr');
 
             return false;
         }
@@ -283,56 +105,56 @@ function is_port_valid($port, $device)
     $ifDescr = $port['ifDescr'];
     $ifName = $port['ifName'] ?? '';
     $ifAlias = $port['ifAlias'] ?? '';
-    $ifType = $port['ifType'];
+    $ifType = $port['ifType'] ?? '';
     $ifOperStatus = $port['ifOperStatus'] ?? '';
 
-    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
+    if (Str::contains($ifDescr, LibrenmsConfig::getOsSetting($device['os'], 'good_if', LibrenmsConfig::get('good_if')), ignoreCase: true)) {
         return true;
     }
 
-    foreach (Config::getCombined($device['os'], 'bad_if') as $bi) {
-        if (str_i_contains($ifDescr, $bi)) {
-            d_echo("ignored by ifDescr: $ifDescr (matched: $bi)\n");
+    foreach (LibrenmsConfig::getCombined($device['os'], 'bad_if') as $bi) {
+        if (Str::contains($ifDescr, $bi, ignoreCase: true)) {
+            Log::debug("ignored by ifDescr: $ifDescr (matched: $bi)");
 
             return false;
         }
     }
 
-    foreach (Config::getCombined($device['os'], 'bad_if_regexp') as $bir) {
-        if (preg_match($bir . 'i', $ifDescr)) {
-            d_echo("ignored by ifDescr: $ifDescr (matched: $bir)\n");
+    foreach (LibrenmsConfig::getCombined($device['os'], 'bad_if_regexp') as $bir) {
+        if (preg_match($bir . 'i', (string) $ifDescr)) {
+            Log::debug("ignored by ifDescr: $ifDescr (matched: $bir)");
 
             return false;
         }
     }
 
-    foreach (Config::getCombined($device['os'], 'bad_ifname_regexp') as $bnr) {
+    foreach (LibrenmsConfig::getCombined($device['os'], 'bad_ifname_regexp') as $bnr) {
         if (preg_match($bnr . 'i', $ifName)) {
-            d_echo("ignored by ifName: $ifName (matched: $bnr)\n");
+            Log::debug("ignored by ifName: $ifName (matched: $bnr)");
 
             return false;
         }
     }
 
-    foreach (Config::getCombined($device['os'], 'bad_ifalias_regexp') as $bar) {
+    foreach (LibrenmsConfig::getCombined($device['os'], 'bad_ifalias_regexp') as $bar) {
         if (preg_match($bar . 'i', $ifAlias)) {
-            d_echo("ignored by ifAlias: $ifAlias (matched: $bar)\n");
+            Log::debug("ignored by ifAlias: $ifAlias (matched: $bar)");
 
             return false;
         }
     }
 
-    foreach (Config::getCombined($device['os'], 'bad_iftype') as $bt) {
+    foreach (LibrenmsConfig::getCombined($device['os'], 'bad_iftype') as $bt) {
         if (Str::contains($ifType, $bt)) {
-            d_echo("ignored by ifType: $ifType (matched: $bt )\n");
+            Log::debug("ignored by ifType: $ifType (matched: $bt )");
 
             return false;
         }
     }
 
-    foreach (Config::getCombined($device['os'], 'bad_ifoperstatus') as $bos) {
+    foreach (LibrenmsConfig::getCombined($device['os'], 'bad_ifoperstatus') as $bos) {
         if (Str::contains($ifOperStatus, $bos)) {
-            d_echo("ignored by ifOperStatus: $ifOperStatus (matched: $bos)\n");
+            Log::debug("ignored by ifOperStatus: $ifOperStatus (matched: $bos)");
 
             return false;
         }
@@ -358,133 +180,23 @@ function port_fill_missing_and_trim(&$port, $device)
     // When devices do not provide data, populate with other data if available
     if (! isset($port['ifDescr']) || $port['ifDescr'] == '') {
         $port['ifDescr'] = $port['ifName'];
-        d_echo(' Using ifName as ifDescr');
+        Log::debug(' Using ifName as ifDescr');
     }
     $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('ifName:' . $port['ifName']);
     if (! empty($attrib)) {
         // ifAlias overridden by user, don't update it
         unset($port['ifAlias']);
-        d_echo(' ifAlias overriden by user');
+        Log::debug(' ifAlias overriden by user');
     } elseif (! isset($port['ifAlias']) || $port['ifAlias'] == '') {
         $port['ifAlias'] = $port['ifDescr'];
-        d_echo(' Using ifDescr as ifAlias');
+        Log::debug(' Using ifDescr as ifAlias');
     }
 
     if (! isset($port['ifName']) || $port['ifName'] == '') {
         $port['ifName'] = $port['ifDescr'];
-        d_echo(' Using ifDescr as ifName');
+        Log::debug(' Using ifDescr as ifName');
     }
 }
-
-function validate_device_id($id)
-{
-    if (empty($id) || ! is_numeric($id)) {
-        $return = false;
-    } else {
-        $device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `device_id` = ?', [$id]);
-        if ($device_id == $id) {
-            $return = true;
-        } else {
-            $return = false;
-        }
-    }
-
-    return $return;
-}
-
-function convert_delay($delay)
-{
-    if (preg_match('/(\d+)([mhd]?)/', $delay, $matches)) {
-        $multipliers = [
-            'm' => 60,
-            'h' => 3600,
-            'd' => 86400,
-        ];
-
-        $multiplier = $multipliers[$matches[2]] ?? 1;
-
-        return $matches[1] * $multiplier;
-    }
-
-    return $delay === '' ? 0 : 300;
-}
-
-function normalize_snmp_ip_address($data)
-{
-    // $data is received from snmpwalk, can be ipv4 xxx.xxx.xxx.xxx or ipv6 xx:xx:...:xx (16 chunks)
-    // ipv4 is returned unchanged, ipv6 is returned with one ':' removed out of two, like
-    //  xxxx:xxxx:...:xxxx (8 chuncks)
-    return preg_replace('/([0-9a-fA-F]{2}):([0-9a-fA-F]{2})/', '\1\2', explode('%', $data, 2)[0]);
-}
-
-function fix_integer_value($value)
-{
-    if ($value < 0) {
-        $return = 4294967296 + $value;
-    } else {
-        $return = $value;
-    }
-
-    return $return;
-}
-
-/**
- * Checks if the $hostname provided exists in the DB already
- *
- * @param  string  $hostname  The hostname to check for
- * @param  string  $sysName  The sysName to check
- * @return bool true if hostname already exists
- *              false if hostname doesn't exist
- */
-function host_exists($hostname, $sysName = null)
-{
-    $query = 'SELECT COUNT(*) FROM `devices` WHERE `hostname`=?';
-    $params = [$hostname];
-
-    if (! empty($sysName) && ! Config::get('allow_duplicate_sysName')) {
-        $query .= ' OR `sysName`=?';
-        $params[] = $sysName;
-
-        if (! empty(Config::get('mydomain'))) {
-            $full_sysname = rtrim($sysName, '.') . '.' . Config::get('mydomain');
-            $query .= ' OR `sysName`=?';
-            $params[] = $full_sysname;
-        }
-    }
-
-    return dbFetchCell($query, $params) > 0;
-}
-
-/**
- * Perform DNS lookup
- *
- * @param  array  $device  Device array from database
- * @param  string  $type  The type of record to lookup
- * @return string ip
- *
- **/
-function dnslookup($device, $type = false, $return = false)
-{
-    if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
-        return false;
-    }
-    if (empty($type)) {
-        // We are going to use the transport to work out the record type
-        if ($device['transport'] == 'udp6' || $device['transport'] == 'tcp6') {
-            $type = DNS_AAAA;
-            $return = 'ipv6';
-        } else {
-            $type = DNS_A;
-            $return = 'ip';
-        }
-    }
-    if (empty($return)) {
-        return false;
-    }
-    $record = dns_get_record($device['hostname'], $type);
-
-    return $record[0][$return] ?? null;
-}//end dnslookup
 
 /**
  * Create a new state index.  Update translations if $states is given.
@@ -498,19 +210,11 @@ function dnslookup($device, $type = false, $return = false)
  */
 function create_state_index($state_name, $states = []): void
 {
-    app('sensor-discovery')->withStateTranslations($state_name, array_map(function ($state) {
-        return new StateTranslation([
-            'state_descr' => $state['descr'],
-            'state_draw_graph' => $state['graph'],
-            'state_value' => $state['value'],
-            'state_generic_value' => $state['generic'],
-        ]);
-    }, $states));
-}
-
-function create_sensor_to_state_index($device, $state_name, $index)
-{
-    // no op
+    app('sensor-discovery')->withStateTranslations($state_name, array_map(fn ($state) => new StateTranslation([
+        'state_descr' => $state['descr'],
+        'state_value' => $state['value'],
+        'state_generic_value' => $state['generic'],
+    ]), $states));
 }
 
 function delta_to_bits($delta, $period)
@@ -518,18 +222,13 @@ function delta_to_bits($delta, $period)
     return round($delta * 8 / $period, 2);
 }
 
-function report_this($message)
-{
-    return '<h2>' . htmlentities($message) . ' Please <a href="' . htmlentities(Config::get('project_issues')) . '">report this</a> to the ' . htmlentities(Config::get('project_name')) . ' developers.</h2>';
-}//end report_this()
-
 function hytera_h2f($number, $nd)
 {
     if (strlen(str_replace(' ', '', $number)) == 4) {
         $number = \LibreNMS\Util\StringHelpers::asciiToHex($number, ' ');
     }
     $r = '';
-    $y = explode(' ', $number);
+    $y = explode(' ', (string) $number);
     foreach ($y as $z) {
         $r = $z . '' . $r;
     }
@@ -585,44 +284,17 @@ function hytera_h2f($number, $nd)
     return number_format($floatfinal, $nd, '.', '');
 }
 
-function q_bridge_bits2indices($hex_data)
-{
-    /* convert hex string to an array of 1-based indices of the nonzero bits
-     * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
-    */
-    $hex_data = str_replace([' ', "\n"], '', $hex_data);
-
-    // we need an even number of digits for hex2bin
-    if (strlen($hex_data) % 2 === 1) {
-        $hex_data = '0' . $hex_data;
-    }
-
-    $value = hex2bin($hex_data);
-    $length = strlen($value);
-    $indices = [];
-    for ($i = 0; $i < $length; $i++) {
-        $byte = ord($value[$i]);
-        for ($j = 7; $j >= 0; $j--) {
-            if ($byte & (1 << $j)) {
-                $indices[] = 8 * $i + 8 - $j;
-            }
-        }
-    }
-
-    return $indices;
-}
-
 /**
  * Function to generate PeeringDB Cache
  */
 function cache_peeringdb()
 {
-    if (Config::get('peeringdb.enabled') === true) {
+    if (LibrenmsConfig::get('peeringdb.enabled') === true) {
         $peeringdb_url = 'https://peeringdb.com/api';
         // We cache for 71 hours
         $cached = dbFetchCell('SELECT count(*) FROM `pdb_ix` WHERE (UNIX_TIMESTAMP() - timestamp) < 255600');
         if ($cached == 0) {
-            $rand = rand(3, 30);
+            $rand = random_int(3, 30);
             echo "No cached PeeringDB data found, sleeping for $rand seconds" . PHP_EOL;
             sleep($rand);
             $peer_keep = [];
@@ -659,7 +331,7 @@ function cache_peeringdb()
                     $ix_json = $get_ix->body();
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'};
-                    foreach ($peers ?? [] as $index => $peer) {
+                    foreach ($peers ?? [] as $peer) {
                         $peer_name = \LibreNMS\Util\AutonomousSystem::get($peer->{'asn'})->name();
                         $tmp_peer = dbFetchRow('SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ? AND `ix_id` = ?', [$peer->{'id'}, $ixid]);
                         if ($tmp_peer) {
@@ -689,14 +361,14 @@ function cache_peeringdb()
 
             // cleanup
             if (empty($peer_keep)) {
-                dbDelete('pdb_ix_peers');
+                \App\Models\PeeringdbIxPeer::query()->delete();
             } else {
-                dbDelete('pdb_ix_peers', '`pdb_ix_peers_id` NOT IN ' . dbGenPlaceholders(count($peer_keep)), $peer_keep);
+                \App\Models\PeeringdbIxPeer::whereNotIn('pdb_ix_peers_id', $peer_keep)->delete();
             }
             if (empty($ix_keep)) {
-                dbDelete('pdb_ix');
+                \App\Models\PeeringdbIx::query()->delete();
             } else {
-                dbDelete('pdb_ix', '`pdb_ix_id` NOT IN ' . dbGenPlaceholders(count($ix_keep)), $ix_keep);
+                \App\Models\PeeringdbIx::whereNotIn('pdb_ix_id', $ix_keep)->delete();
             }
         } else {
             echo 'Cached PeeringDB data found.....' . PHP_EOL;
@@ -719,13 +391,13 @@ function get_device_oid_limit($device)
     }
 
     // then os
-    $os_max = Config::getOsSetting($device['os'], 'snmp_max_oid', 0);
+    $os_max = LibrenmsConfig::getOsSetting($device['os'], 'snmp_max_oid', 0);
     if ($os_max > 0) {
         return $os_max;
     }
 
     // then global
-    $global_max = Config::get('snmp.max_oid', 10);
+    $global_max = LibrenmsConfig::get('snmp.max_oid', 10);
 
     return $global_max > 0 ? $global_max : 10;
 }
@@ -742,11 +414,11 @@ function lock_and_purge($table, $sql)
     $purge_name = $table . '_purge';
     $lock = Cache::lock($purge_name, 86000);
     if ($lock->get()) {
-        $purge_days = Config::get($purge_name);
+        $purge_days = LibrenmsConfig::get($purge_name);
 
         $name = str_replace('_', ' ', ucfirst($table));
         if (is_numeric($purge_days)) {
-            if (dbDelete($table, $sql, [$purge_days])) {
+            if (\Illuminate\Support\Facades\DB::table($table)->whereRaw($sql, [$purge_days])->delete()) {
                 echo "$name cleared for entries over $purge_days days\n";
             }
         }
@@ -770,13 +442,13 @@ function lock_and_purge_query($table, $sql, $msg)
 {
     $purge_name = $table . '_purge';
 
-    $purge_duration = Config::get($purge_name);
+    $purge_duration = LibrenmsConfig::get($purge_name);
     if (! (is_numeric($purge_duration) && $purge_duration > 0)) {
         return -2;
     }
     $lock = Cache::lock($purge_name, 86000);
     if ($lock->get()) {
-        if (dbQuery($sql, [$purge_duration])) {
+        if (DB::statement($sql, [$purge_duration])) {
             printf($msg, $purge_duration);
         }
         $lock->release();
@@ -785,54 +457,4 @@ function lock_and_purge_query($table, $sql, $msg)
     }
 
     return -1;
-}
-
-/**
- * Check if disk is valid to poll.
- * Settings: bad_disk_regexp
- *
- * @param  array  $disk
- * @param  array  $device
- * @return bool
- */
-function is_disk_valid($disk, $device)
-{
-    foreach (Config::getCombined($device['os'], 'bad_disk_regexp') as $bir) {
-        if (preg_match($bir . 'i', $disk['diskIODevice'])) {
-            d_echo("Ignored Disk: {$disk['diskIODevice']} (matched: $bir)\n");
-
-            return false;
-        }
-    }
-
-    return true;
-}
-
-/**
- * Take a BGP error code and subcode to return a string representation of it
- *
- * @params int code
- * @params int subcode
- *
- * @return string
- */
-function describe_bgp_error_code($code, $subcode)
-{
-    // https://www.iana.org/assignments/bgp-parameters/bgp-parameters.xhtml#bgp-parameters-3
-
-    $message = 'Unknown';
-
-    $error_code_key = 'bgp.error_codes.' . $code;
-    $error_subcode_key = 'bgp.error_subcodes.' . $code . '.' . $subcode;
-
-    $error_code_message = __($error_code_key);
-    $error_subcode_message = __($error_subcode_key);
-
-    if ($error_subcode_message != $error_subcode_key) {
-        $message = $error_code_message . ' - ' . $error_subcode_message;
-    } elseif ($error_code_message != $error_code_key) {
-        $message = $error_code_message;
-    }
-
-    return $message;
 }

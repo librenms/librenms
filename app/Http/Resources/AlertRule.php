@@ -5,9 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property \App\Models\Device $devices
- * @property \App\Models\DeviceGroup $groups
- * @property \App\Models\Location $locations
+ * @mixin \App\Models\AlertRule
  */
 class AlertRule extends JsonResource
 {
@@ -18,10 +16,17 @@ class AlertRule extends JsonResource
      */
     public function toArray($request): array
     {
+        /** @var \App\Models\AlertRule $alertRule */
+        $alertRule = $this->resource;
+        $alertRule->load('alertOperation:id,default_operation_step_duration_seconds');
+
         $rule = parent::toArray($request);
-        $rule['devices'] = $this->devices->pluck('device_id')->all();
-        $rule['groups'] = $this->groups->pluck('id')->all();
-        $rule['locations'] = $this->locations->pluck('id')->all();
+        $rule['devices'] = $alertRule->devices->pluck('device_id')->all();
+        $rule['groups'] = $alertRule->groups->pluck('id')->all();
+        $rule['locations'] = $alertRule->locations->pluck('id')->all();
+        $rule['alert_operation_id'] = $alertRule->alert_operation_id;
+        $rule['default_operation_step_duration_seconds'] = $alertRule->alertOperation?->default_operation_step_duration_seconds;
+        $rule['operations'] = $alertRule->toOperationsApiArray();
 
         return $rule;
     }

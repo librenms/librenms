@@ -22,7 +22,7 @@ try {
         $nfs['data']['Mknod'], $nfs['data']['Fsstat'], $nfs['data']['Fsinfo'], $nfs['data']['PathConf'],
         $nfs['data']['Commit'], $nfs['data']['RetFailed'], $nfs['data']['Faults'], $nfs['data']['Inprog'],
         $nfs['data']['Idem'], $nfs['data']['Nonidem'], $nfs['data']['Misses'], $nfs['data']['WriteOps'],
-        $nfs['data']['WriteRPC'], $nfs['data']['Opsaved']] = explode("\n", $legacy);
+        $nfs['data']['WriteRPC'], $nfs['data']['Opsaved']] = explode("\n", (string) $legacy);
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
@@ -97,5 +97,5 @@ $fields = [
 ];
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, 'OK', $nfs['data']);

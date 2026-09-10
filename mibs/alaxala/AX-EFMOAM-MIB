@@ -1,0 +1,109 @@
+--
+-- All Rights Reserved, Copyright (c) 2015, 2016, ALAXALA Networks Corp.
+--
+-- AX-EFMOAM-MIB.my : axEfmoam group MIB file.
+--
+
+AX-EFMOAM-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        ifIndex
+            FROM RFC1213-MIB
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axEfmoam MODULE-IDENTITY
+    LAST-UPDATED    "201512250000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for IEEE802.3ah OAM information."
+
+    REVISION        "201512250000Z"
+    DESCRIPTION
+        "MODULE-IDENTITY DESCRIPTION Changed."
+    REVISION        "201504220000Z"
+    DESCRIPTION
+        "Initial release."
+::= { axMib 81 }
+
+--------------------------------------------------
+-- Object Identifiers
+--------------------------------------------------
+
+-- None
+
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+
+-- None
+
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+
+axEfmoamNotifications           OBJECT IDENTIFIER ::= { axEfmoam 0 }
+
+--
+-- axEfmoam Traps (IEEE802.3ah/UDLD)
+--
+axEfmoamUdldPortInactivateTrap NOTIFICATION-TYPE
+    OBJECTS       { ifIndex }
+    STATUS        current
+    DESCRIPTION
+             "Efmoam udld port inactivate trap."
+    ::= { axEfmoamNotifications 1 }
+
+
+axEfmoamLoopDetectPortInactivateTrap NOTIFICATION-TYPE
+    OBJECTS       { ifIndex }
+    STATUS        current
+    DESCRIPTION
+             "Efmoam loop detect port inactivate trap."
+    ::= { axEfmoamNotifications 2 }
+
+
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Conformance identifier
+--
+axEfmoamConformance       OBJECT IDENTIFIER ::= { axEfmoam 1000 }
+axEfmoamCompliances       OBJECT IDENTIFIER ::= { axEfmoamConformance 1 }
+axEfmoamGroups            OBJECT IDENTIFIER ::= { axEfmoamConformance 2 }
+
+--
+-- Compliance
+--
+axEfmoamCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "AX Efmoam Error"
+    MODULE        -- this module
+        MANDATORY-GROUPS { axEfmoamNotificationGroup }
+    ::= { axEfmoamCompliances 1 }
+
+--
+-- Notification Group
+--
+axEfmoamNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        axEfmoamUdldPortInactivateTrap,
+                        axEfmoamLoopDetectPortInactivateTrap
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of notifications of axEfmoam."
+    ::= { axEfmoamGroups 10 }
+
+END

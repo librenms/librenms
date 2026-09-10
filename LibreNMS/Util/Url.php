@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Url.php
  *
@@ -25,37 +26,80 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Port;
 use Carbon\Carbon;
-use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use LibreNMS\Enum\DeviceStatus;
+use LibreNMS\Enum\IfOperStatus;
 use Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class Url
 {
     /**
+     * Provisional device link generation
+     */
+    public static function modernDeviceLink(?Device $device, Htmlable|string $text = '', string $extra = ''): string
+    {
+        if ($device === null) {
+            return e($text);
+        }
+
+        $class = match ($device->getDeviceStatus()) {
+            DeviceStatus::Up, DeviceStatus::IgnoredUp => 'device-link-up',
+            DeviceStatus::Down, DeviceStatus::NeverPolled, DeviceStatus::IgnoredDown => 'device-link-down',
+            DeviceStatus::Disabled => 'device-link-disabled',
+        };
+
+        return sprintf('<a href="%s" class="%s" x-data="deviceLink({device_id: %d})">%s</a>%s',
+            self::deviceUrl($device),
+            $class,
+            $device->device_id,
+            e($text ?: $device->display),
+            $extra ? '<br />' . e($extra) : $extra
+        );
+    }
+
+    public static function modernPortLink(?Port $port, Htmlable|string $text = '', string $extra = ''): string
+    {
+        if ($port === null) {
+            return e($text);
+        }
+
+        $label = Rewrite::normalizeIfName($port->getLabel());
+        $text = $text ?: $label;
+
+        return sprintf('<a href="%s" class="%s" x-data="portLink({port_id: %d})">%s</a>%s',
+            self::portUrl($port),
+            self::portLinkDisplayClass($port),
+            $port->port_id,
+            e($text),
+            $extra ? '<br />' . e($extra) : $extra
+        );
+    }
+
+    /**
      * @param  Device|null  $device
      * @param  string|null  $text
      * @param  array  $vars
      * @param  int  $start
      * @param  int  $end
-     * @param  int  $escape_text
      * @param  int  $overlib
      * @return string
      */
-    public static function deviceLink($device, $text = '', $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
+    public static function deviceLink(mixed $device, Htmlable|string|null $text = '', array $vars = [], int $start = 0, int $end = 0, bool|int $overlib = 1): string
     {
         if (! $device instanceof Device || ! $device->hostname) {
-            return $escape_text ? htmlentities($text) : (string) $text;
+            return e($text);
         }
 
-        if (! $device->canAccess(Auth::user())) {
-            return $escape_text ? htmlentities($device->displayName()) : $device->displayName();
+        if (Gate::denies('view', $device)) {
+            return e($device->display);
         }
 
         if (! $start) {
@@ -67,12 +111,10 @@ class Url
         }
 
         if (! $text) {
-            $text = $device->displayName();
+            $text = $device->display;
         }
 
-        if ($escape_text) {
-            $text = htmlentities($text);
-        }
+        $text = e($text);
 
         $class = self::deviceLinkDisplayClass($device);
         $graphs = Graph::getOverviewGraphsForDevice($device);
@@ -80,14 +122,14 @@ class Url
 
         // beginning of overlib box contains large hostname followed by hardware & OS details
         // because we are injecting this into javascript htmlentities alone won't work, so strip_tags too
-        $contents = '<div><span class="list-large">' . htmlentities(strip_tags($device->displayName())) . '</span>';
+        $contents = '<div><span class="list-large">' . e(strip_tags($device->display)) . '</span>';
         $devinfo = '';
         if ($device->hardware) {
             $devinfo .= $device->hardware;
         }
 
         if ($device->os) {
-            $devinfo .= ($devinfo ? ' - ' : '') . Config::getOsSetting($device->os, 'text');
+            $devinfo .= ($devinfo ? ' - ' : '') . LibrenmsConfig::getOsSetting($device->os, 'text');
         }
 
         if ($device->version) {
@@ -99,18 +141,18 @@ class Url
         }
 
         if ($devinfo) {
-            $contents .= '<br />' . htmlentities(strip_tags($devinfo));
+            $contents .= '<br />' . e(strip_tags($devinfo));
         }
 
         if ($device->location_id) {
-            $contents .= '<br />' . htmlentities(strip_tags($device->location ?? ''));
+            $contents .= '<br />' . e(strip_tags($device->location ?? ''));
         }
 
         $contents .= '</div><br />';
 
         foreach ((array) $graphs as $entry) {
-            $graph = isset($entry['graph']) ? $entry['graph'] : 'unknown';
-            $graphhead = isset($entry['text']) ? $entry['text'] : 'unknown';
+            $graph = $entry['graph'] ?? 'unknown';
+            $graphhead = $entry['text'] ?? 'unknown';
             $contents .= '<div class="overlib-box">';
             $contents .= '<span class="overlib-title">' . $graphhead . '</span><br />';
             $contents .= Url::minigraphImage($device, $start, $end, $graph);
@@ -128,18 +170,10 @@ class Url
         return $link;
     }
 
-    /**
-     * @param  Port  $port
-     * @param  string  $text
-     * @param  string  $type
-     * @param  bool  $overlib
-     * @param  bool  $single_graph
-     * @return mixed|string
-     */
-    public static function portLink($port, $text = null, $type = null, $overlib = true, $single_graph = false)
+    public static function portLink(?Port $port, Htmlable|string|null $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false, ?string $url = null): string
     {
         if ($port === null) {
-            return $text;
+            return e($text);
         }
 
         $label = Rewrite::normalizeIfName($port->getLabel());
@@ -147,10 +181,12 @@ class Url
             $text = $label;
         }
 
+        $text = e($text);
+
         // strip tags due to complexity of sanitizing here
-        $content = '<div class=list-large>' . addslashes(htmlentities(strip_tags($port->device?->displayName() . ' - ' . $label))) . '</div>';
+        $content = '<div class=list-large>' . addslashes(e(strip_tags($port->device?->display . ' - ' . $label))) . '</div>';
         if ($description = $port->getDescription()) {
-            $content .= addslashes(htmlentities(strip_tags($description))) . '<br />';
+            $content .= addslashes(e(strip_tags($description))) . '<br />';
         }
 
         $content .= "<div style=\'width: 850px\'>";
@@ -178,8 +214,8 @@ class Url
 
         if (! $overlib) {
             return $content;
-        } elseif ($port->canAccess(Auth::user())) {
-            return self::overlibLink(self::portUrl($port), $text, $content, self::portLinkDisplayClass($port));
+        } elseif (Gate::allows('view', $port)) {
+            return self::overlibLink($url ?? self::portUrl($port), $text, $content, self::portLinkDisplayClass($port));
         }
 
         return Rewrite::normalizeIfName($text);
@@ -191,16 +227,18 @@ class Url
      * @param  string  $type
      * @param  bool  $overlib
      * @param  bool  $single_graph
-     * @return mixed|string
+     * @return string
      */
-    public static function sensorLink($sensor, $text = null, $type = null, $overlib = true, $single_graph = false)
+    public static function sensorLink(mixed $sensor, Htmlable|string|null $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false): string
     {
         $label = $sensor->sensor_descr;
         if (! $text) {
             $text = $label;
         }
 
-        $content = '<div class=list-large>' . addslashes(htmlentities($sensor->device->displayName() . ' - ' . $label)) . '</div>';
+        $text = e($text);
+
+        $content = '<div class=list-large>' . addslashes(e($sensor->device?->display . ' - ' . $label)) . '</div>';
 
         $content .= "<div style=\'width: 850px\'>";
         $graph_array = [
@@ -258,56 +296,11 @@ class Url
         return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health', 'metric' => $sensor->sensor_class], $vars);
     }
 
-    /**
-     * @param  Port  $port
-     * @return string
-     */
-    public static function portThumbnail($port)
-    {
-        $graph_array = [
-            'port_id' => $port->port_id,
-            'graph_type' => 'port_bits',
-            'from' => Carbon::now()->subDay()->timestamp,
-            'to' => Carbon::now()->timestamp,
-            'width' => 150,
-            'height' => 21,
-        ];
-
-        return self::portImage($graph_array);
-    }
-
-    /**
-     * @param  Port  $port
-     * @return string
-     */
-    public static function portErrorsThumbnail($port)
-    {
-        $graph_array = [
-            'port_id' => $port->port_id,
-            'graph_type' => 'port_errors',
-            'from' => Carbon::now()->subDay()->timestamp,
-            'to' => Carbon::now()->timestamp,
-            'width' => 150,
-            'height' => 21,
-        ];
-
-        return self::portImage($graph_array);
-    }
-
-    public static function portImage($args)
-    {
-        if (empty($args['bg'])) {
-            $args['bg'] = 'FFFFFF00';
-        }
-
-        return '<img src="' . url('graph.php') . '?type=' . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . '">';
-    }
-
     public static function generate($vars, $new_vars = [])
     {
         $vars = array_merge($vars, $new_vars);
 
-        $url = url(Config::get('base_url', true) . $vars['page'] . '');
+        $url = url(LibrenmsConfig::get('base_url', true) . $vars['page'] . '');
         unset($vars['page']);
 
         return $url . self::urlParams($vars);
@@ -326,7 +319,7 @@ class Url
         $url = empty($vars) ? '' : $prefix;
         foreach ($vars as $var => $value) {
             if ($value == '0' || $value != '' && ! Str::contains($var, 'opt') && ! is_numeric($var)) {
-                $url .= urlencode($var) . '=' . urlencode($value) . '/';
+                $url .= urlencode((string) $var) . '=' . urlencode((string) $value) . '/';
             }
         }
 
@@ -347,67 +340,60 @@ class Url
         return LaravelUrl::signedRoute('graph', $args);
     }
 
-    /**
-     * @param  array  $args
-     * @return string
-     */
-    public static function graphTag($args)
+    public static function graphPageUrl(string $type, array $args = []): string
     {
-        $urlargs = [];
-        foreach ($args as $key => $arg) {
-            $urlargs[] = $key . '=' . ($arg === null ? '' : urlencode($arg));
-        }
-
-        return '<img src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+        return url()->query('graphs', ['type' => $type, ...$args]);
     }
 
-    public static function graphPopup($args, $content = null, $link = null)
+    /**
+     * @param  array<string, mixed>  $args
+     * @return string
+     */
+    public static function graphTag($args): string
+    {
+        return '<img class="graph-image" src="' . route('graph', $args) . '" style="border:0;" />';
+    }
+
+    public static function graphPopup($args, $content = null, $link = null, array $graph_periods = ['-1d', '-1w', '-1mo', '-1y']): string
     {
         // Take $args and print day,week,month,year graphs in overlib, hovered over graph
-        $original_from = $args['from'];
-        $now = CarbonImmutable::now();
+        $original_from = $args['from'] ?? '';
+        $popup_title = $args['popup_title'] ?? 'Graph';
 
         $graph = $content ?: self::graphTag($args);
-        $popup = '<div class=list-large>' . $args['popup_title'] . '</div>';
-        $popup .= '<div style="width: 850px">';
+
         $args['width'] = 340;
         $args['height'] = 100;
         $args['legend'] = 'yes';
-        $args['from'] = $now->subDay()->timestamp;
-        $popup .= self::graphTag($args);
-        $args['from'] = $now->subWeek()->timestamp;
-        $popup .= self::graphTag($args);
-        $args['from'] = $now->subMonth()->timestamp;
-        $popup .= self::graphTag($args);
-        $args['from'] = $now->subYear()->timestamp;
-        $popup .= self::graphTag($args);
+        $columns = count($graph_periods) < 4 ? 1 : 2;
+
+        $popup = "<div class=\'list-large\'>$popup_title</div>";
+        $popup .= "<div style=\"display:grid;grid-template-columns:repeat($columns,max-content);\">";
+        foreach ($graph_periods as $period) {
+            $args['from'] = $period;
+            $popup .= ' ' . self::graphTag($args);
+        }
         $popup .= '</div>';
 
         $args['from'] = $original_from;
 
         $args['link'] = $link ?: self::generate($args, ['page' => 'graphs', 'height' => null, 'width' => null, 'bg' => null]);
 
-        return self::overlibLink($args['link'], $graph, $popup, null);
+        return self::overlibLink($args['link'], $graph, $popup);
     }
 
-    public static function lazyGraphTag($args)
+    public static function lazyGraphTag($args, string $class = 'img-responsive'): string
     {
-        $urlargs = [];
+        $tag = '<img class="graph-image ' . $class . '" src="' . route('graph', $args) . '" style="border:0;"';
 
-        foreach ($args as $key => $arg) {
-            $urlargs[] = $key . '=' . ($arg === null ? '' : urlencode($arg));
-        }
-
-        $tag = '<img class="img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
-
-        if (Config::get('enable_lazy_load', true)) {
+        if (LibrenmsConfig::get('enable_lazy_load', true)) {
             return $tag . ' loading="lazy" />';
         }
 
         return $tag . ' />';
     }
 
-    public static function overlibLink($url, $text, $contents, $class = null)
+    public static function overlibLink($url, $text, $contents, $class = null): string
     {
         $contents = "<div class=\'overlib-contents\'>" . $contents . '</div>';
         $contents = str_replace('"', "\'", $contents);
@@ -417,8 +403,8 @@ class Url
             $output = '<a class="' . $class . '" href="' . $url . '"';
         }
 
-        if (Config::get('web_mouseover', true)) {
-            $defaults = Config::get('overlib_defaults', ",FGCOLOR,'#ffffff', BGCOLOR, '#e5e5e5', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#555555', TEXTCOLOR, '#3e3e3e'");
+        if (LibrenmsConfig::get('web_mouseover', true)) {
+            $defaults = LibrenmsConfig::get('overlib_defaults', ",FGCOLOR,'#ffffff', BGCOLOR, '#e5e5e5', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#555555', TEXTCOLOR, '#3e3e3e'");
             $output .= " onmouseover=\"return overlib('$contents'$defaults,WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
         } else {
             $output .= '>';
@@ -455,16 +441,24 @@ class Url
      * @param  string  $legend
      * @param  int  $width
      * @param  int  $height
-     * @param  string  $sep
      * @param  string  $class
      * @param  int  $absolute_size
      * @return string
      */
-    public static function minigraphImage($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', $class = 'minigraph-image', $absolute_size = 0)
+    public static function minigraphImage($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $class = 'minigraph-image', $absolute_size = 0): string
     {
-        $vars = ['device=' . $device->device_id, "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size"];
+        $vars = [
+            'device' => $device->device_id,
+            'from' => $start,
+            'to' => $end,
+            'width' => $width,
+            'height' => $height,
+            'type' => $type,
+            'legend' => $legend,
+            'absolute' => $absolute_size,
+        ];
 
-        return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="' . url('graph.php') . '?' . implode($sep, $vars) . '">';
+        return '<img class="graph-image ' . $class . '" width="' . $width . '" height="' . $height . '" src="' . route('graph', $vars) . '">';
     }
 
     /**
@@ -473,15 +467,13 @@ class Url
      */
     private static function deviceLinkDisplayClass($device)
     {
-        if ($device->disabled) {
-            return 'list-device-disabled';
-        }
-
-        if ($device->ignore) {
-            return $device->status ? 'list-device-ignored-up' : 'list-device-ignored';
-        }
-
-        return $device->status ? 'list-device' : 'list-device-down';
+        return match ($device->getDeviceStatus()) {
+            DeviceStatus::Disabled => 'list-device-disabled',
+            DeviceStatus::Down, DeviceStatus::NeverPolled => 'list-device-down',
+            DeviceStatus::Up => 'list-device',
+            DeviceStatus::IgnoredDown => 'list-device-ignored',
+            DeviceStatus::IgnoredUp => 'list-device-ignored-up',
+        };
     }
 
     /**
@@ -492,11 +484,11 @@ class Url
      */
     public static function portLinkDisplayClass($port)
     {
-        if ($port->ifAdminStatus == 'down') {
+        if ($port->ifAdminStatus == IfOperStatus::Down) {
             return 'interface-admindown';
         }
 
-        if ($port->ifAdminStatus == 'up' && $port->ifOperStatus != 'up') {
+        if ($port->ifAdminStatus == IfOperStatus::Up && $port->ifOperStatus != IfOperStatus::Up) {
             return 'interface-updown';
         }
 
@@ -541,20 +533,20 @@ class Url
                 $possibilities[] = "$distro.png";
 
                 // second, prefer the first two words of $feature (i.e. 'Red Hat' becomes 'redhat')
-                if (strpos($feature, ' ') !== false) {
+                if (str_contains($feature, ' ')) {
                     $distro = Str::replaceFirst(' ', '', strtolower(trim($feature)));
                     $distro = Str::before($distro, ' ');
                     $possibilities[] = "$distro.svg";
                     $possibilities[] = "$distro.png";
                 }
             }
-            $os_icon = Config::getOsSetting($os, 'icon', $os);
+            $os_icon = LibrenmsConfig::getOsSetting($os, 'icon', $os);
             $possibilities[] = "$os_icon.svg";
             $possibilities[] = "$os_icon.png";
         }
 
         foreach ($possibilities as $file) {
-            if (is_file(Config::get('html_dir') . "/$dir" . $file)) {
+            if (is_file(LibrenmsConfig::get('html_dir') . "/$dir" . $file)) {
                 return $file;
             }
         }
@@ -571,9 +563,7 @@ class Url
      */
     public static function parseLegacyPath($path)
     {
-        $parts = array_filter(explode('/', $path), function ($part) {
-            return Str::contains($part, '=');
-        });
+        $parts = array_filter(explode('/', $path), fn ($part) => Str::contains($part, '='));
 
         $vars = [];
         foreach ($parts as $part) {
@@ -623,11 +613,11 @@ class Url
         }
 
         // don't parse the subdirectory, if there is one in the path
-        $base_url = parse_url(Config::get('base_url'))['path'] ?? '';
+        $base_url = parse_url(LibrenmsConfig::get('base_url'))['path'] ?? '';
         if (strlen($base_url) > 1) {
             $segments = explode('/', trim(str_replace($base_url, '', $path), '/'));
         } else {
-            $segments = explode('/', trim($path, '/'));
+            $segments = explode('/', trim((string) $path, '/'));
         }
 
         // parse the path

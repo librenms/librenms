@@ -1,4 +1,5 @@
 <?php
+
 /**
  * rrdcached_events.inc.php
  *

@@ -7,7 +7,7 @@ Route: `/api/v0/bgp`
 Input:
 
 - hostname = Either the devices hostname or id.
-- asn = The local ASN you would like to filter by
+- asn = the local ASN of the filter
 - remote_asn = Filter by remote peer ASN
 - remote_address = Filter by remote peer address
 - local_address = Filter by local address
@@ -21,16 +21,16 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?hostname=host.example.com
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?asn=1234
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?remote_asn=1234
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?local_address=1.1.1.1&remote_address=2.2.2.2
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?bgp_descr=UPSTREAM
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?bgp_state=established
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?bgp_adminstate=start
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?bgp_family=6
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?bgp_state=idle&bgp_descr=CORE&bgp_family=4
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?hostname=host.example.com
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?asn=1234
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?remote_asn=1234
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?local_address=1.1.1.1&remote_address=2.2.2.2
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_descr=UPSTREAM
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_state=established
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_adminstate=start
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_family=6
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_state=idle&bgp_descr=CORE&bgp_family=4
 ```
 
 Output:
@@ -83,7 +83,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp/4
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp/4
 ```
 
 Output:
@@ -130,7 +130,7 @@ Input:
 Example:
 
 ```curl
-curl -v -H 'X-Auth-Token: YOURAPITOKENHERE' --data '{"bgp_descr": "Your description here"}' https://librenms.org/api/v0/bgp/4
+curl -v -H 'X-Auth-Token: YOURAPITOKENHERE' --data '{"bgp_descr": "Your description here"}' https://foo.example/api/v0/bgp/4
 ```
 
 Output:
@@ -155,8 +155,8 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/bgp/cbgp
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/bgp/cbgp?hostname=host.example.com
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/bgp/cbgp
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/bgp/cbgp?hostname=host.example.com
 ```
 
 Output:
@@ -198,18 +198,20 @@ Output:
 
 ### `list_ip_addresses`
 
-List all IPv4 and IPv6 addresses.
+List all IPv4 and IPv6 or only version specific addresses.
 
-Route: `/api/v0/resources/ip/addresses`
+Route: `/api/v0/resources/ip/addresses/:address_family`
 
 Input:
 
--
+- address_family: optional ipv4 or ipv6 for ip version specific list.
 
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/addresses
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/addresses
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/addresses/ipv4
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/addresses/ipv6
 ```
 
 Output:
@@ -248,7 +250,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks/55/ip
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/networks/55/ip
 ```
 
 Output:
@@ -272,18 +274,20 @@ Output:
 
 ### `list_ip_networks`
 
-List all IPv4 and IPv6 networks.
+List all IPv4 and IPv6 or only version specific networks.
 
-Route: `/api/v0/resources/ip/networks`
+Route: `/api/v0/resources/ip/networks/:address_family`
 
 Input:
 
--
+- address_family: optional ipv4 or ipv6 for ip version specific list.
 
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/networks
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/networks/ipv4
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/networks/ipv6
 ```
 
 Output:
@@ -318,7 +322,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/ipsec/data/localhost
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/ipsec/data/localhost
 ```
 
 Output:
@@ -341,7 +345,8 @@ Output:
 }
 ```
 
-> Please note, this will only show active VPN sessions not all configured.
+> Note: this call shows only the active VPN sessions, not all the
+> configured sessions.
 
 ### `list_ospf`
 
@@ -356,8 +361,8 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospf
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospf?hostname=host.example.com
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ospf
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ospf?hostname=host.example.com
 ```
 
 Output:
@@ -397,7 +402,7 @@ Route: `/api/v0/ospf_ports`
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospf_ports
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ospf_ports
 ```
 
 Output:
@@ -442,6 +447,112 @@ Output:
     "count": 1
 }
 ```
+### `list_ospfv3`
+
+List the current OSPFv3 neighbours.
+
+Route: `/api/v0/ospfv3`
+
+Input:
+
+- hostname = Either the devices hostname or id.
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ospfv3
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ospfv3?hostname=host.example.com
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "ospfv3_neighbours": [
+        {
+            "id": 7,
+            "device_id": 14,
+            "ospfv3_instance_id": 7,
+            "port_id": 2345,
+            "router_id": "10.0.43.11",
+            "ospfv3NbrIfIndex": 2,
+            "ospfv3NbrIfInstId": 0,
+            "ospfv3NbrRtrId": 167797515,
+            "ospfv3NbrAddressType": "ipv6",
+            "ospfv3NbrAddress": "fe80::1d7:101:98cf:af80",
+            "ospfv3NbrOptions": 19,
+            "ospfv3NbrPriority": 50,
+            "ospfv3NbrState": "full",
+            "ospfv3NbrEvents": 6,
+            "ospfv3NbrLsRetransQLen": 0,
+            "ospfv3NbrHelloSuppressed": "false",
+            "ospfv3NbrIfId": 14,
+            "ospfv3NbrRestartHelperStatus": "notHelping",
+            "ospfv3NbrRestartHelperAge": 0,
+            "ospfv3NbrRestartHelperExitReason": "none",
+            "context_name": ""
+        }
+    ],
+    "count": 1
+}
+```
+
+### `list_ospfv3_ports`
+
+List the current OSPFv3 ports.
+
+Route: `/api/v0/ospfv3_ports`
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ospfv3_ports
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ospfv3_ports?hostname=host.example.com
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "ospfv3_ports": [
+        {
+            "id": 13,
+            "device_id": 14,
+            "ospfv3_instance_id": 7,
+            "ospfv3_area_id": 43,
+            "port_id": 2390,
+            "ospfv3IfIndex": 2,
+            "ospfv3IfInstId": 0,
+            "ospfv3IfAreaId": 0,
+            "ospfv3IfType": "broadcast",
+            "ospfv3IfAdminStatus": "enabled",
+            "ospfv3IfRtrPriority": 1,
+            "ospfv3IfTransitDelay": 1,
+            "ospfv3IfRetransInterval": 5,
+            "ospfv3IfHelloInterval": 10,
+            "ospfv3IfRtrDeadInterval": 40,
+            "ospfv3IfPollInterval": 10,
+            "ospfv3IfState": "backupDesignatedRouter",
+            "ospfv3IfDesignatedRouter": "10.0.43.11",
+            "ospfv3IfBackupDesignatedRouter": "10.7.9.254",
+            "ospfv3IfEvents": 7,
+            "ospfv3IfDemand": "false",
+            "ospfv3IfMetricValue": 10,
+            "ospfv3IfLinkScopeLsaCount": 2,
+            "ospfv3IfLinkLsaCksumSum": 64455,
+            "ospfv3IfDemandNbrProbe": "false",
+            "ospfv3IfDemandNbrProbeRetransLimit": 0,
+            "ospfv3IfDemandNbrProbeInterval": 0,
+            "ospfv3IfTEDisabled": "true",
+            "ospfv3IfLinkLSASuppression": "false",
+            "context_name": ""
+        }
+    ],
+    "count": 1
+}
+```
 
 ### `list_vrf`
 
@@ -455,14 +566,14 @@ Input:
 
 **OR**
 
-- vrfname = The VRF name you would like to filter by
+- vrfname = the VRF name of the filter
 
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf?hostname=host.example.com
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf?vrfname=Mgmt-vrf
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/vrf
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/vrf?hostname=host.example.com
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/vrf?vrfname=Mgmt-vrf
 ```
 
 Output:
@@ -498,7 +609,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf/2
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/vrf/2
 ```
 
 Output:
@@ -533,8 +644,8 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/mpls/services
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/mpls/services?hostname=host.example.com
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/mpls/services
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/mpls/services?hostname=host.example.com
 
 ```
 
@@ -585,8 +696,8 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/mpls/saps
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/mpls/saps?hostname=host.example.com
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/mpls/saps
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/mpls/saps?hostname=host.example.com
 ```
 
 Output:

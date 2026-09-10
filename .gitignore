@@ -4,10 +4,8 @@
 !/.gitignore
 !/.git-blame-ignore-revs
 !/.editorconfig
-!/.scrutinizer.yml
 !/.php_cs
 !/.github/
-!/.codeclimate.yml
 !/.mention-bot
 !/.env.example
 
@@ -47,3 +45,7 @@ bin/
 lib/
 lib64
 pyvenv.cfg
+
+/.phpunit.cache/storage/pail
+/.nova
+/database/testing.sqlite

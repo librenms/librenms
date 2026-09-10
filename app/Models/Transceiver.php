@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Observers\TransceiverObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\Keyable;
 
+#[ObservedBy([TransceiverObserver::class])]
 class Transceiver extends PortRelatedModel implements Keyable
 {
     use HasFactory;
@@ -20,7 +23,7 @@ class Transceiver extends PortRelatedModel implements Keyable
         'model', // model number or name
         'revision', // hardware revision
         'serial', // serial number
-        'date', // date of manufacture
+        'date', // date of manufacture as returned by module
         'ddm', // if the module supports DDM or DOM
         'encoding', // data encoding method
         'cable', // SM, MM, Copper, etc
@@ -30,8 +33,18 @@ class Transceiver extends PortRelatedModel implements Keyable
         'channels', // number of channels or lanes
     ];
 
-    public function getCompositeKey()
+    /**
+     * @return array{ddm: 'boolean'}
+     */
+    protected function casts(): array
     {
-        return $this->index;
+        return [
+            'ddm' => 'boolean',
+        ];
+    }
+
+    public function getCompositeKey(): string
+    {
+        return (string) $this->index;
     }
 }

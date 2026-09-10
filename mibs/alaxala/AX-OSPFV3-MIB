@@ -1,0 +1,1712 @@
+--
+-- All Rights Reserved, Copyright (c) 2013, ALAXALA Networks Corp.
+--
+-- AX-OSPFV3-MIB.my: axOspfV3 group MIB file.
+--
+
+AX-OSPFV3-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+        Integer32, Unsigned32                               FROM SNMPv2-SMI
+        RowStatus, TruthValue                               FROM SNMPv2-TC
+        Status                                              FROM OSPF-MIB
+        InterfaceIndex                                      FROM IF-MIB
+        InetAddressType,InetAddress                         FROM INET-ADDRESS-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP                     FROM SNMPv2-CONF
+        axMib                                               FROM AX-SMI-MIB;
+
+axOspfv3 MODULE-IDENTITY
+    LAST-UPDATED    "201310030000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+            "The MIB module for the Multi-backbone OSPFv3.
+             This MIB module is based on a part of the standard MIB defined in RFC 5643."
+    REVISION        "201310030000Z"
+    DESCRIPTION
+        "Updated header comment."
+    REVISION        "201306280000Z"
+    DESCRIPTION
+        "Initial release."
+    ::= { axMib 15 }
+
+--
+-- MIB groups
+--
+
+--
+-- axOspfv3GeneralTable
+--
+
+axOspfv3GeneralTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfv3GeneralEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table which ospfv3 information is stored in."
+    ::= {axOspfv3 1}
+
+axOspfv3GeneralEntry OBJECT-TYPE
+    SYNTAX AxOspfv3GeneralEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The list of the ospfv3 information"
+    INDEX { axOspfv3GeneralDomainNumber }
+    ::= {axOspfv3GeneralTable 1}
+
+AxOspfv3GeneralEntry ::= SEQUENCE {
+    axOspfv3GeneralDomainNumber         Integer32,
+    axOspfv3RouterId                    Unsigned32,
+    axOspfv3AdminStatus                 Status,
+    axOspfv3VersionNumber               INTEGER,
+    axOspfv3AreaBdrRtrStatus            TruthValue,
+    axOspfv3ASBdrRtrStatus              TruthValue,
+    axOspfv3AsScopeLsaCount             Gauge32,
+    axOspfv3AsScopeLsaCksumSum          Integer32,
+    axOspfv3OriginateNewLsas            Counter32,
+    axOspfv3RxNewLsas                   Counter32,
+    axOspfv3ExtLsaCount                 Gauge32,
+    axOspfv3ExtAreaLsdbLimit            Integer32,
+    axOspfv3DemandExtensions            TruthValue,
+    axOspfv3RestartSupport              INTEGER,
+    axOspfv3RestartInterval             Unsigned32,
+    axOspfv3RestartStrictLsaChecking    TruthValue
+}
+
+axOspfv3GeneralDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ospfv3 domain number."
+    ::= {axOspfv3GeneralEntry 1}
+
+axOspfv3RouterId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A  32-bit unsigned integer  uniquely  identifying  the router in the Autonomous System. By convention, to  ensure  uniqueness, this should  default  to  the  value  of  one of the router's IPv4 interface addresses if IPv4 is configured."
+    ::= {axOspfv3GeneralEntry 2}
+
+axOspfv3AdminStatus OBJECT-TYPE
+    SYNTAX Status
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The  administrative  status  of  OSPFv3  in  the router.  The  value 'enabled' denotes that the OSPFv3 Process is active on at least  one  interface;  'disabled'  disables  it  on  all interfaces."
+    ::= {axOspfv3GeneralEntry 3}
+
+axOspfv3VersionNumber OBJECT-TYPE
+    SYNTAX INTEGER {
+                       version3 (3)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The version number of OSPF for IPv6 is 3."
+    ::= {axOspfv3GeneralEntry 4}
+
+axOspfv3AreaBdrRtrStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A flag to note whether this router is an  area border router."
+    ::= {axOspfv3GeneralEntry 5}
+
+axOspfv3ASBdrRtrStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A flag to note whether this router is  configured as an Autonomous System border router."
+    ::= {axOspfv3GeneralEntry 6}
+
+axOspfv3AsScopeLsaCount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of AS-Scope (e.g. AS-External) link-state advertisements in the link-state database."
+    ::= {axOspfv3GeneralEntry 7}
+
+axOspfv3AsScopeLsaCksumSum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The 32-bit unsigned sum of the LS checksums of the  AS-scoped link-state advertisements  con- tained in the link-state database. This sum can  be  used  to determine if there has been a change in a router's link state  database,  and to  compare  the  lin"
+    ::= {axOspfv3GeneralEntry 8}
+
+axOspfv3OriginateNewLsas OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of  new  link state  advertisements that have been originated.  This number is incremented each time the router originates a new LSA."
+    ::= {axOspfv3GeneralEntry 9}
+
+axOspfv3RxNewLsas OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of link state  advertisements  received  that are determined to be new           instantiations. This number does not include  newer  instantiations  of self-originated link-state advertise- ments."
+    ::= {axOspfv3GeneralEntry 10}
+
+axOspfv3ExtLsaCount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of External (LS type 0x4005) in the link state database
+"
+    ::= {axOspfv3GeneralEntry 11}
+
+axOspfv3ExtAreaLsdbLimit OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The  maximum   number   of   non-default   AS- external-LSAs entries that can be stored in the link-state database.  If the value is -1,  then there is no limit.
+When the number of non-default AS-external-LSAs in  a  router's  link-state  database  reache"
+    ::= {axOspfv3GeneralEntry 12}
+
+axOspfv3DemandExtensions OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The router's support for demand routing."
+    ::= {axOspfv3GeneralEntry 14}
+
+axOspfv3RestartSupport OBJECT-TYPE
+    SYNTAX INTEGER {
+                      none(1),
+                      plannedOnly(2),
+                      plannedAndUnplanned(3)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The router's support for OSPF graceful restart.
+"
+    ::= {axOspfv3GeneralEntry 16}
+
+axOspfv3RestartInterval OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Configured OSPF graceful restart timeout interval.
+"
+    ::= {axOspfv3GeneralEntry 17}
+
+axOspfv3RestartStrictLsaChecking OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates if strict LSA checking is enabled for graceful restart. "
+    ::= {axOspfv3GeneralEntry 18}
+
+--
+-- axOspfv3AreaTable
+--
+
+axOspfv3AreaTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfv3AreaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information describing the configured  parame- ters  and cumulative statistics of the router's attached areas."
+    ::= {axOspfv3 2}
+
+axOspfv3AreaEntry OBJECT-TYPE
+    SYNTAX AxOspfv3AreaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information describing the configured  parame- ters  and  cumulative  statistics of one of the router's attached areas."
+    INDEX { axOspfv3AreaDomainNumber,
+            axOspfv3AreaId }
+    ::= {axOspfv3AreaTable 1}
+
+AxOspfv3AreaEntry ::= SEQUENCE {
+    axOspfv3AreaDomainNumber        Integer32,
+    axOspfv3AreaId                  Unsigned32,
+    axOspfv3AreaImportAsExtern      INTEGER,
+    axOspfv3AreaSpfRuns             Counter32,
+    axOspfv3AreaBdrRtrCount         Gauge32,
+    axOspfv3AreaAsBdrRtrCount       Gauge32,
+    axOspfv3AreaScopeLsaCount       Gauge32,
+    axOspfv3AreaScopeLsaCksumSum    Unsigned32,
+    axOspfv3AreaSummary             INTEGER,
+    axOspfv3AreaRowStatus           RowStatus,
+    axOspfv3AreaStubMetric          Integer32,
+    axOspfv3AreaStubMetricType      INTEGER,
+    axOspfv3AreaTEEnabled           TruthValue
+}
+
+axOspfv3AreaDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ospfv3 domain number."
+    ::= {axOspfv3AreaEntry 1}
+
+axOspfv3AreaId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A 32-bit unsigned integer uniquely identifying an area.
+         Area ID 0 is used for the OSPFv3 backbone."
+    ::= {axOspfv3AreaEntry 2}
+
+axOspfv3AreaImportAsExtern OBJECT-TYPE
+    SYNTAX INTEGER {
+                       importExternal(1),
+                       importNoExternal(2),
+                       importNssa(3)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether an area is a Stub area, NSSA, or standard area. AS-scope LSAs are not imported into Stub Areas or NSSAs. NSSAs import AS-External data as Type-7 LSAs which have Area-scope"
+    ::= {axOspfv3AreaEntry 3}
+
+axOspfv3AreaSpfRuns OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of times that the intra-area  route table  has  been  calculated  using this area's link-state database.  This  is  typically  done using Dijkstra's algorithm."
+    ::= {axOspfv3AreaEntry 4}
+
+axOspfv3AreaBdrRtrCount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of area border routers reach- able within this area. This is initially zero, and is calculated in each SPF Pass."
+    ::= {axOspfv3AreaEntry 5}
+
+axOspfv3AreaAsBdrRtrCount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of Autonomous  System  border routers  reachable  within  this area.  This is initially zero, and is calculated in  each  SPF Pass."
+    ::= {axOspfv3AreaEntry 6}
+
+axOspfv3AreaScopeLsaCount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of Area-Scope link-state advertisements in  this  area's link-state database."
+    ::= {axOspfv3AreaEntry 7}
+
+axOspfv3AreaScopeLsaCksumSum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The 32-bit unsigned sum of the Area-Scope link-state advertisements'  LS  checksums  contained in this area's link-state database.  The sum can be used to determine if  there  has been  a  change  in a router's link state database, and to compare the link"
+    ::= {axOspfv3AreaEntry 8}
+
+axOspfv3AreaSummary OBJECT-TYPE
+    SYNTAX INTEGER {
+                       noAreaSummary(1),
+                       sendAreaSummary(2)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The variable axOspfv3AreaSummary controls the import of Inter-Area LSAs into stub and NSSA areas.  It has no effect on other areas. If it is noAreaSummary, the router will neither originate  nor  propagate Inter-Area LSAs into the stub or NSSA area.  It w"
+    ::= {axOspfv3AreaEntry 9}
+
+axOspfv3AreaRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object permits management of the table by facilitating actions such as row creation,construction, and destruction.The value of this object has no effect on whether other objects in this conceptual row can be modified."
+    ::= {axOspfv3AreaEntry 10}
+
+axOspfv3AreaStubMetric OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The metric value advertised for the default route into Stub and NSSA areas."
+    ::= {axOspfv3AreaEntry 11}
+
+axOspfv3AreaStubMetricType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       ospfv3Metric(1),
+                       comparableCost(2),
+                       nonComparable(3)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable assigns the type of metric advertised as a default route."
+    ::= {axOspfv3AreaEntry 16}
+
+axOspfv3AreaTEEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether or not traffic engineering is enabled in the area. "
+    ::= {axOspfv3AreaEntry 17}
+
+--
+-- axOspfv3AsLsdbTable
+--
+
+axOspfv3AsLsdbTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfv3AsLsdbEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The OSPFv3 Process's AS-scope link state database(LSDB).  "
+    ::= {axOspfv3 3}
+
+axOspfv3AsLsdbEntry OBJECT-TYPE
+    SYNTAX AxOspfv3AsLsdbEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A single AS-Scope Link State Advertisement."
+    INDEX { axOspfv3AsLsdbDomainNumber,
+            axOspfv3AsLsdbType,
+            axOspfv3AsLsdbRouterId,
+            axOspfv3AsLsdbLsid }
+    ::= {axOspfv3AsLsdbTable 1}
+
+AxOspfv3AsLsdbEntry ::= SEQUENCE {
+    axOspfv3AsLsdbDomainNumber     Integer32,
+    axOspfv3AsLsdbType             Unsigned32,
+    axOspfv3AsLsdbRouterId         Unsigned32,
+    axOspfv3AsLsdbLsid             Unsigned32,
+    axOspfv3AsLsdbSequence         Integer32,
+    axOspfv3AsLsdbAge              Unsigned32,
+    axOspfv3AsLsdbChecksum         Integer32,
+    axOspfv3AsLsdbAdvertisement    OCTET STRING
+}
+
+axOspfv3AsLsdbDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ospfv3 domain number."
+    ::= {axOspfv3AsLsdbEntry 1}
+
+axOspfv3AsLsdbType OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The type  of  the  link  state  advertisement. Each  link state type has a separate advertise- ment format. Unrecognized AS-Scope LSAs with the U-bit set are also store in this database."
+    ::= {axOspfv3AsLsdbEntry 2}
+
+axOspfv3AsLsdbRouterId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The 32 bit number that uniquely identifies the originating router in the Autonomous System."
+    ::= {axOspfv3AsLsdbEntry 3}
+
+axOspfv3AsLsdbLsid OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Link State ID is an LS type-specific field containing a unique identifier; it identifies the piece of the routing domain that is being described by the advertisement. In contrast to OSPFv2, the LSID has no addressing semantics."
+    ::= {axOspfv3AsLsdbEntry 4}
+
+axOspfv3AsLsdbSequence OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The sequence number field is a  signed  32-bit integer.   It  is used to detect old and dupli- cate link state advertisements.  The  space  of sequence  numbers  is  linearly  ordered.  The larger the sequence number the more recent  the advertisement."
+    ::= {axOspfv3AsLsdbEntry 5}
+
+axOspfv3AsLsdbAge OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This field is the age of the link state adver- tisement in seconds."
+    ::= {axOspfv3AsLsdbEntry 6}
+
+axOspfv3AsLsdbChecksum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This field is the  checksum  of  the  complete contents  of  the  advertisement, excepting the age field.  The age field is excepted  so  that an  advertisement's  age  can  be  incremented without updating the  checksum.  The  checksum used  is  the same"
+    ::= {axOspfv3AsLsdbEntry 7}
+
+axOspfv3AsLsdbAdvertisement OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..65535))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The entire Link State Advertisement, including its header."
+    ::= {axOspfv3AsLsdbEntry 8}
+
+--
+-- axOspfv3AreaLsdbTable
+--
+
+axOspfv3AreaLsdbTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfv3AreaLsdbEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The OSPFv3 Process's Area-Scope LSDB."
+    ::= {axOspfv3 4}
+
+axOspfv3AreaLsdbEntry OBJECT-TYPE
+    SYNTAX AxOspfv3AreaLsdbEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A single Area-Scope Link State Advertisement."
+    INDEX  { axOspfv3AreaLsdbDomainNumber,
+             axOspfv3AreaLsdbAreaId,
+             axOspfv3AreaLsdbType,
+             axOspfv3AreaLsdbRouterId,
+             axOspfv3AreaLsdbLsid }
+    ::= {axOspfv3AreaLsdbTable 1}
+
+AxOspfv3AreaLsdbEntry ::= SEQUENCE {
+    axOspfv3AreaLsdbDomainNumber     Integer32,
+    axOspfv3AreaLsdbAreaId           Unsigned32,
+    axOspfv3AreaLsdbType             Unsigned32,
+    axOspfv3AreaLsdbRouterId         Unsigned32,
+    axOspfv3AreaLsdbLsid             Unsigned32,
+    axOspfv3AreaLsdbSequence         Integer32,
+    axOspfv3AreaLsdbAge              Unsigned32,
+    axOspfv3AreaLsdbChecksum         Integer32,
+    axOspfv3AreaLsdbAdvertisement    OCTET STRING
+}
+
+axOspfv3AreaLsdbDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ospfv3 domain number."
+    ::= {axOspfv3AreaLsdbEntry 1}
+
+axOspfv3AreaLsdbAreaId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The 32 bit identifier of the Area from which the LSA was received."
+    ::= {axOspfv3AreaLsdbEntry 2}
+
+axOspfv3AreaLsdbType OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The type of the link state advertisement. Each link state type has a separate advertisement format.  Area-scope LSAs unrecognized by the router are also stored in this database"
+    ::= {axOspfv3AreaLsdbEntry 3}
+
+axOspfv3AreaLsdbRouterId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The 32 bit number that uniquely identifies the originating router in the Autonomous System."
+    ::= {axOspfv3AreaLsdbEntry 4}
+
+axOspfv3AreaLsdbLsid OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Link State ID is an LS type-specific field containing a unique identifier;it identifies the piece of the routing domain that is being described by the dvertisement.  In contrast to OSPFv2, the LSID has no addressing semantics."
+    ::= {axOspfv3AreaLsdbEntry 5}
+
+axOspfv3AreaLsdbSequence OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The sequence number field is a  signed  32-bit integer.   It  is used to detect old and dupli- cate link state advertisements.  The  space  of sequence  numbers  is  linearly  ordered.   The larger the sequence number the more recent  the advertisement."
+    ::= {axOspfv3AreaLsdbEntry 6}
+
+axOspfv3AreaLsdbAge OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This field is the age of the link state adver- tisement in seconds."
+    ::= {axOspfv3AreaLsdbEntry 7}
+
+axOspfv3AreaLsdbChecksum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This field is the  checksum  of  the  complete contents  of  the  advertisement, excepting the age field.  The age field is excepted  so  that an  advertisement's  age  can  be  incremented without updating the  checksum.  The  checksum used  is  the same"
+    ::= {axOspfv3AreaLsdbEntry 8}
+
+axOspfv3AreaLsdbAdvertisement OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..65535))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The entire Link State Advertisement, including its header."
+    ::= {axOspfv3AreaLsdbEntry 9}
+
+--
+-- axOspfv3LinkLsdbTable
+--
+
+axOspfv3LinkLsdbTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfv3LinkLsdbEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The OSPFv3 Process's Link-scope LSDB for non-virtual interfaces. "
+    ::= {axOspfv3 5 }
+
+axOspfv3LinkLsdbEntry OBJECT-TYPE
+    SYNTAX AxOspfv3LinkLsdbEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A single Link-Scope Link State Advertisement."
+    INDEX {   axOspfv3LinkLsdbDomainNumber,
+              axOspfv3LinkLsdbIfIndex,
+              axOspfv3LinkLsdbIfInstId,
+              axOspfv3LinkLsdbType,
+              axOspfv3LinkLsdbRouterId,
+              axOspfv3LinkLsdbLsid }
+    ::= {axOspfv3LinkLsdbTable 1 }
+
+AxOspfv3LinkLsdbEntry ::= SEQUENCE {
+    axOspfv3LinkLsdbDomainNumber     Integer32,
+    axOspfv3LinkLsdbIfIndex          InterfaceIndex,
+    axOspfv3LinkLsdbIfInstId         Unsigned32,
+    axOspfv3LinkLsdbType             Unsigned32,
+    axOspfv3LinkLsdbRouterId         Unsigned32,
+    axOspfv3LinkLsdbLsid             Unsigned32,
+    axOspfv3LinkLsdbSequence         Integer32,
+    axOspfv3LinkLsdbAge              Unsigned32,
+    axOspfv3LinkLsdbChecksum         Integer32,
+    axOspfv3LinkLsdbAdvertisement    OCTET STRING
+}
+
+axOspfv3LinkLsdbDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ospfv3 domain number."
+    ::= {axOspfv3LinkLsdbEntry 1}
+
+axOspfv3LinkLsdbIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The identifier of the link from which the LSA was received."
+    ::= {axOspfv3LinkLsdbEntry 2}
+
+axOspfv3LinkLsdbIfInstId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The identifier of the interface instance from which the LSA was received."
+    ::= {axOspfv3LinkLsdbEntry 3}
+
+axOspfv3LinkLsdbType OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The type of the link state advertisement. Each link state type has a separate advertisement format.  Link-scope LSAs unrecognized  by the router are also stored in this database"
+    ::= {axOspfv3LinkLsdbEntry 4}
+
+axOspfv3LinkLsdbRouterId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The 32 bit number that uniquely identifies the originating router in the Autonomous System."
+    ::= {axOspfv3LinkLsdbEntry 5}
+
+axOspfv3LinkLsdbLsid OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Link State ID is an LS type-specific field containing a unique identifier;it identifies the piece of the routing domain that is being described by the dvertisement.  In contrast to OSPFv2, the LSID has no addressing semantics."
+    ::= {axOspfv3LinkLsdbEntry 6}
+
+axOspfv3LinkLsdbSequence OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The sequence number field is a  signed  32-bit integer.   It  is used to detect old and dupli- cate link state advertisements.  The  space  of sequence  numbers  is  linearly  ordered.  The larger the sequence number the more recent  the advertisement."
+    ::= {axOspfv3LinkLsdbEntry 7}
+
+axOspfv3LinkLsdbAge OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This field is the age of the link state adver- tisement in seconds."
+    ::= {axOspfv3LinkLsdbEntry 8}
+
+axOspfv3LinkLsdbChecksum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This field is the  checksum  of  the  complete contents  of  the  advertisement, excepting the age field.  The age field is excepted  so  that an  advertisement's  age  can  be  incremented without updating the  checksum.  The  checksum used  is  the same"
+    ::= {axOspfv3LinkLsdbEntry 9}
+
+axOspfv3LinkLsdbAdvertisement OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..65535))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The entire Link State Advertisement, including its header."
+    ::= {axOspfv3LinkLsdbEntry 10}
+
+--
+-- axOspfv3IfTable
+--
+
+axOspfv3IfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfv3IfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The OSPFv3 Interface Table describes the  interfaces from the viewpoint of OSPFv3."
+    ::= {axOspfv3 7}
+
+axOspfv3IfEntry OBJECT-TYPE
+    SYNTAX AxOspfv3IfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The OSPFv3 Interface Entry describes one  interface from the viewpoint of axOspfv3."
+    INDEX { axOspfv3IfDomainNumber,
+            axOspfv3IfIndex,
+            axOspfv3IfInstId }
+    ::= {axOspfv3IfTable 1}
+
+AxOspfv3IfEntry ::= SEQUENCE {
+    axOspfv3IfDomainNumber              Integer32,
+    axOspfv3IfIndex                     InterfaceIndex,
+    axOspfv3IfInstId                    Unsigned32,
+    axOspfv3IfAreaId                    Unsigned32,
+    axOspfv3IfType                      INTEGER,
+    axOspfv3IfAdminStatus               Status,
+    axOspfv3IfRtrPriority               Integer32,
+    axOspfv3IfTransitDelay              Unsigned32,
+    axOspfv3IfRetransInterval           Unsigned32,
+    axOspfv3IfHelloInterval             Integer32,
+    axOspfv3IfRtrDeadInterval           Unsigned32,
+    axOspfv3IfPollInterval              Unsigned32,
+    axOspfv3IfState                     INTEGER,
+    axOspfv3IfDesignatedRouter          Unsigned32,
+    axOspfv3IfBackupDesignatedRouter    Unsigned32,
+    axOspfv3IfEvents                    Counter32,
+    axOspfv3IfRowStatus                 RowStatus,
+    axOspfv3IfDemand                    TruthValue,
+    axOspfv3IfMetricValue               Integer32,
+    axOspfv3IfLinkScopeLsaCount         Gauge32,
+    axOspfv3IfLinkLsaCksumSum           Unsigned32,
+    axOspfv3IfDemandNbrProbe            TruthValue,
+    axOspfv3IfTEDisabled                TruthValue,
+    axOspfv3IfLinkLSASuppression        TruthValue
+}
+
+axOspfv3IfDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ospfv3 domain number."
+    ::= {axOspfv3IfEntry 1}
+
+axOspfv3IfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The interface index of this OSPFv3 interface. It corresponds to the interface index of the Ipv6 interface on which axOspfv3 is configured."
+    ::= {axOspfv3IfEntry 2}
+
+axOspfv3IfInstId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Enables multiple interface instances of OSPFv3 to be run over a single link.  Each interface instance would be assigned a separate ID. "
+    ::= {axOspfv3IfEntry 3}
+
+axOspfv3IfAreaId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A 32-bit integer uniquely identifying the area to  which  the  interface  connects.   Area  ID 0 is used for the axOspfv3 backbone."
+    ::= {axOspfv3IfEntry 4}
+
+axOspfv3IfType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       broadcast(1),
+                       nbma(2),
+                       pointToPoint(3),
+                       pointToMultipoint(5)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The OSPFv3 interface type."
+    ::= {axOspfv3IfEntry 5}
+
+axOspfv3IfAdminStatus OBJECT-TYPE
+    SYNTAX Status
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The OSPFv3 interface's  administrative  status. The  value formed on the interface, and the in- terface will be advertised as an internal route to  some  area.  The  value 'disabled' denotes that the interface is external to OSPFv3."
+    ::= {axOspfv3IfEntry 6}
+
+axOspfv3IfRtrPriority OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The  priority  of  this  interface.   Used  in multi-access  networks,  this  field is used in the designated router election algorithm.  The value 0 signifies that the router is not eligi- ble to become the  designated  router  on  this particular  netwo"
+    ::= {axOspfv3IfEntry 7}
+
+axOspfv3IfTransitDelay OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The estimated number of seconds  it  takes  to transmit  a  link state update packet over this interface."
+    ::= {axOspfv3IfEntry 8}
+
+axOspfv3IfRetransInterval OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of seconds between  link-state  ad- vertisement  retransmissions,  for  adjacencies belonging to this  interface.  This  value  is also used when retransmitting database descrip- tion and link-state request packets."
+    ::= {axOspfv3IfEntry 9}
+
+axOspfv3IfHelloInterval OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The length of time, in  seconds,  between  the Hello  packets that the router sends on the in- terface.  This value must be the same  for  all routers attached to a common network."
+    ::= {axOspfv3IfEntry 10}
+
+axOspfv3IfRtrDeadInterval OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of seconds that  a  router's  Hello packets  have  not been seen before it's neigh- bors declare the router down.  This  should  be some  multiple  of  the  Hello  interval.  This value must be the same for all routers attached to a common netw"
+    ::= {axOspfv3IfEntry 11}
+
+axOspfv3IfPollInterval OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The larger time interval, in seconds,  between the  Hello  packets  sent  to  an inactive non- broadcast multi- access neighbor."
+    ::= {axOspfv3IfEntry 12}
+
+axOspfv3IfState OBJECT-TYPE
+    SYNTAX INTEGER {
+                       down(1),
+                       loopback(2),
+                       waiting(3),
+                       pointToPoint(4),
+                       designatedRouter(5),
+                       backupDesignatedRouter(6),
+                       otherDesignatedRouter(7),
+                       standby(8)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The OSPFv3 Interface State. An interface may be in standby state if there are multiple interfaces on the link and another interface is active.  The interface may be in Down state if the underlying IPv6 interface is down or if the admin status is disabled' either globally or for the interface."
+    ::= {axOspfv3IfEntry 13}
+
+axOspfv3IfDesignatedRouter OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Router ID of the Designated Router."
+    ::= {axOspfv3IfEntry 14}
+
+axOspfv3IfBackupDesignatedRouter OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The  Router ID of  the  Backup   Designated Router."
+    ::= {axOspfv3IfEntry 15}
+
+axOspfv3IfEvents OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of times this  OSPFv3  interface  has changed its state or an error has occurred."
+    ::= {axOspfv3IfEntry 16}
+
+axOspfv3IfRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object permits management of the table by facilitating actions such as row creation, construction, and destruction."
+    ::= {axOspfv3IfEntry 17}
+
+axOspfv3IfDemand OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether Demand axOspfv3 procedures (hel-lo supression to FULL neighbors and setting the DoNotAge flag on proogated LSAs) should be per-formed on this interface."
+    ::= {axOspfv3IfEntry 18}
+
+axOspfv3IfMetricValue OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The metric assigned to this interface. The default value of the Metric is 10^8 / ifSpeed."
+    ::= {axOspfv3IfEntry 19}
+
+axOspfv3IfLinkScopeLsaCount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of Link-Scope link-state advertisements in  this  link's link-state database."
+    ::= {axOspfv3IfEntry 20}
+
+axOspfv3IfLinkLsaCksumSum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The 32-bit unsigned sum of the Link-Scope link-state advertisements'  LS  checksums  contained in this link's link-state database.  The sum can be used to determine if  there  has been  a  change  in a router's link state database, and to compare the link"
+    ::= {axOspfv3IfEntry 21}
+
+axOspfv3IfDemandNbrProbe OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether or not neighbor probing is enabled to determine whether or not the neighbor is inactive.  Neighbor probing is disabled by default."
+    ::= {axOspfv3IfEntry 22}
+
+axOspfv3IfTEDisabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether or not traffic engineering is disabled on the interface when traffic engineering is enabled in the area where the interface is attached. "
+    ::= {axOspfv3IfEntry 25}
+
+axOspfv3IfLinkLSASuppression OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies whether or not link LSA origination is suppressed for broadcast or NBMA interface types."
+    ::= {axOspfv3IfEntry 26}
+
+--
+-- axOspfv3VirtIfTable
+--
+
+axOspfv3VirtIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfv3VirtIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about this router's virtual interfaces."
+    ::= {axOspfv3 8}
+
+axOspfv3VirtIfEntry OBJECT-TYPE
+    SYNTAX AxOspfv3VirtIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about a single virtual interface."
+    INDEX { axOspfv3VirtIfDomainNumber,
+            axOspfv3VirtIfAreaId,
+            axOspfv3VirtIfNeighbor }
+    ::= {axOspfv3VirtIfTable 1}
+
+AxOspfv3VirtIfEntry ::= SEQUENCE {
+    axOspfv3VirtIfDomainNumber         Integer32,
+    axOspfv3VirtIfAreaId               Unsigned32,
+    axOspfv3VirtIfNeighbor             Unsigned32,
+    axOspfv3VirtIfIndex                InterfaceIndex,
+    axOspfv3VirtIfInstId               Unsigned32,
+    axOspfv3VirtIfTransitDelay         Unsigned32,
+    axOspfv3VirtIfRetransInterval      Unsigned32,
+    axOspfv3VirtIfHelloInterval        Integer32,
+    axOspfv3VirtIfRtrDeadInterval      Unsigned32,
+    axOspfv3VirtIfState                INTEGER,
+    axOspfv3VirtIfEvents               Counter32,
+    axOspfv3VirtIfRowStatus            RowStatus,
+    axOspfv3VirtIfLinkScopeLsaCount    Gauge32,
+    axOspfv3VirtIfLinkLsaCksumSum      Unsigned32
+}
+
+axOspfv3VirtIfDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ospfv3 domain number."
+    ::= {axOspfv3VirtIfEntry 1}
+
+axOspfv3VirtIfAreaId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The  Transit  Area  that  the   Virtual   Link traverses.  By definition, this is not 0"
+    ::= {axOspfv3VirtIfEntry 2}
+
+axOspfv3VirtIfNeighbor OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Router ID of the Virtual Neighbor."
+    ::= {axOspfv3VirtIfEntry 3}
+
+axOspfv3VirtIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The local interface index assigned by the OSPFv3 Process to this OSPFv3 virtual interface. It is advertised in Hellos sent over the virtual link and in the router's router-LSAs."
+    ::= {axOspfv3VirtIfEntry 4}
+
+axOspfv3VirtIfInstId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enables multiple interface instances of OSPFv3 to be run over a single link.  Each interface instance would be assigned a separate ID. "
+    ::= {axOspfv3VirtIfEntry 5}
+
+axOspfv3VirtIfTransitDelay OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The estimated number of seconds  it  takes  to transmit  a link- state update packet over this interface."
+    ::= {axOspfv3VirtIfEntry 6}
+
+axOspfv3VirtIfRetransInterval OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of seconds between  link-state  ad-vertisement  retransmissions,  for  adjacencies belonging to this  interface.  This  value  is also used when retransmitting database descrip-tion  and  link-state  request  packets.   This value  should  be w"
+    ::= {axOspfv3VirtIfEntry 7}
+
+axOspfv3VirtIfHelloInterval OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The length of time, in  seconds,  between  the Hello  packets that the router sends on the in-terface.  This value must be the same  for  the virtual neighbor."
+    ::= {axOspfv3VirtIfEntry 8}
+
+axOspfv3VirtIfRtrDeadInterval OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of seconds that  a  router's  Hello packets  have  not been seen before it's neigh-bors declare the router down.  This  should  be some  multiple  of  the  Hello  interval.  This value must be the same for the  virtual  neigh-bor."
+    ::= {axOspfv3VirtIfEntry 9}
+
+axOspfv3VirtIfState OBJECT-TYPE
+    SYNTAX INTEGER {
+                       down(1),
+                       pointToPoint(4)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "OSPF virtual Interface states. The same encoding as the axOspfv3IfTable is used."
+    ::= {axOspfv3VirtIfEntry 10}
+
+axOspfv3VirtIfEvents OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of state changes or error events on this Virtual Link"
+    ::= {axOspfv3VirtIfEntry 11}
+
+axOspfv3VirtIfRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object permits management of the table by facilitating actions such as row creation,  onstruction, and destruction."
+    ::= {axOspfv3VirtIfEntry 12}
+
+axOspfv3VirtIfLinkScopeLsaCount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of Link-Scope link-state advertisements in  this  virtual link's link-state database."
+    ::= {axOspfv3VirtIfEntry 13}
+
+axOspfv3VirtIfLinkLsaCksumSum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The 32-bit unsigned sum of the Link-Scope link-state advertisements'  LS  checksums  contained in this virtual link's link-state database.  The sum can be used to determine if  there  has been  a  change  in a router's link state database, and to compare "
+    ::= {axOspfv3VirtIfEntry 14}
+
+axOspfv3NbrTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfv3NbrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table describing all neighbors in the locality of the OSPFv3 router."
+    ::= {axOspfv3 9}
+
+axOspfv3NbrEntry OBJECT-TYPE
+    SYNTAX AxOspfv3NbrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The information regarding a single neighbor."
+    INDEX { axOspfv3NbrDomainNumber,
+            axOspfv3NbrIfIndex,
+            axOspfv3NbrIfInstId,
+            axOspfv3NbrRtrId}
+    ::= {axOspfv3NbrTable 1}
+
+AxOspfv3NbrEntry ::= SEQUENCE {
+    axOspfv3NbrDomainNumber               Integer32,
+    axOspfv3NbrIfIndex                    InterfaceIndex,
+    axOspfv3NbrIfInstId                   Unsigned32,
+    axOspfv3NbrRtrId                      Unsigned32,
+    axOspfv3NbrAddressType                InetAddressType,
+    axOspfv3NbrAddress                    InetAddress,
+    axOspfv3NbrOptions                    Integer32,
+    axOspfv3NbrPriority                   Integer32,
+    axOspfv3NbrState                      INTEGER,
+    axOspfv3NbrEvents                     Counter32,
+    axOspfv3NbrLsRetransQLen              Gauge32,
+    axOspfv3NbrHelloSuppressed            TruthValue,
+    axOspfv3NbrIfId                       InterfaceIndex,
+    axOspfv3NbrRestartHelperStatus        INTEGER,
+    axOspfv3NbrRestartHelperExitReason    INTEGER
+}
+
+axOspfv3NbrDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ospfv3 domain number."
+    ::= {axOspfv3NbrEntry 1}
+
+axOspfv3NbrIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The local link ID of the link over which the neighbor can be reached."
+    ::= {axOspfv3NbrEntry 2}
+
+axOspfv3NbrIfInstId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Enables multiple interface instances of OSPFv3 to be run over a single link.  Each interface             instance would be assigned a separate ID. "
+    ::= {axOspfv3NbrEntry 3}
+
+axOspfv3NbrRtrId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A 32-bit integer uniquely identifying the neighboring router in the Autonomous System."
+    ::= {axOspfv3NbrEntry 4}
+
+axOspfv3NbrAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The address type of axOspfv3NbrAddress.  Only IPv6 addresses are expected."
+    ::= {axOspfv3NbrEntry 5}
+
+axOspfv3NbrAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IPv6 address of the neighbor associated with the local link."
+    ::= {axOspfv3NbrEntry 6}
+
+axOspfv3NbrOptions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A Bit Mask corresponding to the neighbor's options field."
+    ::= {axOspfv3NbrEntry 7}
+
+axOspfv3NbrPriority OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The priority of this neighbor in the designated router election algorithm.  The value 0 signifies that the neighbor is not eligible to become  the  Designated router on this particular network."
+    ::= {axOspfv3NbrEntry 8}
+
+axOspfv3NbrState OBJECT-TYPE
+    SYNTAX INTEGER {
+                       down(1),
+                       attempt(2),
+                       init(3),
+                       twoWay(4),
+                       exchangeStart(5),
+                       exchange(6),
+                       loading(7),
+                       full(8)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The State of the relationship with this neighbor."
+    ::= {axOspfv3NbrEntry 9}
+
+axOspfv3NbrEvents OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of times this neighbor relationship has changed state, or an error has occurred."
+    ::= {axOspfv3NbrEntry 10}
+
+axOspfv3NbrLsRetransQLen OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The  current  length  of  the   retransmission queue."
+    ::= {axOspfv3NbrEntry 11}
+
+axOspfv3NbrHelloSuppressed OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether Hellos are being  suppressed to the neighbor"
+    ::= {axOspfv3NbrEntry 12}
+
+axOspfv3NbrIfId OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The interface ID that the neighbor advertises in its Hello Packets on this link, that is, the neighbor's local interface index."
+    ::= {axOspfv3NbrEntry 13}
+
+axOspfv3NbrRestartHelperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                       notHelping(1),
+                       helping(2)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether the router is acting as a graceful restart helper for the neighbor"
+    ::= {axOspfv3NbrEntry 14}
+
+axOspfv3NbrRestartHelperExitReason OBJECT-TYPE
+    SYNTAX INTEGER {
+                       none(1),
+                       inProgress(2),
+                       completed(3),
+                       timedOut(4),
+                       topologyChanged(5)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Describes the outcome of the last attempt at acting as a graceful restart helper for the neighbor."
+    ::= {axOspfv3NbrEntry 16}
+
+--
+-- axOspfv3VirtNbrTable
+--
+
+axOspfv3VirtNbrTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfv3VirtNbrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of virtual neighbor information."
+    ::= {axOspfv3 11}
+
+axOspfv3VirtNbrEntry OBJECT-TYPE
+    SYNTAX AxOspfv3VirtNbrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Virtual neighbor information."
+    INDEX { axOspfv3VirtNbrDomainNumber,
+            axOspfv3VirtNbrArea,
+            axOspfv3VirtNbrRtrId }
+    ::= {axOspfv3VirtNbrTable 1}
+
+AxOspfv3VirtNbrEntry ::= SEQUENCE {
+    axOspfv3VirtNbrDomainNumber               Integer32,
+    axOspfv3VirtNbrArea                       Unsigned32,
+    axOspfv3VirtNbrRtrId                      Unsigned32,
+    axOspfv3VirtNbrIfIndex                    InterfaceIndex,
+    axOspfv3VirtNbrIfInstId                   Unsigned32,
+    axOspfv3VirtNbrAddressType                InetAddressType,
+    axOspfv3VirtNbrAddress                    InetAddress,
+    axOspfv3VirtNbrOptions                    Integer32,
+    axOspfv3VirtNbrState                      INTEGER,
+    axOspfv3VirtNbrEvents                     Counter32,
+    axOspfv3VirtNbrLsRetransQLen              Gauge32,
+    axOspfv3VirtNbrHelloSuppressed            TruthValue,
+    axOspfv3VirtNbrIfId                       InterfaceIndex,
+    axOspfv3VirtNbrRestartHelperStatus        INTEGER,
+    axOspfv3VirtNbrRestartHelperExitReason    INTEGER
+}
+
+axOspfv3VirtNbrDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ospfv3 domain number."
+    ::= {axOspfv3VirtNbrEntry 1}
+
+axOspfv3VirtNbrArea OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Transit Area Identifier."
+    ::= {axOspfv3VirtNbrEntry 2}
+
+axOspfv3VirtNbrRtrId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A  32-bit  integer  uniquely  identifying  the neighboring router in the Autonomous System."
+    ::= {axOspfv3VirtNbrEntry 3}
+
+axOspfv3VirtNbrIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The local Interface ID for the virtual link over which the neighbor can be reached."
+    ::= {axOspfv3VirtNbrEntry 4}
+
+axOspfv3VirtNbrIfInstId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enables multiple interface instances of OSPFv3 to be run over a single link.  Each interface instance would be assigned a separate ID. "
+    ::= {axOspfv3VirtNbrEntry 5}
+
+axOspfv3VirtNbrAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The address type of axOspfv3VirtNbrAddress.  Only IPv6 addresses are expected.
+"
+    ::= {axOspfv3VirtNbrEntry 6}
+
+axOspfv3VirtNbrAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IPv6 address advertised by this virtual neighbor.
+ It must be a global scope address."
+    ::= {axOspfv3VirtNbrEntry 7}
+
+axOspfv3VirtNbrOptions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A Bit Mask corresponding to the neighbor's options field."
+    ::= {axOspfv3VirtNbrEntry 8}
+
+axOspfv3VirtNbrState OBJECT-TYPE
+    SYNTAX INTEGER {
+                       down(1),
+                       attempt(2),
+                       init(3),
+                       twoWay(4),
+                       exchangeStart(5),
+                       exchange(6),
+                       loading(7),
+                       full(8)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of the  Virtual  neighbor  relationship."
+    ::= {axOspfv3VirtNbrEntry 9}
+
+axOspfv3VirtNbrEvents OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of  times  this  virtual  link  has changed its state, or an error has occurred."
+    ::= {axOspfv3VirtNbrEntry 10}
+
+axOspfv3VirtNbrLsRetransQLen OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The  current  length  of  the   retransmission queue."
+    ::= {axOspfv3VirtNbrEntry 11}
+
+axOspfv3VirtNbrHelloSuppressed OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether Hellos are being  suppressed to the neighbor"
+    ::= {axOspfv3VirtNbrEntry 12}
+
+axOspfv3VirtNbrIfId OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The interface ID that the neighbor advertises in its Hello Packets on this virtual link, that is, the neighbor's local interface index."
+    ::= {axOspfv3VirtNbrEntry 13}
+
+axOspfv3VirtNbrRestartHelperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      notHelping(1),
+                      helping(2)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether the router is acting as a graceful restart helper for the neighbor."
+    ::= {axOspfv3VirtNbrEntry 14}
+
+axOspfv3VirtNbrRestartHelperExitReason OBJECT-TYPE
+    SYNTAX INTEGER {
+                      none(1),
+                      inProgress(2),
+                      completed(3),
+                      timedOut(4),
+                      topologyChanged(5)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Describes the outcome of the last attempt at acting as a graceful restart helper for the neighbor."
+    ::= {axOspfv3VirtNbrEntry 16}
+
+--
+-- axOspfv3AreaAggregateTable
+--
+
+axOspfv3AreaAggregateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfv3AreaAggregateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A range of IPv6 prefixes specified by a prefix/prefix length  pair. Note that if ranges are configured such that one range sub-sumes  another range the most specific match is the preferred one."
+    ::= {axOspfv3 12}
+
+axOspfv3AreaAggregateEntry OBJECT-TYPE
+    SYNTAX AxOspfv3AreaAggregateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A single area aggregate entry."
+    INDEX  { axOspfv3AreaAggregateDomainNumber,
+             axOspfv3AreaAggregateAreaID,
+             axOspfv3AreaAggregateAreaLsdbType,
+             axOspfv3AreaAggregatePrefixType,
+             axOspfv3AreaAggregatePrefix,
+             axOspfv3AreaAggregatePrefixLength }
+    ::= {axOspfv3AreaAggregateTable 1}
+
+AxOspfv3AreaAggregateEntry ::= SEQUENCE {
+    axOspfv3AreaAggregateDomainNumber    Integer32,
+    axOspfv3AreaAggregateAreaID          Unsigned32,
+    axOspfv3AreaAggregateAreaLsdbType    INTEGER,
+    axOspfv3AreaAggregatePrefixType      InetAddressType,
+    axOspfv3AreaAggregatePrefix          InetAddress,
+    axOspfv3AreaAggregatePrefixLength    Integer32,
+    axOspfv3AreaAggregateRowStatus       RowStatus,
+    axOspfv3AreaAggregateEffect          INTEGER,
+    axOspfv3AreaAggregateRouteTag        Unsigned32
+}
+
+axOspfv3AreaAggregateDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ospfv3 domain number."
+    ::= {axOspfv3AreaAggregateEntry 1}
+
+axOspfv3AreaAggregateAreaID OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Area the Address Aggregate is to be  found within."
+    ::= {axOspfv3AreaAggregateEntry 2}
+
+axOspfv3AreaAggregateAreaLsdbType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       interAreaPrefixLsa(8195),
+                       nssaExternalLsa(8199)
+                   }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The type of the Address Aggregate.  This field specifies the Area LSDB type that this Address Aggregate applies to."
+    ::= {axOspfv3AreaAggregateEntry 3}
+
+axOspfv3AreaAggregatePrefixType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The prefix type of axOspfv3AreaAggregatePrefix.  Only IPv6 addresses are expected."
+    ::= {axOspfv3AreaAggregateEntry 4}
+
+axOspfv3AreaAggregatePrefix OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The IPv6 Prefix."
+    ::= {axOspfv3AreaAggregateEntry 5}
+
+axOspfv3AreaAggregatePrefixLength OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The length of the prefix (in bits). A prefix can not be shorter than 3 bits."
+    ::= {axOspfv3AreaAggregateEntry 6}
+
+axOspfv3AreaAggregateRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object permits management of the table by facilitating actions such as row creation, construction, and destruction."
+    ::= {axOspfv3AreaAggregateEntry 7}
+
+axOspfv3AreaAggregateEffect OBJECT-TYPE
+    SYNTAX INTEGER {
+                       advertiseMatching(1),
+                       doNotAdvertiseMatching(2)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Prefixes subsumed by ranges either trigger  the advertisement  of  the indicated aggregate (advertiseMatching), or result in the prefix not being advertised at all outside the area."
+    ::= {axOspfv3AreaAggregateEntry 8}
+
+axOspfv3AreaAggregateRouteTag OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This tag is advertised only in the summarized As-External LSA when summarizing from NSSA-LSAs to AS-External-LSAs"
+    ::= {axOspfv3AreaAggregateEntry 9}
+
+--
+-- Conformance Statements
+--
+
+-- Conformance identifier
+
+axOspfv3Conformance             OBJECT IDENTIFIER ::= { axOspfv3 1000 }
+axOspfv3Compliances             OBJECT IDENTIFIER ::= { axOspfv3Conformance 1 }
+axOspfv3Groups                  OBJECT IDENTIFIER ::= { axOspfv3Conformance 2 }
+
+--
+-- Compliance
+--
+
+    axOspfv3Compliance MODULE-COMPLIANCE
+        STATUS    current
+        DESCRIPTION
+            "AX Ospf Object"
+        MODULE
+            MANDATORY-GROUPS { axOspfv3Group }
+        ::= { axOspfv3Compliances 1 }
+
+--
+-- Object Group
+--
+    axOspfv3Group OBJECT-GROUP
+        OBJECTS     {
+                        axOspfv3GeneralDomainNumber,
+                        axOspfv3RouterId,
+                        axOspfv3AdminStatus,
+                        axOspfv3VersionNumber,
+                        axOspfv3AreaBdrRtrStatus,
+                        axOspfv3ASBdrRtrStatus,
+                        axOspfv3AsScopeLsaCount,
+                        axOspfv3AsScopeLsaCksumSum,
+                        axOspfv3OriginateNewLsas,
+                        axOspfv3RxNewLsas,
+                        axOspfv3ExtLsaCount,
+                        axOspfv3ExtAreaLsdbLimit,
+                        axOspfv3DemandExtensions,
+                        axOspfv3RestartSupport,
+                        axOspfv3RestartInterval,
+                        axOspfv3RestartStrictLsaChecking,
+                        axOspfv3AreaImportAsExtern,
+                        axOspfv3AreaSpfRuns,
+                        axOspfv3AreaBdrRtrCount,
+                        axOspfv3AreaAsBdrRtrCount,
+                        axOspfv3AreaScopeLsaCount,
+                        axOspfv3AreaScopeLsaCksumSum,
+                        axOspfv3AreaSummary,
+                        axOspfv3AreaRowStatus,
+                        axOspfv3AreaStubMetric,
+                        axOspfv3AreaStubMetricType,
+                        axOspfv3AreaTEEnabled,
+                        axOspfv3AsLsdbSequence,
+                        axOspfv3AsLsdbAge,
+                        axOspfv3AsLsdbChecksum,
+                        axOspfv3AsLsdbAdvertisement,
+                        axOspfv3AreaLsdbSequence,
+                        axOspfv3AreaLsdbAge,
+                        axOspfv3AreaLsdbChecksum,
+                        axOspfv3AreaLsdbAdvertisement,
+                        axOspfv3LinkLsdbSequence,
+                        axOspfv3LinkLsdbAge,
+                        axOspfv3LinkLsdbChecksum,
+                        axOspfv3LinkLsdbAdvertisement,
+                        axOspfv3IfAreaId,
+                        axOspfv3IfType,
+                        axOspfv3IfAdminStatus,
+                        axOspfv3IfRtrPriority,
+                        axOspfv3IfTransitDelay,
+                        axOspfv3IfRetransInterval,
+                        axOspfv3IfHelloInterval,
+                        axOspfv3IfRtrDeadInterval,
+                        axOspfv3IfPollInterval,
+                        axOspfv3IfState,
+                        axOspfv3IfDesignatedRouter,
+                        axOspfv3IfBackupDesignatedRouter,
+                        axOspfv3IfEvents,
+                        axOspfv3IfRowStatus,
+                        axOspfv3IfDemand,
+                        axOspfv3IfMetricValue,
+                        axOspfv3IfLinkScopeLsaCount,
+                        axOspfv3IfLinkLsaCksumSum,
+                        axOspfv3IfDemandNbrProbe,
+                        axOspfv3IfTEDisabled,
+                        axOspfv3IfLinkLSASuppression,
+                        axOspfv3VirtIfIndex,
+                        axOspfv3VirtIfInstId,
+                        axOspfv3VirtIfTransitDelay,
+                        axOspfv3VirtIfRetransInterval,
+                        axOspfv3VirtIfHelloInterval,
+                        axOspfv3VirtIfRtrDeadInterval,
+                        axOspfv3VirtIfState,
+                        axOspfv3VirtIfEvents,
+                        axOspfv3VirtIfRowStatus,
+                        axOspfv3VirtIfLinkScopeLsaCount,
+                        axOspfv3VirtIfLinkLsaCksumSum,
+                        axOspfv3NbrAddressType,
+                        axOspfv3NbrAddress,
+                        axOspfv3NbrOptions,
+                        axOspfv3NbrPriority,
+                        axOspfv3NbrState,
+                        axOspfv3NbrEvents,
+                        axOspfv3NbrLsRetransQLen,
+                        axOspfv3NbrHelloSuppressed,
+                        axOspfv3NbrIfId,
+                        axOspfv3NbrRestartHelperStatus,
+                        axOspfv3NbrRestartHelperExitReason,
+                        axOspfv3VirtNbrIfIndex,
+                        axOspfv3VirtNbrIfInstId,
+                        axOspfv3VirtNbrAddressType,
+                        axOspfv3VirtNbrAddress,
+                        axOspfv3VirtNbrOptions,
+                        axOspfv3VirtNbrState,
+                        axOspfv3VirtNbrEvents,
+                        axOspfv3VirtNbrLsRetransQLen,
+                        axOspfv3VirtNbrHelloSuppressed,
+                        axOspfv3VirtNbrIfId,
+                        axOspfv3VirtNbrRestartHelperStatus,
+                        axOspfv3VirtNbrRestartHelperExitReason,
+                        axOspfv3AreaAggregateRowStatus,
+                        axOspfv3AreaAggregateEffect,
+                        axOspfv3AreaAggregateRouteTag
+                    }
+        STATUS      current
+        DESCRIPTION
+            "axOspf General Group"
+        ::= { axOspfv3Groups 1 }
+
+END
+

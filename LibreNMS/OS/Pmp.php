@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Pmp.php
  *
@@ -28,6 +29,7 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
@@ -50,6 +52,20 @@ class Pmp extends OS implements
     WirelessClientsDiscovery,
     WirelessErrorsDiscovery
 {
+    public static function cnMaestroConnectionStatus(string $status): int
+    {
+        // remove url from string
+        $status = preg_replace('/\s*\([^)]*\)\s*$/', '', $status);
+
+        return match ($status) {
+            'Connected' => 0,
+            'Please verify network settings. Not able to establish connection with cnMaestro server.' => 1,
+            'Connecting' => 2,
+            'Device Approval Pending' => 3,
+            default => 4,
+        };
+    }
+
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
@@ -109,7 +125,7 @@ class Pmp extends OS implements
                 'fecInErrorsCount' => $fec['fecInErrorsCount.0'],
                 'fecOutErrorsCount' => $fec['fecOutErrorsCount.0'],
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'canopy-generic-errorCount', $tags, $fields);
             $this->enableGraph('canopy_generic_errorCount');
         }
@@ -120,7 +136,7 @@ class Pmp extends OS implements
             $fields = [
                 'crcErrors' => $fec['fecCRCError.0'],
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'canopy-generic-crcErrors', $tags, $fields);
             $this->enableGraph('canopy_generic_crcErrors');
         }
@@ -131,7 +147,7 @@ class Pmp extends OS implements
             $fields = [
                 'jitter' => $jitter,
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'canopy-generic-jitter', $tags, $fields);
             $this->enableGraph('canopy_generic_jitter');
             unset($rrd_def, $jitter);
@@ -150,7 +166,7 @@ class Pmp extends OS implements
                 'regCount' => $registered,
                 'failed' => $failed,
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'canopy-generic-regCount', $tags, $fields);
             $this->enableGraph('canopy_generic_regCount');
             unset($rrd_def, $registered, $failed);
@@ -166,7 +182,7 @@ class Pmp extends OS implements
                 'visible' => floatval($visible),
                 'tracked' => floatval($tracked),
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'canopy-generic-gpsStats', $tags, $fields);
             $this->enableGraph('canopy_generic_gpsStats');
         }
@@ -185,7 +201,7 @@ class Pmp extends OS implements
                 'max' => $radio['maxRadioDbm.0'],
                 'avg' => $radio['radioDbmAvg.0'],
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'canopy-generic-radioDbm', $tags, $fields);
             $this->enableGraph('canopy_generic_radioDbm');
         }
@@ -199,7 +215,7 @@ class Pmp extends OS implements
                 'horizontal' => $dbm['linkRadioDbmHorizontal.2'],
                 'vertical' => $dbm['linkRadioDbmVertical.2'],
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'canopy-generic-450-linkRadioDbm', $tags, $fields);
             $this->enableGraph('canopy_generic_450_linkRadioDbm');
         }
@@ -210,7 +226,7 @@ class Pmp extends OS implements
             $fields = [
                 'last' => $lastLevel,
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'canopy-generic-450-powerlevel', $tags, $fields);
             $this->enableGraph('canopy_generic_450_powerlevel');
         }
@@ -228,7 +244,7 @@ class Pmp extends OS implements
                 'horizontal' => floatval($horizontal),
                 'combined' => $combined,
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'canopy-generic-signalHV', $tags, $fields);
             $this->enableGraph('canopy_generic_signalHV');
             unset($rrd_def, $vertical, $horizontal, $combined);
@@ -245,7 +261,7 @@ class Pmp extends OS implements
                 'horizontal' => $horizontal,
                 'vertical' => $vertical,
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'canopy-generic-450-slaveHV', $tags, $fields);
             $this->enableGraph('canopy_generic_450_slaveHV');
         }
@@ -263,7 +279,7 @@ class Pmp extends OS implements
 
         return [
             new WirelessSensor(
-                'rssi',
+                WirelessSensorType::Rssi,
                 $this->getDeviceId(),
                 $rssi_oid,
                 'pmp',
@@ -293,7 +309,7 @@ class Pmp extends OS implements
 
         return [
             new WirelessSensor(
-                'snr',
+                WirelessSensorType::Snr,
                 $this->getDeviceId(),
                 $snr_horizontal,
                 'pmp-h',
@@ -302,7 +318,7 @@ class Pmp extends OS implements
                 null
             ),
             new WirelessSensor(
-                'snr',
+                WirelessSensorType::Snr,
                 $this->getDeviceId(),
                 $snr_vertical,
                 'pmp-v',
@@ -325,7 +341,7 @@ class Pmp extends OS implements
 
         return [
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 $frequency,
                 'pmp',
@@ -360,7 +376,7 @@ class Pmp extends OS implements
 
         return [
             new WirelessSensor(
-                'utilization',
+                WirelessSensorType::Utilization,
                 $this->getDeviceId(),
                 $lowdownlink,
                 'pmp-downlink',
@@ -369,7 +385,7 @@ class Pmp extends OS implements
                 null
             ),
             new WirelessSensor(
-                'utilization',
+                WirelessSensorType::Utilization,
                 $this->getDeviceId(),
                 $lowuplink,
                 'pmp-uplink',
@@ -378,7 +394,7 @@ class Pmp extends OS implements
                 null
             ),
             new WirelessSensor(
-                'utilization',
+                WirelessSensorType::Utilization,
                 $this->getDeviceId(),
                 $meddownlink,
                 'pmp-downlink',
@@ -387,7 +403,7 @@ class Pmp extends OS implements
                 null
             ),
             new WirelessSensor(
-                'utilization',
+                WirelessSensorType::Utilization,
                 $this->getDeviceId(),
                 $meduplink,
                 'pmp-uplink',
@@ -396,7 +412,7 @@ class Pmp extends OS implements
                 null
             ),
             new WirelessSensor(
-                'utilization',
+                WirelessSensorType::Utilization,
                 $this->getDeviceId(),
                 $highdownlink,
                 'pmp-downlink',
@@ -405,7 +421,7 @@ class Pmp extends OS implements
                 null
             ),
             new WirelessSensor(
-                'utilization',
+                WirelessSensorType::Utilization,
                 $this->getDeviceId(),
                 $highuplink,
                 'pmp-uplink',
@@ -414,7 +430,7 @@ class Pmp extends OS implements
                 null
             ),
             new WirelessSensor(
-                'utilization',
+                WirelessSensorType::Utilization,
                 $this->getDeviceId(),
                 $muSectorDownlink,
                 'pmp-450m-sector-downlink',
@@ -423,7 +439,7 @@ class Pmp extends OS implements
                 null
             ),
             new WirelessSensor(
-                'utilization',
+                WirelessSensorType::Utilization,
                 $this->getDeviceId(),
                 $muDownlink,
                 'pmp-450m-downlink',
@@ -432,7 +448,7 @@ class Pmp extends OS implements
                 null
             ),
             new WirelessSensor(
-                'utilization',
+                WirelessSensorType::Utilization,
                 $this->getDeviceId(),
                 $suDownlink,
                 'pmp-450m-su-downlink',
@@ -459,7 +475,7 @@ class Pmp extends OS implements
 
         return [
             new WirelessSensor(
-                'ssr',
+                WirelessSensorType::Ssr,
                 $this->getDeviceId(),
                 $ssr,
                 'pmp',
@@ -525,7 +541,7 @@ class Pmp extends OS implements
 
         return [
             new WirelessSensor(
-                'clients',
+                WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 $registeredSM,
                 'pmp',
@@ -550,7 +566,7 @@ class Pmp extends OS implements
 
         return [
             new WirelessSensor(
-                'errors',
+                WirelessSensorType::Errors,
                 $this->getDeviceId(),
                 $fecCRCError,
                 'pmp-fecCRCError',
@@ -559,7 +575,7 @@ class Pmp extends OS implements
                 null
             ),
             new WirelessSensor(
-                'errors',
+                WirelessSensorType::Errors,
                 $this->getDeviceId(),
                 $fecOutErrorsCount,
                 'pmp-fecOutErrorsCount',
@@ -568,7 +584,7 @@ class Pmp extends OS implements
                 null
             ),
             new WirelessSensor(
-                'errors',
+                WirelessSensorType::Errors,
                 $this->getDeviceId(),
                 $fecInErrorsCount,
                 'pmp-fecInErrorsCount',

@@ -545,9 +545,9 @@
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 20,
-                    "sensor_limit": 45,
+                    "sensor_limit": -11.5,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 5,
+                    "sensor_limit_low": -15.5,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -570,9 +570,9 @@
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 23.61,
-                    "sensor_limit": 45,
+                    "sensor_limit": -11.5,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 5,
+                    "sensor_limit_low": -15.5,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -636,5 +636,25 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.10.0.10",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "10.10.0.0/26",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 1
+                }
+            ]
+        }
     }
 }

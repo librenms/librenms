@@ -19,35 +19,36 @@ ALCATEL-IND1-DHL-MIB DEFINITIONS ::= BEGIN
 
 
     alcatelIND1DHLMIB MODULE-IDENTITY
-        LAST-UPDATED "201008150000Z"
-        ORGANIZATION "Alcatel - Architects Of An Internet World"
+        LAST-UPDATED "201911270000Z"
+        ORGANIZATION "ALE USA Inc."
         CONTACT-INFO
-            "Please consult with Customer Service to insure the most appropriate
-            version of this document is used with the products in question:
+         "Please consult with Customer Service to ensure the most appropriate
+          version of this document is used with the products in question:
 
-                Alcatel Internetworking, Incorporated
-                (Division 1, Formerly XYLAN Corporation)
-                26801 West Agoura Road
-                Agoura Hills, CA  91301-5122
-                United States Of America
+                          ALE USA Inc. Enterprise
+                            26801 West Agoura Road
+                         Agoura Hills, CA  91301-5122
+                           United States Of America
 
-                Telephone:      North America  +1 800 995 2696
-                                Latin America  +1 877 919 9526
-                                Europe         +31 23 556 0100
-                                Asia           +65 394 7933
-                                All Other      +1 818 878 4507
+         Telephone:          +1 800 995 2696
 
-                Electronic Mail:         support@ind.alcatel.com
-                World Wide Web:          http://www.ind.alcatel.com
-                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+         Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+         World Wide Web:     https://www.al-enterprise.com"
 
         DESCRIPTION
-		"The Dual Homed Link uses two links with a number of VLANs split between 
-		them from the common pool of vlans, in such a way that any vlan is not 
-		associated with both of the redundant links at the same time to avoid formation 
-		of loops and also VLANs are still connected to the core when one link fails. 
-		STP is disabled on both the DHL links implicitly."
-	::= { softentIND1DHL 1 }
+            "The Dual Homed Link uses two links with a number of VLANs split between 
+            them from the common pool of vlans, in such a way that any vlan is not 
+            associated with both of the redundant links at the same time to avoid formation 
+            of loops and also VLANs are still connected to the core when one link fails. 
+            STP is disabled on both the DHL links implicitly.
+
+                       Copyright (C) ALE USA Inc. 2014-2019
+                       Copyright (C) 1995-2013 Alcatel-Lucent
+                               ALL RIGHTS RESERVED WORLDWIDE"
+        REVISION      "201911270000Z"
+        DESCRIPTION
+            "Updated the latest contact and Copyright information for ALE USA Inc."
+    ::= { softentIND1DHL 1 }
 
     alcatelIND1DHLMIBNotifications OBJECT-IDENTITY
         STATUS current
@@ -159,7 +160,7 @@ ALCATEL-IND1-DHL-MIB DEFINITIONS ::= BEGIN
         
 
     alaDHLSessionPreemptionTime OBJECT-TYPE
-        SYNTAX      Integer32 (0..600)
+        SYNTAX      Integer32 (10..600)
 	UNITS       "seconds"
         MAX-ACCESS  read-create
         STATUS      current

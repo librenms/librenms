@@ -1,0 +1,1579 @@
+GUDEADS-EPC8316-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Integer32,
+	Unsigned32
+		FROM SNMPv2-SMI
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF;
+
+gudeads MODULE-IDENTITY
+	LAST-UPDATED "202409261541Z"	-- Sep 26, 2024, 3:41:00 PM
+	ORGANIZATION "GUDE Systems GmbH"
+	CONTACT-INFO
+		"Von-der-Wettern-Str. 23
+		51149 Cologne
+		Germany
+		https://www.gude-systems.com"
+	DESCRIPTION
+		"Expert Power Control 8316 MIB"
+	-- 1.3.6.1.4.1.28507
+	::= { enterprises 28507 }
+
+
+epc8316DeviceInfo OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.1.1.2
+	::= { epc8316CommonConfig 2 }
+
+epc8316ProdName OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The Product Name of the device."
+	-- 1.3.6.1.4.1.28507.64.1.1.2.1
+	::= { epc8316DeviceInfo 1 }
+
+
+epc8316FWVersion OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Firmware Version of the device."
+	-- 1.3.6.1.4.1.28507.64.1.1.2.2
+	::= { epc8316DeviceInfo 2 }
+
+
+epc8316HostName OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The configured Host Name."
+	-- 1.3.6.1.4.1.28507.64.1.1.2.3
+	::= { epc8316DeviceInfo 3 }
+
+
+epc8316PhysAddress OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The MAC address of the device."
+	-- 1.3.6.1.4.1.28507.64.1.1.2.4
+	::= { epc8316DeviceInfo 4 }
+
+
+epc8316SerialNumber OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The Serial Number of the device. Not available for all devices. Production start 2026."
+	-- 1.3.6.1.4.1.28507.64.1.1.2.5
+	::= { epc8316DeviceInfo 5 }
+
+
+epc8316ExtInputToggleCount OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of times the Input has changed its state."
+	-- 1.3.6.1.4.1.28507.64.1.6.2.2.1.3
+	::= { epc8316ExtInputEntry 3 }
+
+
+epc8316ExtInputs OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.1.6.2
+	::= { epc8316ExtSensors 2 }
+
+epc8316ExtInputEntry OBJECT-TYPE
+	SYNTAX  Epc8316ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8316ExtInputIndex }
+	-- 1.3.6.1.4.1.28507.64.1.6.2.2.1
+	::= { epc8316ExtInputTable 1 }
+
+
+Epc8316ExtInputEntry ::= SEQUENCE {
+
+	epc8316ExtInputIndex       Unsigned32,
+	epc8316ExtInput            INTEGER,
+	epc8316ExtInputToggleCount Unsigned32,
+	epc8316ExtInputName        OCTET STRING,
+	epc8316ExtInputPortNum     Integer32,
+	epc8316ExtInputBlockIndex  Integer32 }
+
+
+epc8316ExtInput OBJECT-TYPE
+	SYNTAX  INTEGER {
+			lo(0),
+			hi(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Input state of device"
+	-- 1.3.6.1.4.1.28507.64.1.6.2.2.1.2
+	::= { epc8316ExtInputEntry 2 }
+
+
+epc8316ExtActiveInputs OBJECT-TYPE
+	SYNTAX  Unsigned32 (1..12)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Input Channels."
+	-- 1.3.6.1.4.1.28507.64.1.6.2.1
+	::= { epc8316ExtInputs 1 }
+
+
+epc8316ExtInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8316ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.64.1.6.2.2
+	::= { epc8316ExtInputs 2 }
+
+
+epc8316ExtInputIndex OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.64.1.6.2.2.1.1
+	::= { epc8316ExtInputEntry 1 }
+
+
+epc8316ExtInputName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of
+		the Input"
+	-- 1.3.6.1.4.1.28507.64.1.6.2.2.1.32
+	::= { epc8316ExtInputEntry 32 }
+
+
+epc8316ExtInputPortNum OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of external Sensor Port when value greater zero, else device built-in Input."
+	-- 1.3.6.1.4.1.28507.64.1.6.2.2.1.33
+	::= { epc8316ExtInputEntry 33 }
+
+
+epc8316ExtInputBlockIndex OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Either index of device built-in Input, or index of Input in external sensor."
+	-- 1.3.6.1.4.1.28507.64.1.6.2.2.1.34
+	::= { epc8316ExtInputEntry 34 }
+
+
+epc8316NTPClient OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.1.5.15
+	::= { epc8316IntSensors 15 }
+
+epc8316NTPUnixTime OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show received NTP time as unixtime (secs since 1 January 1970)"
+	-- 1.3.6.1.4.1.28507.64.1.5.15.2
+	::= { epc8316NTPClient 2 }
+
+
+epc8316NTPLastValidTimestamp OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show seconds since last valid NTP timestamp received"
+	-- 1.3.6.1.4.1.28507.64.1.5.15.3
+	::= { epc8316NTPClient 3 }
+
+
+epc8316NTPTimeValid OBJECT-TYPE
+	SYNTAX  INTEGER {
+			notime(0),
+			valid(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Show if valid Time is received"
+	-- 1.3.6.1.4.1.28507.64.1.5.15.1
+	::= { epc8316NTPClient 1 }
+
+
+epc8316PortResetDuration OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for turning Port on again after Reset action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.64.1.3.1.2.1.8
+	::= { epc8316portEntry 8 }
+
+
+epc8316LineSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		Line Sensor"
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.100
+	::= { epc8316PowerEntry 100 }
+
+
+epc8316ExtSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		external Sensor"
+	-- 1.3.6.1.4.1.28507.64.1.6.1.1.32
+	::= { epc8316SensorEntry 32 }
+
+
+epc8316TrapCtrl OBJECT-TYPE
+	SYNTAX  Integer32 (0..3)
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"0 = off
+		1 = Ver. 1
+		2 = Ver. 2c
+		3 = Ver. 3"
+	-- 1.3.6.1.4.1.28507.64.1.1.1.1
+	::= { epc8316SNMPaccess 1 }
+
+
+gadsEPC8316 OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64
+	::= { gudeads 64 }
+
+-- Notification Types
+--
+
+events OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.3
+	::= { gadsEPC8316 3 }
+
+-- Scalars and Tables
+--
+
+epc8316Objects OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.1
+	::= { gadsEPC8316 1 }
+
+epc8316CommonConfig OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.1.1
+	::= { epc8316Objects 1 }
+
+epc8316SNMPaccess OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.1.1.1
+	::= { epc8316CommonConfig 1 }
+
+epc8316TrapIPTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8316TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all Trap receiver"
+	-- 1.3.6.1.4.1.28507.64.1.1.1.2
+	::= { epc8316SNMPaccess 2 }
+
+
+epc8316TrapIPEntry OBJECT-TYPE
+	SYNTAX  Epc8316TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"an entry containing management
+		informations regarding the list of trap
+		receivers"
+	INDEX {
+		epc8316TrapIPIndex }
+	-- 1.3.6.1.4.1.28507.64.1.1.1.2.1
+	::= { epc8316TrapIPTable 1 }
+
+
+Epc8316TrapIPEntry ::= SEQUENCE {
+
+	epc8316TrapIPIndex Integer32,
+	epc8316TrapAddr    OCTET STRING }
+
+
+epc8316TrapIPIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each receiver slot."
+	-- 1.3.6.1.4.1.28507.64.1.1.1.2.1.1
+	::= { epc8316TrapIPEntry 1 }
+
+
+epc8316TrapAddr OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..99))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"DNS name or IP address specifying one Trap receiver slot.
+		A port can optionally be specified: 'name:port' An empty
+		string disables this slot."
+	-- 1.3.6.1.4.1.28507.64.1.1.1.2.1.2
+	::= { epc8316TrapIPEntry 2 }
+
+
+epc8316DeviceConfig OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.1.2
+	::= { epc8316Objects 2 }
+
+epc8316IntActors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.1.3
+	::= { epc8316Objects 3 }
+
+epc8316relayports OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.1.3.1
+	::= { epc8316IntActors 1 }
+
+epc8316portNumber OBJECT-TYPE
+	SYNTAX  Integer32 (1..12)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of Relay Ports"
+	-- 1.3.6.1.4.1.28507.64.1.3.1.1
+	::= { epc8316relayports 1 }
+
+
+-- the Interfaces table
+-- The Interfaces table contains information on the entity's
+-- interfaces.  Each sub-layer below the internetwork-layer
+-- of a network interface is considered to be an interface.
+
+epc8316portTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8316portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all EPC Relay Ports"
+	-- 1.3.6.1.4.1.28507.64.1.3.1.2
+	::= { epc8316relayports 2 }
+
+
+epc8316portEntry OBJECT-TYPE
+	SYNTAX  Epc8316portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		particular relay port."
+	INDEX {
+		epc8316PortIndex }
+	-- 1.3.6.1.4.1.28507.64.1.3.1.2.1
+	::= { epc8316portTable 1 }
+
+
+Epc8316portEntry ::= SEQUENCE {
+
+	epc8316PortIndex         Integer32,
+	epc8316PortName          OCTET STRING,
+	epc8316PortState         INTEGER,
+	epc8316PortSwitchCount   Integer32,
+	epc8316PortStartupMode   INTEGER,
+	epc8316PortStartupDelay  Integer32,
+	epc8316PortRepowerTime   Integer32,
+	epc8316PortResetDuration Integer32 }
+
+
+epc8316PortIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each Relay Port."
+	-- 1.3.6.1.4.1.28507.64.1.3.1.2.1.1
+	::= { epc8316portEntry 1 }
+
+
+epc8316PortName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..15))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a Relay Port."
+	-- 1.3.6.1.4.1.28507.64.1.3.1.2.1.2
+	::= { epc8316portEntry 2 }
+
+
+epc8316PortState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"current state a Relay Port"
+	-- 1.3.6.1.4.1.28507.64.1.3.1.2.1.3
+	::= { epc8316portEntry 3 }
+
+
+epc8316PortSwitchCount OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of switch actions ocurred on a Relay Port.
+		Does not count switch commands which will not switch
+		the ralay state, so just real relay switches are displayed here."
+	-- 1.3.6.1.4.1.28507.64.1.3.1.2.1.4
+	::= { epc8316portEntry 4 }
+
+
+epc8316PortStartupMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1),
+			laststate(2) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"set Mode of startup sequence (off, on , remember last state)"
+	DEFVAL { off }
+	-- 1.3.6.1.4.1.28507.64.1.3.1.2.1.5
+	::= { epc8316portEntry 5 }
+
+
+epc8316PortStartupDelay OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for startup action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.64.1.3.1.2.1.6
+	::= { epc8316portEntry 6 }
+
+
+epc8316PortRepowerTime OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for repower port after switching off"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.64.1.3.1.2.1.7
+	::= { epc8316portEntry 7 }
+
+
+epc8316ExtActors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.1.4
+	::= { epc8316Objects 4 }
+
+epc8316IntSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.1.5
+	::= { epc8316Objects 5 }
+
+epc8316PowerChan OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.1.5.1
+	::= { epc8316IntSensors 1 }
+
+epc8316ActivePowerChan OBJECT-TYPE
+	SYNTAX  Unsigned32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Power Channels."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.1
+	::= { epc8316PowerChan 1 }
+
+
+epc8316PowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8316PowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"All available Channel Interfaces."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2
+	::= { epc8316PowerChan 2 }
+
+
+epc8316PowerEntry OBJECT-TYPE
+	SYNTAX  Epc8316PowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information
+		applicable to a particular Power Channel."
+	INDEX {
+		epc8316PowerIndex }
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1
+	::= { epc8316PowerTable 1 }
+
+
+Epc8316PowerEntry ::= SEQUENCE {
+
+	epc8316PowerIndex                   Integer32,
+	epc8316ChanStatus                   Integer32,
+	epc8316AbsEnergyActive              Unsigned32,
+	epc8316PowerActive                  Integer32,
+	epc8316Current                      Unsigned32,
+	epc8316Voltage                      Unsigned32,
+	epc8316Frequency                    Unsigned32,
+	epc8316PowerFactor                  Integer32,
+	epc8316Pangle                       Integer32,
+	epc8316PowerApparent                Integer32,
+	epc8316PowerReactive                Integer32,
+	epc8316AbsEnergyReactive            Unsigned32,
+	epc8316AbsEnergyActiveResettable    Unsigned32,
+	epc8316AbsEnergyReactiveResettable  Unsigned32,
+	epc8316ResetTime                    Unsigned32,
+	epc8316ForwEnergyActive             Unsigned32,
+	epc8316ForwEnergyReactive           Unsigned32,
+	epc8316ForwEnergyActiveResettable   Unsigned32,
+	epc8316ForwEnergyReactiveResettable Unsigned32,
+	epc8316RevEnergyActive              Unsigned32,
+	epc8316RevEnergyReactive            Unsigned32,
+	epc8316RevEnergyActiveResettable    Unsigned32,
+	epc8316RevEnergyReactiveResettable  Unsigned32,
+	epc8316LineSensorName               OCTET STRING }
+
+
+epc8316PowerIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index of Power Channel entries"
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.1
+	::= { epc8316PowerEntry 1 }
+
+
+epc8316ChanStatus OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"0 = data not active, 1 = data valid"
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.2
+	::= { epc8316PowerEntry 2 }
+
+
+epc8316AbsEnergyActive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Active Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.3
+	::= { epc8316PowerEntry 3 }
+
+
+epc8316PowerActive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Active Power"
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.4
+	::= { epc8316PowerEntry 4 }
+
+
+epc8316Current OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Curent on Power Channel."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.5
+	::= { epc8316PowerEntry 5 }
+
+
+epc8316Voltage OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Voltage on Power Channel"
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.6
+	::= { epc8316PowerEntry 6 }
+
+
+epc8316Frequency OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"0.01 hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Frequency of Power Channel"
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.7
+	::= { epc8316PowerEntry 7 }
+
+
+epc8316PowerFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.001"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Power Factor of Channel between
+		-1.0 and 1.00"
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.8
+	::= { epc8316PowerEntry 8 }
+
+
+epc8316Pangle OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Phase Angle between Voltage
+		and L Line Current between
+		-180.0 and 180.0"
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.9
+	::= { epc8316PowerEntry 9 }
+
+
+epc8316PowerApparent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Apparent Power"
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.10
+	::= { epc8316PowerEntry 10 }
+
+
+epc8316PowerReactive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VAR"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Reactive Power"
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.11
+	::= { epc8316PowerEntry 11 }
+
+
+epc8316AbsEnergyReactive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.12
+	::= { epc8316PowerEntry 12 }
+
+
+epc8316AbsEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Active Energy counter.
+		Writing '0' resets all resettable counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.13
+	::= { epc8316PowerEntry 13 }
+
+
+epc8316AbsEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.14
+	::= { epc8316PowerEntry 14 }
+
+
+epc8316ResetTime OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Time in seconds since last Energy
+		Counter reset."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.15
+	::= { epc8316PowerEntry 15 }
+
+
+epc8316ForwEnergyActive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.16
+	::= { epc8316PowerEntry 16 }
+
+
+epc8316ForwEnergyReactive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.17
+	::= { epc8316PowerEntry 17 }
+
+
+epc8316ForwEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.18
+	::= { epc8316PowerEntry 18 }
+
+
+epc8316ForwEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.19
+	::= { epc8316PowerEntry 19 }
+
+
+epc8316RevEnergyActive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.20
+	::= { epc8316PowerEntry 20 }
+
+
+epc8316RevEnergyReactive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.21
+	::= { epc8316PowerEntry 21 }
+
+
+epc8316RevEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.22
+	::= { epc8316PowerEntry 22 }
+
+
+epc8316RevEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.1.2.1.23
+	::= { epc8316PowerEntry 23 }
+
+
+epc8316SinglePortPowerChan OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.1.5.5
+	::= { epc8316IntSensors 5 }
+
+epc8316spActivePowerChan OBJECT-TYPE
+	SYNTAX  Unsigned32 (1..8)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of Single Port Power Channels."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.1
+	::= { epc8316SinglePortPowerChan 1 }
+
+
+epc8316spPowerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8316spPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"All available Single Port Power Channel Interfaces.
+		Indices 0-5 mean Ports A1 to A6, 6-11 are Ports B1 to B6.
+		This table may not be present on devices that have no
+		measurement on every port."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2
+	::= { epc8316SinglePortPowerChan 2 }
+
+
+epc8316spPowerEntry OBJECT-TYPE
+	SYNTAX  Epc8316spPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information applicable
+		to a particular Single Port Power Channel."
+	INDEX {
+		epc8316spPowerIndex }
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1
+	::= { epc8316spPowerTable 1 }
+
+
+Epc8316spPowerEntry ::= SEQUENCE {
+
+	epc8316spPowerIndex                   Integer32,
+	epc8316spChanStatus                   Integer32,
+	epc8316spAbsEnergyActive              Unsigned32,
+	epc8316spPowerActive                  Integer32,
+	epc8316spCurrent                      Unsigned32,
+	epc8316spVoltage                      Unsigned32,
+	epc8316spFrequency                    Unsigned32,
+	epc8316spPowerFactor                  Integer32,
+	epc8316spPangle                       Integer32,
+	epc8316spPowerApparent                Integer32,
+	epc8316spPowerReactive                Integer32,
+	epc8316spAbsEnergyReactive            Unsigned32,
+	epc8316spAbsEnergyActiveResettable    Unsigned32,
+	epc8316spAbsEnergyReactiveResettable  Unsigned32,
+	epc8316spResetTime                    Unsigned32,
+	epc8316spForwEnergyActive             Unsigned32,
+	epc8316spForwEnergyReactive           Unsigned32,
+	epc8316spForwEnergyActiveResettable   Unsigned32,
+	epc8316spForwEnergyReactiveResettable Unsigned32,
+	epc8316spRevEnergyActive              Unsigned32,
+	epc8316spRevEnergyReactive            Unsigned32,
+	epc8316spRevEnergyActiveResettable    Unsigned32,
+	epc8316spRevEnergyReactiveResettable  Unsigned32 }
+
+
+epc8316spPowerIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index of Single Port Power Channel entries.
+		Indices 0-5 mean Ports A1 to A6, 6-11 are Ports B1 to B6."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.1
+	::= { epc8316spPowerEntry 1 }
+
+
+epc8316spChanStatus OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"0 = data not active, 1 = data valid"
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.2
+	::= { epc8316spPowerEntry 2 }
+
+
+epc8316spAbsEnergyActive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Active Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.3
+	::= { epc8316spPowerEntry 3 }
+
+
+epc8316spPowerActive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"W"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Active Power"
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.4
+	::= { epc8316spPowerEntry 4 }
+
+
+epc8316spCurrent OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"mA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Curent on Power Channel."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.5
+	::= { epc8316spPowerEntry 5 }
+
+
+epc8316spVoltage OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"V"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Actual Voltage on Power Channel"
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.6
+	::= { epc8316spPowerEntry 6 }
+
+
+epc8316spFrequency OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"0.01 hz"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Frequency of Power Channel"
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.7
+	::= { epc8316spPowerEntry 7 }
+
+
+epc8316spPowerFactor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.001"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Power Factor of Channel between
+		-1.0 and 1.00"
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.8
+	::= { epc8316spPowerEntry 8 }
+
+
+epc8316spPangle OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Phase Angle between Voltage
+		and L Line Current between
+		-180.0 and 180.0"
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.9
+	::= { epc8316spPowerEntry 9 }
+
+
+epc8316spPowerApparent OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VA"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Apparent Power"
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.10
+	::= { epc8316spPowerEntry 10 }
+
+
+epc8316spPowerReactive OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"VAR"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"L Line Mean Reactive Power"
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.11
+	::= { epc8316spPowerEntry 11 }
+
+
+epc8316spAbsEnergyReactive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.12
+	::= { epc8316spPowerEntry 12 }
+
+
+epc8316spAbsEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Active Energy counter.
+		Writing '0' resets all resettable counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.13
+	::= { epc8316spPowerEntry 13 }
+
+
+epc8316spAbsEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Absolute Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.14
+	::= { epc8316spPowerEntry 14 }
+
+
+epc8316spResetTime OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Time in seconds since last Energy
+		Counter reset."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.15
+	::= { epc8316spPowerEntry 15 }
+
+
+epc8316spForwEnergyActive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.16
+	::= { epc8316spPowerEntry 16 }
+
+
+epc8316spForwEnergyReactive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.17
+	::= { epc8316spPowerEntry 17 }
+
+
+epc8316spForwEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Active Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.18
+	::= { epc8316spPowerEntry 18 }
+
+
+epc8316spForwEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Forward Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.19
+	::= { epc8316spPowerEntry 19 }
+
+
+epc8316spRevEnergyActive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.20
+	::= { epc8316spPowerEntry 20 }
+
+
+epc8316spRevEnergyReactive OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.21
+	::= { epc8316spPowerEntry 21 }
+
+
+epc8316spRevEnergyActiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"Wh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Active Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.22
+	::= { epc8316spPowerEntry 22 }
+
+
+epc8316spRevEnergyReactiveResettable OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"VARh"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Resettable Reverse Reactive Energy counter."
+	-- 1.3.6.1.4.1.28507.64.1.5.5.2.1.23
+	::= { epc8316spPowerEntry 23 }
+
+
+epc8316ExtSensors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.1.6
+	::= { epc8316Objects 6 }
+
+epc8316SensorTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Epc8316SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.64.1.6.1
+	::= { epc8316ExtSensors 1 }
+
+
+epc8316SensorEntry OBJECT-TYPE
+	SYNTAX  Epc8316SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		epc8316SensorIndex }
+	-- 1.3.6.1.4.1.28507.64.1.6.1.1
+	::= { epc8316SensorTable 1 }
+
+
+Epc8316SensorEntry ::= SEQUENCE {
+
+	epc8316SensorIndex   Integer32,
+	epc8316TempSensor    Integer32,
+	epc8316HygroSensor   Integer32,
+	epc8316InputSensor   INTEGER,
+	epc8316AirPressure   Integer32,
+	epc8316DewPoint      Integer32,
+	epc8316DewPointDiff  Integer32,
+	epc8316ExtSensorName OCTET STRING }
+
+
+epc8316SensorIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.64.1.6.1.1.1
+	::= { epc8316SensorEntry 1 }
+
+
+epc8316TempSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual temperature"
+	-- 1.3.6.1.4.1.28507.64.1.6.1.1.2
+	::= { epc8316SensorEntry 2 }
+
+
+epc8316HygroSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 percent humidity"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual humidity"
+	-- 1.3.6.1.4.1.28507.64.1.6.1.1.3
+	::= { epc8316SensorEntry 3 }
+
+
+epc8316InputSensor OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"logical state of input sensor"
+	-- 1.3.6.1.4.1.28507.64.1.6.1.1.4
+	::= { epc8316SensorEntry 4 }
+
+
+-- Conformance
+--
+
+epc8316Conf OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.2
+	::= { gadsEPC8316 2 }
+
+-- Groups
+--
+
+epc8316Groups OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.2.1
+	::= { epc8316Conf 1 }
+
+-- Compliance
+--
+
+epc8316Compls OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.28507.64.2.2
+	::= { epc8316Conf 2 }
+
+epc8316BasicGroup OBJECT-GROUP
+	OBJECTS {
+		epc8316TrapCtrl,
+		epc8316TrapIPIndex,
+		epc8316TrapAddr,
+		epc8316portNumber,
+		epc8316PortIndex,
+		epc8316PortName,
+		epc8316PortState,
+		epc8316PortSwitchCount,
+		epc8316PortStartupMode,
+		epc8316PortStartupDelay,
+		epc8316PortRepowerTime,
+		epc8316ActivePowerChan,
+		epc8316PowerIndex,
+		epc8316ChanStatus,
+		epc8316AbsEnergyActive,
+		epc8316PowerActive,
+		epc8316Current,
+		epc8316Voltage,
+		epc8316Frequency,
+		epc8316PowerFactor,
+		epc8316Pangle,
+		epc8316PowerApparent,
+		epc8316PowerReactive,
+		epc8316AbsEnergyReactive,
+		epc8316AbsEnergyActiveResettable,
+		epc8316AbsEnergyReactiveResettable,
+		epc8316ResetTime,
+		epc8316ForwEnergyActive,
+		epc8316ForwEnergyReactive,
+		epc8316ForwEnergyActiveResettable,
+		epc8316ForwEnergyReactiveResettable,
+		epc8316RevEnergyActive,
+		epc8316RevEnergyReactive,
+		epc8316RevEnergyActiveResettable,
+		epc8316RevEnergyReactiveResettable,
+		epc8316spActivePowerChan,
+		epc8316spPowerIndex,
+		epc8316spChanStatus,
+		epc8316spAbsEnergyActive,
+		epc8316spPowerActive,
+		epc8316spCurrent,
+		epc8316spVoltage,
+		epc8316spFrequency,
+		epc8316spPowerFactor,
+		epc8316spPangle,
+		epc8316spPowerApparent,
+		epc8316spPowerReactive,
+		epc8316spAbsEnergyReactive,
+		epc8316spAbsEnergyActiveResettable,
+		epc8316spAbsEnergyReactiveResettable,
+		epc8316spResetTime,
+		epc8316spForwEnergyActive,
+		epc8316spForwEnergyReactive,
+		epc8316spForwEnergyActiveResettable,
+		epc8316spForwEnergyReactiveResettable,
+		epc8316spRevEnergyActive,
+		epc8316spRevEnergyReactive,
+		epc8316spRevEnergyActiveResettable,
+		epc8316spRevEnergyReactiveResettable,
+		epc8316SensorIndex,
+		epc8316TempSensor,
+		epc8316HygroSensor,
+		epc8316InputSensor,
+		epc8316AirPressure,
+		epc8316DewPoint,
+		epc8316DewPointDiff,
+		epc8316LineSensorName,
+		epc8316ExtSensorName,
+		epc8316PortResetDuration,
+		epc8316NTPTimeValid,
+		epc8316NTPUnixTime,
+		epc8316NTPLastValidTimestamp,
+		epc8316ExtActiveInputs,
+		epc8316ExtInputIndex,
+		epc8316ExtInput,
+		epc8316ExtInputName,
+		epc8316ExtInputPortNum,
+		epc8316ExtInputBlockIndex,
+		epc8316ExtInputToggleCount,
+		epc8316ProdName,
+		epc8316FWVersion,
+		epc8316HostName,
+		epc8316PhysAddress,
+		epc8316SerialNumber }
+	STATUS  current
+	DESCRIPTION
+		"Basic objects."
+	-- 1.3.6.1.4.1.28507.64.2.1.1
+	::= { epc8316Groups 1 }
+
+epc8316NotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		epc8316SwitchEvtPort,
+		epc8316TempEvtSen,
+		epc8316HygroEvtSen,
+		epc8316InputEvtSen,
+		epc8316AirPressureEvtSen,
+		epc8316DewPtDiffEvtSen,
+		epc8316LineAmperageEvt,
+		epc8316PortAmperageEvt,
+		epc8316ExtInputEvt,
+		epc8316LineVoltageEvt,
+		epc8316LinePowerEvt,
+		epc8316PortVoltageEvt,
+		epc8316PortPowerEvt }
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.64.2.1.2
+	::= { epc8316Groups 2 }
+
+
+epc8316PortAmperageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8316spPowerIndex,
+		epc8316spPowerActive,
+		epc8316spCurrent,
+		epc8316spVoltage,
+		epc8316spFrequency,
+		epc8316spPowerApparent,
+		epc8316spPowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		current is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.64.3.8
+	::= { events 8 }
+
+epc8316AirPressure OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual air pressure"
+	-- 1.3.6.1.4.1.28507.64.1.6.1.1.5
+	::= { epc8316SensorEntry 5 }
+
+
+epc8316DewPoint OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"dew point for actual temperature and humidity"
+	-- 1.3.6.1.4.1.28507.64.1.6.1.1.6
+	::= { epc8316SensorEntry 6 }
+
+
+epc8316DewPointDiff OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"difference between dew point and actual
+		temperature (Temp - DewPoint)"
+	-- 1.3.6.1.4.1.28507.64.1.6.1.1.7
+	::= { epc8316SensorEntry 7 }
+
+
+
+epc8316SwitchEvtPort NOTIFICATION-TYPE
+	OBJECTS {
+		epc8316PortIndex,
+		epc8316PortName,
+		epc8316PortState,
+		epc8316PortSwitchCount}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a port is switched"
+	-- 1.3.6.1.4.1.28507.64.3.1
+	::= { events 1 }
+
+
+epc8316TempEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8316SensorIndex,
+		epc8316TempSensor}
+	STATUS  current
+	DESCRIPTION
+		"temperature limits exceeded"
+	-- 1.3.6.1.4.1.28507.64.3.2
+	::= { events 2 }
+
+
+epc8316HygroEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8316SensorIndex,
+		epc8316HygroSensor}
+	STATUS  current
+	DESCRIPTION
+		"hygro limits exceeded"
+	-- 1.3.6.1.4.1.28507.64.3.3
+	::= { events 3 }
+
+
+epc8316InputEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8316SensorIndex,
+		epc8316InputSensor}
+	STATUS  current
+	DESCRIPTION
+		"change of logical input sensor state"
+	-- 1.3.6.1.4.1.28507.64.3.4
+	::= { events 4 }
+
+
+epc8316AirPressureEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8316SensorIndex,
+		epc8316AirPressure}
+	STATUS  current
+	DESCRIPTION
+		"Air Pressure limits exceeded
+
+		"
+	-- 1.3.6.1.4.1.28507.64.3.5
+	::= { events 5 }
+
+
+epc8316DewPtDiffEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		epc8316SensorIndex,
+		epc8316DewPointDiff}
+	STATUS  current
+	DESCRIPTION
+		"Dew Point Difference limits exceeded"
+	-- 1.3.6.1.4.1.28507.64.3.6
+	::= { events 6 }
+
+
+epc8316LineAmperageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8316PowerIndex,
+		epc8316PowerActive,
+		epc8316Current,
+		epc8316Voltage,
+		epc8316Frequency,
+		epc8316PowerApparent,
+		epc8316PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		current is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.64.3.7
+	::= { events 7 }
+
+
+epc8316ExtInputEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8316ExtInputIndex,
+		epc8316ExtInput,
+		epc8316ExtInputToggleCount,
+		epc8316ExtInputName,
+		epc8316ExtInputPortNum,
+		epc8316ExtInputBlockIndex}
+	STATUS  current
+	DESCRIPTION
+		"Change of external sensor input."
+	-- 1.3.6.1.4.1.28507.64.3.9
+	-- 1.3.6.1.4.1.28507.64.3.25
+::= { events 25 }
+
+
+epc8316LineVoltageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8316PowerIndex,
+		epc8316PowerActive,
+		epc8316Current,
+		epc8316Voltage,
+		epc8316Frequency,
+		epc8316PowerApparent,
+		epc8316PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		voltage is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.64.3.26
+	::= { events 26 }
+
+
+epc8316LinePowerEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8316PowerIndex,
+		epc8316PowerActive,
+		epc8316Current,
+		epc8316Voltage,
+		epc8316Frequency,
+		epc8316PowerApparent,
+		epc8316PowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		power is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.64.3.27
+	::= { events 27 }
+
+
+epc8316PortVoltageEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8316spPowerIndex,
+		epc8316spPowerActive,
+		epc8316spCurrent,
+		epc8316spVoltage,
+		epc8316spFrequency,
+		epc8316spPowerApparent,
+		epc8316spPowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		voltage is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.64.3.28
+	::= { events 28 }
+
+
+epc8316PortPowerEvt NOTIFICATION-TYPE
+	OBJECTS {
+		epc8316spPowerIndex,
+		epc8316spPowerActive,
+		epc8316spCurrent,
+		epc8316spVoltage,
+		epc8316spFrequency,
+		epc8316spPowerApparent,
+		epc8316spPowerReactive}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a measured
+		power is crossing the entered limits"
+	-- 1.3.6.1.4.1.28507.64.3.29
+	::= { events 29 }
+
+END

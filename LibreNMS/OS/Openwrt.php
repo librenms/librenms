@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Openwrt.php
  *
@@ -25,6 +26,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -32,6 +34,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\Oid;
 
 class Openwrt extends OS implements
     OSDiscovery,
@@ -79,7 +82,7 @@ class Openwrt extends OS implements
      *
      * @return array Sensors
      */
-    private function getSensorData($type, $query = '', $system = false, $stats = false)
+    private function getSensorData(WirelessSensorType $type, $query = '', $system = false, $stats = false)
     {
         // Initialize needed variables, and get interfaces (actual network name, and LibreNMS name)
         $sensors = [];
@@ -96,15 +99,15 @@ class Openwrt extends OS implements
         foreach ($interfaces as $index => $interface) {
             // Loop over stats, appending to sensors as needed (only a single, blank, addition if no stats)
             foreach ($statstr as $stat) {
-                $oid = "NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"$type$query-$index$stat\"";
-                $sensors[] = new WirelessSensor($type, $this->getDeviceId(), snmp_translate($oid), "openwrt$query", $count, "$interface$query$stat");
+                $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.1.' . Oid::encodeString("{$type->value}$query-$index$stat");
+                $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, "openwrt$query", $count, "$interface$query$stat");
                 $count += 1;
             }
         }
         // If system level (i.e. overall) sensor desired, add that one as well
         if ($system and (count($interfaces) > 1)) {
-            $oid = "NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"$type$query-wlan\"";
-            $sensors[] = new WirelessSensor($type, $this->getDeviceId(), snmp_translate($oid), "openwrt$query", $count, 'wlan');
+            $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.1.' . Oid::encodeString("{$type->value}$query-wlan");
+            $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, "openwrt$query", $count, 'wlan');
         }
 
         // And, return all the sensors that have been created above (i.e. the array of sensors)
@@ -119,7 +122,7 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessClients()
     {
-        return $this->getSensorData('clients', '', true, false);
+        return $this->getSensorData(WirelessSensorType::Clients, '', true, false);
     }
 
     /**
@@ -130,7 +133,7 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        return $this->getSensorData('frequency', '', false, false);
+        return $this->getSensorData(WirelessSensorType::Frequency, '', false, false);
     }
 
     /**
@@ -141,7 +144,7 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessNoiseFloor()
     {
-        return $this->getSensorData('noise-floor', '', false, false);
+        return $this->getSensorData(WirelessSensorType::NoiseFloor, '', false, false);
     }
 
     /**
@@ -152,8 +155,8 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessRate()
     {
-        $txrate = $this->getSensorData('rate', '-tx', false, true);
-        $rxrate = $this->getSensorData('rate', '-rx', false, true);
+        $txrate = $this->getSensorData(WirelessSensorType::Rate, '-tx', false, true);
+        $rxrate = $this->getSensorData(WirelessSensorType::Rate, '-rx', false, true);
 
         return array_merge($txrate, $rxrate);
     }
@@ -166,6 +169,6 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessSNR()
     {
-        return $this->getSensorData('snr', '', false, true);
+        return $this->getSensorData(WirelessSensorType::Snr, '', false, true);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * CheckSqlServerTime.php
  *
@@ -45,10 +46,6 @@ class CheckSqlServerTime implements Validation
         $diff = $db_time->diffAsCarbonInterval($php_time);
 
         if ($diff->compare(CarbonInterval::minute(1)) > 0) {
-            $message = "Time between this server and the mysql database is off\n Mysql time :mysql_time\n PHP time :php_time";
-            $message .= ' Mysql time ' . $db_time->toDateTimeString() . PHP_EOL;
-            $message .= ' PHP time ' . $php_time->toDateTimeString() . PHP_EOL;
-
             return ValidationResult::fail(trans('validation.validations.database.CheckSqlServerTime.fail', [
                 'mysql_time' => $db_time->toDateTimeString(),
                 'php_time' => $php_time->toDateTimeString(),

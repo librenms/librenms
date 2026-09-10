@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2015 Daniel Preussker <f0o@librenms.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +34,7 @@ class Playsms extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        $to = preg_split('/([,\r\n]+)/', $this->config['playsms-mobiles']);
+        $to = preg_split('/([,\r\n]+)/', (string) $this->config['playsms-mobiles']);
 
         $url = str_replace('?app=ws', '', $this->config['playsms-url']); // remove old format
         $data = [

@@ -2,12 +2,35 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use LibreNMS\Interfaces\Models\Keyable;
 
-class Route extends DeviceRelatedModel
+class Route extends PortRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $table = 'route';
     protected $primaryKey = 'route_id';
+    protected $fillable = [
+        'created_at',
+        'updated_at',
+        'device_id',
+        'port_id',
+        'context_name',
+        'inetCidrRouteIfIndex',
+        'inetCidrRouteType',
+        'inetCidrRouteProto',
+        'inetCidrRouteNextHopAS',
+        'inetCidrRouteMetric1',
+        'inetCidrRouteDestType',
+        'inetCidrRouteDest',
+        'inetCidrRouteNextHopType',
+        'inetCidrRouteNextHop',
+        'inetCidrRoutePolicy',
+        'inetCidrRoutePfxLen',
+    ];
+
+    //ipCidrRouteProto from ipForward Mib
     public static $translateProto = [
         'undefined',
         'other',
@@ -41,8 +64,21 @@ class Route extends DeviceRelatedModel
     public $timestamps = true;
 
     // ---- Define Relationships ----
-    public function port(): BelongsTo
+    /**
+     * @return BelongsTo<Device, $this>
+     */
+    public function device(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Port::class, 'port_id', 'port_id');
+        return $this->belongsTo(Device::class, 'device_id');
+    }
+
+    public function getCompositeKey(): string
+    {
+        return
+        $this->context_name . '-' .
+        $this->inetCidrRouteIfIndex . '-' .
+        $this->inetCidrRouteDest . '-' .
+        $this->inetCidrRouteNextHop . '-' .
+        $this->inetCidrRoutePfxLen;
     }
 }

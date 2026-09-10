@@ -1,0 +1,47 @@
+modules:
+    os:
+        hardware: DPS-MIB-V38::dpsRTUModel.0
+        version: DPS-MIB-V38::dpsRTUFirmwareVersion.0
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: DPS-MIB-CG-V1::cgStringChannels
+                    value: DPS-MIB-CG-V1::cgStrVoltage
+                    num_oid: '.1.3.6.1.4.1.2682.2.1.1.4.{{ $index }}'
+                    descr: 'Battery string {{ $index }}'
+                    index: 'cgStrVoltage.{{ $index }}'
+                -
+                    oid: DPS-MIB-CG-V1::cgBatteryChannels
+                    value: DPS-MIB-CG-V1::cgVoltage
+                    num_oid: '.1.3.6.1.4.1.2682.2.2.1.4.{{ $index }}'
+                    descr: 'Battery {{ $index }}'
+                    index: 'cgVoltage.{{ $index }}'
+        current:
+            data:
+                -
+                    oid: DPS-MIB-CG-V1::cgStringChannels
+                    value: DPS-MIB-CG-V1::cgStrCurrent
+                    num_oid: '.1.3.6.1.4.1.2682.2.1.1.5.{{ $index }}'
+                    descr: 'Battery string {{ $index }}'
+                    index: 'cgStrCurrent.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: DPS-MIB-CG-V1::cgStringChannels
+                    value: DPS-MIB-CG-V1::cgStrTempA
+                    num_oid: '.1.3.6.1.4.1.2682.2.1.1.6.{{ $index }}'
+                    descr: 'Battery string {{ $index }}'
+                    index: 'cgStrTempA.{{ $index }}'
+                -
+                    oid: DPS-MIB-CG-V1::cgStringChannels
+                    value: DPS-MIB-CG-V1::cgStrTempB
+                    num_oid: '.1.3.6.1.4.1.2682.2.1.1.7.{{ $index }}'
+                    descr: 'Battery string {{ $index }}'
+                    index: 'cgStrTempB.{{ $index }}'
+                -
+                    oid: DPS-MIB-CG-V1::cgBatteryChannels
+                    value: DPS-MIB-CG-V1::cgTemperature
+                    num_oid: '.1.3.6.1.4.1.2682.2.2.1.5.{{ $index }}'
+                    descr: 'Battery {{ $index }}'
+                    index: 'cgTemperature.{{ $index }}'

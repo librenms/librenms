@@ -1,0 +1,57 @@
+EMC-1 DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, Unsigned32 FROM SNMPv2-SMI
+   morningstar                              FROM MORNINGSTAR
+   DisplayString                            FROM RFC1213-MIB
+   TEXTUAL-CONVENTION                       FROM SNMPv2-TC;
+
+-- Product: EMC-1
+-- ---------------------
+emc1 MODULE-IDENTITY
+    LAST-UPDATED  "201906120000Z" -- June 12th, 2019
+
+    ORGANIZATION  "morningstar"
+    CONTACT-INFO  "Morningstar Corporation
+                   Postal: Morningstar Corporation
+                           8 Pheasant Run
+                           Newtown, PA 18940
+                           United States of America
+
+                   Tel:    +1 215 321 4457
+                   E-Mail: info@morningstarcorp.com"
+
+    DESCRIPTION   "Morningstar Product: EMC-1
+
+                   --
+                   Copyright (C) Morningstar Corporation (2019).
+                   All Rights Reserved"
+
+    REVISION      "201906120000Z"  -- June 12th, 2019
+    DESCRIPTION   "First, barebones version of the EMC-1 MIB"
+    ::= { morningstar 1 }
+
+serialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "EMC-1 Serial Number"
+    ::= { emc1 1 }
+firmwareVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "EMC-1 Firmware Version"
+    ::= { emc1 2 }
+firmwareBuild OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "EMC-1 Firmware Build Number"
+    ::= { emc1 3 }
+
+
+END

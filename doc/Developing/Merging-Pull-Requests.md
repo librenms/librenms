@@ -2,19 +2,18 @@
 
 ### GitHub
 
-We will now build the monthly change log from our GitHub commits. When
-merging a commit, please  ensure you:
+We build the monthly changelog from our GitHub commits. At each merge,
+do these steps:
 
 - Click the `Merge pull request` button
 - Give the merge a descriptive but short title
-- For the commit message prepend it with one of the following tags for
-  the pull request to appear in the changelog:
-  - devices: or newdevice: For new device support.
-  - feature: or feat: To indicate this is a new or updated feature
-  - webui: or web: To indicate this is an update to the WebUI
-  - fix: or bugfix: To show this is a bug fix.
-  - refactoring: or refactor: When the changes are refactoring a large
-    portion of code
+- Add one of these tags to the start of the commit message. The pull
+  request then appears in the changelog:
+    - devices: or newdevice: new device support.
+    - feature: or feat: a new or updated feature.
+    - webui: or web: an update to the web interface.
+    - fix: or bugfix: a bug fix.
+    - refactoring: or refactor: a refactor of a large part of the code.
 - You can reference an issue number with `#xyz`, i.e `#1234`
 - Use the `Confirm squash and merge` button to merge.
 

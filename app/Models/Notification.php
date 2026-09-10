@@ -8,6 +8,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @property int $notifications_id
+ * @property string $title
+ * @property string $body
+ * @property int|null $severity
+ * @property string $source
+ * @property string $checksum
+ * @property string $datetime
+ * @property int|null $user_id
+ * @property string|null $sticky_username
+ */
 class Notification extends Model
 {
     /**
@@ -42,7 +53,7 @@ class Notification extends Model
         parent::boot();
 
         // delete attribs for this notification
-        static::deleting(function (Notification $notification) {
+        static::deleting(function (Notification $notification): void {
             $notification->attribs()->delete();
         });
     }
@@ -76,15 +87,16 @@ class Notification extends Model
     private function setAttrib($name, bool $enabled): bool
     {
         if ($enabled === true) {
-            $read = new NotificationAttrib;
-            $read->user_id = Auth::user()->user_id;
-            $read->key = $name;
-            $read->value = '1';
-            $this->attribs()->save($read);
+            $this->attribs()->firstOrCreate([
+                'user_id' => Auth::id(),
+                'key' => $name,
+            ], [
+                'value' => '1',
+            ]);
 
             return true;
         } else {
-            return $this->attribs()->where('key', $name)->delete();
+            return (bool) $this->attribs()->where('user_id', Auth::id())->where('key', $name)->delete();
         }
     }
 
@@ -95,9 +107,9 @@ class Notification extends Model
      * @param  User  $user
      * @return mixed
      */
-    public function scopeIsUnread(Builder $query, User $user)
+    protected function scopeIsUnread(Builder $query, User $user)
     {
-        return $query->whereNotExists(function ($query) use ($user) {
+        return $query->whereNotExists(function ($query) use ($user): void {
             $query->select(DB::raw(1))
             ->from('notifications_attribs')
             ->whereRaw('notifications.notifications_id = notifications_attribs.notifications_id')
@@ -110,34 +122,23 @@ class Notification extends Model
      *
      * @param  Builder<Notification>  $query
      */
-    public function scopeIsSticky(Builder $query)
+    protected function scopeIsSticky(Builder $query): void
     {
-        $query->leftJoin('notifications_attribs', 'notifications_attribs.notifications_id', 'notifications.notifications_id')
-            ->where(['notifications_attribs.key' => 'sticky', 'notifications_attribs.value' => 1]);
-    }
-
-    /**
-     * @param  Builder<Notification>  $query
-     * @return Builder<Notification>
-     */
-    public function scopeLimit(Builder $query)
-    {
-        return $query->select('notifications.*', 'key', 'users.username');
-    }
-
-    /**
-     * @param  Builder<Notification>  $query
-     * @return Builder|static
-     */
-    public function scopeSource(Builder $query)
-    {
-        return $query->leftJoin('users', 'notifications.source', '=', 'users.user_id');
+        $query->whereExists(function ($query): void {
+            $query->select(DB::raw(1))
+                ->from('notifications_attribs')
+                ->whereColumn('notifications.notifications_id', 'notifications_attribs.notifications_id')
+                ->where('notifications_attribs.key', 'sticky')
+                ->where('notifications_attribs.value', 1);
+        });
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\NotificationAttrib, $this>
+     */
     public function attribs(): HasMany
     {
-        return $this->hasMany(\App\Models\NotificationAttrib::class, 'notifications_id', 'notifications_id');
+        return $this->hasMany(NotificationAttrib::class, 'notifications_id', 'notifications_id');
     }
 }

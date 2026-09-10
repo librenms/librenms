@@ -5669,56 +5669,48 @@
                 {
                     "state_name": "mtxrGaugeStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mtxrGaugeStatus",
                     "state_descr": "fail",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mtxrOpticalRxLoss",
                     "state_descr": "no",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mtxrOpticalRxLoss",
                     "state_descr": "yes",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mtxrOpticalRxLoss",
                     "state_descr": "null",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mtxrOpticalTxFault",
                     "state_descr": "no",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mtxrOpticalTxFault",
                     "state_descr": "yes",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mtxrOpticalTxFault",
                     "state_descr": "null",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 }
@@ -5730,37 +5722,24 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "131072",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "system disk",
                     "storage_size": 16777216,
+                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 14163968,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.131072",
+                    "storage_free": 2613248,
+                    "storage_free_oid": null,
+                    "storage_perc": 84,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "131072",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "system disk",
-                    "storage_size": 16777216,
-                    "storage_units": 1024,
-                    "storage_used": 14163968,
-                    "storage_free": 2613248,
-                    "storage_perc": 84,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "stp": {
         "discovery": {
@@ -5808,6 +5787,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -5968,6 +5948,34 @@
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 9
+                }
+            ]
+        }
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:ce2d:e0ff:fea3:3dd5",
+                    "ipv6_compressed": "fe80::ce2d:e0ff:fea3:3dd5",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "other",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 18
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.10.12.2",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.10.12.0/24",
+                    "ifIndex": 18
                 }
             ]
         }

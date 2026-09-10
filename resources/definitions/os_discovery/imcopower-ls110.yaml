@@ -1,0 +1,80 @@
+modules:
+    os:
+        hardware: IMCO-LSPS-MIB::sdsModel.0
+        serial: IMCO-LSPS-MIB::sdsSerialNumber.0
+        version: IMCO-LSPS-MIB::sdsSoftware.0
+        sysName: IMCO-LSPS-MIB::sdsName.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: IMCO-LSPS-MIB::sdsTempSensValue
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.5.1.3.{{ $index }}'
+                    index: sdsTempSensValue.{{ $index }}
+                    descr: Battery Temperature
+                    divisor: 100
+
+                    skip_values:
+                        -
+                            oid: IMCO-LSPS-MIB::sdsTempSensValue
+                            op: '>='
+                            value: 100000
+
+        charge:
+            data:
+                -
+                    oid: IMCO-LSPS-MIB::sdsBatteryCapacity
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.7.7.{{ $index }}'
+                    index: sdsBatteryCapacity.{{ $index }}
+                    descr: 'Battery Charge'
+                    divisor: 10
+
+        load:
+            data:
+                -
+                    oid: IMCO-LSPS-MIB::sdsLoad
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.7.8.{{ $index }}'
+                    index: sdsLoad.{{ $index }}
+                    descr: 'Load(VA)'
+                    divisor: 10
+
+
+        state:
+            data:
+                -
+                    oid: IMCO-LSPS-MIB::opto3
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.2.3.{{ $index }}'
+                    state_name: opto3
+                    index: opto3.{{ $index }}
+                    descr: 'Power state'
+                    states:
+                        - { descr: Battery, value: 2, generic: 2 }
+                        - { descr: Online, value: 0, generic: 0 }
+
+
+
+        voltage:
+            data:
+                -
+                    oid: IMCO-LSPS-MIB::sdsOutputVoltage1
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.7.4.{{ $index }}'
+                    index: 'sdsOutputVoltage1.{{ $index }}'
+                    descr: 'Voltage1'
+                    divisor: 100
+                -
+                    oid: IMCO-LSPS-MIB::sdsOutputVoltage2
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.7.5.{{ $index }}'
+                    index: 'sdsOutputVoltage2.{{ $index }}'
+                    descr: 'Voltage2'
+                    divisor: 100
+                    skip_values: -9999999
+
+        current:
+            data:
+                -
+                    oid: IMCO-LSPS-MIB::sdsOutputCurrent
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.7.6.{{ $index }}'
+                    index: 'sdsOutputCurrent.{{ $index }}'
+                    descr: 'Current'
+                    divisor: 10
+

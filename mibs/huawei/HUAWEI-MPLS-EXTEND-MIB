@@ -1,12 +1,30 @@
 -- ==================================================================
--- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:   This MIB is used for defining the HUAWEI private   
 --                extended Multiprotocol Label Switching (MPLS) MIB 
 --                object. All MIB objects are used to describe private
 --                managed objects and trap definitions for MPLS.
 -- Reference:
--- Version: V2.46
+-- Version: V2.64
 -- History:
+-- V2.64 jiangweisheng 2022-06-28, modify for hwMplsTunnelStatisticsTransitPackets, hwMplsTunnelStatisticsDiscardPackets
+-- V2.63 WangLina 2021-11-04, modify for hwMplsTeBandwidthExceed, hwMplsTeBandwidthExceedClear alarm
+-- V2.62 WangLina 2021-10-28, modify for hwMplsTeBandwidthExceed, hwMplsTeBandwidthExceedClear alarm
+-- V2.61 WangLina 2021-08-05, modify for hwP2mpTeSubLspDownAlarm, hwP2mpTeSubLspDownAlarmClear alarm
+-- V2.60 chujianping, 2020-12-9, add for hwMplsChassis
+-- V2.59 chujianping, 2020-11-17, add for hwMplsSlotResTotalCountExceed, hwMplsSlotResTotalCountExceedClear, hwMplsSlot, modify for hwMplsResourceType 
+-- V2.58 wenggang, 2020-01-06, add for hwMplsInsecureAlgorithm,hwMplsInsecureAlgorithmClear,hwMplsFeatureName,hwMplsAlgorithmName
+-- V2.57 xujing, 2019-09-19, add for hwBlockLabelThresholdexceed,hwBlockLabelThresholdexceedClear,hwBlockLabeltotalcountexceed,hwBlockLabeltotalcountexceedClear
+-- V2.56 Kehan Zhang, 2018-12-24,modify for hwMplsTunnelDownReason
+-- V2.55 chenlu,2018-10-16,modify for hwMplsTeClassTable,hwMplsIfBcTable,hwStaticLspTnlTable,hwMplsTeVpnQosTable,hwMplsLspStatisticsTable
+-- V2.54 chenlu,2018-10-10,modify for hwMplsTunnelTable,hwTunnelFrrBypassTable,hwTunnelFrrARHopTable,hwTunnelFrrRouteDBTable,hwStaticLspTable
+-- V2.53 chenlu,2018-09-21,modify for hwMplsTunnelLspType,hwMplsTunnelSignalProto,hwMplsTunnelDownReason
+-- V2.52 huangdiyuan, 2018-02-02, modify for hwMplsTunnelSignalledTunnelName object
+-- V2.51 Tianshi Liu, 2018-01-25, modify for hwP2mpTeSubLspDown log
+-- V2.50 Tianshi Liu, 2018-01-04, add for hwP2mpTeTunnelDown/hwP2mpTeTunnelDownClear alarm, hwP2mpTeSubLspDown log
+-- V2.49 huangdiyuan, 2017-12-18, add object hwMplsTunnelSignalledTunnelName, and add this parameter in related alarm
+-- V2.48 Tianshi Liu, 2017-12-08, add for hwMplsOamFDI/hwMplsOamFDIRecovery alarm
+-- V2.47 Tianshi Liu, 2017-08-31, modify for hwMplsTunnelStatisticsTable translation change
 -- V2.45 Siju Samuel, 2017-4-25, modify for hwMplsTunnelDelegationReturn/hwMplsTunnelDelegationReturnClear alarm
 -- V2.44 jiangweisheng, 2017-3-4, modify for hwMplsLspBfdDown/hwMplsLspBfdDownClear add te keyword in the name
 -- V2.43 zhangka, 2016-12-13, modify for hwMplsLspBfdDown/hwMplsLspBfdDownClear
@@ -68,7 +86,7 @@
 
         -- 1.3.6.1.4.1.2011.5.25.121
         hwMplsExtendMib MODULE-IDENTITY 
-            LAST-UPDATED "201708171640Z"        
+            LAST-UPDATED "202206281040Z"
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -86,6 +104,60 @@
                  managed objects and trap definitions for MPLS."
 
             --  Revision history
+            REVISION   "202206281040Z"
+            DESCRIPTION "V2.64, add for hwMplsTunnelStatisticsTransitPackets, hwMplsTunnelStatisticsDiscardPackets"
+
+            REVISION   "202111041040Z"
+            DESCRIPTION "V2.63, modify for hwMplsTeBandwidthExceed, hwMplsTeBandwidthExceedClear alarm"
+
+            REVISION   "202110281040Z"
+            DESCRIPTION "V2.62, add for hwMplsTeBandwidthExceed, hwMplsTeBandwidthExceedClear alarm"
+
+            REVISION   "202108051040Z"
+            DESCRIPTION "V2.61, add for hwP2mpTeSubLspDownAlarm, hwP2mpTeSubLspDownAlarmClear alarm"
+
+            REVISION   "202001061040Z"
+            DESCRIPTION "V2.59, add for hwMplsChassis."
+
+            REVISION   "202001061040Z"
+            DESCRIPTION "V2.59, add for hwMplsSlotResTotalCountExceed, hwMplsSlotResTotalCountExceedClear, hwMplsSlot, modify for hwMplsResourceType."
+
+            REVISION   "202001061040Z"
+            DESCRIPTION "V2.58, add the hwMplsInsecureAlgorithm,hwMplsInsecureAlgorithmClear,hwMplsFeatureName,hwMplsAlgorithmName."
+
+            REVISION   "201909201450Z"
+            DESCRIPTION "V2.57, add the hwBlockLabelThresholdexceed,hwBlockLabelThresholdexceedClear,hwBlockLabeltotalcountexceed,hwBlockLabeltotalcountexceedClear."
+
+            REVISION   "201812242305Z"
+            DESCRIPTION "V2.56, modify for hwMplsTunnelDownReason"   
+
+			REVISION   "201810161818Z"
+            DESCRIPTION "V2.55, modify for hwMplsTeClassTable,hwMplsIfBcTable,hwStaticLspTnlTable,hwMplsTeVpnQosTable,hwMplsLspStatisticsTable" 
+
+			REVISION   "201810101810Z"
+            DESCRIPTION "V2.54, modify for hwMplsTunnelTable,hwTunnelFrrBypassTable,hwTunnelFrrARHopTable,hwTunnelFrrRouteDBTable,hwStaticLspTable" 
+            
+            REVISION   "201809211810Z"
+            DESCRIPTION "V2.53, modify for hwMplsTunnelLspType,hwMplsTunnelSignalProto,hwMplsTunnelDownReason"            
+
+            REVISION   "201802021700Z"
+            DESCRIPTION "V2.52, modify for hwMplsTunnelSignalledTunnelName object"
+            
+            REVISION   "201801251700Z"
+            DESCRIPTION "V2.51, modify for hwP2mpTeSubLspDown log"
+            
+            REVISION   "201801041700Z"
+            DESCRIPTION "V2.50, add for hwP2mpTeTunnelDown/hwP2mpTeTunnelDownClear alarm, hwP2mpTeSubLspDown log"
+            
+            REVISION   "201712181700Z"
+            DESCRIPTION "V2.49, add object hwMplsTunnelSignalledTunnelName, and add this parameter in related alarm"
+
+            REVISION   "201712091740Z"
+            DESCRIPTION "V2.48, add hwMplsOamFDI/hwMplsOamFDIRecovery alarm"
+
+            REVISION   "201708311640Z"
+            DESCRIPTION "V2.47, modify translation of hwMplsTunnelStatisticsTable "
+
             REVISION   "201708171640Z"
             DESCRIPTION "V2.46, modify descroption of three item"
 
@@ -227,10 +299,7 @@
                  tunnel across an MPLS network. The last index     
                  hwMplsTunnelEgressLSRId is useful in identifying
                  all instances of a tunnel that are terminated on
-                 the same egress LSR.                                       
-                 The indexes of this table are hwMplsTunnelIndex,    
-                 hwMplsTunnelInstance, hwMplsTunnelIngressLSRId and  
-                 hwMplsTunnelEgressLSRId."
+                 the same egress LSR."
             ::= { hwMplsExtendMibTunnel 1 }
 
 --   1.3.6.1.4.1.2011.5.25.121.1.1.1
@@ -321,7 +390,11 @@
                 hwMplsTunnelSignalProto
                     INTEGER,
                 hwMplsTunnelType
-                    INTEGER
+                    INTEGER,
+                hwMplsTunnelDirection
+                    INTEGER,
+                hwMplsTunnelSignalledTunnelName
+                    SnmpAdminString
              }
 
 --   1.3.6.1.4.1.2011.5.25.121.1.1.1.1
@@ -715,15 +788,15 @@
             DESCRIPTION
                 "This object is meaningful only at the ingress of the tunnel. It indicates LSP types.                                                                 
                 Options: 
-                0. invalid(0) -indicates that the LSP type is invalid, the possible cause is that the LSP is not created at an ingress. 
-                1. primary(1) -indicates the primary LSP
-                2. primaryModifing(2) -indicates the LSP that will replace the primary LSP
-                3. hotStandby(3) -indicates the hot-standby LSP
-                4. hotStandbyModifing(4) -indicates the LSP that will replace the hot-standby LSP
-                5. ordinary(5) -indicates the ordinary LSP
-                6. ordinaryModifing(6) -indicates the LSP that will replace the ordinary LSP
-                7. bestEffort(7) -indicates the Best-Effort LSP
-                8. bestEffortModifing(8) -indicates the LSP that will replace the Best-Effort LSP
+                1. invalid(0) -indicates that the LSP type is invalid, the possible cause is that the LSP is not created at an ingress. 
+                2. primary(1) -indicates the primary LSP
+                3. primaryModifing(2) -indicates the LSP that will replace the primary LSP
+                4. hotStandby(3) -indicates the hot-standby LSP
+                5. hotStandbyModifing(4) -indicates the LSP that will replace the hot-standby LSP
+                6. ordinary(5) -indicates the ordinary LSP
+                7. ordinaryModifing(6) -indicates the LSP that will replace the ordinary LSP
+                8. bestEffort(7) -indicates the Best-Effort LSP
+                9. bestEffortModifing(8) -indicates the LSP that will replace the Best-Effort LSP
                 Modifying LSPs are created when users modify the make-before-break attribute of the corresponding LSP types. After being created, modifying LSPs replace the corresponding LSPs to transmit traffic.              
                 "
             ::= { hwMplsTunnelEntry 28 }
@@ -748,7 +821,12 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Indicates the signal protocol of this tunnel"
+                "Indicates the signal protocol of this tunnel
+                Options: 
+                1. rsvpTE(1) -indicates the signal protocol of this tunnel is RSVP-TE.
+                2. static(2) -indicates the signal protocol of this tunnel is STATIC.
+                3. staticCR(3) -indicates the signal protocol of this tunnel is STATIC-CR.
+                "
             ::= { hwMplsTunnelEntry 30 }
 
 --   1.3.6.1.4.1.2011.5.25.121.1.1.1.31
@@ -770,14 +848,41 @@
                 "        
             ::= { hwMplsTunnelEntry 31 }
 
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.32
+        hwMplsTunnelDirection OBJECT-TYPE
+            SYNTAX INTEGER
+                { 
+                noneDirectional(0),
+                unidirectional(1),
+                bidirectional(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates tunnel direction.
+                Options: 
+                1. noneDirectional(0) -indicates that the tunnel direction is invalid
+                2. unidirectional(1) -indicates that this is a unidirectional tunnel
+                3. bidirectional(2) -indicates that this is a bidirectional tunnel
+                "        
+            ::= { hwMplsTunnelEntry 32 }
+
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.33
+        hwMplsTunnelSignalledTunnelName OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the user-defined tunnel name"
+            ::= { hwMplsTunnelEntry 33 }
+
 --   1.3.6.1.4.1.2011.5.25.121.1.2
         hwTunnelFrrBypassTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwTunnelFrrBypassEntry
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "Indicates the bypass tunnel. The indexes of this table are 
-                hwTunnelFrrBypassListIndex and hwTunnelFrrBypassIndex."
+                "Indicates the bypass tunnel."
             ::= { hwMplsExtendMibTunnel 2 }
 
         
@@ -840,8 +945,7 @@
             STATUS current
             DESCRIPTION
                 "Indicates the FrrARHopTable, which will show every hop's frr 
-                protect information of the tunnel.
-                The indexes of this table are hwTunnelFrrARHopListIndex and hwTunnelFrrARHopIndex."
+                protect information of the tunnel."
             ::= { hwMplsExtendMibTunnel 3 }
 
         
@@ -936,9 +1040,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "Indicates the primary tunnel is protected by which bypass tunnel. The indexes of this
-                table are hwTunnelFrrRouteDBTunnelIndex, hwTunnelFrrRouteDBTunnelInstance, 
-                hwTunnelFrrRouteDBTunnelIngressLSRId and hwTunnelFrrRouteDBTunnelEngressLSRId."
+                "Indicates the primary tunnel is protected by which bypass tunnel."
             ::= { hwMplsExtendMibTunnel 4 }
 
         
@@ -1061,8 +1163,7 @@
                 static MPLS. Note that only point-to-point static LSP segments
                 are supported. Each static MPLS LSP can thus have one out-segment
                 originating at this LSR and/or one in-segment terminating at
-                this LSR. The indexes of this table are hwStaticLspIndex, 
-                hwStaticLspInSegmentIndex, and hwStaticLspOutSegmentIndex."
+                this LSR."
             ::= { hwMplsExtendMibTunnel 5 }
 
         
@@ -1252,8 +1353,7 @@
                 paired up. You can define a maximum of eight <Class-Type, Priority> pairs.     
                 The LSR is considered to support a particular Class-Type only if it appears 
                 in the definition of the eight possible TE-Classes. It is suggested that all
-                the LSRs in the domain use the same TE-Class mapping. The index of this table
-                is hwMplsTeClassId."
+                the LSRs in the domain use the same TE-Class mapping."
             ::= { hwMplsExtendMibTunnel 6 }
 
         
@@ -1354,7 +1454,7 @@
             STATUS current
             DESCRIPTION
                 "This table describes bandwidth constraints associated with MPLS TE
-                enabled interfaces. The index of this table is ifIndex."
+                enabled interfaces."
             ::= { hwMplsExtendMibTunnel 7 }
 
         
@@ -1505,8 +1605,7 @@
             STATUS current
             DESCRIPTION
                 "hwStaticLspTnlTable is used to display static LSP token of   
-                 a static LSP of a specified name. The index of this table 
-                 is hwStaticLspTnlName."
+                 a static LSP of a specified name."
             ::= { hwMplsExtendMibTunnel 8 }
         
         hwStaticLspTnlEntry OBJECT-TYPE
@@ -1549,8 +1648,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This table is used to display VPN QoS information of a specified TE Tunnel according to TunnelID.
-                 The index of this table is hwMplsTnlID."
+                "This table is used to display VPN QoS information of a specified TE Tunnel according to TunnelID."
             ::= { hwMplsExtendMibTunnel 9 }
             
         hwMplsTeVpnQosEntry OBJECT-TYPE
@@ -1643,19 +1741,8 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A tunnel needs to be uniquely identified across  
-                 an MPLS network. hwMplsTunnelStatisticsTunnelIndex 
-                 uniquely identifies a tunnel on the LSR originating 
-                 the tunnel. hwMplsTunnelStatisticsIngressLSRId 
-                 uniquely identifies a tunnel across an MPLS network. 
-                 The last index hwMplsTunnelStatisticsEgressLSRId is 
-                 useful in identifying all instances of a tunnel that
-                 are terminated on the same egress LSR. 
-
-                 The indexes of this table are 
-                 hwMplsTunnelStatisticsTunnelIndex,    
-                 hwMplsTunnelStatisticsIngressLSRId and  
-                 hwMplsTunnelStatisticsEgressLSRId."
+                "This table allows you to use 3-tuple information to query 
+                 traffic statistics on a TE tunnel interface."
             ::= { hwMplsExtendMibTunnel 14 }
 
 --   1.3.6.1.4.1.2011.5.25.121.1.14.1
@@ -1695,6 +1782,10 @@
                 hwMplsTunnelStatisticsHCInOctets 
                     Counter64,
                 hwMplsTunnelStatisticsHCOutOctets
+                    Counter64,
+                hwMplsTunnelStatisticsTransitPackets
+                    Counter64,
+                hwMplsTunnelStatisticsDiscardPackets
                     Counter64
              }
 
@@ -1764,6 +1855,25 @@
                  interface, including framing characters."
             ::= { hwMplsTunnelStatisticsEntry 5 }
 
+--   1.3.6.1.4.1.2011.5.25.121.1.14.1.6
+        hwMplsTunnelStatisticsTransitPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets transmitted out of the
+                 interface."
+            ::= { hwMplsTunnelStatisticsEntry 6 }
+
+--   1.3.6.1.4.1.2011.5.25.121.1.14.1.7
+        hwMplsTunnelStatisticsDiscardPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets discarded out of the
+                 interface."
+            ::= { hwMplsTunnelStatisticsEntry 7 }
                                                          
 --   1.3.6.1.4.1.2011.5.25.121.2
         hwMplsExtendTrap OBJECT IDENTIFIER ::= { hwMplsExtendMib 2 }
@@ -1906,7 +2016,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.16
         hwMplsTunnelTpOamLossSD NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This object indicates that the loss ratio of the packets carried by the tunnel exceeded the first threshold."
@@ -1914,7 +2024,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.17
         hwMplsOamSDRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto  }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName  }
             STATUS current
             DESCRIPTION 
                 "
@@ -1924,7 +2034,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.18
         hwMplsOamLoss NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, ifName}
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, ifName, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -1934,7 +2044,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.19
         hwMplsOamLossRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto  }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName  }
             STATUS current
             DESCRIPTION 
                 "
@@ -1944,7 +2054,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.20
         hwMplsOamAis NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto  }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName  }
             STATUS current
             DESCRIPTION 
                 "
@@ -1954,7 +2064,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.21
         hwMplsOamAisRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto  }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName  }
             STATUS current
             DESCRIPTION 
                 "
@@ -1964,7 +2074,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.22
         hwMplsOamRdi NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, ifName}
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, ifName, hwMplsTunnelSignalledTunnelName  }
             STATUS current
             DESCRIPTION 
                 "
@@ -1974,7 +2084,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.23
         hwMplsOamRdiRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto  }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName  }
             STATUS current
             DESCRIPTION 
                 "
@@ -1984,7 +2094,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.24
         hwMplsOamMeg NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto  }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName  }
             STATUS current
             DESCRIPTION 
                 "
@@ -1994,7 +2104,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.25
         hwMplsOamMegRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2024,7 +2134,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.28
         hwMplsOamSF NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2034,7 +2144,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.29
         hwMplsOamSFRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2044,7 +2154,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.30
         hwMplsOamPeriod NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2054,7 +2164,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.31
         hwMplsOamPeriodRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2064,7 +2174,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.32
         hwMplsOamLck NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2074,7 +2184,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.33
         hwMplsOamLckRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2084,7 +2194,7 @@
                       
 --   1.3.6.1.4.1.2011.5.25.121.2.1.34
         hwMplsOamExcess NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2094,7 +2204,7 @@
             
 --   1.3.6.1.4.1.2011.5.25.121.2.1.35
         hwMplsOamExcessRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2104,7 +2214,7 @@
         
 --   1.3.6.1.4.1.2011.5.25.121.2.1.36
         hwMplsOamMisMatch NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2114,7 +2224,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.37
         hwMplsOamMisMatchRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2124,7 +2234,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.38
         hwMplsOamMisMerge NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2134,7 +2244,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.39
         hwMplsOamMisMergeRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2144,7 +2254,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.40
         hwMplsOamUnknown NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2154,7 +2264,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.41
         hwMplsOamUnknownRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2164,7 +2274,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.42
         hwMplsOamBDI NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, ifName}
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, ifName, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2174,7 +2284,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.43
         hwMplsOamBDIRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2184,7 +2294,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.44
         hwMplsOamFail NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, ifName}
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, ifName, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2194,7 +2304,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.45
         hwMplsOamFailRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2204,7 +2314,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.46
         hwMplsTunnelPrimaryUp NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates that the status of the RSVP-TE Primary LSP changes to Up."
@@ -2212,7 +2322,7 @@
             
 --   1.3.6.1.4.1.2011.5.25.121.2.1.47
         hwMplsTunnelPrimaryDown NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelDownReason, hwMplsTunnelDownLSRID, hwMplsTunnelDownIfIpAddrType, hwMplsTunnelDownIfIpAddr }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelDownReason, hwMplsTunnelDownLSRID, hwMplsTunnelDownIfIpAddrType, hwMplsTunnelDownIfIpAddr, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates that the status of the RSVP-TE Primary LSP changes to Down."
@@ -2220,7 +2330,7 @@
             
 --   1.3.6.1.4.1.2011.5.25.121.2.1.48
         hwMplsTunnelHotstandbyUp NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates that the status of the RSVP-TE Hot-standby LSP changes to Up."
@@ -2228,7 +2338,7 @@
             
 --   1.3.6.1.4.1.2011.5.25.121.2.1.49
         hwMplsTunnelHotstandbyDown NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelDownReason, hwMplsTunnelDownLSRID, hwMplsTunnelDownIfIpAddrType, hwMplsTunnelDownIfIpAddr}
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelDownReason, hwMplsTunnelDownLSRID, hwMplsTunnelDownIfIpAddrType, hwMplsTunnelDownIfIpAddr, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates that the status of the RSVP-TE Hot-standby LSP changes to Down."
@@ -2236,7 +2346,7 @@
             
 --   1.3.6.1.4.1.2011.5.25.121.2.1.50
         hwMplsTunnelOrdinaryUp NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates that the status of the RSVP-TE Ordinary LSP changes to Up."
@@ -2244,7 +2354,7 @@
             
 --   1.3.6.1.4.1.2011.5.25.121.2.1.51
         hwMplsTunnelOrdinaryDown NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelDownReason, hwMplsTunnelDownLSRID, hwMplsTunnelDownIfIpAddrType, hwMplsTunnelDownIfIpAddr }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelDownReason, hwMplsTunnelDownLSRID, hwMplsTunnelDownIfIpAddrType, hwMplsTunnelDownIfIpAddr, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates that the status of the RSVP-TE Ordinary LSP changes to Down."
@@ -2252,7 +2362,7 @@
             
 --   1.3.6.1.4.1.2011.5.25.121.2.1.52
         hwMplsTunnelBesteffortUp NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates that the status of the RSVP-TE Best-effort LSP changes to Up."
@@ -2260,7 +2370,7 @@
             
 --   1.3.6.1.4.1.2011.5.25.121.2.1.53
         hwMplsTunnelBesteffortDown NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelDownReason, hwMplsTunnelDownLSRID, hwMplsTunnelDownIfIpAddrType, hwMplsTunnelDownIfIpAddr }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelDownReason, hwMplsTunnelDownLSRID, hwMplsTunnelDownIfIpAddrType, hwMplsTunnelDownIfIpAddr, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates that the status of the RSVP-TE Best-effort LSP changes to Down."
@@ -2301,7 +2411,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.58
         hwMplsExtTunnelDown NOTIFICATION-TYPE
-            OBJECTS {hwMplsTunnelInterfaceName, hwMplsTunnelType, hwMplsTunnelAdminStatus, hwMplsTunnelOperStatus, hwMplsTunnelDownReason, ifName, hwMplsTunnelDownLSRID, hwMplsTunnelDownIfIpAddrType, hwMplsTunnelDownIfIpAddr}
+            OBJECTS {hwMplsTunnelInterfaceName, hwMplsTunnelType, hwMplsTunnelAdminStatus, hwMplsTunnelOperStatus, hwMplsTunnelDownReason, ifName, hwMplsTunnelDownLSRID, hwMplsTunnelDownIfIpAddrType, hwMplsTunnelDownIfIpAddr, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates that the status of te tunnel changes to Down."
@@ -2309,7 +2419,7 @@
             
 --   1.3.6.1.4.1.2011.5.25.121.2.1.59
         hwMplsExtTunnelDownClear NOTIFICATION-TYPE
-            OBJECTS {hwMplsTunnelInterfaceName, hwMplsTunnelType, hwMplsTunnelAdminStatus, hwMplsTunnelOperStatus, hwMplsTunnelDownReason, ifName}
+            OBJECTS {hwMplsTunnelInterfaceName, hwMplsTunnelType, hwMplsTunnelAdminStatus, hwMplsTunnelOperStatus, hwMplsTunnelDownReason, ifName, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates that the down alarm of te tunnel was cleared."
@@ -2317,7 +2427,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.60
         hwMplsOamLocalLock NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2327,7 +2437,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.61
         hwMplsOamLocalLockRecovery NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "
@@ -2503,7 +2613,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.79
         hwMplsTunnelHotstandbySwitch NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates that the data is switched from the primary CR-LSP to the HSB CR-LSP."
@@ -2512,7 +2622,7 @@
         
 --   1.3.6.1.4.1.2011.5.25.121.2.1.80
         hwMplsTunnelHotstandbyResume NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates that the data is switched from the HSB CR-LSP to the primary CR-LSP."
@@ -2521,7 +2631,7 @@
 
 --   1.3.6.1.4.1.2011.5.25.121.2.1.81
         hwMplsTunnelBfdPathMismatch NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsSessionTunnelId, hwMplsLocalLspId, hwMplsIngressLsrId, hwMplsEgressLsrId, hwMplsTunnelIfName }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsSessionTunnelId, hwMplsLocalLspId, hwMplsIngressLsrId, hwMplsEgressLsrId, hwMplsTunnelIfName, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates the forward primary LSP path is the same as the reverse hot-standby LSP path, and the reverse primary LSP path is the same as the forward hot-standby LSP path, causing path mismatches."
@@ -2530,7 +2640,7 @@
         
 --   1.3.6.1.4.1.2011.5.25.121.2.1.82
         hwMplsTunnelBfdPathMismatchClear NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsSessionTunnelId, hwMplsLocalLspId, hwMplsIngressLsrId, hwMplsEgressLsrId, hwMplsTunnelIfName }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsSessionTunnelId, hwMplsLocalLspId, hwMplsIngressLsrId, hwMplsEgressLsrId, hwMplsTunnelIfName, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates that either or both path mismatches were rectified."
@@ -2538,7 +2648,7 @@
     
 --   1.3.6.1.4.1.2011.5.25.121.2.1.83
         hwMplsTeLspBfdDown NOTIFICATION-TYPE
-            OBJECTS {hwMplsTunnelInterfaceName, hwMplsTunnelLspType }
+            OBJECTS {hwMplsTunnelInterfaceName, hwMplsTunnelLspType, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates the bfd status of te-lsp changes to down. "
@@ -2547,7 +2657,7 @@
         
 --   1.3.6.1.4.1.2011.5.25.121.2.1.84
         hwMplsTeLspBfdDownClear NOTIFICATION-TYPE
-            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelLspType }
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelLspType, hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "This notification indicates that the down alarm of bfd was cleared."
@@ -2569,7 +2679,179 @@
             DESCRIPTION 
                 "This notification indicates that the delegation of Tunnel LSP is returned by server."
             ::= { hwLspTrap 86 }
+
+--   1.3.6.1.4.1.2011.5.25.121.2.1.87
+        hwMplsOamFDI NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelDirection ,ifName, hwMplsTunnelSignalledTunnelName }
+            STATUS current
+            DESCRIPTION 
+                "
+                This object indicates that MPLS OAM detected the tunnel received FDI alarm.
+                "
+            ::= { hwLspTrap 87 } 
+
+--   1.3.6.1.4.1.2011.5.25.121.2.1.88
+        hwMplsOamFDIRecovery NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelDirection, hwMplsTunnelSignalledTunnelName }
+            STATUS current
+            DESCRIPTION 
+                "
+                This object indicates that MPLS OAM detected the tunnel received FDI alarm end.
+                "
+            ::= { hwLspTrap 88 }
             
+--   1.3.6.1.4.1.2011.5.25.121.2.1.89
+        hwP2mpTeTunnelDown NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsP2mpId, hwMplsTunnelDownReason }
+            STATUS current
+            DESCRIPTION 
+                "
+                This object indicates that the status of the P2MP tunnel changes to Down.
+                "
+            ::= { hwLspTrap 89 }
+            
+            
+--   1.3.6.1.4.1.2011.5.25.121.2.1.90
+        hwP2mpTeTunnelDownClear NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsP2mpId, hwMplsTunnelDownReason }
+            STATUS current
+            DESCRIPTION 
+                "
+                This object indicates that the alarm of the P2MP tunnel was cleared.
+                "
+            ::= { hwLspTrap 90 }
+            
+--   1.3.6.1.4.1.2011.5.25.121.2.1.91
+        hwP2mpTeSubLspDown NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelLspType, hwMplsP2mpId, hwMplsTunnelDownReason, hwMplsTunnelDownLSRID, hwMplsTunnelDownIfIpAddrType, hwMplsTunnelDownIfIpAddr}
+            STATUS current
+            DESCRIPTION 
+                "
+                This object indicates that the status of the P2MP tunnel sub-lsp changes to down.
+                "
+            ::= { hwLspTrap 91 }
+            
+            
+--  1.3.6.1.4.1.2011.5.25.121.2.1.92
+       hwBlockLabelThresholdExceed NOTIFICATION-TYPE
+            OBJECTS { hwBlockLabelTotalCount, hwBlockLabelCurrentCount, hwBlockLabelThresholdUpperLimit, hwBlockLabelThresholdLowerLimit }
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates that label usage has exceeded the threshold.
+                "
+            ::= { hwLspTrap 92 }
+
+--  1.3.6.1.4.1.2011.5.25.121.2.1.93
+       hwBlockLabelThresholdExceedClear NOTIFICATION-TYPE
+            OBJECTS { hwBlockLabelTotalCount, hwBlockLabelCurrentCount, hwBlockLabelThresholdUpperLimit, hwBlockLabelThresholdLowerLimit }
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates that label usage has resumed from exceeding the threshold.
+                " 
+            ::= { hwLspTrap 93 }               
+
+--  1.3.6.1.4.1.2011.5.25.121.2.1.94
+       hwBlockLabelTotalCountExceed NOTIFICATION-TYPE
+            OBJECTS { hwBlockLabelTotalCount, hwBlockLabelCurrentCount }
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates that label count has reached the total count.
+                "    
+            ::= { hwLspTrap 94 }     
+                                        
+--  1.3.6.1.4.1.2011.5.25.121.2.1.95
+       hwBlockLabelTotalCountExceedClear NOTIFICATION-TYPE
+            OBJECTS { hwBlockLabelTotalCount, hwBlockLabelCurrentCount }
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates that label usage count has resumed from reaching the total count.
+                " 
+            ::= { hwLspTrap 95 }      
+            
+ --  1.3.6.1.4.1.2011.5.25.121.2.1.96
+       hwMplsInsecureAlgorithm NOTIFICATION-TYPE
+            OBJECTS { hwMplsFeatureName, hwMplsAlgorithmName }
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates that an insecure encryption algorithm is used, which has security risks.
+                "    
+            ::= { hwLspTrap 96 }     
+                                        
+--  1.3.6.1.4.1.2011.5.25.121.2.1.97
+       hwMplsInsecureAlgorithmClear NOTIFICATION-TYPE
+            OBJECTS { hwMplsFeatureName, hwMplsAlgorithmName }
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates that the insecure encryption algorithm alarm is cleared.
+                " 
+            ::= { hwLspTrap 97 }
+
+--  1.3.6.1.4.1.2011.5.25.121.2.1.98
+       hwMplsSlotResTotalCountExceed NOTIFICATION-TYPE
+            OBJECTS { hwMplsResourceType, hwMplsChassis, hwMplsSlot, hwMplsResourceTotalCount }
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates that the number of MPLS resources on the interface board has reached the maximum number.
+                "    
+            ::= { hwLspTrap 98 }     
+                                        
+--  1.3.6.1.4.1.2011.5.25.121.2.1.99
+       hwMplsSlotResTotalCountExceedClear NOTIFICATION-TYPE
+            OBJECTS { hwMplsResourceType, hwMplsChassis, hwMplsSlot }
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates that the number of MPLS resources on the interface board fallen below the recovery number.
+                " 
+            ::= { hwLspTrap 99 }
+
+--   1.3.6.1.4.1.2011.5.25.121.2.1.100
+        hwP2mpTeSubLspDownAlarm NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelLspType, hwMplsP2mpId, hwMplsTunnelDownReason, hwMplsTunnelDownLSRID, hwMplsTunnelDownIfIpAddrType, hwMplsTunnelDownIfIpAddr}
+            STATUS current
+            DESCRIPTION 
+                "
+                This object indicates that the status of the P2MP tunnel sub-lsp changes to down.
+                "
+            ::= { hwLspTrap 100 }
+
+--   1.3.6.1.4.1.2011.5.25.121.2.1.101
+        hwP2mpTeSubLspDownAlarmClear NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelInterfaceName, hwMplsTunnelLspType, hwMplsP2mpId, hwMplsTunnelDownReason, hwMplsTunnelDownLSRID, hwMplsTunnelDownIfIpAddrType, hwMplsTunnelDownIfIpAddr}
+            STATUS current
+            DESCRIPTION 
+                "
+                This object indicates that the alarm of the P2MP tunnel sub-lsp was cleared.
+                "
+            ::= { hwLspTrap 101 }
+
+--   1.3.6.1.4.1.2011.5.25.121.2.1.102
+        hwMplsTeBandwidthExceed NOTIFICATION-TYPE
+            OBJECTS { ifIndex, ifName}
+            STATUS current
+            DESCRIPTION 
+                "
+                This object indicates that the configured maximum reservable bandwidth of MPLS TE is greater than the remaining bandwidth of the interface.
+                "
+            ::= { hwLspTrap 102 }
+
+--   1.3.6.1.4.1.2011.5.25.121.2.1.103
+        hwMplsTeBandwidthExceedClear NOTIFICATION-TYPE
+            OBJECTS { ifIndex, ifName}
+            STATUS current
+            DESCRIPTION 
+                "
+                This object indicates that the MPLS-TE bandwidth exceed alarm was cleared.
+                "
+            ::= { hwLspTrap 103 }
+
 -- 1.3.6.1.4.1.2011.5.25.121.2.2
         hwMplsTrapObjects OBJECT IDENTIFIER ::= { hwMplsExtendTrap 2 }
         
@@ -2631,42 +2913,45 @@
             mplsOamDOamFail(27),
             serviceResume(28),
             serviceDelete(29),
+            p2mpAllLeafDown(30),
             clear(100)
             }
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
                 "Indicates the alarm reason as below:
-                1. Other;
-                2. Static LSP down;
-                3. Static CR-LSP down;
-                4. The out interface of the RSVP LSP ingress is down; 
-                5. The resource of RSVP LSP is preempted;
-                6. RSVP message timeout;
-                7. RSVP neighbor lost;
-                8. The bypass-tunnel is down or is unbinded with main tunnel, as bypass-tunnel is in used;
-                9. CSPF compute fail;
-                10.User shutdown the tunnel;
-                11.TPOAM indicates the connectivity fault of the link;
-                12.TPOAM indicates receive alarm indication signal defect of the link;
-                13.TPOAM indicates the remote defect of the link;
-                14.TPOAM indicates receive unexpected MEG-ID defect of the link;
-                15.TPOAM indicates receive unexpected MEP-ID defect of the link;
-                16.TPOAM indicates packet lost exceed signal fault threshold in the local link;
-                17.TPOAM indicates packet unexpected period defect of the link;
-                18.MPLS OAM connectivity fault;
-                19.MPLS OAM TTSI excess;
-                20.MPLS OAM TTSI mismatch;
-                21.MPLS OAM TTSI merge error;
-                22.MPLS OAM unknown error;
-                23.MPLS OAM BDI;
-                24.MPLS OAM FDI;
-                25.MPLS OAM signal fail;
-                26.MPLS OAM signal degrade;
-                27.MPLS OAM fail;
-                28.Service resume;
-                29.Service delete;
-                100. Clear."
+                Options:
+            1.other(1)         -indicates that another cause was involved.
+            2.staticLspDown(2)         -indicates that Static LSP down.
+            3.staticCrlspDown(3)         -indicates that Static CR-LSP down.
+            4.outIfDown(4)         -indicates that the out interface of the RSVP LSP ingress is down.
+            5.resourcePreempted(5)         -indicates that the resource of RSVP LSP is preempted.
+            6.rsvpMessageTimeout(6)         -indicates that RSVP message timeout.
+            7.rsvpNeighborLost(7)         -indicates that RSVP neighbor lost.
+            8.bypassTunnelDownOrUnbinded(8)         -indicates that The bypass-tunnel is down or is unbinded with main tunnel, as bypass-tunnel is in used.
+            9.cspfComputeFail(9)         -indicates that CSPF compute fail.
+            10.userShutdown(10)         -indicates that user shutdown the tunnel.
+            11.tpoamLossOfContinuity(11)         -indicates that TPOAM indicates the connectivity fault of the link.
+            12.tpoamAlarmIndicationSignal(12)         -indicates that TPOAM indicates receive alarm indication signal defect of the link.
+            13.tpoamRemoteDefectIndication(13)         -indicates that TPOAM indicates the remote defect of the link.
+            14.tpoamUnexpectedMEG(14)         -indicates that TPOAM indicates receive unexpected MEG-ID defect of the link.
+            15.tpoamUnexpectedMEP(15)         -indicates that TPOAM indicates receive unexpected MEP-ID defect of the link.
+            16.tpoamLossSF(16)         -indicates that TPOAM indicates packet lost exceed signal fault threshold in the local link.
+            17.tpoamPeriod(17)         -indicates that TPOAM indicates packet unexpected period defect of the link.
+            18.mplsOamLocv(18)         -indicates that MPLS OAM connectivity fault.
+            19.mplsOamExcess(19)         -indicates that MPLS OAM TTSI excess.
+            20.mplsOamMisMatch(20)         -indicates that MPLS OAM TTSI mismatch.
+            21.mplsOamMisMerge(21)         -indicates that MPLS OAM TTSI merge error.
+            22.mplsOamUnknown(22)         -indicates that MPLS OAM unknown error.
+            23.mplsOamBdi(23)         -indicates MPLS OAM BDI.
+            24.mplsOamFdi(24)         -indicates MPLS OAM FDI.
+            25.mplsOamSF(25)         -indicates that MPLS OAM signal fail.
+            26.mplsOamSD(26)         -indicates that MPLS OAM signal degrade.
+            27.mplsOamDOamFail(27)         -indicates that MPLS OAM fail.
+            28.serviceResume(28)         -indicates that service resume.
+            29.serviceDelete(29)         -indicates that service delete.
+            30.p2mpAllLeafDown(30)         -indicates that all the P2MP leafs are down.
+            31.clear(100)         -indicates that alarm clears."
             ::= { hwMplsTrapObjects 3 }
 
      hwMplsLspProtocol OBJECT-TYPE
@@ -2799,6 +3084,7 @@
              cspfLink(12),
              cspfNlsa(13),
              cspfSrlg(14),
+             rsvpLsp(15),
              unknown(100)
              }
         MAX-ACCESS     accessible-for-notify
@@ -2820,7 +3106,8 @@
             12.cspfLink(12)                       -Indicates that the resource is cspf link.
             13.cspfNlsa(13)                       -Indicates that the resource is cspf nlsa.
             14.cspfSrlg(14)                       -Indicates that the resource is cspf srlg.
-            15.unknown(100)   -Indicates that the resource type is unknown. "
+            15.rsvpLsp(15)                        -Indicates that the resource is rsvp lsp.
+            16.unknown(100)   -Indicates that the resource type is unknown. "
         ::= { hwMplsTrapObjects 11 }
         
      hwMplsResourceCurrentCount OBJECT-TYPE
@@ -2886,7 +3173,63 @@
         DESCRIPTION
             "This object indicates the name of an bidirectional static CR-LSP."
         ::= { hwMplsTrapObjects 19 }
-                                        
+
+      hwMplsP2mpId OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Indicates the P2MP id"
+        ::= { hwMplsTrapObjects 20 }     
+        
+      hwMplsFeatureName OBJECT-TYPE
+        SYNTAX  INTEGER
+             {
+             ldp(1),
+             te(2),
+             unknown(100)
+             }
+        MAX-ACCESS     accessible-for-notify
+        STATUS           current
+        DESCRIPTION
+            "The value of this object identifies the feature name.
+            Options:                                                       
+            1.ldp(1)         -Indicates that the feature name is ldp.
+            2.te(2)          -Indicates that the feature name is te."
+        ::= { hwMplsTrapObjects 21 }
+
+      hwMplsAlgorithmName OBJECT-TYPE
+        SYNTAX  INTEGER
+             {
+             md5(1),
+             hmacmd5(2),
+             unknown(100)
+             }
+        MAX-ACCESS     accessible-for-notify
+        STATUS           current
+        DESCRIPTION
+            "The value of this object identifies the algorithm name.
+            Options:                                                       
+            1.md5(1)         -Indicates that the algorithm name is md5.
+            2.hmacmd5(2)     -Indicates that the algorithm name is hmacmd5."
+        ::= { hwMplsTrapObjects 22 }
+
+        hwMplsSlot OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS     accessible-for-notify
+        STATUS           current
+        DESCRIPTION
+            "Slot ID of an interface board."
+        ::= { hwMplsTrapObjects 23 }
+
+        hwMplsChassis OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS     accessible-for-notify
+        STATUS           current
+        DESCRIPTION
+            "Chassis ID of an interface board."
+        ::= { hwMplsTrapObjects 24 }
+            
      hwMplsTunnelFrrConfigChange NOTIFICATION-TYPE
         OBJECTS { hwMplsTunnelIfName, hwMplsTunnelFrrConfigOper }
         STATUS obsolete
@@ -2960,6 +3303,38 @@
                 "The lower limit threshold value (%) of dynamic label, default value is 70."
             ::= { hwMplsGlobalObject 6 }
         
+       hwBlockLabelTotalCount OBJECT-TYPE
+            SYNTAX  Unsigned32
+            MAX-ACCESS     read-only
+            STATUS         current
+            DESCRIPTION
+                "The value of this object identifies the total permit count of block label."
+            ::= { hwMplsGlobalObject 7 }
+
+        hwBlockLabelCurrentCount OBJECT-TYPE
+            SYNTAX  Unsigned32
+            MAX-ACCESS     read-only
+            STATUS         current
+            DESCRIPTION
+                "The value of this object identifies the current count of the block label."
+            ::= { hwMplsGlobalObject 8 }
+            
+        hwBlockLabelThresholdUpperLimit OBJECT-TYPE
+            SYNTAX  Unsigned32
+            MAX-ACCESS     read-only
+            STATUS         current
+            DESCRIPTION
+                "The upper limit threshold value (%) of block label, default value is 80." 
+            ::= { hwMplsGlobalObject 9 }
+            
+        hwBlockLabelThresholdLowerLimit OBJECT-TYPE
+            SYNTAX  Unsigned32
+            MAX-ACCESS     read-only
+            STATUS         current
+            DESCRIPTION
+                "The lower limit threshold value (%) of block label, default value is 70."
+            ::= { hwMplsGlobalObject 10 }
+        
         hwMplsLspStatistics OBJECT IDENTIFIER ::= { hwMplsExtendMib 4 }
         
         hwMplsLspStatisticsTable OBJECT-TYPE
@@ -2968,8 +3343,7 @@
             STATUS current
             DESCRIPTION
                 "hwMplsLspStatisticsTable is used to display the number of ingress LSPs,  
-                transit LSPs, or egress LSPs of specified types. The index of this table 
-                is hwMplsLspStatisticsLspType."
+                transit LSPs, or egress LSPs of specified types."
             ::= { hwMplsLspStatistics 1 }
         
         hwMplsLspStatisticsEntry OBJECT-TYPE
@@ -3232,7 +3606,8 @@
                 hwStaticLspOwner, hwMplsTunnelClassType, hwMplsTunnelSessionAttr, hwMplsTunnelFrrARHopTableIndex, hwMplsTunnelName, 
                 hwMplsTunnelIfIndex, hwMplsTunnelPreBandwidth, hwMplsTunnelNextBandwidth, hwMplsTunnelFrrSwitchover, hwMplsTunnelFrrBandwidth, 
                 hwMplsTunnelOperStatus, hwMplsTunnelAdminStatus, hwMplsTunnelBandwidth, hwMplsTeVpnMaxBandwidth, hwMplsTeVpnAllocatedBandwidth, 
-                hwMplsTunnelFrrHoldingPrio, hwMplsTunnelFrrSetupPrio, hwMplsTunnelFrrBypassTableIndex, hwMplsTunnelLspType,hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelType }
+                hwMplsTunnelFrrHoldingPrio, hwMplsTunnelFrrSetupPrio, hwMplsTunnelFrrBypassTableIndex, hwMplsTunnelLspType,hwMplsTunnelInterfaceName, hwMplsTunnelSignalProto, hwMplsTunnelType,
+                hwMplsTunnelSignalledTunnelName }
             STATUS current
             DESCRIPTION 
                 "Indicate the atrributes of the tunnel."
@@ -3286,7 +3661,8 @@
         ::= { hwMplsExtendGroups 7 }
 
         hwMplsGlobalGroup OBJECT-GROUP
-        OBJECTS { hwMplsDynamicLabelTotalCount, hwMplsDynamicLabelCurrentCount, hwMplsDynamicLabelThresholdUpperLimit, hwMplsDynamicLabelThresholdLowerLimit }
+        OBJECTS { hwMplsDynamicLabelTotalCount, hwMplsDynamicLabelCurrentCount, hwMplsDynamicLabelThresholdUpperLimit, hwMplsDynamicLabelThresholdLowerLimit,
+                  hwBlockLabelTotalCount, hwBlockLabelCurrentCount, hwBlockLabelThresholdUpperLimit, hwBlockLabelThresholdLowerLimit }
         STATUS current
         DESCRIPTION 
            "For mpls global object."
@@ -3341,9 +3717,10 @@
                 hwMplsRingEastAPSMismatch, hwMplsRingEastAPSMismatchClear,hwMplsRingWestOamUnexpectedMEP, hwMplsRingWestOamUnexpectedMEPClear, hwMplsRingEastOamUnexpectedMEP, hwMplsRingEastOamUnexpectedMEPClear, hwMplsTunnelDelete,
                 hwMplsLspTotalCountExceed, hwMplsLspThresholdExceed, hwMplsLspTotalCountExceedClear, hwMplsLspThresholdExceedClear, hwMplsDynamicLabelThresholdExceed,
                 hwMplsDynamicLabelThresholdExceedClear, hwMplsDynamicLabelTotalCountExceed, hwMplsDynamicLabelTotalCountExceedClear,
+                hwBlockLabelThresholdExceed, hwBlockLabelThresholdExceedClear, hwBlockLabelTotalCountExceed, hwBlockLabelTotalCountExceedClear,
                 hwMplsResourceThresholdExceed, hwMplsResourceThresholdExceedClear, hwMplsResourceTotalCountExceed, hwMplsResourceTotalCountExceedClear,
                 hwMplsLspLoopBack, hwMplsLspLoopBackClear, hwMplsTunnelCommitLost, hwMplsTunnelCommitLostClear, hwMplsTunnelHotstandbySwitch, hwMplsTunnelHotstandbyResume, hwMplsTunnelBfdPathMismatch, hwMplsTunnelBfdPathMismatchClear,
-                hwMplsTeLspBfdDown, hwMplsTeLspBfdDownClear, hwMplsTunnelDelegationReturn, hwMplsTunnelDelegationReturnClear 
+                hwMplsTeLspBfdDown, hwMplsTeLspBfdDownClear, hwMplsTunnelDelegationReturn, hwMplsTunnelDelegationReturnClear, hwMplsOamFDI, hwMplsOamFDIRecovery 
             }
             STATUS current
             DESCRIPTION 

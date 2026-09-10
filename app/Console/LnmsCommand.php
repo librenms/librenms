@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LnmsCommand.php
  *
@@ -28,13 +29,12 @@ namespace App\Console;
 use Illuminate\Console\Command;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use LibreNMS\Util\Debug;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Validator;
 
 abstract class LnmsCommand extends Command
 {
-    protected $developer = false;
+    protected bool $developer = false;
 
     /** @var string[][]|callable[]|null */
     protected $optionValues;
@@ -56,29 +56,30 @@ abstract class LnmsCommand extends Command
     {
         $env = $this->getLaravel() ? $this->getLaravel()->environment() : getenv('APP_ENV');
 
-        return $this->hidden || ($this->developer && $env !== 'production');
+        return $this->hidden || ($this->developer && $env === 'production');
     }
 
     /**
      * Adds an argument. If $description is null, translate commands.command-name.arguments.name
      * If you want the description to be empty, just set an empty string
      *
-     * @param  string  $name  The argument name
-     * @param  int|null  $mode  The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param  string  $description  A description text
-     * @param  string|string[]|null  $default  The default value (for InputArgument::OPTIONAL mode only)
+     * @param  string  $name
+     * @param  int|null  $mode
+     * @param  string  $description
+     * @param  mixed|null  $default
+     * @param  array|\Closure  $suggestedValues
      * @return $this
      *
      * @throws InvalidArgumentException When argument mode is not valid
      */
-    public function addArgument(string $name, ?int $mode = null, string $description = '', mixed $default = null): static
+    public function addArgument(string $name, ?int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = []): static
     {
         // use a generated translation location by default
         if (empty($description)) {
             $description = __('commands.' . $this->getName() . '.arguments.' . $name);
         }
 
-        parent::addArgument($name, $mode, $description, $default);
+        parent::addArgument($name, $mode, $description, $default, $suggestedValues);
 
         return $this;
     }
@@ -87,16 +88,17 @@ abstract class LnmsCommand extends Command
      * Adds an option. If $description is null, translate commands.command-name.arguments.name
      * If you want the description to be empty, just set an empty string
      *
-     * @param  string  $name  The option name
-     * @param  string|array|null  $shortcut  The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
-     * @param  int|null  $mode  The option mode: One of the InputOption::VALUE_* constants
-     * @param  string  $description  A description text
-     * @param  string|string[]|int|bool|null  $default  The default value (must be null for InputOption::VALUE_NONE)
+     * @param  string  $name
+     * @param  array|string|null  $shortcut
+     * @param  int|null  $mode
+     * @param  string  $description
+     * @param  mixed|null  $default
+     * @param  array|\Closure  $suggestedValues
      * @return $this
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      */
-    public function addOption(string $name, array|string|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null): static
+    public function addOption(string $name, array|string|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = []): static
     {
         // use a generated translation location by default
         if (empty($description)) {
@@ -113,6 +115,7 @@ abstract class LnmsCommand extends Command
                 $default,
                 $this->getCallable('Defaults', $name),
                 $this->getCallable('Values', $name),
+                $suggestedValues,
             )
         );
 
@@ -151,23 +154,51 @@ abstract class LnmsCommand extends Command
             $validator->validate();
 
             return $validator->validated();
-        } catch (ValidationException $e) {
-            collect($validator->getMessageBag()->all())->each(function ($message) {
+        } catch (ValidationException) {
+            collect($validator->getMessageBag()->all())->each(function ($message): void {
                 $this->error($message);
             });
             exit(1);
         }
     }
 
-    protected function configureOutputOptions(): void
+    protected function validatePromptInput(string $attributeName, string|array $rules): callable
     {
-        \Log::setDefaultDriver($this->getOutput()->isQuiet() ? 'stack' : 'console');
-        if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
-            Debug::set();
-            if ($verbosity >= 256) {
-                Debug::setVerbose();
+        return function (string|array $value) use ($attributeName, $rules): ?string {
+            $validator = Validator::make([$attributeName => $value], [$attributeName => $rules]);
+
+            if ($validator->fails()) {
+                return $validator->errors()->first($attributeName);
             }
+
+            return null;
+        };
+    }
+
+    /**
+     * Parse a comma-separated option into an array of strings.
+     *
+     * @return array<int, string>
+     */
+    protected function commaSeparatedOption(string $name, bool $filterEmpty = true, bool $unique = true): array
+    {
+        $value = $this->option($name);
+        if (! is_string($value) && ! is_array($value)) {
+            return [];
         }
+
+        $items = is_array($value) ? $value : explode(',', $value);
+        $trimmed = array_map(trim(...), $items);
+
+        if ($filterEmpty) {
+            $trimmed = array_filter($trimmed, fn (string $item) => $item !== '');
+        }
+
+        if ($unique) {
+            $trimmed = array_unique($trimmed);
+        }
+
+        return array_values($trimmed);
     }
 
     private function getCallable(string $type, string $name): ?callable
@@ -181,8 +212,6 @@ abstract class LnmsCommand extends Command
             return $values;
         }
 
-        return function () use ($values) {
-            return $values;
-        };
+        return fn () => $values;
     }
 }

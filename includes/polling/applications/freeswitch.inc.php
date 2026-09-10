@@ -13,7 +13,7 @@ if (! empty($agent_data[$name])) {
     $rawdata = str_replace("<<<freeswitch>>>\n", '', $rawdata);
 }
 // Format Data
-$lines = explode("\n", $rawdata);
+$lines = explode("\n", (string) $rawdata);
 $freeswitch = [];
 foreach ($lines as $line) {
     [$var,$value] = explode('=', $line);
@@ -43,7 +43,7 @@ $tags = [
     'rrd_name' => ['app', $name, 'stats', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, $rawdata, $fields);
 
 unset($lines, $freeswitch, $rrd_def, $fields, $tags);

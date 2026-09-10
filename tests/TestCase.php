@@ -6,15 +6,7 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-    use CreatesApplication;
     use SnmpsimHelpers;
-
-    public function __construct($name = null, $data = [], $dataName = '')
-    {
-        parent::__construct($name, $data, $dataName);
-        // grab global $snmpsim from bootstrap and make it accessible
-        $this->getSnmpsim();
-    }
 
     public function dbSetUp()
     {
@@ -38,7 +30,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function tearDown(): void
     {
-        $this->beforeApplicationDestroyed(function () {
+        $this->beforeApplicationDestroyed(function (): void {
             $this->getConnection()->disconnect();
         });
 

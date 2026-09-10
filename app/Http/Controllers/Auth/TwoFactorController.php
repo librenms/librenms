@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TwoFactorController.php
  *
@@ -25,6 +26,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Http\Interfaces\ToastInterface;
 use App\Models\User;
@@ -32,7 +34,6 @@ use App\Models\UserPref;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\TwoFactor;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 use Session;
 
@@ -52,7 +53,7 @@ class TwoFactorController extends Controller
 
         // token validated
         if (session('twofactorremove')) {
-            UserPref::forgetPref(auth()->user(), 'twofactor');
+            UserPref::forgetPref($request->user(), 'twofactor');
             $request->session()->forget(['twofactor', 'twofactorremove']);
 
             $toast->info(__('TwoFactor auth removed.'));
@@ -67,10 +68,11 @@ class TwoFactorController extends Controller
 
     public function showTwoFactorForm(Request $request)
     {
-        $twoFactorSettings = $this->loadSettings($request->user());
+        $user = $request->user();
+        $twoFactorSettings = $this->loadSettings($user);
 
         // don't allow visiting this page if not needed
-        if (empty($twoFactorSettings) || ! Config::get('twofactor') || session('twofactor')) {
+        if (empty($twoFactorSettings) || ! LibrenmsConfig::get('twofactor') || session('twofactor')) {
             return redirect()->intended();
         }
 
@@ -78,10 +80,11 @@ class TwoFactorController extends Controller
 
         // lockout the user if there are too many failures
         if (isset($twoFactorSettings['fails']) && $twoFactorSettings['fails'] >= 3) {
-            $lockout_time = Config::get('twofactor_lock', 0);
+            $lockout_time = LibrenmsConfig::get('twofactor_lock', 0);
 
             if (! $lockout_time) {
                 $errors['lockout'] = __('Too many two-factor failures, please contact administrator.');
+                auth()->logout();
             } elseif ((time() - $twoFactorSettings['last']) < $lockout_time) {
                 $errors['lockout'] = __('Too many two-factor failures, please wait :time seconds', ['time' => $lockout_time]);
             }
@@ -89,7 +92,7 @@ class TwoFactorController extends Controller
 
         return view('auth.2fa')->with([
             'key' => $twoFactorSettings['key'],
-            'uri' => TwoFactor::generateUri($request->user()->username, $twoFactorSettings['key'], $twoFactorSettings['counter'] !== false),
+            'uri' => TwoFactor::generateUri($user->username, $twoFactorSettings['key'], $twoFactorSettings['counter'] !== false),
         ])->withErrors($errors);
     }
 
@@ -97,13 +100,18 @@ class TwoFactorController extends Controller
      * Show the form for creating a new resource.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse.
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function create(Request $request)
     {
         $this->validate($request, [
             'twofactor' => Rule::in('time', 'counter'),
         ]);
+
+        // Already enabled in the DB, or mid-setup in session - don't generate a new secret
+        if (UserPref::getPref($request->user(), 'twofactor') || Session::has('twofactoradd')) {
+            return redirect()->intended();
+        }
 
         $key = TwoFactor::genKey();
 
@@ -112,7 +120,7 @@ class TwoFactorController extends Controller
             'key' => $key,
             'fails' => 0,
             'last' => 0,
-            'counter' => $request->get('twofactortype') == 'counter' ? 0 : false,
+            'counter' => $request->input('twofactortype') == 'counter' ? 0 : false,
         ];
 
         Session::put('twofactoradd', $settings);
@@ -124,7 +132,7 @@ class TwoFactorController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse.
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request)
     {
@@ -138,7 +146,7 @@ class TwoFactorController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse.
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function cancelAdd(Request $request)
     {

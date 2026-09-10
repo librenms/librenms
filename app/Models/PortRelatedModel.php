@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PortRelatedModel.php
  *
@@ -37,9 +38,11 @@ abstract class PortRelatedModel extends BaseModel
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Port, $this>
+     */
     public function port(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Port::class, 'port_id', 'port_id');
+        return $this->belongsTo(Port::class, 'port_id', 'port_id');
     }
 }

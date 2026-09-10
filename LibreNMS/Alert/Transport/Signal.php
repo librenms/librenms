@@ -1,4 +1,5 @@
 <?php
+
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,11 +29,11 @@ class Signal extends Transport
 {
     public function deliverAlert(array $alert_data): bool
     {
-        exec(escapeshellarg($this->config['path'])
+        exec(escapeshellarg((string) $this->config['path'])
            . ' --dbus-system send'
            . (($this->config['recipient-type'] == 'group') ? ' -g ' : ' ')
-           . escapeshellarg($this->config['recipient'])
-           . ' -m ' . escapeshellarg($alert_data['title']));
+           . escapeshellarg((string) $this->config['recipient'])
+           . ' -m ' . escapeshellarg((string) $alert_data['title']));
 
         return true;
     }

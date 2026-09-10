@@ -1,0 +1,50 @@
+{
+  "html/fonts/glyphicons-halflings-regular.eot": {
+    "file": "assets/glyphicons-halflings-regular-BUJKDMgK.eot",
+    "src": "html/fonts/glyphicons-halflings-regular.eot"
+  },
+  "html/fonts/glyphicons-halflings-regular.svg": {
+    "file": "assets/glyphicons-halflings-regular-CSehLiBc.svg",
+    "src": "html/fonts/glyphicons-halflings-regular.svg"
+  },
+  "html/fonts/glyphicons-halflings-regular.ttf": {
+    "file": "assets/glyphicons-halflings-regular-DrwTMapi.ttf",
+    "src": "html/fonts/glyphicons-halflings-regular.ttf"
+  },
+  "html/fonts/glyphicons-halflings-regular.woff": {
+    "file": "assets/glyphicons-halflings-regular-BKjkU69z.woff",
+    "src": "html/fonts/glyphicons-halflings-regular.woff"
+  },
+  "html/fonts/glyphicons-halflings-regular.woff2": {
+    "file": "assets/glyphicons-halflings-regular-DzqM6ju8.woff2",
+    "src": "html/fonts/glyphicons-halflings-regular.woff2"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-DPkz7_bu.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/configHighlight.js"
+    ],
+    "css": [
+      "assets/app-XVfAfTRy.css"
+    ],
+    "assets": [
+      "assets/glyphicons-halflings-regular-BUJKDMgK.eot",
+      "assets/glyphicons-halflings-regular-DzqM6ju8.woff2",
+      "assets/glyphicons-halflings-regular-BKjkU69z.woff",
+      "assets/glyphicons-halflings-regular-DrwTMapi.ttf",
+      "assets/glyphicons-halflings-regular-CSehLiBc.svg"
+    ]
+  },
+  "resources/js/configHighlight.js": {
+    "file": "assets/configHighlight-BIZTFFSG.js",
+    "name": "configHighlight",
+    "src": "resources/js/configHighlight.js",
+    "isDynamicEntry": true,
+    "css": [
+      "assets/configHighlight-BkecBk_5.css"
+    ]
+  }
+}

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Sensor.php
  *
@@ -25,6 +26,7 @@
 
 namespace App\Discovery;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\SensorToStateIndex;
@@ -33,7 +35,6 @@ use App\Models\StateTranslation;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\Severity;
 
@@ -41,17 +42,16 @@ class Sensor
 {
     use SyncsModels;
 
+    /** @var Collection<int, \App\Models\Sensor> */
     private Collection $models;
     /** @var bool[] */
     private array $discovered = [];
     private string $relationship = 'sensors';
-    private Device $device;
-    /** @var array<string, Collection<StateTranslation>> */
+    /** @var array<string, Collection<int, StateTranslation>> */
     private array $states = [];
 
-    public function __construct(Device $device)
+    public function __construct(private Device $device)
     {
-        $this->device = $device;
         $this->models = new Collection;
     }
 
@@ -74,7 +74,7 @@ class Sensor
 
     /**
      * @param  string  $stateName
-     * @param  StateTranslation[]|Collection<StateTranslation>  $states
+     * @param  StateTranslation[]|Collection<int, StateTranslation>  $states
      * @return $this
      */
     public function withStateTranslations(string $stateName, array|Collection $states): static
@@ -89,6 +89,9 @@ class Sensor
         return $this->discovered[$type] ?? false;
     }
 
+    /**
+     * @return Collection<int, \App\Models\Sensor>
+     */
     public function sync(...$params): Collection
     {
         $type = implode('-', $params);
@@ -105,6 +108,9 @@ class Sensor
         return new Collection;
     }
 
+    /**
+     * @return Collection<int, \App\Models\Sensor>
+     */
     public function getModels(): Collection
     {
         return $this->models;
@@ -112,16 +118,16 @@ class Sensor
 
     public function canSkip(\App\Models\Sensor $sensor): bool
     {
-        if (! empty($sensor->sensor_class) && (Config::getOsSetting($this->device->os, "disabled_sensors.$sensor->sensor_class") || Config::get("disabled_sensors.$sensor->sensor_class"))) {
+        if (! empty($sensor->sensor_class) && (LibrenmsConfig::getOsSetting($this->device->os, "disabled_sensors.$sensor->sensor_class") || LibrenmsConfig::get("disabled_sensors.$sensor->sensor_class"))) {
             return true;
         }
-        foreach (Config::getCombined($this->device->os, 'disabled_sensors_regex') as $skipRegex) {
-            if (! empty($sensor->sensor_descr) && preg_match($skipRegex, $sensor->sensor_descr)) {
+        foreach (LibrenmsConfig::getCombined($this->device->os, 'disabled_sensors_regex') as $skipRegex) {
+            if (! empty($sensor->sensor_descr) && preg_match($skipRegex, (string) $sensor->sensor_descr)) {
                 return true;
             }
         }
-        foreach (Config::getCombined($this->device->os, "disabled_sensors_regex.$sensor->sensor_class") as $skipRegex) {
-            if (! empty($sensor->sensor_descr) && preg_match($skipRegex, $sensor->sensor_descr)) {
+        foreach (LibrenmsConfig::getCombined($this->device->os, "disabled_sensors_regex.$sensor->sensor_class") as $skipRegex) {
+            if (! empty($sensor->sensor_descr) && preg_match($skipRegex, (string) $sensor->sensor_descr)) {
                 return true;
             }
         }
@@ -129,6 +135,9 @@ class Sensor
         return false;
     }
 
+    /**
+     * @param  Collection<int, \App\Models\Sensor>  $sensors
+     */
     private function syncStates(Collection $sensors): void
     {
         $stateSensors = $sensors->where('sensor_class', 'state');

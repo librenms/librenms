@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,7 +23,7 @@ $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.112.105.45.104.111.108.101';
 $pihole = snmp_walk($device, $oid, $options);
 
 if ($pihole) {
-    [$domains_blocked, $dns_query, $ads_blocked, $ads_percentage, $unique_domains, $queries_forwarded, $queries_cached, $query_a, $query_aaaa, $query_ptr, $query_srv] = explode("\n", $pihole);
+    [$domains_blocked, $dns_query, $ads_blocked, $ads_percentage, $unique_domains, $queries_forwarded, $queries_cached, $query_a, $query_aaaa, $query_ptr, $query_srv] = explode("\n", (string) $pihole);
 
     $rrd_name = ['app', $name, $app->app_id];
     $rrd_def = RrdDefinition::make()
@@ -53,7 +54,7 @@ if ($pihole) {
     ];
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
     update_application($app, $pihole, $fields);
 }
 

@@ -1,0 +1,66 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.11.2.3.9.1",
+                    "sysDescr": "HP ETHERNET MULTI-ENVIRONMENT,SN:TEST000000,PID:HP Color LaserJet Test",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": "Color LaserJet Test",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "jetdirect",
+                    "type": "printer",
+                    "serial": null,
+                    "icon": "hp.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "printer-supplies": {
+        "discovery": {
+            "printer_supplies": [
+                {
+                    "supply_index": 1,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "supply_descr": "Black Cartridge",
+                    "supply_capacity": 100,
+                    "supply_current": 61,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                },
+                {
+                    "supply_index": 2,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "supply_descr": "Cyan Cartridge",
+                    "supply_capacity": 100,
+                    "supply_current": 47,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                },
+                {
+                    "supply_index": 3,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "supply_descr": "Magenta Cartridge",
+                    "supply_capacity": 100,
+                    "supply_current": 72,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                },
+                {
+                    "supply_index": 4,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "supply_descr": "Yellow Cartridge",
+                    "supply_capacity": 100,
+                    "supply_current": 55,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

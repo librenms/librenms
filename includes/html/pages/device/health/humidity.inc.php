@@ -1,7 +1,5 @@
 <?php
 
-$class = 'humidity';
-$unit = '%';
-$graph_type = 'sensor_humidity';
+$class = \LibreNMS\Enum\Sensor::Humidity;
 
 require 'sensors.inc.php';

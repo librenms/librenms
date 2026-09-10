@@ -1,0 +1,497 @@
+G6-POE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32, enterprises,NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	DisplayString, MacAddress
+		FROM SNMPv2-TC
+	g6	FROM MICROSENS-G6-MIB
+	;
+
+device MODULE-IDENTITY --Category
+	LAST-UPDATED "202302141127Z"
+	ORGANIZATION "MICROSENS GmbH & Co. KG"
+	CONTACT-INFO
+		"Kueferstrasse 16
+		D-59067 Hamm
+		Germany
+		support@microsens.de
+		http://www.microsens.de"
+	DESCRIPTION
+		"Microsens private MIB for Generation 6 Ethernet Switches"
+
+	REVISION "202302141127Z"
+	DESCRIPTION
+		"File creation"
+	::= { g6 1 }
+
+poe  OBJECT IDENTIFIER ::= { device 33 }
+
+
+
+-- *************************** CONFIGURATION SECTION ********************************
+
+
+poePoeMaxPowerAvailable OBJECT-TYPE   -- poe_max_power_available
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Defines the total power that this units power supply can support. This value is used to balance the PoE output power delivered. Please adjust according to connected power supply rating."
+	::= { poe 1 }
+
+
+poeRestartPoePort OBJECT-TYPE   -- restart_poe_port
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"This function may be used to briefly drop the power on a PoE port in order to reboot the attached device. Please supply port number as parameter. The shorthand port format like 1 for 1/1 may be used. Syntax examples: poe.restart_poe_port = 1/2,1/5  or poe.restart_poe_port = 1-3 or equivalent poe.restart_poe_port = 1/1-1/3.   "
+	::= { poe 2 }
+
+
+poeRestartEnergyPort OBJECT-TYPE   -- restart_energy_port
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"This function may be used to restart measurement of energy consumption per port. Please supply port number as parameter. The shorthand port format like 1 for 1/1 may be used. Syntax examples: poe.restart_energy_port = 1/2,1/5  or poe.restart_energy_port = 1-3 or equivalent poe.restart_energy_port = 1/1-1/3."
+	::= { poe 3 }
+
+
+-- ******************* Begin of configTable *************************
+
+configTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF ConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Power over Ethernet function permits the powering of connected units which do not use their own local power supply."
+	::= { poe 4 }
+
+configEntry	OBJECT-TYPE
+	SYNTAX ConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { configPortIndex }
+	::= { configTable 1 }
+
+
+	ConfigEntry ::= SEQUENCE {
+	configPortIndex INTEGER,
+	configMode INTEGER ,
+	configPriorityPort INTEGER ,
+	configEnablePoePlus INTEGER 
+	}
+
+configPortIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..24)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { configEntry 1 }
+
+configMode OBJECT-TYPE   -- mode
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		automatic (1),
+		class0 (2),
+		class1 (3),
+		class2 (4),
+		class3 (5),
+		class4 (6),
+		forcedOn (7)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Used to enable or disable PoE function."
+	::= { configEntry 2 }
+
+configPriorityPort OBJECT-TYPE   -- priority_port
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Ports without priority may be switched off under a power contention situation."
+	::= { configEntry 3 }
+
+configEnablePoePlus OBJECT-TYPE   -- enable_poe_plus
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		enabled (1),
+		lldpControlled (2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Allow between 15-30W power consumption."
+	::= { configEntry 4 }
+
+
+-- ********************* End of configTable ***********************
+
+
+-- ******************* Begin of watchdogTable *************************
+
+watchdogTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF WatchdogEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	::= { poe 5 }
+
+watchdogEntry	OBJECT-TYPE
+	SYNTAX WatchdogEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { watchdogPortIndex }
+	::= { watchdogTable 1 }
+
+
+	WatchdogEntry ::= SEQUENCE {
+	watchdogPortIndex INTEGER,
+	watchdogTestMethod INTEGER ,
+	watchdogStartDelay Unsigned32,
+	watchdogCheckInterval Unsigned32,
+	watchdogRecheckInterval Unsigned32,
+	watchdogTolerableFailures Unsigned32,
+	watchdogMinimumRmonPackets Unsigned32,
+	watchdogCheckedAddress DisplayString,
+	watchdogClearStatistics DisplayString
+	}
+
+watchdogPortIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..24)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { watchdogEntry 1 }
+
+watchdogTestMethod OBJECT-TYPE   -- test_method
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		ping (1),
+		rmon (2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Selects the method with which the attached device is probed. Turn unused to ports, which should not affect PoE, to DISABLE."
+	::= { watchdogEntry 2 }
+
+watchdogStartDelay OBJECT-TYPE   -- start_delay
+	SYNTAX Unsigned32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Defines the time in seconds after PoE enable to the first check. This is useful when the device has a long boot time and a short check period is used. Effectively this delays the first check."
+	::= { watchdogEntry 3 }
+
+watchdogCheckInterval OBJECT-TYPE   -- check_interval
+	SYNTAX Unsigned32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Defines the time in seconds between successive checks. If set to 0 only manual checks via the test_now command are executed."
+	::= { watchdogEntry 4 }
+
+watchdogRecheckInterval OBJECT-TYPE   -- recheck_interval
+	SYNTAX Unsigned32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Defines the time in seconds between successive checks while an error has occured. This parameter permits a long check interval combined with faster checking while an error is suspected."
+	::= { watchdogEntry 5 }
+
+watchdogTolerableFailures OBJECT-TYPE   -- tolerable_failures
+	SYNTAX Unsigned32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Defines the number of tolerable successive errors before reboot action is taken by toggling PoE."
+	::= { watchdogEntry 6 }
+
+watchdogMinimumRmonPackets OBJECT-TYPE   -- minimum_rmon_packets
+	SYNTAX Unsigned32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Defines the number of packets that must be received within check interval. Applies to RMON test method only."
+	::= { watchdogEntry 7 }
+
+watchdogCheckedAddress OBJECT-TYPE   -- checked_address
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Defines the IP v4 or v6 address of the checked device. Also accepts hostname. Applies to PING method only."
+	::= { watchdogEntry 8 }
+
+watchdogClearStatistics OBJECT-TYPE   -- clear_statistics
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Resets statistics counter for this port to 0."
+	::= { watchdogEntry 9 }
+
+
+-- ********************* End of watchdogTable ***********************
+
+
+
+-- ****************************** STATUS SECTION ********************************
+
+
+poeTotalPowerConsumed OBJECT-TYPE   -- total_power_consumed
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The sum of power currently delivered to all ports. (units: mW)"
+	::= { poe 100 }
+
+
+-- ******************* Begin of statusTable *************************
+
+statusTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF StatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table list the current PoE port conditions."
+	::= { poe 101 }
+
+statusEntry	OBJECT-TYPE
+	SYNTAX StatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { statusPortIndex }
+	::= { statusTable 1 }
+
+
+	StatusEntry ::= SEQUENCE {
+	statusPortIndex INTEGER,
+	statusCondition INTEGER ,
+	statusDeterminedClass INTEGER ,
+	statusOutputCurrent Integer32 ,
+	statusOutputVoltage Integer32 ,
+	statusOutputPower Integer32 ,
+	statusPowerDeniedCounter Unsigned32,
+	statusOverCurrentCounter Unsigned32,
+	statusShortCircuitCounter Unsigned32,
+	statusNumberOfChecks Unsigned32,
+	statusNumberOfFailures Unsigned32,
+	statusPoeRestartCounter Unsigned32
+	}
+
+statusPortIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..31)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { statusEntry 1 }
+
+statusCondition OBJECT-TYPE   -- condition
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		powerOff (1),
+		discovering (2),
+		powered (3),
+		classMismatch (4),
+		shortCircuit (5),
+		rejected (6),
+		overCurrent (7),
+		overTemp (8),
+		voltageTooLow (9)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"PoE status and conditions."
+	::= { statusEntry 2 }
+
+statusDeterminedClass OBJECT-TYPE   -- determined_class
+	SYNTAX INTEGER 
+		{
+		isClass0 (0),
+		isClass1 (1),
+		isClass2 (2),
+		isClass3 (3),
+		isClass4 (4),
+		isOverload (5),
+		probesNotEqual (7),
+		isUnknown (255)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Determined and negotiated PoE class."
+	::= { statusEntry 3 }
+
+statusOutputCurrent OBJECT-TYPE   -- output_current
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Current delivered to the attached device. (units: mA)"
+	::= { statusEntry 4 }
+
+statusOutputVoltage OBJECT-TYPE   -- output_voltage
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Voltage delivered to the attached device. (units: mV)"
+	::= { statusEntry 5 }
+
+statusOutputPower OBJECT-TYPE   -- output_power
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Calculated power delivered to the attached device. (units: mW)"
+	::= { statusEntry 6 }
+
+statusPowerDeniedCounter OBJECT-TYPE   -- power_denied_counter
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Incremented whenever a PoE request was denied regardless of reason."
+	::= { statusEntry 7 }
+
+statusOverCurrentCounter OBJECT-TYPE   -- over_current_counter
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Incremented whenever an over_current condition was detected."
+	::= { statusEntry 8 }
+
+statusShortCircuitCounter OBJECT-TYPE   -- short_circuit_counter
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Incremented whenever a short circuit was detected."
+	::= { statusEntry 9 }
+
+statusNumberOfChecks OBJECT-TYPE   -- number_of_checks
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Counts the number of watchdog checks."
+	::= { statusEntry 10 }
+
+statusNumberOfFailures OBJECT-TYPE   -- number_of_failures
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Counts the number of failed wachdog checks."
+	::= { statusEntry 11 }
+
+statusPoeRestartCounter OBJECT-TYPE   -- poe_restart_counter
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Counts the number of times PoE was toggled by watchdog to reboot the attached device."
+	::= { statusEntry 12 }
+
+
+-- ********************* End of statusTable ***********************
+
+
+-- ******************* Begin of energySuppliedTable *************************
+
+energySuppliedTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF EnergySuppliedEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table list the power provided via PoE ports. The values are automatically updated in the given interval."
+	::= { poe 102 }
+
+energySuppliedEntry	OBJECT-TYPE
+	SYNTAX EnergySuppliedEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { energySuppliedPortIndex }
+	::= { energySuppliedTable 1 }
+
+
+	EnergySuppliedEntry ::= SEQUENCE {
+	energySuppliedPortIndex INTEGER,
+	energySuppliedTimeOfValueRestart Counter32,
+	energySuppliedTimeSinceValueRestart Counter32,
+	energySuppliedLastSecond Unsigned32,
+	energySuppliedAccumulated Unsigned32
+	}
+
+energySuppliedPortIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..31)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { energySuppliedEntry 1 }
+
+energySuppliedTimeOfValueRestart OBJECT-TYPE   -- time_of_value_restart
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Time stamp when the statistics counter had been restarted."
+	::= { energySuppliedEntry 2 }
+
+energySuppliedTimeSinceValueRestart OBJECT-TYPE   -- time_since_value_restart
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"How long ago have the statistics counter been restarted."
+	::= { energySuppliedEntry 3 }
+
+energySuppliedLastSecond OBJECT-TYPE   -- last_second
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Energy supplied in the last second. Value in Joule."
+	::= { energySuppliedEntry 4 }
+
+energySuppliedAccumulated OBJECT-TYPE   -- accumulated
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Energy supplied since last value reset. Value in Wh. (1Wh = 3600 Joule = 3600Ws)."
+	::= { energySuppliedEntry 5 }
+
+
+-- ********************* End of energySuppliedTable ***********************
+
+
+
+END
+

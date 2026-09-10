@@ -12,9 +12,11 @@
  * the source code distribution for details.
  */
 
+use App\Models\AlertSchedule;
+
 $pagetitle[] = 'Alert Schedule';
 $no_refresh = true;
-if (Auth::user()->hasGlobalAdmin()) {
+if (Gate::allows('viewAny', AlertSchedule::class)) {
     include_once 'includes/html/modal/alert_schedule.inc.php';
     include_once 'includes/html/modal/remove_alert_schedule.inc.php'; ?>
 
@@ -30,6 +32,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             <thead>
                 <tr>
                     <th data-column-id="title">Title</th>
+                    <th data-column-id="behavior">Behavior</th>
                     <th data-column-id="recurring">Recurring</th>
                     <th data-column-id="start" data-order="desc">Start (no recurring)</th>
                     <th data-column-id="end">End (no recurring)</th>
@@ -51,8 +54,14 @@ var grid = $("#alert-schedule").bootgrid({
     ajax: true,
     formatters: {
         "commands": function(column, row) {
-            var response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#schedule-maintenance' data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-pencil\"></span></button> " +
-                "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-trash-o\"></span></button>";
+            let response = "";
+
+<?php if(Gate::allows('update', \App\Models\AlertSchedule::class)) { ?>
+            response += "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#schedule-maintenance' data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-pencil\"></span></button> ";
+<?php } if(Gate::allows('delete', \App\Models\AlertSchedule::class)) { ?>
+            response += "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-trash-o\"></span></button>";
+<?php } ?>
+
             return response;
         },
         "schedstatus": function(column, row) {
@@ -70,7 +79,9 @@ var grid = $("#alert-schedule").bootgrid({
     templates: {
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-4 actionBar\"><span class=\"pull-left\">"+
-                "<button type=\"button\" class=\"btn btn-primary btn-sm\" data-toggle=\"modal\" data-target=\"#schedule-maintenance\">Schedule maintenance</button>"+
+<?php if(Gate::allows('create', \App\Models\AlertSchedule::class)) { ?>
+                "<button type=\"button\" class=\"btn btn-primary btn-sm\" data-toggle=\"modal\" data-target=\"#schedule-maintenance\">Schedule maintenance</button>" +
+<?php } ?>
                 "</span></div>"+
                 "<div class=\"col-sm-8 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>"
     },

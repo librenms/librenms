@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Iosxe.php
  *
@@ -26,6 +27,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\IsisAdjacency;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -40,7 +42,9 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS\Traits\CiscoCellular;
+use LibreNMS\OS\Traits\CiscoPortSecurity;
 use LibreNMS\Util\IP;
 use SnmpQuery;
 
@@ -53,10 +57,12 @@ class Iosxe extends Ciscowlc implements
     WirelessRssiDiscovery,
     WirelessRsrqDiscovery,
     WirelessRsrpDiscovery,
-    WirelessSnrDiscovery
+    WirelessSnrDiscovery,
+    PortSecurityPolling
 {
     use SyncsModels;
     use CiscoCellular;
+    use CiscoPortSecurity;
 
     /**
      * Array of shortened ISIS codes
@@ -93,18 +99,16 @@ class Iosxe extends Ciscowlc implements
                         'device_id' => $this->getDeviceId(),
                         'index' => "[$circuit_index][$adjacency_index]",
                         'ifIndex' => $circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircIfIndex'],
-                        'port_id' => $this->ifIndexToId($circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircIfIndex']),
+                        'port_id' => PortCache::getIdFromIfIndex($circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircIfIndex'], $this->getDevice()),
                         'isisCircAdminState' => $circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircAdminState'] ?? 'down',
                         'isisISAdjState' => $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjState'] ?? 'down',
                         'isisISAdjNeighSysType' => Arr::get($this->isis_codes, $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjNeighSysType'] ?? '', 'unknown'),
                         'isisISAdjNeighSysID' => $this->formatIsIsId($adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjNeighSysID'] ?? ''),
                         'isisISAdjNeighPriority' => $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjNeighPriority'] ?? '',
                         'isisISAdjLastUpTime' => $this->parseAdjacencyTime($adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime'] ?? 0),
-                        'isisISAdjAreaAddress' => implode(',', array_map([$this, 'formatIsIsId'], $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjAreaAddress'] ?? [])),
+                        'isisISAdjAreaAddress' => implode(',', array_map($this->formatIsIsId(...), $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjAreaAddress'] ?? [])),
                         'isisISAdjIPAddrType' => implode(',', $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjIPAddrType'] ?? []),
-                        'isisISAdjIPAddrAddress' => implode(',', array_map(function ($ip) {
-                            return (string) IP::fromHexString($ip, true);
-                        }, $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjIPAddrAddress'] ?? [])),
+                        'isisISAdjIPAddrAddress' => implode(',', array_map(fn ($ip) => (string) IP::fromHexString($ip, true), $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjIPAddrAddress'] ?? [])),
                     ]));
                 }
             }
@@ -126,7 +130,7 @@ class Iosxe extends Ciscowlc implements
 
         $uptime = SnmpQuery::walk('CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime')->values();
 
-        return $adjacencies->each(function ($adjacency) use ($states, $uptime) {
+        return $adjacencies->each(function ($adjacency) use ($states, $uptime): void {
             $adjacency->isisISAdjState = $states['CISCO-IETF-ISIS-MIB::ciiISAdjState' . $adjacency->index] ?? $adjacency->isisISAdjState;
             $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($uptime['CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime' . $adjacency->index] ?? 0);
         });

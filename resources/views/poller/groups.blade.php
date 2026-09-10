@@ -6,7 +6,9 @@
 
 @parent
 
+@can('create', \App\Models\PollerGroup::class)
 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#poller-groups">{{ __('Create new poller group') }}</button>
+@endcan
 <br /><br />
 <div class="table-responsive">
     <table class="table table-striped table-bordered table-hover table-condensed">
@@ -20,7 +22,7 @@
         <tr id="0">
             <td>0</td>
             <td>General @if($default_group_id == 0) ({{ __('default') }}) @endif</td>
-            <td><a href="{{ url('devices/poller_group=0') }}">{{ $ungrouped_count }}</a></td>
+            <td><a href="{{ route('devices', ['filter' => ['poller_group' => ['eq' => $default_group_id]]]) }}">{{ $ungrouped_count }}</a></td>
             <td></td>
             <td>
         </tr>
@@ -28,18 +30,21 @@
         <tr id="{{ $group->id }}">
             <td>{{ $group->id }}</td>
             <td>{{ $group->group_name }}@if($group->id == $default_group_id) ({{ __('default') }}) @endif</td>
-            <td><a href="{{ url('devices/poller_group=' . $group->id) }}">{{ $group->devices_count }}</a></td>
+            <td><a href="{{ route('devices', ['filter' => ['poller_group' => ['eq' => $group->id]]]) }}">{{ $group->devices_count }}</a></td>
             <td>{{ $group->descr }}</td>
             <td>
+                @can('update', $group)
                 <button type="button" class="btn btn-success btn-xs" data-group_id="{{ $group->id }}" data-toggle="modal" data-target="#poller-groups">{{ __('Edit') }}</button>
+                @endcan
+                @can('delete', $group)
                 <button type="button" class="btn btn-danger btn-xs" data-group_id="{{ $group->id }}" data-toggle="modal" data-target="#confirm-delete">{{ __('Delete') }}</button>
+                @endcan
             </td>
         @endforeach
         </tr>
     </table>
 </div>
 
-@if(auth()->user()->isAdmin())
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
@@ -104,12 +109,9 @@
         </div>
     </div>
 </div>
-</form>
-@endif
 @endsection
 
 @section('scripts')
-@if(auth()->user()->isAdmin())
 <script>
 $('#confirm-delete').on('show.bs.modal', function(e) {
     group_id = $(e.relatedTarget).data('group_id');
@@ -141,9 +143,8 @@ $('#poller-groups').on('show.bs.modal', function (event) {
     if(group_id != '') {
         $('#group_id').val(group_id);
         $.ajax({
-            type: "POST",
-            url: "ajax_form.php",
-            data: { type: "parse-poller-groups", group_id: group_id },
+            type: "GET",
+            url: '{{ route("pollergroup.show", ["pollergroup" => ":pollergroup"]) }}'.replace(':pollergroup', group_id),
             dataType: "json",
             success: function(output) {
                 $('#group_name').val(output['group_name']);
@@ -158,10 +159,12 @@ $('#create-group').on("click", function(e) {
     var group_name = $("#group_name").val();
     var descr = $("#descr").val();
     var group_id = $('#group_id').val();
+    var url = group_id ? '{{ route("pollergroup.update", ["pollergroup" => ":pollergroup"]) }}'.replace(':pollergroup', group_id) : '{{ route("pollergroup.store") }}';
+    var type = group_id ? 'PUT' : 'POST';
     $.ajax({
-        type: "POST",
-        url: "ajax_form.php",
-        data: { type: "poller-groups", group_name: group_name, descr: descr, group_id: group_id },
+        type: type,
+        url: url,
+        data: { group_name: group_name, descr: descr },
         dataType: "html",
         success: function(msg){
             if(msg.indexOf("ERROR:") <= -1) {
@@ -179,6 +182,5 @@ $('#create-group').on("click", function(e) {
         }
     });
 });
-@endif
 </script>
 @endsection

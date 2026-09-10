@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OspfInstance.php
  *
@@ -25,8 +26,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class OspfInstance extends DeviceRelatedModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $fillable = [
         'device_id',
@@ -47,4 +53,28 @@ class OspfInstance extends DeviceRelatedModel
         'ospfExitOverflowInterval',
         'ospfDemandExtensions',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\OspfArea, $this>
+     */
+    public function areas(): HasMany
+    {
+        return $this->hasMany(OspfArea::class, 'device_id', 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\OspfPort, $this>
+     */
+    public function ports(): HasMany
+    {
+        return $this->hasMany(OspfPort::class, 'device_id', 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\OspfNbr, $this>
+     */
+    public function nbrs(): HasMany
+    {
+        return $this->hasMany(OspfNbr::class, 'device_id', 'device_id');
+    }
 }

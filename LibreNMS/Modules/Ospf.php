@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Ospf.php
  *
@@ -25,8 +26,8 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\PortCache;
 use App\Models\Device;
-use App\Models\Ipv4Address;
 use App\Models\OspfArea;
 use App\Models\OspfInstance;
 use App\Models\OspfNbr;
@@ -37,6 +38,7 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use SnmpQuery;
@@ -51,7 +53,7 @@ class Ospf implements Module
         return ['ports'];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
         return false;
     }
@@ -64,9 +66,9 @@ class Ospf implements Module
         // no discovery
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -75,20 +77,19 @@ class Ospf implements Module
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
         foreach ($os->getDevice()->getVrfContexts() as $context_name) {
-            Log::info('Processes: ');
-            ModuleModelObserver::observe(OspfInstance::class);
+            ModuleModelObserver::observe(OspfInstance::class, 'Processes');
 
             // Pull data from device
             $ospf_instances_poll = SnmpQuery::context($context_name)
-                ->hideMib()->enumStrings()
+                ->enumStrings()
                 ->walk('OSPF-MIB::ospfGeneralGroup')->valuesByIndex();
 
             $ospf_instances = new Collection();
             foreach ($ospf_instances_poll as $ospf_instance_id => $ospf_entry) {
-                if (empty($ospf_entry['ospfRouterId'])) {
+                if (empty($ospf_entry['OSPF-MIB::ospfRouterId'])) {
                     continue; // skip invalid data
                 }
-                foreach (['ospfRxNewLsas', 'ospfOriginateNewLsas', 'ospfAreaBdrRtrStatus', 'ospfTOSSupport', 'ospfExternLsaCksumSum', 'ospfExternLsaCount', 'ospfASBdrRtrStatus', 'ospfVersionNumber', 'ospfAdminStat'] as $column) {
+                foreach (['OSPF-MIB::ospfRxNewLsas', 'OSPF-MIB::ospfOriginateNewLsas', 'OSPF-MIB::ospfAreaBdrRtrStatus', 'OSPF-MIB::ospfTOSSupport', 'OSPF-MIB::ospfExternLsaCksumSum', 'OSPF-MIB::ospfExternLsaCount', 'OSPF-MIB::ospfASBdrRtrStatus', 'OSPF-MIB::ospfVersionNumber', 'OSPF-MIB::ospfAdminStat'] as $column) {
                     if (! array_key_exists($column, $ospf_entry) || is_null($ospf_entry[$column])) {
                         continue 2; // This column must exist and not be null
                     }
@@ -98,7 +99,22 @@ class Ospf implements Module
                     'device_id' => $os->getDeviceId(),
                     'ospf_instance_id' => $ospf_instance_id,
                     'context_name' => $context_name,
-                ], $ospf_entry);
+                ], [
+                    'ospfRouterId' => $ospf_entry['OSPF-MIB::ospfRouterId'],
+                    'ospfAdminStat' => $ospf_entry['OSPF-MIB::ospfAdminStat'],
+                    'ospfVersionNumber' => $ospf_entry['OSPF-MIB::ospfVersionNumber'],
+                    'ospfAreaBdrRtrStatus' => $ospf_entry['OSPF-MIB::ospfAreaBdrRtrStatus'],
+                    'ospfASBdrRtrStatus' => $ospf_entry['OSPF-MIB::ospfASBdrRtrStatus'],
+                    'ospfExternLsaCount' => $ospf_entry['OSPF-MIB::ospfExternLsaCount'],
+                    'ospfExternLsaCksumSum' => $ospf_entry['OSPF-MIB::ospfExternLsaCksumSum'],
+                    'ospfTOSSupport' => $ospf_entry['OSPF-MIB::ospfTOSSupport'],
+                    'ospfOriginateNewLsas' => $ospf_entry['OSPF-MIB::ospfOriginateNewLsas'],
+                    'ospfRxNewLsas' => $ospf_entry['OSPF-MIB::ospfRxNewLsas'],
+                    'ospfExtLsdbLimit' => $ospf_entry['OSPF-MIB::ospfExtLsdbLimit'] ?? null,
+                    'ospfMulticastExtensions' => $ospf_entry['OSPF-MIB::ospfMulticastExtensions'] ?? null,
+                    'ospfExitOverflowInterval' => $ospf_entry['OSPF-MIB::ospfExitOverflowInterval'] ?? null,
+                    'ospfDemandExtensions' => $ospf_entry['OSPF-MIB::ospfDemandExtensions'] ?? null,
+                ]);
 
                 $ospf_instances->push($instance);
             }
@@ -108,6 +124,7 @@ class Ospf implements Module
                 ->where('context_name', $context_name)
                 ->whereNotIn('id', $ospf_instances->pluck('id'))->delete();
 
+            ModuleModelObserver::done();
             $instance_count = $ospf_instances->count();
             Log::info("Total processes: $instance_count");
             if ($instance_count == 0) {
@@ -115,30 +132,27 @@ class Ospf implements Module
                 return;
             }
 
-            Log::info('Areas: ');
-            ModuleModelObserver::observe(OspfArea::class);
+            ModuleModelObserver::observe(OspfArea::class, 'Areas');
 
             // Pull data from device
             $ospf_areas = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPF-MIB::ospfAreaTable')
-                ->mapTable(function ($ospf_area, $ospf_area_id) use ($context_name, $os) {
-                    return OspfArea::updateOrCreate([
-                        'device_id' => $os->getDeviceId(),
-                        'ospfAreaId' => $ospf_area_id,
-                        'context_name' => $context_name,
-                    ], $ospf_area);
-                });
+                ->mapTable(fn ($ospf_area, $ospf_area_id) => OspfArea::updateOrCreate([
+                    'device_id' => $os->getDeviceId(),
+                    'ospfAreaId' => $ospf_area_id,
+                    'context_name' => $context_name,
+                ], $ospf_area));
 
             // cleanup
             $os->getDevice()->ospfAreas()
                 ->where('context_name', $context_name)
                 ->whereNotIn('id', $ospf_areas->pluck('id'))->delete();
 
+            ModuleModelObserver::done();
             Log::info('Total areas: ' . $ospf_areas->count());
 
-            Log::info('Ports: ');
-            ModuleModelObserver::observe(OspfPort::class);
+            ModuleModelObserver::observe(OspfPort::class, 'Ports');
 
             // Pull data from device
             $ospf_ports = SnmpQuery::context($context_name)
@@ -146,12 +160,9 @@ class Ospf implements Module
                 ->walk('OSPF-MIB::ospfIfTable')
                 ->mapTable(function ($ospf_port, $ip, $ifIndex) use ($context_name, $os) {
                     // find port_id
-                    $ospf_port['port_id'] = (int) $os->getDevice()->ports()->where('ifIndex', $ifIndex)->value('port_id');
+                    $ospf_port['port_id'] = (int) PortCache::getIdFromIfIndex($ifIndex, $os->getDevice());
                     if ($ospf_port['port_id'] == 0) {
-                        $ospf_port['port_id'] = (int) $os->getDevice()->ipv4()
-                            ->where('ipv4_address', $ip)
-                            ->where('context_name', $context_name)
-                            ->value('ipv4_addresses.port_id');
+                        $ospf_port['port_id'] = (int) PortCache::getIdFromIp($ip, $context_name, $os->getDevice());
                     }
 
                     return OspfPort::updateOrCreate([
@@ -166,10 +177,10 @@ class Ospf implements Module
                 ->where('context_name', $context_name)
                 ->whereNotIn('id', $ospf_ports->pluck('id'))->delete();
 
+            ModuleModelObserver::done();
             Log::info('Total Ports: ' . $ospf_ports->count());
 
-            Log::info('Neighbours: ');
-            ModuleModelObserver::observe(OspfNbr::class);
+            ModuleModelObserver::observe(OspfNbr::class, 'Neighbours');
 
             // Pull data from device
             $ospf_neighbours = SnmpQuery::context($context_name)
@@ -177,10 +188,7 @@ class Ospf implements Module
                 ->walk('OSPF-MIB::ospfNbrTable')
                 ->mapTable(function ($ospf_nbr, $ip, $ifIndex) use ($context_name, $os) {
                     // get neighbor port_id
-                    $ospf_nbr['port_id'] = Ipv4Address::query()
-                        ->where('ipv4_address', $ip)
-                        ->where('context_name', $context_name)
-                        ->value('port_id');
+                    $ospf_nbr['port_id'] = PortCache::getIdFromIp($ip, $context_name); // search all devices
 
                     return OspfNbr::updateOrCreate([
                         'device_id' => $os->getDeviceId(),
@@ -194,6 +202,7 @@ class Ospf implements Module
                 ->where('context_name', $context_name)
                 ->whereNotIn('id', $ospf_neighbours->pluck('id'))->delete();
 
+            ModuleModelObserver::done();
             Log::info('Total neighbors: ' . $ospf_neighbours->count());
 
             Log::info('TOS Metrics: ');
@@ -208,7 +217,7 @@ class Ospf implements Module
 
                     if (! $port) {
                         // didn't find port by IP, try harder
-                        $port = $ospf_ports_by_ip->where(fn ($p) => str_starts_with($p->ospf_port_id, $ip))->first();
+                        $port = $ospf_ports_by_ip->where(fn ($p) => str_starts_with((string) $p->ospf_port_id, $ip))->first();
                     }
 
                     if ($port) {
@@ -222,24 +231,22 @@ class Ospf implements Module
 
             Log::info('Total TOS metrics: ' . $ospf_tos_metrics->count());
 
-            if ($instance_count) {
-                // Create device-wide statistics RRD
-                $rrd_def = RrdDefinition::make()
-                    ->addDataset('instances', 'GAUGE', 0, 1000000)
-                    ->addDataset('areas', 'GAUGE', 0, 1000000)
-                    ->addDataset('ports', 'GAUGE', 0, 1000000)
-                    ->addDataset('neighbours', 'GAUGE', 0, 1000000);
+            // Create device-wide statistics RRD
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('instances', 'GAUGE', 0, 1000000)
+                ->addDataset('areas', 'GAUGE', 0, 1000000)
+                ->addDataset('ports', 'GAUGE', 0, 1000000)
+                ->addDataset('neighbours', 'GAUGE', 0, 1000000);
 
-                $fields = [
-                    'instances' => $instance_count,
-                    'areas' => $ospf_areas->count(),
-                    'ports' => $ospf_ports->count(),
-                    'neighbours' => $ospf_neighbours->count(),
-                ];
+            $fields = [
+                'instances' => $instance_count,
+                'areas' => $ospf_areas->count(),
+                'ports' => $ospf_ports->count(),
+                'neighbours' => $ospf_neighbours->count(),
+            ];
 
-                $tags = compact('rrd_def');
-                $datastore->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
-            }
+            $tags = ['rrd_def' => $rrd_def];
+            $datastore->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
         }
     }
 

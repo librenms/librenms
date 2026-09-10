@@ -1,3 +1,0 @@
-modules:
-  os:
-    sysDescr_regex: '/LigoPTP (?<hardware>[^,]*),? (?<version>v[\d\-.]+\d)/'

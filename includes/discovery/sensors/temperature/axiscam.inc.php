@@ -4,35 +4,41 @@ echo 'AXIS Temperatures ';
 
 // Set Temp Limits based on Device Description
 switch (true) {
-    case stristr($device['sysDescr'], 'P1425-LE'):
+    case stristr((string) $device['sysDescr'], 'P1375'):
+        $high_limit = 55;
+        $high_warn_limit = 50;
+        $low_warn_limit = -5;
+        $low_limit = -10;
+        break;
+    case stristr((string) $device['sysDescr'], 'P1425-LE'):
         $high_limit = 50;
         $high_warn_limit = 40;
         $low_warn_limit = -20;
         $low_limit = -30;
         break;
-    case stristr($device['sysDescr'], 'P1435-LE'):
+    case stristr((string) $device['sysDescr'], 'P1435-LE'):
         $high_limit = 60;
         $high_warn_limit = 50;
         $low_warn_limit = -20;
         $low_limit = -30;
         break;
-    case stristr($device['sysDescr'], 'P1455-LE'):
+    case stristr((string) $device['sysDescr'], 'P1455-LE'):
         $high_limit = 60;
         $high_warn_limit = 50;
         $low_warn_limit = -30;
         $low_limit = -40;
         break;
-    case stristr($device['sysDescr'], 'P5676-LE'):
+    case stristr((string) $device['sysDescr'], 'P5676-LE'):
         $high_limit = 50;
         $high_warn_limit = 40;
         $low_warn_limit = -20;
         $low_limit = -30;
         break;
     default:
-        $high_limit = 5;
-        $high_warn_limit = 10;
-        $low_warn_limit = 30;
-        $low_limit = 35;
+        $high_limit = 50;
+        $high_warn_limit = 45;
+        $low_warn_limit = 5;
+        $low_limit = 0;
 }
 
 // Temp Sensor Status

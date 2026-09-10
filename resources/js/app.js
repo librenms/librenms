@@ -4,11 +4,37 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+import "../css/app.css";
+import "./bootstrap";
 
-require('./bootstrap');
+// Gridstack (bundled by Vite)
+import 'gridstack/dist/gridstack.min.css';
+import {GridStack} from 'gridstack';
+import Vue from "vue";
+import {i18n} from "./plugins/i18n.js"; // translation
+import ToggleButton from "vue-js-toggle-button";
+import VTooltip from "v-tooltip";
+import vSelect from "vue-select";
+import Multiselect from "vue-multiselect";
+import VueTabs from "vue-nav-tabs";
+import VModal from "vue-js-modal";
+// // Alpine Components
+import Alpine from "alpinejs";
+import intersect from "@alpinejs/intersect";
+// import popup from './components/alpine/popup.js'
+import popup from "./components/alpine/oldpopup.js";
+import deviceLink from "./components/alpine/deviceLink.js";
+import portLink from "./components/alpine/portLink.js";
+import filterBarComponent from "./components/alpine/filterBarComponent.js";
+import remoteDropdown from "./components/alpine/remoteDropdown.js";
+import LibreNMSDate from "./datetime.js";
+import LibreNMSUrl from './url.js';
 
-window.Vue = require('vue').default;
-import { i18n } from "./plugins/i18n.js"; // translation
+window.GridStack = GridStack;
+
+window.LibreNMS = window.LibreNMS || {};
+window.LibreNMS.Date = LibreNMSDate;
+window.LibreNMS.Url = LibreNMSUrl;
 
 /**
  * The following block of code may be used to automatically register your
@@ -17,26 +43,22 @@ import { i18n } from "./plugins/i18n.js"; // translation
  *
  * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
  */
+const components = import.meta.glob('./components/*.vue', { eager: true });
+Object.entries(components).forEach(([path, component]) => {
+    const name = path.split('/').pop().replace(/\.\w+$/, '');
+    Vue.component(name, component.default);
+});
 
-const files = require.context('./', true, /\.vue$/i);
-files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
-
-import ToggleButton from 'vue-js-toggle-button'
 Vue.use(ToggleButton);
 
-import VTooltip from 'v-tooltip'
 Vue.use(VTooltip);
 
-import vSelect from 'vue-select'
 Vue.component('v-select', vSelect);
 
-import Multiselect from 'vue-multiselect'
 Vue.component('multiselect', Multiselect)
 
-import VueTabs from 'vue-nav-tabs'
 Vue.use(VueTabs)
 
-import VModal from 'vue-js-modal'
 Vue.use(VModal)
 
 // Vue.mixin({
@@ -61,3 +83,18 @@ const app = new Vue({
     el: '#app',
     i18n,
 });
+
+Alpine.plugin(intersect);
+Alpine.data('popup', popup);
+Alpine.data('deviceLink', deviceLink);
+Alpine.data('portLink', portLink);
+Alpine.data("filterBarComponent", filterBarComponent);
+Alpine.data("remoteDropdown", remoteDropdown);
+
+window.Alpine = Alpine;
+
+if (document.querySelector('[data-config-backups]')) {
+    window.LibreNMS.loadConfigHighlight = () => import("./configHighlight.js");
+}
+
+Alpine.start();

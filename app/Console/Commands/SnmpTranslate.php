@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Collection;
-use LibreNMS\Config;
-use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use SnmpQuery;
 
 class SnmpTranslate extends SnmpFetch
@@ -23,6 +23,9 @@ class SnmpTranslate extends SnmpFetch
         $this->getDefinition()->setOptions($options);
     }
 
+    /**
+     * @return Collection<int, \App\Models\Device>
+     */
     protected function getDevices(): Collection
     {
         if (empty($this->oids)) {
@@ -37,7 +40,7 @@ class SnmpTranslate extends SnmpFetch
         }
 
         // check if the "device" is an valid os, if it is, use that for the dummy device
-        if (Config::has('os.' . $this->deviceSpec)) {
+        if (LibrenmsConfig::has('os.' . $this->deviceSpec)) {
             return new Collection([new Device(['os' => $this->deviceSpec])]);
         }
 

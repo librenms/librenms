@@ -1,6 +1,7 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -15,7 +16,7 @@ try {
 }
 
 // grab the alert here as it is the global one
-$metrics = ['alert' => $suricata['alert']];
+$metrics = ['alert' => $suricata['alert'] ?? null];
 
 // Used by both.
 $instances = [];
@@ -176,13 +177,13 @@ if ($suricata['version'] == 1) {
         }
 
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
     }
 } elseif ($suricata['version'] == 2) {
     $new_data['version'] = 2;
 
     // Nothing here is used by version 1.
-    include Config::get('install_dir') . '/includes/suricata-shared.php';
+    include LibrenmsConfig::get('install_dir') . '/includes/suricata-shared.php';
 
     $counter_rrd_def = RrdDefinition::make()
         ->addDataset('data', 'DERIVE', 0);
@@ -201,10 +202,10 @@ if ($suricata['version'] == 1) {
             // Check if it is a gauge or counter
             if (isset($suricata_stat_gauges[$stat])) {
                 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
-                data_update($device, 'app', $tags, $fields);
+                app('Datastore')->put($device, 'app', $tags, $fields);
             } else {
                 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $counter_rrd_def, 'rrd_name' => $rrd_name];
-                data_update($device, 'app', $tags, $fields);
+                app('Datastore')->put($device, 'app', $tags, $fields);
             }
         }
     }
@@ -223,10 +224,10 @@ if ($suricata['version'] == 1) {
                 // Check if it is a gauge or counter
                 if (isset($suricata_stat_gauges[$stat])) {
                     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
-                    data_update($device, 'app', $tags, $fields);
+                    app('Datastore')->put($device, 'app', $tags, $fields);
                 } else {
                     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $counter_rrd_def, 'rrd_name' => $rrd_name];
-                    data_update($device, 'app', $tags, $fields);
+                    app('Datastore')->put($device, 'app', $tags, $fields);
                 }
             }
         }
@@ -249,7 +250,7 @@ if (count($added_instances) > 0 || count($removed_instances) > 0) {
     $log_message = 'Suricata Instance Change:';
     $log_message .= count($added_instances) > 0 ? ' Added ' . implode(',', $added_instances) : '';
     $log_message .= count($removed_instances) > 0 ? ' Removed ' . implode(',', $added_instances) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 $app->data = $new_data;

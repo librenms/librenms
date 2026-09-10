@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\UserPref;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use Symfony\Component\HttpFoundation\Response;
 
 class VerifyTwoFactor
@@ -14,16 +14,16 @@ class VerifyTwoFactor
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  Request  $request
+     * @param  Closure  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         // check twofactor
-        if (Config::get('twofactor') === true) {
+        if ($request->user() !== null && LibrenmsConfig::get('twofactor') === true) {
             // don't apply on 2fa checking routes
             $route_name = $request->route()->getName();
-            if ($route_name && Str::startsWith($route_name, '2fa.')) {
+            if ($route_name && Str::startsWith($route_name, ['2fa.verify', '2fa.form'])) {
                 return $next($request);
             }
 

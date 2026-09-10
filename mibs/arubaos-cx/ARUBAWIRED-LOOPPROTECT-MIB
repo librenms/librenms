@@ -1,7 +1,7 @@
 --**MOD+***********************************************************************
 --* Module:    ARUBAWIRED-LOOPPROTECT-MIB.mib
 --*
---* (c) Copyright 2017,2022 Hewlett Packard Enterprise Development LP
+--* (c) Copyright 2017,2022-2023 Hewlett Packard Enterprise Development LP
 --* All Rights Reserved.
 --*
 --* The contents of this software are proprietary and confidential
@@ -72,7 +72,7 @@ ARUBAWIRED-LOOPPROTECT-MIB DEFINITIONS ::= BEGIN
                     bit has a value of 0.  This list represents the entire
                     range of VlanIndex values defined in the scope of IEEE
                     802.1Q."
-        SYNTAX OCTET STRING (SIZE (512))
+        SYNTAX OCTET STRING (SIZE (0..512))
 
     arubaWiredLoopProtectObjects
         OBJECT IDENTIFIER ::= { arubaWiredLoopProtectMIB 1 }
@@ -248,11 +248,10 @@ ARUBAWIRED-LOOPPROTECT-MIB DEFINITIONS ::= BEGIN
 
 
     arubaWiredLoopProtectLoopDetectedVlan OBJECT-TYPE
-        SYNTAX      Integer32(1..4096)
+        SYNTAX      Integer32(0..4096)
         MAX-ACCESS  read-only
         STATUS      current
-        DESCRIPTION "Refers to this object for the port on which loop is
-                     detected."
+        DESCRIPTION "The loop-detected VLAN ID. A value of 0 indicates no loop."
         ::= { arubaWiredLoopProtectPortEntry 7 }
 
 

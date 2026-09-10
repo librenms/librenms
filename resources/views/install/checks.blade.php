@@ -20,19 +20,19 @@
                         </div>
                     </div>
 
-                    @foreach($modules as $module)
-                    <div class="row check-row border-top">
-                        <div class="col-7">
-                            {{ $module['name'] }}
+                    @foreach($moduleList as $module)
+                        <div class="row check-row border-top">
+                            <div class="col-7">
+                                {{ $module['name'] }}
+                            </div>
+                            <div class="col-5 text-right">
+                                @if($module['status'])
+                                    <i class="fa-solid fa-lg fa-square-check text-success align-middle"></i>
+                                @else
+                                    <i class="fa-solid fa-lg fa-rectangle-xmark text-danger align-middle"></i>
+                                @endif
+                            </div>
                         </div>
-                        <div class="col-5 text-right">
-                            @if($module['status'])
-                                <i class="fa-solid fa-lg fa-square-check text-success align-middle"></i>
-                            @else
-                                <i class="fa-solid fa-lg fa-rectangle-xmark text-danger align-middle"></i>
-                            @endif
-                        </div>
-                    </div>
                     @endforeach
                 </div>
             </div>
@@ -48,13 +48,16 @@
             margin-right: -20px;
             margin-left: -20px;
         }
+
         .checks .card-body {
             padding-top: 0;
             padding-bottom: 0;
         }
+
         .checks {
             font-size: 16pt;
         }
+
         small {
             font-size: 10pt;
         }

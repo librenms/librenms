@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IP.php
  *
@@ -27,7 +28,7 @@ namespace LibreNMS\Util;
 
 use LibreNMS\Exceptions\InvalidIpException;
 
-abstract class IP
+abstract class IP implements \Stringable
 {
     public $ip;
     public $cidr;
@@ -48,7 +49,7 @@ abstract class IP
 
         try {
             return self::parse($hex);
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             // ignore
         }
 
@@ -98,9 +99,7 @@ abstract class IP
         $hex = implode(
             ':',
             array_map(
-                function ($dec) {
-                    return sprintf('%02x', $dec);
-                },
+                fn ($dec) => sprintf('%02x', $dec),
                 explode(' ', (string) $snmpOid)
             )
         );
@@ -121,13 +120,13 @@ abstract class IP
     {
         try {
             return new IPv4($ip);
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             // ignore ipv4 failure and try ipv6
         }
 
         try {
             return new IPv6($ip);
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             if (! $ignore_errors) {
                 throw new InvalidIpException("$ip is not a valid IP address");
             }
@@ -197,6 +196,14 @@ abstract class IP
     }
 
     /**
+     * @return bool
+     */
+    public function isLinkLocal()
+    {
+        return false; // IPv4 has no concept of link local, overridden for IPv6
+    }
+
+    /**
      * Check if this IP is in the reserved range.
      *
      * @return bool
@@ -248,24 +255,28 @@ abstract class IP
         return $this->host_bits == 32 ? 'ipv4' : 'ipv6';
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         if ($this->cidr == $this->host_bits) {
-            return (string) $this->ip;
+            return (string) $this->compressed();
         }
 
-        return $this->ip . "/{$this->cidr}";
+        return $this->compressed() . "/{$this->cidr}";
     }
 
     /**
      * Extract an address from a cidr, assume a host is given if it does not contain /
      *
      * @param  string  $ip
-     * @return array [$ip, $cidr]
+     * @return array{0: string, 1: int} [$ip, $cidr]
      */
-    protected function extractCidr($ip)
+    protected function extractCidr($ip): array
     {
-        return array_pad(explode('/', $ip, 2), 2, $this->host_bits);
+        $parts = explode('/', $ip, 2);
+        $addr = $parts[0];
+        $cidr = $parts[1] ?? $this->host_bits;
+
+        return [$addr, (int) $cidr];
     }
 
     /**

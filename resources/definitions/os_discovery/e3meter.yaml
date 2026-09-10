@@ -1,0 +1,78 @@
+modules:
+    os:
+        version: NETTRACK-E3METER-CTR-SNMP-MIB::e3ConcentratorFWVersion
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: NETTRACK-E3METER-SNMP-MIB::e3IpmSensorEntry
+                    value: NETTRACK-E3METER-SNMP-MIB::e3IpmSensorTemperatureCelsius
+                    num_oid: '.1.3.6.1.4.1.21695.1.10.7.3.1.4.{{ $index }}'
+                    descr: 'Temperature {{ NETTRACK-E3METER-SNMP-MIB::e3IpmSensorVersion }}'
+                    index: '{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: NETTRACK-E3METER-SNMP-MIB::e3IpmSensorType
+                            op: '!='
+                            value: '1'
+                        -
+                            oid: NETTRACK-E3METER-SNMP-MIB::e3IpmSensorTemperatureCelsius
+                            op: '='
+                            value: '0'
+        frequency:
+            data:
+                -
+                    oid: NETTRACK-E3METER-SNMP-MIB::e3IpmMeterEntry
+                    value: NETTRACK-E3METER-SNMP-MIB::e3IpmFrequency
+                    num_oid: '.1.3.6.1.4.1.21695.1.10.7.2.1.10.{{ $index }}'
+                    descr: 'Frequency {{ NETTRACK-E3METER-SNMP-MIB::e3IpmChannelName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: NETTRACK-E3METER-SNMP-MIB::e3IpmFrequency
+                            op: '='
+                            value: '0'
+        power:
+            data:
+                -
+                    oid: NETTRACK-E3METER-SNMP-MIB::e3IpmMeterEntry
+                    value: NETTRACK-E3METER-SNMP-MIB::e3IpmPowerP
+                    num_oid: '.1.3.6.1.4.1.21695.1.10.7.2.1.5.{{ $index }}'
+                    descr: 'Power {{ NETTRACK-E3METER-SNMP-MIB::e3IpmChannelName }}'
+                    index: '{{ $index }}'
+                    skip_values:
+                        -
+                            oid: NETTRACK-E3METER-SNMP-MIB::e3IpmFrequency
+                            op: '='
+                            value: '0'
+        voltage:
+            data:
+                -
+                    oid: NETTRACK-E3METER-SNMP-MIB::e3IpmMeterEntry
+                    value: NETTRACK-E3METER-SNMP-MIB::e3IpmUrms
+                    num_oid: '.1.3.6.1.4.1.21695.1.10.7.2.1.8.{{ $index }}'
+                    descr: 'Voltage {{ NETTRACK-E3METER-SNMP-MIB::e3IpmChannelName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: NETTRACK-E3METER-SNMP-MIB::e3IpmFrequency
+                            op: '='
+                            value: '0'
+        current:
+            data:
+                -
+                    oid: NETTRACK-E3METER-SNMP-MIB::e3IpmMeterEntry
+                    value: NETTRACK-E3METER-SNMP-MIB::e3IpmIrms
+                    num_oid: '.1.3.6.1.4.1.21695.1.10.7.2.1.9.{{ $index }}'
+                    descr: 'Current {{ NETTRACK-E3METER-SNMP-MIB::e3IpmChannelName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: NETTRACK-E3METER-SNMP-MIB::e3IpmFrequency
+                            op: '='
+                            value: '0'
+

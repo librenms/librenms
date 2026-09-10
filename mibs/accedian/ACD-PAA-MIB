@@ -1,7 +1,7 @@
 --
 -- Accedian Enterprise Specific MIB
 --
--- Copyright (c) 2005-2009, Accedian Networks, Inc.
+-- Copyright (c) 2005-2016, Accedian Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -23,16 +23,30 @@ IMPORTS
 
 acdPaa MODULE-IDENTITY
 
-    LAST-UPDATED "201011100100Z"
+    LAST-UPDATED "201609230100Z"
     ORGANIZATION "Accedian Networks, Inc."
     CONTACT-INFO
             "Accedian Technical Assistance Center
              Accedian Networks, Inc.
-             4878 Levy, suite 202
-             Saint-Laurent, Quebec Canada H4R 2P1
+             2351 Alfred-Nobel blvd., Suite N-410
+             Saint-Laurent, Quebec Canada H4S 2A9
              E-mail: support@accedian.com"
     DESCRIPTION
             "PAA database for this Accedian Networks device."
+
+    REVISION "201609230100Z"        -- 23 September 2016
+    DESCRIPTION
+            "Add acdPaaHistResultID and acdPaaHistResultID
+             to acdPaaHistResultGroup."
+
+    REVISION "201605260100Z"        -- 26 May 2016
+    DESCRIPTION
+            "Set access level to read-only for acdPaaHistResultID,
+             acdPaaHistResultSampleIndex."
+
+    REVISION "201211060100Z"        -- 6 November 2012
+    DESCRIPTION
+            "Add Vlan and DSCP validation section."
 
     REVISION "201011100100Z"        -- 10 November 2010
     DESCRIPTION
@@ -196,7 +210,22 @@ AcdPaaResultEntry ::= SEQUENCE {
     acdPaaResultPktLossNeCurrNbrLoss       Unsigned32,
     acdPaaResultPktLossNePrevNbrLoss       Unsigned32,
     acdPaaResultPktLossFeCurrNbrLoss       Unsigned32,
-    acdPaaResultPktLossFePrevNbrLoss       Unsigned32
+    acdPaaResultPktLossFePrevNbrLoss       Unsigned32,
+    acdPaaResultVlan1IdMismatch		   Unsigned32,
+    acdPaaResultVlan1IdExpected		   Unsigned32,
+    acdPaaResultVlan1IdReceived		   Unsigned32,
+    acdPaaResultVlan2IdMismatch		   Unsigned32,
+    acdPaaResultVlan2IdExpected		   Unsigned32,
+    acdPaaResultVlan2IdReceived		   Unsigned32,
+    acdPaaResultVlan1PriorityMismatch	   Unsigned32,
+    acdPaaResultVlan1PriorityExpected	   Unsigned32,
+    acdPaaResultVlan1PriorityReceived	   Unsigned32,
+    acdPaaResultVlan2PriorityMismatch	   Unsigned32,
+    acdPaaResultVlan2PriorityExpected	   Unsigned32,
+    acdPaaResultVlan2PriorityReceived	   Unsigned32,
+    acdPaaResultDscpMismatch	 	   Unsigned32,
+    acdPaaResultDscpExpected	   	   Unsigned32,
+    acdPaaResultDscpReceived	   	   Unsigned32
 }
 
 acdPaaResultID  OBJECT-TYPE
@@ -1167,6 +1196,125 @@ acdPaaResultPktLossFePrevNbrLoss  OBJECT-TYPE
          This should be less or equal to acdPaaResultPktLossFePrevSamples."
     ::= { acdPaaResultEntry 109 }
 
+acdPaaResultVlan1IdMismatch  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of VLAN 1 ID mismatch detected."
+    ::= { acdPaaResultEntry 110 }
+
+acdPaaResultVlan1IdExpected  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the VLAN 1 ID expected value."
+    ::= { acdPaaResultEntry 111 }
+
+acdPaaResultVlan1IdReceived  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the VLAN 1 ID received value."
+    ::= { acdPaaResultEntry 112 }
+
+acdPaaResultVlan2IdMismatch  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of VLAN 2 ID mismatch detected."
+    ::= { acdPaaResultEntry 113 }
+
+acdPaaResultVlan2IdExpected  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the VLAN 2 ID expected value."
+    ::= { acdPaaResultEntry 114 }
+
+acdPaaResultVlan2IdReceived  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the VLAN 2 ID received value."
+    ::= { acdPaaResultEntry 115 }
+
+acdPaaResultVlan1PriorityMismatch  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of VLAN 1 priority mismatch detected."
+    ::= { acdPaaResultEntry 116 }
+
+acdPaaResultVlan1PriorityExpected  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the VLAN 1 priority expected value."
+    ::= { acdPaaResultEntry 117 }
+
+acdPaaResultVlan1PriorityReceived  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the VLAN 1 priority received value."
+    ::= { acdPaaResultEntry 118 }
+
+acdPaaResultVlan2PriorityMismatch  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of VLAN 2 priority mismatch detected."
+    ::= { acdPaaResultEntry 119 }
+
+acdPaaResultVlan2PriorityExpected  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the VLAN 2 priority expected value."
+    ::= { acdPaaResultEntry 120 }
+
+acdPaaResultVlan2PriorityReceived  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the VLAN 2 priority received value."
+    ::= { acdPaaResultEntry 121 }
+
+acdPaaResultDscpMismatch  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of DSCP mismatch detected."
+    ::= { acdPaaResultEntry 122 }
+
+acdPaaResultDscpExpected  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the DSCP expected value."
+    ::= { acdPaaResultEntry 123 }
+
+acdPaaResultDscpReceived  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the DSCP received value."
+    ::= { acdPaaResultEntry 124 }
 
 ---------------------------------------------------------------------------
  -- The PAA status table
@@ -1382,7 +1530,13 @@ AcdPaaUdpCfgEntry ::= SEQUENCE {
     acdPaaUdpCfgIgmpMaxLvDly            Unsigned32,
     acdPaaUdpCfgIgmpLvDlyThresh         Unsigned32,
     acdPaaUdpCfgIgmpLvAvgDlyThresh      Unsigned32,
-    acdPaaUdpCfgPktLossThreshExt        Unsigned32
+    acdPaaUdpCfgPktLossThreshExt        Unsigned32,
+    acdPaaUdpCfgVlan1PriorityValidation TruthValue,
+    acdPaaUdpCfgVlan1PriorityTxRxCoupling TruthValue,
+    acdPaaUdpCfgVlan1PriorityExpected     Unsigned32,
+    acdPaaUdpCfgDscpValidation 		  TruthValue,
+    acdPaaUdpCfgDscpTxRxCoupling          TruthValue,
+    acdPaaUdpCfgDscpExpected     	  Unsigned32
 }
 
 acdPaaUdpCfgID  OBJECT-TYPE
@@ -1712,6 +1866,56 @@ acdPaaUdpCfgPktLossThreshExt  OBJECT-TYPE
      DEFVAL      { 0 }
     ::= { acdPaaUdpCfgEntry 39 }
 
+acdPaaUdpCfgVlan1PriorityValidation  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of VLAN 1 priority validation."
+    ::= { acdPaaUdpCfgEntry 40 }
+
+acdPaaUdpCfgVlan1PriorityTxRxCoupling  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of VLAN 1 priority TX/RX coupling."
+    ::= { acdPaaUdpCfgEntry 41 }
+
+acdPaaUdpCfgVlan1PriorityExpected  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The expected VLAN 1 priority value."
+     DEFVAL      { 0 }
+    ::= { acdPaaUdpCfgEntry 42 }
+
+
+acdPaaUdpCfgDscpValidation  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of DSCP validation."
+    ::= { acdPaaUdpCfgEntry 43 }
+
+acdPaaUdpCfgDscpTxRxCoupling  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of DSCP TX/RX coupling."
+    ::= { acdPaaUdpCfgEntry 44 }
+
+acdPaaUdpCfgDscpExpected  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The expected VLAN 1 priority value."
+     DEFVAL      { 0 }
+    ::= { acdPaaUdpCfgEntry 45 }
 
 ---------------------------------------------------------------------------
  -- The L2 PAA configuration table
@@ -1770,7 +1974,20 @@ AcdPaaL2CfgEntry ::= SEQUENCE {
     acdPaaL2CfgOneWayAvgDelayThresh    Unsigned32,
     acdPaaL2CfgPeerID                  Unsigned32,
     acdPaaL2CfgOperationMode           Unsigned32,
-    acdPaaL2CfgPktLossThreshExt        Unsigned32
+    acdPaaL2CfgPktLossThreshExt        Unsigned32,
+    acdPaaL2CfgVlan1IdValidation       TruthValue,
+    acdPaaL2CfgVlan1IdTxRxCoupling     TruthValue,
+    acdPaaL2CfgVlan1IdExpected         Unsigned32,
+    acdPaaL2CfgVlan2IdValidation       TruthValue,
+    acdPaaL2CfgVlan2IdTxRxCoupling     TruthValue,
+    acdPaaL2CfgVlan2IdExpected         Unsigned32,
+    acdPaaL2CfgVlan1PriorityValidation   TruthValue,
+    acdPaaL2CfgVlan1PriorityTxRxCoupling TruthValue,
+    acdPaaL2CfgVlan1PriorityExpected     Unsigned32,
+    acdPaaL2CfgVlan2PriorityValidation   TruthValue,
+    acdPaaL2CfgVlan2PriorityTxRxCoupling TruthValue,
+    acdPaaL2CfgVlan2PriorityExpected     Unsigned32
+
 }
 
 acdPaaL2CfgID  OBJECT-TYPE
@@ -2058,6 +2275,107 @@ acdPaaL2CfgPktLossThreshExt  OBJECT-TYPE
      DEFVAL      { 0 }
     ::= { acdPaaL2CfgEntry 34 }
 
+
+acdPaaL2CfgVlan1IdValidation  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of VLAN 1 ID validation."
+    ::= { acdPaaL2CfgEntry 35 }
+
+acdPaaL2CfgVlan1IdTxRxCoupling  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of VLAN 1 ID Tx/Rx coupling."
+    ::= { acdPaaL2CfgEntry 36 }
+
+acdPaaL2CfgVlan1IdExpected  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The expected VLAN 1 ID value."
+     DEFVAL      { 0 }
+    ::= { acdPaaL2CfgEntry 37 }
+
+acdPaaL2CfgVlan2IdValidation  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of VLAN 2 ID validation."
+    ::= { acdPaaL2CfgEntry 38 }
+
+acdPaaL2CfgVlan2IdTxRxCoupling  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of VLAN 2 ID Tx/Rx coupling."
+    ::= { acdPaaL2CfgEntry 39 }
+
+acdPaaL2CfgVlan2IdExpected  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The expected VLAN 2 ID value."
+     DEFVAL      { 0 }
+    ::= { acdPaaL2CfgEntry 40 }
+
+acdPaaL2CfgVlan1PriorityValidation  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of VLAN 1 priority validation."
+    ::= { acdPaaL2CfgEntry 41 }
+
+acdPaaL2CfgVlan1PriorityTxRxCoupling  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of VLAN 1 priority Tx/Rx coupling."
+    ::= { acdPaaL2CfgEntry 42 }
+
+acdPaaL2CfgVlan1PriorityExpected  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The expected VLAN 1 priority value."
+     DEFVAL      { 0 }
+    ::= { acdPaaL2CfgEntry 43 }
+
+acdPaaL2CfgVlan2PriorityValidation  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of VLAN 2 priority validation."
+    ::= { acdPaaL2CfgEntry 44 }
+
+acdPaaL2CfgVlan2PriorityTxRxCoupling  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of VLAN 2 priority Tx/Rx coupling."
+    ::= { acdPaaL2CfgEntry 45 }
+
+acdPaaL2CfgVlan2PriorityExpected  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The expected VLAN 2 priority value."
+     DEFVAL      { 0 }
+    ::= { acdPaaL2CfgEntry 46 }
+
 ------------------------------------------------------------------------
  -- The PAA history Results table
  -- This table contains all PAA entry results.
@@ -2138,7 +2456,7 @@ AcdPaaHistResultEntry ::= SEQUENCE {
 
 acdPaaHistResultID  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Unique value for each PAA instance. Its value ranges from 1 to
@@ -2147,7 +2465,7 @@ acdPaaHistResultID  OBJECT-TYPE
 
 acdPaaHistResultSampleIndex  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "An index that uniquely identifies the particular sample this entry
@@ -2722,7 +3040,22 @@ acdPaaResultGroup OBJECT-GROUP
         acdPaaResultPktLossNeCurrNbrLoss,
         acdPaaResultPktLossNePrevNbrLoss,
         acdPaaResultPktLossFeCurrNbrLoss,
-        acdPaaResultPktLossFePrevNbrLoss
+        acdPaaResultPktLossFePrevNbrLoss,
+        acdPaaResultVlan1IdMismatch,
+        acdPaaResultVlan1IdExpected,
+        acdPaaResultVlan1IdReceived,
+        acdPaaResultVlan2IdMismatch,
+        acdPaaResultVlan2IdExpected,
+        acdPaaResultVlan2IdReceived,
+        acdPaaResultVlan1PriorityMismatch,
+        acdPaaResultVlan1PriorityExpected,
+        acdPaaResultVlan1PriorityReceived,
+        acdPaaResultVlan2PriorityMismatch,
+        acdPaaResultVlan2PriorityExpected,
+        acdPaaResultVlan2PriorityReceived,
+        acdPaaResultDscpMismatch,
+        acdPaaResultDscpExpected,
+        acdPaaResultDscpReceived
     }
     STATUS      current
     DESCRIPTION
@@ -2788,7 +3121,13 @@ acdPaaUdpCfgGroup OBJECT-GROUP
         acdPaaUdpCfgIgmpMaxLvDly,
         acdPaaUdpCfgIgmpLvDlyThresh,
         acdPaaUdpCfgIgmpLvAvgDlyThresh,
-        acdPaaUdpCfgPktLossThreshExt
+        acdPaaUdpCfgPktLossThreshExt,
+        acdPaaUdpCfgVlan1PriorityValidation,
+        acdPaaUdpCfgVlan1PriorityTxRxCoupling,
+        acdPaaUdpCfgVlan1PriorityExpected,
+        acdPaaUdpCfgDscpValidation,
+        acdPaaUdpCfgDscpTxRxCoupling,
+        acdPaaUdpCfgDscpExpected
     }
     STATUS      current
     DESCRIPTION
@@ -2829,7 +3168,19 @@ acdPaaL2CfgGroup OBJECT-GROUP
         acdPaaL2CfgOneWayAvgDelayThresh,
         acdPaaL2CfgPeerID,
         acdPaaL2CfgOperationMode,
-        acdPaaL2CfgPktLossThreshExt
+        acdPaaL2CfgPktLossThreshExt,
+	acdPaaL2CfgVlan1IdValidation,
+        acdPaaL2CfgVlan1IdTxRxCoupling,
+        acdPaaL2CfgVlan1IdExpected,
+        acdPaaL2CfgVlan2IdValidation,
+        acdPaaL2CfgVlan2IdTxRxCoupling,
+        acdPaaL2CfgVlan2IdExpected,
+        acdPaaL2CfgVlan1PriorityValidation,
+        acdPaaL2CfgVlan1PriorityTxRxCoupling,
+        acdPaaL2CfgVlan1PriorityExpected,
+        acdPaaL2CfgVlan2PriorityValidation,
+        acdPaaL2CfgVlan2PriorityTxRxCoupling,
+        acdPaaL2CfgVlan2PriorityExpected
     }
     STATUS      current
     DESCRIPTION
@@ -2838,6 +3189,8 @@ acdPaaL2CfgGroup OBJECT-GROUP
 
 acdPaaHistResultGroup OBJECT-GROUP
     OBJECTS {
+        acdPaaHistResultID,
+        acdPaaHistResultSampleIndex,
         acdPaaHistResultStatus,
         acdPaaHistResultDuration,
         acdPaaHistResultIntervalEnd,

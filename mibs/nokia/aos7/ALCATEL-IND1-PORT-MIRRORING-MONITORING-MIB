@@ -9,44 +9,40 @@ IMPORTS
         OBJECT-GROUP,
         NOTIFICATION-GROUP             FROM SNMPv2-CONF
         TEXTUAL-CONVENTION,
+        TruthValue,
         RowStatus                      FROM SNMPv2-TC
         SnmpAdminString                FROM SNMP-FRAMEWORK-MIB
         InterfaceIndex                 FROM IF-MIB
         softentIND1PortMirroringMonitoring              FROM ALCATEL-IND1-BASE
         sFlowFsEntry,
-        sFlowCpEntry                   FROM SFLOW-MIB
+        sFlowCpEntry,
+        SFlowInstance                  FROM SFLOW-MIB
         InetAddress,
         InetAddressType                FROM INET-ADDRESS-MIB;
 
 
         alcatelIND1PortMirrorMonitoringMIB MODULE-IDENTITY
-                LAST-UPDATED "200704030000Z"
-                ORGANIZATION "Alcatel-Lucent"
-                CONTACT-INFO
-            "Please consult with Customer Service to ensure the most appropriate
-             version of this document is used with the products in question:
+            LAST-UPDATED "201911270000Z"
+            ORGANIZATION "ALE USA Inc."
+            CONTACT-INFO
+             "Please consult with Customer Service to ensure the most appropriate
+              version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+                              ALE USA Inc. Enterprise
+                                26801 West Agoura Road
+                             Agoura Hills, CA  91301-5122
+                               United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+             Telephone:          +1 800 995 2696
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+             Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+             World Wide Web:     https://www.al-enterprise.com"
 
                 DESCRIPTION
                         "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  Port Mirroring and Monitoring for mirroring/monitoring session control
 
              The right to make changes in specification and other information
@@ -60,10 +56,15 @@ IMPORTS
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                       Copyright (C) ALE USA Inc. 2014-2019
+                       Copyright (C) 1995-2013 Alcatel-Lucent
+                           ALL RIGHTS RESERVED WORLDWIDE"
 
-                REVISION      "200704030000Z"
+        REVISION      "201911270000Z"
+        DESCRIPTION
+            "Updated the latest contact and Copyright information for ALE USA Inc."
+
+        REVISION      "200704030000Z"
         DESCRIPTION
             "Addressing discrepancies with Alcatel Standard."
                 ::= { softentIND1PortMirroringMonitoring 1}
@@ -151,7 +152,9 @@ MirrorEntry ::= SEQUENCE {
         mirrorSessOperStatus
                 INTEGER,
         mirrorTaggedVLAN
-                Integer32
+                Integer32,
+        mirrorModeLoopback
+                INTEGER
         }
 
 mirrorSessionNumber OBJECT-TYPE
@@ -252,6 +255,19 @@ mirrorTaggedVLAN OBJECT-TYPE
                 "A VLAN identifier which specifies the VLAN identifier that must used to tag the mirrored packets going
 out of the MTP for remote port mirroring .Value 0 indicates this parameter is not set"
            ::= { mirrorEntry 9 }
+
+mirrorModeLoopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable (1),
+                disable (2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                 "To enable loopback mechanism on the destination port of the respective	 
+                  remote port mirroring session. To disable the loopback mechanism, remove the session completely. "	 
+    DEFVAL  { disable }
+            ::= { mirrorEntry 10 }
 
 -- xxxxxxxxxxxxxxxxxxx
 -- Mirror Source Table
@@ -378,7 +394,9 @@ MirrorDstEntry ::= SEQUENCE {
         mirrorDstAdminStatus
                 INTEGER,
         mirrorDstRowStatus
-                RowStatus
+                RowStatus,
+        mirrorDstTagRemove
+                TruthValue
         }
 
 mirrorDstMirroringIf  OBJECT-TYPE
@@ -421,6 +439,15 @@ mirrorDstRowStatus OBJECT-TYPE
                         "The status of this table entry.Row Status to control creation,
                         modification and deletion of this entry. "
            ::= { mirrorDstEntry 4 }
+
+mirrorDstTagRemove OBJECT-TYPE
+        SYNTAX  TruthValue
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                        "The mirroring tag-remove value of this mirrored destination."
+                DEFVAL  { false }
+           ::= { mirrorDstEntry 5 }
 
 -- End of Mirror Destination Table
 
@@ -984,7 +1011,108 @@ mirrorUnlikeNi  NOTIFICATION-TYPE
                   agent over extended periods of time so that a history can
                   be maintained."
            ::= { mirmonSFlowObjects 5 }
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Flow Sampling Ext Table 
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      alasFlowFsExtTable OBJECT-TYPE
+              SYNTAX      SEQUENCE OF AlaSFlowFsExtEntry
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                "A table of the flow samplers within a device."
+              ::= { mirmonSFlowObjects 6 }
 
+      alasFlowFsExtEntry OBJECT-TYPE
+              SYNTAX      AlaSFlowFsExtEntry
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                "Attributes of a flow sampler."
+              INDEX { alasFlowFsInstance }
+              ::= { alasFlowFsExtTable 1 }
+
+      AlaSFlowFsExtEntry ::= SEQUENCE {
+              alasFlowFsInstance            SFlowInstance,
+              alasFlowFsRate            Integer32,
+              alasFlowFsRateRowStatus        RowStatus
+              }
+
+       alasFlowFsInstance OBJECT-TYPE
+           SYNTAX      SFlowInstance
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+                 "Flow samplers instance"
+           ::= { alasFlowFsExtEntry 1 }
+
+       alasFlowFsRate OBJECT-TYPE
+           SYNTAX      Integer32 
+           MAX-ACCESS  read-create
+           STATUS      current
+           DESCRIPTION
+                 "Flow samplers rate"
+           ::= { alasFlowFsExtEntry 2 }
+
+        alasFlowFsRateRowStatus OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                        "The status of this table entry.Row Status to control creation,
+                        modification and deletion of this entry. "
+           ::= { alasFlowFsExtEntry 3 }     
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--        SFLOW EXTENDED SWITCH/ROUTER/GATEWAY OBJECTS (RFC 3176)
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+       alasFlowExtendedSwitch OBJECT-TYPE
+           SYNTAX  INTEGER {
+                enabled (1),
+                disabled  (2)
+           }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+                "Indicates whether extended switch data sampling is enabled or disabled in the sFlow record.
+                 When enabled (1), additional extended switch data is included in the sFlow record. 
+                 When disabled (2), extended switch data is not included."
+           DEFVAL  { enabled }                 
+           ::= { mirmonSFlowObjects 7 }
+
+       alasFlowExtendedRouter OBJECT-TYPE
+           SYNTAX  INTEGER {
+                enabled (1),
+                disabled  (2)
+           }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+                "Indicates whether extended router data sampling is enabled or disabled in the sFlow record.
+                 When enabled (1), additional extended router data is included in the sFlow record. 
+                 When disabled (2), extended router data is not included."
+           DEFVAL  { disabled }                 
+           ::= { mirmonSFlowObjects 8 }
+                  
+ -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        mirmonGlobalConfig    OBJECT IDENTIFIER ::= { alcatelIND1PortMirMonMIBObjects 5 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        mirrorTrafficPriority OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        normal(1),
+                        high(2)
+            }
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "To set priority for mirroring traffic."
+            DEFVAL  { normal }
+            ::= {  mirmonGlobalConfig 1}
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- COMPLIANCE
@@ -1028,8 +1156,9 @@ mirrorUnlikeNi  NOTIFICATION-TYPE
                         mirrorSrcOperStatus,
                         mirrorDstOperStatus,
                         mirrorDstAdminStatus,
-                        mirrorDstRowStatus
-
+                        mirrorDstRowStatus,
+                        mirrorDstTagRemove,
+                        mirrorTrafficPriority
 
         }
         STATUS  current
@@ -1098,7 +1227,9 @@ mirrorUnlikeNi  NOTIFICATION-TYPE
         OBJECTS {
             alasFlowAgentAddress ,
             alasFlowAgentAddressType ,
-            alasFlowAgentConfigType
+            alasFlowAgentConfigType,
+            alasFlowExtendedSwitch,
+            alasFlowExtendedRouter
         }
         STATUS  current
         DESCRIPTION
@@ -1115,7 +1246,8 @@ mirrorUnlikeNi  NOTIFICATION-TYPE
                 mirrorRowStatus ,
                 mirrorDirection ,
                 mirrorSessOperStatus ,
-                mirrorTaggedVLAN
+                mirrorTaggedVLAN,
+                mirrorModeLoopback
         }
         STATUS  current
         DESCRIPTION
@@ -1134,11 +1266,21 @@ mirrorUnlikeNi  NOTIFICATION-TYPE
 
     portSFlowFsGroup OBJECT-GROUP
         OBJECTS {
-              alasFlowFsDeleteEntry
+              alasFlowFsDeleteEntry,
+              alasFlowFsRate
               }
         STATUS  current
         DESCRIPTION
             "Collection of objects for sFlow Fs configuration."
         ::= { alcatelIND1PortMirMonMIBGroups 8 }
 
+    portSFlowFsExtGroup OBJECT-GROUP
+        OBJECTS {
+              alasFlowFsRate,
+              alasFlowFsRateRowStatus
+              }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for sFlow Fs configuration."
+        ::= { alcatelIND1PortMirMonMIBGroups 9 }
 END

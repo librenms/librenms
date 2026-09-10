@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ifotec.inc.php
  *
@@ -23,7 +24,7 @@
  * @author     Cedric MARMONIER
  */
 if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
-    $pre_cache['ifoSysProductIndex'] = snmp_get($device, 'ifoSysProductIndex.0', '-Oqv', 'IFOTEC-SMI');
+    $pre_cache['ifoSysProductIndex'] = SnmpQuery::get('IFOTEC-SMI::ifoSysProductIndex.0')->value();
 
     if ($pre_cache['ifoSysProductIndex'] != null) {
         $virtual_tables = [
@@ -39,7 +40,10 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
 
         // .ifoTemperatureTable.ifoTemperatureEntry.<ifoSysProductIndex>
         $data = snmp_walk($device, 'ifoTemperatureEntry', '-OQn', 'IFOTEC-SMI');
-        foreach (explode(PHP_EOL, $data) as $line) {
+        foreach (explode(PHP_EOL, (string) $data) as $line) {
+            if (! Str::contains($line, ' = ')) {
+                continue;
+            }
             [$oid, $value] = explode(' = ', $line);
 
             $processed = false;

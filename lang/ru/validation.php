@@ -155,7 +155,6 @@ return [
     'alpha_space' => 'Поле :attribute может содержать только буквы, цифры, подчеркивания и пробелы.',
     'ip_or_hostname' => 'Поле :attribute должно быть действительным IP адресом/сетью или именем хоста.',
     'is_regex' => 'Поле :attribute не является действительным регулярным выражением',
-    'keys_in' => 'Поле :attribute содержит недопустимые ключи: :extra. Допустимые ключи: :values',
 
     /*
     |--------------------------------------------------------------------------
@@ -202,13 +201,14 @@ return [
     'validations' => [
         'rrd' => [
             'CheckRrdVersion' => [
-                'fail' => 'Версия rrdtool, которую вы указали, новее установленной. Конфигурация: :config_version Установлено: :installed_version',
+                'fail' => 'Версия rrdtool :installed_version слишком стара, LibreNMS требует минимальную версию 1.5.5',
+                'fail_config' => 'Указанная вами версия rrdtool_version :config_version слишком стара, LibreNMS требует минимальную версию 1.5.5',
                 'fix' => 'Закомментируйте или удалите $config[\'rrdtool_version\'] = \':version\'; из вашего файла config.php',
                 'ok' => 'Версия rrdtool в порядке',
             ],
             'CheckRrdcachedConnectivity' => [
                 'fail_socket' => ':socket, похоже, не существует, тест соединения с rrdcached не удался',
-                'fail_port' => 'Не удается подключиться к серверу rrdcached на порту :port',
+                'fail_port' => 'Не удается подключиться к серверу rrdcached :server на порту :port',
                 'ok' => 'Подключено к rrdcached',
             ],
             'CheckRrdDirPermissions' => [
@@ -291,7 +291,7 @@ return [
                 'not_detected' => 'Запись cron для обертки Python не присутствует',
             ],
             'CheckRedis' => [
-                'bad_driver' => 'Используется :driver для блокировки, вы должны установить CACHE_DRIVER=redis',
+                'bad_driver' => 'Используется :driver для блокировки, вы должны установить CACHE_STORE=redis',
                 'ok' => 'Redis функционирует',
                 'unavailable' => 'Redis недоступен',
             ],

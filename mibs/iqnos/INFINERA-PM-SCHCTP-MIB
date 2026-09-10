@@ -1,0 +1,467 @@
+-- *****************************************************************
+-- INFINERA-PM-SCHCTP-MIB
+--
+-- October 2013, Rishab Joshi
+--
+--
+-- Copyright (c) 2008-2013 by Infinera Inc.
+-- All rights reserved.
+-- ****************************************************************
+
+INFINERA-PM-SCHCTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32                                   FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF
+    TruthValue                                  FROM SNMPv2-TC
+    ifIndex                                     FROM IF-MIB
+    FloatHundredths, FloatArbitraryPrecision    FROM INFINERA-TC-MIB
+    perfMon                                     FROM INFINERA-REG-MIB;
+
+
+schCtpPmMIB MODULE-IDENTITY
+    LAST-UPDATED  "201310080000Z"
+    ORGANIZATION  "Infinera"
+    CONTACT-INFO
+        "Infinera
+        1322 Bordeaux Drive
+        Sunnyvale, CA - 94089
+
+        Contact : Technical Support
+        Email   : support@infinera.com
+        Phone   : 1-877-INF-5288"
+    DESCRIPTION
+        " "
+    REVISION      "201310080000Z"
+    DESCRIPTION
+        "First Version"
+    ::= { perfMon 38 }
+
+
+schCtpPmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SchCtpPmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of SchCtpPm entries. Each entry is uniquely identified by the value of ifIndex."
+    ::= { schCtpPmMIB 2 }
+
+schCtpPmEntry  OBJECT-TYPE
+    SYNTAX      SchCtpPmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A SchCtp entry containing historical performance information pertaining to Infinera LM SCH CTP interfaces.
+        This table is a subclass of IfCommon. Entries will exist in this table only for interfaces
+        of type SCHCTP."
+    INDEX { ifIndex, schCtpPmSampleDuration, schCtpPmTimestamp}
+    ::= { schCtpPmTable 1 }
+
+
+SchCtpPmEntry  ::= SEQUENCE {
+	schCtpPmTimestamp		Integer32,
+	schCtpPmSampleDuration	INTEGER,
+    schCtpPmValidity      TruthValue,
+    schCtpPmChanSchOptMin FloatHundredths,
+    schCtpPmChanSchOptMax FloatHundredths,
+    schCtpPmChanSchOptAve FloatHundredths,
+    schCtpPmPmdMin        FloatArbitraryPrecision,
+    schCtpPmPmdMax        FloatArbitraryPrecision,
+    schCtpPmPmdAve        FloatArbitraryPrecision,
+    schCtpPmSoPmdMin      FloatArbitraryPrecision,
+    schCtpPmSoPmdMax      FloatArbitraryPrecision,
+    schCtpPmSoPmdAve      FloatArbitraryPrecision,
+    schCtpPmSchOptMin               FloatHundredths,
+    schCtpPmSchOptMax               FloatHundredths,
+    schCtpPmSchOptAve               FloatHundredths,
+    schCtpPmSchEstimatedSpanOptMin  FloatHundredths,
+    schCtpPmSchEstimatedSpanOptMax  FloatHundredths,
+    schCtpPmSchEstimatedSpanOptAve  FloatHundredths,
+    schCtpPmSchTargetSpanOptMin     FloatHundredths,
+    schCtpPmSchTargetSpanOptMax     FloatHundredths,
+    schCtpPmSchTargetSpanOptAve     FloatHundredths,
+    schCtpPmSchOprMin               FloatHundredths,
+    schCtpPmSchOprMax               FloatHundredths,
+    schCtpPmSchOprAve               FloatHundredths,
+    schCtpPmSchTxSnrMin             FloatArbitraryPrecision,
+    schCtpPmSchTxSnrMax             FloatArbitraryPrecision,
+    schCtpPmSchTxSnrAve             FloatArbitraryPrecision
+}
+
+schCtpPmTimestamp OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "End Time stamp for this interval. If this time is later than the current time,then the data for this bucket is currently being collected."
+    ::= { schCtpPmEntry  1 }
+
+schCtpPmSampleDuration OBJECT-TYPE
+    SYNTAX      INTEGER {
+        fifteenMinutes(1),
+        day(2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The duration of this sample."
+    ::= { schCtpPmEntry  2 }
+
+schCtpPmValidity OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Flag indicating if data was valid for the entire interval"
+    ::= { schCtpPmEntry  3 }
+
+
+schCtpPmChanSchOptMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum SCH optical power."
+    ::= { schCtpPmEntry  4}
+
+
+schCtpPmChanSchOptMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum SCH optical power."
+    ::= { schCtpPmEntry  5}
+
+
+schCtpPmChanSchOptAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average SCH optical power."
+    ::= { schCtpPmEntry  6}
+
+
+schCtpPmPmdMin OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum Pmd."
+    ::= { schCtpPmEntry  7 }
+
+schCtpPmPmdMax OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum Pmd."
+    ::= { schCtpPmEntry  8 }
+
+schCtpPmPmdAve OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average Pmd."
+    ::= { schCtpPmEntry  9 }
+
+schCtpPmSoPmdMin OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum SoPmd."
+    ::= { schCtpPmEntry  10 }
+
+schCtpPmSoPmdMax OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum SoPmd."
+    ::= { schCtpPmEntry  11 }
+
+schCtpPmSoPmdAve OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average SoPmd."
+    ::= { schCtpPmEntry  12 }
+
+schCtpPmSchOptMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum SchOpt"
+    ::= { schCtpPmEntry  13 }
+
+schCtpPmSchOptMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum SchOpt"
+    ::= { schCtpPmEntry  14 }
+
+schCtpPmSchOptAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average SchOpt"
+    ::= { schCtpPmEntry  15 }
+
+schCtpPmSchEstimatedSpanOptMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum SchEstimatedSpanOpt"
+    ::= { schCtpPmEntry  16 }
+
+schCtpPmSchEstimatedSpanOptMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum SchEstimatedSpanOpt"
+    ::= { schCtpPmEntry  17 }
+
+schCtpPmSchEstimatedSpanOptAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average SchEstimatedSpanOpt"
+    ::= { schCtpPmEntry  18 }
+
+schCtpPmSchTargetSpanOptMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum SchTargetSpanOpt"
+    ::= { schCtpPmEntry  19 }
+
+schCtpPmSchTargetSpanOptMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum SchTargetSpanOpt"
+    ::= { schCtpPmEntry  20 }
+
+schCtpPmSchTargetSpanOptAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average SchTargetSpanOpt"
+    ::= { schCtpPmEntry  21 }
+
+schCtpPmSchOprMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum SchOpr"
+    ::= { schCtpPmEntry  22 }
+
+schCtpPmSchOprMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum SchOpr"
+    ::= { schCtpPmEntry  23 }
+
+schCtpPmSchOprAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average SchOpr"
+    ::= { schCtpPmEntry  24 }
+
+schCtpPmSchTxSnrMin OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Opt SNR Min value."
+    ::= { schCtpPmEntry  25 }
+
+schCtpPmSchTxSnrMax OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Opt SNR Max value."
+    ::= { schCtpPmEntry  26 }
+
+schCtpPmSchTxSnrAve OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Opt SNR Ave value."
+    ::= { schCtpPmEntry  27 }
+
+schCtpPmRealTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SchCtpPmRealEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of SchCtpPmReal entries. Each entry is uniquely identified by the value of ifIndex."
+    ::= { schCtpPmMIB 1 }
+
+schCtpPmRealEntry  OBJECT-TYPE
+    SYNTAX      SchCtpPmRealEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A SchCtp entry containing real-time performance information pertaining to Infinera
+        SCHCTP interfaces. This table is a subclass of IfCommon."
+    INDEX { ifIndex }
+    ::= { schCtpPmRealTable 1 }
+
+
+SchCtpPmRealEntry  ::= SEQUENCE {
+    schCtpPmRealChanSchOpt            FloatHundredths,
+    schCtpPmRealPmd                   FloatArbitraryPrecision,
+    schCtpPmRealSoPmd                 FloatArbitraryPrecision,
+    schCtpPmRealSchOpt                FloatHundredths,
+    schCtpPmRealSchEstimatedSpanOpt   FloatHundredths,
+    schCtpPmRealSchTargetSpanOpt      FloatHundredths,
+    schCtpPmRealSchOpr                FloatHundredths,
+    schCtpPmRealLastPollTimeStampOpt  INTEGER,
+    schCtpPmRealLastPollTimeStampOpr  INTEGER,
+    schCtpPmRealSchTxSnr              FloatArbitraryPrecision
+}
+
+schCtpPmRealChanSchOpt OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total SCH optical power leaving."
+    ::= { schCtpPmRealEntry  1 }
+
+schCtpPmRealPmd OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Pmd"
+    ::= { schCtpPmRealEntry  2 }
+
+schCtpPmRealSoPmd OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SoPmd"
+    ::= { schCtpPmRealEntry  3 }
+
+schCtpPmRealSchOpt OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SchOpt"
+    ::= { schCtpPmRealEntry  4 }
+
+schCtpPmRealSchEstimatedSpanOpt OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SchEstimatedSpanOpt"
+    ::= { schCtpPmRealEntry  5 }
+
+schCtpPmRealSchTargetSpanOpt OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SchTargetSpanOpt"
+    ::= { schCtpPmRealEntry  6 }
+
+schCtpPmRealSchOpr OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SchOpr"
+    ::= { schCtpPmRealEntry  7 }
+
+schCtpPmRealLastPollTimeStampOpt OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "LastPollTimeStampOpt"
+    ::= { schCtpPmRealEntry  8 }
+
+schCtpPmRealLastPollTimeStampOpr OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "LastPollTimeStampOpr"
+    ::= { schCtpPmRealEntry  9 }
+
+schCtpPmRealSchTxSnr OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Opt SNR"
+    ::= { schCtpPmRealEntry  10 }
+
+
+
+-- Conformance Statements
+schCtpPmConformance    OBJECT IDENTIFIER ::= { schCtpPmMIB 3 }
+schCtpPmCompliances    OBJECT IDENTIFIER ::= { schCtpPmConformance 1 }
+schCtpPmGroups         OBJECT IDENTIFIER ::= { schCtpPmConformance 2 }
+
+schCtpPmCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+    "Describes the requirements for conformance to the SCHCTP-MIB"
+    MODULE
+        MANDATORY-GROUPS { schCtpPmGroup }
+    ::= { schCtpPmCompliances 1 }
+
+schCtpPmRealCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+    "Describes the requirements for conformance to the SchCtpPmReal-MIB"
+    MODULE
+        MANDATORY-GROUPS { schCtpPmRealGroup }
+    ::= { schCtpPmCompliances 2 }
+
+schCtpPmGroup OBJECT-GROUP
+    OBJECTS {
+        schCtpPmValidity,
+        schCtpPmChanSchOptMin,
+        schCtpPmChanSchOptMax,
+        schCtpPmChanSchOptAve,
+        schCtpPmPmdMin,
+        schCtpPmPmdMax,
+        schCtpPmPmdAve,
+        schCtpPmSoPmdMin,
+        schCtpPmSoPmdMax,
+        schCtpPmSoPmdAve,
+        schCtpPmSchOptMin,
+        schCtpPmSchOptMax,
+        schCtpPmSchOptAve,
+        schCtpPmSchEstimatedSpanOptMin,
+        schCtpPmSchEstimatedSpanOptMax,
+        schCtpPmSchEstimatedSpanOptAve,
+        schCtpPmSchTargetSpanOptMin,
+        schCtpPmSchTargetSpanOptMax,
+        schCtpPmSchTargetSpanOptAve,
+        schCtpPmSchOprMin,
+        schCtpPmSchOprMax,
+        schCtpPmSchOprAve,
+        schCtpPmSchTxSnrMin,
+        schCtpPmSchTxSnrMax,
+        schCtpPmSchTxSnrAve
+    }
+    STATUS current
+    DESCRIPTION
+        " A collection of objects for reading the historical performance of the SchCtp."
+    ::= { schCtpPmGroups 1 }
+
+schCtpPmRealGroup OBJECT-GROUP
+    OBJECTS {
+        schCtpPmRealChanSchOpt,
+        schCtpPmRealPmd,
+        schCtpPmRealSoPmd,
+        schCtpPmRealSchOpt,
+        schCtpPmRealSchEstimatedSpanOpt,
+        schCtpPmRealSchTargetSpanOpt,
+        schCtpPmRealSchOpr,
+        schCtpPmRealLastPollTimeStampOpt,
+        schCtpPmRealLastPollTimeStampOpr,
+        schCtpPmRealSchTxSnr
+    }
+    STATUS current
+    DESCRIPTION
+        " A collection of objects for reading the real-time performance of the SchCtp."
+    ::= { schCtpPmGroups 2 }
+
+END
+

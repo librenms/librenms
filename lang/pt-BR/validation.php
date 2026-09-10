@@ -156,7 +156,6 @@ return [
     'alpha_space' => 'O campo :attribute pode conter apenas letras, números, sublinhados e espaços.',
     'ip_or_hostname' => 'O campo :attribute deve ser um endereço IP/rede ou nome de host válido.',
     'is_regex' => 'O campo :attribute não é uma expressão regular válida',
-    'keys_in' => 'O campo :attribute contém chaves inválidas: :extra. Chaves válidas: :values',
 
     /*
     |--------------------------------------------------------------------------
@@ -203,13 +202,14 @@ return [
     'validations' => [
         'rrd' => [
             'CheckRrdVersion' => [
-                'fail' => 'A versão do rrdtool especificada é mais recente do que a instalada. Config: :config_version Instalado: :installed_version',
+                'fail' => 'A versão do rrdtool :installed_version é muito antiga, o LibreNMS requer uma versão mínima de 1.5.5',
+                'fail_config' => 'A rrdtool_version :config_version que você especificou é muito antiga, o LibreNMS requer uma versão mínima de 1.5.5',
                 'fix' => 'Comente ou exclua $config[\'rrdtool_version\'] = \':version\'; do seu arquivo config.php',
                 'ok' => 'Versão do rrdtool ok',
             ],
             'CheckRrdcachedConnectivity' => [
                 'fail_socket' => ':socket não parece existir, teste de conectividade do rrdcached falhou',
-                'fail_port' => 'Não é possível conectar ao servidor rrdcached na porta :port',
+                'fail_port' => 'Não é possível conectar ao servidor rrdcached :server na porta :port',
                 'ok' => 'Conectado ao rrdcached',
             ],
             'CheckRrdDirPermissions' => [
@@ -292,7 +292,7 @@ return [
                 'not_detected' => 'A entrada cron do wrapper Python não está presente',
             ],
             'CheckRedis' => [
-                'bad_driver' => 'Usando :driver para bloqueio, você deve definir CACHE_DRIVER=redis',
+                'bad_driver' => 'Usando :driver para bloqueio, você deve definir CACHE_STORE=redis',
                 'ok' => 'Redis está funcional',
                 'unavailable' => 'Redis está indisponível',
             ],

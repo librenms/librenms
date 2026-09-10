@@ -12,7 +12,7 @@ class StpObserver
     /**
      * Handle the Stp "updating" event.
      *
-     * @param  \App\Models\Stp  $stp
+     * @param  Stp  $stp
      * @return void
      */
     public function updating(Stp $stp)
@@ -25,8 +25,8 @@ class StpObserver
             Eventlog::log('STP root port changed: ' . $stp->getOriginal('rootPort') . ' > ' . $stp->rootPort, $stp->device_id, 'stp', Severity::Warning);
         }
 
-        if ($stp->isDirty('rootPort')) {
-            $time = Time::formatInterval((int) $stp->timeSinceTopologyChange);
+        if ($stp->isDirty('timeSinceTopologyChange') && $stp->timeSinceTopologyChange < $stp->getOriginal('timeSinceTopologyChange')) {
+            $time = Time::formatInterval((int) $stp->getOriginal('timeSinceTopologyChange'));
             Eventlog::log('STP topology changed after: ' . $time, $stp->device_id, 'stp', Severity::Warning);
         }
     }

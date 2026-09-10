@@ -11,6 +11,8 @@
  * the source code distribution for details.
  */
 
+use Illuminate\Support\Facades\Gate;
+
 $no_refresh = true;
 
 $pagetitle[] = 'Device Dependencies';
@@ -56,7 +58,7 @@ var grid = $("#hostdeps").bootgrid({
     templates: {
         header: '<div id="{{ctx.id}}" class="{{css.header}}"> \
                     <div class="row"> \
-<?php if (Auth::user()->hasGlobalAdmin()) { ?>
+<?php if (Gate::allows('update', DeviceCache::getPrimary())) { ?>
                         <div class="col-sm-8 actionBar"> \
                             <span class="pull-left"> \
                             <button type="button" class="btn btn-primary btn-sm command-manage" data-toggle="modal" data-target="#manage-dependencies" data-template_id="">Manage Device Dependencies</button> \
@@ -73,6 +75,7 @@ var grid = $("#hostdeps").bootgrid({
             var content = document.createElement('div');
             content.style.whiteSpace = "nowrap";
 
+            <?php if (Gate::allows('device.update')) { ?>
             var edit_button = document.createElement('button');
             edit_button.setAttribute('type', 'button');
             edit_button.setAttribute('class', 'btn btn-primary btn-sm command-edit');
@@ -90,7 +93,9 @@ var grid = $("#hostdeps").bootgrid({
             content.appendChild(edit_button);
 
             content.appendChild(document.createTextNode(' '))
+            <?php } ?>
 
+            <?php if (Gate::allows('device.delete')) { ?>
             var delete_button = document.createElement('button');
             delete_button.setAttribute('type', 'button');
             delete_button.setAttribute('class', 'btn btn-danger btn-sm command-delete');
@@ -107,6 +112,7 @@ var grid = $("#hostdeps").bootgrid({
             delete_button_label.setAttribute('aria-hidden', 'true');
             delete_button.appendChild(delete_button_label);
             content.appendChild(delete_button)
+            <?php } ?>
 
             return content.outerHTML;
         },

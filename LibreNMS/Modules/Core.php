@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Core.php
  *
@@ -25,14 +26,18 @@
 
 namespace LibreNMS\Modules;
 
+use App\Events\OsChangedEvent;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
+use App\Observers\DeviceObserver;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Compare;
@@ -51,53 +56,53 @@ class Core implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+        return $connectivity->snmpIsAvailable();
     }
 
     public function discover(OS $os): void
     {
-        $snmpdata = SnmpQuery::numeric()->get(['SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysName.0'])
-            ->values();
+        $snmpdata = SnmpQuery::numeric()->get([
+            'SNMPv2-MIB::sysObjectID.0',
+            'SNMPv2-MIB::sysDescr.0',
+            'SNMPv2-MIB::sysName.0',
+        ])->values();
+
+        $snmp_engine = SnmpQuery::get('SNMP-FRAMEWORK-MIB::snmpEngineID.0')->value();
 
         $device = $os->getDevice();
         $device->fill([
             'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? null,
             'sysName' => $snmpdata['.1.3.6.1.2.1.1.5.0'] ?? null,
             'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? null,
+            'snmpEngineID' => $snmp_engine,
         ]);
 
-        foreach ($device->getDirty() as $attribute => $value) {
-            Eventlog::log($value . ' -> ' . $device->$attribute, $device, 'system', Severity::Notice);
-            $os->getDeviceArray()[$attribute] = $value; // update device array
+        foreach (['sysObjectID', 'sysName', 'sysDescr', 'snmpEngineID'] as $attribute) {
+            if ($device->isDirty($attribute)) {
+                Log::debug(DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)));
+                $os->getDeviceArray()[$attribute] = $device->$attribute; // update device array
+            }
         }
 
         // detect OS
         $device->os = self::detectOS($device, false);
 
+        // Set type to a predefined type for the OS if it's not user set (still could be overridden later by os discovery)
+        if (! $device->getAttrib('override_device_type')) {
+            $device->type = LibrenmsConfig::getOsSetting($device->os, 'type');
+            $os->getDeviceArray()['type'] = $device->type;
+        }
+
         if ($device->isDirty('os')) {
-            Eventlog::log('Device OS changed: ' . $device->getOriginal('os') . ' -> ' . $device->os, $device, 'system', Severity::Notice);
-            $os->getDeviceArray()['os'] = $device->os;
-
-            Log::info('OS Changed ');
+            OsChangedEvent::dispatch($device);
         }
-
-        // Set type to a predefined type for the OS if it's not already set
-        $loaded_os_type = Config::get("os.$device->os.type");
-        if (! $device->getAttrib('override_device_type') && $loaded_os_type != $device->type) {
-            $device->type = $loaded_os_type;
-            Log::debug("Device type changed to $loaded_os_type!");
-        }
-
-        $device->save();
-
-        Log::notice('OS: ' . Config::getOsSetting($device->os, 'text') . " ($device->os)\n");
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+        return $connectivity->snmpIsAvailable();
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void
@@ -170,7 +175,7 @@ class Core implements Module
         ];
 
         // check yaml files
-        $os_defs = Config::get('os');
+        $os_defs = LibrenmsConfig::get('os');
 
         foreach ($os_defs as $os => $def) {
             if (isset($def['discovery']) && ! in_array($os, $generic_os)) {
@@ -206,7 +211,7 @@ class Core implements Module
      * sysObjectID if sysObjectID starts with any of the values under this item
      * sysDescr if sysDescr contains any of the values under this item
      * sysDescr_regex if sysDescr matches any of the regexes under this item
-     * snmpget perform an snmpget on `oid` and check if the result contains `value`. Other subkeys: options, mib, mibdir
+     * snmpget perform an snmpget on `oid` and check if the result contains `value`. Other subkeys: options, mib_dir
      *
      * Appending _except to any condition will invert the match.
      *
@@ -220,7 +225,7 @@ class Core implements Module
         // all items must be true
         foreach ($array as $key => $value) {
             if ($check = Str::endsWith($key, '_except')) {
-                $key = substr($key, 0, -7);
+                $key = substr((string) $key, 0, -7);
             }
 
             if ($key == 'sysObjectID') {
@@ -243,7 +248,7 @@ class Core implements Module
                 $get_value = SnmpQuery::device($device)
                     ->options($value['options'] ?? null)
                     ->mibDir($value['mib_dir'] ?? $mibdir)
-                    ->get(isset($value['mib']) ? "{$value['mib']}::{$value['oid']}" : $value['oid'])
+                    ->get($value['oid'])
                     ->value();
                 if (Compare::values($get_value, $value['value'], $value['op'] ?? 'contains') == $check) {
                     return false;
@@ -252,7 +257,7 @@ class Core implements Module
                 $walk_value = SnmpQuery::device($device)
                     ->options($value['options'] ?? null)
                     ->mibDir($value['mib_dir'] ?? $mibdir)
-                    ->walk(isset($value['mib']) ? "{$value['mib']}::{$value['oid']}" : $value['oid'])
+                    ->walk($value['oid'])
                     ->raw;
                 if (Compare::values($walk_value, $value['value'], $value['op'] ?? 'contains') == $check) {
                     return false;
@@ -265,23 +270,23 @@ class Core implements Module
 
     private function calculateUptime(OS $os, ?string $sysUpTime, DataStorageInterface $datastore): void
     {
-        global $agent_data;
         $device = $os->getDevice();
 
-        if (Config::get("os.$device->os.bad_uptime")) {
+        if (LibrenmsConfig::get("os.$device->os.bad_uptime")) {
             return;
         }
 
+        $agent_data = Cache::driver('array')->get('agent_data');
         if (! empty($agent_data['uptime'])) {
-            $uptime = round((float) substr($agent_data['uptime'], 0, strpos($agent_data['uptime'], ' ')));
+            $uptime = round((float) substr((string) $agent_data['uptime'], 0, strpos((string) $agent_data['uptime'], ' ')));
             Log::info("Using UNIX Agent Uptime ($uptime)");
         } else {
             $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
 
             $uptime = max(
                 round(Number::cast($sysUpTime) / 100),
-                Config::get("os.$device->os.bad_snmpEngineTime") ? 0 : Number::cast($uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'] ?? 0),
-                Config::get("os.$device->os.bad_hrSystemUptime") ? 0 : round(Number::cast($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] ?? 0) / 100)
+                LibrenmsConfig::get("os.$device->os.bad_snmpEngineTime") ? 0 : Number::cast($uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'] ?? 0),
+                LibrenmsConfig::get("os.$device->os.bad_hrSystemUptime") ? 0 : round(Number::cast($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] ?? 0) / 100)
             );
             Log::debug("Uptime seconds: $uptime\n");
         }
@@ -290,7 +295,7 @@ class Core implements Module
         if ($uptime > 0) {
             if ($uptime < $device->uptime) {
                 Eventlog::log('Device rebooted after ' . Time::formatInterval($device->uptime) . " -> {$uptime}s", $device, 'reboot', Severity::Warning, $device->uptime);
-                if (Config::get('discovery_on_reboot')) {
+                if (LibrenmsConfig::get('discovery_on_reboot')) {
                     $device->last_discovered = null;
                     $device->save();
                 }

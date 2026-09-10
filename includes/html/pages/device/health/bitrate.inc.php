@@ -1,4 +1,5 @@
 <?php
+
 /**
  * bitrate.inc.php
  *
@@ -22,8 +23,6 @@
  * @copyright  2021 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-$class = 'bitrate';
-$unit = 'bps';
-$graph_type = 'sensor_bitrate';
+$class = \LibreNMS\Enum\Sensor::Bitrate;
 
 require 'sensors.inc.php';

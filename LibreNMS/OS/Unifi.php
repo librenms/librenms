@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Unifi.php
  *
@@ -27,6 +28,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -36,6 +38,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessCcqPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Unifi extends OS implements
     ProcessorDiscovery,
@@ -47,8 +50,8 @@ class Unifi extends OS implements
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
-    use OS\Traits\FrogfootResources {
-        OS\Traits\FrogfootResources::discoverProcessors as discoverFrogfootProcessors;
+    use Traits\FrogfootResources {
+        Traits\FrogfootResources::discoverProcessors as discoverFrogfootProcessors;
     }
 
     private $ccqDivisor = 10;
@@ -56,15 +59,19 @@ class Unifi extends OS implements
     public function discoverOS(Device $device): void
     {
         // try the Unifi MIB first, then fall back to dot11manufacturer
-        if ($data = snmp_getnext_multi($this->getDeviceArray(), ['unifiApSystemModel', 'unifiApSystemVersion'], '-OQUs', 'UBNT-UniFi-MIB')) {
-            $device->hardware = $data['unifiApSystemModel'] ?? $device->hardware;
-            $device->version = $data['unifiApSystemVersion'] ?? $device->version;
-        } elseif ($data = snmp_getnext_multi($this->getDeviceArray(), ['dot11manufacturerProductName', 'dot11manufacturerProductVersion'], '-OQUs', 'IEEE802dot11-MIB')) {
-            $device->hardware = $data['dot11manufacturerProductName'] ?? $device->hardware;
-            if (preg_match('/(v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/', $data['dot11manufacturerProductVersion'], $matches)) {
-                $device->version = $matches[1];
-            }
+        $response = SnmpQuery::next(['UBNT-UniFi-MIB::unifiApSystemModel', 'UBNT-UniFi-MIB::unifiApSystemVersion']);
+        if ($response->isValid()) {
+            $device->hardware = $response->value('UBNT-UniFi-MIB::unifiApSystemModel') ?: null;
+            $device->version = $response->value('UBNT-UniFi-MIB::unifiApSystemVersion') ?: null;
+
+            return;
         }
+
+        $response = SnmpQuery::next(['IEEE802dot11-MIB::dot11manufacturerProductName', 'IEEE802dot11-MIB::dot11manufacturerProductVersion']);
+
+        $device->hardware = $response->value('IEEE802dot11-MIB::dot11manufacturerProductName') ?: null;
+        preg_match('/(v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/', (string) $response->value('IEEE802dot11-MIB::dot11manufacturerProductVersion'), $matches);
+        $device->version = $matches[1] ?? null;
     }
 
     /**
@@ -94,7 +101,7 @@ class Unifi extends OS implements
 
         $radios = [];
         foreach ($client_oids as $index => $entry) {
-            $radio_name = $vap_radios[$index];
+            $radio_name = $vap_radios[$index] ?? $index;
             $radios[$radio_name]['oids'][] = '.1.3.6.1.4.1.41112.1.6.1.2.1.8.' . $index;
             if (isset($radios[$radio_name]['count'])) {
                 $radios[$radio_name]['count'] += $entry['unifiVapNumStations'];
@@ -108,7 +115,7 @@ class Unifi extends OS implements
         // discover client counts by radio
         foreach ($radios as $name => $data) {
             $sensors[] = new WirelessSensor(
-                'clients',
+                WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 $data['oids'],
                 'unifi',
@@ -128,7 +135,7 @@ class Unifi extends OS implements
         // discover client counts by SSID
         $ssids = [];
         foreach ($client_oids as $index => $entry) {
-            $ssid = $ssid_ids[$index];
+            $ssid = $ssid_ids[$index] ?? $index;
             if (! empty($ssid)) {
                 if (isset($ssids[$ssid])) {
                     $ssids[$ssid]['oids'][] = '.1.3.6.1.4.1.41112.1.6.1.2.1.8.' . $index;
@@ -144,7 +151,7 @@ class Unifi extends OS implements
 
         foreach ($ssids as $ssid => $data) {
             $sensors[] = new WirelessSensor(
-                'clients',
+                WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 $data['oids'],
                 'unifi',
@@ -175,7 +182,7 @@ class Unifi extends OS implements
         foreach ($ccq_oids as $index => $entry) {
             if ($ssids[$index]) { // don't discover ssids with empty names
                 $sensors[] = new WirelessSensor(
-                    'ccq',
+                    WirelessSensorType::Ccq,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.41112.1.6.1.2.1.3.' . $index,
                     'unifi',
@@ -233,7 +240,7 @@ class Unifi extends OS implements
                 continue;
             }
             $sensors[$radio] = new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.6.1.2.1.4.' . $index,
                 'unifi',
@@ -278,7 +285,7 @@ class Unifi extends OS implements
             $radio_name = $vap_radios[$index];
             if (! isset($sensors[$radio_name])) {
                 $sensors[$radio_name] = new WirelessSensor(
-                    'power',
+                    WirelessSensorType::Power,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.41112.1.6.1.2.1.21.' . $index,
                     'unifi-tx',
@@ -312,7 +319,7 @@ class Unifi extends OS implements
         $sensors = [];
         foreach ($radio_names as $index => $name) {
             $sensors[] = new WirelessSensor(
-                'utilization',
+                WirelessSensorType::Utilization,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.6.1.1.1.6.' . $index,
                 'unifi-total',
@@ -321,7 +328,7 @@ class Unifi extends OS implements
                 $util_oids[$index]['unifiRadioCuTotal']
             );
             $sensors[] = new WirelessSensor(
-                'utilization',
+                WirelessSensorType::Utilization,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.6.1.1.1.7.' . $index,
                 'unifi-rx',
@@ -330,7 +337,7 @@ class Unifi extends OS implements
                 $util_oids[$index]['unifiRadioCuSelfRx']
             );
             $sensors[] = new WirelessSensor(
-                'utilization',
+                WirelessSensorType::Utilization,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.6.1.1.1.8.' . $index,
                 'unifi-tx',
@@ -339,7 +346,7 @@ class Unifi extends OS implements
                 $util_oids[$index]['unifiRadioCuSelfTx']
             );
             $sensors[] = new WirelessSensor(
-                'utilization',
+                WirelessSensorType::Utilization,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.41112.1.6.1.1.1.9.' . $index,
                 'unifi-other',

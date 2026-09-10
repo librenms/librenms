@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "1/65",
                     "app_instance": "",
-                    "data": "{\"all_networks\":{\"cur\":\"1\",\"max\":\"65\",\"percent\":\"1.538\"},\"leases\":{\"abandoned\":0,\"active\":3,\"backup\":0,\"bootp\":0,\"expired\":0,\"free\":52,\"released\":0,\"reset\":0,\"total\":52},\"networks\":[{\"cur\":\"1\",\"max\":\"65\",\"network\":\"192.168.14.0\\\/23\",\"percent\":\"1.538\"}],\"pools\":[{\"cur\":\"1\",\"first_ip\":\"192.168.15.128\",\"last_ip\":\"192.168.15.192\",\"max\":\"65\",\"percent\":\"1.538\"}]}",
+                    "data": "{\"all_networks\":{\"cur\":\"1\",\"max\":\"65\",\"percent\":\"1.538\"},\"leases\":{\"abandoned\":0,\"active\":3,\"backup\":0,\"bootp\":0,\"expired\":0,\"free\":52,\"released\":0,\"reset\":0,\"total\":52},\"networks\":[{\"cur\":\"1\",\"max\":\"65\",\"network\":\"192.168.14.0\\/23\",\"percent\":\"1.538\"}],\"pools\":[{\"cur\":\"1\",\"first_ip\":\"192.168.15.128\",\"last_ip\":\"192.168.15.192\",\"max\":\"65\",\"percent\":\"1.538\"}]}",
                     "deleted_at": null
                 }
             ],

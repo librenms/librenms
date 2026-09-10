@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ValidationResult.php
  *
@@ -33,17 +34,10 @@ class ValidationResult
     public const WARNING = 1;
     public const SUCCESS = 2;
     public const INFO = 3;
-
-    /** @var string */
-    private $message;
-    /** @var int */
-    private $status;
     /** @var string */
     private $list_description = '';
     /** @var array */
     private $list;
-    /** @var string|null */
-    private $fix;
     /** @var string|null */
     private $fixer;
 
@@ -54,11 +48,8 @@ class ValidationResult
      * @param  int  $status  The status of this result FAILURE, WARNING, or SUCCESS
      * @param  string|null  $fix  a suggested fix to highlight for the user
      */
-    public function __construct(string $message, int $status, string $fix = null)
+    public function __construct(private readonly string $message, private readonly int $status, private string|array|null $fix = null)
     {
-        $this->message = $message;
-        $this->status = $status;
-        $this->fix = $fix;
     }
 
     /**
@@ -68,7 +59,7 @@ class ValidationResult
      * @param  string|null  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
      */
-    public static function ok(string $message, string $fix = null): ValidationResult
+    public static function ok(string $message, ?string $fix = null): ValidationResult
     {
         return new self($message, self::SUCCESS, $fix);
     }
@@ -80,7 +71,7 @@ class ValidationResult
      * @param  string|null  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
      */
-    public static function warn(string $message, string $fix = null): ValidationResult
+    public static function warn(string $message, ?string $fix = null): ValidationResult
     {
         return new self($message, self::WARNING, $fix);
     }
@@ -103,7 +94,7 @@ class ValidationResult
      * @param  string|null  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
      */
-    public static function fail(string $message, string $fix = null): ValidationResult
+    public static function fail(string $message, ?string $fix = null): ValidationResult
     {
         return new self($message, self::FAILURE, $fix);
     }
@@ -137,9 +128,7 @@ class ValidationResult
     public function setList(string $description, array $list): ValidationResult
     {
         if (is_array(current($list))) {
-            $list = array_map(function ($item) {
-                return implode(' ', $item);
-            }, $list);
+            $list = array_map(fn ($item) => implode(' ', $item), $list);
         }
 
         $this->list_description = $description;
@@ -180,7 +169,7 @@ class ValidationResult
      */
     public function consolePrint(): void
     {
-        c_echo(str_pad('[' . $this->getStatusText($this->status) . ']', 12) . $this->message . PHP_EOL);
+        c_echo(str_pad('[' . static::getStatusText($this->status) . ']', 12) . $this->message . PHP_EOL);
 
         if (isset($this->fix)) {
             c_echo("\t[%BFIX%n]: \n");
@@ -225,7 +214,7 @@ class ValidationResult
 
         return [
             'status' => $resultStatus,
-            'statusText' => substr($this->getStatusText($resultStatus), 2, -2), // remove console colors
+            'statusText' => substr(static::getStatusText($resultStatus), 2, -2), // remove console colors
             'message' => $this->getMessage(),
             'fix' => Arr::wrap($resultFix),
             'fixer' => $this->getFixer(),

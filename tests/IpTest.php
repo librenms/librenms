@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IpTest.php
  *
@@ -29,7 +30,7 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 
-class IpTest extends TestCase
+final class IpTest extends TestCase
 {
     public function testIsValid(): void
     {
@@ -41,6 +42,12 @@ class IpTest extends TestCase
         $this->assertFalse(IPv4::isValid('2001:4860:4860::8888'));
         $this->assertFalse(IPv6::isValid('192.168.0.1'));
         $this->assertFalse(IP::isValid('not_an_ip'));
+
+        $this->assertTrue(IP::isValid('0:0:0:0:0:0:a9fe:901'));
+        $this->assertTrue(IPv6::isValid('0:0:0:0:0:0:a9fe:901'));
+        $this->assertFalse(IPv4::isValid('0:0:0:0:0:0:a9fe:901'));
+        $this->assertTrue(IP::isValid('::169.254.12.3'));
+        $this->assertTrue(IP::isValid('::ffff:169.254.12.3'));
 
         $this->assertTrue(IPv4::isValid('8.8.8.8', true));
         $this->assertTrue(IP::isValid('8.8.8.8', true));
@@ -56,12 +63,19 @@ class IpTest extends TestCase
 
     /**
      * See https://github.com/librenms/librenms/pull/13468 for more info
-     *
-     * @requires PHP >= 7.4
      */
     public function testIsValidIPv6ExcludeReserved(): void
     {
-        $this->assertFalse(IPv6::isValid('2001:db8:85a3::8a2e:370:7334', true));
+        $this->assertFalse(IPv6::isValid('::1', true));
+    }
+
+    public function testIpv6IsLinkLocal(): void
+    {
+        $this->assertFalse(IP::parse('169.254.1.1')->isLinkLocal());
+        $this->assertTrue(IP::parse('fe80::1')->isLinkLocal());
+        $this->assertTrue(IP::parse('FE80::1')->isLinkLocal());
+        $this->assertFalse(IP::parse('fe80:8000::1')->isLinkLocal());
+        $this->assertFalse(IP::parse('febf::1')->isLinkLocal());
     }
 
     public function testIpParse(): void
@@ -76,13 +90,13 @@ class IpTest extends TestCase
         $this->assertEquals('2001:db8:85a3::8a2e:370:7334', new IPv6('2001:db8:85a3::8a2e:370:7334'));
         $this->assertEquals('::1', new IPv6('::1'));
 
-        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
         new IPv6('192.168.0.1');
-        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
         new IPv6('127.0.0.1');
-        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
         new IPv4('2001:db8:85a3::8a2e:370:7334');
-        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
         new IPv4('::1');
     }
 
@@ -105,10 +119,10 @@ class IpTest extends TestCase
 
         $this->assertEquals('::', IP::fromHexString('00000000000000000000000000000000'));
 
-        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
         IP::fromHexString('c0 a8 01 01 fe');
 
-        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
         IP::fromHexString('20 01 0d b8 00 00 00 00 00 00 00 00 00 02 00 00 00 01');
     }
 
@@ -136,13 +150,13 @@ class IpTest extends TestCase
         $this->assertTrue(IP::parse('2001:db8:85a3::8a2e:370:7334')->inNetwork('2001:db8:85a3::8a2e:370:7334/128'));
         $this->assertFalse(IP::parse('2001:db8:85a3::8a2e:370:7335')->inNetwork('2001:db8:85a3::8a2e:370:7334/128'));
 
-        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
         IP::parse('42')->inNetwork('192.168.1.0/4');
 
-        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
         IP::parse('192.168.1.256')->inNetwork('192.168.1.0/24');
 
-        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
         IP::parse('192.168.1.0')->inNetwork('192.168.1.0');
     }
 
@@ -153,6 +167,9 @@ class IpTest extends TestCase
         $this->assertSame('::', IP::parse('0:0:0:0:0:0:0:0')->compressed());
         $this->assertSame('::', IP::parse('0000:0000:0000:0000:0000:0000:0000:0000')->compressed());
         $this->assertSame('2001:db8:85a3::8a2e:370:7334', IP::parse('2001:0db8:85a3:0000:0000:8a2e:0370:7334')->compressed());
+        $this->assertSame('::169.254.9.1', IP::parse('0:0:0:0:0:0:a9fe:901')->compressed());
+        $this->assertSame('::169.254.12.3', IP::parse('::169.254.12.3')->compressed());
+        $this->assertSame('::ffff:169.254.12.3', IP::parse('::ffff:169.254.12.3')->compressed());
     }
 
     public function testIpv6Uncompress(): void
@@ -161,6 +178,9 @@ class IpTest extends TestCase
         $this->assertSame('0000:0000:0000:0000:0000:0000:0000:0000', IP::parse('::')->uncompressed());
         $this->assertSame('2001:0db8:85a3:0000:0000:8a2e:0370:7334', IP::parse('2001:db8:85a3::8a2e:370:7334')->uncompressed());
         $this->assertSame('2001:0db8:85a3:0001:0001:8a2e:0370:7334', IP::parse('2001:db8:85a3:1:1:8a2e:370:7334')->uncompressed());
+        $this->assertSame('0000:0000:0000:0000:0000:0000:a9fe:0901', IP::parse('0:0:0:0:0:0:a9fe:901')->uncompressed());
+        $this->assertSame('0000:0000:0000:0000:0000:0000:a9fe:0c03', IP::parse('::169.254.12.3')->uncompressed());
+        $this->assertSame('0000:0000:0000:0000:0000:ffff:a9fe:0c03', IP::parse('::ffff:169.254.12.3')->uncompressed());
     }
 
     public function testNetworkFromIp(): void

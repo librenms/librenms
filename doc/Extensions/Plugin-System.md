@@ -3,18 +3,37 @@
 With plugins you can extend LibreNMS with special functions that are
 specific to your setup or are not relevant or interesting for all community members.
 
-You are able to intervene in defined places in the behavior of
+You can intervene at defined places in the behaviour of
 the website, without it coming to problems with future updates.
 
-This documentation will give you a basis for writing a plugin for
-LibreNMS. An example plugin is included in the LibreNMS distribution.
+This documentation gives the basis of a plugin for
+LibreNMS.
 
+## Distribution
 
-## Version 2 Plugin System structure
+There are two ways to create a plugin.
 
-Plugins in version 2 need to be installed into app/Plugins
+ 1. Local plugin: Within LibreNMS under the app/Plugins directory. This is appropriate for plugins that are
+    for your own instance only. A local plugin uses ONLY the plugin
+    hooks to extend LibreNMS.
+ 3. Plugin package: A php package that can be distributed via composer/packagist.org.  This is appropriate
+    for plugins that are intended to be installed by many people. A plugin package can publish multiple
+    routes, views, database migrations and more in addition to using hooks to augment specific parts of LibreNMS.
 
->Note: Plugins are disabled when the have an error, to show errors instead set plugins.show_errors
+### Plugin package
+
+Create a package according to the Laravel documentation [https://laravel.com/docs/packages](https://laravel.com/docs/packages)
+To tie in to specific parts of LibreNMS such as the Menu, Device Overview or a Port Tab, use Plugin Hooks.
+
+You can see an example plugin here: [example plugin repository](https://github.com/murrant/librenms-example-plugin).
+
+> Please come to discord and share any experiences and update this documentation!
+
+## Local plugin
+
+Local plugins need to be placed in app/Plugins
+
+> Note: Plugins are disabled when the have an error, to show errors instead set plugins.show_errors
 
 The structure of a plugin is follows:
 
@@ -39,7 +58,7 @@ The above structure is checked before a plugin can be installed.
 All file/folder names are case sensitive and must match the structure.
 
 Only the blade files that are really needed need to be created. A plugin manager
-will then load a hook that has a basic functionality.
+then loads a hook with a basic function.
 
 If you want to customize the basic behavior of the hooks, you can create a
 class in 'app/Plugins/PluginName' and overload the hook methods.
@@ -69,7 +88,7 @@ class in 'app/Plugins/PluginName' and overload the hook methods.
 ```
 
 - port-tab.blade.php :: This is called in the Port page,
-  in the "Plugins" menu_option that will appear when your plugin gets
+  in the "Plugins" menu option. This option appears when LibreNMS
   enabled. In this blade, you can do your work and display your
   results in a frame.
 
@@ -82,20 +101,22 @@ class in 'app/Plugins/PluginName' and overload the hook methods.
 
 ### PHP Hooks customization
 
-PHP code should run inside your hooks method and not your blade view.
+Put your PHP code in the hook method, not in the blade view.
 The built in hooks support authorize and data methods.
 
 These methods are called with [Dependency Injection](https://laravel.com/docs/container#method-invocation-and-injection)
-Hooks with relevant database models will include them in these calls.
-Additionally, the settings argument may be included to inject the plugin settings into the method.
+A hook with database models passes them in these calls.
+The settings argument passes the plugin settings to the method.
 
 #### Data
 
-You can overrid the data method to supply data to your view.  You should also do any processing here.
+Override the data method to give data to your view. Do the processing
+in this method.
 You can do things like access the database or configuration settings and more.
 
 In the data method we are injecting settings here to count how many we have for display in the menu entry blade view.
-Note that you must specify a default value (`= []` here) for any arguments that don't exist on the parent method.
+Note: give a default value, `= []` here, for each argument outside the
+parent method.
 
 ```php
 class Menu extends MenuEntryHook
@@ -111,10 +132,11 @@ class Menu extends MenuEntryHook
 
 #### Authorize 
 
-By default hooks are always shown, but you may control when the user is authorized to view the hook content.
+By default, LibreNMS always shows the hooks. You can control the access
+of the user to the hook content.
 
-As an example, you could imagine that the device-overview.blade.php should only be displayed when the
-device is in maintanence mode and the current user has the admin role. 
+For example, `device-overview.blade.php` appears only when the
+device is in a maintenance mode and the current user has the admin role.
 
 ```php
 class DeviceOverview extends DeviceOverviewHook
@@ -124,101 +146,4 @@ class DeviceOverview extends DeviceOverviewHook
         return $user->can('admin') && $device->isUnderMaintenance();
     }
 }
-```
-
-
-### Full plugin
-
-You may create a full plugin that can publish multiple routes, views, database migrations and more.
-Create a package according to the Laravel documentation you may call any of the supported hooks to tie into LibreNMS.
-
-https://laravel.com/docs/packages
-
-> This is untested, please come to discord and share any expriences and update this documentation!
-
-
-## Version 1 Plugin System structure (legacy version)
-
-Plugins need to be installed into html/plugins
-
-The structure of a plugin is follows:
-
-```
-html/plugins
-            /PluginName
-                       /PluginName.php
-                       /PluginName.inc.php
-```
-
-The above structure is checked before a plugin can be installed.
-
-All files / folder names are case sensitive and must match.
-
-PluginName - This is a directory and needs to be named as per the
-plugin you are creating.
-
-- PluginName.php :: This file is used to process calls into the plugin
-  from the main LibreNMS install. Here only functions within the class
-  for your plugin that LibreNMS calls will be executed. For a list of
-  currently enabled system hooks, please see further down. The minimum
-  code required in this file is (replace Test with the name of your
-  plugin):
-
-```
-<?php
-
-class Test {
-}
-
-?>
-```
-
-- PluginName.inc.php :: This file is the main included file when
-                     browsing to the plugin itself. You can use this
-                     to display / edit / remove whatever you like. The
-                     minimum code required in this file is:
-
-```
-<?php
-
-?>
-```
-
-## System Hooks
-
-System hooks are called as functions within your plugin class. The
-following system hooks are currently available:
-
-- menu() :: This is called to build the plugin menu system and you
-   can use this to link to your plugin (you don't have to).
-
-```
-    public static function menu() {
-        echo('<li><a href="plugin/p='.get_class().'">'.get_class().'</a></li>');
-    }
-```
-
-- device_overview_container($device) :: This is called in the Device
-  Overview page. You receive the $device as a parameter, can do your
-  work here and display your results in a frame.
-
-```
-    public static function device_overview_container($device) {
-        echo('<div class="container-fluid"><div class="row"> <div class="col-md-12"> <div class="panel panel-default panel-condensed"> <div class="panel-heading"><strong>'.get_class().' Plugin </strong> </div>');
-        echo('  Example plugin in "Device - Overview" tab <br>');
-        echo('</div></div></div></div>');
-    }
-```
-
-- port_container($device, $port) :: This is called in the Port page,
-  in the "Plugins" menu_option that will appear when your plugin gets
-  enabled. In this function, you can do your work and display your
-  results in a frame.
-
-```
-    public static function port_container($device, $port) {
-        echo('<div class="container-fluid"><div class="row"> <div class="col-md-12"> <div class="panel panel-default panel-condensed"> <div class="panel-heading"><strong>'.get_class().' plugin in "Port" tab</strong> </div>');
-        echo ('Example display in Port tab</br>');
-        echo('</div></div></div></div>');
-    }
 ```

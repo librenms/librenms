@@ -1,4 +1,5 @@
 <?php
+
 /**
  * JnxVpnIfDown.php
  *

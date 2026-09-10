@@ -1,7 +1,7 @@
 <?php
 
 echo 'MGE ';
-$oids = trim(snmp_walk($device, '.1.3.6.1.4.1.705.1.7.1', '-OsqnU'));
+$oids = trim((string) snmp_walk($device, '.1.3.6.1.4.1.705.1.7.1', '-OsqnU'));
 d_echo($oids . "\n");
 
 $numPhase = count(explode("\n", $oids));
@@ -12,10 +12,10 @@ for ($i = 1; $i <= $numPhase; $i++) {
         $descr .= " Phase $i";
     }
 
-    $current = snmp_get($device, $freq_oid, '-Oqv');
+    $current = SnmpQuery::get($freq_oid)->value();
     if (! $current) {
         $freq_oid .= '.0';
-        $current = snmp_get($device, $freq_oid, '-Oqv');
+        $current = SnmpQuery::get($freq_oid)->value();
     }
 
     $current /= 10;
@@ -25,7 +25,7 @@ for ($i = 1; $i <= $numPhase; $i++) {
     discover_sensor(null, 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
-$oids = trim(snmp_walk($device, '.1.3.6.1.4.1.705.1.6.1', '-OsqnU'));
+$oids = trim((string) snmp_walk($device, '.1.3.6.1.4.1.705.1.6.1', '-OsqnU'));
 d_echo($oids . "\n");
 
 $numPhase = count(explode("\n", $oids));
@@ -36,10 +36,10 @@ for ($i = 1; $i <= $numPhase; $i++) {
         $descr .= " Phase $i";
     }
 
-    $current = snmp_get($device, $freq_oid, '-Oqv');
+    $current = SnmpQuery::get($freq_oid)->value();
     if (! $current) {
         $freq_oid .= '.0';
-        $current = snmp_get($device, $freq_oid, '-Oqv');
+        $current = SnmpQuery::get($freq_oid)->value();
     }
 
     $current /= 10;

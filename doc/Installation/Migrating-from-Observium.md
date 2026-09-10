@@ -1,84 +1,84 @@
-A LibreNMS user, [Dan](https://twitter.com/thedanbrown), has kindly
-provided full details and scripts to be able to migrate from Observium
-to LibreNMS.
+A LibreNMS user, [Dan](https://twitter.com/thedanbrown), supplied full
+details and scripts for a migration from Observium to LibreNMS.
 
-We have mirrored the scripts he's provided with consent, these are
-available in the `scripts\Migration` folder of your installation..
+We mirror his scripts with his consent. The scripts are in the
+`scripts\Migration` folder of your installation.
 
 # Setup:
 
-First I had to lay out my script requirements:
+The scripts must do these steps:
 
 -   Build the RRD directories on LibreNMS
--   Convert the RRD files on Observium to XML (x86 to x64 move)
--   Copy the RRD/XML files to LibreNMS
+-   Convert the RRD files on Observium to XML (a move from x86 to x64)
+-   Copy the RRD files and the XML files to LibreNMS
 -   Convert the XML files back to RRD files
 -   Add the device to LibreNMS
 
 # Script:
 
-There are two versions of the scripts available for you to download:
-- One converts the RRDs to XML and then back to RRD files when they hit the destination. This is a requirement if you are moving from x86 to x64. 
-- Assuming you’re moving servers that are on the same architecture, we can skip that step and just SCP the original RRD files.
+Two versions of the scripts are available:
 
-For everything to work as originally intended, you’ll need four files. **Put all four files on both servers, the scripts default to /tmp/**:
+- The first version converts the RRD files to XML. It then converts them back to RRD files on the destination server. A move from x86 to x64 needs this version.
+- The second version copies the original RRD files with SCP. Use this version when both servers have the same architecture.
 
--   nodelist.txt – this file contains the list of hosts you would like to move. This must match exactly to the hostname Observium uses
--   mkdir.sh – this script creates the necessary directories on your LibreNMS server
--   destwork.sh – depending on the version you choose, this script will add the device to LibreNMS and possibly convert from XML to RRD
--   convert.sh – convert is the main script we’ll be calling. All of the magic happens here.
+You need four files. **Put all four files on both servers. The scripts use `/tmp/` by default**:
 
-Feel free to crack open the scripts and modify them to suit you. Each file has a handful of variables you’ll need to set for your conversion. They should be self-explanatory, but please leave a comment if you have trouble. 
+-   `nodelist.txt` – the list of the hosts to move. Each name must match the hostname in Observium exactly.
+-   `mkdir.sh` – this script creates the necessary directories on your LibreNMS server.
+-   `destwork.sh` – this script adds the device to LibreNMS. In one version, it also converts XML back to RRD.
+-   `convert.sh` – the main script. It controls the migration.
+
+You can read and modify the scripts. Each file has some variables that you must set for your conversion. If you have a problem, leave a comment.
 
 # Conversion:
 
-This section assumes the following:
+This section assumes these conditions:
 
 -   Root access is available on both servers
 -   You have SSH access to both servers
--   All four files have been placed in the tmp directory of both servers
+-   All four files are in the `/tmp/` directory of both servers
 
-I would strongly suggest you start with just one or two hosts and see how things work. For me, 10 standard sized devices took about 20 minutes with the RRD to XML conversion. Every environment will be different, so start slow and work your way up to full automation.
+Start with one or two hosts. Then examine the result. In one test, 10 standard devices took about 20 minutes with the RRD to XML conversion. Each environment is different. Start slowly, then increase the level of automation.
 
 ### SSH Keys
 
-First thing we will want to do is exchange SSH keys so that we can automate the login process used by the scripts. Perform these steps on your Observium server:
+Exchange SSH keys first. The scripts can then log in without a password. Do these steps on your Observium server:
 
 `ssh-keygen -t rsa`
 
-Accept the defaults and enter a passphrase if you wish. Then:
+Accept the defaults. You can enter a passphrase. Then run:
 
 `ssh-copy-id librenms`
 
-Where librenms is the hostname or IP of your destination server.
+Here, `librenms` is the hostname or the IP address of your destination server.
 
 ## Nodelist.txt
 
-The nodelist.txt file contains a list of hosts we want to migrate from Observium. These names must match the name of the RRD folder on Observium. You can get those names by running the following –
+The `nodelist.txt` file holds the list of the hosts to migrate from Observium. Each name must match the name of the RRD folder on Observium. To get these names, run:
 
 `ls /opt/observium/rrd/`
 
-Also important, the nodelist.txt file must be on **both your Observium and LibreNMS server**. Once you have your list, edit nodelist.txt with nano:
+The `nodelist.txt` file must be on **both the Observium server and the LibreNMS server**. To edit the file, use nano:
 
 `nano /tmp/nodelist.txt`
 
-And replace the dummy data with the hosts you are converting. CTRL+X and then Y to save your modifications. Make the same changes on the LibreNMS server.
+Replace the dummy data with your hosts. Press CTRL+X, then Y, to save the file. Make the same changes on the LibreNMS server.
 
 ## Script Variables
 
-Now that we have nodelist.txt setup correctly, it is time to set the variables in all three shell scripts. We are going to start with convert.sh. Edit it with nano:
+After you configure `nodelist.txt`, set the variables in all three shell scripts. Start with `convert.sh`. Edit the file with nano:
 
 `nano /tmp/convert.sh`
 
-and change the variables to suit your environment. Here is a quick list of them:
+Change the variables for your environment. The list below gives each variable:
 
--   DEST – This should be the IP or hostname of your LibreNMS server
--   L_RRDPATH – This signifies the location of the LibreNMS RRD directory. The default value is the default install location
--   O_RRDPATH – Location of the Observium RRD directory. The default value is the default install location
--   MKDIR – Location of the mkdir.sh script
--   DESTSCRIPT – Location of the destwork.sh script
--   NODELIST – Location of the nodelist.txt file
+-   `DEST` – the IP address or the hostname of your LibreNMS server
+-   `L_RRDPATH` – the location of the LibreNMS RRD directory. The default value is the default install location
+-   `O_RRDPATH` – the location of the Observium RRD directory. The default value is the default install location
+-   `MKDIR` – the location of the `mkdir.sh` script
+-   `DESTSCRIPT` – the location of the `destwork.sh` script
+-   `NODELIST` – the location of the `nodelist.txt` file
 
-Next, edit the destwork.sh script:
+Then edit the `destwork.sh` script:
 
 `nano /tmp/destwork.sh`

@@ -24,7 +24,7 @@ return new class extends Migration
             $table->increments('availability_id');
             $table->unsignedInteger('device_id')->index();
             $table->bigInteger('duration');
-            $table->float('availability_perc', 6, 6)->default(0.000000);
+            $table->double('availability_perc')->default(0.000000);
             $table->unique(['device_id', 'duration']);
         });
     }

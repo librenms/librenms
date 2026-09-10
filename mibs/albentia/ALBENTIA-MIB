@@ -1,0 +1,151 @@
+--***************************************************************************
+--  Copyright 2005 Albentia Systems, S.A.
+--    File  : ALBENTIA-MIB.my
+--    Author: Noelia Moron Tabernero
+--***************************************************************************
+ALBENTIA-MIB    DEFINITIONS ::= BEGIN
+    IMPORTS
+        TEXTUAL-CONVENTION, DisplayString
+            FROM SNMPv2-TC
+        OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        enterprises, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY
+            FROM SNMPv2-SMI;
+
+    albGlobalModule    MODULE-IDENTITY
+        LAST-UPDATED    "200404110920Z"
+        ORGANIZATION    "Albentia Systems, S.A."
+        CONTACT-INFO    "ipichel@albentia.com"
+        DESCRIPTION        "Albentia MIB Definition"
+        ::=  {  albModules  1  }
+
+    albentia    OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION        "Root of the OID sub-tree assigned to Albentia Systems, S.A.
+                 by the Internet Assigned Numbers Authority (IANA)"
+        ::=  {  enterprises  28087  }
+
+    AlbAlarmType    ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "Alarm type"
+        SYNTAX            INTEGER  { bbovertemp ( 0 ), rfovertemp ( 1 ) , phyunavailable ( 2 ), framedurmismatch ( 3 ), framedivmismatch ( 4 ), phaseinvmismatch ( 5 ), cpuovertemp ( 6 ) }
+
+    AlbAlarmStatus    ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "Alarm status"
+        SYNTAX            INTEGER  { triggered ( 0 ), acknowledged ( 1 ) , muted ( 2 ), resolved ( 3 ) }
+
+    albReg    OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION        "Sub-tree registrations"
+        ::=  {  albentia  1  }
+
+    albProducts    OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION        "Products"
+        ::=  {  albentia  12  }
+
+    albGeneric    OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION        "Albentia equipment generic parameters"
+        ::=  {  albentia  13  }
+
+    albCapabilities    OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION        "Implementation characteristics of an SNMP albAgent sub-system with respect to object types and events"
+        ::=  {  albentia  14  }
+
+    albModules    OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION        "Sub-tree for module registrations with MODULE-IDENTITY construct"
+        ::=  {  albReg  1  }
+
+    albExperimental    OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION        "Experimental"
+        ::=  {  albentia  15  }
+
+    albAlarms    OBJECT IDENTIFIER
+        ::=  {  albentia  16  }
+
+    albAlarmNotification    NOTIFICATION-TYPE
+        OBJECTS            { albAlarmType, albAlarmContext, albAlarmDesc, albAlarmStatus, albAlarmTimeStamp, albAlarmNumOccur }
+        STATUS            current
+        DESCRIPTION        "Alarm notification"
+        ::=  {  albAlarms  1  }
+
+    albAlarmTable    OBJECT-TYPE
+        SYNTAX            SEQUENCE OF AlbAlarmEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION        "Triggered alarms"
+        ::=  {  albAlarms  2  }
+
+    albAlarmEntry    OBJECT-TYPE
+        SYNTAX            AlbAlarmEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION        "Alarm entry for albAlarmTable"
+        INDEX            { albAlarmIndex }
+        ::= { albAlarmTable 1 }
+
+    AlbAlarmEntry ::=    SEQUENCE {
+        albAlarmIndex        Integer32,
+        albAlarmType        AlbAlarmType,
+        albAlarmContext        Integer32,
+        albAlarmDesc        DisplayString,
+        albAlarmStatus        AlbAlarmStatus,
+        albAlarmTimeStamp    DisplayString,
+        albAlarmNumOccur    Integer32
+    }
+
+    albAlarmIndex    OBJECT-TYPE
+        SYNTAX            Integer32(1..65536)
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Row index for alarm entry"
+        ::= { albAlarmEntry 1 }
+
+    albAlarmType        OBJECT-TYPE
+        SYNTAX            AlbAlarmType
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Alarm type"
+        ::= { albAlarmEntry  2 }
+
+    albAlarmContext        OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Alarm context. It depends on alarm type and for example it could mean the MAC id."
+        ::= { albAlarmEntry  3 }
+
+    albAlarmDesc        OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Alarm textual description"
+        ::= { albAlarmEntry  4 }
+
+    albAlarmStatus        OBJECT-TYPE
+        SYNTAX            AlbAlarmStatus
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Alarm current status"
+        ::= { albAlarmEntry  5 }
+
+    albAlarmTimeStamp    OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Last time alarm was triggered"
+        ::= { albAlarmEntry  6 }
+
+    albAlarmNumOccur    OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Number of occurrences of the alarm"
+        ::= { albAlarmEntry  7 }
+
+END

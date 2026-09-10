@@ -2,43 +2,41 @@
 
 ## LibreNMS JSON SNMP Extends
 
-The polling function `json_app_get` makes it easy to poll complex data
-using SNMP extends and JSON.
+The polling function `json_app_get` polls complex data with SNMP
+extends and JSON.
 
-The following exceptions are provided by it.
+It supplies the exceptions below.
 
-It takes three parameters, in order in the list below.
+It takes three parameters, in this order:
 
-- Integer :: Device ID to fetch it for.
-- String :: The extend name. For example, if 'zfs' is passed it will
-  be converted to 'nsExtendOutputFull.3.122.102.115'.
-- Integer :: Minimum expected version of the JSON return.
+- Integer :: the device ID of the data.
+- String :: the extend name. For example, 'zfs' becomes
+  'nsExtendOutputFull.3.122.102.115'.
+- Integer :: the minimum version of the JSON return.
 
-The required keys for the returned JSON are as below.
+The returned JSON needs these keys:
 
-- version :: The version of the snmp extend script. Should be numeric
-  and at least 1.
-- error :: Error code from the snmp extend script. Should be > 0
-   (0 will be ignored and negatives are reserved)
-- errorString :: Text to describe the error.
-- data :: An key with an array with the data to be used.
+- version :: the version of the SNMP extend script. It is a number and
+  it is at least 1.
+- error :: the error code of the SNMP extend script. It is more than 0.
+  LibreNMS ignores 0, and the negative values are reserved.
+- errorString :: the description of the error.
+- data :: a key with an array of the data.
 
-The supported exceptions are as below.
+These exceptions are available:
 
 - JsonAppPollingFailedException :: Empty return from SNMP.
-- JsonAppParsingFailedException :: Could not parse the JSON
+- JsonAppParsingFailedException :: the JSON parse failed.
 - JsonAppBlankJsonException :: Blank JSON.
-- JsonAppMissingKeysException :: Missing required keys.
-- JsonAppWrongVersionException :: Older version than supported.
-- JsonAppExtendErroredException :: Polling and parsing was good, but
-  the returned data has an error set. This may be checked via
-  $e->getParsedJson() and then checking the keys error and
-  errorString.
+- JsonAppMissingKeysException :: a required key is absent.
+- JsonAppWrongVersionException :: the version is too old.
+- JsonAppExtendErroredException :: the polling and the parsing were
+  correct, but the returned data holds an error. Read the error with
+  `$e->getParsedJson()`. Then read the keys `error` and `errorString`.
 
-The error value can be accessed via $e->getCode(). The output can be
-accessed via $->getOutput() Only returned
-JsonAppParsingFailedException. The parsed JSON can be access via
-$e->getParsedJson().
+`$e->getCode()` gives the error value. `$e->getOutput()` gives the
+output. Only JsonAppParsingFailedException returns the output.
+`$e->getParsedJson()` gives the parsed JSON.
 
 An example below from `includes/polling/applications/zfs.inc.php`...
 
@@ -58,24 +56,24 @@ try {
 
 ### Compression
 
-Also worth noting that `json_app_get` supports compressed data via
-base64 encoded gzip. If base64 encoding is detected on the the SNMP
-return, it will be gunzipped and then parsed.
+`json_app_get` also accepts compressed data as base64-encoded gzip. At
+a base64 encoding in the SNMP return, it decompresses the data and then
+parses it.
 
 `https://github.com/librenms/librenms-agent/blob/master/utils/librenms_return_optimizer`
-may be used to optimize JSON returns.
+optimizes the JSON returns.
 
 ## Application Data Storage
 
-The `$app` model is supplied for each application poller and graph.
-You may access and update the `$app->data` field to store arrays of data
-the Application model.
+Each application poller and graph gets the `$app` model. Read and
+update the `$app->data` field to store arrays of data in the
+Application model.
 
-When you call update_application() the `$app` model will be saved along with
-any changes to the data field.
+`update_application()` saves the `$app` model with each change to the
+data field.
 
 ```
-// set the varaible data to $foo
+// set the variable data to $foo
 $app->data = [
     'item_A' => 123,
     'item_B' => 4.5,

@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="row">
-@if (Config::get('vertical_summary'))
+@if (LibrenmsConfig::get('vertical_summary'))
     <div class="col-md-9">
 @else
     <div class="col-md-8">
@@ -22,7 +22,7 @@
             <br />
             <span class=list-device-down>{{ __('Device Down') }}</span>
             <br />
-            <span class=body-date-1>{{ \LibreNMS\Util\StringHelpers::shortenText($device->location, 20) }}</span>
+            <span class=body-date-1>{{ \Str::limit($device->location, 20) }}</span>
         </div>
     @endforeach
 
@@ -35,7 +35,7 @@
             {!! \LibreNMS\Util\Url::PortLink($port) !!}
             @if($port->ifAlias)
                 <br />
-                <span class="body-date-1">{{ \LibreNMS\Util\StringHelpers::shortenText($port->getLabel(), 20) }}</span>
+                <span class="body-date-1">{{ \Str::limit($port->getLabel(), 20) }}</span>
             @endif
         </div>
     @endforeach
@@ -56,7 +56,7 @@
                 {{ $bgp->bgpPeerIdentifier }}
             </span>
             <br />
-            <span class="body-date-1">AS{{ \LibreNMS\Util\StringHelpers::shortenText($bgp->bgpPeerRemoteAs . ' ' . $bgp->astext, 14) }}</span>
+            <span class="body-date-1">AS{{ \Str::limit($bgp->bgpPeerRemoteAs . ' ' . $bgp->astext, 14) }}</span>
         </div>
     @endforeach
 
@@ -79,8 +79,8 @@
     <h5>Nothing here yet</h5>
     <p class=welcome>
         This is where status notifications about devices and services would normally go.
-        You might have none because you run such a great network, or perhaps you've just started using {{ Config::get('project_name') }}
-        If you're new to {{ Config::get('project_name') }}, you might
+        You might have none because you run such a great network, or perhaps you've just started using {{ LibrenmsConfig::get('project_name') }}
+        If you're new to {{ LibrenmsConfig::get('project_name') }}, you might
         want to start by adding one or more devices in the Devices menu.
     </p>
 @endif

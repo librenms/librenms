@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Eltex-MES23xx PoE power
  *
@@ -18,46 +19,46 @@
  * @package    LibreNMS
  * @link       https://www.librenms.org
  *
- * @copyright  2022 Peca Nesovanovic
+ * @copyright  2025 Peca Nesovanovic
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
+
+$oids = SnmpQuery::hideMib()->walk([
+    'MARVELL-POE-MIB::rlPethPsePortPowerLimit',
+    'MARVELL-POE-MIB::rlPethPsePortOutputPower',
+])->table(2);
 $divisor = 1000;
-$multiplier = 1;
-if ($pre_cache['eltex-mes23xx-poe']) {
-    foreach ($pre_cache['eltex-mes23xx-poe'] as $index => $data) {
+
+foreach ($oids as $unit => $indexData) {
+    foreach ($indexData as $ifIndex => $data) {
         if (isset($data['rlPethPsePortOutputPower'])) {
             $value = $data['rlPethPsePortOutputPower'] / $divisor;
             if ($value) {
-                $high_limit = isset($data['rlPethPsePortPowerLimit']) ? ($data['rlPethPsePortPowerLimit'] / $divisor) : null;
-                $high_warn_limit = isset($data['rlPethPsePortPowerLimit']) ? ($data['rlPethPsePortPowerLimit'] / $divisor) * 0.8 : null;
-                $low_warn_limit = 0;
-                $low_limit = 0;
-                [$unit, $ifIndex] = explode('.', $index);
-                $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
-                $descr = $tmp['ifName'];
-                $oid = '.1.3.6.1.4.1.89.108.1.1.5.' . $unit . '.' . $ifIndex;
-                discover_sensor(
-                    null,
-                    'power',
-                    $device,
-                    $oid,
-                    'Poe' . $index, //unit.index
-                    'rlPethPsePortOutputPower',
-                    'PoE-' . $descr,
-                    $divisor,
-                    $multiplier,
-                    $low_limit,
-                    $low_warn_limit,
-                    $high_warn_limit,
-                    $high_limit,
-                    $value,
-                    'snmp',
-                    null,
-                    null,
-                    null,
-                    'PoE'
-                );
+                $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+                $descr = $port?->ifName;
+                $index = $unit . '.' . $ifIndex;
+                $oid = '.1.3.6.1.4.1.89.108.1.1.5.' . $index;
+
+                app('sensor-discovery')->discover(new \App\Models\Sensor([
+                    'poller_type' => 'snmp',
+                    'sensor_class' => 'power',
+                    'sensor_oid' => $oid,
+                    'sensor_index' => 'Poe' . $index,
+                    'sensor_type' => 'rlPethPsePortOutputPower',
+                    'sensor_descr' => 'PoE-' . $descr,
+                    'sensor_divisor' => $divisor,
+                    'sensor_multiplier' => 1,
+                    'sensor_limit_low' => 0,
+                    'sensor_limit_low_warn' => 0,
+                    'sensor_limit_warn' => isset($data['rlPethPsePortPowerLimit']) ? ($data['rlPethPsePortPowerLimit'] / $divisor) * 0.8 : null,
+                    'sensor_limit' => isset($data['rlPethPsePortPowerLimit']) ? ($data['rlPethPsePortPowerLimit'] / $divisor) : null,
+                    'sensor_current' => $value,
+                    'entPhysicalIndex' => null,
+                    'entPhysicalIndex_measured' => null,
+                    'user_func' => null,
+                    'group' => 'PoE',
+                ]));
             }
         }
     }

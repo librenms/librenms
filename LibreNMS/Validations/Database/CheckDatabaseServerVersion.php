@@ -1,4 +1,5 @@
 <?php
+
 /*
  * CheckDatabaseServerVersion.php
  *

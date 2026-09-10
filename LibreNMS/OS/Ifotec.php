@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ifotec.inc.php
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * InvalideModuleException.php
  *

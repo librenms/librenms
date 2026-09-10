@@ -1,0 +1,106 @@
+--
+-- All Rights Reserved, Copyright (c) 2014, ALAXALA Networks Corp.
+--
+-- AX-MANAGEMENT-MIB.my axManagementMIB group MIB file.
+--
+
+AX-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        TimeTicks
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axManagementMIB MODULE-IDENTITY
+    LAST-UPDATED    "201405080001Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for MANAGEMENT information."
+
+    REVISION        "201405080001Z"
+    DESCRIPTION
+        "Initial release."
+::= { axMib 1004 }
+
+axOperationCommand  OBJECT IDENTIFIER ::= {axManagementMIB 1}
+axFdbClearMIB       OBJECT IDENTIFIER ::= {axOperationCommand 1}
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+axFdbClearSet OBJECT-TYPE
+    SYNTAX INTEGER {
+                    initialValue(1),
+                    processing(2),
+                    failure(3),
+                    success(4)
+                    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Fdb clear information. When want to clear fdb,
+         then set value of this MIB as 2."
+    ::= {axFdbClearMIB 1}
+
+axFdbClearReqTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates the most recent time that
+         received the demand to clear Fdb information.(sysUpTime)"
+    ::= {axFdbClearMIB 2}
+
+axFdbClearSuccessTime OBJECT-TYPE
+    SYNTAX TimeTicks
+
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates the time of the most recent
+         Fdb clearing success.(sysUpTime)"
+    ::= {axFdbClearMIB 3}
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Conformance identifier
+--
+
+axManagementMIBConformance       OBJECT IDENTIFIER ::= { axManagementMIB 1000 }
+axManagementMIBCompliances       OBJECT IDENTIFIER ::= { axManagementMIBConformance 1 }
+axManagementMIBGroups            OBJECT IDENTIFIER ::= { axManagementMIBConformance 2 }
+
+-- Compliance
+--
+
+axManagementMIBCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "AX MANAGEMENT"
+    MODULE        -- this module
+        MANDATORY-GROUPS {  axManagementMIBGroup }
+    ::= { axManagementMIBCompliances 1 }
+
+--
+-- Object Group
+--
+
+axManagementMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                   axFdbClearSet,
+                   axFdbClearReqTime,
+                   axFdbClearSuccessTime
+                 }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects which are used to provide axManagementMIB group."
+    ::= { axManagementMIBGroups 1 }
+
+END

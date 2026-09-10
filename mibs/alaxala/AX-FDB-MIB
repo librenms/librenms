@@ -1,0 +1,142 @@
+--
+-- All Rights Reserved, Copyright (c) 2014, ALAXALA Networks Corp.
+--
+-- AX-FDB-MIB.my axFdb group MIB file.
+--
+
+AX-FDB-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Counter32, Integer32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axFdb MODULE-IDENTITY
+    LAST-UPDATED    "201403260001Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for FDB information."
+
+    REVISION        "201403260001Z"
+    DESCRIPTION
+        "Initial release."
+::= { axMib 5 }
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+
+axFdbCounterTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxFdbCounterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of FDB information."
+    ::= {axFdb 1}
+
+axFdbCounterEntry OBJECT-TYPE
+    SYNTAX AxFdbCounterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of FDB information."
+    INDEX { axFdbCounterNifIndex,
+            axFdbCounterLineIndex }
+    ::= {axFdbCounterTable 1}
+
+AxFdbCounterEntry ::= SEQUENCE {
+    axFdbCounterNifIndex       Integer32,
+    axFdbCounterLineIndex      Integer32,
+    axFdbCounterCounts         Counter32,
+    axFdbCounterType           INTEGER,
+    axFdbCounterLimits         Counter32
+}
+
+axFdbCounterNifIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identified by a particular value of this index is same value of NIF.Its value ranges between 1 and the value of axNifBoardNumber."
+    ::= {axFdbCounterEntry 1}
+
+axFdbCounterLineIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identified by a particular value of this index is same value of Physical Line.Its value ranges between 1 and the value of axNifPhysLineNumber."
+    ::= {axFdbCounterEntry 2}
+
+axFdbCounterCounts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of FDB entries learned on the port."
+    ::= {axFdbCounterEntry 3}
+
+axFdbCounterType OBJECT-TYPE
+    SYNTAX INTEGER {
+        unlimited(1),
+        limitedAndForward(2),
+        limitedAndDiscard(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of FDB entries learning."
+    ::= {axFdbCounterEntry 4}
+
+axFdbCounterLimits OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of FDB entries that can be learned on the port."
+    ::= {axFdbCounterEntry 5}
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Conformance identifier
+--
+
+axFdbConformance       OBJECT IDENTIFIER ::= { axFdb 1000 }
+axFdbCompliances       OBJECT IDENTIFIER ::= { axFdbConformance 1 }
+axFdbGroups            OBJECT IDENTIFIER ::= { axFdbConformance 2 }
+
+-- Compliance
+--
+
+axFdbCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "AX Fdb"
+    MODULE        -- this module
+        MANDATORY-GROUPS {  axFdbGroup }
+    ::= { axFdbCompliances 1 }
+
+--
+-- Object Group
+--
+
+axFdbGroup OBJECT-GROUP
+    OBJECTS     {
+                   axFdbCounterCounts,
+                   axFdbCounterType,
+                   axFdbCounterLimits
+                 }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects which are used to provide axFdb group."
+    ::= { axFdbGroups 1 }
+
+END

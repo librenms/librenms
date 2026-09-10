@@ -1,0 +1,650 @@
+--
+-- All Rights Reserved, Copyright (c) 2013, 2016, ALAXALA Networks Corp.
+--
+-- AX-FLOW-MIB.my : axFlow group MIB file.
+--
+
+AX-FLOW-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Unsigned32, Counter64
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,OBJECT-GROUP
+            FROM SNMPv2-CONF
+        DisplayString
+            FROM SNMPv2-TC
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axFlow MODULE-IDENTITY
+    LAST-UPDATED    "201603220000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for filter and QoS flow information."
+
+    REVISION        "201603220000Z"
+    DESCRIPTION
+        "+Added axAccessFilterStatsInMirrorTotalTable
+         +Added axAccessFilterStatsOutMirrorTotalTable"
+    REVISION        "201310030000Z"
+    DESCRIPTION
+        "Updated header comment."
+    REVISION        "201304260000Z"
+    DESCRIPTION
+        "Initial release."
+    ::= { axMib 8 }
+
+
+--------------------------------------------------
+-- Object Identifiers
+--------------------------------------------------
+
+axAccessFilterStats OBJECT IDENTIFIER ::= {axFlow 151}
+axQosFlowStats      OBJECT IDENTIFIER ::= {axFlow 251}
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+
+--
+--  axAccessFilterStatsInTotalTable
+--
+axAccessFilterStatsInTotalTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxAccessFilterStatsInTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table information on corresponding number of statistics to flow detection condition and action specification set by access list."
+    ::= {axAccessFilterStats 11}
+
+axAccessFilterStatsInTotalEntry OBJECT-TYPE
+    SYNTAX AxAccessFilterStatsInTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry concerning corresponding number of statistics to flow detection condition and action specification set by access list."
+    INDEX {
+        axAccessFilterStatsInTotalifIndex,
+        axAccessFilterStatsInTotalGroupType,
+        axAccessFilterStatsInTotalSequenceNumber
+    }
+    ::= {axAccessFilterStatsInTotalTable 1}
+
+AxAccessFilterStatsInTotalEntry ::= SEQUENCE {
+    axAccessFilterStatsInTotalifIndex          Integer32,
+    axAccessFilterStatsInTotalGroupType        INTEGER,
+    axAccessFilterStatsInTotalSequenceNumber   Unsigned32,
+    axAccessFilterStatsInTotalListName         DisplayString,
+    axAccessFilterStatsInTotalMatchedPackets   Counter64,
+    axAccessFilterStatsInTotalMatchedBytes     Counter64
+}
+
+axAccessFilterStatsInTotalifIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index value in which entry of this table is identified."
+    ::= {axAccessFilterStatsInTotalEntry 1}
+
+axAccessFilterStatsInTotalGroupType OBJECT-TYPE
+    SYNTAX INTEGER {
+            mac(1),
+            ip(2),
+            ipv6(3),
+            advance(4)
+            }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Indicates access-list type. mac access-list : 1 ip access-list : 2 ipv6 access-list : 3 advance access-list : 4"
+    ::= {axAccessFilterStatsInTotalEntry 2}
+
+axAccessFilterStatsInTotalSequenceNumber OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Sequence number of flow detection condition and action specification set to access list name."
+    ::= {axAccessFilterStatsInTotalEntry 3}
+
+axAccessFilterStatsInTotalListName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Access list number or access list name corresponding to index of access list."
+    ::= {axAccessFilterStatsInTotalEntry 4}
+
+axAccessFilterStatsInTotalMatchedPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Corresponding number of packets to flow detection condition of access list. "
+    ::= {axAccessFilterStatsInTotalEntry 5}
+
+axAccessFilterStatsInTotalMatchedBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Corresponding number of bytes to flow detection condition of access list. "
+    ::= {axAccessFilterStatsInTotalEntry 6}
+
+
+--
+--  axAccessFilterStatsOutTotalTable
+--
+axAccessFilterStatsOutTotalTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxAccessFilterStatsOutTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table information on corresponding number of statistics to flow detection condition and action specification set by access list."
+    ::= {axAccessFilterStats 21}
+
+axAccessFilterStatsOutTotalEntry OBJECT-TYPE
+    SYNTAX AxAccessFilterStatsOutTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry concerning corresponding number of statistics to flow detection condition and action specification set by access list."
+    INDEX {
+        axAccessFilterStatsOutTotalifIndex,
+        axAccessFilterStatsOutTotalGroupType,
+        axAccessFilterStatsOutTotalSequenceNumber
+    }
+    ::= {axAccessFilterStatsOutTotalTable 1}
+
+AxAccessFilterStatsOutTotalEntry ::= SEQUENCE {
+    axAccessFilterStatsOutTotalifIndex              Integer32,
+    axAccessFilterStatsOutTotalGroupType            INTEGER,
+    axAccessFilterStatsOutTotalSequenceNumber       Unsigned32,
+    axAccessFilterStatsOutTotalListName             DisplayString,
+    axAccessFilterStatsOutTotalMatchedPackets       Counter64,
+    axAccessFilterStatsOutTotalMatchedBytes         Counter64
+}
+
+axAccessFilterStatsOutTotalifIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index value in which entry of this table is identified."
+    ::= {axAccessFilterStatsOutTotalEntry 1}
+
+axAccessFilterStatsOutTotalGroupType OBJECT-TYPE
+    SYNTAX INTEGER {
+            mac(1),
+            ip(2),
+            ipv6(3),
+            advance(4)
+            }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Indicates access-list type. mac access-list : 1 ip access-list : 2 ipv6 access-list : 3 advance access-list : 4"
+    ::= {axAccessFilterStatsOutTotalEntry 2}
+
+axAccessFilterStatsOutTotalSequenceNumber OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Sequence number of flow detection condition and action specification set to access list name."
+    ::= {axAccessFilterStatsOutTotalEntry 3}
+
+axAccessFilterStatsOutTotalListName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Access list number or access list name corresponding to index of access list."
+    ::= {axAccessFilterStatsOutTotalEntry 4}
+
+axAccessFilterStatsOutTotalMatchedPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Corresponding number of packets to flow detection condition of access list."
+    ::= {axAccessFilterStatsOutTotalEntry 5}
+
+axAccessFilterStatsOutTotalMatchedBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Corresponding number of bytes to flow detection condition of access list. "
+    ::= {axAccessFilterStatsOutTotalEntry 6}
+
+
+--
+--  axAccessFilterStatsInMirrorTotalTable
+--
+axAccessFilterStatsInMirrorTotalTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxAccessFilterStatsInMirrorTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table information on corresponding number of statistics to flow detection condition
+         and action specification set by access list."
+    ::= {axAccessFilterStats 31}
+
+axAccessFilterStatsInMirrorTotalEntry OBJECT-TYPE
+    SYNTAX AxAccessFilterStatsInMirrorTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry concerning corresponding number of statistics to flow detection condition
+         and action specification set by access list."
+    INDEX {
+        axAccessFilterStatsInMirrorTotalifIndex,
+        axAccessFilterStatsInMirrorTotalGroupType,
+        axAccessFilterStatsInMirrorTotalSequenceNumber
+    }
+    ::= {axAccessFilterStatsInMirrorTotalTable 1}
+
+AxAccessFilterStatsInMirrorTotalEntry ::= SEQUENCE {
+    axAccessFilterStatsInMirrorTotalifIndex          Integer32,
+    axAccessFilterStatsInMirrorTotalGroupType        INTEGER,
+    axAccessFilterStatsInMirrorTotalSequenceNumber   Unsigned32,
+    axAccessFilterStatsInMirrorTotalListName         DisplayString,
+    axAccessFilterStatsInMirrorTotalMatchedPackets   Counter64,
+    axAccessFilterStatsInMirrorTotalMatchedBytes     Counter64
+}
+
+axAccessFilterStatsInMirrorTotalifIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index value in which entry of this table is identified."
+    ::= {axAccessFilterStatsInMirrorTotalEntry 1}
+
+axAccessFilterStatsInMirrorTotalGroupType OBJECT-TYPE
+    SYNTAX INTEGER {
+            mac(1),
+            ip(2),
+            ipv6(3),
+            advance(4)
+            }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Indicates access-list type.
+           mac access-list : 1
+           ip access-list : 2
+           ipv6 access-list : 3
+           advance access-list : 4"
+    ::= {axAccessFilterStatsInMirrorTotalEntry 2}
+
+axAccessFilterStatsInMirrorTotalSequenceNumber OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Sequence number of flow detection condition and action specification set to access list name."
+    ::= {axAccessFilterStatsInMirrorTotalEntry 3}
+
+axAccessFilterStatsInMirrorTotalListName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Access list number or access list name corresponding to index of access list."
+    ::= {axAccessFilterStatsInMirrorTotalEntry 4}
+
+axAccessFilterStatsInMirrorTotalMatchedPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Corresponding number of packets to flow detection condition of access list."
+    ::= {axAccessFilterStatsInMirrorTotalEntry 5}
+
+axAccessFilterStatsInMirrorTotalMatchedBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Corresponding number of bytes to flow detection condition of access list."
+    ::= {axAccessFilterStatsInMirrorTotalEntry 6}
+
+
+--
+--  axAccessFilterStatsOutMirrorTotalTable
+--
+axAccessFilterStatsOutMirrorTotalTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxAccessFilterStatsOutMirrorTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table information on corresponding number of statistics to flow detection condition
+         and action specification set by access list."
+    ::= {axAccessFilterStats 41}
+
+axAccessFilterStatsOutMirrorTotalEntry OBJECT-TYPE
+    SYNTAX AxAccessFilterStatsOutMirrorTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry concerning corresponding number of statistics to flow detection condition
+         and action specification set by access list."
+    INDEX {
+        axAccessFilterStatsOutMirrorTotalifIndex,
+        axAccessFilterStatsOutMirrorTotalGroupType,
+        axAccessFilterStatsOutMirrorTotalSequenceNumber
+    }
+    ::= {axAccessFilterStatsOutMirrorTotalTable 1}
+
+AxAccessFilterStatsOutMirrorTotalEntry ::= SEQUENCE {
+    axAccessFilterStatsOutMirrorTotalifIndex              Integer32,
+    axAccessFilterStatsOutMirrorTotalGroupType            INTEGER,
+    axAccessFilterStatsOutMirrorTotalSequenceNumber       Unsigned32,
+    axAccessFilterStatsOutMirrorTotalListName             DisplayString,
+    axAccessFilterStatsOutMirrorTotalMatchedPackets       Counter64,
+    axAccessFilterStatsOutMirrorTotalMatchedBytes         Counter64
+}
+
+axAccessFilterStatsOutMirrorTotalifIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index value in which entry of this table is identified."
+    ::= {axAccessFilterStatsOutMirrorTotalEntry 1}
+
+axAccessFilterStatsOutMirrorTotalGroupType OBJECT-TYPE
+    SYNTAX INTEGER {
+            mac(1),
+            ip(2),
+            ipv6(3),
+            advance(4)
+            }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Indicates access-list type.
+           mac access-list : 1
+           ip access-list : 2
+           ipv6 access-list : 3
+           advance access-list : 4"
+    ::= {axAccessFilterStatsOutMirrorTotalEntry 2}
+
+axAccessFilterStatsOutMirrorTotalSequenceNumber OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Sequence number of flow detection condition and action specification set to access list name."
+    ::= {axAccessFilterStatsOutMirrorTotalEntry 3}
+
+axAccessFilterStatsOutMirrorTotalListName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Access list number or access list name corresponding to index of access list."
+    ::= {axAccessFilterStatsOutMirrorTotalEntry 4}
+
+axAccessFilterStatsOutMirrorTotalMatchedPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Corresponding number of packets to flow detection condition of access list."
+    ::= {axAccessFilterStatsOutMirrorTotalEntry 5}
+
+axAccessFilterStatsOutMirrorTotalMatchedBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Corresponding number of bytes to flow detection condition of access list."
+    ::= {axAccessFilterStatsOutMirrorTotalEntry 6}
+
+
+--
+--  axQosFlowStatsInTotalTable
+--
+axQosFlowStatsInTotalTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxQosFlowStatsInTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table information on corresponding number of statistics to QoS flow detection condition and action specification set in QoS flow list."
+    ::= {axQosFlowStats 11}
+
+axQosFlowStatsInTotalEntry OBJECT-TYPE
+    SYNTAX AxQosFlowStatsInTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry concerning corresponding number of statistics to QoS flow detection condition and action specification set in QoS flow list."
+    INDEX {
+        axQosFlowStatsInTotalifIndex,
+        axQosFlowStatsInTotalGroupType,
+        axQosFlowStatsInTotalSequenceNumber
+     }
+    ::= {axQosFlowStatsInTotalTable 1}
+
+AxQosFlowStatsInTotalEntry ::= SEQUENCE {
+    axQosFlowStatsInTotalifIndex            Integer32,
+    axQosFlowStatsInTotalGroupType          INTEGER,
+    axQosFlowStatsInTotalSequenceNumber     Unsigned32,
+    axQosFlowStatsInTotalListName           DisplayString,
+    axQosFlowStatsInTotalMatchedPackets     Counter64,
+    axQosFlowStatsInTotalMatchedBytes       Counter64
+}
+
+axQosFlowStatsInTotalifIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index value in which entry of this table is identified."
+    ::= {axQosFlowStatsInTotalEntry 1}
+
+axQosFlowStatsInTotalGroupType OBJECT-TYPE
+    SYNTAX INTEGER {
+            mac(1),
+            ip(2),
+            ipv6(3),
+            advance(4)
+            }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Indicates qos-flow-list type. mac qos-flow-list : 1 ip qos-flow-list : 2 ipv6 qos-flow-list : 3 advance qos-flow-list : 4"
+    ::= {axQosFlowStatsInTotalEntry 2}
+
+axQosFlowStatsInTotalSequenceNumber OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Sequence number of flow detection condition and action specification set to QoS flow list name."
+    ::= {axQosFlowStatsInTotalEntry 3}
+
+axQosFlowStatsInTotalListName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "QoS flow list name corresponding to index of QoS flow list."
+    ::= {axQosFlowStatsInTotalEntry 4}
+
+axQosFlowStatsInTotalMatchedPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Corresponding number of packets to flow detection condition of QoS flow list."
+    ::= {axQosFlowStatsInTotalEntry 5}
+
+axQosFlowStatsInTotalMatchedBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Corresponding number of bytes to flow detection condition of QoS flow list. "
+    ::= {axQosFlowStatsInTotalEntry 6}
+
+
+--
+--  axQosFlowStatsOutTotalTable
+--
+axQosFlowStatsOutTotalTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxQosFlowStatsOutTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table information on corresponding number of statistics to QoS flow detection condition and action specification set in QoS flow list."
+    ::= {axQosFlowStats 21}
+
+axQosFlowStatsOutTotalEntry OBJECT-TYPE
+    SYNTAX AxQosFlowStatsOutTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry concerning corresponding number of statistics to QoS flow detection condition and action specification set in QoS flow list."
+    INDEX {
+        axQosFlowStatsOutTotalifIndex,
+        axQosFlowStatsOutTotalGroupType,
+        axQosFlowStatsOutTotalSequenceNumber
+     }
+    ::= {axQosFlowStatsOutTotalTable 1}
+
+AxQosFlowStatsOutTotalEntry ::=  SEQUENCE {
+    axQosFlowStatsOutTotalifIndex               Integer32,
+    axQosFlowStatsOutTotalGroupType             INTEGER,
+    axQosFlowStatsOutTotalSequenceNumber        Unsigned32,
+    axQosFlowStatsOutTotalListName              DisplayString,
+    axQosFlowStatsOutTotalMatchedPackets        Counter64,
+    axQosFlowStatsOutTotalMatchedBytes          Counter64
+}
+
+axQosFlowStatsOutTotalifIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index value in which entry of this table is identified."
+    ::= {axQosFlowStatsOutTotalEntry 1}
+
+axQosFlowStatsOutTotalGroupType OBJECT-TYPE
+    SYNTAX INTEGER {
+            mac(1),
+            ip(2),
+            ipv6(3),
+            advance(4)
+            }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Indicates qos-flow-list type. mac qos-flow-list : 1 ip qos-flow-list : 2 ipv6 qos-flow-list : 3 advance qos-flow-list : 4"
+    ::= {axQosFlowStatsOutTotalEntry 2}
+
+axQosFlowStatsOutTotalSequenceNumber OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Sequence number of flow detection condition and action specification set to QoS flow list name."
+    ::= {axQosFlowStatsOutTotalEntry 3}
+
+axQosFlowStatsOutTotalListName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "QoS flow list name corresponding to index of QoS flow list."
+    ::= {axQosFlowStatsOutTotalEntry 4}
+
+axQosFlowStatsOutTotalMatchedPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Corresponding number of packets to flow detection condition of QoS flow list."
+    ::= {axQosFlowStatsOutTotalEntry 5}
+
+axQosFlowStatsOutTotalMatchedBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Corresponding number of bytes to flow detection condition of QoS flow list. "
+    ::= {axQosFlowStatsOutTotalEntry 6}
+
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Confoemance identifier
+--
+
+axFlowConformance          OBJECT IDENTIFIER ::= { axFlow 1000 }
+axFlowCompliances          OBJECT IDENTIFIER ::= { axFlowConformance 1 }
+axFlowGroups               OBJECT IDENTIFIER ::= { axFlowConformance 2 }
+
+--
+-- Compliance
+--
+
+axFlowCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "AX Flow Object"
+    MODULE      -- this module
+        MANDATORY-GROUPS{ axFlowGroup }
+    ::= { axFlowCompliances 1 }
+
+--
+-- Object Group
+--
+
+axFlowGroup OBJECT-GROUP
+    OBJECTS    {
+                    axAccessFilterStatsInTotalListName,
+                    axAccessFilterStatsInTotalMatchedPackets,
+                    axAccessFilterStatsInTotalMatchedBytes,
+                    
+                    axAccessFilterStatsOutTotalListName,
+                    axAccessFilterStatsOutTotalMatchedPackets,
+                    axAccessFilterStatsOutTotalMatchedBytes,
+                    
+                    axAccessFilterStatsInMirrorTotalListName,
+                    axAccessFilterStatsInMirrorTotalMatchedPackets,
+                    axAccessFilterStatsInMirrorTotalMatchedBytes,
+                    
+                    axAccessFilterStatsOutMirrorTotalListName,
+                    axAccessFilterStatsOutMirrorTotalMatchedPackets,
+                    axAccessFilterStatsOutMirrorTotalMatchedBytes,
+                    
+                    axQosFlowStatsInTotalListName,
+                    axQosFlowStatsInTotalMatchedPackets,
+                    axQosFlowStatsInTotalMatchedBytes,
+                    
+                    axQosFlowStatsOutTotalListName,
+                    axQosFlowStatsOutTotalMatchedPackets,
+                    axQosFlowStatsOutTotalMatchedBytes
+               }
+    STATUS current
+    DESCRIPTION
+                "The collection of notifications of axFlow."
+    ::= { axFlowGroups 1 }
+
+END

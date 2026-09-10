@@ -89,7 +89,7 @@ $rrd_def = RrdDefinition::make();
 $fields = [];
 foreach ($powerdns_metrics as $ds => $metric) {
     $rrd_def->addDataset($ds, 'DERIVE', 0, 125000000000);
-    $fields[$ds] = isset($powerdns[$metric]) ? $powerdns[$metric] : 'U';
+    $fields[$ds] = $powerdns[$metric] ?? null;
 }
 
 $tags = [
@@ -98,5 +98,5 @@ $tags = [
     'rrd_name' => ['app', $name, $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, json_encode($powerdns), $fields);

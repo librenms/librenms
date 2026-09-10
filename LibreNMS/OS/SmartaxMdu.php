@@ -8,15 +8,15 @@ use LibreNMS\Util\StringHelpers;
 
 class SmartaxMdu extends OS
 {
-    use OS\Traits\EntityMib {
-        OS\Traits\EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
+    use Traits\EntityMib {
+        Traits\EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
     }
 
     protected ?string $entityVendorTypeMib = 'HUAWEI-MIB';
 
     public function discoverEntityPhysical(): \Illuminate\Support\Collection
     {
-        return $this->discoverBaseEntityPhysical()->each(function (EntPhysical $entity) {
+        return $this->discoverBaseEntityPhysical()->each(function (EntPhysical $entity): void {
             // clean garbage in Rev fields "...............\n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
             $entity->entPhysicalDescr = StringHelpers::trimHexGarbage($entity->entPhysicalDescr);
             $entity->entPhysicalName = StringHelpers::trimHexGarbage($entity->entPhysicalName);

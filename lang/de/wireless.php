@@ -112,8 +112,8 @@ return [
         'unit' => '',
     ],
     'channel' => [
-        'short' => 'Kanall',
-        'long' => 'Kanall',
+        'short' => 'Kanal',
+        'long' => 'Kanal',
         'unit' => '',
     ],
 ];

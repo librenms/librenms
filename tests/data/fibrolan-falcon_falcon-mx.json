@@ -8436,7 +8436,7 @@
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.4467.1000.10.1.120.1.2",
+                    "processor_oid": ".1.3.6.1.4.1.4467.1000.10.1.120.1.2.201",
                     "processor_index": "201",
                     "processor_type": "fibrolan-falcon",
                     "processor_usage": 96,
@@ -8446,21 +8446,7 @@
                 }
             ]
         },
-        "poller": {
-            "processors": [
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.4467.1000.10.1.120.1.2",
-                    "processor_index": "201",
-                    "processor_type": "fibrolan-falcon",
-                    "processor_usage": 0,
-                    "processor_descr": "CPU Usage",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -8984,7 +8970,7 @@
                     "entPhysicalFirmwareRev": "7.4.4.24",
                     "entPhysicalSoftwareRev": "7.4.4.24",
                     "entPhysicalAlias": "None",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "Jaguar2-cu8sfp16",
                     "entPhysicalVendorType": "enterprises.4467.1000.340",
@@ -8992,10 +8978,26 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 }
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0205:80ff:fe05:9160",
+                    "ipv6_compressed": "fe80::205:80ff:fe05:9160",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 999
+                }
+            ]
+        }
     }
 }

@@ -16,7 +16,7 @@ try {
         'data' => [],
     ];
     [$ntp['data']['offset'], $ntp['data']['frequency'], $ntp['data']['sys_jitter'],
-        $ntp['data']['clk_jitter'], $ntp['data']['clk_wander']] = explode("\n", $legacy);
+        $ntp['data']['clk_jitter'], $ntp['data']['clk_wander']] = explode("\n", (string) $legacy);
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
@@ -45,5 +45,5 @@ $tags = [
     'rrd_name' => ['app', $name, $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, 'OK', $fields);

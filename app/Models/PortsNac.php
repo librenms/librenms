@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PortsNac.php
  *
@@ -25,10 +26,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PortsNac extends PortRelatedModel
 {
+    use HasFactory;
     protected $table = 'ports_nac';
     protected $primaryKey = 'ports_nac_id';
     public $timestamps = true;
@@ -52,9 +55,11 @@ class PortsNac extends PortRelatedModel
     ];
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
+     */
     public function device(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
+        return $this->belongsTo(Device::class, 'device_id', 'device_id');
     }
 }

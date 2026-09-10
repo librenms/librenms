@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2020 Adam Bishop <adam@omega.org.uk>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +23,9 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Alert\Transport;
-use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
@@ -60,7 +61,7 @@ class Sensu extends Transport
 
         if ($alert_data['state'] !== AlertState::RECOVERED && $alert_data['state'] !== AlertState::ACKNOWLEDGED && $alert_data['alerted'] === 0) {
             // If this is the first event, send a forced "ok" dated (rrd.step / 2) seconds ago to tell Sensu the last time the check was healthy
-            $data = $this->generateData($alert_data, self::OK, (int) round(Config::get('rrd.step', 300) / 2));
+            $data = $this->generateData($alert_data, self::OK, (int) round(LibrenmsConfig::get('rrd.step', 300) / 2));
             Log::debug('Sensu transport sent last good event to socket: ', $data);
 
             $result = $client->post($url . '/events', $data);
@@ -95,7 +96,7 @@ class Sensu extends Transport
                 ],
                 'command' => sprintf('LibreNMS: %s', $alert_data['builder']),
                 'executed' => time() - $offset,
-                'interval' => Config::get('rrd.step', 300),
+                'interval' => LibrenmsConfig::get('rrd.step', 300),
                 'issued' => time() - $offset,
                 'output' => $alert_data['msg'],
                 'status' => $status,

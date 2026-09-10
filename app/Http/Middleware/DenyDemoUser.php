@@ -11,12 +11,12 @@ class DenyDemoUser
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  Request  $request
+     * @param  Closure  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user()->isDemo()) {
+        if ($request->user()->can('demo')) {
             return response()->view('auth.deny-demo');
         }
 

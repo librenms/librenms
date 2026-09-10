@@ -1,7 +1,5 @@
 <?php
 
-$class = 'percent';
-$unit = '%';
-$graph_type = 'sensor_percent';
+$class = \LibreNMS\Enum\Sensor::Percent;
 
 require 'sensors.inc.php';

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Stp.php
  *
@@ -28,11 +29,11 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Models\PortStp;
 use App\Observers\ModuleModelObserver;
-use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 
 class Stp implements Module
@@ -47,9 +48,9 @@ class Stp implements Module
         return ['ports', 'vlans'];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     public function discover(OS $os): void
@@ -57,35 +58,35 @@ class Stp implements Module
         $device = $os->getDevice();
 
         $instances = $os->discoverStpInstances();
-        Log::info('Instances: ');
-        ModuleModelObserver::observe(\App\Models\Stp::class);
+        ModuleModelObserver::observe(\App\Models\Stp::class, 'Instances');
         $this->syncModels($device, 'stpInstances', $instances);
+        ModuleModelObserver::done();
 
         $ports = $os->discoverStpPorts($instances);
-        Log::info('Ports: ');
-        ModuleModelObserver::observe(PortStp::class);
+        ModuleModelObserver::observe(PortStp::class, 'Ports');
         $this->syncModels($device, 'stpPorts', $ports);
+        ModuleModelObserver::done();
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $device = $os->getDevice();
 
-        Log::info('Instances: ');
         $instances = $device->stpInstances;
         $instances = $os->pollStpInstances($instances);
-        ModuleModelObserver::observe(\App\Models\Stp::class);
+        ModuleModelObserver::observe(\App\Models\Stp::class, 'Instances');
         $this->syncModels($device, 'stpInstances', $instances);
+        ModuleModelObserver::done();
 
-        Log::info('Ports: ');
         $ports = $device->stpPorts;
-        ModuleModelObserver::observe(PortStp::class);
+        ModuleModelObserver::observe(PortStp::class, 'Ports');
         $this->syncModels($device, 'stpPorts', $ports);
+        ModuleModelObserver::done();
     }
 
     public function dataExists(Device $device): bool

@@ -14,6 +14,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users_widgets', function (Blueprint $table) {
+            $table->dropIndex('user_id');
+            $table->index(['user_id'], 'user_id');
             $table->dropColumn('widget_id');
         });
     }

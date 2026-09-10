@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Availability.php
  *
@@ -121,7 +122,7 @@ class Availability
 
         // don't calculate for time when the device didn't exist
         if ($device->inserted) {
-            $duration = min($duration, $device->inserted->diffInSeconds());
+            $duration = min($duration, (int) $device->inserted->diffInSeconds(null, true));
         }
 
         $outage_summary = self::outageSummary($found_outages, $duration, $now);

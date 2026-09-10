@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2019 George Pantazis <gpant@eservices-greece.com>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +33,7 @@ class Mattermost extends Transport
     public function deliverAlert(array $alert_data): bool
     {
         $host = $this->config['mattermost-url'];
-        $mattermost_msg = strip_tags($alert_data['msg']);
+        $mattermost_msg = strip_tags((string) $alert_data['msg']);
         $color = self::getColorForState($alert_data['state']);
         $data = [
             'attachments' => [

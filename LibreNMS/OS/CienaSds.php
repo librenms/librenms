@@ -165,7 +165,7 @@ class CienaSds extends OS
 
         foreach ($transceivers as $index => $contents) {
             if (! empty($contents['cienaCesEttpConfigName'])) {
-                $nameArr = explode('/', $contents['cienaCesEttpConfigName']);
+                $nameArr = explode('/', (string) $contents['cienaCesEttpConfigName']);
                 $slotIndex = isset($nameArr[1]) ? $nameArr[0] : 1;
 
                 $inventory->push(new EntPhysical([
@@ -184,11 +184,11 @@ class CienaSds extends OS
                     $contents['cienaCesPortXcvrWaveLength'] . ' nm ' : '');
                 $mfgString = ($contents['cienaCesPortXcvrMfgDate'] != '' ?
                     'manufactured ' . $contents['cienaCesPortXcvrMfgDate'] . ' ' : '');
-                $xcvrIndex = '57' . $contents['cienaCesPortXcvrPortNumber'];
+                $xcvrIndex = '57' . ($contents['cienaCesPortXcvrPortNumber'] ?? null);
 
                 $inventory->push(new EntPhysical([
                     'entPhysicalIndex' => $xcvrIndex,
-                    'entPhysicalDescr' => 'port ' . $contents['cienaCesPortXcvrPortNumber'] . ' ' . $wavelengthString .
+                    'entPhysicalDescr' => 'port ' . ($contents['cienaCesPortXcvrPortNumber'] ?? null) . ' ' . $wavelengthString .
                         ' transceiver ' . $mfgString,
                     'entPhysicalClass' => 'sensor',
                     'entPhysicalModelName' => $contents['cienaCesPortXcvrVendorPartNum'],

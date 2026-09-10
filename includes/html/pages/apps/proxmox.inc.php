@@ -6,7 +6,8 @@ $graphs['proxmox'] = [
 ];
 
 $pmxcl = dbFetchRows('SELECT DISTINCT(`app_instance`) FROM `applications` WHERE `app_type` = ?', ['proxmox']);
-$instance = Request::get('instance', $pmxcl[0]['app_instance'] ?? null);
+$default_instance = ! empty($pmxcl) ? $pmxcl[0]['app_instance'] : null;
+$instance = $vars['instance'] ?? $default_instance;
 
 print_optionbar_start();
 
@@ -22,7 +23,7 @@ foreach ($pmxcl as $pmxc) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link(\LibreNMS\Util\StringHelpers::niceCase($pmxc->app_instance), ['page' => 'apps', 'app' => 'proxmox', 'instance' => $pmxc['app_instance']]);
+    echo generate_link($pmxc['app_instance'], ['page' => 'apps', 'app' => 'proxmox', 'instance' => $pmxc['app_instance']]);
 
     if ($selected) {
         echo '</span>';

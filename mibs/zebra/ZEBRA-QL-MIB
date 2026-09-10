@@ -1,0 +1,2358 @@
+ZEBRA-QL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+enterprises, OBJECT-TYPE, NetworkAddress,
+IpAddress, Counter                          FROM RFC1155-SMI
+DisplayString                               FROM RFC1213-MIB
+TRAP-TYPE                                   FROM RFC-1215;
+
+zebra             OBJECT IDENTIFIER ::= { enterprises 10642 }
+zql-zebra-ql      OBJECT IDENTIFIER ::= { zebra 200 }
+zql-ql-bluetooth  OBJECT IDENTIFIER ::= { zql-zebra-ql 1 }
+
+zql-bluetooth-discoverable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-bluetooth 3 }
+
+zql-bluetooth-friendly-name OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-bluetooth 5 }
+
+zql-bluetooth-version OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-bluetooth 6 }
+
+zql-bluetooth-date OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-bluetooth 7 }
+
+zql-bluetooth-local-name OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-bluetooth 10 }
+
+zql-bluetooth-address OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-bluetooth 11 }
+
+zql-bluetooth-bluetooth-pin OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-bluetooth 12 }
+
+zql-bluetooth-short-address OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-bluetooth 13 }
+
+zql-bluetooth-radio-version OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-bluetooth 14 }
+
+zql-bluetooth-afh-mode OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-bluetooth 15 }
+
+zql-bluetooth-afh-map OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-bluetooth 16 }
+
+zql-bluetooth-afh-map-curr OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-bluetooth 17 }
+
+zql-bluetooth-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-bluetooth 19 }
+
+zql-bluetooth-connected OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-bluetooth 21 }
+
+zql-ql-card   OBJECT IDENTIFIER ::= { zql-zebra-ql 2 }
+
+zql-card-inserted OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-card 1 }
+
+zql-card-idtext1 OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-card 6 }
+
+zql-card-idtext2 OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-card 7 }
+
+
+zql-card-idtext3 OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-card 8 }
+
+zql-card-idtext4 OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-card 9 }
+
+zql-card-mac-addr OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-card 15 }
+
+zql-card-mac-raw OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-card 16 }
+
+zql-card-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-card 17 }
+
+zql-ql-comm   OBJECT IDENTIFIER ::= { zql-zebra-ql 3 }
+
+zql-comm-baud OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-comm 1 }
+
+zql-comm-data-bits OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-comm 2 }
+
+zql-comm-parity OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-comm 3 }
+
+zql-comm-stop-bits OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-comm 4 }
+
+zql-comm-dsr OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-comm 5 }
+
+zql-ql-head   OBJECT IDENTIFIER ::= { zql-zebra-ql 4 }
+
+zql-head-latch OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-head 1 }
+
+zql-ql-ip   OBJECT IDENTIFIER ::= { zql-zebra-ql 5 }
+
+zql-ip-dhcp   OBJECT IDENTIFIER ::= { zql-ql-ip 1 }
+
+zql-dhcp-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dhcp 1 }
+
+zql-dhcp-cid-type OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dhcp 2 }
+
+zql-dhcp-cid-prefix OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dhcp 3 }
+
+zql-dhcp-cid-value OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dhcp 4 }
+
+zql-dhcp-requests-per-session OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dhcp 5 }
+
+zql-dhcp-request-timeout OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dhcp 6 }
+
+
+zql-dhcp-session-interval OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dhcp 7 }
+
+zql-dhcp-lease   OBJECT IDENTIFIER ::= { zql-ip-dhcp 8 }
+
+zql-lease-length OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-dhcp-lease 1 }
+
+zql-lease-time-left OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-dhcp-lease 2 }
+
+zql-lease-server OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-dhcp-lease 3 }
+
+
+zql-lease-last-attempt OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-dhcp-lease 4 }
+
+zql-dhcp-cache-ip OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dhcp 9 }
+
+zql-dhcp-vendor-class-id OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dhcp 10 }
+
+zql-dhcp-user-class-id OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dhcp 11 }
+
+zql-dhcp-option12 OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dhcp 12 }
+
+zql-dhcp-option12-format OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dhcp 13 }
+
+zql-dhcp-option12-value OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dhcp 14 }
+
+zql-ip-ftp   OBJECT IDENTIFIER ::= { zql-ql-ip 2 }
+
+zql-ftp-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-ftp 1 }
+
+zql-ftp-execute-file OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-ftp 2 }
+
+zql-ip-lpd   OBJECT IDENTIFIER ::= { zql-ql-ip 3 }
+
+zql-lpd-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-lpd 1 }
+
+zql-ip-tcp   OBJECT IDENTIFIER ::= { zql-ql-ip 4 }
+
+zql-tcp-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-tcp 1 }
+
+zql-ip-udp   OBJECT IDENTIFIER ::= { zql-ql-ip 5 }
+
+zql-udp-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-udp 1 }
+
+zql-ip-http   OBJECT IDENTIFIER ::= { zql-ql-ip 6 }
+
+zql-http-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-http 1 }
+
+zql-ip-smtp   OBJECT IDENTIFIER ::= { zql-ql-ip 7 }
+
+zql-smtp-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-smtp 1 }
+
+zql-smtp-server-addr OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-smtp 2 }
+
+zql-ip-pop3   OBJECT IDENTIFIER ::= { zql-ql-ip 8 }
+
+zql-pop3-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-pop3 1 }
+
+zql-pop3-print-headers OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-pop3 2 }
+
+zql-pop3-verbose-headers OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-pop3 3 }
+
+zql-pop3-print-body OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-pop3 4 }
+
+zql-pop3-save-attachments OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-pop3 5 }
+
+zql-pop3-poll OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-pop3 6 }
+
+zql-pop3-username OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-pop3 7 }
+
+zql-pop3-password OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-pop3 8 }
+
+zql-pop3-server-addr OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-pop3 9 }
+
+zql-pop3-print-attachments OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-pop3 10 }
+
+zql-ip-snmp   OBJECT IDENTIFIER ::= { zql-ql-ip 9 }
+
+zql-snmp-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-snmp 1 }
+
+zql-snmp-get-community-name OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-snmp 2 }
+
+zql-snmp-set-community-name OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-snmp 3 }
+
+zql-snmp-create-mib OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-snmp 4 }
+
+zql-ip-telnet   OBJECT IDENTIFIER ::= { zql-ql-ip 10 }
+
+zql-telnet-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-telnet 1 }
+
+zql-telnet-disconnect OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-telnet 2 }
+
+zql-ip-addr OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-ip 11 }
+
+zql-ip-netmask OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-ip 12 }
+
+zql-ip-gateway OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-ip 13 }
+
+zql-ip-port OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-ip 14 }
+
+zql-ip-remote OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-ip 15 }
+
+zql-ip-ping-remote OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-ip 16 }
+
+zql-ip-netstat OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-ip 17 }
+
+zql-ip-remote-port OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-ip 18 }
+
+zql-ip-bootp   OBJECT IDENTIFIER ::= { zql-ql-ip 20 }
+
+zql-bootp-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-bootp 1 }
+
+zql-ip-mirror   OBJECT IDENTIFIER ::= { zql-ql-ip 21 }
+
+zql-mirror-auto OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 1 }
+
+zql-mirror-username OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 2 }
+
+zql-mirror-password OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 3 }
+
+zql-mirror-server OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 4 }
+
+zql-mirror-path OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 5 }
+
+zql-mirror-freq OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 6 }
+
+zql-mirror-fetch OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 7 }
+
+zql-mirror-version OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 8 }
+
+zql-mirror-freq-hours OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 9 }
+
+zql-mirror-error-retry OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 10 }
+
+zql-mirror-feedback   OBJECT IDENTIFIER ::= { zql-ip-mirror 11 }
+
+zql-feedback-auto OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-mirror-feedback 1 }
+
+zql-feedback-path OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-mirror-feedback 2 }
+
+zql-feedback-freq OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-mirror-feedback 3 }
+
+zql-mirror-success OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 12 }
+
+zql-mirror-success-time OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 13 }
+
+zql-mirror-last-time OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 14 }
+
+zql-mirror-last-error OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 15 }
+
+zql-mirror-mode OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-mirror 17 }
+
+zql-ip-ping-len OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-ip 24 }
+
+zql-ip-dns   OBJECT IDENTIFIER ::= { zql-ql-ip 25 }
+
+zql-dns-domain OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dns 1 }
+
+zql-dns-servers OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-dns 2 }
+
+zql-ip-discovery   OBJECT IDENTIFIER ::= { zql-ql-ip 26 }
+
+zql-discovery-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-discovery 1 }
+
+zql-discovery-port OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ip-discovery 2 }
+
+zql-ip-roam-packet OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-ip 27 }
+
+zql-ql-label   OBJECT IDENTIFIER ::= { zql-zebra-ql 6 }
+
+zql-label-x-move OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-label 1 }
+
+zql-label-y-move OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-label 2 }
+
+zql-ql-motor   OBJECT IDENTIFIER ::= { zql-zebra-ql 7 }
+
+zql-ql-media   OBJECT IDENTIFIER ::= { zql-zebra-ql 8 }
+
+zql-media-status OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-media 1 }
+
+zql-media-sense-mode OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-media 2 }
+
+zql-media-tof OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-media 3 }
+
+zql-media-type OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-media 4 }
+
+zql-media-width-sense   OBJECT IDENTIFIER ::= { zql-ql-media 5 }
+
+zql-width-sense-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-media-width-sense 1 }
+
+zql-width-sense-in-mm OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-media-width-sense 2 }
+
+zql-width-sense-in-cm OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-media-width-sense 3 }
+
+zql-width-sense-in-dots OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-media-width-sense 4 }
+
+zql-width-sense-in-inches OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-media-width-sense 5 }
+
+zql-media-measure-label OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-media 11 }
+
+zql-media-measured-lbl-height   OBJECT IDENTIFIER ::= { zql-ql-media 12 }
+
+zql-measured-lbl-height-min OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-media-measured-lbl-height 1 }
+
+zql-measured-lbl-height-max OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-media-measured-lbl-height 2 }
+
+zql-measured-lbl-height-avg OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-media-measured-lbl-height 3 }
+
+zql-measured-lbl-height-std-dev OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-media-measured-lbl-height 4 }
+
+zql-ql-sensor   OBJECT IDENTIFIER ::= { zql-zebra-ql 9 }
+
+zql-sensor-paper-supply OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-sensor 2 }
+
+zql-sensor-peeler OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-sensor 3 }
+
+zql-ql-srf   OBJECT IDENTIFIER ::= { zql-zebra-ql 10 }
+
+zql-ql-wlan   OBJECT IDENTIFIER ::= { zql-zebra-ql 11 }
+
+zql-wlan-operating-mode OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 1 }
+
+zql-wlan-essid OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 2 }
+
+zql-wlan-current-essid OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 3 }
+
+zql-wlan-station-name OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 4 }
+
+zql-wlan-current-tx-rate OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 6 }
+
+zql-wlan-encryption-mode OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 7 }
+
+zql-wlan-associated OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 8 }
+
+zql-wlan-encryption-index OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 9 }
+
+zql-wlan-encryption-key1 OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 10 }
+
+zql-wlan-encryption-key2 OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 11 }
+
+zql-wlan-encryption-key3 OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 12 }
+
+zql-wlan-encryption-key4 OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 13 }
+
+zql-wlan-leap-mode OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 14 }
+
+zql-wlan-leap-username OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 15 }
+
+zql-wlan-leap-password OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 16 }
+
+zql-wlan-power-save OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 17 }
+
+zql-wlan-test   OBJECT IDENTIFIER ::= { zql-ql-wlan 18 }
+
+zql-wlan-auth-type OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 20 }
+
+zql-wlan-preamble OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 21 }
+
+zql-wlan-bssid OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 22 }
+
+zql-wlan-firmware-version OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 24 }
+
+zql-wlan-signal-strength OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 25 }
+
+zql-wlan-current-freq OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 28 }
+
+zql-wlan-roam   OBJECT IDENTIFIER ::= { zql-ql-wlan 31 }
+
+zql-roam-signal OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-roam 1 }
+
+zql-roam-interval OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-roam 2 }
+
+zql-roam-interchannel-delay OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-roam 4 }
+
+zql-roam-max-chan-scan-time OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-roam 5 }
+
+zql-roam-rssi OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-roam 6 }
+
+zql-roam-max-fail OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-roam 7 }
+
+zql-wlan-channel OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 35 }
+
+zql-wlan-wpa   OBJECT IDENTIFIER ::= { zql-ql-wlan 36 }
+
+zql-wpa-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-wpa 1 }
+
+zql-wpa-authentication OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-wpa 2 }
+
+zql-wpa-psk OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-wpa 3 }
+
+zql-wpa-wpa-version OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-wpa 5 }
+
+zql-wpa-groupkey-ciphersuite OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-wpa 6 }
+
+zql-wpa-pairwise-ciphersuite OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-wpa 7 }
+
+zql-wlan-8021x   OBJECT IDENTIFIER ::= { zql-ql-wlan 37 }
+
+zql-8021x-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-8021x 1 }
+
+zql-8021x-authentication OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-8021x 2 }
+
+zql-8021x-peap   OBJECT IDENTIFIER ::= { zql-wlan-8021x 3 }
+
+zql-peap-peap-username OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-8021x-peap 1 }
+
+zql-peap-peap-password OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-8021x-peap 2 }
+
+zql-peap-privkey-password OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-8021x-peap 3 }
+
+zql-8021x-eap   OBJECT IDENTIFIER ::= { zql-wlan-8021x 4 }
+
+zql-eap-username OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-8021x-eap 1 }
+
+zql-eap-password OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-8021x-eap 2 }
+
+zql-eap-privkey-password OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-8021x-eap 3 }
+
+zql-wlan-adhocchannel OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 38 }
+
+zql-wlan-adhocautomode OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 39 }
+
+zql-wlan-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 40 }
+
+zql-wlan-encryption-optional OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 41 }
+
+zql-wlan-adhoc-last-channel OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 42 }
+
+zql-wlan-secure-ssid OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-wlan 43 }
+
+zql-wlan-ip   OBJECT IDENTIFIER ::= { zql-ql-wlan 44 }
+
+zql-wlan-ip-addr OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-ip 1 }
+
+zql-wlan-ip-netmask OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-ip 2 }
+
+zql-wlan-keep-alive   OBJECT IDENTIFIER ::= { zql-ql-wlan 45 }
+
+zql-keep-alive-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-keep-alive 1 }
+
+zql-keep-alive-timeout OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-wlan-keep-alive 2 }
+
+zql-ql-display   OBJECT IDENTIFIER ::= { zql-zebra-ql 12 }
+
+zql-display-contrast OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-display 1 }
+
+zql-display-text OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-display 2 }
+
+zql-display-backlight OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-display 3 }
+
+zql-display-backlight-on-time OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-display 8 }
+
+zql-ql-memory   OBJECT IDENTIFIER ::= { zql-zebra-ql 13 }
+
+zql-memory-flash-size OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-memory 1 }
+
+zql-memory-ram-size OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-memory 2 }
+
+zql-memory-flash-free OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-memory 3 }
+
+zql-memory-ram-free OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-memory 4 }
+
+zql-ql-power   OBJECT IDENTIFIER ::= { zql-zebra-ql 14 }
+
+zql-power-voltage OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 1 }
+
+zql-power-percent-full OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 2 }
+
+zql-power-status OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 3 }
+
+zql-power-low-battery-warning OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The low-battery warning level - voltage (hardware A/D units)."
+   ::= { zql-ql-power 4 }
+
+zql-power-low-battery-shutdown OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The low battery shutdown level  - voltage (hardware A/D units)."
+   ::= { zql-ql-power 5 }
+
+zql-power-low-battery-timeout OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 6 }
+
+zql-power-inactivity-timeout OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 7 }
+
+zql-power-dtr-power-off OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 8 }
+
+zql-power-shutdown OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 9 }
+
+zql-power-ascii-graph OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 10 }
+
+zql-power-low-battery-warning-raw OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 11 }
+
+zql-power-power-on-cycles OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 12 }
+
+zql-power-design-voltage OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 16 }
+
+zql-power-design-capacity OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 17 }
+
+zql-power-manufacture-date OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 19 }
+
+zql-power-relative-state-of-charge OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 20 }
+
+zql-power-serial-number OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 21 }
+
+zql-power-cycle-count OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 23 }
+
+zql-power-full-charge-capacity OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 30 }
+
+zql-power-health OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 45 }
+
+zql-power-date-first-used OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-power 47 }
+
+zql-ql-file   OBJECT IDENTIFIER ::= { zql-zebra-ql 15 }
+
+zql-file-dir OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-file 1 }
+
+zql-file-type OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-file 2 }
+
+zql-file-delete OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-file 3 }
+
+zql-file-print OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-file 4 }
+
+zql-file-run OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-file 5 }
+
+zql-file-rename OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-file 6 }
+
+zql-file-append OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-file 7 }
+
+zql-ql-odometer   OBJECT IDENTIFIER ::= { zql-zebra-ql 17 }
+
+zql-odometer-user-label-count OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-odometer 1 }
+
+zql-odometer-total-label-count OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-odometer 2 }
+
+zql-odometer-total-print-length OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-odometer 3 }
+
+zql-odometer-latch-open-count OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-odometer 5 }
+
+zql-odometer-label-dot-length OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-odometer 6 }
+
+zql-odometer-rfid   OBJECT IDENTIFIER ::= { zql-ql-odometer 11 }
+
+zql-ql-appl   OBJECT IDENTIFIER ::= { zql-zebra-ql 18 }
+
+zql-appl-date OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-appl 1 }
+
+zql-appl-name OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-appl 2 }
+
+zql-appl-version OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-appl 3 }
+
+zql-appl-ps   OBJECT IDENTIFIER ::= { zql-ql-appl 4 }
+
+zql-ql-device   OBJECT IDENTIFIER ::= { zql-zebra-ql 19 }
+
+zql-device-reset OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 1 }
+
+zql-device-restore-defaults OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 2 }
+
+zql-device-card   OBJECT IDENTIFIER ::= { zql-ql-device 3 }
+
+zql-device-friendly-name OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 5 }
+
+zql-device-company-name OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 6 }
+
+zql-device-product-name OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 7 }
+
+zql-device-status OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 8 }
+
+zql-device-pld   OBJECT IDENTIFIER ::= { zql-ql-device 9 }
+
+zql-device-languages OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 13 }
+
+zql-device-cph-enable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 14 }
+
+zql-device-cph-interval OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 15 }
+
+zql-device-macro-get OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 16 }
+
+zql-device-user-p1 OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 17 }
+
+zql-device-user-p2 OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 18 }
+
+zql-device-uptime OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 20 }
+
+zql-device-volume OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 21 }
+
+zql-device-local-menu-mode OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 22 }
+
+zql-device-ff-disable OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-device 35 }
+
+zql-ql-input   OBJECT IDENTIFIER ::= { zql-zebra-ql 20 }
+
+zql-input-capture OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-input 1 }
+
+zql-ql-print   OBJECT IDENTIFIER ::= { zql-zebra-ql 21 }
+
+zql-print-contrast OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-print 1 }
+
+zql-print-tone OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-print 2 }
+
+zql-print-print-adj OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-print 4 }
+
+zql-ql-rtc   OBJECT IDENTIFIER ::= { zql-zebra-ql 23 }
+
+zql-rtc-time OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-rtc 1 }
+
+zql-rtc-date OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-rtc 2 }
+
+zql-rtc-set-counter OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-rtc 5 }
+
+zql-rtc-enable-counter OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-rtc 6 }
+
+zql-ql-usb   OBJECT IDENTIFIER ::= { zql-zebra-ql 25 }
+
+zql-usb-device   OBJECT IDENTIFIER ::= { zql-ql-usb 1 }
+
+zql-device-vendor-id OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-usb-device 1 }
+
+zql-device-product-id OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-usb-device 2 }
+
+zql-device-device-version OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-usb-device 3 }
+
+zql-device-product-string OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-usb-device 4 }
+
+zql-device-manufacturer-string OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-usb-device 5 }
+
+zql-device-serial-string OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-usb-device 6 }
+
+zql-device-device-id-string OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-usb-device 7 }
+
+zql-device-device-unique-id OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-usb-device 8 }
+
+zql-usb-connected OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-usb 2 }
+
+zql-usb-halt OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-usb 3 }
+
+zql-ql-log   OBJECT IDENTIFIER ::= { zql-zebra-ql 27 }
+
+zql-log-reboot   OBJECT IDENTIFIER ::= { zql-ql-log 1 }
+
+zql-reboot-code OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-log-reboot 1 }
+
+zql-reboot-reason OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-log-reboot 2 }
+
+zql-reboot-codes OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-log-reboot 3 }
+
+zql-reboot-report OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-log-reboot 4 }
+
+zql-ql-netmanage   OBJECT IDENTIFIER ::= { zql-zebra-ql 28 }
+
+zql-netmanage-type OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-netmanage 1 }
+
+zql-netmanage-status-code OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-netmanage 2 }
+
+zql-netmanage-state-code OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-netmanage 3 }
+
+zql-netmanage-error-code OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-netmanage 4 }
+
+zql-netmanage-avalanche   OBJECT IDENTIFIER ::= { zql-ql-netmanage 5 }
+
+zql-avalanche-model-name OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-netmanage-avalanche 1 }
+
+zql-avalanche-interval OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-netmanage-avalanche 2 }
+
+zql-avalanche-startup-update OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-netmanage-avalanche 3 }
+
+zql-avalanche-interval-update OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-netmanage-avalanche 4 }
+
+zql-avalanche-agent-addr OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-netmanage-avalanche 5 }
+
+zql-avalanche-available-agent OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-netmanage-avalanche 6 }
+
+zql-avalanche-available-port OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-netmanage-avalanche 7 }
+
+zql-avalanche-encryption-type OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-netmanage-avalanche 9 }
+
+zql-avalanche-udp-timeout OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-netmanage-avalanche 10 }
+
+zql-avalanche-tcp-connection-timeout OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-netmanage-avalanche 11 }
+
+zql-avalanche-terminal-id OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-netmanage-avalanche 18 }
+
+zql-avalanche-text-msg   OBJECT IDENTIFIER ::= { zql-netmanage-avalanche 19 }
+
+zql-text-msg-print OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-avalanche-text-msg 1 }
+
+zql-text-msg-display OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-avalanche-text-msg 2 }
+
+zql-text-msg-beep OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-avalanche-text-msg 3 }
+
+zql-avalanche-app   OBJECT IDENTIFIER ::= { zql-netmanage-avalanche 20 }
+
+zql-avalanche-set-property OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-netmanage-avalanche 21 }
+
+zql-ql-zpl   OBJECT IDENTIFIER ::= { zql-zebra-ql 41 }
+
+zql-zpl-save OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-zpl 2 }
+
+zql-zpl-label-length OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-zpl 8 }
+
+zql-ql-rfid   OBJECT IDENTIFIER ::= { zql-zebra-ql 46 }
+
+zql-ql-event-log   OBJECT IDENTIFIER ::= { zql-zebra-ql 49 }
+
+zql-ql-line-print   OBJECT IDENTIFIER ::= { zql-zebra-ql 52 }
+
+zql-line-print-buffer-height OBJECT-TYPE
+   SYNTAX OCTET STRING
+   ACCESS read-write
+   STATUS current
+   DESCRIPTION
+   ""
+   ::= { zql-ql-line-print 1 }
+
+zql-ql-apl   OBJECT IDENTIFIER ::= { zql-zebra-ql 53 }
+
+END

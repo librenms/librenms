@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2015 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +39,7 @@ class Victorops extends Transport
         $url = $this->config['victorops-url'];
         $protocol = [
             'entity_id' => strval($alert_data['id'] ?: $alert_data['uid']),
-            'state_start_time' => strtotime($alert_data['timestamp']),
+            'state_start_time' => strtotime((string) $alert_data['timestamp']),
             'entity_display_name' => $alert_data['title'],
             'state_message' => $alert_data['msg'],
             'monitoring_tool' => 'librenms',
@@ -53,7 +54,7 @@ class Victorops extends Transport
             },
         };
 
-        foreach ($alert_data['faults'] as $fault => $data) {
+        foreach ($alert_data['faults'] as $data) {
             $protocol['state_message'] .= $data['string'];
         }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'postgres';
@@ -9,7 +10,7 @@ $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.111.115.116.103.114.101.115';
 $postgres = snmp_walk($device, $oid, $options);
 
 [$backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
-    $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del] = explode("\n", $postgres);
+    $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del] = explode("\n", (string) $postgres);
 
 $rrd_name = ['app', $name, $app->app_id];
 $metrics = [];
@@ -55,10 +56,10 @@ $fields = [
 $metrics['none'] = $fields;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //process each database
-$db_lines = explode("\n", $postgres);
+$db_lines = explode("\n", (string) $postgres);
 $db_lines_int = 17;
 $databases = [];
 
@@ -92,7 +93,7 @@ while (isset($db_lines[$db_lines_int])) {
 
     $metrics[$dbname] = $fields;
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $db_lines_int++;
 }
@@ -112,7 +113,7 @@ if (count($added_databases) > 0 || count($removed_databases) > 0) {
     if (count($removed_databases)) {
         $log_message .= ' Removed ' . implode(',', $removed_databases);
     }
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 update_application($app, $postgres, $metrics);

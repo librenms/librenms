@@ -1,0 +1,2683 @@
+SUPERCAPBATTERY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    mib-2, Integer32, Unsigned32, Unsigned32, Unsigned32
+        FROM SNMPv2-SMI                                -- RFC 2578
+    DateAndTime
+        FROM SNMPv2-TC                                 -- RFC 2579
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF                               -- RFC 2580
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB                        -- RFC 3411
+    entPhysicalIndex
+        FROM ENTITY-MIB;                               -- RFC 6933
+
+supercapbatteryMIB MODULE-IDENTITY
+    LAST-UPDATED "202401190000Z"         -- 15 June 2015
+    ORGANIZATION "Supercap Working Group"
+    CONTACT-INFO
+        "Address for supercap 
+
+        Editor:
+          Dwaine Mougeotte"
+    DESCRIPTION
+        "This MIB module defines a set of objects for monitoring
+        batteries of networked devices and of their components.
+
+        Copyright xxxx"
+--  Revision history
+
+    REVISION "202401090000Z"         -- 01 January 2024
+    DESCRIPTION
+        "Initial version published as RFC Supercap Battery."
+    ::= { mib-2 555 }
+
+--******************************************************************
+-- Top-Level Structure of the MIB Module
+--******************************************************************
+
+batteryNotifications OBJECT IDENTIFIER ::= { supercapbatteryMIB 0 }
+batteryObjects       OBJECT IDENTIFIER ::= { supercapbatteryMIB 1 }
+batteryConformance   OBJECT IDENTIFIER ::= { supercapbatteryMIB 2 }
+
+--==================================================================
+-- 1.  Object Definitions
+--==================================================================
+
+--------------------------------------------------------------------
+-- 1.1.  Battery Table
+--------------------------------------------------------------------
+batteryTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BatteryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides information on batteries.  It contains
+        one conceptual row per battery complete pack."
+    ::= { batteryObjects 1 }
+
+batteryEntry OBJECT-TYPE
+    SYNTAX      BatteryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry providing information on a pack of batteries."
+    INDEX  { entPhysicalIndex }
+    ::= { batteryTable 1 }
+
+BatteryEntry ::=
+    SEQUENCE {
+		batteryIdentifier                        SnmpAdminString,
+		BMS01-AmbientTemperature                 Unsigned32,	
+		BMS01-PowerTemperature                   Unsigned32,	
+		BMS01-Current                            Unsigned32,	
+		BMS01-Voltage                            Unsigned32,	   
+		BMS01-RemainingCapacity                  Unsigned32,	   
+		BMS01-TotalCapacity                      Unsigned32,	
+		BMS01-Cycles                      	 Unsigned32,
+		BMS01-TotalDischargeCapacity             Unsigned32,	
+		BMS01-HealthStatus                       Unsigned32,	
+		BMS01-AmbientTempAlarmStatus             Unsigned32,	
+		BMS01-PowerTempAlarmStatus               Unsigned32,	
+		BMS01-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS01-BatteryVoltageAlarmStatus          Unsigned32,	
+		BMS02-AmbientTemperature                 Unsigned32,	
+		BMS02-PowerTemperature                   Unsigned32,	
+		BMS02-Current                            Unsigned32,	
+		BMS02-Voltage                            Unsigned32,	   
+		BMS02-RemainingCapacity                  Unsigned32,	   
+		BMS02-TotalCapacity                      Unsigned32,	
+		BMS02-Cycles                      	 Unsigned32,
+		BMS02-TotalDischargeCapacity             Unsigned32,	
+		BMS02-HealthStatus                       Unsigned32,	
+		BMS02-AmbientTempAlarmStatus             Unsigned32,	
+		BMS02-PowerTempAlarmStatus               Unsigned32,	
+		BMS02-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS02-BatteryVoltageAlarmStatus          Unsigned32,	
+		BMS03-AmbientTemperature                 Unsigned32,	
+		BMS03-PowerTemperature                   Unsigned32,	
+		BMS03-Current                            Unsigned32,	
+		BMS03-Voltage                            Unsigned32,	   
+		BMS03-RemainingCapacity                  Unsigned32,	   
+		BMS03-TotalCapacity                      Unsigned32,	
+		BMS03-Cycles                      	 Unsigned32,
+		BMS03-TotalDischargeCapacity             Unsigned32,	
+		BMS03-HealthStatus                       Unsigned32,	
+		BMS03-AmbientTempAlarmStatus             Unsigned32,	
+		BMS03-PowerTempAlarmStatus               Unsigned32,	
+		BMS03-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS03-BatteryVoltageAlarmStatus          Unsigned32,	
+		BMS04-AmbientTemperature                 Unsigned32,	
+		BMS04-PowerTemperature                   Unsigned32,	
+		BMS04-Current                            Unsigned32,	
+		BMS04-Voltage                            Unsigned32,	   
+		BMS04-RemainingCapacity                  Unsigned32,	   
+		BMS04-TotalCapacity                      Unsigned32,	
+		BMS04-Cycles                      	 Unsigned32,
+		BMS04-TotalDischargeCapacity             Unsigned32,	
+		BMS04-HealthStatus                       Unsigned32,	
+		BMS04-AmbientTempAlarmStatus             Unsigned32,	
+		BMS04-PowerTempAlarmStatus               Unsigned32,	
+		BMS04-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS04-BatteryVoltageAlarmStatus          Unsigned32,	
+		BMS05-AmbientTemperature                 Unsigned32,	
+		BMS05-PowerTemperature                   Unsigned32,	
+		BMS05-Current                            Unsigned32,	
+		BMS05-Voltage                            Unsigned32,	   
+		BMS05-RemainingCapacity                  Unsigned32,	   
+		BMS05-TotalCapacity                      Unsigned32,	
+		BMS05-Cycles                      	 Unsigned32,
+		BMS05-TotalDischargeCapacity             Unsigned32,	
+		BMS05-HealthStatus                       Unsigned32,	
+		BMS05-AmbientTempAlarmStatus             Unsigned32,	
+		BMS05-PowerTempAlarmStatus               Unsigned32,	
+		BMS05-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS05-BatteryVoltageAlarmStatus          Unsigned32,	
+		BMS06-AmbientTemperature                 Unsigned32,	
+		BMS06-PowerTemperature                   Unsigned32,	
+		BMS06-Current                            Unsigned32,	
+		BMS06-Voltage                            Unsigned32,	   
+		BMS06-RemainingCapacity                  Unsigned32,	   
+		BMS06-TotalCapacity                      Unsigned32,	
+		BMS06-Cycles                      	 Unsigned32,
+		BMS06-TotalDischargeCapacity             Unsigned32,	
+		BMS06-HealthStatus                       Unsigned32,	
+		BMS06-AmbientTempAlarmStatus             Unsigned32,	
+		BMS06-PowerTempAlarmStatus               Unsigned32,	
+		BMS06-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS06-BatteryVoltageAlarmStatus          Unsigned32,	
+		BMS07-AmbientTemperature                 Unsigned32,	
+		BMS07-PowerTemperature                   Unsigned32,	
+		BMS07-Current                            Unsigned32,	
+		BMS07-Voltage                            Unsigned32,	   
+		BMS07-RemainingCapacity                  Unsigned32,	   
+		BMS07-TotalCapacity                      Unsigned32,	
+		BMS07-Cycles                      	 Unsigned32,
+		BMS07-TotalDischargeCapacity             Unsigned32,	
+		BMS07-HealthStatus                       Unsigned32,	
+		BMS07-AmbientTempAlarmStatus             Unsigned32,	
+		BMS07-PowerTempAlarmStatus               Unsigned32,	
+		BMS07-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS07-BatteryVoltageAlarmStatus          Unsigned32,	
+		BMS08-AmbientTemperature                 Unsigned32,	
+		BMS08-PowerTemperature                   Unsigned32,	
+		BMS08-Current                            Unsigned32,	
+		BMS08-Voltage                            Unsigned32,	   
+		BMS08-RemainingCapacity                  Unsigned32,	   
+		BMS08-TotalCapacity                      Unsigned32,	
+		BMS08-Cycles                      	 Unsigned32,
+		BMS08-TotalDischargeCapacity             Unsigned32,	
+		BMS08-HealthStatus                       Unsigned32,	
+		BMS08-AmbientTempAlarmStatus             Unsigned32,	
+		BMS08-PowerTempAlarmStatus               Unsigned32,	
+		BMS08-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS08-BatteryVoltageAlarmStatus          Unsigned32,	
+		BMS09-AmbientTemperature                 Unsigned32,	
+		BMS09-PowerTemperature                   Unsigned32,	
+		BMS09-Current                            Unsigned32,	
+		BMS09-Voltage                            Unsigned32,	   
+		BMS09-RemainingCapacity                  Unsigned32,	   
+		BMS09-TotalCapacity                      Unsigned32,	
+		BMS09-Cycles                      	 Unsigned32,
+		BMS09-TotalDischargeCapacity             Unsigned32,	
+		BMS09-HealthStatus                       Unsigned32,	
+		BMS09-AmbientTempAlarmStatus             Unsigned32,	
+		BMS09-PowerTempAlarmStatus               Unsigned32,	
+		BMS09-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS09-BatteryVoltageAlarmStatus          Unsigned32,	
+		BMS10-AmbientTemperature                 Unsigned32,	
+		BMS10-PowerTemperature                   Unsigned32,	
+		BMS10-Current                            Unsigned32,	
+		BMS10-Voltage                            Unsigned32,	   
+		BMS10-RemainingCapacity                  Unsigned32,	   
+		BMS10-TotalCapacity                      Unsigned32,	
+		BMS10-Cycles                      	 Unsigned32,
+		BMS10-TotalDischargeCapacity             Unsigned32,	
+		BMS10-HealthStatus                       Unsigned32,	
+		BMS10-AmbientTempAlarmStatus             Unsigned32,	
+		BMS10-PowerTempAlarmStatus               Unsigned32,	
+		BMS10-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS10-BatteryVoltageAlarmStatus          Unsigned32,	
+		BMS11-AmbientTemperature                 Unsigned32,	
+		BMS11-PowerTemperature                   Unsigned32,	
+		BMS11-Current                            Unsigned32,	
+		BMS11-Voltage                            Unsigned32,	   
+		BMS11-RemainingCapacity                  Unsigned32,	   
+		BMS11-TotalCapacity                      Unsigned32,	
+		BMS11-Cycles                      	 Unsigned32,
+		BMS11-TotalDischargeCapacity             Unsigned32,	
+		BMS11-HealthStatus                       Unsigned32,	
+		BMS11-AmbientTempAlarmStatus             Unsigned32,	
+		BMS11-PowerTempAlarmStatus               Unsigned32,	
+		BMS11-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS11-BatteryVoltageAlarmStatus          Unsigned32,	
+		BMS12-AmbientTemperature                 Unsigned32,	
+		BMS12-PowerTemperature                   Unsigned32,	
+		BMS12-Current                            Unsigned32,	
+		BMS12-Voltage                            Unsigned32,	   
+		BMS12-RemainingCapacity                  Unsigned32,	   
+		BMS12-TotalCapacity                      Unsigned32,	
+		BMS12-Cycles                      	 Unsigned32,
+		BMS12-TotalDischargeCapacity             Unsigned32,	
+		BMS12-HealthStatus                       Unsigned32,	
+		BMS12-AmbientTempAlarmStatus             Unsigned32,	
+		BMS12-PowerTempAlarmStatus               Unsigned32,	
+		BMS12-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS12-BatteryVoltageAlarmStatus          Unsigned32,	
+		BMS13-AmbientTemperature                 Unsigned32,	
+		BMS13-PowerTemperature                   Unsigned32,	
+		BMS13-Current                            Unsigned32,	
+		BMS13-Voltage                            Unsigned32,	   
+		BMS13-RemainingCapacity                  Unsigned32,	   
+		BMS13-TotalCapacity                      Unsigned32,	
+		BMS13-Cycles                      	 Unsigned32,
+		BMS13-TotalDischargeCapacity             Unsigned32,	
+		BMS13-HealthStatus                       Unsigned32,	
+		BMS13-AmbientTempAlarmStatus             Unsigned32,	
+		BMS13-PowerTempAlarmStatus               Unsigned32,	
+		BMS13-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS13-BatteryVoltageAlarmStatus          Unsigned32,	
+		BMS14-AmbientTemperature                 Unsigned32,	
+		BMS14-PowerTemperature                   Unsigned32,	
+		BMS14-Current                            Unsigned32,	
+		BMS14-Voltage                            Unsigned32,	   
+		BMS14-RemainingCapacity                  Unsigned32,	   
+		BMS14-TotalCapacity                      Unsigned32,	
+		BMS14-Cycles                      	 Unsigned32,
+		BMS14-TotalDischargeCapacity             Unsigned32,	
+		BMS14-HealthStatus                       Unsigned32,	
+		BMS14-AmbientTempAlarmStatus             Unsigned32,	
+		BMS14-PowerTempAlarmStatus               Unsigned32,	
+		BMS14-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS14-BatteryVoltageAlarmStatus          Unsigned32,	
+		BMS15-AmbientTemperature                 Unsigned32,	
+		BMS15-PowerTemperature                   Unsigned32,	
+		BMS15-Current                            Unsigned32,	
+		BMS15-Voltage                            Unsigned32,	   
+		BMS15-RemainingCapacity                  Unsigned32,	   
+		BMS15-TotalCapacity                      Unsigned32,	
+		BMS15-Cycles                      	 Unsigned32,
+		BMS15-TotalDischargeCapacity             Unsigned32,	
+		BMS15-HealthStatus                       Unsigned32,	
+		BMS15-AmbientTempAlarmStatus             Unsigned32,	
+		BMS15-PowerTempAlarmStatus               Unsigned32,	
+		BMS15-ChargeDischargeCurrentAlarmStatus  Unsigned32,	
+		BMS15-BatteryVoltageAlarmStatus          Unsigned32	
+    }
+	
+batteryIdentifier OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains an identifier for the battery."
+    ::= { batteryEntry 1 }
+
+BMS01-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 2 }
+
+BMS01-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 3 }
+
+BMS01-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 4 }
+
+BMS01-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 5 }
+
+BMS01-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 6 }
+
+BMS01-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 7 }
+
+BMS01-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 8 }
+
+BMS01-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 9 }
+
+BMS01-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 10 }
+
+BMS01-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 11 }
+
+BMS01-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 12 }
+
+BMS01-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 13 }
+
+BMS01-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 14 }
+
+BMS02-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 15 }
+
+BMS02-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 16 }
+
+BMS02-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 17 }
+
+BMS02-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 18 }
+
+BMS02-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 19 }
+
+BMS02-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 20 }
+
+BMS02-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 21 }
+
+BMS02-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 22 }
+
+BMS02-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 23 }
+
+BMS02-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 24 }
+
+BMS02-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 25 }
+
+BMS02-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 26 }
+
+BMS02-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 27 }
+
+BMS03-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 28 }
+
+BMS03-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 29 }
+
+BMS03-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 30 }
+
+BMS03-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 31 }
+
+BMS03-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 32 }
+
+BMS03-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 33 }
+
+BMS03-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 34 }
+
+BMS03-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 35 }
+
+BMS03-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 36 }
+
+BMS03-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 37 }
+
+BMS03-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 38 }
+
+BMS03-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 39 }
+
+BMS03-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 40 }
+
+BMS04-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 41 }
+
+BMS04-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 42 }
+
+BMS04-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 43 }
+
+BMS04-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 44 }
+
+BMS04-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 45 }
+
+BMS04-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 46 }
+
+BMS04-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 47 }
+
+BMS04-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 48 }
+
+BMS04-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 49 }
+
+BMS04-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 50 }
+
+BMS04-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 51 }
+
+BMS04-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 52 }
+
+BMS04-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 53 }
+
+BMS05-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 54 }
+
+BMS05-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 55 }
+
+BMS05-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 56 }
+
+BMS05-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 57 }
+
+BMS05-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 58 }
+
+BMS05-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 59 }
+
+BMS05-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 60 }
+
+BMS05-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 61 }
+
+BMS05-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 62 }
+
+BMS05-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 63 }
+
+BMS05-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 64 }
+
+BMS05-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 65 }
+
+BMS05-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 66 }
+
+BMS06-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 67 }
+
+BMS06-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 68 }
+
+BMS06-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 69 }
+
+BMS06-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 70 }
+
+BMS06-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 71 }
+
+BMS06-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 72 }
+
+BMS06-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 73 }
+
+BMS06-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 74 }
+
+BMS06-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 75 }
+
+BMS06-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 76 }
+
+BMS06-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 77 }
+
+BMS06-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 78 }
+
+BMS06-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 79 }
+
+BMS07-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 80 }
+
+BMS07-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 81 }
+
+BMS07-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 82 }
+
+BMS07-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 83 }
+
+BMS07-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 84 }
+
+BMS07-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 85 }
+
+BMS07-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 86 }
+
+BMS07-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 87 }
+
+BMS07-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 88 }
+
+BMS07-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 89 }
+
+BMS07-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 90 }
+
+BMS07-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 91 }
+
+BMS07-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 92 }
+
+BMS08-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 93 }
+
+BMS08-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 94 }
+
+BMS08-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 95 }
+
+BMS08-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 96 }
+
+BMS08-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 97 }
+
+BMS08-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 98 }
+
+BMS08-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 99 }
+
+BMS08-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 100 }
+
+BMS08-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 101 }
+
+BMS08-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 102 }
+
+BMS08-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 103 }
+
+BMS08-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 104 }
+
+BMS08-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 105 }
+
+BMS09-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 106 }
+
+BMS09-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 107 }
+
+BMS09-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 108 }
+
+BMS09-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 109 }
+
+BMS09-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 110 }
+
+BMS09-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 111 }
+
+BMS09-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 112 }
+
+BMS09-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 113 }
+
+BMS09-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 114 }
+
+BMS09-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 115 }
+
+BMS09-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 116 }
+
+BMS09-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 117 }
+
+BMS09-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 118 }
+
+BMS10-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 119 }
+
+BMS10-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 120 }
+
+BMS10-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 121 }
+
+BMS10-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 122 }
+
+BMS10-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 123 }
+
+BMS10-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 124 }
+
+BMS10-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 125 }
+
+BMS10-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 126 }
+
+BMS10-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 127 }
+
+BMS10-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 128 }
+
+BMS10-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 129 }
+
+BMS10-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 130 }
+
+BMS10-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 131 }
+
+BMS11-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 132 }
+
+BMS11-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 133 }
+
+BMS11-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 134 }
+
+BMS11-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 135 }
+
+BMS11-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 136 }
+
+BMS11-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 137 }
+
+BMS11-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 138 }
+
+BMS11-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 139 }
+
+BMS11-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 140 }
+
+BMS11-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 141 }
+
+BMS11-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 142 }
+
+BMS11-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 143 }
+
+BMS11-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 144 }
+
+BMS12-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 145 }
+
+BMS12-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 146 }
+
+BMS12-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 147 }
+
+BMS12-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 148 }
+
+BMS12-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 149 }
+
+BMS12-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 150 }
+
+BMS12-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 151 }
+
+BMS12-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 152 }
+
+BMS12-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 153 }
+
+BMS12-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 154 }
+
+BMS12-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 155 }
+
+BMS12-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 156 }
+
+BMS12-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 157 }
+
+BMS13-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 158 }
+
+BMS13-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 159 }
+
+BMS13-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 160 }
+
+BMS13-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 161 }
+
+BMS13-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 162 }
+
+BMS13-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 163 }
+
+BMS13-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 164 }
+
+BMS13-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 165 }
+
+BMS13-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 166 }
+
+BMS13-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 167 }
+
+BMS13-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 168 }
+
+BMS13-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 169 }
+
+BMS13-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 170 }
+
+BMS14-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 171 }
+
+BMS14-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 172 }
+
+BMS14-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 173 }
+
+BMS14-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 174 }
+
+BMS14-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 175 }
+
+BMS14-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 176 }
+
+BMS14-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 177 }
+
+BMS14-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 178 }
+
+BMS14-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 179 }
+
+BMS14-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 180 }
+
+BMS14-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 181 }
+
+BMS14-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 182}
+
+BMS14-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 183 }
+
+BMS15-AmbientTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "  "
+    ::= { batteryEntry 184 }
+
+BMS15-PowerTemperature OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01C" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 185 }
+
+BMS15-Current OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 186 }
+
+BMS15-Voltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 187 }
+
+BMS15-RemainingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 188 }
+
+BMS15-TotalCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".01AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 189 }
+
+BMS15-Cycles OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 190 }
+
+BMS15-TotalDischargeCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "10AH"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 191 }
+
+BMS15-HealthStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       ".1%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 192 }
+
+BMS15-AmbientTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 193 }
+
+BMS15-PowerTempAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 194}
+
+BMS15-ChargeDischargeCurrentAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 195}
+
+BMS15-BatteryVoltageAlarmStatus OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryEntry 196}
+
+  
+
+--==================================================================
+-- 2.  Notifications
+--==================================================================
+
+BMS01-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 1 }
+
+BMS01-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 2 }
+
+BMS01-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 3 }
+
+BMS01-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 4 }
+
+BMS01-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 5 }
+
+BMS01-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 6 }
+	
+BMS01-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 7 }
+
+BMS01-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 8 }
+
+BMS02-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 9 }
+
+BMS02-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 10 }
+
+BMS02-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 11 }
+
+BMS02-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 12 }
+
+BMS02-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 13 }
+
+BMS02-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 14 }
+	
+BMS02-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 15 }
+
+BMS02-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 16 }
+
+BMS03-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 17 }
+
+BMS03-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 18 }
+
+BMS03-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 19 }
+
+BMS03-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 20 }
+
+BMS03-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 21 }
+
+BMS03-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 22 }
+	
+BMS03-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 23 }
+
+BMS03-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 24 }
+
+BMS04-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 25 }
+
+BMS04-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 26 }
+
+BMS04-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 27 }
+
+BMS04-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 28 }
+
+BMS04-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 29 }
+
+BMS04-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 30 }
+	
+BMS04-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 31 }
+
+BMS04-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 32 }
+
+BMS05-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 33 }
+
+BMS05-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 34 }
+
+BMS05-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 35 }
+
+BMS05-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 36 }
+
+BMS05-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 37 }
+
+BMS05-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 38 }
+	
+BMS05-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 39 }
+
+BMS05-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 40 }
+
+BMS06-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 41 }
+
+BMS06-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 42 }
+
+BMS06-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 43 }
+
+BMS06-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 44 }
+
+BMS06-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 45 }
+
+BMS06-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 46 }
+	
+BMS06-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 47 }
+
+BMS06-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 48 }
+
+BMS07-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 49 }
+
+BMS07-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 50 }
+
+BMS07-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 51 }
+
+BMS07-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 52 }
+
+BMS07-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 53 }
+
+BMS07-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 54 }
+	
+BMS07-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 55 }
+
+BMS07-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 56 }
+
+BMS08-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 57 }
+
+BMS08-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 58 }
+
+BMS08-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 59 }
+
+BMS08-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 60 }
+
+BMS08-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 61 }
+
+BMS08-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 62 }
+	
+BMS08-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 63 }
+
+BMS08-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 64 }
+
+BMS09-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 65 }
+
+BMS09-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 66 }
+
+BMS09-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 67 }
+
+BMS09-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 68 }
+
+BMS09-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 69 }
+
+BMS09-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 70 }
+	
+BMS09-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 71 }
+
+BMS09-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 72 }
+
+BMS10-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 73 }
+
+BMS10-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 74 }
+
+BMS10-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 75 }
+
+BMS10-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 76 }
+
+BMS10-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 77 }
+
+BMS10-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 78 }
+	
+BMS10-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 79 }
+
+BMS10-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 80 }
+
+BMS11-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 81 }
+
+BMS11-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 82 }
+
+BMS11-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 83 }
+
+BMS11-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 84 }
+
+BMS11-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 85 }
+
+BMS11-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 86 }
+	
+BMS11-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 87 }
+
+BMS11-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 88 }
+
+BMS12-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 89 }
+
+BMS12-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 90 }
+
+BMS12-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 91 }
+
+BMS12-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 92 }
+
+BMS12-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 93 }
+
+BMS12-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 94 }
+	
+BMS12-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 95 }
+
+BMS12-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 96 }
+
+BMS13-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 97 }
+
+BMS13-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 98 }
+
+BMS13-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 99 }
+
+BMS13-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 100 }
+
+BMS13-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 101 }
+
+BMS13-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 102 }
+	
+BMS13-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 103 }
+
+BMS13-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 104 }
+
+BMS14-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 105 }
+
+BMS14-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 106 }
+
+BMS14-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 107 }
+
+BMS14-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 108 }
+
+BMS14-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 109 }
+
+BMS14-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 110 }
+	
+BMS14-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 111 }
+
+BMS14-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 112 }
+
+BMS15-AmbientTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 113 }
+
+BMS15-AmbientTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 114 }
+
+BMS15-PowerTempAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 115 }
+
+BMS15-PowerTempAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 116 }
+
+BMS15-ChargeDischargeCurrentAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 117 }
+
+BMS15-ChargeDischargeCurrentAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 118 }
+	
+BMS15-BatteryVoltageAlarmStatusWarning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 119 }
+
+BMS15-BatteryVoltageAlarmStatusAlarm NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        " "
+    ::= { batteryNotifications 120 }
+	
+END	

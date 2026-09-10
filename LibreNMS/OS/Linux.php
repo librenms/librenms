@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Linux.php
  *
@@ -30,6 +31,7 @@ use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\OS\Traits\VminfoLibvirt;
 use LibreNMS\OS\Traits\VminfoVmware;
+use LibreNMS\OS\Traits\VminfoXcpNg;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
@@ -37,13 +39,18 @@ class Linux extends Shared\Unix implements VminfoDiscovery
 {
     // NOTE: Only Linux specific stuff should go here, most things should be in Unix
 
-    use VminfoLibvirt, VminfoVmware {
+    use VminfoLibvirt, VminfoVmware, VminfoXcpNg {
         VminfoLibvirt::discoverVminfo as discoverLibvirtVminfo;
         VminfoVmware::discoverVmInfo as discoverVmwareVminfo;
+        VminfoXcpNg::discoverVmInfo as discoverXcpNgVminfo;
     }
 
     public function discoverVmInfo(): Collection
     {
+        if (preg_match('/^XCP-ng/', (string) $this->getDevice()->features)) {
+            return $this->discoverXcpNgVminfo();
+        }
+
         $vms = $this->discoverLibvirtVminfo();
 
         if ($vms->isNotEmpty()) {
@@ -85,7 +92,7 @@ class Linux extends Shared\Unix implements VminfoDiscovery
         $bbus = SnmpQuery::hideMib()->walk('LSI-MegaRAID-SAS-MIB::bbuTable')->table(1);
         foreach ($bbus as $bbu) {
             $inventory->push(new EntPhysical([
-                'entPhysicalIndex' => 1000 + $bbu['pdIndex'],
+                'entPhysicalIndex' => 1000 + ($bbu['pdIndex'] ?? null),
                 'entPhysicalClass' => 'charge',
                 'entPhysicalModelName' => $bbu['deviceName'],
                 'entPhysicalSerialNum' => $bbu['serialNumber'],
@@ -133,7 +140,7 @@ class Linux extends Shared\Unix implements VminfoDiscovery
     private function handleHex(string $string): string
     {
         $string = str_replace("\n", '', $string);
-        if (StringHelpers::isHex($string)) {
+        if (StringHelpers::isHex($string, ' ')) {
             $ascii = StringHelpers::hexToAscii($string, ' ');
 
             return preg_split('/[^ -~]/', $ascii)[0] ?? $ascii;

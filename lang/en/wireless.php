@@ -62,6 +62,11 @@ return [
         'long' => 'Mean Square Error',
         'unit' => 'dB',
     ],
+    'mcs' => [
+        'short' => 'MCS',
+        'long' => 'Modulation and Coding Scheme',
+        'unit' => 'MCS',
+    ],
     'noise-floor' => [
         'short' => 'Noise Floor',
         'long' => 'Noise Floor',
@@ -94,7 +99,7 @@ return [
     ],
     'sinr' => [
         'short' => 'SINR',
-        'long' => ' Signal-to-Interference-plus-Noise Ratio',
+        'long' => 'Signal-to-Interference-plus-Noise Ratio',
         'unit' => 'dB',
     ],
     'rsrq' => [
@@ -114,7 +119,7 @@ return [
     ],
     'utilization' => [
         'short' => 'Utilization',
-        'long' => 'utilization',
+        'long' => 'Utilization',
         'unit' => '%',
     ],
     'xpi' => [

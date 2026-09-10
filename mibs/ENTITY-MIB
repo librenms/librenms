@@ -1,64 +1,97 @@
--- *****************************************************************
--- Entity MIB version 3
---
--- September 2005, Subra Hegde
---
--- Copyright (c) 2005 by cisco Systems, Inc.
--- All rights reserved.
--- *****************************************************************
---
--- This mib was extracted from RFC 4133
---
-
 ENTITY-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, mib-2, NOTIFICATION-TYPE,
     Integer32
-        FROM SNMPv2-SMI
+        FROM SNMPv2-SMI                       -- RFC 2578
     TDomain, TAddress, TEXTUAL-CONVENTION,
     AutonomousType, RowPointer, TimeStamp, TruthValue,
     DateAndTime
-        FROM SNMPv2-TC
+        FROM SNMPv2-TC                        -- RFC 2579
     MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
-        FROM SNMPv2-CONF
+        FROM SNMPv2-CONF                      -- RFC 2580
     SnmpAdminString
-        FROM SNMP-FRAMEWORK-MIB;
+        FROM SNMP-FRAMEWORK-MIB               -- RFC 3411
+    UUIDorZero
+        FROM UUID-TC-MIB                      -- RFC 6933
+    IANAPhysicalClass
+        FROM IANA-ENTITY-MIB;                 -- RFC 6933
 
 entityMIB MODULE-IDENTITY
-    LAST-UPDATED "200508100000Z"
-    ORGANIZATION "IETF ENTMIB Working Group"
+    LAST-UPDATED "201304050000Z"      -- April 5, 2013
+    ORGANIZATION "IETF Energy Management Working Group"
     CONTACT-INFO
-            "        WG E-mail: entmib@ietf.org
-                     Mailing list subscription info:
-                       http://www.ietf.org/mailman/listinfo/entmib
+            "WG Email: eman@ietf.org
+            Mailing list subscription info:
+            http://www.ietf.org/mailman/listinfo/eman
 
-                     Andy Bierman
-                     ietf@andybierman.com
+            Andy Bierman
+            YumaWorks, Inc.
+            274 Redwood Shores Parkway, #133
+            Redwood City, CA 94065
+            USA
+            Phone: +1 408-716-0466
+            Email: andy@yumaworks.com
 
-                     Keith McCloghrie
-                     Cisco Systems Inc.
-                     170 West Tasman Drive
-                     San Jose, CA 95134
+            Dan Romascanu
+            Avaya
+            Park Atidim, Bldg. #3
+            Tel Aviv, 61581
+            Israel
+            Phone: +972-3-6458414
+            Email: dromasca@avaya.com
 
+            Juergen Quittek
+            NEC Europe Ltd.
+            Network Research Division
+            Kurfuersten-Anlage 36
+            Heidelberg  69115
+            Germany
+            Phone: +49 6221 4342-115
+            Email: quittek@neclab.eu
 
-                     +1 408-526-5260
-                     kzm@cisco.com"
-
+            Mouli Chandramouli
+            Cisco Systems, Inc.
+            Sarjapur Outer Ring Road
+            Bangalore 560103
+            India
+            Phone: +91 80 4429 2409
+            Email: moulchan@cisco.com"
     DESCRIPTION
             "The MIB module for representing multiple logical
             entities supported by a single SNMP agent.
 
-            Copyright (C) The Internet Society (2005).  This
-            version of this MIB module is part of RFC 4133; see
-            the RFC itself for full legal notices."
+            Copyright (c) 2013 IETF Trust and the persons identified
+            as authors of the code.  All rights reserved.
+
+            Redistribution and use in source and binary forms, with
+            or without modification, is permitted pursuant to, and
+            subject to the license terms contained in, the Simplified
+            BSD License set forth in Section 4.c of the IETF Trust's
+            Legal Provisions Relating to IETF Documents
+            (http://trustee.ietf.org/license-info)."
+
+    REVISION        "201304050000Z"      -- April 5, 2013
+    DESCRIPTION
+            "Entity MIB (Version 4).
+            This revision obsoletes RFC 4133.
+            - Creation of a new MIB module, IANA-ENTITY-MIB, which
+            makes the PhysicalIndex TC an IANA-maintained TEXTUAL-
+            CONVENTION.  IANAPhysicalClass is now imported
+            from the IANA-ENTITY-MIB.
+            - Addition of a new MIB object to the entPhysicalTable,
+            entPhysicalUUID.  UUIDorZero is imported from the
+            UUID-TC-MIB.
+            - Addition of two new MODULE-COMPLIANCE modules-
+            entity4Compliance and entity4CRCompliance.
+            This version is published as RFC 6933."
 
     REVISION        "200508100000Z"
     DESCRIPTION
             "Initial Version of Entity MIB (Version 3).
              This revision obsoletes RFC 2737.
              Additions:
-               - cpu(12) enumeration added to PhysicalClass TC
+               - cpu(12) enumeration added to IANAPhysicalClass TC
                - DISPLAY-HINT clause to PhysicalIndex TC
                - PhysicalIndexOrZero TC
                - entPhysicalMfgDate object
@@ -67,13 +100,13 @@ entityMIB MODULE-IDENTITY
                - entPhysicalContainedIn SYNTAX changed from
                  INTEGER to PhysicalIndexOrZero
 
-             This version published as RFC 4133."
+             This version was published as RFC 4133."
 
     REVISION        "199912070000Z"
     DESCRIPTION
             "Initial Version of Entity MIB (Version 2).
              This revision obsoletes RFC 2037.
-             This version published as RFC 2737."
+             This version was published as RFC 2737."
 
     REVISION        "199610310000Z"
     DESCRIPTION
@@ -89,14 +122,13 @@ entityLogical  OBJECT IDENTIFIER ::= { entityMIBObjects 2 }
 entityMapping  OBJECT IDENTIFIER ::= { entityMIBObjects 3 }
 entityGeneral  OBJECT IDENTIFIER ::= { entityMIBObjects 4 }
 
-
 -- Textual Conventions
 PhysicalIndex ::= TEXTUAL-CONVENTION
     DISPLAY-HINT      "d"
     STATUS            current
     DESCRIPTION
             "An arbitrary value that uniquely identifies the physical
-            entity.  The value should be a small, positive integer.
+            entity.  The value should be a small positive integer.
             Index values for different physical entities are not
             necessarily contiguous."
     SYNTAX Integer32 (1..2147483647)
@@ -105,7 +137,7 @@ PhysicalIndexOrZero ::= TEXTUAL-CONVENTION
     DISPLAY-HINT      "d"
     STATUS            current
     DESCRIPTION
-            "This textual convention is an extension of the
+            "This TEXTUAL-CONVENTION is an extension of the
             PhysicalIndex convention, which defines a greater than zero
             value used to identify a physical entity.  This extension
             permits the additional value of zero.  The semantics of the
@@ -116,17 +148,38 @@ PhysicalIndexOrZero ::= TEXTUAL-CONVENTION
             referenced."
     SYNTAX Integer32 (0..2147483647)
 
-PhysicalClass ::= TEXTUAL-CONVENTION
+SnmpEngineIdOrNone ::= TEXTUAL-CONVENTION
     STATUS            current
     DESCRIPTION
-            "An enumerated value which provides an indication of the
+            "A specially formatted SnmpEngineID string for use with the
+            Entity MIB.
+
+            If an instance of an object of SYNTAX SnmpEngineIdOrNone has
+            a non-zero length, then the object encoding and semantics
+            are defined by the SnmpEngineID TEXTUAL-CONVENTION (see STD
+            62, RFC 3411).
+
+            If an instance of an object of SYNTAX SnmpEngineIdOrNone
+            contains a zero-length string, then no appropriate
+            SnmpEngineID is associated with the logical entity (i.e.,
+            SNMPv3 is not supported)."
+    SYNTAX OCTET STRING (SIZE(0..32)) -- empty string or SnmpEngineID
+
+PhysicalClass ::= TEXTUAL-CONVENTION
+    STATUS            deprecated
+    DESCRIPTION
+            "Starting with version 4 of the ENTITY-MIB, this TC is
+            deprecated, and the usage of the IANAPhysicalClass TC from
+            the IANA-ENTITY-MIB is recommended instead.
+
+            An enumerated value that provides an indication of the
             general hardware type of a particular physical entity.
             There are no restrictions as to the number of
             entPhysicalEntries of each entPhysicalClass, which must be
             instantiated by an agent.
 
             The enumeration 'other' is applicable if the physical entity
-            class is known, but does not match any of the supported
+            class is known but does not match any of the supported
             values.
 
             The enumeration 'unknown' is applicable if the physical
@@ -135,9 +188,8 @@ PhysicalClass ::= TEXTUAL-CONVENTION
             The enumeration 'chassis' is applicable if the physical
             entity class is an overall container for networking
             equipment.  Any class of physical entity, except a stack,
-            may be contained within a chassis; and a chassis may only
+            may be contained within a chassis; a chassis may only
             be contained within a stack.
-
 
             The enumeration 'backplane' is applicable if the physical
             entity class is some sort of device for aggregating and
@@ -153,6 +205,7 @@ PhysicalClass ::= TEXTUAL-CONVENTION
             example, each (empty or full) slot in a chassis will be
             modeled as a container.  Note that all removable physical
             entities should be modeled within a container entity, such
+
             as field-replaceable modules, fans, or power supplies.  Note
             that all known containers should be modeled by the agent,
             including empty containers.
@@ -170,16 +223,16 @@ PhysicalClass ::= TEXTUAL-CONVENTION
             The enumeration 'module' is applicable if the physical
             entity class is some sort of self-contained sub-system.  If
             the enumeration 'module' is removable, then it should be
-            modeled within a container entity, otherwise it should be
+            modeled within a container entity; otherwise, it should be
             modeled directly within another physical entity (e.g., a
             chassis or another module).
 
             The enumeration 'port' is applicable if the physical entity
-            class is some sort of networking port, capable of receiving
+            class is some sort of networking port capable of receiving
             and/or transmitting networking traffic.
 
             The enumeration 'stack' is applicable if the physical entity
-            class is some sort of super-container (possibly virtual),
+            class is some sort of super-container (possibly virtual)
             intended to group together multiple chassis entities.  A
             stack may be realized by a 'virtual' cable, a real
             interconnect cable, attached to multiple chassis, or may in
@@ -187,7 +240,6 @@ PhysicalClass ::= TEXTUAL-CONVENTION
             should not be modeled within any other physical entities,
             but a stack may be contained within another stack.  Only
             chassis entities should be contained within a stack.
-
 
             The enumeration 'cpu' is applicable if the physical entity
             class is some sort of central processing unit."
@@ -206,23 +258,6 @@ PhysicalClass ::= TEXTUAL-CONVENTION
        cpu(12)
     }
 
-SnmpEngineIdOrNone ::= TEXTUAL-CONVENTION
-    STATUS            current
-    DESCRIPTION
-            "A specially formatted SnmpEngineID string for use with the
-            Entity MIB.
-
-            If an instance of an object of SYNTAX SnmpEngineIdOrNone has
-            a non-zero length, then the object encoding and semantics
-            are defined by the SnmpEngineID textual convention (see STD
-            62, RFC 3411 [RFC3411]).
-
-            If an instance of an object of SYNTAX SnmpEngineIdOrNone
-            contains a zero-length string, then no appropriate
-            SnmpEngineID is associated with the logical entity (i.e.,
-            SNMPv3 is not supported)."
-    SYNTAX OCTET STRING (SIZE(0..32)) -- empty string or SnmpEngineID
-
 --           The Physical Entity Table
 entPhysicalTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF EntPhysicalEntry
@@ -236,15 +271,13 @@ entPhysicalTable OBJECT-TYPE
 entPhysicalEntry       OBJECT-TYPE
     SYNTAX      EntPhysicalEntry
     MAX-ACCESS  not-accessible
-
-
     STATUS      current
     DESCRIPTION
             "Information about a particular physical entity.
 
             Each entry provides objects (entPhysicalDescr,
             entPhysicalVendorType, and entPhysicalClass) to help an NMS
-            identify and characterize the entry, and objects
+            identify and characterize the entry and objects
             (entPhysicalContainedIn and entPhysicalParentRelPos) to help
             an NMS relate the particular entry to other entries in this
             table."
@@ -256,7 +289,7 @@ EntPhysicalEntry ::= SEQUENCE {
       entPhysicalDescr          SnmpAdminString,
       entPhysicalVendorType     AutonomousType,
       entPhysicalContainedIn    PhysicalIndexOrZero,
-      entPhysicalClass          PhysicalClass,
+      entPhysicalClass          IANAPhysicalClass,
       entPhysicalParentRelPos   Integer32,
       entPhysicalName           SnmpAdminString,
       entPhysicalHardwareRev    SnmpAdminString,
@@ -269,7 +302,8 @@ EntPhysicalEntry ::= SEQUENCE {
       entPhysicalAssetID        SnmpAdminString,
       entPhysicalIsFRU          TruthValue,
       entPhysicalMfgDate        DateAndTime,
-      entPhysicalUris           OCTET STRING
+      entPhysicalUris           OCTET STRING,
+      entPhysicalUUID           UUIDorZero
 
 }
 
@@ -286,11 +320,9 @@ entPhysicalDescr OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-
-
             "A textual description of physical entity.  This object
             should contain a string that identifies the manufacturer's
-            name for the physical entity, and should be set to a
+            name for the physical entity and should be set to a
             distinct value for each version or model of the physical
             entity."
     ::= { entPhysicalEntry 2 }
@@ -320,7 +352,7 @@ entPhysicalContainedIn OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-            "The value of entPhysicalIndex for the physical entity which
+            "The value of entPhysicalIndex for the physical entity that
             'contains' this physical entity.  A value of zero indicates
             this physical entity is not contained in any other physical
             entity.  Note that the set of 'containment' relationships
@@ -334,10 +366,8 @@ entPhysicalContainedIn OBJECT-TYPE
     ::= { entPhysicalEntry 4 }
 
 entPhysicalClass OBJECT-TYPE
-    SYNTAX      PhysicalClass
+    SYNTAX      IANAPhysicalClass
     MAX-ACCESS  read-only
-
-
     STATUS      current
     DESCRIPTION
             "An indication of the general hardware type of the physical
@@ -386,7 +416,6 @@ entPhysicalParentRelPos OBJECT-TYPE
             of 'sibling' components, perhaps based on internal
             representation of the components.
 
-
             If the agent cannot determine the parent-relative position
             for some reason, or if the associated value of
             entPhysicalContainedIn is '0', then the value '-1' is
@@ -421,9 +450,9 @@ entPhysicalName OBJECT-TYPE
             "The textual name of the physical entity.  The value of this
             object should be the name of the component as assigned by
             the local device and should be suitable for use in commands
-            entered at the device's `console'.  This might be a text
-            name (e.g., `console') or a simple component number (e.g.,
-            port or module number, such as `1'), depending on the
+            entered at the device's 'console'.  This might be a text
+            name (e.g., 'console') or a simple component number (e.g.,
+            port or module number, such as '1'), depending on the
             physical component naming syntax of the device.
 
             If there is no local name, or if this object is otherwise
@@ -435,7 +464,6 @@ entPhysicalName OBJECT-TYPE
             interface does not distinguish between them, e.g., slot-1
             and the card in slot-1."
     ::= { entPhysicalEntry 7 }
-
 
 entPhysicalHardwareRev    OBJECT-TYPE
     SYNTAX      SnmpAdminString
@@ -449,7 +477,7 @@ entPhysicalHardwareRev    OBJECT-TYPE
 
             Note that if revision information is stored internally in a
             non-printable (e.g., binary) format, then the agent must
-            convert such information to a printable format, in an
+            convert such information to a printable format in an
             implementation-specific manner.
 
             If no specific hardware revision string is associated with
@@ -468,7 +496,7 @@ entPhysicalFirmwareRev    OBJECT-TYPE
 
             Note that if revision information is stored internally in a
             non-printable (e.g., binary) format, then the agent must
-            convert such information to a printable format, in an
+            convert such information to a printable format in an
             implementation-specific manner.
 
             If no specific firmware programs are associated with the
@@ -485,10 +513,8 @@ entPhysicalSoftwareRev    OBJECT-TYPE
             physical entity.
 
             Note that if revision information is stored internally in a
-
-
             non-printable (e.g., binary) format, then the agent must
-            convert such information to a printable format, in an
+            convert such information to a printable format in an
             implementation-specific manner.
 
             If no specific software programs are associated with the
@@ -505,7 +531,7 @@ entPhysicalSerialNum   OBJECT-TYPE
             entity.  The preferred value is the serial number string
             actually printed on the component itself (if present).
 
-            On the first instantiation of an physical entity, the value
+            On the first instantiation of a physical entity, the value
             of entPhysicalSerialNum associated with that entity is set
             to the correct vendor-assigned serial number, if this
             information is available to the agent.  If a serial number
@@ -515,28 +541,26 @@ entPhysicalSerialNum   OBJECT-TYPE
             Note that implementations that can correctly identify the
             serial numbers of all installed physical entities do not
             need to provide write access to the entPhysicalSerialNum
-            object.  Agents which cannot provide non-volatile storage
+            object.  Agents that cannot provide non-volatile storage
             for the entPhysicalSerialNum strings are not required to
             implement write access for this object.
 
             Not every physical component will have a serial number, or
             even need one.  Physical entities for which the associated
             value of the entPhysicalIsFRU object is equal to 'false(2)'
-            (e.g., the repeater ports within a repeater module), do not
-            need their own unique serial number.  An agent does not have
-            to provide write access for such entities, and may return a
-            zero-length string.
+            (e.g., the repeater ports within a repeater module) do not
+            need their own unique serial numbers.  An agent does not
+            have to provide write access for such entities and may
+            return a zero-length string.
 
             If write access is implemented for an instance of
-            entPhysicalSerialNum, and a value is written into the
+            entPhysicalSerialNum and a value is written into the
             instance, the agent must retain the supplied value in the
             entPhysicalSerialNum instance (associated with the same
             physical entity) for as long as that entity remains
             instantiated.  This includes instantiations across all
             re-initializations/reboots of the network management system,
             including those resulting in a change of the physical
-
-
             entity's entPhysicalIndex value."
     ::= { entPhysicalEntry 11 }
 
@@ -552,7 +576,7 @@ entPhysicalMfgName   OBJECT-TYPE
             Note that comparisons between instances of the
             entPhysicalModelName, entPhysicalFirmwareRev,
             entPhysicalSoftwareRev, and the entPhysicalSerialNum
-            objects, are only meaningful amongst entPhysicalEntries with
+            objects are only meaningful amongst entPhysicalEntries with
             the same value of entPhysicalMfgName.
 
             If the manufacturer name string associated with the physical
@@ -585,15 +609,13 @@ entPhysicalAlias    OBJECT-TYPE
             'handle' for the physical entity.
 
             On the first instantiation of a physical entity, the value
-
-
             of entPhysicalAlias associated with that entity is set to
             the zero-length string.  However, the agent may set the
             value to a locally unique default value, instead of a
             zero-length string.
 
             If write access is implemented for an instance of
-            entPhysicalAlias, and a value is written into the instance,
+            entPhysicalAlias and a value is written into the instance,
             the agent must retain the supplied value in the
             entPhysicalAlias instance (associated with the same physical
             entity) for as long as that entity remains instantiated.
@@ -609,7 +631,7 @@ entPhysicalAssetID OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "This object is a user-assigned asset tracking identifier
-            (as specified by a network manager) for the physical entity,
+            (as specified by a network manager) for the physical entity
             and provides non-volatile storage of this information.
 
             On the first instantiation of a physical entity, the value
@@ -617,16 +639,16 @@ entPhysicalAssetID OBJECT-TYPE
             the zero-length string.
 
             Not every physical component will have an asset tracking
-            identifier, or even need one.  Physical entities for which
+            identifier or even need one.  Physical entities for which
             the associated value of the entPhysicalIsFRU object is equal
             to 'false(2)' (e.g., the repeater ports within a repeater
-            module), do not need their own unique asset tracking
+            module) do not need their own unique asset tracking
             identifier.  An agent does not have to provide write access
-            for such entities, and may instead return a zero-length
+            for such entities and may instead return a zero-length
             string.
 
             If write access is implemented for an instance of
-            entPhysicalAssetID, and a value is written into the
+            entPhysicalAssetID and a value is written into the
             instance, the agent must retain the supplied value in the
             entPhysicalAssetID instance (associated with the same
             physical entity) for as long as that entity remains
@@ -634,7 +656,6 @@ entPhysicalAssetID OBJECT-TYPE
             re-initializations/reboots of the network management system,
             including those resulting in a change of the physical
             entity's entPhysicalIndex value.
-
 
             If no asset tracking information is associated with the
             physical component, then this object will contain a
@@ -647,8 +668,8 @@ entPhysicalIsFRU OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "This object indicates whether or not this physical entity
-            is considered a 'field replaceable unit' by the vendor.  If
-            this object contains the value 'true(1)' then this
+            is considered a 'field replaceable unit' by the vendor.
+            If this object contains the value 'true(1)', then this
             entPhysicalEntry identifies a field replaceable unit.  For
             all entPhysicalEntries that represent components
             permanently contained within a field replaceable unit, the
@@ -661,8 +682,8 @@ entPhysicalMfgDate  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "This object contains the date of manufacturing of the
-            managed entity.  If the manufacturing date is unknown or not
-            supported, the object is not instantiated.  The special
+            managed entity.  If the manufacturing date is unknown or
+            not supported, the object is not instantiated.  The special
             value '0000000000000000'H may also be returned in this
             case."
     ::= { entPhysicalEntry 17 }
@@ -672,26 +693,40 @@ entPhysicalUris OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-            "This object contains additional identification information
-            about the physical entity.  The object contains URIs and,
-            therefore, the syntax of this object must conform to RFC
-            3986, section 2.
+            "This object contains identification
+            information about the physical entity.  The object
+            contains URIs; therefore, the syntax of this object
+            must conform to RFC 3986, Section 3.
 
             Multiple URIs may be present and are separated by white
             space characters.  Leading and trailing white space
             characters are ignored.
 
-            If no additional identification information is known
-            about the physical entity or supported, the object is not
-            instantiated.  A zero length octet string may also be
-
-
+            If no URI identification information is known
+            about the physical entity, the object is not
+            instantiated.  A zero-length octet string may also be
             returned in this case."
     REFERENCE
             "RFC 3986, Uniform Resource Identifiers (URI): Generic
-            Syntax, section 2, August 1998."
-
+            Syntax, Section 2, August 1998."
     ::= { entPhysicalEntry 18 }
+
+entPhysicalUUID OBJECT-TYPE
+    SYNTAX      UUIDorZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object contains identification information
+            about the physical entity.  The object contains a
+            Universally Unique Identifier, the syntax of this object
+            must conform to RFC 4122, Section 4.1.
+
+            A zero-length octet string is returned if no UUID
+            information is known."
+    REFERENCE
+            "RFC 4122, A Universally Unique IDentifier (UUID) URN
+            Namespace, Section 4.1, July 2005."
+    ::= { entPhysicalEntry 19 }
 
 --           The Logical Entity Table
 entLogicalTable OBJECT-TYPE
@@ -701,7 +736,7 @@ entLogicalTable OBJECT-TYPE
     DESCRIPTION
             "This table contains one row per logical entity.  For agents
             that implement more than one naming scope, at least one
-            entry must exist.  Agents which instantiate all MIB objects
+            entry must exist.  Agents that instantiate all MIB objects
             within a single naming scope are not required to implement
             this table."
     ::= { entityLogical 1 }
@@ -733,8 +768,6 @@ entLogicalIndex OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-
-
             "The value of this object uniquely identifies the logical
             entity.  The value should be a small positive integer; index
             values for different logical entities are not necessarily
@@ -748,7 +781,7 @@ entLogicalDescr OBJECT-TYPE
     DESCRIPTION
             "A textual description of the logical entity.  This object
             should contain a string that identifies the manufacturer's
-            name for the logical entity, and should be set to a distinct
+            name for the logical entity and should be set to a distinct
             value for each version of the logical entity."
     ::= { entLogicalEntry 2 }
 
@@ -759,7 +792,7 @@ entLogicalType OBJECT-TYPE
     DESCRIPTION
             "An indication of the type of logical entity.  This will
             typically be the OBJECT IDENTIFIER name of the node in the
-            SMI's naming hierarchy which represents the major MIB
+            SMI's naming hierarchy that represents the major MIB
             module, or the majority of the MIB modules, supported by the
             logical entity.  For example:
                a logical entity of a regular host/router -> mib-2
@@ -774,7 +807,7 @@ entLogicalCommunity OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      deprecated
     DESCRIPTION
-            "An SNMPv1 or SNMPv2C community-string, which can be used to
+            "An SNMPv1 or SNMPv2c community string, which can be used to
             access detailed management information for this logical
             entity.  The agent should allow read access with this
             community string (to an appropriate subset of all managed
@@ -782,9 +815,8 @@ entLogicalCommunity OBJECT-TYPE
             privileges of the request used to read this object.  Note
             that an agent may return a community string with read-only
             privileges, even if this object is accessed with a
+
             read-write community string.  However, the agent must take
-
-
             care not to return a community string that allows more
             privileges than the community string used to access this
             object.
@@ -802,18 +834,18 @@ entLogicalCommunity OBJECT-TYPE
             represented by sysOREntries associated with the 'default'
             naming scope.
 
-            For agents not accessible via SNMPv1 or SNMPv2C, the value
+            For agents not accessible via SNMPv1 or SNMPv2c, the value
             of this object is the empty string.  This object may also
             contain an empty string if a community string has not yet
-            been assigned by the agent, or if no community string with
+            been assigned by the agent or if no community string with
             suitable access rights can be returned for a particular SNMP
             request.
 
-            Note that this object is deprecated.  Agents which implement
+            Note that this object is deprecated.  Agents that implement
             SNMPv3 access should use the entLogicalContextEngineID and
             entLogicalContextName objects to identify the context
             associated with each logical entity.  SNMPv3 agents may
-            return a zero-length string for this object, or may continue
+            return a zero-length string for this object or may continue
             to return a community string (e.g., tri-lingual agent
             support)."
     ::= { entLogicalEntry 4 }
@@ -828,13 +860,12 @@ entLogicalTAddress OBJECT-TYPE
             the corresponding value of entLogicalTDomain.
 
             For snmpUDPDomain, a TAddress is 6 octets long: the initial
-            4 octets contain the IP-address in network-byte order and
+            4 octets contain the IP-address in network-byte order, and
             the last 2 contain the UDP port in network-byte order.
-            Consult 'Transport Mappings for the Simple Network
-            Management Protocol' (STD 62, RFC 3417 [RFC3417]) for
-            further information on snmpUDPDomain."
-
-
+            Consult RFC 3417 for further information on snmpUDPDomain."
+    REFERENCE
+            "Transport Mappings for the Simple Network Management
+            Protocol (SNMP), STD 62, RFC 3417."
     ::= { entLogicalEntry 5 }
 
 entLogicalTDomain OBJECT-TYPE
@@ -844,9 +875,11 @@ entLogicalTDomain OBJECT-TYPE
     DESCRIPTION
             "Indicates the kind of transport service by which the
             logical entity receives network management traffic.
-            Possible values for this object are presently found in the
-            Transport Mappings for Simple Network Management Protocol'
-            (STD 62, RFC 3417 [RFC3417])."
+            Possible values for this object are presently found in
+            RFC 3417."
+    REFERENCE
+            "Transport Mappings for the Simple Network Management
+            Protocol (SNMP), STD 62, RFC 3417."
     ::= { entLogicalEntry 6 }
 
 entLogicalContextEngineID    OBJECT-TYPE
@@ -856,13 +889,13 @@ entLogicalContextEngineID    OBJECT-TYPE
     DESCRIPTION
             "The authoritative contextEngineID that can be used to send
             an SNMP message concerning information held by this logical
-            entity, to the address specified by the associated
+            entity to the address specified by the associated
             'entLogicalTAddress/entLogicalTDomain' pair.
 
             This object, together with the associated
             entLogicalContextName object, defines the context associated
-            with a particular logical entity, and allows access to SNMP
-            engines identified by a contextEngineId and contextName
+            with a particular logical entity and allows access to SNMP
+            engines identified by a contextEngineID and contextName
             pair.
 
             If no value has been configured by the agent, a zero-length
@@ -876,16 +909,14 @@ entLogicalContextName    OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "The contextName that can be used to send an SNMP message
-            concerning information held by this logical entity, to the
+            concerning information held by this logical entity to the
             address specified by the associated
             'entLogicalTAddress/entLogicalTDomain' pair.
 
             This object, together with the associated
             entLogicalContextEngineID object, defines the context
-            associated with a particular logical entity, and allows
-
-
-            access to SNMP engines identified by a contextEngineId and
+            associated with a particular logical entity and allows
+            access to SNMP engines identified by a contextEngineID and
             contextName pair.
 
             If no value has been configured by the agent, a zero-length
@@ -933,16 +964,14 @@ entLPMappingTable OBJECT-TYPE
 entLPMappingEntry       OBJECT-TYPE
     SYNTAX      EntLPMappingEntry
     MAX-ACCESS  not-accessible
-
-
     STATUS      current
     DESCRIPTION
-            "Information about a particular logical entity to physical
+            "Information about a particular logical-entity-to-physical-
             equipment association.  Note that the nature of the
             association is not specifically identified in this entry.
             It is expected that sufficient information exists in the
-            MIBs used to manage a particular logical entity to infer how
-            physical component information is utilized."
+            MIB modules used to manage a particular logical entity to
+            infer how physical component information is utilized."
     INDEX       { entLogicalIndex, entLPPhysicalIndex }
     ::= { entLPMappingTable 1 }
 
@@ -967,10 +996,11 @@ entAliasMappingTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "This table contains zero or more rows, representing
-            mappings of logical entity and physical component to
+            mappings of logical entities and physical components to
             external MIB identifiers.  Each physical port in the system
             may be associated with a mapping to an external identifier,
             which itself is associated with a particular logical
+
             entity's naming scope.  A 'wildcard' mechanism is provided
             to indicate that an identifier is associated with more than
             one logical entity."
@@ -981,12 +1011,11 @@ entAliasMappingEntry       OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-            "Information about a particular physical equipment, logical
-
-
-            entity to external identifier binding.  Each logical
-            entity/physical component pair may be associated with one
-            alias mapping.  The logical entity index may also be used as
+            "Information about a particular binding between a
+            logical entity/physical component pair and an external
+            identifier.  Each logical entity/physical component pair
+            may be associated with one alias mapping.
+            The logical entity index may also be used as
             a 'wildcard' (refer to the entAliasLogicalIndexOrZero object
             DESCRIPTION clause for details.)
 
@@ -1008,7 +1037,7 @@ entAliasLogicalIndexOrZero OBJECT-TYPE
     DESCRIPTION
             "The value of this object identifies the logical entity
             that defines the naming scope for the associated instance
-            of the 'entAliasMappingIdentifier' object.
+            of the entAliasMappingIdentifier object.
 
             If this object has a non-zero value, then it identifies the
             logical entity named by the same value of entLogicalIndex.
@@ -1032,7 +1061,6 @@ entAliasLogicalIndexOrZero OBJECT-TYPE
             for some logical entities, additional entAliasMapping
             entries may exist, e.g.:
 
-
                     entAliasMappingIdentifier.33.0 = ifIndex.6
                     entAliasMappingIdentifier.33.4 =  ifIndex.1
                     entAliasMappingIdentifier.33.5 =  ifIndex.1
@@ -1040,7 +1068,7 @@ entAliasLogicalIndexOrZero OBJECT-TYPE
 
             Note that entries with non-zero entAliasLogicalIndexOrZero
             index values have precedence over zero-indexed entries.  In
-            this example, all logical entities except 4, 5, and 10,
+            this example, all logical entities except 4, 5, and 10
             associate physical entity 33 with ifIndex.6."
     ::= { entAliasMappingEntry 1 }
 
@@ -1056,7 +1084,7 @@ entAliasMappingIdentifier OBJECT-TYPE
             Because only physical ports are modeled in this table, only
             entries that represent interfaces or ports are allowed.  If
             an ifEntry exists on behalf of a particular physical port,
-            then this object should identify the associated 'ifEntry'.
+            then this object should identify the associated ifEntry.
             For repeater ports, the appropriate row in the
             'rptrPortGroupTable' should be identified instead.
 
@@ -1065,13 +1093,15 @@ entAliasMappingIdentifier OBJECT-TYPE
             repeater, and entLogicalEntry.22 existed for a bridge.  Then
             there might be two related instances of
             entAliasMappingIdentifier:
+
                entAliasMappingIdentifier.3.15 == rptrPortGroupIndex.5.2
                entAliasMappingIdentifier.3.22 == ifIndex.17
+
             It is possible that other mappings (besides interfaces and
             repeater ports) may be defined in the future, as required.
 
             Bridge ports are identified by examining the Bridge MIB and
-            appropriate ifEntries associated with each 'dot1dBasePort',
+            appropriate ifEntries associated with each 'dot1dBasePort'
             and are thus not represented in this table."
     ::= { entAliasMappingEntry 2 }
 
@@ -1080,8 +1110,6 @@ entPhysicalContainsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF EntPhysicalContainsEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-
-
     DESCRIPTION
             "A table that exposes the container/'containee'
             relationships between physical entities.  This table
@@ -1130,8 +1158,6 @@ entLastChangeTime OBJECT-TYPE
                     - entLogicalTable
                     - entLPMappingTable
                     - entAliasMappingTable
-
-
                     - entPhysicalContainsTable
             "
     ::= { entityGeneral 1 }
@@ -1177,8 +1203,6 @@ entityGroups      OBJECT IDENTIFIER ::= { entityConformance 2 }
 -- compliance statements
 entityCompliance MODULE-COMPLIANCE
     STATUS  deprecated
-
-
     DESCRIPTION
             "The compliance statement for SNMP entities that implement
             version 1 of the Entity MIB."
@@ -1226,13 +1250,11 @@ entity2Compliance MODULE-COMPLIANCE
         DESCRIPTION
             "Read and write access is not required for agents that
             cannot identify serial number information for physical
-            entities, and/or cannot provide non-volatile storage for
-
-
+            entities and/or cannot provide non-volatile storage for
             NMS-assigned serial numbers.
 
             Write access is not required for agents that can identify
-            serial number information for physical entities, but cannot
+            serial number information for physical entities but cannot
             provide non-volatile storage for NMS-assigned serial
             numbers.
 
@@ -1274,12 +1296,10 @@ entity2Compliance MODULE-COMPLIANCE
         DESCRIPTION
             "Implementation of the 'cpu(12)' enumeration is not
             required."
-
     ::= { entityCompliances 2 }
 
-
 entity3Compliance MODULE-COMPLIANCE
-    STATUS  current
+    STATUS  deprecated
     DESCRIPTION
             "The compliance statement for SNMP entities that implement
             version 3 of the Entity MIB."
@@ -1313,11 +1333,11 @@ entity3Compliance MODULE-COMPLIANCE
         DESCRIPTION
             "Read and write access is not required for agents that
             cannot identify serial number information for physical
-            entities, and/or cannot provide non-volatile storage for
+            entities and/or cannot provide non-volatile storage for
             NMS-assigned serial numbers.
 
             Write access is not required for agents that can identify
-            serial number information for physical entities, but cannot
+            serial number information for physical entities but cannot
             provide non-volatile storage for NMS-assigned serial
             numbers.
 
@@ -1326,8 +1346,6 @@ entity3Compliance MODULE-COMPLIANCE
             is equal to 'false(2)'."
 
         OBJECT entPhysicalAlias
-
-
         MIN-ACCESS   read-only
         DESCRIPTION
             "Write access is required only if the associated
@@ -1345,6 +1363,85 @@ entity3Compliance MODULE-COMPLIANCE
             'false(2)'."
     ::= { entityCompliances 3 }
 
+entity4Compliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities that implement
+            the full version 4 (full compliance) of the Entity MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+                           entityPhysicalGroup,
+                           entityPhysical2Group,
+                           entityPhysical3Group,
+                           entityGeneralGroup,
+                           entityNotificationsGroup,
+                           entityPhysical4Group
+        }
+        GROUP entityLogical2Group
+        DESCRIPTION
+            "Implementation of this group is not mandatory for agents
+            that model all MIB object instances within a single naming
+            scope."
+
+        GROUP entityMappingGroup
+        DESCRIPTION
+            "Implementation of the entPhysicalContainsTable is mandatory
+            for all agents.  Implementation of the entLPMappingTable and
+            entAliasMappingTables are not mandatory for agents that
+            model all MIB object instances within a single naming scope.
+
+            Note that the entAliasMappingTable may be useful for all
+            agents; however, implementation of the entityLogicalGroup or
+            entityLogical2Group is required to support this table."
+
+        OBJECT entPhysicalSerialNum
+        MIN-ACCESS   not-accessible
+        DESCRIPTION
+            "Read and write access is not required for agents that
+            cannot identify serial number information for physical
+            entities and/or cannot provide non-volatile storage for
+            NMS-assigned serial numbers.
+
+            Write access is not required for agents that can identify
+            serial number information for physical entities but cannot
+            provide non-volatile storage for NMS-assigned serial
+            numbers.
+
+            Write access is not required for physical entities for
+            which the associated value of the entPhysicalIsFRU object
+            is equal to 'false(2)'."
+
+        OBJECT entPhysicalAlias
+        MIN-ACCESS   read-only
+        DESCRIPTION
+            "Write access is required only if the associated
+            entPhysicalClass value is equal to 'chassis(3)'."
+
+        OBJECT entPhysicalAssetID
+        MIN-ACCESS   not-accessible
+        DESCRIPTION
+            "Read and write access is not required for agents that
+            cannot provide non-volatile storage for NMS-assigned asset
+            identifiers.
+
+            Write access is not required for physical entities for which
+            the associated value of entPhysicalIsFRU is equal to
+            'false(2)'."
+    ::= { entityCompliances 4 }
+
+entity4CRCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities that implement
+            version 4 of the Entity MIB on devices with constrained
+            resources."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+                           entityPhysicalCRGroup,
+                           entityPhysical4Group
+        }
+    ::= { entityCompliances 5 }
+
 -- MIB groupings
 entityPhysicalGroup    OBJECT-GROUP
     OBJECTS {
@@ -1358,7 +1455,7 @@ entityPhysicalGroup    OBJECT-GROUP
     STATUS  current
     DESCRIPTION
             "The collection of objects used to represent physical
-            system components, for which a single agent provides
+            system components for which a single agent provides
             management information."
     ::= { entityGroups 1 }
 
@@ -1373,10 +1470,8 @@ entityLogicalGroup    OBJECT-GROUP
     STATUS  deprecated
     DESCRIPTION
             "The collection of objects used to represent the list of
-            logical entities, for which a single agent provides
+            logical entities for which a single agent provides
             management information."
-
-
     ::= { entityGroups 2 }
 
 entityMappingGroup    OBJECT-GROUP
@@ -1389,7 +1484,7 @@ entityMappingGroup    OBJECT-GROUP
     DESCRIPTION
             "The collection of objects used to represent the
             associations between multiple logical entities, physical
-            components, interfaces, and port identifiers, for which a
+            components, interfaces, and port identifiers for which a
             single agent provides management information."
     ::= { entityGroups 3 }
 
@@ -1400,7 +1495,7 @@ entityGeneralGroup    OBJECT-GROUP
     STATUS  current
     DESCRIPTION
             "The collection of objects used to represent general entity
-            information, for which a single agent provides management
+            information for which a single agent provides management
             information."
     ::= { entityGroups 4 }
 
@@ -1425,11 +1520,9 @@ entityPhysical2Group    OBJECT-GROUP
               entPhysicalIsFRU
             }
     STATUS  current
-
-
     DESCRIPTION
             "The collection of objects used to represent physical
-            system components, for which a single agent provides
+            system components for which a single agent provides
             management information.  This group augments the objects
             contained in the entityPhysicalGroup."
     ::= { entityGroups 6 }
@@ -1446,7 +1539,7 @@ entityLogical2Group    OBJECT-GROUP
     STATUS  current
     DESCRIPTION
             "The collection of objects used to represent the
-            list of logical entities, for which a single SNMP entity
+            list of logical entities for which a single SNMP entity
             provides management information."
     ::= { entityGroups 7 }
 
@@ -1458,9 +1551,35 @@ entityPhysical3Group    OBJECT-GROUP
     STATUS  current
     DESCRIPTION
             "The collection of objects used to represent physical
-            system components, for which a single agent provides
+            system components for which a single agent provides
             management information.  This group augments the objects
             contained in the entityPhysicalGroup."
     ::= { entityGroups 8 }
+
+entityPhysical4Group    OBJECT-GROUP
+    OBJECTS {
+              entPhysicalUUID
+            }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects used to represent physical
+            system components for which a single agent provides
+            management information.  This group augments the objects
+            contained in the entityPhysicalGroup and
+            entityPhysicalCRGroup."
+    ::= { entityGroups 9 }
+
+entityPhysicalCRGroup    OBJECT-GROUP
+    OBJECTS {
+              entPhysicalClass,
+              entPhysicalName
+            }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects used to represent physical
+            system components for constrained resourced devices,
+            for which a single agent provides management
+            information."
+    ::= { entityGroups 10 }
 
 END

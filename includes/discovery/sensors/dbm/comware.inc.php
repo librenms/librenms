@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -11,6 +12,8 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
 */
+use LibreNMS\Enum\IfOperStatus;
+
 echo 'Comware ';
 
 $multiplier = 1;
@@ -18,8 +21,8 @@ $divisor = 100;
 $hh3cTransceiverInfoTable = SnmpQuery::cache()->enumStrings()->walk('HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverInfoTable')->table(1);
 foreach ($hh3cTransceiverInfoTable as $index => $entry) {
     if (is_numeric($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverCurRXPower']) && $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverCurRXPower'] != 2147483647 && isset($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverDiagnostic'])) {
-        $interface = get_port_by_index_cache($device['device_id'], $index);
-        if ($interface['ifAdminStatus'] != 'up') {
+        $port = PortCache::getByIfIndex($index, $device['device_id']);
+        if ($port?->ifAdminStatus != IfOperStatus::Up) {
             continue;
         }
 
@@ -31,7 +34,7 @@ foreach ($hh3cTransceiverInfoTable as $index => $entry) {
         $current = $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverCurRXPower'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        $descr = makeshortif($interface['ifDescr']) . ' Receive Power';
+        $descr = $port?->getShortLabel() . ' Receive Power';
         discover_sensor(null, 'dbm', $device, $oid, 'rx-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 
@@ -44,9 +47,9 @@ foreach ($hh3cTransceiverInfoTable as $index => $entry) {
         $current = $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverCurTXPower'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        $interface = get_port_by_index_cache($device['device_id'], $index);
-        if ($interface['ifAdminStatus'] == 'up') {
-            $descr = makeshortif($interface['ifDescr']) . ' Transmit Power';
+        $port = PortCache::getByIfIndex($index, $device['device_id']);
+        if ($port?->ifAdminStatus == IfOperStatus::Up) {
+            $descr = $port->getShortLabel() . ' Transmit Power';
             discover_sensor(null, 'dbm', $device, $oid, 'tx-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
         }
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EnvHelper.php
  *
@@ -41,7 +42,7 @@ class EnvHelper
      * @param  string  $file
      * @return string
      *
-     * @throws \LibreNMS\Exceptions\FileWriteFailedException
+     * @throws FileWriteFailedException
      */
     public static function writeEnv($settings, $unset = [], $file = '.env')
     {
@@ -111,7 +112,7 @@ class EnvHelper
      *
      * @return bool|string
      *
-     * @throws \LibreNMS\Exceptions\FileWriteFailedException
+     * @throws FileWriteFailedException
      */
     public static function init()
     {
@@ -139,7 +140,7 @@ class EnvHelper
 
                 try {
                     config(['app.key' => $key]);
-                } catch (BindingResolutionException $e) {
+                } catch (BindingResolutionException) {
                     // called outside of Laravel, ignore config() failure
                 }
 
@@ -181,7 +182,7 @@ class EnvHelper
      */
     private static function escapeValue($value)
     {
-        if (strpos($value, ' ') !== false) {
+        if (str_contains($value, ' ')) {
             return "\"$value\"";
         }
 

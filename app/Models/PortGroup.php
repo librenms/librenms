@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PortGroup.php
  *
@@ -25,23 +26,31 @@
 
 namespace App\Models;
 
+use App\Facades\Permissions;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Gate;
+
 class PortGroup extends BaseModel
 {
+    use HasFactory;
     public $timestamps = false;
     protected $fillable = ['name', 'desc'];
 
     public function scopeHasAccess($query, User $user)
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAll', PortGroup::class)) {
             return $query;
         }
 
-        // maybe filtered in future
-        return $query;
+        return $query->whereIntegerInRaw('id', Permissions::portGroupsForUser($user));
     }
 
-    public function ports()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Port, $this>
+     */
+    public function ports(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Port::class, 'port_group_port', 'port_group_id', 'port_id');
+        return $this->belongsToMany(Port::class, 'port_group_port', 'port_group_id', 'port_id');
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Proxy.php
  *
@@ -25,14 +26,14 @@
 
 namespace LibreNMS\Util;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 class Proxy
 {
     public static function http(): string
     {
         // use local_only to avoid CVE-2016-5385
-        $http_proxy = getenv('http_proxy', local_only: true) ?: getenv('HTTP_PROXY', local_only: true) ?: Config::get('http_proxy', '');
+        $http_proxy = getenv('http_proxy', local_only: true) ?: getenv('HTTP_PROXY', local_only: true) ?: LibrenmsConfig::get('http_proxy', '');
 
         return $http_proxy;
     }
@@ -40,13 +41,13 @@ class Proxy
     public static function https(): string
     {
         // use local_only to avoid CVE-2016-5385
-        return getenv('https_proxy', local_only: true) ?: getenv('HTTPS_PROXY', local_only: true) ?: Config::get('https_proxy', '');
+        return getenv('https_proxy', local_only: true) ?: getenv('HTTPS_PROXY', local_only: true) ?: LibrenmsConfig::get('https_proxy', '');
     }
 
     public static function ignore(): array
     {
         // use local_only to avoid CVE-2016-5385
-        $no_proxy = getenv('no_proxy', local_only: true) ?: getenv('NO_PROXY', local_only: true) ?: Config::get('no_proxy', '');
+        $no_proxy = getenv('no_proxy', local_only: true) ?: getenv('NO_PROXY', local_only: true) ?: LibrenmsConfig::get('no_proxy', '');
 
         if ($no_proxy == '') {
             return [];

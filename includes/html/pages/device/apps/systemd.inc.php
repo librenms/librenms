@@ -26,14 +26,14 @@ function systemd_graph_builder(
     } else {
         foreach ($systemd_mapper as $flattened_type => $state_statuses) {
             // Ternary-depth systemd type check.
-            if (! preg_match('/^(.+)_(.+)$/', $flattened_type, $regex_matches)) {
+            if (! preg_match('/^(.+)_(.+)$/', (string) $flattened_type, $regex_matches)) {
                 continue;
             }
             if ($regex_matches[1] !== $state_type) {
                 continue;
             }
 
-            $graph_descr = ucfirst($flattened_type) . ' State';
+            $graph_descr = ucfirst((string) $flattened_type) . ' State';
             $graphs[$graph_name]['sub_states'][$flattened_type][
                 'desc'
             ] = $graph_descr;
@@ -93,7 +93,7 @@ echo generate_link('All Unit States', $link_array) . ' | ';
 
 $i = 0;
 foreach ($systemd_state_types as $state_type) {
-    echo generate_link(ucfirst($state_type) . ' State', $link_array, [
+    echo generate_link(ucfirst((string) $state_type) . ' State', $link_array, [
         'section' => $state_type,
     ]);
 

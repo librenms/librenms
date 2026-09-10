@@ -14,10 +14,6 @@ if (isset($vars['borgrepo'])) {
     $name_part = 'totals___' . $name_part;
 }
 
-$filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $name_part]);
-
-if (! Rrd::checkRrdExists($filename)) {
-    d_echo('RRD "' . $filename . '" not found');
-}
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $name_part]);
 
 require 'includes/html/graphs/generic_stats.inc.php';

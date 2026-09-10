@@ -1,0 +1,351 @@
+-- *****************************************************************
+-- RUIJIE-PROCESS-MIB.mib:  Ruijie Process MIB file
+--
+-- October 2003, Wuzg
+--
+-- Copyright (c) 2003 by Ruijie Networks Co.,Ltd.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+RUIJIE-PROCESS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32
+                FROM SNMPv2-SMI
+        DisplayString,
+        MacAddress,
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        ruijieMgmt
+                FROM RUIJIE-SMI;
+
+ruijieProcessMIB MODULE-IDENTITY
+        LAST-UPDATED "200310140000Z"
+        ORGANIZATION "Ruijie Networks Co.,Ltd."
+        CONTACT-INFO
+                " 
+                Tel: 4008-111-000 
+
+                E-mail: service@ruijie.com.cn"
+        DESCRIPTION
+                "This module defines ruijie system mibs."
+        REVISION      "200310140000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { ruijieMgmt 36}
+
+-- Percentage for statistic, etc.
+--
+Percent ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "An integer that is in the range of a percent value."
+    SYNTAX INTEGER (0..100)
+    
+ruijieCPUMIBObjects OBJECT IDENTIFIER ::= { ruijieProcessMIB 1 }
+
+-- general mib
+ruijieCpuGeneralMibsGroup OBJECT IDENTIFIER ::= { ruijieCPUMIBObjects 1 }
+
+ruijieCPUUtilization5Sec OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU utilization for 5 seconds."
+    ::= { ruijieCpuGeneralMibsGroup 1 }
+
+ruijieCPUUtilization1Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU utilization for 1 minutes."
+    ::= { ruijieCpuGeneralMibsGroup 2 }
+
+ruijieCPUUtilization5Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU utilization for 5 minutes."
+    ::= { ruijieCpuGeneralMibsGroup 3 }
+
+ruijieCPUUtilizationWarning OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the first warning of cpu using rate."
+    ::= { ruijieCpuGeneralMibsGroup 4 }
+    
+ruijieCPUUtilizationCritical OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the realtime collection switch of cpu using rate."
+    ::= { ruijieCpuGeneralMibsGroup 5 } 
+
+ruijieCPUMaxUtilization5Sec OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU max utilization for 5 seconds."
+    ::= { ruijieCpuGeneralMibsGroup 6 }
+
+ruijieCPUMaxUtilization1Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU max utilization for 1 minutes."
+    ::= { ruijieCpuGeneralMibsGroup 7 }
+
+ruijieCPUMaxUtilization5Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU max utilization for 5 minutes."
+    ::= { ruijieCpuGeneralMibsGroup 8 }
+
+ruijieCPUUtilizationCollectSwitch OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the realtime collection of cpu using rate."
+    ::= { ruijieCpuGeneralMibsGroup 9 } 
+    
+ruijieCPUUtilizationCurrent OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the collection of current cpu using rate."
+    ::= { ruijieCpuGeneralMibsGroup 10 } 
+
+---Node's CPU utilization table
+ruijieNodeCPUTotalTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF RuijieNodeCPUTotalEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of line cards's CPU utilization entries. Each of the
+     objects provides a general idea of how much of the CPU resource
+     of a line card has been used over a given period of time."
+  ::= { ruijieCPUMIBObjects 2 }
+
+ruijieNodeCPUTotalEntry OBJECT-TYPE
+  SYNTAX      RuijieNodeCPUTotalEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in the node's CPU utilization table."
+  INDEX { ruijieNodeCPUTotalIndex }
+  ::= { ruijieNodeCPUTotalTable 1 }
+
+RuijieNodeCPUTotalEntry ::=
+  SEQUENCE {
+    ruijieNodeCPUTotalIndex  Integer32,
+    ruijieNodeCPUTotalName   DisplayString,
+    ruijieNodeCPUTotal5sec   Percent,
+    ruijieNodeCPUTotal1min   Percent,
+    ruijieNodeCPUTotal5min   Percent,
+    ruijieNodeCPUTotalWarning  Percent,
+    ruijieNodeCPUTotalCritical Percent
+  }
+    
+ruijieNodeCPUTotalIndex OBJECT-TYPE
+    SYNTAX        Integer32(0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a node's CPU utilization information."
+    ::= { ruijieNodeCPUTotalEntry 1 }
+   
+ruijieNodeCPUTotalName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The name of a node, for example, slot x is the x slot."
+    ::= { ruijieNodeCPUTotalEntry 2 } 
+   
+ruijieNodeCPUTotal5sec OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU utilization of a node for 5 seconds."
+    ::= { ruijieNodeCPUTotalEntry 3 }
+
+ruijieNodeCPUTotal1min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU utilization of a node for 1 minutes."
+    ::= { ruijieNodeCPUTotalEntry 4 }
+
+ruijieNodeCPUTotal5min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU utilization of a node for 5 minutes."
+    ::= { ruijieNodeCPUTotalEntry 5 }
+
+ruijieNodeCPUTotalWarning OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the first warning of the node's cpu using rate."
+    ::= { ruijieNodeCPUTotalEntry 6 }
+    
+ruijieNodeCPUTotalCritical OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the second warning of the node's cpu using rate."
+    ::= { ruijieNodeCPUTotalEntry 7 }  
+
+--lank ap 2010-7 
+ruijieLankApCPUTotalTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF RuijieLankApCPUTotalEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of lank ap CPU utilization entries. Each of the
+     objects provides a lank ap CPU utilization information."
+  ::= { ruijieCPUMIBObjects 3 }
+
+ruijieLankApCPUTotalEntry OBJECT-TYPE
+  SYNTAX      RuijieLankApCPUTotalEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in lank ap CPU utilization table."
+  INDEX { ruijieLankApCPUMacAddr }
+  ::= { ruijieLankApCPUTotalTable 1 }
+
+RuijieLankApCPUTotalEntry ::=
+  SEQUENCE {
+    ruijieLankApCPUMacAddr                   MacAddress,
+    ruijieLankApCPUUtilizationCollectSwitch  Integer32,
+    ruijieLankApCPUUtilizationWarning        Percent,
+    ruijieLankApCPUUtilizationCritical       Percent,
+    ruijieLankApCPUUtilizationCurrent        Percent,
+    ruijieLankApCPUUtilization5Min           Percent 
+  }
+    
+ruijieLankApCPUMacAddr OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents lank ap CPU."
+    ::= { ruijieLankApCPUTotalEntry 1 }
+
+ruijieLankApCPUUtilizationCollectSwitch OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the realtime collection of lank ap cpu using rate."
+    ::= { ruijieLankApCPUTotalEntry 2 }  
+
+ruijieLankApCPUUtilizationWarning OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the first warning of lank ap cpu using rate."
+    ::= { ruijieLankApCPUTotalEntry 3 }
+   
+ruijieLankApCPUUtilizationCritical OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the realtime collection switch of lank ap cpu using rate."
+    ::= { ruijieLankApCPUTotalEntry 4 } 
+    
+ruijieLankApCPUUtilizationCurrent OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the collection of current lank ap cpu using rate."
+    ::= { ruijieLankApCPUTotalEntry 5 }  
+  
+ruijieLankApCPUUtilization5Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the lank ap CPU utilization for 5 minutes."
+    ::= { ruijieLankApCPUTotalEntry 6 }
+
+           
+ruijieProcessMIBConformance OBJECT IDENTIFIER ::= { ruijieProcessMIB 2 }
+ruijieProcessMIBCompliances OBJECT IDENTIFIER ::= { ruijieProcessMIBConformance 1 }
+ruijieProcessMIBGroups      OBJECT IDENTIFIER ::= { ruijieProcessMIBConformance 2 }
+
+-- compliance statements
+
+ruijieProcessMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the Ruijie Process MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { ruijieCPUUtilizationMIBGroup
+                 }
+        ::= { ruijieProcessMIBCompliances 1 }
+                
+-- units of conformance
+
+ruijieCPUUtilizationMIBGroup OBJECT-GROUP
+        OBJECTS {
+          ruijieCPUUtilization5Sec,
+          ruijieCPUUtilization1Min,
+          ruijieCPUUtilization5Min,
+          ruijieCPUMaxUtilization5Sec,
+          ruijieCPUMaxUtilization1Min,
+          ruijieCPUMaxUtilization5Min,
+          ruijieCPUUtilizationCollectSwitch,
+          ruijieCPUUtilizationCurrent
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing CPU utilization to a Ruijie agent."
+        ::= { ruijieProcessMIBGroups 1 } 
+
+ruijieNodeCPUTotalGroups OBJECT-GROUP
+        OBJECTS {
+          ruijieNodeCPUTotalIndex,
+          ruijieNodeCPUTotalName,
+          ruijieNodeCPUTotal5sec,
+          ruijieNodeCPUTotal1min,
+          ruijieNodeCPUTotal5min,
+          ruijieNodeCPUTotalWarning,
+          ruijieNodeCPUTotalCritical
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing node's CPU utilization to a Ruijie agent."
+        ::= { ruijieProcessMIBGroups 2 } 
+  
+END

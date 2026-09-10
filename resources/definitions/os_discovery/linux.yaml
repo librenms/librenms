@@ -1,0 +1,165 @@
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::adapterPropertiesTable
+                    value: LSI-MegaRAID-SAS-MIB::temperatureROC
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.2.1.42.{{ $index }}'
+                    index: 'controllertemp.{{ $index }}'
+                    group: 'RAID Controller {{ LSI-MegaRAID-SAS-MIB::adapterID-APT }}'
+                    descr: 'Controller'
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::bbuTable
+                    value: LSI-MegaRAID-SAS-MIB::temperature
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.6.2.1.16.{{ $index }}'
+                    index: 'bbutemp.{{ $index }}'
+                    group: 'RAID Controller {{ LSI-MegaRAID-SAS-MIB::adpID }}'
+                    descr: 'BBU'
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::physicalDriveTable
+                    value: LSI-MegaRAID-SAS-MIB::pdTemperature
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.2.1.2.1.36.{{ $index }}'
+                    index: 'slot.{{ $index }}'
+                    group: 'RAID Controller {{ LSI-MegaRAID-SAS-MIB::adpID-PDT }} Enclosure {{ LSI-MegaRAID-SAS-MIB::enclDeviceId }}'
+                    descr: '/c{{ LSI-MegaRAID-SAS-MIB::adpID-PDT }}/e{{ LSI-MegaRAID-SAS-MIB::enclDeviceId }}/s{{ LSI-MegaRAID-SAS-MIB::slotNumber }}'
+        count:
+            data:
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::adapterPropertiesTable
+                    value: LSI-MegaRAID-SAS-MIB::vdPresentCount
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.2.1.18.{{ $index }}'
+                    index: 'vdsum.{{ $index }}'
+                    group: 'RAID Controller {{ LSI-MegaRAID-SAS-MIB::adapterID-APT }}'
+                    descr: 'Virtual disks'
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::adapterPropertiesTable
+                    value: LSI-MegaRAID-SAS-MIB::vdDegradedCount
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.2.1.19.{{ $index }}'
+                    index: 'vddegraded.{{ $index }}'
+                    group: 'RAID Controller {{ LSI-MegaRAID-SAS-MIB::adapterID-APT }}'
+                    high_limit: 1
+                    descr: 'Virtual disk degraded'
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::adapterPropertiesTable
+                    value: LSI-MegaRAID-SAS-MIB::pdDiskPredFailureCount
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.2.1.23.{{ $index }}'
+                    index: 'criticaldisks.{{ $index }}'
+                    group: 'RAID Controller {{ LSI-MegaRAID-SAS-MIB::adapterID-APT }}'
+                    high_limit: 1
+                    descr: 'Critical disks'
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::adapterPropertiesTable
+                    value: LSI-MegaRAID-SAS-MIB::pdDiskFailedCount
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.2.1.24.{{ $index }}'
+                    index: 'faileddisks.{{ $index }}'
+                    group: 'RAID Controller {{ LSI-MegaRAID-SAS-MIB::adapterID-APT }}'
+                    high_limit: 1
+                    descr: 'Failed disks'
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::physicalDriveTable
+                    value: LSI-MegaRAID-SAS-MIB::mediaErrCount
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.2.1.2.1.7.{{ $index }}'
+                    index: 'mediaerr.slot.{{ $index }}'
+                    group: 'RAID Controller {{ LSI-MegaRAID-SAS-MIB::adpID-PDT }} Enclosure {{ LSI-MegaRAID-SAS-MIB::enclDeviceId }}'
+                    warn_limit: 1
+                    descr: '/c{{ LSI-MegaRAID-SAS-MIB::adpID-PDT }}/e{{ LSI-MegaRAID-SAS-MIB::enclDeviceId }}/s{{ LSI-MegaRAID-SAS-MIB::slotNumber }} Media Errors'
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::physicalDriveTable
+                    value: LSI-MegaRAID-SAS-MIB::otherErrCount
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.2.1.2.1.8.{{ $index }}'
+                    index: 'othererr.slot.{{ $index }}'
+                    group: 'RAID Controller {{ LSI-MegaRAID-SAS-MIB::adpID-PDT }} Enclosure {{ LSI-MegaRAID-SAS-MIB::enclDeviceId }}'
+                    warn_limit: 1
+                    descr: '/c{{ LSI-MegaRAID-SAS-MIB::adpID-PDT }}/e{{ LSI-MegaRAID-SAS-MIB::enclDeviceId }}/s{{ LSI-MegaRAID-SAS-MIB::slotNumber }} Other Errors'
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::physicalDriveTable
+                    value: LSI-MegaRAID-SAS-MIB::predFailCount
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.2.1.2.1.9.{{ $index }}'
+                    index: 'predfail.slot.{{ $index }}'
+                    group: 'RAID Controller {{ LSI-MegaRAID-SAS-MIB::adpID-PDT }} Enclosure {{ LSI-MegaRAID-SAS-MIB::enclDeviceId }}'
+                    warn_limit: 1
+                    descr: '/c{{ LSI-MegaRAID-SAS-MIB::adpID-PDT }}/e{{ LSI-MegaRAID-SAS-MIB::enclDeviceId }}/s{{ LSI-MegaRAID-SAS-MIB::slotNumber }} Predictive Failures'
+        state:
+            data:
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::adapterPropertiesTable
+                    value: LSI-MegaRAID-SAS-MIB::alarmState
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.2.1.4.{{ $index }}'
+                    group: 'RAID Controller {{ LSI-MegaRAID-SAS-MIB::adapterID-APT }}'
+                    descr: 'Alarm'
+                    state_name: alarmState
+                    states:
+                        - { descr: disabled , value: 0, generic: 1 }
+                        - { descr: enabled  , value: 1, generic: 0 }
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::enclosurePowerSupplyTable
+                    value: LSI-MegaRAID-SAS-MIB::powerSupplyStatus
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.5.5.1.3.{{ $index }}'
+                    group: 'Enclosure {{ LSI-MegaRAID-SAS-MIB::enclosureId-EPST }}'
+                    descr: 'Powersupply {{ LSI-MegaRAID-SAS-MIB::powerSupplyID }}'
+                    state_name: powerSupplyStatus
+                    states:
+                        - { descr: invalid       , value: 1, generic: 2 }
+                        - { descr: ok            , value: 2, generic: 0 }
+                        - { descr: critical      , value: 3, generic: 2 }
+                        - { descr: nonCritical   , value: 4, generic: 1 }
+                        - { descr: unrecoverable , value: 5, generic: 2 }
+                        - { descr: notInstalled  , value: 6, generic: 3 }
+                        - { descr: unknown       , value: 7, generic: 1 }
+                        - { descr: notAvailible  , value: 8, generic: 3 }
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::enclosureFanTable
+                    value: LSI-MegaRAID-SAS-MIB::fanStatus
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.5.3.1.3.{{ $index }}'
+                    group: 'Enclosure {{ LSI-MegaRAID-SAS-MIB::enclosureId }}'
+                    descr: 'FAN {{ LSI-MegaRAID-SAS-MIB::fanID }}'
+                    state_name: fanStatus
+                    states:
+                        - { descr: invalid       , value: 1, generic: 2 }
+                        - { descr: ok            , value: 2, generic: 0 }
+                        - { descr: critical      , value: 3, generic: 2 }
+                        - { descr: nonCritical   , value: 4, generic: 1 }
+                        - { descr: unrecoverable , value: 5, generic: 2 }
+                        - { descr: notInstalled  , value: 6, generic: 3 }
+                        - { descr: unknown       , value: 7, generic: 1 }
+                        - { descr: notAvailible  , value: 8, generic: 3 }
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::enclosureAlarmTable
+                    value: LSI-MegaRAID-SAS-MIB::alarmStatus
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.5.7.{{ $index }}'
+                    group: 'Enclosure {{ LSI-MegaRAID-SAS-MIB::enclosureId-EAT }}'
+                    descr: 'Alarm'
+                    state_name: alarmStatus
+                    states:
+                        - { descr: invalid       , value: 1, generic: 2 }
+                        - { descr: ok            , value: 2, generic: 0 }
+                        - { descr: critical      , value: 3, generic: 2 }
+                        - { descr: nonCritical   , value: 4, generic: 1 }
+                        - { descr: unrecoverable , value: 5, generic: 2 }
+                        - { descr: notInstalled  , value: 6, generic: 3 }
+                        - { descr: unknown       , value: 7, generic: 1 }
+                        - { descr: notAvailible  , value: 8, generic: 3 }
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::bbuTable
+                    value: LSI-MegaRAID-SAS-MIB::chargerStatus
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.6.2.1.20.{{ $index }}'
+                    group: 'RAID Controller {{ LSI-MegaRAID-SAS-MIB::adpID }}'
+                    descr: 'BBU charger'
+                    state_name: chargerStatus
+                    states:
+                        - { descr: notAvailible, value: -1, generic: 3 }
+                        - { descr: off          , value:  0, generic: 2 }
+                        - { descr: complete     , value:  1, generic: 0 }
+                        - { descr: progress     , value:  2, generic: 1 }
+                -
+                    oid: LSI-MegaRAID-SAS-MIB::bbuTable
+                    value: LSI-MegaRAID-SAS-MIB::batteryReplacement
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.6.2.1.27.{{ $index }}'
+                    group: 'RAID Controller {{ LSI-MegaRAID-SAS-MIB::adpID }}'
+                    descr: 'BBU replacement'
+                    state_name: batteryReplacement
+                    states:
+                        - { descr: not availible    , value: -1, generic: 3 }
+                        - { descr: needsReplacement , value:  1, generic: 2 }
+                        - { descr: ok               , value:  0, generic: 0 }

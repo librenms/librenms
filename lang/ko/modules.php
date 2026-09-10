@@ -1,0 +1,36 @@
+<?php
+
+return [
+    'slas' => [
+        'types' => [
+            'dhcp' => 'DHCP',
+            'dlsw' => 'DLSW',
+            'dns' => 'DNS',
+            'DnsQuery' => 'DNS 쿼리',
+            'echo' => 'ICMP Ping',
+            'ethernetJitter' => '이더넷 지터',
+            'ethernetPing' => '이더넷 Ping',
+            'fileIO' => '파일 I/O',
+            'ftp' => 'FTP',
+            'http' => 'HTTP',
+            'HttpGet' => 'HTTP Get',
+            'HttpGetMetadata' => 'HTTP Get 메타데이터',
+            'IcmpEcho' => 'ICMP Echo',
+            'icmpjitter' => 'ICMP 지터',
+            'IcmpTimeStamp' => 'ICMP 타임스탬프',
+            'jitter' => '지터',
+            'lspGroup' => 'LSP 그룹',
+            'lspPing' => 'LSP Ping',
+            'lspPingPseudowire' => 'LSP 슈도와이어 Ping',
+            'lspTrace' => 'LSP Trace',
+            'NtpQuery' => 'NTP 쿼리',
+            'pathEcho' => '경로 ICMP Ping',
+            'rtp' => 'RTP',
+            'script' => '스크립트',
+            'tcpConnect' => 'TCP 연결',
+            'udpEcho' => 'UDP Ping',
+            'UdpTimestamp' => 'UDP 타임스탬프',
+            'voip' => 'VoIP',
+        ],
+    ],
+];

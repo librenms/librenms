@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AdvaTeholdCrossingAlertTest.php
  *
@@ -25,7 +26,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class AdvaNetThresholdCrossingAlertTest extends SnmpTrapTestCase
+final class AdvaNetThresholdCrossingAlertTest extends SnmpTrapTestCase
 {
     public function testNetThresholdTrap(): void
     {

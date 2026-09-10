@@ -18,12 +18,16 @@ echo '| DBs:';
 $databases = $app->data['databases'] ?? [];
 sort($databases);
 foreach ($databases as $index => $db) {
-    $db = htmlspecialchars($db);
-    $label = $vars['database'] == $db
-        ? '<span class="pagemenu-selected">' . $db . '</span>'
-        : $db;
+    $db = htmlspecialchars((string) $db);
 
-    echo generate_link($label, $link_array, ['database' => $db]);
+    $label = $db;
+    $link = generate_link($label, $link_array, ['database' => $db]);
+
+    $link = $vars['database'] == $db
+        ? '<span class="pagemenu-selected">' . $link . '</span>'
+        : $link;
+
+    echo $link;
 
     if ($index < (count($databases) - 1)) {
         echo ', ';
@@ -45,7 +49,7 @@ foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 

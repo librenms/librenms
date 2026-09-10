@@ -1,18 +1,10 @@
--- ==================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
--- 
--- Description: HUAWEI Private IPFPM MIB
+-- ============================================================================
+-- Copyright (C) 2021 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: The mib is used for configuring the IPFPM.
 -- Reference:
--- Version: V1.35
--- History:
---          Wang XuanXuan,2012-08-13,Create 
--- ==================================================================
--- ==================================================================
--- 
--- Variables and types be imported
--- 
--- ==================================================================
-
+-- Version: V1.38
+--
+-- ============================================================================
 HUAWEI-IPFPM-MIB DEFINITIONS ::= BEGIN
  
 IMPORTS
@@ -31,7 +23,7 @@ IMPORTS
     
     
     hwIpfpmMib MODULE-IDENTITY 
-        LAST-UPDATED "201708171704Z"-- 
+        LAST-UPDATED "202107302026Z"
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -43,86 +35,85 @@ IMPORTS
 			   Email: support@huawei.com
 			"
         DESCRIPTION 
-            "This MIB describes objects to manage IPFPM (IP Flow 
-            Performance Measurement). IPFPM provides a method for IP 
-            flow performance measurement, in which MCP (Measurement 
-            Control Point),DCP (Data Collecting Point) and TLP 
-            (Target Logic Point) are three kinds of roles working 
-            together. TLP is responsible for implementing measurement 
-            and generating the measurement data. DCP manages TLPs and 
-            get measurement data from them to report to MCP. MCP 
-            works as the control role to collect and calculate the 
-            measurement data that DCP reported."
+            "The mib is used for configuring the IPFPM."
+
+        -- Revision history
+        REVISION "202107302026Z"  
+        DESCRIPTION  "V1.38, add hwIpfpmBoardPktDscpConflict, hwIpfpmBoardStreamCreateFail, hwIpfpmBoardAclResourceExceed"
+        REVISION "202106111523Z"  
+        DESCRIPTION  "V1.37, add hwIpfpmStreamUsed, hwIpfpmStreamTotal, hwIpfpmSlotStr, hwIpfpmStreamResourceExceed, hwIpfpmStreamResourceRecovery, hwIpfpmBoardStreamResourceExceed, hwIpfpmBoardStreamResourceRecovery"
+        REVISION "201809251940Z"  
+        DESCRIPTION  "V1.36, modify the description of hwIpfpmMultiOneDelayRecovery, hwIpfpmMultiTwoDelayRecovery"
         REVISION "201708171704Z"  
-        DESCRIPTION  "revision 1.35, modify the description of hwIpfpmMultiOneDelayRecovery, hwIpfpmMultiTwoDelayRecovery"
+        DESCRIPTION  "V1.35, modify the description of hwIpfpmMultiOneDelayRecovery, hwIpfpmMultiTwoDelayRecovery"
         REVISION "201707211530Z"  
-        DESCRIPTION  "revision 1.34, add hwIpfpmDcpInstTlpIndexTable, hwIpfpmDcpInstTlpNHIndexTable"
+        DESCRIPTION  "V1.34, add hwIpfpmDcpInstTlpIndexTable, hwIpfpmDcpInstTlpNHIndexTable"
         REVISION "201707211451Z"  
-        DESCRIPTION  "revision 1.33, modify the description of hwIpfpmMcpInstTlpMaxNum, hwIpfpmMcpAchMaxNum, hwIpfpmDcpMcpVpnType, hwIpfpmPeriodSource, hwIpfpmMcpInstDesc, hwIpfpmDcpInstTlpBackwardFlowLabelFlag"
+        DESCRIPTION  "V1.33, modify the description of hwIpfpmMcpInstTlpMaxNum, hwIpfpmMcpAchMaxNum, hwIpfpmDcpMcpVpnType, hwIpfpmPeriodSource, hwIpfpmMcpInstDesc, hwIpfpmDcpInstTlpBackwardFlowLabelFlag"
         REVISION "201608191122Z"  
-        DESCRIPTION  "revision 1.32, add hwIpfpmDcpFlowVxlan and hwIpfpmDcpFlowVni,hwIpfpmMcpInstTlpMaxNum, hwIpfpmMcpAchMaxNum"
+        DESCRIPTION  "V1.32, add hwIpfpmDcpFlowVxlan and hwIpfpmDcpFlowVni,hwIpfpmMcpInstTlpMaxNum, hwIpfpmMcpAchMaxNum"
         REVISION "201607262022Z"  
-        DESCRIPTION  "revision 1.31, modify hwIpfpmDcpInstTlpLspLabel2 and hwIpfpmDcpInstTlpBackwardLspLabel2"
+        DESCRIPTION  "V1.31, modify hwIpfpmDcpInstTlpLspLabel2 and hwIpfpmDcpInstTlpBackwardLspLabel2"
         REVISION "201605172022Z"  
-        DESCRIPTION  "revision 1.30, modify the description of hwIpfpmDcpNexthopIp"
+        DESCRIPTION  "V1.30, modify the description of hwIpfpmDcpNexthopIp"
         REVISION "201603292003Z"      
-        DESCRIPTION  "revision 1.29, modify hwIpfpmMcpAuthKey, hwIpfpmDcpAuthKey, hwIpfpmDcpInstAuthKey OBJECT-TYPE range"
+        DESCRIPTION  "V1.29, modify hwIpfpmMcpAuthKey, hwIpfpmDcpAuthKey, hwIpfpmDcpInstAuthKey OBJECT-TYPE range"
         REVISION "201602251100Z"      
-        DESCRIPTION  "revision 1.28, add hwIpfpmDcpInstTlpNHTable"
+        DESCRIPTION  "V1.28, add hwIpfpmDcpInstTlpNHTable"
         REVISION "201510211700Z"      
-        DESCRIPTION  "revision 1.27, add for multiDelay"
+        DESCRIPTION  "V1.27, add for multiDelay"
         REVISION "201510131700Z"      
-        DESCRIPTION  "revision 1.26, modify the spelling mistake of the word label"
+        DESCRIPTION  "V1.26, modify the spelling mistake of the word label"
         REVISION "201508142059Z"      
-        DESCRIPTION  "revision 1.25, modify the DEFVAL of hwIpfpmMcpId ,hwIpfpmDcpFlowDstAddr, hwIpfpmDcpFlowSrcAddr,hwIpfpmDcpId,hwIpfpmDcpId node"
-        REVISION "201505071555Z"      
-        DESCRIPTION  "revision 1.24, modify the type of hwIpfpmDcpTlpExtIfIndex node"	
+        DESCRIPTION  "V1.25, modify the DEFVAL of hwIpfpmMcpId ,hwIpfpmDcpFlowDstAddr, hwIpfpmDcpFlowSrcAddr,hwIpfpmDcpId,hwIpfpmDcpId node"
         REVISION "201507091658Z"      
-        DESCRIPTION  "revision 1.23, modify the value of hwIpfpmDcpInstGroupId node range"	
+        DESCRIPTION  "V1.24, modify the type of hwIpfpmDcpTlpExtIfIndex node"	
+        REVISION "201505071555Z"      
+        DESCRIPTION  "V1.23, modify the value of hwIpfpmDcpInstGroupId node range"	
         REVISION "201505061255Z"                                                  
-        DESCRIPTION  "revision 1.22, add hwIpfpmDcpTlpQueryExtTable and  hwIpfpmDcpTlpExtTable "
+        DESCRIPTION  "V1.22, add hwIpfpmDcpTlpQueryExtTable and  hwIpfpmDcpTlpExtTable "
         REVISION "201505051555Z"                                                  
-        DESCRIPTION  "revision 1.21, add hwIpfpmDcpInstGroupId "
+        DESCRIPTION  "V1.21, add hwIpfpmDcpInstGroupId "
         REVISION "201504161527Z"                                                  
-        DESCRIPTION  "revision 1.20, add enum bidirectional (3) value for hwIpfpmMcpFlowType mib node"
+        DESCRIPTION  "V1.20, add enum bidirectional (3) value for hwIpfpmMcpFlowType mib node"
         REVISION "201502061143Z"                                                  
-        DESCRIPTION  "revision 1.19, modify table index"
+        DESCRIPTION  "V1.19, modify table index"
         REVISION "201412291626Z"                                                  
-        DESCRIPTION  "revision 1.18, modify hwIpfpmDcpInstTlpTable for atom"
+        DESCRIPTION  "V1.18, modify hwIpfpmDcpInstTlpTable for atom"
         REVISION "201406261000Z"
-        DESCRIPTION  "revision 1.17, add new VB in hwIpfpmDcpInstTlpTable for SFP"
+        DESCRIPTION  "V1.17, add new VB in hwIpfpmDcpInstTlpTable for SFP"
         REVISION "201402121000Z"
-        DESCRIPTION  "revision 1.16, modify size list of hwIpfpmDcpSourceInstId, hwIpfpmDcpInstTlpVpnLabel, hwIpfpmDcpInstTlpLspLabel"
+        DESCRIPTION  "V1.16, modify size list of hwIpfpmDcpSourceInstId, hwIpfpmDcpInstTlpVpnLabel, hwIpfpmDcpInstTlpLspLabel"
         REVISION "201312171000Z"
-        DESCRIPTION  "revision 1.15, add hwIpfpmTlpExceed, hwIpfpmTlpRecovery, hwIpfpmTlpExceedBoardId, hwIpfpmTlpNumber, hwIpfpmTlpThreshold"
+        DESCRIPTION  "V1.15, add hwIpfpmTlpExceed, hwIpfpmTlpRecovery, hwIpfpmTlpExceedBoardId, hwIpfpmTlpNumber, hwIpfpmTlpThreshold"
         REVISION "201310252000Z"
-        DESCRIPTION  "revision 1.14, add description in the threshold trap"
+        DESCRIPTION  "V1.14, add description in the threshold trap"
         REVISION "201309252000Z"
-        DESCRIPTION  "revision 1.13, support flow-label"  
+        DESCRIPTION  "V1.13, support flow-label"  
         REVISION "201309232000Z"
-        DESCRIPTION  "revision 1.12, add hwIpfpmDcpMcpVpnName, hwIpfpmDcpMcpVpnType, hwIpfpmDcpInstMcpVpnName, hwIpfpmDcpInstMcpVpnType"  
+        DESCRIPTION  "V1.12, add hwIpfpmDcpMcpVpnName, hwIpfpmDcpMcpVpnType, hwIpfpmDcpInstMcpVpnName, hwIpfpmDcpInstMcpVpnType"  
         REVISION "201308182038Z"
-        DESCRIPTION  "revision 1.11, add hwIpfpmDcpFlowConflict"            
+        DESCRIPTION  "V1.11, add hwIpfpmDcpFlowConflict"            
         REVISION "201308142038Z"
-        DESCRIPTION  "revision 1.10"
+        DESCRIPTION  "V1.10, add hwIpfpmDcpMcpVpnName, hwIpfpmDcpMcpVpnType,hwIpfpmDcpInstMcpVpnType"
         REVISION "201308051504Z"
-        DESCRIPTION  "revision 1.09"
+        DESCRIPTION  "V1.09, add hwIpfpmDcpMcpVpnName, hwIpfpmDcpMcpVpnType, hwIpfpmDcpInstMcpVpnName, hwIpfpmDcpInstMcpVpnType"
         REVISION "201307041612Z"
-        DESCRIPTION  "revision 1.08"
+        DESCRIPTION  "V1.08, add hwIpfpmDcpMcpVpnName,hwIpfpmDcpInstMcpVpnName, hwIpfpmDcpInstMcpVpnType"
         REVISION "201306221450Z"
-        DESCRIPTION  "revision 1.07"
+        DESCRIPTION  "V1.07, add hwIpfpmDcpMcpVpnName, hwIpfpmDcpMcpVpnType, hwIpfpmDcpInstMcpVpnType"
         REVISION "201306041403Z"
-        DESCRIPTION  "revision 1.06"
+        DESCRIPTION  "V1.06, add hwIpfpmDcpMcpVpnName, hwIpfpmDcpMcpVpnType, hwIpfpmDcpInstMcpVpnName, hwIpfpmDcpInstMcpVpnType"
         REVISION "201304271730Z"
-        DESCRIPTION  "revision 1.05"
+        DESCRIPTION  "V1.05, add hwIpfpmDcpMcpVpnName, hwIpfpmDcpMcpVpnType, hwIpfpmDcpInstMcpVpnName, hwIpfpmDcpInstMcpVpnType"
         REVISION "201303271011Z"
-        DESCRIPTION  "revision 1.04"
+        DESCRIPTION  "V1.04, add hwIpfpmDcpMcpVpnName, hwIpfpmDcpMcpVpnType, hwIpfpmDcpInstMcpVpnName"
         REVISION "201303261011Z"
-        DESCRIPTION  "revision 1.03"
+        DESCRIPTION  "V1.03, add hwIpfpmDcpMcpVpnName, hwIpfpmDcpInstMcpVpnName, hwIpfpmDcpInstMcpVpnType"
         REVISION "201303131150Z"
-        DESCRIPTION  "revision"
+        DESCRIPTION  "V1.02, add hwIpfpmDcpMcpVpnName, hwIpfpmDcpMcpVpnType, hwIpfpmDcpInstMcpVpnName, hwIpfpmDcpInstMcpVpnType"
         REVISION "201302181150Z"
-        DESCRIPTION  "init"        
+        DESCRIPTION  "V1.01, init for ipfpm"        
         ::= { hwDatacomm 316 }
     
 --
@@ -426,7 +417,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table contains attribute of MCP authenticaiton."
+        "IPFPM authenticaiton configuration information.
+		The index of this table is hwIpfpmMcpAuthKeyId."
     ::= { hwIpfpmMcpConfiguration 4 }
     
     hwIpfpmMcpAuthEntry OBJECT-TYPE
@@ -434,7 +426,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "IPFPM authenticaiton configuration information."
+        "IPFPM authenticaiton configuration information.
+		The index of this entry is hwIpfpmMcpAuthKeyId."
     INDEX { hwIpfpmMcpAuthKeyId }
     ::= { hwIpfpmMcpAuthTable 1 }
     
@@ -495,7 +488,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table contains attribute of MCP test instances."
+        "IPFPM configuration information for a particular MCP test 
+        instance.The index of this table is hwIpfpmMcpInstId."
     ::= { hwIpfpmMcpConfiguration 5 }
     
     hwIpfpmMcpInstEntry OBJECT-TYPE
@@ -504,7 +498,7 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "IPFPM configuration information for a particular MCP test 
-        instance."
+        instance.The index of this entry is hwIpfpmMcpInstId."
     INDEX { hwIpfpmMcpInstId }
     ::= { hwIpfpmMcpInstTable 1 }
     
@@ -659,8 +653,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table describe the DCPs belonging to MCP test 
-        instances."
+        "IPFPM DCPs information for a particular MCP test instance.
+		The indexes of this table are hwIpfpmMcpInstId and hwIpfpmMcpDcpId."
     ::= { hwIpfpmMcpConfiguration 6 }
     
     hwIpfpmMcpDcpEntry OBJECT-TYPE
@@ -668,7 +662,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "IPFPM DCPs information for a particular MCP test instance."
+        "IPFPM DCPs information for a particular MCP test instance.
+		The indexes of this entry are hwIpfpmMcpInstId and hwIpfpmMcpDcpId."
     INDEX { hwIpfpmMcpInstId, hwIpfpmMcpDcpId }
     ::= { hwIpfpmMcpDcpTable 1 }
     
@@ -705,8 +700,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table describe the ACHs(Atomic Closed Hop) belonging to 
-        MCP test instances."
+        "IPFPM ACHs(Atomic Closed Hop) information for a particular 
+        MCP test instance.The indexes of this table are hwIpfpmMcpInstId and hwIpfpmMcpAchId."
     ::= { hwIpfpmMcpConfiguration 7 }
     
     hwIpfpmMcpAchEntry OBJECT-TYPE
@@ -715,7 +710,7 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "IPFPM ACHs(Atomic Closed Hop) information for a particular 
-        MCP test instance."
+        MCP test instance.The indexes of this entry are hwIpfpmMcpInstId and hwIpfpmMcpAchId."
     INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId }
     ::= { hwIpfpmMcpAchTable 1 }
     
@@ -764,8 +759,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table describe the TLPs(Target Logical Port) belonging to 
-        MCP ACHs."
+        "IPFPM TLPs(Target Logical Port) information for a particular 
+        MCP ACH.The indexes of this table are hwIpfpmMcpInstId and hwIpfpmMcpAchId and hwIpfpmMcpTlpRole and hwIpfpmMcpTlpDcpId and hwIpfpmMcpTlpId."
     ::= { hwIpfpmMcpConfiguration 8 }
     
     hwIpfpmMcpTlpEntry OBJECT-TYPE
@@ -774,7 +769,7 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "IPFPM TLPs(Target Logical Port) information for a particular 
-        MCP ACH."
+        MCP ACH.The indexes of this entry are hwIpfpmMcpInstId and hwIpfpmMcpAchId and hwIpfpmMcpTlpRole and hwIpfpmMcpTlpDcpId and hwIpfpmMcpTlpId."
     INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId, hwIpfpmMcpTlpRole, hwIpfpmMcpTlpDcpId, hwIpfpmMcpTlpId}
     ::= { hwIpfpmMcpTlpTable 1 }
     
@@ -832,7 +827,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table describes the information of multicast source instance referred by some multicast receiver instances."
+        "The information is that the multicast source instance referred by some multicast receiver instances.
+		The index of this table is hwIpfpmMcpInstId."
     ::= { hwIpfpmMcpConfiguration 9 }
     
     hwIpfpmMcpSrcInstReferQueryEntry OBJECT-TYPE
@@ -840,7 +836,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The information is that the multicast source instance referred by some multicast receiver instances."
+        "The information is that the multicast source instance referred by some multicast receiver instances.
+		The index of this entry is hwIpfpmMcpInstId."
     INDEX { hwIpfpmMcpInstId}
     ::= { hwIpfpmMcpSrcInstReferQueryTable 1 }
     
@@ -909,8 +906,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The tables contains the index of MCP 
-        test instances and ACH."
+        "Index of a particular test instance and ACH.
+		The indexes of this table are hwIpfpmMcpInstId and hwIpfpmMcpAchId."
     ::= { hwIpfpmMcpStatistics 3 }
     
     hwIpfpmMcpInstAchIndexEntry OBJECT-TYPE
@@ -918,7 +915,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "Index of a particular test instance and ACH."
+        "Index of a particular test instance and ACH.
+		The indexes of this entry are hwIpfpmMcpInstId and hwIpfpmMcpAchId."
     INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId }
     ::= { hwIpfpmMcpInstAchIndexTable 1 }
     
@@ -945,8 +943,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The tables contains loss measure statistics of MCP test 
-        instances."
+        "Loss measure statistics of an interval for a particular 
+        test instance.The indexes of this table are hwIpfpmMcpInstId and hwIpfpmMcpAchId and hwIpfpmMcpSeqNoHigh and hwIpfpmMcpSeqNoLow."
     ::= { hwIpfpmMcpStatistics 4 }
     
     hwIpfpmMcpLossStatsEntry OBJECT-TYPE
@@ -955,7 +953,7 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "Loss measure statistics of an interval for a particular 
-        test instance."
+        test instance.The indexes of this entry are hwIpfpmMcpInstId and hwIpfpmMcpAchId and hwIpfpmMcpSeqNoHigh and hwIpfpmMcpSeqNoLow."
     INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId, hwIpfpmMcpSeqNoHigh, hwIpfpmMcpSeqNoLow }
     ::= { hwIpfpmMcpLossStatsTable 1 }
     
@@ -1165,8 +1163,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The tables contains one-way delay measure statistics of MCP 
-        test instances."
+        "One-way delay measure statistics of an interval for a 
+        particular test instance.The indexes of this table are hwIpfpmMcpInstId and hwIpfpmMcpAchId and hwIpfpmMcpSeqNoHigh and hwIpfpmMcpSeqNoLow."
     ::= { hwIpfpmMcpStatistics 5 }
     
     hwIpfpmMcpOneDelayStatEntry OBJECT-TYPE
@@ -1175,7 +1173,7 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "One-way delay measure statistics of an interval for a 
-        particular test instance."
+        particular test instance.The indexes of this entry are hwIpfpmMcpInstId and hwIpfpmMcpAchId and hwIpfpmMcpSeqNoHigh and hwIpfpmMcpSeqNoLow."
     INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId, hwIpfpmMcpSeqNoHigh, hwIpfpmMcpSeqNoLow }
     ::= { hwIpfpmMcpOneDelayStatTable 1 }
     
@@ -1252,8 +1250,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The tables contains two-way delay measure statistics of MCP 
-        test instances."
+        "Two-way delay measure statistics of an interval for a 
+        particular test instance.The indexes of this table are hwIpfpmMcpInstId and hwIpfpmMcpAchId and hwIpfpmMcpSeqNoHigh and hwIpfpmMcpSeqNoLow."
     ::= { hwIpfpmMcpStatistics 6 }
     
     hwIpfpmMcpTwoDelayStatEntry OBJECT-TYPE
@@ -1262,7 +1260,7 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "Two-way delay measure statistics of an interval for a 
-        particular test instance."
+        particular test instance.The indexes of this entry are hwIpfpmMcpInstId and hwIpfpmMcpAchId and hwIpfpmMcpSeqNoHigh and hwIpfpmMcpSeqNoLow."
     INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId, hwIpfpmMcpSeqNoHigh, hwIpfpmMcpSeqNoLow }
     ::= { hwIpfpmMcpTwoDelayStatTable 1 }
     
@@ -1349,8 +1347,10 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The tables contains multi-in-point one-way delay measure statistics of MCP
-        test instances."
+        "Multi-in-point one-way delay measure statistics of an interval for a
+        particular test instance.The indexes of this table are hwIpfpmMcpInstId and 
+		hwIpfpmMcpAchId and hwIpfpmMcpSeqNoHigh and hwIpfpmMcpSeqNoLow and hwIpfpmMcpOneDelayFlowType and hwIpfpmMcpOneDelayMultiSrcDCP and 
+		hwIpfpmMcpOneDelayMultiSrcTLP and hwIpfpmMcpOneDelayMultiDesDCP and hwIpfpmMcpOneDelayMultiDesTLP"
     ::= { hwIpfpmMcpStatistics 7 }
 
     hwIpfpmMcpOneDelayMultiStatEntry OBJECT-TYPE
@@ -1359,7 +1359,9 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "Multi-in-point one-way delay measure statistics of an interval for a
-        particular test instance."
+        particular test instance.The indexes of this entry are hwIpfpmMcpInstId and 
+		hwIpfpmMcpAchId and hwIpfpmMcpSeqNoHigh and hwIpfpmMcpSeqNoLow and hwIpfpmMcpOneDelayFlowType and hwIpfpmMcpOneDelayMultiSrcDCP and 
+		hwIpfpmMcpOneDelayMultiSrcTLP and hwIpfpmMcpOneDelayMultiDesDCP and hwIpfpmMcpOneDelayMultiDesTLP"
     INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId, hwIpfpmMcpSeqNoHigh, hwIpfpmMcpSeqNoLow, hwIpfpmMcpOneDelayFlowType, hwIpfpmMcpOneDelayMultiSrcDCP, hwIpfpmMcpOneDelayMultiSrcTLP, hwIpfpmMcpOneDelayMultiDesDCP, hwIpfpmMcpOneDelayMultiDesTLP}
     ::= { hwIpfpmMcpOneDelayMultiStatTable 1 }
     
@@ -1456,8 +1458,11 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The tables contains multi-in-point two-way delay measure statistics of MCP
-        test instances."
+        "Multi-in-point two-way delay measure statistics of an interval for a
+        particular test instance.The indexes of this table are 
+		hwIpfpmMcpInstId and hwIpfpmMcpAchId and hwIpfpmMcpSeqNoHigh and hwIpfpmMcpSeqNoLow and hwIpfpmMcpForwardDelayMultiSrcDCP and 
+		hwIpfpmMcpForwardDelayMultiSrcTLP and hwIpfpmMcpForwardDelayMultiDesDCP and hwIpfpmMcpForwardDelayMultiDesTLP and 
+		hwIpfpmMcpBackwardDelayMultiSrcDCP and hwIpfpmMcpBackwardDelayMultiSrcTLP and hwIpfpmMcpBackwardDelayMultiDesDCP and hwIpfpmMcpBackwardDelayMultiDesTLP."
     ::= { hwIpfpmMcpStatistics 8 }
 
     hwIpfpmMcpTwoDelayMultiStatEntry OBJECT-TYPE
@@ -1466,7 +1471,10 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "Multi-in-point two-way delay measure statistics of an interval for a
-        particular test instance."
+        particular test instance.The indexes of this entry are 
+		hwIpfpmMcpInstId and hwIpfpmMcpAchId and hwIpfpmMcpSeqNoHigh and hwIpfpmMcpSeqNoLow and hwIpfpmMcpForwardDelayMultiSrcDCP and 
+		hwIpfpmMcpForwardDelayMultiSrcTLP and hwIpfpmMcpForwardDelayMultiDesDCP and hwIpfpmMcpForwardDelayMultiDesTLP and 
+		hwIpfpmMcpBackwardDelayMultiSrcDCP and hwIpfpmMcpBackwardDelayMultiSrcTLP and hwIpfpmMcpBackwardDelayMultiDesDCP and hwIpfpmMcpBackwardDelayMultiDesTLP."
     INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId, hwIpfpmMcpSeqNoHigh, hwIpfpmMcpSeqNoLow, hwIpfpmMcpForwardDelayMultiSrcDCP, hwIpfpmMcpForwardDelayMultiSrcTLP, hwIpfpmMcpForwardDelayMultiDesDCP, hwIpfpmMcpForwardDelayMultiDesTLP, hwIpfpmMcpBackwardDelayMultiSrcDCP, hwIpfpmMcpBackwardDelayMultiSrcTLP, hwIpfpmMcpBackwardDelayMultiDesDCP, hwIpfpmMcpBackwardDelayMultiDesTLP}
     ::= { hwIpfpmMcpTwoDelayMultiStatTable 1 }
 
@@ -1740,7 +1748,7 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table contains authentication of DCP."
+        "IPFPM authentication information for DCP.The index of this table is hwIpfpmDcpAuthKeyId."
     ::= { hwIpfpmDcpConfiguration 7 }  
     
     hwIpfpmDcpAuthEntry OBJECT-TYPE
@@ -1748,7 +1756,7 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "IPFPM authentication information for DCP"
+        "IPFPM authentication information for DCP.The index of this entry is hwIpfpmDcpAuthKeyId."
     INDEX { hwIpfpmDcpAuthKeyId  }
     ::= { hwIpfpmDcpAuthTable 1 }
     
@@ -1809,7 +1817,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table contains attribute of DCP test instances."
+        "IPFPM configuration information for a particular DCP test 
+        instance.The index of this table is hwIpfpmDcpInstId."
     ::= { hwIpfpmDcpConfiguration 8 }
     
     hwIpfpmDcpInstEntry OBJECT-TYPE
@@ -1818,7 +1827,7 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "IPFPM configuration information for a particular DCP test 
-        instance."
+        instance.The index of this entry is hwIpfpmDcpInstId."
     INDEX { hwIpfpmDcpInstId  }
     ::= { hwIpfpmDcpInstTable 1 }
     
@@ -1956,7 +1965,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table contains authentication of DCP test instances."
+        "IPFPM authentication information for a particular DCP test 
+        instance.The indexes of this table are hwIpfpmDcpInstId and hwIpfpmDcpInstAuthKeyId."
     ::= { hwIpfpmDcpConfiguration 9 }  
     
     hwIpfpmDcpInstAuthEntry OBJECT-TYPE
@@ -1965,7 +1975,7 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "IPFPM authentication information for a particular DCP test 
-        instance."
+        instance.The indexes of this entry are hwIpfpmDcpInstId and hwIpfpmDcpInstAuthKeyId."
     INDEX { hwIpfpmDcpInstId, hwIpfpmDcpInstAuthKeyId }
     ::= { hwIpfpmDcpInstAuthTable 1 }
     
@@ -2028,7 +2038,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table contains flow attribute of DCP test instances."
+        "IPFPM configuration information for a particular DCP test 
+        instance flow.The indexes of this table are hwIpfpmDcpInstId and hwIpfpmDcpFlowType."
     ::= { hwIpfpmDcpConfiguration 10 }
     
     hwIpfpmDcpFlowEntry OBJECT-TYPE
@@ -2037,7 +2048,7 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "IPFPM configuration information for a particular DCP test 
-        instance flow."
+        instance flow.The indexes of this entry are hwIpfpmDcpInstId and hwIpfpmDcpFlowType."
     INDEX { hwIpfpmDcpInstId, hwIpfpmDcpFlowType }
     ::= { hwIpfpmDcpFlowTable 1 }
     
@@ -2279,7 +2290,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table contains attribute of TLPs."
+        "IPFPM configuration information for a particular TLP.
+		The indexes of this table are hwIpfpmDcpInstId and hwIpfpmDcpTlpId."
     ::= { hwIpfpmDcpConfiguration 11 }
     
     hwIpfpmDcpInstTlpEntry OBJECT-TYPE
@@ -2287,7 +2299,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "IPFPM configuration information for a particular TLP."
+        "IPFPM configuration information for a particular TLP.
+		The indexes of this entry are hwIpfpmDcpInstId and hwIpfpmDcpTlpId."
     INDEX { hwIpfpmDcpInstId, 
             hwIpfpmDcpTlpId }
     ::= { hwIpfpmDcpInstTlpTable 1 }
@@ -2600,8 +2613,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table contains loss measure information of DCP test 
-        instances."
+        "IPFPM loss measure configuration information for a particular  
+        DCP test instance.The indexes of this table are hwIpfpmDcpInstId and hwIpfpmDcpLossTlpRole."
     ::= { hwIpfpmDcpConfiguration 12 }
     
     hwIpfpmDcpLossMeasEntry OBJECT-TYPE
@@ -2610,7 +2623,7 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "IPFPM loss measure configuration information for a particular  
-        DCP test instance."
+        DCP test instance.The indexes of this entry are hwIpfpmDcpInstId and hwIpfpmDcpLossTlpRole."
     INDEX { hwIpfpmDcpInstId,  hwIpfpmDcpLossTlpRole}
     ::= { hwIpfpmDcpLossMeasTable 1 }
     
@@ -2678,8 +2691,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table contains delay measure information of DCP  
-        test instances."
+        "IPFPM delay measure configuration information for a particular  
+        DCP test instance.The indexes of this table are hwIpfpmDcpInstId and hwIpfpmDcpDelayTlpRole."
     ::= { hwIpfpmDcpConfiguration 13 }
     
     hwIpfpmDcpDelayMeasEntry OBJECT-TYPE
@@ -2688,7 +2701,7 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "IPFPM delay measure configuration information for a particular  
-        DCP test instance."
+        DCP test instance.The indexes of this entry are hwIpfpmDcpInstId and hwIpfpmDcpDelayTlpRole."
     INDEX { hwIpfpmDcpInstId, hwIpfpmDcpDelayTlpRole}
     ::= { hwIpfpmDcpDelayMeasTable 1 }
     
@@ -2800,7 +2813,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table contains attribute of TLPs."
+        "IPFPM configuration information for a particular TLP on interface.
+		The index of this table is hwIpfpmDcpTlpId."
     ::= { hwIpfpmDcpConfiguration 14 }
     
     hwIpfpmDcpTlpEntry OBJECT-TYPE
@@ -2808,7 +2822,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "IPFPM configuration information for a particular TLP on interface."
+        "IPFPM configuration information for a particular TLP on interface.
+		The index of this entry is hwIpfpmDcpTlpId."
     INDEX {hwIpfpmDcpTlpId }
     ::= { hwIpfpmDcpTlpTable 1 }
     
@@ -2870,7 +2885,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table contains the query interface ifindex and TLP ID with the interface."
+        "The TLP information which is configured with the interface.
+		The indexes of this table are hwIpfpmDcpTlpQueryIfIndex and hwIpfpmDcpTlpQueryVlanId."
     ::= { hwIpfpmDcpConfiguration 15 }
     
     hwIpfpmDcpTlpQueryEntry OBJECT-TYPE
@@ -2878,7 +2894,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The TLP information which is configured with the interface."
+        "The TLP information which is configured with the interface.
+		The indexes of this entry are hwIpfpmDcpTlpQueryIfIndex and hwIpfpmDcpTlpQueryVlanId."
     INDEX { hwIpfpmDcpTlpQueryIfIndex, hwIpfpmDcpTlpQueryVlanId }
     ::= { hwIpfpmDcpTlpQueryTable 1 }
     
@@ -2927,7 +2944,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table describes the information of multicast source instance referred by some multicast receiver instances."
+        "The information is that the multicast source instance referred by some multicast receiver instances.
+		The index of this table is hwIpfpmDcpInstId."
     ::= { hwIpfpmDcpConfiguration 16 }
     
     hwIpfpmDcpSrcInstReferQueryEntry OBJECT-TYPE
@@ -2935,7 +2953,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The information is that the multicast source instance referred by some multicast receiver instances."
+        "The information is that the multicast source instance referred by some multicast receiver instances.
+		The index of this entry is hwIpfpmDcpInstId."
     INDEX { hwIpfpmDcpInstId}
     ::= { hwIpfpmDcpSrcInstReferQueryTable 1 }
     
@@ -2976,8 +2995,136 @@ IMPORTS
     STATUS current                                         
     DESCRIPTION                                            
         " The threshold of tlp."                         
-    ::= { hwIpfpmDcpTrapObjects 3 }       
-    
+    ::= { hwIpfpmDcpTrapObjects 3 } 
+
+	hwIpfpmStreamUsed  OBJECT-TYPE                            
+    SYNTAX Integer32                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The used number of stream."                         
+    ::= { hwIpfpmDcpTrapObjects 4 }
+	
+	hwIpfpmStreamTotal  OBJECT-TYPE                            
+    SYNTAX Integer32                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The total number of stream."                         
+    ::= { hwIpfpmDcpTrapObjects 5 }
+	
+	hwIpfpmSlotStr  OBJECT-TYPE                            
+    SYNTAX OCTET STRING                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The string of slot."                         
+    ::= { hwIpfpmDcpTrapObjects 6 }
+
+        hwIpfpmThreshold  OBJECT-TYPE                            
+    SYNTAX Integer32                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The value of threshold."                         
+    ::= { hwIpfpmDcpTrapObjects 7 }
+
+    hwIpfpmIfIndex  OBJECT-TYPE                            
+    SYNTAX Integer32                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The value of interface index."                         
+    ::= { hwIpfpmDcpTrapObjects 8 }
+
+    hwIpfpmDirection  OBJECT-TYPE                            
+    SYNTAX OCTET STRING                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The direction of stream."                         
+    ::= { hwIpfpmDcpTrapObjects 9 }
+
+    hwIpfpmSrcIp  OBJECT-TYPE                            
+    SYNTAX OCTET STRING                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The source ipv4 addresss."                         
+    ::= { hwIpfpmDcpTrapObjects 10 }
+
+    hwIpfpmDstIp  OBJECT-TYPE                            
+    SYNTAX OCTET STRING                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The destination ipv4 addresss."                         
+    ::= { hwIpfpmDcpTrapObjects 11 }
+
+    hwIpfpmProtocol  OBJECT-TYPE                            
+    SYNTAX Integer32                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The value of protocol."                         
+    ::= { hwIpfpmDcpTrapObjects 12 }
+
+    hwIpfpmSrcPort  OBJECT-TYPE                            
+    SYNTAX Integer32                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The value of l4 source port."                         
+    ::= { hwIpfpmDcpTrapObjects 13 }
+
+    hwIpfpmDstPort  OBJECT-TYPE                            
+    SYNTAX Integer32                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The value of l4 destination port."                         
+    ::= { hwIpfpmDcpTrapObjects 14 }
+
+    hwIpfpmPktDscp  OBJECT-TYPE                            
+    SYNTAX Integer32                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The dscp value of packet."                         
+    ::= { hwIpfpmDcpTrapObjects 15 }
+
+    hwIpfpmCfgDscp  OBJECT-TYPE                            
+    SYNTAX Integer32                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The dscp value of configuration."                         
+    ::= { hwIpfpmDcpTrapObjects 16 }
+
+    hwIpfpmFailReason  OBJECT-TYPE                            
+    SYNTAX OCTET STRING                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The reason of stream create failure."                         
+    ::= { hwIpfpmDcpTrapObjects 17 }
+
+    hwIpfpmAclUsed  OBJECT-TYPE                            
+    SYNTAX Integer32                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The used number of ACL."                         
+    ::= { hwIpfpmDcpTrapObjects 18 }
+
+    hwIpfpmAclTotal  OBJECT-TYPE                            
+    SYNTAX Integer32                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The total number of ACL."                         
+    ::= { hwIpfpmDcpTrapObjects 19 }
+
     --
     -- hwIpfpmDcpTlpQueryExtTable: DCP TLP id information
     --
@@ -2986,7 +3133,9 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table contains the query interface ifindex and TLP ID with the interface."
+        "The TLP information which is configured with the interface.
+		The indexes of this table are hwIpfpmDcpTlpQueryExtIfIndex and 
+		hwIpfpmDcpTlpQueryExtVlanId and hwIpfpmDcpTlpQueryExtOntId and hwIpfpmDcpTlpQueryExtOntPortType and hwIpfpmDcpTlpQueryExtOntPortId."
     ::= { hwIpfpmDcpConfiguration 17 }
     
     hwIpfpmDcpTlpQueryExtEntry OBJECT-TYPE
@@ -2994,7 +3143,9 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The TLP information which is configured with the interface."
+        "The TLP information which is configured with the interface.
+		The indexes of this entry are hwIpfpmDcpTlpQueryExtIfIndex and 
+		hwIpfpmDcpTlpQueryExtVlanId and hwIpfpmDcpTlpQueryExtOntId and hwIpfpmDcpTlpQueryExtOntPortType and hwIpfpmDcpTlpQueryExtOntPortId."
     INDEX { hwIpfpmDcpTlpQueryExtIfIndex, hwIpfpmDcpTlpQueryExtVlanId, hwIpfpmDcpTlpQueryExtOntId, hwIpfpmDcpTlpQueryExtOntPortType, hwIpfpmDcpTlpQueryExtOntPortId }
     ::= { hwIpfpmDcpTlpQueryExtTable 1 }
     
@@ -3059,7 +3210,7 @@ IMPORTS
     DESCRIPTION
         "This object indicates the ONT port's type.
         Options: 
-        1. eth (47))   -indicates ONT port's type is the eth type.
+        1. eth (47)   -indicates ONT port's type is the eth type.
         2. invalid(-1) -indicates ONT port's type is not matched.
         "
     ::= { hwIpfpmDcpTlpQueryExtEntry 5 }
@@ -3080,7 +3231,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table contains attribute of TLPs."
+        "IPFPM configuration information for a particular TLP on interface.
+		The index of this table is hwIpfpmDcpExtTlpId."
     ::= { hwIpfpmDcpConfiguration 18 }
     
     hwIpfpmDcpTlpExtEntry OBJECT-TYPE
@@ -3088,7 +3240,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "IPFPM configuration information for a particular TLP on interface."
+        "IPFPM configuration information for a particular TLP on interface.
+		The index of this entry is hwIpfpmDcpExtTlpId."
     INDEX {hwIpfpmDcpExtTlpId }
     ::= { hwIpfpmDcpTlpExtTable 1 }
     
@@ -3164,7 +3317,7 @@ IMPORTS
     DESCRIPTION
         "This object indicates the ONT port's type.
         Options: 
-        1. eth (47))   -indicates ONT port's type is the eth type.
+        1. eth (47)   -indicates ONT port's type is the eth type.
         2. invalid(-1) -indicates ONT port's type is not matched.
        DEFVAL { -1 }  .
         "
@@ -3187,7 +3340,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "IPFPM nexthop configuration information for a particular TLP of the test instance."
+        "IPFPM nexthop configuration information for a particular TLP.
+		The indexes of this table are hwIpfpmDcpInstId and hwIpfpmDcpTlpId and hwIpfpmDcpNexthopIp."
     ::= { hwIpfpmDcpConfiguration 19 }
     
     hwIpfpmDcpInstTlpNHEntry OBJECT-TYPE
@@ -3195,7 +3349,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "IPFPM nexthop configuration information for a particular TLP."
+        "IPFPM nexthop configuration information for a particular TLP.
+		The indexes of this entry are hwIpfpmDcpInstId and hwIpfpmDcpTlpId and hwIpfpmDcpNexthopIp."
     INDEX { hwIpfpmDcpInstId, 
             hwIpfpmDcpTlpId,
 	    hwIpfpmDcpNexthopIp}
@@ -3236,7 +3391,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table contains attribute of TLPs for load balancing paths."
+        "IPFPM configuration information for a particular load balancing path TLP.
+		The indexes of this table are hwIpfpmDcpInstId and hwIpfpmDcpTlpId and hwIpfpmIndex."
     ::= { hwIpfpmDcpConfiguration 20 }
     
     hwIpfpmDcpInstTlpIndexEntry OBJECT-TYPE
@@ -3244,7 +3400,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "IPFPM configuration information for a particular load balancing path TLP."
+        "IPFPM configuration information for a particular load balancing path TLP.
+		The indexes of this entry are hwIpfpmDcpInstId and hwIpfpmDcpTlpId and hwIpfpmIndex."
     INDEX { hwIpfpmDcpInstId, 
             hwIpfpmDcpTlpId,
             hwIpfpmIndex }
@@ -3485,7 +3642,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "IPFPM nexthop configuration information for a particular TLP of the test instance."
+        "IPFPM nexthop configuration information for a  a particular load balancing path TLP.
+		The indexes of this table are hwIpfpmDcpInstId and hwIpfpmDcpTlpId and hwIpfpmIndex and hwIpfpmDcpNexthopIp."
     ::= { hwIpfpmDcpConfiguration 21 }
     
     hwIpfpmDcpInstTlpNHIndexEntry OBJECT-TYPE
@@ -3493,7 +3651,8 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "IPFPM nexthop configuration information for a  a particular load balancing path TLP."
+        "IPFPM nexthop configuration information for a  a particular load balancing path TLP.
+		The indexes of this entry are hwIpfpmDcpInstId and hwIpfpmDcpTlpId and hwIpfpmIndex and hwIpfpmDcpNexthopIp."
     INDEX { hwIpfpmDcpInstId, 
             hwIpfpmDcpTlpId,
             hwIpfpmIndex,
@@ -3680,7 +3839,101 @@ IMPORTS
         of IPFPM test instance is under the lower threshold in 
         continuous five test intervals. This trap supports multi two-way delay for a period."
     ::= { hwIpfpmTraps 13 }
+	
+	hwIpfpmStreamResourceExceed NOTIFICATION-TYPE
+    OBJECTS {
+        hwIpfpmStreamUsed,
+	hwIpfpmStreamTotal,
+        hwIpfpmThreshold
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmStreamResourceExceed trap is sent when the SIPFPM stream number exceeds the upper threshold." 
+    ::= { hwIpfpmTraps 14 }
     
+    hwIpfpmStreamResourceRecovery NOTIFICATION-TYPE
+    OBJECTS {
+        hwIpfpmStreamUsed,
+	hwIpfpmStreamTotal,
+        hwIpfpmThreshold
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmStreamResourceRecovery trap is sent when the SIPFPM stream number is lower than the upper threshold." 
+    ::= { hwIpfpmTraps 15 }
+	
+	hwIpfpmBoardStreamResourceExceed NOTIFICATION-TYPE
+    OBJECTS {
+	hwIpfpmSlotStr,
+        hwIpfpmStreamUsed,
+	hwIpfpmStreamTotal,
+        hwIpfpmThreshold
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmBoardStreamResourceExceed trap is sent when the SIPFPM stream number on the board exceeds the upper threshold." 
+    ::= { hwIpfpmTraps 16 }
+    
+    hwIpfpmBoardStreamResourceRecovery NOTIFICATION-TYPE
+    OBJECTS {
+	hwIpfpmSlotStr,
+        hwIpfpmStreamUsed,
+	hwIpfpmStreamTotal,
+        hwIpfpmThreshold
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmBoardStreamResourceRecovery trap is sent when the SIPFPM stream number on the board is lower than the upper threshold." 
+    ::= { hwIpfpmTraps 17 }
+
+    hwIpfpmBoardPktDscpConflict NOTIFICATION-TYPE
+    OBJECTS {
+        hwIpfpmSlotStr,
+        hwIpfpmIfIndex,
+        hwIpfpmDirection,
+        hwIpfpmSrcIp,
+        hwIpfpmDstIp,
+        hwIpfpmProtocol,
+        hwIpfpmSrcPort,
+        hwIpfpmDstPort,
+        hwIpfpmPktDscp,
+        hwIpfpmCfgDscp
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmBoardPktDscpConflict trap is sent when the DSCP value of the packets matching the SIPFPM measurement flow on the card conflicts with the configured SIPFPM color bit." 
+    ::= { hwIpfpmTraps 18 }
+
+    hwIpfpmBoardStreamCreateFail NOTIFICATION-TYPE
+    OBJECTS {
+        hwIpfpmSlotStr,
+        hwIpfpmIfIndex,
+        hwIpfpmDirection,
+        hwIpfpmSrcIp,
+        hwIpfpmDstIp,
+        hwIpfpmProtocol,
+        hwIpfpmSrcPort,
+        hwIpfpmDstPort,
+        hwIpfpmFailReason
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmBoardStreamCreateFail trap is sent when failing to create an SIPFPM flow entry on the card." 
+    ::= { hwIpfpmTraps 19 }
+
+    hwIpfpmBoardAclResourceExceed NOTIFICATION-TYPE
+    OBJECTS {
+        hwIpfpmSlotStr,
+        hwIpfpmDirection,
+        hwIpfpmAclUsed,
+        hwIpfpmAclTotal,
+        hwIpfpmThreshold
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmBoardAclResourceExceed trap is sent when the number of ACL resources used by SIPFPM on the card exceeds the threshold." 
+    ::= { hwIpfpmTraps 20 }
+
 -- ==================================================================    
 -- IPFPM Compliances and groups
 -- ==================================================================

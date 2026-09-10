@@ -1290,4 +1290,16 @@ TmnxMobUeStrPrefix               ::= TEXTUAL-CONVENTION
          (UE)."
     SYNTAX      DisplayString (SIZE (4..15))
 
+TmnxMobUeRoamStatusType          ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobUeRoamStatusType specifies the roaming status
+         type for user range."
+    SYNTAX      INTEGER {
+        none     (0),
+        home     (1),
+        roaming  (2),
+        visiting (3)
+    }
+
 END

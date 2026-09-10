@@ -1,13 +1,13 @@
 <?php
 
-## Have a look in misc/config_definitions.json for examples of settings you can set here. DO NOT EDIT misc/config_definitions.json!
+## Have a look in resources/definitions/config_definitions.json for examples of settings you can set here. DO NOT EDIT config_definitions.json!
 
 // This is the user LibreNMS will run as
 //Please ensure this user is created and has the correct permissions to your install
 #$config['user'] = 'librenms';
 
 ### This should *only* be set if you want to *force* a particular hostname/port
-### It will prevent the web interface being usable form any other hostname
+### It will prevent the web interface being usable from any other hostname
 #$config['base_url']        = "/";
 
 ### Enable this to use rrdcached. Be sure rrd_dir is within the rrdcached dir

@@ -3,6 +3,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
@@ -20,7 +21,7 @@ class Alfo80hd extends OS implements
         $oid = '.1.3.6.1.4.1.3373.1103.39.2.1.12.1';
 
         return [
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'alfo80hd-rx', 1, 'RSSI'),
+            new WirelessSensor(WirelessSensorType::Rssi, $this->getDeviceId(), $oid, 'alfo80hd-rx', 1, 'RSSI'),
         ];
     }
 
@@ -29,7 +30,7 @@ class Alfo80hd extends OS implements
         $oid = '.1.3.6.1.4.1.3373.1103.39.2.1.2.1';
 
         return [
-            new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'alfo80hd-tx-freq', 1, 'Tx Frequency', null, 1, 1000),
+            new WirelessSensor(WirelessSensorType::Frequency, $this->getDeviceId(), $oid, 'alfo80hd-tx-freq', 1, 'Tx Frequency', null, 1, 1000),
         ];
     }
 
@@ -38,7 +39,7 @@ class Alfo80hd extends OS implements
         $oid = '.1.3.6.1.4.1.3373.1103.39.2.1.13.1';
 
         return [
-            new WirelessSensor('power', $this->getDeviceId(), $oid, 'alfo80hd-tx', 1, 'Tx Power'),
+            new WirelessSensor(WirelessSensorType::Power, $this->getDeviceId(), $oid, 'alfo80hd-tx', 1, 'Tx Power'),
         ];
     }
 
@@ -47,8 +48,8 @@ class Alfo80hd extends OS implements
         $oid = '.1.3.6.1.4.1.3373.1103.15.4.1.';
 
         return [
-            new WirelessSensor('rate', $this->getDeviceId(), $oid . '17.1', 'alfo80hd-tx-rate', 1, 'Tx Rate', null, 1000, 1),
-            new WirelessSensor('rate', $this->getDeviceId(), $oid . '18.1', 'alfo80hd-rx-rate', 2, 'Rx Rate', null, 1000, 1),
+            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), $oid . '17.1', 'alfo80hd-tx-rate', 1, 'Tx Rate', null, 1000, 1),
+            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), $oid . '18.1', 'alfo80hd-rx-rate', 2, 'Rx Rate', null, 1000, 1),
         ];
     }
 }

@@ -1,7 +1,5 @@
 <?php
 
-$class = 'state';
-$unit = '';
-$graph_type = 'sensor_state';
+$class = \LibreNMS\Enum\Sensor::State;
 
 require 'sensors.inc.php';

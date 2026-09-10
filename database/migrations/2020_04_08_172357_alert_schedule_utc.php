@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+        if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
             DB::table('alert_schedule')->update([
                 'start' => DB::raw("CONVERT_TZ(IF(`recurring` = 1, STR_TO_DATE(CONCAT(start_recurring_dt, ' ', start_recurring_hr), '%Y-%m-%d %H:%i:%s'), start), @@global.time_zone, '+00:00')"),
                 'end' => DB::raw("CONVERT_TZ(IF(`recurring` = 1, STR_TO_DATE(CONCAT(IFNULL(end_recurring_dt, '9000-09-09'), ' ', end_recurring_hr), '%Y-%m-%d %H:%i:%s'), end), @@global.time_zone, '+00:00')"),
@@ -39,7 +39,7 @@ return new class extends Migration
             $table->time('end_recurring_hr')->nullable(false)->default('00:00:00')->after('end_recurring_dt');
         });
 
-        if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+        if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
             DB::table('alert_schedule')->update([
                 'start' => DB::raw("CONVERT_TZ(start, '+00:00', @@global.time_zone)"),
                 'end' => DB::raw("CONVERT_TZ(end, '+00:00', @@global.time_zone)"),

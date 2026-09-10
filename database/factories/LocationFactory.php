@@ -23,7 +23,7 @@ class LocationFactory extends Factory
     /**
      * Indicate add lat,lng
      *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     * @return Factory
      */
     public function withCoordinates()
     {

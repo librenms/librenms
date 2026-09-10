@@ -1,14 +1,35 @@
 -- ***********************************************************************************
--- * NEXANS-BM-MIB   (January 29, 2014, HUBERT THEISSEN)
--- * Copyright (c) 2003-2014  Nexans Advanced Networking Solutions
+-- * NEXANS-BM-MIB   (January 24, 2017, HUBERT THEISSEN)
+-- * Copyright (c) 2003-2017  Nexans Advanced Networking Solutions
 -- *
 -- * MIB for Nexans Switches
--- * Release version = 4.01
+-- * Release version = 4.14N
 -- *
+-- * Changes in version 4.14N
+-- * - PortEntry:         Missing objects portActiveDefaultVlanId and portActiveVoiceVlanId added
+-- * Changes in version 4.14
+-- * - bmSwitchPortTable: object portActiveDefaultVlanId and portActiveVoiceVlanId added
+-- * - bmSwitchAdmin:     object adminMemoryCardMode: enum mcEnabledWithAes256 and mcEnabledWithAes256AndFw added.
+-- * Changes in version 4.02
+-- * - bmSwitchInfo:      objects infoLastConfigChangeSource, infoLastPortStateChangeSource,
+-- *                      infoFunctionInputStateF2, infoFunctionInputStateF3, infoFunctionInputStateF4
+-- *                      infoLastFuncInputAlarmNumber, infoLastFuncInputAlarmState,
+-- *                      and infoLastFuncInputAlarmName added
+-- * - bmSwitchAdmin:     adminLedGlobalMode: enum ledGlobalModeGreenBlink and 
+-- *                      ledGlobalModeRedBlueBlink added.
+-- * - bmSwitchAdmin:     objects adminFunctionInputNameF2, adminFunctionInputNameF3 and
+-- *                      adminFunctionInputNameF1 added
+-- * - bmSwitchPortTable: portAdminState: dhcpSnoopingDisable(12) added
+-- * - bmSwitchPortTable: portSecurityForwardingState: enum portDhcpSnoopingDisable (19) added
+-- * - bmSwitchPortTable: portName: SIZE changed from 15 to 64 characters 
+-- * - bmTraps:		  switchConfigurationChanged: object infoLastConfigChangeSource added
+-- * - bmTraps:           switchFunctionInputAlarm: OBJECTS changed to infoLastFuncInputAlarmState, 
+-- *                      infoLastFuncInputAlarmName and infoLastFuncInputAlarmNumber 
+-- * - bmTraps:		  trap portStateChanged added
 -- * Changes in version 4.01
 -- * - bmSwitchAdmin:     object adminLedGlobalMode added
 -- * - bmTraps:		  trap portErrorDisabled added
--- * - bmSwitchPortTable: portAdminState: enum bpduDisable(6), udldDisable(7), linkFlapDisable(8), 
+-- * - bmSwitchPortTable: portAdminState: enums bpduDisable(6), udldDisable(7), linkFlapDisable(8), 
 -- *			  errorCountDisable(9), sfpErrorDisable(10) and redundanyLoopDisable(11) added
 -- * - bmSwitchPortTable: portSecurityForwardingState: enum portBpduDisabled(13), portUdldDisabled(14),
 -- *			  portLinkFlapDisabled(15), portErrorCountDisabled(16), portSfpErrorDisabled(17)
@@ -158,16 +179,18 @@ IMPORTS
 	MacAddress,
 	DisplayString
 		FROM SNMPv2-TC
+	dot1dStpPortState
+		FROM BRIDGE-MIB
 	nexansANS
 		FROM NEXANS-MIB;
 
 bmSwitchMIB MODULE-IDENTITY
-	LAST-UPDATED "201401290000Z"
+	LAST-UPDATED "201701240000Z"
 	ORGANIZATION "Nexans Advanced Networking Solutions"
 	CONTACT-INFO "h.theissen@nexans.com"
 	DESCRIPTION  "MIB for Nexans switches"
-	REVISION     "201401290000Z"
-	DESCRIPTION  "Revision 4.01"
+	REVISION     "201701240000Z"
+	DESCRIPTION  "Revision 4.14"
 	::= { nexansANS 20 }
 
 bmTraps			OBJECT IDENTIFIER ::= { bmSwitchMIB 0 }
@@ -455,6 +478,93 @@ infoTotalConfigChanges OBJECT-TYPE
 	DESCRIPTION
 		"The number of total configurations changes."
 	::= { bmSwitchInfo 27 }
+
+infoLastConfigChangeSource OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..50))
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"The source of the last configuration change."
+	::= { bmSwitchInfo 28 }
+
+infoLastPortStateChangeSource OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..50))
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"The source of the last port status change from blocking to 
+		 forwarding or vice versa."
+	::= { bmSwitchInfo 29 }
+
+infoFunctionInputStateF2 OBJECT-TYPE
+	SYNTAX	INTEGER {
+			notSupported                (1),
+			functionInputShorted        (2),
+			functionInputOpen           (3)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current state of the function input F2."
+	::= { bmSwitchInfo 30 }
+
+infoFunctionInputStateF3 OBJECT-TYPE
+	SYNTAX	INTEGER {
+			notSupported                (1),
+			functionInputShorted        (2),
+			functionInputOpen           (3)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current state of the function input F3."
+	::= { bmSwitchInfo 31 }
+
+infoFunctionInputStateF4 OBJECT-TYPE
+	SYNTAX	INTEGER {
+			notSupported                (1),
+			functionInputShorted        (2),
+			functionInputOpen           (3)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current state of the function input F4."
+	::= { bmSwitchInfo 32 }
+
+infoLastFuncInputAlarmNumber OBJECT-TYPE
+	SYNTAX      Integer32 (1..4)
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"The number (1..4) of the function input which causes the last 
+		 function input alarm. This object is only used for trap 
+		 switchFunctionInputAlarm(21)"
+	::= { bmSwitchInfo 33 }
+
+infoLastFuncInputAlarmState OBJECT-TYPE
+	SYNTAX	INTEGER {
+			notSupported                (1),
+			functionInputShorted        (2),
+			functionInputOpen           (3)
+	}
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"The state of the function input which causes the last 
+		 function input alarm. This object is only used for trap 
+		 switchFunctionInputAlarm(21)"
+	::= { bmSwitchInfo 34 }
+
+infoLastFuncInputAlarmName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"The administratively assigned name of the function input which
+		 causes the last function input alarm. This object is only 
+		 used for trap switchFunctionInputAlarm(21)"
+	::= { bmSwitchInfo 35 }
 
 -- ****************************************************************************
 -- * bmSwitchAdmin
@@ -765,10 +875,12 @@ adminAlarmM2 OBJECT-TYPE
 
 adminMemoryCardMode OBJECT-TYPE
 	SYNTAX     INTEGER {
-			notSupported            (1),
-			mcEnabled		(2),
-			mcDisabled		(3),
-			mcPermanentDisabled	(4)
+			notSupported                   (1),
+			mcEnabled                      (2),
+			mcDisabled                     (3),
+			mcPermanentDisabled            (4),
+			mcEnabledWithAes256            (5),
+			mcEnabledWithAes256AndFw       (6)
 			}
 	MAX-ACCESS  read-write
 	STATUS      current
@@ -777,7 +889,11 @@ adminMemoryCardMode OBJECT-TYPE
 		 be re-enabled later by writing mcEnabled(1).
 		 If set to mcPermanentDisabled(3), the memory card is disabled 
 		 permanently and can't be re-enabled by management or any
-		 kind of hardware reset."
+		 kind of hardware reset.
+		 If set to mcEnabledWithAes256(5), the configuration is stored
+		 with AES-256 encryption.
+		 If set to mcEnabledWithAes256AndFw(6), the configuration
+		 with AES-256 encryption and the firmware are stored."
 	::= { bmSwitchAdmin 21 }
 
 adminAlarmNameM1 OBJECT-TYPE
@@ -819,13 +935,48 @@ adminLedGlobalMode OBJECT-TYPE
 			ledGlobalModeStandard	   (2),
 			ledGlobalModeAllOff        (3),
 			ledGlobalModeAllOn         (4),
-			ledGlobalModeMgmtOnly      (5)
+			ledGlobalModeMgmtOnly      (5),
+			ledGlobalModeGreenBlink    (6),
+			ledGlobalModeRedBlueBlink  (7)
 			}
 	MAX-ACCESS  read-write
 	STATUS      current
 	DESCRIPTION
 		"Set the global mode for all front side LEDs."
 	::= { bmSwitchAdmin 25 }
+
+adminFunctionInputNameF2 OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"An administratively assigned name for function input F2.
+		 The configured name will be send as part of alarm message
+		 switchFunctionInputAlarm."
+	DEFVAL  { "not defined" }
+	::= { bmSwitchAdmin 26 }
+
+adminFunctionInputNameF3 OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"An administratively assigned name for function input F2.
+		 The configured name will be send as part of alarm message
+		 switchFunctionInputAlarm."
+	DEFVAL  { "not defined" }
+	::= { bmSwitchAdmin 27 }
+
+adminFunctionInputNameF4 OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"An administratively assigned name for function input F2.
+		 The configured name will be send as part of alarm message
+		 switchFunctionInputAlarm."
+	DEFVAL  { "not defined" }
+	::= { bmSwitchAdmin 28 }
 
 -- ****************************************************************************
 -- * bmSwitchPort
@@ -919,9 +1070,12 @@ PortEntry ::= SEQUENCE {
 		portPrioDot1p
 			INTEGER,
 		portPrioIp
-			INTEGER
+			INTEGER,
+        portActiveDefaultVlanId
+            Integer32,
+        portActiveVoiceVlanId
+            Integer32 
 		}
-
 
 portIndex OBJECT-TYPE
 	SYNTAX      Integer32 (1..64)
@@ -944,7 +1098,7 @@ portDescr OBJECT-TYPE
 	::= { bmSwitchPortEntry 2 }
 
 portName OBJECT-TYPE
-	SYNTAX      DisplayString (SIZE (0..15))
+	SYNTAX      DisplayString (SIZE (0..64))
 	MAX-ACCESS  read-write
 	STATUS      current
 	DESCRIPTION
@@ -964,7 +1118,8 @@ portAdminState OBJECT-TYPE
 			linkFlapDisable		(8),
 			errorCountDisable	(9),
 			sfpErrorDisable		(10),
-			redundanyLoopDisable	(11)
+			redundanyLoopDisable	(11),
+			dhcpSnoopingDisable	(12)
 			}
 	MAX-ACCESS  read-write
 	STATUS      current
@@ -1366,7 +1521,8 @@ portSecurityForwardingState OBJECT-TYPE
 			portLinkFlapDisabled	(15),
 			portErrorCountDisabled	(16),
 			portSfpErrorDisabled	(17),
-			portRedundanyLoopDisable(18)
+			portRedundanyLoopDisable(18),
+			portDhcpSnoopingDisable (19)
 			}
 	MAX-ACCESS  read-only
 	STATUS      current
@@ -1466,6 +1622,26 @@ portPrioIp  OBJECT-TYPE
 		"Defines whether port prioritisation for IPv4/IPv6 packets is enabled."
 	::= { bmSwitchPortEntry 32 }
 
+portActiveDefaultVlanId  OBJECT-TYPE
+	SYNTAX      Integer32 (0..4095)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The currently active Default-VLAN-ID assigned to this port.
+		 This is either the configured portDefaultVlanId or the VLAN ID
+		 assigned by RADIUS authentication"
+	::= { bmSwitchPortEntry 33 }
+
+portActiveVoiceVlanId  OBJECT-TYPE
+	SYNTAX      Integer32 (0..4095)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The currently active Voice-VLAN-ID assigned to this port.
+		 This is either the configured portVoiceVlanId or the VLAN ID 
+		 assigned by RADIUS authentication"
+	::= { bmSwitchPortEntry 34 }
+
 -- ****************************************************************************
 -- * bmSwitchPort subtables
 -- ****************************************************************************
@@ -1508,7 +1684,11 @@ PortVlan ::= SEQUENCE {
 		portVoiceVlanId
 			Integer32,
 		portTrunkingMode
-			INTEGER
+			INTEGER,
+		portActiveDefaultVlanId
+			Integer32,
+		portActiveVoiceVlanId
+			Integer32
 		}
 
 PortPrio ::= SEQUENCE {
@@ -2132,16 +2312,16 @@ internalMgmtWarning NOTIFICATION-TYPE
 	::= { bmTraps  20 }
 
 switchFunctionInputAlarm NOTIFICATION-TYPE
-	OBJECTS		{ infoFunctionInputStateF1, adminFunctionInputNameF1 }
+	OBJECTS		{ infoLastFuncInputAlarmState, infoLastFuncInputAlarmName, infoLastFuncInputAlarmNumber }
 	STATUS		current
-	--&MESG "Function Input Alarm: F1-State=$'1, Name=$'2"
-        DESCRIPTION	"The state of the function input has changed."
+	--&MESG "Function Input Alarm: Input-Number=$'3, Input-State=$'1 Name=$'2"
+        DESCRIPTION	"The state of a function input 1...4 has changed."
 	::= { bmTraps 21 }
 
 switchConfigurationChanged NOTIFICATION-TYPE
-	OBJECTS		{ infoTotalConfigChanges }
+	OBJECTS		{ infoTotalConfigChanges, infoLastConfigChangeSource }
 	STATUS		current
-	--&MESG "Configuration has been changed: Total-Configuration-Changes=$'1"
+	--&MESG "Configuration has been changed: Total-Configuration-Changes=$'1, Source=$'2"
         DESCRIPTION	"The configuration of the switch has been changed."
 	::= { bmTraps 22 }
 
@@ -2151,5 +2331,12 @@ portErrorDisabled NOTIFICATION-TYPE
 	--&MESG "Port Error disabled: portAdminState=$'4, portIndex=$1, portDescr=$'2, portName=$'3"
         DESCRIPTION	"The port has been error disabled."
 	::= { bmTraps 23 }
+
+portStateChanged NOTIFICATION-TYPE
+	OBJECTS		{ portIndex, portDescr, portName, dot1dStpPortState, infoLastPortStateChangeSource }
+	STATUS		current
+	--&MESG "Port State Changed: portState=$'4, Source=$'5, portIndex=$1, portDescr=$'2, portName=$'3"
+        DESCRIPTION	"The port state has been changed from blocking to forwarding or vice versa."
+	::= { bmTraps 24 }
 
 END

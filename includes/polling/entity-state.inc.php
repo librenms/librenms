@@ -1,4 +1,5 @@
 <?php
+
 /**
  * entity-state.inc.php
  *
@@ -37,9 +38,9 @@ if (! empty($entityStatesIndexes)) {
     $entLC = snmpwalk_group($device, 'entStateLastChanged', 'ENTITY-STATE-MIB', 0);
 
     foreach (current($entLC) as $index => $changed) {
-        if ($changed) { // skip empty entries
+        if ($changed || $changed === '0-0-0,0:0:0.0,.0:0') { // skip empty entries
             try {
-                [$date, $time, $tz] = explode(',', $changed);
+                [$date, $time, $tz] = explode(',', (string) $changed);
                 $lastChanged = new DateTime("$date $time", new DateTimeZone($tz));
                 $dbLastChanged = new DateTime($entityStatesIndexes[$index]['entStateLastChanged']);
                 if ($lastChanged != $dbLastChanged) {

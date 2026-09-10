@@ -26,7 +26,7 @@ AC-PSTN-MIB DEFINITIONS ::= BEGIN
 
        
 acPSTN  MODULE-IDENTITY       
-    LAST-UPDATED "201209241539Z"          --Monday, September 24 2012
+    LAST-UPDATED "201711022148Z"          --Thursday, November 2 2017
     ORGANIZATION "AudioCodes Ltd"
     CONTACT-INFO
     "Postal: Support
@@ -104,7 +104,8 @@ acPSTN  MODULE-IDENTITY
        acTrunkLineType                                 INTEGER,
        acTrunkAutoClockPriority                        Unsigned32,
        acTrunkDeactivate                               INTEGER,
-       acTrunkLoopbackConfig                           INTEGER
+       acTrunkLoopbackConfig                           INTEGER,
+       acTrunkName                                     SnmpAdminString
      }
 
 
@@ -515,6 +516,18 @@ AC INI-Param: N/A"
 Access: Offline.
 AC INI-Param: N/A"
        ::= {acTrunkEntry 12}
+
+
+
+     acTrunkName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This variable represent user defined trunk name.
+Access: Online.
+AC INI-Param: DIGITALPORTINFO"
+       ::= {acTrunkEntry 13}
 
 
 
@@ -1479,7 +1492,7 @@ AC INI-Param: CASFILENAME"
      acSonetSDHTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSonetSDHEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSonetSDH 1}
@@ -1492,7 +1505,7 @@ AC INI-Param: CASFILENAME"
      acSonetSDHEntry OBJECT-TYPE
        SYNTAX AcSonetSDHEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSonetSDHIndex}
@@ -1517,7 +1530,7 @@ AC INI-Param: CASFILENAME"
      acSonetSDHIndex OBJECT-TYPE
        SYNTAX Unsigned32 (1..1)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Fiber groupe index.
 AC INI-Param: N/A"
@@ -1537,7 +1550,7 @@ AC INI-Param: N/A"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Selects SDH/SONET mapping type (signal label + payload mapping
 type) for the PSTN interface.
@@ -1570,7 +1583,7 @@ AC INI-Param: SDHFbrGrp_Mapping_Type"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Provides VC/VT numbering scheme for STM-1/OC3 fiber group.
 Access: Offline.
@@ -1587,7 +1600,7 @@ AC INI-Param: SDHFbrGrp_KLM_Numbering_Scheme"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Sets the Automatic Protection Switch Unidir/Bidir mode for the
 Fiber Group.
@@ -1605,7 +1618,7 @@ AC INI-Param: SDHFbrGrp_APS_DirMode"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Sets the Automatic Protection Switch Revertive mode for the
 Fiber Group.
@@ -1618,7 +1631,7 @@ AC INI-Param: SDHFbrGrp_APS_RevertMode"
      acSonetSDHFbrGrpAPSWaitToRestoreTime OBJECT-TYPE
        SYNTAX Unsigned32 (5..12)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Sets the APS Wait-to-restore time for the Fiber Group.
 Access: Offline.
@@ -2036,7 +2049,7 @@ AC INI-Param: N/A"
      acSDHKLMNumberingSchemeTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSDHKLMNumberingSchemeEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSDHKLMNumberingScheme 1}
@@ -2049,7 +2062,7 @@ AC INI-Param: N/A"
      acSDHKLMNumberingSchemeEntry OBJECT-TYPE
        SYNTAX AcSDHKLMNumberingSchemeEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSDHKLMNumberingSchemeTrunkIndex}
@@ -2072,7 +2085,7 @@ AC INI-Param: N/A"
      acSDHKLMNumberingSchemeTrunkIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..5000)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Trunk Number.
 AC INI-Param: N/A"
@@ -2083,7 +2096,7 @@ AC INI-Param: N/A"
      acSDHKLMNumberingSchemeTUG3OrSTS1 OBJECT-TYPE
        SYNTAX Unsigned32 (1..3)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: N/A"
@@ -2094,7 +2107,7 @@ AC INI-Param: N/A"
      acSDHKLMNumberingSchemeTUG2OrVTG OBJECT-TYPE
        SYNTAX Unsigned32 (1..7)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: N/A"
@@ -2105,7 +2118,7 @@ AC INI-Param: N/A"
      acSDHKLMNumberingSchemeTU12OrVT15 OBJECT-TYPE
        SYNTAX Unsigned32 (1..4)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: N/A"

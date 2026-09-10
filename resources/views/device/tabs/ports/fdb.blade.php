@@ -1,5 +1,6 @@
-<x-panel body-class="!tw-p-0">
-    <table id="ports-fdb" class="table table-condensed table-hover table-striped tw-mt-1 !tw-mb-0">
+<x-panel>
+    <x-slot:slot class="tw:p-0!">
+    <table id="ports-fdb" class="table table-condensed table-hover table-striped tw:mt-1 tw:mb-0!">
         <thead>
         <tr>
             <th data-column-id="mac_address" data-width="150px" data-formatter="tooltip">MAC Address</th>
@@ -14,6 +15,7 @@
         </tr>
         </thead>
     </table>
+    </x-slot:slot>
 </x-panel>
 
 <script>

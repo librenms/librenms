@@ -1,0 +1,12 @@
+os: mx-nos
+icon: moxa
+text: 'MX-NOS'
+type: network
+mib_dir: moxa
+group: moxa
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.8691.600.

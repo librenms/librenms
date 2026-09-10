@@ -1,15 +1,30 @@
 <?php
 
 return [
+    'show_filter' => 'Show Filter',
+    'show_header' => 'Show Header',
+    'purge' => 'Purge all deleted',
+    'purged' => 'Purged',
+    'purged_message' => 'Purged all deleted ports.',
+    'purge_failed' => 'Purge Failed',
+    'server_error' => 'The server encountered an error.',
+    'network_error' => 'Could not connect to the server.',
+    'processing' => 'Processing...',
+    'oper_status' => 'Oper Status',
+    'speed' => 'Speed',
+    'media' => 'Media',
+    'duplex' => 'Duplex',
+    'duplex_full' => 'Full',
+    'duplex_half' => 'Half',
+    'duplex_unknown' => 'Unknown',
+    'port_group' => 'Port Group',
+    'port_type' => 'Port Type',
+    'errors' => 'Errors',
     'groups' => [
         'updated' => ':port: groups updated',
         'none' => ':port no update requested',
-    ],
-    'filters' => [
-        'status_up' => 'Only Show Up',
-        'admin_down' => 'Show Admin Down',
-        'disabled' => 'Show Disabled',
-        'ignored' => 'Show Ignored',
+        'combined' => 'Combined',
+        'graph' => 'Port Group Graph',
     ],
     'graphs' => [
         'bits' => 'Bits',
@@ -21,10 +36,12 @@ return [
     'mtu_label' => 'MTU :mtu',
     'tabs' => [
         'arp' => 'ARP Table',
+        'nd' => 'IPv6 ND',
         'fdb' => 'FDB Table',
         'links' => 'Neighbors',
         'transceivers' => 'Transceivers',
         'xdsl' => 'xDSL',
+        'portsecurity' => 'Port Security',
     ],
     'transceiver' => 'Transceiver',
     'transceivers' => [

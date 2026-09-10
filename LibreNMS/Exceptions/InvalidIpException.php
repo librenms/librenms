@@ -1,4 +1,5 @@
 <?php
+
 /**
  * InvalidIpException.php
  *

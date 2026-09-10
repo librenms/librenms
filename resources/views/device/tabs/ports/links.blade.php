@@ -1,5 +1,6 @@
-<x-panel body-class="!tw-p-0">
-    <table class="table table-hover table-condensed tw-mt-1 !tw-mb-0">
+<x-panel>
+    <x-slot:slot class="tw:p-0!">
+    <table class="table table-hover table-condensed tw:mt-1 tw:mb-0!">
         <thead>
             <tr>
                 <th>Local Port</th>
@@ -43,4 +44,5 @@
             </tr>
         @endforeach
     </table>
+    </x-slot:slot>
 </x-panel>

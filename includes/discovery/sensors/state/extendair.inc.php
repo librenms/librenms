@@ -1,4 +1,5 @@
 <?php
+
 /**
  * extendair.inc.php
  *
@@ -25,13 +26,13 @@
 
 // Common States
 $states = [
-    ['value' => 0, 'generic' => 0, 'graph' => 1, 'descr' => 'almNORMAL'],
-    ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => 'almMINOR'],
-    ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'almMAJOR'],
-    ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'almDisable'],
-    ['value' => 4, 'generic' => 1, 'graph' => 1, 'descr' => 'almNotAvailable'],
-    ['value' => 5, 'generic' => 1, 'graph' => 1, 'descr' => 'almClearChanel'],
-    ['value' => 6, 'generic' => 1, 'graph' => 1, 'descr' => 'almNonOccupant'],
+    ['value' => 0, 'generic' => 0, 'descr' => 'almNORMAL'],
+    ['value' => 1, 'generic' => 1, 'descr' => 'almMINOR'],
+    ['value' => 2, 'generic' => 2, 'descr' => 'almMAJOR'],
+    ['value' => 3, 'generic' => 1, 'descr' => 'almDisable'],
+    ['value' => 4, 'generic' => 1, 'descr' => 'almNotAvailable'],
+    ['value' => 5, 'generic' => 1, 'descr' => 'almClearChanel'],
+    ['value' => 6, 'generic' => 1, 'descr' => 'almNonOccupant'],
 ];
 
 $sensors = [
@@ -47,7 +48,7 @@ $sensors = [
 ];
 
 foreach ($sensors as $sensor) {
-    $temp = snmp_get($device, $sensor['state_name'] . '.0', '-Ovqe', 'ExaltComProducts');
+    $temp = SnmpQuery::get('ExaltComProducts::' . $sensor['state_name'] . '.0')->value();
     $cur_oid = $sensor['num_oid'];
 
     if (is_numeric($temp)) {
@@ -57,7 +58,6 @@ foreach ($sensors as $sensor) {
 
         $descr = $sensor['descr'];
         discover_sensor(null, 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
-        create_sensor_to_state_index($device, $state_name, $index);
     }
 }
 

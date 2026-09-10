@@ -3,7 +3,8 @@
 This is currently being tested, use at your own risk.
 
 LibreNMS can be used with a MariaDB Galera Cluster. This is a Multi Master cluster, meaning each
-node in the cluster can read and write to the database. They all have the same ability. LibreNMS will
+node in the cluster reads and writes to the database. All nodes have
+the same capability. LibreNMS
 randomly choose a working node to read and write requests to.
 
 
@@ -13,8 +14,11 @@ For more information see
 
 ## Getting Started
 
- * It is best practice to have a minimum of 3 nodes in the cluster, A odd number of nodes is recommended in the event nodes have a disagreement on data, they will have a tie breaker.
- * It's recommended that all servers be similar in hardware performance, cluster performance can be affected by the slowest server in the cluster.
+ * Use at least 3 nodes in the cluster. We recommend an odd number of
+   nodes. An odd number gives a majority at a disagreement about the
+   data.
+ * Give all servers a similar hardware performance. The slowest server
+   limits the cluster performance.
  * Backup the database before starting, and backing up the database regularly is still recommended even in a working cluster environment.
 
 ## Install and Configure Galera
@@ -54,18 +58,26 @@ wsrep_node_name="librenms1.35"
 ```
 Change the following values for your environment.
 * wsrep_cluster_address -  All the IP address's of your nodes.
-* wsrep_cluster_name - Name of cluster, should be the same for all nodes
+* wsrep_cluster_name - the name of the cluster. It is the same on all nodes
 * wsrep_node_address - IP address of this node.
 * wsrep_node_name - Name of this node.
 
 ### Edit LibreNMS .env
 
-LibreNMS supports up to 9 galera nodes, you define these nodes in the .env file. For each node we have the ability to define if this librenms installation/poller is able to write, read or both to that node.
-The galera nodes you define here can be the same or differnt for each librenms poller. If you have a poller you only want to write/read to one galera node, you would simply add one DB_HOST, and omit all the rest. This allows you to precisely control what galera nodes a librenms poller is reading and or writing too.
+LibreNMS supports up to 9 Galera nodes. You define these nodes in the
+`.env` file. For each node, you set the access of this LibreNMS
+installation or poller: write, read, or both.
+The Galera nodes here are the same or different for each LibreNMS
+poller. For a poller with one Galera node, add one DB_HOST and remove
+the others. You therefore control the Galera nodes of the read and the
+write of each poller.
 
 * DB_HOST is always set to read/write.
-* DB_HOST must be set, however, it does not have to be the same on each poller, it can be different as long as it's part of the same galera cluster.
-* If the node that is set to DB_HOST is down, things like ```lnms db``` command no longer work, as they only use DB_HOST and don't failover to other nodes.
+* DB_HOST is mandatory. It does not need the same value on each poller.
+  It can differ, but it must be part of the same Galera cluster.
+* If the DB_HOST node is down, a command such as ```lnms db``` stops.
+  These commands use only DB_HOST. They do not fail over to another
+  node.
 * Set DB_CONNECTION=mysql_cluster to enable
 * DB_STICKY can be used if you are pulling out of sync data form the database in a read request. For more information see
 <https://laravel.com/docs/database#the-sticky-option>
@@ -87,7 +99,8 @@ DB_DATABASE=librenms
 DB_USERNAME=librenms
 DB_PASSWORD=password
 ```
-The above .env on a librenms installation/poller would communicate to each galera node as follows.
+The `.env` file above connects a LibreNMS installation or poller to
+each Galera node in this way.
 
 * 192.168.1.35 - Read/Write
 * 192.168.1.36 - Read/Write
@@ -126,7 +139,7 @@ SHOW GLOBAL STATUS LIKE 'wsrep_%';
 |    :----:                            |    :----:                                                       |    :----:                                               |
 | -----------------------------------  | ----------------------------------------------------------------|---------------------------------------------------------|
 | wsrep_cluster_size                   | 2                                                               | Current number of nodes in Cluster                      |
-| wsrep_cluster_state_uuid             | e71582f3-cf14-11eb-bcf6-a23029e16405                            | Last Transaction UUID, Should be the same for each node |
+| wsrep_cluster_state_uuid             | e71582f3-cf14-11eb-bcf6-a23029e16405                            | The UUID of the last transaction. It is the same on each node |
 | wsrep_connected                      | On                                                              | On = Connected with other nodes                         |
 | wsrep_local_state_comment            | Synced                                                          | Synced with other nodes                                 |
 
@@ -134,8 +147,10 @@ SHOW GLOBAL STATUS LIKE 'wsrep_%';
 
 ### Restarting the Entire Cluster
 
-In a cluster environment, steps should be taken to ensure that ALL nodes are not offline at the same time. Failed nodes can recover without issue as long as one node remains online.
-In the event that ALL nodes are offline, the following should be done to ensure you are starting the cluster with the most up-to-date database. To do this login to each node and running the following
+In a cluster, keep at least one node online at all times. A failed node
+recovers without a problem while one node stays online.
+If ALL nodes are offline, do these steps. They start the cluster with
+the newest database. Log in to each node and run this command:
 
 
 ```grastate.dat

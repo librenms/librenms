@@ -6,7 +6,7 @@
                 <h5 class="modal-title" id="imageModalNewLabel">{{ __('map.custom.nodeimage.title.new') }}</h5>
             </div>
 
-            <div class="modal-body tw-p-10">
+            <div class="modal-body tw:p-10">
                 <x-input id="nodeimage"
                          x-ref="nodeimage"
                          type="file"
@@ -21,7 +21,7 @@
                          label="{{ __('map.custom.nodeimage.name') }}">
                 </x-input>
                 <div>
-                    <div class="tw-text-red-600" id="nodeimageerror"></div>
+                    <div class="tw:text-red-600" id="nodeimageerror"></div>
                 </div>
             </div>
 

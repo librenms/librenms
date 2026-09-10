@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AuthLog.php
  *
@@ -25,13 +26,23 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AuthLog extends Model
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $table = 'authlog';
-    protected $casts = [
-        'datetime' => 'datetime',
-    ];
+
+    /**
+     * @return array{datetime: 'datetime'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'datetime' => 'datetime',
+        ];
+    }
 }

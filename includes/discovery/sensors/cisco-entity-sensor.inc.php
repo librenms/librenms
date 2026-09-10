@@ -63,7 +63,7 @@ if ($device['os_group'] == 'cisco') {
     if (is_array($oids)) {
         foreach ($oids as $index => $entry) {
             // echo("[" . $entry['entSensorType'] . "|" . $entry['entSensorValue']. "|" . $index . "]");
-            if ($entitysensor[$entry['entSensorType']] && is_numeric($entry['entSensorValue']) && is_numeric($index)) {
+            if (isset($entry['entSensorType'], $entry['entSensorValue'], $entitysensor[$entry['entSensorType']]) && $entitysensor[$entry['entSensorType']] && is_numeric($entry['entSensorValue']) && is_numeric($index)) {
                 $group = null;
                 $entPhysicalIndex = $index;
                 if ($entity_array[$index]['entPhysicalName'] || $device['os'] == 'iosxr') {
@@ -91,42 +91,19 @@ if ($device['os_group'] == 'cisco') {
                 $current = $entry['entSensorValue'];
                 $type = $entitysensor[$entry['entSensorType']];
 
-                // echo("$index : ".$entry['entSensorScale']."|");
-                // FIXME this stuff is foul
-                if ($entry['entSensorScale'] == 'nano') {
-                    $divisor = '1000000000';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'micro') {
-                    $divisor = '1000000';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'milli') {
-                    $divisor = '1000';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'units') {
-                    $divisor = '1';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'kilo') {
-                    $divisor = '1';
-                    $multiplier = '1000';
-                }
-
-                if ($entry['entSensorScale'] == 'mega') {
-                    $divisor = '1';
-                    $multiplier = '1000000';
-                }
-
-                if ($entry['entSensorScale'] == 'giga') {
-                    $divisor = '1';
-                    $multiplier = '1000000000';
-                }
+                // Try to handle the scale
+                [$divisor, $multiplier] = match ($entry['entSensorScale']) {
+                    'zepto' => [1000000000000000000, 1],
+                    'nano' => [1000000000, 1],
+                    'micro' => [1000000, 1],
+                    'milli' => [1000, 1],
+                    'units' => [1, 1],
+                    'kilo' => [1, 1000],
+                    'mega' => [1, 1000000],
+                    'giga' => [1, 1000000000],
+                    'yocto' => [1, 1],
+                    default => [1, 1],
+                };
 
                 if (is_numeric($entry['entSensorPrecision'])
                         && $entry['entSensorPrecision'] > '0'
@@ -144,20 +121,32 @@ if ($device['os_group'] == 'cisco') {
                 $limit_low = null;
                 $warn_limit = null;
                 $warn_limit_low = null;
+                $other_limit = null;
+                $other_limit_low = null;
 
                 // Check thresholds for this entry (bit dirty, but it works!)
                 if (isset($t_oids[$index]) && is_array($t_oids[$index])) {
-                    foreach ($t_oids[$index] as $t_index => $key) {
+                    foreach ($t_oids[$index] as $key) {
                         // Skip invalid treshold values
-                        if (! isset($key['entSensorThresholdValue']) || $key['entSensorThresholdValue'] == '-32768') {
+                        if (! isset($key['entSensorThresholdValue']) || $key['entSensorThresholdValue'] == '-32768' || $key['entSensorThresholdValue'] == '2147483647') {
+                            continue;
+                        } elseif ($type == 'fanspeed' && $key['entSensorThresholdValue'] == '-1') {
                             continue;
                         }
                         // Critical Limit
                         if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
+                            if ($key['entSensorThresholdValue'] == '0' && isset($limit)) {
+                                // Ignore a threshold of 0 if another threshold has been set (major vs critical)
+                                continue;
+                            }
                             $limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
                         if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
+                            if ($key['entSensorThresholdValue'] == '0' && isset($limit_low)) {
+                                // Ignore a threshold of 0 if another threshold has been set (major vs critical)
+                                continue;
+                            }
                             $limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
@@ -168,6 +157,15 @@ if ($device['os_group'] == 'cisco') {
 
                         if ($key['entSensorThresholdSeverity'] == 'minor' && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
                             $warn_limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
+                        }
+
+                        // Other Limit
+                        if ($key['entSensorThresholdSeverity'] == 'other' && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
+                            $other_limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
+                        }
+
+                        if ($key['entSensorThresholdSeverity'] == 'other' && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
+                            $other_limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
                     }//end foreach
                 }//end if
@@ -181,6 +179,15 @@ if ($device['os_group'] == 'cisco') {
                     if ($limit_low == 0) {
                         $limit_low = -5;
                     }
+                }
+
+                // Handle platforms that do not have the "Minor"/"Major"/"Critical" threshold for a sensor but instead only have the "Other" threshold for such sensor (ISR1k / ISR4k)
+                // Since there is no other threshold available other than "Other", treat these as Critical Limit
+                if (! isset($limit_low) && ! isset($warn_limit_low) && isset($other_limit_low)) {
+                    $limit_low = $other_limit_low;
+                }
+                if (! isset($limit) && ! isset($warn_limit) && isset($other_limit)) {
+                    $limit = $other_limit;
                 }
 
                 // End Threshold code
@@ -198,16 +205,30 @@ if ($device['os_group'] == 'cisco') {
                             break;
                         }
 
+                        if (! isset($entity_array[$phys_index])) {
+                            // NX-OS: entPhysicalContainedIn may reference a parent index (e.g. 1)
+                            // that is not returned by the SNMP walk — stop traversal safely.
+                            break;
+                        }
+
                         $entPhysicalClass = $entity_array[$phys_index]['entPhysicalClass'];
                         $entPhysicalName = $entity_array[$phys_index]['entPhysicalName'];
+                        $transceivers = \App\Models\Transceiver::where('device_id', $device['device_id'])->where('index', '=', $phys_index)->first();
+                        if (! empty($transceivers)) {
+                            // If we already have a mapping done in transceivers, let's use it.
+                            $entPhysicalIndex = $phys_index;
+                            $entry['entSensorMeasuredEntity'] = 'ports';
+                            $group = 'transceiver';
+                            break;
+                        }
                         //either sensor is contained by a port class entity.
                         if ($entPhysicalClass === 'port') {
                             $entAliasMappingIdentifier = $entity_array[$phys_index][0]['entAliasMappingIdentifier'];
                             if (Str::contains($entAliasMappingIdentifier, 'ifIndex.')) {
-                                [, $tmp_ifindex] = explode('.', $entAliasMappingIdentifier);
+                                [, $tmp_ifindex] = explode('.', (string) $entAliasMappingIdentifier);
                             }
                             break;
-                        //or sensor entity has a parent entity with module class and entPhysicalName set to an existing ifName.
+                            //or sensor entity has a parent entity with module class and entPhysicalName set to an existing ifName.
                         } elseif ($entPhysicalClass === 'module' && array_key_exists($entPhysicalName, $port_reverse_array)) {
                             $tmp_ifindex = $port_reverse_array[$entPhysicalName]['ifIndex'];
                             break;
@@ -216,15 +237,15 @@ if ($device['os_group'] == 'cisco') {
                         }
                     }
                     if ($tmp_ifindex != 0) {
-                        $tmp_port = get_port_by_index_cache($device['device_id'], $tmp_ifindex);
-                        if (is_array($tmp_port)) {
-                            $entPhysicalIndex = $tmp_ifindex;
+                        $port_id = PortCache::getIdFromIfIndex($tmp_ifindex, $device['device_id']);
+                        if ($port_id) {
+                            $entPhysicalIndex = $phys_index;
                             $entry['entSensorMeasuredEntity'] = 'ports';
                             $group = 'transceiver';
                         }
                     }
 
-                    discover_sensor(null, $type, $device, $oid, $index, 'cisco-entity-sensor', ucwords($descr), $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null, $group);
+                    discover_sensor(null, $type, $device, $oid, $index, 'cisco-entity-sensor', ucwords($descr), $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
                     //Cisco IOS-XR : add a fake sensor to graph as dbm
                     if ($type == 'power' and $device['os'] == 'iosxr' and (preg_match('/power (R|T)x/i', $descr) or preg_match('/(R|T)x Power/i', $descr) or preg_match('/(R|T)x Lane/i', $descr))) {
                         // convert Watts to dbm
@@ -237,7 +258,7 @@ if ($device['os_group'] == 'cisco') {
                         $limit = isset($limit_low) ? round(mw_to_dbm($limit * $multiplier), 3) : null;
                         $current = mw_to_dbm($current * $multiplier);
                         //echo("\n".$valid['sensor'].", $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, $user_func");
-                        discover_sensor(null, $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], $user_func, $group);
+                        discover_sensor(null, $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, $user_func, $group);
                     }
                 }
 

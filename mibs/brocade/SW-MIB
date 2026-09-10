@@ -13,7 +13,7 @@
 
 SW-MIB DEFINITIONS ::= BEGIN
   IMPORTS
-	DisplayString, TEXTUAL-CONVENTION
+	DisplayString, TEXTUAL-CONVENTION, TruthValue
       FROM SNMPv2-TC
     Counter32, Integer32, IpAddress,
     OBJECT-TYPE, OBJECT-IDENTITY,
@@ -24,11 +24,11 @@ SW-MIB DEFINITIONS ::= BEGIN
       FROM Brocade-TC
     fcSwitch, bcsiModules
       FROM Brocade-REG-MIB
-	connUnitPortStatEntry
+	connUnitPortStatEntry, connUnitPortEntry
 	  FROM FCMGMT-MIB;
 
   swMibModule MODULE-IDENTITY
-    LAST-UPDATED "200408061830Z" -- Aug 06, 2004 6:30pm
+    LAST-UPDATED "201409051112Z" -- Sep 5, 2014 11:12am
     ORGANIZATION "Brocade Communications Systems, Inc.,"
     CONTACT-INFO "Customer Support Group
 		  Brocade Communications Systems,
@@ -117,14 +117,124 @@ SW-MIB DEFINITIONS ::= BEGIN
 	REVISION    "200911061130Z" -- Nov 06, 2009 11:30am
 	DESCRIPTION "Added swConnUnitExtensionTable and entries for 64 bit
 				portstats."
-	REVISION    "0911301030Z" -- Nov 30, 2009 10:30am
+	REVISION    "200911301030Z" -- Nov 30, 2009 10:30am
 	DESCRIPTION "Added swMemUsageLimit1 and swMemUsageLimit3 under 
 				swCpuOrMemoryUsage"
-	REVISION    "0912031730Z" -- Dec 03, 2009 05:30pm
+	REVISION    "200912031730Z" -- Dec 03, 2009 05:30pm
 	DESCRIPTION "Added swExttrap as internal trap."
-	REVISION    "1001301730Z" -- Jan 30, 2010 05:30pm
-	DESCRIPTION "Changed the descriptions for swConnUnitExtensionTable as per latest FS."
+	REVISION    "201001301730Z" -- Jan 30, 2010 05:30pm
+	DESCRIPTION "Changed the descriptions for swConnUnitExtensionTable."
+	REVISION    "201007081130Z" -- July 08, 2010 11:30am
+	DESCRIPTION "Obsoleted swGroupTable, swGroupMemTable from swGroup."
+	REVISION    "201007151130Z" -- July 15, 2010 11:30am
+	DESCRIPTION "Added swFCPortWwn, swFCPortBrcdType in swFcPortScn and added 
+				swStateChangeTrap" 
+	REVISION    "201007211130Z" -- July 21, 2010 11:30am
+	DESCRIPTION "Added trap swPortMoveTrap" 
+	REVISION    "201008061130Z" -- Aug 06, 2010 11:30am
+	DESCRIPTION "Added trap portStats objects under SwConnUnitPortStatEntry" 
+    REVISION    "201008201030Z" -- Aug 20, 2010 10:30am
+    DESCRIPTION "Added trap swBrcdGenericTrap"
+    REVISION    "201010071030Z" -- Oct 07, 2010 10:30am
+    DESCRIPTION "Added swVfName"
+    REVISION    "201010091030Z" -- Oct 09, 2010 10:30am
+	DESCRIPTION "Added swPortConfigTable" 
+    REVISION    "201010251030Z" -- Oct 25, 2010 10:30am
+	DESCRIPTION "Added swFCPortPrevType in swFCPortScn"
+	REVISION    "201011010600Z" -- Nov 1, 2010 06:00pm
+	DESCRIPTION "Added fifty filter classes under swFwClassAreaIndex"
+	REVISION    "201011021030Z" -- Nov 2, 2010 10:30am
+	DESCRIPTION "Updated the description of swBrcdTrapBitMask and
+				 swBrcdGenericTrap for Fapwwn Trap"
+	REVISION    "201012021030Z" -- Dec 2, 2010 10:30am
+	DESCRIPTION "Deprecated swAgtCmtyTable and provided support of standard mibs
+				 SnmpCommunityTable and snmpTargetParamsTable  and snmpTargetAddrTable"
+	REVISION    "201012081030Z" -- Dec 8, 2010 10:30am
+	DESCRIPTION "Updated the datatype for swPortEncrypt and swPortCompression"
+	REVISION    "201012201000Z" -- Dec 20, 2010 06:00pm
+	DESCRIPTION "Added enumeration sexdecuple for swNbBaudRate"
+    REVISION    "201012210400Z" -- Dec 21, 2010 04:00pm         		    
+	DESCRIPTION "Added a new value lowBufferCrsd(7) for swFwLastEvent"
+	REVISION    "201012221000Z" -- Dec 22,2010 06:00pm
+	DESCRIPTION "Changed the area name filter-fmcfg to filterFmCfg in SwFwClassesAreas"
+	REVISION    "201012301000Z" -- Dec 30,2010 06:00pm
+	DESCRIPTION "Included FDMI event case in swBrcdTrapBitMask"
+    REVISION    "201101061030Z" -- Jan 06, 2011 10:30am
+    DESCRIPTION "Added class3 discards error in SwConnUnitPortStatEntry"
+	REVISION    "201101071030Z" -- Jan 07, 2011 10:30am
+	DESCRIPTION "Moved swPortConfigTable, CiperMode and Encrypt/CompressStatus
+				to faext.mib"
+	REVISION	"201102180600Z" -- Feb 18, 2011 06:00pm
+	DESCRIPTION	"Changed fportmode(2) to portmode(2) for object swTopTalkerMntMode."
+	REVISION    "201202231030Z" -- Feb 23, 2012 10:30am
+	DESCRIPTION "Added swauthProtocolPassword and swauthProtocolPassword for
+				IBM DirectorServer applications"
 
+	REVISION    "201203050333Z" -- Mar 05, 2012 03:33pm
+	DESCRIPTION "Added new enum noSigDet(14) for object swFCPortPhyState"
+
+	REVISION	"201205151425Z" -- May 15, 2012 02:25pm
+	DESCRIPTION "Changed the syntax of swCpuAction and swMemAction objects."
+	REVISION    "201206041720Z" -- June 04, 2012 05:20pm
+    DESCRIPTION "Added PCS block errors in swConnUnitPortStatEntry"
+	REVISION    "201206141000Z" -- June 15, 2012 10:00am
+	DESCRIPTION "Added swDeviceStatus and swDeviceStatusTrap"
+	REVISION    "201206291520Z" -- June 29, 2012 03:20pm
+    DESCRIPTION "Added sixteenGB support to swFCPortSpeed and also
+				deprecated teh same"
+	REVISION    "201207101600Z" -- July 10, 2012 04:00pm
+	DESCRIPTION "Added an area filterFmCfg51 in the class SwFwClassesAreas"
+	REVISION    "201209261400Z" -- Sep 26, 2012 02:00pm
+	DESCRIPTION "Removed the tab space and added the space key for swFCPortEntry 38
+				as this caused a crash in MIB browser"
+	REVISION    "201303211300Z" -- Mar 21, 2013 01:00pm
+    DESCRIPTION "Added swFCPortDisableReason in SwFCPortEntry and swFCPortScn 
+		         trap."
+	REVISION	"201304041748Z" -- Apr 4,2013 05:48pm
+	DESCRIPTION "Added unroutable frame counter in swConnUnitPortStatEntry"
+	REVISION    "201304221130Z" -- Apr 22, 2013 11:30am
+	DESCRIPTION "Made the swFCPortSpeed obsolete"
+	REVISION	"201304251803Z" -- Apr 25, 2013 06:03pm
+	DESCRIPTION "Changed the description for swVFName and swConnUnitPCSErrorCounter"
+	REVISION	"201305151430Z" -- May 15, 2013 02:30pm
+	DESCRIPTION "Updated swFCPortCapacity description"
+	REVISION    "201306051600Z" -- June 5, 2013 04:00pm
+    DESCRIPTION "Added swFwPowerOnHours in SwFwClassesAreas"
+	REVISION    "201306291000Z" -- June 29, 2013 10:00am
+	DESCRIPTION "Updated the description for swCpuUsageLimit, swCpuAction, 
+				 swMemAction, swMemUsageLimit1 and swMemUsageLimit3."
+
+	REVISION    "201309121000Z" -- Sep 12, 2013 10:00am
+	DESCRIPTION "Added FEC Counters swConnUnitFECCorrectedCounter, swConnUnitFECUnCorrectedCounter"
+	REVISION	"201310041340Z" -- Oct 4, 2013 01:40pm
+	DESCRIPTION	"Added swZoneConfigChangeTrap"
+	REVISION	"201401161637Z" -- Jan 16, 2014 04:37pm
+	DESCRIPTION	"Added swBrcdBitObjVal in swSystem and swBrcdGenericTrap.
+				Added swVfId to swBrcdGenericTrap.
+				Included Routing Policy bit in swBrcdTrapBitMask"
+	REVISION	"201403041230Z" -- Mar 4, 2014 12:30pm
+	DESCRIPTION "Deprecated swTelnetShellAdmStatus"
+	REVISION "201403311730Z" -- Mar 31, 2014 17:30pm
+	DESCRIPTION "Added  D-Port in swBrcdTrapBitMask, swFCPortBrcdType, swFCPortPrevType"
+	REVISION	"201404151220Z" -- Apr 15, 2014 12:20pm
+	DESCRIPTION "Made obsolete for swTrackChangesInfo and swTrackChangesTrap"
+	REVISION "201405091113Z" -- May 9, 2014 11:13am
+	DESCRIPTION "Added Polling status field to swBrcdGenericTrap"
+	REVISION "201407011203Z" -- July 1, 2014 12:03pm
+	DESCRIPTION "Added swIODState in swSystem"
+	REVISION "201408211447Z" -- Aug 21, 2014 02:47pm
+	DESCRIPTION "Obsolete OIDs under swFwSystem, swBlmPerfMnt and swTopTalker.
+					Obsolete swFabricWatchTrap"
+	REVISION "201409051112Z" -- Sep 5, 2014 11:12am
+	DESCRIPTION "Added Supportsave start/complete event to swBrcdTrapBitMask"
+	REVISION "201410041310Z" -- Nov 4, 2014 13:10pm
+	DESCRIPTION "Added Dynamic Port Name bit under description
+					for swBrcdTrapBitMask and swBrcdGenericTrap"
+	REVISION "201410041310Z" -- Nov 4, 2014 13:10pm
+	DESCRIPTION "Added Dynamic Port Name Feature Event under description
+					for swBrcdTrapBitMask and swBrcdGenericTrap"
+	REVISION "201412091700Z" -- Dec 9, 2014 17:00pm
+	DESCRIPTION "swFWLastUpdated obsolete"
 	::=	{ bcsiModules 3 }
 	
     sw		    OBJECT-IDENTITY
@@ -211,7 +321,7 @@ SW-MIB DEFINITIONS ::= BEGIN
      ::= { sw 8 }
 
   swFwSystem	OBJECT-IDENTITY
-     STATUS  current
+     STATUS  obsolete
      DESCRIPTION   "The OID sub-tree for swFwSystem group."
      ::= { sw 10 }
 
@@ -221,12 +331,12 @@ SW-MIB DEFINITIONS ::= BEGIN
      ::= { sw 21 }
 
   swGroup       OBJECT-IDENTITY
-     STATUS  current
+     STATUS  obsolete
      DESCRIPTION   "The OID sub-tree for swGroup group."
      ::= { sw 22 }
 
   swBlmPerfMnt    OBJECT-IDENTITY
-     STATUS  current
+     STATUS  obsolete
      DESCRIPTION   "The OID sub-tree for swBlmPerfMnt (Bloom Performance
                     Monitor) group."
     ::= { sw 23 }
@@ -237,7 +347,7 @@ SW-MIB DEFINITIONS ::= BEGIN
      ::= { sw 24 }   
 
   swTopTalker   OBJECT-IDENTITY
-     STATUS  current
+     STATUS  obsolete
      DESCRIPTION   "The OID sub-tree for TopTalker group."
 	 ::= { sw 25 }
 
@@ -252,6 +362,8 @@ SW-MIB DEFINITIONS ::= BEGIN
      STATUS    current
      DESCRIPTION    "This represents the Conn unit Port Stats"
      ::= { sw 27 }
+
+-- sw 28 is assigned to faExt 	
 
   --
   -- the System Group (sw)
@@ -276,7 +388,7 @@ SW-MIB DEFINITIONS ::= BEGIN
   swFWLastUpdated	OBJECT-TYPE
 	SYNTAX		DisplayString(SIZE (0..64))
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"The information indicates the date when the firmware
 		was last updated, in displayable textual format."
   ::= { swSystem 3 }
@@ -360,7 +472,7 @@ SW-MIB DEFINITIONS ::= BEGIN
 				  terminated	(1)
 				}
 	MAX-ACCESS			read-write
-	STATUS			current
+	STATUS			deprecated
 	DESCRIPTION	"The desired administrative status of the Telnet
 		shell. By setting it to terminated(1), the current
 		Telnet shell task is deleted. When this variable instance
@@ -620,7 +732,7 @@ SW-MIB DEFINITIONS ::= BEGIN
   swTrackChangesInfo	OBJECT-TYPE
 	SYNTAX		DisplayString
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"Track changes string. For trap only"
   ::= { swSystem 23 }
 
@@ -703,6 +815,79 @@ SW-MIB DEFINITIONS ::= BEGIN
 	DESCRIPTION	"presence of this string represents test trap."
 	::= { swSystem 32 }
 
+  swPortList  OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS     current
+    DESCRIPTION "This string represents the list of ports and
+                its WWN when ports moved from one switch to another."
+    ::= { swSystem 33 }
+
+  swBrcdTrapBitMask  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS     current
+    DESCRIPTION "Type of notification will be represented by a single bit
+                 in this variable.
+                 0x01 - Fabric change event
+                 0x02 - Device change event
+				 0x04 - Fapwwn change event
+				 0x08 - FDMI events
+				 0x0A - Routing Policy change
+				 0x10 -  D-Port Configuraiton Event
+				 0x20 - SupportSave Start/Complete Event
+				 0x40 - Dynamic Port Name change
+				 0x80 - Dynamic Port Name Feature Enable/Disable Event"
+    ::= { swSystem 34 }
+
+  swFCPortPrevType  OBJECT-TYPE
+	SYNTAX INTEGER {
+				unknown			(1),
+				other			(2),
+				fl-port			(3),  -- public loop
+				f-port			(4),  -- fabric port
+				e-port			(5),  -- fabric expansion port
+				g-port			(6), -- generic fabric port
+				ex-port			(7),
+				d-port          (8)   -- Diagnostic port
+			}
+	MAX-ACCESS  not-accessible 
+	STATUS      current
+	DESCRIPTION "This represents port type of a port before 
+				it goes online/offline and it is valid only in swFcPortSCN trap"
+    ::= { swSystem 35 }
+
+  swDeviceStatus  OBJECT-TYPE
+	SYNTAX INTEGER {
+			login		(1),
+			logout      (2),
+			unknown		(3)
+		}
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "This represents the attached device status.
+		The status will change whenever port/node goes to 
+		online/offline"
+	::= { swSystem 36 }
+
+	swBrcdBitObjVal OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION "It will have object value for each change mentioned in swBrcdGenericTrap. It will be
+				empty for the events which don't have any values."
+		::= { swSystem 37 }
+
+	swIODState OBJECT-TYPE
+		SYNTAX INTEGER {
+				enabled (1),
+				disabled (2),
+				unknown (3)
+			}
+		MAX-ACCESS read-only
+		STATUS   current
+		DESCRIPTION "This represents the in-order-delivery (IOD) feature state."
+		::= { swSystem 38 }
 
   --
   -- End of System Group
@@ -809,7 +994,8 @@ SW-MIB DEFINITIONS ::= BEGIN
 				double          (32),   --   2 Gbaud
 				quadruple       (64),   --   4 Gbaud
 				octuple         (128),  --   8 Gbaud
-				decuple         (256)   --  10 Gbaud
+				decuple         (256),  --  10 Gbaud
+				sexdecuple	    (512)   --  16 Gbaud
 			}
 	MAX-ACCESS		read-only
 	STATUS		current
@@ -981,6 +1167,14 @@ SW-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION "The Virtual fabric id."
   ::= { swFabric 15 }
 
+  swVfName        OBJECT-TYPE
+        SYNTAX         DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This represents the virtual fabric name configured in the switch"
+  ::= { swFabric 16 }
+
+
   --
   -- SNMP Agent Configuration
   --
@@ -990,15 +1184,33 @@ SW-MIB DEFINITIONS ::= BEGIN
   swAgtCmtyTable	OBJECT-TYPE
 	SYNTAX		SEQUENCE OF SwAgtCmtyEntry
 	MAX-ACCESS		not-accessible
-	STATUS		current
+	STATUS		deprecated
 	DESCRIPTION	"A table that contains, one entry for each Community,
 		the access control and parameters of the Community."
   ::= { swAgtCfg 11 }
 
+    swauthProtocolPassword  OBJECT-TYPE
+  	SYNTAX		OCTET STRING(SIZE(1..32))
+  	MAX-ACCESS		read-write
+  	STATUS			current
+  	DESCRIPTION "This entry is created specific to the Pharos switch 
+  		to change the password for the auth protocol to reserved user
+  		DirectorServerSNMPv3User"
+  ::= { swAgtCfg 12 }
+  
+  swprivProtocolPassword  OBJECT-TYPE
+  	SYNTAX		OCTET STRING(SIZE(1..32))
+  	MAX-ACCESS		read-write
+  	STATUS			current
+  	DESCRIPTION "This entry is created specific to the Pharos switch 
+  		to change the password for the priv protocol to reserved user
+  		DirectorServerSNMPv3User"
+  ::= { swAgtCfg 13 }
+
   swAgtCmtyEntry	OBJECT-TYPE
 	SYNTAX		SwAgtCmtyEntry
 	MAX-ACCESS		not-accessible
-	STATUS		current
+	STATUS		deprecated
 	DESCRIPTION	"An entry containing the Community parameters."
 	INDEX	{ swAgtCmtyIdx }
   ::= { swAgtCmtyTable 1 }
@@ -1013,14 +1225,14 @@ SW-MIB DEFINITIONS ::= BEGIN
   swAgtCmtyIdx		OBJECT-TYPE
 	SYNTAX		Integer32 (1..6)
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		deprecated
 	DESCRIPTION	"This object identifies the SNMPv1 Community entry."
   ::= { swAgtCmtyEntry 1 }
 
   swAgtCmtyStr		OBJECT-TYPE
 	SYNTAX		DisplayString(SIZE (2..16))
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		deprecated
 	DESCRIPTION	"This is a Community string supported by the agent.
 		If a new value is set successfully, it takes effect
 		immediately."
@@ -1029,7 +1241,7 @@ SW-MIB DEFINITIONS ::= BEGIN
   swAgtTrapRcp		OBJECT-TYPE
 	SYNTAX			IpAddress
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		deprecated
 	DESCRIPTION	"This is the trap recipient associated with the
 		Community. If a new value is set successfully, it takes
 		effect immediately."
@@ -1038,7 +1250,7 @@ SW-MIB DEFINITIONS ::= BEGIN
   swAgtTrapSeverityLevel		OBJECT-TYPE
 	SYNTAX			SwSevType
 	MAX-ACCESS		read-write
-	STATUS		    current
+	STATUS		    deprecated
 	DESCRIPTION	"This is the trap severity level associated with the
 		swAgtTrapRcp. The trap severity level in conjunction with
         the an event's severity level. When an event occurs and if its
@@ -1064,9 +1276,8 @@ SW-MIB DEFINITIONS ::= BEGIN
 	SYNTAX		Integer32 (0..2147483647)
 	MAX-ACCESS		read-only
 	STATUS		current
-	DESCRIPTION	"The maximum number of Fibre Channel ports on this
-		switch. It includes G_Port, F_Port, FL_Port and any other
-		types of Fibre Channel port."
+	DESCRIPTION	"The maximum number of physical FC ports on the
+		switch."
   ::= { swFCport 1 }
 
   swFCPortTable		OBJECT-TYPE
@@ -1139,7 +1350,10 @@ SW-MIB DEFINITIONS ::= BEGIN
 	swFCPortFlag	FcPortFlag,
 
 	-- Brocade port type.
-	swFCPortBrcdType	INTEGER
+	swFCPortBrcdType	INTEGER,
+
+	-- port disable reason.
+	swFCPortDisableReason    INTEGER
   }
 
   swFCPortIndex		OBJECT-TYPE
@@ -1182,6 +1396,7 @@ SW-MIB DEFINITIONS ::= BEGIN
 			  lockRef	(9),
 			  validating    (10),
 			  invalidModule (11),
+			  noSigDet (14),
 			  unknown   (255)
 			}
 	MAX-ACCESS		read-only
@@ -1494,18 +1709,19 @@ SW-MIB DEFINITIONS ::= BEGIN
 					four-GB (4),
 					eight-GB (5),
 					ten-GB (6),
-					unknown (7)
+					unknown (7),
+					sixteen-GB (8)
 				}
 	MAX-ACCESS      read-write
-	STATUS      current
+	STATUS      obsolete
 	DESCRIPTION "The desired baud rate for the port. It can have the
 		values of 1GB (1), 2GB (2), Auto-Negotiate (3), 4GB (4), 8GB (5),
-		or 10GB (6). Some of the above values may not be supported
+		10GB (6), 16GB (8). Some of the above values may not be supported
 		by all type of switches."
   ::= { swFCPortEntry 35 }
 
  swFCPortName     OBJECT-TYPE
-    SYNTAX      DisplayString(SIZE(0..32))
+    SYNTAX      DisplayString(SIZE(0..255))
 	MAX-ACCESS      read-only
 	STATUS      current
 	DESCRIPTION "A string indicates the name of the addressed port.
@@ -1533,7 +1749,7 @@ SW-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
 	 "A bit  map  of  port  status  flags which includes the information of port type.
 	  Currently this will indicate if the port is virtual or physical."
-  ::= {	swFCPortEntry 38	}
+  ::= { swFCPortEntry 38 }
 
   swFCPortBrcdType		OBJECT-TYPE
 		SYNTAX INTEGER {
@@ -1543,14 +1759,254 @@ SW-MIB DEFINITIONS ::= BEGIN
 				f-port			(4),  -- fabric port
 				e-port			(5),  -- fabric expansion port
 				g-port			(6), -- generic fabric port
-				ex-port			(7)
+				ex-port			(7),
+				d-port          (8)   -- Diagnostic port
 			}
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
 		"The Brocade port type."
-  ::= { swFCPortEntry 39    }
-	
+  ::= { swFCPortEntry 39 }
+
+  swFCPortDisableReason     OBJECT-TYPE
+ 			SYNTAX INTEGER {
+ 				r-recover-fail                     (1),             -- general recovery failure 
+ 				r-invalid-reason                   (2),              -- invalid reason 
+ 				r-forced                           (3),              -- forced to disable 
+ 				r-sw-disabled                      (4),              -- switch got disabled 
+ 				r-bl-disabled                      (5),              -- blade got disabled 
+ 				r-slot-off                         (6),              -- slot is turned off 
+ 				r-sw-enabled                       (7),              -- switch got enabled 
+ 				r-bl-enabled                       (8),              -- blade got enabled 
+ 				r-slot-on                          (9),              -- slot turned on 
+ 				r-persistid                        (10),              -- port disabled: persistant d-id 
+ 				r-sw-violation                     (11),              -- port disabled: switch sec violation 
+ 				r-prv-dev-violation                (12),             -- port disabled: prv dev sec violation 
+ 				r-pub-dev-violation                (13),             -- port disabled: pub dev sec violation 
+ 				r-port-data-fail                   (14),             -- online chip asic data fail 
+ 				r-online-incomplete                (15),             -- online incompleted 
+ 				r-online-route-fail                (16),             -- online route recovery failure 
+ 				r-inconsistent                     (17),             -- port failed consistency check 
+ 				r-set-vcc-fail                     (18),             -- set vcc credits ioctl failed 
+ 				r-ecp-in-testing                   (19),             -- recvd ecp in switchtesting state 
+ 				r-elp-in-testing                   (20),             -- recvd elp in switchtesting state 
+ 				r-ecp-retries-exceeded             (21),             -- ecp retries exceeeded 
+ 				r-invalid-ecp-state                (22),             -- ecp retr in invalid state 
+ 				r-bad-ecp-rcvd                     (23),             -- ecp fctl len not valid 
+ 				r-send-rtmark-fail                 (24),             -- send roundtrip mark ioctl failure 
+ 				r-send-ecp-fail                    (25),             -- send ecp failure 
+ 				r-save-link-rtt-fail               (26),             -- saving link roundtrip time failure 
+ 				r-em-incnst                        (27),             -- em has a different state than blade/pic 
+ 				r-pci-attach-fail                  (28),             -- pci bus scan/attach failed 
+ 				r-buf-starv                        (29),             -- port disabled: due to buffer starvation 
+ 				r-elp-fctl-mismatch                (30),             -- flow control mode different in elp acc 
+ 				r-eport-disabled                   (31),             -- e-port disabled 
+ 				r-trunk-with-vcxlt                 (32),             -- trunk and vcxltinit enabled 
+ 				r-sw-fl-port-not-ready             (33),             -- sw not ready for f or l ports 
+ 				r-link-reinit                      (34),             -- port disabled: due to too many link re-inits 
+ 				r-domain-id-change                 (35),             -- domain id change 
+ 				r-auth-rejected                    (36),             -- authentication is rejected 
+ 				r-auth-timeout                     (37),             -- authentication timeout 
+ 				r-auth-fail-retry                  (38),             -- fail to retry authentication 
+ 				r-fcr-conf-mismatch1               (39),             -- brcd mode mcdata switch connected 
+ 				r-fcr-conf-mismatch2               (40),             -- mcdt mode  brcd switch connected 
+ 				r-fcr-port-ld-mode-mismatch        (41),             -- port is not configured ld 
+ 				r-fcr-ld-credit-mismatch           (42),             -- port in ld mode incoming elp is r-rdy 
+ 				r-fcr-set-vcc-failed               (43),             -- setting vcc failed for the port 
+ 				r-fcr-set-rtc-failed               (44),             -- setting rt credit failed for the port 
+ 				r-fcr-elp-ver-inconsis             (45),             -- version of elp is inconsistent 
+ 				r-fcr-elp-fctl-mismatch            (46),             -- invalid flow control parameter 
+ 				r-fcr-pid-mismatch                 (47),             -- pid mismatch 
+ 				r-fcr-tov-mismatch                 (48),             -- tov mismatch 
+ 				r-fcr-ld-incompat                  (49),             -- long distance incompatability 
+ 				r-fcr-isolated                     (50),             -- long distance incompatability 
+ 				r-elp-retries-exceeded             (51),             -- exceeded max elp retries 
+ 				r-fcr-exports-exceeded             (52),             -- fcr too many ex ports online 
+ 				r-fcr-license                      (53),             -- fcr not licensed 
+ 				r-fcr-conf-ex                      (54),             -- fcr conflicting ex-port aleady online
+ 				r-fcr-ftag-over                    (55),             -- fcr fabric id oversubscribed 
+ 				r-fcr-ftag-conflict                (56),             -- fcr fabric id conflict 
+ 				r-fcr-fowner-conflict              (57),             -- fcr fabric owner conflict 
+ 				r-fcr-zone-resource                (58),             -- fcr exceeded max number of zone resources 
+ 				r-fcr-port-state-to                (59),             -- fcr failed to init in time 
+ 				r-fcr-authn-reject                 (60),             -- fcr authentication failure 
+ 				r-fcr-sec-fcs-list                 (61),             -- fcr invalid member(s) in fcs list 
+ 				r-fcr-sec-failure                  (62),             -- fcr fail to join secure fabric 
+ 				r-fcr-incompatible-mode            (63),             -- fcr incompatible port mode 
+ 				r-fcr-sec-scc-list                 (64),             -- fcr invalid member(s) in scc list 
+ 				r-fcr-generic                      (65),             -- fcr generic error (should not happen)
+ 				r-sw-ex-port-not-ready             (66),
+ 				r-fcr-class-f-incompat             (67),             -- class-f incompatability 
+ 				r-fcr-class-n-incompat             (68),             -- class-n incompatability 
+ 				r-fcr-invalid-flow-rcvd            (69),             -- invalid flow control recieved 
+ 				r-fcr-state-disabled               (70),
+ 				r-fdd-strict-exist                 (71),             -- strict fabric wide policy  peer is non-acl switch 
+ 				r-last-port-disable-msg            (72),
+ 				r-sw-l-port-not-support            (73),             -- port does not support l-port 
+ 				r-peer-port-in-di-zone             (74),             -- zone member of peer port is on pre-quantum switch 
+ 				r-zone-incompat                    (75),             -- neighbor cannot handle zone db and won't segment 
+ 				r-sw-config-l-port-not-support     (76),             -- port does not support configed l-port 
+ 				r-sw-port-mirror-configured        (77),             -- port disabled: due to port mirroring configured 
+ 				r-nportlogin-inprogress            (78),             -- port disabled: n-port login in progress 
+ 				r-nonpiv                           (79),             -- port disabled: no npiv support 
+ 				r-nomapping                        (80),             -- f-port is not mapped to a n-port 
+ 				r-unknowntype                      (81),             -- 289315  296266: port type not detected 
+ 				r-nportoffline                     (82),             -- n-port for this f-port is offline 
+ 				r-flogifailed                      (83),             -- fabric login failed for port 
+ 				r-nportbusy                        (84),             -- n-port is busy handling other login requests 
+ 				r-noflogi                          (85),             -- no flogi received on f-port 
+ 				r-noflogiresp                      (86),             -- no flogi response received on n-port 
+ 				r-flogidupalpa                     (87),             -- fdisc response received duplicate/zero al-pa 
+ 				r-loopcfg                          (88),             -- detected loop configuration 
+ 				r-noenclicense                     (89),             -- n-port's configured fi-port not licensed (enc1&2)
+ 				r-nofiportmapping                  (90),             -- n-port has no configured fi-port 
+ 				r-brcdfabconn                      (91),             -- n-port connected to brocade fabric - not supported on agmace 
+ 				r-port-reset                       (92),             -- the port needs to be disabled and enabled 
+ 				r-floginport                       (93),             -- flogi received on port configured as n-port 
+ 				r-fdd-strict-conflict              (94),             -- fabric wide strict policy conflict 
+ 				r-fdd-cfg-conflict                 (95),             -- fabric wide cfg conflict 
+ 				r-fdd-cfg-conflict-na-neigh        (96),             -- fabric wide cfg conflict  neighbor is non-acl switch 
+ 				r-fcr-insistent-front-did-mismatch (97),
+ 				r-fcr-fabric-binding-failure       (98),
+ 				r-fcr-non-standard-domain-offset   (99),            -- port disabled: non-standard domain offset in esc 
+ 				r-area-in-use                      (100),             -- area in use 
+ 				r-mstr-diff-pg                     (101),             -- master has different port group than slave 
+ 				r-mstr-diff-area                   (102),            -- master has different area than slave 
+ 				r-ta-not-supported                 (103),            -- trunk area not supported 
+ 				r-eport-not-supported              (104),            -- e-port not suppored on port type 
+ 				r-fport-not-supported              (105),            -- f-port not suppored on port type 
+ 				r-cfg-not-supported                (106),            -- port cfg not supported 
+ 				r-port-ll-th-exceeded              (107),            -- port class link loss threshold exceeded 
+ 				r-port-synl-th-exceeded            (108),            -- port class sync loss threshold exceeded 
+ 				r-port-pe-th-exceeded              (109),            -- port class protocol errors threshold exceeded 
+ 				f-port-disable-no-trk-lic          (110),           -- no trunking license and f port trunk enabled 
+ 				r-port-inw-th-exceeded             (111),            -- port class invalid words threshold exceeded 
+ 				r-port-crc-th-exceeded             (112),            -- port class invalid crc threshold exceeded 
+ 				f-port-tr-disable-speed-not-ok     (113),            -- speed is not 2, 4 or 8g 
+ 				r-port-auto-disable                (114),            -- disabled due to port auto disable 
+ 				r-fcr-export-in-non-base-sw        (115),            -- ex port is online in non base switch 
+ 				r-base-switch-supports-no-device   (116),           -- base switch does not support device 
+ 				r-port-trunk-proto-error           (117),            -- invalid trunk state for ac-port 
+ 				r-no-area-avail                    (118),            -- no more area is available for dynamic assignment 
+ 				r-cannot-unbind-existing-area      (119),
+ 				r-cannot-use-10bit-area            (120),
+ 				r-authentication-required          (121),            -- hba authentication required 
+ 				r-port-lr-th-exceeded              (122),            -- port class link reset threshold exceeded 
+ 				r-fcr-export-lf-conflict           (123),            -- ex and lf conflict 
+ 				r-incompat                         (124),            -- switch incompatible 
+ 				r-did-overlap                      (125),            -- domain id overlap 
+ 				r-zone-conflict                    (126),            -- zone overlap 
+ 				r-eport-seg                        (127),            -- generic eport segment 
+ 				r-no-license                       (128),            -- no license 
+ 				r-platform-db                      (129),            -- incompatible platform db 
+ 				r-sec-incompat                     (130),            -- security incompatibility 
+ 				r-sec-violation                    (131),            -- security violation 
+ 				r-ecp-longdist                     (132),            -- ecp rejected or retries exceeded 
+ 				r-dup-wwn                          (133),            -- duplication wwn in fabric 
+ 				r-eport-isolated                   (134),            -- eport isolated 
+ 				r-ad                               (135),            -- ad header conflict 
+ 				r-esc-did-offset                   (136),            -- domain id offset conflict 
+ 				r-esc-etiz                         (137),            -- esc enhanced ti zone conflict 
+ 				r-esc-fid                          (138),            -- esc fabric id conflict 
+ 				r-safe-zone                        (139),            -- mcdata safezone conflict 
+ 				r-vf                               (140),            -- vf ad conflict 
+ 				r-vf-bs-incompat                   (141),            -- vf bs conflict 
+ 				r-pers-pid-on-lport                (142),            -- persistent pid isnt supported on l port 
+ 				r-pers-pid-portaddr-collision      (143),            -- pers pid and port address binding collision 
+ 				r-pers-pid-port-on-same-area       (144),            -- another port online with same area 
+ 				r-pers-pid-port-addr-bnd           (145),            -- pers pid and port address binding collision port addr bound 
+ 				r-msfr                             (146),            -- msfr/rd conflict 
+ 				r-sw-halfbw-lic                    (147),            -- half bandwidth license only 
+ 				r-1g-mode-incompat                 (148),            -- the port is incompatible in the 1g mode 
+ 				r-10g-mode-incompat                (149),            -- the port is incompatible in the 10g mode 
+ 				r-dual-mode-incompat               (150),            -- the port is incompatible in the 10g mode 
+ 				r-implict-plt-service-block        (151),            -- enabling of platform service implicitly was blocked 
+ 				r-port-st-th-exceeded              (152),            -- port class st threshold exceeded 
+ 				r-port-c3txto-th-exceeded          (153),            -- port class c3 tx to threshold exceeded 
+ 				r-eport-not-supported-def-sw       (154),            -- uppermost 8 ports on quattro blade on dcx on def-sw have no eport supp 
+ 				r-eport-ll-th-exceeded             (155),            -- eport class link loss threshold exceeded 
+ 				r-eport-synl-th-exceeded           (156),            -- eport class sync loss threshold exceeded 
+ 				r-eport-pe-th-exceeded             (157),            -- eport class protocol errors threshold exceeded 
+ 				r-eport-inw-th-exceeded            (158),            -- eport class invalid words threshold exceeded 
+ 				r-eport-crc-th-exceeded            (159),            -- eport class invalid crc threshold exceeded 
+ 				r-eport-lr-th-exceeded             (160),            -- eport class link reset threshold exceeded 
+ 				r-eport-st-th-exceeded             (161),            -- eport class st threshold exceeded 
+ 				r-eport-c3txto-th-exceeded         (162),            -- eport class c3 tx to threshold exceeded 
+ 				r-fopport-ll-th-exceeded           (163),            -- fopport class link loss threshold exceeded 
+ 				r-fopport-synl-th-exceeded         (164),            -- fopport class sync loss threshold exceeded 
+ 				r-fopport-pe-th-exceeded           (165),            -- fopport class protocol errors threshold exceeded 
+ 				r-fopport-inw-th-exceeded          (166),            -- fopport class invalid words threshold exceeded 
+ 				r-fopport-crc-th-exceeded          (167),            -- fopport class invalid crc threshold exceeded 
+ 				r-fopport-lr-th-exceeded           (168),            -- fopport class link reset threshold exceeded 
+ 				r-fopport-st-th-exceeded           (169),            -- fopport class st threshold exceeded 
+ 				r-fopport-c3txto-th-exceeded       (170),            -- fopport class c3 tx to threshold exceeded 
+ 				r-fcuport-ll-th-exceeded           (171),            -- fcuport class link loss threshold exceeded 
+ 				r-fcuport-synl-th-exceeded         (172),            -- fcuport class sync loss threshold exceeded 
+ 				r-fcuport-pe-th-exceeded           (173),            -- fcuport class protocol errors threshold exceeded 
+ 				r-fcuport-inw-th-exceeded          (174),            -- fcuport class invalid words threshold exceeded 
+ 				r-fcuport-crc-th-exceeded          (175),            -- fcuport class invalid crc threshold exceeded 
+ 				r-fcuport-lr-th-exceeded           (176),            -- fcuport class link reset threshold exceeded 
+ 				r-fcuport-st-th-exceeded           (177),            -- fcuport class st threshold exceeded 
+ 				r-fcuport-c3txto-th-exceeded       (178),            -- fcuport class c3 tx to threshold exceeded 
+ 				r-port-no-area-avail-pers-disable  (179),              -- out of area 
+ 				r-eport-locked                     (180),            -- f-port disabled: due to port is locked as e-port 
+ 				r-enh-tizone                       (181),            -- enhanced ti zone conflict 
+ 				r-sw-port-swap-not-supported       (182),            -- port swap not supported in quattro 
+ 				r-fport-slow-drain-condition       (183),            -- f-port is experiencing slow drain condition 
+ 				r-esc-vlanid                       (184),            -- esc vlan id conflict 
+ 				r-port-recov-state                 (185),
+ 				r-port-auto-disable-losn           (186),            -- pad: loss of sync 
+ 				r-port-auto-disable-losg           (187),            -- pad: loss of signal 
+ 				r-port-auto-disable-ols            (188),            -- pad: offline primitive sequence 
+ 				r-port-auto-disable-nos            (189),            -- pad: not operational primitive sequence 
+ 				r-port-auto-disable-lip            (190),            -- pad: loop initialization primitive sequence 
+ 				r-port-compression                 (191),            -- compression configuration mismatch 
+ 				r-port-encryption                  (192),            -- encryption configuration mismatch 
+ 				r-port-enccomp-res                 (193),            -- encryption/compression enabled but resource unavailable 
+ 				r-port-decommissioned              (194),            -- used to denote a port that has been decommissioned 
+ 				r-port-dportmode                   (195),            -- d-port mode we will not allow flogi 
+ 				r-port-dport-incompat              (196),            -- d-port mode mismatch with a remot switch 
+ 				r-port-enc-comp-mismatch           (197),            -- encryption/compression config mismatch 
+ 				r-non-rcs-rem-dom                  (198),            -- remote domain is rcs incapable 
+ 				r-port-fips-comp-mismatch          (199),            -- fips compliance mismatch 
+ 				r-port-non-fips-comp-mismatch      (200),            -- non fips compliance mismatch 
+ 				r-port-enc-auth-disabled           (201),
+ 				r-port-disable-on-zeroize          (202),            -- matador zeroize disable 
+ 				r-cfgspeed-not-supported           (203),            -- port configured speed not supported 
+ 				r-fcr-ex-port-not-allowed          (204),            -- fc routing on this port not supported 
+ 				r-port-duplicate-pwwn              (205),            -- duplicate pwwn reason for respective port 
+ 				r-fcr-trunk-master-sfid-not-set    (206),            -- sfid is not set for master ex-port 
+ 				r-nportistrunkmem                  (207),            -- n-port is a trunk member 
+ 				r-policynotsupported               (208),            -- auto wwnloadbalance policies are not supported for a static f-port 
+ 				r-no-icl-license                   (209),            -- no icl license 
+ 				r-no-ten-gig-license               (210),            -- no ten gig license 
+ 				r-fdd-strict-scc-conflict          (211),            -- fdd strict scc policy conflict 
+ 				r-fdd-strict-dcc-conflict          (212),            -- fdd strict dcc policy conflict 
+ 				r-fdd-strict-fcs-conflict          (213),            -- fdd strict fcs policy conflict 
+ 				r-fdd-strict-fabwide-conflict      (214),            -- fdd strict fabwide policy conflict 
+ 				r-fdd-strict-pwd-conflict          (215),            -- fdd strict pwd policy conflict 
+ 				r-fcr-interop-conf                 (216),            -- ex interopmode mismatch 
+ 				r-port-enc-interop-conflict        (217),            -- ex-port in nos and encryption mismatch 
+ 				r-port-comp-interop-conflict       (218),            -- ex-port in nos and compression mismatch 
+ 				r-no-port-open-rsp                 (219),            -- fail to unblock the port after auth 
+ 				r-no-eicl-license                  (220),            -- eicl license not installed 
+ 				r-eicl-license-limited             (221),            -- icl links limit reached eicl license 
+ 				r-esc-base-sw                      (222),            -- base switch conflict 
+ 				r-sw-cpu-overload                  (223),            -- cpu overload 
+ 				r-no-icl-pod2-license              (224),            -- no 2nd pod icl license. used only in dcx+/pluto+ switch 
+ 				r-port-area-mismatch-pers-disable  (225),           -- port disabled due to area and full-fmt-area mismatch 
+ 				r-unauthorized-device              (226),            -- un-authorized device 
+ 				r-max-flogi-reached                (227),           -- max allowed flogis reached 
+ 				r-auth-not-supported-in-switch     (228),           -- port authentication not supported in connected switch f-port
+ 				r-icl-ex-on-non-vf                 (229),           -- EX-port on ICL is not supported in Non-VF mode
+				r-user-disabled-reason             (230)            -- Disable reason configured by the user
+				}
+			 MAX-ACCESS      not-accessible
+			 STATUS      current
+			 DESCRIPTION "It indicates the state change reason
+						 when port goes from online to offline"
+  ::= { swFCPortEntry 40 }
+
 
   --
   -- End of Fibre Channel Port group
@@ -2066,8 +2522,59 @@ SW-MIB DEFINITIONS ::= BEGIN
 				swFwEPortTrunkUtil(97),
 				swFwFCUPortTrunkUtil(98),
 				swFwFOPPortTrunkUtil(99),
-				swFwCPUMemUsage(100)
-
+				swFwCPUMemUsage(100),
+				filterFmCfg1(101),
+				filterFmCfg2(102),
+				filterFmCfg3(103),
+				filterFmCfg4(104),
+				filterFmCfg5(105),
+				filterFmCfg6(106),
+				filterFmCfg7(107),
+				filterFmCfg8(108),
+				filterFmCfg9(109),
+				filterFmCfg10(110),
+				filterFmCfg11(111),
+				filterFmCfg12(112),
+				filterFmCfg13(113),
+				filterFmCfg14(114),
+				filterFmCfg15(115),
+				filterFmCfg16(116),
+				filterFmCfg17(117),
+				filterFmCfg18(118),
+				filterFmCfg19(119),
+				filterFmCfg20(120),
+				filterFmCfg21(121),
+				filterFmCfg22(122),
+				filterFmCfg23(123),
+				filterFmCfg24(124),
+				filterFmCfg25(125),
+				filterFmCfg26(126),
+				filterFmCfg27(127),
+				filterFmCfg28(128),
+				filterFmCfg29(129),
+				filterFmCfg30(130),
+				filterFmCfg31(131),
+				filterFmCfg32(132),
+				filterFmCfg33(133),
+				filterFmCfg34(134),
+				filterFmCfg35(135),
+				filterFmCfg36(136),
+				filterFmCfg37(137),
+				filterFmCfg38(138),
+				filterFmCfg39(139),
+				filterFmCfg40(140),
+				filterFmCfg41(141),
+				filterFmCfg42(142),
+				filterFmCfg43(143),
+				filterFmCfg44(144),
+				filterFmCfg45(145),
+				filterFmCfg46(146),
+				filterFmCfg47(147),
+				filterFmCfg48(148),
+				filterFmCfg49(149),
+				filterFmCfg50(150),
+				filterFmCfg51(151),
+				swFwPowerOnHours(152)
 				}
 
   -- write only variable for applying or canceling
@@ -2099,7 +2606,8 @@ SW-MIB DEFINITIONS ::= BEGIN
 				exceeded(3),
 				below(4),
 				above(5),
-				inBetween(6)
+				inBetween(6),
+				lowBufferCrsd(7)
 				}
  
   -- behavior type for thresholds
@@ -2135,7 +2643,7 @@ SW-MIB DEFINITIONS ::= BEGIN
   swFwFabricWatchLicense	OBJECT-TYPE
 	SYNTAX		SwFwLicense
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"tells if licensed or not."
   ::= { swFwSystem 1 }
 
@@ -2143,14 +2651,14 @@ SW-MIB DEFINITIONS ::= BEGIN
   swFwClassAreaTable	OBJECT-TYPE
 	SYNTAX		SEQUENCE OF	SwFwClassAreaEntry
 	MAX-ACCESS		not-accessible
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"The table of classes and areas."
   ::= { swFwSystem 2 }
 
   swFwClassAreaEntry	OBJECT-TYPE
 	SYNTAX		SwFwClassAreaEntry
 	MAX-ACCESS		not-accessible
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"An entry of the classes and areas."
 	INDEX		{ swFwClassAreaIndex }
   ::= { swFwClassAreaTable 1 }
@@ -2187,7 +2695,7 @@ SW-MIB DEFINITIONS ::= BEGIN
   swFwClassAreaIndex	OBJECT-TYPE
 	SYNTAX		SwFwClassesAreas
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"This object identifies the class type."
   ::= { swFwClassAreaEntry 1 }
 
@@ -2198,7 +2706,7 @@ SW-MIB DEFINITIONS ::= BEGIN
   swFwWriteThVals	OBJECT-TYPE
 	SYNTAX		SwFwWriteVals
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"This object is set to apply the value changes."
   ::= { swFwClassAreaEntry 2 }
 
@@ -2210,70 +2718,70 @@ SW-MIB DEFINITIONS ::= BEGIN
   swFwDefaultUnit		OBJECT-TYPE	
 	SYNTAX		DisplayString
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"A Default unit string name for a threshold area."
   ::= { swFwClassAreaEntry 3 }
 
   swFwDefaultTimebase	OBJECT-TYPE
 	SYNTAX		SwFwTimebase
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"A Default timebase for the current threshold counter."
   ::= { swFwClassAreaEntry 4 }
 
   swFwDefaultLow		OBJECT-TYPE
 	SYNTAX		Integer32 (0..2147483647)
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"A Default low threshold value."
   ::= { swFwClassAreaEntry 5 }
 
   swFwDefaultHigh		OBJECT-TYPE
 	SYNTAX		Integer32 (0..2147483647)
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"A Default high threshold value."
   ::= { swFwClassAreaEntry 6 }
 
   swFwDefaultBufSize		OBJECT-TYPE
 	SYNTAX		Integer32 (0..2147483647)
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"A Default buffer size value."
   ::= { swFwClassAreaEntry 7 }
 
   swFwCustUnit	OBJECT-TYPE	
 	SYNTAX		DisplayString
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"A custom unit string name for a threshold area."
   ::= { swFwClassAreaEntry 8 }
 
   swFwCustTimebase	OBJECT-TYPE
 	SYNTAX		SwFwTimebase
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"A custom timebase for the current threshold counter."
   ::= { swFwClassAreaEntry 9 }
 
   swFwCustLow		OBJECT-TYPE
 	SYNTAX		Integer32 (0..2147483647)
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"A custom low threshold value."
   ::= { swFwClassAreaEntry 10 }
 
   swFwCustHigh		OBJECT-TYPE
 	SYNTAX		Integer32 (0..2147483647)
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"A custom high threshold value."
   ::= { swFwClassAreaEntry 11 }
 
   swFwCustBufSize		OBJECT-TYPE
 	SYNTAX		Integer32 (0..2147483647)
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"A custom buffer size value."
   ::= { swFwClassAreaEntry 12 }
 
@@ -2282,7 +2790,7 @@ SW-MIB DEFINITIONS ::= BEGIN
   swFwThLevel		OBJECT-TYPE
 	SYNTAX		SwFwLevels
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"A level where all the threshold values are set at."
   ::= { swFwClassAreaEntry 13 }
 
@@ -2293,7 +2801,7 @@ SW-MIB DEFINITIONS ::= BEGIN
   swFwWriteActVals	OBJECT-TYPE
 	SYNTAX		SwFwWriteVals
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"This object is set to apply act value changes."
   ::= { swFwClassAreaEntry 14 }
 
@@ -2305,77 +2813,77 @@ SW-MIB DEFINITIONS ::= BEGIN
   swFwDefaultChangedActs	OBJECT-TYPE
 	SYNTAX		SwFwActs
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"Default action matrix for changed event."
   ::= { swFwClassAreaEntry 15 }
 	
   swFwDefaultExceededActs	OBJECT-TYPE
 	SYNTAX		SwFwActs
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"Default action matrix for exceeded event."
   ::= { swFwClassAreaEntry 16 }
 	
   swFwDefaultBelowActs	OBJECT-TYPE
 	SYNTAX		SwFwActs
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"Default action matrix for below event."
   ::= { swFwClassAreaEntry 17 }
 	
   swFwDefaultAboveActs	OBJECT-TYPE
 	SYNTAX		SwFwActs
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"Default action matrix for above event."
   ::= { swFwClassAreaEntry 18 }
 
   swFwDefaultInBetweenActs	OBJECT-TYPE
 	SYNTAX		SwFwActs
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"Default action matrix for in-between event."
   ::= { swFwClassAreaEntry 19 }
 
   swFwCustChangedActs	OBJECT-TYPE
 	SYNTAX		SwFwActs
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"custom action matrix for changed event."
   ::= { swFwClassAreaEntry 20 }
 	
   swFwCustExceededActs	OBJECT-TYPE
 	SYNTAX		SwFwActs
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"custom action matrix for exceeded event."
   ::= { swFwClassAreaEntry 21 }
 	
   swFwCustBelowActs	OBJECT-TYPE
 	SYNTAX		SwFwActs
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"custom action matrix for below event."
   ::= { swFwClassAreaEntry 22 }
 	
   swFwCustAboveActs	OBJECT-TYPE
 	SYNTAX		SwFwActs
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"custom action matrix for above event."
   ::= { swFwClassAreaEntry 23 }
 
   swFwCustInBetweenActs	OBJECT-TYPE
 	SYNTAX		SwFwActs
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"custom action matrix for in-between event."
   ::= { swFwClassAreaEntry 24 }
 
   swFwValidActs	OBJECT-TYPE
 	SYNTAX		SwFwActs
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"matrix of valid acts for an class/area."
   ::= { swFwClassAreaEntry 25 }
 
@@ -2384,7 +2892,7 @@ SW-MIB DEFINITIONS ::= BEGIN
   swFwActLevel	OBJECT-TYPE
 	SYNTAX		SwFwLevels
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"A level where all the actions are set at."
   ::= { swFwClassAreaEntry 26 }
 
@@ -2392,14 +2900,14 @@ SW-MIB DEFINITIONS ::= BEGIN
   swFwThresholdTable	OBJECT-TYPE
 	SYNTAX		SEQUENCE OF	SwFwThresholdEntry
 	MAX-ACCESS		not-accessible
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"The table of individual thresholds."
   ::= { swFwSystem 3 }
 
   swFwThresholdEntry	OBJECT-TYPE
 	SYNTAX		SwFwThresholdEntry
 	MAX-ACCESS		not-accessible
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"An entry of an individual threshold."
 	INDEX		{ swFwClassAreaIndex, swFwThresholdIndex }
   ::= { swFwThresholdTable 1 }
@@ -2422,7 +2930,7 @@ SW-MIB DEFINITIONS ::= BEGIN
   swFwThresholdIndex	OBJECT-TYPE
 	SYNTAX		Integer32 (0..2147483647)
 	MAX-ACCESS		read-only	
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"This object identifies the element index of
 				an threshold."
   ::= { swFwThresholdEntry 1 }
@@ -2430,7 +2938,7 @@ SW-MIB DEFINITIONS ::= BEGIN
   swFwStatus		OBJECT-TYPE
 	SYNTAX		SwFwStatus
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"This object identifies if an threshold is
 				enabled or disabled."
   ::= { swFwThresholdEntry 2 }
@@ -2438,70 +2946,70 @@ SW-MIB DEFINITIONS ::= BEGIN
   swFwName		OBJECT-TYPE
 	SYNTAX		DisplayString(SIZE(0..32))
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"This object is a name of the threshold."
   ::= { swFwThresholdEntry 3 }
 
   swFwLabel		OBJECT-TYPE
 	SYNTAX		DisplayString(SIZE(0..70))
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"This object is a label of the threshold."
   ::= { swFwThresholdEntry 4 }
 
   swFwCurVal		OBJECT-TYPE
 	SYNTAX		Integer32 (0..2147483647)
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"This object is a current counter of the threshold."
   ::= { swFwThresholdEntry 5 }
 
   swFwLastEvent	OBJECT-TYPE
 	SYNTAX		SwFwEvent
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"This object is a last event type of the threshold."
   ::= { swFwThresholdEntry 6 }
 
   swFwLastEventVal	OBJECT-TYPE
 	SYNTAX		Integer32 (0..2147483647)
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"This object is a last event value of the threshold."
   ::= { swFwThresholdEntry 7 }
 
   swFwLastEventTime	OBJECT-TYPE
 	SYNTAX		DisplayString(SIZE(0..32))
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"This object is a last event time of the threshold."
   ::= { swFwThresholdEntry 8 }
 
   swFwLastState	OBJECT-TYPE
 	SYNTAX		SwFwState
 	MAX-ACCESS		read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"This object is a last event state of the threshold."
   ::= { swFwThresholdEntry 9 }
 
   swFwBehaviorType	OBJECT-TYPE
 	SYNTAX		SwFwBehavior
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"A behavior of which the thresholds generate event."
   ::= { swFwThresholdEntry 10 }
 
   swFwBehaviorInt	OBJECT-TYPE
 	SYNTAX		Integer32 (0..2147483647)
 	MAX-ACCESS		read-write
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"A integer of which the thresholds generate continuous event."
   ::= { swFwThresholdEntry 11 }
 
   swFwLastSeverityLevel	OBJECT-TYPE
 	SYNTAX		SwSevType
 	MAX-ACCESS	read-only
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION	"This object is a last event severity level of the threshold."
   ::= { swFwThresholdEntry 12 }
 
@@ -2612,7 +3120,7 @@ SW-MIB DEFINITIONS ::= BEGIN
   swGroupTable  OBJECT-TYPE
         SYNTAX          SEQUENCE OF     SwGroupEntry
         MAX-ACCESS          not-accessible
-        STATUS          current
+        STATUS          obsolete
         DESCRIPTION     "The table of groups. This may not be available
                          on all versions of Fabric OS."
   ::= { swGroup 1 }
@@ -2620,7 +3128,7 @@ SW-MIB DEFINITIONS ::= BEGIN
   swGroupEntry  OBJECT-TYPE
         SYNTAX          SwGroupEntry
         MAX-ACCESS          not-accessible
-        STATUS          current
+        STATUS          obsolete
         DESCRIPTION     "An entry of table of groups."
         INDEX           { swGroupIndex }
   ::= { swGroupTable 1 }
@@ -2633,21 +3141,21 @@ SW-MIB DEFINITIONS ::= BEGIN
 swGroupIndex    OBJECT-TYPE
         SYNTAX          Integer32 (0..2147483647)
         MAX-ACCESS          read-only
-        STATUS          current
+        STATUS          obsolete
         DESCRIPTION     "This object is the group index starting from 1."
   ::= { swGroupEntry 1 }
 
  swGroupName    OBJECT-TYPE
         SYNTAX          OCTET STRING (SIZE (0..32))
         MAX-ACCESS          read-only
-        STATUS          current
+        STATUS          obsolete
         DESCRIPTION     "This object identifies the name of the group."
   ::= { swGroupEntry 2 }
 
   swGroupType   OBJECT-TYPE
         SYNTAX          OCTET STRING (SIZE (0..15))
         MAX-ACCESS          read-only
-        STATUS          current
+        STATUS          obsolete
         DESCRIPTION     "This object identifies the type of the group."
   ::= { swGroupEntry 3 }
 
@@ -2656,7 +3164,7 @@ swGroupIndex    OBJECT-TYPE
   swGroupMemTable       OBJECT-TYPE
         SYNTAX          SEQUENCE OF SwGroupMemEntry
         MAX-ACCESS          not-accessible
-        STATUS          current
+        STATUS          obsolete
         DESCRIPTION     "The table of members of all groups. This may not
                          be available on all versions of Fabric OS."
   ::= { swGroup 2 }
@@ -2664,7 +3172,7 @@ swGroupIndex    OBJECT-TYPE
   swGroupMemEntry       OBJECT-TYPE
         SYNTAX          SwGroupMemEntry
         MAX-ACCESS          not-accessible
-        STATUS          current
+        STATUS          obsolete
         DESCRIPTION     "An entry for a member of a group."
         INDEX           { swGroupId, swGroupMemWwn }
   ::= { swGroupMemTable 1 }
@@ -2678,7 +3186,7 @@ swGroupIndex    OBJECT-TYPE
   swGroupId OBJECT-TYPE
         SYNTAX          Integer32 (0..2147483647)
         MAX-ACCESS          read-only
-        STATUS          current
+        STATUS          obsolete
         DESCRIPTION     "This object identifies the Group Id  of the
                          member switch."
   ::= { swGroupMemEntry 1 }
@@ -2686,14 +3194,14 @@ swGroupIndex    OBJECT-TYPE
   swGroupMemWwn OBJECT-TYPE
         SYNTAX          FcWwn
         MAX-ACCESS          read-only
-        STATUS          current
+        STATUS          obsolete
         DESCRIPTION     "This object identifies the WWN of the member switch."
   ::= { swGroupMemEntry 2 }
 
   swGroupMemPos OBJECT-TYPE
         SYNTAX          Integer32 (0..2147483647)
         MAX-ACCESS          read-only
-        STATUS          current
+        STATUS          obsolete
         DESCRIPTION     "This object identifies position of the member
                          switch in the group. This is based on the order
                          that the switches were added in the group."
@@ -2707,14 +3215,14 @@ swGroupIndex    OBJECT-TYPE
  swBlmPerfALPAMntTable      OBJECT-TYPE
    SYNTAX          SEQUENCE OF SwBlmPerfALPAMntEntry
    MAX-ACCESS          not-accessible
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION  "ALPA monitoring counter Table. "
  ::= { swBlmPerfMnt 1}
 
  swBlmPerfALPAMntEntry      OBJECT-TYPE
    SYNTAX          SwBlmPerfALPAMntEntry
    MAX-ACCESS          not-accessible
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION     " ALPA monitoring counter for given ALPA."
    INDEX           { swBlmPerfAlpaPort,swBlmPerfAlpaIndx }
  ::= { swBlmPerfALPAMntTable 1}
@@ -2729,21 +3237,21 @@ swGroupIndex    OBJECT-TYPE
  swBlmPerfAlpaPort       OBJECT-TYPE
    SYNTAX          SwPortIndex
    MAX-ACCESS          read-only
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION     " This Object identifies the port index of the switch."
  ::= { swBlmPerfALPAMntEntry 1}
 
  swBlmPerfAlpaIndx           OBJECT-TYPE
  SYNTAX          Integer32 (1..126)
  MAX-ACCESS          read-only
- STATUS          current
+ STATUS          obsolete
  DESCRIPTION   " This Object identifies the ALPA index. There can be 126 ALPA values"
  ::= { swBlmPerfALPAMntEntry 2}
 
  swBlmPerfAlpa           OBJECT-TYPE
    SYNTAX          Integer32 (0..2147483647) 
    MAX-ACCESS          read-only
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION  " This Object identifies the ALPA values. These values
                   range between x'01' and x'EF'(1 to 239). ALPA value x'00'
                   is reserved for FL_Port
@@ -2753,7 +3261,7 @@ swGroupIndex    OBJECT-TYPE
  swBlmPerfAlpaCRCCnt     OBJECT-TYPE
    SYNTAX          OCTET STRING (SIZE(8))
    MAX-ACCESS          read-only
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION   "Get CRC count for given ALPA and port. This monitoring
 				  provides information on the number of CRC errors
 				  occurred on the frames destined to each possible ALPA
@@ -2764,14 +3272,14 @@ swGroupIndex    OBJECT-TYPE
  swBlmPerfEEMntTable        OBJECT-TYPE
    SYNTAX          SEQUENCE OF SwBlmPerfEEMntEntry
    MAX-ACCESS          not-accessible
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION     " End-to-End  monitoring counter Table"
  ::= { swBlmPerfMnt 2}
 
  swBlmPerfEEMntEntry        OBJECT-TYPE
    SYNTAX          SwBlmPerfEEMntEntry
    MAX-ACCESS          not-accessible
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION     "End-to-End monitoring counter for given port."
    INDEX               { swBlmPerfEEPort, swBlmPerfEERefKey}
  ::= { swBlmPerfEEMntTable 1}
@@ -2789,14 +3297,14 @@ swGroupIndex    OBJECT-TYPE
  swBlmPerfEEPort     OBJECT-TYPE
    SYNTAX          SwPortIndex
    MAX-ACCESS          read-only
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION    " This object identifies the port number of the switch."
  ::= { swBlmPerfEEMntEntry 1}
 
  swBlmPerfEERefKey      OBJECT-TYPE
    SYNTAX          Integer32 (1..8)
    MAX-ACCESS          read-only
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION     "This object identifies the reference number
 					of the counter. This reference is  number assigned
                     when a filter is created. In SNMP Index start one
@@ -2806,7 +3314,7 @@ swGroupIndex    OBJECT-TYPE
  swBlmPerfEECRC      OBJECT-TYPE
    SYNTAX          OCTET STRING (SIZE(8))
    MAX-ACCESS          read-only
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION    " Get End to End CRC error for the frames that matched
 					the SID-DID pair."
 ::= { swBlmPerfEEMntEntry 3}
@@ -2815,7 +3323,7 @@ swGroupIndex    OBJECT-TYPE
  swBlmPerfEEFCWRx        OBJECT-TYPE
    SYNTAX          OCTET STRING (SIZE(8))
    MAX-ACCESS          read-only
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION     "Get End to End count of Fibre Channel words (FCW),
    					received by the port, that matched
 				    the SID-DID pair. "
@@ -2824,7 +3332,7 @@ swGroupIndex    OBJECT-TYPE
  swBlmPerfEEFCWTx        OBJECT-TYPE
    SYNTAX          OCTET STRING (SIZE(8))
    MAX-ACCESS          read-only
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION     "Get End to End count of Fibre Channel words (FCW),
 					transmitted by the port, that matched the SID-DID pair. "
  ::= { swBlmPerfEEMntEntry 5}
@@ -2832,7 +3340,7 @@ swGroupIndex    OBJECT-TYPE
  swBlmPerfEESid      OBJECT-TYPE
    SYNTAX          Integer32 (0..2147483647)
    MAX-ACCESS          read-only
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION     " Gets SID info by reference number. SID (Source Identifier)
           			is a 3-byte field in the frame header used to indicate the
 					address identifier of the N-Port from which the frame was sent."
@@ -2841,7 +3349,7 @@ swGroupIndex    OBJECT-TYPE
  swBlmPerfEEDid      OBJECT-TYPE
    SYNTAX          Integer32 (0..2147483647)
    MAX-ACCESS          read-only
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION     "Gets DID info by reference number.
                     DID (Destination Identifier) is a 3-byte field in the
                     frame header used to indicate the address identifier of 
@@ -2851,14 +3359,14 @@ swGroupIndex    OBJECT-TYPE
  swBlmPerfFltMntTable       OBJECT-TYPE
    SYNTAX          SEQUENCE OF SwBlmPerfFltMntEntry
    MAX-ACCESS          not-accessible
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION     "Filter based monitoring counter."
  ::= { swBlmPerfMnt 3}
 
  swBlmPerfFltMntEntry       OBJECT-TYPE
    SYNTAX          SwBlmPerfFltMntEntry
    MAX-ACCESS          not-accessible
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION     " Filter base monitoring counter for given port."
    INDEX           { swBlmPerfFltPort,swBlmPerfFltRefkey}
  ::= { swBlmPerfFltMntTable 1}
@@ -2873,14 +3381,14 @@ swGroupIndex    OBJECT-TYPE
  swBlmPerfFltPort        OBJECT-TYPE
    SYNTAX          SwPortIndex
    MAX-ACCESS          read-only
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION     "This object identifies the port number of the switch."
  ::= { swBlmPerfFltMntEntry 1}
 
  swBlmPerfFltRefkey      OBJECT-TYPE
    SYNTAX          Integer32 (1..8)
    MAX-ACCESS          read-only
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION    " This object identifies the reference number of the filter.
 					This reference number is assigned when a filter is created.
 					In SNMP Index start one instead of 0, add one to actual ref key"
@@ -2889,7 +3397,7 @@ swGroupIndex    OBJECT-TYPE
  swBlmPerfFltCnt     OBJECT-TYPE
    SYNTAX          OCTET STRING (SIZE(8))
    MAX-ACCESS          read-only
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION     "Get statistics of filter based monitor.
  					Filter based monitoring provides information
     				about a filter hit count such as
@@ -2901,7 +3409,7 @@ swGroupIndex    OBJECT-TYPE
  swBlmPerfFltAlias       OBJECT-TYPE
    SYNTAX          DisplayString(SIZE(0..20))
    MAX-ACCESS          read-only
-   STATUS          current
+   STATUS          obsolete
    DESCRIPTION    " Alias name for the filter."
  ::= { swBlmPerfFltMntEntry 4}
 
@@ -3033,10 +3541,10 @@ swTrunkMaster			OBJECT-TYPE
 swTopTalkerMntMode       OBJECT-TYPE
   SYNTAX                INTEGER {
                        fabricmode  (1),
-                       fportmode   (2)
+                       portmode   (2)
                        } 
   MAX-ACCESS               read-only
-  STATUS                 current
+  STATUS                 obsolete
   DESCRIPTION          "Gives the mode in which toptalker
 						is installed"
     ::= { swTopTalker 1}
@@ -3044,7 +3552,7 @@ swTopTalkerMntMode       OBJECT-TYPE
 swTopTalkerMntNumEntries   OBJECT-TYPE
   SYNTAX                 Integer32 (1..32) 
   MAX-ACCESS               read-only
-  STATUS                  current
+  STATUS                  obsolete
   DESCRIPTION           "Gives the number of toptalking
 						flows"
     ::= { swTopTalker 2}
@@ -3052,14 +3560,14 @@ swTopTalkerMntNumEntries   OBJECT-TYPE
 swTopTalkerMntTable       OBJECT-TYPE
   SYNTAX            SEQUENCE OF SwTopTalkerMntEntry
   MAX-ACCESS             not-accessible 
-  STATUS                 current 
+  STATUS                 obsolete
   DESCRIPTION           "Table to display toptalkingflows"
     ::= { swTopTalker 3}
 
  swTopTalkerMntEntry      OBJECT-TYPE
   SYNTAX               SwTopTalkerMntEntry
   MAX-ACCESS              not-accessible
-  STATUS                  current
+  STATUS                  obsolete
   DESCRIPTION            "Entry for the toptalker table"
   INDEX{ swTopTalkerMntIndex}
     ::= { swTopTalkerMntTable 1} 
@@ -3077,7 +3585,7 @@ swTopTalkerMntTable       OBJECT-TYPE
    swTopTalkerMntIndex     OBJECT-TYPE
     SYNTAX                Integer32 (1..32)
     MAX-ACCESS             read-only
-    STATUS                 current
+    STATUS                obsolete
     DESCRIPTION           "This object identifies the list/object
 							entry"
       ::= { swTopTalkerMntEntry 1}
@@ -3086,7 +3594,7 @@ swTopTalkerMntTable       OBJECT-TYPE
    swTopTalkerMntPort      OBJECT-TYPE
     SYNTAX                 Integer32 (1..32) 
     MAX-ACCESS             read-only
-    STATUS                  current
+    STATUS                  obsolete
     DESCRIPTION            "This object identifies the switch port
                             number on which the f-port mode toptalker
                             is added."
@@ -3095,35 +3603,35 @@ swTopTalkerMntTable       OBJECT-TYPE
    swTopTalkerMntSpid      OBJECT-TYPE
     SYNTAX               Integer32 (1..32) 
     MAX-ACCESS             read-only
-    STATUS                  current
+    STATUS                  obsolete
     DESCRIPTION            "This object identifies the SID of the host"
       ::= { swTopTalkerMntEntry 3}
 
    swTopTalkerMntDpid       OBJECT-TYPE
     SYNTAX                Integer32 (1..32) 
     MAX-ACCESS             read-only
-    STATUS                  current
+    STATUS                  obsolete
     DESCRIPTION              "This object identifies the DID of the SID-DID pair"
       ::= { swTopTalkerMntEntry 4}
 
    swTopTalkerMntflow       OBJECT-TYPE
      SYNTAX                  Integer32 (1..32)
      MAX-ACCESS              read-only
-     STATUS                 current
+     STATUS                 obsolete
      DESCRIPTION          "This object identifies the traffic flow in MB/sec"
 	   ::= { swTopTalkerMntEntry 5}
 
   swTopTalkerMntSwwn      OBJECT-TYPE
     SYNTAX               FcWwn
     MAX-ACCESS             read-only
-    STATUS                  current
+    STATUS                  obsolete
     DESCRIPTION            "This object identifies the SID in WWN format of the host"
       ::= { swTopTalkerMntEntry 6}
 
    swTopTalkerMntDwwn       OBJECT-TYPE
     SYNTAX                FcWwn
     MAX-ACCESS             read-only
-    STATUS                  current
+    STATUS                  obsolete
     DESCRIPTION              "This object identifies the DID in WWN format of the SID-DID pair"
       ::= { swTopTalkerMntEntry 7}
 	
@@ -3146,7 +3654,8 @@ swTopTalkerMntTable       OBJECT-TYPE
     SYNTAX      Integer32 (1..100)
     MAX-ACCESS      read-only
     STATUS          current
-    DESCRIPTION     "CPU usage limit"
+    DESCRIPTION     "CPU usage limit. If MAPS is enabled, then this 
+					 object is not supported and return 0 value."
      ::= { swCpuOrMemoryUsage 3 }
 
     swCpuPollingInterval  OBJECT-TYPE
@@ -3158,12 +3667,18 @@ swTopTalkerMntTable       OBJECT-TYPE
      ::= { swCpuOrMemoryUsage 4 }
 
     swCpuAction  OBJECT-TYPE
-    SYNTAX        Integer32 (0..3)
-    UNITS           "seconds"
+    SYNTAX        INTEGER {
+					none (0),
+					raslog (1),
+					snmp (2),
+					raslogandSnmp (3)
+				}
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION     "Specifies  the  actions to be taken if system
-	             resources  exceed  the  specified  threshold."
+		             resources  exceed  the  specified  threshold.
+					 If MAPS is enabled, then this object is not 
+					 supported and return 0 value."
      ::= { swCpuOrMemoryUsage 5 }
 
     swMemUsage   OBJECT-TYPE
@@ -3196,12 +3711,18 @@ swTopTalkerMntTable       OBJECT-TYPE
      ::= { swCpuOrMemoryUsage 9 }
 
     swMemAction  OBJECT-TYPE
-    SYNTAX      Integer32 (0..3)
-    UNITS           "seconds"
+    SYNTAX      INTEGER {
+					none (0),
+					raslog (1),
+					snmp (2),
+					raslogandSnmp (3)
+				}
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION     "Specifies  the  actions to be taken if system
-	             resources  exceed  the  specified  threshold."
+	             	 resources  exceed  the  specified  threshold.
+					 If MAPS is enabled, then this object is not 
+					 supported and return 0 value."
      ::= { swCpuOrMemoryUsage 10 }
 
 
@@ -3209,7 +3730,9 @@ swTopTalkerMntTable       OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS      read-only
     STATUS          current
-    DESCRIPTION     "Low memory usage limit"
+    DESCRIPTION     "Low memory usage limit. If MAPS is enabled, 
+					 then this object is not supported and 
+					 return 0 value."
      ::= { swCpuOrMemoryUsage 11 }
 
 
@@ -3217,7 +3740,9 @@ swTopTalkerMntTable       OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS      read-only
     STATUS          current
-    DESCRIPTION     "High memory usage limit"
+    DESCRIPTION     "High memory usage limit. If MAPS is enabled, 
+					 then this object is not supported and 
+					 return 0 value."
      ::= { swCpuOrMemoryUsage 12 }
 
 
@@ -3247,7 +3772,21 @@ swTopTalkerMntTable       OBJECT-TYPE
         swConnUnitBadEOF  OCTET STRING,
         swConnUnitLCRX  OCTET STRING,
         swConnUnitRDYPriority  OCTET STRING,
-		swConnUnitLli OCTET STRING
+		swConnUnitLli OCTET STRING,
+		swConnUnitInterrupts OCTET STRING,
+        swConnUnitUnknownInterrupts OCTET STRING,
+        swConnUnitTimedOut  OCTET STRING,
+        swConnUnitProcRequired OCTET STRING,
+        swConnUnitTxBufferUnavailable OCTET STRING,
+        swConnUnitStateChange OCTET STRING,
+        swConnUnitC3DiscardDueToRXTimeout OCTET STRING,
+        swConnUnitC3DiscardDueToDestUnreachable OCTET STRING,
+        swConnUnitC3DiscardDueToTXTimeout OCTET STRING,
+        swConnUnitC3DiscardOther    OCTET STRING,
+		swConnUnitPCSErrorCounter OCTET STRING,
+		swConnUnitUnroutableFrameCounter OCTET STRING,
+		swConnUnitFECCorrectedCounter OCTET STRING,
+		swConnUnitFECUnCorrectedCounter OCTET STRING
     }
   swConnUnitCRCWithBadEOF OBJECT-TYPE
     SYNTAX OCTET STRING (SIZE (8))
@@ -3339,6 +3878,7 @@ swTopTalkerMntTable       OBJECT-TYPE
     DESCRIPTION "This counter is incremented when the port receives a frame with an SID and DID that are not zoned together."
             ::= { swConnUnitPortStatEntry 13 }
 
+
   swConnUnitLunZoneMiss OBJECT-TYPE
     SYNTAX OCTET STRING (SIZE (8))
     MAX-ACCESS read-only
@@ -3373,7 +3913,106 @@ swTopTalkerMntTable       OBJECT-TYPE
     STATUS current
     DESCRIPTION "The number low level interrupts generated by the physical and link layer."
             ::= { swConnUnitPortStatEntry 18 }	
---
+
+  swConnUnitInterrupts OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION " This represents all the interrupts received on a port.
+    Includes LLI, unknown etc"
+            ::= { swConnUnitPortStatEntry 19 }
+
+  swConnUnitUnknownInterrupts OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION " Represents all the unknown interrupts received on a port."
+            ::= { swConnUnitPortStatEntry 20 }
+
+  swConnUnitTimedOut OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Represents number of timed out frames due to any reason."
+            ::= { swConnUnitPortStatEntry 21 }
+
+  swConnUnitProcRequired OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Represents number of frames trapped by CPU."
+            ::= { swConnUnitPortStatEntry 22 }
+
+  swConnUnitTxBufferUnavailable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of times port failed to transmit frames ."
+            ::= { swConnUnitPortStatEntry 23 }
+
+ swConnUnitStateChange OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION " Number of times port has gone to offline, online, and
+    faulty state."
+            ::= { swConnUnitPortStatEntry 24 }
+
+ swConnUnitC3DiscardDueToRXTimeout OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Class 3 receive frames discarded due to timeout."
+            ::= { swConnUnitPortStatEntry 25 }
+
+ swConnUnitC3DiscardDueToDestUnreachable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Class 3 frames discarded due to destination unreachable."
+            ::= { swConnUnitPortStatEntry 26 }
+
+ swConnUnitC3DiscardDueToTXTimeout OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Class 3 transmit frames discarded due to timeout."
+            ::= { swConnUnitPortStatEntry 27 }
+
+ swConnUnitC3DiscardOther OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Class 3 frames discarded due to unknow reasons."
+            ::= { swConnUnitPortStatEntry 28 }
+
+ swConnUnitPCSErrorCounter OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Physical coding sublayer(PCS) block errors. It records the encoding violations on 10G or 16Gbps port."
+            ::= { swConnUnitPortStatEntry 29 }
+
+ swConnUnitUnroutableFrameCounter OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (8))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "It indicates unroutable frame counter"
+		::= { swConnUnitPortStatEntry 30 }
+
+ swConnUnitFECCorrectedCounter OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "It indicates Forward Error Correction Corrected Blocks count.FEC feature is only applicable to 10G/16G platforms."
+            ::= { swConnUnitPortStatEntry 31 }
+
+ swConnUnitFECUnCorrectedCounter OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "It indicates Forward Error Correction UnCorrected Blocks count.FEC feature is only applicable to 10G/16G platforms."
+            ::= { swConnUnitPortStatEntry 32 }
 -- Enterprise Specific Traps for Fibre Channel Switch (sw).
 --
 
@@ -3383,14 +4022,14 @@ swTopTalkerMntTable       OBJECT-TYPE
 	::= { sw 0 }
 
   swFault		NOTIFICATION-TYPE
-	OBJECTS	{ swDiagResult, swSsn , swGroupName, swGroupType, swGroupMemPos
+	OBJECTS	{ swDiagResult, swSsn 
 			}
 	STATUS	obsolete
 	DESCRIPTION	"Obsoleted this trap as firmware doesn't support this trap.
 		A swFault(1) is generated whenever the diagnostics
 		detects a fault with the switch."
 	--#TYPE		"Switch is faulty."
-	--#SUMMARY	"Faulty reason: %d and SSN is #%s,GroupName %s,GroupType %s,GroupMemPosition %d""
+	--#SUMMARY	"Faulty reason: %d and SSN is #%s,GroupName %s,GroupType %s,GroupMemPosition %d"
 	--#ARGUMENTS	{ 0, 1, 2, 3, 4}
 	--#SEVERITY	CRITICAL
 	--#TIMEINDEX	1
@@ -3399,8 +4038,7 @@ swTopTalkerMntTable       OBJECT-TYPE
 
   swSensorScn	NOTIFICATION-TYPE
 	OBJECTS	{ swSensorStatus, swSensorIndex, swSensorType,
-					swSensorValue, swSensorInfo, swSsn,
-					swGroupName, swGroupType, swGroupMemPos
+					swSensorValue, swSensorInfo, swSsn
 					}
 	STATUS	current
 	DESCRIPTION	"A swSensorScn(2) is generated whenever an
@@ -3420,19 +4058,14 @@ swTopTalkerMntTable       OBJECT-TYPE
 
    swFCPortScn		NOTIFICATION-TYPE
 	OBJECTS	{ swFCPortOpStatus, swFCPortIndex, swFCPortName,
-					swSsn, swFCPortFlag, swGroupName, swGroupType,
-					swGroupMemPos, swVfId }
+					swFCPortWwn, swFCPortPrevType, swFCPortBrcdType,
+					swSsn, swFCPortFlag, swFCPortDisableReason, swVfId }
 	STATUS	current
-	DESCRIPTION	"A swFCPortScn(3) is generated whenever an FC_Port
-		changes its operational state. For instance, the FC_Port
-		goes from on-line to offline. The VarBind in the Trap Data
-		Unit shall contain the corresponding instance of the
-		FC_Port's operational status, index, swFCPortName,swSsn and
-		swFCPortFlag. swSsn is optional varbind sent when swExtTrap
-		is also enabled.swVfId is optional if VF is enabled.
-		The three arguments swGroupName, swGroupType,
-		swGroupMemPos belong to swGroup table which is obsolete
-		and not implemented."
+	DESCRIPTION	"This trap is sent whenever an FC port operational status or
+                its type changed. The events that trigger this trap are
+                port goes to online/offline, port type changed to 
+				E-port/F-port/FL-port. swFCPortName and swSsn are optional 
+				varbind in the trap PDU" 
 	--#TYPE		"A Fibre Channel Port changed its operational state."
 	--#SUMMARY	"Port Index %d changed state to %d  Port Name: %s and SSN is #%s"
 	--#ARGUMENTS	{ 1, 0, 2, 3 }
@@ -3444,12 +4077,12 @@ swTopTalkerMntTable       OBJECT-TYPE
    swEventTrap           NOTIFICATION-TYPE
         OBJECTS       { swEventIndex, swEventTimeInfo, swEventLevel,
                           swEventRepeatCount, swEventDescr, swSsn,
-						  swGroupName,swGroupType,swGroupMemPos,swVfId }
+						  swVfId }
         STATUS      current
         DESCRIPTION     "This trap is generated when an event whose
                 level at or below swEventTrapLevel occurs."
 	--#TYPE		"A firmware event has been logged"
-	--#SUMMARY	"Event %d: %s (severity level %d) - %s SSN is #%s"
+	--#SUMMARY	"Event Index %d: %s (severity level %d) - %s SSN is #%s"
 	--#ARGUMENTS	{ 0, 1, 2, 4, 5 }
 	--#SEVERITY	INFORMATIONAL
 	--#TIMEINDEX	1
@@ -3469,16 +4102,13 @@ swTopTalkerMntTable       OBJECT-TYPE
 					swFwLastState,
 					swFwLastSeverityLevel,
 					swSsn,
-				    swGroupName,
-					swGroupType,
-					swGroupMemPos,
 					swVfId	
 					}
-	STATUS	current
-	DESCRIPTION	"trap to be sent by Fabric Watch to notify of an event"
+	STATUS	obsolete
+	DESCRIPTION	"trap to be sent by Fabric Watch to notify of an event."
 	--#TYPE		"Fabric Watch has generated an event"
-	--#SUMMARY	"Threshold %s in Class/Area %d at index %d has generated event %d with %d on %s. This event is %d. This event label is %d, event severity level is %d and SSN is #%s"
-	--#ARGUMENTS	{ 2, 0, 1, 6, 4, 5, 7, 3, 8, 9 }
+	--#SUMMARY	"Threshold %s in Class/Area %d at index %d has generated event %d with %d on %s. The event severity is %d. trap severity level is %d and SSN is #%s"
+	--#ARGUMENTS	{ 2, 0, 1, 6, 4, 5, 7, 8, 9 }
 	--#SEVERITY	WARNING
 	--#TIMEINDEX	1
 	--#STATE	OPERATIONAL
@@ -3487,12 +4117,10 @@ swTopTalkerMntTable       OBJECT-TYPE
   -- traps for track changes subsystem
 
   swTrackChangesTrap	NOTIFICATION-TYPE
-	OBJECTS	{	swTrackChangesInfo, swSsn,
-					swGroupName, swGroupType, swGroupMemPos,
-					swVfId
+	OBJECTS	{	swTrackChangesInfo, swSsn, swVfId
 					}
-	STATUS	current
-	DESCRIPTION	"trap to be sent for tracking login/logout/config changes"
+	STATUS	obsolete
+	DESCRIPTION	"trap to be sent for tracking login/logout/config changes."
 	--#TYPE		"Track changes has generated a trap"
 	--#SUMMARY	"%s and SSN is #%s"
 	--#ARGUMENTS	{ 0, 1 }
@@ -3507,8 +4135,8 @@ swTopTalkerMntTable       OBJECT-TYPE
      DESCRIPTION     "This trap is generated when an ipv6 address
                 status change event occurs."
 	--#TYPE		"IPv6 address status change has generated a trap"
-	--#SUMMARY	
-	--#ARGUMENTS	
+	--#SUMMARY	"IPv6 address change event has occured"	
+	--#ARGUMENTS	{}	
 	--#SEVERITY	INFORMATIONAL
 	--#TIMEINDEX	1
 	--#STATE	OPERATIONAL
@@ -3532,8 +4160,8 @@ swTopTalkerMntTable       OBJECT-TYPE
 	STATUS current
 	DESCRIPTION	"trap to be sent for tracking fabric reconfiguration"
 	--#TYPE		"Fabric reconfiguration has generated a trap"
-	--#SUMMARY	
-	--#ARGUMENTS	
+	--#SUMMARY	"Fabric reconfiguration has occured"	
+	--#ARGUMENTS	{}	
 	--#SEVERITY	INFORMATIONAL
 	--#TIMEINDEX	1
 	--#STATE	OPERATIONAL
@@ -3545,8 +4173,8 @@ swTopTalkerMntTable       OBJECT-TYPE
 	STATUS current
 	DESCRIPTION	"trap to be sent for tracking segmentation"
 	--#TYPE		"Fabric segmentation has generated a trap"
-	--#SUMMARY	
-	--#ARGUMENTS	
+	--#SUMMARY	"Fabric segmentation event has occured"	
+	--#ARGUMENTS	{}	
 	--#SEVERITY	INFORMATIONAL
 	--#TIMEINDEX	1
 	--#STATE	OPERATIONAL
@@ -3556,6 +4184,47 @@ swTopTalkerMntTable       OBJECT-TYPE
 	STATUS current
 	DESCRIPTION "THIS IS INTERNAL TRAP"
 	::= { swTrapsV2 11 }
+
+  swStateChangeTrap  NOTIFICATION-TYPE
+    OBJECTS { swOperStatus, swVfId }
+    STATUS current
+    DESCRIPTION "This trap is sent whenever switch state changes to online/offline"
+    ::= { swTrapsV2 12 }
+
+  swPortMoveTrap  NOTIFICATION-TYPE
+    OBJECTS { swPortList, swVfId}
+    STATUS current
+    DESCRIPTION "This trap is sent when ports are moved from one switch to another"
+    ::= { swTrapsV2 13 }
+
+  swBrcdGenericTrap NOTIFICATION-TYPE
+    OBJECTS { swBrcdTrapBitMask, swBrcdBitObjVal, swVfId}
+    STATUS current
+    DESCRIPTION "This trap is sent when there is any one of the following 
+                 event occured. 
+				 1. fabric change
+				 2. device change
+			     3. Fapwwn change
+				 4. fdmi event
+				 5. Routing Policy change
+				 6. Diagnostics Port Configuration Change
+				 7. Polling status
+				 8. Dynamic Port Name change
+				 9. Dynamic Port Name Feature Enable/Disable Event
+				 This Trap is strictly for brocade's internal usage."
+    ::= { swTrapsV2 14 }
+
+  swDeviceStatusTrap NOTIFICATION-TYPE
+	OBJECTS { swFCPortSpecifier, swDeviceStatus, swEndDevicePortID, swNsNodeName}
+	STATUS current
+	DESCRIPTION "This trap is sent whenever there is a device login or logout"
+	::= { swTrapsV2 15 }
+
+	swZoneConfigChangeTrap NOTIFICATION-TYPE
+		OBJECTS { swVfId }
+		STATUS current
+		DESCRIPTION "This trap is sent whenever there is change in local zone database."
+		::= { swTrapsV2 16 }
 
    -- end of Enterprise Specific Traps for Fibre Channel Switch (sw)
 END

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * NetgearFailedUserLoginTest.php
  *
@@ -24,7 +25,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class NetgearFailedUserLoginTest extends SnmpTrapTestCase
+final class NetgearFailedUserLoginTest extends SnmpTrapTestCase
 {
     public function testManagedSeries(): void
     {
