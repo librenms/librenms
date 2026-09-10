@@ -43,6 +43,7 @@ class SnmpQuery implements SnmpQueryInterface
 {
     private Device $device;
     private string $context = '';
+    private string $v3ContextPrefix = '';
     private SnmpQueryOptions $options;
     private bool $abort = false;
     private bool $cache = false;
@@ -110,11 +111,8 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function context(string $context, ?string $v3_prefix = null): SnmpQueryInterface
     {
-        if ($context && $this->device->snmpver === 'v3') {
-            $context = $v3_prefix . $context;
-        }
-
         $this->context = $context;
+        $this->v3ContextPrefix = $v3_prefix ?? '';
 
         return $this;
     }
@@ -235,7 +233,8 @@ class SnmpQuery implements SnmpQueryInterface
     {
         $config = $this->device->toSnmpConfig();
         $target = $this->device->pollerTarget();
-        $this->options->mibDirs = Mib::directories($this->device->os, $this->options->mibDirs);
+        $this->options->mibDirs = Mib::directories($this->device->os ?? 'generic', $this->options->mibDirs);
+        $this->options->context = $config->version === 'v3' ? $this->v3ContextPrefix . $this->context : $this->context;
         $chunks = $this->limitOids($this->parseOid($oid), $config);
         $response = new SnmpResponse('');
 
@@ -266,12 +265,14 @@ class SnmpQuery implements SnmpQueryInterface
     {
         $config = $this->device->toSnmpConfig();
         $target = $this->device->pollerTarget();
-        $this->options->mibDirs = Mib::directories($this->device->os, $this->options->mibDirs);
+        $os = $this->device->os ?? 'generic';
+        $this->options->mibDirs = Mib::directories($os, $this->options->mibDirs);
+        $this->options->context = $config->version === 'v3' ? $this->v3ContextPrefix . $this->context : $this->context;
         $oids = $this->parseOid($oid);
         $response = new SnmpResponse('');
 
         foreach ($oids as $singleOid) {
-            $options = $this->options->createPerWalkInstance($this->device->os, $singleOid);
+            $options = $this->options->createPerWalkInstance($os, $singleOid);
             $res = $this->execWithCache('snmpwalk', [$singleOid], $options, fn () => $this->backend->walk($target, $singleOid, $config, $options));
             $response = $response->append($res);
 
@@ -299,7 +300,8 @@ class SnmpQuery implements SnmpQueryInterface
         $config = $this->device->toSnmpConfig();
         $target = $this->device->pollerTarget();
         $chunks = $this->limitOids($this->parseOid($oid), $config);
-        $this->options->mibDirs = Mib::directories($this->device->os, $this->options->mibDirs);
+        $this->options->mibDirs = Mib::directories($this->device->os ?? 'generic', $this->options->mibDirs);
+        $this->options->context = $config->version === 'v3' ? $this->v3ContextPrefix . $this->context : $this->context;
         $response = new SnmpResponse('');
 
         foreach ($chunks as $chunk) {
@@ -330,7 +332,7 @@ class SnmpQuery implements SnmpQueryInterface
             return Str::start($oid, '.'); // numeric to numeric optimization
         }
 
-        $this->options->mibDirs = Mib::directories($this->device->os, $this->options->mibDirs);
+        $this->options->mibDirs = Mib::directories($this->device->os ?? 'generic', $this->options->mibDirs);
 
         return $this->translateBackend->translate($oid, $this->options);
     }
@@ -416,16 +418,20 @@ class SnmpQuery implements SnmpQueryInterface
      */
     private function getCacheKey(string $type, array $oids): string
     {
-        $oidsStr = implode(',', $oids);
-        $optionsStr = implode(',', [
-            (string) $this->options->oidFormat->name,
-            (int) $this->options->numericIndexes,
-            (int) $this->options->numericEnums,
-            (int) $this->options->tolerateUnorderedIndexes,
-            implode(';', $this->options->mibs),
-            implode(';', $this->options->mibDirs),
+        return implode('|', [
+            $type,
+            $this->device->hostname,
+            $this->device->community,
+            $this->options->context,
+            implode(',', $oids),
+            implode(',', [
+                $this->options->oidFormat->name,
+                (int) $this->options->numericIndexes,
+                (int) $this->options->numericEnums,
+                (int) $this->options->tolerateUnorderedIndexes,
+                implode(';', $this->options->mibs),
+                implode(';', $this->options->mibDirs),
+            ]),
         ]);
-
-        return "$type|{$this->device->hostname}|{$this->device->community}|$this->context|$oidsStr|$optionsStr";
     }
 }
