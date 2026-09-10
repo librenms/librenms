@@ -19,7 +19,7 @@ jobs:
           days-before-issue-close: 14
           stale-issue-label: 'Stale'
           stale-issue-message: >
-            This issue has had no activity for 80 days. Add a comment to keep it open.
+            This issue has had no activity for 90 days. Add a comment to keep it open.
             If there is no activity in 14 days, it will be closed.
           close-issue-message: >
             This issue was closed because it had no activity for 14 days after the stale warning.
