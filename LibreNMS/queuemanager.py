@@ -710,16 +710,25 @@ class PollerQueueManager(QueueManager):
 
                 http_output = response.content.decode().rstrip()
                 if response.ok and "text/plain" in response.headers.get("Content-Type"):
-                    lastline_pos = http_output.rfind("\n")
-                    if lastline_pos < 0:
-                        exit_code = 0
+                    lines = http_output.splitlines();
+                    if len(lines) == 0:
+                        logger.error(
+                            "Device {} didn't receive any HTTP output".format(
+                                device_id
+                            )
+                        )
+                        try_cli = True
                     else:
-                        lastline = http_output[lastline_pos:]
-                        if lastline.startswith("exit_status:"):
-                            exit_code = int(lastline.split(":")[1])
-                            output = http_output[:lastline_pos]
+                        if lines[-1].startswith("exit_status:"):
+                            exit_code = int(lines[-1].split(":")[1])
+                            output = "\n".join(lines[:-1])
                         else:
-                            exit_code = 0
+                            logger.error(
+                                "Device {} didn't have an exit code on the last line: {}".format(
+                                    device_id, lines[-1]
+                                )
+                            )
+                            try_cli = True
                 else:
                     try_cli = True
 
@@ -808,16 +817,25 @@ class DiscoveryQueueManager(TimedQueueManager):
 
                 http_output = response.content.decode().rstrip()
                 if response.ok and "text/plain" in response.headers.get("Content-Type"):
-                    lastline_pos = http_output.rfind("\n")
-                    if lastline_pos < 0:
-                        exit_code = 0
+                    lines = http_output.splitlines();
+                    if len(lines) == 0:
+                        logger.error(
+                            "Device {} didn't receive any HTTP output".format(
+                                device_id
+                            )
+                        )
+                        try_cli = True
                     else:
-                        lastline = http_output[lastline_pos:]
-                        if lastline.startswith("exit_status:"):
-                            exit_code = int(lastline.split(":")[1])
-                            output = http_output[:lastline_pos]
+                        if lines[-1].startswith("exit_status:"):
+                            exit_code = int(lines[-1].split(":")[1])
+                            output = "\n".join(lines[:-1])
                         else:
-                            exit_code = 0
+                            logger.error(
+                                "Device {} didn't have an exit code on the last line: {}".format(
+                                    device_id, lines[-1]
+                                )
+                            )
+                            try_cli = True
                 else:
                     try_cli = True
 
