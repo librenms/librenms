@@ -710,12 +710,10 @@ class PollerQueueManager(QueueManager):
 
                 http_output = response.content.decode().rstrip()
                 if response.ok and "text/plain" in response.headers.get("Content-Type"):
-                    lines = http_output.splitlines();
+                    lines = http_output.splitlines()
                     if len(lines) == 0:
                         logger.error(
-                            "Device {} didn't receive any HTTP output".format(
-                                device_id
-                            )
+                            "Device {} didn't receive any HTTP output".format(device_id)
                         )
                         try_cli = True
                     else:
@@ -817,12 +815,10 @@ class DiscoveryQueueManager(TimedQueueManager):
 
                 http_output = response.content.decode().rstrip()
                 if response.ok and "text/plain" in response.headers.get("Content-Type"):
-                    lines = http_output.splitlines();
+                    lines = http_output.splitlines()
                     if len(lines) == 0:
                         logger.error(
-                            "Device {} didn't receive any HTTP output".format(
-                                device_id
-                            )
+                            "Device {} didn't receive any HTTP output".format(device_id)
                         )
                         try_cli = True
                     else:
