@@ -5,6 +5,7 @@ namespace LibreNMS\Data\Source\Snmp;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Enum\SnmpQuickPrint;
 use LibreNMS\Enum\SnmpStringOutput;
 use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
@@ -65,9 +66,11 @@ class NetSnmpOptions
     {
         $opts = '';
 
-        if ($options->quickPrint) {
-            $opts .= 'Q';
-        }
+        $opts .= match ($options->quickPrint) {
+            SnmpQuickPrint::Equals => 'Q',
+            SnmpQuickPrint::NoEquals => 'q',
+            SnmpQuickPrint::None => '',
+        };
 
         if ($options->extendedIndex) {
             $opts .= 'X';
@@ -108,6 +111,7 @@ class NetSnmpOptions
             SnmpOidOutput::Suffix => 's',
             SnmpOidOutput::Ucd => 'u',
             SnmpOidOutput::Numeric => 'n',
+            SnmpOidOutput::None => 'v',
             default => '',
         };
 
@@ -216,7 +220,9 @@ class NetSnmpOptions
                         'b' => $options->numericIndexes = true,
                         'e' => $options->numericEnums = true,
                         'E' => $options->escapeQuotes = true,
-                        'Q' => $options->quickPrint = true,
+                        'Q' => $options->quickPrint = SnmpQuickPrint::Equals,
+                        'q' => $options->quickPrint = SnmpQuickPrint::NoEquals,
+                        'v' => $options->oidFormat = SnmpOidOutput::None,
                         't' => $options->numericTimeticks = true,
                         'T' => $options->printHexText = true,
                         'U' => $options->printUnits = false,

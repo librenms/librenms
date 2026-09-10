@@ -10,6 +10,7 @@ use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
 use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Enum\SnmpQuickPrint;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Tests\TestCase;
 use Mockery;
@@ -245,7 +246,7 @@ class SnmpQueryTest extends TestCase
         $mockBackend = $this->mockBackend();
         $mockBackend->shouldReceive('get')
             ->once()
-            ->withArgs(fn (string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options) => $options->quickPrint === true
+            ->withArgs(fn (string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options) => $options->quickPrint === SnmpQuickPrint::Equals
                     && $options->extendedIndex === true
                     && $options->printUnits === false
                     && $options->numericEnums === true

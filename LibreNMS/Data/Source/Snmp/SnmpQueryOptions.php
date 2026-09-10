@@ -28,6 +28,7 @@ namespace LibreNMS\Data\Source\Snmp;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Enum\SnmpQuickPrint;
 use LibreNMS\Enum\SnmpStringOutput;
 
 class SnmpQueryOptions
@@ -59,7 +60,7 @@ class SnmpQueryOptions
         public SnmpStringOutput $stringFormat = SnmpStringOutput::Guess,
 
         // Output presentation
-        public bool $quickPrint = false,
+        public SnmpQuickPrint $quickPrint = SnmpQuickPrint::None,
         public bool $extendedIndex = false,
         public bool $allowUnderscores = false,
     ) {
@@ -72,7 +73,7 @@ class SnmpQueryOptions
         $options->numericEnums = true;
         $options->numericTimeticks = true;
         $options->printUnits = false;
-        $options->quickPrint = true;
+        $options->quickPrint = SnmpQuickPrint::Equals;
         $options->extendedIndex = true;
 
         return $options;
