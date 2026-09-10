@@ -42,12 +42,13 @@ class PollerCluster extends Model
     protected $fillable = ['poller_name'];
 
     /**
-     * @return array{last_report: 'datetime'}
+     * @return array{last_report: 'datetime', poller_details: 'array'}
      */
     protected function casts(): array
     {
         return [
             'last_report' => 'datetime',
+            'poller_details' => 'array',
         ];
     }
 
