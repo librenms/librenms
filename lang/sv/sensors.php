@@ -132,7 +132,7 @@ return [
         'short' => 'Signal',
         'long' => 'Signal',
         'unit' => 'dBm',
-        'unit_long' => 'Decibal-Milliwatt',
+        'unit_long' => 'Decibel-milliwatt',
     ],
     'tv_signal' => [
         'short' => 'Signal',
