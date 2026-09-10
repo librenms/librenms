@@ -39,7 +39,6 @@ return [
             'programs' => '程式',
             'python' => 'Python',
             'rrd' => 'RRD',
-            'rrdcheck' => 'RRD 檢查',
             'scheduler' => '排程器',
             'system' => '系統',
             'updates' => '更新',
