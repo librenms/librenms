@@ -44,30 +44,19 @@ class Mib
         $dirs = [$base];
 
         if ($os) {
-            // os group
             if ($osGroup = LibrenmsConfig::getOsSetting($os, 'group')) {
-                if (is_dir("$base/$osGroup")) {
-                    $dirs[] = "$base/$osGroup";
-                }
+                $dirs[] = "$base/$osGroup";
             }
 
-            // os directory
-            $osMibDir = LibrenmsConfig::getOsSetting($os, 'mib_dir');
-            if ($osMibDir && is_string($osMibDir)) {
-                $dirs[] = "$base/$osMibDir";
-            } elseif (is_dir($base . '/' . $os)) {
-                $dirs[] = $base . '/' . $os;
-            }
+            $dirs[] = "$base/$os";
+            $dirs[] = $base . '/' . LibrenmsConfig::getOsSetting($os, 'mib_dir');
         }
 
         foreach ($extraDirs as $mibDir) {
-            $extra = Str::start($mibDir, "$base/");
-            if (is_dir($extra)) {
-                $dirs[] = rtrim($extra, '/');
-            }
+            $dirs[] = rtrim(Str::start($mibDir, "$base/"), '/');
         }
 
-        return array_values(array_unique($dirs));
+        return array_values(array_filter(array_unique($dirs), fn ($dir) => is_dir($dir)));
     }
 
     public static function parseCliInput(string $mibs, array $existing = []): array
