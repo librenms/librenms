@@ -1682,6 +1682,7 @@ pollers:
     - { Field: last_polled, Type: datetime, 'Null': false, Extra: '' }
     - { Field: devices, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: time_taken, Type: double, 'Null': false, Extra: '' }
+    - { Field: poller_details, Type: longtext, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     pollers_poller_name_unique: { Name: pollers_poller_name_unique, Columns: [poller_name], Unique: true, Type: BTREE }
@@ -1691,6 +1692,7 @@ poller_cluster:
     - { Field: node_id, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: poller_name, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: poller_version, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: poller_details, Type: longtext, 'Null': true, Extra: '' }
     - { Field: poller_groups, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
     - { Field: last_report, Type: datetime, 'Null': false, Extra: '' }
     - { Field: master, Type: tinyint, 'Null': false, Extra: '' }

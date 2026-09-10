@@ -24,7 +24,6 @@ class NetSnmpTest extends TestCase
     public function testBuildCliV2c(): void
     {
         $config = new SnmpConfig(
-            target: '192.168.1.1',
             version: 'v2c',
             community: 'public',
             transport: 'udp',
@@ -32,7 +31,7 @@ class NetSnmpTest extends TestCase
         );
 
         $options = SnmpQueryOptions::quickPrint();
-        $cli = $this->backend->buildCli('snmpget', $config, ['sysDescr.0'], $options);
+        $cli = $this->backend->buildCli('snmpget', '192.168.1.1', ['sysDescr.0'], $config, $options);
 
         $this->assertStringEndsWith('snmpget', $cli[0]);
         $this->assertContains('-M', $cli);
@@ -48,7 +47,6 @@ class NetSnmpTest extends TestCase
     public function testBuildCliNetSnmpLibraryDefaults(): void
     {
         $config = new SnmpConfig(
-            target: '192.168.1.1',
             version: 'v2c',
             community: 'public',
             transport: 'udp',
@@ -56,7 +54,7 @@ class NetSnmpTest extends TestCase
         );
 
         $options = new SnmpQueryOptions();
-        $cli = $this->backend->buildCli('snmpget', $config, ['sysDescr.0'], $options);
+        $cli = $this->backend->buildCli('snmpget', '192.168.1.1', ['sysDescr.0'], $config, $options);
 
         $this->assertStringEndsWith('snmpget', $cli[0]);
         $this->assertNotContains('-OQXUte', $cli);
@@ -68,7 +66,6 @@ class NetSnmpTest extends TestCase
     public function testBuildCliV1(): void
     {
         $config = new SnmpConfig(
-            target: '10.0.0.1',
             version: 'v1',
             community: 'secret',
             transport: 'udp',
@@ -76,7 +73,7 @@ class NetSnmpTest extends TestCase
         );
 
         $options = new SnmpQueryOptions();
-        $cli = $this->backend->buildCli('snmpget', $config, ['sysUpTime.0'], $options);
+        $cli = $this->backend->buildCli('snmpget', '10.0.0.1', ['sysUpTime.0'], $config, $options);
 
         $this->assertContains('-v1', $cli);
         $this->assertContains('secret', $cli);
@@ -86,13 +83,12 @@ class NetSnmpTest extends TestCase
     public function testBuildCliV2cWithContext(): void
     {
         $config = new SnmpConfig(
-            target: '192.168.1.1',
             version: 'v2c',
             community: 'public',
         );
 
         $options = new SnmpQueryOptions(context: 'vrf1');
-        $cli = $this->backend->buildCli('snmpget', $config, ['sysDescr.0'], $options);
+        $cli = $this->backend->buildCli('snmpget', '192.168.1.1', ['sysDescr.0'], $config, $options);
 
         $this->assertContains('public@vrf1', $cli);
     }
@@ -100,7 +96,6 @@ class NetSnmpTest extends TestCase
     public function testBuildCliV3AuthPriv(): void
     {
         $config = new SnmpConfig(
-            target: '192.168.1.5',
             version: 'v3',
             authname: 'admin',
             authpass: 'auth_pass',
@@ -111,7 +106,7 @@ class NetSnmpTest extends TestCase
         );
 
         $options = new SnmpQueryOptions(context: 'ctx');
-        $cli = $this->backend->buildCli('snmpget', $config, ['sysDescr.0'], $options);
+        $cli = $this->backend->buildCli('snmpget', '192.168.1.5', ['sysDescr.0'], $config, $options);
 
         $this->assertContains('-v3', $cli);
         $this->assertContains('-l', $cli);
@@ -133,7 +128,6 @@ class NetSnmpTest extends TestCase
     public function testBuildCliV3AuthNoPriv(): void
     {
         $config = new SnmpConfig(
-            target: '192.168.1.5',
             version: 'v3',
             authname: 'user1',
             authpass: 'auth_pass',
@@ -142,7 +136,7 @@ class NetSnmpTest extends TestCase
         );
 
         $options = new SnmpQueryOptions();
-        $cli = $this->backend->buildCli('snmpget', $config, ['sysDescr.0'], $options);
+        $cli = $this->backend->buildCli('snmpget', '192.168.1.5', ['sysDescr.0'], $config, $options);
 
         $this->assertContains('-v3', $cli);
         $this->assertContains('-l', $cli);
@@ -160,14 +154,13 @@ class NetSnmpTest extends TestCase
     public function testBuildCliV3NoAuthNoPriv(): void
     {
         $config = new SnmpConfig(
-            target: '192.168.1.5',
             version: 'v3',
             authname: 'guest',
             authlevel: 'noAuthNoPriv',
         );
 
         $options = new SnmpQueryOptions();
-        $cli = $this->backend->buildCli('snmpget', $config, ['sysDescr.0'], $options);
+        $cli = $this->backend->buildCli('snmpget', '192.168.1.5', ['sysDescr.0'], $config, $options);
 
         $this->assertContains('-v3', $cli);
         $this->assertContains('-l', $cli);
@@ -181,14 +174,13 @@ class NetSnmpTest extends TestCase
     public function testBuildCliIpv6Brackets(): void
     {
         $config = new SnmpConfig(
-            target: '2001:db8::1',
             version: 'v2c',
             community: 'public',
             transport: 'udp6',
             port: 161,
         );
 
-        $cli = $this->backend->buildCli('snmpget', $config, ['sysDescr.0'], new SnmpQueryOptions());
+        $cli = $this->backend->buildCli('snmpget', '2001:db8::1', ['sysDescr.0'], $config, new SnmpQueryOptions());
 
         $this->assertContains('udp6:[2001:db8::1]:161', $cli);
     }
@@ -196,14 +188,13 @@ class NetSnmpTest extends TestCase
     public function testBuildCliTimeoutAndRetries(): void
     {
         $config = new SnmpConfig(
-            target: '192.168.1.1',
             version: 'v2c',
             community: 'public',
             timeout: 3,
             retries: 0,
         );
 
-        $cli = $this->backend->buildCli('snmpget', $config, ['sysDescr.0'], new SnmpQueryOptions());
+        $cli = $this->backend->buildCli('snmpget', '192.168.1.1', ['sysDescr.0'], $config, new SnmpQueryOptions());
 
         $this->assertContains('-t', $cli);
         $this->assertContains('3', $cli);
@@ -214,13 +205,12 @@ class NetSnmpTest extends TestCase
     public function testBuildCliFloatTimeout(): void
     {
         $config = new SnmpConfig(
-            target: '192.168.1.1',
             version: 'v2c',
             community: 'public',
             timeout: 0.2,
         );
 
-        $cli = $this->backend->buildCli('snmpget', $config, ['sysDescr.0'], new SnmpQueryOptions());
+        $cli = $this->backend->buildCli('snmpget', '192.168.1.1', ['sysDescr.0'], $config, new SnmpQueryOptions());
 
         $this->assertContains('-t', $cli);
         $this->assertContains('0.2', $cli);
@@ -229,13 +219,12 @@ class NetSnmpTest extends TestCase
     public function testBuildCliZeroOrNegativeTimeoutDoesNotEmitFlag(): void
     {
         $config = new SnmpConfig(
-            target: '192.168.1.1',
             version: 'v2c',
             community: 'public',
             timeout: 0,
         );
 
-        $cli = $this->backend->buildCli('snmpget', $config, ['sysDescr.0'], new SnmpQueryOptions());
+        $cli = $this->backend->buildCli('snmpget', '192.168.1.1', ['sysDescr.0'], $config, new SnmpQueryOptions());
 
         $this->assertNotContains('-t', $cli);
     }
@@ -243,43 +232,39 @@ class NetSnmpTest extends TestCase
     public function testBuildCliDecidesBulk(): void
     {
         $configV2 = new SnmpConfig(
-            target: '192.168.1.1',
             version: 'v2c',
             community: 'public',
         );
         $configV1 = new SnmpConfig(
-            target: '192.168.1.1',
             version: 'v1',
             community: 'public',
         );
 
         // v2c with allowBulk (default) upgrades snmpwalk to snmpbulkwalk
-        $cliBulk = $this->backend->buildCli('snmpwalk', $configV2, ['.'], new SnmpQueryOptions());
+        $cliBulk = $this->backend->buildCli('snmpwalk', '192.168.1.1', ['.'], $configV2, new SnmpQueryOptions());
         $this->assertStringEndsWith('snmpbulkwalk', $cliBulk[0]);
 
         // v2c with allowBulk: false stays snmpwalk
-        $cliNoBulk = $this->backend->buildCli('snmpwalk', $configV2, ['.'], new SnmpQueryOptions(allowBulk: false));
+        $cliNoBulk = $this->backend->buildCli('snmpwalk', '192.168.1.1', ['.'], $configV2, new SnmpQueryOptions(allowBulk: false));
         $this->assertStringEndsWith('snmpwalk', $cliNoBulk[0]);
 
         // v1 with allowBulk: true stays snmpwalk because v1 does not support bulk
-        $cliV1 = $this->backend->buildCli('snmpwalk', $configV1, ['.'], new SnmpQueryOptions(allowBulk: true));
+        $cliV1 = $this->backend->buildCli('snmpwalk', '192.168.1.1', ['.'], $configV1, new SnmpQueryOptions(allowBulk: true));
         $this->assertStringEndsWith('snmpwalk', $cliV1[0]);
 
         // v2c with bulk: false on SnmpConfig stays snmpwalk even with allowBulk: true
         $configNoBulk = new SnmpConfig(
-            target: '192.168.1.1',
             version: 'v2c',
             community: 'public',
             bulk: false,
         );
-        $cliTargetNoBulk = $this->backend->buildCli('snmpwalk', $configNoBulk, ['.'], new SnmpQueryOptions(allowBulk: true));
+        $cliTargetNoBulk = $this->backend->buildCli('snmpwalk', '192.168.1.1', ['.'], $configNoBulk, new SnmpQueryOptions(allowBulk: true));
         $this->assertStringEndsWith('snmpwalk', $cliTargetNoBulk[0]);
     }
 
     public function testBuildCliFormattingOptions(): void
     {
         $config = new SnmpConfig(
-            target: '192.168.1.1',
             version: 'v2c',
             community: 'public',
         );
@@ -290,7 +275,7 @@ class NetSnmpTest extends TestCase
         $options->numericIndexes = true;
         $options->numericEnums = false;
 
-        $cli = $this->backend->buildCli('snmpget', $config, ['sysDescr.0'], $options);
+        $cli = $this->backend->buildCli('snmpget', '192.168.1.1', ['sysDescr.0'], $config, $options);
 
         $this->assertContains('-OQXUtbn', $cli); // numeric suppression of 's', no 'e' because numericEnums = false
         $this->assertContains('-Cc', $cli);
@@ -298,25 +283,24 @@ class NetSnmpTest extends TestCase
         // When oidFormat is Suffix, 's' is emitted
         $optionsSymbolic = SnmpQueryOptions::quickPrint();
         $optionsSymbolic->oidFormat = SnmpOidOutput::Suffix;
-        $cliSymbolic = $this->backend->buildCli('snmpget', $config, ['sysDescr.0'], $optionsSymbolic);
+        $cliSymbolic = $this->backend->buildCli('snmpget', '192.168.1.1', ['sysDescr.0'], $config, $optionsSymbolic);
         $this->assertContains('-OQXUtes', $cliSymbolic);
     }
 
     public function testBuildCliAsciiStrings(): void
     {
         $config = new SnmpConfig(
-            target: '192.168.1.1',
             version: 'v2c',
             community: 'public',
         );
 
         $options = SnmpQueryOptions::quickPrint();
         $options->stringFormat = SnmpStringOutput::Ascii;
-        $cli = $this->backend->buildCli('snmpget', $config, ['sysDescr.0'], $options);
+        $cli = $this->backend->buildCli('snmpget', '192.168.1.1', ['sysDescr.0'], $config, $options);
         $this->assertContains('-OQXUtea', $cli);
 
         $optionsFromCli = (new SnmpQueryOptions)->parseCli(['-OteQUSab', '-Pu', '-Ih']);
-        $cliFromCli = $this->backend->buildCli('snmpwalk', $config, ['.1.3.6.1.4.1.2356.100'], $optionsFromCli);
+        $cliFromCli = $this->backend->buildCli('snmpwalk', '192.168.1.1', ['.1.3.6.1.4.1.2356.100'], $config, $optionsFromCli);
         $this->assertContains('-OQUteba', $cliFromCli);
         $this->assertContains('-Pu', $cliFromCli);
         $this->assertContains('-Ih', $cliFromCli);
@@ -325,18 +309,17 @@ class NetSnmpTest extends TestCase
     public function testBuildCliHexStrings(): void
     {
         $config = new SnmpConfig(
-            target: '192.168.1.1',
             version: 'v2c',
             community: 'public',
         );
 
         $options = SnmpQueryOptions::quickPrint();
         $options->stringFormat = SnmpStringOutput::Hex;
-        $cli = $this->backend->buildCli('snmpget', $config, ['sysDescr.0'], $options);
+        $cli = $this->backend->buildCli('snmpget', '192.168.1.1', ['sysDescr.0'], $config, $options);
         $this->assertContains('-OQXUtex', $cli);
 
         $optionsFromCli = (new SnmpQueryOptions)->parseCli(['-OteQUax', '-Pu']);
-        $cliFromCli = $this->backend->buildCli('snmpwalk', $config, ['.1.3.6.1.4.1.2356.100'], $optionsFromCli);
+        $cliFromCli = $this->backend->buildCli('snmpwalk', '192.168.1.1', ['.1.3.6.1.4.1.2356.100'], $config, $optionsFromCli);
         $this->assertContains('-OQUtex', $cliFromCli);
         $this->assertContains('-Pu', $cliFromCli);
     }
@@ -354,7 +337,6 @@ class NetSnmpTest extends TestCase
 
         $config = SnmpConfig::fromDevice($device);
 
-        $this->assertSame('router1.example.com', $config->target);
         $this->assertSame('v2c', $config->version);
         $this->assertSame('test-comm', $config->community);
         $this->assertSame(1161, $config->port);
@@ -377,8 +359,6 @@ class NetSnmpTest extends TestCase
 
         $this->assertSame('test-comm', $config1->community);
         $this->assertSame('new', $config2->community);
-        $this->assertSame('router1.example.com', $config1->target);
-        $this->assertSame('router1.example.com', $config2->target);
     }
 
     public function testSnmpConfigFromDeviceRespectsSnmpBulkSetting(): void

@@ -695,7 +695,7 @@
                         <span class="visible-xs-inline-block">{{ __('User') }}</span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ url('notifications') }}"><span
+                        <li><a href="{{ route('notifications.index') }}"><span
                                     class="badge count-notif">{{ $notification_count }}</span> {{ __('Notifications') }}
                             </a></li>
                         <li><a href="{{ route('preferences.index') }}"><i class="fa fa-cog fa-fw fa-lg"

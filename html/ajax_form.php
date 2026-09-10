@@ -41,7 +41,6 @@ $ajax_form = match ($_POST['type'] ?? '') {
     'delete-host-dependency' => 'includes/html/forms/delete-host-dependency.inc.php',
     'get-host-dependencies' => 'includes/html/forms/get-host-dependencies.inc.php',
     'mempool-update' => 'includes/html/forms/mempool-update.inc.php',
-    'notifications' => 'includes/html/forms/notifications.inc.php',
     'override-config' => 'includes/html/forms/override-config.inc.php',
     'parse-alert-template' => 'includes/html/forms/parse-alert-template.inc.php',
     'processor-update' => 'includes/html/forms/processor-update.inc.php',
