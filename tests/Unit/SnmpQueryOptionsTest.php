@@ -222,5 +222,25 @@ class SnmpQueryOptionsTest extends TestCase
         $this->assertSame(SnmpQuickPrint::Equals, $optionsUpperQv->quickPrint);
         $this->assertSame(SnmpOidOutput::None, $optionsUpperQv->oidFormat);
         $this->assertContains('-OQv', $parser->buildOutputFlags($optionsUpperQv));
+
+        $optionsVqn = $parser->parseCli(['-Ovqn']);
+        $this->assertSame(SnmpQuickPrint::NoEquals, $optionsVqn->quickPrint);
+        $this->assertSame(SnmpOidOutput::None, $optionsVqn->oidFormat);
+        $this->assertContains('-Oqv', $parser->buildOutputFlags($optionsVqn));
+
+        $optionsQvn = $parser->parseCli(['-Oqvn']);
+        $this->assertSame(SnmpQuickPrint::NoEquals, $optionsQvn->quickPrint);
+        $this->assertSame(SnmpOidOutput::None, $optionsQvn->oidFormat);
+        $this->assertContains('-Oqv', $parser->buildOutputFlags($optionsQvn));
+
+        $optionsNvq = $parser->parseCli(['-Onvq']);
+        $this->assertSame(SnmpQuickPrint::NoEquals, $optionsNvq->quickPrint);
+        $this->assertSame(SnmpOidOutput::None, $optionsNvq->oidFormat);
+        $this->assertContains('-Oqv', $parser->buildOutputFlags($optionsNvq));
+
+        $optionsVqs = $parser->parseCli(['-Ovqs']);
+        $this->assertSame(SnmpQuickPrint::NoEquals, $optionsVqs->quickPrint);
+        $this->assertSame(SnmpOidOutput::None, $optionsVqs->oidFormat);
+        $this->assertContains('-Oqv', $parser->buildOutputFlags($optionsVqs));
     }
 }
