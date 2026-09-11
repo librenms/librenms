@@ -84,13 +84,19 @@
             var network = new vis.Network(container, {nodes: nodes, edges: edges, stabilize: true}, options);
 
             // width/height might be % get values in pixels
-            network_height = $($(container).children(".vis-network")[0]).height();
-            network_width = $($(container).children(".vis-network")[0]).width();
+            var network_height = $($(container).children(".vis-network")[0]).height() || $(container).height();
+            var network_width = $($(container).children(".vis-network")[0]).width() || $(container).width();
+            var mapWidth = Math.round(network_width / scale);
+            var mapHeight = Math.round(network_height / scale);
+            container._mapWidth = mapWidth;
+            container._mapHeight = mapHeight;
+            container._visNetwork = network;
+
             var centreY = Math.round(network_height / (2 * scale));
             var centreX = Math.round(network_width / (2 * scale));
             network.moveTo({position: {x: centreX, y: centreY}, scale: scale});
 
-            setCustomMapBackground(elementId, bgtype, bgdata);
+            setCustomMapBackground(elementId, bgtype, bgdata, network);
 
             network.on('zoom', function (data) {
                 if(data.scale < scale) {
