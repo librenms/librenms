@@ -50,6 +50,5 @@ class XklTransportLinkUp implements SnmptrapHandler
         $message = "Tranport $transIndex is up.";
 
         $trap->log($message, Severity::Ok);
-
     }
 }

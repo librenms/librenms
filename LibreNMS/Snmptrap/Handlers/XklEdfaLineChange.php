@@ -47,7 +47,7 @@ class XklEdfaLineChange implements SnmptrapHandler
     {
         $edfaName = $trap->getOidData($trap->findOid('XKL-MIB::xklEDFAName'));
         $edfaState = $trap->getOidData($trap->findOid('XKL-MIB::xklEDFAAmplificationState'));
-        $severity  = match ($edfaState) {
+        $severity = match ($edfaState) {
             'up' => Severity::Ok,
             'unused' => Severity::Info,
             'warning' => Severity::Info,

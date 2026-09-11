@@ -46,7 +46,6 @@ class XklAutomaticOTDRTriggered implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-
         $otdrDescr = $trap->getOidData($trap->findOid('XKL-MIB::xklOTDRLatestMeasurementOSCDescr'));
         $otdrDistance = $trap->getOidData($trap->findOid('XKL-MIB::xklOTDRLatestMeasurementResults'));
         $otdrDate = $trap->getOidData($trap->findOid('XKL-MIB::xklOTDRLatestMeasurementDateTime'));

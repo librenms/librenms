@@ -53,10 +53,9 @@ class XklEdfaAlarmChange implements SnmptrapHandler
          * @param  Trap  $trap
          * @return void
          */
-
-        $severity = Severity::Warning;
         $edfaName = $trap->getOidData($trap->findOid('XKL-MIB::xklEDFAName'));
-        $message = 'Alarm not found';
+        $moduleName = $trap->getOidData($trap->findOid('XKL-MIB::xklEDFAModuleAlarms'));
+        $message = "$edfaName module alarm: $moduleName";
 
         if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFAInReset')) == 'yes') {
             $message = "$edfaName reset.";
@@ -67,27 +66,10 @@ class XklEdfaAlarmChange implements SnmptrapHandler
         if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFAMuted')) == 'yes') {
             $message = "$edfaName has become muted.";
         }
-        if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFACaseTemperatureAlarm')) == 'yes') {
-            $message = "$edfaName case temperature alarm is active.";
-        }
-        if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFAPumpTemperatureAlarm')) == 'yes') {
-            $message = "$edfaName pump temperature alarm is active.";
-        }
-        if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFAPumpBiasAlarm')) == 'yes') {
-            $message = "$edfaName EDFA pump BIAS alarm is active.";
+
+        $severity = Severity::Warning;
+        if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFAPumpBiasAlarm')) == 'yes' || $trap->getOidData($trap->findOid('XKL-MIB::xklEDFALossOfInputAlarm')) == 'yes' || $trap->getOidData($trap->findOid('XKL-MIB::xklEDFALossOfOutputAlarm'))) {
             $severity = Severity::Error;
-        }
-        if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFALossOfInputAlarm')) == 'yes') {
-            $message = "$edfaName loss of input alarm is active.";
-            $severity = Severity::Error;
-        }
-        if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFALossOfOutputAlarm')) == 'yes') {
-            $message = "$edfaName loss of output alarm is active.";
-            $severity = Severity::Error;
-        }
-        if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFAModuleAlarms')) != 'NONE') {
-            $moduleName = $trap->getOidData($trap->findOid('XKL-MIB::xklEDFAModuleAlarms'));
-            $message = "$edfaName module alarm: $moduleName";
         }
 
         $trap->log($message, $severity);
