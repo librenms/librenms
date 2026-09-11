@@ -12,6 +12,7 @@
         <table class="table table-striped table-bordered table-hover table-condensed">
             <tr>
                 <th>{{ __('Poller Name') }}</th>
+                <th>{{ __('Environment') }}</th>
                 <th>{{ __('Devices Polled') }}</th>
                 <th>{{ __('Total Poll Time') }}</th>
                 <th>{{ __('Last Run') }}</th>
@@ -20,6 +21,7 @@
             @foreach($pollers as $poller)
             <tr class="{{ $poller['row_class'] }}" id="row_{{ $poller['id'] }}">
                 <td>{{ $poller['poller_name'] }}</td>
+                <td>@include('poller.details', ['details' => $poller->poller_details])</td>
                 <td>{{ $poller['devices'] }}</td>
                 <td>{{ $poller['time_taken'] }} Seconds</td>
                 <td>{{ \LibreNMS\Util\Time::format($poller['last_polled'], 'compact') }}</td>
@@ -45,6 +47,7 @@
                 <th>{{ __('Name') }}</th>
                 <th>{{ __('Node ID') }}</th>
                 <th>{{ __('Version') }}</th>
+                <th>{{ __('Environment') }}</th>
                 <th>{{ __('Groups Served') }}</th>
                 <th>{{ __('Last Checkin') }}</th>
                 <th>{{ __('Cluster Master') }}</th>
@@ -62,6 +65,7 @@
                     <td rowspan="{{ $poller->stats->count() }}">{{ $poller->poller_name }}</td>
                     <td rowspan="{{ $poller->stats->count() }}" @if($poller->node_id == '') class="danger" @endif>{{ $poller->node_id }}</td>
                     <td rowspan="{{ $poller->stats->count() }}">{{ $poller->poller_version }}</td>
+                    <td rowspan="{{ $poller->stats->count() }}">@include('poller.details', ['details' => $poller->poller_details])</td>
                     <td rowspan="{{ $poller->stats->count() }}">{{ $poller->poller_groups }}</td>
                     <td rowspan="{{ $poller->stats->count() }}">{{ \LibreNMS\Util\Time::format($poller->last_report, 'compact') }}</td>
                     <td rowspan="{{ $poller->stats->count() }}">{{ __($poller->master ? 'Yes' : 'No') }}</td>
