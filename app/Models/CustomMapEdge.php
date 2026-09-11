@@ -36,6 +36,16 @@ class CustomMapEdge extends BaseModel
     protected $primaryKey = 'custom_map_edge_id';
 
     /**
+     * @return array{waypoints: 'array'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'waypoints' => 'array',
+        ];
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\CustomMap, $this>
      */
     public function map(): BelongsTo
