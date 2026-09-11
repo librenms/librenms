@@ -83,14 +83,30 @@
                                 <label for="nodeicon" class="col-sm-3 control-label">{{ __('map.custom.edit.node.icon') }}</label>
                                 <div class="col-sm-6">
                                     <select id="nodeicon" class="form-control input-sm" onchange="nodeSetIcon();">
-                                        <option value="f233">{{ __('map.custom.edit.node.icon_options.server')  }}</option>
-                                        <option value="f390">{{ __('map.custom.edit.node.icon_options.desktop')  }}</option>
+                                        <option value="f6ff">{{ __('map.custom.edit.node.icon_options.network_wired')  }}</option>
+                                        <option value="f4d7">{{ __('map.custom.edit.node.icon_options.router')  }}</option>
+                                        <option value="f796">{{ __('map.custom.edit.node.icon_options.ethernet')  }}</option>
+                                        <option value="f1eb">{{ __('map.custom.edit.node.icon_options.wifi')  }}</option>
+                                        <option value="f519">{{ __('map.custom.edit.node.icon_options.tower')  }}</option>
                                         <option value="f7c0">{{ __('map.custom.edit.node.icon_options.dish')  }}</option>
                                         <option value="f7bf">{{ __('map.custom.edit.node.icon_options.satellite')  }}</option>
-                                        <option value="f1eb">{{ __('map.custom.edit.node.icon_options.wifi')  }}</option>
                                         <option value="f0c2">{{ __('map.custom.edit.node.icon_options.cloud')  }}</option>
                                         <option value="f0ac">{{ __('map.custom.edit.node.icon_options.globe')  }}</option>
-                                        <option value="f519">{{ __('map.custom.edit.node.icon_options.tower')  }}</option>
+                                        <option value="f1ad">{{ __('map.custom.edit.node.icon_options.building')  }}</option>
+                                        <option value="f3ed">{{ __('map.custom.edit.node.icon_options.shield')  }}</option>
+                                        <option value="f023">{{ __('map.custom.edit.node.icon_options.lock')  }}</option>
+                                        <option value="f1e6">{{ __('map.custom.edit.node.icon_options.plug')  }}</option>
+                                        <option value="f011">{{ __('map.custom.edit.node.icon_options.power_off')  }}</option>
+                                        <option value="f240">{{ __('map.custom.edit.node.icon_options.battery')  }}</option>
+                                        <option value="f233">{{ __('map.custom.edit.node.icon_options.server')  }}</option>
+                                        <option value="f1c0">{{ __('map.custom.edit.node.icon_options.database')  }}</option>
+                                        <option value="f0a0">{{ __('map.custom.edit.node.icon_options.hard_drive')  }}</option>
+                                        <option value="f2db">{{ __('map.custom.edit.node.icon_options.microchip')  }}</option>
+                                        <option value="f390">{{ __('map.custom.edit.node.icon_options.desktop')  }}</option>
+                                        <option value="f109">{{ __('map.custom.edit.node.icon_options.laptop')  }}</option>
+                                        <option value="f3fa">{{ __('map.custom.edit.node.icon_options.tablet')  }}</option>
+                                        <option value="f3ce">{{ __('map.custom.edit.node.icon_options.mobile')  }}</option>
+                                        <option value="f02f">{{ __('map.custom.edit.node.icon_options.print')  }}</option>
                                         <option value="f061">{{ __('map.custom.edit.node.icon_options.arrow_right')  }}</option>
                                         <option value="f060">{{ __('map.custom.edit.node.icon_options.arrow_left')  }}</option>
                                         <option value="f062">{{ __('map.custom.edit.node.icon_options.arrow_up')  }}</option>

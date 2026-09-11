@@ -208,6 +208,13 @@ class SnmpQuery implements SnmpQueryInterface
         return $this;
     }
 
+    public function bulk(bool $allow = true): SnmpQueryInterface
+    {
+        $this->options->allowBulk = $allow;
+
+        return $this;
+    }
+
     /**
      * Set option(s) for net-snmp command line. Converts net-snmp flags to SnmpQueryOptions.
      *
