@@ -106,12 +106,15 @@ class NetSnmpOptions
             default => '',
         };
 
+        if ($options->valueOnly) {
+            $opts .= 'v';
+        }
+
         $opts .= match ($options->oidFormat) {
             SnmpOidOutput::Full => 'f',
             SnmpOidOutput::Suffix => 's',
             SnmpOidOutput::Ucd => 'u',
             SnmpOidOutput::Numeric => 'n',
-            SnmpOidOutput::None => 'v',
             default => '',
         };
 
@@ -212,17 +215,17 @@ class NetSnmpOptions
                     match ($outopt) {
                         'a' => $options->stringFormat = SnmpStringOutput::Ascii,
                         'x' => $options->stringFormat = SnmpStringOutput::Hex,
-                        'f' => $options->oidFormat = $options->oidFormat === SnmpOidOutput::None ? SnmpOidOutput::None : SnmpOidOutput::Full,
-                        's' => $options->oidFormat = $options->oidFormat === SnmpOidOutput::None ? SnmpOidOutput::None : SnmpOidOutput::Suffix,
-                        'S' => $options->oidFormat = $options->oidFormat === SnmpOidOutput::None ? SnmpOidOutput::None : SnmpOidOutput::Module,
-                        'u' => $options->oidFormat = $options->oidFormat === SnmpOidOutput::None ? SnmpOidOutput::None : SnmpOidOutput::Ucd,
-                        'n' => $options->oidFormat = $options->oidFormat === SnmpOidOutput::None ? SnmpOidOutput::None : SnmpOidOutput::Numeric,
+                        'f' => $options->oidFormat = SnmpOidOutput::Full,
+                        's' => $options->oidFormat = SnmpOidOutput::Suffix,
+                        'S' => $options->oidFormat = SnmpOidOutput::Module,
+                        'u' => $options->oidFormat = SnmpOidOutput::Ucd,
+                        'n' => $options->oidFormat = SnmpOidOutput::Numeric,
                         'b' => $options->numericIndexes = true,
                         'e' => $options->numericEnums = true,
                         'E' => $options->escapeQuotes = true,
                         'Q' => $options->quickPrint = SnmpQuickPrint::Equals,
                         'q' => $options->quickPrint = SnmpQuickPrint::NoEquals,
-                        'v' => $options->oidFormat = SnmpOidOutput::None,
+                        'v' => $options->valueOnly = true,
                         't' => $options->numericTimeticks = true,
                         'T' => $options->printHexText = true,
                         'U' => $options->printUnits = false,

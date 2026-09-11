@@ -61,6 +61,7 @@ class SnmpQueryOptions
 
         // Output presentation
         public SnmpQuickPrint $quickPrint = SnmpQuickPrint::None,
+        public bool $valueOnly = false,
         public bool $extendedIndex = false,
         public bool $allowUnderscores = false,
     ) {
