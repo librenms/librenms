@@ -30,6 +30,12 @@
             "order": 2,
             "type": "boolean"
         },
+        "alert.macros.rule.*": {
+            "type": "text",
+            "validate": {
+                "value": "string"
+            }
+        },
         "alert.macros.rule.bill_quota_over_quota": {
             "default": "((%bills.total_data / %bills.bill_quota)*100) && %bills.bill_type = \"quota\"",
             "type": "text"
