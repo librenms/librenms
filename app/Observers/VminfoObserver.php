@@ -16,7 +16,7 @@ class VminfoObserver
      */
     public function created(Vminfo $vminfo): void
     {
-        Eventlog::log('Virtual Machine added: ' . $vminfo->vmwVmDisplayName . " ($vminfo->vmwVmMemSize GB / $vminfo->vmwVmCpus vCPU)", $vminfo->device_id, 'vm', Severity::Notice, $vminfo->vmwVmVMID);
+        Eventlog::log('Virtual Machine added: ' . $vminfo->vmwVmDisplayName . " ($vminfo->memoryFormatted / $vminfo->vmwVmCpus vCPU)", $vminfo->device_id, 'vm', Severity::Notice, $vminfo->vmwVmVMID);
     }
 
     /**
