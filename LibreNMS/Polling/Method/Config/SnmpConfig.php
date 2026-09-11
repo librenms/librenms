@@ -41,7 +41,6 @@ final readonly class SnmpConfig
         public ?string $authalgo = null,
         public ?string $cryptopass = null,
         public ?string $cryptoalgo = null,
-        public ?string $context = null,
 
         // Settings
         public string $transport = 'udp',
@@ -71,7 +70,6 @@ final readonly class SnmpConfig
             authalgo: $device->authalgo,
             cryptopass: $device->cryptopass,
             cryptoalgo: $device->cryptoalgo,
-            context: $device->context ?? null,
             transport: $device->transport ?? 'udp',
             port: (int) ($device->port ?? 161),
             timeout: max(0.1, $timeout),
@@ -80,5 +78,10 @@ final readonly class SnmpConfig
             maxOid: max(1, $configuredMaxOid),
             bulk: filter_var($rawBulk, FILTER_VALIDATE_BOOLEAN),
         );
+    }
+
+    public static function fromDeviceArray(array $device): self
+    {
+        return self::fromDevice(new Device($device));
     }
 }

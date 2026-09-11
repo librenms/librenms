@@ -27,7 +27,6 @@
 namespace LibreNMS\Data\Source\Snmp;
 
 use App\Events\SnmpQueryExecuted;
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use DeviceCache;
@@ -44,6 +43,7 @@ class SnmpQuery implements SnmpQueryInterface
 {
     private Device $device;
     private string $context = '';
+    private string $v3ContextPrefix = '';
     private SnmpQueryOptions $options;
     private bool $abort = false;
     private bool $cache = false;
@@ -111,11 +111,8 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function context(string $context, ?string $v3_prefix = null): SnmpQueryInterface
     {
-        if ($context && $this->device->snmpver === 'v3') {
-            $context = $v3_prefix . $context;
-        }
-
         $this->context = $context;
+        $this->v3ContextPrefix = $v3_prefix ?? '';
 
         return $this;
     }
@@ -219,7 +216,7 @@ class SnmpQuery implements SnmpQueryInterface
         if ($options instanceof SnmpQueryOptions) {
             $this->options = $options;
         } else {
-            $this->options->parseCli($options ?: null);
+            $this->options = resolve(NetSnmpOptions::class)->parseCli($options ?: null);
         }
 
         return $this;
@@ -234,26 +231,7 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function get($oid): SnmpResponse
     {
-        $config = $this->device->toSnmpConfig();
-        $target = $this->device->pollerTarget();
-        $chunks = $this->limitOids($this->parseOid($oid), $config);
-        $response = new SnmpResponse('');
-
-        foreach ($chunks as $chunk) {
-            $options = $this->prepareOptions($chunk);
-            $res = $this->execWithCache('snmpget', $chunk, $options, fn () => $this->backend->get($target, $chunk, $config, $options));
-            $response = $response->append($res);
-
-            // if abort on failure is set, return after first failure
-            if ($this->abort && ! $response->isValid()) {
-                $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $chunks));
-                Log::debug('SNMP failed getting ' . implode(',', $chunk) . " of $oid_list aborting.");
-
-                return $response;
-            }
-        }
-
-        return $response;
+        return $this->executeChunked('snmpget', 'getting', $oid, fn ($target, $chunk, $config, $options) => $this->backend->get($target, $chunk, $config, $options));
     }
 
     /**
@@ -265,26 +243,20 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function walk($oid): SnmpResponse
     {
-        $config = $this->device->toSnmpConfig();
+        $config = $this->prepareQuery();
         $target = $this->device->pollerTarget();
+        $os = $this->device->os ?? 'generic';
         $oids = $this->parseOid($oid);
-        $response = new SnmpResponse('');
 
-        foreach ($oids as $singleOid) {
-            $options = $this->prepareOptions([$singleOid], walk: true);
-            $res = $this->execWithCache('snmpwalk', [$singleOid], $options, fn () => $this->backend->walk($target, $singleOid, $config, $options));
-            $response = $response->append($res);
+        return $this->runWithAbort(
+            $oids,
+            function ($singleOid) use ($target, $config, $os) {
+                $options = $this->options->createPerWalkInstance($os, $singleOid);
 
-            // if abort on failure is set, return after first failure
-            if ($this->abort && ! $response->isValid()) {
-                $oid_list = implode(',', $oids);
-                Log::debug("SNMP failed walking $singleOid of $oid_list aborting.");
-
-                return $response;
-            }
-        }
-
-        return $response;
+                return $this->execWithCache('snmpwalk', [$singleOid], $options, fn () => $this->backend->walk($target, $singleOid, $config, $options));
+            },
+            fn ($singleOid) => "SNMP failed walking $singleOid of " . implode(',', $oids) . ' aborting.'
+        );
     }
 
     /**
@@ -296,26 +268,7 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function next($oid): SnmpResponse
     {
-        $config = $this->device->toSnmpConfig();
-        $target = $this->device->pollerTarget();
-        $chunks = $this->limitOids($this->parseOid($oid), $config);
-        $response = new SnmpResponse('');
-
-        foreach ($chunks as $chunk) {
-            $options = $this->prepareOptions($chunk);
-            $res = $this->execWithCache('snmpgetnext', $chunk, $options, fn () => $this->backend->next($target, $chunk, $config, $options));
-            $response = $response->append($res);
-
-            // if abort on failure is set, return after first failure
-            if ($this->abort && ! $response->isValid()) {
-                $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $chunks));
-                Log::debug('SNMP failed next on ' . implode(',', $chunk) . " of $oid_list aborting.");
-
-                return $response;
-            }
-        }
-
-        return $response;
+        return $this->executeChunked('snmpgetnext', 'next on', $oid, fn ($target, $chunk, $config, $options) => $this->backend->next($target, $chunk, $config, $options));
     }
 
     /**
@@ -330,37 +283,76 @@ class SnmpQuery implements SnmpQueryInterface
             return Str::start($oid, '.'); // numeric to numeric optimization
         }
 
-        $options = clone $this->options;
-        $options->mibDirs = Mib::directories($this->device, $this->options->mibDirs);
+        $this->prepareMibDirs();
 
-        return $this->translateBackend->translate($oid, $options);
+        return $this->translateBackend->translate($oid, $this->options);
     }
 
     /**
-     * Prepare options for an execution chunk.
+     * Shared implementation for get() and next(): chunk the OIDs to respect the device's
+     * max OID limit, then run each chunk through runWithAbort().
      *
-     * Note: tolerateUnorderedIndexes and bulk are properties of the specific OID group being queried,
-     * not request-wide constants, and must be resolved per OID chunk.
-     *
-     * @param  string[]  $oids
+     * @param  string  $command  net-snmp command name, used for caching/events (e.g. 'snmpget')
+     * @param  string  $verb  wording for the abort log message (e.g. 'getting', 'next on')
+     * @param  string[]|string  $oid
+     * @param  \Closure  $backendCall  fn($target, $chunk, $config, $options): SnmpResponse
      */
-    private function prepareOptions(array $oids, bool $walk = false): SnmpQueryOptions
+    private function executeChunked(string $command, string $verb, array|string $oid, \Closure $backendCall): SnmpResponse
     {
-        $options = clone $this->options;
-        $options->context = $this->context ?: (string) ($this->device->getAttribute('context_name') ?: $this->device->getAttribute('context') ?: '');
-        $options->mibDirs = Mib::directories($this->device, $this->options->mibDirs);
+        $config = $this->prepareQuery();
+        $target = $this->device->pollerTarget();
+        $chunks = $this->limitOids($this->parseOid($oid), $config);
 
-        if ($walk) {
-            if (! empty(array_intersect($oids, LibrenmsConfig::getCombined($this->device->os, 'oids.unordered', 'snmp.')))) {
-                $options->tolerateUnorderedIndexes = true;
-            }
+        return $this->runWithAbort(
+            $chunks,
+            fn ($chunk) => $this->execWithCache($command, $chunk, $this->options, fn () => $backendCall($target, $chunk, $config, $this->options)),
+            fn ($chunk) => "SNMP failed $verb " . implode(',', $chunk) . ' of ' . implode(',', array_map(fn ($group) => implode(',', $group), $chunks)) . ' aborting.'
+        );
+    }
 
-            if (! empty(array_intersect($oids, LibrenmsConfig::getCombined($this->device->os, 'oids.no_bulk', 'snmp.')))) {
-                $options->allowBulk = false;
+    /**
+     * Run each item through the backend, appending responses, and abort after the
+     * first failed item if abortOnFailure() is set. Shared by executeChunked() (chunks
+     * of OIDs) and walk() (individual OIDs with per-OID options).
+     *
+     * @param  array<int, mixed>  $items
+     * @param  \Closure(mixed): SnmpResponse  $run
+     * @param  \Closure(mixed): string  $logMessage
+     */
+    private function runWithAbort(array $items, \Closure $run, \Closure $logMessage): SnmpResponse
+    {
+        $response = new SnmpResponse('');
+
+        foreach ($items as $item) {
+            $response = $response->append($run($item));
+
+            // if abort on failure is set, return after first failure
+            if ($this->abort && ! $response->isValid()) {
+                Log::debug($logMessage($item));
+
+                return $response;
             }
         }
 
-        return $options;
+        return $response;
+    }
+
+    /**
+     * Resolve the device's SNMP config and sync mibDirs/context onto the query options.
+     * Shared by get/walk/next; translate() only needs prepareMibDirs().
+     */
+    private function prepareQuery(): SnmpConfig
+    {
+        $config = $this->device->toSnmpConfig();
+        $this->prepareMibDirs();
+        $this->options->context = $config->version === 'v3' ? $this->v3ContextPrefix . $this->context : $this->context;
+
+        return $config;
+    }
+
+    private function prepareMibDirs(): void
+    {
+        $this->options->mibDirs = Mib::directories($this->device->os ?? 'generic', $this->options->mibDirs);
     }
 
     /**
@@ -444,16 +436,20 @@ class SnmpQuery implements SnmpQueryInterface
      */
     private function getCacheKey(string $type, array $oids): string
     {
-        $oidsStr = implode(',', $oids);
-        $optionsStr = implode(',', [
-            (string) $this->options->oidFormat->name,
-            (int) $this->options->numericIndexes,
-            (int) $this->options->numericEnums,
-            (int) $this->options->tolerateUnorderedIndexes,
-            implode(';', $this->options->mibs),
-            implode(';', $this->options->mibDirs),
+        return implode('|', [
+            $type,
+            $this->device->hostname,
+            $this->device->community,
+            $this->options->context,
+            implode(',', $oids),
+            implode(',', [
+                $this->options->oidFormat->name,
+                (int) $this->options->numericIndexes,
+                (int) $this->options->numericEnums,
+                (int) $this->options->tolerateUnorderedIndexes,
+                implode(';', $this->options->mibs),
+                implode(';', $this->options->mibDirs),
+            ]),
         ]);
-
-        return "$type|{$this->device->hostname}|{$this->device->community}|$this->context|$oidsStr|$optionsStr";
     }
 }

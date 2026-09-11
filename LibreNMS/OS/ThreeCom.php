@@ -30,6 +30,7 @@ use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class ThreeCom extends OS implements OSDiscovery
 {
@@ -46,12 +47,17 @@ class ThreeCom extends OS implements OSDiscovery
         $device->hardware = str_replace('3Com ', '', $device->sysDescr);
         // Old Stack Units
         if (Str::startsWith($device->sysObjectID ?? '', '.1.3.6.1.4.1.43.10.27.4.1.')) {
-            $oids = ['stackUnitDesc.1', 'stackUnitPromVersion.1', 'stackUnitSWVersion.1', 'stackUnitSerialNumber.1', 'stackUnitCapabilities.1'];
-            $data = snmp_get_multi($this->getDeviceArray(), $oids, ['-OQUs', '--hexOutputLength=0'], 'A3COM0352-STACK-CONFIG');
-            $device->hardware = trim($device->hardware . ' ' . ($data[1]['stackUnitDesc'] ?? ''));
-            $device->version = $data[1]['stackUnitSWVersion'] ?? null;
-            $device->serial = $data[1]['stackUnitSerialNumber'] ?? null;
-            $device->features = $data[1]['stackUnitCapabilities'] ?? null;
+            $response = SnmpQuery::get([
+                'A3COM0352-STACK-CONFIG::stackUnitDesc.1',
+                'A3COM0352-STACK-CONFIG::stackUnitPromVersion.1',
+                'A3COM0352-STACK-CONFIG::stackUnitSWVersion.1',
+                'A3COM0352-STACK-CONFIG::stackUnitSerialNumber.1',
+                'A3COM0352-STACK-CONFIG::stackUnitCapabilities.1',
+            ]);
+            $device->hardware = trim($device->hardware . ' ' . $response->value('A3COM0352-STACK-CONFIG::stackUnitDesc'));
+            $device->version = $response->value('A3COM0352-STACK-CONFIG::stackUnitSWVersion') ?: null;
+            $device->serial = $response->value('A3COM0352-STACK-CONFIG::stackUnitSerialNumber') ?: null;
+            $device->features = str_replace("\n", '', $response->value('A3COM0352-STACK-CONFIG::stackUnitCapabilities')) ?: null;
         }
     }
 }

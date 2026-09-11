@@ -27,43 +27,48 @@
 namespace LibreNMS\Util;
 
 use App\Facades\LibrenmsConfig;
-use App\Models\Device;
+use Illuminate\Support\Str;
 
 class Mib
 {
     /**
      * Get the list of MIB directories for a device, including OS and group directories.
      *
-     * @param  Device|null  $device
+     * @param  string  $os
      * @param  array<int, string>  $extraDirs
      * @return array<int, string>
      */
-    public static function directories(?Device $device = null, array $extraDirs = []): array
+    public static function directories(string $os = '', array $extraDirs = []): array
     {
-        $base = LibrenmsConfig::get('mib_dir');
+        $base = rtrim(LibrenmsConfig::get('mib_dir'), '/');
         $dirs = [$base];
 
-        if ($device) {
-            // os group
-            if ($osGroup = LibrenmsConfig::getOsSetting($device->os, 'group')) {
-                if (file_exists("$base/$osGroup")) {
-                    $dirs[] = "$base/$osGroup";
-                }
+        if ($os) {
+            if ($osGroup = LibrenmsConfig::getOsSetting($os, 'group')) {
+                $dirs[] = "$base/$osGroup";
             }
 
-            // os directory
-            $osMibdir = LibrenmsConfig::getOsSetting($device->os, 'mib_dir');
-            if ($osMibdir && is_string($osMibdir)) {
-                $dirs[] = "$base/$osMibdir";
-            } elseif (file_exists($base . '/' . $device->os)) {
-                $dirs[] = $base . '/' . $device->os;
-            }
+            $dirs[] = "$base/$os";
+            $dirs[] = $base . '/' . LibrenmsConfig::getOsSetting($os, 'mib_dir');
         }
 
         foreach ($extraDirs as $mibDir) {
-            $dirs[] = str_starts_with((string) $mibDir, '/') ? (string) $mibDir : "$base/$mibDir";
+            $dirs[] = rtrim(Str::start($mibDir, "$base/"), '/');
         }
 
-        return array_values(array_unique(array_filter(array_map(fn ($dir) => rtrim((string) $dir, '/'), $dirs))));
+        return array_values(array_filter(array_unique($dirs), is_dir(...)));
+    }
+
+    public static function parseCliInput(string $mibs, array $existing = []): array
+    {
+        if ($mibs === '') {
+            return $existing;
+        }
+
+        if (! str_starts_with($mibs, '+')) {
+            return explode(':', $mibs);
+        }
+
+        return array_values(array_unique([...$existing, ...explode(':', substr($mibs, 1))]));
     }
 }
