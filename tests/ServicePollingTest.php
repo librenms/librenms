@@ -69,6 +69,7 @@ SH
         }
     }
 
+    /** @return array<string, array{int, int, string}> */
     public static function checkResultsProvider(): array
     {
         return [
