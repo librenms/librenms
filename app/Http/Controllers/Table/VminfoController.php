@@ -76,9 +76,9 @@ class VminfoController extends TableController
             'vmwVmGuestOS' => $model->operatingSystem,
             'vmwVmMemSize' => $model->memoryFormatted,
             'vmwVmCpus' => $model->vmwVmCpus,
-            'hostname' => self::getHostname($model->device),
+            'hostname' => is_null($model->device) ? '' : self::getHostname($model->device),
             'deviceid' => $model->device_id,
-            'sysname' => $model->device->sysName,
+            'sysname' => $model->device->sysName ?? '',
 
         ];
     }
