@@ -76,15 +76,19 @@ class VminfoController extends TableController
             'vmwVmGuestOS' => $model->operatingSystem,
             'vmwVmMemSize' => $model->memoryFormatted,
             'vmwVmCpus' => $model->vmwVmCpus,
-            'hostname' => is_null($model->device) ? '' : self::getHostname($model->device),
+            'hostname' => self::getHostname($model->device),
             'deviceid' => $model->device_id,
-            'sysname' => $model->device->sysName ?? '',
+            'sysname' => $model->device?->sysName,
 
         ];
     }
 
-    private static function getHostname(Device $device): string
+    private static function getHostname(?Device $device): string
     {
+        if ($device === null) {
+            return '';
+        }
+
         return '<a class="list-device" href="' . Url::deviceUrl($device) . '">' . $device->displayName() . '</a>';
     }
 }
