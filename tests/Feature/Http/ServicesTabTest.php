@@ -77,6 +77,24 @@ class ServicesTabTest extends TestCase
             ->assertSee('colspan="8"', false);
     }
 
+    public function testServiceCheckCanBeRecordedWithoutAStatusChange(): void
+    {
+        $device = Device::factory()->create();
+        Service::factory()->for($device)->create([
+            'service_name' => 'Steady service',
+            'service_status' => 0,
+            'service_changed' => 0,
+            'service_checked' => time() - 300,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'services']))
+            ->assertOk()
+            ->assertSeeInOrder(['Steady service', 'No status change recorded', '5 minutes'])
+            ->assertDontSee('Waiting for first check')
+            ->assertDontSee('Not yet recorded');
+    }
+
     public function testGlobalServicesPageShowsRecordedAndUnknownCheckTimes(): void
     {
         $device = Device::factory()->create();
@@ -117,9 +135,10 @@ class ServicesTabTest extends TestCase
                     '3 days',
                     'Not yet recorded',
                     'Waiting Check',
-                    'Waiting for first check',
+                    'No status change recorded',
                     'Not yet recorded',
                 ])
+                ->assertDontSee('Waiting for first check')
                 ->assertDontSee('years');
         } finally {
             if ($previousUri === null) {

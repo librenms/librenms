@@ -138,6 +138,9 @@ Last Checked displays **Not yet recorded** until a check time is recorded.
 Upgrades do not backfill historical check times, so existing services show
 this text until their next completed check.
 
+Last Changed displays **No status change recorded** when no status change
+time is available, even if the service has already been checked.
+
 The [Services API](../API/Services.md#list_services) exposes these times
 and the configured global Dispatcher check interval. This interval is not
 a measured polling interval or a scheduled next check time; cron schedules
