@@ -2124,6 +2124,10 @@ return [
                 ],
             ],
         ],
+        'service_poll_api' => [
+            'description' => 'Poll using the API',
+            'help' => 'Use a connection to localhost to poll and discover devices (requires additional setup).',
+        ],
         'sensors' => [
             'guess_limits' => [
                 'description' => 'Guess sensor limits',

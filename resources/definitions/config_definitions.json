@@ -6751,6 +6751,13 @@
             "section": "sensors",
             "order": 4
         },
+        "service_poll_api": {
+            "default": false,
+            "group": "poller",
+            "section": "dispatcherservice",
+            "order": 27,
+            "type": "boolean"
+        },
         "service_poller_workers": {
             "default": 24,
             "group": "poller",
