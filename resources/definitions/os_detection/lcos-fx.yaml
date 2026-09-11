@@ -1,4 +1,4 @@
-os: rscs-lcos-fx
+os: lcos-fx
 text: 'R&S NC LANCOM Unified Firewall'
 type: firewall
 icon: rsnc

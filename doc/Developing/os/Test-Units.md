@@ -1,4 +1,4 @@
-# Tests
+# OS Unit Tests and SNMP Simulation
 
 Tests keep LibreNMS correct, now and in the future. A new OS must
 supply enough test data. Test data for an existing OS is also welcome.
@@ -31,16 +31,30 @@ all the discovery data and the polling data of a device in LibreNMS.
 Run the command again after you add more support. For more options,
 read the command line help.
 
+- **Do not fabricate snmprec files**. You must only capture snmprec
+  files from an actual device or convert them from snmpwalk output from an
+  actual device.
+- **Do not break the data when you sanitize it**. Keep valid syntax,
+  correct data types, and valid OID structure. Remove real passwords,
+  SNMP community strings, and public IP addresses.
+
 ### 2. Save test data
 
-After the collection of the SNMP data, run
-`lnms dev:generate-test-data <os>` with the `--variant ''` option. It
-dumps the database entries after discovery and after polling into JSON
-files. This step needs snmpsim. If you have a problem, the maintainers
-can generate the files from your snmprec file.
+After you collect the SNMP data, run `lnms dev:generate-test-data`:
 
-You usually collect the data one time. After the snmprec file holds
-your data, use `lnms dev:generate-test-data` to update the JSON database dump.
+- For a new base OS fixture, pass the `--variant=""` option:
+  `lnms dev:generate-test-data <os> --variant=""`.
+  You must include this option when creating a new fixture for the first
+  time. Without this option, the command searches only for existing JSON
+  files.
+- To update existing JSON fixtures, run:
+  `lnms dev:generate-test-data <os>`.
+- For an OS variant, use a lowercase variant name:
+  `lnms dev:generate-test-data <os> --variant="<variant>"`.
+
+This command dumps the database entries after discovery and after
+polling into a JSON file (`tests/data/<os>.json`). Do not edit this
+file manually.
 
 ## Running tests
 
