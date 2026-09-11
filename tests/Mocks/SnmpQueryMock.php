@@ -139,6 +139,11 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
+    public function bulk(bool $allow = true): SnmpQueryInterface
+    {
+        return $this;
+    }
+
     public function options($options = []): SnmpQueryInterface
     {
         $this->options = $options === null ? [] : Arr::wrap($options);
