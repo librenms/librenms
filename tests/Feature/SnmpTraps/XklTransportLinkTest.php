@@ -21,15 +21,16 @@
  * @copyright  2026 Heath Barnhart
  * @author     Heath Barnhart hbarnhart@kanren.net
  */
- 
+
 namespace LibreNMS\Tests\Feature\SnmpTraps;
+
 use LibreNMS\Enum\Severity;
 
 final class XklTransportLinkTest extends SnmpTrapTestCase
 {
     public function testXklTransportLinkUp(): void
     {
-	    $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
@@ -40,15 +41,15 @@ XKL-MIB::xklTransportTxStatus.1 up
 XKL-MIB::xklTransportRxStatus.1 up
 TRAP,
 
-		'Tranport 1 is up.',
-		'Failed to handle XklTransportLinkUp trap',
-		[Severity::Ok],
-		);
-	}
+            'Tranport 1 is up.',
+            'Failed to handle XklTransportLinkUp trap',
+            [Severity::Ok],
+        );
+    }
 
-	public function testXklTransportLinkDown(): void
+    public function testXklTransportLinkDown(): void
     {
-	    $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
@@ -59,9 +60,9 @@ XKL-MIB::xklTransportTxStatus.3 up
 XKL-MIB::xklTransportRxStatus.3 los
 TRAP,
 
-		'Transport service 3 is down. Transmit status: up Receive status: los',
-		'Failed to handle trap XklTransportLinkDown',
-		[Severity::Error],
-		);
-	}
+            'Transport service 3 is down. Transmit status: up Receive status: los',
+            'Failed to handle trap XklTransportLinkDown',
+            [Severity::Error],
+        );
+    }
 }

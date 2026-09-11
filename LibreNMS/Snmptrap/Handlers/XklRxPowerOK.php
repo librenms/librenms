@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @link       http://librenms.org
+ *
  * @copyright  2026 Heath Barnhart
  * @author     Heath Barnhart <your email>
  */
@@ -41,13 +42,11 @@ class XklRxPowerOK implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-
-        $rxPower = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportReceivePower'));
+        $rxPower   = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportReceivePower'));
         $xcvrDescr = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportDescr.33'));
 
         $message = "Transciever $xcvrDescr receive power OK. Current value: $rxPower";
-        
-		$trap->log($message, Severity::Ok);
 
+        $trap->log($message, Severity::Ok);
     }
 }

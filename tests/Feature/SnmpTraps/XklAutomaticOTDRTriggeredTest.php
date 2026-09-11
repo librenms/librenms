@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XklAutomaticOTDRTriggeredTest.php
  *
@@ -18,18 +19,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @link       http://librenms.org
+ *
  * @copyright  2026 Heath Barnhart
  * @author     Heath Barnhart hbarnhart@kanren.net
  */
- 
+
 namespace LibreNMS\Tests\Feature\SnmpTraps;
+
 use LibreNMS\Enum\Severity;
 
 final class XklAutomaticOTDRTriggeredTest extends SnmpTrapTestCase
 {
     public function testXklAutomaticOTDRTriggered(): void
     {
-	    $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
@@ -42,9 +45,9 @@ XKL-MIB::xklOTDRLatestMeasurementOTDRGroupNumber.1 none
 XKL-MIB::xklOTDRLatestMeasurementOTDRGroupName.1 N\/A
 TRAP,
 
-		'Automatic OTDR Event at 06-23-2026 01:25:21. Name: OSC 0 (N\/A) Length: 47.91km',
-		'Failed to handle XklAutomaticOTDRTriggered trap.',
-		[Severity::Warning],
-		);
-	}
+            'Automatic OTDR Event at 06-23-2026 01:25:21. Name: OSC 0 (N\/A) Length: 47.91km',
+            'Failed to handle XklAutomaticOTDRTriggered trap.',
+            [Severity::Warning],
+        );
+    }
 }

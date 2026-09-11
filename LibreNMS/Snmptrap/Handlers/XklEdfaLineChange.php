@@ -33,7 +33,8 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
-class XklEdfaLineChange implements SnmptrapHandler {
+class XklEdfaLineChange implements SnmptrapHandler
+{
     /**
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
@@ -44,14 +45,14 @@ class XklEdfaLineChange implements SnmptrapHandler {
      */
     public function handle(Device $device, Trap $trap): void
     {
-        $edfaName = $trap->getOidData($trap->findOid('XKL-MIB::xklEDFAName'));
+        $edfaName  = $trap->getOidData($trap->findOid('XKL-MIB::xklEDFAName'));
         $edfaState = $trap->getOidData($trap->findOid('XKL-MIB::xklEDFAAmplificationState'));
-        $severity = match($edfaState) {
-            'up' => Severity::Ok,
-            'unused' => Severity::Info,
+        $severity  = match ($edfaState) {
+            'up'      => Severity::Ok,
+            'unused'  => Severity::Info,
             'warning' => Severity::Info,
             'unknown' => Severity::Info,
-            default => Severity::Error,
+            default   => Severity::Error,
         };
 
         $trap->log("$edfaName changed state to $edfaState", $severity);

@@ -3,7 +3,7 @@
  * XklAutomaticOTDRTriggered.php
  *
  * -Description-
- * 
+ *
  * XKL Automatic OTDR was run, indicating a disruption in the fiber at
  * the length provided.
  *
@@ -21,6 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @link       http://librenms.org
+ *
  * @copyright  2026 Heath Barnhart
  * @author     Heath Barnhart hbarnhart@kanren.net
  */
@@ -38,20 +39,19 @@ class XklAutomaticOTDRTriggered implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
     public function handle(Device $device, Trap $trap)
     {
 
-        $otdrDescr = $trap->getOidData($trap->findOid('XKL-MIB::xklOTDRLatestMeasurementOSCDescr'));
+        $otdrDescr    = $trap->getOidData($trap->findOid('XKL-MIB::xklOTDRLatestMeasurementOSCDescr'));
         $otdrDistance = $trap->getOidData($trap->findOid('XKL-MIB::xklOTDRLatestMeasurementResults'));
-        $otdrDate = $trap->getOidData($trap->findOid('XKL-MIB::xklOTDRLatestMeasurementDateTime'));
+        $otdrDate     = $trap->getOidData($trap->findOid('XKL-MIB::xklOTDRLatestMeasurementDateTime'));
 
         $message = "Automatic OTDR Event at $otdrDate. Name: $otdrDescr Length: $otdrDistance";
-     
-		$trap->log($message, Severity::Warning);
 
+        $trap->log($message, Severity::Warning);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XklEdfaAlarmChangeTest.php
  *
@@ -18,18 +19,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @link       http://librenms.org
+ *
  * @copyright  2026 Heath Barnhart
  * @author     Heath Barnhart hbarnhart@kanren.net
  */
- 
+
 namespace LibreNMS\Tests\Feature\SnmpTraps;
+
 use LibreNMS\Enum\Severity;
 
 final class XklEdfaAlarmChangeTest extends SnmpTrapTestCase
 {
     public function testXklEdfaAlarmChangeDisabled(): void
     {
-	    $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
@@ -43,18 +46,18 @@ XKL-MIB::xklEDFACommonAlarm.1 yes
 XKL-MIB::xklEDFAPumpTemperatureAlarm.1 no
 XKL-MIB::xklEDFALossOfInputAlarm.1 no
 XKL-MIB::xklEDFALossOfOutputAlarm.1 no
-XKL-MIB::xklEDFAModuleAlarms.1 NONE 
+XKL-MIB::xklEDFAModuleAlarms.1 NONE
 XKL-MIB::xklEDFAName.1 Output EDFA
 TRAP,
 
-		'Output EDFA changed to disabled.',
-		'Failed to handle XklEdfaAlarmChange EDFA disabled alarm trap.',
-		);
-	}
+            'Output EDFA changed to disabled.',
+            'Failed to handle XklEdfaAlarmChange EDFA disabled alarm trap.',
+        );
+    }
 
-	public function testXklEdfaAlarmChangeReset(): void
+    public function testXklEdfaAlarmChangeReset(): void
     {
-	    $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
@@ -68,18 +71,18 @@ XKL-MIB::xklEDFACommonAlarm.1 yes
 XKL-MIB::xklEDFAPumpTemperatureAlarm.1 no
 XKL-MIB::xklEDFALossOfInputAlarm.1 no
 XKL-MIB::xklEDFALossOfOutputAlarm.1 no
-XKL-MIB::xklEDFAModuleAlarms.1 NONE 
+XKL-MIB::xklEDFAModuleAlarms.1 NONE
 XKL-MIB::xklEDFAName.1 Output EDFA
 TRAP,
 
-		'Output EDFA reset.',
-		'Failed to handle XklEdfaAlarmChange EDFA reset alarm trap.',
-		);
-	}
+            'Output EDFA reset.',
+            'Failed to handle XklEdfaAlarmChange EDFA reset alarm trap.',
+        );
+    }
 
-	public function testXklEdfaAlarmChangeMuted(): void
+    public function testXklEdfaAlarmChangeMuted(): void
     {
-	    $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
@@ -93,18 +96,18 @@ XKL-MIB::xklEDFACommonAlarm.1 yes
 XKL-MIB::xklEDFAPumpTemperatureAlarm.1 no
 XKL-MIB::xklEDFALossOfInputAlarm.1 no
 XKL-MIB::xklEDFALossOfOutputAlarm.1 no
-XKL-MIB::xklEDFAModuleAlarms.1 NONE 
+XKL-MIB::xklEDFAModuleAlarms.1 NONE
 XKL-MIB::xklEDFAName.1 Output EDFA
 TRAP,
 
-		'Output EDFA has become muted.',
-		'Failed to handle XklEdfaAlarmChange EDFA muted alarm trap.',
-		);
-	}
+            'Output EDFA has become muted.',
+            'Failed to handle XklEdfaAlarmChange EDFA muted alarm trap.',
+        );
+    }
 
-	public function testXklEdfaAlarmChangeCaseTemp(): void
+    public function testXklEdfaAlarmChangeCaseTemp(): void
     {
-	    $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
@@ -118,18 +121,18 @@ XKL-MIB::xklEDFACommonAlarm.1 yes
 XKL-MIB::xklEDFAPumpTemperatureAlarm.1 no
 XKL-MIB::xklEDFALossOfInputAlarm.1 no
 XKL-MIB::xklEDFALossOfOutputAlarm.1 no
-XKL-MIB::xklEDFAModuleAlarms.1 NONE 
+XKL-MIB::xklEDFAModuleAlarms.1 NONE
 XKL-MIB::xklEDFAName.1 Output EDFA
 TRAP,
 
-		'Output EDFA case temperature alarm is active.',
-		'Failed to handle XklEdfaAlarmChange case temperature alarm trap.',
-		);
-	}
+            'Output EDFA case temperature alarm is active.',
+            'Failed to handle XklEdfaAlarmChange case temperature alarm trap.',
+        );
+    }
 
-	public function testXklEdfaAlarmChangePumpTemp(): void
+    public function testXklEdfaAlarmChangePumpTemp(): void
     {
-	    $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
@@ -143,18 +146,18 @@ XKL-MIB::xklEDFACommonAlarm.1 yes
 XKL-MIB::xklEDFAPumpTemperatureAlarm.1 yes
 XKL-MIB::xklEDFALossOfInputAlarm.1 no
 XKL-MIB::xklEDFALossOfOutputAlarm.1 no
-XKL-MIB::xklEDFAModuleAlarms.1 NONE 
+XKL-MIB::xklEDFAModuleAlarms.1 NONE
 XKL-MIB::xklEDFAName.1 Output EDFA
 TRAP,
 
-		'Output EDFA pump temperature alarm is active.',
-		'Failed to handle XklEdfaAlarmChange pump temperature alarm trap.',
-		);
-	}
+            'Output EDFA pump temperature alarm is active.',
+            'Failed to handle XklEdfaAlarmChange pump temperature alarm trap.',
+        );
+    }
 
-	public function testXklEdfaAlarmChangePumpBias(): void
+    public function testXklEdfaAlarmChangePumpBias(): void
     {
-	    $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
@@ -169,19 +172,19 @@ XKL-MIB::xklEDFAPumpTemperatureAlarm.1 no
 XKL-MIB::xklEDFAPumpBiasAlarm yes
 XKL-MIB::xklEDFALossOfInputAlarm.1 no
 XKL-MIB::xklEDFALossOfOutputAlarm.1 no
-XKL-MIB::xklEDFAModuleAlarms.1 NONE 
+XKL-MIB::xklEDFAModuleAlarms.1 NONE
 XKL-MIB::xklEDFAName.1 Output EDFA
 TRAP,
 
-		'Output EDFA pump BIAS alarm is active.',
-		'Failed to handle XklEdfaAlarmChange EDFA BIAS alarm trap.',
-		[Severity::Error],
-		);
-	}
+            'Output EDFA pump BIAS alarm is active.',
+            'Failed to handle XklEdfaAlarmChange EDFA BIAS alarm trap.',
+            [Severity::Error],
+        );
+    }
 
-	public function testXklEdfaAlarmChangeLossInput(): void
+    public function testXklEdfaAlarmChangeLossInput(): void
     {
-	    $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
@@ -196,19 +199,19 @@ XKL-MIB::xklEDFAPumpTemperatureAlarm.1 no
 XKL-MIB::xklEDFAPumpBiasAlarm no
 XKL-MIB::xklEDFALossOfInputAlarm.1 yes
 XKL-MIB::xklEDFALossOfOutputAlarm.1 no
-XKL-MIB::xklEDFAModuleAlarms.1 NONE 
+XKL-MIB::xklEDFAModuleAlarms.1 NONE
 XKL-MIB::xklEDFAName.1 Output EDFA
 TRAP,
 
-		'Output EDFA loss of input alarm is active.',
-		'Failed to handle XklEdfaAlarmChange loss of input alarm trap.',
-		[Severity::Error],
-		);
-	}
+            'Output EDFA loss of input alarm is active.',
+            'Failed to handle XklEdfaAlarmChange loss of input alarm trap.',
+            [Severity::Error],
+        );
+    }
 
-	public function testXklEdfaAlarmChangeLossOutput(): void
+    public function testXklEdfaAlarmChangeLossOutput(): void
     {
-	    $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
@@ -223,19 +226,19 @@ XKL-MIB::xklEDFAPumpTemperatureAlarm.1 no
 XKL-MIB::xklEDFAPumpBiasAlarm no
 XKL-MIB::xklEDFALossOfInputAlarm.1 no
 XKL-MIB::xklEDFALossOfOutputAlarm.1 yes
-XKL-MIB::xklEDFAModuleAlarms.1 NONE 
+XKL-MIB::xklEDFAModuleAlarms.1 NONE
 XKL-MIB::xklEDFAName.1 Output EDFA
 TRAP,
 
-		'Output EDFA loss of output alarm is active.',
-		'Failed to handle XklEdfaAlarmChange loss of output alarm trap.',
-		[Severity::Error],
-		);
-	}
+            'Output EDFA loss of output alarm is active.',
+            'Failed to handle XklEdfaAlarmChange loss of output alarm trap.',
+            [Severity::Error],
+        );
+    }
 
-	public function testXklEdfaAlarmChangeModule(): void
+    public function testXklEdfaAlarmChangeModule(): void
     {
-	    $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
@@ -254,9 +257,9 @@ XKL-MIB::xklEDFAModuleAlarms.1 OSC 6
 XKL-MIB::xklEDFAName.1 Output EDFA
 TRAP,
 
-		'Output EDFA $ module alarm: OSC 6',
-		'Failed to handle XklEdfaAlarmChange loss of output alarm trap.',
-		[Severity::Error],
-		);
-	}
+            'Output EDFA $ module alarm: OSC 6',
+            'Failed to handle XklEdfaAlarmChange loss of output alarm trap.',
+            [Severity::Error],
+        );
+    }
 }
