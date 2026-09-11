@@ -104,6 +104,7 @@ class ServicesController implements DeviceTab
                     'service' => $service,
                     'status_class' => $statusClass,
                     'last_changed' => $service->service_changed ? Time::formatInterval(time() - $service->service_changed) : __('Waiting for first check'),
+                    'last_checked' => $service->service_checked ? Time::formatInterval(time() - $service->service_checked) : __('Not yet recorded'),
                     'graphs' => $graphs,
                 ];
             });

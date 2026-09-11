@@ -3478,7 +3478,13 @@ function list_services(Illuminate\Http\Request $request)
         $query .= ' WHERE ' . implode(' AND ', $where);
     }
     $query .= ' ORDER BY `service_ip`';
-    $services = [dbFetchRows($query, $params)]; // double array for backwards compat :(
+    $serviceCheckInterval = max(1, (int) LibrenmsConfig::get('service_services_frequency', 300));
+    $serviceRows = dbFetchRows($query, $params);
+    foreach ($serviceRows as &$serviceRow) {
+        $serviceRow['service_check_interval'] = $serviceCheckInterval;
+    }
+    unset($serviceRow);
+    $services = [$serviceRows]; // double array for backwards compat :(
 
     return api_success($services, 'services');
 }

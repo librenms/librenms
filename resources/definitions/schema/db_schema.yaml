@@ -2262,6 +2262,7 @@ services:
     - { Field: service_ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: service_status, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: service_changed, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: service_checked, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: service_message, Type: text, 'Null': true, Extra: '' }
     - { Field: service_disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: service_ds, Type: text, 'Null': true, Extra: '' }

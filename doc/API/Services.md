@@ -19,6 +19,22 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services?sta
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services?state=0&type=tcp
 ```
 
+Both `GET /api/v0/services` and `GET /api/v0/services/:hostname`
+include these timing fields for each service:
+
+- `service_checked`: the completion time of the most recent check, in
+  Unix seconds. This updates even when the status is unchanged or the
+  check returns Warning or Critical. A value of `0` means no check time
+  has been recorded. Upgrades do not backfill historical check times;
+  existing services receive a timestamp after their next completed check.
+- `service_changed`: the time the service status last changed, in Unix
+  seconds. This does not indicate when an unchanged service was checked.
+- `service_check_interval`: the configured global Dispatcher service
+  check interval (`service_services_frequency`), in seconds. It defaults
+  to `300` and the API returns at least `1`. This is not a measured interval
+  or a scheduled next check time. Checks run through cron can use a
+  different interval.
+
 Output:
 
 ```json
@@ -38,6 +54,8 @@ Output:
                 "service_ignore": "0",
                 "service_status": "0",
                 "service_changed": "1470962470",
+                "service_checked": 1470962770,
+                "service_check_interval": 300,
                 "service_message": "NTP OK: Offset -0.000717 secs",
                 "service_disabled": "0",
                 "service_ds": "{\"offset\":{ \"uom\":\"s\", \"full_name\": \"offset\" } }"
@@ -54,6 +72,8 @@ Output:
                 "service_ignore": "0",
                 "service_status": "0",
                 "service_changed": "1471702206",
+                "service_checked": 1471702506,
+                "service_check_interval": 300,
                 "service_message": "OK - Server: Supermicro X9SCL/X9SCM s/n: 0123456789 System BIOS: 2.2 2015-02-20",
                 "service_disabled": "0",
                 "service_ds": "{\"P2Vol_0_Processor_1_Vcore\":\"\",\"P2Vol_1_System_Board_1_-12V\":\"\",\"P2Vol_2_System_Board_1_12V\":\"\",\"P2Vol_3_System_Board_1_3.3VCC\":\"\",\"P2Vol_4_System_Board_1_5VCC\":\"\",\"P2Vol_5_System_Board_1_AVCC\":\"\",\"P2Vol_6_System_Board_1_VBAT\":\"\",\"P2Vol_7_System_Board_1_"
@@ -68,6 +88,9 @@ Output:
 Retrieve services for device
 
 Route: `/api/v0/services/:hostname`
+
+The response includes the same timing fields described in
+[`list_services`](#list_services).
 
 - id or hostname is the specific device
 
@@ -104,6 +127,8 @@ Output:
                 "service_ignore": "0",
                 "service_status": "0",
                 "service_changed": "1471702206",
+                "service_checked": 1471702506,
+                "service_check_interval": 300,
                 "service_message": "OK - Server: Supermicro X9SCL/X9SCM s/n: 0123456789 System BIOS: 2.2 2015-02-20",
                 "service_disabled": "0",
                 "service_ds": "{\"P2Vol_0_Processor_1_Vcore\":\"\",\"P2Vol_1_System_Board_1_-12V\":\"\",\"P2Vol_2_System_Board_1_12V\":\"\",\"P2Vol_3_System_Board_1_3.3VCC\":\"\",\"P2Vol_4_System_Board_1_5VCC\":\"\",\"P2Vol_5_System_Board_1_AVCC\":\"\",\"P2Vol_6_System_Board_1_VBAT\":\"\",\"P2Vol_7_System_Board_1_"
