@@ -35,6 +35,9 @@ class AnchorJoinTest extends TestCase
         parent::tearDown();
     }
 
+    /**
+     * @return array{condition: string, rules: array<array{id: string, field: string, type: string, input: string, operator: string, value: string}>, valid: bool}
+     */
     private function ruleFor(string $field, string $operator, string $value): array
     {
         return [
@@ -51,6 +54,9 @@ class AnchorJoinTest extends TestCase
         ];
     }
 
+    /**
+     * @param  array{condition: string, rules: array<array{id: string, field: string, type: string, input: string, operator: string, value: string}>, valid: bool}  $builder
+     */
     private function assertRuleTriggers(Device $device, array $builder, bool $expected, string $message = ''): void
     {
         $rule = AlertRule::factory()->create(['query' => '', 'builder' => $builder]);
@@ -101,6 +107,9 @@ class AnchorJoinTest extends TestCase
 
     // ── 2. Compound rules -- IP condition combined with a non-joined condition ──
 
+    /**
+     * @return array{condition: string, rules: array<array{id: string, field: string, type: string, input: string, operator: string, value: string}>, valid: bool}
+     */
     private function ipAndStatusRule(string $condition, string $ipOperator): array
     {
         return [
