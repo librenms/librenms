@@ -149,9 +149,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
 
     protected function joinTables(Builder $query): Builder
     {
-        if (! isset($this->builder['joins'])) {
-            $this->generateJoins();
-        }
+        $this->generateJoins();
 
         foreach ($this->builder['joins'] as $join) {
             [$rightTable, $left, $right] = $join;
@@ -159,28 +157,5 @@ class QueryBuilderFluentParser extends QueryBuilderParser
         }
 
         return $query;
-    }
-
-    /**
-     * Generate the joins for this rule and store them in the rule.
-     * This is an expensive operation.
-     */
-    public function generateJoins(): static
-    {
-        $joins = [];
-        foreach ($this->generateGlue() as $glue) {
-            [$left, $right] = explode(' = ', (string) $glue, 2);
-            if (Str::contains($right, '.')) { // last line is devices.device_id = ? for alerting... ignore it
-                [$leftTable, $leftKey] = explode('.', $left);
-                [$rightTable, $rightKey] = explode('.', $right);
-                $target_table = ($rightTable != 'devices' ? $rightTable : $leftTable);  // don't try to join devices
-
-                $joins[] = [$target_table, $left, $right];
-            }
-        }
-
-        $this->builder['joins'] = $joins;
-
-        return $this;
     }
 }

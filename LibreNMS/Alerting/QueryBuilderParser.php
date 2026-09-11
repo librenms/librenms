@@ -159,14 +159,55 @@ class QueryBuilderParser implements \JsonSerializable
         $wrap = false;
 
         if ($expand) {
-            $sql = 'SELECT * FROM ' . implode(',', $this->getTables());
-            $sql .= ' WHERE (' . implode(' AND ', $this->generateGlue()) . ') AND ';
+            $this->generateJoins();
+
+            // LEFT JOIN, not a comma-joined implicit INNER JOIN -- a comma
+            // join excludes the device entirely from the result set when a
+            // referenced table (ports, ipv4_addresses, ...) has no matching
+            // row for it, before the rule condition is ever evaluated. That
+            // silently breaks any operator whose correct result for "no
+            // related row" is true rather than false -- confirmed for both
+            // ip_not_in_prefix's NOT EXISTS and is_null on a joined field.
+            // Mirrors the LEFT JOINs QueryBuilderFluentParser::toQuery()
+            // already builds correctly from the same generateGlue() data.
+            $sql = 'SELECT * FROM devices';
+            foreach ($this->builder['joins'] as [$table, $left, $right]) {
+                $sql .= " LEFT JOIN $table ON $left = $right";
+            }
+            $sql .= ' WHERE (devices.' . $this->schema->getPrimaryKey('devices') . ' = ?) AND ';
 
             // only wrap in ( ) if the condition is OR and there is more than one rule
             $wrap = $this->builder['condition'] == 'OR' && count($this->builder['rules']) > 1;
         }
 
         return $sql . $this->parseGroup($this->builder, $expand, $wrap);
+    }
+
+    /**
+     * Generate the joins for this rule and store them in the rule.
+     * This is an expensive operation.
+     */
+    public function generateJoins(): static
+    {
+        if (isset($this->builder['joins'])) {
+            return $this;
+        }
+
+        $joins = [];
+        foreach ($this->generateGlue() as $glue) {
+            [$left, $right] = explode(' = ', (string) $glue, 2);
+            if (Str::contains($right, '.')) { // last line is devices.device_id = ? for alerting... ignore it
+                [$leftTable, $leftKey] = explode('.', $left);
+                [$rightTable, $rightKey] = explode('.', $right);
+                $target_table = ($rightTable != 'devices' ? $rightTable : $leftTable);  // don't try to join devices
+
+                $joins[] = [$target_table, $left, $right];
+            }
+        }
+
+        $this->builder['joins'] = $joins;
+
+        return $this;
     }
 
     /**
