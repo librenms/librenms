@@ -56,7 +56,7 @@ class Mib
             $dirs[] = rtrim(Str::start($mibDir, "$base/"), '/');
         }
 
-        return array_values(array_filter(array_unique($dirs), fn ($dir) => is_dir($dir)));
+        return array_values(array_filter(array_unique($dirs), is_dir(...)));
     }
 
     public static function parseCliInput(string $mibs, array $existing = []): array
