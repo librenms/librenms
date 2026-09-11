@@ -1,6 +1,9 @@
 modules:
     os:
-        version: HUAWEI-SITE-MONITOR-MIB::hwMonEquipSoftwareVersion.1
+        hardware:
+          - '.1.3.6.1.4.1.2011.6.3.1.31.0'
+        version:
+          - HUAWEI-SITE-MONITOR-MIB::hwMonEquipSoftwareVersion.1
     additional_oids:
         data:
             -
@@ -8,6 +11,8 @@ modules:
                     - HUAWEI-SITE-MONITOR-MIB::hwLvdUnitEquipName
     sensors:
         voltage:
+            options:
+                skip_values: 2147483647
             data:
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwRectsRatedVoltage
@@ -24,10 +29,38 @@ modules:
                     index: "adjustedRectifier-{{ $index }}"
                     group: Rectifier
                 -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwRectOutputVoltage
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.2.2.1.3.{{ $index }}'
+                    divisor: 10
+                    descr: Rectifier Output Voltage
+                    index: "rectOutput-{{ $index }}"
+                    group: Rectifier
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwRectACVoltage
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.2.2.1.6.{{ $index }}'
+                    divisor: 10
+                    descr: Rectifier AC Input Voltage
+                    index: "rectAC-{{ $index }}"
+                    group: Rectifier
+                -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwApOrAblVoltage
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.2.1.1.4.{{ $index }}'
-                    descr:  "AC Input (A-Phase)"
-                    index: "acInput-{{ $index }}"
+                    descr: "AC Input (L1-Phase)"
+                    index: "acL1-{{ $index }}"
+                    group: AC
+                    divisor: 10
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwBpOrBclVoltage
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.2.1.1.5.{{ $index }}'
+                    descr: "AC Input (L2-Phase)"
+                    index: "acL2-{{ $index }}"
+                    group: AC
+                    divisor: 10
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwCpOrCalVoltage
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.2.1.1.6.{{ $index }}'
+                    descr: "AC Input (L3-Phase)"
+                    index: "acL3-{{ $index }}"
                     group: AC
                     divisor: 10
                 -
@@ -52,6 +85,8 @@ modules:
                     group: LVD
                     divisor: 10
         current:
+            options:
+                skip_values: 2147483647
             data:
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattsTotalCurrent
@@ -59,25 +94,130 @@ modules:
                     descr: Battery Current
                     index: "battery-{{ $index }}"
                     group: Battery
+                    divisor: 10
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwBattStringCurrent
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.4.2.1.2.{{ $index }}'
+                    descr: Battery String Current
+                    index: "battString-{{ $index }}"
+                    group: Battery
+                    divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwRectsTotalCurrent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.3.{{ $index }}'
                     descr: Rectifier Current
                     index: "rectifier-{{ $index }}"
                     group: Rectifier
+                    divisor: 10
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwRectOutputCurrent
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.2.2.1.2.{{ $index }}'
+                    descr: Rectifier Output Current
+                    index: "rectOutput-{{ $index }}"
+                    group: Rectifier
+                    divisor: 10
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwAphaseCurrent
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.2.1.1.7.{{ $index }}'
+                    descr: "AC L1 Current"
+                    index: "acL1-{{ $index }}"
+                    group: AC
+                    divisor: 10
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwBphaseCurrent
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.2.1.1.8.{{ $index }}'
+                    descr: "AC L2 Current"
+                    index: "acL2-{{ $index }}"
+                    group: AC
+                    divisor: 10
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwCphaseCurrent
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.2.1.1.9.{{ $index }}'
+                    descr: "AC L3 Current"
+                    index: "acL3-{{ $index }}"
+                    group: AC
+                    divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwDcsTotalCurrent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.1.4.{{ $index }}'
                     descr: DC Total Current
                     index: "dcTotal-{{ $index }}"
                     group: DC
+                    divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwDcOutputCurrent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.2.1.1.5.{{ $index }}'
                     descr: DC Output Current
                     index: "dcOutput-{{ $index }}"
                     group: DC
+                    divisor: 10
+        temperature:
+            options:
+                skip_values: 2147483647
+            data:
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwRectifierTemperature
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.2.2.1.8.{{ $index }}'
+                    descr: Rectifier Temperature
+                    index: "rectifier-{{ $index }}"
+                    group: Rectifier
+                    divisor: 10
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwBattsTemprature
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.5.{{ $index }}'
+                    descr: Battery Temperature
+                    index: "battery-{{ $index }}"
+                    group: Battery
+                    divisor: 10
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwBattStringTemprature
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.4.2.1.6.{{ $index }}'
+                    descr: Battery String Temperature
+                    index: "battString-{{ $index }}"
+                    group: Battery
+                    divisor: 10
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwEnvTemperature
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.8.2.1.1.4.{{ $index }}'
+                    descr: Environment Temperature
+                    index: "envTemp-{{ $index }}"
+                    group: Environment
+                    divisor: 10
+        power:
+            data:
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwRectsTotalDCPower
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.9.{{ $index }}'
+                    descr: Rectifier Total DC Output Power
+                    index: "rectDcTotal-{{ $index }}"
+                    group: Rectifier
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwRectsTotalACInputPower
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.11.{{ $index }}'
+                    descr: Rectifier Total AC Input Power
+                    index: "rectAcTotal-{{ $index }}"
+                    group: Rectifier
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwRectDCOutputPower
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.2.2.1.5.{{ $index }}'
+                    descr: Rectifier DC Output Power
+                    index: "rectOutput-{{ $index }}"
+                    group: Rectifier
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwDcsTotalPower
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.1.5.{{ $index }}'
+                    descr: DC Total Power
+                    index: "dcTotal-{{ $index }}"
+                    group: DC
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwDcOutputPower
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.2.1.1.6.{{ $index }}'
+                    descr: DC Output Power
+                    index: "dcOutput-{{ $index }}"
+                    group: DC
         count:
+            options:
+                skip_values: 2147483647
             data:
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattsTotalQuantity
@@ -103,27 +243,62 @@ modules:
                     descr: "Quantity of ACs"
                     index: "ac-{{ $index }}"
                     group: AC
-
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwEnvTempSensorsTotalQuantity
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.8.1.6.{{ $index }}'
+                    descr: "Quantity of Temperature Sensors"
+                    index: "envTemp-{{ $index }}"
+                    group: Environment
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwBattsRemainCapacity
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.9.{{ $index }}'
+                    descr: 'Total Battery Remaining Capacity (Ah)'
+                    index: 'batteryRemainAh-{{ $index }}'
+                    group: Battery
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwBattsRatedCapacity
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.8.{{ $index }}'
+                    descr: 'Total Battery Rated Capacity (Ah)'
+                    index: 'batteryRatedAh-{{ $index }}'
+                    group: Battery
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwSetBattStdCapacity
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.4.1.1.8.{{ $index }}'
+                    descr: 'Battery String Rated Capacity (Ah)'
+                    index: 'battStringRatedAh-{{ $index }}'
+                    group: Battery
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwBattStringRemainCapacity
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.4.2.1.4.{{ $index }}'
+                    descr: 'Battery String Remaining Capacity (Ah)'
+                    index: 'battStringRemainAh-{{ $index }}'
+                    group: Battery
         charge:
             data:
+                -    
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwTotalRemainingCapacityPercent
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.10.{{ $index }}'
+                    descr: 'Remaining battery total capacity'
+                    index: 'battTotal-{{ $index }}'
+                    group: Battery
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattStringRemainCapacityPercent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.4.2.1.3.{{ $index }}'
-                    descr: 'Remaining battery capacity'
-                    index: 'hwBattStringRemainCapacityPercent.{{ $index }}'
+                    descr: 'Remaining battery string capacity'
+                    index: 'battString-{{ $index }}'
                     divisor: 10
+                    group: Battery
         state:
             data:
                 -
-                    oid: HUAWEI-SITE-MONITOR-MIB::hwSiteDGWorkStatus
-                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.1.1.9.{{ $index }}'
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwSiteRunningStatus
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.1.1.10.{{ $index }}'
                     group: Site Summary
                     descr: "Site Status"
-                    state_name: hwSiteDGWorkStatus
+                    state_name: hwSiteRunningStatus
                     states:
-                        - { value: 1, generic: 3, descr: 'idle' }
-                        - { value: 2, generic: 0, descr: 'working' }
-                        - { value: 3, generic: 3, descr: 'unknown' }
+                        - { value: 1, generic: 0, descr: 'normal'}
+                        - { value: 2, generic: 2, descr: 'alarm'}
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwMonitorOperStatus
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.2.2.1.1.99.{{ $index }}'
@@ -131,12 +306,12 @@ modules:
                     group: Site Summary
                     state_name: hwMonitorOperStatus
                     states:
-                        - { value: 1, generic: 0, descr: 'normal' }
-                        - { value: 2, generic: 2, descr: 'commRs485Fail' }
-                        - { value: 3, generic: 2, descr: 'commNetFail' }
-                        - { value: 4, generic: 2, descr: 'fault' }
-                        - { value: 254, generic: 1, descr: 'alarmResume' }
-                        - { value: 255, generic: 3, descr: 'other' }
+                        - { value: 1, generic: 0, descr: 'normal'}
+                        - { value: 2, generic: 2, descr: 'commRs485Fail'}
+                        - { value: 3, generic: 2, descr: 'commNetFail'}
+                        - { value: 4, generic: 2, descr: 'fault'}
+                        - { value: 254, generic: 1, descr: 'alarmResume'}
+                        - { value: 255, generic: 3, descr: 'other'}
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwSetMonEquipCtrlState
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.2.2.1.1.11.{{ $index }}'
@@ -144,9 +319,9 @@ modules:
                     group: Site Summary
                     state_name: hwSetMonEquipCtrlState
                     states:
-                        - { value: 1, generic: 0, descr: 'manualMode' }
-                        - { value: 2, generic: 0, descr: 'autoMode' }
-                        - { value: 255, generic: 3, descr: 'unknown' }
+                        - { value: 1, generic: 0, descr: 'manualMode'}
+                        - { value: 2, generic: 0, descr: 'autoMode'}
+                        - { value: 255, generic: 3, descr: 'unknown'}
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwSetRectsRedundEnable
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.7.{{ $index }}'
@@ -154,9 +329,9 @@ modules:
                     group: Rectifier
                     state_name: hwSetRectsRedundEnable
                     states:
-                        - { value: 1, generic: 0, descr: 'disable' }
-                        - { value: 2, generic: 0, descr: 'enable' }
-                        - { value: 3, generic: 3, descr: 'funcNotSuppport' }
+                        - { value: 1, generic: 0, descr: 'disable'}
+                        - { value: 2, generic: 0, descr: 'enable'}
+                        - { value: 3, generic: 3, descr: 'funcNotSuppport'}
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwCtrlRectsAllOnOff
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.8.{{ $index }}'
@@ -164,9 +339,27 @@ modules:
                     group: Rectifier
                     state_name: hwCtrlRectsAllOnOff
                     states:
-                        - { value: 1, generic: 0, descr: 'on' }
-                        - { value: 2, generic: 1, descr: 'off' }
-                        - { value: 255, generic: 3, descr: 'nullOper' }
+                        - { value: 1, generic: 0, descr: 'on'}
+                        - { value: 2, generic: 1, descr: 'off'}
+                        - { value: 255, generic: 3, descr: 'nullOper'}
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwRectOperStatus
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.2.2.1.99.{{ $index }}'
+                    descr: "Rectifier Module Status"
+                    group: Rectifier
+                    state_name: hwRectOperStatus
+                    states:
+                        - { value: 1, generic: 0, descr: 'normal'}
+                        - { value: 2, generic: 2, descr: 'fault'}
+                        - { value: 3, generic: 2, descr: 'protect'}
+                        - { value: 4, generic: 2, descr: 'commFail'}
+                        - { value: 5, generic: 1, descr: 'switchOff'}
+                        - { value: 6, generic: 2, descr: 'invalid'}
+                        - { value: 7, generic: 2, descr: 'noConfig'}
+                        - { value: 8, generic: 2, descr: 'acOff'}
+                        - { value: 9, generic: 2, descr: 'rectLost'}
+                        - { value: 254, generic: 1, descr: 'alarmResume'}
+                        - { value: 255, generic: 3, descr: 'unknown'}
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattsChargeStatus
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.3.{{ $index }}'
@@ -174,10 +367,10 @@ modules:
                     group: Battery
                     state_name: hwBattsChargeStatus
                     states:
-                        - { value: 1, generic: 0, descr: 'floatCharge' }
-                        - { value: 2, generic: 1, descr: 'boostCharge' }
-                        - { value: 3, generic: 2, descr: 'disCharge' }
-                        - { value: 255, generic: 3, descr: 'unknown' }
+                        - { value: 1, generic: 0, descr: 'floatCharge'}
+                        - { value: 2, generic: 1, descr: 'boostCharge'}
+                        - { value: 3, generic: 2, descr: 'disCharge'}
+                        - { value: 255, generic: 3, descr: 'unknown'}
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattsCurrLimitStatus
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.4.{{ $index }}'
@@ -185,6 +378,67 @@ modules:
                     group: Battery
                     state_name: hwBattsCurrLimitStatus
                     states:
-                        - { value: 1, generic: 0, descr: 'unlimit' }
-                        - { value: 2, generic: 0, descr: 'limit' }
-                        - { value: 255, generic: 3, descr: 'unknown' }
+                        - { value: 1, generic: 0, descr: 'unlimit'}
+                        - { value: 2, generic: 0, descr: 'limit'}
+                        - { value: 255, generic: 3, descr: 'unknown'}
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwAcInputOperStatus
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.2.1.1.99.{{ $index }}'
+                    descr: "AC Input Status"
+                    group: AC
+                    state_name: hwAcInputOperStatus
+                    states:
+                        - { value: 1, generic: 0, descr: 'normal'}
+                        - { value: 2, generic: 2, descr: 'acOff'}
+                        - { value: 3, generic: 2, descr: 'acAbsent'}
+                        - { value: 4, generic: 2, descr: 'voltHigh'}
+                        - { value: 5, generic: 2, descr: 'voltLow'}
+                        - { value: 6, generic: 2, descr: 'freqHigh'}
+                        - { value: 7, generic: 2, descr: 'freqLow'}
+                        - { value: 254, generic: 1, descr: 'alarmResume'}
+                        - { value: 255, generic: 3, descr: 'unknown'}
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwDcOutputOperStatus
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.2.1.1.99.{{ $index }}'
+                    descr: "DC Output Status"
+                    group: DC
+                    state_name: hwDcOutputOperStatus
+                    states:
+                        - { value: 1, generic: 0, descr: 'normal'}
+                        - { value: 2, generic: 2, descr: 'voltHigh'}
+                        - { value: 3, generic: 2, descr: 'voltLow'}
+                        - { value: 4, generic: 2, descr: 'dcAbsent'}
+                        - { value: 5, generic: 2, descr: 'overload'}
+                        - { value: 254, generic: 1, descr: 'alarmResume'}
+                        - { value: 255, generic: 3, descr: 'unknown'}
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwLvdBranchOperStatus
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.7.2.1.1.99.{{ $index }}'
+                    descr: "LVD Branch Status"
+                    group: LVD
+                    state_name: hwLvdBranchOperStatus
+                    states:
+                        - { value: 1, generic: 0, descr: 'normal'}
+                        - { value: 2, generic: 2, descr: 'lowVoltOff'}
+                        - { value: 3, generic: 1, descr: 'backgroundOff'}
+                        - { value: 4, generic: 1, descr: 'localManualOff'}
+                        - { value: 5, generic: 2, descr: 'lowTempOff'}
+                        - { value: 6, generic: 2, descr: 'highTempOff'}
+                        - { value: 7, generic: 1, descr: 'timeOff'}
+                        - { value: 8, generic: 2, descr: 'capacityOff'}
+                        - { value: 9, generic: 1, descr: 'forceOff'}
+                        - { value: 254, generic: 1, descr: 'alarmResume'}
+                        - { value: 255, generic: 3, descr: 'unknown'}
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwEnvTempSensorOperStatus
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.8.2.1.1.99.{{ $index }}'
+                    descr: "Environment Temperature Sensor Status"
+                    group: Environment
+                    state_name: hwEnvTempSensorOperStatus
+                    states:
+                        - { value: 1, generic: 0, descr: 'normal' }
+                        - { value: 2, generic: 2, descr: 'tempHigh'}
+                        - { value: 3, generic: 2, descr: 'tempLow'}
+                        - { value: 4, generic: 3, descr: 'notInslot'}
+                        - { value: 254, generic: 1, descr: 'alarmResume'}
+                        - { value: 255, generic: 3, descr: 'unknown'}
