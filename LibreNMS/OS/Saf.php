@@ -49,49 +49,40 @@ class Saf extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        $wireless_frequency = [];
+        $wireless_frequency[] = new WirelessSensor(
+            WirelessSensorType::Frequency,
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.9.1',
+            'saf-tx',
+            1,
+            'Tx Frequency',
+            null,
+            1,
+            1000
+        );
+        $wireless_frequency[] = new WirelessSensor(
+            WirelessSensorType::Frequency,
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.10.1',
+            'saf-rx',
+            1,
+            'Rx Frequency',
+            null,
+            1,
+            1000
+        );
 
-        array_push(
-            $wireless_frequency,
-            new WirelessSensor(
-                WirelessSensorType::Frequency,
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.9.1',
-                'saf-tx',
-                1,
-                'Tx Frequency',
-                null,
-                1,
-                1000
-            )
-        );
-        array_push(
-            $wireless_frequency,
-            new WirelessSensor(
-                WirelessSensorType::Frequency,
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.10.1',
-                'saf-rx',
-                1,
-                'Rx Frequency',
-                null,
-                1,
-                1000
-            )
-        );
         $freemile60_radios = $this->discoverFreemile60Radios();
+
         foreach ($freemile60_radios as $index => $radio) {
-            array_push(
-                $wireless_frequency,
-                new WirelessSensor(
-                    WirelessSensorType::Frequency,
-                    $this->getDeviceId(),
-                    '.1.3.6.1.4.1.7571.100.1.1.12.2.2.1.5.' . $index,
-                    'saf-radio',
-                    "wirelessRadioFrequency.$index",
-                    $radio['wirelessRadioName'] . ' Frequency',
-                    $radio['wirelessRadioFrequency'],
-                )
+            $wireless_frequency[] = new WirelessSensor(
+                WirelessSensorType::Frequency,
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.7571.100.1.1.12.2.2.1.5.' . $index,
+                'saf-radio',
+                "wirelessRadioFrequency.$index",
+                $radio['wirelessRadioName'] . ' Frequency',
+                $radio['wirelessRadioFrequency'],
             );
         }
 
@@ -130,42 +121,32 @@ class Saf extends OS implements
      */
     public function discoverWirelessPower()
     {
-        $wireless_power = [];
-        array_push(
-            $wireless_power,
-            new WirelessSensor(
-                WirelessSensorType::Power,
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.5.1',
-                'saf-rx',
-                1,
-                'Rx Power'
-            )
+        $wireless_power[] = new WirelessSensor(
+            WirelessSensorType::Power,
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.5.1',
+            'saf-rx',
+            1,
+            'Rx Power'
         );
-        array_push(
-            $wireless_power,
-            new WirelessSensor(
-                WirelessSensorType::Power,
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.4.1',
-                'saf-tx',
-                1,
-                'Tx Power'
-            )
+        $wireless_power[] = new WirelessSensor(
+            WirelessSensorType::Power,
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.4.1',
+            'saf-tx',
+            1,
+            'Tx Power'
         );
         $freemile60_radios = $this->discoverFreemile60Radios();
         foreach ($freemile60_radios as $index => $radio) {
-            array_push(
-                $wireless_power,
-                new WirelessSensor(
-                    WirelessSensorType::Power,
-                    $this->getDeviceId(),
-                    '.1.3.6.1.4.1.7571.100.1.1.12.2.2.1.3.' . $index,
-                    'saf-radio',
-                    "wirelessRadioTxPower.$index",
-                    $radio['wirelessRadioName'] . ' Tx Power',
-                    $radio['wirelessRadioTxPower'],
-                )
+            $wireless_power[] = new WirelessSensor(
+                WirelessSensorType::Power,
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.7571.100.1.1.12.2.2.1.3.' . $index,
+                'saf-radio',
+                "wirelessRadioTxPower.$index",
+                $radio['wirelessRadioName'] . ' Tx Power',
+                $radio['wirelessRadioTxPower'],
             );
         }
 
