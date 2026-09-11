@@ -55,6 +55,8 @@ class QueryBuilderParser implements \JsonSerializable
         'not_regex' => 'NOT REGEXP',
         'in' => 'IN',
         'not_in' => 'NOT IN',
+        'ip_in_prefix' => 'IN_PREFIX',
+        'ip_not_in_prefix' => 'NOT_IN_PREFIX',
     ];
 
     protected static array $values = [
@@ -157,14 +159,55 @@ class QueryBuilderParser implements \JsonSerializable
         $wrap = false;
 
         if ($expand) {
-            $sql = 'SELECT * FROM ' . implode(',', $this->getTables());
-            $sql .= ' WHERE (' . implode(' AND ', $this->generateGlue()) . ') AND ';
+            $this->generateJoins();
+
+            // LEFT JOIN, not a comma-joined implicit INNER JOIN -- a comma
+            // join excludes the device entirely from the result set when a
+            // referenced table (ports, ipv4_addresses, ...) has no matching
+            // row for it, before the rule condition is ever evaluated. That
+            // silently breaks any operator whose correct result for "no
+            // related row" is true rather than false -- confirmed for both
+            // ip_not_in_prefix's NOT EXISTS and is_null on a joined field.
+            // Mirrors the LEFT JOINs QueryBuilderFluentParser::toQuery()
+            // already builds correctly from the same generateGlue() data.
+            $sql = 'SELECT * FROM devices';
+            foreach ($this->builder['joins'] as [$table, $left, $right]) {
+                $sql .= " LEFT JOIN $table ON $left = $right";
+            }
+            $sql .= ' WHERE (devices.' . $this->schema->getPrimaryKey('devices') . ' = ?) AND ';
 
             // only wrap in ( ) if the condition is OR and there is more than one rule
             $wrap = $this->builder['condition'] == 'OR' && count($this->builder['rules']) > 1;
         }
 
         return $sql . $this->parseGroup($this->builder, $expand, $wrap);
+    }
+
+    /**
+     * Generate the joins for this rule and store them in the rule.
+     * This is an expensive operation.
+     */
+    public function generateJoins(): static
+    {
+        if (isset($this->builder['joins'])) {
+            return $this;
+        }
+
+        $joins = [];
+        foreach ($this->generateGlue() as $glue) {
+            [$left, $right] = explode(' = ', (string) $glue, 2);
+            if (Str::contains($right, '.')) { // last line is devices.device_id = ? for alerting... ignore it
+                [$leftTable, $leftKey] = explode('.', $left);
+                [$rightTable, $rightKey] = explode('.', $right);
+                $target_table = ($rightTable != 'devices' ? $rightTable : $leftTable);  // don't try to join devices
+
+                $joins[] = [$target_table, $left, $right];
+            }
+        }
+
+        $this->builder['joins'] = $joins;
+
+        return $this;
     }
 
     /**
@@ -229,7 +272,206 @@ class QueryBuilderParser implements \JsonSerializable
             $field = $this->expandMacro($field);
         }
 
+        if ($builder_op === 'ip_in_prefix' || $builder_op === 'ip_not_in_prefix') {
+            return $this->buildPrefixSql($field, $rule['value'], $builder_op === 'ip_not_in_prefix');
+        }
+
         return trim("$field $op $value");
+    }
+
+    /**
+     * Build a SQL expression for prefix membership testing (IPv4 and IPv6).
+     *
+     * @param  string  $field  SQL field expression (may include table prefix)
+     * @param  string  $value  CIDR notation e.g. "192.168.10.16/28"
+     * @param  bool  $negate  Whether to negate the expression
+     * @return string
+     */
+    protected function buildPrefixSql(string $field, string $value, bool $negate): string
+    {
+        $value = trim($value, '"\'');
+
+        if (! str_contains($value, '/')) {
+            $value .= filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? '/128' : '/32';
+        }
+
+        [$net, $prefix_len] = explode('/', $value, 2);
+        $prefix_len = (int) $prefix_len;
+
+        // Quote field correctly as `table`.`column` or just `column`
+        $parts = explode('.', $field, 2);
+        $quoted_field = count($parts) === 2
+            ? "`{$parts[0]}`.`{$parts[1]}`"
+            : "`$field`";
+
+        // Detect if field stores a network/prefix string (e.g. "x.x.x.x/yy")
+        // vs a plain address (devices.ip, ipv6_addresses.ipv6_compressed etc.)
+        $network_fields = ['ipv4_network', 'ipv6_network'];
+        $is_network_field = isset($parts[1]) && in_array($parts[1], $network_fields);
+
+        // devices.ip is stored as varbinary(16) via inet_pton(); all other IP columns are text
+        $is_binary_field = ($parts[0] ?? '') === 'devices' && ($parts[1] ?? '') === 'ip';
+
+        if (filter_var($net, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            // Clamp to [0,32] — a negative shift or >32 bit-shift throws ArithmeticError on PHP 8
+            $prefix_len = max(0, min(32, $prefix_len));
+            $mask = $prefix_len > 0 ? ((~0 << (32 - $prefix_len)) & 0xFFFFFFFF) : 0;
+            $network = ip2long($net) & $mask;
+
+            if ($is_binary_field) {
+                $positive_sql = "(LENGTH($quoted_field) = 4 AND (CONV(HEX($quoted_field), 16, 10) & $mask) = $network)";
+            } else {
+                $ip_expr = $is_network_field
+                    ? "INET_ATON(SUBSTRING_INDEX($quoted_field, '/', 1))"
+                    : "INET_ATON($quoted_field)";
+                $positive_sql = "($ip_expr & $mask) = $network";
+            }
+        } elseif (filter_var($net, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            // Clamp to [0,128] — a boundary byte beyond 16 produces ORD('')=0, silently matching everything
+            $prefix_len = max(0, min(128, $prefix_len));
+            $positive_sql = $is_binary_field
+                ? $this->buildIPv6BinaryPrefixSql($quoted_field, $net, $prefix_len)
+                : $this->buildIPv6PrefixSql($quoted_field, $net, $prefix_len, $is_network_field, false);
+        } else {
+            // Not a valid IPv4 or IPv6 address — return a safe no-match rather than interpolating
+            // arbitrary user input into SQL (SQL injection guard).
+            return $negate ? '(1=1)' : '(1=0)';
+        }
+
+        if (! $negate) {
+            return $positive_sql;
+        }
+
+        // For joined tables use NOT EXISTS so "ip_not_in_prefix" means "device has no address in prefix",
+        // not "device has at least one address outside prefix" (which the plain NOT gives with a LEFT JOIN).
+        $table = $parts[0];
+        if ($table !== 'devices') {
+            $path = $this->schema->findRelationshipPath($table, 'devices');
+            if ($path && count($path) >= 2) {
+                return $this->buildNotExistsSql($path, $positive_sql);
+            }
+        }
+
+        // Confirmed unreachable for ipv4_networks/ipv6_networks, the only tables
+        // ip_not_in_prefix reaches today -- both resolve a real 2+ element path via
+        // ports->ipv4_addresses/ipv6_addresses (verified by actually running this
+        // parser against real schema data, not just reading the code). If this
+        // ever fires for a table added later, that table's relationship path
+        // needs registering -- this plain NOT is the wrong semantic for a
+        // multi-row join and isn't a safe degradation to fall back on.
+        return "NOT ($positive_sql)";
+    }
+
+    /**
+     * Wrap a positive prefix expression in a correlated NOT EXISTS subquery so that
+     * "ip_not_in_prefix" means "the device has no row in the given table matching the prefix".
+     *
+     * @param  array  $path  Relationship path from 'devices' to the field table,
+     *                       e.g. ['devices', 'ports', 'ipv4_addresses']
+     * @param  string  $positive_check  The positive prefix SQL expression to negate
+     * @return string
+     */
+    private function buildNotExistsSql(array $path, string $positive_check): string
+    {
+        // path[0] = 'devices', path[1] = first joined table (anchor), ...
+        $anchor_table = $path[1];
+        $anchor_glue = $this->getGlue('devices', $anchor_table);
+        // anchor_glue is e.g. "devices.device_id = ports.device_id"
+        // rewrite as "ports.device_id = devices.device_id" for the subquery WHERE
+        $glue_parts = explode(' = ', $anchor_glue, 2);
+        if (count($glue_parts) !== 2) {
+            // Unexpected glue format — fall back to plain NOT rather than producing broken SQL
+            return "NOT ($positive_check)";
+        }
+        [$devices_col, $anchor_col] = $glue_parts;
+        $where_anchor = "$anchor_col = $devices_col";
+
+        $joins = [];
+        for ($i = 1; $i < count($path) - 1; $i++) {
+            $right = $path[$i + 1];
+            $glue = $this->getGlue($path[$i], $right);
+            $joins[] = "INNER JOIN `$right` ON $glue";
+        }
+
+        $joins_sql = $joins ? ' ' . implode(' ', $joins) : '';
+
+        return "NOT EXISTS (SELECT 1 FROM `$anchor_table`{$joins_sql} WHERE $where_anchor AND $positive_check)";
+    }
+
+    /**
+     * Build a SQL expression for IPv6 prefix membership testing.
+     * Uses SUBSTRING on INET6_ATON binary output for both byte-aligned
+     * and non-byte-aligned prefix lengths.
+     *
+     * @param  string  $quoted_field  Already-quoted SQL field expression
+     * @param  string  $net  IPv6 network address e.g. "fd42:cafe:d00d::"
+     * @param  int  $prefix_len  Prefix length e.g. 64
+     * @param  bool  $is_network_field  Whether field stores "addr/prefix" string
+     * @param  bool  $negate  Whether to negate the expression
+     * @return string
+     */
+    protected function buildIPv6PrefixSql(string $quoted_field, string $net, int $prefix_len, bool $is_network_field, bool $negate): string
+    {
+        $full_bytes = intdiv($prefix_len, 8);
+        $remainder_bits = $prefix_len % 8;
+
+        $addr_expr = $is_network_field
+            ? "SUBSTRING_INDEX($quoted_field, '/', 1)"
+            : $quoted_field;
+
+        $field_aton = "INET6_ATON($addr_expr)";
+        $net_aton = "INET6_ATON('$net')";
+
+        if ($full_bytes > 0) {
+            $sql = "SUBSTRING($field_aton, 1, $full_bytes) = SUBSTRING($net_aton, 1, $full_bytes)";
+        } else {
+            // /0 matches everything
+            $sql = '1=1';
+        }
+
+        if ($remainder_bits > 0) {
+            $boundary_byte = $full_bytes + 1;
+            $mask = (0xFF << (8 - $remainder_bits)) & 0xFF;
+            $sql .= " AND ORD(SUBSTRING($field_aton, $boundary_byte, 1)) & $mask"
+                  . " = ORD(SUBSTRING($net_aton, $boundary_byte, 1)) & $mask";
+        }
+
+        if ($negate) {
+            $sql = "NOT ($sql)";
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Build an IPv6 prefix SQL expression for binary-stored fields (devices.ip, varbinary(16)).
+     * Compares raw bytes directly — no INET6_ATON on the field side.
+     *
+     * @param  string  $quoted_field  Already-quoted SQL field expression
+     * @param  string  $net  IPv6 network address e.g. "fd42:cafe:d00d::"
+     * @param  int  $prefix_len  Prefix length e.g. 48
+     * @return string
+     */
+    private function buildIPv6BinaryPrefixSql(string $quoted_field, string $net, int $prefix_len): string
+    {
+        $full_bytes = intdiv($prefix_len, 8);
+        $remainder_bits = $prefix_len % 8;
+        $net_aton = "INET6_ATON('$net')";
+
+        $conditions = ["LENGTH($quoted_field) = 16"];
+
+        if ($full_bytes > 0) {
+            $conditions[] = "SUBSTRING($quoted_field, 1, $full_bytes) = SUBSTRING($net_aton, 1, $full_bytes)";
+        }
+
+        if ($remainder_bits > 0) {
+            $boundary_byte = $full_bytes + 1;
+            $mask = (0xFF << (8 - $remainder_bits)) & 0xFF;
+            $conditions[] = "ORD(SUBSTRING($quoted_field, $boundary_byte, 1)) & $mask"
+                           . " = ORD(SUBSTRING($net_aton, $boundary_byte, 1)) & $mask";
+        }
+
+        return '(' . implode(' AND ', $conditions) . ')';
     }
 
     /**
