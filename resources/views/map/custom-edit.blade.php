@@ -73,6 +73,9 @@
             display: grid;
             grid-template: 1fr / 1fr;
             place-items: center;
+            width: max-content;
+            max-width: 100%;
+            margin: 0 auto;
             overflow: hidden;
             position: relative;
         }
