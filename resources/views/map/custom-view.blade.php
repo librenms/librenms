@@ -39,6 +39,8 @@
         display: grid;
         grid-template: 1fr / 1fr;
         place-items: center;
+        overflow: hidden;
+        position: relative;
     }
     #custom-map {
         grid-column: 1 / 1;

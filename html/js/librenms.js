@@ -600,31 +600,106 @@ function init_map_marker(leaflet, latlng) {
     return marker;
 }
 
-function setCustomMapBackground(id, type, data) {
-    let image = '';
-    let color = '';
-
-    if(type === 'image') {
-        image = `url(${data.image_url})`;
-    } else if(type === 'color') {
-        color = data.color;
+function setCustomMapBackground(id, type, data, network) {
+    var container = document.getElementById(id);
+    if (!container) {
+        return;
     }
+
+    if (network) {
+        container._visNetwork = network;
+    }
+    var currentNetwork = container._visNetwork || (id === 'custom-map' && typeof window.network !== 'undefined' ? window.network : null);
+
+    container._customMapBg = container._customMapBg || {};
+    container._customMapBg.type = type;
+    container._customMapBg.data = data;
+    container._customMapBg.imageLoaded = false;
+    container._customMapBg.image = null;
+
     $(`#${id} .vis-network canvas`)
-        .css('background-image', image)
-        .css('background-size', 'cover')
-        .css('background-color', color);
+        .css('background-image', '')
+        .css('background-color', '');
 
     const mapBackgroundId = `${id}-bg-geo-map`;
+    const mapBgElem = document.getElementById(mapBackgroundId);
+
+    if (type === 'image' && data && data.image_url) {
+        let img = new Image();
+        img.onload = function () {
+            if (container._customMapBg && container._customMapBg.type === 'image' && container._customMapBg.image === img) {
+                container._customMapBg.imageLoaded = true;
+                if (container._visNetwork) {
+                    container._visNetwork.redraw();
+                } else if (id === 'custom-map' && typeof window.network !== 'undefined') {
+                    window.network.redraw();
+                }
+            }
+        };
+        img.src = data.image_url;
+        container._customMapBg.image = img;
+        if (img.complete && img.naturalWidth !== 0) {
+            container._customMapBg.imageLoaded = true;
+        }
+    }
+
     if (type === 'map') {
-        $(`#${id}-bg-geo-map`).show();
-        let config = data;
+        if (mapBgElem) {
+            $(mapBgElem).show();
+        }
+        let config = data || {};
         config['readonly'] = true;
         init_map(mapBackgroundId, config)
             .setView(L.latLng(data.lat, data.lng), data.zoom);
     } else {
-        // destroy the map if it exists
-        destroy_map(mapBackgroundId)
+        destroy_map(mapBackgroundId);
+        if (mapBgElem) {
+            $(mapBgElem).hide();
+            mapBgElem.style.transform = 'none';
+        }
     }
+
+    if (currentNetwork) {
+        attachCustomMapBackgroundHooks(container, currentNetwork, id);
+        currentNetwork.redraw();
+    }
+}
+
+function attachCustomMapBackgroundHooks(container, network, id) {
+    if (!network || network._customMapBgHookAttached) {
+        return;
+    }
+    network._customMapBgHookAttached = true;
+
+    network.on('beforeDrawing', function (ctx) {
+        var bg = container._customMapBg;
+        if (!bg) {
+            return;
+        }
+
+        var visDiv = $(container).children('.vis-network')[0];
+        var clientW = visDiv ? $(visDiv).width() : $(container).width();
+        var clientH = visDiv ? $(visDiv).height() : $(container).height();
+        var mapWidth = container._mapWidth || clientW;
+        var mapHeight = container._mapHeight || clientH;
+
+        if (bg.type === 'color' && bg.data && bg.data.color) {
+            ctx.fillStyle = bg.data.color;
+            ctx.fillRect(0, 0, mapWidth, mapHeight);
+        } else if (bg.type === 'image' && bg.imageLoaded && bg.image) {
+            ctx.drawImage(bg.image, 0, 0, mapWidth, mapHeight);
+        }
+
+        if (bg.type === 'map') {
+            var bgGeoMap = document.getElementById(`${id}-bg-geo-map`);
+            if (bgGeoMap && bgGeoMap.style.zIndex !== '3') {
+                var topLeft = network.canvasToDOM({x: 0, y: 0});
+                var scale = network.getScale();
+                bgGeoMap.style.transformOrigin = '0 0';
+                bgGeoMap.style.transform = 'translate(' + topLeft.x + 'px, ' + topLeft.y + 'px) scale(' + scale + ')';
+            }
+        }
+    });
 }
 
 function update_location(id, latlng, callback) {
