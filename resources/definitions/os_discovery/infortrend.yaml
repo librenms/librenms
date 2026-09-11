@@ -1,35 +1,412 @@
+mib: IFT-SNMP-MIB
+
 modules:
-   os:
-        serial: 
-            - IFT-SNMP-MIB::serialNum.0
-        hardware:
-            - IFT-SNMP-MIB::privateLogoModel.0
-   sensors:
-       temperature:
-            data:
-                -
-                    oid: IFT-SNMP-MIB::luDevTable
-                    value: IFT-SNMP-MIB::luDevValue
-                    num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.9.{{ $index }}'
-                    divisor: 10
-                    index: 'temp{{ $index }}'
-                    descr: IFT-SNMP-MIB::luDevDescription
-                    skip_values:                
-                        -
-                            oid: IFT-SNMP-MIB::luDevTypeCode
-                            op: '!='
-                            value: 3
-       voltage:
-            data:
-                - 
-                    oid: IFT-SNMP-MIB::luDevTable
-                    value: IFT-SNMP-MIB::luDevValue
-                    num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.9.{{ $index }}'
-                    divisor: 1000
-                    index: 'voltage{{ $index }}'
-                    descr: IFT-SNMP-MIB::luDevDescription
-                    skip_values:                
-                        -
-                            oid: IFT-SNMP-MIB::luDevTypeCode
-                            op: '!='
-                            value: 5
+  os:
+    hardware:
+      - IFT-SNMP-MIB::privateLogoModel.0
+    serial:
+      - IFT-SNMP-MIB::serialNum.0
+      - IFT-SNMP-MIB::serialNumSec.0
+    version_template: '{{ IFT-SNMP-MIB::fwMajorVersion.0 }}.{{ IFT-SNMP-MIB::fwMinorVersion.0 }}.{{ IFT-SNMP-MIB::fwEngineerVersion.0 }}'
+
+  sensors:
+    state:
+      data:
+
+        # luDevStatus is a per-device-class BITMASK, not a plain 1-5 enum
+        -
+          oid: luDevTable
+          value: luDevStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.13.{{ $index }}'
+          descr: luDevDescription
+          index: 'luDevStatus.{{ $index }}'
+          state_name: luDevStatusGeneric
+          snmp_flags: '-OQUsbe'
+          states:
+            - { value: 0,   generic: 0, graph: 1, descr: ok }
+            - { value: 1,   generic: 2, graph: 1, descr: malfunction }
+            - { value: 64,  generic: 1, graph: 1, descr: off }
+            - { value: 65,  generic: 2, graph: 1, descr: 'malfunction, off' }
+            - { value: 128, generic: 3, graph: 1, descr: 'not present' }
+            - { value: 129, generic: 2, graph: 1, descr: 'malfunction, not present' }
+            - { value: 192, generic: 3, graph: 1, descr: 'off, not present' }
+            - { value: 193, generic: 2, graph: 1, descr: 'malfunction, off, not present' }
+            - { value: 255, generic: 3, graph: 1, descr: unknown }
+          skip_values:
+            -
+              oid: luDevTypeCode
+              op: 'not_in_array'
+              value: [1, 2, 4, 10, 11, 13, 14, 18, 31]
+
+       
+        -
+          oid: luDevTable
+          value: luDevStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.13.{{ $index }}'
+          descr: luDevDescription
+          index: 'luDevStatus.{{ $index }}'
+          state_name: luDevStatusLED
+          snmp_flags: '-OQUsbe'
+          states:
+            - { value: 0,   generic: 0, graph: 1, descr: ok }
+            - { value: 1,   generic: 2, graph: 1, descr: malfunction }
+            - { value: 64,  generic: 1, graph: 1, descr: off }
+            - { value: 65,  generic: 2, graph: 1, descr: 'malfunction, off' }
+            - { value: 128, generic: 3, graph: 1, descr: 'not present' }
+            - { value: 129, generic: 2, graph: 1, descr: 'malfunction, not present' }
+            - { value: 192, generic: 3, graph: 1, descr: 'off, not present' }
+            - { value: 193, generic: 2, graph: 1, descr: 'malfunction, off, not present' }
+            - { value: 255, generic: 3, graph: 1, descr: unknown }
+          skip_values:
+            -
+              oid: luDevDescriptor
+              op: 'not_in_array'
+              value: [33]
+
+        -
+          oid: luDevTable
+          value: luDevStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.13.{{ $index }}'
+          descr: 'Temperature Out-of-Range Flag {{ $index }}'
+          index: 'luDevStatus.{{ $index }}'
+          state_name: luDevStatusTempFlag
+          snmp_flags: '-OQUsbe'
+          states:
+            - { value: 0,   generic: 0, graph: 1, descr: ok }
+            - { value: 1,   generic: 2, graph: 1, descr: 'temperature out of range' }
+            - { value: 255, generic: 3, graph: 1, descr: unknown }
+          skip_values:
+            -
+              oid: luDevTypeCode
+              op: '!='
+              value: 8
+
+        -
+          oid: luDevTable
+          value: luDevStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.13.{{ $index }}'
+          descr: luDevDescription
+          index: 'luDevStatus.{{ $index }}'
+          state_name: luDevStatusDoor
+          snmp_flags: '-OQUsbe'
+          states:
+            - { value: 0,   generic: 0, graph: 1, descr: 'closed, locked' }
+            - { value: 1,   generic: 2, graph: 1, descr: malfunction }
+            - { value: 2,   generic: 1, graph: 1, descr: open }
+            - { value: 3,   generic: 2, graph: 1, descr: 'malfunction, open' }
+            - { value: 64,  generic: 1, graph: 1, descr: 'closed, unlocked' }
+            - { value: 65,  generic: 2, graph: 1, descr: 'malfunction, unlocked' }
+            - { value: 66,  generic: 1, graph: 1, descr: 'open, unlocked' }
+            - { value: 67,  generic: 2, graph: 1, descr: 'malfunction, open, unlocked' }
+            - { value: 128, generic: 3, graph: 1, descr: 'not present' }
+            - { value: 129, generic: 2, graph: 1, descr: 'malfunction, not present' }
+            - { value: 130, generic: 3, graph: 1, descr: 'not present' }
+            - { value: 131, generic: 2, graph: 1, descr: 'malfunction, not present' }
+            - { value: 192, generic: 3, graph: 1, descr: 'not present' }
+            - { value: 193, generic: 2, graph: 1, descr: 'malfunction, not present' }
+            - { value: 194, generic: 3, graph: 1, descr: 'not present' }
+            - { value: 195, generic: 2, graph: 1, descr: 'malfunction, not present' }
+            - { value: 255, generic: 3, graph: 1, descr: unknown }
+          skip_values:
+            -
+              oid: luDevTypeCode
+              op: '!='
+              value: 9
+
+        -
+          oid: luDevTable
+          value: luDevStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.13.{{ $index }}'
+          descr: luDevDescription
+          index: 'luDevStatus.{{ $index }}'
+          state_name: luDevStatusSlot
+          snmp_flags: '-OQUsbe'
+          states:
+            - { value: 0,   generic: 0, graph: 1, descr: ok }
+            - { value: 1,   generic: 2, graph: 1, descr: malfunction }
+            - { value: 2,   generic: 1, graph: 1, descr: 'marked for replacement' }
+            - { value: 3,   generic: 2, graph: 1, descr: 'malfunction, marked for replacement' }
+            - { value: 4,   generic: 2, graph: 1, descr: 'not activated' }
+            - { value: 5,   generic: 2, graph: 1, descr: 'malfunction, not activated' }
+            - { value: 6,   generic: 2, graph: 1, descr: 'marked for replacement, not activated' }
+            - { value: 7,   generic: 2, graph: 1, descr: 'malfunction, marked for replacement, not activated' }
+            - { value: 64,  generic: 1, graph: 1, descr: 'ready for insertion/removal' }
+            - { value: 65,  generic: 2, graph: 1, descr: 'malfunction, ready for insertion/removal' }
+            - { value: 66,  generic: 1, graph: 1, descr: 'marked for replacement, ready for removal' }
+            - { value: 67,  generic: 2, graph: 1, descr: 'malfunction, marked for replacement, ready for removal' }
+            - { value: 68,  generic: 1, graph: 1, descr: 'not activated, ready for removal' }
+            - { value: 69,  generic: 2, graph: 1, descr: 'malfunction, not activated, ready for removal' }
+            - { value: 70,  generic: 1, graph: 1, descr: 'marked for replacement, not activated, ready for removal' }
+            - { value: 71,  generic: 2, graph: 1, descr: 'malfunction, marked for replacement, not activated, ready for removal' }
+            - { value: 128, generic: 3, graph: 1, descr: empty }
+            - { value: 129, generic: 2, graph: 1, descr: 'malfunction, empty' }
+            - { value: 130, generic: 3, graph: 1, descr: empty }
+            - { value: 131, generic: 2, graph: 1, descr: 'malfunction, empty' }
+            - { value: 132, generic: 3, graph: 1, descr: empty }
+            - { value: 133, generic: 2, graph: 1, descr: 'malfunction, empty' }
+            - { value: 134, generic: 3, graph: 1, descr: empty }
+            - { value: 135, generic: 2, graph: 1, descr: 'malfunction, empty' }
+            - { value: 192, generic: 3, graph: 1, descr: 'ready for insertion, empty' }
+            - { value: 193, generic: 2, graph: 1, descr: 'malfunction, ready for insertion, empty' }
+            - { value: 194, generic: 3, graph: 1, descr: 'ready for insertion, empty' }
+            - { value: 195, generic: 2, graph: 1, descr: 'malfunction, ready for insertion, empty' }
+            - { value: 196, generic: 3, graph: 1, descr: 'ready for insertion, empty' }
+            - { value: 197, generic: 2, graph: 1, descr: 'malfunction, ready for insertion, empty' }
+            - { value: 198, generic: 3, graph: 1, descr: 'ready for insertion, empty' }
+            - { value: 199, generic: 2, graph: 1, descr: 'malfunction, ready for insertion, empty' }
+            - { value: 255, generic: 3, graph: 1, descr: unknown }
+          skip_values:
+            -
+              oid: luDevTypeCode
+              op: '!='
+              value: 17
+
+        # Logical Drive Status.
+        -
+          oid: ldTable
+          value: ldStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.2.1.6.{{ $index }}'
+          descr: 'Logical Drive {{ ldID }}'
+          index: 'ldStatus.{{ $index }}'
+          state_name: ldStatus
+          states:
+            - { value: 0, generic: 0, graph: 1, descr: good }
+            - { value: 1, generic: 1, graph: 1, descr: rebuilding }
+            - { value: 2, generic: 1, graph: 1, descr: initializing }
+            - { value: 3, generic: 2, graph: 1, descr: degraded }
+            - { value: 4, generic: 2, graph: 1, descr: dead }
+            - { value: 5, generic: 2, graph: 1, descr: invalid }
+            - { value: 6, generic: 2, graph: 1, descr: incomplete }
+            - { value: 7, generic: 2, graph: 1, descr: drive missing }
+            - { value: 64, generic: 0, graph: 1, descr: 'good' }
+            - { value: 65, generic: 1, graph: 1, descr: 'rebuilding (flag bit 6 set)' }
+            - { value: 66, generic: 1, graph: 1, descr: 'initializing (flag bit 6 set)' }
+            - { value: 67, generic: 2, graph: 1, descr: 'degraded (flag bit 6 set)' }
+            - { value: 68, generic: 2, graph: 1, descr: 'dead (flag bit 6 set)' }
+            - { value: 69, generic: 2, graph: 1, descr: 'invalid (flag bit 6 set)' }
+            - { value: 70, generic: 2, graph: 1, descr: 'incomplete (flag bit 6 set)' }
+            - { value: 71, generic: 2, graph: 1, descr: 'drive missing (flag bit 6 set)' }
+            - { value: 128, generic: 2, graph: 1, descr: 'good (offline)' }
+            - { value: 129, generic: 2, graph: 1, descr: 'rebuilding (offline)' }
+            - { value: 130, generic: 2, graph: 1, descr: 'initializing (offline)' }
+            - { value: 131, generic: 2, graph: 1, descr: 'degraded (offline)' }
+            - { value: 132, generic: 2, graph: 1, descr: 'dead (offline)' }
+            - { value: 133, generic: 2, graph: 1, descr: 'invalid (offline)' }
+            - { value: 134, generic: 2, graph: 1, descr: 'incomplete (offline)' }
+            - { value: 135, generic: 2, graph: 1, descr: 'drive missing (offline)' }
+            - { value: 192, generic: 2, graph: 1, descr: 'good (offline, flag bit 6 set)' }
+            - { value: 193, generic: 2, graph: 1, descr: 'rebuilding (offline, flag bit 6 set)' }
+            - { value: 194, generic: 2, graph: 1, descr: 'initializing (offline, flag bit 6 set)' }
+            - { value: 195, generic: 2, graph: 1, descr: 'degraded (offline, flag bit 6 set)' }
+            - { value: 196, generic: 2, graph: 1, descr: 'dead (offline, flag bit 6 set)' }
+            - { value: 197, generic: 2, graph: 1, descr: 'invalid (offline, flag bit 6 set)' }
+            - { value: 198, generic: 2, graph: 1, descr: 'incomplete (offline, flag bit 6 set)' }
+            - { value: 199, generic: 2, graph: 1, descr: 'drive missing (offline, flag bit 6 set)' }
+
+        # Physical Hard Drive Status.
+        -
+          oid: hddTable
+          value: hddStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.6.1.11.{{ $index }}'
+          descr: 'Drive Slot {{ hddSlotNum }} {{ hddModelStr }}'
+          index: 'hddStatus.{{ $index }}'
+          state_name: hddStatus
+          states:
+            - { value: 0, generic: 0, graph: 1, descr: new }
+            - { value: 1, generic: 0, graph: 1, descr: online }
+            - { value: 2, generic: 0, graph: 1, descr: used }
+            - { value: 3, generic: 0, graph: 1, descr: spare }
+            - { value: 4, generic: 1, graph: 1, descr: initialization }
+            - { value: 5, generic: 1, graph: 1, descr: rebuilding }
+            - { value: 6, generic: 1, graph: 1, descr: add-to-ld }
+            - { value: 9, generic: 0, graph: 1, descr: global-spare }
+            - { value: 17, generic: 1, graph: 1, descr: cloning }
+            - { value: 18, generic: 0, graph: 1, descr: clone-valid }
+            - { value: 19, generic: 1, graph: 1, descr: copying }
+            - { value: 63, generic: 3, graph: 1, descr: absent }
+            - { value: 252, generic: 2, graph: 1, descr: missing-global-spare }
+            - { value: 253, generic: 2, graph: 1, descr: missing-spare }
+            - { value: 254, generic: 2, graph: 1, descr: missing }
+            - { value: 255, generic: 2, graph: 1, descr: failed }
+          skip_values:
+            -
+              oid: hddSlotNum
+              op: '='
+              value: 0
+
+        # Dual-controller
+        -
+          oid: redCtlrStatus.0
+          value: redCtlrStatus.0
+          num_oid: '.1.3.6.1.4.1.1714.1.1.1.6.4.0'
+          descr: 'Redundant Controller Status'
+          index: 'redCtlrStatus'
+          state_name: redCtlrStatus
+          states:
+            - { value: 0, generic: 1, graph: 1, descr: inactive }
+            - { value: 1, generic: 1, graph: 1, descr: scanning }
+            - { value: 17, generic: 0, graph: 1, descr: detected }
+            - { value: 18, generic: 0, graph: 1, descr: enabled }
+            - { value: 63, generic: 2, graph: 1, descr: 'controller failed' }
+          skip_values:
+            -
+              oid: redCtlrCfg.0
+              op: '='
+              value: 255
+
+    temperature:
+      data:
+        -
+          oid: luDevTable
+          value: luDevValue
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.9.{{ $index }}'
+          descr: luDevDescription
+          divisor: 10
+          skip_values:
+            -
+              oid: luDevTypeCode
+              op: '!='
+              value: 3
+            -
+              oid: luDevValue
+              op: '='
+              value: 0
+
+    voltage:
+      data:
+        -
+          oid: luDevTable
+          value: luDevValue
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.9.{{ $index }}'
+          descr: luDevDescription
+          divisor: 1000
+          skip_values:
+            -
+              oid: luDevTypeCode
+              op: '!='
+              value: 5
+            -
+              oid: luDevValue
+              op: '='
+              value: 0
+
+    current:
+      data:
+        -
+          oid: luDevTable
+          value: luDevValue
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.9.{{ $index }}'
+          descr: luDevDescription
+          divisor: 1000
+          skip_values:
+            -
+              oid: luDevTypeCode
+              op: '!='
+              value: 6
+            -
+              oid: luDevValue
+              op: '='
+              value: 0
+
+    fanspeed:
+      data:
+        -
+          oid: luDevTable
+          value: luDevValue
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.9.{{ $index }}'
+          descr: luDevDescription
+          skip_values:
+            -
+              oid: luDevTypeCode
+              op: '!='
+              value: 2
+            -
+              oid: luDevValue
+              op: '='
+              value: 0
+
+    percent:
+      data:
+        -
+          oid: hddTable
+          value: hddWearLife
+          num_oid: '.1.3.6.1.4.1.1714.1.1.6.1.50.{{ $index }}'
+          descr: 'SSD {{ hddSlotNum }} Wear Life'
+          group: SSD Wear Life
+          low_limit: 10
+          low_warn_limit: 20
+          skip_values:
+            -
+              oid: hddWearLife
+              op: '='
+              value: -1
+
+    count:
+      data:
+
+        -
+          oid: lvTable
+          value: lvSize
+          num_oid: '.1.3.6.1.4.1.1714.1.1.3.1.3.{{ $index }}'
+          descr: 'LUN {{ lvID }} (TB)'
+          index: 'lvSize.{{ $index }}'
+          multiplier: 24
+          divisor: 46881075200
+          group: LUN Capacity
+
+        -
+          oid: hddTable
+          value: hddSize
+          num_oid: '.1.3.6.1.4.1.1714.1.1.6.1.7.{{ $index }}'
+          descr: 'Drive Slot {{ hddSlotNum }} {{ hddModelStr }} (TB)'
+          index: 'hddSize.{{ $index }}'
+          multiplier: 4
+          divisor: 7813512960
+          group: Physical Drive Capacity
+          skip_values:
+            -
+              oid: hddSlotNum
+              op: '='
+              value: 0
+
+        -
+          oid: cacheTotal.0
+          value: cacheTotal.0
+          num_oid: '.1.3.6.1.4.1.1714.1.1.1.2.3.0'
+          descr: 'Cache Total Blocks'
+          index: 'cacheTotal'
+
+        -
+          oid: cacheDirty.0
+          value: cacheDirty.0
+          num_oid: '.1.3.6.1.4.1.1714.1.1.1.2.4.0'
+          descr: 'Cache Dirty Blocks'
+          index: 'cacheDirty'
+
+        -
+          oid: ldTable
+          value: ldTotalDrvCnt
+          num_oid: '.1.3.6.1.4.1.1714.1.1.2.1.8.{{ $index }}'
+          descr: 'LD {{ $index }} Total Drives'
+          index: 'ldTotalDrvCnt.{{ $index }}'
+
+        -
+          oid: ldTable
+          value: ldOnlineDrvCnt
+          num_oid: '.1.3.6.1.4.1.1714.1.1.2.1.9.{{ $index }}'
+          descr: 'LD {{ $index }} Online Drives'
+          index: 'ldOnlineDrvCnt.{{ $index }}'
+
+        -
+          oid: ldTable
+          value: ldSpareDrvCnt
+          num_oid: '.1.3.6.1.4.1.1714.1.1.2.1.10.{{ $index }}'
+          descr: 'LD {{ $index }} Spare Drives'
+          index: 'ldSpareDrvCnt.{{ $index }}'
+
+        -
+          oid: ldTable
+          value: ldFailedDrvCnt
+          num_oid: '.1.3.6.1.4.1.1714.1.1.2.1.11.{{ $index }}'
+          descr: 'LD {{ $index }} Failed Drives'
+          index: 'ldFailedDrvCnt.{{ $index }}'
