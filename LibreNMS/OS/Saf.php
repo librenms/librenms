@@ -50,7 +50,7 @@ class Saf extends OS implements
     public function discoverWirelessFrequency()
     {
         $wireless_frequency = [];
-        
+
         array_push(
             $wireless_frequency,
             new WirelessSensor(
@@ -60,6 +60,9 @@ class Saf extends OS implements
                 'saf-tx',
                 1,
                 'Tx Frequency'
+                null,
+                1,
+                1000
             )
         );
         array_push(
@@ -91,6 +94,7 @@ class Saf extends OS implements
                 )
             );
         }
+
         return $wireless_frequency;
     }
 
@@ -164,6 +168,7 @@ class Saf extends OS implements
                 )
             );
         }
+
         return $wireless_power;
     }
 
