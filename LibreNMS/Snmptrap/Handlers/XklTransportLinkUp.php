@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XklTransportLinkUp.php
  *
@@ -44,7 +45,6 @@ class XklTransportLinkUp implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-
         $transIndex = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportIndex'));
 
         $message = "Tranport $transIndex is up.";

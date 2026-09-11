@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XklRxPowerHiAlrm.php
  *
@@ -44,7 +45,7 @@ class XklRxPowerHiAlrm implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $rxPower   = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportReceivePower'));
+        $rxPower = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportReceivePower'));
         $rxHiAlarm = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportRxPowerHiAlrmThresh'));
         $xcvrDescr = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportDescr'));
 

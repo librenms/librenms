@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XklTransportLinkDown.php
  *
@@ -44,7 +45,7 @@ class XklTransportLinkDown implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $transIndex    = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportIndex'));
+        $transIndex = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportIndex'));
         $transTxStatus = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportTxStatus'));
         $transRxStatus = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportRxStatus'));
 

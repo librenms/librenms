@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XklEdfaAlarmChange.php
  *
@@ -55,7 +56,7 @@ class XklEdfaAlarmChange implements SnmptrapHandler
 
         $severity = Severity::Warning;
         $edfaName = $trap->getOidData($trap->findOid('XKL-MIB::xklEDFAName'));
-        $message  = 'Alarm not found';
+        $message = 'Alarm not found';
 
         if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFAInReset')) == 'yes') {
             $message = "$edfaName reset.";
@@ -73,20 +74,20 @@ class XklEdfaAlarmChange implements SnmptrapHandler
             $message = "$edfaName pump temperature alarm is active.";
         }
         if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFAPumpBiasAlarm')) == 'yes') {
-            $message  = "$edfaName EDFA pump BIAS alarm is active.";
+            $message = "$edfaName EDFA pump BIAS alarm is active.";
             $severity = Severity::Error;
         }
         if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFALossOfInputAlarm')) == 'yes') {
-            $message  = "$edfaName loss of input alarm is active.";
+            $message = "$edfaName loss of input alarm is active.";
             $severity = Severity::Error;
         }
         if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFALossOfOutputAlarm')) == 'yes') {
-            $message  = "$edfaName loss of output alarm is active.";
+            $message = "$edfaName loss of output alarm is active.";
             $severity = Severity::Error;
         }
         if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFAModuleAlarms')) != 'NONE') {
             $moduleName = $trap->getOidData($trap->findOid('XKL-MIB::xklEDFAModuleAlarms'));
-            $message    = "$edfaName module alarm: $moduleName";
+            $message = "$edfaName module alarm: $moduleName";
         }
 
         $trap->log($message, $severity);
