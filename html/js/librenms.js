@@ -373,6 +373,25 @@ function loadjs(filename, func){
     }
 }
 
+function build_tile_url(url) {
+    url ||= '{s}.tile.openstreetmap.org';
+
+    // protocol
+    if (!/^([a-z][a-z0-9+.-]*:)?\/\//i.test(url)) {
+        url = '//' + url;
+    }
+
+    // check for templates
+    if (url.includes('{z}') && url.includes('{x}') && url.includes('{y}')) {
+        return url;
+    }
+
+    // separate path and suffix
+    const path = url.split(/[?#]/)[0];
+
+    return path.replace(/\/+$/, '') + '/{z}/{x}/{y}.png' + url.slice(path.length);
+}
+
 function init_map(id, config = {}) {
     let leaflet = get_map(id)
     if (leaflet) {
@@ -491,8 +510,7 @@ function init_map(id, config = {}) {
         }
     } else {
         leaflet.setMaxZoom(20);
-        const tile_url = config.tile_url ? config.tile_url : '{s}.tile.openstreetmap.org';
-        L.tileLayer('//' + tile_url + '/{z}/{x}/{y}.png', {
+        L.tileLayer(build_tile_url(config.tile_url), {
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(leaflet);
