@@ -30,12 +30,173 @@
             "order": 2,
             "type": "boolean"
         },
-        "alert.macros.rule": {
-            "type": "array",
-            "validate": {
-                 "value": "array",
-                 "value.*": "string"
-             }
+        "alert.macros.rule.bill_quota_over_quota": {
+            "default": "((%bills.total_data / %bills.bill_quota)*100) && %bills.bill_type = \"quota\"",
+            "type": "text"
+        },
+        "alert.macros.rule.bill_cdr_over_quota": {
+            "default": "((%bills.rate_95th / %bills.bill_cdr)*100) && %bills.bill_type = \"cdr\"",
+            "type": "text"
+        },
+        "alert.macros.rule.component": {
+            "default": "(%component.disabled = 0 && %component.ignore = 0)",
+            "type": "text"
+        },
+        "alert.macros.rule.component_critical": {
+            "default": "(%component.status = 2 && %macros.component)",
+            "type": "text"
+        },
+        "alert.macros.rule.component_normal": {
+            "default": "(%component.status = 0 && %macros.component)",
+            "type": "text"
+        },
+        "alert.macros.rule.component_warning": {
+            "default": "(%component.status = 1 && %macros.component)",
+            "type": "text"
+        },
+        "alert.macros.rule.device": {
+            "default": "(%devices.disabled = 0 && %devices.ignore = 0)",
+            "type": "text"
+        },
+        "alert.macros.rule.device_component_down_junos": {
+            "default": "%sensors.sensor_class = \"state\" && %sensors.sensor_current != \"6\" && (%sensors.sensor_type = \"jnxFruState\" || %sensors.sensor_type = \"jnxFruTable\") && %sensors.sensor_current != \"2\" && %sensors.sensor_alert = \"1\"",
+            "type": "text"
+        },
+        "alert.macros.rule.device_component_down_cisco": {
+            "default": "%sensors.sensor_current != \"1\" && %sensors.sensor_current != \"5\" && %sensors.sensor_type REGEXP \"^cisco.*State$\" && %sensors.sensor_alert = \"1\"",
+            "type": "text"
+        },
+        "alert.macros.rule.device_cpu_avg_perc": {
+            "default": "COALESCE((SELECT AVG(p.processor_usage) FROM processors AS p WHERE p.device_id = %devices.device_id), 0)",
+            "type": "text"
+        },
+        "alert.macros.rule.device_up": {
+            "default": "(%devices.status = 1 && %macros.device)",
+            "type": "text"
+        },
+        "alert.macros.rule.device_down": {
+            "default": "(%devices.status = 0 && %macros.device)",
+            "type": "text"
+        },
+        "alert.macros.rule.now": {
+            "default": "NOW()",
+            "type": "text"
+        },
+        "alert.macros.rule.packet_loss_15m": {
+            "default": "if(%devices.status = 0, 100, 0)",
+            "type": "text"
+        },
+        "alert.macros.rule.packet_loss_5m": {
+            "default": "if(%devices.status = 0, 100, 0)",
+            "type": "text"
+        },
+        "alert.macros.rule.ping_loss_variance_perc": {
+            "default": "((%device_stats.ping_loss_last - %device_stats.ping_loss_avg) / %device_stats.ping_loss_avg) * 100",
+            "type": "text"
+        },
+        "alert.macros.rule.ping_rtt_variance_perc": {
+            "default": "((%device_stats.ping_rtt_last - %device_stats.ping_rtt_avg) / %device_stats.ping_rtt_avg) * 100",
+            "type": "text"
+        },
+        "alert.macros.rule.past_5m": {
+            "default": "DATE_SUB(NOW(),INTERVAL 5 MINUTE)",
+            "type": "text"
+        },
+        "alert.macros.rule.past_10m": {
+            "default": "DATE_SUB(NOW(),INTERVAL 10 MINUTE)",
+            "type": "text"
+        },
+        "alert.macros.rule.past_15m": {
+            "default": "DATE_SUB(NOW(),INTERVAL 15 MINUTE)",
+            "type": "text"
+        },
+        "alert.macros.rule.past_20m": {
+            "default": "DATE_SUB(NOW(),INTERVAL 20 MINUTE)",
+            "type": "text"
+        },
+        "alert.macros.rule.past_30m": {
+            "default": "DATE_SUB(NOW(),INTERVAL 30 MINUTE)",
+            "type": "text"
+        },
+        "alert.macros.rule.past_60m": {
+            "default": "DATE_SUB(NOW(),INTERVAL 60 MINUTE)",
+            "type": "text"
+        },
+        "alert.macros.rule.port": {
+            "default": "(%ports.deleted = 0 && %ports.ignore = 0 && %ports.disabled = 0)",
+            "type": "text"
+        },
+        "alert.macros.rule.port_out_error_perc": {
+            "default": "((%ports.ifOutErrors_rate) / %ports.ifOutUcastPkts_rate)*100",
+            "type": "text"
+        },
+        "alert.macros.rule.port_in_error_perc": {
+            "default": "((%ports.ifInErrors_rate) / %ports.ifInUcastPkts_rate)*100",
+            "type": "text"
+        },
+        "alert.macros.rule.port_down": {
+            "default": "(%ports.ifOperStatus = \"down\" && %ports.ifAdminStatus != \"down\" && %macros.port)",
+            "type": "text"
+        },
+        "alert.macros.rule.port_up": {
+            "default": "(%ports.ifOperStatus = \"up\" && %ports.ifAdminStatus = \"up\" && %macros.port)",
+            "type": "text"
+        },
+        "alert.macros.rule.port_usage_perc": {
+            "default": "((SELECT IF(%ports.ifOutOctets_rate>%ports.ifInOctets_rate, %ports.ifOutOctets_rate, %ports.ifInOctets_rate)*8) / %ports.ifSpeed)*100",
+            "type": "text"
+        },
+        "alert.macros.rule.port_in_usage_perc": {
+            "default": "((%ports.ifInOctets_rate*8) / %ports.ifSpeed)*100",
+            "type": "text"
+        },
+        "alert.macros.rule.port_out_usage_perc": {
+            "default": "((%ports.ifOutOctets_rate*8) / %ports.ifSpeed)*100",
+            "type": "text"
+        },
+        "alert.macros.rule.port_now_down": {
+            "default": "%ports.ifOperStatus != %ports.ifOperStatus_prev && %ports.ifOperStatus_prev = \"up\" && %ports.ifAdminStatus = \"up\" && %macros.port",
+            "type": "text"
+        },
+        "alert.macros.rule.port_has_xdp_neighbours": {
+            "default": "(%macros.port && %links.local_port_id = %ports.port_id)",
+            "type": "text"
+        },
+        "alert.macros.rule.port_has_xdp_neighbours_device": {
+            "default": "(%macros.port_has_xdp_neighbours && %links.remote_port_id IS NOT NULL)",
+            "type": "text"
+        },
+        "alert.macros.rule.pdu_over_amperage_apc": {
+            "default": "%sensors.sensor_class = \"current\" && %sensors.sensor_descr = \"Bank Total\" && %sensors.sensor_current > %sensors.sensor_limit && %devices.os = \"apc\"",
+            "type": "text"
+        },
+        "alert.macros.rule.sensor": {
+            "default": "(%sensors.sensor_alert = 1)",
+            "type": "text"
+        },
+        "alert.macros.rule.sensor_port_link": {
+            "default": "(%sensors.entPhysicalIndex_measured = 'ports' && %sensors.entPhysicalIndex = %ports.ifIndex && %macros.port_up)",
+            "type": "text"
+        },
+        "alert.macros.rule.service": {
+            "default": "(%services.service_disabled = 0 && %services.service_ignore = 0)",
+            "type": "text"
+        },
+        "alert.macros.rule.state_sensor_critical": {
+            "default": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 2",
+            "type": "text"
+        },
+        "alert.macros.rule.state_sensor_ok": {
+            "default": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 0",
+            "type": "text"
+        },
+        "alert.macros.rule.state_sensor_unknown": {
+            "default": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 3",
+            "type": "text"
+        },
+        "alert.macros.rule.state_sensor_warning": {
+            "default": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 1",
+            "type": "text"
         },
         "alert.scheduled_maintenance_default_behavior": {
             "default": "1",
