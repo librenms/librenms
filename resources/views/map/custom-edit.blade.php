@@ -265,6 +265,8 @@
                         real_nodes.push(nodeid);
                     }
                 });
+                // Flush the queued removals so rebuildEdgeChain no longer sees the deleted waypoints
+                network_nodes.flush();
 
                 // Only delete whole edges when a real node is being removed (not when removing a waypoint)
                 if (real_nodes.length > 0) {

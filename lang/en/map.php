@@ -199,7 +199,7 @@ return [
                 'label' => 'Label',
                 'recenter' => 'Recenter Line',
                 'add_waypoint' => 'Add Waypoint',
-                'remove_waypoint' => 'Remove Waypoint',
+                'remove_waypoint' => 'To remove a waypoint, select its dot on the map and click Delete selected',
             ],
             'validate' => [
                 'width_format' => 'Width must be a number followed by px or %',
