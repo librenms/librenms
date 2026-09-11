@@ -32,7 +32,7 @@ class MergeSavedFilter
             return $next($request);
         }
 
-        if (auth()->check()) {
+        if ($request->user() !== null) {
             $prefKey = 'filters.' . $filterName;
             $savedFilter = UserPref::getPref($request->user(), $prefKey) ?: [];
             $request->merge(['filter' => array_merge($savedFilter, $filter)]);

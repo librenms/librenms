@@ -13,19 +13,33 @@ modules:
                         - ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentLowerWarningThreshold
                         - ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentUpperWarningThreshold
                         - ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentUpperCriticalThreshold
+                        - ENLOGIC-PDU2-MIB::pduInputPhaseStatusCurrentState
+                        - ENLOGIC-PDU2-MIB::pduCircuitBreakerPropertiesInputLayout
         power:
             data:
                 -
                     oid: ENLOGIC-PDU2-MIB::pduUnitStatusTable
                     value: ENLOGIC-PDU2-MIB::pduUnitStatusActivePower
-                    num_oid: '.1.3.6.1.4.1.38446.1.2.4.1.4.1.{{ $index }}'
-                    descr: "Active power #{{ $index }}"
+                    num_oid: '.1.3.6.1.4.1.38446.1.2.4.1.4.{{ $index }}'
+                    index: 'pduUnitStatusActivePower.{{ $index }}'
+                    descr: "Active power unit {{ $index }}"
+                    group: "Units"
                 -
                     oid: ENLOGIC-PDU2-MIB::pduInputPhaseStatusTable
                     value: ENLOGIC-PDU2-MIB::pduInputPhaseStatusActivePower
-                    num_oid: '.1.3.6.1.4.1.38446.1.3.4.1.7.1.{{ $index }}'
+                    group: "Phases"
+                    num_oid: '.1.3.6.1.4.1.38446.1.3.4.1.7.{{ $index }}'
                     index: 'pduInputPhaseStatusActivePower.{{ $index }}'
-                    descr: "Input Phase #{{ $index }}"
+                    descr: "Active power unit {{ $subindex0 }} phase {{ $subindex1 }}"
+
+        power_consumed:
+            data:
+                -
+                    oid: ENLOGIC-PDU2-MIB::pduUnitStatusTable
+                    value: ENLOGIC-PDU2-MIB::pduUnitStatusEnergy
+                    num_oid: '.1.3.6.1.4.1.38446.1.2.4.1.9.{{ $index }}'
+                    descr: "Total Energy unit {{ $index }}"
+                    index: 'pduUnitStatusEnergy.{{ $index }}'
         voltage:
             data:
                 -
@@ -37,38 +51,44 @@ modules:
                     warn_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigVoltageUpperWarningThreshold
                     high_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigVoltageUpperCriticalThreshold
                     index: 'pduInputPhaseStatusVoltage.{{ $index }}'
-                    descr: "Input Phase {{ $index }}"
+                    descr: "Input unit {{ $subindex0 }} phase {{ $subindex1 }}"
         current:
             data:
                 -
                     oid: ENLOGIC-PDU2-MIB::pduInputPhaseStatusTable
                     value: ENLOGIC-PDU2-MIB::pduInputPhaseStatusCurrent
                     divisor: 100
+                    group: "Phases"
                     num_oid: '.1.3.6.1.4.1.38446.1.3.4.1.5.{{ $index }}'
                     low_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentLowerCriticalThreshold
                     low_warn_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentLowerWarningThreshold
                     warn_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentUpperWarningThreshold
                     high_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentUpperCriticalThreshold
                     index: 'pduInputPhaseStatusCurrent.{{ $index }}'
-                    descr: "Input Phase {{ $index }}"
+                    descr: "Input unit {{ $subindex0 }} phase {{ $subindex1 }}"
                 -
                     oid: ENLOGIC-PDU2-MIB::pduCircuitBreakerStatusTable
                     value: ENLOGIC-PDU2-MIB::pduCircuitBreakerStatusCurrent
                     divisor: 100
                     num_oid: '.1.3.6.1.4.1.38446.1.4.4.1.5.{{ $index }}'
+                    group: 'Breaker'
                     low_limit: ENLOGIC-PDU2-MIB::pduCircuitBreakerConfigLowerCriticalThreshold
                     low_warn_limit: ENLOGIC-PDU2-MIB::pduCircuitBreakerConfigLowerWarningThreshold
                     warn_limit: ENLOGIC-PDU2-MIB::pduCircuitBreakerConfigUpperWarningThreshold
                     high_limit: ENLOGIC-PDU2-MIB::pduCircuitBreakerConfigUpperCriticalThreshold
-                    descr: "Input Phase {{ ENLOGIC-PDU2-MIB::pduCircuitBreakerLabel }}"
-                    skip_values: 0
+                    descr: "Input Breaker {{ ENLOGIC-PDU2-MIB::pduCircuitBreakerLabel }} phase {{ ENLOGIC-PDU2-MIB::pduCircuitBreakerPropertiesInputLayout }}"
+                    skip_values:
+                        -
+                            oid: ENLOGIC-PDU2-MIB::pduCircuitBreakerStatusLoadState
+                            op: '='
+                            value: 0
         state:
             data:
                 -
                     oid: ENLOGIC-PDU2-MIB::pduUnitStatusTable
                     value: ENLOGIC-PDU2-MIB::pduUnitStatusLoadState
                     num_oid: '.1.3.6.1.4.1.38446.1.2.4.1.3.{{ $index }}'
-                    descr: "Load state #{{ $index }}"
+                    descr: "Load state unit {{ $index }}"
                     states:
                         - { value: 1, descr: 'upperCritical', generic: 2 }
                         - { value: 2, descr: 'upperWarning', generic: 1 }
@@ -79,7 +99,7 @@ modules:
                     oid: ENLOGIC-PDU2-MIB::pduInputPhaseStatusCurrentState
                     value: ENLOGIC-PDU2-MIB::pduInputPhaseStatusCurrentState
                     num_oid: '.1.3.6.1.4.1.38446.1.3.4.1.3.{{ $index }}'
-                    descr: "Current state #{{ $index }}"
+                    descr: "Current state unit {{ $subindex0 }} phase {{ $subindex1 }}"
                     states:
                         - { value: 1, descr: 'upperCritical', generic: 2 }
                         - { value: 2, descr: 'upperWarning', generic: 1 }
@@ -90,7 +110,7 @@ modules:
                     oid: ENLOGIC-PDU2-MIB::pduInputPhaseStatusVoltageState
                     value: ENLOGIC-PDU2-MIB::pduInputPhaseStatusVoltageState
                     num_oid: '.1.3.6.1.4.1.38446.1.3.4.1.4.{{ $index }}'
-                    descr: "Voltage state #{{ $index }}"
+                    descr: "Voltage state unit {{ $subindex0 }} phase {{ $subindex1 }}"
                     states:
                         - { value: 1, descr: 'upperCritical', generic: 2 }
                         - { value: 2, descr: 'upperWarning', generic: 1 }
@@ -101,7 +121,7 @@ modules:
                     oid: ENLOGIC-PDU2-MIB::pduCircuitBreakerStatusTable
                     value: ENLOGIC-PDU2-MIB::pduCircuitBreakerStatusLoadState
                     num_oid: '.1.3.6.1.4.1.38446.1.4.4.1.4.{{ $index }}'
-                    descr: "Circuit breaker state {{ ENLOGIC-PDU2-MIB::pduCircuitBreakerLabel }}"
+                    descr: "Circuit breaker state unit {{ $subindex0 }} breaker {{ ENLOGIC-PDU2-MIB::pduCircuitBreakerLabel }}"
                     skip_values: 0
                     states:
                         - { value: 1, descr: 'upperCritical', generic: 2 }

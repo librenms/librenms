@@ -1,31 +1,25 @@
 # Enabling support for InfluxDBv2
 
-Before we get started it is important that you know and understand
-that InfluxDBv2 support is currently alpha at best. All it provides is
-the sending of data to a InfluxDBv2 bucket. Due to the current changes
-that are constantly being made to InfluxDB itself then we cannot
-guarantee that your data will be ok so enabling this support is at
-your own risk!
+InfluxDBv2 support is alpha quality. It only sends the data to a InfluxDBv2 bucket.
+InfluxDB changes often, so we cannot guarantee the integrity of your data.
+Use this support at your own risk.
 
-It is also important to understand that InfluxDBv2 only supports the
-InfluxDBv2 API used in InfluxDB version 2.0 or higher. If you are
-looking to send data to any other version of InfluxDB than you should
-use the InfluxDB datastore instead.
+InfluxDBv2 supports only the InfluxDBv2 API of InfluxDB version 2.0 and
+later. For any other InfluxDB version, use the InfluxDB datastore.
 
 ## Requirements
 
 - InfluxDB >= 2.0
 
-The setup of the above is completely out of scope here and we aren't
-really able to provide any help with this side of things.
+This document does not describe the setup of these components. We
+cannot help with them.
 
-## What you don't get
+## What you do not get
 
-- Support for InfluxDB, we would highly recommend that you
-  have some level of experience with these.
+- Support for InfluxDB. You need experience with this tool.
 
-RRD will continue to function as normal so LibreNMS itself should
-continue to function as normal.
+RRD continues to work in the normal way. LibreNMS therefore also
+continues to work in the normal way.
 
 ## Configuration
 
@@ -48,8 +42,9 @@ continue to function as normal.
     lnms config:set influxdbv2.max_retry 2
     ```
 
-The same data stored within rrd will be sent to InfluxDB and
-recorded. You can then create graphs within Grafana or InfluxDB to display the
-information you need.
+LibreNMS sends the same data from rrd to InfluxDB, and InfluxDB records
+it. You can then create graphs in Grafana or in InfluxDB for the
+information that you need.
 
-Please note that polling will slow down when the poller isn't able to reach or write data to InfluxDBv2.
+Note: the polling becomes slower when the poller cannot reach
+InfluxDBv2 or cannot write data to it.

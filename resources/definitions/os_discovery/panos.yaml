@@ -11,6 +11,7 @@ modules:
                         - PAN-COMMON-MIB::panSessionMax
                         - PAN-COMMON-MIB::panVsysName
                         - PAN-COMMON-MIB::panVsysMaxSessions
+                        - PAN-COMMON-MIB::panGPGWUtilizationMaxTunnels
         state:
             data:
                 -
@@ -121,12 +122,33 @@ modules:
                     group: Sessions
                     high_limit: PAN-COMMON-MIB::panSessionMax
                 -
+                    oid: PAN-COMMON-MIB::panSessionActiveICMP
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.6.{{ $index }}'
+                    index: 'panSessionActiveICMP.{{ $index }}'
+                    descr: Active ICMP Sessions
+                    group: Sessions
+                    high_limit: PAN-COMMON-MIB::panSessionMax
+                -
                     oid: PAN-COMMON-MIB::panVsysActiveSessions
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.4.{{ $index }}'
                     index: 'panVsysActiveSessions.{{ $index }}'
                     descr: Active Sessions
                     group: '{{ PAN-COMMON-MIB::panVsysName }}'
                     high_limit: PAN-COMMON-MIB::panVsysMaxSessions
+                    skip_values:
+                        - oid: PAN-COMMON-MIB::panVsysMaxSessions
+                          op: '='
+                          value: 0
+                -
+                    oid: PAN-COMMON-MIB::panVsysActiveSessions
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.4.{{ $index }}'
+                    index: 'panVsysActiveSessions.{{ $index }}'
+                    descr: Active Sessions
+                    group: '{{ PAN-COMMON-MIB::panVsysName }}'
+                    skip_values:
+                        - oid: PAN-COMMON-MIB::panVsysMaxSessions
+                          op: '!='
+                          value: 0
                 -
                     oid: PAN-COMMON-MIB::panVsysActiveTcpCps
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.6.{{ $index }}'
@@ -157,8 +179,21 @@ modules:
                     index: 'panGPGWUtilizationActiveTunnels.{{ $index }}'
                     descr: GlobalProtect VPN Active Sessions
                     group: VPN
-                    low_limit: 0
-                    low_warn_limit: 0
+                    high_limit: PAN-COMMON-MIB::panGPGWUtilizationMaxTunnels
+                    skip_values:
+                        - oid: PAN-COMMON-MIB::panGPGWUtilizationMaxTunnels
+                          op: '='
+                          value: 0
+                -
+                    oid: PAN-COMMON-MIB::panGPGWUtilizationActiveTunnels
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.5.1.3.{{ $index }}'
+                    index: 'panGPGWUtilizationActiveTunnels.{{ $index }}'
+                    descr: GlobalProtect VPN Active Sessions
+                    group: VPN
+                    skip_values:
+                        - oid: PAN-COMMON-MIB::panGPGWUtilizationMaxTunnels
+                          op: '!='
+                          value: 0
         load:
             data:
                 -
@@ -167,6 +202,12 @@ modules:
                     index: 'panSessionUtilization.{{ $index }}'
                     descr: Session Utilization
                     group: Sessions
+                -
+                    oid: PAN-COMMON-MIB::panGPGWUtilizationPct
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.5.1.1.{{ $index }}'
+                    index: 'panGPGWUtilizationPct.{{ $index }}'
+                    descr: GlobalProtect Gateway Utilization
+                    group: VPN
                 -
                     oid: PAN-COMMON-MIB::panSessionSslProxyUtilization
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.8.{{ $index }}'

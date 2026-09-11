@@ -13,11 +13,14 @@ echo 'Ports:';
 $ports = $app->data['ports'] ?? [];
 sort($ports);
 foreach ($ports as $index => $port) {
-    $label = $vars['port'] == $port
-        ? '<span class="pagemenu-selected">' . $port . '</span>'
-        : $port;
+    $label = $port;
+    $link = generate_link($label, $link_array, ['port' => $port]);
 
-    echo generate_link($label, $link_array, ['port' => $port]);
+    $link = $vars['port'] == $port
+        ? '<span class="pagemenu-selected">' . $link . '</span>'
+        : $link;
+
+    echo $link;
 
     if ($index < (count($ports) - 1)) {
         echo ', ';

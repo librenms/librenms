@@ -50,7 +50,7 @@ Route::prefix('v0')->group(function (): void {
     });
 
     // Oxidized
-    Route::get('oxidized/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_oxidized'])->middleware(['can:oxidized.list'])->name('list_oxidized');
+    Route::get('oxidized/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_oxidized'])->middleware(['can:viewAny,App\Models\Device'])->name('list_oxidized');
     Route::get('oxidized/config/search/{searchstring}', [App\Api\Controllers\LegacyApiController::class, 'search_oxidized'])->middleware(['can:oxidized.search'])->name('search_oxidized');
     Route::get('oxidized/config/{device_name}', [App\Api\Controllers\LegacyApiController::class, 'get_oxidized_config'])->middleware(['can:viewAny,App\Models\Device'])->name('get_oxidized_config');
 

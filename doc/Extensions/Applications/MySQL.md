@@ -6,7 +6,7 @@ The MySQL script requires PHP-CLI and the PHP MySQL extension, so
 please verify those are installed.
 
 !!! note "" 
-    May vary based on PHP version
+    The version depends on your PHP version
         
 === "Debian/Ubuntu"
 
@@ -46,7 +46,7 @@ $mysql_port = 3306;
 ```
 
 Note that depending on your MySQL installation (chrooted install for example),
-you may have to specify 127.0.0.1 instead of localhost. Localhost make
+use 127.0.0.1 instead of localhost. localhost makes
 a MySQL connection via the mysql socket, while 127.0.0.1 make a standard
 IP connection to mysql.
 
@@ -56,7 +56,7 @@ so you need to also include the line `$chk_options['slave'] = false;` into `mysq
 
 === "Agent"
 
-    [Install the agent](../Agent-Setup.md) on this device if it isn't already
+    If this device has no agent, [install the agent](../Agent-Setup.md)
 
     and copy the `mysql` script to `/usr/lib/check_mk_agent/local/`
 
@@ -78,7 +78,7 @@ so you need to also include the line `$chk_options['slave'] = false;` into `mysq
 
     3. Edit `/etc/snmp/mysql` to set your MySQL connection constants or declare them in `/etc/snmp/mysql.cnf` (new file)
 
-    4. Edit your snmpd.conf file and add:
+    4. Edit your `snmpd.conf` file and add:
 
         ```bash
         extend mysql /etc/snmp/mysql
@@ -86,6 +86,6 @@ so you need to also include the line `$chk_options['slave'] = false;` into `mysq
 
     5. Restart snmpd.
 
-    The application should be auto-discovered as described at the top of
-    the page. If it is not, please follow the steps set out under `SNMP
-    Extend` heading top of page.
+    LibreNMS discovers the application automatically, as described at
+    the top of the page. If the discovery fails, do the steps under the
+    `SNMP Extend` heading at the top of the page.

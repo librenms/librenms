@@ -25,7 +25,6 @@
  */
 
 use LibreNMS\Util\Number;
-use LibreNMS\Util\StringHelpers;
 
 $cmc_iii_var_table = snmpwalk_cache_oid($device, 'cmcIIIVarTable', [], 'RITTAL-CMC-III-MIB', null);
 $cmc_iii_sensors = [];
@@ -103,7 +102,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
             }
 
             // encode string to ensure that degree sign may be used properly for unit comparison
-            $unit = StringHelpers::inferEncoding($entry['cmcIIIVarUnit']);
+            $unit = $entry['cmcIIIVarUnit'];
             $type = 'state';
             $temperature_units = ['degree C', 'degree F', '°C', '°F'];
             if ($unit == 'mA') {

@@ -36,7 +36,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     /** @var string Update this on release */
-    public const VERSION = '26.7.0';
+    public const VERSION = '26.8.1';
 
     /** @var Git convenience instance */
     public $git;
@@ -73,7 +73,7 @@ class Version
                 $month = 1;
             }
 
-            return sprintf('%d.%d.%d-dev.%s+%s', $year, $month, $matches['minor'], $matches['commits'], $matches['sha']);
+            return sprintf('%d.%d.%d-dev.%s+%s', $year, $month, '0', $matches['commits'], $matches['sha']);
         }
 
         return self::VERSION;

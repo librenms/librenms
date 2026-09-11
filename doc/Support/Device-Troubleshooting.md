@@ -1,29 +1,28 @@
 # Capture Debug Information
 
-You can use this feature to run Debug on Discovery, Poller, SNMP
-and Alerts. This output information could be helpful for you when
-troubleshooting a device or when requesting help from the community.
+This feature runs Discovery, Poller, SNMP, and Alerts in debug mode.
+The output helps you to troubleshoot a device. It also helps the
+community to answer a request for help.
 
-This feature can be found by going to the device that you are
-troubleshooting in the webui, clicking on the settings icon menu on
-far right and selecting Capture.
+To use this feature, open the device in the web interface. Then click
+the settings icon on the far right and select Capture.
 ![Capture-Debug-Icon](../img/capture-debug-icon.png)
 
 ## Discovery
 
-Discovery will run and output debug information.
+Discovery runs and gives debug information.
 
 ## Poller
 
-Poller will run and output debug information.
+The poller runs and gives debug information.
 
 ## SNMP
 
-SNMP will run SNMP Bulk Walk on the device and output the information.
+LibreNMS does an SNMP bulk walk of the device and gives the result.
 
 ## Alerts
 
-Alerts Capture is handy when you are creating alerts and need to see
-if your alert rule matches.
+The Alerts capture is useful during the creation of an alert. It shows
+whether your alert rule matches.
 
 ![device-troubleshooting](../img/device-troubleshooting.png)

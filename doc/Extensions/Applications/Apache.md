@@ -13,7 +13,7 @@ Either use SNMP extend or use the agent.
     wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apache-stats.py -O /etc/snmp/apache-stats.py
     ```
 
-    2. Make the script executable
+    2. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/apache-stats.py
@@ -32,13 +32,13 @@ Either use SNMP extend or use the agent.
     apt-get install python3-urllib3
     ```
 
-    5. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+    5. Edit your `snmpd.conf` file, usually `/etc/snmp/snmpd.conf`, and add:
 
     ```bash
     extend apache /etc/snmp/apache-stats.py
     ```
 
-    6. Restart snmpd on your host
+    6. Restart snmpd on your host.
 
     ```bash
     sudo systemctl snmpd restart
@@ -62,7 +62,7 @@ Either use SNMP extend or use the agent.
 
     ### install agent
 
-    [Install the agent](../Agent-Setup.md)) on this device if it isn't already
+    If this device has no agent, [install the agent](../Agent-Setup.md)
     and copy the `apache` script to `/usr/lib/check_mk_agent/local/`
 
     1. Verify it is working by running `/usr/lib/check_mk_agent/local/apache`

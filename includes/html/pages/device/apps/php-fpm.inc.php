@@ -16,22 +16,28 @@ if ($app_data['version'] == 'legacy') {
 } else {
     print_optionbar_start();
 
+    $label = 'Totals';
+    $link = generate_link($tlabel, $link_array);
+
     // print the link to the totals
-    $total_label = isset($vars['phpfpm_pool'])
-        ? 'Totals'
-        : '<span class="pagemenu-selected">Totals</span>';
-    echo generate_link($total_label, $link_array);
+    $link = isset($vars['phpfpm_pool'])
+        ? $link
+        : '<span class="pagemenu-selected">' . $link . '</span>';
+    echo $link;
 
     // print links to the pools
     echo ' | Pools: ';
     $pools = $app->data['pools'] ?? [];
     sort($pools);
     foreach ($pools as $index => $pool_name) {
-        $label = $vars['phpfpm_pool'] == $pool_name
-            ? '<span class="pagemenu-selected">' . $pool_name . '</span>'
-            : $pool_name;
+        $label = $pool_name;
+        $link = generate_link($label, $link_array, ['phpfpm_pool' => $pool_name]);
 
-        echo generate_link($label, $link_array, ['phpfpm_pool' => $pool_name]);
+        $link = $vars['phpfpm_pool'] == $pool_name
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+
+        echo $link;
 
         if ($index < (count($pools) - 1)) {
             echo ', ';

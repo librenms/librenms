@@ -1,7 +1,7 @@
 ## Elasticsearch
 
-You can have LibreNMS send alerts to an elasticsearch database. Each
-fault will be sent as a separate document.
+LibreNMS sends alerts to an Elasticsearch database. It sends each fault
+as a separate document.
 
 **Example:**
 

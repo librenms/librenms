@@ -45,6 +45,7 @@ discovery:
         sysDescr:
             - 'Catalyst 1200 Series'
             - 'Catalyst 1300 Series'
+            - 'Catalyst 1300X Series'
     -
         sysDescr_regex:
             - '/^Linksys SLM/'

@@ -8,13 +8,13 @@
     wget https://github.com/librenms/librenms-agent/raw/master/snmp/nvidia -O /etc/snmp/nvidia
     ```
 
-2. Make the script executable
+2. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/nvidia
     ```
 
-3. Edit your snmpd.conf file and add:
+3. Edit your `snmpd.conf` file and add:
 
     ```bash
     extend nvidia /etc/snmp/nvidia
@@ -26,9 +26,10 @@
     sudo systemctl restart snmpd
     ```
 
-5. Verify you have nvidia-smi installed, which it generally should be if you have the driver from Nvida installed.
+5. Make sure that `nvidia-smi` is installed. The Nvidia driver usually
+   installs it.
 
-    The GPU numbering on the graphs will correspond to how the nvidia-smi
+    The GPU numbers on the graphs match the numbers of nvidia-smi
     sees them as being.
 
     For questions about what the various values are/mean, please see the

@@ -10,33 +10,33 @@ An authoritative DNS server: <https://www.powerdns.com/auth.html>
     wget https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns.py -O /etc/snmp/powerdns.py
     ```
 
-    2. Make the script executable
+    2. Make the script executable.
     
     ```bash
     chmod +x /etc/snmp/powerdns.py
     ```
 
-    3. Edit your snmpd.conf file and add:
+    3. Edit your `snmpd.conf` file and add:
 
     ```bash
     extend powerdns /etc/snmp/powerdns.py
     ```
 
-    4. Restart snmpd on your host
+    4. Restart snmpd on your host.
 
-    The application should be auto-discovered as described at the top of
-    the page. If it is not, please follow the steps set out under `SNMP
-    Extend` heading top of page.
+    LibreNMS discovers the application automatically, as described at
+    the top of the page. If the discovery fails, do the steps under the
+    `SNMP Extend` heading at the top of the page.
 
 === "Agent"
 
-    [Install the agent](../Agent-Setup.md) on this device if it isn't already
+    If this device has no agent, [install the agent](../Agent-Setup.md)
 
     and copy the `powerdns` script to `/usr/lib/check_mk_agent/local/`
 
 === "Permissions"
 
-   If snmpd is running as an unpriveledged user, you may need to use sudo.
+   If snmpd runs as an unprivileged user, use sudo.
    Here is a rough outline of one way to accomplish this.
 
    Add `Debian-snmp ALL=(ALL) NOPASSWD: /usr/bin/pdns_control list` to your sudoers file

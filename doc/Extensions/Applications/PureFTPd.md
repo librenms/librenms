@@ -4,19 +4,19 @@ SNMP extend script to monitor PureFTPd.
 
 ## SNMP Extend
 
-1. Download the script onto the desired host
+1. Download the script onto the host.
 
     ```bash
     wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/pureftpd.py -O /etc/snmp/pureftpd.py
     ```
 
-2. Make the script executable
+2. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/pureftpd.py
     ```
 
-3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+3. Edit your `snmpd.conf` file, usually `/etc/snmp/snmpd.conf`, and add:
 
     ```bash
     extend pureftpd sudo /etc/snmp/pureftpd.py
@@ -33,11 +33,11 @@ SNMP extend script to monitor PureFTPd.
 
 5. If pure-ftpwho is not located in /usr/sbin
 
-    you will also need to create a config file, which is named `/etc/snmp/.pureftpd.json`: 
+    you must also create the config file `/etc/snmp/.pureftpd.json`: 
 
     ```json
     {"pureftpwho_cmd": "/usr/sbin/pure-ftpwho"
     }
     ```
 
-5. Restart snmpd on your host
+5. Restart snmpd on your host.

@@ -21,7 +21,7 @@ return [
             'jitter' => 'Jitter',
             'lspGroup' => 'LSP Group',
             'lspPing' => 'LSP Ping',
-            'lspPingPseudowire' => 'LSP Pseudowire Ping"',
+            'lspPingPseudowire' => 'LSP Pseudowire Ping',
             'lspTrace' => 'LSP Trace',
             'NtpQuery' => 'NTP Query',
             'pathEcho' => 'Path ICMP Ping',

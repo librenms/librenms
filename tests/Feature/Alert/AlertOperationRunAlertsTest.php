@@ -139,6 +139,49 @@ final class AlertOperationRunAlertsTest extends TestCase
         $this->assertCount(0, $captured, 'A suppressed operation should not notify');
     }
 
+    public function testParentDownSuppressesAlertWithoutAdvancingSegmentTimers(): void
+    {
+        // Parent is down; child has an active, unnotified alert.
+        $parent = Device::factory()->create(['status' => 0, 'ignore' => 0, 'disabled' => 0]);
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 0, 'dur' => 3600],
+        ]);
+
+        DB::table('device_relationships')->insert([
+            'parent_device_id' => $parent->device_id,
+            'child_device_id' => $context['device']->device_id,
+        ]);
+
+        // Run several times while parent is down.
+        // The alert must be suppressed and segment timer state must NOT advance.
+        $captured = $this->runAlertsCapturing(3);
+        $this->assertCount(0, $captured, 'No alert should fire while parent is down');
+
+        $segmentId = $context['segments'][0]['segment']->id;
+        $details = $this->latestAlertLogDetails($context['rule']->id);
+        $fires = (int) ($details['op_seg'][(string) $segmentId]['fires'] ?? 0);
+        $this->assertSame(0, $fires, 'Segment timer must not advance while parent is suppressing the alert');
+
+        // Bring parent back up.  The child alert must fire immediately on the next cycle.
+        DB::table('devices')
+            ->where('device_id', $parent->device_id)
+            ->update(['status' => 1]);
+
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(1, $captured, 'Alert must fire as soon as parent recovers with child still down');
+        $this->assertSame(
+            ['api'],
+            array_map(static fn ($t) => $t['transport_type'], $captured[0]),
+            'The correct transport should be notified on the first unsuppressed cycle'
+        );
+
+        $alerted = DB::table('alerts')
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->value('alerted');
+        $this->assertEquals(AlertState::ACTIVE, $alerted, 'alerts.alerted must be advanced after the notification fires');
+    }
+
     /**
      * Build a device + alert rule (optionally with an operation/segments/transports) and an
      * open, active alert ready for RunAlerts to process.

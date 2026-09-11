@@ -68,6 +68,19 @@ class GraphsPageControllerTest extends TestCase
         $this->assertNoPhpWarningOutput($response->getContent());
     }
 
+    public function testDateSelectorQueryRangeOverridesLegacyPathRange(): void
+    {
+        $device = Device::factory()->create();
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs/to=1700003600/id={$device->device_id}/type=device_poller_perf/from=1700000000/?from=1700007200&to=1700010800");
+
+        $response->assertOk();
+        $response->assertSee('data-start="1700007200"', false);
+        $response->assertSee('data-end="1700010800"', false);
+        $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
     public function testShowCommandUsesGraphVars(): void
     {
         $device = Device::factory()->create(['hostname' => 'port-device.example.com']);
@@ -206,6 +219,48 @@ class GraphsPageControllerTest extends TestCase
         $response->assertSee('from={{start}}', false);
         $response->assertSee('to={{end}}', false);
         $response->assertSee('width={{width}}', false);
+    }
+
+    public function testSensorGraphPageUsesSubtitleFromAuthFile(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'sensor-device.example.com']);
+        $sensor = \App\Models\Sensor::factory()->for($device)->create([
+            'sensor_descr' => 'Chassis Temp',
+            'sensor_class' => 'temperature',
+        ]);
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?id={$sensor->sensor_id}&type=sensor_temperature");
+
+        $response->assertOk();
+        $response->assertSee(' :: Sensor :: Chassis Temp');
+        $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
+    public function testMultiPortGraphPageUsesSubtitleFromAuthFile(): void
+    {
+        $device = Device::factory()->create();
+        $port1 = Port::factory()->for($device)->create();
+        $port2 = Port::factory()->for($device)->create();
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?id={$port1->port_id},{$port2->port_id}&type=multiport_bits");
+
+        $response->assertOk();
+        $response->assertSee('Multi Port');
+        $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
+    public function testDeviceGraphPageUsesDefaultSubtitleWhenNoTitleInAuthFile(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'perf-device.example.com']);
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?device={$device->device_id}&type=device_poller_perf");
+
+        $response->assertOk();
+        $response->assertSee(' :: Poller Time');
+        $this->assertNoPhpWarningOutput($response->getContent());
     }
 
     private function adminUser(): User

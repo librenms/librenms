@@ -42,7 +42,7 @@ A small shell script that checks your system's fail2ban status.
 
         If not specified, `/usr/bin/env fail2ban-client` is used.
 
-1. Restart snmpd on your host
+1. Restart snmpd on your host.
 
     ```bash
     sudo systemctl restart snmpd
@@ -50,14 +50,14 @@ A small shell script that checks your system's fail2ban status.
 2. If you wish to use caching, add the following to /etc/crontab and
 restart cron.
 
-    The following will update the cache every 3 minutes.
+    This entry updates the cache every 3 minutes.
 
     ```cron
     */3    *    *    *    *    root    /etc/snmp/fail2ban -u
     ```
 
-If you have more than a few jails configured, you may need to use
-caching as each jail needs to be polled and fail2ban-client can't do
+With many jails, use caching. Each jail needs a poll, and
+`fail2ban-client` cannot do
 so in a timely manner for than a few. This can result in failure of
 other SNMP information being polled.
 

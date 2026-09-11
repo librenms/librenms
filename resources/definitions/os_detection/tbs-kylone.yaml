@@ -3,6 +3,7 @@ group: tbs
 text: 'Kylone'
 type: network
 icon: tbs
+snmp_bulk: false
 mib_dir: tbs
 over:
     - { graph: device_bits, text: 'Device Traffic' }

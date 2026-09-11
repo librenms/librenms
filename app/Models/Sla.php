@@ -28,6 +28,6 @@ class Sla extends DeviceRelatedModel implements Keyable
 
     public function getCompositeKey(): string
     {
-        return "$this->owner-$this->tag";
+        return "$this->sla_nr-$this->owner-$this->tag";
     }
 }

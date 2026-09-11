@@ -100,9 +100,10 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         include base_path('includes/polling/unix-agent/munin-plugins.inc.php');
 
         foreach (array_keys($agent_data) as $key) {
-            $parser_file = base_path("includes/polling/unix-agent/$key.inc.php");
+            $file = basename($key);
+            $parser_file = base_path("includes/polling/unix-agent/$file.inc.php");
             if (file_exists($parser_file)) {
-                d_echo("Including: unix-agent/$key.inc.php");
+                d_echo("Including: unix-agent/$file.inc.php");
 
                 include $parser_file;
             }

@@ -105,6 +105,36 @@ final class UnimusProviderTest extends TestCase
         $this->assertSame('latest config', $latest['content']);
     }
 
+    public function testRefreshTriggersBackupJob(): void
+    {
+        Http::fake([
+            'unimus:8085/api/v2/devices/findByAddress/*' => Http::response(['data' => ['id' => 7]], 200),
+            'unimus:8085/api/v2/jobs/backup*' => Http::response(['data' => ['accepted' => 1, 'refused' => 0]], 202),
+        ]);
+
+        $this->assertTrue($this->makeProvider()->refresh($this->makeDevice(), 'admin'));
+
+        Http::assertSent(fn ($request) => str_contains((string) $request->url(), '/jobs/backup?id=7')
+            && $request->method() === 'PATCH');
+    }
+
+    public function testRefreshReturnsFalseWhenBackupRefused(): void
+    {
+        Http::fake([
+            'unimus:8085/api/v2/devices/findByAddress/*' => Http::response(['data' => ['id' => 7]], 200),
+            'unimus:8085/api/v2/jobs/backup*' => Http::response(['data' => ['accepted' => 0, 'refused' => 1]], 202),
+        ]);
+
+        $this->assertFalse($this->makeProvider()->refresh($this->makeDevice(), 'admin'));
+    }
+
+    public function testRefreshReturnsFalseWhenDeviceNotFound(): void
+    {
+        Http::fake(['unimus:8085/api/v2/devices/findByAddress/*' => Http::response(['code' => 404], 404)]);
+
+        $this->assertFalse($this->makeProvider()->refresh($this->makeDevice(), 'admin'));
+    }
+
     public function testContentRejectsNonNumericId(): void
     {
         Http::fake(['*' => Http::response(['data' => []], 200)]);

@@ -1,12 +1,12 @@
 # Entities
 
-Entities as described earlier are based on the table and column names
-within the database, if you are unsure of what the entity is you want
-then have a browse around inside MySQL using `show tables` and `desc <tablename>`.
+An entity comes from a table name and a column name in the database. To
+find the correct entity, open MySQL. Then use `show tables` and
+`desc <tablename>`.
 
-Below are some common entities that you can use within the alerting
-system. This list is not exhaustive and you should look at the MySQL
-database schema for the full list.
+The tables below give some common entities for the alerting system.
+This list is not complete. For the full list, read the MySQL database
+schema.
 
 ## Devices
 
@@ -19,11 +19,11 @@ Entity | Description
 `devices.version` | The device os version
 `devices.location` | The device location
 `devices.status` | The status of the device, 1 | up, 0 | down
-`devices.status_reason` | The reason the device was detected as down (icmp or snmp)
-`devices.ignore` | If the device is ignored this will be set to 1
-`devices.disabled` | If the device is disabled this will be set to 1
-`devices.last_polled` | The the last polled datetime (yyyy-mm-dd hh:mm:ss)
-`devices.type` | The device type such as network, server, firewall, etc.
+`devices.status_reason` | The reason for the down status of the device, icmp or snmp
+`devices.ignore` | The value is 1 for an ignored device
+`devices.disabled` | The value is 1 for a disabled device
+`devices.last_polled` | The datetime of the last poll (yyyy-mm-dd hh:mm:ss)
+`devices.type` | The device type, such as network, server, or firewall
 
 ## Device Stats
 
@@ -36,9 +36,10 @@ Entity | Description
 `device_stats.ping_rtt_diff_avg_last` | Difference between the RTT last and average ping (ms)
 `device_stats.ping_rtt_diff_avg_last` | Difference between the RTT of the ping from the last 2 polls (ms)
 
-Details on how the averages above are calculated can be found [here](../Support/Configuration.md#averaging-factor).
+For the calculation of these averages, read the [averaging
+factor](../Support/Configuration.md#averaging-factor) section.
 
-The difference fields can be used to detect when ping times increase from their normal valuse.
+Use the difference fields to detect a ping time above its normal value.
 
 ## BGP Peers
 

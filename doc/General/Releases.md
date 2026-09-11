@@ -1,32 +1,31 @@
 # Choosing a release
 
-We try to ensure that breaking changes aren't introduced by utilising
-various automated code, syntax and unit testing along with manual code
-review. However bugs can and do get introduced as well as major
-refactoring to improve the quality of the code base.
+We use automated code tests, syntax tests, and unit tests to keep
+breaking changes out of the software. We also do manual code review.
+Bugs still get introduced. We also do major refactoring to improve the
+quality of the code base.
 
-We have two branches available for you to use. The default is the `master` branch.
+Two branches are available. The default branch is `master`.
 
 ## Development branch
 
-Our `master` branch is our dev branch, this is actively committed to
-and it's not uncommon for multiple commits to be merged in daily. As
-such sometimes changes will be introduced which will cause unintended
-issues. If this happens we are usually quick to fix or revert those changes.
+The `master` branch is the development branch. We commit to it often,
+and we merge several commits on most days. A change can therefore cause
+an unintended problem. When this happens, we usually fix or revert the
+change quickly.
 
-We appreciate everyone that runs this branch as you are in essence
-secondary testers to the automation and manually testing that is done
-during the merge stages.
+We value everyone who runs this branch. These users are the second line
+of tests after the automated tests and the manual tests at the merge
+stage.
 
-You can configure your install (this is the default) to use this
-branch by setting:
+To use this branch, set the update channel. This branch is the default:
 
 !!! setting "system/updates"
     ```bash
     lnms config:set update_channel master
     ```
 
-Then ensure you are on the master branch by doing:
+Then move to the master branch:
 
 ```bast
 cd /opt/librenms
@@ -36,25 +35,23 @@ git checkout master
 
 ## Stable branch
 
-With this in mind, we provide a monthly stable release which is
-released on or around the middle of the month, usually on a weekday.
-Merging of pull requests (aside from Bug fixes) are typically stopped
-days leading up to the release to ensure that we have a clean working
-branch at that point.
+We also supply a stable release each month. The release comes out near
+the middle of the month, usually on a weekday. Before the release, we
+stop the merge of pull requests other than bug fixes. The working
+branch is then clean at the release.
 
-The [changelog](Changelog.md) will be updated and will reference the
-release number and date so you can see what changes have been made since
-the last release.
+The [changelog](Changelog.md) gives the release number and the release
+date. It shows every change since the last release.
 
-To switch to using stable branches you can set:
+To use the stable branch, set the update channel:
 
 !!! setting "system/updates"
     ```bash
     lnms config:set update_channel release
     ```
 
-This will pause updates until the next stable release, at that time LibreNMS will
-update to the stable release and continue to only update to stable releases.
+This setting pauses updates until the next stable release. LibreNMS then updates
+to that release. After that, LibreNMS updates only to stable releases.
 
 !!! warning
-    Downgrading is not supported on LibreNMS and will likely cause bugs.
+    Do not downgrade LibreNMS. A downgrade is not supported and usually causes bugs.

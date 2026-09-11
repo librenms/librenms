@@ -1,6 +1,7 @@
 ## Pushbullet
 
-Get your Access Token from your Pushbullet's settings page and set it in your transport:
+Get your access token from the Pushbullet settings page. Then set it in
+your transport:
 
 **Example:**
 

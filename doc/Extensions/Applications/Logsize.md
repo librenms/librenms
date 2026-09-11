@@ -60,7 +60,7 @@ logsize is a small shell script that reports the size of log files.
 
 4. If the directories all readable via SNMPD, this script can be ran
    via snmpd. Otherwise it needs setup in cron. Similarly is
-   processing a large number of files, it may also need setup in cron
+   processes many files, it can also need a cron entry
    if it takes the script awhile to run.
 
     ```cron
@@ -141,7 +141,7 @@ script and make it executable.
 
 4. If the directories all readable via SNMPD, this script can be ran
    via snmpd. Otherwise it needs setup in cron. Similarly is
-   processing a large number of files, it may also need setup in cron
+   processes many files, it can also need a cron entry
    if it takes the script awhile to run.
 
     ```cron

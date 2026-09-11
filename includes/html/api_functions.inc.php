@@ -64,6 +64,8 @@ use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
+use LibreNMS\Syslog\Entry;
+use LibreNMS\Syslog\Processor;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -309,9 +311,10 @@ function get_device(Illuminate\Http\Request $request)
     }
 
     return check_device_permission($device->device_id, function () use ($device) {
-        $device['location'] = $device->location?->location;
-        $device['lat'] = $device->location?->lat;
-        $device['lng'] = $device->location?->lng;
+        $location = $device->location;
+        $device['location'] = $location?->location;
+        $device['lat'] = $location?->lat;
+        $device['lng'] = $location?->lng;
 
         $host_id = get_vm_parent_id($device);
         if (is_numeric($host_id)) {
@@ -2100,7 +2103,7 @@ function get_oxidized_config(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('device_name');
     $device = DeviceCache::get($hostname);
-    if (Gate::denies('showConfig', $device)) {
+    if (! $device || Gate::denies('configBackupView', $device)) {
         return api_error(403, 'Insufficient permissions');
     }
 
@@ -2117,14 +2120,15 @@ function list_oxidized(Illuminate\Http\Request $request)
 {
     $return = [];
     $devices = Device::query()
-            ->with('attribs')
-             ->where('disabled', 0)
-             ->when($request->route('hostname'), fn ($query, $hostname) => $query->where('hostname', $hostname))
-             ->whereNotIn('type', LibrenmsConfig::get('oxidized.ignore_types', []))
-             ->whereNotIn('os', LibrenmsConfig::get('oxidized.ignore_os', []))
-             ->whereAttributeDisabled('override_Oxidized_disable')
-             ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes', 'poller_group'])
-             ->get();
+        ->with('attribs')
+        ->where('disabled', 0)
+        ->hasAccess($request->user())
+        ->when($request->route('hostname'), fn ($query, $hostname) => $query->where('hostname', $hostname))
+        ->whereNotIn('type', LibrenmsConfig::get('oxidized.ignore_types', []))
+        ->whereNotIn('os', LibrenmsConfig::get('oxidized.ignore_os', []))
+        ->whereAttributeDisabled('override_Oxidized_disable')
+        ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes', 'poller_group'])
+        ->get();
 
     /** @var Device $device */
     foreach ($devices as $device) {
@@ -3787,17 +3791,23 @@ function add_location(Illuminate\Http\Request $request)
 
 function edit_location(Illuminate\Http\Request $request)
 {
-    $location = $request->route('location_id_or_name');
-    if (empty($location)) {
+    $location_input = $request->route('location_id_or_name');
+    if (empty($location_input)) {
         return api_error(400, 'No location has been provided to edit');
     }
-    $location_id = ctype_digit($location) ? $location : get_location_id_by_name($location);
-    $data = json_decode($request->getContent(), true);
-    if (empty($location_id)) {
-        return api_error(400, 'Failed to delete location');
+
+    $location = Location::query()
+        ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
+        ->hasAccess($request->user)
+        ->first();
+
+    if ($location === null) {
+        return api_error(400, 'Failed to update location');
     }
-    $result = dbUpdate($data, 'locations', '`id` = ?', [$location_id]);
-    if ($result == 1) {
+
+    $location->fill($request->json());
+
+    if ($location->save()) {
         return api_success_noresult(201, 'Location updated successfully');
     }
 
@@ -3806,39 +3816,41 @@ function edit_location(Illuminate\Http\Request $request)
 
 function get_location(Illuminate\Http\Request $request)
 {
-    $location = $request->route('location_id_or_name');
-    if (empty($location)) {
+    $location_input = $request->route('location_id_or_name');
+    if (empty($location_input)) {
         return api_error(400, 'No location has been provided to get');
     }
-    $data = ctype_digit($location) ? Location::find($location) : Location::where('location', $location)->first();
-    if (empty($data)) {
+    $location = Location::query()
+        ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
+        ->hasAccess($request->user)
+        ->first();
+
+    if ($location === null) {
         return api_error(404, 'Location does not exist');
     }
 
-    return api_success($data, 'get_location');
-}
-
-function get_location_id_by_name($location)
-{
-    return dbFetchCell('SELECT id FROM locations WHERE location = ?', $location);
+    return api_success($location, 'get_location');
 }
 
 function del_location(Illuminate\Http\Request $request)
 {
-    $location = $request->route('location');
-    if (empty($location)) {
+    $location_input = $request->route('location');
+    if (empty($location_input)) {
         return api_error(400, 'No location has been provided to delete');
     }
-    $location_id = ctype_digit($location) ? $location : get_location_id_by_name($location);
-    if (empty($location_id)) {
+
+    $location = Location::query()
+        ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
+        ->hasAccess($request->user)
+        ->first();
+
+    if ($location === null) {
         return api_error(400, "Failed to delete $location (Does not exists)");
     }
-    $data = [
-        'location_id' => 0,
-    ];
-    dbUpdate($data, 'devices', '`location_id` = ?', [$location_id]);
-    $result = \App\Models\Location::where('id', $location_id)->delete();
-    if ($result == 1) {
+
+    Device::where('location_id', $location->id)->update(['location_id' => null]);
+
+    if ($location->delete()) {
         return api_success_noresult(201, "Location $location has been deleted successfully");
     }
 
@@ -3853,8 +3865,8 @@ function maintenance_location(Illuminate\Http\Request $request)
         return api_error(400, 'No information has been provided to set this location into maintenance');
     }
 
-    $loc = $request->route('location');
-    if (! $loc) {
+    $location_input = $request->route('location');
+    if (! $location_input) {
         return api_error(400, 'No location was provided');
     }
 
@@ -3862,9 +3874,13 @@ function maintenance_location(Illuminate\Http\Request $request)
         return api_error(400, 'Duration not provided');
     }
 
-    $location = ctype_digit($loc) ? Location::find($loc) : Location::where('location', $loc)->first();
-    if (empty($location)) {
-        return api_error(404, "Location $loc does not exist");
+    $location = Location::query()
+        ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
+        ->hasAccess($request->user)
+        ->first();
+
+    if ($location === null) {
+        return api_error(404, "Location $location_input does not exist");
     }
 
     $notes = $data['notes'] ?? '';
@@ -3984,9 +4000,21 @@ function post_syslogsink(Illuminate\Http\Request $request)
     }
 
     $logs = array_is_list($json) ? $json : [$json];
+    $processor = new Processor();
 
     foreach ($logs as $entry) {
-        process_syslog($entry, 1);
+        $entryObject = $processor->parse(new Entry(
+            host: $entry['host'] ?? '',
+            facility: $entry['facility'] ?? '',
+            priority: $entry['priority'] ?? '',
+            level: $entry['level'] ?? '',
+            tag: $entry['tag'] ?? '',
+            timestamp: $entry['timestamp'] ?? '',
+            msg: $entry['msg'] ?? '',
+            program: $entry['program'] ?? '',
+            device_id: $entry['device_id'] ?? null,
+        ));
+        $processor->storeEntry($entryObject);
     }
 
     return api_success_noresult(200, 'Syslog received: ' . count($logs));

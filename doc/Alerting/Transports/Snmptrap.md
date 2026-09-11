@@ -1,31 +1,32 @@
 ## SNMP Trap
 
-SNMP traps are the standard way to push alert notifications to a northbound NMS or
-event correlation system. This transport sends **SNMPv2c TRAPs or INFORMs** carrying
-structured varbind data that is fully defined by the alert template — giving you
-complete control over which OIDs and values are included.
+An SNMP trap is the standard method to send an alert notification to a
+northbound NMS or to an event correlation system. This transport sends
+**SNMPv2c TRAPs or INFORMs**. Each message carries structured varbind
+data from the alert template. You therefore control the OIDs and the
+values.
 
-The transport uses the system `snmptrap` binary (configurable under
-**Settings → External → Binaries → snmptrap**).
+The transport uses the system `snmptrap` binary. You can configure its
+path under **Settings → External → Binaries → snmptrap**.
 
 ### Requirements
 
 - Net-SNMP tools installed on the LibreNMS host (`snmptrap` binary).
-- A MIB file accessible on the LibreNMS host describing the trap structure.
-  The LibreNMS-contributed MIB (`LIBRENMS-NOTIFICATIONS-MIB`) is shipped under
-  `mibs/librenms/` and covers the default alert template.
+- A MIB file on the LibreNMS host with the trap structure. The LibreNMS
+  MIB (`LIBRENMS-NOTIFICATIONS-MIB`) is in `mibs/librenms/`. It covers
+  the default alert template.
 
 ### Configuration
 
 | Setting | Default | Description |
 | ------- | ------- | ----------- |
-| Destination Host | — | Hostname or IP of the trap receiver |
-| Destination Port | `162` | UDP/TCP port on the receiver |
+| Destination Host | — | The hostname or IP address of the trap receiver |
+| Destination Port | `162` | The UDP or TCP port on the receiver |
 | Transport | `UDP` | `UDP` or `TCP` |
-| Community | `public` | SNMPv2c community string |
-| Trap OID | `LIBRENMS-NOTIFICATIONS-MIB::defaultAlertEvent` | Notification OID defined in the MIB |
-| PDU Type | `TRAPv2` | `TRAPv2` (one-way) or `INFORM` (acknowledged) |
-| MIB Directory | `/opt/librenms/mibs/librenms` | Directory containing the MIB file(s) |
+| Community | `public` | The SNMPv2c community string |
+| Trap OID | `LIBRENMS-NOTIFICATIONS-MIB::defaultAlertEvent` | The notification OID from the MIB |
+| PDU Type | `TRAPv2` | `TRAPv2` is one-way. `INFORM` is acknowledged |
+| MIB Directory | `/opt/librenms/mibs/librenms` | The directory with the MIB files |
 
 **Example:**
 
@@ -41,21 +42,22 @@ The transport uses the system `snmptrap` binary (configurable under
 
 ### Alert Templates
 
-The message body produced by the alert template is parsed as a sequence of
-**varbind lines**, each with the form:
+The transport reads the message body of the alert template as a
+sequence of **varbind lines**. Each line has this form:
 
 ```
 OID type value
 ```
 
-where `type` is a Net-SNMP type character (`s` = string, `i` = integer,
-`t` = timeticks, `o` = OID, …) and `value` may be a double-quoted string
-containing spaces.  Lines beginning with `#` are treated as comments.
+`type` is a Net-SNMP type character. `s` is a string, `i` is an
+integer, `t` is timeticks, and `o` is an OID. `value` can be a string
+in double quotation marks with spaces. A line that starts with `#` is a
+comment.
 
 #### Catch-All Template (LIBRENMS-NOTIFICATIONS-MIB)
 
 Create an alert template with the name **SNMP Trap — Default** and the
-following body.  Assign it to transports that reference
+body below. Assign it to each transport with
 `LIBRENMS-NOTIFICATIONS-MIB::defaultAlertEvent`.
 
 ```
@@ -92,14 +94,14 @@ defaultAlertFaultDetail.{{ $key }} s "{{ $value['string'] }}"
 
 ### MIB Installation
 
-Copy the desired MIB directory to the LibreNMS host and configure the path:
+Copy the MIB directory to the LibreNMS host. Then configure the path:
 
 ```bash
 # LibreNMS MIB (default)
 cp -r /opt/librenms/mibs/librenms /opt/librenms/mibs/librenms
 ```
 
-To make the MIB globally available to Net-SNMP tools:
+To make the MIB available to all Net-SNMP tools:
 
 ```bash
 cp /opt/librenms/mibs/librenms/LIBRENMS-NOTIFICATIONS-MIB \

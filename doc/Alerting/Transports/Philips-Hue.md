@@ -1,18 +1,17 @@
 ## Philips Hue
 
-Want to spice up your noc life? LibreNMS will flash all lights
-connected to your philips hue bridge whenever an alert is triggered.
+LibreNMS flashes all lights on your Philips Hue bridge at each
+triggered alert.
 
-To setup, go to the you <http://`your-bridge-ip`/debug/clip.html>
+To set this up, open <http://`your-bridge-ip`/debug/clip.html>.
 
-- Update the "URL:" field to `/api`
-- Paste this in the "Message Body" {"devicetype":"librenms"}
-- Press the round button on your `philips Hue Bridge`
-- Click on `POST`
-- In the `Command Response` You should see output with your
-  username. Copy this without the quotes
+- Set the "URL:" field to `/api`.
+- Paste `{"devicetype":"librenms"}` into the "Message Body" field.
+- Press the round button on your Philips Hue bridge.
+- Click `POST`.
+- The `Command Response` field then shows your username. Copy this value without the quotation marks.
 
-More Info: [Philips Hue Documentation](https://www.developers.meethue.com/documentation/getting-started)
+For more information, read the [Philips Hue documentation](https://www.developers.meethue.com/documentation/getting-started).
 
 **Example:**
 

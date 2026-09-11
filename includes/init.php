@@ -29,7 +29,6 @@
  */
 
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Laravel;
 
@@ -58,7 +57,6 @@ if (! function_exists('module_selected')) {
 // function only files
 require_once $install_dir . '/includes/common.php';
 require_once $install_dir . '/includes/dbFacile.php';
-require_once $install_dir . '/includes/syslog.php';
 require_once $install_dir . '/includes/snmp.inc.php';
 require_once $install_dir . '/includes/services.inc.php';
 require_once $install_dir . '/includes/functions.php';
@@ -100,14 +98,6 @@ if (! module_selected('nodb', $init_modules)) {
 
 if (is_numeric(LibrenmsConfig::get('php_memory_limit')) && LibrenmsConfig::get('php_memory_limit') > 128) {
     ini_set('memory_limit', LibrenmsConfig::get('php_memory_limit') . 'M');
-}
-
-try {
-    LegacyAuth::get();
-} catch (Exception $exception) {
-    print_error('ERROR: no valid auth_mechanism defined!');
-    echo $exception->getMessage() . PHP_EOL;
-    exit;
 }
 
 if (module_selected('web', $init_modules)) {

@@ -1,8 +1,8 @@
 ## GitLab
 
-LibreNMS will create issues for warning and critical level alerts
-however only title and description are set. Uses Personal access
-tokens to authenticate with GitLab and will store the token in cleartext.
+LibreNMS creates issues for warning alerts and critical alerts. It
+sets only the title and the description. The authentication with GitLab
+uses a personal access token. LibreNMS stores this token in clear text.
 
 **Example:**
 

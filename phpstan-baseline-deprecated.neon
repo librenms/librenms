@@ -1658,6 +1658,15 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated function gen_snmpwalk_cmd\(\)\:
+				Please use SnmpQuery instead$#
+			'''
+			identifier: function.deprecated
+			count: 1
+			path: app/Http/Controllers/Device/CommandController.php
+
+		-
+			message: '''
 				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
 				use display field directly$#
 			'''
@@ -4142,15 +4151,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/dev-groups-overview-data.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbInsert\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
@@ -4230,14 +4230,6 @@ parameters:
 			count: 6
 			path: includes/html/forms/get-host-dependencies.inc.php
 
-		-
-			message: '''
-				#^Call to deprecated function dbInsert\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 4
-			path: includes/html/forms/notifications.inc.php
 
 		-
 			message: '''
@@ -4871,24 +4863,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function gen_snmpwalk_cmd\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/output/capture.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/output/query.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchRows\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -4994,15 +4968,6 @@ parameters:
 			identifier: function.deprecated
 			count: 2
 			path: includes/html/pages/bills.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/html/pages/device/accesspoints.inc.php
 
 		-
 			message: '''
@@ -5165,51 +5130,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/html/pages/device/munin.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/device/overview/eventlog.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/device/overview/ports.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/device/overview/processors.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/device/overview/storage.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/device/overview/syslog.inc.php
 
 		-
 			message: '''
@@ -7145,24 +7065,6 @@ parameters:
 			identifier: function.deprecated
 			count: 2
 			path: includes/polling/unix-agent/munin-plugins.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 6
-			path: includes/syslog.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbInsert\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/syslog.php
 
 		-
 			message: '''

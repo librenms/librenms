@@ -55,8 +55,9 @@ Functional permissions like `device.viewAny`, `port.viewAny`, and `bill.viewAny`
 ALL resources of that type.
 
 *   If a user **has** `device.viewAny`, they see all devices.
-*   If a user **lacks** `device.viewAny`, the system falls back to **granular permissions**. They will
-    only see devices specifically assigned to them (via direct assignment or a static device group).
+*   If a user **lacks** `device.viewAny`, the system uses the **granular
+    permissions**. The user then sees only their own devices. These
+    devices come from a direct assignment or from a static device group.
 
 Most other items in the system (sensors, services, health data, alerts for a specific device) do not have their
 own separate granular permissions. Instead, access to these items **falls back to the device or port permissions**.
@@ -64,21 +65,21 @@ If you have access to a device, you generally have access to its sub-resources.
 
 #### Interaction Between Functional and Resource Permissions
 
-A common point of confusion is the interaction between functional permissions (e.g., `routing.viewAny`)
-and resource-specific permissions (e.g., device access).
+A common point of confusion is the interaction between functional permissions, for example `routing.viewAny`,
+and resource-specific permissions, for example device access.
 
 Even if a user is granted access to a specific device, they still require the corresponding **functional
 permission** to access certain modules or menu items for that device.
 
 **Example: Routing**
-Even with access to Router-01, the Routing menu won't appear unless the user's role includes
-`routing.viewAny` or `routing.view`.
+The user has access to Router-01. The Routing menu still needs
+`routing.viewAny` or `routing.view` in the role of the user.
 
 This pattern applies to several other modules, including:
 *   **Switching (VLANs):** Requires `vlan.viewAny`.
 *   **Services:** Requires `service.view`.
 *   **Health Data (Sensors):** While viewing basic health data typically falls back to device access,
-    managing sensors (e.g., editing thresholds or labels) requires specific functional
+    the management of sensors, for example an edit of a threshold or a label, needs specific functional
     permissions such as `sensor.update` or `wireless-sensor.update`.
 
 #### Device Permissions:
@@ -89,17 +90,18 @@ also have the required functional permissions for those modules).
 #### Port Permissions:
 
 Access can be granted to individual ports. Note that if a user already has access to the parent device,
-they will automatically have access to all its ports.
+they also get access to all its ports.
 
 **Port-only Access:**
-If a user is granted access only to specific ports, they will **not** see the parent device in the main
-Devices list or in most global views. They will only see the ports they have access to in the Ports list
+A user with access only to specific ports does **not** see the parent
+device in the main Devices list or in most global views. That user sees
+only their own ports in the Ports list
 and in specific port-related views. This is useful for providing customers access to only their specific
 interfaces without exposing the entire device configuration or other customers' ports.
 
 #### Bill Permissions:
 Visibility of billing data is restricted to specific users through bill-level permissions. If a user
-lacks `bill.viewAny`, they will only see bills they have been explicitly granted access to.
+lacks `bill.viewAny`, that user sees only their own bills.
 
 #### Device Group Permissions:
 Access can be granted to all devices within a specific **Static Device Group**.
@@ -141,9 +143,10 @@ Goal: Allow a customer to see only their devices and specific ports.
 
 1.  **Assign Role:** Assign the built-in `user` role to the customer. (This role has no `viewAny` permissions).
 2.  **Assign Devices:** Go to **Manage Access** for that user and add the specific devices they own.
-3.  **Assign Ports:** Go to **Manage Access** for that user and add specific ports on other devices (e.g., their uplink port
+3.  **Assign Ports:** Go to **Manage Access** for that user and add specific ports on other devices, for example their uplink port
     on a shared switch).
-4.  **Result:** The customer will see their own devices in full, plus only the specific ports assigned to them from
+4.  **Result:** the customer sees all their own devices. They also see
+    only their own ports from
     other devices.
 
 #### Scenario: Billing Manager

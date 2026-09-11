@@ -109,7 +109,7 @@ class DashboardController extends Controller
             'bare' => 'nullable|in:yes',
         ]);
 
-        $user = Auth::user();
+        $user = $request->user();
 
         // Split dashboards into user owned or shared
         $dashboards = $this->getAvailableDashboards($user);
@@ -219,7 +219,7 @@ class DashboardController extends Controller
 
         $dashboard_copy = $dashboard->replicate()->fill([
             'user_id' => $target_user_id,
-            'dashboard_name' => $dashboard->dashboard_name . '_' . Auth::user()->username,
+            'dashboard_name' => $dashboard->dashboard_name . '_' . $request->user()->username,
         ]);
 
         if ($dashboard_copy->save()) {

@@ -6,19 +6,19 @@ Script to monitor your Redis Server
 
 === "SNMP Extend"
 
-    1. Download the script onto the desired host
+    1. Download the script onto the host.
  
         ```bash
         wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/redis.py -O /etc/snmp/redis.py
         ```
 
-    2. Make the script executable
+    2. Make the script executable.
 
         ```bash
         chmod +x /etc/snmp/redis.py
         ```
 
-    3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+    3. Edit your `snmpd.conf` file, usually `/etc/snmp/snmpd.conf`, and add:
     
     ```bash
     extend redis /etc/snmp/redis.py
@@ -52,5 +52,5 @@ Script to monitor your Redis Server
 
 === "Agent"
 
-    [Install the agent](../Agent-Setup.md) on this device if it isn't already
+    If this device has no agent, [install the agent](../Agent-Setup.md)
     and copy the `redis` script to `/usr/lib/check_mk_agent/local/`

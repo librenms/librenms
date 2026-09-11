@@ -131,24 +131,24 @@ if ($vars['view'] == 'lsp') {
         $avail = Number::calculatePercent($lsp['mplsLspPrimaryTimeUp'], $lsp['mplsLspAge'], 5);
 
         $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$lsp['mplsLspToAddr']]);
-        $destination = $lsp['mplsLspToAddr'];
+        $destination = e($lsp['mplsLspToAddr']);
         if (is_array($host)) {
             $destination = generate_device_link($host, 0, ['tab' => 'routing', 'proto' => 'mpls']);
         }
 
         echo "<tr bgcolor=$bg_colour>
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls']) . '</td>
-            <td>' . $lsp['mplsLspName'] . '</td>
+            <td>' . e($lsp['mplsLspName']) . '</td>
             <td>' . $destination . '</td>
-            <td>' . $lsp['vrf_name'] . '</td>
-            <td><span class="label label-' . $adminstate_status_color . '">' . $lsp['mplsLspAdminState'] . '</td>
-            <td><span class="label label-' . $operstate_status_color . '">' . $lsp['mplsLspOperState'] . '</td>
+            <td>' . e($lsp['vrf_name']) . '</td>
+            <td><span class="label label-' . $adminstate_status_color . '">' . e($lsp['mplsLspAdminState']) . '</td>
+            <td><span class="label label-' . $operstate_status_color . '">' . e($lsp['mplsLspOperState']) . '</td>
             <td>' . \LibreNMS\Util\Time::formatInterval($lsp['mplsLspLastChange']) . '</td>
-            <td>' . $lsp['mplsLspTransitions'] . '</td>
+            <td>' . e($lsp['mplsLspTransitions']) . '</td>
             <td>' . \LibreNMS\Util\Time::formatInterval($lsp['mplsLspLastTransition']) . '</td>
-            <td><span class="label label-' . $path_status_color . '">' . $lsp['mplsLspConfiguredPaths'] . '      /     ' . $lsp['mplsLspStandbyPaths'] . ' / ' . $lsp['mplsLspOperationalPaths'] . '</td>
-            <td>' . $lsp['mplsLspType'] . '</td>
-            <td>' . $lsp['mplsLspFastReroute'] . '</td>
+            <td><span class="label label-' . $path_status_color . '">' . e($lsp['mplsLspConfiguredPaths']) . '      /     ' . e($lsp['mplsLspStandbyPaths']) . ' / ' . e($lsp['mplsLspOperationalPaths']) . '</td>
+            <td>' . e($lsp['mplsLspType']) . '</td>
+            <td>' . e($lsp['mplsLspFastReroute']) . '</td>
             <td>' . $avail . '</td>';
         echo '</tr>';
 
@@ -201,26 +201,26 @@ if ($vars['view'] == 'paths') {
         }
 
         $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$path['mplsLspPathFailNodeAddr']]);
-        $destination = $path['mplsLspPathFailNodeAddr'];
+        $destination = e($path['mplsLspPathFailNodeAddr']);
         if (is_array($host)) {
             $destination = generate_device_link($host, 0, ['tab' => 'routing', 'proto' => 'mpls']);
         }
         echo "<tr bgcolor=$bg_colour>
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'paths']) . '</td>
-            <td>' . $path['mplsLspName'] . '</td>
-            <td>' . $path['path_oid'] . '</td>
-            <td>' . $path['mplsLspPathType'] . '</td>
-            <td><span class="label label-' . $adminstate_status_color . '">' . $path['mplsLspPathAdminState'] . '</td>
-            <td><span class="label label-' . $operstate_status_color . '">' . $path['mplsLspPathOperState'] . '</td>
+            <td>' . e($path['mplsLspName']) . '</td>
+            <td>' . e($path['path_oid']) . '</td>
+            <td>' . e($path['mplsLspPathType']) . '</td>
+            <td><span class="label label-' . $adminstate_status_color . '">' . e($path['mplsLspPathAdminState']) . '</td>
+            <td><span class="label label-' . $operstate_status_color . '">' . e($path['mplsLspPathOperState']) . '</td>
             <td>' . \LibreNMS\Util\Time::formatInterval($path['mplsLspPathLastChange']) . '</td>
-            <td>' . $path['mplsLspPathTransitionCount'] . '</td>
-            <td>' . $path['mplsLspPathBandwidth'] . '</td>
-            <td>' . $path['mplsLspPathOperBandwidth'] . '</td>
-            <td>' . $path['mplsLspPathState'] . '</td>
-            <td><span class="label label-' . $failcode_status_color . '">' . $path['mplsLspPathFailCode'] . '</td>
+            <td>' . e($path['mplsLspPathTransitionCount']) . '</td>
+            <td>' . e($path['mplsLspPathBandwidth']) . '</td>
+            <td>' . e($path['mplsLspPathOperBandwidth']) . '</td>
+            <td>' . e($path['mplsLspPathState']) . '</td>
+            <td><span class="label label-' . $failcode_status_color . '">' . e($path['mplsLspPathFailCode']) . '</td>
             <td>' . $destination . '</td>
-            <td>' . $path['mplsLspPathMetric'] . '</td>
-            <td>' . $path['mplsLspPathOperMetric'] . '</td>';
+            <td>' . e($path['mplsLspPathMetric']) . '</td>
+            <td>' . e($path['mplsLspPathOperMetric']) . '</td>';
         echo '</tr>';
 
         $i++;
@@ -266,21 +266,21 @@ if ($vars['view'] == 'sdps') {
         }
 
         $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$sdp['sdpFarEndInetAddress']]);
-        $destination = $sdp['sdpFarEndInetAddress'];
+        $destination = e($sdp['sdpFarEndInetAddress']);
         if (is_array($host)) {
             $destination = generate_device_link($host, 0, ['tab' => 'routing', 'proto' => 'mpls']);
         }
         echo "<tr bgcolor=$bg_colour>
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'sdps']) . '</td>
-            <td>' . $sdp['sdp_oid'] . '</td>
+            <td>' . e($sdp['sdp_oid']) . '</td>
             <td>' . $destination . '</td>
-            <td>' . $sdp['sdpDelivery'] . '</td>
-            <td>' . $sdp['sdpActiveLspType'] . '</td>
-            <td>' . $sdp['sdpDescription'] . '</td>
-            <td><span class="label label-' . $adminstate_status_color . '">' . $sdp['sdpAdminStatus'] . '</td>
-            <td><span class="label label-' . $operstate_status_color . '">' . $sdp['sdpOperStatus'] . '</td>
-            <td>' . $sdp['sdpAdminPathMtu'] . '</td>
-            <td>' . $sdp['sdpOperPathMtu'] . '</td>
+            <td>' . e($sdp['sdpDelivery']) . '</td>
+            <td>' . e($sdp['sdpActiveLspType']) . '</td>
+            <td>' . e($sdp['sdpDescription']) . '</td>
+            <td><span class="label label-' . $adminstate_status_color . '">' . e($sdp['sdpAdminStatus']) . '</td>
+            <td><span class="label label-' . $operstate_status_color . '">' . e($sdp['sdpOperStatus']) . '</td>
+            <td>' . e($sdp['sdpAdminPathMtu']) . '</td>
+            <td>' . e($sdp['sdpOperPathMtu']) . '</td>
             <td>' . \LibreNMS\Util\Time::formatInterval($sdp['sdpLastMgmtChange']) . '</td>
             <td>' . \LibreNMS\Util\Time::formatInterval($sdp['sdpLastStatusChange']) . '</td>';
         echo '</tr>';
@@ -340,18 +340,18 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
 
         echo "<tr bgcolor=$bg_colour>
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'sdpbinds']) . '</td>
-            <td>' . $sdpbind['svcId'] . '</td>
-            <td>' . $sdpbind['sdp_oid'] . ':' . $sdpbind['svc_oid'] . '</td>
-            <td>' . $sdpbind['sdpBindType'] . '</td>
-            <td>' . $sdpbind['sdpBindVcType'] . '</td>
-            <td><span class="label label-' . $adminstate_status_color . '">' . $sdpbind['sdpBindAdminStatus'] . '</td>
-            <td><span class="label label-' . $operstate_status_color . '">' . $sdpbind['sdpBindOperStatus'] . '</td>
+            <td>' . e($sdpbind['svcId']) . '</td>
+            <td>' . e($sdpbind['sdp_oid']) . ':' . e($sdpbind['svc_oid']) . '</td>
+            <td>' . e($sdpbind['sdpBindType']) . '</td>
+            <td>' . e($sdpbind['sdpBindVcType']) . '</td>
+            <td><span class="label label-' . $adminstate_status_color . '">' . e($sdpbind['sdpBindAdminStatus']) . '</td>
+            <td><span class="label label-' . $operstate_status_color . '">' . e($sdpbind['sdpBindOperStatus']) . '</td>
             <td>' . \LibreNMS\Util\Time::formatInterval($sdpbind['sdpBindLastMgmtChange']) . '</td>
             <td>' . \LibreNMS\Util\Time::formatInterval($sdpbind['sdpBindLastStatusChange']) . '</td>
-            <td>' . $sdpbind['sdpBindBaseStatsIngFwdPackets'] . '</td>
-            <td>' . $sdpbind['sdpBindBaseStatsIngFwdOctets'] . '</td>
-            <td>' . $sdpbind['sdpBindBaseStatsEgrFwdPackets'] . '</td>
-            <td>' . $sdpbind['sdpBindBaseStatsEgrFwdOctets'] . '</td>';
+            <td>' . e($sdpbind['sdpBindBaseStatsIngFwdPackets']) . '</td>
+            <td>' . e($sdpbind['sdpBindBaseStatsIngFwdOctets']) . '</td>
+            <td>' . e($sdpbind['sdpBindBaseStatsEgrFwdPackets']) . '</td>
+            <td>' . e($sdpbind['sdpBindBaseStatsEgrFwdOctets']) . '</td>';
         echo '</tr>';
 
         $i++;
@@ -417,22 +417,22 @@ vprn services are up when the service is administratively up however routing fun
 
         echo "<tr bgcolor=$bg_colour>
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'services']) . '</td>
-            <td>' . $svc['svc_oid'] . '</td>
-            <td>' . $svc['svcType'] . '</td>
-            <td>' . $svc['svcCustId'] . '</td>
-            <td><span class="label label-' . $adminstate_status_color . '">' . $svc['svcAdminStatus'] . '</td>
-            <td><span class="label label-' . $operstate_status_color . '">' . $svc['svcOperStatus'] . '</td>
-            <td>' . $svc['svcDescription'] . '</td>
-            <td>' . $svc['svcMtu'] . '</td>
-            <td>' . $svc['svcNumSaps'] . '</td>
+            <td>' . e($svc['svc_oid']) . '</td>
+            <td>' . e($svc['svcType']) . '</td>
+            <td>' . e($svc['svcCustId']) . '</td>
+            <td><span class="label label-' . $adminstate_status_color . '">' . e($svc['svcAdminStatus']) . '</td>
+            <td><span class="label label-' . $operstate_status_color . '">' . e($svc['svcOperStatus']) . '</td>
+            <td>' . e($svc['svcDescription']) . '</td>
+            <td>' . e($svc['svcMtu']) . '</td>
+            <td>' . e($svc['svcNumSaps']) . '</td>
             <td>' . \LibreNMS\Util\Time::formatInterval($svc['svcLastMgmtChange']) . '</td>
             <td>' . \LibreNMS\Util\Time::formatInterval($svc['svcLastStatusChange']) . '</td>
-            <td>' . $svc['vrf_name'] . '</td>
-            <td>' . $svc['svcTlsMacLearning'] . '</td>
-            <td>' . $svc['svcTlsFdbTableSize'] . '</td>
-            <td><span class="label label-' . $fdb_status_color . '">' . $svc['svcTlsFdbNumEntries'] . '</td>
-            <td>' . $svc['svcTlsStpAdminStatus'] . '</td>
-            <td>' . $svc['svcTlsStpOperStatus'] . '</td>';
+            <td>' . e($svc['vrf_name']) . '</td>
+            <td>' . e($svc['svcTlsMacLearning']) . '</td>
+            <td>' . e($svc['svcTlsFdbTableSize']) . '</td>
+            <td><span class="label label-' . $fdb_status_color . '">' . e($svc['svcTlsFdbNumEntries']) . '</td>
+            <td>' . e($svc['svcTlsStpAdminStatus']) . '</td>
+            <td>' . e($svc['svcTlsStpOperStatus']) . '</td>';
         echo '</tr>';
 
         $i++;
@@ -480,13 +480,13 @@ if ($vars['view'] == 'saps') {
 
         echo "<tr bgcolor=$bg_colour>
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps']) . '</td>
-            <td>' . generate_sap_url($sap, $sap['svc_oid']) . '</td>
+            <td>' . generate_sap_url($sap, e($sap['svc_oid'])) . '</td>
             <td>' . generate_port_link($port) . '</td>
-            <td>' . $sap['sapEncapValue'] . '</td>
-            <td>' . $sap['sapType'] . '</td>
-            <td>' . $sap['sapDescription'] . '</td>
-            <td><span class="label label-' . $adminstate_status_color . '">' . $sap['sapAdminStatus'] . '</td>
-            <td><span class="label label-' . $operstate_status_color . '">' . $sap['sapOperStatus'] . '</td>
+            <td>' . e($sap['sapEncapValue']) . '</td>
+            <td>' . e($sap['sapType']) . '</td>
+            <td>' . e($sap['sapDescription']) . '</td>
+            <td><span class="label label-' . $adminstate_status_color . '">' . e($sap['sapAdminStatus']) . '</td>
+            <td><span class="label label-' . $operstate_status_color . '">' . e($sap['sapOperStatus']) . '</td>
             <td>' . \LibreNMS\Util\Time::formatInterval($sap['sapLastMgmtChange']) . '</td>
             <td>' . \LibreNMS\Util\Time::formatInterval($sap['sapLastStatusChange']) . '</td>';
         echo '</tr>';

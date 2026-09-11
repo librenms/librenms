@@ -16,11 +16,13 @@ $cert_name_list = [];
 foreach ($domain_list as $label) {
     $cert_name = $label;
 
+    $link = generate_link($label, $link_array, ['cert_name' => $cert_name]);
+
     if (isset($vars['cert_name']) && ($vars['cert_name'] == $cert_name)) {
-        $label = '<span class="pagemenu-selected">' . $label . '</span>';
+        $link = '<span class="pagemenu-selected">' . $link . '</span>';
     }
 
-    array_push($cert_name_list, generate_link($label, $link_array, ['cert_name' => $cert_name]));
+    array_push($cert_name_list, $link);
 }
 
 printf('%s | certificates: %s', generate_link('All Certificates', $link_array), implode(', ', $cert_name_list));

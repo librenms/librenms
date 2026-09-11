@@ -53,7 +53,7 @@ class TwoFactorController extends Controller
 
         // token validated
         if (session('twofactorremove')) {
-            UserPref::forgetPref(auth()->user(), 'twofactor');
+            UserPref::forgetPref($request->user(), 'twofactor');
             $request->session()->forget(['twofactor', 'twofactorremove']);
 
             $toast->info(__('TwoFactor auth removed.'));
@@ -107,6 +107,11 @@ class TwoFactorController extends Controller
         $this->validate($request, [
             'twofactor' => Rule::in('time', 'counter'),
         ]);
+
+        // Already enabled in the DB, or mid-setup in session - don't generate a new secret
+        if (UserPref::getPref($request->user(), 'twofactor') || Session::has('twofactoradd')) {
+            return redirect()->intended();
+        }
 
         $key = TwoFactor::genKey();
 

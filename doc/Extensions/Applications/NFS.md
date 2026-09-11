@@ -1,8 +1,8 @@
 # NFS
 
-Provides both NFS client and server support.
+It supports the NFS client and the NFS server.
 
-Currently supported OSes are as below.
+These operating systems are supported:
 
 - FreeBSD
 - Linux

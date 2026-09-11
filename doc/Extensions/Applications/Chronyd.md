@@ -10,7 +10,7 @@ A shell script that gets the stats from chronyd and exports them with SNMP Exten
     wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/chrony -O /etc/snmp/chrony
     ```
 
-2. Make the script executable
+2. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/chrony
@@ -27,4 +27,6 @@ A shell script that gets the stats from chronyd and exports them with SNMP Exten
 
 4. Restart snmpd service on the host
 
-    Application should be auto-discovered and its stats presented on the Apps-page on the host. Note: Applications module needs to be enabled on the host or globally for the statistics to work as intended.
+    LibreNMS discovers the application automatically. Its statistics then
+    appear on the Apps page of the host. Note: the applications module
+    must be enabled on the host or globally.

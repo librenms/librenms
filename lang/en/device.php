@@ -24,10 +24,10 @@ return [
     'delete_device' => 'Delete Device',
     'delete' => 'Delete :name',
     'confirm_delete' => 'Are you sure you want to delete device :name?',
-    'deleted' => 'Device :hostname has been deleted.',
-    'please_select' => 'Please select',
-    'warning_monitored' => 'Warning, this will remove the device from being monitored!',
-    'warning_data' => 'It will also remove historical data about this device such as:',
+    'deleted' => 'Deleted device :hostname.',
+    'please_select' => 'Select',
+    'warning_monitored' => 'Warning! This removes the device from monitoring.',
+    'warning_data' => 'It also removes historical data about this device, such as:',
     'device_group' => 'Device Group',
     'show_filter' => 'Show Filter',
     'show_header' => 'Show Header',
@@ -46,7 +46,7 @@ return [
         'hostname_title' => 'Change the hostname used for name resolution',
         'hostname_ip' => 'Hostname / IP',
 
-        'display_title' => 'Display Name for this device.  Keep short. Available placeholders: hostname, sysName, sysName_fallback, ip (e.g. ":sysName")',
+        'display_title' => 'Display name for this device. Keep it short. Available placeholders: hostname, sysName, sysName_fallback, ip (for example ":sysName")',
         'display_name' => 'Display Name',
         'system_default' => 'System Default',
 
@@ -73,7 +73,7 @@ return [
         'disable_alerting' => 'Disable alerting',
 
         'ignore_alert_tag' => 'Ignore alert tag',
-        'ignore_alert_tag_title' => "Tag device to ignore alerts. Alert checks will still run.\nHowever, ignore tag can be read in alert rules.\nIf `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore alert tag is on, the alert rule won't match.",
+        'ignore_alert_tag_title' => "Tag the device to ignore alerts. Alert checks still run.\nAlert rules can read the ignore tag.\nIf the ignore alert tag is on, the alert rule does not match the condition `devices.ignore = 0` or `macros.device = 1`.",
 
         'ignore_device_status' => 'Ignore Device Status',
         'ignore_device_status_title' => 'Tag device to ignore Status. It will always be shown as online.',
@@ -85,10 +85,10 @@ return [
         'last_polled' => 'Last polled',
         'last_discovered' => 'Last discovered',
 
-        'rediscover_error' => 'An error occurred setting this device to be rediscovered',
+        'rediscover_error' => 'Failed to schedule this device for rediscovery',
     ],
 
     'oxidized' => [
-        'connection_error' => "We couldn't retrieve the device information from Oxidized",
+        'connection_error' => 'Could not retrieve the device information from Oxidized',
     ],
 ];

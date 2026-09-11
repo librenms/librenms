@@ -19,7 +19,7 @@ class GraphController extends Controller
     {
         $vars = array_merge(Url::parseLegacyPathVars($request->path()), $request->except(['username', 'password']));
 
-        if (\Auth::check()) {
+        if ($request->user() !== null) {
             // only allow debug for logged in users
             Debug::set(! empty($vars['debug']));
         }

@@ -3,10 +3,10 @@
 With plugins you can extend LibreNMS with special functions that are
 specific to your setup or are not relevant or interesting for all community members.
 
-You are able to intervene in defined places in the behavior of
+You can intervene at defined places in the behaviour of
 the website, without it coming to problems with future updates.
 
-This documentation will give you a basis for writing a plugin for
+This documentation gives the basis of a plugin for
 LibreNMS.
 
 ## Distribution
@@ -14,7 +14,8 @@ LibreNMS.
 There are two ways to create a plugin.
 
  1. Local plugin: Within LibreNMS under the app/Plugins directory. This is appropriate for plugins that are
-    intended to run only on your instance. A local plugin may ONLY use plugin hooks to augment LibreNMS.
+    for your own instance only. A local plugin uses ONLY the plugin
+    hooks to extend LibreNMS.
  3. Plugin package: A php package that can be distributed via composer/packagist.org.  This is appropriate
     for plugins that are intended to be installed by many people. A plugin package can publish multiple
     routes, views, database migrations and more in addition to using hooks to augment specific parts of LibreNMS.
@@ -57,7 +58,7 @@ The above structure is checked before a plugin can be installed.
 All file/folder names are case sensitive and must match the structure.
 
 Only the blade files that are really needed need to be created. A plugin manager
-will then load a hook that has a basic functionality.
+then loads a hook with a basic function.
 
 If you want to customize the basic behavior of the hooks, you can create a
 class in 'app/Plugins/PluginName' and overload the hook methods.
@@ -87,7 +88,7 @@ class in 'app/Plugins/PluginName' and overload the hook methods.
 ```
 
 - port-tab.blade.php :: This is called in the Port page,
-  in the "Plugins" menu_option that will appear when your plugin gets
+  in the "Plugins" menu option. This option appears when LibreNMS
   enabled. In this blade, you can do your work and display your
   results in a frame.
 
@@ -100,20 +101,22 @@ class in 'app/Plugins/PluginName' and overload the hook methods.
 
 ### PHP Hooks customization
 
-PHP code should run inside your hooks method and not your blade view.
+Put your PHP code in the hook method, not in the blade view.
 The built in hooks support authorize and data methods.
 
 These methods are called with [Dependency Injection](https://laravel.com/docs/container#method-invocation-and-injection)
-Hooks with relevant database models will include them in these calls.
-Additionally, the settings argument may be included to inject the plugin settings into the method.
+A hook with database models passes them in these calls.
+The settings argument passes the plugin settings to the method.
 
 #### Data
 
-You can overrid the data method to supply data to your view.  You should also do any processing here.
+Override the data method to give data to your view. Do the processing
+in this method.
 You can do things like access the database or configuration settings and more.
 
 In the data method we are injecting settings here to count how many we have for display in the menu entry blade view.
-Note that you must specify a default value (`= []` here) for any arguments that don't exist on the parent method.
+Note: give a default value, `= []` here, for each argument outside the
+parent method.
 
 ```php
 class Menu extends MenuEntryHook
@@ -129,9 +132,10 @@ class Menu extends MenuEntryHook
 
 #### Authorize 
 
-By default hooks are always shown, but you may control when the user is authorized to view the hook content.
+By default, LibreNMS always shows the hooks. You can control the access
+of the user to the hook content.
 
-As an example, you could imagine that the device-overview.blade.php should only be displayed when the
+For example, `device-overview.blade.php` appears only when the
 device is in a maintenance mode and the current user has the admin role.
 
 ```php

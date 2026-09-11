@@ -18,27 +18,38 @@ $app_data = $app->data;
 print_optionbar_start();
 
 // print the link to the totals
-$label = (isset($vars['poudriere_page']) || isset($vars['poudriere_set']))
-    ? 'Totals'
-    : '<span class="pagemenu-selected">Totals</span>';
-echo generate_link($label, $link_array);
+
+$label = 'Totals';
+$link = generate_link($label, $link_array);
+
+$link = (isset($vars['poudriere_page']) || isset($vars['poudriere_set']))
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 echo ' | ';
 
 // print the link to the details page
-$label = (! isset($vars['poudriere_page']) && $vars['poudriere_page'] != 'details')
-    ? 'Details'
-    : '<span class="pagemenu-selected">Details</span>';
-echo generate_link($label, $link_array, ['poudriere_page' => 'details']);
+$label = 'Details';
+$link = generate_link($label, $link_array, ['poudriere_page' => 'details']);
+
+$link = (! isset($vars['poudriere_page']) && $vars['poudriere_page'] != 'details')
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 echo ' | Sets: ';
 
 $index_int = 0;
 foreach ($app_data['sets'] as $index => $set_name) {
     $set_name = htmlspecialchars((string) $set_name);
-    $label = (! isset($vars['poudriere_set']) || $vars['poudriere_set'] != $set_name)
-        ? $set_name
-        : '<span class="pagemenu-selected">' . $set_name . '</span>';
+
+    $label = $set_name;
+    $link = generate_link($label, $link_array, ['poudriere_set' => $set_name]);
+
+    $link = (! isset($vars['poudriere_set']) || $vars['poudriere_set'] != $set_name)
+        ? $link
+        : '<span class="pagemenu-selected">' . $link . '</span>';
     $index_int++;
-    echo generate_link($label, $link_array, ['poudriere_set' => $set_name]);
+    echo $link;
     if (isset($app_data['sets'][$index_int])) {
         echo ', ';
     }

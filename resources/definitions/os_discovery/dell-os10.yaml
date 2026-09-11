@@ -50,5 +50,11 @@ modules:
                     group: PSUs
                     state_name: os10PowerSupplyOperStatus
                     states:
-                        - { value: 1, descr: normal, generic: 0 }
-                        - { value: 2, descr: abnormal, generic: 2 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: testing, generic: 1 }
+                        - { value: 4, descr: unknown, generic: 3 }
+                        - { value: 5, descr: dormant, generic: 1 }
+                        - { value: 6, descr: notPresent, generic: 2 }
+                        - { value: 7, descr: lowerLayerDown, generic: 2 }
+                        - { value: 8, descr: failed, generic: 2 }

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 class ReportDevices extends LnmsCommand
@@ -254,7 +255,7 @@ class ReportDevices extends LnmsCommand
     /**
      * @return Collection<int, string>|null
      */
-    public function completeOptionValue(DynamicInputOption $option, string $current): ?Collection
+    public function completeOptionValue(DynamicInputOption $option, string $current, ?InputInterface $input = null): ?Collection
     {
         if ($option->getName() == 'fields') {
             return collect()

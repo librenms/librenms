@@ -46,6 +46,7 @@ modules:
                         - HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
                         - HUAWEI-ENTITY-EXTENT-MIB::hwPwrStatusTable
                         - HUAWEI-STACK-MIB::hwStackPortTable
+                        - HUAWEI-STACK-MIB::hwStackMemberNum
                         - HUAWEI-WAN-MIB::hw3GTable
         temperature:
             data:
@@ -615,6 +616,7 @@ modules:
                     group: Stack
                     state_name: hwMemberStackRole
                     states:
+                        - { descr: Standalone, value: 0, generic: 3 }
                         - { descr: Master, value: 1, generic: 0 }
                         - { descr: Standby, value: 2, generic: 0 }
                         - { descr: Slave, value: 3, generic: 0 }
@@ -628,6 +630,11 @@ modules:
                     states:
                         - { descr: Up, value: 1, generic: 0 }
                         - { descr: Down, value: 2, generic: 2 }
+                    skip_values:
+                        -
+                            oid: 'HUAWEI-STACK-MIB::hwStackMemberNum.0'
+                            op: '='
+                            value: 1
                 -
                     oid: HUAWEI-WAN-MIB::hw3GTable
                     value: HUAWEI-WAN-MIB::hw3GModemStatus

@@ -7,7 +7,7 @@ Route: `/api/v0/bgp`
 Input:
 
 - hostname = Either the devices hostname or id.
-- asn = The local ASN you would like to filter by
+- asn = the local ASN of the filter
 - remote_asn = Filter by remote peer ASN
 - remote_address = Filter by remote peer address
 - local_address = Filter by local address
@@ -345,7 +345,8 @@ Output:
 }
 ```
 
-> Please note, this will only show active VPN sessions not all configured.
+> Note: this call shows only the active VPN sessions, not all the
+> configured sessions.
 
 ### `list_ospf`
 
@@ -565,7 +566,7 @@ Input:
 
 **OR**
 
-- vrfname = The VRF name you would like to filter by
+- vrfname = the VRF name of the filter
 
 Example:
 

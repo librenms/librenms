@@ -43,10 +43,13 @@ if (! isset($app_data['has']) || ! is_array($app_data['has'])) {
 
 print_optionbar_start();
 
-$label = isset($vars['oslvm'])
-    ? 'Totals'
-    : '<span class="pagemenu-selected">Totals</span>';
-echo generate_link($label, $link_array);
+$label = 'Totals';
+$link = generate_link($label, $link_array);
+
+$link = isset($vars['oslvm'])
+    ? $link
+    : '<span class="pagemenu-selected">' . $link . '</span>';
+echo $link;
 
 if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
     $oslvm_name = 'Jails';
@@ -61,11 +64,16 @@ if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
     $index_int = 0;
     foreach ($app_data['oslvms'] as $oslvm) {
         $oslvm = htmlspecialchars((string) $oslvm);
-        $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-            ? $oslvm
-            : '<span class="pagemenu-selected">' . $oslvm . '</span>';
+
+        $label = $oslvm;
+        $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+        $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
         $index_int++;
-        echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+        echo $link;
+
         if (isset($app_data['oslvms'][$index_int])) {
             echo ', ';
         }
@@ -76,11 +84,15 @@ if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
         $index_int = 0;
         foreach ($app_data['inactive'] as $oslvm) {
             $oslvm = htmlspecialchars((string) $oslvm);
-            $label = (! isset($vars['inactive']) || $vars['oslvm'] != $oslvm)
-                ? $oslvm
-                : '<span class="pagemenu-selected">' . $oslvm . '</span>';
+
+            $label = $oslvm;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['inactive']) || $vars['oslvm'] != $oslvm)
+                ? $link
+                : '<span class="pagemenu-selected">' . $link . '</span>';
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($app_data['inactive'][$index_int])) {
                 echo ', ';
             }
@@ -143,11 +155,16 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         foreach ($podman_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^p\_/', '', $oslvm_name);
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-            ? $oslvm_name
-            : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($podman_containers[$index_int])) {
                 echo ', ';
             }
@@ -159,11 +176,16 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         foreach ($seen_podman_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^p\_/', '', $oslvm_name);
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-            ? $oslvm_name
-            : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($seen_podman_containers[$index_int])) {
                 echo ', ';
             }
@@ -180,11 +202,16 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         foreach ($docker_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^d\_/', '', $oslvm_name);
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-                ? $oslvm_name
-                : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+                ? $link
+                : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($docker_containers[$index_int])) {
                 echo ', ';
             }
@@ -196,11 +223,16 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         foreach ($seen_docker_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^d\_/', '', $oslvm_name);
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-            ? $oslvm_name
-            : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($seen_docker_containers[$index_int])) {
                 echo ', ';
             }
@@ -217,11 +249,16 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         foreach ($systemd_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^s\_/', '', $oslvm_name);
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-                ? $oslvm_name
-                : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+                ? $link
+                : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($systemd_containers[$index_int])) {
                 echo ', ';
             }
@@ -233,11 +270,16 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         foreach ($seen_systemd_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^s\_/', '', $oslvm_name);
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-            ? $oslvm_name
-            : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($seen_systemd_containers[$index_int])) {
                 echo ', ';
             }
@@ -257,11 +299,16 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             if (isset($app_data['uid_mapping'][$oslvm_name])) {
                 $oslvm_name = $oslvm_name . '(' . $app_data['uid_mapping'][$oslvm_name]['name'] . ')';
             }
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-                ? $oslvm_name
-                : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+                ? $link
+                : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($user_containers[$index_int])) {
                 echo ', ';
             }
@@ -276,11 +323,16 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             if (isset($app_data['uid_mapping'][$oslvm_name])) {
                 $oslvm_name = $oslvm_name . '(' . $app_data['uid_mapping'][$oslvm_name]['name'] . ')';
             }
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-            ? $oslvm_name
-            : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($seen_user_containers[$index_int])) {
                 echo ', ';
             }
@@ -295,11 +347,15 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         }
         $index_int = 0;
         foreach ($other_containers as $oslvm) {
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-                ? $oslvm
-                : '<span class="pagemenu-selected">' . $oslvm . '</span>';
+            $label = $oslvm;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+                ? $link
+                : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($other_containers[$index_int])) {
                 echo ', ';
             }
@@ -311,11 +367,16 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         foreach ($seen_other_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^d\_/', '', $oslvm_name);
-            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
-            ? $oslvm_name
-            : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
+
+            $label = $oslvm_name;
+            $link = generate_link($label, $link_array, ['oslvm' => $oslvm]);
+
+            $link = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            ? $link
+            : '<span class="pagemenu-selected">' . $link . '</span>';
+
             $index_int++;
-            echo generate_link($label, $link_array, ['oslvm' => $oslvm]);
+            echo $link;
             if (isset($seen_other_containers[$index_int])) {
                 echo ', ';
             }

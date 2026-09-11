@@ -16495,7 +16495,7 @@
         "discovery": {
             "ipv6_nd": [
                 {
-                    "mac_address": "ec:67:94:50:4d:00",
+                    "mac_address": "ec6794504d00",
                     "ipv6_address": "fe80:0000:0000:0000:ec67:9483:f650:4d00",
                     "context_name": ""
                 }

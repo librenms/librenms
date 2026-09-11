@@ -1,11 +1,11 @@
 ## Mail
 
-The E-Mail transports uses the same email-configuration as the rest of LibreNMS.
-As a small reminder, here is its configuration directives including defaults:
+The email transport uses the same email configuration as the rest of
+LibreNMS. These are its configuration directives with their defaults:
 
-Emails will attach all graphs included with the @signedGraphTag directive.
-If the email format is set to html, they will be embedded.
-To disable attaching images, set email_attach_graphs to false.
+An email attaches each graph of the `@signedGraphTag` directive. In
+HTML format, the graphs are embedded. To disable the image
+attachments, set `email_attach_graphs` to false.
 
 !!! setting "alerting/email"
 ```bash

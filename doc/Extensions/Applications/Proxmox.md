@@ -11,25 +11,25 @@
 
 ## SNMP Extend
 
-2. Download the script onto the desired host
+2. Download the script onto the host.
 
     ```
     wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/proxmox -O /usr/local/bin/proxmox
     ```
 
-3. Make the script executable
+3. Make the script executable.
 
     ```bash
     chmod +x /usr/local/bin/proxmox
     ```
 
-4. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+4. Edit your `snmpd.conf` file, usually `/etc/snmp/snmpd.conf`, and add:
 
     ```bash
     extend proxmox /usr/local/bin/proxmox
     ```
 
-5. Note: if your snmpd doesn't run as root, you might have to invoke
+5. Note: if your snmpd does not run as root, call
    the script using sudo and modify the "extend" line
 
     ```bash
@@ -42,4 +42,4 @@
     Debian-snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
     ```
 
-6. Restart snmpd on your host
+6. Restart snmpd on your host.

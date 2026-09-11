@@ -42,12 +42,13 @@ class PollerCluster extends Model
     protected $fillable = ['poller_name'];
 
     /**
-     * @return array{last_report: 'datetime'}
+     * @return array{last_report: 'datetime', poller_details: 'array'}
      */
     protected function casts(): array
     {
         return [
             'last_report' => 'datetime',
+            'poller_details' => 'array',
         ];
     }
 
@@ -64,16 +65,16 @@ class PollerCluster extends Model
 
     // ---- Scopes ----
 
-    public function scopeIsActive(Builder $query): Builder
+    protected function scopeIsActive(Builder $query): Builder
     {
-        $default = (int) \App\Facades\LibrenmsConfig::get('service_poller_frequency');
+        $default = (int) (\App\Facades\LibrenmsConfig::get('service_poller_frequency') ?? \App\Facades\LibrenmsConfig::get('rrd.step'));
 
         return $query->where('last_report', '>=', \DB::raw("DATE_SUB(NOW(),INTERVAL COALESCE(`poller_frequency`, $default) SECOND)"));
     }
 
-    public function scopeIsInactive(Builder $query): Builder
+    protected function scopeIsInactive(Builder $query): Builder
     {
-        $default = (int) \App\Facades\LibrenmsConfig::get('service_poller_frequency');
+        $default = (int) (\App\Facades\LibrenmsConfig::get('service_poller_frequency') ?? \App\Facades\LibrenmsConfig::get('rrd.step'));
 
         return $query->where('last_report', '<', \DB::raw("DATE_SUB(NOW(),INTERVAL COALESCE(`poller_frequency`, $default) SECOND)"));
     }
@@ -145,8 +146,8 @@ class PollerCluster extends Model
             ],
             [
                 'name' => 'poller_frequency',
-                'default' => \App\Facades\LibrenmsConfig::get('service_poller_frequency'),
-                'value' => $this->poller_frequency ?? \App\Facades\LibrenmsConfig::get('service_poller_frequency'),
+                'default' => \App\Facades\LibrenmsConfig::get('service_poller_frequency') ?? \App\Facades\LibrenmsConfig::get('rrd.step'),
+                'value' => $this->poller_frequency ?? \App\Facades\LibrenmsConfig::get('service_poller_frequency') ?? \App\Facades\LibrenmsConfig::get('rrd.step'),
                 'type' => 'integer',
                 'units' => 'seconds',
                 'advanced' => true,

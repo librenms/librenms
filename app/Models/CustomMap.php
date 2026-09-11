@@ -91,7 +91,7 @@ class CustomMap extends BaseModel
         return $config;
     }
 
-    public function scopeHasAccess(Builder $query, User $user): Builder
+    protected function scopeHasAccess(Builder $query, User $user): Builder
     {
         if (Gate::allows('viewAll', CustomMap::class)) {
             return $query;

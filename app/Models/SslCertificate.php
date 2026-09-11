@@ -98,7 +98,7 @@ class SslCertificate extends Model
      * @param  Builder<SslCertificate>  $query
      * @return Builder<SslCertificate>
      */
-    public function scopeEnabled(Builder $query): Builder
+    protected function scopeEnabled(Builder $query): Builder
     {
         return $query->where('disabled', false);
     }
@@ -107,7 +107,7 @@ class SslCertificate extends Model
      * @param  Builder<SslCertificate>  $query
      * @return Builder<SslCertificate>
      */
-    public function scopeDisabled(Builder $query): Builder
+    protected function scopeDisabled(Builder $query): Builder
     {
         return $query->where('disabled', true);
     }
@@ -119,7 +119,7 @@ class SslCertificate extends Model
      * @param  mixed  $user
      * @return Builder<SslCertificate>
      */
-    public function scopeHasAccess(Builder $query, $user): Builder
+    protected function scopeHasAccess(Builder $query, $user): Builder
     {
         return $query->where(function (Builder $q) use ($user): void {
             $q->whereNull('device_id')

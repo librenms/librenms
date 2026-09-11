@@ -28,6 +28,11 @@ class SmOs extends OS implements
     private $radioLabels;
     private $linkLabels;
 
+    protected function useEntLogicalIndexAsIfIndex(): bool
+    {
+        return true;
+    }
+
     public function discoverWirelessRate()
     {
         $oids = snmpwalk_group($this->getDeviceArray(), 'linkTxETHCapacity', 'SIAE-RADIO-SYSTEM-MIB', 2);
@@ -258,8 +263,9 @@ class SmOs extends OS implements
     public function discoverTransceivers(): Collection
     {
         $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+        $ifIndexToEntPhysicalIndex = array_flip($this->getIfIndexEntPhysicalMap());
 
-        return SnmpQuery::cache()->walk('SIAE-SFP-MIB::sfpSerialIdTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+        return SnmpQuery::cache()->walk('SIAE-SFP-MIB::sfpSerialIdTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId, $ifIndexToEntPhysicalIndex) {
             $distance = null;
             if ($data['SIAE-SFP-MIB::sfpLinkLength9u'] > 0) {
                 $distance = $data['SIAE-SFP-MIB::sfpLinkLength9u'];
@@ -274,7 +280,7 @@ class SmOs extends OS implements
             return new Transceiver([
                 'port_id' => $ifIndexToPortId->get($ifIndex, 0),
                 'index' => $ifIndex,
-                'entity_physical_index' => $ifIndex,
+                'entity_physical_index' => $ifIndexToEntPhysicalIndex[$ifIndex] ?? null,
                 'type' => null,
                 'vendor' => $data['SIAE-SFP-MIB::sfpVendorName'] ?? null,
                 'date' => $data['SIAE-SFP-MIB::sfpVendorDateCode'] ?? null,

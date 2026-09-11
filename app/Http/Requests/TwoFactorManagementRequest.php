@@ -38,7 +38,7 @@ class TwoFactorManagementRequest extends FormRequest
     public function authorize(): bool
     {
         $user = $this->route()->parameter('user');
-        $auth_user = auth()->user();
+        $auth_user = $this->user();
 
         // don't allow admins to bypass security for themselves
         return $auth_user->can('update', $user) && $auth_user->isNot($user);

@@ -4,7 +4,7 @@ Script that reports load-average/memory/open-files stats of Opensips
 
 ### SNMP Extend
 
-1. Download the script onto the desired host
+1. Download the script onto the host.
 
     ```bash
     wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/opensips-stats.sh -O /etc/snmp/opensips-stats.sh
@@ -18,7 +18,7 @@ Script that reports load-average/memory/open-files stats of Opensips
 
 3. Verify it is working by running `/etc/snmp/opensips-stats.sh`
 
-4. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+4. Edit your `snmpd.conf` file, usually `/etc/snmp/snmpd.conf`, and add:
 
     ```bash
     extend opensips /etc/snmp/opensips-stats.sh

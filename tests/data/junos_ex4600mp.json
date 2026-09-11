@@ -183084,22 +183084,22 @@
         "discovery": {
             "ipv6_nd": [
                 {
-                    "mac_address": "00:00:00:ff:10:01",
+                    "mac_address": "000000ff1001",
                     "ipv6_address": "fd00:0000:0000:0000:0000:0000:0000:0001",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "00:00:00:01:74:f7",
+                    "mac_address": "0000000174f7",
                     "ipv6_address": "fd00:0000:0000:0000:0000:0000:0000:0020",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "00:00:00:01:74:f7",
+                    "mac_address": "0000000174f7",
                     "ipv6_address": "fe80:0000:0000:0000:0000:0000:0071:74f7",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "00:00:00:ff:10:01",
+                    "mac_address": "000000ff1001",
                     "ipv6_address": "fe80:0000:0000:0000:0210:db00:faff:1001",
                     "context_name": ""
                 }

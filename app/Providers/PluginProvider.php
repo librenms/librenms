@@ -41,7 +41,9 @@ class PluginProvider extends ServiceProvider implements DeferrableProvider
 
     public function boot(): void
     {
-        $this->loadLocalPlugins($this->app->make(PluginManagerInterface::class));
+        if (! $this->app->runningInConsole() && ! $this->app->runningUnitTests()) {
+            $this->loadLocalPlugins($this->app->make(PluginManagerInterface::class));
+        }
     }
 
     public function provides(): array

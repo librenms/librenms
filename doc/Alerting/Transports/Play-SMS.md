@@ -1,12 +1,12 @@
 ## PlaySMS
 
-PlaySMS is an open source SMS-Gateway that can be used via their HTTP
-API using a Username and WebService Token. Please consult PlaySMS's
-documentation regarding number formatting.
+PlaySMS is an open source SMS gateway. It has an HTTP API with a
+username and a web service token. For the number format, read the
+PlaySMS documentation.
 
 [PlaySMS Docs](https://github.com/antonraharja/playSMS/blob/master/documents/development/WEBSERVICES.md)
 
-Here an example using 3 numbers, any amount of numbers is supported:
+This example uses 3 numbers. Any number of entries is valid:
 
 **Example:**
 
