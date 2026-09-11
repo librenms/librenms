@@ -59,7 +59,7 @@ class Saf extends OS implements
                 '.1.3.6.1.4.1.7571.100.1.1.5.1.1.1.10.1.9.1',
                 'saf-tx',
                 1,
-                'Tx Frequency'
+                'Tx Frequency',
                 null,
                 1,
                 1000
