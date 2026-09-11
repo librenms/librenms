@@ -41,6 +41,7 @@ class DiscoverDevice implements ShouldQueue
     public function __construct(
         public int $device_id,
         public ModuleList $moduleList,
+        public bool $nodata,
     ) {
     }
 
