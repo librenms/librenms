@@ -45,8 +45,6 @@ class FieldDefinition
         public ?int $min = null,
         public ?int $max = null,
         public ?string $placeholder = null,
-        /** @var callable|null Resolved when the stored value is null; also shown as placeholder hint. */
-        protected mixed $fallback = null,
     ) {
     }
 
@@ -127,45 +125,29 @@ class FieldDefinition
         return $this;
     }
 
-    /**
-     * Set a callable that resolves the effective value when the stored value is null.
-     * The result is also surfaced as placeholder text in the UI so users can see
-     * what value will apply if they leave the field empty.
-     *
-     * Example:
-     *   ->fallback(fn() => LibrenmsConfig::get('snmp.timeout', 3))
-     */
-    public function fallback(callable $fn): static
-    {
-        $this->fallback = $fn;
-
-        return $this;
-    }
-
-    /**
-     * Evaluate and return the fallback value, or null if no fallback is defined.
-     */
-    public function getFallback(): mixed
-    {
-        return $this->fallback !== null ? ($this->fallback)() : null;
-    }
-
     public function getDefault(): mixed
     {
+        $val = null;
         if ($this->default !== null) {
-            return is_callable($this->default) ? ($this->default)() : $this->default;
+            $val = is_callable($this->default) ? ($this->default)() : $this->default;
+        } elseif (! empty($this->options)) {
+            $val = array_key_first($this->options);
         }
 
-        if (! empty($this->options)) {
-            return array_key_first($this->options);
-        }
+        return $val !== null ? $this->castValue($val) : null;
+    }
 
-        return null;
+    /**
+     * Alias for getDefault() for backwards compatibility.
+     */
+    public function getEffectiveDefault(): mixed
+    {
+        return $this->getDefault();
     }
 
     /**
      * Return the placeholder string: explicit placeholder takes priority,
-     * then a stringified fallback value if one is defined.
+     * then a stringified default value if one is defined.
      */
     public function getPlaceholder(): ?string
     {
@@ -173,9 +155,9 @@ class FieldDefinition
             return $this->placeholder;
         }
 
-        $fallbackValue = $this->getFallback();
+        $default = $this->getDefault();
 
-        return $fallbackValue !== null ? (string) $fallbackValue : null;
+        return $default !== null ? (string) $default : null;
     }
 
     /**
@@ -187,7 +169,7 @@ class FieldDefinition
             return is_array($this->rules) ? $this->rules : [$this->rules];
         }
 
-        $generated = [];
+        $generated = ['nullable'];
         if ($this->type === 'number') {
             $generated[] = 'integer';
             if ($this->min !== null) {

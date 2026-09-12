@@ -22,17 +22,17 @@ class UnixAgentPollingMethodDefinition implements PollingMethodDefinitionInterfa
     {
         return [
             'port' => FieldDefinition::make('port', 'number')
-                ->fallback(fn () => LibrenmsConfig::get('unix-agent.port'))
+                ->default(fn () => (int) LibrenmsConfig::get('unix-agent.port', 6556))
                 ->min(1)
                 ->max(65535)
-                ->rules(['required', 'integer', 'min:1', 'max:65535'])
+                ->rules(['nullable', 'integer', 'min:1', 'max:65535'])
                 ->cast('int'),
 
             'timeout' => FieldDefinition::make('timeout', 'number')
-                ->fallback(fn () => LibrenmsConfig::get('unix-agent.connection-timeout', 10))
+                ->default(fn () => (int) LibrenmsConfig::get('unix-agent.connection-timeout', 10))
                 ->min(1)
                 ->max(300)
-                ->rules(['required', 'integer', 'min:1', 'max:300'])
+                ->rules(['nullable', 'integer', 'min:1', 'max:300'])
                 ->cast('int'),
         ];
     }

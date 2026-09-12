@@ -45,7 +45,7 @@ readonly class IpmiConfig implements PollingMethodConfigInterface
             $secretData['username'] ?? '',
             $secretData['password'] ?? '',
             $secretData['kg_key'] ?? '',
-            $settings['hostname'] ?? '',
+            ! empty($settings['hostname']) ? $settings['hostname'] : ($method->device?->hostname ?? ''),
             $settings['port'] ?? 623,
             (int) ($settings['ciphersuite'] ?? 0),
             $settings['timeout'] ?? 3,

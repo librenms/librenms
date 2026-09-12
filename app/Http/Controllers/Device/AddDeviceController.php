@@ -37,6 +37,7 @@ class AddDeviceController
                 'schema_defaults' => $secretDefinition?->schemaDefaults() ?? [],
                 'settings_fields' => $definition->buildSchemaFields(dataVar: "methods['" . $type->value . "'].settingsData"),
                 'settings_defaults' => $definition->schemaDefaults(),
+                'settings_form_defaults' => $definition->formDefaults(),
             ];
         })->all();
 
@@ -69,7 +70,7 @@ class AddDeviceController
                     'description' => old("polling_methods.{$type}.description", ''),
                     'default' => (bool) old("polling_methods.{$type}.default"),
                     'formData' => old("polling_methods.{$type}.secret_data", $method['schema_defaults'] ?? []),
-                    'settingsData' => old("polling_methods.{$type}.settings", $method['settings_defaults'] ?? []),
+                    'settingsData' => old("polling_methods.{$type}.settings", $method['settings_form_defaults'] ?? []),
                 ]];
             })->all(),
             'all_types' => collect($availableMethods)->map(fn ($m) => ['type' => $m['type'], 'label' => $m['label']])->values()->all(),
@@ -141,7 +142,7 @@ class AddDeviceController
                 'error_details' => ! empty($reasons) ? implode("\n", $reasons) : null,
                 'errors' => ['hostname' => $errors],
             ], 422);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'message' => $e->getMessage(),
                 'errors' => ['hostname' => [$e->getMessage()]],

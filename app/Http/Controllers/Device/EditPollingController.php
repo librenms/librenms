@@ -99,9 +99,11 @@ class EditPollingController
             'settings_fields' => $settingsFields,
             'settings_defaults' => $settingsDefaults,
             'settings' => array_merge(
-                $settingsDefaults,
+                $definition->formDefaults(),
                 $row->settings ?? [],
-                $type === PollingMethodType::Snmp ? ['port_association_mode' => PortAssociationMode::getName($device->port_association_mode) ?? LibrenmsConfig::get('default_port_association_mode', 'ifIndex')] : []
+                $type === PollingMethodType::Snmp && ! isset($row?->settings['port_association_mode'])
+                    ? ['port_association_mode' => PortAssociationMode::getName($device->port_association_mode) ?? LibrenmsConfig::get('default_port_association_mode', 'ifIndex')]
+                    : []
             ),
             'affects_availability' => $row ? $row->affects_availability : $definition->defaultAffectsAvailability(),
             'secret' => $secret,

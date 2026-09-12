@@ -31,8 +31,6 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\PollingMethodConfigInterface;
-use SnmpQuery;
-use LibreNMS\Util\Rewrite;
 
 readonly class SnmpConfig implements PollingMethodConfigInterface
 {

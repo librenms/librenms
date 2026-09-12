@@ -26,6 +26,13 @@ interface HasFieldSchema
     public function schemaDefaults(): array;
 
     /**
+     * Initial form values: select fields preselect their default, while text/number fields stay empty.
+     *
+     * @return array<string, mixed>
+     */
+    public function formDefaults(): array;
+
+    /**
      * Resolve field values by combining schema defaults, existing values, and new input values, filtering allowed schema keys.
      *
      * @param  array<string, mixed>  $input
@@ -33,6 +40,15 @@ interface HasFieldSchema
      * @return array<string, mixed>
      */
     public function resolveValues(array $input, array $existing = []): array;
+
+    /**
+     * Filter input values for storage, retaining only non-empty values that differ from defaults.
+     *
+     * @param  array<string, mixed>  $input
+     * @param  array<string, mixed>  $existing
+     * @return array<string, mixed>
+     */
+    public function filterOverrides(array $input, array $existing = []): array;
 
     /**
      * Build UI schema fields derived from schema().

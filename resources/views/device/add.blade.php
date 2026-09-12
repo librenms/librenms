@@ -198,27 +198,7 @@
                                 @endforeach
 
                                  {{-- Add polling type --}}
-                                 <li class="tw:mt-4 tw:pt-2 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-400"
-                                     x-show="addableRemaining.length > 0"
-                                     x-cloak>
-                                     <div class="input-group">
-                                         <select id="add-method-select" class="form-control tw:rounded-l-lg tw:rounded-r-none tw:border-gray-200 tw:bg-white tw:dark:border-dark-gray-400 tw:dark:bg-dark-gray-500 tw:dark:text-white">
-                                             <option value="">{{ __('Add polling type...') }}</option>
-                                             <template x-for="m in addableRemaining" :key="m.type">
-                                                 <option :value="m.type" x-text="m.label"></option>
-                                             </template>
-                                         </select>
-                                         <span class="input-group-btn">
-                                             <button type="button" class="btn btn-success tw:bg-emerald-600 tw:hover:bg-emerald-700 tw:border-emerald-600"
-                                                     @click="
-                                                         const sel = $el.closest('.input-group').querySelector('select');
-                                                         if (sel.value) { addMethod(sel.value); sel.value = ''; }
-                                                     ">
-                                                 <i class="fa fa-plus"></i>
-                                             </button>
-                                         </span>
-                                     </div>
-                                 </li>
+                                 <x-device.polling.add-type-select />
                             </ul>
                         </div>
 
@@ -327,68 +307,28 @@
 
                                                     {{-- New secret form --}}
                                                     <template x-if="methods['{{ $method['type'] }}'].credential_mode === 'new'">
-                                                        <div>
-                                                            <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4 tw:max-w-2xl tw:mb-4">
-                                                                <div class="form-group"
-                                                                     :class="(errors && errors['polling_methods.{{ $method['type'] }}.description']) ? 'has-error' : ''">
-                                                                    <label class="control-label">{{ __('Secret Description') }}</label>
-                                                                    <input type="text"
-                                                                           name="polling_methods[{{ $method['type'] }}][description]"
-                                                                           class="form-control"
-                                                                           placeholder="{{ __('Optional') }}"
-                                                                           x-model="methods['{{ $method['type'] }}'].description">
-                                                                    <template x-if="errors && errors['polling_methods.{{ $method['type'] }}.description']">
-                                                                        <span class="help-block" x-text="errors['polling_methods.{{ $method['type'] }}.description']?.[0]"></span>
-                                                                    </template>
-                                                                </div>
-                                                                <div class="form-group tw:flex tw:items-end">
-                                                                    <div class="checkbox tw:mb-0">
-                                                                        <label>
-                                                                            <input type="hidden" name="polling_methods[{{ $method['type'] }}][default]" value="0">
-                                                                            <input type="checkbox"
-                                                                                   name="polling_methods[{{ $method['type'] }}][default]"
-                                                                                   value="1"
-                                                                                   x-model="methods['{{ $method['type'] }}'].default">
-                                                                            {{ __('Make Default') }}
-                                                                        </label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            @php
-                                                                $secretNamePrefix = 'polling_methods[' . $method['type'] . '][secret_data]';
-                                                                $secretModelPrefix = "methods['" . $method['type'] . "'].formData";
-                                                            @endphp
-                                                            <x-field-schema-fields
-                                                                :fields="$method['schema_fields']"
-                                                                :method-type="$method['type']"
-                                                                :name-prefix="$secretNamePrefix"
-                                                                :model-prefix="$secretModelPrefix"
-                                                                :grid="true" />
-                                                        </div>
+                                                        <x-device.polling.new-secret-fields
+                                                            :method="$method"
+                                                            :name-prefix="'polling_methods[' . $method['type'] . '][secret_data]'"
+                                                            :model-prefix="'methods[\'' . $method['type'] . '\'].formData'"
+                                                            :description-name="'polling_methods[' . $method['type'] . '][description]'"
+                                                            :description-model="'methods[\'' . $method['type'] . '\'].description'"
+                                                            :description-placeholder="__('Optional')"
+                                                            :default-name="'polling_methods[' . $method['type'] . '][default]'"
+                                                            :default-model="'methods[\'' . $method['type'] . '\'].default'"
+                                                            :error-key="'polling_methods.' . $method['type'] . '.description'"
+                                                        />
                                                     </template>
                                                 </div>
                                             </div>
                                         @endif
 
                                         {{-- Settings fields --}}
-                                        @if(!empty($method['settings_fields']))
-                                            <div class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
-                                                <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Settings') }}</h4>
-                                                <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500">
-                                                    @php
-                                                        $settingsNamePrefix = 'polling_methods[' . $method['type'] . '][settings]';
-                                                        $settingsModelPrefix = "methods['" . $method['type'] . "'].settingsData";
-                                                    @endphp
-                                                    <x-field-schema-fields
-                                                        :fields="$method['settings_fields']"
-                                                        :method-type="$method['type']"
-                                                        :name-prefix="$settingsNamePrefix"
-                                                        :model-prefix="$settingsModelPrefix"
-                                                        :grid="true" />
-                                                </div>
-                                            </div>
-                                        @endif
+                                        <x-device.polling.settings
+                                            :method="$method"
+                                            :name-prefix="'polling_methods[' . $method['type'] . '][settings]'"
+                                            :model-prefix="'methods[\'' . $method['type'] . '\'].settingsData'"
+                                        />
 
                                     </div>
                                 </template>
@@ -445,50 +385,11 @@
                 </div>
 
                 {{-- Reachability Failure Dialog --}}
-                <template x-teleport="body">
-                    <div x-show="unreachableDialog" x-cloak style="display: none;"
-                         class="tw:fixed tw:inset-0 tw:z-100 tw:flex tw:items-center tw:justify-center tw:p-4 tw:bg-black/60 tw:backdrop-blur-xs"
-                         @click="unreachableDialog = false"
-                         @keydown.escape.window="unreachableDialog = false">
-                        <div x-show="unreachableDialog"
-                             x-transition:enter="tw:ease-out tw:duration-300"
-                             x-transition:enter-start="tw:opacity-0 tw:scale-95"
-                             x-transition:enter-end="tw:opacity-100 tw:scale-100"
-                             x-transition:leave="tw:ease-in tw:duration-200"
-                             x-transition:leave-start="tw:opacity-100 tw:scale-100"
-                             x-transition:leave-end="tw:opacity-0 tw:scale-95"
-                             @click.stop
-                             class="tw:w-full tw:max-w-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-gray-200 tw:dark:border-dark-gray-300 tw:rounded-xl tw:shadow-2xl tw:p-6"
-                             role="dialog" aria-modal="true" aria-labelledby="modal-title">
-
-                            <div class="tw:flex tw:items-start tw:gap-4">
-                                <div class="tw:shrink-0 tw:flex tw:items-center tw:justify-center tw:h-12 tw:w-12 tw:rounded-full tw:bg-amber-100 tw:dark:bg-amber-900/50">
-                                    <i class="fa fa-exclamation-triangle tw:text-amber-600 tw:dark:text-amber-400 tw:text-xl"></i>
-                                </div>
-                                <div class="tw:grow">
-                                    <h3 class="tw:text-lg tw:font-semibold tw:text-gray-900 tw:dark:text-dark-white-100 tw:m-0" id="modal-title">
-                                        {{ __('poller.reachability_check_failed') }}
-                                    </h3>
-                                    <div class="tw:mt-2">
-                                        <p class="tw:text-sm tw:text-gray-600 tw:dark:text-dark-white-300" x-text="unreachableMessage"></p>
-                                        <template x-if="unreachableDetails">
-                                            <div class="tw:mt-3 tw:p-3 tw:bg-gray-100 tw:dark:bg-dark-gray-600 tw:rounded tw:text-xs tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-200 tw:overflow-x-auto tw:max-h-40" x-text="unreachableDetails"></div>
-                                        </template>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="tw:mt-6 tw:flex tw:flex-col-reverse tw:sm:flex-row tw:justify-end tw:gap-3">
-                                <button type="button" @click="unreachableDialog = false" class="btn btn-default">
-                                    {{ __('Edit Settings') }}
-                                </button>
-                                <button type="button" @click="addAnyway()" class="btn btn-warning">
-                                    <i class="fa fa-plus tw:mr-1"></i> {{ __('Add Anyway') }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </template>
+                <x-device.polling.unreachable-modal
+                    action-click="addAnyway()"
+                    :action-label="__('Add Anyway')"
+                    action-icon="fa-plus"
+                />
             </form>
         </x-panel>
     </div>

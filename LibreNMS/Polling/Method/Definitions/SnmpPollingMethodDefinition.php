@@ -32,47 +32,47 @@ class SnmpPollingMethodDefinition implements PollingMethodDefinitionInterface
                     'tcp6' => 'TCP6',
                 ])
                 ->default('udp')
-                ->rules(['required', 'string', 'in:udp,tcp,udp6,tcp6']),
+                ->rules(['nullable', 'string', 'in:udp,tcp,udp6,tcp6']),
 
             'port' => FieldDefinition::make('port', 'number')
-                ->fallback(fn () => (int) LibrenmsConfig::get('snmp.port', 161))
+                ->default(fn () => (int) LibrenmsConfig::get('snmp.port', 161))
                 ->min(1)
                 ->max(65535)
-                ->rules(['required', 'integer', 'min:1', 'max:65535'])
+                ->rules(['nullable', 'integer', 'min:1', 'max:65535'])
                 ->cast('int'),
 
             'timeout' => FieldDefinition::make('timeout', 'number')
-                ->fallback(fn () => max(1, (int) LibrenmsConfig::get('snmp.timeout', 1)))
+                ->default(fn () => max(1, (int) LibrenmsConfig::get('snmp.timeout', 1)))
                 ->min(1)
                 ->max(60)
-                ->rules(['required', 'integer', 'min:1', 'max:60'])
+                ->rules(['nullable', 'integer', 'min:1', 'max:60'])
                 ->cast('int'),
 
             'retries' => FieldDefinition::make('retries', 'number')
-                ->fallback(fn () => (int) LibrenmsConfig::get('snmp.retries', 5))
+                ->default(fn () => (int) LibrenmsConfig::get('snmp.retries', 5))
                 ->min(0)
                 ->max(10)
-                ->rules(['required', 'integer', 'min:0', 'max:10'])
+                ->rules(['nullable', 'integer', 'min:0', 'max:10'])
                 ->cast('int'),
 
             'max_repeaters' => FieldDefinition::make('max_repeaters', 'number')
-                ->fallback(fn () => (int) LibrenmsConfig::get('snmp.max_repeaters', 10))
+                ->default(fn () => (int) LibrenmsConfig::get('snmp.max_repeaters', 10))
                 ->min(0)
                 ->max(30)
-                ->rules(['required', 'integer', 'min:0', 'max:30'])
+                ->rules(['nullable', 'integer', 'min:0', 'max:30'])
                 ->cast('int'),
 
             'max_oid' => FieldDefinition::make('max_oid', 'number')
-                ->fallback(fn () => max(1, (int) LibrenmsConfig::get('snmp.max_oid', 10)))
+                ->default(fn () => max(1, (int) LibrenmsConfig::get('snmp.max_oid', 10)))
                 ->min(1)
                 ->max(100)
-                ->rules(['required', 'integer', 'min:1', 'max:100'])
+                ->rules(['nullable', 'integer', 'min:1', 'max:100'])
                 ->cast('int'),
 
             'port_association_mode' => FieldDefinition::make('port_association_mode', 'select')
                 ->options(array_combine(PortAssociationMode::getModes(), PortAssociationMode::getModes()))
                 ->default(fn () => LibrenmsConfig::get('default_port_association_mode', 'ifIndex'))
-                ->rules(['required', 'string', Rule::in(PortAssociationMode::getModes())]),
+                ->rules(['nullable', 'string', Rule::in(PortAssociationMode::getModes())]),
         ];
     }
 

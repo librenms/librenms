@@ -105,10 +105,6 @@ class StoreDeviceRequest extends FormRequest
         // Merge flags in polling_methods
         $methods = $this->input('polling_methods', []);
         foreach ($methods as $method => $data) {
-            $type = PollingMethodType::tryFrom($method);
-            if ($type && isset($data['settings']) && is_array($data['settings'])) {
-                $methods[$method]['settings'] = array_merge($type->definition()->schemaDefaults(), $data['settings']);
-            }
             if (isset($data['active'])) {
                 $methods[$method]['active'] = $this->boolean("polling_methods.{$method}.active");
             }

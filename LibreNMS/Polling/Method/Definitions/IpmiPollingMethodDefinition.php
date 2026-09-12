@@ -23,13 +23,13 @@ class IpmiPollingMethodDefinition implements PollingMethodDefinitionInterface
         return [
             'hostname' => FieldDefinition::make('hostname', 'text')
                 ->placeholder('Default: device\'s hostname')
-                ->rules(['required', 'string']),
+                ->rules(['nullable', 'string']),
 
             'port' => FieldDefinition::make('port', 'number')
                 ->default(623)
                 ->min(1)
                 ->max(65535)
-                ->rules(['required', 'integer', 'min:1', 'max:65535'])
+                ->rules(['nullable', 'integer', 'min:1', 'max:65535'])
                 ->cast('int'),
 
             'ciphersuite' => FieldDefinition::make('ciphersuite', 'text')
@@ -38,7 +38,7 @@ class IpmiPollingMethodDefinition implements PollingMethodDefinitionInterface
             'timeout' => FieldDefinition::make('timeout', 'number')
                 ->default(3)
                 ->min(1)
-                ->rules(['required', 'integer', 'min:1'])
+                ->rules(['nullable', 'integer', 'min:1'])
                 ->cast('int'),
         ];
     }

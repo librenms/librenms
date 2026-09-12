@@ -618,4 +618,81 @@ class EditPollingControllerTest extends TestCase
             'last_check_successful' => 0,
         ]);
     }
+
+    public function testUpdatePollingMethodSettingsOnlyStoresOverridesAndFallsBackToDefaults(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+
+        $device = Device::factory()->create();
+
+        $method = DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::UnixAgent,
+            'enabled' => true,
+            'settings' => [],
+        ]);
+
+        // 1. Update with empty port/timeout (should store empty array, not fallback values)
+        $response = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'unix-agent']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '0',
+                'force_save' => '1',
+                'settings' => [
+                    'port' => '',
+                    'timeout' => '',
+                ],
+            ]
+        );
+        $response->assertOk();
+
+        $freshMethod = $method->fresh();
+        $this->assertEquals([], $freshMethod->settings);
+        $config = $freshMethod->toConfig();
+        $this->assertEquals(6556, $config->port);
+        $this->assertEquals(10, $config->timeout);
+
+        // 2. Update with custom port override
+        $response2 = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'unix-agent']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '0',
+                'force_save' => '1',
+                'settings' => [
+                    'port' => 6557,
+                    'timeout' => '',
+                ],
+            ]
+        );
+        $response2->assertOk();
+
+        $freshMethod = $method->fresh();
+        $this->assertEquals(['port' => 6557], $freshMethod->settings);
+        $config = $freshMethod->toConfig();
+        $this->assertEquals(6557, $config->port);
+
+        // 3. Clear the override by submitting empty port
+        $response3 = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'unix-agent']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '0',
+                'force_save' => '1',
+                'settings' => [
+                    'port' => '',
+                    'timeout' => '',
+                ],
+            ]
+        );
+        $response3->assertOk();
+
+        $freshMethod = $method->fresh();
+        $this->assertEquals([], $freshMethod->settings);
+        $config = $freshMethod->toConfig();
+        $this->assertEquals(6556, $config->port);
+    }
 }

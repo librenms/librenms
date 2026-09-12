@@ -370,4 +370,34 @@ class AddDeviceControllerTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['display_template']);
     }
+
+    public function testStoreDeviceWithEmptyPollingSettingsFallsBackToDefaults(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.create');
+
+        $mock = Mockery::mock('overload:App\Actions\Device\ValidateDeviceAndCreate');
+        $mock->shouldReceive('execute')->once()->andReturnUsing(fn () => true);
+
+        $response = $this->actingAs($admin)->postJson(route('device.add.store'), [
+            'hostname' => 'fallback-defaults.example.com',
+            'poller_group' => 0,
+            'polling_methods' => [
+                'snmp' => [
+                    'active' => '1',
+                    'validate' => '0',
+                    'credential_mode' => 'default',
+                    'settings' => [
+                        'transport' => 'udp',
+                        'port' => '',
+                        'timeout' => '',
+                    ],
+                ],
+            ],
+        ]);
+
+        $response->assertOk();
+        $this->assertEquals('ok', $response->json('status'));
+    }
 }

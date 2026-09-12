@@ -90,6 +90,7 @@
             'min'         => $config['min'] ?? null,
             'max'         => $config['max'] ?? null,
             'placeholder' => $config['placeholder'] ?? null,
+            'default'     => $config['default'] ?? null,
             'required'    => ! empty($config['required']),
         ];
     }
@@ -145,7 +146,7 @@
                     @if($modelPrefix) x-model="{{ $modelPrefix }}['{{ $key }}']" @endif>
                 @foreach($field['options'] as $optVal => $optLabel)
                     <option value="{{ $optVal }}"
-                            @if((string) $value === (string) $optVal) selected @endif>
+                            @if((string) $value === (string) $optVal || ($value === '' && isset($field['default']) && (string) $field['default'] === (string) $optVal)) selected @endif>
                         {{ __($optLabel) }}
                     </option>
                 @endforeach

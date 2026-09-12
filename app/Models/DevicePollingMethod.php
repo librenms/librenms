@@ -61,7 +61,7 @@ class DevicePollingMethod extends Model
         $affectsAvail = $affectsAvailability ?? $definition->defaultAffectsAvailability();
         $method->enabled = $enabled;
         $method->affects_availability = $affectsAvail;
-        $method->settings = $definition->resolveValues($settings, $method->settings ?? []);
+        $method->settings = $definition->filterOverrides($settings, $method->settings ?? []);
 
         $method->save();
         $method->invalidateConfigCache();
@@ -84,14 +84,14 @@ class DevicePollingMethod extends Model
         bool $enabled = true,
     ): self {
         $definition = $type->definition();
-        $resolvedSettings = $definition->resolveValues($settings);
+        $filteredSettings = $definition->filterOverrides($settings);
         $affectsAvail = $affectsAvailability ?? $definition->defaultAffectsAvailability();
 
         $method = new static([
             'method_type' => $type,
             'enabled' => $enabled,
             'affects_availability' => $affectsAvail,
-            'settings' => $resolvedSettings,
+            'settings' => $filteredSettings,
         ]);
 
         if ($device !== null) {

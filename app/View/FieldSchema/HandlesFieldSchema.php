@@ -77,9 +77,27 @@ trait HandlesFieldSchema
     {
         return collect($this->fields())
             ->mapWithKeys(function (FieldDefinition $field, string $key): array {
-                $val = $field->getDefault() ?? $field->getFallback();
+                $val = $field->getDefault();
 
-                return [$key => $val !== null ? $field->castValue($val) : null];
+                return [$key => $val];
+            })
+            ->filter(fn (mixed $v): bool => $v !== null)
+            ->all();
+    }
+
+    /**
+     * Initial form values: select fields preselect their default, while text/number fields stay empty.
+     *
+     * @return array<string, mixed>
+     */
+    public function formDefaults(): array
+    {
+        return collect($this->fields())
+            ->filter(fn (FieldDefinition $field): bool => $field->type === 'select')
+            ->mapWithKeys(function (FieldDefinition $field, string $key): array {
+                $val = $field->getDefault();
+
+                return [$key => $val !== null ? (string) $val : null];
             })
             ->filter(fn (mixed $v): bool => $v !== null)
             ->all();
@@ -99,20 +117,56 @@ trait HandlesFieldSchema
             return [];
         }
 
-        $base = array_merge($this->schemaDefaults(), $existing);
+        $result = [];
+        foreach ($fields as $key => $field) {
+            if (array_key_exists($key, $input) && $input[$key] !== null && $input[$key] !== '') {
+                $result[$key] = $field->castValue($input[$key]);
+            } elseif (array_key_exists($key, $existing) && $existing[$key] !== null && $existing[$key] !== '') {
+                $result[$key] = $field->castValue($existing[$key]);
+            } elseif (($default = $field->getDefault()) !== null) {
+                $result[$key] = $default;
+            }
+        }
 
-        $allowedKeys = array_keys($fields);
-        $filteredInput = collect($input)->only($allowedKeys)->filter(fn (mixed $v): bool => $v !== null)->all();
+        return $result;
+    }
 
-        $merged = array_merge($base, $filteredInput);
+    /**
+     * Filter input values for storage, retaining only non-empty values that differ from defaults.
+     *
+     * @param  array<string, mixed>  $input
+     * @param  array<string, mixed>  $existing
+     * @return array<string, mixed>
+     */
+    public function filterOverrides(array $input, array $existing = []): array
+    {
+        $fields = $this->fields();
+        if (empty($fields)) {
+            return [];
+        }
 
         $result = [];
         foreach ($fields as $key => $field) {
-            if (array_key_exists($key, $merged)) {
-                $result[$key] = $field->castValue($merged[$key]);
-            } elseif (($fallback = $field->getFallback()) !== null) {
-                // No stored value and no default — use the fallback (e.g. a global config value).
-                $result[$key] = $field->castValue($fallback);
+            $default = $field->getDefault();
+
+            if (array_key_exists($key, $input)) {
+                $raw = $input[$key];
+                if ($raw === null || $raw === '') {
+                    continue;
+                }
+                $cast = $field->castValue($raw);
+                if ($cast !== $default) {
+                    $result[$key] = $cast;
+                }
+            } elseif (array_key_exists($key, $existing)) {
+                $raw = $existing[$key];
+                if ($raw === null || $raw === '') {
+                    continue;
+                }
+                $cast = $field->castValue($raw);
+                if ($cast !== $default) {
+                    $result[$key] = $cast;
+                }
             }
         }
 
