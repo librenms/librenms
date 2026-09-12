@@ -37,6 +37,9 @@ use SnmpQuery;
 
 trait VminfoProxmox
 {
+    /**
+     * @return Collection<int, Vminfo>
+     */
     public function discoverVminfo(): Collection
     {
         Log::info('Proxmox VM: ');
@@ -96,14 +99,20 @@ trait VminfoProxmox
             throw new JsonAppExtendErroredException('vmwinfo: ' . $data['errorString'], $json, $data);
         }
 
-        return Collection::make($data['data']['vms'] ?? [])
-            ->map(fn (array $vm): Vminfo => new Vminfo([
+        $vms = [];
+
+        foreach ($data['data']['vms'] ?? [] as $vm) {
+            if (! is_array($vm) || ! isset($vm['vmid'])) {
+                continue;
+            }
+
+            $vms[] = new Vminfo([
                 'vm_type' => match ($vm['type'] ?? '') {
                     'lxc' => 'proxmox-lxc',
                     default => 'proxmox-qemu',
                 },
-                'vmwVmVMID' => (string) ($vm['vmid'] ?? ''),
-                'vmwVmDisplayName' => $vm['name'] ?? ('VM ' . ($vm['vmid'] ?? '')),
+                'vmwVmVMID' => (string) $vm['vmid'],
+                'vmwVmDisplayName' => $vm['name'] ?? ('VM ' . $vm['vmid']),
                 'vmwVmGuestOS' => ($vm['type'] ?? '') === 'lxc' ? 'LXC container' : 'QEMU guest',
                 'vmwVmMemSize' => (int) round(($vm['mem'] ?? 0) / 1024 / 1024),
                 'vmwVmCpus' => (int) ($vm['cpus'] ?? 0),
@@ -113,7 +122,9 @@ trait VminfoProxmox
                     'paused', 'suspended' => PowerState::SUSPENDED,
                     default => PowerState::UNKNOWN,
                 },
-            ]))
-            ->filter(fn (Vminfo $vm): bool => $vm->vmwVmVMID !== '');
+            ]);
+        }
+
+        return new Collection($vms);
     }
 }
