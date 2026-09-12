@@ -6,7 +6,7 @@
     <div class="container">
         <div class="row">
             <form action="{{ route('port-groups.store') }}" method="POST" role="form"
-                  class="form-horizontal device-group-form col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2 col-sm-12">
+                  class="form-horizontal port-group-form col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2 col-sm-12">
                 <legend>{{ __('Create Port Group') }}</legend>
                 @csrf
 
@@ -24,3 +24,8 @@
     </div>
 @endsection
 
+@section('javascript')
+    <script src="{{ asset('js/sql-parser.min.js') }}"></script>
+    <script src="{{ asset('js/query-builder.standalone.min.js') }}"></script>
+    <script src="{{ asset('js/interact.min.js') }}"></script>
+@endsection

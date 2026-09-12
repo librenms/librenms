@@ -231,7 +231,7 @@ var grid = $("#edit-ports").bootgrid({
             override_config(event,state,$(this));
         });
 
-        init_select2('.port_group_select', 'port-group', {}, null, 'No Group');
+        init_select2('.port_group_select', 'port-group', {type: 'static'}, null, 'No Group');
         var last_port_group_change;
         $('.port_group_select').on('change', function (e) {
             var $target = $(e.target);
