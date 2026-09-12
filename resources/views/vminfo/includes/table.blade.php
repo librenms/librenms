@@ -49,14 +49,12 @@
     </table>
     <div class="tw:flex tw:flex-row-reverse tw:m-3">
         {{ $vms->links('pagination::tailwind', ['perPage' => $perPage]) }}
-        <x-select :options="$paginationOptions"
-                  x-on:change="
-                  const params = new URLSearchParams(window.location.search);
-                  params.set('perPage', $event.target.value);
-                  params.delete('page');
-                  window.location.search = params.toString();
-                  " x-data="{}"
-                  selected="{{ $perPage }}"
+        <x-select :options="collect($paginationOptions)->map(fn ($option) => [
+                      'value' => request()->fullUrlWithQuery(['perPage' => $option, 'page' => 1]),
+                      'text' => $option,
+                  ])"
+                  x-on:change="window.location = $event.target.value" x-data="{}"
+                  :selected="request()->fullUrlWithQuery(['perPage' => $perPage, 'page' => 1])"
                   name="perPage"
                   label="{{ __('Per Page') }}"
                   class="tw:mx-4"></x-select>
