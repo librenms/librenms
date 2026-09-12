@@ -1,5 +1,4 @@
 @php
-    // the same options the other paginated tables offer
     $paginationOptions ??= [50, 100, 250, 'all'];
     $showDevice ??= false;
 @endphp

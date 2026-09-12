@@ -2,11 +2,7 @@
 
 @section('content')
     <x-device.page :device="$device">
-        @isset($data['submenu'])
-            <x-submenu :title="$title" :menu="$data['submenu']" :device-id="$device_id" :current-tab="$current_tab" :selected="$vars" />
-        @endisset
-
-        <div class="tw:flex tw:items-center tw:justify-between tw:pb-4 tw:-mt-4 tw:gap-4">
+        <div class="tw:flex tw:items-center tw:justify-between tw:pb-4 tw:gap-4">
             <div class="tw:flex-1">
                 <x-filter name="device.vminfo" :fields="$data['filterFields']" :initial="$data['filter']" :reload="true"/>
             </div>
