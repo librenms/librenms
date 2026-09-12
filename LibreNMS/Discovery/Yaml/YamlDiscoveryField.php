@@ -71,6 +71,11 @@ class YamlDiscoveryField
             return;
         }
 
+        if ($this->isOid && is_numeric($value)) {
+            $value *= $yaml[$this->key . '_multiplier'] ?? $yaml['multiplier'] ?? 1;
+            $value /= $yaml[$this->key . '_divisor'] ?? $yaml['divisor'] ?? 1;
+        }
+
         $this->setValue($value);
     }
 
