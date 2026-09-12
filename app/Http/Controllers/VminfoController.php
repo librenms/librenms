@@ -50,10 +50,8 @@ class VminfoController extends Controller
     {
         $query = self::getFilteredQuery($request, $deviceId);
 
-        $limit = $perPage === 'all'
-            ? $query->toBase()->getCountForPagination()
-            : (int) $perPage;
+        $total = $perPage === 'all' ? $query->toBase()->getCountForPagination() : null;
 
-        return $query->paginate(max($limit, 1))->appends($request->query());
+        return $query->paginate($total ?: (int) $perPage, total: $total)->appends($request->query());
     }
 }
