@@ -73,8 +73,8 @@ class Configuration extends BaseValidation
     private function failKeyChanged(Validator $validator): void
     {
         $validator->fail(
-            'APP_KEY does not match key used to encrypt data. APP_KEY must be the same on all nodes.',
-            'If you rotated APP_KEY, run lnms key:rotate to resolve.'
+            'APP_KEY does not match key used to encrypt secrets in the database. APP_KEY must be identical across all nodes and restored from backups.',
+            'If you rotated APP_KEY, run lnms key:rotate to re-encrypt stored secrets with the new key.'
         );
     }
 }

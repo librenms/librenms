@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
+use App\Models\DeviceGroup;
 use App\Models\Location;
+use App\Models\PollerGroup;
+use App\Models\Secret;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -96,7 +99,7 @@ class DevicesController extends Controller
             'filter' => $request->array('filter'),
             'hideFilterLink' => $hideFilter ? $request->fullUrlWithoutQuery('searchbar') : $request->fullUrlWithQuery(['searchbar' => 'hide']),
             'hideFilter' => $hideFilter,
-            'filterFields' => $this->filterFields(),
+            'filterFields' => $this->filterFields($request),
             'graphTemplate' => $graphTemplate,
         ]);
     }
@@ -123,9 +126,9 @@ class DevicesController extends Controller
     /**
      * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[]|array<string, string>, params?: array<string, string>}>
      */
-    private function filterFields(): array
+    private function filterFields(Request $request): array
     {
-        return [
+        $fields = [
             [
                 'key' => 'search',
                 'label' => __('Search'),
@@ -177,49 +180,71 @@ class DevicesController extends Controller
                     'field' => 'features',
                 ],
             ],
-            [
+        ];
+
+        if ($request->user()->can('viewAny', Location::class)) {
+            $fields[] = [
                 'key' => 'location_id',
                 'label' => __('Location'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.location'),
+            ];
+        }
+
+        $fields[] = [
+            'key' => 'type',
+            'label' => __('device.device_type'),
+            'type' => 'select',
+            'endpoint' => route('ajax.select.device-field'),
+            'params' => [
+                'field' => 'type',
             ],
-            [
-                'key' => 'type',
-                'label' => __('device.device_type'),
-                'type' => 'select',
-                'endpoint' => route('ajax.select.device-field'),
-                'params' => [
-                    'field' => 'type',
-                ],
-            ],
-            [
+        ];
+
+        if ($request->user()->can('viewAny', DeviceGroup::class)) {
+            $fields[] = [
                 'key' => 'groups.id',
                 'label' => __('device.device_group'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.device-group'),
-            ],
-            [
+            ];
+        }
+
+        if ($request->user()->can('viewAny', Secret::class)) {
+            $fields[] = [
+                'key' => 'secrets.secret_id',
+                'label' => __('Secret'),
+                'type' => 'select',
+                'endpoint' => route('ajax.select.secret'),
+            ];
+        }
+
+        if ($request->user()->can('viewAny', PollerGroup::class)) {
+            $fields[] = [
                 'key' => 'poller_group',
                 'label' => __('device.edit.poller_group'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.poller-group'),
-            ],
-            [
-                'key' => 'disabled',
-                'label' => __('Disabled'),
-                'type' => 'boolean',
-            ],
-            [
-                'key' => 'ignore',
-                'label' => __('Ignored'),
-                'type' => 'boolean',
-            ],
-            [
-                'key' => 'disable_notify',
-                'label' => __('device.alerts_disabled'),
-                'type' => 'boolean',
-            ],
+            ];
+        }
+
+        $fields[] = [
+            'key' => 'disabled',
+            'label' => __('Disabled'),
+            'type' => 'boolean',
         ];
+        $fields[] = [
+            'key' => 'ignore',
+            'label' => __('Ignored'),
+            'type' => 'boolean',
+        ];
+        $fields[] = [
+            'key' => 'disable_notify',
+            'label' => __('device.alerts_disabled'),
+            'type' => 'boolean',
+        ];
+
+        return $fields;
     }
 
     /**

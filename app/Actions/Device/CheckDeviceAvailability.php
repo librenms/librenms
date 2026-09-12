@@ -3,51 +3,50 @@
 namespace App\Actions\Device;
 
 use App\Models\Device;
-use Carbon\Carbon;
-use LibreNMS\Polling\ConnectivityHelper;
+use App\Models\Eventlog;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\Severity;
 
 readonly class CheckDeviceAvailability
 {
     public function __construct(
         private SetDeviceAvailability $setDeviceAvailability,
-        private DeviceIsPingable $deviceIsPingable,
-        private DeviceIsSnmpable $deviceIsSnmpable,
-        private DeviceMtuTest $deviceMtuTest,
-        private UpdateDeviceOutage $updateDeviceOutage,
     ) {
     }
 
     public function execute(Device $device, bool $commit = false): bool
     {
-        $connectivity = new ConnectivityHelper($device);
-        $ping_response = $this->deviceIsPingable->execute($device);
+        $enabledPollingMethods = $device->pollingMethods->filter(fn ($m) => $m->enabled);
 
-        $results = [];
-        if ($connectivity->icmpIsEnabled()) {
-            $results['icmp'] = $ping_response->isAlive();
-            $device->last_ping = Carbon::now();
-            $device->last_ping_timetaken = $ping_response->avg_latency ?: $device->last_ping_timetaken;
-        }
-        if ($connectivity->snmpIsEnabled()) {
-            $results['snmp'] = $this->deviceIsSnmpable->execute($device);
+        foreach ($enabledPollingMethods as $method) {
+            $definition = $method->method_type->definition();
+            $result = $definition->probe()->check($device);
+
+            $method->last_check_successful = $result->isSuccess();
+            $method->last_checked_at = now();
+
+            if ($method->method_type === PollingMethodType::Icmp) {
+                if ($result->stat('duplicates')) {
+                    Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $device, 'icmp', Severity::Warning);
+                }
+
+                $fpingStatus = $result->stat('fping_status');
+                if ($commit && $fpingStatus) {
+                    $fpingStatus->saveStats($device);
+                }
+
+                $mtuStatus = $result->stat('mtu_status');
+                if ($result->isSuccess() && $mtuStatus !== null) {
+                    $device->mtu_status = $mtuStatus;
+                }
+            }
         }
 
-        $changed = $this->setDeviceAvailability->execute($device, $results);
-
-        if ($ping_response->isAlive()) {
-            $device->mtu_status = $this->deviceMtuTest->execute($device);
-        }
+        $this->setDeviceAvailability->execute($device, $commit);
 
         if ($commit) {
-            if ($connectivity->icmpIsEnabled()) {
-                $ping_response->saveStats($device);
-            }
-
-            $device->save();
-
-            if ($changed) {
-                $this->updateDeviceOutage->execute($device);
-            }
+            $enabledPollingMethods->each->save();
+            $device->save(); // confirm device is saved
         }
 
         return $device->status;

@@ -41,19 +41,20 @@ class EditTabs extends Component
         ?string $tab = null,
     ) {
         $this->tab = $tab ?? Request::segment(4, 'edit');
+        $snmpEnabled = $this->device->pollingMethodFor()->snmp()->enabled;
 
         $this->tabs = [
             'edit' => [
                 'text' => __('Device Settings'),
                 'link' => route('device.edit', $this->device->device_id),
             ],
-            'snmp' => [
-                'text' => 'SNMP',
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=snmp/'),
+            'polling' => [
+                'text' => __('Polling'),
+                'link' => route('device.edit.polling', $this->device->device_id),
             ],
         ];
 
-        if (! $device->snmp_disable) {
+        if ($snmpEnabled) {
             $this->tabs['ports'] = [
                 'text' => __('Port Settings'),
                 'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=ports/'),
@@ -74,7 +75,7 @@ class EditTabs extends Component
             ];
         }
 
-        if (! $device->snmp_disable) {
+        if ($snmpEnabled) {
             $this->tabs['apps'] = [
                 'text' => __('Applications'),
                 'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=apps/'),
@@ -86,7 +87,7 @@ class EditTabs extends Component
             'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=alert-rules/'),
         ];
 
-        if (! $device->snmp_disable) {
+        if ($snmpEnabled) {
             $this->tabs['modules'] = [
                 'text' => __('Modules'),
                 'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=modules/'),
@@ -99,11 +100,6 @@ class EditTabs extends Component
                 'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=services/'),
             ];
         }
-
-        $this->tabs['ipmi'] = [
-            'text' => __('IPMI'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=ipmi/'),
-        ];
 
         if ($this->device->sensors()->exists()) {
             $this->tabs['health'] = [
@@ -119,7 +115,7 @@ class EditTabs extends Component
             ];
         }
 
-        if (! $device->snmp_disable) {
+        if ($snmpEnabled) {
             $this->tabs['storage'] = [
                 'text' => __('Storage'),
                 'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=storage/'),

@@ -31,6 +31,7 @@ return [
         'env_manual' => 'Manually update :file with the following content',
         'env_not_written' => 'Could not write .env file',
         'env_written' => '.env file written',
+        'app_key_warning' => 'Important: Back up your .env file! The APP_KEY encrypts stored credentials and secrets in the database. Without it, database backups cannot decrypt sensitive data.',
         'failed' => 'Failed to save .env',
         'finish' => 'Finish Install',
         'retry' => 'Retry',

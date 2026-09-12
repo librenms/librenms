@@ -42,7 +42,10 @@ use Log;
 
 class SnmpQuery implements SnmpQueryInterface
 {
-    private Device $device;
+    private ?Device $device = null;
+    private string $target = '';
+    private ?SnmpConfig $config = null;
+    private string $contextPrefix = '';
     private string $context = '';
     private SnmpQueryOptions $options;
     private bool $abort = false;
@@ -71,8 +74,6 @@ class SnmpQuery implements SnmpQueryInterface
             $this->options = SnmpQueryOptions::quickPrint();
             $this->options->allowUnderscores = true;
         }
-
-        $this->device = DeviceCache::getPrimary();
     }
 
     /**
@@ -90,6 +91,16 @@ class SnmpQuery implements SnmpQueryInterface
     public function device(Device $device): SnmpQueryInterface
     {
         $this->device = $device;
+        $this->config = $device->toSnmpConfig();
+        $this->target = $device->pollerTarget();
+        $this->options->mibDirs = Mib::directories($device, $this->options->mibDirs);
+
+        return $this;
+    }
+
+    public function config(SnmpConfig $config): SnmpQueryInterface
+    {
+        $this->config = $config;
 
         return $this;
     }
@@ -111,10 +122,7 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function context(string $context, ?string $v3_prefix = null): SnmpQueryInterface
     {
-        if ($context && $this->device->snmpver === 'v3') {
-            $context = $v3_prefix . $context;
-        }
-
+        $this->contextPrefix = $v3_prefix ?? '';
         $this->context = $context;
 
         return $this;
@@ -241,14 +249,13 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function get($oid): SnmpResponse
     {
-        $config = $this->device->toSnmpConfig();
-        $target = $this->device->pollerTarget();
+        $config = $this->prepareConfig();
         $chunks = $this->limitOids($this->parseOid($oid), $config);
         $response = new SnmpResponse('');
 
         foreach ($chunks as $chunk) {
-            $options = $this->prepareOptions($chunk);
-            $res = $this->execWithCache('snmpget', $chunk, $options, fn () => $this->backend->get($target, $chunk, $config, $options));
+            $options = $this->prepareOptions($chunk, $config);
+            $res = $this->execWithCache('snmpget', $chunk, $options, fn () => $this->backend->get($this->target, $chunk, $config, $options));
             $response = $response->append($res);
 
             // if abort on failure is set, return after first failure
@@ -272,14 +279,13 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function walk($oid): SnmpResponse
     {
-        $config = $this->device->toSnmpConfig();
-        $target = $this->device->pollerTarget();
+        $config = $this->prepareConfig();
         $oids = $this->parseOid($oid);
         $response = new SnmpResponse('');
 
         foreach ($oids as $singleOid) {
-            $options = $this->prepareOptions([$singleOid], walk: true);
-            $res = $this->execWithCache('snmpwalk', [$singleOid], $options, fn () => $this->backend->walk($target, $singleOid, $config, $options));
+            $options = $this->prepareOptions([$singleOid], $config, walk: true);
+            $res = $this->execWithCache('snmpwalk', [$singleOid], $options, fn () => $this->backend->walk($this->target, $singleOid, $config, $options));
             $response = $response->append($res);
 
             // if abort on failure is set, return after first failure
@@ -303,14 +309,13 @@ class SnmpQuery implements SnmpQueryInterface
      */
     public function next($oid): SnmpResponse
     {
-        $config = $this->device->toSnmpConfig();
-        $target = $this->device->pollerTarget();
+        $config = $this->prepareConfig();
         $chunks = $this->limitOids($this->parseOid($oid), $config);
         $response = new SnmpResponse('');
 
         foreach ($chunks as $chunk) {
-            $options = $this->prepareOptions($chunk);
-            $res = $this->execWithCache('snmpgetnext', $chunk, $options, fn () => $this->backend->next($target, $chunk, $config, $options));
+            $options = $this->prepareOptions($chunk, $config);
+            $res = $this->execWithCache('snmpgetnext', $chunk, $options, fn () => $this->backend->next($this->target, $chunk, $config, $options));
             $response = $response->append($res);
 
             // if abort on failure is set, return after first failure
@@ -338,9 +343,17 @@ class SnmpQuery implements SnmpQueryInterface
         }
 
         $options = clone $this->options;
-        $options->mibDirs = Mib::directories($this->device, $this->options->mibDirs);
 
         return $this->translateBackend->translate($oid, $options);
+    }
+
+    private function prepareConfig(): SnmpConfig
+    {
+        if ($this->config === null) {
+            $this->device(DeviceCache::getPrimary());
+        }
+
+        return $this->config;
     }
 
     /**
@@ -351,11 +364,10 @@ class SnmpQuery implements SnmpQueryInterface
      *
      * @param  string[]  $oids
      */
-    private function prepareOptions(array $oids, bool $walk = false): SnmpQueryOptions
+    private function prepareOptions(array $oids, SnmpConfig $config, bool $walk = false): SnmpQueryOptions
     {
         $options = clone $this->options;
-        $options->context = $this->context ?: (string) ($this->device->getAttribute('context_name') ?: $this->device->getAttribute('context') ?: '');
-        $options->mibDirs = Mib::directories($this->device, $this->options->mibDirs);
+        $options->context = $config->version === 'v3' ? "$this->contextPrefix$this->context" : $this->context;
 
         if ($walk) {
             if (! empty(array_intersect($oids, LibrenmsConfig::getCombined($this->device->os, 'oids.unordered', 'snmp.')))) {

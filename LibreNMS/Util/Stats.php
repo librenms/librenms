@@ -115,7 +115,11 @@ class Stats
             'cef' => $this->selectTotal('cef_switching'),
             'mempool' => $this->selectTotal('mempools', ['mempool_descr']),
             'dbschema' => $this->selectStatic(DB::table('migrations')->count()),
-            'snmp_version' => $this->selectTotal('devices', ['snmpver']),
+            'snmp_version' => DB::table('device_polling_methods')
+                ->selectRaw('COUNT(*) AS `total`, JSON_UNQUOTE(JSON_EXTRACT(`settings`, \'$.version\')) AS `snmpver`')
+                ->where('method_type', 'snmp')
+                ->groupBy('snmpver')
+                ->get(),
             'os' => $this->selectTotal('devices', ['os']),
             'type' => $this->selectTotal('devices', ['type']),
             'hardware' => $this->selectTotal('devices', ['hardware']),

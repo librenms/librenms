@@ -3,9 +3,12 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
+use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Data\Source\Snmp\NetSnmp;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Enum\SnmpStringOutput;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
@@ -19,6 +22,23 @@ class NetSnmpTest extends TestCase
     {
         parent::setUp();
         $this->backend = new NetSnmp();
+    }
+
+    private function makeDeviceWithSnmpConfig(array $secretData = [], array $settings = [], array $deviceAttrs = []): Device
+    {
+        $device = new Device(array_merge(['hostname' => 'router1.example.com'], $deviceAttrs));
+        $device->device_id = 1;
+        $device->setRelation('attribs', new Collection);
+
+        $method = DevicePollingMethod::transient(
+            PollingMethodType::Snmp,
+            settings: $settings,
+            secretData: array_merge(['version' => 'v2c', 'community' => 'test-comm'], $secretData),
+            device: $device,
+        );
+        $device->setRelation('pollingMethods', collect([$method]));
+
+        return $device;
     }
 
     public function testBuildCliV2c(): void
@@ -326,14 +346,17 @@ class NetSnmpTest extends TestCase
 
     public function testSnmpConfigFromDevice(): void
     {
-        $device = new Device([
-            'hostname' => 'router1.example.com',
-            'snmpver' => 'v2c',
-            'community' => 'test-comm',
-            'port' => 1161,
-            'timeout' => 2,
-            'retries' => 3,
-        ]);
+        $device = $this->makeDeviceWithSnmpConfig(
+            secretData: [
+                'version' => 'v2c',
+                'community' => 'test-comm',
+            ],
+            settings: [
+                'port' => 1161,
+                'timeout' => 2,
+                'retries' => 3,
+            ],
+        );
 
         $config = SnmpConfig::fromDevice($device);
 
@@ -347,14 +370,17 @@ class NetSnmpTest extends TestCase
 
     public function testDeviceToSnmpConfigHandlesMutation(): void
     {
-        $device = new Device([
-            'hostname' => 'router1.example.com',
-            'snmpver' => 'v2c',
-            'community' => 'test-comm',
-        ]);
+        $device = $this->makeDeviceWithSnmpConfig(
+            secretData: ['community' => 'test-comm'],
+        );
 
         $config1 = $device->toSnmpConfig();
-        $device->community = 'new';
+
+        // Mutate the polling method's secret data
+        $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
+        $secret = $snmpMethod->secret;
+        $secret->data = array_merge($secret->data, ['community' => 'new']);
+
         $config2 = $device->toSnmpConfig();
 
         $this->assertSame('test-comm', $config1->community);
@@ -363,39 +389,33 @@ class NetSnmpTest extends TestCase
 
     public function testSnmpConfigFromDeviceRespectsSnmpBulkSetting(): void
     {
-        $deviceBulk = new Device([
-            'hostname' => 'bulk.device',
-            'os' => 'ios',
-        ]);
+        $deviceBulk = $this->makeDeviceWithSnmpConfig(
+            deviceAttrs: ['hostname' => 'bulk.device', 'os' => 'ios'],
+        );
         $configBulk = SnmpConfig::fromDevice($deviceBulk);
         $this->assertTrue($configBulk->bulk);
 
         \App\Facades\LibrenmsConfig::set('os.airos.snmp_bulk', false);
-        $deviceNoBulk = new Device([
-            'hostname' => 'nobulk.device',
-            'os' => 'airos',
-        ]);
+        $deviceNoBulk = $this->makeDeviceWithSnmpConfig(
+            deviceAttrs: ['hostname' => 'nobulk.device', 'os' => 'airos'],
+        );
         $configNoBulk = SnmpConfig::fromDevice($deviceNoBulk);
         $this->assertFalse($configNoBulk->bulk);
     }
 
     public function testSnmpConfigFromDeviceFloatTimeout(): void
     {
-        $device = new Device([
-            'hostname' => 'router1.example.com',
-            'snmpver' => 'v2c',
-            'community' => 'test-comm',
-            'timeout' => 0.5,
-        ]);
+        $device = $this->makeDeviceWithSnmpConfig(
+            settings: ['timeout' => 0.5],
+        );
 
         $config = SnmpConfig::fromDevice($device);
         $this->assertSame(0.5, $config->timeout);
 
         // A timeout <= 0 falls back to configured snmp.timeout
-        $deviceZero = new Device([
-            'hostname' => 'router1.example.com',
-            'timeout' => 0,
-        ]);
+        $deviceZero = $this->makeDeviceWithSnmpConfig(
+            settings: ['timeout' => 0],
+        );
         $configZero = SnmpConfig::fromDevice($deviceZero);
         $this->assertEquals(\App\Facades\LibrenmsConfig::get('snmp.timeout', 1), $configZero->timeout);
     }
@@ -427,13 +447,14 @@ class NetSnmpTest extends TestCase
 
     public function testDebugSnmpwalkControllerBuildsCommandLine(): void
     {
-        $device = new Device([
-            'hostname' => 'debug.device.local',
-            'os' => 'ios',
-            'snmpver' => 'v2c',
-            'community' => 'secret',
-            'port' => 161,
-        ]);
+        $device = $this->makeDeviceWithSnmpConfig(
+            secretData: ['community' => 'secret'],
+            settings: ['port' => 161],
+            deviceAttrs: [
+                'hostname' => 'debug.device.local',
+                'os' => 'ios',
+            ],
+        );
 
         $controller = new \App\Http\Controllers\Device\Debug\DebugSnmpwalkController();
         $refMethod = new \ReflectionMethod($controller, 'buildCommandLine');
@@ -450,13 +471,14 @@ class NetSnmpTest extends TestCase
     public function testDebugSnmpwalkControllerRespectsOsSnmpBulkFalse(): void
     {
         \App\Facades\LibrenmsConfig::set('os.airos.snmp_bulk', false);
-        $device = new Device([
-            'hostname' => 'nobulk.device.local',
-            'os' => 'airos',
-            'snmpver' => 'v2c',
-            'community' => 'secret',
-            'port' => 161,
-        ]);
+        $device = $this->makeDeviceWithSnmpConfig(
+            secretData: ['community' => 'secret'],
+            settings: ['port' => 161],
+            deviceAttrs: [
+                'hostname' => 'nobulk.device.local',
+                'os' => 'airos',
+            ],
+        );
 
         $controller = new \App\Http\Controllers\Device\Debug\DebugSnmpwalkController();
         $refMethod = new \ReflectionMethod($controller, 'buildCommandLine');

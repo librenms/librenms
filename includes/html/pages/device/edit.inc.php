@@ -14,7 +14,7 @@ if (Gate::denies('device.update')) {
     print_error('Insufficient Privileges');
 } else {
     $panes['device'] = 'Device Settings';
-    $panes['snmp'] = 'SNMP';
+    $panes['polling'] = 'Polling';
     if (! $device['snmp_disable']) {
         $panes['ports'] = 'Port Settings';
     }
@@ -23,7 +23,7 @@ if (Gate::denies('device.update')) {
         $panes['routing'] = 'Routing';
     }
 
-    if (count(\App\Facades\LibrenmsConfig::get("os.{$device['os']}.icons", []))) {
+    if (count(App\Facades\LibrenmsConfig::get("os.{$device['os']}.icons", []))) {
         $panes['icon'] = 'Icon';
     }
 
@@ -35,11 +35,9 @@ if (Gate::denies('device.update')) {
         $panes['modules'] = 'Modules';
     }
 
-    if (\App\Facades\LibrenmsConfig::get('show_services')) {
+    if (App\Facades\LibrenmsConfig::get('show_services')) {
         $panes['services'] = 'Services';
     }
-
-    $panes['ipmi'] = 'IPMI';
 
     if (Sensor::where('device_id', $device['device_id'])->where('sensor_deleted', 0)->exists()) {
         $panes['health'] = 'Health';
@@ -75,6 +73,7 @@ if (Gate::denies('device.update')) {
         echo match ($type) {
             'device' => '<a href="' . route('device.edit', [$device['device_id']]) . "\">$text</a>",
             'misc' => '<a href="' . route('device.edit.misc', [$device['device_id']]) . "\">$text</a>",
+            'polling' => '<a href="' . route('device.edit.polling', [$device['device_id']]) . "\">$text</a>",
             'health' => '<a href="' . route('device.edit.health', [$device['device_id']]) . "\">$text</a>",
             default => generate_link($text, $link_array, ['section' => $type]),
         };
