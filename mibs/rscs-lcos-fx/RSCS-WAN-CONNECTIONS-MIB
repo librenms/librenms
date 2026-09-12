@@ -1,0 +1,70 @@
+RSCS-WAN-CONNECTIONS DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, enterprises
+            FROM SNMPv2-SMI
+        DisplayString, TruthValue
+            FROM SNMPv2-TC;
+
+
+    RSCS        OBJECT IDENTIFIER ::= { enterprises 29577 }
+
+    WanConnections  OBJECT IDENTIFIER ::= { RSCS 3 }
+
+    wanConnectionTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF WanConnectionTableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table of WAN connections and their current states"
+        ::= { WanConnections 1 }
+
+    wanConnectionTableEntry OBJECT-TYPE
+        SYNTAX      WanConnectionTableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "WAN connection table entry"
+        INDEX { wanConnectionIndex }
+        ::= { wanConnectionTable 1 }
+
+    WanConnectionTableEntry ::= SEQUENCE {
+        wanConnectionIndex INTEGER,
+        wanConnectionName DisplayString,
+        wanConnectionState TruthValue,
+        wanConnectionInterfaceName DisplayString
+    }
+
+    wanConnectionIndex OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "WAN connection table index"
+        ::= { wanConnectionTableEntry 1 }
+
+    wanConnectionName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Name of the WAN connection"
+        ::= { wanConnectionTableEntry 2 }
+
+    wanConnectionState OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Connection state of the WAN interface (up or down)"
+        ::= { wanConnectionTableEntry 3 }
+
+    wanConnectionInterfaceName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Name of the WAN connection interface"
+        ::= { wanConnectionTableEntry 4 }
+
+END

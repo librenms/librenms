@@ -1,0 +1,19 @@
+os: lcos-fx
+text: 'R&S NC LANCOM Unified Firewall'
+type: firewall
+icon: rsnc
+group: rscs
+mib_dir: rscs-lcos-fx
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+
+discovery:
+    -
+        sysObjectID:
+            - '.1.3.6.1.4.1.8072.3.2.10'
+        snmpget:
+            oid: '.1.3.6.1.4.1.29577.6.5.0'
+            op: 'regex'
+            value: '/(UF-|vFirewall)/'

@@ -1,0 +1,93 @@
+RSCS-STATISTICS DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, enterprises, Unsigned32, Counter64
+            FROM SNMPv2-SMI;
+
+    RSCS        OBJECT IDENTIFIER ::= { enterprises 29577 }
+
+    Statistics  OBJECT IDENTIFIER ::= { RSCS 9 }
+
+    Security  OBJECT IDENTIFIER ::= { Statistics 1 }
+    
+    BlockedLogins  OBJECT IDENTIFIER ::= { Security 1 }
+    
+    BlockedConnections  OBJECT IDENTIFIER ::= { Security 2 }
+    
+    BlockedContent  OBJECT IDENTIFIER ::= { Security 3 }
+    
+    BlockedViruses  OBJECT IDENTIFIER ::= { BlockedContent 1 }
+
+    blockedWebclientLogins OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Blocked Webclient logins"
+        ::= { BlockedLogins 1 }
+
+    blockedSshLogins OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Blocked SSH logins"
+        ::= { BlockedLogins 2 }
+
+    blockedInboundConnections OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of blocked inbound connections"
+        ::= { BlockedConnections 1 }
+
+    blockedForwardedConnections OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of blocked forwarded connections"
+        ::= { BlockedConnections 2 }
+
+    blockedIdsIpsConnections OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of connections blocked by IDS/IPS service"
+        ::= { BlockedConnections 3 }
+
+    blockedWebViruses OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of blocked HTTP(S) viruses"
+        ::= { BlockedViruses 1 }
+
+    blockedMailViruses OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of blocked mail viruses"
+        ::= { BlockedViruses 2 }
+
+    blockedWebUrls OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of blocked HTTP(S) URLs"
+        ::= { BlockedContent 2 }
+
+    spamMails OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of detected spam mails"
+        ::= { BlockedContent 3 }
+
+END
