@@ -121,8 +121,8 @@ class Schleifenbauer extends \LibreNMS\OS
 
         foreach ($sdbDevInputs as $sdbDevIdIndex => $sdbDevInNames) {
             $data = $sdbDev[$sdbDevIdIndex];
-            // index 0 would get entPhysicalIndex 0, which would cause a loop on inventory page
-            $unitEntPhysicalIndex = $sdbDevIdIndex * 10 ?: 5;
+            // means "contained in no other entity", so the PDU contained itself.
+            $unitEntPhysicalIndex = $sdbDevIdIndex * 1000000 + 10;
 
             // We are determining the $entPhysicalAlias for this PDU based on a few optional user-customizable fields.
             $entPhysicalAlias = $data['SCHLEIFENBAUER-DATABUS-MIB::sdbDevIdName'] ?: null;
