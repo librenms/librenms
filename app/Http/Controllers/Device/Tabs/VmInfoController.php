@@ -26,10 +26,12 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Http\Controllers\VminfoController as VminfoPageController;
 use App\Models\Device;
 use App\Models\Vminfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class VmInfoController implements DeviceTab
@@ -56,17 +58,19 @@ class VmInfoController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [
-            'vms' => self::getVms($device),
-        ];
-    }
+        Validator::validate($request->all(), [
+            'page' => 'integer',
+            'perPage' => ['regex:/^(\d+|all)$/'],
+            ...Vminfo::filterValidationRules(),
+        ]);
 
-    private static function getVms(Device $device)
-    {
-        return $device->vminfo()
-        ->select('vmwVmDisplayName', 'vmwVmState', 'vmwVmGuestOS', 'vmwVmMemSize', 'vmwVmCpus')
-        ->with('parentDevice')
-        ->orderBy('vmwVmDisplayName')
-        ->get();
+        $perPage = $request->input('perPage', 50);
+
+        return [
+            'vms' => VminfoPageController::paginate($request, $device->device_id, $perPage),
+            'filterFields' => Vminfo::filterFieldDefinitions($device->device_id),
+            'filter' => $request->array('filter'),
+            'perPage' => $perPage,
+        ];
     }
 }

@@ -63,6 +63,7 @@ use App\Http\Controllers\UserPermissionsController;
 use App\Http\Controllers\UserPreferencesController;
 use App\Http\Controllers\ValidateController;
 use App\Http\Controllers\Widgets;
+use App\Http\Controllers\VminfoController;
 use App\Http\Controllers\WidgetSettingsController;
 use App\Http\Controllers\WirelessSensorController;
 use App\Http\Middleware\AuthenticateGraph;
@@ -167,7 +168,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('authlog', [AuthLogController::class, 'index'])->name('auth-log');
     Route::get('overview', [OverviewController::class, 'index'])->name('overview');
     Route::get('/', [OverviewController::class, 'index'])->name('home');
-    Route::view('vminfo', 'vminfo');
+    Route::get('vminfo', [VminfoController::class, 'index'])->name('vminfo.index');
 
     Route::get('nac', [NacController::class, 'index']);
 
@@ -436,7 +437,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('wireless', Table\WirelessSensorController::class)->name('table.wireless');
             Route::post('vlan-ports', Table\VlanPortsController::class)->name('table.vlan-ports');
             Route::post('vlan-devices', Table\VlanDevicesController::class)->name('table.vlan-devices');
-            Route::post('vminfo', Table\VminfoController::class);
+            Route::get('vminfo/export', [Table\VminfoController::class, 'export'])->name('table.vminfo.export');
             Route::post('ssl-certificates', Table\SslCertificateController::class)->name('table.ssl-certificates');
         });
 

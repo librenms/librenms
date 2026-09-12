@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Http\Controllers\VminfoController as VminfoPageController;
 use App\Models\Device;
 use App\Models\Vminfo;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,14 +39,15 @@ use LibreNMS\Util\Url;
  */
 class VminfoController extends TableController
 {
-    public function searchFields(Request $request): array
+    protected function rules(): array
     {
-        return ['vmwVmDisplayName', 'vmwVmGuestOS', 'devices.hostname', 'devices.sysname'];
-    }
-
-    public function sortFields(Request $request): array
-    {
-        return ['vmwVmDisplayName', 'vmwVmGuestOS', 'vmwVmMemSize', 'vmwVmCpus', 'vmwVmState', 'hostname'];
+        return [
+            'device_id' => 'nullable|integer',
+            'page' => 'nullable|integer',
+            'perPage' => ['nullable', 'regex:/^(\d+|all)$/'],
+            'export' => 'nullable|in:page,all',
+            ...Vminfo::filterValidationRules(),
+        ];
     }
 
     /**
@@ -55,13 +57,25 @@ class VminfoController extends TableController
     {
         $this->authorize('viewAny', Vminfo::class);
 
-        return Vminfo::hasAccess($request->user())
-            ->select('vminfo.*')
-            ->with('device')
-            ->with('parentDevice')
-            ->when($request->input('searchPhrase') || in_array('hostname', array_keys($request->input('sort', []))), function ($query): void {
-                $query->leftJoin('devices', 'devices.device_id', 'vminfo.device_id');
-            });
+        return VminfoPageController::getFilteredQuery(
+            $request,
+            $request->integer('device_id') ?: null
+        );
+    }
+
+    protected function getExportHeaders(): array
+    {
+        return [
+            __('Power Status'),
+            __('VM Name'),
+            __('Type'),
+            __('Operating System'),
+            __('Memory'),
+            __('vCPUs'),
+            __('Host'),
+            __('Device'),
+            __('Sysname'),
+        ];
     }
 
     /**
@@ -73,6 +87,7 @@ class VminfoController extends TableController
         return [
             'vmwVmState' => '<span class="label ' . $model->stateLabel[1] . '">' . $model->stateLabel[0] . '</span>',
             'vmwVmDisplayName' => is_null($model->parentDevice) ? $model->vmwVmDisplayName : self::getHostname($model->parentDevice),
+            'vm_type' => $model->vm_type,
             'vmwVmGuestOS' => $model->operatingSystem,
             'vmwVmMemSize' => $model->memoryFormatted,
             'vmwVmCpus' => $model->vmwVmCpus,
