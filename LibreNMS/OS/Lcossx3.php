@@ -20,8 +20,7 @@
  *
  * @link https://www.librenms.org
  *
- * @copyright 2026 NETHEON
- * @author Marcus Kuchler
+ * @author Marcus Kuchler - NETHEON S.M.PC
  */
 
 namespace LibreNMS\OS;
@@ -33,6 +32,7 @@ use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Lcossx3 extends OS implements MempoolsDiscovery, ProcessorDiscovery, ProcessorPolling
 {
@@ -200,13 +200,13 @@ class Lcossx3 extends OS implements MempoolsDiscovery, ProcessorDiscovery, Proce
     public function discoverProcessors(): array
     {
         $processorOid = $this->getProcessorOid();
-        $data = snmpwalk_array_num($this->getDeviceArray(), $processorOid);
+        $processorValue = SnmpQuery::get($processorOid)->value();
 
-        if (! is_array($data)) {
+        if ($processorValue === '') {
             return [];
         }
 
-        $processorValues = $this->convertProcessorData($data);
+        $processorValues = $this->convertProcessorData([$processorValue]);
 
         if ($processorValues === []) {
             return [];
@@ -239,13 +239,15 @@ class Lcossx3 extends OS implements MempoolsDiscovery, ProcessorDiscovery, Proce
     public function pollProcessors(array $processors): array
     {
         $processorOid = $this->getProcessorOid();
-        $data = snmpwalk_array_num($this->getDeviceArray(), $processorOid);
+        $processorValue = SnmpQuery::get($processorOid)->value();
 
-        if (! is_array($data)) {
+        if ($processorValue === '') {
             return [];
         }
 
-        $processorValues = array_values($this->convertProcessorData($data));
+        $processorValues = array_values(
+            $this->convertProcessorData([$processorValue])
+        );
 
         if ($processorValues === []) {
             return [];
@@ -281,29 +283,21 @@ class Lcossx3 extends OS implements MempoolsDiscovery, ProcessorDiscovery, Proce
         $totalOid = $this->getMemoryTotalOid();
         $freeOid = $this->getMemoryFreeOid();
 
-        $memoryData = snmp_get_multi_oid(
-            $this->getDeviceArray(),
-            [$totalOid, $freeOid]
-        );
-
-        if (! is_array($memoryData)) {
-            return new Collection();
-        }
+        $totalValue = SnmpQuery::get($totalOid)->value();
+        $freeValue = SnmpQuery::get($freeOid)->value();
 
         if (
-            ! array_key_exists($totalOid, $memoryData)
-            || ! array_key_exists($freeOid, $memoryData)
-            || $memoryData[$totalOid] === false
-            || $memoryData[$freeOid] === false
+            $totalValue === ''
+            || $freeValue === ''
         ) {
             return new Collection();
         }
 
         $totalKiB = $this->parseMemorySizeToKiB(
-            (string) $memoryData[$totalOid]
+            (string) $totalValue
         );
 
-        $freeValue = trim((string) $memoryData[$freeOid]);
+        $freeValue = trim((string) $freeValue);
         $freeValue = trim($freeValue, "\"'");
 
         if (! preg_match('/^-?\d+$/', $freeValue)) {
