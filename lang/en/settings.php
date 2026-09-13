@@ -71,7 +71,6 @@ return [
             'smokeping' => ['name' => 'Smokeping Integration'],
             'snmptrapd' => ['name' => 'SNMP Traps Integration'],
             'rancid' => ['name' => 'RANCID Integration'],
-            'collectd' => ['name' => 'Collectd Integration'],
             'unimus' => ['name' => 'Unimus Integration'],
         ],
         'poller' => [
@@ -620,14 +619,6 @@ return [
         'transit_descr' => [
             'description' => 'Transit Port Types',
             'help' => 'Ports of the listed description type(s) are shown under the transit ports menu entry. For more information, see the Interface Description Parsing documentation.',
-        ],
-        'collectd_dir' => [
-            'description' => 'Collectd Directory',
-            'help' => 'Directory where collectd stores its RRD files. This is used to display collectd data.',
-        ],
-        'collectd_sock' => [
-            'description' => 'Collectd Socket',
-            'help' => 'Socket that collectd listens on. This is used to display collectd data.',
         ],
         'core_descr' => [
             'description' => 'Core Port Types',
