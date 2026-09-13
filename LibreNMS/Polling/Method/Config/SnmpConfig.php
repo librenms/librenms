@@ -28,10 +28,16 @@ namespace LibreNMS\Polling\Method\Config;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Interfaces\PollingMethodConfigInterface;
 
-final readonly class SnmpConfig
+readonly class SnmpConfig implements PollingMethodConfigInterface
 {
     public function __construct(
+        public bool $enabled = true,
+        public bool $affectsAvailability = true,
+
         // Secrets
         public string $version = 'v2c',
         public ?string $community = null,
@@ -54,26 +60,46 @@ final readonly class SnmpConfig
     ) {
     }
 
-    public static function fromDevice(Device $device): self
+    public static function fromDevice(Device $device): static
     {
-        $timeout = (float) ($device->timeout > 0 ? $device->timeout : LibrenmsConfig::get('snmp.timeout', 1));
-        $retries = (int) (is_numeric($device->retries) ? $device->retries : LibrenmsConfig::get('snmp.retries', 5));
-        $maxRepeaters = (int) ($device->getAttrib('snmp_max_repeaters') ?: LibrenmsConfig::getOsSetting($device->os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0)));
-        $configuredMaxOid = (int) ($device->getAttrib('snmp_max_oid') ?: LibrenmsConfig::getOsSetting($device->os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10)));
-        $rawBulk = $device->getAttrib('snmp_bulk') ?? LibrenmsConfig::getOsSetting($device->os, 'snmp_bulk', LibrenmsConfig::get('snmp_bulk', true));
+        return static::fromModel($device->pollingMethod(PollingMethodType::Snmp));
+    }
 
-        return new self(
-            version: $device->snmpver ?? 'v2c',
-            community: $device->community,
-            authname: $device->authname,
-            authpass: $device->authpass,
-            authlevel: $device->authlevel,
-            authalgo: $device->authalgo,
-            cryptopass: $device->cryptopass,
-            cryptoalgo: $device->cryptoalgo,
-            context: $device->context ?? null,
-            transport: $device->transport ?? 'udp',
-            port: (int) ($device->port ?? 161),
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    public static function fromModel(DevicePollingMethod $method): static
+    {
+        $definition = PollingMethodType::Snmp->definition();
+        $secretDefinition = $definition->secretDefinition();
+
+        $settings = $definition->resolveValues($method->settings ?? []);
+        $secretData = $secretDefinition->resolveValues($method->secret->data ?? []);
+
+        $os = $method->device->os ?? 'generic';
+
+        $timeout = (float) ($settings['timeout'] > 0 ? $settings['timeout'] : LibrenmsConfig::get('snmp.timeout', 1));
+        $retries = (int) (is_numeric($settings['retries']) ? $settings['retries'] : LibrenmsConfig::get('snmp.retries', 5));
+        $maxRepeaters = (int) ($settings['max_repeaters'] ?: LibrenmsConfig::getOsSetting($os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0)));
+        $configuredMaxOid = (int) ($settings['max_oid'] ?: LibrenmsConfig::getOsSetting($os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10)));
+        $rawBulk = LibrenmsConfig::getOsSetting($os, 'snmp_bulk', LibrenmsConfig::get('snmp_bulk', true));
+
+        return new static(
+            enabled: $method->enabled,
+            affectsAvailability: $method->affects_availability,
+            version: $secretData['version'],
+            community: $secretData['community'] ?? null,
+            authname: $secretData['authname'] ?? null,
+            authpass: $secretData['authpass'] ?? null,
+            authlevel: $secretData['authlevel'],
+            authalgo: $secretData['authalgo'],
+            cryptopass: $secretData['cryptopass'] ?? null,
+            cryptoalgo: $secretData['cryptoalgo'],
+            context: $secretData['context'] ?? null,
+            transport: $settings['transport'],
+            port: (int) ($settings['port'] ?? 161),
             timeout: max(0.1, $timeout),
             retries: max(0, $retries),
             maxRepeaters: max(0, $maxRepeaters),

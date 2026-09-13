@@ -57,6 +57,14 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpBackendInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpQueryInterface::class, \LibreNMS\Data\Source\Snmp\SnmpQuery::class);
+
+        $this->app->singleton('polling.method.snmp', \LibreNMS\Polling\Method\Definitions\SnmpPollingMethodDefinition::class);
+        $this->app->singleton('polling.method.icmp', \LibreNMS\Polling\Method\Definitions\IcmpPollingMethodDefinition::class);
+        $this->app->singleton('polling.method.ipmi', \LibreNMS\Polling\Method\Definitions\IpmiPollingMethodDefinition::class);
+        $this->app->singleton('polling.method.unix-agent', \LibreNMS\Polling\Method\Definitions\UnixAgentPollingMethodDefinition::class);
+
+        $this->app->singleton('secret.snmp', \LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition::class);
+        $this->app->singleton('secret.ipmi', \LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition::class);
     }
 
     /**

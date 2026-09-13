@@ -10,6 +10,8 @@ class SnmpQueryExecuted
 {
     use Dispatchable;
 
+    public readonly ?Device $device;
+
     /**
      * @param  string  $method  snmpget, snmpwalk, snmpgetnext, snmptranslate, etc.
      * @param  array<int, string>  $oids  List of OIDs queried
@@ -25,10 +27,11 @@ class SnmpQueryExecuted
         public readonly array $oids,
         public readonly SnmpResponse $response,
         public readonly array $cliCommand = [],
-        public readonly ?Device $device = null,
+        ?Device $device = null,
         public readonly string $context = '',
         public readonly array $mibs = [],
         public readonly ?string $mibDir = null,
     ) {
+        $this->device = $device;
     }
 }

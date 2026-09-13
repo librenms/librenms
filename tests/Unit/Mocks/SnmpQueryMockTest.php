@@ -33,8 +33,10 @@ namespace LibreNMS\Tests\Unit\Mocks;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Data\Source\Snmp\SnmpQuery;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
 use LibreNMS\Tests\SnmpsimHelpers;
 use LibreNMS\Tests\TestCase;
@@ -51,8 +53,16 @@ final class SnmpQueryMockTest extends TestCase
         // SnmpQueryMock reads the community from DeviceCache::getPrimary() to
         // pick its snmprec fixture. Fake the primary device so the mock has a
         // community without touching the database.
-        $device = new Device(['community' => self::FIXTURE]);
+        $device = new Device();
         $device->device_id = 1;
+        $device->setRelation('attribs', new Collection);
+        $method = DevicePollingMethod::transient(
+            PollingMethodType::Snmp,
+            secretData: ['version' => 'v2c', 'community' => self::FIXTURE],
+            device: $device,
+        );
+        $device->setRelation('pollingMethods', collect([$method]));
+
         DeviceCache::fake($device);
         DeviceCache::setPrimary($device->device_id);
 
@@ -132,14 +142,25 @@ final class SnmpQueryMockTest extends TestCase
     {
         $device = new Device([
             'hostname' => $this->getSnmpsimIp(),
-            'port' => $this->getSnmpsimPort(),
-            'snmpver' => 'v2c',
-            'community' => self::FIXTURE,
-            'timeout' => 3,
-            'retries' => 0,
             'os' => 'generic',
         ]);
+        $device->device_id = 1;
         $device->setRelation('attribs', new Collection); // getAttrib without a database
+
+        $method = DevicePollingMethod::transient(
+            PollingMethodType::Snmp,
+            settings: [
+                'port' => $this->getSnmpsimPort(),
+                'timeout' => 3,
+                'retries' => 0,
+            ],
+            secretData: [
+                'version' => 'v2c',
+                'community' => self::FIXTURE,
+            ],
+            device: $device,
+        );
+        $device->setRelation('pollingMethods', collect([$method]));
 
         return $device;
     }

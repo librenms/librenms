@@ -126,6 +126,7 @@ class KeyRotate extends LnmsCommand
         }
 
         $this->info(trans('commands.key:rotate.success'));
+        $this->warn(trans('commands.key:rotate.ha_notice'));
 
         if ($this->option('generate-new-key') && $this->confirm(trans('commands.key:rotate.save_key'))) {
             EnvHelper::writeEnv([
