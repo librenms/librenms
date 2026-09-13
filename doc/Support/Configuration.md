@@ -744,7 +744,7 @@ array with `[1]`, `[2]`, and `[3]`.
 
 ```
 authlevel   noAuthNoPriv | authNoPriv | authPriv
-authname    User Name (required even for noAuthNoPriv)
+authname    User Name (required even for noAuthNoPriv; leading and trailing whitespace is automatically trimmed)
 authpass    Auth Passphrase
 authalgo    MD5 | SHA | SHA-224 | SHA-256 | SHA-384 | SHA-512
 cryptopass  Privacy (Encryption) Passphrase

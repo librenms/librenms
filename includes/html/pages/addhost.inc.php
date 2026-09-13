@@ -223,6 +223,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
             <label for="authname" class="col-sm-3 control-label">Auth User Name</label>
             <div class="col-sm-9">
               <input type="text" name="authname" id="authname" class="form-control input-sm" autocomplete="off">
+              <span id="authname-warning" class="help-block text-warning" style="display: none;"><i class="fa fa-exclamation-triangle"></i> <?php echo __('Warning: Username contains leading or trailing spaces (will be trimmed)'); ?></span>
             </div>
           </div>
           <div class="form-group">
@@ -334,6 +335,18 @@ if (LibrenmsConfig::get('distributed_poller') === true) {
 
     $("[name='snmp']").bootstrapSwitch('offColor','danger');
     $("[name='force_add']").bootstrapSwitch();
+
+    $('#authname').on('input', function() {
+        var val = $(this).val();
+        if (/^\s+|\s+$/.test(val)) {
+            $('#authname-warning').show();
+        } else {
+            $('#authname-warning').hide();
+        }
+    }).on('blur', function() {
+        $(this).val($.trim($(this).val()));
+        $('#authname-warning').hide();
+    });
 
     $(document).ready(function loadPage() { changeForm(); });
 <?php
