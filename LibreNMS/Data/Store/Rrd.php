@@ -525,7 +525,6 @@ class Rrd extends BaseDatastore
     {
         if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
             try {
-                $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
                 $check_output = $this->command('last', $filename);
 
                 return ! (str_contains($check_output, $filename) && str_contains($check_output, 'No such file or directory'));
@@ -533,6 +532,11 @@ class Rrd extends BaseDatastore
                 return false;
             }
         } else {
+            if ($this->rrdcached) {
+                // Re-add the base direcotry if we are not using rrdcached
+                $filename = $this->rrd_dir . '/' . $filename;
+            }
+
             return is_file($filename);
         }
     }
