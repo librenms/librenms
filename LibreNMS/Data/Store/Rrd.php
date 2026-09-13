@@ -446,7 +446,11 @@ class Rrd extends BaseDatastore
      */
     public function graph(array $options): string
     {
-        return $this->backend->graph($options);
+        try {
+            return $this->backend->graph($options);
+        } catch (RrdException $e) {
+            throw new RrdGraphException($e->getMessage(), 'Error');
+        }
     }
 
     /**
