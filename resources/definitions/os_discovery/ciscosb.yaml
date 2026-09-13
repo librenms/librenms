@@ -95,6 +95,12 @@ modules:
                     descr: 'Unit {{ $index }} Temperature'
                     warn_limit: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamTempSensorWarningThresholdValue
                     high_limit: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamTempSensorCriticalThresholdValue
+# This is broken for all SG300 devices at least. The report always the value 2. Removing them
+                    skip_values:
+                        -
+                            oid: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamTempSensorValue
+                            op: '=='
+                            value: 2  
         fanspeed:
             data:
                 -
