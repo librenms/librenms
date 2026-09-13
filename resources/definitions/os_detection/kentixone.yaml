@@ -2,6 +2,7 @@ os: kentixone
 text: Kentix MultiSensor
 type: environment
 icon: kentix
+mib_dir: kentix
 
 discovery:
     -
