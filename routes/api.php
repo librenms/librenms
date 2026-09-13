@@ -255,6 +255,8 @@ Route::prefix('v0')->group(function (): void {
         });
         Route::middleware('can:viewAny,App\Models\Sensor')->group(function (): void {
             Route::get('sensors', [App\Api\Controllers\LegacyApiController::class, 'list_sensors'])->name('list_sensors');
+            Route::patch('sensors', [App\Api\Controllers\SensorThresholdController::class, 'bulkUpdate'])->name('bulk_update_sensor_thresholds');
+            Route::patch('sensors/{sensor}', [App\Api\Controllers\SensorThresholdController::class, 'update'])->name('update_sensor_thresholds');
         });
         Route::middleware('can:viewAny,App\Models\Vlan')->group(function (): void {
             Route::get('vlans', [App\Api\Controllers\LegacyApiController::class, 'list_vlans'])->name('list_vlans');
