@@ -1,4 +1,17 @@
 modules:
+    os:
+        hardware:
+            - LIEBERT-GP-AGENT-MIB::lgpAgentDeviceModel.1
+            - LIEBERT-GP-AGENT-MIB::lgpAgentDeviceFirmwareVersion.1
+        hardware_template: '{{ LIEBERT-GP-AGENT-MIB::lgpAgentDeviceModel.1 }} ({{ LIEBERT-GP-AGENT-MIB::lgpAgentDeviceFirmwareVersion.1 }})'
+        hardware_replace:
+            - ['/\s+/', ' ']
+            - ['/ \(\)$/', '']
+        serial: LIEBERT-GP-AGENT-MIB::lgpAgentDeviceSerialNumber.1
+        version:
+            - LIEBERT-GP-AGENT-MIB::lgpAgentIdentFirmwareVersion.0
+            - UPS-MIB::upsIdentAgentSoftwareVersion.0
+        features: LIEBERT-GP-AGENT-MIB::lgpAgentIdentModel.0
     sensors:
         temperature:
             data:
