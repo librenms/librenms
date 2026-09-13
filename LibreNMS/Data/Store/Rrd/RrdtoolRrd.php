@@ -27,7 +27,6 @@
 namespace LibreNMS\Data\Store\Rrd;
 
 use LibreNMS\Data\Store\Rrd;
-use LibreNMS\Data\Store\TimeSeriesPoint;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
@@ -55,25 +54,6 @@ class RrdtoolRrd implements RrdBackendInterface
     public function terminate(): void
     {
         $this->rrd?->stop();
-    }
-
-    /**
-     * @throws RrdException
-     */
-    public function lastUpdate(string $filename): ?TimeSeriesPoint
-    {
-        $output = $this->command('lastupdate', $filename);
-
-        if (preg_match('/((?: \w+)+)\n\n(\d+):((?: [\d.-]+)+)\nOK/', $output, $matches)) {
-            $data = array_combine(
-                explode(' ', ltrim($matches[1])),
-                explode(' ', ltrim($matches[3])),
-            );
-
-            return new TimeSeriesPoint((int) $matches[2], $data);
-        }
-
-        return null;
     }
 
     /**

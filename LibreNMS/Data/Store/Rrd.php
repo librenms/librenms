@@ -171,18 +171,6 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * @throws RrdException
-     */
-    public function lastUpdate(string $filename): ?TimeSeriesPoint
-    {
-        $stat = Measurement::start('other');
-        $ret = $this->backend->lastUpdate($filename);
-        $this->recordStatistic($stat->end());
-
-        return $ret;
-    }
-
-    /**
      * Updates an rrd database at $filename using $options
      * Where $options is an array, each entry which is not a number is replaced with "U"
      *

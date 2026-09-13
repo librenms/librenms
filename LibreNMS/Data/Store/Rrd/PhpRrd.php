@@ -1,7 +1,7 @@
 <?php
 
 /**
- * RrdCmd.php
+ * PhpRrd.php
  *
  * -Description-
  *
@@ -27,7 +27,6 @@
 namespace LibreNMS\Data\Store\Rrd;
 
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Data\Store\TimeSeriesPoint;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdGraphException;
 use Log;
@@ -60,25 +59,6 @@ class PhpRrd implements RrdBackendInterface
     {
         // Clean up the RrdCmd
         $this->rrdtool->terminate();
-    }
-
-    /**
-     * @throws RrdException
-     */
-    public function lastUpdate(string $filename): ?TimeSeriesPoint
-    {
-        if ($this->rrdcached) {
-            // PHP-RRD does not support this command with cached
-            return $this->rrdtool->lastUpdate($filename);
-        }
-
-        Log::debug("PHPRRD[%glastupdate $filename%n]", ['color' => true]);
-        $lastUpdate = rrd_lastupdate($filename);
-        if (! $lastUpdate) {
-            return null;
-        }
-
-        return new TimeSeriesPoint($lastUpdate['last_update'], array_combine($lastUpdate['ds_navm'], $lastUpdate['data']));
     }
 
     /**

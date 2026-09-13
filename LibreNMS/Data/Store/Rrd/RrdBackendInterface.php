@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Data\Store\Rrd;
 
-use LibreNMS\Data\Store\TimeSeriesPoint;
 use LibreNMS\Exceptions\RrdException;
 
 interface RrdBackendInterface
@@ -36,11 +35,6 @@ interface RrdBackendInterface
      * This should be done before exiting
      */
     public function terminate(): void;
-
-    /**
-     * Returns the data from the last update
-     */
-    public function lastUpdate(string $filename): ?TimeSeriesPoint;
 
     /**
      * Create a rrd database at $filename using the supplied arguments
