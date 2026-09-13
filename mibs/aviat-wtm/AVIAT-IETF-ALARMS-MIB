@@ -1,0 +1,1585 @@
+-- ****************************************************************************
+-- aviatIetfAlarms.mib: Aviat Networks IETF Alarms MIB
+--
+-- Copyright © 2022 Aviat U.S, Inc. All rights reserved.
+-- Certain information and content may be provided by third parties to AVIAT,
+-- and in each case, such copyrighted work remains the property of that third
+-- party creator/licensor.
+-- All rights not expressly granted herein are reserved. Except as otherwise
+-- required by applicable law, any reproduction, distribution, modification,
+-- retransmission, or publication of any copyrighted material is strictly
+-- prohibited without the express written consent of the copyright owner.
+-- "AVIAT", "AVIAT NETWORKS" and the AVIAT logo are trademarks of Aviat
+-- Networks, Inc. All other trademarks or brand names may be trademarks or
+-- registered trademarks of AVIAT's affiliated companies in the United States
+-- and/or other countries.
+--
+-- ****************************************************************************
+
+AVIAT-IETF-ALARMS-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DateAndTime, TruthValue, DisplayString
+            FROM SNMPv2-TC
+        ItuPerceivedSeverity, ItuTrendIndication
+            FROM ITU-ALARM-TC-MIB
+        IANAItuProbableCause, IANAItuEventType
+            FROM IANA-ITU-ALARM-TC-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        aviatModules
+            FROM STXN-GLOBALREGISTER-MIB;
+
+    aviatIetfAlarmModule MODULE-IDENTITY
+        LAST-UPDATED    "202203221220Z"
+        ORGANIZATION    "Aviat Networks"
+        CONTACT-INFO    "Aviat Networks
+                         Customer Service
+
+                         Postal: 860 North McCarthy Boulevard
+                                 Suite 200
+                                 Milpitas
+                                 California 95035
+                                 United States of America
+
+                         Tel: 408 941-7100
+
+                         E-mail: mibsupport@aviatnet.com"
+        DESCRIPTION
+                "This module defines an interface for managing alarms. Main
+                 inputs to the module design are the 3GPP Alarm IRP, ITU-T
+                 X.733 and ANSI/ISA-18.2 alarm standards. Main features of this
+                 module include:
+
+                   * Alarm list:
+                          A list of all alarms. Cleared alarms stay in the list
+                          until explicitly purged.
+                   * Alarm inventory:
+                          A list of all alarm types implemented by the system.
+                   * Alarm shelving:
+                          Shelving (blocking) alarms according to specific
+                          criteria.
+
+                 This module uses a stateful view of alarms. An alarm is a
+                 state for a specific resource (note that an alarm is not a
+                 notification). An alarm type is a possible alarm state for a
+                 resource. For example, the tuple:
+
+                   ('link-alarm', 'GigabitEthernet0/25')
+
+                 is an alarm of type 'link-alarm' on the resource
+                 'GigabitEthernet0/25'.
+
+                 Alarm types identify a possible alarm state and not the
+                 individual notifications. For example, the traditional
+                 'link-down' and 'link-up' notifications are two notifications
+                 referring to the same alarm type 'link-alarm'.
+
+                 With this design there is no ambiguity about how alarm and
+                 alarm clear correlation should be performed: notifications
+                 that report the same resource and alarm type are considered
+                 updates of the same alarm, e.g. clearing an active alarm or
+                 changing the severity of an alarm.
+
+                 The system may update 'severity' and 'alarm-text' for an
+                 existing alarm in real-time. The above alarm example can
+                 therefore look like:
+
+                   (('link-alarm', 'GigabitEthernet0/25'), warning, 'interface
+                    down while interface admin state is up')."
+        REVISION        "202203221220Z"
+        DESCRIPTION
+                "Initial Version."
+            ::= { aviatModules 49 }
+
+
+-- ****************************************************************************
+-- Textual Conventions
+-- ****************************************************************************
+    AviatIetfAlarmNotificationControlMethod ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "Defines possible SNMP notification control settings."
+        SYNTAX          INTEGER {
+                                    allStateChanges (1),
+                                    allRaiseAndClearEvents (2),
+                                    minimumIndeterminateSevAndClearEvents (3),
+                                    minimumWarningSevAndClearEvents (4),
+                                    minimumMinorSevAndClearEvents (5),
+                                    minimumMajorSevAndClearEvents (6),
+                                    minimumCriticalSevAndClearEvents (7)
+                                }
+
+    AviatIetfAlarmEntryThresholdType ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "For alarms that are triggered when a measured value is
+                         exceeded, defines whether an alarm instance relates to
+                         an upper or lower threshold being crossed."
+        SYNTAX          INTEGER {
+                                    upperThreshold (1),
+                                    lowerThreshold (2),
+                                    noThresholdAssociation (3)
+                                }
+
+-- ****************************************************************************
+-- Conformance area, containing groups and compliance specifications
+-- ****************************************************************************
+    aviatIetfAlarmConformance   OBJECT IDENTIFIER ::= { aviatIetfAlarmModule 1 }
+
+    aviatIetfAlarmGroups        OBJECT IDENTIFIER ::= { aviatIetfAlarmConformance 1 }
+
+    aviatIetfAlarmCompliance    OBJECT IDENTIFIER ::= { aviatIetfAlarmConformance 2 }
+
+
+-- ****************************************************************************
+-- Sub-trees for Aviat IETF Alarms MIB objects
+-- ****************************************************************************
+    aviatIetfAlarmMIBObjects    OBJECT IDENTIFIER ::= { aviatIetfAlarmModule 2 }
+
+    aviatIetfAlarms             OBJECT IDENTIFIER ::= { aviatIetfAlarmMIBObjects 1 }
+
+    aviatIetfAlarmControl       OBJECT IDENTIFIER ::= { aviatIetfAlarms 1 }
+
+    aviatIetfAlarmInventory     OBJECT IDENTIFIER ::= { aviatIetfAlarms 2 }
+
+    aviatIetfAlarmSummary       OBJECT IDENTIFIER ::= { aviatIetfAlarms 3 }
+
+    aviatIetfAlarmList          OBJECT IDENTIFIER ::= { aviatIetfAlarms 4 }
+
+    aviatIetfAlarmShelvedAlarms OBJECT IDENTIFIER ::= { aviatIetfAlarms 5 }
+
+    aviatIetfAlarmNotifications OBJECT IDENTIFIER ::= { aviatIetfAlarms 6 }
+
+
+-- ****************************************************************************
+-- Sub-tree for Aviat IETF Alarms MIB notifications
+-- ****************************************************************************
+    aviatIetfAlarmMIBEvents     OBJECT IDENTIFIER ::= { aviatIetfAlarmModule 0 }
+
+
+-- ****************************************************************************
+-- Alarm Control Objects
+-- ****************************************************************************
+    aviatIetfMaxAlarmStatusChanges  OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The maximum number of alarm status changes for a given
+                         alarm instance. Historic status change entries are
+                         kept in a circular list per alarm. When this number is
+                         exceeded, the oldest status change entry is
+                         automatically removed."
+            ::= { aviatIetfAlarmControl 1 }
+
+    aviatIetfAlarmNotificationControl   OBJECT-TYPE
+        SYNTAX          AviatIetfAlarmNotificationControlMethod
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The alarm notifiaction types that the system will
+                         transmit."
+            ::= { aviatIetfAlarmControl 2 }
+
+
+-- ****************************************************************************
+-- Aviat IETF Alarm Shelving Control Table
+-- ****************************************************************************
+    aviatIetfAlarmShelvingControlTable  OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatIetfAlarmShelvingControlEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This table shows how the system is configured to
+                         shelve (block/filter) alarms. Any alarms corresponding
+                         to the shelving criteria will be moved from the alarms
+                         list to the shelved alarms list. No notifications will
+                         be sent for shelved alarms. The conditions in the
+                         shelf criteria are logically ANDed. When the shelving
+                         criteria is deleted or changed by the system, the
+                         non-matching alarms will appear in the alarms list
+                         according to their real state."
+            ::= { aviatIetfAlarmControl 3 }
+
+    aviatIetfAlarmShelvingControlEntry  OBJECT-TYPE
+        SYNTAX          AviatIetfAlarmShelvingControlEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Each entry defines the criteria for shelving alarms.
+                         Criteria are ANDed. If no criteria are specified, all
+                         alarms will be shelved."
+        INDEX           { IMPLIED aviatIetfAlarmShelvingControlName }
+            ::= { aviatIetfAlarmShelvingControlTable 1 }
+
+    AviatIetfAlarmShelvingControlEntry ::=
+        SEQUENCE {
+            aviatIetfAlarmShelvingControlName
+                DisplayString,
+            aviatIetfAlarmShelvingControlResource
+                DisplayString,
+            aviatIetfAlarmShelvingControlAlarmTypeId
+                DisplayString,
+            aviatIetfAlarmShelvingControlAlarmTypeQualifierMatch
+                DisplayString,
+            aviatIetfAlarmShelvingControlDescription
+                DisplayString
+        }
+
+    aviatIetfAlarmShelvingControlName   OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An arbitrary name for the alarm shelf entry."
+            ::= { aviatIetfAlarmShelvingControlEntry 1 }
+
+    aviatIetfAlarmShelvingControlResource   OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Shelve alarms for matching resources."
+            ::= { aviatIetfAlarmShelvingControlEntry 2 }
+
+    aviatIetfAlarmShelvingControlAlarmTypeId    OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Shelve all alarms that have an Alarm Type ID that is
+                         equal to or derived from the given Alarm Type ID."
+            ::= { aviatIetfAlarmShelvingControlEntry 3 }
+
+    aviatIetfAlarmShelvingControlAlarmTypeQualifierMatch    OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "A W3C regular expression that is used to match an
+                         Alarm Type Qualifier. All alarms that match this
+                         regular expression will be shelved."
+            ::= { aviatIetfAlarmShelvingControlEntry 4 }
+
+    aviatIetfAlarmShelvingControlDescription    OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "An optional textual description of the shelf control
+                         entry. This description should include the reason for
+                         shelving these alarms."
+            ::= { aviatIetfAlarmShelvingControlEntry 5 }
+
+
+-- ****************************************************************************
+-- Alarm Inventory Objects
+-- ****************************************************************************
+
+-- ****************************************************************************
+-- Aviat IETF Alarm Inventory Table
+-- ****************************************************************************
+    aviatIetfAlarmInventoryTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatIetfAlarmInventoryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A table of all possible alarm types for the system. If
+                         the system knows for which resources a specific alarm
+                         type can appear, this is also identified in the
+                         inventory."
+            ::= { aviatIetfAlarmInventory 1 }
+
+    aviatIetfAlarmInventoryEntry    OBJECT-TYPE
+        SYNTAX          AviatIetfAlarmInventoryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An entry in this table defines a possible alarm."
+        INDEX           { aviatIetfAlarmInventoryAlarmTypeId,
+                          aviatIetfAlarmInventoryAlarmTypeQualifier }
+            ::= { aviatIetfAlarmInventoryTable 1 }
+
+    AviatIetfAlarmInventoryEntry ::=
+        SEQUENCE {
+            aviatIetfAlarmInventoryAlarmTypeId
+                DisplayString,
+            aviatIetfAlarmInventoryAlarmTypeQualifier
+                DisplayString,
+            aviatIetfAlarmInventoryAlarmResources
+                DisplayString,
+            aviatIetfAlarmInventoryAlarmHasClear
+                TruthValue,
+            aviatIetfAlarmInventoryAlarmSeverityLevels
+                DisplayString,
+            aviatIetfAlarmInventoryAlarmDescription
+                DisplayString,
+            aviatIetfAlarmInventoryAlarmEventType
+                IANAItuEventType,
+            aviatIetfAlarmInventoryAlarmProbableCause
+                IANAItuProbableCause,
+            aviatIetfAlarmInventoryAlarmProbableCauseString
+                DisplayString
+        }
+
+    aviatIetfAlarmInventoryAlarmTypeId  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The statically defined alarm type identifier for this
+                         possible alarm."
+            ::= { aviatIetfAlarmInventoryEntry 1 }
+
+    aviatIetfAlarmInventoryAlarmTypeQualifier   OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The optionally dynamically defined alarm type
+                         identifier for this possible alarm."
+            ::= { aviatIetfAlarmInventoryEntry 2 }
+
+    aviatIetfAlarmInventoryAlarmResources   OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Optionally, a comma separated list of resources that
+                         the alarm type is valid for."
+            ::= { aviatIetfAlarmInventoryEntry 3 }
+
+    aviatIetfAlarmInventoryAlarmHasClear    OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicates whether or not this alarm will be cleared if
+                         appropriate corrective action is taken."
+            ::= { aviatIetfAlarmInventoryEntry 4 }
+
+    aviatIetfAlarmInventoryAlarmSeverityLevels  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "A comma separated list of possible
+                         ItuPerceivedSeverity severity levels for this alarm
+                         type (excluding 'cleared')."
+            ::= { aviatIetfAlarmInventoryEntry 5 }
+
+    aviatIetfAlarmInventoryAlarmDescription OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "A description of the possible alarm."
+            ::= { aviatIetfAlarmInventoryEntry 6 }
+
+    aviatIetfAlarmInventoryAlarmEventType   OBJECT-TYPE
+        SYNTAX          IANAItuEventType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The X.733/X.736 event type for this alarm."
+            ::= { aviatIetfAlarmInventoryEntry 7 }
+
+    aviatIetfAlarmInventoryAlarmProbableCause   OBJECT-TYPE
+        SYNTAX          IANAItuProbableCause
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The X.733 probable cause for this alarm."
+            ::= { aviatIetfAlarmInventoryEntry 8 }
+
+    aviatIetfAlarmInventoryAlarmProbableCauseString OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The user friendly string matching the value of
+                         aviatIetfAlarmInventoryAlarmProbableCause. The string
+                         SHOULD match the X.733 enumeration."
+            ::= { aviatIetfAlarmInventoryEntry 9 }
+
+
+-- ****************************************************************************
+-- Alarm Summary Objects
+-- ****************************************************************************
+    aviatIetfAlarmSummaryShelvesAreActive   OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "An indication of whether any alarms are currently
+                         shelved."
+            ::= { aviatIetfAlarmSummary 1 }
+
+
+-- ****************************************************************************
+-- Aviat IETF Alarm Summary Table
+-- ****************************************************************************
+    aviatIetfAlarmSummaryTable  OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatIetfAlarmSummaryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A global summary of all alarms in the system. The
+                         summary does not include shelved alarms."
+            ::= { aviatIetfAlarmSummary 2 }
+
+    aviatIetfAlarmSummaryEntry  OBJECT-TYPE
+        SYNTAX          AviatIetfAlarmSummaryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A summary of alarms for a given severity level."
+        INDEX           { aviatIetfAlarmSummarySeverityLevel }
+            ::= { aviatIetfAlarmSummaryTable 1 }
+
+    AviatIetfAlarmSummaryEntry ::=
+        SEQUENCE {
+            aviatIetfAlarmSummarySeverityLevel
+                ItuPerceivedSeverity,
+            aviatIetfAlarmSummaryTotalAlarms
+                Gauge32,
+            aviatIetfAlarmSummaryClearedAlarms
+                Gauge32
+        }
+
+    aviatIetfAlarmSummarySeverityLevel  OBJECT-TYPE
+        SYNTAX          ItuPerceivedSeverity
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The ItuPerceivedSeverity level for this entry."
+            ::= { aviatIetfAlarmSummaryEntry 1 }
+
+    aviatIetfAlarmSummaryTotalAlarms    OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Total number of alarms of this severity level."
+            ::= { aviatIetfAlarmSummaryEntry 2 }
+
+    aviatIetfAlarmSummaryClearedAlarms  OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "For this severity level, the number of alarms that are
+                         cleared."
+            ::= { aviatIetfAlarmSummaryEntry 3 }
+
+
+-- ****************************************************************************
+-- Alarm List Objects
+-- ****************************************************************************
+    aviatIetfAlarmListNumberOfAlarms    OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of alarm instances that the system has
+                         records for."
+            ::= { aviatIetfAlarmList 1 }
+
+    aviatIetfAlarmListLastChanged   OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time at which the alarm list was last modified."
+            ::= { aviatIetfAlarmList 2 }
+
+
+-- ****************************************************************************
+-- Aviat IETF Alarm List Table
+-- ****************************************************************************
+    aviatIetfAlarmListTable     OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatIetfAlarmListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The list of alarms. Each entry in the list holds one
+                         alarm for a given alarm type and resource."
+            ::= { aviatIetfAlarmList 3 }
+
+    aviatIetfAlarmListEntry     OBJECT-TYPE
+        SYNTAX          AviatIetfAlarmListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Entries appear in the alarm list the first time an
+                         alarm becomes active for a given alarm type and
+                         resource. Entries do not get deleted when the alarm is
+                         cleared, this is a boolean state in the alarm.
+
+                         Alarm entries are removed from the list by an explicit
+                         purge action performed by the operator."
+        INDEX           { aviatIetfAlarmListResource,
+                          aviatIetfAlarmListAlarmTypeId,
+                          aviatIetfAlarmListAlarmTypeQualifier }
+            ::= { aviatIetfAlarmListTable 1 }
+
+    AviatIetfAlarmListEntry ::=
+        SEQUENCE {
+            aviatIetfAlarmListResource
+                DisplayString,
+            aviatIetfAlarmListAlarmTypeId
+                DisplayString,
+            aviatIetfAlarmListAlarmTypeQualifier
+                DisplayString,
+            aviatIetfAlarmListTimeCreated
+                DateAndTime,
+            aviatIetfAlarmListIsCleared
+                TruthValue,
+            aviatIetfAlarmListLastStateChange
+                DateAndTime,
+            aviatIetfAlarmListPerceivedSeverity
+                ItuPerceivedSeverity,
+            aviatIetfAlarmListAlarmText
+                DisplayString,
+            aviatIetfAlarmListEventType
+                IANAItuEventType,
+            aviatIetfAlarmListProbableCause
+                IANAItuProbableCause,
+            aviatIetfAlarmListProbableCauseString
+                DisplayString,
+            aviatIetfAlarmListTrendIndication
+                ItuTrendIndication,
+            aviatIetfAlarmListObservedValue
+                Integer32,
+            aviatIetfAlarmListThresholdType
+                AviatIetfAlarmEntryThresholdType,
+            aviatIetfAlarmListRaiseThresholdValue
+                Integer32,
+            aviatIetfAlarmListClearThresholdValue
+                Integer32,
+            aviatIetfAlarmListLastClearedTime
+                DateAndTime
+        }
+
+    aviatIetfAlarmListResource  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The alarming resource. This could for example be a
+                         reference to the alarming interface."
+            ::= { aviatIetfAlarmListEntry 1 }
+
+    aviatIetfAlarmListAlarmTypeId   OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An identifier for this alarm type."
+            ::= { aviatIetfAlarmListEntry 2 }
+
+    aviatIetfAlarmListAlarmTypeQualifier    OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A secondary identifier for the alarm type which
+                         together with aviatIetfAlarmListAlarmTypeId uniquely
+                         identifies a specific alarm type."
+            ::= { aviatIetfAlarmListEntry 3 }
+
+    aviatIetfAlarmListTimeCreated   OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time-stamp when this alarm entry was created. This
+                         represents the first time the alarm appeared. It can
+                         also represent that the alarm re-appeared after a
+                         purge."
+            ::= { aviatIetfAlarmListEntry 4 }
+
+    aviatIetfAlarmListIsCleared OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicates the current clearance state of the alarm. An
+                         alarm might toggle from active alarm to cleared alarm
+                         and back to active again."
+            ::= { aviatIetfAlarmListEntry 5 }
+
+    aviatIetfAlarmListLastStateChange   OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The timestamp when the alarm status was last changed.
+                         Status changes occur when the values of
+                         aviatIetfAlarmListAlarmIsCleared,
+                         aviatIetfAlarmListAlarmPerceivedSeverity or
+                         aviatIetfAlarmListAlarmText change for the alarm."
+            ::= { aviatIetfAlarmListEntry 6 }
+
+    aviatIetfAlarmListPerceivedSeverity OBJECT-TYPE
+        SYNTAX          ItuPerceivedSeverity
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The last severity level of the alarm.
+
+                         If the alarm was raised with severity 'warning', but
+                         later changed to 'major', this object will show
+                         'major'."
+            ::= { aviatIetfAlarmListEntry 7 }
+
+    aviatIetfAlarmListAlarmText OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The last reported alarm text."
+            ::= { aviatIetfAlarmListEntry 8 }
+
+    aviatIetfAlarmListEventType OBJECT-TYPE
+        SYNTAX          IANAItuEventType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The X.733/X.736 event type for this alarm."
+            ::= { aviatIetfAlarmListEntry 9 }
+
+    aviatIetfAlarmListProbableCause OBJECT-TYPE
+        SYNTAX          IANAItuProbableCause
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The X.733 probable cause for this alarm."
+            ::= { aviatIetfAlarmListEntry 10 }
+
+    aviatIetfAlarmListProbableCauseString   OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The user friendly string matching the value of
+                         aviatIetfAlarmListProbableCause. The string SHOULD
+                         match the X.733 enumeration."
+            ::= { aviatIetfAlarmListEntry 11 }
+
+    aviatIetfAlarmListTrendIndication   OBJECT-TYPE
+        SYNTAX          ItuTrendIndication
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This parameter specifies the current severity trend of
+                         the resource. If present it indicates that there are
+                         one or more alarms ('outstanding alarms') which have
+                         not been cleared, and pertain to the same resource as
+                         that to which this alarm ('current alarm') pertains.
+                         The possible values are:
+
+                         more-severe: The Perceived severity in the current
+                         alarm is higher (more severe) than that reported in
+                         any of the outstanding alarms.
+
+                         no-change: The Perceived severity reported in the
+                         current alarm is the same as the highest (most severe)
+                         of any of the outstanding alarms.
+
+                         less-severe: There is at least one outstanding alarm
+                         of a severity higher (more severe) than that in the
+                         current alarm."
+            ::= { aviatIetfAlarmListEntry 12 }
+
+    aviatIetfAlarmListObservedValue OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The observed value of the monitored resource when this
+                         entry was created. The measured units are specific to
+                         the resource."
+            ::= { aviatIetfAlarmListEntry 13 }
+
+    aviatIetfAlarmListThresholdType OBJECT-TYPE
+        SYNTAX          AviatIetfAlarmEntryThresholdType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The type of threshold that was crossed when this alarm
+                         list entry was created (upper, lower or none)."
+            ::= { aviatIetfAlarmListEntry 14 }
+
+    aviatIetfAlarmListRaiseThresholdValue   OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object depends on the value of
+                         aviatIetfAlarmListThresholdType as follows:
+
+                         upperThreshold = the highest acceptable value of the
+                                          monitored resource. If this threshold
+                                          is crossed an alarm will be raised.
+
+                         lowerThreshold = the lowest acceptable value of the
+                                          monitored resource. If this threshold
+                                          is crossed an alarm will be raised.
+
+                         noThresholdAssociation = this object has no meaning.
+
+                         The value is effectively part of a scale and measured
+                         units are not specified for the monitored resource."
+            ::= { aviatIetfAlarmListEntry 15 }
+
+    aviatIetfAlarmListClearThresholdValue   OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object depends on the value of
+                         aviatIetfAlarmListThresholdType as follows:
+
+                         upperThreshold = the highest acceptable value of the
+                                          monitored resource to enable an alarm
+                                          for it to be cleared once it has been
+                                          raised.
+
+                         lowerThreshold = the lowest acceptable value of the
+                                          monitored resource to enable an alarm
+                                          for it to be cleared once it has been
+                                          raised.
+
+                         noThresholdAssociation = this object has no meaning.
+
+                         The value is effectively part of a scale and measured
+                         units are not specified for the monitored resource."
+            ::= { aviatIetfAlarmListEntry 16 }
+
+    aviatIetfAlarmListLastClearedTime   OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time at which the system last started monitoring
+                         the resource for an alarm condition."
+            ::= { aviatIetfAlarmListEntry 17 }
+
+
+-- ****************************************************************************
+-- Aviat IETF Alarm Status History Table
+-- ****************************************************************************
+    aviatIetfAlarmStatusHistoryTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatIetfAlarmStatusHistoryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A history of status change events for each alarm."
+            ::= { aviatIetfAlarmList 4 }
+
+    aviatIetfAlarmStatusHistoryEntry    OBJECT-TYPE
+        SYNTAX          AviatIetfAlarmStatusHistoryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Entries in this table are ordered according to the
+                         timestamps of alarm state changes. The last item
+                         corresponds to the latest state change.
+
+                         The following state changes create an entry in this
+                         list:
+                           - changed severity level (warning, minor, major,
+                             critical)
+                           - clearance status of the alarm
+                           - an alarm text update."
+        INDEX           { aviatIetfAlarmStatusHistoryResource,
+                          aviatIetfAlarmStatusHistoryAlarmTypeId,
+                          aviatIetfAlarmStatusHistoryAlarmTypeQualifier,
+                          aviatIetfAlarmStatusHistoryChangeHighEpoch,
+                          aviatIetfAlarmStatusHistoryChangeLowEpoch }
+            ::= { aviatIetfAlarmStatusHistoryTable 1 }
+
+    AviatIetfAlarmStatusHistoryEntry ::=
+        SEQUENCE {
+            aviatIetfAlarmStatusHistoryResource
+                DisplayString,
+            aviatIetfAlarmStatusHistoryAlarmTypeId
+                DisplayString,
+            aviatIetfAlarmStatusHistoryAlarmTypeQualifier
+                DisplayString,
+            aviatIetfAlarmStatusHistoryChangeHighEpoch
+                Gauge32,
+            aviatIetfAlarmStatusHistoryChangeLowEpoch
+                Gauge32,
+            aviatIetfAlarmStatusHistoryChangeTimestamp
+                DateAndTime,
+            aviatIetfAlarmStatusHistoryPerceivedSeverity
+                ItuPerceivedSeverity,
+            aviatIetfAlarmStatusHistoryAlarmText
+                DisplayString
+        }
+
+    aviatIetfAlarmStatusHistoryResource OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The resource on which the alarm changed state. This
+                         could for example be a reference to the alarming
+                         interface."
+            ::= { aviatIetfAlarmStatusHistoryEntry 1 }
+
+    aviatIetfAlarmStatusHistoryAlarmTypeId  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An identifier for the alarm type for this status
+                         history entry."
+            ::= { aviatIetfAlarmStatusHistoryEntry 2 }
+
+    aviatIetfAlarmStatusHistoryAlarmTypeQualifier   OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A secondary identifier for the alarm type which
+                         together with aviatIetfAlarmStatusHistoryAlarmTypeId
+                         uniquely identifies the specific alarm type that this
+                         status change entry relates to."
+            ::= { aviatIetfAlarmStatusHistoryEntry 3 }
+
+    aviatIetfAlarmStatusHistoryChangeHighEpoch  OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The high 32-bits of the epoch time when this status
+                         change occurred."
+            ::= { aviatIetfAlarmStatusHistoryEntry 4 }
+
+    aviatIetfAlarmStatusHistoryChangeLowEpoch   OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The low 32-bits of the epoch time when this status
+                         change occurred."
+            ::= { aviatIetfAlarmStatusHistoryEntry 5 }
+
+    aviatIetfAlarmStatusHistoryChangeTimestamp  OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time-stamp when this status change occurred."
+            ::= { aviatIetfAlarmStatusHistoryEntry 6 }
+
+    aviatIetfAlarmStatusHistoryPerceivedSeverity    OBJECT-TYPE
+        SYNTAX          ItuPerceivedSeverity
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The severity level of the alarm when this status
+                         change event occurred."
+            ::= { aviatIetfAlarmStatusHistoryEntry 7 }
+
+    aviatIetfAlarmStatusHistoryAlarmText    OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The description of the alarm when this status change
+                         event occurred."
+            ::= { aviatIetfAlarmStatusHistoryEntry 8 }
+
+
+-- ****************************************************************************
+-- Alarm Shelving Objects
+-- ****************************************************************************
+    aviatIetfAlarmNumberOfShelvedAlarms OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The current number of entries in the Shelved Alarms
+                         List."
+            ::= { aviatIetfAlarmShelvedAlarms 1 }
+
+    aviatIetfAlarmsShelvedAlarmsLastChanged OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time at which an entry in the Shelved Alarms List
+                         last changed."
+            ::= { aviatIetfAlarmShelvedAlarms 2 }
+
+
+-- ****************************************************************************
+-- Aviat IETF Alarm Shelved Alarms Table
+-- ****************************************************************************
+    aviatIetfAlarmShelvedAlarmsTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatIetfAlarmShelvedAlarmsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The list of shelved alarms. Shelved alarms can only be
+                         updated from the underlying resource - no operator
+                         actions are supported."
+            ::= { aviatIetfAlarmShelvedAlarms 3 }
+
+    aviatIetfAlarmShelvedAlarmsEntry    OBJECT-TYPE
+        SYNTAX          AviatIetfAlarmShelvedAlarmsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An instance of a shelved alarm that occurred on the
+                         system."
+        INDEX           { aviatIetfAlarmShelvedAlarmsResource,
+                          aviatIetfAlarmShelvedAlarmsAlarmTypeId,
+                          aviatIetfAlarmShelvedAlarmsAlarmTypeQualifier }
+            ::= { aviatIetfAlarmShelvedAlarmsTable 1 }
+
+    AviatIetfAlarmShelvedAlarmsEntry ::=
+        SEQUENCE {
+            aviatIetfAlarmShelvedAlarmsResource
+                DisplayString,
+            aviatIetfAlarmShelvedAlarmsAlarmTypeId
+                DisplayString,
+            aviatIetfAlarmShelvedAlarmsAlarmTypeQualifier
+                DisplayString,
+            aviatIetfAlarmShelvedAlarmsShelfName
+                DisplayString,
+            aviatIetfAlarmShelvedAlarmsIsCleared
+                TruthValue,
+            aviatIetfAlarmShelvedAlarmsLastChanged
+                DateAndTime,
+            aviatIetfAlarmShelvedAlarmsPerceivedSeverity
+                ItuPerceivedSeverity,
+            aviatIetfAlarmShelvedAlarmsAlarmText
+                DisplayString,
+            aviatIetfAlarmShelvedAlarmsEventType
+                IANAItuEventType,
+            aviatIetfAlarmShelvedAlarmsProbableCause
+                IANAItuProbableCause,
+            aviatIetfAlarmShelvedAlarmsProbableCauseString
+                DisplayString,
+            aviatIetfAlarmShelvedAlarmsTrendIndication
+                ItuTrendIndication,
+            aviatIetfAlarmShelvedAlarmsObservedValue
+                Integer32,
+            aviatIetfAlarmShelvedAlarmsThresholdType
+                AviatIetfAlarmEntryThresholdType,
+            aviatIetfAlarmShelvedAlarmsRaiseThresholdValue
+                Integer32,
+            aviatIetfAlarmShelvedAlarmsClearThresholdValue
+                Integer32,
+            aviatIetfAlarmShelvedAlarmsLastClearedTime
+                DateAndTime
+        }
+
+    aviatIetfAlarmShelvedAlarmsResource OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The resource on which the shelved alarm changed state.
+                         This could for example be a reference to the alarming
+                         interface."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 1 }
+
+    aviatIetfAlarmShelvedAlarmsAlarmTypeId  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An identifier for the alarm type for this shelved
+                         alarm entry."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 2 }
+
+    aviatIetfAlarmShelvedAlarmsAlarmTypeQualifier   OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A secondary identifier for the alarm type which
+                         together with aviatIetfAlarmShelvedAlarmsAlarmTypeId
+                         uniquely identifies the specific alarm type that this
+                         shelved alarm entry relates to."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 3 }
+
+    aviatIetfAlarmShelvedAlarmsShelfName    OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The aviatIetfAlarmShelvingControlName for the
+                         configuration that led to the alarm being shelved."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 4 }
+
+    aviatIetfAlarmShelvedAlarmsIsCleared    OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicates the current clearance state of the shelved
+                         alarm. An alarm might toggle from active alarm to
+                         cleared alarm and back to active again."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 5 }
+
+    aviatIetfAlarmShelvedAlarmsLastChanged  OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The timestamp when this shelved alarm's status was
+                         last changed. Status changes occur when the values of
+                         aviatIetfAlarmShelvedAlarmsIsCleared,
+                         aviatIetfAlarmShelvedAlarmsPerceivedSeverity or
+                         aviatIetfAlarmShelvedAlarmsAlarmText change for the
+                         alarm."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 6 }
+
+    aviatIetfAlarmShelvedAlarmsPerceivedSeverity    OBJECT-TYPE
+        SYNTAX          ItuPerceivedSeverity
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The last severity level of this shelved alarm.
+
+                         If the alarm was raised with severity 'warning', but
+                         later changed to 'major', this object will show
+                         'major'."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 7 }
+
+    aviatIetfAlarmShelvedAlarmsAlarmText    OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The last reported alarm text."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 8 }
+
+    aviatIetfAlarmShelvedAlarmsEventType    OBJECT-TYPE
+        SYNTAX          IANAItuEventType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The X.733/X.736 event type for this alarm."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 9 }
+
+    aviatIetfAlarmShelvedAlarmsProbableCause    OBJECT-TYPE
+        SYNTAX          IANAItuProbableCause
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The X.733 probable cause for this alarm."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 10 }
+
+    aviatIetfAlarmShelvedAlarmsProbableCauseString  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The user friendly string matching the value of
+                         aviatIetfAlarmShelvedAlarmsProbableCause. The string
+                         SHOULD match the X.733 enumeration."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 11 }
+
+    aviatIetfAlarmShelvedAlarmsTrendIndication  OBJECT-TYPE
+        SYNTAX          ItuTrendIndication
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This parameter specifies the current severity trend of
+                         the resource. If present it indicates that there are
+                         one or more alarms ('outstanding alarms') which have
+                         not been cleared, and pertain to the same resource as
+                         that to which this alarm ('current alarm') pertains.
+                         The possible values are:
+
+                         more-severe: The Perceived severity in the current
+                         alarm is higher (more severe) than that reported in
+                         any of the outstanding alarms.
+
+                         no-change: The Perceived severity reported in the
+                         current alarm is the same as the highest (most severe)
+                         of any of the outstanding alarms.
+
+                         less-severe: There is at least one outstanding alarm
+                         of a severity higher (more severe) than that in the
+                         current alarm."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 12 }
+
+    aviatIetfAlarmShelvedAlarmsObservedValue    OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The observed value of the monitored resource when this
+                         entry was created. The measured units are specific to
+                         the resource."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 13 }
+
+    aviatIetfAlarmShelvedAlarmsThresholdType OBJECT-TYPE
+        SYNTAX          AviatIetfAlarmEntryThresholdType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The type of threshold that was crossed when this
+                         shelved alarm entry was created (upper, lower or
+                         none)."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 14 }
+
+    aviatIetfAlarmShelvedAlarmsRaiseThresholdValue   OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object depends on the value of
+                         aviatIetfAlarmShelvedAlarmsThresholdType as follows:
+
+                         upperThreshold = the highest acceptable value of the
+                                          monitored resource. If this threshold
+                                          is crossed an alarm will be raised.
+
+                         lowerThreshold = the lowest acceptable value of the
+                                          monitored resource. If this threshold
+                                          is crossed an alarm will be raised.
+
+                         noThresholdAssociation = this object has no meaning.
+
+                         The value is effectively part of a scale and measured
+                         units are not specified for the monitored resource."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 15 }
+
+    aviatIetfAlarmShelvedAlarmsClearThresholdValue   OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object depends on the value of
+                         aviatIetfAlarmShelvedAlarmsThresholdType as follows:
+
+                         upperThreshold = the highest acceptable value of the
+                                          monitored resource to enable an alarm
+                                          for it to be cleared once it has been
+                                          raised.
+
+                         lowerThreshold = the lowest acceptable value of the
+                                          monitored resource to enable an alarm
+                                          for it to be cleared once it has been
+                                          raised.
+
+                         noThresholdAssociation = this object has no meaning.
+
+                         The value is effectively part of a scale and measured
+                         units are not specified for the monitored resource."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 16 }
+
+    aviatIetfAlarmShelvedAlarmsLastClearedTime  OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time at which the system last started monitoring
+                         the resource for an alarm condition."
+            ::= { aviatIetfAlarmShelvedAlarmsEntry 17 }
+
+
+-- ****************************************************************************
+-- Aviat IETF Alarm Shelved Alarms Status History Table
+-- ****************************************************************************
+    aviatIetfAlarmShelvedAlarmsStatusHistoryTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatIetfAlarmShelvedAlarmsStatusHistoryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A history of status change events for each shelved
+                         alarm."
+            ::= { aviatIetfAlarmShelvedAlarms 4 }
+
+    aviatIetfAlarmShelvedAlarmsStatusHistoryEntry   OBJECT-TYPE
+        SYNTAX          AviatIetfAlarmShelvedAlarmsStatusHistoryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Entries in this table are ordered according to the
+                         timestamps of shelved alarm state changes. The last
+                         item corresponds to the latest state change.
+
+                         The following state changes create an entry in this
+                         list:
+                           - changed severity level (warning, minor, major,
+                             critical)
+                           - clearance status of the alarm
+                           - an alarm text update."
+        INDEX           { aviatIetfAlarmShelvedAlarmsStatusHistoryResource,
+                          aviatIetfAlarmShelvedAlarmsStatusHistoryAlarmTypeId,
+                          aviatIetfAlarmShelvedAlarmsStatusHistoryAlarmTypeQualifier,
+                          aviatIetfAlarmShelvedAlarmsStatusHistoryChangeHighEpoch,
+                          aviatIetfAlarmShelvedAlarmsStatusHistoryChangeLowEpoch }
+            ::= { aviatIetfAlarmShelvedAlarmsStatusHistoryTable 1 }
+
+    AviatIetfAlarmShelvedAlarmsStatusHistoryEntry ::=
+        SEQUENCE {
+            aviatIetfAlarmShelvedAlarmsStatusHistoryResource
+                DisplayString,
+            aviatIetfAlarmShelvedAlarmsStatusHistoryAlarmTypeId
+                DisplayString,
+            aviatIetfAlarmShelvedAlarmsStatusHistoryAlarmTypeQualifier
+                DisplayString,
+            aviatIetfAlarmShelvedAlarmsStatusHistoryChangeHighEpoch
+                Gauge32,
+            aviatIetfAlarmShelvedAlarmsStatusHistoryChangeLowEpoch
+                Gauge32,
+            aviatIetfAlarmShelvedAlarmsStatusHistoryChangeTimestamp
+                DateAndTime,
+            aviatIetfAlarmShelvedAlarmsStatusHistoryPerceivedSeverity
+                ItuPerceivedSeverity,
+            aviatIetfAlarmShelvedAlarmsStatusHistoryAlarmText
+                DisplayString
+        }
+
+    aviatIetfAlarmShelvedAlarmsStatusHistoryResource    OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The resource on which the shelved alarm changed state.
+                         This could for example be a reference to the alarming
+                         interface."
+            ::= { aviatIetfAlarmShelvedAlarmsStatusHistoryEntry 1 }
+
+    aviatIetfAlarmShelvedAlarmsStatusHistoryAlarmTypeId OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An identifier for the alarm type for this shelved
+                         alarm status history entry."
+            ::= { aviatIetfAlarmShelvedAlarmsStatusHistoryEntry 2 }
+
+    aviatIetfAlarmShelvedAlarmsStatusHistoryAlarmTypeQualifier  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A secondary identifier for the alarm type which
+                         together with
+                         aviatIetfAlarmShelvedAlarmsStatusHistoryAlarmTypeId
+                         uniquely identifies the specific alarm type that this
+                         shelved alarm status change entry relates to."
+            ::= { aviatIetfAlarmShelvedAlarmsStatusHistoryEntry 3 }
+
+    aviatIetfAlarmShelvedAlarmsStatusHistoryChangeHighEpoch OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The high 32-bits of the epoch time when this status
+                         change occurred."
+            ::= { aviatIetfAlarmShelvedAlarmsStatusHistoryEntry 4 }
+
+    aviatIetfAlarmShelvedAlarmsStatusHistoryChangeLowEpoch  OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The low 32-bits of the epoch time when this status
+                         change occurred."
+            ::= { aviatIetfAlarmShelvedAlarmsStatusHistoryEntry 5 }
+
+    aviatIetfAlarmShelvedAlarmsStatusHistoryChangeTimestamp OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time-stamp when this status change occurred."
+            ::= { aviatIetfAlarmShelvedAlarmsStatusHistoryEntry 6 }
+
+    aviatIetfAlarmShelvedAlarmsStatusHistoryPerceivedSeverity   OBJECT-TYPE
+        SYNTAX          ItuPerceivedSeverity
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The severity level of the alarm when this status
+                         change event occurred."
+            ::= { aviatIetfAlarmShelvedAlarmsStatusHistoryEntry 7 }
+
+    aviatIetfAlarmShelvedAlarmsStatusHistoryAlarmText   OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The description of the alarm when this status change
+                         event occurred."
+            ::= { aviatIetfAlarmShelvedAlarmsStatusHistoryEntry 8 }
+
+
+-- ****************************************************************************
+-- Alarm Notification Objects
+-- ****************************************************************************
+    aviatIetfAlarmResource      OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The resource that is associated with this
+                         notification. Only used for the generation of
+                         notifications."
+            ::= { aviatIetfAlarmNotifications 1 }
+
+    aviatIetfAlarmTypeId        OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "An identifier for the alarm type that this
+                         notification relates to. Only used for the generation
+                         of notifications."
+            ::= { aviatIetfAlarmNotifications 2 }
+
+    aviatIetfAlarmTypeQualifier OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "A secondary identifier for the alarm type which
+                         together with aviatIetfAlarmTypeId uniquely identifies
+                         the specific alarm type that this notification relates
+                         to. Only used for the generation of notifications."
+            ::= { aviatIetfAlarmNotifications 3 }
+
+    aviatIetfAlarmLastStateChange   OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The timestamp when the alarm status was last changed.
+                         Only used for the generation of notifications."
+            ::= { aviatIetfAlarmNotifications 4 }
+
+    aviatIetfAlarmPerceivedSeverity OBJECT-TYPE
+        SYNTAX          ItuPerceivedSeverity
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The last severity level of the alarm. Only used for
+                         the generation of notifications."
+            ::= { aviatIetfAlarmNotifications 5 }
+
+    aviatIetfAlarmText  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The last reported alarm text. Only used for the
+                         generation of notifications."
+            ::= { aviatIetfAlarmNotifications 6 }
+
+    aviatIetfAlarmEventType OBJECT-TYPE
+        SYNTAX          IANAItuEventType
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The X.733/X.736 event type for this alarm. Only used
+                         for the generation of notifications."
+            ::= { aviatIetfAlarmNotifications 7 }
+
+    aviatIetfAlarmProbableCause OBJECT-TYPE
+        SYNTAX          IANAItuProbableCause
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The X.733 probable cause for this alarm. Only used for
+                         the generation of notifications."
+            ::= { aviatIetfAlarmNotifications 8 }
+
+    aviatIetfAlarmProbableCauseString   OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The user friendly string matching the value of
+                         aviatIetfAlarmListProbableCause. Only used for the
+                         generation of notifications."
+            ::= { aviatIetfAlarmNotifications 9 }
+
+    aviatIetfAlarmTrendIndication   OBJECT-TYPE
+        SYNTAX          ItuTrendIndication
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The current severity trend of the resource. Only used
+                         for the generation of notifications."
+            ::= { aviatIetfAlarmNotifications 10 }
+
+    aviatIetfAlarmObservedValue OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The observed value of the monitored resource when this
+                         event occurred. The measured units are specific to the
+                         resource. Only used for the generation of
+                         notifications."
+            ::= { aviatIetfAlarmNotifications 11 }
+
+    aviatIetfAlarmThresholdType OBJECT-TYPE
+        SYNTAX          AviatIetfAlarmEntryThresholdType
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The type of threshold that was crossed when this alarm
+                         was created (upper, lower or none). Only used for the
+                         generation of notifications."
+            ::= { aviatIetfAlarmNotifications 12 }
+
+    aviatIetfAlarmRaiseThresholdValue   OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "This object depends on the value of
+                         aviatIetfAlarmThresholdType as follows:
+
+                         upperThreshold = the highest acceptable value of the
+                                          monitored resource. If this threshold
+                                          is crossed an alarm will be raised.
+
+                         lowerThreshold = the lowest acceptable value of the
+                                          monitored resource. If this threshold
+                                          is crossed an alarm will be raised.
+
+                         noThresholdAssociation = this object has no meaning.
+
+                         The value is effectively part of a scale and measured
+                         units are not specified for the monitored resource.
+                         Only used for the generation of notifications."
+            ::= { aviatIetfAlarmNotifications 13 }
+
+    aviatIetfAlarmClearThresholdValue   OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "This object depends on the value of
+                         aviatIetfAlarmThresholdType as follows:
+
+                         upperThreshold = the highest acceptable value of the
+                                          monitored resource to enable an alarm
+                                          for it to be cleared once it has been
+                                          raised.
+
+                         lowerThreshold = the lowest acceptable value of the
+                                          monitored resource to enable an alarm
+                                          for it to be cleared once it has been
+                                          raised.
+
+                         noThresholdAssociation = this object has no meaning.
+
+                         The value is effectively part of a scale and measured
+                         units are not specified for the monitored resource.
+                         Only used for the generation of notifications."
+            ::= { aviatIetfAlarmNotifications 14 }
+
+    aviatIetfAlarmLastClearedTime   OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The time at which the system last started monitoring
+                         the resource for an alarm condition. Only used for the
+                         generation of notifications."
+            ::= { aviatIetfAlarmNotifications 15 }
+
+   aviatIetfAlarmResources OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "Optionally, a comma separated list of resources that
+                         the alarm type is valid for. Only used for the
+                         generation of notifications."
+            ::= { aviatIetfAlarmNotifications 16 }
+
+   aviatIetfAlarmHasClear  OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "Indicates whether or not this alarm will be cleared if
+                         appropriate corrective action is taken. Only used for
+                         the generation of notifications."
+            ::= { aviatIetfAlarmNotifications 17 }
+
+   aviatIetfAlarmSeverityLevels    OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "A comma separated list of possible
+                         ItuPerceivedSeverity severity levels for this alarm
+                         type (excluding 'cleared'). Only used for the
+                         generation of notifications."
+            ::= { aviatIetfAlarmNotifications 18 }
+
+   aviatIetfAlarmDescription   OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "A description of the possible alarm. Only used for the
+                         generation of notifications."
+            ::= { aviatIetfAlarmNotifications 19 }
+
+
+-- ****************************************************************************
+-- Notification Events
+-- ****************************************************************************
+    aviatIetfAlarmNotification  NOTIFICATION-TYPE
+        OBJECTS {
+            aviatIetfAlarmResource,
+            aviatIetfAlarmTypeId,
+            aviatIetfAlarmTypeQualifier,
+            aviatIetfAlarmLastStateChange,
+            aviatIetfAlarmPerceivedSeverity,
+            aviatIetfAlarmText,
+            aviatIetfAlarmEventType,
+            aviatIetfAlarmProbableCause,
+            aviatIetfAlarmProbableCauseString,
+            aviatIetfAlarmTrendIndication,
+            aviatIetfAlarmObservedValue,
+            aviatIetfAlarmThresholdType,
+            aviatIetfAlarmRaiseThresholdValue,
+            aviatIetfAlarmClearThresholdValue,
+            aviatIetfAlarmLastClearedTime
+        }
+        STATUS          current
+        DESCRIPTION     "This notification is used to report a state change for
+                         an alarm (i.e. an alarm instance has been raised or
+                         cleared). Notifications are not sent for shelved
+                         alarms."
+            ::= { aviatIetfAlarmMIBEvents 1 }
+
+    aviatIetfAlarmInventoryChangedNotification  NOTIFICATION-TYPE
+        OBJECTS {
+            aviatIetfAlarmTypeId,
+            aviatIetfAlarmTypeQualifier,
+            aviatIetfAlarmResources,
+            aviatIetfAlarmHasClear,
+            aviatIetfAlarmSeverityLevels,
+            aviatIetfAlarmDescription
+        }
+        STATUS          current
+        DESCRIPTION     "This notification is used to report that the list of
+                         possible alarms has changed. This can happen when for
+                         example if a new software module is installed, or a
+                         new physical card is inserted."
+            ::= { aviatIetfAlarmMIBEvents 2 }
+
+
+-- ****************************************************************************
+-- The Object and Event Groups
+-- ****************************************************************************
+    aviatIetfAlarmObjectGroup   OBJECT-GROUP
+        OBJECTS {
+            aviatIetfMaxAlarmStatusChanges,
+            aviatIetfAlarmNotificationControl,
+            aviatIetfAlarmShelvingControlResource,
+            aviatIetfAlarmShelvingControlAlarmTypeId,
+            aviatIetfAlarmShelvingControlAlarmTypeQualifierMatch,
+            aviatIetfAlarmShelvingControlDescription,
+            aviatIetfAlarmInventoryAlarmResources,
+            aviatIetfAlarmInventoryAlarmHasClear,
+            aviatIetfAlarmInventoryAlarmSeverityLevels,
+            aviatIetfAlarmInventoryAlarmDescription,
+            aviatIetfAlarmInventoryAlarmEventType,
+            aviatIetfAlarmInventoryAlarmProbableCause,
+            aviatIetfAlarmInventoryAlarmProbableCauseString,
+            aviatIetfAlarmSummaryShelvesAreActive,
+            aviatIetfAlarmSummaryTotalAlarms,
+            aviatIetfAlarmSummaryClearedAlarms,
+            aviatIetfAlarmListNumberOfAlarms,
+            aviatIetfAlarmListLastChanged,
+            aviatIetfAlarmListTimeCreated,
+            aviatIetfAlarmListIsCleared,
+            aviatIetfAlarmListLastStateChange,
+            aviatIetfAlarmListPerceivedSeverity,
+            aviatIetfAlarmListAlarmText,
+            aviatIetfAlarmListEventType,
+            aviatIetfAlarmListProbableCause,
+            aviatIetfAlarmListProbableCauseString,
+            aviatIetfAlarmListTrendIndication,
+            aviatIetfAlarmListObservedValue,
+            aviatIetfAlarmListThresholdType,
+            aviatIetfAlarmListRaiseThresholdValue,
+            aviatIetfAlarmListClearThresholdValue,
+            aviatIetfAlarmListLastClearedTime,
+            aviatIetfAlarmStatusHistoryChangeTimestamp,
+            aviatIetfAlarmStatusHistoryPerceivedSeverity,
+            aviatIetfAlarmStatusHistoryAlarmText,
+            aviatIetfAlarmNumberOfShelvedAlarms,
+            aviatIetfAlarmsShelvedAlarmsLastChanged,
+            aviatIetfAlarmShelvedAlarmsShelfName,
+            aviatIetfAlarmShelvedAlarmsIsCleared,
+            aviatIetfAlarmShelvedAlarmsLastChanged,
+            aviatIetfAlarmShelvedAlarmsPerceivedSeverity,
+            aviatIetfAlarmShelvedAlarmsAlarmText,
+            aviatIetfAlarmShelvedAlarmsEventType,
+            aviatIetfAlarmShelvedAlarmsProbableCause,
+            aviatIetfAlarmShelvedAlarmsProbableCauseString,
+            aviatIetfAlarmShelvedAlarmsTrendIndication,
+            aviatIetfAlarmShelvedAlarmsObservedValue,
+            aviatIetfAlarmShelvedAlarmsThresholdType,
+            aviatIetfAlarmShelvedAlarmsRaiseThresholdValue,
+            aviatIetfAlarmShelvedAlarmsClearThresholdValue,
+            aviatIetfAlarmShelvedAlarmsLastClearedTime,
+            aviatIetfAlarmShelvedAlarmsStatusHistoryChangeTimestamp,
+            aviatIetfAlarmShelvedAlarmsStatusHistoryPerceivedSeverity,
+            aviatIetfAlarmShelvedAlarmsStatusHistoryAlarmText,
+            aviatIetfAlarmResource,
+            aviatIetfAlarmTypeId,
+            aviatIetfAlarmTypeQualifier,
+            aviatIetfAlarmLastStateChange,
+            aviatIetfAlarmPerceivedSeverity,
+            aviatIetfAlarmText,
+            aviatIetfAlarmEventType,
+            aviatIetfAlarmProbableCause,
+            aviatIetfAlarmProbableCauseString,
+            aviatIetfAlarmTrendIndication,
+            aviatIetfAlarmObservedValue,
+            aviatIetfAlarmThresholdType,
+            aviatIetfAlarmRaiseThresholdValue,
+            aviatIetfAlarmClearThresholdValue,
+            aviatIetfAlarmLastClearedTime,
+            aviatIetfAlarmResources,
+            aviatIetfAlarmHasClear,
+            aviatIetfAlarmSeverityLevels,
+            aviatIetfAlarmDescription
+        }
+        STATUS          current
+        DESCRIPTION     "Generic objects defined in this MIB."
+            ::= { aviatIetfAlarmGroups 1 }
+
+
+    aviatIetfAlarmNotifyGroup   NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            aviatIetfAlarmNotification,
+            aviatIetfAlarmInventoryChangedNotification
+        }
+        STATUS          current
+        DESCRIPTION     "Generic notifications defined in this MIB."
+            ::= { aviatIetfAlarmGroups 2 }
+
+
+-- ****************************************************************************
+-- The Compliance Specifications
+-- ****************************************************************************
+    aviatIetfAlarmComplV1       MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION     "The implementation requirements for this MIB."
+        MODULE          -- This module
+            MANDATORY-GROUPS    {
+                                    aviatIetfAlarmObjectGroup,
+                                    aviatIetfAlarmNotifyGroup
+                                }
+            ::= { aviatIetfAlarmCompliance 1 }
+
+END
