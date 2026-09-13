@@ -8,11 +8,11 @@ TEXTUAL-CONVENTION, DisplayString, MacAddress, TruthValue, DateAndTime FROM SNMP
 OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF;
 
 mikrotikExperimentalModule MODULE-IDENTITY
-  LAST-UPDATED "202505190000Z"
+  LAST-UPDATED "202607070000Z"
   ORGANIZATION "MikroTik"
   CONTACT-INFO "support@mikrotik.com"
   DESCRIPTION ""
-  REVISION "202505190000Z"
+  REVISION "202607070000Z"
   DESCRIPTION ""
   ::= { mikrotik 1 }
 
@@ -95,6 +95,12 @@ GDiv1000 ::= TEXTUAL-CONVENTION
     STATUS current
     DESCRIPTION "/1000"
     SYNTAX Gauge32
+
+IDiv10 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS current
+    DESCRIPTION "/10"
+    SYNTAX Integer32 (-2147483648..2147483647)
 
 IDiv1000 ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d-3"
@@ -1732,6 +1738,20 @@ mtxrHotspotActiveUserBlockedByAdvert OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrHotspotActiveUsersTableEntry 20 }
 
+mtxrHotspotActiveUserCount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of active (logged-in) HotSpot clients"
+    ::= { mtxrHotspot 2 }
+
+mtxrHotspotHostCount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of HotSpot hosts"
+    ::= { mtxrHotspot 3 }
+
 mtxrHotspotActiveUserGroup OBJECT-GROUP OBJECTS {
 	mtxrHotspotActiveUserServerID,
 	mtxrHotspotActiveUserName,
@@ -1756,6 +1776,14 @@ mtxrHotspotActiveUserGroup OBJECT-GROUP OBJECTS {
     STATUS current
     DESCRIPTION ""
     ::= { mtXRouterOsGroups 5 }
+
+mtxrHotspotCountGroup OBJECT-GROUP OBJECTS {
+	mtxrHotspotActiveUserCount,
+	mtxrHotspotHostCount
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 26 }
 
 -- DHCP ********************************************************************
 
@@ -3076,7 +3104,18 @@ MtxrLTEModemEntry ::= SEQUENCE {
     mtxrLTEModemIMEI DisplayString,
     mtxrLTEModemIMSI DisplayString,
     mtxrLTEModemUICC DisplayString,
-    mtxrLTEModemRAT DisplayString
+    mtxrLTEModemRAT DisplayString,
+    mtxrLTEModemPrimaryBand DisplayString,
+    mtxrLTEModemSessionUptime TimeTicks,
+    mtxrLTEModemRegStatus DisplayString,
+    mtxrLTEModemPinStatus DisplayString,
+    mtxrLTEModemModel DisplayString,
+    mtxrLTEModemFirmware DisplayString,
+    mtxrLTEModemCQI Integer32,
+    mtxrLTEModemNrRSRP Integer32,
+    mtxrLTEModemNrRSRQ IDiv10,
+    mtxrLTEModemNrSINR Integer32,
+    mtxrLTEModemSignalRSRQD10 IDiv10
 }
 
 mtxrLTEModemInterfaceIndex OBJECT-TYPE
@@ -3096,7 +3135,7 @@ mtxrLTEModemSignalRSSI OBJECT-TYPE
 mtxrLTEModemSignalRSRQ OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
-    STATUS current
+    STATUS deprecated
     DESCRIPTION "dB"
     ::= { mtxrLTEModemEntry 3 }
 
@@ -3189,6 +3228,83 @@ mtxrLTEModemRAT OBJECT-TYPE
     DESCRIPTION ""
     ::= { mtxrLTEModemEntry 14 }
 
+mtxrLTEModemPrimaryBand OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 15 }
+
+mtxrLTEModemSessionUptime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 16 }
+
+mtxrLTEModemRegStatus OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 17 }
+
+mtxrLTEModemPinStatus OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 18 }
+
+mtxrLTEModemModel OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 19 }
+
+mtxrLTEModemFirmware OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 20 }
+
+mtxrLTEModemCQI OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 21 }
+
+mtxrLTEModemNrRSRP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 22 }
+
+mtxrLTEModemNrRSRQ OBJECT-TYPE
+    SYNTAX IDiv10
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 23 }
+
+mtxrLTEModemNrSINR OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 24 }
+
+mtxrLTEModemSignalRSRQD10 OBJECT-TYPE
+    SYNTAX IDiv10
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTEModemEntry 25 }
+
 mtxrLTEModemGroup OBJECT-GROUP OBJECTS {
         mtxrLTEModemSignalRSSI,
         mtxrLTEModemSignalRSRQ,
@@ -3202,11 +3318,237 @@ mtxrLTEModemGroup OBJECT-GROUP OBJECTS {
         mtxrLTEModemIMEI,
         mtxrLTEModemIMSI,
         mtxrLTEModemUICC,
-        mtxrLTEModemRAT
+        mtxrLTEModemRAT,
+        mtxrLTEModemPrimaryBand,
+        mtxrLTEModemSessionUptime,
+        mtxrLTEModemRegStatus,
+        mtxrLTEModemPinStatus,
+        mtxrLTEModemModel,
+        mtxrLTEModemFirmware,
+        mtxrLTEModemCQI,
+        mtxrLTEModemNrRSRP,
+        mtxrLTEModemNrRSRQ,
+        mtxrLTEModemNrSINR,
+        mtxrLTEModemSignalRSRQD10
     }
     STATUS current
     DESCRIPTION ""
     ::= { mtXRouterOsGroups 19 }
+
+mtxrLTECarrierAgg OBJECT IDENTIFIER ::= { mtxrLTEModem 2 }
+
+mtxrLTECarrierAggTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MtxrLTECarrierAggEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTECarrierAgg 1 }
+
+mtxrLTECarrierAggEntry OBJECT-TYPE
+    SYNTAX MtxrLTECarrierAggEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX {
+        mtxrLTECarrierAggInterfaceIndex,
+        mtxrLTECarrierAggIndex
+    }
+    ::= { mtxrLTECarrierAggTable 1 }
+
+MtxrLTECarrierAggEntry ::= SEQUENCE {
+    mtxrLTECarrierAggInterfaceIndex ObjectIndex,
+    mtxrLTECarrierAggIndex ObjectIndex,
+    mtxrLTECarrierAggBand Integer32,
+    mtxrLTECarrierAggEARFCN Integer32,
+    mtxrLTECarrierAggBandwidth Integer32,
+    mtxrLTECarrierAggPhyCellId Integer32,
+    mtxrLTECarrierAggRSSI Integer32,
+    mtxrLTECarrierAggRSRP Integer32,
+    mtxrLTECarrierAggRSRQ IDiv10,
+    mtxrLTECarrierAggSINR Integer32,
+    mtxrLTECarrierAggSNR Integer32,
+    mtxrLTECarrierAggNR TruthValue,
+    mtxrLTECarrierAggUplink TruthValue
+}
+
+mtxrLTECarrierAggInterfaceIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTECarrierAggEntry 1 }
+
+mtxrLTECarrierAggIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTECarrierAggEntry 2 }
+
+mtxrLTECarrierAggBand OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTECarrierAggEntry 3 }
+
+mtxrLTECarrierAggEARFCN OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTECarrierAggEntry 4 }
+
+mtxrLTECarrierAggBandwidth OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "MHz"
+    ::= { mtxrLTECarrierAggEntry 5 }
+
+mtxrLTECarrierAggPhyCellId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTECarrierAggEntry 6 }
+
+mtxrLTECarrierAggRSSI OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "dBm"
+    ::= { mtxrLTECarrierAggEntry 7 }
+
+mtxrLTECarrierAggRSRP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "dBm"
+    ::= { mtxrLTECarrierAggEntry 8 }
+
+mtxrLTECarrierAggRSRQ OBJECT-TYPE
+    SYNTAX IDiv10
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "dB"
+    ::= { mtxrLTECarrierAggEntry 9 }
+
+mtxrLTECarrierAggSINR OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "dB"
+    ::= { mtxrLTECarrierAggEntry 10 }
+
+mtxrLTECarrierAggSNR OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "dB"
+    ::= { mtxrLTECarrierAggEntry 11 }
+
+mtxrLTECarrierAggNR OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTECarrierAggEntry 12 }
+
+mtxrLTECarrierAggUplink OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrLTECarrierAggEntry 13 }
+
+mtxrLTECarrierAggGroup OBJECT-GROUP
+    OBJECTS {
+        mtxrLTECarrierAggBand,
+        mtxrLTECarrierAggEARFCN,
+        mtxrLTECarrierAggBandwidth,
+        mtxrLTECarrierAggPhyCellId,
+        mtxrLTECarrierAggRSSI,
+        mtxrLTECarrierAggRSRP,
+        mtxrLTECarrierAggRSRQ,
+        mtxrLTECarrierAggSINR,
+        mtxrLTECarrierAggSNR,
+        mtxrLTECarrierAggNR,
+        mtxrLTECarrierAggUplink
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 22 }
+
+
+-- LTE Modem Firmware ************************************************************
+
+mtxrLteFirmware OBJECT IDENTIFIER ::= { mtxrLTEModem 3 }
+
+mtxrLteFirmwareInstalledVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Firmware version currently installed on the LTE modem."
+    ::= { mtxrLteFirmware 1 }
+
+mtxrLteFirmwareLatestVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Latest firmware version available for the LTE modem,
+         as determined by the most recent successful version check."
+    ::= { mtxrLteFirmware 2 }
+
+
+mtxrLteFirmwareStatus OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { mtxrLteFirmware 3 }
+
+mtxrLteFirmwareLastChecked OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds since 1970 (epoch)"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unix epoch timestamp indicating when the firmware version
+         was last successfully checked online."
+    ::= { mtxrLteFirmware 4 }
+
+mtxrLteFirmwareCheckTrigger OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Write the LTE modem device ID to this object to initiate firmware version check for that modem."
+    ::= { mtxrLteFirmware 5 }
+
+mtxrLteFirmwareInstallTrigger OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Write the LTE modem device ID to this object to initiate firmware upgrade for that modem."
+    ::= { mtxrLteFirmware 6 }
+
+mtxrLteFirmwareGroup OBJECT-GROUP
+    OBJECTS {
+        mtxrLteFirmwareInstalledVersion,
+        mtxrLteFirmwareLatestVersion,
+        mtxrLteFirmwareStatus,
+        mtxrLteFirmwareLastChecked,
+        mtxrLteFirmwareCheckTrigger,
+        mtxrLteFirmwareInstallTrigger
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 24 }
+
 
 -- Partition ************************************************************
 
@@ -3316,7 +3658,13 @@ MtxrOpticalTableEntry ::= SEQUENCE {
         mtxrOpticalTxPower IDiv1000,
         mtxrOpticalRxPower IDiv1000,
         mtxrOpticalVendorName DisplayString,
-        mtxrOpticalVendorSerial DisplayString
+        mtxrOpticalVendorSerial DisplayString,
+        mtxrOpticalModulePresent BoolValue,
+        mtxrOpticalVendorPartNumber DisplayString,
+        mtxrOpticalType INTEGER,
+        mtxrOpticalConnectorType INTEGER,
+        mtxrOpticalLinkLengthCopperOM4 Gauge32,
+        mtxrOpticalSupportedRates DisplayString
 
 }
 
@@ -3331,7 +3679,13 @@ mtxrOpticalGroup OBJECT-GROUP OBJECTS {
         mtxrOpticalTxPower,
         mtxrOpticalRxPower,
         mtxrOpticalVendorName,
-        mtxrOpticalVendorSerial
+        mtxrOpticalVendorSerial,
+        mtxrOpticalModulePresent,
+        mtxrOpticalVendorPartNumber,
+        mtxrOpticalType,
+        mtxrOpticalConnectorType,
+        mtxrOpticalLinkLengthCopperOM4,
+        mtxrOpticalSupportedRates
     }
     STATUS current
     DESCRIPTION ""
@@ -3426,6 +3780,73 @@ mtxrOpticalVendorSerial OBJECT-TYPE
     STATUS current
     DESCRIPTION ""
     ::= { mtxrOpticalTableEntry 12 }
+
+mtxrOpticalModulePresent OBJECT-TYPE
+    SYNTAX BoolValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether a transceiver module is inserted in the cage"
+    ::= { mtxrOpticalTableEntry 13 }
+
+mtxrOpticalVendorPartNumber OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Vendor part number of the transceiver module"
+    ::= { mtxrOpticalTableEntry 14 }
+
+mtxrOpticalType OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(0),
+        gbic(1),
+        soldered(2),
+        sfp(3),
+        dwdmSfp(11),
+        qsfp(12),
+        qsfpPlus(13),
+        qsfp28(17),
+        qsfpDD(24),
+        qsfpCmis(30)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Transceiver module type, SFF-8024 identifier value"
+    ::= { mtxrOpticalTableEntry 15 }
+
+mtxrOpticalConnectorType OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(0),
+        sc(1),
+        lc(7),
+        opticalPigtail(11),
+        mpo1x12(12),
+        mpo2x16(13),
+        hssdc2(32),
+        copperPigtail(33),
+        rj45(34),
+        noSeparableConnector(35),
+        mpo2x12(39),
+        mpo1x16(40)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Transceiver connector type, SFF-8024 connector value"
+    ::= { mtxrOpticalTableEntry 16 }
+
+mtxrOpticalLinkLengthCopperOM4 OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "m"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Supported link length for copper cable or OM4 fiber"
+    ::= { mtxrOpticalTableEntry 17 }
+
+mtxrOpticalSupportedRates OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Comma separated list of link rates supported by the module"
+    ::= { mtxrOpticalTableEntry 18 }
 
 -- IPSec *****************************************************************
 
@@ -4109,7 +4530,8 @@ MtxrWifiInterfacesEntry ::= SEQUENCE {
     mtxrWifiInterfacesId             ObjectIndex,
     mtxrWifiInterfacesName           DisplayString,
     mtxrWifiInterfacesSsid           DisplayString,
-    mtxrWifiInterfacesFreq           DisplayString
+    mtxrWifiInterfacesFreq           DisplayString,
+    mtxrWifiInterfacesCurrentChannel DisplayString
 }
 
 mtxrWifiInterfacesId OBJECT-TYPE
@@ -4140,6 +4562,13 @@ mtxrWifiInterfacesFreq OBJECT-TYPE
     DESCRIPTION "Frequency used by the WiFi interface"
     ::= { mtxrWifiInterfacesEntry 4 }
 
+mtxrWifiInterfacesCurrentChannel OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Channel currently in use by the WiFi interface. Empty when the interface is not running"
+    ::= { mtxrWifiInterfacesEntry 5 }
+
 -- TRAPS **********************************************************************
 
 mtxrNotifications OBJECT IDENTIFIER ::= { mtxrTraps 0 }
@@ -4164,30 +4593,27 @@ mtxrTrapGroup NOTIFICATION-GROUP NOTIFICATIONS {
 
 -- Connection Tracking ********************************************************
 
-mtxrCTStats OBJECT IDENTIFIER ::= { mtxrCT 1 }
-
 mtxrCtTotalEntries OBJECT-TYPE
     SYNTAX Counter32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Total number of connections"
-    ::= { mtxrCTStats 1 }
+    ::= { mtxrCT 1 }
 
 mtxrCtIP4Entries OBJECT-TYPE
     SYNTAX Counter32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Total number of ipv4 connections"
-    ::= { mtxrCTStats 2 }
+    ::= { mtxrCT 2 }
 
 mtxrCtIP6Entries OBJECT-TYPE
     SYNTAX Counter32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Total number of ipv6 connections"
-    ::= { mtxrCTStats 3 }
+    ::= { mtxrCT 3 }
 
 -- ***************************************************************************
 
 END
-

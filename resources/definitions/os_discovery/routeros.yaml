@@ -22,6 +22,16 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
                     index: 'mtxrOpticalTemperature.{{ $index }}'
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrOpticalModulePresent
+                            op: '='
+                            value: 'false'
+                        -   oid: MIKROTIK-MIB::mtxrOpticalModulePresent
+                            op: '='
+                            value: 0
+                        -   oid: MIKROTIK-MIB::mtxrOpticalSupplyVoltage
+                            op: '<='
+                            value: 0
                 -
                     oid: MIKROTIK-MIB::mtxrGaugeTable
                     value: MIKROTIK-MIB::mtxrGaugeValue
@@ -45,6 +55,16 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
                     index: 'mtxrOpticalSupplyVoltage.{{ $index }}'
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrOpticalModulePresent
+                            op: '='
+                            value: 'false'
+                        -   oid: MIKROTIK-MIB::mtxrOpticalModulePresent
+                            op: '='
+                            value: 0
+                        -   oid: MIKROTIK-MIB::mtxrOpticalSupplyVoltage
+                            op: '<='
+                            value: 0
                 -
                     oid: MIKROTIK-MIB::mtxrPOETable
                     value: MIKROTIK-MIB::mtxrPOEVoltage
@@ -82,6 +102,16 @@ modules:
                     group: transceiver
                     divisor: 1000
                     index: 'mtxrOpticalTxBiasCurrent.{{ $index }}'
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrOpticalModulePresent
+                            op: '='
+                            value: 'false'
+                        -   oid: MIKROTIK-MIB::mtxrOpticalModulePresent
+                            op: '='
+                            value: 0
+                        -   oid: MIKROTIK-MIB::mtxrOpticalSupplyVoltage
+                            op: '<='
+                            value: 0
                 -
                     oid: MIKROTIK-MIB::mtxrPOETable
                     value: MIKROTIK-MIB::mtxrPOECurrent
@@ -115,6 +145,16 @@ modules:
                     group: transceiver
                     divisor: 1000
                     index: 'mtxrOpticalTxPower.{{ $index }}'
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrOpticalModulePresent
+                            op: '='
+                            value: 'false'
+                        -   oid: MIKROTIK-MIB::mtxrOpticalModulePresent
+                            op: '='
+                            value: 0
+                        -   oid: MIKROTIK-MIB::mtxrOpticalSupplyVoltage
+                            op: '<='
+                            value: 0
                 -
                     oid: MIKROTIK-MIB::mtxrOpticalTable
                     value: MIKROTIK-MIB::mtxrOpticalRxPower
@@ -125,6 +165,16 @@ modules:
                     group: transceiver
                     divisor: 1000
                     index: 'mtxrOpticalRxPower.{{ $index }}'
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrOpticalModulePresent
+                            op: '='
+                            value: 'false'
+                        -   oid: MIKROTIK-MIB::mtxrOpticalModulePresent
+                            op: '='
+                            value: 0
+                        -   oid: MIKROTIK-MIB::mtxrOpticalSupplyVoltage
+                            op: '<='
+                            value: 0
         state:
             data:
                 -

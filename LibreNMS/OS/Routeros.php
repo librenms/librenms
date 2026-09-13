@@ -55,8 +55,8 @@ use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\MikrotikTransceiver;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Util\Number;
 use SnmpQuery;
 
 class Routeros extends OS implements
@@ -78,6 +78,8 @@ class Routeros extends OS implements
     WirelessSinrDiscovery,
     WirelessQualityDiscovery
 {
+    use MikrotikTransceiver;
+
     private Collection $qosIdxToParent;
 
     /**
@@ -660,18 +662,19 @@ class Routeros extends OS implements
 
     public function discoverTransceivers(): Collection
     {
-        return \SnmpQuery::walk('MIKROTIK-MIB::mtxrOpticalTable')->mapTable(function ($data, $ifIndex) {
-            $wavelength = isset($data['MIKROTIK-MIB::mtxrOpticalWavelength']) && $data['MIKROTIK-MIB::mtxrOpticalWavelength'] != '.00' ? Number::cast($data['MIKROTIK-MIB::mtxrOpticalWavelength']) : null;
+        return \SnmpQuery::enumStrings()->walk('MIKROTIK-MIB::mtxrOpticalTable')->mapTable(function ($data, $ifIndex) {
+            $transceiver = $this->parseMikrotikTransceiver($data);
+            if ($transceiver === null) {
+                return null;
+            }
 
             return new Transceiver([
                 'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $ifIndex,
-                'vendor' => $data['MIKROTIK-MIB::mtxrOpticalVendorName'] ?? null,
-                'serial' => $data['MIKROTIK-MIB::mtxrOpticalVendorSerial'] ?? null,
-                'wavelength' => $wavelength == 65535 ? null : $wavelength, // NA value = 65535.00
                 'entity_physical_index' => $ifIndex,
+                ...$transceiver,
             ]);
-        });
+        })->filter();
     }
 
     public function discoverVlans(): Collection
