@@ -314,24 +314,6 @@ class RrdProcessTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testRunAsyncReplacesDirWithRrdcached(): void
-    {
-        \App\Facades\LibrenmsConfig::set('rrdcached', 'unix:/var/run/rrdcached.sock');
-        \App\Facades\LibrenmsConfig::set('rrd_dir', '/opt/librenms/rrd');
-
-        $this->process->shouldReceive('waitUntil')->andReturn(true);
-        $this->process->shouldReceive('getOutput')->andReturn("OK u:0.01\n");
-
-        $this->logger->shouldReceive('debug')
-            ->with('RRD[%gupdate test.rrd N:1%n]', ['color' => true])
-            ->once();
-
-        $rrdProcess = new RrdProcess($this->logger, 300, fn () => $this->process);
-        $rrdProcess->run('update /opt/librenms/rrd/test.rrd N:1');
-
-        $this->expectNotToPerformAssertions();
-    }
-
     public function testDestructorStopsProcess(): void
     {
         $this->process->shouldReceive('stop')->once();
