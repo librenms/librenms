@@ -41,7 +41,6 @@ require_once 'includes/html/modal/delete_service.inc.php';
                     'critical' => 'Critical',
                 ];
 
-
                 // The menu option - on the left
 
                 $sep = '';
@@ -163,6 +162,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
                         if ($service_iteration < 2 && $header) {
                             echo '<div class="panel panel-default">';
                             echo '<div class="panel-heading"><h3 class="panel-title">' . $devlink . '</h3>' . $device_sysName . '</div>';
+                            echo '<div class="table-responsive">';
                             echo '<table class="table table-hover table-condensed">';
                             echo '<thead>';
                             echo '<th style="width:1%;max-width:1%;"></th>';
@@ -170,8 +170,9 @@ require_once 'includes/html/modal/delete_service.inc.php';
                             echo '<th style="width:10%;max-width: 10%;">Check Type</th>';
                             echo '<th style="width:10%;max-width: 15%;">Remote Host</th>';
                             echo '<th >Message</th>';
-                            echo '<th style="width:16%;max-width: 25%;">Description</th>';
-                            echo '<th style="width:15%;max-width: 15%;">Last Changed</th>';
+                            echo '<th style="width:14%;max-width: 25%;">Description</th>';
+                            echo '<th style="width:12%;max-width: 15%;">Last Changed</th>';
+                            echo '<th style="width:12%;max-width: 15%;">' . __('Last Checked') . '</th>';
                             echo '<th style="width:2%;max-width: 2%;">Alert</th>';
                             echo '<th style="width:4%;max-width: 4%;">Status</th>';
                             echo '<th style="width:100px;max-width: 100px;"></th>';
@@ -187,7 +188,8 @@ require_once 'includes/html/modal/delete_service.inc.php';
                         echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_ip'], [])) . '</td>';
                         echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_message'], [])) . '</td>';
                         echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_desc'], [])) . '</td>';
-                        echo '<td>' . (isset($service['service_changed']) ? \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) : 'Waiting for first service check') . '</td>';
+                        echo '<td>' . ($service['service_changed'] ? \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) : __('No status change recorded')) . '</td>';
+                        echo '<td>' . ($service['service_checked'] ? \LibreNMS\Util\Time::formatInterval(time() - $service['service_checked']) : __('Not yet recorded')) . '</td>';
 
                         $service_checked = '';
                         $ico = 'pause';
@@ -231,6 +233,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
 
                         if ($service_iteration >= $services_count) {
                             echo '</table>';
+                            echo '</div>';
                             echo '</div>';
                         }
                     }
