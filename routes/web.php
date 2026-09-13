@@ -169,6 +169,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('overview', [OverviewController::class, 'index'])->name('overview');
     Route::get('/', [OverviewController::class, 'index'])->name('home');
     Route::get('vminfo', [VminfoController::class, 'index'])->name('vminfo.index');
+    Route::get('vminfo/export', [VminfoController::class, 'export'])->name('vminfo.export');
 
     Route::get('nac', [NacController::class, 'index']);
 
@@ -437,7 +438,6 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('wireless', Table\WirelessSensorController::class)->name('table.wireless');
             Route::post('vlan-ports', Table\VlanPortsController::class)->name('table.vlan-ports');
             Route::post('vlan-devices', Table\VlanDevicesController::class)->name('table.vlan-devices');
-            Route::get('vminfo/export', [Table\VminfoController::class, 'export'])->name('table.vminfo.export');
             Route::post('ssl-certificates', Table\SslCertificateController::class)->name('table.ssl-certificates');
         });
 

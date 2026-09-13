@@ -3,27 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vminfo;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class VminfoController extends Controller
 {
     public function index(Request $request): View
     {
         $this->authorize('viewAny', Vminfo::class);
-
-        $request->validate([
-            'page' => 'integer',
-            'perPage' => ['regex:/^(\d+|all)$/'],
-            ...Vminfo::filterValidationRules(),
-        ]);
+        $this->validateRequest($request);
 
         $perPage = $request->input('perPage', 50);
+        $query = Vminfo::listing($request->user(), null, $request->array('filter'));
+        $total = $query->toBase()->getCountForPagination();
 
         return view('vminfo.index', [
-            'vms' => self::paginate($request, null, $perPage),
+            'vms' => $query->paginate($perPage === 'all' ? max($total, 1) : (int) $perPage, total: $total)
+                ->appends($request->query()),
             'filterFields' => Vminfo::filterFieldDefinitions(),
             'filter' => $request->array('filter'),
             'perPage' => $perPage,
@@ -31,27 +28,61 @@ class VminfoController extends Controller
     }
 
     /**
-     * @return Builder<Vminfo>
+     * directly stream CSV to browser
      */
-    public static function getFilteredQuery(Request $request, ?int $deviceId = null): Builder
+    public function export(Request $request): StreamedResponse
     {
-        return Vminfo::hasAccess($request->user())
-            ->with(['device', 'parentDevice'])
-            ->when($deviceId, fn (Builder $q) => $q->where('vminfo.device_id', $deviceId))
-            ->when($request->array('filter'), fn (Builder $q, $filters) => $q->applyFilters($filters))
-            ->orderBy('vmwVmDisplayName')
-            ->select('vminfo.*');
+        $this->authorize('viewAny', Vminfo::class);
+        $this->validateRequest($request);
+
+        $query = Vminfo::listing($request->user(), $request->integer('device_id') ?: null, $request->array('filter'));
+        $perPage = $request->input('perPage', 50);
+
+        $rows = $request->input('export') === 'page' && $perPage !== 'all'
+            ? $query->forPage($request->integer('page') ?: 1, (int) $perPage ?: 50)->get()
+            : $query->lazy();
+
+        $headers = [
+            __('VM Name'),
+            __('Host'),
+            __('Sysname'),
+            __('Power Status'),
+            __('Type'),
+            __('Operating System'),
+            __('Memory'),
+            __('vCPUs'),
+        ];
+
+        return response()->streamDownload(function () use ($rows, $headers): void {
+            $output = fopen('php://output', 'w');
+            fwrite($output, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM so Excel reads UTF-8
+            fputcsv($output, $headers);
+
+            foreach ($rows as $vm) {
+                fputcsv($output, [
+                    $vm->parentDevice?->displayName() ?? $vm->vmwVmDisplayName,
+                    $vm->device?->displayName(),
+                    $vm->device?->sysName,
+                    $vm->stateLabel[0],
+                    $vm->vm_type,
+                    $vm->operatingSystem,
+                    $vm->memoryFormatted,
+                    $vm->vmwVmCpus,
+                ]);
+            }
+
+            fclose($output);
+        }, 'vminfo-' . date('Y-m-d-His') . '.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
-    /**
-     * @return LengthAwarePaginator<int, Vminfo>
-     */
-    public static function paginate(Request $request, ?int $deviceId, int|string $perPage): LengthAwarePaginator
+    private function validateRequest(Request $request): void
     {
-        $query = self::getFilteredQuery($request, $deviceId);
-
-        $total = $perPage === 'all' ? $query->toBase()->getCountForPagination() : null;
-
-        return $query->paginate($total ?: (int) $perPage, total: $total)->appends($request->query());
+        $request->validate([
+            'device_id' => 'integer',
+            'page' => 'integer',
+            'perPage' => ['regex:/^(\d+|all)$/'],
+            'export' => 'in:page,all',
+            ...Vminfo::filterValidationRules(),
+        ]);
     }
 }

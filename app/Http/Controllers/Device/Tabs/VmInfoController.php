@@ -26,7 +26,6 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
-use App\Http\Controllers\VminfoController as VminfoPageController;
 use App\Models\Device;
 use App\Models\Vminfo;
 use Illuminate\Http\Request;
@@ -65,9 +64,12 @@ class VmInfoController implements DeviceTab
         ]);
 
         $perPage = $request->input('perPage', 50);
+        $query = Vminfo::listing($request->user(), $device->device_id, $request->array('filter'));
+        $total = $query->toBase()->getCountForPagination();
 
         return [
-            'vms' => VminfoPageController::paginate($request, $device->device_id, $perPage),
+            'vms' => $query->paginate($perPage === 'all' ? max($total, 1) : (int) $perPage, total: $total)
+                ->appends($request->query()),
             'filterFields' => Vminfo::filterFieldDefinitions($device->device_id),
             'filter' => $request->array('filter'),
             'perPage' => $perPage,

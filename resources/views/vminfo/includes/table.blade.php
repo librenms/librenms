@@ -1,7 +1,22 @@
 @php
     $paginationOptions ??= [50, 100, 250, 'all'];
     $showDevice ??= false;
+    $exportParams ??= [];
 @endphp
+<div class="tw:flex tw:items-center tw:justify-between tw:pb-4 tw:gap-4">
+    <div class="tw:flex-1">
+        <x-filter :name="$filterName" :fields="$filterFields" :initial="$filter" :reload="true"/>
+    </div>
+    <x-table-export
+        :export-route="route('vminfo.export')"
+        :params="$exportParams"
+        :filter="$filter"
+        :filter-name="$filterName"
+        :page="$vms->currentPage()"
+        :per-page="$perPage"
+        class="tw:shrink-0"
+    />
+</div>
 <x-panel>
     <x-slot:slot class="tw:p-0!">
     <table class="table table-hover table-condensed table-striped tw:mt-1 tw:mb-0!">

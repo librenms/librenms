@@ -98,6 +98,23 @@ class Vminfo extends DeviceRelatedModel implements Keyable
     }
 
     /**
+     * query used by the VM list page, the device tab and the export.
+     *
+     * @param  Builder<Vminfo>  $query
+     * @param  array<string, mixed>  $filters
+     * @return Builder<Vminfo>
+     */
+    protected function scopeListing(Builder $query, User $user, ?int $deviceId, array $filters): Builder
+    {
+        return $query->hasAccess($user)
+            ->with(['device', 'parentDevice'])
+            ->when($deviceId, fn (Builder $q) => $q->where('vminfo.device_id', $deviceId))
+            ->when($filters, fn (Builder $q) => $q->applyFilters($filters))
+            ->orderBy('vmwVmDisplayName')
+            ->select('vminfo.*');
+    }
+
+    /**
      * Search the name of the VM and the host it runs on.
      */
     public function filterSearch(Builder $query, mixed $value, array $config): void
