@@ -17,6 +17,7 @@ discovery_modules:
     applications: true
     bgp-peers: false
     stp: false
+    vminfo: true
 processor_stacked: true
 discovery:
     -
