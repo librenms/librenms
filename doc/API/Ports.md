@@ -473,3 +473,30 @@ Output:
     "message": "Port description updated."
 }
 ```
+
+### `update_port_speed`
+
+Override the polled interface speed for a given port id. The speed is specified
+in bits per second. Set the speed to `0` to clear the override and allow the
+poller to populate the value again.
+
+Route: `/api/v0/ports/:portid/speed`
+
+Input (JSON):
+
+- speed: Interface speed in bits per second, or `0` to clear the override.
+
+Example:
+
+```curl
+curl -X PATCH -d '{"speed": 1000000000}' -H 'Content-Type: application/json' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ports/323/speed
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Port speed updated."
+}
+```
