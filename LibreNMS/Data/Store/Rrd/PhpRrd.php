@@ -92,26 +92,6 @@ class PhpRrd implements RrdBackendInterface
         }
     }
 
-    /**
-     * @param  string[]  $options
-     */
-    public function tune(string $filename, array $options): bool
-    {
-        if ($this->rrdcached) {
-            // PHP-RRD does not support this command with cached
-            return $this->rrdtool->tune($filename, $options);
-        }
-
-        Log::debug("PHPRRD[%gtune $filename " . implode('|', $options) . '%n]', ['color' => true]);
-        if (! rrd_tune($filename, $options)) {
-            Log::warning('Error tuning RRD file: ' . rrd_error());
-
-            return false;
-        }
-
-        return true;
-    }
-
     public function last(string $filename): string
     {
         if ($this->rrdcached) {

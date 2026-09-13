@@ -206,12 +206,9 @@ class Rrd extends BaseDatastore
      */
     public function tune($type, $filename, $max): bool
     {
-        if ($this->disabled) {
-            if (! LibrenmsConfig::get('hide_rrd_disabled')) {
-                Log::debug('[%rRRD Disabled%n]', ['color' => true]);
-            }
-
-            return false;
+        // tune only works on the local filesystem - use the fully qualified path the RRD file
+        if ($this->rrdcached) {
+            $filename = implode('/', [$this->rrd_dir, $filename]);
         }
 
         $fields = [];
@@ -239,22 +236,25 @@ class Rrd extends BaseDatastore
             ];
         }
         if (count($fields) > 0) {
-            $options = [];
+            $cmd = [LibrenmsConfig::get('rrdtool', 'rrdtool'), 'tune', $filename];
             foreach ($fields as $field) {
-                array_push($options, '--maximum', $field . ':' . $max);
+                array_push($cmd, '--maximum', $field . ':' . $max);
             }
-            try {
-                $stat = Measurement::start('other');
-                $this->backend->tune($filename, $options);
-                $this->recordStatistic($stat->end());
-            } catch (RrdException $e) {
-                if (! $e instanceof RrdNotFoundException) {
-                    Log::debug('RRD tune failed: ' . $e->getMessage());
-                }
-            }
+            Log::debug('[%gRRD ' . implode(' ', $cmd) . '%n]', ['color' => true]);
+
+            $stat = Measurement::start('other');
+            $process = app()->make(Process::class, ['command' => $cmd]);
+            $process->disableOutput();
+            $process->run();
+
+            $ret = $process->isSuccessful();
+
+            $this->recordStatistic($stat->end());
+        } else {
+            return true;
         }
 
-        return true;
+        return $ret;
     }
 
     /**
