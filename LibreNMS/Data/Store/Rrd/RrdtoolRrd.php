@@ -29,7 +29,6 @@ namespace LibreNMS\Data\Store\Rrd;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdGraphException;
-use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use Log;
@@ -76,24 +75,6 @@ class RrdtoolRrd implements RrdBackendInterface
         $data = 'N:' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data));
 
         $this->command('update', $filename, [$data]);
-    }
-
-    /**
-     * Modify an rrd file's max value and trim the peaks as defined by rrdtool
-     *
-     * @param  string[]  $options
-     */
-    public function tune(string $filename, array $options): bool
-    {
-        try {
-            $this->command('tune', $filename, $options);
-        } catch (RrdException $e) {
-            if (! $e instanceof RrdNotFoundException) {
-                Log::debug('RRD tune failed: ' . $e->getMessage());
-            }
-        }
-
-        return true;
     }
 
     /**

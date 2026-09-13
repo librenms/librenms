@@ -55,13 +55,6 @@ interface RrdBackendInterface
     public function update(string $filename, array $data): void;
 
     /**
-     * Modify an rrd file's max value
-     *
-     * @param  string[]  $options
-     */
-    public function tune(string $filename, array $options): bool;
-
-    /**
      * Return the last timestamp a RRD file was updated or an error message if it does not
      */
     public function last(string $filename): string;
