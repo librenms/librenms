@@ -1150,18 +1150,6 @@
         "callback_proxy": {
             "type": "text"
         },
-        "collectd_dir": {
-            "type": "directory",
-            "group": "external",
-            "section": "collectd",
-            "order": 0
-        },
-        "collectd_sock": {
-            "type": "text",
-            "group": "external",
-            "section": "collectd",
-            "order": 1
-        },
         "core_descr": {
             "default": ["core"],
             "type": "array",
