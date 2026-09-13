@@ -30,6 +30,7 @@ use App\Models\Device;
 use App\Models\Vminfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class VmInfoController implements DeviceTab
@@ -56,17 +57,22 @@ class VmInfoController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [
-            'vms' => self::getVms($device),
-        ];
-    }
+        Validator::validate($request->all(), [
+            'page' => 'integer',
+            'perPage' => ['regex:/^(\d+|all)$/'],
+            ...Vminfo::filterValidationRules(),
+        ]);
 
-    private static function getVms(Device $device)
-    {
-        return $device->vminfo()
-        ->select('vmwVmDisplayName', 'vmwVmState', 'vmwVmGuestOS', 'vmwVmMemSize', 'vmwVmCpus')
-        ->with('parentDevice')
-        ->orderBy('vmwVmDisplayName')
-        ->get();
+        $perPage = $request->input('perPage', 50);
+        $query = Vminfo::listing($request->user(), $device->device_id, $request->array('filter'));
+        $total = $query->toBase()->getCountForPagination();
+
+        return [
+            'vms' => $query->paginate($perPage === 'all' ? max($total, 1) : (int) $perPage, total: $total)
+                ->appends($request->query()),
+            'filterFields' => Vminfo::filterFieldDefinitions($device->device_id),
+            'filter' => $request->array('filter'),
+            'perPage' => $perPage,
+        ];
     }
 }

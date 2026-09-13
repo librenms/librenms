@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Traits\Filterable;
 use App\Observers\VminfoObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\PowerState;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
@@ -17,6 +19,7 @@ use LibreNMS\Util\Rewrite;
 #[ObservedBy([VminfoObserver::class])]
 class Vminfo extends DeviceRelatedModel implements Keyable
 {
+    use Filterable;
     use HasFactory;
 
     protected $table = 'vminfo';
@@ -30,6 +33,107 @@ class Vminfo extends DeviceRelatedModel implements Keyable
         'vmwVmCpus',
         'vmwVmState',
     ];
+
+    /** @var list<string> */
+    protected array $filterable = [
+        'device_id',
+        'vm_type',
+        'vmwVmGuestOS',
+        'vmwVmState',
+        'vmwVmCpus',
+        'vmwVmMemSize',
+        'search',
+    ];
+
+    /**
+     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[], search?: bool}>
+     */
+    public static function filterFieldDefinitions(?int $deviceId = null): array
+    {
+        $fields = [];
+
+        if ($deviceId === null) {
+            $fields[] = [
+                'key' => 'device_id',
+                'label' => __('Host'),
+                'type' => 'select',
+                'endpoint' => route('ajax.select.device'),
+            ];
+        }
+
+        return array_merge($fields, [
+            [
+                'key' => 'search',
+                'label' => __('VM Name'),
+                'type' => 'text',
+                'search' => true,
+            ],
+            [
+                'key' => 'vmwVmState',
+                'label' => __('Power Status'),
+                'type' => 'select',
+                'options' => ['on', 'off', 'suspended', 'unknown'],
+            ],
+            [
+                'key' => 'vm_type',
+                'label' => __('Type'),
+                'type' => 'text',
+            ],
+            [
+                'key' => 'vmwVmGuestOS',
+                'label' => __('Operating System'),
+                'type' => 'text',
+            ],
+            [
+                'key' => 'vmwVmCpus',
+                'label' => __('vCPUs'),
+                'type' => 'number',
+            ],
+            [
+                'key' => 'vmwVmMemSize',
+                'label' => __('Memory (MB)'),
+                'type' => 'number',
+            ],
+        ]);
+    }
+
+    /**
+     * query used by the VM list page, the device tab and the export.
+     *
+     * @param  Builder<Vminfo>  $query
+     * @param  array<string, mixed>  $filters
+     * @return Builder<Vminfo>
+     */
+    protected function scopeListing(Builder $query, User $user, ?int $deviceId, array $filters): Builder
+    {
+        return $query->hasAccess($user)
+            ->with(['device', 'parentDevice'])
+            ->when($deviceId, fn (Builder $q) => $q->where('vminfo.device_id', $deviceId))
+            ->when($filters, fn (Builder $q) => $q->applyFilters($filters))
+            ->orderBy('vmwVmDisplayName')
+            ->select('vminfo.*');
+    }
+
+    /**
+     * Search the name of the VM and the host it runs on.
+     */
+    public function filterSearch(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyFilterSearch(['vmwVmDisplayName', 'device.hostname', 'device.sysName'], $query, $value, $config);
+    }
+
+    /**
+     * Accept the power state by name instead of by number.
+     */
+    public function filterVmwVmState(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyMappedFilter($query, $value, $config, fn (Builder $q, $state) => $q->where('vmwVmState', match ($state) {
+            'on' => PowerState::ON,
+            'off' => PowerState::OFF,
+            'suspended' => PowerState::SUSPENDED,
+            default => PowerState::UNKNOWN,
+        }));
+    }
 
     public function getStateLabelAttribute(): array
     {
