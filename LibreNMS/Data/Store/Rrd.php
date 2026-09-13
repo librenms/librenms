@@ -667,11 +667,7 @@ class Rrd extends BaseDatastore
             throw new RrdPermissionException("Renaming of $oldName failed due to existing RRD folder for $newName");
         }
 
-        if (rename($this->dirFromHost($oldName, true), $new_rrd_dir) === true) {
-            return true;
-        }
-
-        return false;
+        return rename($this->dirFromHost($oldName, true), $new_rrd_dir);
     }
 
     /**
