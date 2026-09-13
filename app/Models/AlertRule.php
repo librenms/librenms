@@ -80,6 +80,14 @@ class AlertRule extends BaseModel
         'alert_operation_id',
     ];
 
+    // query, builder and extra are NOT NULL without a database default,
+    // so creates must always provide a value
+    protected $attributes = [
+        'query' => '',
+        'builder' => '{}',
+        'extra' => '{}',
+    ];
+
     protected $casts = [
         'builder' => 'array',
         'extra' => 'array',
