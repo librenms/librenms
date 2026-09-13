@@ -1,0 +1,9 @@
+os: kentix
+text: Kentix MultiSensor
+type: environment
+icon: kentix
+
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.37954.5
