@@ -402,10 +402,6 @@ class ConfigRepository
             }
         }
 
-        // load macros from json
-        $macros = json_decode(file_get_contents($this->get('install_dir') . '/resources/definitions/macros.json'), true);
-        Arr::set($this->config, 'alert.macros.rule', $macros);
-
         Arr::set($this->config, 'log_dir', $this->get('install_dir') . '/logs');
         Arr::set($this->config, 'distributed_poller_name', php_uname('n'));
 
