@@ -58,7 +58,7 @@ class PollDevice implements ShouldQueue
     {
         $this->initDevice();
         $connectivity = new ConnectivityHelper($this->device);
-        $this->initRrdDirectory();
+        Rrd::initStorage($this->device);
         PollingDevice::dispatch($this->device);
         $this->os = OS::make($this->deviceArray);
 
@@ -186,16 +186,6 @@ OS:        %s
 IP:        %s
 
 EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->device_id, $this->device->os, $this->device->ip));
-    }
-
-    private function initRrdDirectory(): void
-    {
-        try {
-            Rrd::initStorage($this->device);
-        } catch (\ErrorException $e) {
-            Eventlog::log('Failed to create rrd directory for ' . $this->device->hostname, $this->device);
-            Log::error($e);
-        }
     }
 
     private function recordPerformance(Measurement $measurement): void
