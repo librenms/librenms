@@ -29,7 +29,7 @@ namespace LibreNMS\Data\Store\Rrd;
 use App\Facades\LibrenmsConfig;
 use Log;
 
-final class RrdPath
+final class RrdPath implements \Stringable
 {
     private readonly string $rrdDir;
     private readonly string $relativeDir;
