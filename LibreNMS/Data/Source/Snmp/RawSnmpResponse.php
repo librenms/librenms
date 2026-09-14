@@ -79,6 +79,9 @@ class RawSnmpResponse extends SnmpResponse
         return true;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function values(): array
     {
         if (! empty($this->values)) {

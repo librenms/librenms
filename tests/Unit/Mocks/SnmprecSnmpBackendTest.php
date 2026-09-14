@@ -34,6 +34,7 @@ use App\Models\Device;
 use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQuery;
+use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
@@ -53,7 +54,7 @@ final class SnmprecSnmpBackendTest extends TestCase
         return new SnmprecSnmpBackend();
     }
 
-    private function makeNumericQuery(): SnmpQuery
+    private function makeNumericQuery(): SnmpQueryInterface
     {
         $device = new Device(['community' => self::FIXTURE]);
         $device->device_id = 1;

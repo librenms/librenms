@@ -44,8 +44,6 @@ class SnmpResponse implements \Stringable
 
     /**
      * @param  array<string, string>  $rawValues
-     * @param  string  $stderr
-     * @param  int  $exitCode
      * @param  array<int, string>  $command
      */
     public function __construct(
@@ -260,7 +258,7 @@ class SnmpResponse implements \Stringable
 
         $return = new Collection;
         foreach ($data as $index => $values) {
-            $return->push(call_user_func($callback, $values, ...explode('][', (string) $index)));
+            $return->push(call_user_func($callback, $values, ...explode('][', $index)));
         }
 
         return $return;
@@ -274,7 +272,7 @@ class SnmpResponse implements \Stringable
     public function append(SnmpResponse $response): SnmpResponse
     {
         $newResponse = new SnmpResponse(
-            array_merge($this->rawValues ?: $this->values, $response instanceof self && ! empty($response->rawValues) ? $response->rawValues : $response->values()),
+            array_merge($this->rawValues ?: $this->values, ! empty($response->rawValues) ? $response->rawValues : $response->values()),
             $this->stderr . $response->stderr,
             $this->exitCode ?: $response->exitCode,
             $response->command ?: $this->command,

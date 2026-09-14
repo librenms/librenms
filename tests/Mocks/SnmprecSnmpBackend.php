@@ -239,7 +239,7 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
      * Get all data of the specified $community from the snmprec cache
      *
      * @param  string  $community  snmp community to return
-     * @return array array of the data containing: [$oid][$type, $data]
+     * @return array<string, array{0: string, 1: string}> array of the data containing: [$oid][$type, $data]
      *
      * @throws Exception this $community is not cached
      */

@@ -27,8 +27,6 @@
 namespace LibreNMS\Tests;
 
 use App\Models\Device;
-use Illuminate\Foundation\Bootstrap\HandleExceptions;
-use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
@@ -46,7 +44,6 @@ final class OSDiscoveryTest extends TestCase
 {
     /** @var array<string, int> */
     private static ?array $unchecked_files = null;
-    private static ?\Illuminate\Contracts\Foundation\Application $sharedApp = null;
 
     public static function setUpBeforeClass(): void
     {
@@ -62,32 +59,11 @@ final class OSDiscoveryTest extends TestCase
 
     protected function setUp(): void
     {
-        if (self::$sharedApp === null) {
-            parent::setUp();
-            self::$sharedApp = $this->app;
-            if (! getenv('SNMPSIM')) {
-                $this->app->bind(SnmpBackendInterface::class, SnmprecSnmpBackend::class);
-            }
-        } else {
-            $this->app = self::$sharedApp;
-            Facade::setFacadeApplication($this->app);
-            (new HandleExceptions)->bootstrap($this->app);
+        parent::setUp();
+
+        if (! getenv('SNMPSIM')) {
+            $this->app->bind(SnmpBackendInterface::class, SnmprecSnmpBackend::class);
         }
-    }
-
-    protected function tearDown(): void
-    {
-        HandleExceptions::flushState($this);
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        if (self::$sharedApp !== null) {
-            self::$sharedApp->flush();
-            self::$sharedApp = null;
-        }
-
-        parent::tearDownAfterClass();
     }
 
     #[TestDox('Valid OS names')]
