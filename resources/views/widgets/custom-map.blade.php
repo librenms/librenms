@@ -3,6 +3,8 @@
         display: grid;
         grid-template: 1fr / 1fr;
         place-items: center;
+        overflow: hidden;
+        position: relative;
     }
     #custom-map-{{ $id }} {
         grid-column: 1 / 1;
@@ -20,9 +22,9 @@
   <div id="custom-map-{{ $id }}" style="width: 99%; height: 99%"></div>
   <x-geo-map id="custom-map-bg-geo-map-{{ $id }}"
     :init="$map->background_type == 'map'"
+    :width="$map->width"
+    :height="$map->height"
     :config="$background_config"
-    width="99%"
-    height="99%"
     readonly
   />
 </div>
