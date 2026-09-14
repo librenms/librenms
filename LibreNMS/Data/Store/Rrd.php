@@ -149,7 +149,7 @@ class Rrd extends BaseDatastore
                 $this->update($rrd, $fields);
             } catch (RrdNotFoundException) {
                 if (isset($rrd_def)) {
-                    $this->command('create', $rrd->defaultFilePath(), ['--step', $step, ...$rrd_def->getArguments(), ...$this->rra]);
+                    $this->command('create', $rrd, ['--step', $step, ...$rrd_def->getArguments(), ...$this->rra]);
                     $this->update($rrd, $fields);
                 }
             }
@@ -199,7 +199,7 @@ class Rrd extends BaseDatastore
     {
         $data = 'N:' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data));
 
-        $this->command('update', $rrd->defaultFilePath(), [$data]);
+        $this->command('update', $rrd, [$data]);
     }
 
     /**
@@ -237,7 +237,7 @@ class Rrd extends BaseDatastore
                 array_push($options, '--maximum', $field . ':' . $max);
             }
             try {
-                $this->command('tune', $rrd->fullFilePath(), $options);
+                $this->command('tune', $rrd->fullPath(), $options);
             } catch (RrdException $e) {
                 if (! $e instanceof RrdNotFoundException) {
                     Log::debug('RRD tune failed: ' . $e->getMessage());
@@ -394,7 +394,7 @@ class Rrd extends BaseDatastore
         $rrdpath = RrdPath::make($hostname);
 
         if ($this->rrdcached) {
-            $output = $this->command('list', '/' . $rrdpath->defaultFilePath());
+            $output = $this->command('list', '/' . $rrdpath);
             $files = array_filter(explode("\n", trim($output)), fn ($file) => str_starts_with((string) $file, $prefix));
         } else {
             $files = glob($rrdpath . DIRECTORY_SEPARATOR . $prefix . '*.rrd') ?: [];
@@ -450,14 +450,14 @@ class Rrd extends BaseDatastore
     {
         if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
             try {
-                $check_output = $this->command('last', $rrdpath->defaultFilePath());
+                $check_output = $this->command('last', $rrdpath);
 
                 return ! (str_contains($check_output, $rrdpath) && str_contains($check_output, 'No such file or directory'));
             } catch (RrdNotFoundException) {
                 return false;
             }
         } else {
-            return is_file($rrdpath->fullFilePath());
+            return is_file($rrdpath->fullPath());
         }
     }
 
@@ -475,7 +475,7 @@ class Rrd extends BaseDatastore
             return;
         }
 
-        foreach (glob(RrdPath::make($hostname)->setFileName($prefix)->fullFilePath() . '*.rrd') as $rrd) {
+        foreach (glob(RrdPath::make($hostname)->setFileName($prefix)->fullPath() . '*.rrd') as $rrd) {
             unlink($rrd);
         }
     }

@@ -31,8 +31,8 @@ use Log;
 
 final class RrdPath
 {
-    private readonly string $relativePath;
     private readonly string $rrdDir;
+    private readonly string $relativeDir;
     private string $fileName = '';
 
     /**
@@ -44,7 +44,7 @@ final class RrdPath
             $hostname = implode(DIRECTORY_SEPARATOR, $hostname);
         }
 
-        $this->relativePath = self::safeName(trim($hostname, '[]'));
+        $this->relativeDir = self::safeName(trim($hostname, '[]'));
         $this->rrdDir = LibrenmsConfig::get('rrd_dir', base_path('rrd'));
     }
 
@@ -60,37 +60,22 @@ final class RrdPath
 
     public function relativePath(): string
     {
-        return $this->relativePath;
+        return $this->fileName($this->relativeDir);
     }
 
     public function fullPath(): string
     {
-        return $this->rrdDir . DIRECTORY_SEPARATOR . $this->relativePath;
+        return $this->fileName($this->fullDir());
     }
 
     public function defaultPath(): string
     {
-        return LibrenmsConfig::get('rrdcached') ? $this->relativePath() : $this->fullPath();
-    }
-
-    public function relativeFilePath(): string
-    {
-        return $this->fileName($this->relativePath);
-    }
-
-    public function fullFilePath(): string
-    {
-        return $this->fileName($this->fullPath());
-    }
-
-    public function defaultFilePath(): string
-    {
-        return $this->fileName($this->defaultPath());
+        return $this->fileName($this->defaultDir());
     }
 
     public function __toString(): string
     {
-        return $this->defaultFilePath();
+        return $this->defaultPath();
     }
 
     /**
@@ -112,9 +97,9 @@ final class RrdPath
             return $this;
         }
 
-        if (! is_dir($this->fullPath())) {
-            mkdir($this->fullPath(), 0775, true);
-            Log::info('Created directory : ' . $this->fullPath());
+        if (! is_dir($this->fullDir())) {
+            mkdir($this->fullDir(), 0775, true);
+            Log::info('Created directory : ' . $this->fullDir());
         }
 
         return $this;
@@ -126,6 +111,22 @@ final class RrdPath
     public static function safeName(string $name): string
     {
         return preg_replace('/[^a-zA-Z0-9,._\-]/', '_', $name);
+    }
+
+    /**
+     * Return the directory component for a full path
+     */
+    public function fullDir(): string
+    {
+        return $this->rrdDir . DIRECTORY_SEPARATOR . $this->relativePath;
+    }
+
+    /**
+     * Return the default directory component depending on whether rrdcached is enabled or not
+     */
+    public function defaultDir(): string
+    {
+        return LibrenmsConfig::get('rrdcached') ? $this->relativeDir : $this->fullDir();
     }
 
     /**
