@@ -55,8 +55,6 @@ class Rrd extends BaseDatastore
 
     private ?RrdProcess $rrd = null;
     /** @var string */
-    private $rrd_dir;
-    /** @var string */
     private $version;
     /** @var string */
     private $rrdcached;
@@ -84,7 +82,6 @@ class Rrd extends BaseDatastore
     protected function loadConfig(): void
     {
         $this->rrdcached = LibrenmsConfig::get('rrdcached', false);
-        $this->rrd_dir = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
         $this->step = LibrenmsConfig::get('rrd.step', 300);
         $this->rra = preg_split('/\s+/', trim(LibrenmsConfig::get(
             'rrd_rra',
@@ -188,8 +185,7 @@ class Rrd extends BaseDatastore
      * Updates an rrd database at $filename using $options
      * Where $options is an array, each entry which is not a number is replaced with "U"
      *
-     * @param  string  $filename
-     * @param  array  $data
+     * @param  string[]  $data
      *
      * @throws RrdException
      *
@@ -277,8 +273,8 @@ class Rrd extends BaseDatastore
     public function renameFile(Device $device, $oldname, $newname): bool
     {
         $rrdpath = new RrdPath($device->hostname);
-        $oldrrd = $rrdpath->fullPath($oldname);
-        $newrrd = $rrdpath->fullPath($newname);
+        $oldrrd = $rrdpath->setFileName($oldname)->fullPath();
+        $newrrd = $rrdpath->setFileName($newname)->fullPath();
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
                 Eventlog::log("Renamed $oldrrd to $newrrd", $device, 'poller', Severity::Ok);
@@ -296,8 +292,7 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * @param  string  $host  Host name
-     * @param  string[]|string  $filename  Components of RRD filename - will be separated with "-", or a pre-formed rrdname
+     * Public function to return the RRD filename for a given host and file
      */
     public function name(string $hostname, array|string $filename): RrdPath
     {
@@ -324,7 +319,7 @@ class Rrd extends BaseDatastore
         try {
             $cmd = self::buildCommand($command, $filename, $options);
         } catch (RrdFileExistsException) {
-            Log::debug("RRD[%g$rrd already exists%n]", ['color' => true]);
+            Log::debug("RRD[%g$filename already exists%n]", ['color' => true]);
 
             return $output;
         }
@@ -385,7 +380,7 @@ class Rrd extends BaseDatastore
      * Get array of all rrd files for a device,
      * via rrdached or localdisk.
      *
-     * @param  string|string[]  limit returned results to files matching this prefix
+     * @param  string|string[]  $prefix  limit returned results to files matching this prefix
      * @return string[] array of rrd files for this host
      */
     public function getRrdFiles(string $hostname, string|array $prefix = ''): array

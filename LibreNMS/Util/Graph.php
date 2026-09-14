@@ -133,7 +133,7 @@ class Graph
      *
      * @throws RrdGraphException
      */
-    public static function getRrdOptions($vars, ?string &$rrd_filename = null): array
+    public static function getRrdOptions($vars, ?RrdPath &$rrd_filename = null): array
     {
         if (! defined('IGNORE_ERRORS')) {
             define('IGNORE_ERRORS', true);
