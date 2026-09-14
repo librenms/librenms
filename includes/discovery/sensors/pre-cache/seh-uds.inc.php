@@ -9,13 +9,14 @@
  * indexes: the device row (owner, physical port) is indexed by device entry,
  * the port row (utnPortTag) by physical port. utnPortSlot / utnDevPort points
  * from the device entry to the port. YAML discovery can only look up columns
- * of the current row, so the join is done here and exposed as two pre-cache
- * tables, one per SNMP layout, consumed by seh-uds.yaml:
+ * of the current row, so the join is done here and the joined rows are
+ * pre-populated under the table names seh-uds.yaml uses as oid (one row per
+ * attached device: seh_usb_slot, seh_usb_tag, seh_usb_own, seh_usb_label):
  *
- *  - seh_usb_legacy: SEH-PSRV-MIB 1.x, everything in utnPortTable
- *                    (sehPSrv.50.2.1: tag = 10, utnPortUsbOwn = 26, utnPortSlot = 27)
- *  - seh_usb_v2:     sehMIB 2.x, utnPortTable (seh.5.10.2.1: tag = 10, descr = 12)
- *                    + utnDevTable (seh.5.20.2.1: utnDevOwn = 7, utnDevPort = 8)
+ *  - SEH-PSRV-MIB::utnPortTable: SEH-PSRV-MIB 1.x, everything in utnPortTable
+ *        (sehPSrv.50.2.1: tag = 10, utnPortUsbOwn = 26, utnPortSlot = 27)
+ *  - SEH-PSRV-MIB::utnDevTable:  sehMIB 2.x, utnPortTable (seh.5.10.2.1: tag = 10, descr = 12)
+ *        + utnDevTable (seh.5.20.2.1: utnDevOwn = 7, utnDevPort = 8)
  *
  * Numeric OIDs on purpose: both MIB versions share the module name
  * SEH-PSRV-MIB and each lacks the objects of the other layout.
@@ -56,8 +57,8 @@ $seh_join = function (array $tags_by_port, array $owns, array $slots): array {
 };
 
 // always define both keys so YamlDiscovery::preCache() does not try to walk them
-$pre_cache['seh_usb_legacy'] = [];
-$pre_cache['seh_usb_v2'] = [];
+$pre_cache['SEH-PSRV-MIB::utnPortTable'] = [];
+$pre_cache['SEH-PSRV-MIB::utnDevTable'] = [];
 
 $seh_owns = $seh_walk('.1.3.6.1.4.1.1229.2.50.2.1.26');
 if (! empty($seh_owns)) {
@@ -65,7 +66,7 @@ if (! empty($seh_owns)) {
     foreach ($seh_walk('.1.3.6.1.4.1.1229.2.50.2.1.10') as $idx => $tag) {
         $seh_tags[(int) $idx] = $tag; // index is <port>.0
     }
-    $pre_cache['seh_usb_legacy'] = $seh_join($seh_tags, $seh_owns, $seh_walk('.1.3.6.1.4.1.1229.2.50.2.1.27'));
+    $pre_cache['SEH-PSRV-MIB::utnPortTable'] = $seh_join($seh_tags, $seh_owns, $seh_walk('.1.3.6.1.4.1.1229.2.50.2.1.27'));
 } else {
     $seh_owns = $seh_walk('.1.3.6.1.4.1.1229.5.20.2.1.7');
     if (! empty($seh_owns)) {
@@ -78,7 +79,7 @@ if (! empty($seh_owns)) {
                 $seh_tags[(int) $idx] = $descr; // fall back to utnPortDescr when the tag is unset
             }
         }
-        $pre_cache['seh_usb_v2'] = $seh_join($seh_tags, $seh_owns, $seh_walk('.1.3.6.1.4.1.1229.5.20.2.1.8'));
+        $pre_cache['SEH-PSRV-MIB::utnDevTable'] = $seh_join($seh_tags, $seh_owns, $seh_walk('.1.3.6.1.4.1.1229.5.20.2.1.8'));
     }
 }
 
