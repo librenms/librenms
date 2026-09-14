@@ -374,7 +374,7 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
             'IF-MIB::ifDescr[2]' => 'enp4s0',
         ];
 
-        $response = SnmpResponse::fromValues($values);
+        $response = new SnmpResponse($values);
 
         $this->assertTrue($response->isValid());
         $this->assertSame($values, $response->values());
@@ -388,7 +388,7 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
             '1.3.6.1.2.1.2.2.1.2.99' => 'No Such Instance currently exists at this OID',
         ];
 
-        $response = SnmpResponse::fromValues($values);
+        $response = new SnmpResponse($values);
 
         $this->assertFalse($response->isValid());
         $this->assertSame([], $response->values());
@@ -397,8 +397,8 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
 
     public function testAppendWithPrepopulatedValues(): void
     {
-        $first = SnmpResponse::fromValues(['IF-MIB::ifDescr[1]' => 'lo']);
-        $second = SnmpResponse::fromValues(['IF-MIB::ifDescr[2]' => 'enp4s0']);
+        $first = new SnmpResponse(['IF-MIB::ifDescr[1]' => 'lo']);
+        $second = new SnmpResponse(['IF-MIB::ifDescr[2]' => 'enp4s0']);
 
         $combined = $first->append($second);
 
@@ -411,10 +411,10 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
 
     public function testRawOutput(): void
     {
-        $response = SnmpResponse::fromValues([
+        $response = new SnmpResponse([
             'IF-MIB::ifDescr[1]' => 'lo',
             'IF-MIB::ifDescr[2]' => 'enp4s0',
-        ]);
+        ], '', 0, []);
         $this->assertSame("IF-MIB::ifDescr[1] = lo\nIF-MIB::ifDescr[2] = enp4s0\n", $response->raw());
         $this->assertSame("IF-MIB::ifDescr[1] = lo\nIF-MIB::ifDescr[2] = enp4s0\n", (string) $response);
 

@@ -16,7 +16,7 @@ final class PrintSnmpDebugOutputTest extends TestCase
         Debug::set(true);
         Debug::setVerbose(true);
 
-        $response = SnmpResponse::fromValues([
+        $response = new SnmpResponse([
             'sysDescr.0' => 'Linux 6.1',
             'sysObjectID.0' => '1.3.6.1.4.1.8072.3.2.10',
         ]);

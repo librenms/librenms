@@ -27,7 +27,6 @@
 namespace LibreNMS\Tests\Mocks;
 
 use Exception;
-use Illuminate\Support\Str;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
@@ -42,6 +41,8 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
 {
     /** @var array<string, array<string, array{0: string, 1: string}>>|null */
     private static ?array $cache = null;
+    /** @var array<string, string> */
+    private static array $translateCache = [];
     private readonly SnmpTranslatorInterface $translator;
 
     public function __construct(?SnmpTranslatorInterface $translator = null)
@@ -52,6 +53,7 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
     public static function clearCache(): void
     {
         self::$cache = null;
+        self::$translateCache = [];
     }
 
     /**
@@ -76,7 +78,7 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
             $results[$key] = $val;
         }
 
-        return SnmpResponse::fromValues($results);
+        return new SnmpResponse($results);
     }
 
     /**
@@ -89,8 +91,9 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
         $num_oid = $this->translateNumber($oid, $options);
         $results = [];
 
+        $prefix = $num_oid . '.';
         foreach ($dev as $key => $data) {
-            if ($key === $num_oid || Str::startsWith($key, $num_oid . '.')) {
+            if ($key === $num_oid || str_starts_with($key, $prefix)) {
                 [$formattedKey, $formattedVal] = $this->formatEntry($oid, $num_oid, $key, $data[0], $data[1], $options);
                 $results[$formattedKey] = $formattedVal;
             }
@@ -98,7 +101,7 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
 
         Log::debug("[SNMP] snmpwalk $community $num_oid");
 
-        return SnmpResponse::fromValues($results);
+        return new SnmpResponse($results);
     }
 
     /**
@@ -116,10 +119,11 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
             $num_oid = $this->translateNumber($oid, $options);
 
             Log::debug("[SNMP] snmpnext $community $num_oid: ");
-            while (Str::contains($num_oid, '.')) {
+            while (str_contains($num_oid, '.')) {
                 $found = false;
+                $prefix = $num_oid . '.';
                 foreach ($dev as $key => $data) {
-                    if ($key === $num_oid || Str::startsWith($key, $num_oid . '.')) {
+                    if ($key === $num_oid || str_starts_with($key, $prefix)) {
                         [$formattedKey, $formattedVal] = $this->formatEntry($oid, $num_oid, $key, $data[0], $data[1], $options);
                         $results[$formattedKey] = $formattedVal;
                         $found = true;
@@ -135,7 +139,7 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
             }
         }
 
-        return SnmpResponse::fromValues($results);
+        return new SnmpResponse($results);
     }
 
     private function community(SnmpConfig $config, SnmpQueryOptions $options, string $target = ''): string
@@ -156,25 +160,27 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
      */
     private function formatEntry(string $oid, string $num_oid, string $key, string $type, string $data, SnmpQueryOptions $options): array
     {
-        $oidObj = new Oid($oid);
-        $indexSuffix = substr($key, strlen($num_oid));
         $isNumeric = $options->oidFormat === SnmpOidOutput::Numeric;
 
-        if ($type == '6') {
+        if ($isNumeric) {
+            $val = $type === '6' ? ".$data" : $data;
+            return [".$key", $val]; // net-snmp -On prints numeric OIDs with a leading dot
+        }
+
+        $oidObj = new Oid($oid);
+        $indexSuffix = substr($key, strlen($num_oid));
+
+        if ($type === '6') {
             $mib = $oidObj->getMib();
             $translateOptions = clone $options;
             if ($mib) {
                 $translateOptions->mibs = array_unique(array_merge($translateOptions->mibs, [$mib]));
             }
-            $data = $isNumeric ? ".$data" : $this->translator->translate($data, $translateOptions);
-        }
-
-        if ($isNumeric) {
-            return [".$key", $data]; // net-snmp -On prints numeric OIDs with a leading dot
+            $data = $this->translate($data, $translateOptions);
         }
 
         if (! empty($oidObj->oid) && $oidObj->isNumeric()) {
-            $oid = $this->translator->translate($oidObj->oid, $options);
+            $oid = $this->translate($oidObj->oid, $options);
         }
 
         return ["$oid$indexSuffix", $data];
@@ -205,11 +211,11 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
                         $itemData = trim($itemData, '.');
                     } elseif ($type == '4x') {
                         // MacAddress type is stored as hex string, but we don't understand mibs
-                        if (Str::startsWith($oid, [
-                            '1.3.6.1.2.1.2.2.1.6', // IF-MIB::ifPhysAddress
-                            '1.3.6.1.2.1.17.1.1.0', // BRIDGE-MIB::dot1dBaseBridgeAddress.0
-                            '1.3.6.1.4.1.890.1.5.13.13.8.1.1.20', // IES5206-MIB::slotModuleMacAddress
-                        ])) {
+                        if (
+                            str_starts_with($oid, '1.3.6.1.2.1.2.2.1.6') // IF-MIB::ifPhysAddress
+                            || str_starts_with($oid, '1.3.6.1.2.1.17.1.1.0') // BRIDGE-MIB::dot1dBaseBridgeAddress.0
+                            || str_starts_with($oid, '1.3.6.1.4.1.890.1.5.13.13.8.1.1.20') // IES5206-MIB::slotModuleMacAddress
+                        ) {
                             $itemData = Mac::parse($itemData)->readable();
                         } else {
                             $hex = trim($itemData);
@@ -249,6 +255,19 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
         throw new Exception("SNMPREC: community $community not cached");
     }
 
+    private function translate(string $oid, SnmpQueryOptions $options): string
+    {
+        $cacheKey = $oid . "\0" . $options->oidFormat->name . "\0" . implode(':', $options->mibDirs) . "\0" . implode(':', $options->mibs);
+
+        if (isset(self::$translateCache[$cacheKey])) {
+            return self::$translateCache[$cacheKey];
+        }
+
+        $number = $this->translator->translate($oid, $options);
+
+        return self::$translateCache[$cacheKey] = $number;
+    }
+
     /**
      * Get the numeric oid of an oid
      * The leading dot is omitted by default to be compatible with snmpsim
@@ -260,31 +279,6 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
      */
     private function translateNumber(string $oid, SnmpQueryOptions $options): string
     {
-        // optimizations (35s -> 1.6s on my laptop)
-        switch ($oid) {
-            case 'SNMPv2-MIB::sysDescr.0':
-            case 'sysDescr.0':
-                return '1.3.6.1.2.1.1.1.0';
-            case 'SNMPv2-MIB::sysObjectID.0':
-            case 'sysObjectID.0':
-                return '1.3.6.1.2.1.1.2.0';
-            case 'ENTITY-MIB::entPhysicalDescr.1':
-            case 'entPhysicalDescr.1':
-                return '1.3.6.1.2.1.47.1.1.1.1.2.1';
-            case 'SML-MIB::product-Name.0':
-            case 'product-Name.0':
-                return '1.3.6.1.4.1.2.6.182.3.3.1.0';
-            case 'ENTITY-MIB::entPhysicalMfgName.1':
-            case 'entPhysicalMfgName.1':
-                return '1.3.6.1.2.1.47.1.1.1.1.12.1';
-            case 'GAMATRONIC-MIB::psUnitManufacture.0':
-            case 'psUnitManufacture.0':
-                return '1.3.6.1.4.1.6050.1.1.2.0';
-            case 'SYNOLOGY-SYSTEM-MIB::systemStatus.0':
-            case 'systemStatus.0':
-                return '1.3.6.1.4.1.6574.1.1.0';
-        }
-
         if (Oid::of($oid)->isNumeric()) {
             return ltrim($oid, '.');
         }
@@ -292,7 +286,7 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
         $translateOptions = clone $options;
         $translateOptions->oidFormat = SnmpOidOutput::Numeric;
 
-        $number = $this->translator->translate($oid, $translateOptions);
+        $number = $this->translate($oid, $translateOptions);
 
         if (empty($number)) {
             throw new Exception('Could not translate oid: ' . $oid . PHP_EOL);

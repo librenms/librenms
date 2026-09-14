@@ -68,23 +68,6 @@ class SnmpResponse implements \Stringable
         }
     }
 
-    /**
-     * Create an SnmpResponse directly from an oid => value array.
-     *
-     * @param  array<string, string>  $values
-     * @param  string  $stderr
-     * @param  int  $exitCode
-     * @param  array<int, string>  $command
-     */
-    public static function fromValues(
-        array $values,
-        string $stderr = '',
-        int $exitCode = 0,
-        array $command = [],
-    ): self {
-        return new self($values, $stderr, $exitCode, $command);
-    }
-
     public function raw(): string
     {
         $lines = [];
