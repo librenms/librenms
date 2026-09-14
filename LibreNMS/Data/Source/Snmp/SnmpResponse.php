@@ -35,10 +35,13 @@ class SnmpResponse implements \Stringable
 {
     protected const KEY_VALUE_DELIMITER = ' = ';
 
+    protected const STDERR_ERROR_REGEX = '/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/';
+
     /**
      * @var array<string, string> <oid, value>
      */
     protected array $values = [];
+    protected ?string $badValue = null;
     protected ?string $errorMessage = null;
 
     /**
@@ -52,7 +55,8 @@ class SnmpResponse implements \Stringable
         public readonly array $command = [],
     ) {
         foreach ($this->rawValues as $oid => $val) {
-            if (preg_match('/(No Such Instance|No Such Object|at this OID|this MIB View|End of MIB)/', (string) $val) || str_ends_with((string) $val, ' = NULL')) {
+            if (preg_match('/(No Such Instance|No Such Object|at this OID|this MIB View|End of MIB).*/', (string) $val, $matches) || str_ends_with((string) $val, ' = NULL')) {
+                $this->badValue ??= $matches[0] ?? (string) $val;
                 continue;
             }
             $this->values[$oid] = (string) $val;
@@ -77,20 +81,37 @@ class SnmpResponse implements \Stringable
         }
 
         $this->errorMessage = '';
-        $raw = $this->raw();
 
-        $invalid = (! empty($this->stderr) && preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/', $this->stderr, $errors))
-            || empty($raw)
-            || preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $raw, $errors);
+        $badString = $this->getStderrError() ?? $this->findBadString();
+        $isEmpty = $this->isEmpty();
 
-        if ($invalid) {
-            $this->errorMessage = $errors[0] ?? 'Empty Output';
-            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: %s Bad String: %s', $this->exitCode, var_export(empty($raw), true), $errors[0] ?? 'not found'));
+        if ($badString !== null || $isEmpty) {
+            $this->errorMessage = $badString ?? 'Empty Output';
+            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: %s Bad String: %s', $this->exitCode, var_export($isEmpty, true), $badString ?? 'not found'));
 
             return false;
         }
 
         return true;
+    }
+
+    protected function getStderrError(): ?string
+    {
+        if (! empty($this->stderr) && preg_match(self::STDERR_ERROR_REGEX, $this->stderr, $errors)) {
+            return $errors[0];
+        }
+
+        return null;
+    }
+
+    protected function findBadString(): ?string
+    {
+        return $this->badValue;
+    }
+
+    public function isEmpty(): bool
+    {
+        return empty($this->values);
     }
 
     /**
@@ -299,6 +320,6 @@ class SnmpResponse implements \Stringable
 
     public function __sleep()
     {
-        return ['values', 'rawValues', 'exitCode', 'stderr', 'command', 'errorMessage'];
+        return ['values', 'rawValues', 'badValue', 'exitCode', 'stderr', 'command', 'errorMessage'];
     }
 }

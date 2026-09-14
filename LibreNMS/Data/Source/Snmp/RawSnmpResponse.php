@@ -55,6 +55,20 @@ class RawSnmpResponse extends SnmpResponse
         $this->raw = (string) preg_replace('/Wrong Type \(should be .*\): /', '', $output);
     }
 
+    protected function findBadString(): ?string
+    {
+        if (preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $this->raw, $errors)) {
+            return $errors[0];
+        }
+
+        return null;
+    }
+
+    public function isEmpty(): bool
+    {
+        return empty($this->raw);
+    }
+
     /**
      * @return array<string, mixed>
      */
