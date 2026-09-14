@@ -24,7 +24,7 @@ return new class extends Migration
                     'token' => hash('sha256', (string) $token->token_hash),
                     'abilities' => json_encode(['*']),
                     'last_used_at' => null,
-                    'expires_at' => $token->disabled ? '1970-01-01 00:00:00' : null,
+                    'expires_at' => $token->disabled ? now()->subDay() : null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

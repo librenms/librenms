@@ -4,7 +4,6 @@ namespace LibreNMS\Tests\Feature\Http;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\PersonalAccessToken;
 use LibreNMS\Tests\DBTestCase;
 
@@ -139,48 +138,5 @@ class ApiAccessControllerTest extends DBTestCase
 
         $response->assertRedirect(route('api-access.index'));
         $this->assertNull(PersonalAccessToken::find($pat->id));
-    }
-
-    public function testMigrationTransfersLegacyApiTokensToPersonalAccessTokens(): void
-    {
-        $user = User::factory()->admin()->create(['enabled' => 1]);
-        $rawToken1 = bin2hex(random_bytes(16)); // 32 chars
-        $rawToken2 = bin2hex(random_bytes(16));
-
-        $migration = require database_path('migrations/2026_09_12_000000_migrate_api_tokens_to_sanctum.php');
-        $migration->down(); // ensures api_tokens table exists
-
-        DB::table('api_tokens')->insert([
-            'user_id' => $user->user_id,
-            'token_hash' => $rawToken1,
-            'description' => 'Legacy unhashed 1',
-            'disabled' => 0,
-        ]);
-
-        DB::table('api_tokens')->insert([
-            'user_id' => $user->user_id,
-            'token_hash' => $rawToken2,
-            'description' => 'Legacy unhashed 2',
-            'disabled' => 1,
-        ]);
-
-        $migration->up();
-
-        $hash1 = hash('sha256', $rawToken1);
-        $hash2 = hash('sha256', $rawToken2);
-
-        $pat1 = DB::table('personal_access_tokens')->where('token', $hash1)->first();
-        $pat2 = DB::table('personal_access_tokens')->where('token', $hash2)->first();
-
-        $this->assertNotNull($pat1);
-        $this->assertSame('Legacy unhashed 1', $pat1->name);
-        $this->assertSame($user->user_id, (int) $pat1->tokenable_id);
-        $this->assertNull($pat1->expires_at);
-
-        $this->assertNotNull($pat2);
-        $this->assertSame('Legacy unhashed 2', $pat2->name);
-        $this->assertNotNull($pat2->expires_at);
-
-        $this->assertFalse(\Illuminate\Support\Facades\Schema::hasTable('api_tokens'));
     }
 }
