@@ -29,7 +29,8 @@ namespace LibreNMS\Data\Store\Rrd;
 use App\Facades\LibrenmsConfig;
 use Log;
 
-final class RrdPath {
+final class RrdPath
+{
     private readonly string $relativePath;
     private readonly string $rrdDir;
     private string $fileName = '';
@@ -37,7 +38,8 @@ final class RrdPath {
     /**
      * @param  string|string[]  $hostname  hostname of the device
      */
-    public function __construct(string|array $hostname) {
+    public function __construct(string|array $hostname)
+    {
         if (is_array($hostname)) {
             $hostname = implode(DIRECTORY_SEPARATOR, $hostname);
         }
@@ -48,6 +50,7 @@ final class RrdPath {
 
     /**
      * Easy way to start a new instance
+     *
      * @param  string|string[]  $hostname  hostname of the device
      */
     public static function make(string|array $hostname): RrdPath
@@ -59,7 +62,7 @@ final class RrdPath {
     {
         return $this->relativePath;
     }
-  
+
     public function fullPath(): string
     {
         return $this->rrdDir . DIRECTORY_SEPARATOR . $this->relativePath;
@@ -74,7 +77,7 @@ final class RrdPath {
     {
         return $this->fileName($this->relativePath);
     }
-  
+
     public function fullFilePath(): string
     {
         return $this->fileName($this->fullPath());

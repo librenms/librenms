@@ -261,7 +261,7 @@ class Rrd extends BaseDatastore
     /**
      * Get the name of the port rrd file.  For alternate rrd, specify the suffix.
      */
-    public function portName(int $port_id, string $suffix = null): string
+    public function portName(int $port_id, ?string $suffix = null): string
     {
         return "port-id$port_id" . (empty($suffix) ? '' : '-' . $suffix);
     }
