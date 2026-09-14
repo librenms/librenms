@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Tests;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Support\Facades\Facade;
@@ -142,18 +141,8 @@ final class OSDiscoveryTest extends TestCase
      */
     #[DataProvider('osProvider')]
     #[TestDox('OS detection')]
-    public function testOSDetection($os_name): void
+    public function testOSDetection($os_name, array $files = []): void
     {
-        $glob = LibrenmsConfig::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
-        $files = array_map(fn ($file) => basename($file, '.snmprec'), glob($glob));
-        $files = array_filter($files, function ($file) use ($os_name) {
-            if (Str::contains($file, '@')) {
-                return false;
-            }
-
-            return $file == $os_name || Str::startsWith($file, $os_name . '_');
-        });
-
         if (empty($files)) {
             $this->fail("No snmprec files found for $os_name!");
         }
@@ -254,9 +243,19 @@ final class OSDiscoveryTest extends TestCase
         ];
         $filtered_os = array_diff($config_os, $excluded_os);
 
+        $snmprecFiles = array_map(fn ($f) => basename($f, '.snmprec'), glob(realpath(__DIR__ . '/..') . '/tests/snmpsim/*.snmprec'));
+        $snmprecFiles = array_filter($snmprecFiles, fn ($f) => ! str_contains($f, '@'));
+
         $all_os = [];
         foreach ($filtered_os as $os) {
-            $all_os[$os] = [$os];
+            $prefix = $os . '_';
+            $matchedFiles = [];
+            foreach ($snmprecFiles as $file) {
+                if ($file === $os || str_starts_with($file, $prefix)) {
+                    $matchedFiles[] = $file;
+                }
+            }
+            $all_os[$os] = [$os, $matchedFiles];
         }
 
         return $all_os;

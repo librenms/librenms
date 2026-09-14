@@ -48,7 +48,7 @@ class RawSnmpResponse extends SnmpResponse
         array $command = [],
     ) {
         parent::__construct(
-            values: [],
+            rawValues: [],
             stderr: $stderr,
             exitCode: $exitCode,
             command: $command,
