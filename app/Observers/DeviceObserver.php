@@ -10,6 +10,7 @@ use App\Models\Eventlog;
 use Illuminate\Support\Facades\App;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostRenameException;
+use LibreNMS\Exceptions\RrdPermissionException;
 use Log;
 
 class DeviceObserver
@@ -93,7 +94,7 @@ class DeviceObserver
 
             try {
                 Rrd::renameDevice($old_name, $new_name);
-            } catch (\Exception $e) {
+            } catch (RrdPermissionException $e) {
                 Eventlog::log("Renaming of $old_name failed", $device, 'system', Severity::Error);
 
                 throw new HostRenameException($e->getMessage());
