@@ -28,7 +28,6 @@ namespace LibreNMS\Data\Source\Snmp;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use LibreNMS\Util\Oid;
 use Log;
 
@@ -53,8 +52,7 @@ class SnmpResponse implements \Stringable
         public readonly array $command = [],
     ) {
         foreach ($this->rawValues as $oid => $val) {
-            if (Str::contains((string) $val, ['No Such Instance', 'No Such Object', 'at this OID', 'this MIB View', 'End of MIB']) || str_ends_with((string) $val, ' = NULL')) {
-                $this->errorMessage ??= (string) $val;
+            if (preg_match('/(No Such Instance|No Such Object|at this OID|this MIB View|End of MIB)/', (string) $val) || str_ends_with((string) $val, ' = NULL')) {
                 continue;
             }
             $this->values[$oid] = (string) $val;
@@ -74,22 +72,20 @@ class SnmpResponse implements \Stringable
 
     public function isValid(bool $ignore_partial = false): bool
     {
-        if (! empty($this->stderr) && preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/', $this->stderr, $errors)) {
-            $this->errorMessage = $errors[0];
-            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: false Bad String: %s', $this->exitCode, $errors[0]));
-
-            return false;
+        if ($ignore_partial) {
+            return ! empty($this->values());
         }
 
-        if (! empty($this->errorMessage)) {
-            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: false Bad String: %s', $this->exitCode, $this->errorMessage));
+        $this->errorMessage = '';
+        $raw = $this->raw();
 
-            return false;
-        }
+        $invalid = (! empty($this->stderr) && preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/', $this->stderr, $errors))
+            || empty($raw)
+            || preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $raw, $errors);
 
-        if (empty($this->values)) {
-            $this->errorMessage = 'Empty Output';
-            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: true Bad String: not found', $this->exitCode));
+        if ($invalid) {
+            $this->errorMessage = $errors[0] ?? 'Empty Output';
+            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: %s Bad String: %s', $this->exitCode, var_export(empty($raw), true), $errors[0] ?? 'not found'));
 
             return false;
         }
@@ -291,7 +287,7 @@ class SnmpResponse implements \Stringable
     private function getOidParts(string $key): array
     {
         // table
-        if (Str::contains($key, '[')) {
+        if (str_contains($key, '[')) {
             preg_match_all('/([^[\]]+)/', $key, $parts);
 
             return $parts[1]; // get all group 1 matches

@@ -27,9 +27,7 @@
 namespace LibreNMS\Data\Source\Snmp;
 
 use App\Facades\LibrenmsConfig;
-use Illuminate\Support\Str;
 use LibreNMS\Util\StringHelpers;
-use Log;
 
 class RawSnmpResponse extends SnmpResponse
 {
@@ -57,28 +55,6 @@ class RawSnmpResponse extends SnmpResponse
         $this->raw = (string) preg_replace('/Wrong Type \(should be .*\): /', '', $output);
     }
 
-    public function isValid(bool $ignore_partial = false): bool
-    {
-        if ($ignore_partial) {
-            return ! empty($this->values());
-        }
-
-        $this->errorMessage = '';
-
-        $invalid = (! empty($this->stderr) && preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/', $this->stderr, $errors))
-            || empty($this->raw)
-            || preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $this->raw, $errors);
-
-        if ($invalid) {
-            $this->errorMessage = $errors[0] ?? 'Empty Output';
-            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: %s Bad String: %s', $this->exitCode, var_export(empty($this->raw), true), $errors[0] ?? 'not found'));
-
-            return false;
-        }
-
-        return true;
-    }
-
     /**
      * @return array<string, mixed>
      */
@@ -92,7 +68,7 @@ class RawSnmpResponse extends SnmpResponse
         $this->values = [];
         $line = strtok($this->raw, PHP_EOL);
         while ($line !== false) {
-            if (Str::contains($line, ['at this OID', 'this MIB View', 'End of MIB']) || str_ends_with($line, ' = NULL')) {
+            if (str_contains($line, 'at this OID') || str_contains($line, 'this MIB View') || str_contains($line, 'End of MIB') || str_ends_with($line, ' = NULL')) {
                 $line = strtok(PHP_EOL);
                 continue;
             }
@@ -104,7 +80,7 @@ class RawSnmpResponse extends SnmpResponse
             [$oid, $value] = $parts;
 
             $line = strtok(PHP_EOL);
-            while ($line !== false && ! Str::contains($line, self::KEY_VALUE_DELIMITER)) {
+            while ($line !== false && ! str_contains($line, self::KEY_VALUE_DELIMITER)) {
                 $value .= PHP_EOL . $line;
                 $line = strtok(PHP_EOL);
             }
@@ -113,7 +89,7 @@ class RawSnmpResponse extends SnmpResponse
                 $value = stripslashes($value);
             }
 
-            if (Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
+            if (str_starts_with($value, '"') && str_ends_with($value, '"')) {
                 $value = trim(stripslashes($value), "\" \n\r");
             } else {
                 $value = trim($value);
