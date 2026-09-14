@@ -34,11 +34,16 @@ use LibreNMS\Util\Oid;
 use LibreNMS\Util\StringHelpers;
 use Log;
 
+/**
+ * @property-read string $raw
+ */
 class SnmpResponse implements \Stringable
 {
     protected const KEY_VALUE_DELIMITER = ' = ';
 
-    public readonly string $raw;
+    private ?string $raw = null;
+    /** @var array<string, string>|null */
+    private ?array $rawValues = null;
 
     private ?string $errorMessage = null;
     /**
@@ -62,15 +67,15 @@ class SnmpResponse implements \Stringable
         public readonly array $command = [],
     ) {
         if (is_array($output)) {
-            $raw = '';
             $values = [];
             foreach ($output as $oid => $val) {
-                $raw .= ($oid !== '' ? "$oid" . self::KEY_VALUE_DELIMITER : '') . "$val\n";
-                if (! Str::contains((string) $val, ['at this OID', 'this MIB View', 'End of MIB']) && ! str_ends_with((string) $val, ' = NULL')) {
-                    $values[$oid] = (string) $val;
+                if (Str::contains((string) $val, ['No Such Instance', 'No Such Object', 'at this OID', 'this MIB View', 'End of MIB']) || str_ends_with((string) $val, ' = NULL')) {
+                    $this->errorMessage ??= (string) $val;
+                    continue;
                 }
+                $values[$oid] = (string) $val;
             }
-            $this->raw = $raw;
+            $this->rawValues = $output;
             $this->values = $values;
         } else {
             $this->raw = (string) preg_replace('/Wrong Type \(should be .*\): /', '', $output);
@@ -94,14 +99,74 @@ class SnmpResponse implements \Stringable
         return new self($values, $stderr, $exitCode, $command);
     }
 
+    public function __get(string $name): mixed
+    {
+        if ($name === 'raw') {
+            return $this->raw();
+        }
+
+        return null;
+    }
+
+    public function __isset(string $name): bool
+    {
+        return $name === 'raw';
+    }
+
+    public function raw(): string
+    {
+        if ($this->raw !== null) {
+            return $this->raw;
+        }
+
+        if ($this->rawValues !== null) {
+            $raw = '';
+            foreach ($this->rawValues as $oid => $val) {
+                $raw .= ($oid !== '' ? "$oid" . self::KEY_VALUE_DELIMITER : '') . "$val\n";
+            }
+
+            return $this->raw = $raw;
+        }
+
+        return '';
+    }
+
     public function isValid(bool $ignore_partial = false): bool
     {
         $this->errorMessage = '';
-        $raw = $ignore_partial ? $this->getRawWithoutBadLines() : $this->raw;
 
-        // not checking exitCode because I think it may lead to false negatives
-        $invalid = preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/', $this->stderr, $errors)
-            || empty($raw)
+        if (! empty($this->stderr) && preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/', $this->stderr, $errors)) {
+            $this->errorMessage = $errors[0];
+            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: false Bad String: %s', $this->exitCode, $errors[0]));
+
+            return false;
+        }
+
+        if ($this->values !== null) {
+            if ($this->rawValues !== null) {
+                foreach ($this->rawValues as $val) {
+                    if (preg_match('/(No Such Instance|No Such Object|No more variables left).*/', (string) $val, $errors)) {
+                        $this->errorMessage = $errors[0];
+                        Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: false Bad String: %s', $this->exitCode, $errors[0]));
+
+                        return false;
+                    }
+                }
+            }
+
+            if (empty($this->values)) {
+                $this->errorMessage = 'Empty Output';
+                Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: true Bad String: not found', $this->exitCode));
+
+                return false;
+            }
+
+            return true;
+        }
+
+        $raw = $ignore_partial ? $this->getRawWithoutBadLines() : $this->raw();
+
+        $invalid = empty($raw)
             || preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $raw, $errors);
 
         if ($invalid) {
@@ -165,13 +230,11 @@ class SnmpResponse implements \Stringable
         }
 
         // try to match table format
-        if (str_contains($this->raw, '[')) {
-            foreach ($oids as $oid) {
-                $dot_index_oid = preg_replace('/\.([^.]+)/', '[$1]', (string) $oid);
-                // if new oid is different and exists and is not an empty string
-                if ($dot_index_oid !== $oid && isset($values[$dot_index_oid]) && $values[$dot_index_oid] !== '') {
-                    return $values[$dot_index_oid];
-                }
+        foreach ($oids as $oid) {
+            $dot_index_oid = preg_replace('/\.([^.]+)/', '[$1]', (string) $oid);
+            // if new oid is different and exists and is not an empty string
+            if ($dot_index_oid !== $oid && isset($values[$dot_index_oid]) && $values[$dot_index_oid] !== '') {
+                return $values[$dot_index_oid];
             }
         }
 
@@ -184,9 +247,10 @@ class SnmpResponse implements \Stringable
             return $this->values;
         }
 
-        $this->inferValueEncoding ??= ! StringHelpers::isValidUtf8($this->raw);
+        $raw = $this->raw();
+        $this->inferValueEncoding ??= ! StringHelpers::isValidUtf8($raw);
         $this->values = [];
-        $line = strtok($this->raw, PHP_EOL);
+        $line = strtok($raw, PHP_EOL);
         while ($line !== false) {
             if (Str::contains($line, ['at this OID', 'this MIB View', 'End of MIB']) || str_ends_with($line, ' = NULL')) {
                 // these occur when we seek past the end of data, usually the end of the response, but grab the next line and continue
@@ -346,20 +410,29 @@ class SnmpResponse implements \Stringable
             '/^.*No Such (Instance currently exists|Object available on this agent at this OID).*$/m',
             '/(\n[^\r\n]+No more variables left[^\r\n]+)+$/m',
             '/^.* = NULL[\r\n]*$/',
-        ], '', $this->raw);
+        ], '', $this->raw());
     }
 
     public function append(SnmpResponse $response): SnmpResponse
     {
-        $newResponse = new static(
-            $this->raw . $response->raw,
-            $this->stderr . $response->stderr,
-            $this->exitCode ?: $response->exitCode,
-            $response->command ?: $this->command,
-        );
-
         if ($this->values !== null && $response->values !== null) {
-            $newResponse->values = array_merge($this->values, $response->values);
+            $rawValues = ($this->rawValues !== null && $response->rawValues !== null)
+                ? array_merge($this->rawValues, $response->rawValues)
+                : array_merge($this->values, $response->values);
+
+            $newResponse = new static(
+                $rawValues,
+                $this->stderr . $response->stderr,
+                $this->exitCode ?: $response->exitCode,
+                $response->command ?: $this->command,
+            );
+        } else {
+            $newResponse = new static(
+                $this->raw() . $response->raw(),
+                $this->stderr . $response->stderr,
+                $this->exitCode ?: $response->exitCode,
+                $response->command ?: $this->command,
+            );
         }
 
         $newResponse->errorMessage = $this->errorMessage ?: $response->errorMessage;
@@ -369,7 +442,7 @@ class SnmpResponse implements \Stringable
 
     public function __toString(): string
     {
-        return $this->raw;
+        return $this->raw();
     }
 
     private function getOidParts(string $key): array
@@ -387,6 +460,6 @@ class SnmpResponse implements \Stringable
 
     public function __sleep()
     {
-        return ['raw', 'exitCode', 'stderr', 'command'];
+        return ['raw', 'exitCode', 'stderr', 'command', 'values', 'rawValues', 'errorMessage'];
     }
 }
