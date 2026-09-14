@@ -96,7 +96,7 @@ readonly class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
         $proc->setTimeout((int) LibrenmsConfig::get('snmp.exec_timeout', 1200));
         $proc->run();
 
-        return new SnmpResponse(
+        return new RawSnmpResponse(
             $proc->getOutput(),
             $proc->getErrorOutput(),
             $proc->getExitCode(),
