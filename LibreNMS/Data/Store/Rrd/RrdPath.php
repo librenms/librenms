@@ -118,7 +118,7 @@ final class RrdPath
      */
     public function fullDir(): string
     {
-        return $this->rrdDir . DIRECTORY_SEPARATOR . $this->relativePath;
+        return $this->rrdDir . DIRECTORY_SEPARATOR . $this->relativeDir;
     }
 
     /**
