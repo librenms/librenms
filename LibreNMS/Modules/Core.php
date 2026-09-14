@@ -244,13 +244,13 @@ class Core implements Module
                 if (preg_match_any($device['sysObjectID'] ?? '', $value) == $check) {
                     return false;
                 }
-            } elseif ($key == 'snmpget') {
-                $get_value = SnmpQuery::device($device)
+            } elseif ($key === 'snmpget') {
+                $response = SnmpQuery::device($device)
                     ->options($value['options'] ?? null)
                     ->mibDir($value['mib_dir'] ?? $mibdir)
-                    ->get($value['oid'])
-                    ->value();
-                if (Compare::values($get_value, $value['value'], $value['op'] ?? 'contains') == $check) {
+                    ->get($value['oid']);
+
+                if (Compare::values($response->isValid() ? $response->value() : null, $value['value'], $value['op'] ?? 'contains') === $check) {
                     return false;
                 }
             } elseif ($key == 'snmpwalk') {
