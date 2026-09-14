@@ -48,10 +48,10 @@ class PrintSnmpDebugOutput
         if (! Debug::isVerbose()) {
             $debugCommand = preg_replace($this->commandCleanupPatterns, $this->commandReplacementPatterns, $commandStr);
             Log::debug('SNMP[%c' . $debugCommand . '%n]', ['color' => true]);
-            Log::debug(preg_replace($this->output_regex, $this->output_replacement, $event->response->debugOutput()));
+            Log::debug(preg_replace($this->output_regex, $this->output_replacement, $event->response->raw()));
         } else {
             Log::debug('SNMP[%c' . $commandStr . '%n]', ['color' => true]);
-            Log::debug($event->response->debugOutput());
+            Log::debug($event->response->raw());
         }
 
         if (! empty($event->response->stderr)) {

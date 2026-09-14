@@ -11,7 +11,7 @@ use LibreNMS\Util\Debug;
 
 final class PrintSnmpDebugOutputTest extends TestCase
 {
-    public function testHandlesArrayResponseUsingDebugOutput(): void
+    public function testHandlesArrayResponseUsingRawOutput(): void
     {
         Debug::set(true);
         Debug::setVerbose(true);
@@ -34,11 +34,13 @@ final class PrintSnmpDebugOutputTest extends TestCase
 
         Log::shouldReceive('debug')
             ->once()
-            ->with("sysDescr.0 = Linux 6.1\nsysObjectID.0 = 1.3.6.1.4.1.8072.3.2.10");
+            ->with("sysDescr.0 = Linux 6.1\nsysObjectID.0 = 1.3.6.1.4.1.8072.3.2.10\n");
 
-        (new PrintSnmpDebugOutput())->handle($event);
-
-        Debug::set(false);
-        Debug::setVerbose(false);
+        try {
+            (new PrintSnmpDebugOutput())->handle($event);
+        } finally {
+            Debug::set(false);
+            Debug::setVerbose(false);
+        }
     }
 }

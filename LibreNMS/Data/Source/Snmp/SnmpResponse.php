@@ -32,9 +32,6 @@ use Illuminate\Support\Str;
 use LibreNMS\Util\Oid;
 use Log;
 
-/**
- * @property-read string $raw
- */
 class SnmpResponse implements \Stringable
 {
     protected const KEY_VALUE_DELIMITER = ' = ';
@@ -88,21 +85,7 @@ class SnmpResponse implements \Stringable
         return new self($values, $stderr, $exitCode, $command);
     }
 
-    public function __get(string $name): mixed
-    {
-        if ($name === 'raw') {
-            return $this->debugOutput();
-        }
-
-        return null;
-    }
-
-    public function __isset(string $name): bool
-    {
-        return $name === 'raw';
-    }
-
-    public function debugOutput(): string
+    public function raw(): string
     {
         $lines = [];
         $source = ! empty($this->rawValues) ? $this->rawValues : $this->values;
@@ -305,17 +288,9 @@ class SnmpResponse implements \Stringable
         return $return;
     }
 
-    /**
-     * @return int
-     */
     public function getExitCode(): int
     {
         return $this->exitCode;
-    }
-
-    public function getRawWithoutBadLines(): string
-    {
-        return $this->debugOutput();
     }
 
     public function append(SnmpResponse $response): SnmpResponse
@@ -334,7 +309,7 @@ class SnmpResponse implements \Stringable
 
     public function __toString(): string
     {
-        return $this->debugOutput();
+        return $this->raw();
     }
 
     private function getOidParts(string $key): array

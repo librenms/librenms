@@ -254,12 +254,13 @@ class Core implements Module
                     return false;
                 }
             } elseif ($key == 'snmpwalk') {
-                $walk_value = SnmpQuery::device($device)
+                $walk_values = SnmpQuery::device($device)
                     ->options($value['options'] ?? null)
                     ->mibDir($value['mib_dir'] ?? $mibdir)
                     ->walk($value['oid'])
-                    ->raw;
-                if (Compare::values($walk_value, $value['value'], $value['op'] ?? 'contains') == $check) {
+                    ->values();
+                $matched = collect($walk_values)->contains(fn ($val) => Compare::values($val, $value['value'], $value['op'] ?? 'contains'));
+                if ($matched == $check) {
                     return false;
                 }
             }

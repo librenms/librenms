@@ -52,7 +52,10 @@ final class OSDiscoveryTest extends TestCase
 
         $glob = realpath(__DIR__ . '/..') . '/tests/snmpsim/*.snmprec';
 
-        self::$unchecked_files = array_flip(array_filter(array_map(fn ($file) => basename($file, '.snmprec'), glob($glob)), fn ($file) => ! Str::contains($file, '@')));
+        self::$unchecked_files = array_flip(array_filter(
+            array_map(fn ($file) => basename($file, '.snmprec'), glob($glob)),
+            fn ($file) => ! Str::contains($file, '@') && ! in_array($file, ['snmpquerymock_regression', 'snmprec_regression'], true)
+        ));
     }
 
     #[TestDox('Valid OS names')]

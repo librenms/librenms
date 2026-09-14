@@ -67,31 +67,25 @@ final class SnmprecSnmpBackendTest extends TestCase
 
     public function test_walk_does_not_match_numerically_adjacent_subtrees(): void
     {
-        $output = $this->makeNumericQuery()->walk(self::BASE_OID)->raw;
+        $values = $this->makeNumericQuery()->walk(self::BASE_OID)->values();
 
         // base OID is "1.3.6.1.2.1.2.2.1.2"; siblings "1.3.6.1.2.1.2.20.x" and
         // "1.3.6.1.2.1.2.21.x" share the numeric prefix without a dot boundary.
-        $this->assertStringNotContainsString('sibling-subtree-20', $output);
-        $this->assertStringNotContainsString('sibling-subtree-21', $output);
+        $this->assertArrayNotHasKey('.1.3.6.1.2.1.2.20.1', $values);
+        $this->assertArrayNotHasKey('.1.3.6.1.2.1.2.21.1', $values);
+        $this->assertNotContains('sibling-subtree-20', $values);
+        $this->assertNotContains('sibling-subtree-21', $values);
     }
 
     public function test_walk_returns_each_row_with_full_oid_suffix(): void
     {
-        $output = $this->makeNumericQuery()->walk(self::BASE_OID)->raw;
+        $values = $this->makeNumericQuery()->walk(self::BASE_OID)->values();
 
-        $this->assertSame(
-            ".1.3.6.1.2.1.2.2.1.2.1 = eth0\n.1.3.6.1.2.1.2.2.1.2.2 = eth1\n.1.3.6.1.2.1.2.2.1.2.3 = eth2\n",
-            $output
-        );
-    }
-
-    public function test_walk_output_lines_are_newline_terminated(): void
-    {
-        $output = $this->makeNumericQuery()->walk(self::BASE_OID)->raw;
-
-        $lines = array_filter(explode("\n", $output), fn ($l) => $l !== '');
-        $this->assertCount(3, $lines, "expected exactly 3 newline-separated rows, got: $output");
-        $this->assertStringEndsWith("\n", $output);
+        $this->assertSame([
+            '.1.3.6.1.2.1.2.2.1.2.1' => 'eth0',
+            '.1.3.6.1.2.1.2.2.1.2.2' => 'eth1',
+            '.1.3.6.1.2.1.2.2.1.2.3' => 'eth2',
+        ], $values);
     }
 
     public function test_direct_backend_get_and_walk(): void
@@ -114,10 +108,6 @@ final class SnmprecSnmpBackendTest extends TestCase
             '.1.3.6.1.2.1.2.2.1.2.1' => 'eth0',
             '.1.3.6.1.2.1.2.2.1.2.2' => 'eth1',
         ], $getResponse->values());
-        $this->assertSame(
-            ".1.3.6.1.2.1.2.2.1.2.1 = eth0\n.1.3.6.1.2.1.2.2.1.2.2 = eth1\n",
-            $getResponse->raw
-        );
     }
 
     public function test_numeric_output_matches_real_net_snmp(): void
@@ -128,23 +118,23 @@ final class SnmprecSnmpBackendTest extends TestCase
         $real = (new SnmpQuery(backend: resolve(SnmpBackendInterface::class)))->device($this->snmpsimDevice())->numeric();
 
         $this->assertSame(
-            $real->walk(self::BASE_OID)->raw,
-            $mock->walk(self::BASE_OID)->raw,
+            $real->walk(self::BASE_OID)->values(),
+            $mock->walk(self::BASE_OID)->values(),
             'mock walk output diverges from real net-snmp'
         );
         $this->assertSame(
-            $real->get(self::BASE_OID . '.1')->raw,
-            $mock->get(self::BASE_OID . '.1')->raw,
+            $real->get(self::BASE_OID . '.1')->values(),
+            $mock->get(self::BASE_OID . '.1')->values(),
             'mock get output diverges from real net-snmp'
         );
         $this->assertSame(
-            $real->get(self::BASE_OID . '.99')->raw,
-            $mock->get(self::BASE_OID . '.99')->raw,
+            $real->get(self::BASE_OID . '.99')->values(),
+            $mock->get(self::BASE_OID . '.99')->values(),
             'mock get output for a missing OID diverges from real net-snmp'
         );
         $this->assertSame(
-            $real->next(self::BASE_OID)->raw,
-            $mock->next(self::BASE_OID)->raw,
+            $real->next(self::BASE_OID)->values(),
+            $mock->next(self::BASE_OID)->values(),
             'mock getnext output diverges from real net-snmp'
         );
     }

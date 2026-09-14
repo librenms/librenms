@@ -212,7 +212,12 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
                         ])) {
                             $itemData = Mac::parse($itemData)->readable();
                         } else {
-                            $itemData = hex2bin($itemData);
+                            $hex = trim($itemData);
+                            if (strlen($hex) % 2 !== 0) {
+                                $hex = '0' . $hex;
+                            }
+                            $decoded = @hex2bin($hex);
+                            $itemData = $decoded !== false ? $decoded : $itemData;
                         }
                     }
 

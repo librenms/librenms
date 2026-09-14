@@ -38,7 +38,8 @@ final class SnmpResponseTest extends TestCase
         $response = new RawSnmpResponse("IF-MIB::ifDescr[1] = \xD8verbyvegen\n");
 
         $this->assertSame('Øverbyvegen', $response->value());
-        $this->assertSame("IF-MIB::ifDescr[1] = \xD8verbyvegen\n", $response->raw);
+        $this->assertSame("IF-MIB::ifDescr[1] = \xD8verbyvegen\n", $response->raw());
+        $this->assertSame(['IF-MIB::ifDescr[1]' => 'Øverbyvegen'], $response->values());
     }
 
     public function testSimple(): void
@@ -361,7 +362,6 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         // NULL return
         $response = new RawSnmpResponse("hrDeviceTable = NULL\n", '', 0);
         $this->assertTrue($response->isValid());
-        $this->assertEquals('', $response->getRawWithoutBadLines());
         $response->mapTable(function (): void {
             $this->fail('There should be no data in the array.');
         });
@@ -377,7 +377,6 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $response = SnmpResponse::fromValues($values);
 
         $this->assertTrue($response->isValid());
-        $this->assertSame("IF-MIB::ifDescr[1] = lo\nIF-MIB::ifDescr[2] = enp4s0\n", $response->raw);
         $this->assertSame($values, $response->values());
         $this->assertSame('lo', $response->value());
         $this->assertSame('enp4s0', $response->value('IF-MIB::ifDescr[2]'));
@@ -392,7 +391,6 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $response = SnmpResponse::fromValues($values);
 
         $this->assertFalse($response->isValid());
-        $this->assertSame("1.3.6.1.2.1.2.2.1.2.99 = No Such Instance currently exists at this OID\n", $response->raw);
         $this->assertSame([], $response->values());
         $this->assertSame('No Such Instance currently exists at this OID', $response->getErrorMessage());
     }
@@ -405,10 +403,23 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $combined = $first->append($second);
 
         $this->assertTrue($combined->isValid());
-        $this->assertSame("IF-MIB::ifDescr[1] = lo\nIF-MIB::ifDescr[2] = enp4s0\n", $combined->raw);
         $this->assertSame([
             'IF-MIB::ifDescr[1]' => 'lo',
             'IF-MIB::ifDescr[2]' => 'enp4s0',
         ], $combined->values());
+    }
+
+    public function testRawOutput(): void
+    {
+        $response = SnmpResponse::fromValues([
+            'IF-MIB::ifDescr[1]' => 'lo',
+            'IF-MIB::ifDescr[2]' => 'enp4s0',
+        ]);
+        $this->assertSame("IF-MIB::ifDescr[1] = lo\nIF-MIB::ifDescr[2] = enp4s0\n", $response->raw());
+        $this->assertSame("IF-MIB::ifDescr[1] = lo\nIF-MIB::ifDescr[2] = enp4s0\n", (string) $response);
+
+        $rawResponse = new RawSnmpResponse("IF-MIB::ifDescr[1] = lo\n");
+        $this->assertSame("IF-MIB::ifDescr[1] = lo\n", $rawResponse->raw());
+        $this->assertSame("IF-MIB::ifDescr[1] = lo\n", (string) $rawResponse);
     }
 }

@@ -33,7 +33,7 @@ use Log;
 
 class RawSnmpResponse extends SnmpResponse
 {
-    public readonly string $raw;
+    protected readonly string $raw;
     private ?bool $inferValueEncoding = null;
 
     /**
@@ -59,16 +59,19 @@ class RawSnmpResponse extends SnmpResponse
 
     public function isValid(bool $ignore_partial = false): bool
     {
+        if ($ignore_partial) {
+            return ! empty($this->values());
+        }
+
         $this->errorMessage = '';
-        $raw = $ignore_partial ? $this->getRawWithoutBadLines() : $this->raw;
 
         $invalid = (! empty($this->stderr) && preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/', $this->stderr, $errors))
-            || empty($raw)
-            || preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $raw, $errors);
+            || empty($this->raw)
+            || preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $this->raw, $errors);
 
         if ($invalid) {
             $this->errorMessage = $errors[0] ?? 'Empty Output';
-            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: %s Bad String: %s', $this->exitCode, var_export(empty($raw), true), $errors[0] ?? 'not found'));
+            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: %s Bad String: %s', $this->exitCode, var_export(empty($this->raw), true), $errors[0] ?? 'not found'));
 
             return false;
         }
@@ -121,16 +124,7 @@ class RawSnmpResponse extends SnmpResponse
         return $this->values;
     }
 
-    public function getRawWithoutBadLines(): string
-    {
-        return (string) preg_replace([
-            '/^.*No Such (Instance currently exists|Object available on this agent at this OID).*$/m',
-            '/(\n[^\r\n]+No more variables left[^\r\n]+)+$/m',
-            '/^.* = NULL[\r\n]*$/',
-        ], '', $this->raw);
-    }
-
-    public function debugOutput(): string
+    public function raw(): string
     {
         return $this->raw;
     }
