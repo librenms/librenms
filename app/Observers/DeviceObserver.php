@@ -10,7 +10,6 @@ use App\Models\Eventlog;
 use Illuminate\Support\Facades\App;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostRenameException;
-use LibreNMS\Exceptions\RrdPermissionException;
 use Log;
 
 class DeviceObserver
