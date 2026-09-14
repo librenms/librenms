@@ -48,20 +48,15 @@ class Vminfo extends DeviceRelatedModel implements Keyable
     /**
      * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[], search?: bool}>
      */
-    public static function filterFieldDefinitions(?int $deviceId = null): array
+    public static function filterFieldDefinitions(): array
     {
-        $fields = [];
-
-        if ($deviceId === null) {
-            $fields[] = [
+        return [
+            [
                 'key' => 'device_id',
                 'label' => __('Host'),
                 'type' => 'select',
                 'endpoint' => route('ajax.select.device'),
-            ];
-        }
-
-        return array_merge($fields, [
+            ],
             [
                 'key' => 'search',
                 'label' => __('VM Name'),
@@ -94,37 +89,14 @@ class Vminfo extends DeviceRelatedModel implements Keyable
                 'label' => __('Memory (MB)'),
                 'type' => 'number',
             ],
-        ]);
+        ];
     }
 
-    /**
-     * query used by the VM list page, the device tab and the export.
-     *
-     * @param  Builder<Vminfo>  $query
-     * @param  array<string, mixed>  $filters
-     * @return Builder<Vminfo>
-     */
-    protected function scopeListing(Builder $query, User $user, ?int $deviceId, array $filters): Builder
-    {
-        return $query->hasAccess($user)
-            ->with(['device', 'parentDevice'])
-            ->when($deviceId, fn (Builder $q) => $q->where('vminfo.device_id', $deviceId))
-            ->when($filters, fn (Builder $q) => $q->applyFilters($filters))
-            ->orderBy('vmwVmDisplayName')
-            ->select('vminfo.*');
-    }
-
-    /**
-     * Search the name of the VM and the host it runs on.
-     */
     public function filterSearch(Builder $query, mixed $value, array $config): void
     {
         $this->applyFilterSearch(['vmwVmDisplayName', 'device.hostname', 'device.sysName'], $query, $value, $config);
     }
 
-    /**
-     * Accept the power state by name instead of by number.
-     */
     public function filterVmwVmState(Builder $query, mixed $value, array $config): void
     {
         $this->applyMappedFilter($query, $value, $config, fn (Builder $q, $state) => $q->where('vmwVmState', match ($state) {
