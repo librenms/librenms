@@ -577,11 +577,13 @@ class Rrd extends BaseDatastore
     /**
      * Rename storage for a device
      */
-    public function renameDevice(string $oldName, string $newName): bool
+    public function renameDevice(Device $device, string $oldName, string $newName): bool
     {
         $new_rrd_dir = RrdPath::make($newName)->fullPath();
 
         if (is_dir($new_rrd_dir)) {
+            Eventlog::log("Renaming of $oldName failed due to existing RRD folder for $newName", $device, 'system', Severity::Error);
+
             throw new RrdPermissionException("Renaming of $oldName failed due to existing RRD folder for $newName");
         }
 

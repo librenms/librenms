@@ -92,13 +92,7 @@ class DeviceObserver
                 throw new HostRenameException("Renaming of $old_name failed because there is already a device with the hostname $new_name");
             }
 
-            try {
-                Rrd::renameDevice($old_name, $new_name);
-            } catch (RrdPermissionException $e) {
-                Eventlog::log("Renaming of $old_name failed", $device, 'system', Severity::Error);
-
-                throw new HostRenameException($e->getMessage());
-            }
+            Rrd::renameDevice($device, $old_name, $new_name);
 
             $device->ip = null;
             $source = auth()->user()?->username ?: 'console';
