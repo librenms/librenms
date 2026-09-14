@@ -213,6 +213,11 @@ class Rrd extends BaseDatastore
      */
     public function tune($type, $filename, $max): bool
     {
+        // tune only works on the local filesystem - use the fully qualified path the RRD file
+        if ($this->rrdcached) {
+            $filename = implode('/', [$this->rrd_dir, $filename]);
+        }
+
         $fields = [];
         if ($type === 'port') {
             if ($max < 10000000) {
