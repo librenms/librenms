@@ -40,26 +40,21 @@ class SnmpResponse implements \Stringable
      * @var array<string, string> <oid, value>
      */
     protected array $values = [];
-    /**
-     * @var array<string, string>
-     */
-    protected array $rawValues = [];
     protected ?string $errorMessage = null;
 
     /**
-     * @param  array<string, string>  $values
+     * @param  array<string, string>  $rawValues
      * @param  string  $stderr
      * @param  int  $exitCode
      * @param  array<int, string>  $command
      */
     public function __construct(
-        array $values = [],
+        protected array $rawValues = [],
         public readonly string $stderr = '',
         public readonly int $exitCode = 0,
         public readonly array $command = [],
     ) {
-        $this->rawValues = $values;
-        foreach ($values as $oid => $val) {
+        foreach ($this->rawValues as $oid => $val) {
             if (Str::contains((string) $val, ['No Such Instance', 'No Such Object', 'at this OID', 'this MIB View', 'End of MIB']) || str_ends_with((string) $val, ' = NULL')) {
                 $this->errorMessage ??= (string) $val;
                 continue;

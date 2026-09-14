@@ -164,6 +164,7 @@ class SnmprecSnmpBackend implements SnmpBackendInterface
 
         if ($isNumeric) {
             $val = $type === '6' ? ".$data" : $data;
+
             return [".$key", $val]; // net-snmp -On prints numeric OIDs with a leading dot
         }
 

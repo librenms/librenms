@@ -28,6 +28,8 @@ namespace LibreNMS\Tests;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use Illuminate\Foundation\Bootstrap\HandleExceptions;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
@@ -45,6 +47,7 @@ final class OSDiscoveryTest extends TestCase
 {
     /** @var array<string, int> */
     private static ?array $unchecked_files = null;
+    private static ?\Illuminate\Contracts\Foundation\Application $sharedApp = null;
 
     public static function setUpBeforeClass(): void
     {
@@ -56,6 +59,36 @@ final class OSDiscoveryTest extends TestCase
             array_map(fn ($file) => basename($file, '.snmprec'), glob($glob)),
             fn ($file) => ! Str::contains($file, '@') && ! in_array($file, ['snmpquerymock_regression', 'snmprec_regression'], true)
         ));
+    }
+
+    protected function setUp(): void
+    {
+        if (self::$sharedApp === null) {
+            parent::setUp();
+            self::$sharedApp = $this->app;
+            if (! getenv('SNMPSIM')) {
+                $this->app->bind(SnmpBackendInterface::class, SnmprecSnmpBackend::class);
+            }
+        } else {
+            $this->app = self::$sharedApp;
+            Facade::setFacadeApplication($this->app);
+            (new HandleExceptions)->bootstrap($this->app);
+        }
+    }
+
+    protected function tearDown(): void
+    {
+        HandleExceptions::flushState($this);
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if (self::$sharedApp !== null) {
+            self::$sharedApp->flush();
+            self::$sharedApp = null;
+        }
+
+        parent::tearDownAfterClass();
     }
 
     #[TestDox('Valid OS names')]
@@ -111,10 +144,6 @@ final class OSDiscoveryTest extends TestCase
     #[TestDox('OS detection')]
     public function testOSDetection($os_name): void
     {
-        if (! getenv('SNMPSIM')) {
-            $this->app->bind(SnmpBackendInterface::class, SnmprecSnmpBackend::class);
-        }
-
         $glob = LibrenmsConfig::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
         $files = array_map(fn ($file) => basename($file, '.snmprec'), glob($glob));
         $files = array_filter($files, function ($file) use ($os_name) {
@@ -159,23 +188,29 @@ final class OSDiscoveryTest extends TestCase
         $start = microtime(true);
 
         $community = $filename ?: $expected_os;
-        $log_driver = Log::getDefaultDriver();
-
-        Debug::set();
-        Debug::setVerbose();
-        Debug::enableCliDebugOutput();
-        ob_start();
-        Log::setDefaultDriver('stdout');
         $os = Core::detectOS($this->genDevice($community));
-        $output = ob_get_contents();
-        Log::setDefaultDriver($log_driver);
-        ob_end_clean();
-        Debug::set(false);
-        Debug::setVerbose(false);
-        Debug::disableCliDebugOutput();
+
+        if ($os !== $expected_os) {
+            // Re-run with full debug output only on mismatch to capture diagnostics
+            $log_driver = Log::getDefaultDriver();
+            Debug::set();
+            Debug::setVerbose();
+            Debug::enableCliDebugOutput();
+            ob_start();
+            Log::setDefaultDriver('stdout');
+            $os = Core::detectOS($this->genDevice($community));
+            $output = ob_get_contents();
+            Log::setDefaultDriver($log_driver);
+            ob_end_clean();
+            Debug::set(false);
+            Debug::setVerbose(false);
+            Debug::disableCliDebugOutput();
+
+            $this->assertEquals($expected_os, $os, "Test file: $community.snmprec\n$output");
+        }
 
         $this->assertLessThan(60, microtime(true) - $start, "OS $expected_os took longer than 60s to detect");
-        $this->assertEquals($expected_os, $os, "Test file: $community.snmprec\n$output");
+        $this->assertEquals($expected_os, $os);
     }
 
     /**
