@@ -34,14 +34,15 @@ use Log;
 class SnmpResponse implements \Stringable
 {
     protected const KEY_VALUE_DELIMITER = ' = ';
-
     protected const STDERR_ERROR_REGEX = '/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/';
+    protected const BAD_STRING_REGEX = '/(No Such Instance|No Such Object|No more variables left).*/';
+    protected const BAD_VALUE_REGEX = '/(No Such Instance|No Such Object|at this OID|this MIB View|End of MIB| = NULL$).*/';
 
     /**
      * @var array<string, string> <oid, value>
      */
     protected array $values = [];
-    protected ?string $badValue = null;
+    protected ?string $badString = null;
     protected ?string $errorMessage = null;
 
     /**
@@ -55,8 +56,11 @@ class SnmpResponse implements \Stringable
         public readonly array $command = [],
     ) {
         foreach ($this->rawValues as $oid => $val) {
-            if (preg_match('/(No Such Instance|No Such Object|at this OID|this MIB View|End of MIB).*/', (string) $val, $matches) || str_ends_with((string) $val, ' = NULL')) {
-                $this->badValue ??= $matches[0] ?? (string) $val;
+            if (preg_match(self::BAD_STRING_REGEX, (string) $val, $matches)) {
+                $this->badString ??= $matches[0];
+                continue;
+            }
+            if (preg_match(self::BAD_VALUE_REGEX, (string) $val)) {
                 continue;
             }
             $this->values[$oid] = (string) $val;
@@ -106,7 +110,7 @@ class SnmpResponse implements \Stringable
 
     protected function findBadString(): ?string
     {
-        return $this->badValue;
+        return $this->badString;
     }
 
     public function isEmpty(): bool
@@ -320,6 +324,6 @@ class SnmpResponse implements \Stringable
 
     public function __sleep()
     {
-        return ['values', 'rawValues', 'badValue', 'exitCode', 'stderr', 'command', 'errorMessage'];
+        return ['values', 'rawValues', 'badString', 'exitCode', 'stderr', 'command', 'errorMessage'];
     }
 }

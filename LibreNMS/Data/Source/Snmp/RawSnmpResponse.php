@@ -57,7 +57,7 @@ class RawSnmpResponse extends SnmpResponse
 
     protected function findBadString(): ?string
     {
-        if (preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $this->raw, $errors)) {
+        if (preg_match(self::BAD_STRING_REGEX, $this->raw, $errors)) {
             return $errors[0];
         }
 
@@ -82,7 +82,7 @@ class RawSnmpResponse extends SnmpResponse
         $this->values = [];
         $line = strtok($this->raw, PHP_EOL);
         while ($line !== false) {
-            if (str_contains($line, 'at this OID') || str_contains($line, 'this MIB View') || str_contains($line, 'End of MIB') || str_ends_with($line, ' = NULL')) {
+            if (preg_match(self::BAD_VALUE_REGEX, $line)) {
                 $line = strtok(PHP_EOL);
                 continue;
             }
