@@ -94,7 +94,7 @@ final class RrdPath
     }
 
     /**
-     * @param  string|string[]  $file  filename or array of parts to build the filename
+     * @param  string|string[]  $filename  filename or array of parts to build the filename
      */
     public function setFileName(string|array $filename, string $suffix = ''): RrdPath
     {
