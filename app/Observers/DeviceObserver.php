@@ -91,11 +91,15 @@ class DeviceObserver
                 throw new HostRenameException("Renaming of $old_name failed because there is already a device with the hostname $new_name");
             }
 
-            Rrd::renameDevice($device, $old_name, $new_name);
-
-            $device->ip = null;
-            $source = auth()->user()?->username ?: 'console';
-            Eventlog::log("Hostname changed -> $new_name ($source)", $device, 'system', Severity::Notice);
+            if (Rrd::renameDevice($device, $old_name, $new_name)) {
+                $device->ip = null;
+                $source = auth()->user()?->username ?: 'console';
+                Eventlog::log("Hostname changed -> $new_name ($source)", $device, 'system', Severity::Notice);
+            } else {
+                $device->hostname = $old_name;
+                Eventlog::log("Renaming of $old_name failed because the RRD directory rename failed", $device, 'system', Severity::Error);
+                throw new HostRenameException("Renaming of $old_name failed");
+            }
         }
     }
 
