@@ -459,10 +459,10 @@ class Rrd extends BaseDatastore
     /**
      * Remove RRD file(s).  Use with care as this permanently deletes rrd data.
      *
-     * @param  string  $hostname  rrd subfolder (hostname)
+     * @param  string|null  $hostname  rrd subfolder (hostname)
      * @param  string  $prefix  start of rrd file name all files matching will be deleted
      */
-    public function purge(string $hostname, string $prefix): void
+    public function purge(?string $hostname, string $prefix): void
     {
         if (empty($hostname)) {
             Log::error("Could not purge rrd $prefix, empty hostname");
