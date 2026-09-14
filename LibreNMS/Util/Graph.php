@@ -33,6 +33,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Data\Graphing\GraphImage;
 use LibreNMS\Data\Graphing\GraphParameters;
+use LibreNMS\Data\Store\Rrd\RrdPath;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Exceptions\RrdGraphException;
 use Rrd;
@@ -128,7 +129,7 @@ class Graph
      * Build RRD options for the given $vars
      *
      * @param  array|string  $vars
-     * @param  string|null  &$rrd_filename  output parameter for the resolved rrd filename
+     * @param  RrdPath|null  &$rrd_filename  output parameter for the resolved rrd filename
      * @return array
      *
      * @throws RrdGraphException
