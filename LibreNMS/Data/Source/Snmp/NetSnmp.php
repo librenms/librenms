@@ -33,9 +33,9 @@ use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Util\Oid;
 use Symfony\Component\Process\Process;
 
-class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
+readonly class NetSnmp implements SnmpBackendInterface, SnmpTranslatorInterface
 {
-    private readonly NetSnmpOptions $optionsParser;
+    private NetSnmpOptions $optionsParser;
 
     public function __construct(?NetSnmpOptions $optionsParser = null)
     {

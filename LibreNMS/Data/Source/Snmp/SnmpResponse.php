@@ -41,24 +41,57 @@ class SnmpResponse implements \Stringable
     public readonly string $raw;
 
     private ?string $errorMessage = null;
+    /**
+     * @var array<string, string>|null <oid, value>
+     */
     private ?array $values = null;
     private ?bool $inferValueEncoding = null;
 
     /**
-     * Create a new response object filling with output from the net-snmp command.
+     * Create a new response object filling with output from the net-snmp command or an array of key-value pairs.
      *
-     * @param  string  $output
+     * @param  string|array<string, string>  $output
      * @param  string  $stderr
      * @param  int  $exitCode
      * @param  array<int, string>  $command
      */
     public function __construct(
-        string $output,
+        string|array $output = '',
         public readonly string $stderr = '',
         public readonly int $exitCode = 0,
         public readonly array $command = [],
     ) {
-        $this->raw = (string) preg_replace('/Wrong Type \(should be .*\): /', '', $output);
+        if (is_array($output)) {
+            $raw = '';
+            $values = [];
+            foreach ($output as $oid => $val) {
+                $raw .= ($oid !== '' ? "$oid" . self::KEY_VALUE_DELIMITER : '') . "$val\n";
+                if (! Str::contains((string) $val, ['at this OID', 'this MIB View', 'End of MIB']) && ! str_ends_with((string) $val, ' = NULL')) {
+                    $values[$oid] = (string) $val;
+                }
+            }
+            $this->raw = $raw;
+            $this->values = $values;
+        } else {
+            $this->raw = (string) preg_replace('/Wrong Type \(should be .*\): /', '', $output);
+        }
+    }
+
+    /**
+     * Create an SnmpResponse directly from an oid => value array.
+     *
+     * @param  array<string, string>  $values
+     * @param  string  $stderr
+     * @param  int  $exitCode
+     * @param  array<int, string>  $command
+     */
+    public static function fromValues(
+        array $values,
+        string $stderr = '',
+        int $exitCode = 0,
+        array $command = [],
+    ): self {
+        return new self($values, $stderr, $exitCode, $command);
     }
 
     public function isValid(bool $ignore_partial = false): bool
@@ -324,6 +357,10 @@ class SnmpResponse implements \Stringable
             $this->exitCode ?: $response->exitCode,
             $response->command ?: $this->command,
         );
+
+        if ($this->values !== null && $response->values !== null) {
+            $newResponse->values = array_merge($this->values, $response->values);
+        }
 
         $newResponse->errorMessage = $this->errorMessage ?: $response->errorMessage;
 

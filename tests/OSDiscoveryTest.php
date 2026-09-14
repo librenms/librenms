@@ -30,9 +30,9 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Source\Snmp\SnmpQuery;
+use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Modules\Core;
-use LibreNMS\Tests\Mocks\SnmpQueryMock;
+use LibreNMS\Tests\Mocks\SnmprecSnmpBackend;
 use LibreNMS\Util\Debug;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
@@ -109,7 +109,7 @@ final class OSDiscoveryTest extends TestCase
     public function testOSDetection($os_name): void
     {
         if (! getenv('SNMPSIM')) {
-            $this->app->bind(SnmpQuery::class, SnmpQueryMock::class);
+            $this->app->bind(SnmpBackendInterface::class, SnmprecSnmpBackend::class);
         }
 
         $glob = LibrenmsConfig::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
