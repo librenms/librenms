@@ -27,19 +27,17 @@
 namespace LibreNMS\Data\Store\Rrd;
 
 use App\Facades\LibrenmsConfig;
-use Log;
+use LibreNMS\Data\Store\Rrd;
 
 final class RrdPath implements \Stringable
 {
-    private readonly string $rrdDir;
     private readonly string $relativeDir;
     private readonly string $fileName;
 
     private function __construct(string $hostname, string $filename)
     {
-        $this->fileName = self::safeName($filename);
-        $this->relativeDir = self::safeName(trim($hostname, '[]'));
-        $this->rrdDir = LibrenmsConfig::get('rrd_dir', base_path('rrd'));
+        $this->fileName = Rrd::safeName($filename);
+        $this->relativeDir = Rrd::safeName(trim($hostname, '[]'));
     }
 
     /**
@@ -71,40 +69,11 @@ final class RrdPath implements \Stringable
     }
 
     /**
-     * Check that the directories exist if we are not using rrdcached
-     */
-    public function checkDirExists(): RrdPath
-    {
-        if (LibrenmsConfig::get('rrdcached')) {
-            return $this;
-        }
-
-        $rrd_dir = $this->fullDir();
-        if (! is_dir($rrd_dir)) {
-            if (mkdir($rrd_dir, 0775, true)) {
-                Log::info("Created directory : $rrd_dir");
-            } else {
-                Log::error("Failed to create rrd directory: $rrd_dir");
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Replaces invalid characters in a path with underscores
-     */
-    public static function safeName(string $name): string
-    {
-        return preg_replace('/[^a-zA-Z0-9,._\-]/', '_', $name);
-    }
-
-    /**
      * Return the directory component for a full path
      */
     public function fullDir(): string
     {
-        return $this->rrdDir . DIRECTORY_SEPARATOR . $this->relativeDir;
+        return LibrenmsConfig::get('rrd_dir') . DIRECTORY_SEPARATOR . $this->relativeDir;
     }
 
     /**

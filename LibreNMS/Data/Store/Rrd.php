@@ -122,7 +122,8 @@ class Rrd extends BaseDatastore
 
         if (isset($meta['rrd_proxmox_name'])) {
             $pmxvars = $meta['rrd_proxmox_name'];
-            $rrd = self::proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport'])->checkDirExists();
+            $rrd = self::proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport']);
+            self::checkDirExists($rrd);
         } else {
             $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
         }
@@ -454,6 +455,26 @@ class Rrd extends BaseDatastore
         }
     }
 
+    private static function checkDirExists(RrdPath $rrdpath): bool
+    {
+        if (LibrenmsConfig::get('rrdcached')) {
+            return true;
+        }
+
+        $rrd_dir = $this->fullDir();
+        if (! is_dir($rrd_dir)) {
+            if (mkdir($rrd_dir, 0775, true)) {
+                Log::info("Created directory : $rrd_dir");
+            } else {
+                Log::error("Failed to create rrd directory: $rrd_dir");
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * Remove RRD file(s).  Use with care as this permanently deletes rrd data.
      *
@@ -502,7 +523,7 @@ class Rrd extends BaseDatastore
      */
     public static function safeName(string $name): string
     {
-        return RrdPath::safeName($name);
+        return preg_replace('/[^a-zA-Z0-9,._\-]/', '_', $name);
     }
 
     /**
@@ -571,7 +592,7 @@ class Rrd extends BaseDatastore
     public function initStorage(Device $device): void
     {
         if (LibrenmsConfig::get('rrd.enable', true)) {
-            RrdPath::make($device->hostname)->checkDirExists();
+            self::checkDirExists(RrdPath::make($device->hostname));
         }
     }
 
