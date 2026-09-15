@@ -26,6 +26,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -35,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class AviatWtm extends OS implements
     OSDiscovery,
@@ -44,6 +46,33 @@ class AviatWtm extends OS implements
     WirelessSnrDiscovery,
     WirelessPowerDiscovery
 {
+    /**
+     * Discover OS version, hardware and serial.
+     *
+     * The yaml baseline reads these from fixed entPhysicalIndex 2, which holds the
+     * chassis on WTM 4000. That works for hardware and serial, but the software
+     * revision is only populated on a different entity (index 4 on AOS 6.2), so
+     * version came back empty. Entity indexes are also renumbered by the radio
+     * across reboots and module changes, so rather than hardcode another index we
+     * take the first non-empty entPhysicalSoftwareRev in the table.
+     */
+    public function discoverOS(Device $device): void
+    {
+        parent::discoverOS($device); // yaml baseline: hardware, serial
+
+        if (empty($device->version)) {
+            $versions = SnmpQuery::hideMib()->walk('ENTITY-MIB::entPhysicalSoftwareRev')->table(1);
+
+            foreach ($versions as $entity) {
+                $version = trim((string) ($entity['entPhysicalSoftwareRev'] ?? ''));
+                if ($version !== '') {
+                    $device->version = $version;
+                    break;
+                }
+            }
+        }
+    }
+
     /**
      * Discover wireless tx or rx power. This is in dBm. Type is power.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -105,7 +134,7 @@ class AviatWtm extends OS implements
                 ".1.3.6.1.4.1.2509.9.3.2.1.1.12.$index",
                 'aviat-wtm-carrier-rx-rate',
                 $index,
-                "TX Capacity ({$name[$index]})",
+                "RX Capacity ({$name[$index]})",
                 $data['aviatModemCurCapacityRx'],
                 1000
             );

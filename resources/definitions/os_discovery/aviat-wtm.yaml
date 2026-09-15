@@ -2,29 +2,208 @@ modules:
     os:
         hardware: ENTITY-MIB::entPhysicalModelName.2
         serial: ENTITY-MIB::entPhysicalSerialNum.2
+        # entPhysicalSoftwareRev is empty at index 2 on AOS 6.2 (it lives on a different
+        # entity, index 4 on current firmware). LibreNMS\OS\AviatWtm::discoverOS() falls
+        # back to the first non-empty entry in the table when this comes back blank.
         version: ENTITY-MIB::entPhysicalSoftwareRev.2
     sensors:
+        # Pre-cache entity names so sensors can be labelled with the radio/carrier they
+        # belong to (e.g. "System/Root1/RFM1/Carrier1") instead of a bare entPhysicalIndex.
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - ENTITY-MIB::entPhysicalName
+
         state:
             data:
+                # ---------------------------------------------------------------------
+                # Receive modulation.
+                # state_name and index are deliberately unchanged from the original
+                # definition so existing RRDs (sensor-state-aviatModemCurModulationRx-*)
+                # keep their history. Only the label and the state map are corrected:
+                # the old label said "Tx Mod Rate" while polling the Rx object, the
+                # 512/1024 "HD" entries should be "HG" (high gain) per AviatModulationType,
+                # and values 15/16 were missing entirely - those are the quarter/half
+                # QPSK steps the radio drops to in deep fade, which is exactly the
+                # condition we need visible during a storm.
+                # ---------------------------------------------------------------------
                 -
                     oid: AVIAT-MODEM-MIB::aviatModemCurModulationRx
                     value: AVIAT-MODEM-MIB::aviatModemCurModulationRx
                     num_oid: '.1.3.6.1.4.1.2509.9.3.2.1.1.14.{{ $index }}'
-                    descr: Tx Mod Rate (Carrier1/{{ $index }})
+                    descr: 'RX Modulation ({{ ENTITY-MIB::entPhysicalName }})'
                     index: '{{ $index }}'
                     state_name: aviatModemCurModulationRx
                     states:
-                        - { value: 1, generic: 1, descr: 'N/A' }
-                        - { value: 2, generic: 0, descr: 'QPSK' }
-                        - { value: 3, generic: 0, descr: '16-QAM' }
-                        - { value: 4, generic: 0, descr: '32-QAM' }
-                        - { value: 5, generic: 0, descr: '64-QAM' }
-                        - { value: 6, generic: 0, descr: '128-QAM' }
+                        - { value: 1, generic: 3, descr: 'N/A' }
+                        - { value: 2, generic: 2, descr: 'QPSK' }
+                        - { value: 3, generic: 1, descr: '16-QAM' }
+                        - { value: 4, generic: 1, descr: '32-QAM' }
+                        - { value: 5, generic: 1, descr: '64-QAM' }
+                        - { value: 6, generic: 1, descr: '128-QAM' }
                         - { value: 7, generic: 0, descr: '256-QAM' }
                         - { value: 8, generic: 0, descr: '512-QAM' }
                         - { value: 9, generic: 0, descr: '1024-QAM' }
                         - { value: 10, generic: 0, descr: '256-QAM-HG' }
-                        - { value: 11, generic: 0, descr: '512-QAM-HD' }
-                        - { value: 12, generic: 0, descr: '1024-QAM-HD' }
+                        - { value: 11, generic: 0, descr: '512-QAM-HG' }
+                        - { value: 12, generic: 0, descr: '1024-QAM-HG' }
                         - { value: 13, generic: 0, descr: '2048-QAM' }
                         - { value: 14, generic: 0, descr: '4096-QAM' }
+                        - { value: 15, generic: 2, descr: 'Quarter-QPSK' }
+                        - { value: 16, generic: 2, descr: 'Half-QPSK' }
+
+                # Transmit modulation - not previously monitored. Tx and Rx modulation
+                # diverge on an asymmetric fade, so both ends of the ACM behaviour matter.
+                -
+                    oid: AVIAT-MODEM-MIB::aviatModemCurModulationTx
+                    value: AVIAT-MODEM-MIB::aviatModemCurModulationTx
+                    num_oid: '.1.3.6.1.4.1.2509.9.3.2.1.1.13.{{ $index }}'
+                    descr: 'TX Modulation ({{ ENTITY-MIB::entPhysicalName }})'
+                    index: 'aviatModemCurModulationTx.{{ $index }}'
+                    state_name: aviatModemCurModulationTx
+                    states:
+                        - { value: 1, generic: 3, descr: 'N/A' }
+                        - { value: 2, generic: 2, descr: 'QPSK' }
+                        - { value: 3, generic: 1, descr: '16-QAM' }
+                        - { value: 4, generic: 1, descr: '32-QAM' }
+                        - { value: 5, generic: 1, descr: '64-QAM' }
+                        - { value: 6, generic: 1, descr: '128-QAM' }
+                        - { value: 7, generic: 0, descr: '256-QAM' }
+                        - { value: 8, generic: 0, descr: '512-QAM' }
+                        - { value: 9, generic: 0, descr: '1024-QAM' }
+                        - { value: 10, generic: 0, descr: '256-QAM-HG' }
+                        - { value: 11, generic: 0, descr: '512-QAM-HG' }
+                        - { value: 12, generic: 0, descr: '1024-QAM-HG' }
+                        - { value: 13, generic: 0, descr: '2048-QAM' }
+                        - { value: 14, generic: 0, descr: '4096-QAM' }
+                        - { value: 15, generic: 2, descr: 'Quarter-QPSK' }
+                        - { value: 16, generic: 2, descr: 'Half-QPSK' }
+
+                # ---------------------------------------------------------------------
+                # Radio link operational state. Previously not monitored at all.
+                # NOTE: this object moved between MIB generations - it was
+                # .2509.9.3.2.4.1.2 under the 2.11 MIBs, and .1.2 is now
+                # aviatModemStatusMaxConfigCapacity (a Counter64). Polling the old
+                # sub-identifier returns a valid varbind carrying link capacity in bps,
+                # so a legacy template silently reports nonsense rather than failing.
+                # ---------------------------------------------------------------------
+                -
+                    oid: AVIAT-MODEM-MIB::aviatModemStatusOper
+                    value: AVIAT-MODEM-MIB::aviatModemStatusOper
+                    num_oid: '.1.3.6.1.4.1.2509.9.3.2.4.1.3.{{ $index }}'
+                    descr: 'Radio Link ({{ ENTITY-MIB::entPhysicalName }})'
+                    index: 'aviatModemStatusOper.{{ $index }}'
+                    state_name: aviatModemStatusOper
+                    states:
+                        - { value: 1, generic: 0, descr: 'Up' }
+                        - { value: 2, generic: 2, descr: 'Down' }
+                        - { value: 3, generic: 1, descr: 'Testing' }
+                        - { value: 4, generic: 3, descr: 'Unknown' }
+                        - { value: 5, generic: 1, descr: 'Dormant' }
+                        - { value: 6, generic: 3, descr: 'Not Present' }
+                        - { value: 7, generic: 2, descr: 'Lower Layer Down' }
+
+        count:
+            data:
+                # ---------------------------------------------------------------------
+                # ITU-T G.826 error performance, per radio and per carrier.
+                #
+                # These come from the realtime table, which is cumulative since the last
+                # counter reset (i.e. since boot, in practice) rather than per-interval.
+                # They are stored as GAUGE on purpose: a COUNTER RRD would treat the
+                # reset-to-zero at every reboot as a counter wrap and inject a huge false
+                # spike - and reboots are precisely the event under investigation here.
+                # Read as a staircase: flat means clean, a rising step means errors.
+                #
+                # This is the measurement that separates "the radio rebooted" (UAS jumps,
+                # no preceding error ramp) from "the path faded" (ES/SES climb as RSL
+                # drops, before the outage).
+                # ---------------------------------------------------------------------
+                -
+                    oid: AVIAT-G826-MIB::aviatG826ErroredSeconds
+                    value: AVIAT-G826-MIB::aviatG826ErroredSeconds
+                    num_oid: '.1.3.6.1.4.1.2509.9.14.2.2.1.4.{{ $index }}'
+                    descr: 'ES cumulative ({{ ENTITY-MIB::entPhysicalName }})'
+                    index: 'aviatG826ErroredSeconds.{{ $index }}'
+                -
+                    oid: AVIAT-G826-MIB::aviatG826SeverelyErroredSeconds
+                    value: AVIAT-G826-MIB::aviatG826SeverelyErroredSeconds
+                    num_oid: '.1.3.6.1.4.1.2509.9.14.2.2.1.6.{{ $index }}'
+                    descr: 'SES cumulative ({{ ENTITY-MIB::entPhysicalName }})'
+                    index: 'aviatG826SeverelyErroredSeconds.{{ $index }}'
+                -
+                    oid: AVIAT-G826-MIB::aviatG826BackgroundBlockErrors
+                    value: AVIAT-G826-MIB::aviatG826BackgroundBlockErrors
+                    num_oid: '.1.3.6.1.4.1.2509.9.14.2.2.1.8.{{ $index }}'
+                    descr: 'BBE cumulative ({{ ENTITY-MIB::entPhysicalName }})'
+                    index: 'aviatG826BackgroundBlockErrors.{{ $index }}'
+                -
+                    oid: AVIAT-G826-MIB::aviatG826UnavailableSeconds
+                    value: AVIAT-G826-MIB::aviatG826UnavailableSeconds
+                    num_oid: '.1.3.6.1.4.1.2509.9.14.2.2.1.11.{{ $index }}'
+                    descr: 'UAS cumulative ({{ ENTITY-MIB::entPhysicalName }})'
+                    index: 'aviatG826UnavailableSeconds.{{ $index }}'
+
+                # ---------------------------------------------------------------------
+                # Alarm summary, from the AOS 6.2 IETF/RFC 8632 alarm model at
+                # .2509.9.49 (the 2.11 model at .2509.9.47 no longer exists).
+                #
+                # The table is indexed by ItuPerceivedSeverity: critical(3), major(4),
+                # minor(5), warning(6). Note the ordering is inverted - a LOWER integer
+                # is a MORE severe alarm - so do not write ">=" threshold rules on it.
+                #
+                # Active alarms at a severity = Total - Cleared. LibreNMS YAML cannot
+                # subtract one OID from another, so both are exposed and the comparison
+                # is done in an alert rule (see /opt/librenms-local/alert-rules/).
+                # Cleared alarms stay in the table until an operator purges them, so
+                # Total on its own is not an alarm count.
+                # ---------------------------------------------------------------------
+                -
+                    oid: AVIAT-IETF-ALARMS-MIB::aviatIetfAlarmSummaryTotalAlarms
+                    value: AVIAT-IETF-ALARMS-MIB::aviatIetfAlarmSummaryTotalAlarms
+                    num_oid: '.1.3.6.1.4.1.2509.9.49.2.1.3.2.1.2.{{ $index }}'
+                    descr: 'Alarms Critical - total'
+                    index: 'aviatIetfAlarmTotal.{{ $index }}'
+                    skip_values:
+                        - { oid: index, op: '!=', value: 3 }
+                -
+                    oid: AVIAT-IETF-ALARMS-MIB::aviatIetfAlarmSummaryClearedAlarms
+                    value: AVIAT-IETF-ALARMS-MIB::aviatIetfAlarmSummaryClearedAlarms
+                    num_oid: '.1.3.6.1.4.1.2509.9.49.2.1.3.2.1.3.{{ $index }}'
+                    descr: 'Alarms Critical - cleared'
+                    index: 'aviatIetfAlarmCleared.{{ $index }}'
+                    skip_values:
+                        - { oid: index, op: '!=', value: 3 }
+                -
+                    oid: AVIAT-IETF-ALARMS-MIB::aviatIetfAlarmSummaryTotalAlarms
+                    value: AVIAT-IETF-ALARMS-MIB::aviatIetfAlarmSummaryTotalAlarms
+                    num_oid: '.1.3.6.1.4.1.2509.9.49.2.1.3.2.1.2.{{ $index }}'
+                    descr: 'Alarms Major - total'
+                    index: 'aviatIetfAlarmTotal.{{ $index }}'
+                    skip_values:
+                        - { oid: index, op: '!=', value: 4 }
+                -
+                    oid: AVIAT-IETF-ALARMS-MIB::aviatIetfAlarmSummaryClearedAlarms
+                    value: AVIAT-IETF-ALARMS-MIB::aviatIetfAlarmSummaryClearedAlarms
+                    num_oid: '.1.3.6.1.4.1.2509.9.49.2.1.3.2.1.3.{{ $index }}'
+                    descr: 'Alarms Major - cleared'
+                    index: 'aviatIetfAlarmCleared.{{ $index }}'
+                    skip_values:
+                        - { oid: index, op: '!=', value: 4 }
+                -
+                    oid: AVIAT-IETF-ALARMS-MIB::aviatIetfAlarmSummaryTotalAlarms
+                    value: AVIAT-IETF-ALARMS-MIB::aviatIetfAlarmSummaryTotalAlarms
+                    num_oid: '.1.3.6.1.4.1.2509.9.49.2.1.3.2.1.2.{{ $index }}'
+                    descr: 'Alarms Minor - total'
+                    index: 'aviatIetfAlarmTotal.{{ $index }}'
+                    skip_values:
+                        - { oid: index, op: '!=', value: 5 }
+                -
+                    oid: AVIAT-IETF-ALARMS-MIB::aviatIetfAlarmSummaryClearedAlarms
+                    value: AVIAT-IETF-ALARMS-MIB::aviatIetfAlarmSummaryClearedAlarms
+                    num_oid: '.1.3.6.1.4.1.2509.9.49.2.1.3.2.1.3.{{ $index }}'
+                    descr: 'Alarms Minor - cleared'
+                    index: 'aviatIetfAlarmCleared.{{ $index }}'
+                    skip_values:
+                        - { oid: index, op: '!=', value: 5 }

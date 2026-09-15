@@ -1,7 +1,7 @@
 -- ****************************************************************************
 -- aviatTextConvention.mib: Aviat Networks Common Textual Conventions
 --
--- Copyright © 2014 Aviat U.S, Inc. All rights reserved.
+-- Copyright © 2022 Aviat U.S, Inc. All rights reserved.
 -- Certain information and content may be provided by third parties to AVIAT,
 -- and in each case, such copyrighted work remains the property of that third
 -- party creator/licensor.
@@ -26,17 +26,18 @@ AVIAT-TEXTCONVENTION-MIB DEFINITIONS ::= BEGIN
             FROM STXN-GLOBALREGISTER-MIB;
 
     aviatTextConventionModule MODULE-IDENTITY
-        LAST-UPDATED    "201703282339Z"
+        LAST-UPDATED    "202102110010Z"
         ORGANIZATION    "Aviat Networks"
         CONTACT-INFO    "Aviat Networks
                          Customer Service
 
-                         Postal: 5200 Great America Parkway
-                                 Santa Clara
-                                 California 95054
+                         Postal: 860 North McCarthy Boulevard
+                                 Suite 200
+                                 Milpitas
+                                 California 95035
                                  United States of America
 
-                         Tel: 408 567 7000
+                         Tel: 408 941-7100
 
                          E-mail: mibsupport@aviatnet.com"
         DESCRIPTION
@@ -45,6 +46,10 @@ AVIAT-TEXTCONVENTION-MIB DEFINITIONS ::= BEGIN
                  are for general purpose use. Textual conventions that are for
                  specific MIB functionality are defined in the respective MIB
                  modules."
+        REVISION        "202102110010Z"
+        DESCRIPTION
+                "Added quater and half QPSK modulations. Updated
+                 description for AviatYangIdentityRef"
         REVISION        "201703282339Z"
         DESCRIPTION
                 "Added modulation2048qam and modulation4096qam modulations
@@ -101,7 +106,9 @@ AVIAT-TEXTCONVENTION-MIB DEFINITIONS ::= BEGIN
                                     modulation512qamHG (11),
                                     modulation1024qamHG (12),
                                     modulation2048qam (13),
-                                    modulation4096qam (14)
+                                    modulation4096qam (14),
+                                    modulationQuarterQpsk (15),
+                                    modulationHalfQpsk (16)
                                 }
 
     AviatPowerLevel ::=         TEXTUAL-CONVENTION
@@ -187,7 +194,7 @@ AVIAT-TEXTCONVENTION-MIB DEFINITIONS ::= BEGIN
                                     pla (2)
                                 }
 
-    AviatRfuSideBandType ::=  TEXTUAL-CONVENTION
+    AviatRfuSideBandType ::=    TEXTUAL-CONVENTION
         STATUS          current
         DESCRIPTION     "The side band type for an RFU."
         SYNTAX          INTEGER {
@@ -196,13 +203,13 @@ AVIAT-TEXTCONVENTION-MIB DEFINITIONS ::= BEGIN
                                     fullBand (3)
                                 }
 
-    AviatYangIdentityRef ::= TEXTUAL-CONVENTION
-        DISPLAY-HINT "255t"
-        STATUS       current
-        DESCRIPTION
-            "A reference to a Yang identity, consisting of the namespace and identity id.
-             These are represented as a string delimited with a colon, 
-             i.e. namespace:identity"
-        SYNTAX       OCTET STRING (SIZE (0..255))
+    AviatYangIdentityRef ::=    TEXTUAL-CONVENTION
+        DISPLAY-HINT    "255t"
+        STATUS          current
+        DESCRIPTION     "A reference to a Yang identity, consisting of the
+                         namespace and identity id. These are represented as a
+                         string delimited with a colon, i.e. namespace:identity
+                         (e.g. aviat-alarm-types:demodulator-not-locked)."
+        SYNTAX          OCTET STRING ( SIZE ( 0..255 ) )
 
 END
