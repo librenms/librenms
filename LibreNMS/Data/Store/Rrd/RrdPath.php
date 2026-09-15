@@ -29,10 +29,10 @@ namespace LibreNMS\Data\Store\Rrd;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
 
-final class RrdPath implements \Stringable
+final readonly class RrdPath implements \Stringable
 {
-    private readonly string $relativeDir;
-    private readonly string $fileName;
+    private string $relativeDir;
+    private string $fileName;
 
     private function __construct(string $hostname, string $filename)
     {
