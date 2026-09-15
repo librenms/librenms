@@ -67,16 +67,12 @@
 @endsection
 
 @section('javascript')
-	<script type="text/javascript">
-		init_select2('#device_group-{{ $id }}', 'device-group', {});
-
-		function toggleWorldMapInitFields() {
-			var autoScaleOn = $('#auto_scale-{{ $id }}').is(':checked');
-			$('#init_lat-{{ $id }}, #init_lng-{{ $id }}, #init_zoom-{{ $id }}')
-				.prop('readonly', autoScaleOn);
-		}
-
-		toggleWorldMapInitFields();
-		$('#auto_scale-{{ $id }}').on('change', toggleWorldMapInitFields);
-	</script>
+    <script type="text/javascript">
+        init_select2('#device_group-{{ $id }}', 'device-group', {});
+ 
+        $('#auto_scale-{{ $id }}').on('change', function () {
+            $('#init_lat-{{ $id }}, #init_lng-{{ $id }}, #init_zoom-{{ $id }}')
+                .prop('readonly', $(this).is(':checked'));
+        }).trigger('change');
+    </script>
 @endsection
