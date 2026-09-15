@@ -21,13 +21,14 @@ see [their documentation](https://docs.peeringdb.com/howto/api_keys/).
     lnms config:set peeringdb.api_key <your key>
     ```
 
-The next run of `daily.sh` collects the data. To force the collection,
-run `php daily.php -f peeringdb`.
+The scheduler collects the data once a day. To force the collection,
+run `lnms maintenance:cache-peeringdb`.
 
 To keep the load on the PeeringDB API low, LibreNMS:
 
-- waits a random 3 to 30 seconds before each request, so that installs
-  do not query the API in lockstep
+- starts the job at a time derived from your `APP_KEY`, so installs do
+  not all query the API at the same moment
+- waits a random 3 to 30 seconds between requests
 - keeps the collected data for 71 hours before it refreshes
 - remembers for a week which of your ASNs PeeringDB holds no data for
   and skips them
