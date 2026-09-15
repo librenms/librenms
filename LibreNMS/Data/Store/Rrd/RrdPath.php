@@ -97,9 +97,13 @@ final class RrdPath implements \Stringable
             return $this;
         }
 
-        if (! is_dir($this->fullDir())) {
-            mkdir($this->fullDir(), 0775, true);
-            Log::info('Created directory : ' . $this->fullDir());
+        $rrd_dir = $this->fullDir();
+        if (! is_dir($rrd_dir) {
+            if (mkdir($rrd_dir, 0775, true)) {
+                Log::info("Created directory : $rrd_dir");
+            } else {
+                Log::error("Failed to create rrd directory: $rrd_dir");
+            }
         }
 
         return $this;
