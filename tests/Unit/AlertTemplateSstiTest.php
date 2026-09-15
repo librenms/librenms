@@ -10,8 +10,7 @@ class AlertTemplateSstiTest extends TestCase
 {
     public function testDefaultTitleDoesNotExecuteBladeInDeviceDisplayName(): void
     {
-        $flag = false;
-        $GLOBALS['__test_ssti_flag'] = &$flag;
+        $GLOBALS['__test_ssti_flag'] = false;
 
         $maliciousDisplay = 'Router1 {{ ($GLOBALS["__test_ssti_flag"] = true) ? "malicious" : "" }}';
 
@@ -37,8 +36,10 @@ class AlertTemplateSstiTest extends TestCase
         $tpl = new Template();
         $renderedTitle = $tpl->getTitle($data);
 
-        $this->assertFalse($flag, 'Blade expressions in device display string should not be evaluated');
+        $this->assertFalse($GLOBALS['__test_ssti_flag'], 'Blade expressions in device display string should not be evaluated');
         $this->assertEquals('Alert for device ' . e($maliciousDisplay) . ' - Test Rule', $renderedTitle);
+
+        unset($GLOBALS['__test_ssti_flag']);
     }
 
     public function testCustomTemplateTitleRendersSafely(): void
@@ -69,8 +70,7 @@ class AlertTemplateSstiTest extends TestCase
 
     public function testDirectivesInDeviceDisplayAreNotEvaluated(): void
     {
-        $flag = false;
-        $GLOBALS['__test_ssti_flag_directive'] = &$flag;
+        $GLOBALS['__test_ssti_flag_directive'] = false;
 
         $maliciousDisplay = 'Router1 @php($GLOBALS["__test_ssti_flag_directive"] = true)';
 
@@ -96,7 +96,9 @@ class AlertTemplateSstiTest extends TestCase
         $tpl = new Template();
         $renderedTitle = $tpl->getTitle($data);
 
-        $this->assertFalse($flag, 'Blade directives like @php in device display string should not be evaluated');
+        $this->assertFalse($GLOBALS['__test_ssti_flag_directive'], 'Blade directives like @php in device display string should not be evaluated');
         $this->assertEquals('Alert for device ' . e($maliciousDisplay) . ' - Test Rule', $renderedTitle);
+
+        unset($GLOBALS['__test_ssti_flag_directive']);
     }
 }
