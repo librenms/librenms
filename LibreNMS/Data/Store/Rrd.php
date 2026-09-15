@@ -124,7 +124,7 @@ class Rrd extends BaseDatastore
             $pmxvars = $meta['rrd_proxmox_name'];
             $rrd = self::proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport'])->checkDirExists();
         } else {
-            $rrd = RrdPath::make($device_model->hostname)->setFileName($rrd_name, '.rrd');
+            $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
         }
 
         if (isset($meta['rrd_def'])) {
@@ -249,8 +249,7 @@ class Rrd extends BaseDatastore
      */
     public function proxmoxName(string $pmxcluster, string $vmid, string $vmport): RrdPath
     {
-        return RrdPath::make(['proxmox', $pmxcluster])
-            ->setFileName($vmid . '_netif_' . $vmport . '.rrd');
+        return RrdPath::make('proxmox-' . $pmxcluster, $vmid . '_netif_' . $vmport . '.rrd');
     }
 
     /**
@@ -295,7 +294,7 @@ class Rrd extends BaseDatastore
      */
     public function name(string $hostname, array|string $filename): RrdPath
     {
-        return RrdPath::make($hostname)->setFileName($filename, '.rrd');
+        return RrdPath::make($hostname, self::filenameString($filename) . '.rrd');
     }
 
     /**
@@ -469,7 +468,7 @@ class Rrd extends BaseDatastore
             return;
         }
 
-        foreach (glob(RrdPath::make($hostname)->setFileName($prefix)->fullPath() . '*.rrd') as $rrd) {
+        foreach (glob(RrdPath::make($hostname, $prefix)->fullPath() . '*.rrd') as $rrd) {
             unlink($rrd);
         }
     }
@@ -556,6 +555,14 @@ class Rrd extends BaseDatastore
     private function coalesceStatisticType($type): string
     {
         return ($type == 'update' || $type == 'create') ? $type : 'other';
+    }
+
+    /**
+     * @param  string|string[]  $filename
+     */
+    private static function filenameString(string|array $filename): string
+    {
+        return is_array($filename) ? implode('-', $filename) : $filename;
     }
 
     /**

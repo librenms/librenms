@@ -33,29 +33,21 @@ final class RrdPath implements \Stringable
 {
     private readonly string $rrdDir;
     private readonly string $relativeDir;
-    private string $fileName = '';
+    private readonly string $fileName;
 
-    /**
-     * @param  string|string[]  $hostname  hostname of the device
-     */
-    public function __construct(string|array $hostname)
+    private function __construct(string $hostname, string $filename)
     {
-        if (is_array($hostname)) {
-            $hostname = implode(DIRECTORY_SEPARATOR, $hostname);
-        }
-
+        $this->fileName = self::safeName($filename);
         $this->relativeDir = self::safeName(trim($hostname, '[]'));
         $this->rrdDir = LibrenmsConfig::get('rrd_dir', base_path('rrd'));
     }
 
     /**
      * Easy way to start a new instance
-     *
-     * @param  string|string[]  $hostname  hostname of the device
      */
-    public static function make(string|array $hostname): RrdPath
+    public static function make(string $hostname, string $filename = ''): RrdPath
     {
-        return new RrdPath($hostname);
+        return new RrdPath($hostname, $filename);
     }
 
     public function relativePath(): string
@@ -76,16 +68,6 @@ final class RrdPath implements \Stringable
     public function __toString(): string
     {
         return $this->defaultPath();
-    }
-
-    /**
-     * @param  string|string[]  $filename  filename or array of parts to build the filename
-     */
-    public function setFileName(string|array $filename, string $suffix = ''): RrdPath
-    {
-        $this->fileName = self::safeName(is_array($filename) ? implode('-', $filename) : $filename) . $suffix;
-
-        return $this;
     }
 
     /**
