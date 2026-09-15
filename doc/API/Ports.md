@@ -14,7 +14,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ports?columns=ifName%2Cport_id
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ports?columns=ifName%2Cport_id
 ```
 
 Output:
@@ -57,7 +57,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ports/search/ifAlias,ifDescr,ifName/lo
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ports/search/ifAlias,ifDescr,ifName/lo
 ```
 
 Output:
@@ -104,7 +104,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ports/search/ifName/lo
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ports/search/ifName/lo
 ```
 
 Output:
@@ -151,9 +151,9 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ports/mac/00:11:22:33:44:55
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ports/mac/001122.334455?filter=first
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ports/mac/001122334455?filter=first
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ports/mac/00:11:22:33:44:55
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ports/mac/001122.334455?filter=first
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ports/mac/001122334455?filter=first
 ```
 
 Output:
@@ -257,7 +257,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ports/323
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ports/323
 ```
 
 Output:
@@ -360,7 +360,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ports/323/ip
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ports/323/ip
 ```
 
 Output:
@@ -393,7 +393,7 @@ Route: `/api/v0/ports/:portid/transceiver`
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ports/50736/transceiver
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ports/50736/transceiver
 ```
 
 Output:
@@ -437,7 +437,7 @@ Route: `/api/v0/ports/:portid/description`
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ports/323/description
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ports/323/description
 ```
 
 Output:
@@ -463,7 +463,7 @@ An empty string resets the description to its default.
 Example:
 
 ```curl
-curl -X PATCH -d '{"description": "Out-of-Band Management Link"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ports/323/description
+curl -X PATCH -d '{"description": "Out-of-Band Management Link"}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ports/323/description
 ```
 
 Output:
