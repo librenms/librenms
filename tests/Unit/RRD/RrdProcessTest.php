@@ -33,6 +33,7 @@ class RrdProcessTest extends TestCase
         $this->process->shouldReceive('setInput')->byDefault();
         $this->process->shouldReceive('setTimeout')->byDefault();
         $this->process->shouldReceive('setIdleTimeout')->byDefault();
+        $this->process->shouldReceive('getLastOutputTime')->andReturn(microtime(true))->byDefault();
         $this->process->shouldReceive('start')->byDefault();
         $this->process->shouldReceive('isRunning')->andReturn(false, true)->byDefault();
         $this->process->shouldReceive('clearOutput')->byDefault();
@@ -292,6 +293,7 @@ class RrdProcessTest extends TestCase
         $process->shouldReceive('setInput');
         $process->shouldReceive('setTimeout');
         $process->shouldReceive('setIdleTimeout');
+        $process->shouldReceive('getLastOutputTime')->andReturn(microtime(true));
         $process->shouldReceive('start')->once();
         $process->shouldReceive('isRunning')->andReturn(true);
         $process->shouldReceive('stop');
