@@ -167,17 +167,6 @@ class RunAlerts
         $template = $tpl->getTemplate($obj);
 
         if ($alert['state'] >= AlertState::ACTIVE) {
-            $obj['title'] = 'Alert for device ' . $obj['display'] . ' - ' . $alert['name'];
-            if ($alert['state'] == AlertState::ACKNOWLEDGED) {
-                $obj['title'] .= ' Has been acknowledged';
-            } elseif ($alert['state'] == AlertState::WORSE) {
-                $obj['title'] .= ' Has worsened';
-            } elseif ($alert['state'] == AlertState::BETTER) {
-                $obj['title'] .= ' Has improved';
-            } elseif ($alert['state'] == AlertState::CHANGED) {
-                $obj['title'] .= ' changed';
-            }
-
             foreach ($extra['rule'] as $incident) {
                 $i++;
                 $obj['faults'][$i] = $incident;
@@ -208,7 +197,6 @@ class RunAlerts
             $extra['count'] = 0;
             dbUpdate(['details' => gzcompress(json_encode($id['details']), 9)], 'alert_log', 'id = ?', [$alert['id']]);
 
-            $obj['title'] = 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']);
             $obj['elapsed'] = Time::formatInterval(strtotime((string) $alert['time_logged']) - strtotime((string) $id['time_logged']), true) ?: 'none';
             $obj['id'] = $id['id'];
             foreach ($extra['rule'] as $incident) {
@@ -704,9 +692,8 @@ class RunAlerts
                 $transport_title = "Transport {$item['transport_type']}";
                 $obj['transport'] = $item['transport_type'];
                 $obj['transport_name'] = $item['transport_name'];
-                $obj['alert'] = new AlertData($obj);
                 $obj['title'] = $type->getTitle($obj);
-                $obj['alert']['title'] = $obj['title'];
+                $obj['alert'] = new AlertData($obj);
                 $obj['msg'] = $type->getBody($obj);
                 c_echo(" :: $transport_title => ");
                 try {

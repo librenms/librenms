@@ -74,7 +74,7 @@ class Template
      */
     public function bladeBody($data)
     {
-        $alert['alert'] = new AlertData($data['alert']);
+        $alert['alert'] = new AlertData($data['alert'] ?? $data);
         try {
             return Blade::render($data['template']->template, $alert);
         } catch (\Exception $e) {
@@ -93,27 +93,35 @@ class Template
         $template = $data['template'] ?? null;
         $state = $data['state'] ?? ($data['alert']['state'] ?? null);
         $isRecovered = $state == AlertState::RECOVERED;
+        $defaultTemplate = $isRecovered
+            ? 'Device {{ $alert->display }} recovered from {{ $alert->name ?: $alert->rule }}'
+            : 'Alert for device {{ $alert->display }} - {{ $alert->name }}';
         $templateTitle = $isRecovered
-            ? ($template->title_rec ?: 'Device {{ $alert->display }} recovered from {{ $alert->name ?: $alert->rule }}')
-            : ($template->title ?: 'Alert for device {{ $alert->display }} - {{ $alert->name }}');
+            ? ($template->title_rec ?: $defaultTemplate)
+            : ($template->title ?: $defaultTemplate);
 
         $alert['alert'] = new AlertData($data['alert'] ?? $data);
         try {
             $title = Blade::render($templateTitle, $alert);
-            if ($state == AlertState::ACKNOWLEDGED) {
-                $title .= ' Has been acknowledged';
-            } elseif ($state == AlertState::WORSE) {
-                $title .= ' Has worsened';
-            } elseif ($state == AlertState::BETTER) {
-                $title .= ' Has improved';
-            } elseif ($state == AlertState::CHANGED) {
-                $title .= ' changed';
-            }
-
-            return $title;
         } catch (\Exception) {
-            return (string) ($data['title'] ?? '');
+            try {
+                $title = Blade::render($defaultTemplate, $alert);
+            } catch (\Exception) {
+                return (string) ($data['title'] ?? '');
+            }
         }
+
+        if ($state == AlertState::ACKNOWLEDGED) {
+            $title .= ' Has been acknowledged';
+        } elseif ($state == AlertState::WORSE) {
+            $title .= ' Has worsened';
+        } elseif ($state == AlertState::BETTER) {
+            $title .= ' Has improved';
+        } elseif ($state == AlertState::CHANGED) {
+            $title .= ' changed';
+        }
+
+        return $title;
     }
 
     public function getDefaultTemplate(string $template_name, string $error): string
