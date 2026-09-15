@@ -58,13 +58,15 @@ if (isset($rrd_filename)) {
     $check_graph['mysql'][] = ' GPRINT:DS5:AVERAGE:%0.0lf ';
     $check_graph['mysql'][] = ' GPRINT:DS5:MAX:%0.0lf\\l ';
 
-    $check_graph['mysqluptime'][] = ' DEF:DS0=' . $rrd_filename . ':Uptime:LAST ';
-    $check_graph['mysqluptime'][] = ' CDEF:cuptime=DS0,86400,/';
-    $check_graph['mysqluptime'][] = " 'COMMENT:Days      Current  Minimum  Maximum  Average\\n'";
-    $check_graph['mysqluptime'][] = ' AREA:cuptime#EEEEEE:Uptime';
-    $check_graph['mysqluptime'][] = ' LINE1.25:cuptime#36393D:';
-    $check_graph['mysqluptime'][] = ' GPRINT:cuptime:LAST:%6.2lf  GPRINT:cuptime:MIN:%6.2lf';
-    $check_graph['mysqluptime'][] = ' GPRINT:cuptime:MAX:%6.2lf  GPRINT:cuptime:AVERAGE:%6.2lf\\l';
+    $check_graph['mysqluptime'][] = 'DEF:DS0=' . $rrd_filename . ':Uptime:LAST';
+    $check_graph['mysqluptime'][] = 'CDEF:cuptime=DS0,86400,/';
+    $check_graph['mysqluptime'][] = 'COMMENT:Days      Current  Minimum  Maximum  Average\n';
+    $check_graph['mysqluptime'][] = 'AREA:cuptime#EEEEEE:Uptime';
+    $check_graph['mysqluptime'][] = 'LINE1.25:cuptime#36393D:';
+    $check_graph['mysqluptime'][] = 'GPRINT:cuptime:LAST:%6.2lf';
+    $check_graph['mysqluptime'][] = 'GPRINT:cuptime:MIN:%6.2lf';
+    $check_graph['mysqluptime'][] = 'GPRINT:cuptime:MAX:%6.2lf';
+    $check_graph['mysqluptime'][] = 'GPRINT:cuptime:AVERAGE:%6.2lf\l';
 
     $check_graph['mysqlQcache'][] = ' DEF:DS0=' . $rrd_filename . ':Qcache_free_memory:AVERAGE ';
     $check_graph['mysqlQcache'][] = ' LINE1.25:DS0#' . $mixed_colours[0] . ":'" . str_pad(substr('Qcache_free_memory', 0, 19), 19) . "' ";
