@@ -26,11 +26,14 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\ApiToken;
 use App\Models\Device;
+use App\Models\Service;
 use App\Models\User;
 use App\Models\WirelessSensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class BasicApiTest extends DBTestCase
 {
@@ -50,6 +53,47 @@ final class BasicApiTest extends DBTestCase
                 'devices' => [$device->toArray()],
                 'count' => 1,
             ]);
+    }
+
+    #[DataProvider('serviceListTimingProvider')]
+    public function testListServicesIncludesCheckTiming(bool $deviceOnly, int $frequency): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = ApiToken::generateToken($user);
+        $device = Device::factory()->create();
+        $checkedAt = 1787468400;
+        $service = Service::factory()->for($device)->create(['service_checked' => $checkedAt]);
+        $neverChecked = Service::factory()->for($device)->create();
+        $originalFrequency = LibrenmsConfig::get('service_services_frequency');
+
+        try {
+            LibrenmsConfig::set('service_services_frequency', $frequency);
+
+            $url = $deviceOnly ? "/api/v0/services/{$device->device_id}" : '/api/v0/services';
+            $response = $this->json('GET', $url, [], ['X-Auth-Token' => $token->token_hash])
+                ->assertStatus(200)
+                ->assertJsonPath('status', 'ok')
+                ->assertJsonCount(2, 'services.0');
+
+            $services = array_column($response->json('services.0'), null, 'service_id');
+            $this->assertSame($checkedAt, $services[$service->service_id]['service_checked']);
+            $this->assertSame(0, $services[$neverChecked->service_id]['service_checked']);
+            $this->assertSame($frequency, $services[$service->service_id]['service_check_interval']);
+            $this->assertSame($frequency, $services[$neverChecked->service_id]['service_check_interval']);
+        } finally {
+            LibrenmsConfig::set('service_services_frequency', $originalFrequency);
+        }
+    }
+
+    public static function serviceListTimingProvider(): array
+    {
+        return [
+            'all services with default interval' => [false, 300],
+            'device services with default interval' => [true, 300],
+            'all services with custom interval' => [false, 120],
+            'device services with custom interval' => [true, 120],
+        ];
     }
 
     public function testDisabledUserTokenCannotAccessApi(): void
