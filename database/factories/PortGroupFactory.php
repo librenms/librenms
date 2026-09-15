@@ -12,6 +12,7 @@ class PortGroupFactory extends Factory
         return [
             'name' => $this->faker->unique()->words(2, true),
             'desc' => $this->faker->sentence(),
+            'type' => 'static',
         ];
     }
 }

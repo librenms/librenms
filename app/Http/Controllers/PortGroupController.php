@@ -8,6 +8,7 @@ use App\Models\PortGroup;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use LibreNMS\Alerting\QueryBuilderFilter;
 
 class PortGroupController extends Controller
 {
@@ -37,6 +38,7 @@ class PortGroupController extends Controller
 
         return view('port-group.create', [
             'port_group' => new PortGroup(),
+            'filters' => json_encode(new QueryBuilderFilter('group')),
         ]);
     }
 
@@ -52,10 +54,19 @@ class PortGroupController extends Controller
 
         $this->validate($request, [
             'name' => 'required|string|unique:port_groups',
+            'type' => 'required|in:dynamic,static',
+            'ports' => 'array|required_if:type,static',
+            'ports.*' => 'integer',
+            'rules' => 'json|required_if:type,dynamic',
         ]);
 
-        $portGroup = new PortGroup($request->only(['name', 'desc']));
+        $portGroup = new PortGroup($request->only(['name', 'desc', 'type']));
+        $portGroup->rules = json_decode($request->rules);
         $portGroup->save();
+
+        if ($request->type == 'static') {
+            $portGroup->ports()->sync($request->ports);
+        }
 
         $toast->success(__('Port Group :name created', ['name' => $portGroup->name]));
 
@@ -74,6 +85,7 @@ class PortGroupController extends Controller
 
         return view('port-group.edit', [
             'port_group' => $portGroup,
+            'filters' => json_encode(new QueryBuilderFilter('group')),
         ]);
     }
 
@@ -98,16 +110,40 @@ class PortGroupController extends Controller
                 }),
             ],
             'desc' => 'string|max:255',
+            'type' => 'required|in:dynamic,static',
+            'ports' => 'array|required_if:type,static',
+            'ports.*' => 'integer',
+            'rules' => 'json|required_if:type,dynamic',
         ]);
 
-        $portGroup->fill($request->only(['name', 'desc']));
+        $portGroup->fill($request->only(['name', 'desc', 'type']));
 
-        if ($portGroup->save()) {
-            $toast->success(__('Port Group :name updated', ['name' => $portGroup->name]));
+        $ports_updated = false;
+        if ($portGroup->type == 'static') {
+            // sync port_ids from input
+            $updated = $portGroup->ports()->sync($request->input('ports', []));
+            // check for attached/detached/updated
+            $ports_updated = array_sum(array_map(count(...), $updated)) > 0;
         } else {
-            $toast->error(__('Failed to save'));
+            $portGroup->rules = json_decode($request->rules);
+        }
 
-            return redirect()->back()->withInput();
+        if ($portGroup->isDirty() || $ports_updated) {
+            try {
+                if ($portGroup->save() || $ports_updated) {
+                    $toast->success(__('Port Group :name updated', ['name' => $portGroup->name]));
+                } else {
+                    $toast->error(__('Failed to save'));
+
+                    return redirect()->back()->withInput();
+                }
+            } catch (\Illuminate\Database\QueryException $e) {
+                return redirect()->back()->withInput()->withErrors([
+                    'rules' => __('Rules resulted in invalid query: ') . $e->getMessage(),
+                ]);
+            }
+        } else {
+            $toast->info(__('No changes made'));
         }
 
         return redirect()->route('port-groups.index');
