@@ -265,14 +265,14 @@ class Rrd extends BaseDatastore
      * rename an rrdfile, can only be done on the LibreNMS server hosting the rrd files
      *
      * @param  Device  $device  Device model
-     * @param  string|array  $oldname  RRD name array as used with rrd_name()
-     * @param  string|array  $newname  RRD name array as used with rrd_name()
+     * @param  string|string[]  $oldname  RRD name array as used with rrd_name()
+     * @param  string|string[]  $newname  RRD name array as used with rrd_name()
      * @return bool indicating rename success or failure
      */
     public function renameFile(Device $device, $oldname, $newname): bool
     {
-        $oldrrd = RrdPath::make($device->hostname, $oldname)->fullPath();
-        $newrrd = RrdPath::make($device->hostname, $newname)->fullPath();
+        $oldrrd = RrdPath::make($device->hostname, self::filenameString($oldname))->fullPath();
+        $newrrd = RrdPath::make($device->hostname, self::filenameString($newname))->fullPath();
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
                 Eventlog::log("Renamed $oldrrd to $newrrd", $device, 'poller', Severity::Ok);
