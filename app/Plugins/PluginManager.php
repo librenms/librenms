@@ -31,6 +31,7 @@ use App\Models\Plugin;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Interfaces\Plugins\PluginManagerInterface;
 use LibreNMS\Util\Notifications;
 use Log;
@@ -262,7 +263,9 @@ class PluginManager implements PluginManagerInterface
             throw new PluginException('You cannot inject "pluginName", this is a reserved name');
         }
 
-        return array_merge($args, [
+        // always inject the user
+        $defaults = Auth::check() ? ['user' => Auth::user()] : [];
+        return array_merge($defaults, $args, [
             'pluginName' => $pluginName,
             'settings' => $this->getSettings($pluginName),
         ]);
