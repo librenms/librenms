@@ -644,7 +644,7 @@ function setCustomMapBackground(id, type, data, network) {
         }
     }
 
-    if (type === 'map' && mapBgElem && typeof init_map === 'function') {
+    if (type === 'map' && mapBgElem) {
         $(mapBgElem).show();
         let config = data || {};
         config['readonly'] = true;
@@ -652,9 +652,7 @@ function setCustomMapBackground(id, type, data, network) {
             .setView(L.latLng(data.lat, data.lng), data.zoom);
     } else {
         if (mapBgElem) {
-            if (typeof destroy_map === 'function') {
-                destroy_map(mapBgElem.id);
-            }
+            destroy_map(mapBgElem.id);
             $(mapBgElem).hide();
             mapBgElem.style.transform = 'none';
         }
@@ -710,7 +708,7 @@ function update_location(id, latlng, callback) {
         data: {lat: latlng.lat, lng: latlng.lng}
     }).done(function () {
         toastr.success('Location updated');
-        typeof callback === 'function' && callback(true);
+        callback?.(true);
     }).fail(function (e) {
         var msg = 'Failed to update location: ' + e.statusText;
         var data = e.responseJSON;
@@ -728,8 +726,7 @@ function update_location(id, latlng, callback) {
         }
 
         toastr.error(msg);
-        typeof callback === 'function' && callback(false);
-
+        callback?.(false);
     });
 }
 
