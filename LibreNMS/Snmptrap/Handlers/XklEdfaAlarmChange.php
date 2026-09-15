@@ -68,7 +68,7 @@ class XklEdfaAlarmChange implements SnmptrapHandler
         }
 
         $severity = Severity::Warning;
-        if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFAPumpBiasAlarm')) == 'yes' || $trap->getOidData($trap->findOid('XKL-MIB::xklEDFALossOfInputAlarm')) == 'yes' || $trap->getOidData($trap->findOid('XKL-MIB::xklEDFALossOfOutputAlarm'))) {
+        if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFAPumpBiasAlarm')) == 'yes' || $trap->getOidData($trap->findOid('XKL-MIB::xklEDFALossOfInputAlarm')) == 'yes' || $trap->getOidData($trap->findOid('XKL-MIB::xklEDFALossOfOutputAlarm')) == 'yes') {
             $severity = Severity::Error;
         }
 
