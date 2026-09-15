@@ -23252,7 +23252,7 @@
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 2078608,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 1,
                     "vrfLocalAs": null
                 }
@@ -23305,7 +23305,7 @@
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 2078608,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 1,
                     "vrfLocalAs": null
                 }

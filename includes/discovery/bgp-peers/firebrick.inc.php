@@ -73,6 +73,7 @@ foreach ($bgpPeers ?? [] as $vrfId => $vrf) {
             $peers = [
                 'vrf_id' => $vrfId,
                 'bgpPeerIdentifier' => $address,
+                'context_name' => '',
                 'bgpPeerRemoteAs' => $value['fbBgpPeerRemoteAS'],
                 'bgpPeerState' => 'idle',
                 'bgpPeerAdminStatus' => 'stop',
