@@ -101,4 +101,16 @@ final class DeviceTest extends DBTestCase
         $this->assertNotNull($found);
         $this->assertEquals($device->device_id, $found->device_id, 'Did not find the correct device');
     }
+
+    public function testAuthnameTrimming(): void
+    {
+        $device = new Device(['authname' => '  librenms  ']);
+        $this->assertEquals('librenms', $device->authname);
+
+        $device->authname = "  another_user \t\n ";
+        $this->assertEquals('another_user', $device->authname);
+
+        $device->authname = null;
+        $this->assertNull($device->authname);
+    }
 }
