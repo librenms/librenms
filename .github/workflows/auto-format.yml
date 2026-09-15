@@ -1,0 +1,93 @@
+name: Auto-Format Code (Fork Only)
+
+on:
+  push:
+    branches:
+      - '**'  # Run on all branches
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+jobs:
+  auto-format:
+    # Only run on forks, never on the main repository
+    if: github.repository != github.event.repository.full_name || github.repository_owner != 'MAIN_REPO_OWNER'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if auto-formatting is enabled
+        id: check_enabled
+        env:
+          ENABLE_AUTO_FORMAT: ${{ vars.ENABLE_AUTO_FORMAT }}
+        run: |
+          # Check for opt-in via repository variable
+          if [ "$ENABLE_AUTO_FORMAT" = "true" ]; then
+            echo "enabled=true" >> $GITHUB_OUTPUT
+            echo "✅ Auto-formatting is enabled for this fork"
+          else
+            echo "enabled=false" >> $GITHUB_OUTPUT
+            echo "⏭️ Auto-formatting is disabled."
+            echo "To enable: Go to Settings > Secrets and variables > Actions > Variables"
+            echo "Create a variable named ENABLE_AUTO_FORMAT with value: true"
+            exit 0
+          fi
+
+      - name: Checkout code
+        if: steps.check_enabled.outputs.enabled == 'true'
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Check if last commit was auto-format
+        if: steps.check_enabled.outputs.enabled == 'true'
+        id: check_loop
+        run: |
+          LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
+          LAST_COMMIT_AUTHOR=$(git log -1 --pretty=%an)
+
+          if [[ "$LAST_COMMIT_MSG" == *"auto-format code"* ]] || [[ "$LAST_COMMIT_AUTHOR" == "github-actions[bot]" ]]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "⏭️ Skipping: Last commit was an auto-format"
+            exit 0
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install PHP dependencies
+        if: steps.check_enabled.outputs.enabled == 'true'
+        uses: ./.github/actions/composer-install
+        with:
+          cache-version: ${{ secrets.CACHE_VERSION }}
+
+
+      - name: Format Code
+        if: steps.check_enabled.outputs.enabled == 'true' && steps.check_loop.outputs.skip != 'true'
+        run: |
+          DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
+          git fetch origin "$DEFAULT_BRANCH"
+          DIFF_TARGET=$(git merge-base "origin/$DEFAULT_BRANCH" HEAD 2>/dev/null || echo "origin/$DEFAULT_BRANCH")
+
+          ./vendor/bin/pint --parallel --diff="$DIFF_TARGET"
+
+      - name: Check for changes
+        if: steps.check_enabled.outputs.enabled == 'true' && steps.check_loop.outputs.skip != 'true'
+        id: check_changes
+        run: |
+          if [[ -n $(git status -s) ]]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "Code formatting changes detected"
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "No formatting changes needed"
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_enabled.outputs.enabled == 'true' && steps.check_loop.outputs.skip != 'true' && steps.check_changes.outputs.changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -A
+          CO_AUTHOR_NAME="${{ github.event.repository.owner.login }}"
+          CO_AUTHOR_EMAIL="${{ github.event.repository.owner.id }}+${{ github.event.repository.owner.login }}@users.noreply.github.com"
+          git commit -m $'style: auto-format code [skip ci]\n\nCo-authored-by: '"$CO_AUTHOR_NAME"' <'"$CO_AUTHOR_EMAIL"'>'
+          git push
