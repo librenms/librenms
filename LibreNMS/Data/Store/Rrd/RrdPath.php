@@ -31,13 +31,11 @@ use LibreNMS\Data\Store\Rrd;
 
 final readonly class RrdPath implements \Stringable
 {
-    private string $relativeDir;
-    private string $fileName;
+    private string $relativePath;
 
     private function __construct(string $hostname, string $filename)
     {
-        $this->fileName = Rrd::safeName($filename);
-        $this->relativeDir = Rrd::safeName(trim($hostname, '[]'));
+        $this->relativePath = Rrd::safeName(trim($hostname, '[]')) . ($filename ? DIRECTORY_SEPARATOR . $filename : '');
     }
 
     /**
@@ -50,12 +48,12 @@ final readonly class RrdPath implements \Stringable
 
     public function relativePath(): string
     {
-        return $this->fileName($this->relativeDir);
+        return $this->relativePath;
     }
 
     public function fullPath(): string
     {
-        return $this->fileName(LibrenmsConfig::get('rrd_dir') . DIRECTORY_SEPARATOR . $this->relativeDir);
+        return LibrenmsConfig::get('rrd_dir') . DIRECTORY_SEPARATOR . $this->relativePath;
     }
 
     public function defaultPath(): string
@@ -66,17 +64,5 @@ final readonly class RrdPath implements \Stringable
     public function __toString(): string
     {
         return $this->defaultPath();
-    }
-
-    /**
-     * Builds the filename for the current path
-     */
-    private function fileName(string $basedir): string
-    {
-        if (! $this->fileName) {
-            return $basedir;
-        }
-
-        return $basedir . DIRECTORY_SEPARATOR . $this->fileName;
     }
 }
