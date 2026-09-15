@@ -3805,7 +3805,7 @@ function edit_location(Illuminate\Http\Request $request)
         return api_error(400, 'Failed to update location');
     }
 
-    $location->fill($request->json());
+    $location->fill([$request->json()]);
 
     if ($location->save()) {
         return api_success_noresult(201, 'Location updated successfully');
