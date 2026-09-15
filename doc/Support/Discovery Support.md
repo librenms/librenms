@@ -192,7 +192,7 @@ with history data.
 
 `slas`: SLA detection and support.
 
-`vminfo`: detection of the VM guests for VMware ESXi, libvirt, and XCP-NG.
+`vminfo`: detection of the VM guests for VMware ESXi, libvirt, XCP-NG, and Proxmox VE.
 
 `printer-supplies`: toner level support.
 
