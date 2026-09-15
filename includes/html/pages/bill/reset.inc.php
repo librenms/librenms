@@ -1,4 +1,4 @@
-<form name="form1" action="" method="post" class="form-horizontal">
+<form name="form1" action="<?php echo route('bill.reset', $bill_id); ?>" method="post" class="form-horizontal">
   <?php echo csrf_field() ?>
   <script type="text/javascript">
     function showWarning() {
@@ -12,7 +12,6 @@
       }
     }
   </script>
-  <input type="hidden" name="action" value="reset_bill">
   <div class="row">
   <div class="col-md-8 col-md-push-2">
   <div class="alert alert-danger alert-block">
