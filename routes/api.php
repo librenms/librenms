@@ -277,6 +277,12 @@ Route::prefix('v0')->group(function (): void {
         Route::get('', [App\Api\Controllers\LegacyApiController::class, 'get_port_security'])->name('get_port_security');
     });
 
+    // Port VLAN
+    Route::prefix('port_vlan')->group(function (): void {
+        Route::get('port/{portid}', [App\Api\Controllers\LegacyApiController::class, 'get_port_vlan_info'])->name('get_port_vlan_info_by_port');
+        Route::get('device/{hostname}', [App\Api\Controllers\LegacyApiController::class, 'get_port_vlan_info'])->name('get_port_vlan_info_by_hostname');
+    });
+
     // Locations
     Route::post('locations', [App\Api\Controllers\LegacyApiController::class, 'add_location'])->name('add_location')->middleware('can:create,App\Models\Location');
     Route::get('location/{location_id_or_name}', [App\Api\Controllers\LegacyApiController::class, 'get_location'])->name('get_location')->middleware('can:viewAny,App\Models\Location');

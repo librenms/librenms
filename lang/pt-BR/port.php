@@ -72,4 +72,5 @@ return [
         'snr' => 'Margem SNR',
         'power' => 'Potências de Saída',
     ],
+    'voice_vlan_label' => 'Voice VLAN: :label',
 ];

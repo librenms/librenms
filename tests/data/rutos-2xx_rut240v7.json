@@ -4640,22 +4640,22 @@
         "discovery": {
             "ipv6_nd": [
                 {
-                    "mac_address": "48e1ca2c00e0",
+                    "mac_address": "48:e1:ca:2c:00:e0",
                     "ipv6_address": "fe80:0000:0000:0000:14ac:e140:6009:22ff",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "52e860c2e155",
+                    "mac_address": "52:e8:60:c2:e1:55",
                     "ipv6_address": "fe80:0000:0000:0000:1c9f:4f02:9fa5:cdcf",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "34f64b2ad8c0",
+                    "mac_address": "34:f6:4b:2a:d8:c0",
                     "ipv6_address": "fe80:0000:0000:0000:a8f3:a781:339d:e824",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "c0847dba582c",
+                    "mac_address": "c0:84:7d:ba:58:2c",
                     "ipv6_address": "fe80:0000:0000:0000:c284:7dff:feba:582c",
                     "context_name": ""
                 }
