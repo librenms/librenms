@@ -8,10 +8,10 @@ if ($service['service_param']) {
 }
 $check_cmd = \App\Facades\LibrenmsConfig::get('nagios_plugins') . '/check_mysql -H ' . $service['hostname'] . ' ' . $dbname . ' ' . $service['service_param'];
 
-if (isset($rrd_filename)) {
-    // Check DS is a json array of the graphs that are available
-    $check_ds = '{"mysqlqueries":"c","mysql":"c","mysqluptime":"c","mysqlQcache":"c"}';
+// Check DS is a json array of the graphs that are available
+$check_ds = '{"mysqlqueries":"c","mysql":"c","mysqluptime":"c","mysqlQcache":"c"}';
 
+if (isset($rrd_filename)) {
     // Build the graph data
     $check_graph = [];
     $mixed_colours = \App\Facades\LibrenmsConfig::get('graph_colours.mixed');
