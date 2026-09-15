@@ -30,6 +30,11 @@
   color: #0052cccc;
 }
 
+.widget-header {
+  background: #0052cc22;
+  color: #0052cccc;
+}
+
 .pace {
   -webkit-pointer-events: none;
   pointer-events: none;
