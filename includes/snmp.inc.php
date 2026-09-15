@@ -67,7 +67,7 @@ function snmp_exec(string $cmd, array|string|null $oids, array|string|null $opti
         mibDir: implode(':', $queryOptions->mibDirs),
     ));
 
-    return $response->raw;
+    return $response->raw();
 }
 
 /**

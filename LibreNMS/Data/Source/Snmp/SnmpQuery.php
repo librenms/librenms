@@ -328,7 +328,7 @@ class SnmpQuery implements SnmpQueryInterface
      */
     private function runWithAbort(array $items, \Closure $run, \Closure $logMessage): SnmpResponse
     {
-        $response = new SnmpResponse('');
+        $response = new SnmpResponse([]);
 
         foreach ($items as $item) {
             $response = $response->append($run($item));

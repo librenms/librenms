@@ -405,10 +405,10 @@ class NetSnmpTest extends TestCase
 
     public function testSnmpResponseStoresCommand(): void
     {
-        $response = new SnmpResponse("test = 1\n", '', 0, ['/usr/bin/snmpget', 'test']);
+        $response = new SnmpResponse(['test' => '1'], '', 0, ['/usr/bin/snmpget', 'test']);
         $this->assertSame(['/usr/bin/snmpget', 'test'], $response->command);
 
-        $appended = $response->append(new SnmpResponse("test2 = 2\n"));
+        $appended = $response->append(new SnmpResponse(['test2' => '2']));
         $this->assertSame(['/usr/bin/snmpget', 'test'], $appended->command);
     }
 
