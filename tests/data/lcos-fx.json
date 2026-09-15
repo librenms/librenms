@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux HB-SR01-FW01 5.15.202-gp-ext #1 SMP Mon Jun 15 10:50:07 UTC 2026 x86_64",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": "UF-260 Full",
+                    "features": null,
+                    "location": null,
+                    "os": "lcos-fx",
+                    "type": "firewall",
+                    "serial": null,
+                    "icon": "rsnc.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
