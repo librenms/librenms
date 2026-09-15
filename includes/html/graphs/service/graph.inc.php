@@ -48,7 +48,7 @@ $ds = isset($vars['ds'], $service_ds[$vars['ds']]) ? $vars['ds'] : array_key_fir
 
 if ($ds) {
     if (isset($check_graph[$ds])) {
-        $rrd_options = $check_graph[$ds];
+        $rrd_options = array_map(trim(...), $check_graph[$ds]);
     } else {
         $rrd_options[] = 'COMMENT:                      Now     Avg      Max\n';
 
