@@ -36,12 +36,9 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Exceptions\HostRenameException;
 use LibreNMS\Util\Number;
-use SplFileInfo;
-use Throwable;
 
 class EditDeviceController
 {
@@ -59,8 +56,6 @@ class EditDeviceController
                 'type' => $device->type,
             ]);
         }
-
-        [$rrd_size, $rrd_num] = $this->getFolderSize(Rrd::dirFromHost($device->hostname));
 
         $alertSchedules = $device->alertSchedules()->isActive()->get();
         $isUnderMaintenance = $alertSchedules->isNotEmpty();
@@ -91,8 +86,6 @@ class EditDeviceController
             'maintenance' => $isUnderMaintenance,
             'default_maintenance_behavior' => MaintenanceBehavior::from((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'))->value,
             'exclusive_maintenance_id' => $exclusive_schedule_id,
-            'rrd_size' => Number::formatBi($rrd_size),
-            'rrd_num' => $rrd_num,
         ]);
     }
 
@@ -143,32 +136,5 @@ class EditDeviceController
         }
 
         return response()->redirectToRoute('device', ['device' => $device->device_id, 'edit']);
-    }
-
-    /**
-     * @param  string  $directory
-     * @return array{int, int} [size, count]
-     */
-    private function getFolderSize(string $directory): array
-    {
-        if (! File::isDirectory($directory) || ! File::isReadable($directory)) {
-            return [0, 0];
-        }
-
-        try {
-            $files = collect(File::allFiles($directory));
-
-            $size = $files->sum(function (SplFileInfo $file): int {
-                try {
-                    return $file->getSize();
-                } catch (Throwable) {
-                    return 0;
-                }
-            });
-
-            return [$size, $files->count()];
-        } catch (Throwable) {
-            return [0, 0];
-        }
     }
 }
