@@ -290,9 +290,6 @@
 
             if(node.linked_map_name) {
                 node_cfg.title = "{{ trans('map.custom.view.go_to') }} " + node.linked_map_name;
-            } else if(node.device_id) {
-                node_cfg.title = document.createElement("div");
-                node_cfg.title.innerHTML = node.device_info;
             } else {
                 node_cfg.title = null;
             }
