@@ -296,6 +296,11 @@ function cache_peeringdb()
         return;
     }
 
+    // Without an API key we only look up which exchanges our own ASNs are on. Crawling
+    // every peer at those exchanges is what actually loads the PeeringDB API, so that
+    // part stays opt in. See #14598
+    $api_key = LibrenmsConfig::get('peeringdb.api_key');
+
     // We cache for 71 hours. Track the sync itself rather than the contents of pdb_ix,
     // otherwise installs whose ASNs return no data re-query PeeringDB on every daily run.
     if (Cache::has('peeringdb.last_sync')) {
@@ -320,13 +325,19 @@ function cache_peeringdb()
     $incomplete = false;
 
     // Spread requests out so many LibreNMS installs don't hit the PeeringDB API in lockstep
-    $fetch = function (string $url) {
+    $fetch = function (string $url) use ($api_key) {
         $rand = random_int(3, 30);
         echo "Sleeping for $rand seconds before querying PeeringDB" . PHP_EOL;
         sleep($rand);
 
-        return \LibreNMS\Util\Http::client()->get($url);
+        $client = \LibreNMS\Util\Http::client();
+
+        return ($api_key ? $client->withToken($api_key, 'Api-Key') : $client)->get($url);
     };
+
+    // ASNs we already hold exchanges for. If one of those suddenly returns nothing it is
+    // more likely a glitch than a removal, so retry it next run instead of for a week.
+    $known_asns = array_map('intval', array_column(dbFetchRows('SELECT DISTINCT `asn` FROM `pdb_ix`'), 'asn'));
 
     // Exclude reserved, private and documentation ASN ranges
     // 23456 (AS_TRANS, RFC6793)
@@ -355,7 +366,9 @@ function cache_peeringdb()
 
         if ($get->notFound()) {
             echo "AS$asn is not in PeeringDB" . PHP_EOL;
-            Cache::put("peeringdb.no_data.$asn", true, 604800);
+            if (! in_array((int) $asn, $known_asns)) {
+                Cache::put("peeringdb.no_data.$asn", true, 604800);
+            }
             continue;
         }
 
@@ -371,7 +384,9 @@ function cache_peeringdb()
 
         if (empty($ixs)) {
             echo "AS$asn has no exchanges in PeeringDB" . PHP_EOL;
-            Cache::put("peeringdb.no_data.$asn", true, 604800);
+            if (! in_array((int) $asn, $known_asns)) {
+                Cache::put("peeringdb.no_data.$asn", true, 604800);
+            }
             continue;
         }
 
@@ -392,6 +407,11 @@ function cache_peeringdb()
                 $pdb_ix_id = dbInsert($insert, 'pdb_ix');
             }
             $ix_keep[] = $pdb_ix_id;
+
+            // Listing every network at an exchange is the expensive call, only key holders get it
+            if (empty($api_key)) {
+                continue;
+            }
 
             $get_ix = $fetch("$peeringdb_url/netixlan?ix_id=$ixid");
             if (! $get_ix->successful()) {

@@ -10,6 +10,17 @@ Enable the integration in the web interface.
     lnms config:set peeringdb.enabled true
     ```
 
+Optionally add an API key. Without one LibreNMS only collects the
+exchanges your own ASNs are on. Listing every other network at those
+exchanges is by far the most expensive call for the PeeringDB API, so
+it only runs if you have a key. Create one in your PeeringDB account,
+see [their documentation](https://docs.peeringdb.com/howto/api_keys/).
+
+!!! setting "external/peeringdb"
+    ```bash
+    lnms config:set peeringdb.api_key <your key>
+    ```
+
 The next run of `daily.sh` collects the data. To force the collection,
 run `php daily.php -f peeringdb`.
 
