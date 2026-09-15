@@ -4917,7 +4917,6 @@ parameters:
 
 		-
 			message: '''
-			message: '''
 				#^Call to deprecated function dbFetchRows\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''

@@ -25,12 +25,6 @@
         Yes, please reset MySQL data for all interfaces on this bill!
         </label>
       </div>
-      <div class="checkbox">
-        <label>
-        <input disabled type="checkbox" name="confirm" value="rrd" onchange="javascript: showWarning();">
-        Yes, please reset RRD data for all interfaces on this bill!
-        </label>
-      </div>
     </div>
   </div>
   <br>
