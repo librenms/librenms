@@ -209,9 +209,14 @@ function check_service($command)
         }
 
         if ($ds != '') {
+            $ds = trim($ds, "'\"");
             // Normalize ds for rrd : ds-name must be 1 to 19 characters long in the characters [a-zA-Z0-9_]
             // http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
-            $normalized_ds = preg_replace('/[^a-zA-Z0-9_]/', '', $ds);
+            if (preg_match('/(?:.+)?(rta|rtmin|rtmax|pl)$/', $ds, $matches)) {
+                $normalized_ds = $matches[1];
+            } else {
+                $normalized_ds = preg_replace('/[^a-zA-Z0-9_]/', '', $ds);
+            }
             // if ds_name is longer than 19 characters, only use the first 19
             if (strlen((string) $normalized_ds) > 19) {
                 $normalized_ds = substr((string) $normalized_ds, 0, 19);
@@ -256,6 +261,49 @@ function check_service($command)
         } else {
             // No DS. Don't add an entry to the array.
             d_echo("Perf Data - None.\n");
+        }
+    }
+
+    if (empty($metrics) && preg_match('/retrieved stats:\s*(.*)/i', $response_string, $stat_matches)) {
+        $stat_map = [
+            'uptime' => ['name' => 'Uptime', 'uom' => 's'],
+            'threads' => ['name' => 'Threads_connected', 'uom' => ''],
+            'threads connected' => ['name' => 'Threads_connected', 'uom' => ''],
+            'questions' => ['name' => 'Questions', 'uom' => 'c'],
+            'opens' => ['name' => 'Open_files', 'uom' => 'c'],
+            'open files' => ['name' => 'Open_files', 'uom' => 'c'],
+            'open tables' => ['name' => 'Open_tables', 'uom' => ''],
+            'queries per second avg' => ['name' => 'Queries', 'uom' => ''],
+            'queries' => ['name' => 'Queries', 'uom' => ''],
+        ];
+
+        preg_match_all('/([A-Za-z ]+):\s*([0-9.]+)/', $stat_matches[1], $matched_stats, PREG_SET_ORDER);
+        foreach ($matched_stats as $stat) {
+            $key = strtolower(trim($stat[1]));
+            $val = trim($stat[2]);
+            if (isset($stat_map[$key])) {
+                $dsName = $stat_map[$key]['name'];
+                $uom = $stat_map[$key]['uom'];
+                $metrics[$dsName] = ['value' => $val, 'uom' => $uom, 'full_name' => $dsName];
+                d_echo('Perf Data - DS: ' . $dsName . ', Value: ' . $val . ', UOM: ' . $uom . "\n");
+            }
+        }
+
+        $extra_defaults = [
+            'Connections' => ['value' => 0, 'uom' => 'c'],
+            'Table_locks_waited' => ['value' => 0, 'uom' => 'c'],
+            'Threads_running' => ['value' => 0, 'uom' => ''],
+            'Qcache_free_memory' => ['value' => 0, 'uom' => ''],
+            'Qcache_hits' => ['value' => 0, 'uom' => 'c'],
+            'Qcache_inserts' => ['value' => 0, 'uom' => 'c'],
+            'Qcache_lowmem_prune' => ['value' => 0, 'uom' => 'c'],
+            'Qcache_not_cached' => ['value' => 0, 'uom' => 'c'],
+            'Qcache_queries_in_c' => ['value' => 0, 'uom' => ''],
+        ];
+        foreach ($extra_defaults as $dsName => $info) {
+            if (! isset($metrics[$dsName])) {
+                $metrics[$dsName] = ['value' => $info['value'], 'uom' => $info['uom'], 'full_name' => $dsName];
+            }
         }
     }
 
