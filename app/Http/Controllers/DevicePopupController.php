@@ -63,24 +63,22 @@ class DevicePopupController
                 [
                     'device' => $device,
                     'type' => $type,
-                    'title' => Str::title($type),
-                    'graphs' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-14d'], ['from' => '-30d']],
+                    'title' => Str::title(str_replace('_', ' ', $type)),
+                    'graphs' => [['from' => '-1d'], ['from' => '-7d']],
                 ],
             ];
         }
 
-        $graphs = [];
-        foreach (Graph::getOverviewGraphsForDevice($device) as $graph) {
-            if (isset($graph['text'], $graph['graph'])) {
-                $graphs[] = [
-                    'device' => $device,
-                    'type' => $graph['graph'],
-                    'title' => $graph['text'],
-                    'graphs' => [['from' => '-1d'], ['from' => '-7d']],
-                ];
-            }
-        }
+        $overview = Graph::getOverviewGraphsForDevice($device);
+        $primaryGraph = $overview[0] ?? ['graph' => 'device_bits', 'text' => __('Device Traffic')];
 
-        return $graphs;
+        return [
+            [
+                'device' => $device,
+                'type' => $primaryGraph['graph'] ?? 'device_bits',
+                'title' => $primaryGraph['text'] ?? __('Device Traffic'),
+                'graphs' => [['from' => '-1d'], ['from' => '-7d']],
+            ],
+        ];
     }
 }

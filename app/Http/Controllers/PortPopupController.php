@@ -51,7 +51,7 @@ class PortPopupController
                 'port' => $port,
                 'type' => $graph_type,
                 'title' => $request->string('title', Str::title(str_replace('_', ' ', $graph_type))),
-                'graphs' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']],
+                'graphs' => [['from' => '-1d']],
             ],
         ];
 

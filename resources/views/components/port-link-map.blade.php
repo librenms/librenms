@@ -5,6 +5,6 @@
     {{ $port->getDescription() }}
     <br>
     @foreach($graphs as $graph)
-        <x-graph-row loading="lazy" :port="$port" :type="$graph['type']" :title="$graph['title']" :graphs="[['from' => '-1d']]" />
+        <x-graph-row loading="lazy" :port="$port" :type="$graph['type']" :title="$graph['title']" :graphs="[['from' => '-1d']]" :absolute-size="1" />
     @endforeach
 </div>

@@ -11,7 +11,7 @@
     </x-slot>
     <div>
         @foreach($graphs as $graph)
-            <x-graph-row loading="lazy" :port="$port" :type="$graph['type']" :title="$graph['title']" :graphs="$graph['graphs']" />
+            <x-graph-row loading="lazy" :port="$port" :type="$graph['type']" :title="$graph['title']" :graphs="$graph['graphs']" :absolute-size="1" />
         @endforeach
     </div>
 </x-panel>
