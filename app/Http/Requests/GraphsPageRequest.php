@@ -112,12 +112,6 @@ class GraphsPageRequest extends FormRequest
             'width' => ['nullable', 'integer', 'min:10'],
             'height' => ['nullable', 'integer', 'min:10'],
 
-            // Collectd parameters
-            'c_plugin' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
-            'c_plugin_instance' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
-            'c_type' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
-            'c_type_instance' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+$/'],
-
             // Sensor parameters
             'sensor' => ['nullable', 'integer'],
 
