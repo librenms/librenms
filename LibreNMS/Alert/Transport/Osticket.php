@@ -14,6 +14,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
@@ -22,7 +23,11 @@ class Osticket extends Transport
 {
     protected string $name = 'osTicket';
 
-    public function deliverAlert(array $alert_data): bool
+    /**
+     * @param  array<string, mixed>|AlertData  $alert_data
+     * @return bool
+     */
+    public function deliverAlert($alert_data): bool
     {
         $url = $this->config['os-url'];
         $token = $this->config['os-token'];

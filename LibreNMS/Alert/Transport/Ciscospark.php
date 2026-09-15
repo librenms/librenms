@@ -13,6 +13,7 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
@@ -23,7 +24,11 @@ class Ciscospark extends Transport
     // This is the total length minus 4 bytes for ellipses.
     private static int $MAX_MSG_SIZE = 7435;
 
-    public function deliverAlert(array $alert_data): bool
+    /**
+     * @param  array<string, mixed>|AlertData  $alert_data
+     * @return bool
+     */
+    public function deliverAlert($alert_data): bool
     {
         $room_id = $this->config['room-id'];
         $token = $this->config['api-token'];

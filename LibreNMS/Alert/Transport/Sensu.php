@@ -25,6 +25,7 @@ namespace LibreNMS\Alert\Transport;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
@@ -44,7 +45,11 @@ class Sensu extends Transport
         'critical' => self::CRITICAL,
     ];
 
-    public function deliverAlert(array $alert_data): bool
+    /**
+     * @param  array<string, mixed>|AlertData  $alert_data
+     * @return bool
+     */
+    public function deliverAlert($alert_data): bool
     {
         $sensu_opts['source-key'] = $this->config['sensu-source-key'];
 

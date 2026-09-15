@@ -29,6 +29,7 @@ namespace LibreNMS\Alert\Transport;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use Symfony\Component\Process\Process;
@@ -37,7 +38,11 @@ class Snmptrap extends Transport
 {
     protected string $name = 'SNMP Trap';
 
-    public function deliverAlert(array $alert_data): bool
+    /**
+     * @param  array<string, mixed>|AlertData  $alert_data
+     * @return bool
+     */
+    public function deliverAlert($alert_data): bool
     {
         $host = $this->config['snmptrap-destination-host'];
         $port = $this->config['snmptrap-destination-port'] ?: '162';
