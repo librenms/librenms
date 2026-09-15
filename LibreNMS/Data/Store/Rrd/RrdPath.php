@@ -98,7 +98,7 @@ final class RrdPath implements \Stringable
         }
 
         $rrd_dir = $this->fullDir();
-        if (! is_dir($rrd_dir) {
+        if (! is_dir($rrd_dir)) {
             if (mkdir($rrd_dir, 0775, true)) {
                 Log::info("Created directory : $rrd_dir");
             } else {
