@@ -1,0 +1,52 @@
+RSCS-UPDATES DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, enterprises, Unsigned32
+            FROM SNMPv2-SMI;
+
+
+    RSCS        OBJECT IDENTIFIER ::= { enterprises 29577 }
+
+    Updates         OBJECT IDENTIFIER ::= { RSCS 7 }
+
+    uninstalledUpdates OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Number of updates that are not installed yet"
+        ::= { Updates 1 }
+
+    uninstalledUpgradeUpdates OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Number of upgrade type updates that are not installed yet"
+        ::= { Updates 2 }
+
+    uninstalledSecurityUpdates OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Number of security type updates that are not installed yet"
+        ::= { Updates 3 }
+
+    uninstalledHotfixUpdates OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Number of hotfix type updates that are not installed yet"
+        ::= { Updates 4 }
+
+    uninstalledRecommendedUpdates OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Number of recommended type updates that are not installed yet"
+        ::= { Updates 5 }
+
+END
