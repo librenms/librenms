@@ -40,8 +40,10 @@ class DeviceLinkMap extends Component
             return view('components.device-link-no-access');
         }
 
+        $overview = Graph::getOverviewGraphsForDevice($this->device);
+
         return view('components.device-link-map', [
-            'graphs' => Graph::getOverviewGraphsForDevice($this->device),
+            'graphs' => array_slice($overview, 0, 1),
         ]);
     }
 }

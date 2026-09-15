@@ -27,7 +27,7 @@
     </x-slot>
     <div>
         @forelse($graphs as $graph)
-            <x-graph-row :device="$device->device_id" :type="$graph['type']" :title="$graph['title']" :graphs="$graph['graphs']" />
+            <x-graph-row :device="$device->device_id" :type="$graph['type']" :title="$graph['title']" :graphs="$graph['graphs']" :absolute-size="1" />
         @empty
             <div class="tw:text-center tw:py-4 tw:text-gray-500">
                 {{ __('No graphs available for this device') }}

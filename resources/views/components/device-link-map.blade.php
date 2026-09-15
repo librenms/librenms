@@ -13,7 +13,7 @@
     </span>
     @foreach($graphs as $graph)
         @isset($graph['text'], $graph['graph'])
-            <x-graph-row loading="lazy" :device="$device" :type="$graph['graph']" :title="$graph['text']" :graphs="[['from' => '-1d'], ['from' => '-7d']]"></x-graph-row>
+            <x-graph-row loading="lazy" :device="$device" :type="$graph['graph']" :title="$graph['text']" :graphs="[['from' => '-1d'], ['from' => '-7d']]" :absolute-size="1"></x-graph-row>
         @endisset
     @endforeach
 </div>

@@ -622,7 +622,8 @@ function setCustomMapBackground(id, type, data, network) {
         .css('background-color', '');
 
     const mapBackgroundId = `${id}-bg-geo-map`;
-    const mapBgElem = document.getElementById(mapBackgroundId);
+    const altMapBackgroundId = `custom-map-bg-geo-map-${id.replace('custom-map-', '')}`;
+    const mapBgElem = document.getElementById(mapBackgroundId) || document.getElementById(altMapBackgroundId);
 
     if (type === 'image' && data && data.image_url) {
         let img = new Image();
@@ -643,17 +644,17 @@ function setCustomMapBackground(id, type, data, network) {
         }
     }
 
-    if (type === 'map') {
-        if (mapBgElem) {
-            $(mapBgElem).show();
-        }
+    if (type === 'map' && mapBgElem && typeof init_map === 'function') {
+        $(mapBgElem).show();
         let config = data || {};
         config['readonly'] = true;
-        init_map(mapBackgroundId, config)
+        init_map(mapBgElem.id, config)
             .setView(L.latLng(data.lat, data.lng), data.zoom);
     } else {
-        destroy_map(mapBackgroundId);
         if (mapBgElem) {
+            if (typeof destroy_map === 'function') {
+                destroy_map(mapBgElem.id);
+            }
             $(mapBgElem).hide();
             mapBgElem.style.transform = 'none';
         }
