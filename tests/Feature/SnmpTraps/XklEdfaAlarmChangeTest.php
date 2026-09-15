@@ -77,6 +77,7 @@ TRAP,
 
             'Output EDFA reset.',
             'Failed to handle XklEdfaAlarmChange EDFA reset alarm trap.',
+            [Severity::Warning],
         );
     }
 
@@ -102,6 +103,7 @@ TRAP,
 
             'Output EDFA has become muted.',
             'Failed to handle XklEdfaAlarmChange EDFA muted alarm trap.',
+            [Severity::Warning],
         );
     }
 
@@ -127,6 +129,7 @@ TRAP,
 
             'Output EDFA modules alarms: LOS AOP.',
             'Failed to handle EDFA module alarms',
+            [Severity::Warning],
         );
     }
 }
