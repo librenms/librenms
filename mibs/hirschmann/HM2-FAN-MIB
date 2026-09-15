@@ -1,0 +1,195 @@
+
+HM2-FAN-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann FAN Management MIB
+-- *************************************************************
+--
+
+IMPORTS
+	MODULE-IDENTITY, NOTIFICATION-TYPE,
+	OBJECT-TYPE, 
+	Integer32,
+	Unsigned32			FROM SNMPv2-SMI -- RFC 2578
+	hm2UnitIndex			FROM HM2-DEVMGMT-MIB
+	hm2ConfigurationMibs		FROM HM2-TC-MIB;
+
+hm2FanMgmtMib MODULE-IDENTITY
+	LAST-UPDATED "201704260000Z" -- April 26, 2017
+	ORGANIZATION "Hirschmann Automation and Control GmbH"
+	CONTACT-INFO
+		"Postal:	Stuttgarter Str. 45-51
+					 72654 Neckartenzlingen
+					 Germany
+		 Phone:		+49 7127 140
+		 E-mail:	hac.support@belden.com"
+	DESCRIPTION
+		"Hirschmann FAN Management MIB. 
+		 Copyright (C) 2017. All Rights Reserved."
+	REVISION	 "201704260000Z" -- April 26, 2017
+	DESCRIPTION
+		 "Initial version."
+	::= { hm2ConfigurationMibs 13 }
+
+--
+-- *************************************************************
+-- hm2FanMgmtMib
+-- *************************************************************
+--
+
+hm2FanMgmtMibNotifications  OBJECT IDENTIFIER ::= { hm2FanMgmtMib 0 }
+hm2FanMgmtMibObjects		OBJECT IDENTIFIER ::= { hm2FanMgmtMib 1 }
+-- hm2FanMgmtMibConformance	 OBJECT IDENTIFIER ::= { hm2FanMgmtMib 2 }
+
+--
+-- *************************************************************
+-- Textual Conventions
+-- *************************************************************
+--
+Hm2FanModuleStatus  ::= TEXTUAL-CONVENTION
+	STATUS	   current
+	DESCRIPTION  "Status of FAN module and corresponding FAN entities."
+	SYNTAX	   INTEGER {
+				not-available(1),
+				available-and-ok (2),
+				available-but-failure (3)
+			   }
+--
+-- *************************************************************
+-- hm2FanMgmtMib groups
+-- *************************************************************
+--
+
+hm2FanMgmtGroup		 OBJECT IDENTIFIER ::= { hm2FanMgmtMibObjects 1 }
+
+--
+-- *************************************************************
+-- hm2FanMgmtGlobalGroup
+-- *************************************************************
+--
+
+hm2FanMgmtGlobalGroup   OBJECT IDENTIFIER ::= { hm2FanMgmtGroup 1 }
+
+hm2FanMgmtMaxSuppModulesPerUnit OBJECT-TYPE
+						SYNTAX Unsigned32
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"Max. number of modules per unit."
+						::= { hm2FanMgmtGlobalGroup 1 }
+
+hm2FanMgmtMaxSuppFanPerModule   OBJECT-TYPE
+						SYNTAX Unsigned32
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"Max. number of FANs per module."
+						::= { hm2FanMgmtGlobalGroup 2 }
+
+--
+-- *************************************************************
+-- hm2FanModuleMgmtTable
+-- *************************************************************
+--
+hm2FanModuleMgmtTable   OBJECT-TYPE
+						SYNTAX SEQUENCE OF Hm2FanModuleMgmtEntry
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION
+							"Table containing info of the FAN modules per unit."
+						::= { hm2FanMgmtGroup 2 }
+
+hm2FanModuleMgmtEntry   OBJECT-TYPE
+						SYNTAX Hm2FanModuleMgmtEntry
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION
+							"The entries of the hm2FanModuleMgmtTable."
+						INDEX { hm2UnitIndex, hm2FanModuleMgmtId }
+						::= { hm2FanModuleMgmtTable 1 }
+
+Hm2FanModuleMgmtEntry   ::= SEQUENCE {
+						hm2FanModuleMgmtId	Unsigned32,
+						hm2FanModuleMgmtStatus  Hm2FanModuleStatus
+				     }
+
+hm2FanModuleMgmtId	  OBJECT-TYPE
+						SYNTAX Unsigned32
+						MAX-ACCESS accessible-for-notify
+						STATUS current
+						DESCRIPTION
+							"Module index."
+						::= { hm2FanModuleMgmtEntry 1 }
+
+hm2FanModuleMgmtStatus  OBJECT-TYPE
+						SYNTAX  Hm2FanModuleStatus
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"Status of the module plugged per unit."
+						::= { hm2FanModuleMgmtEntry 2 }
+
+--
+-- *************************************************************
+-- hm2FanMgmtTable
+-- *************************************************************
+--
+hm2FanMgmtTable		 OBJECT-TYPE
+						SYNTAX SEQUENCE OF Hm2FanMgmtEntry
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION
+							"Table containing info of the FANs per module per unit."
+						::= { hm2FanMgmtGroup 3 }
+
+hm2FanMgmtEntry		 OBJECT-TYPE
+						SYNTAX Hm2FanMgmtEntry
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION
+							"The entries of the hm2FanMgmtTable."
+						INDEX { hm2UnitIndex, hm2FanModuleMgmtId, hm2FanMgmtFanId}
+						::= { hm2FanMgmtTable 1 }
+
+Hm2FanMgmtEntry		 ::= SEQUENCE {
+						hm2FanMgmtFanId		Unsigned32,
+						hm2FanMgmtStatus	Hm2FanModuleStatus
+				      }
+
+hm2FanMgmtFanId		 OBJECT-TYPE
+						SYNTAX Unsigned32
+						MAX-ACCESS accessible-for-notify
+						STATUS  current
+						DESCRIPTION
+							"FAN index."
+						::= { hm2FanMgmtEntry 1 }
+						
+hm2FanMgmtStatus		OBJECT-TYPE
+						SYNTAX  Hm2FanModuleStatus
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"Status of the FAN per module plugged per unit."
+						::= { hm2FanMgmtEntry 2 }
+						
+--
+-- *************************************************************
+-- hm2FanMgmtMibNotifications
+-- *************************************************************
+--
+hm2FanMgmtModuleNotification NOTIFICATION-TYPE
+						OBJECTS { hm2UnitIndex, hm2FanModuleMgmtId, hm2FanModuleMgmtStatus }
+						STATUS current
+						DESCRIPTION 
+							"This notification is sent whenever the status of 'hm2FanModuleMgmtStatus' changes."
+						::= { hm2FanMgmtMibNotifications 1 }
+						
+hm2FanMgmtFanNotification NOTIFICATION-TYPE
+						OBJECTS { hm2UnitIndex, hm2FanModuleMgmtId, hm2FanMgmtFanId, hm2FanMgmtStatus }
+						STATUS current
+						DESCRIPTION 
+							"This notification is sent whenever the status of 'hm2FanMgmtStatus' changes."
+						::= { hm2FanMgmtMibNotifications 2 }
+
+END

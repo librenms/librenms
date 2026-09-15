@@ -1,0 +1,2545 @@
+
+HM2-DEVMGMT-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann Device Management MIB
+-- ***********************************************************
+--
+
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    Integer32,
+    Unsigned32,
+    NOTIFICATION-TYPE		    FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, 
+    DisplayString,
+    TruthValue			        FROM SNMPv2-TC
+    SnmpAdminString             FROM SNMP-FRAMEWORK-MIB
+    ifIndex, 
+    InterfaceIndexOrZero        FROM IF-MIB
+    HmEnabledStatus,
+    HmTimeSeconds1970,
+    hm2ConfigurationMibs        FROM HM2-TC-MIB
+	IANAifType                  FROM IANAifType-MIB;
+      		 
+
+
+hm2DeviceMgmtMib MODULE-IDENTITY
+    LAST-UPDATED "201210100000Z" -- October 10, 2012
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann Device Management MIB.
+         Copyright (C) 2012. All Rights Reserved."
+    REVISION     "201210100000Z" -- October 10, 2012
+    DESCRIPTION
+        "hm2SfpThresholdTable table added to store
+        SFP thresholds."
+    REVISION     "201103160000Z" -- March 16, 2011
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 10 }
+
+
+Hm2DeviceExtNVMType ::= TEXTUAL-CONVENTION
+		STATUS       current
+		DESCRIPTION
+		"Type of an external non volatile memory device."
+		REFERENCE
+		"RFC3164 - 4.1.1: Table 2"
+		SYNTAX  INTEGER {
+        	 	 	 	 	none(0),
+        	 	 	 	 	sd(1),
+        	 	 	 	 	usb(2),
+        	 	 	 	 	serial(3)
+         	 	 	 	 }     
+
+-- 
+-- ***********************************************************
+-- hm2DeviceMgmtMib
+-- ***********************************************************
+--
+
+hm2DeviceMgmtMibNotifications			OBJECT IDENTIFIER ::= { hm2DeviceMgmtMib 0 }
+hm2DeviceMgmtMibObjects					OBJECT IDENTIFIER ::= { hm2DeviceMgmtMib 1 }
+-- hm2DeviceMgmtMibConformance				OBJECT IDENTIFIER ::= { hm2DeviceMgmtMib 2 }
+
+hm2DeviceMgmtGroup						OBJECT IDENTIFIER ::= { hm2DeviceMgmtMibObjects 1 }
+
+hm2DeviceMgmtActionGroup				OBJECT IDENTIFIER ::= { hm2DeviceMgmtMibObjects 2 }
+
+hm2DeviceMgmtSoftwareGroup				OBJECT IDENTIFIER ::= { hm2DeviceMgmtMibObjects 3 }
+
+hm2DeviceMgmtHardwareGroup				OBJECT IDENTIFIER ::= { hm2DeviceMgmtMibObjects 4 }
+
+hm2DeviceMgmtTemperatureGroup			OBJECT IDENTIFIER ::= { hm2DeviceMgmtMibObjects 5 }
+
+hm2IfaceGroup							OBJECT IDENTIFIER ::= { hm2DeviceMgmtMibObjects 6 }
+
+hm2SfpGroup								OBJECT IDENTIFIER ::= { hm2DeviceMgmtMibObjects 7 }
+
+hm2ExtNvmGroup							OBJECT IDENTIFIER ::= { hm2DeviceMgmtMibObjects 8 }
+
+hm2AutoDisableGroup 					OBJECT IDENTIFIER ::= { hm2DeviceMgmtMibObjects 9 }
+
+hm2UnitGroup							OBJECT IDENTIFIER ::= { hm2DeviceMgmtMibObjects 10 }
+
+hm2ModuleGroup							OBJECT IDENTIFIER ::= { hm2DeviceMgmtMibObjects 11 }
+
+hm2DeviceMgmtHumidityGroup			    OBJECT IDENTIFIER ::= { hm2DeviceMgmtMibObjects 12 }
+
+-- 
+-- ***********************************************************
+-- hm2DeviceMgmtGroup
+-- ***********************************************************
+--
+hm2DevMgmtProductId OBJECT-TYPE
+		 SYNTAX   		OBJECT IDENTIFIER
+		 MAX-ACCESS   	read-only							  
+		 STATUS 	  	current
+		 DESCRIPTION
+				"Manufacturer-defined product identifier (product family + product ID).
+				 Example:Objekt-ID 1.3.6.1.4.1.248.11.2.1.1 is the hm2ProductFamily EES and
+				 Objekt-ID 1.3.6.1.4.1.248.11.2.1.1.2 is the Product ID for ees25-0600"
+		 ::= { hm2DeviceMgmtGroup 1 }		
+
+hm2DevMgmtProductDescr OBJECT-TYPE
+		 SYNTAX   		DisplayString 
+		 MAX-ACCESS   	read-only							  
+		 STATUS 	  	current
+		 DESCRIPTION
+				"Manufacturer-defined product description."
+		 ::= { hm2DeviceMgmtGroup 2 }
+		 
+hm2DevMgmtSerialNumber OBJECT-TYPE
+		 SYNTAX   		DisplayString 
+		 MAX-ACCESS   	read-only							  
+		 STATUS 	  	current
+		 DESCRIPTION
+				"Manufacturer-defined serial number of the device."
+		 ::= { hm2DeviceMgmtGroup 3 }
+
+ 
+
+-- 
+-- ***********************************************************
+-- hm2DeviceMgmtActionGroup
+-- ***********************************************************
+--
+
+hm2DevMgmtActionReset OBJECT-TYPE
+	SYNTAX 		INTEGER
+				{
+				 other(1),
+				 reset(2)
+				} 
+	MAX-ACCESS 	read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'reset' has the same effect as a power-on sequence (cold start)
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 1 }
+
+hm2DevMgmtActionFlushFDB OBJECT-TYPE
+	SYNTAX   	INTEGER
+				{
+				 other(1),
+				 flushFDB(2)
+				} 
+	MAX-ACCESS  read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushFDB' will flush the forwarding database of the switch.
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 2 }
+
+hm2DevMgmtActionFlushARP OBJECT-TYPE
+	SYNTAX   	INTEGER
+				{
+				 other(1),
+				 flushARP(2)
+				} 
+	MAX-ACCESS  read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushARP' will flush the ARP cache.
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 3 }
+
+hm2DevMgmtActionFlushIGS OBJECT-TYPE
+	SYNTAX   	INTEGER
+				{
+				 other(1),
+				 flushIGS(2)
+				} 
+	MAX-ACCESS  read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushIGS' will flush all dynamically
+		 learnt IGMP snooping entries.
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 4 }	
+
+hm2DevMgmtActionFlushPortStats OBJECT-TYPE
+	SYNTAX   	INTEGER
+				{
+				 other(1),
+				 flushPortStats(2)
+				} 
+	MAX-ACCESS  read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushPortStats' will flush all port statistics.
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 5 }	
+
+hm2DevMgmtActionFlushEmailLogStats OBJECT-TYPE
+	SYNTAX   	INTEGER
+				{
+				 other(1),
+				 flushEmailLogCounters(2)
+				} 
+	MAX-ACCESS  read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushEmailLogCounters' will flush all email logging statistics.
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 6 }	
+
+hm2DevMgmtActionFlushMMRP OBJECT-TYPE
+	SYNTAX   	INTEGER
+				{
+				 other(1),
+				 flushMMRP(2)
+				} 
+	MAX-ACCESS  read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushMMRP' will flush all MMRP counters.
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 7 }
+
+hm2DevMgmtActionFlushMVRP OBJECT-TYPE
+	SYNTAX   	INTEGER
+				{
+				 other(1),
+				 flushMVRP(2)
+				} 
+	MAX-ACCESS  read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushMVRP' will flush all MVRP counters.
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 8 }
+
+hm2DevMgmtActionFlushMSRP OBJECT-TYPE
+	SYNTAX   	INTEGER
+				{
+				 other(1),
+				 flushMSRP(2)
+				} 
+	MAX-ACCESS  read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushMSRP' will flush all MSRP counters.
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 9 }
+	
+hm2DevMgmtActionFlushIeee8021AS OBJECT-TYPE
+	SYNTAX   	INTEGER
+				{
+				 other(1),
+				 flushIeee8021AS(2)
+				} 
+	MAX-ACCESS  read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushIeee8021AS' will flush all IEEE8021AS related counters.
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 10 }
+
+hm2DevMgmtActionFlushDnsClientCache OBJECT-TYPE
+	SYNTAX   	INTEGER
+				{
+				 other(1),
+				 flushDnsClientCache(2)
+				} 
+	MAX-ACCESS  read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushDnsClientCache' will flush all DNS client cache records.
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 11 }
+	
+hm2DevMgmtActionFlushDnsCachingServerCache OBJECT-TYPE
+	SYNTAX   	INTEGER
+				{
+				 other(1),
+				 flushDnsCachingServerCache(2)
+				} 
+	MAX-ACCESS  read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushDnsCachingServerCache' will flush all DNS caching server cache records.
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 12 }
+	
+hm2DevMgmtActionFlushIpUdpHelperStats OBJECT-TYPE
+	SYNTAX   	INTEGER
+				{
+				 other(1),
+				 flushIpUdpHelperStats(2)
+				} 
+	MAX-ACCESS  read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushIpUdpHelperStats' will flush all ip udp helper statistics.
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 13 }	
+
+hm2DevMgmtActionFlushAclStats OBJECT-TYPE
+	SYNTAX   	INTEGER
+				{
+				 other(1),
+				 flushAclStats(2),
+				 flushAclMacStats(3)
+				} 
+	MAX-ACCESS  read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushAclStats' will flush all acl statistics from the AgentAclRuleTable.
+		 Setting the object to 'flushAclMacStats' will flush all acl statistics from the AgentAclMacRuleTable.
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 14 }
+
+hm2DevMgmtActionFlushLdapUserCache OBJECT-TYPE
+	SYNTAX   	INTEGER
+				{
+				 other(1),
+				 flushLdapUserCache(2)
+				} 
+	MAX-ACCESS  read-write							  
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushLdapUserCache' will flush all cached users from LDAP queries to an 
+		 Active Directory Server.
+		 Reading the object always returns 'other'."			
+	::= { hm2DeviceMgmtActionGroup 15 }	
+
+hm2DevMgmtActionFlushMgmtAccessStatistics OBJECT-TYPE
+	SYNTAX 		INTEGER
+				{
+		 		other(1),
+		 		flushMgmtAccessStatistics(2)
+				}
+	MAX-ACCESS 	read-write
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting the object to 'flushMgmtAccessStatistics' will flush all management access statistics.
+		Reading the object always returns 'other'."
+	::= { hm2DeviceMgmtActionGroup 16 }
+	
+hm2DevMgmtActionFlushDiffServ OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                other(1),
+                flushDiffServ(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting the object to 'flushDiffServ' will flush all diffserv tables.
+        Reading the object always returns 'other'."
+    ::= { hm2DeviceMgmtActionGroup 17 }
+
+hm2DevMgmtActionDelayPreset OBJECT-TYPE
+	SYNTAX 		 Integer32 (0..2147483)
+	MAX-ACCESS	 read-write
+	STATUS 		 current	
+	DESCRIPTION
+		"Time in seconds until a reset that was triggered         
+		 over the hm2DevMgmtActionReset object is executed. 
+		 Writing a zero will cancel any scheduled reset."
+	DEFVAL		 { 0 }
+	::= { hm2DeviceMgmtActionGroup 100 }
+
+hm2DevMgmtActionDelayCurrent OBJECT-TYPE
+	SYNTAX 		 Integer32 (0..2147483)
+	MAX-ACCESS	 read-only
+	STATUS 		 current
+	DESCRIPTION
+		 "If a delayed reset is scheduled this object 
+		  will decrement from the start value to zero."
+	::= { hm2DeviceMgmtActionGroup 101 }
+
+
+hm2DevMgmtActionLanBypass OBJECT-TYPE
+	SYNTAX 		 HmEnabledStatus
+	MAX-ACCESS	 read-write
+	STATUS 		 current
+	DESCRIPTION
+		 "Enable/Disable run-time LAN Bypass mode upon
+		  software request. Run-time LAN bypass feature
+		  ensures that traffic pass freely between interface
+		  pairs, when system is fully up and is running an
+		  Operating System."
+	DEFVAL		 { disable }
+	::= { hm2DeviceMgmtActionGroup 102 }
+
+hm2DevMgmtActionSystemoffLanBypass OBJECT-TYPE
+	SYNTAX 		 HmEnabledStatus
+	MAX-ACCESS	 read-write
+	STATUS 		 current
+	DESCRIPTION
+		 "Enable/Disable system-off LAN Bypass mode upon
+		  software request. Systemoff LAN bypass feature
+		  ensures that traffic pass freely between interface
+		  pairs in the event of device failure caused due to
+		  power outage,application failure."
+	DEFVAL		 { disable }
+	::= { hm2DeviceMgmtActionGroup 103 }
+
+-- 
+-- ***********************************************************
+-- hm2DeviceMgmtSoftwareVersionGroup
+-- ***********************************************************
+--
+hm2DeviceMgmtSoftwareVersionGroup OBJECT IDENTIFIER ::= { hm2DeviceMgmtSoftwareGroup 1 }
+
+		 
+hm2DevMgmtSwVersBootcode	OBJECT-TYPE
+			 SYNTAX 	DisplayString 			 
+			 MAX-ACCESS	read-only
+			 STATUS 	current
+			 DESCRIPTION
+				 "Software version of the boot code."
+			 ::= { hm2DeviceMgmtSoftwareVersionGroup 1 }
+
+hm2DevMgmtSwVersAllowUnsigned	OBJECT-TYPE
+		SYNTAX		HmEnabledStatus
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Status Enable allows the update with an unsigned firmware
+			 Status Disable blocks the update with an unsigned firmware."
+		DEFVAL	{disable}
+			::= { hm2DeviceMgmtSoftwareVersionGroup 2 }
+
+hm2DevMgmtSwVersCertTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hm2DevMgmtSwVersCertEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains all information related
+			to the stored certificates."
+			::= { hm2DeviceMgmtSoftwareVersionGroup 7 }
+
+hm2DevMgmtSwVersCertEntry	OBJECT-TYPE
+		SYNTAX 		Hm2DevMgmtSwVersCertEntry
+		MAX-ACCESS 	not-accessible
+		STATUS 		current
+		DESCRIPTION
+			"Certificate table entry."
+		INDEX { hm2DevMgmtSwVersCertIndex }
+		::= { hm2DevMgmtSwVersCertTable 1 }
+
+Hm2DevMgmtSwVersCertEntry 	::= SEQUENCE {
+		hm2DevMgmtSwVersCertIndex		Integer32,
+		hm2DevMgmtSwVersCertSerialNo	OCTET STRING,
+		hm2DevMgmtSwVersCertSubject		DisplayString,
+		hm2DevMgmtSwVersCertSigAlg		DisplayString,
+		hm2DevMgmtSwVersCertType		INTEGER,
+		hm2DevMgmtSwVersCertStatus		INTEGER,
+		hm2DevMgmtSwVersCertFingerprint	OCTET STRING
+			}
+
+hm2DevMgmtSwVersCertIndex	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Certificate index."
+		::= { hm2DevMgmtSwVersCertEntry 1 }
+
+hm2DevMgmtSwVersCertSerialNo	OBJECT-TYPE
+		SYNTAX		OCTET STRING
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Certificate serial number."
+		::= { hm2DevMgmtSwVersCertEntry 2 }
+
+hm2DevMgmtSwVersCertSubject	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Certificate subject name."
+		::= { hm2DevMgmtSwVersCertEntry 3 }
+
+hm2DevMgmtSwVersCertSigAlg	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Certificate signature algorithm."
+		::= { hm2DevMgmtSwVersCertEntry 4 }
+
+hm2DevMgmtSwVersCertType OBJECT-TYPE
+		SYNTAX		INTEGER {
+					production(1),
+					development(2)
+					}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Certificate type used for image verification."
+		::= { hm2DevMgmtSwVersCertEntry 5 }
+
+hm2DevMgmtSwVersCertStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					revoked(1),
+					valid(2)
+					}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Contains the revocation status of the Certificate."
+		::= { hm2DevMgmtSwVersCertEntry 6 }
+
+hm2DevMgmtSwVersCertFingerprint	OBJECT-TYPE
+		SYNTAX		OCTET STRING
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"SHA-256 certificate fingerprint."
+		::= { hm2DevMgmtSwVersCertEntry 7 }
+
+hm2DevMgmtSwVersTable	OBJECT-TYPE
+			 SYNTAX 		 SEQUENCE OF Hm2DevMgmtSwVersEntry
+			 MAX-ACCESS 	 not-accessible
+			 STATUS 		 current
+			 DESCRIPTION
+				 "This table contains all information related to running 
+				 and stored software versions on the device.
+				 The limit are 24 firmware (*.bin) files in up to 5 directory levels."
+			 ::= { hm2DeviceMgmtSoftwareVersionGroup 10 }
+
+hm2DevMgmtSwVersEntry	OBJECT-TYPE
+			 SYNTAX 		 Hm2DevMgmtSwVersEntry
+			 MAX-ACCESS 	 not-accessible
+			 STATUS 		 current
+			 DESCRIPTION     "The entry of the hm2DevMgmtSwVersTable."
+			 INDEX			 { hm2DevMgmtSwFileLocation, hm2DevMgmtSwFileType, hm2DevMgmtSwFileIdx}
+			 ::= { hm2DevMgmtSwVersTable 1}
+
+Hm2DevMgmtSwVersEntry ::= SEQUENCE {
+			 hm2DevMgmtSwFileLocation	INTEGER,
+			 hm2DevMgmtSwFileType		INTEGER,
+			 hm2DevMgmtSwFileIdx		Integer32,
+			 hm2DevMgmtSwFileName 		DisplayString,
+			 hm2DevMgmtSwVersion		DisplayString,
+			 hm2DevMgmtSwMajorRelNum   	Integer32,
+			 hm2DevMgmtSwMinorRelNum   	Integer32,
+			 hm2DevMgmtSwBugfixRelNum  	Integer32
+			 }
+
+hm2DevMgmtSwFileLocation	 OBJECT-TYPE
+			 SYNTAX 		 INTEGER {
+							 ram (1),
+							 flash (2),
+							 sd-card (3),
+							 usb (4)
+							 }
+			 MAX-ACCESS 	 not-accessible
+			 STATUS 		 current
+			 DESCRIPTION
+				 "Indicates the file location (ram, flash, sd-card or usb)."
+			 ::= { hm2DevMgmtSwVersEntry 1 }
+
+hm2DevMgmtSwFileType	 	 OBJECT-TYPE
+			 SYNTAX 		 INTEGER {
+							 firmware (1),
+							 applet (2),
+							 logic (3)
+							 }
+			 MAX-ACCESS 	 not-accessible
+			 STATUS 		 current
+			 DESCRIPTION
+				 "Indicates the file type (firmware, applet, logic)."
+			 ::= { hm2DevMgmtSwVersEntry 2 }
+
+hm2DevMgmtSwFileIdx	 	 	 OBJECT-TYPE
+			 SYNTAX			 Integer32 (1..25)
+			 MAX-ACCESS 	 not-accessible
+			 STATUS 		 current
+			 DESCRIPTION
+				 "Indicates the index.
+				  For flash the index has the following meaning:
+				  - flash.xxx.1 = bootable version in flash (ROM)
+				  - flash.xxx.2 = backup version in flash (BAK)"
+			 ::= { hm2DevMgmtSwVersEntry 3 }
+			 			 
+hm2DevMgmtSwFileName	 	 OBJECT-TYPE
+			 SYNTAX 		 DisplayString
+			 MAX-ACCESS		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				 "Indicates the file name."
+			 ::= { hm2DevMgmtSwVersEntry 4 }
+
+hm2DevMgmtSwVersion		OBJECT-TYPE
+			 SYNTAX 		DisplayString
+			 MAX-ACCESS		read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Version of the stored software."
+			 ::= { hm2DevMgmtSwVersEntry 5 }
+
+hm2DevMgmtSwMajorRelNum    		OBJECT-TYPE
+               SYNTAX      		Integer32
+               MAX-ACCESS  		read-only
+               STATUS      		current
+               DESCRIPTION
+                    "Shows the major release number of the firmware."
+               ::= { hm2DevMgmtSwVersEntry 6 }
+
+hm2DevMgmtSwMinorRelNum       	OBJECT-TYPE
+               SYNTAX         	Integer32
+               MAX-ACCESS     	read-only
+               STATUS           current
+               DESCRIPTION
+                    "Shows the minor release number of the firmware."
+               ::= { hm2DevMgmtSwVersEntry 7 }
+
+hm2DevMgmtSwBugfixRelNum      	OBJECT-TYPE
+               SYNTAX          	Integer32
+               MAX-ACCESS      	read-only
+               STATUS          	current
+               DESCRIPTION
+                    "Shows the bug fix release number of the firmware."
+               ::= { hm2DevMgmtSwVersEntry 8 }
+
+
+
+
+-- 
+-- ***********************************************************
+-- hm2DeviceMgmtHardwareVersionGroup
+-- ***********************************************************
+--
+
+hm2DevMgmtHwVersion	OBJECT-TYPE
+			 SYNTAX 	DisplayString 			 
+			 MAX-ACCESS	read-only
+			 STATUS 	current
+			 DESCRIPTION
+				 "Version of the device hardware."
+			 ::= { hm2DeviceMgmtHardwareGroup 1 }
+			 
+hm2DevMgmtSwitchingCoreVersion	OBJECT-TYPE
+			 SYNTAX 	DisplayString 			 
+			 MAX-ACCESS	read-only
+			 STATUS 	current
+			 DESCRIPTION
+				 "Version of the device hardware."
+			 ::= { hm2DeviceMgmtHardwareGroup 2 }
+			 			 
+-- 
+-- ***********************************************************
+-- hm2DeviceMgmtLogicVersionGroup
+-- ***********************************************************
+--
+
+hm2DeviceMgmtLogicVersionGroup OBJECT IDENTIFIER ::= { hm2DeviceMgmtHardwareGroup 5 }
+
+hm2DevMgmtLogicVersTable	OBJECT-TYPE
+			 SYNTAX 		 SEQUENCE OF Hm2DevMgmtLogicVersEntry
+			 MAX-ACCESS		 not-accessible
+			 STATUS 		 current
+			 DESCRIPTION "The table displays all versions of
+				supported logic modules."
+			 ::= { hm2DeviceMgmtLogicVersionGroup 1 }
+
+hm2DevMgmtLogicVersEntry	OBJECT-TYPE
+			 SYNTAX 		 Hm2DevMgmtLogicVersEntry
+			 MAX-ACCESS 	 not-accessible
+			 STATUS 		 current
+			 DESCRIPTION     "The entry of the 
+			 	hm2DevMgmtLogicVersTable."
+			 INDEX			 { hm2DevMgmtLogicIdx }
+			 ::= { hm2DevMgmtLogicVersTable 1}
+
+Hm2DevMgmtLogicVersEntry ::= SEQUENCE {
+
+			 hm2DevMgmtLogicIdx					Integer32,
+			 hm2DevMgmtLogicAddress 			DisplayString,
+			 hm2DevMgmtLogicVersion				DisplayString 
+			 }
+
+hm2DevMgmtLogicIdx 		     OBJECT-TYPE
+			 SYNTAX			 Integer32 (1..32)
+			 MAX-ACCESS      not-accessible
+			 STATUS 		 current
+			 DESCRIPTION
+					"Index of the module to display."
+			 ::= { hm2DevMgmtLogicVersEntry 1 }
+
+hm2DevMgmtLogicAddress	    OBJECT-TYPE
+			 SYNTAX 		DisplayString 			 
+			 MAX-ACCESS		read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Address of the logic module in fpga."
+			::= { hm2DevMgmtLogicVersEntry 2 }
+			 
+hm2DevMgmtLogicVersion	OBJECT-TYPE
+			 SYNTAX 		DisplayString 			 
+			 MAX-ACCESS		read-only
+			 STATUS 		current
+			 DESCRIPTION
+				 "Version of the logic module in fpga."
+			::= { hm2DevMgmtLogicVersEntry 3 }
+
+
+-- 
+-- ***********************************************************
+-- hm2DeviceMgmtTemperatureGroup
+-- ***********************************************************
+--
+hm2DevMgmtTemperature	OBJECT-TYPE
+			 SYNTAX			Integer32
+			 MAX-ACCESS		read-only
+			 STATUS			current
+			 DESCRIPTION
+			    "This object is used to identify the temperature
+				within a device in units of centigrade (Celsius)."
+			 ::= { hm2DeviceMgmtTemperatureGroup 1 }
+
+hm2DevMgmtTemperatureUpperLimit	 OBJECT-TYPE
+			 SYNTAX			Integer32 (-99..99)
+			 MAX-ACCESS		read-write
+			 STATUS			current
+			 DESCRIPTION
+				"This object is used to define a maximum level for the
+				temperature within a device. If the temperature rises above
+				this upper limit, the management station will be notified by
+				a hm2DevMonStateChangeTrap trap."
+			 DEFVAL  {70 }				
+			 ::= { hm2DeviceMgmtTemperatureGroup 2 }
+ 
+hm2DevMgmtTemperatureLowerLimit	 OBJECT-TYPE
+			 SYNTAX			Integer32 (-99..99)
+			 MAX-ACCESS		read-write
+			 STATUS			current
+			 DESCRIPTION
+				"This object is used to define a minimum level for the
+				temperature within a device. If the temperature falls
+				below this lower limit, the management station will be notified
+				by a hm2DevMonStateChangeTrap trap."
+			 DEFVAL  { 0 }				
+			 ::= { hm2DeviceMgmtTemperatureGroup 3 }
+
+--
+
+--  hm2DevMgmtTemperatureExtTable
+
+-- 
+
+hm2DevMgmtTemperatureExtTable  OBJECT-TYPE
+			SYNTAX         SEQUENCE OF Hm2DevMgmtTemperatureExtEntry
+            MAX-ACCESS     not-accessible
+            STATUS         current
+            DESCRIPTION
+                "This table is used to identify the temperature settings within a device."
+            ::= { hm2DeviceMgmtTemperatureGroup 10 }
+
+hm2DevMgmtTemperatureExtEntry  OBJECT-TYPE
+			SYNTAX         Hm2DevMgmtTemperatureExtEntry
+            MAX-ACCESS     not-accessible
+            STATUS         current
+            DESCRIPTION    
+                "The entries of the temperature table per unit."
+            INDEX  { hm2UnitIndex, hm2DevMgmtTemperatureExtType, hm2DevMgmtTemperatureExtSensorId}
+            ::= { hm2DevMgmtTemperatureExtTable 1 }
+ 
+Hm2DevMgmtTemperatureExtEntry ::= SEQUENCE {
+            hm2DevMgmtTemperatureExtType                INTEGER,
+			hm2DevMgmtTemperatureExtSensorId            Integer32,
+            hm2DevMgmtTemperatureExt                    Integer32,
+            hm2DevMgmtTemperatureExtUpperLimit          Integer32,
+            hm2DevMgmtTemperatureExtLowerLimit          Integer32
+            }
+
+hm2DevMgmtTemperatureExtType  OBJECT-TYPE
+           SYNTAX         INTEGER { mainboard(1), module(2), switch(3), cpu(4), phy(5), other(10) }
+           MAX-ACCESS     not-accessible
+           STATUS         current
+           DESCRIPTION
+               "This object is used to identify the type of the temperature sensor."
+           ::= { hm2DevMgmtTemperatureExtEntry 1 }
+		   
+hm2DevMgmtTemperatureExtSensorId  OBJECT-TYPE
+          SYNTAX         Integer32 (1..8)
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION
+              "This object is used to identify the sensor Id."
+		  ::= { hm2DevMgmtTemperatureExtEntry 2 }
+
+ 
+hm2DevMgmtTemperatureExt  OBJECT-TYPE
+          SYNTAX         Integer32
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION
+              "This object is used to identify the temperature within a device in units of centigrade (Celsius)."
+		  ::= { hm2DevMgmtTemperatureExtEntry 3 }
+
+hm2DevMgmtTemperatureExtUpperLimit  OBJECT-TYPE
+          SYNTAX         Integer32 (-99..99)
+          MAX-ACCESS     read-write
+          STATUS         current
+          DESCRIPTION
+              "This object is used to define a maximum level for the
+               temperature within a device. If the temperature rises above
+               this upper limit, the management station will be notified by
+               a hm2DevMgmtTemperature trap."
+          DEFVAL  {70 }                                                   
+          ::= { hm2DevMgmtTemperatureExtEntry 4 }
+
+hm2DevMgmtTemperatureExtLowerLimit  OBJECT-TYPE
+          SYNTAX         Integer32 (-99..99)
+          MAX-ACCESS     read-write
+          STATUS         current
+          DESCRIPTION
+              "This object is used to define a minimum level for the
+              temperature within a device. If the temperature falls
+              below this lower limit, the management station will be notified
+              by a hm2DevMgmtTemperature trap."
+          DEFVAL  { 0 }                                                     
+          ::= { hm2DevMgmtTemperatureExtEntry 5 }
+
+-- ***********************************************************
+-- hm2DeviceMgmtHumidityGroup
+-- ***********************************************************
+--
+hm2DevMgmtHumidity	OBJECT-TYPE
+			 SYNTAX			Unsigned32 (0..100)
+			 UNITS 			"percent"
+			 MAX-ACCESS		read-only
+			 STATUS			current
+			 DESCRIPTION
+			    "This object is used to identify the humidity
+				within a device."
+			 ::= { hm2DeviceMgmtHumidityGroup 1 }
+
+hm2DevMgmtHumidityUpperLimit	 OBJECT-TYPE
+			 SYNTAX			Unsigned32 (0..100)
+			 UNITS 			"percent"
+			 MAX-ACCESS		read-write
+			 STATUS			current
+			 DESCRIPTION
+				"This object is used to define a maximum level for the
+				humidity within a device. If the humidity rises above
+				this upper limit, the management station will be
+				notified by a hm2DevMonStateChangeTrap trap."
+			 DEFVAL  { 95 }
+			 ::= { hm2DeviceMgmtHumidityGroup 2 }
+ 
+hm2DevMgmtHumidityLowerLimit	 OBJECT-TYPE
+			 SYNTAX			Unsigned32 (0..100)
+			 UNITS 			"percent"
+			 MAX-ACCESS		read-write
+			 STATUS			current
+			 DESCRIPTION
+				"This object is used to define a minimum level for the
+				humidity within a device. If the humidity falls
+				below this lower limit, the management station
+				will be notified by a hm2DevMonStateChangeTrap trap."
+			 DEFVAL  { 5 }
+			 ::= { hm2DeviceMgmtHumidityGroup 3 }
+
+-- 
+-- ***********************************************************
+-- hm2IfaceGroup
+-- ***********************************************************
+--
+hm2IfaceTable   OBJECT-TYPE
+			 SYNTAX 	 	SEQUENCE OF Hm2IfaceEntry
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION
+				 "This table contains extended PHY capabilities and
+				  configuration options."
+			 ::= { hm2IfaceGroup 1 }
+
+hm2IfaceEntry	 OBJECT-TYPE
+			 SYNTAX 		 Hm2IfaceEntry
+			 MAX-ACCESS 	 not-accessible
+			 STATUS 		 current
+			 DESCRIPTION     
+			 	"Entry with the configuration options and supported
+			 	 features of a port."
+			 INDEX	 { hm2IfacePhysIndex }
+			 ::= { hm2IfaceTable 1 }
+
+Hm2IfaceEntry ::= SEQUENCE {
+			 hm2IfacePhysIndex			Integer32,
+			 hm2IfacePortCapabilityBits	BITS,
+			 hm2IfaceCableCrossing  	INTEGER,
+			 hm2IfacePowerState			HmEnabledStatus,
+			 hm2IfaceAutoPowerDown  	INTEGER,
+			 hm2IfaceOperAdminStatus	INTEGER
+			 }
+
+hm2IfacePhysIndex OBJECT-TYPE
+			 SYNTAX 		 Integer32 
+			 MAX-ACCESS 	 accessible-for-notify
+			 STATUS 		 current
+			 DESCRIPTION
+				 "The index of the available physical interfaces." 
+			 ::= { hm2IfaceEntry 1 }
+
+			
+hm2IfacePortCapabilityBits	OBJECT-TYPE
+			SYNTAX 		 BITS 	{
+							manual-mdix	(0),
+							auto-mdix 	(1),
+							auto-power-down (2),
+							energy-efficient-ethernet (3),
+							cable-test (4),
+							poe (5),
+							poe-plus (6),
+							poe-ext (7)
+						}
+			MAX-ACCESS      read-only
+			STATUS          current			 
+			DESCRIPTION
+			"manual-mdix - port supports MDIX and MDI
+			auto-mdix    - port supports MDIX and Auto-MDIX
+			auto-power-down - port can enter low power mode if no link is established
+			energy-efficient-ethernet - port supports EEE
+			cable-test - port supports cable testing
+			poe - port supports PoE
+			poe-plus - port supports PoE+
+			poe-ext - port supports PoE Extender"
+			::= { hm2IfaceEntry 2 }
+			
+hm2IfaceCableCrossing	OBJECT-TYPE
+		 SYNTAX INTEGER
+						{
+						 mdi(1),
+						 mdix(2),
+						 auto-mdix(3),
+						 unsupported(4)
+						}
+			MAX-ACCESS      read-write
+			STATUS          current			 
+			DESCRIPTION
+			"This variable configures the cable crossing on twisted pair cables.
+			When set to 'mdi', the device does not swap the send and receive line pairs of the TP cable for this port.
+			When set to 'mdix', the device swaps the send and receive line pairs of the TP cable for this port.
+			When set to 'auto-mdix', the port uses the auto crossover mode.
+			'Unsupported' is shown, if a port does not support cable crossing or auto-negotiation is disabled.
+			It is not possible to set 'unsupported' to any type of port."
+			DEFVAL { mdix }
+			::= { hm2IfaceEntry 3 } 
+					
+hm2IfacePowerState	OBJECT-TYPE
+			SYNTAX HmEnabledStatus
+			MAX-ACCESS      read-write
+			STATUS          current			 
+			DESCRIPTION
+			"This variable configures the power on the interface.
+			When set to 'enable' that means the interface-power is on (power up)
+			When set to 'disable' that means the interface-power is off (power down)
+			The interface power state settings have no effect if the interface admin state
+			(ifAdminStatus) is enabled"
+			DEFVAL { disable }
+			::= { hm2IfaceEntry 4 }
+
+
+			
+hm2IfaceAutoPowerDown	OBJECT-TYPE
+			SYNTAX INTEGER
+							{
+							auto-power-down (1),
+							no-power-save (2),
+							energy-efficient-ethernet (3),
+							unsupported(4)
+							}
+			MAX-ACCESS      read-write
+			STATUS          current			 
+			DESCRIPTION
+			"This variable configures the automatic power save mode on the interface.
+			When set to 'auto-power-down', the port goes in a low power mode if no link is detected.
+			When set to 'no-power-save', the port does not use the automatic power save mode.
+			When set to 'energy-efficient-ethernet', the port uses energy-efficient-ethernet mode to save the power.
+			'Unsupported' is shown, if a port does not support automatic power save mode."
+			DEFVAL { no-power-save }
+			::= { hm2IfaceEntry 5 }
+			
+			
+hm2IfaceOperAdminStatus	OBJECT-TYPE
+			SYNTAX INTEGER
+							{
+							up(1),
+							down(2)
+							}
+			MAX-ACCESS      read-only
+			STATUS          current			 
+			DESCRIPTION
+			"This variable shows the operational admin state of a specific interface.
+			The operational state could be different to the ifAdminStatus if the interface is 
+			forced to down by other means like hm2AutoDisableIntfOperState."
+			
+			::= { hm2IfaceEntry 6 }
+
+-- 
+-- ***********************************************************
+-- hm2IfaceLayoutTable
+-- ***********************************************************
+--
+hm2IfaceLayoutTable   OBJECT-TYPE
+			 SYNTAX 	 	SEQUENCE OF Hm2IfaceLayoutEntry
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION
+				"This table does contain the layout of the interface modules or 
+			 	blocks. It contains all possible physical and logical items. 
+			 	This table can be used to determine any interface index according to 
+			 	'IfEntry' that may exist and the name of this interface. "
+			 ::= { hm2IfaceGroup 2 }
+
+
+hm2IfaceLayoutEntry	 OBJECT-TYPE
+			 SYNTAX 		 Hm2IfaceLayoutEntry
+			 MAX-ACCESS 	 not-accessible
+			 STATUS 		 current
+			 DESCRIPTION     
+			 	"An entry of a module or block of interfaces."
+			 INDEX	 { hm2IfaceLayoutIndex }
+			 ::= { hm2IfaceLayoutTable 1 }
+
+Hm2IfaceLayoutEntry ::= SEQUENCE {
+			 hm2IfaceLayoutIndex				Integer32,
+			 hm2IfaceLayoutStartIfIndex			InterfaceIndexOrZero,
+			 hm2IfaceLayoutEndIfIndex			InterfaceIndexOrZero,
+			 hm2IfaceLayoutModuleCapacity		Unsigned32,
+			 hm2IfaceLayoutModulePortCapacity   Unsigned32,
+			 hm2IfaceLayoutFormat				SnmpAdminString,
+			 hm2IfaceLayoutIfIndexType			IANAifType
+			 }
+
+hm2IfaceLayoutIndex OBJECT-TYPE
+			 SYNTAX 		 Integer32 
+			 MAX-ACCESS 	 not-accessible
+			 STATUS 		 current
+			 DESCRIPTION
+				 "The index used for this table." 
+			 ::= { hm2IfaceLayoutEntry 1 }
+
+hm2IfaceLayoutStartIfIndex OBJECT-TYPE
+			 SYNTAX 		 InterfaceIndexOrZero 
+			 MAX-ACCESS 	 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				 "It specifies the first interface index of this block or module." 
+			 ::= { hm2IfaceLayoutEntry 2 }
+
+hm2IfaceLayoutEndIfIndex OBJECT-TYPE
+			 SYNTAX 		 InterfaceIndexOrZero 
+			 MAX-ACCESS 	 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				 "It specifies the last interface index of this block or module that 
+				 can exist for this particular device. The amount of interfaces 
+				 between first and last may not be equal than to the maximum 
+				 interface per module." 
+			 ::= { hm2IfaceLayoutEntry 3 }
+
+hm2IfaceLayoutModuleCapacity OBJECT-TYPE
+			 SYNTAX 		 Unsigned32 
+			 MAX-ACCESS 	 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				 "It is the Number of modules in that block. Currently not used and it is always 0." 
+			 ::= { hm2IfaceLayoutEntry 4 }
+
+hm2IfaceLayoutModulePortCapacity OBJECT-TYPE
+			 SYNTAX 		 Unsigned32 
+			 MAX-ACCESS 	 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				 "Number of interfaces that one module can contain. Currently not used and it is always 0" 
+			 ::= { hm2IfaceLayoutEntry 5 }
+
+hm2IfaceLayoutFormat OBJECT-TYPE
+			 SYNTAX 		 SnmpAdminString 
+			 MAX-ACCESS 	 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				 "This specifies a format string that can be used to determine the textual representation of an interface in this block.
+					following wildcards are supported:
+					%i the absolute interface number according to 'IfEntry'. 
+					%p the relative number based on hm2IfaceLayoutStartIfIndex
+					%s the block number from 'hm2IfaceLayoutIndex'
+					%vid the vlan of the routing interface
+					%lre the name of the redundancy port (prp or hsr)"
+			 ::= { hm2IfaceLayoutEntry 6 }
+
+hm2IfaceLayoutIfIndexType OBJECT-TYPE
+			 SYNTAX 		 IANAifType
+			 MAX-ACCESS 	 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				 "Type of the interfaces in that block according to IANA-Type table." 
+			 ::= { hm2IfaceLayoutEntry 7 }
+			 
+			 
+			 -- 
+-- ***********************************************************
+-- hm2IfaceExtTable
+-- ***********************************************************
+--
+hm2IfaceExtTable   OBJECT-TYPE
+			 SYNTAX 	 	SEQUENCE OF Hm2IfaceExtEntry
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION
+				 "This table contains additional information about the interfaces."
+			 ::= { hm2IfaceGroup 3 }
+
+hm2IfaceExtEntry	 OBJECT-TYPE
+			 SYNTAX 		 Hm2IfaceExtEntry
+			 MAX-ACCESS 	 not-accessible
+			 STATUS 		 current
+			 DESCRIPTION     
+			 	"."
+			 INDEX	 { ifIndex }
+			 ::= { hm2IfaceExtTable 1 }
+
+Hm2IfaceExtEntry ::= SEQUENCE {
+			 hm2IfaceExtIfRole			INTEGER
+			 }
+
+hm2IfaceExtIfRole OBJECT-TYPE
+			 SYNTAX 		 INTEGER
+			 		{
+			 			ethernetCsmacd 		(6),
+			 			softwareLoopback 	(24),
+			 			l3ipvlan 			(136),
+			 			ieee8023adLag 		(161),
+			 			shdsl 				(169),
+			 			ringPort 			(1001),
+			 			subringPort 		(1002),
+			 			couplingPort 		(1003),
+			 			routerPort 			(1004),
+			 			probePort 			(1005),
+			 			cpuPort 			(1006),
+			 			servicePort 		(1007),
+			 			outOfBandMgmtPort	(1008),
+			 			lagMember 			(1101),
+			 			lreMember 			(1102),
+			 			lreInterface 		(1201),
+			 			ringLagInterface 	(1202)
+			 		}
+			 MAX-ACCESS 	 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				 "The current role of the interface." 
+			 ::= { hm2IfaceExtEntry 1 }
+
+			 
+-- 
+-- ***********************************************************
+-- hm2SfpGroup
+-- ***********************************************************
+--
+
+hm2SfpInfoTable   OBJECT-TYPE
+			 SYNTAX 	 	SEQUENCE OF Hm2SfpInfoEntry
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION
+				 "This table contains variables for each SFP."
+			 ::= { hm2SfpGroup 1 }
+
+hm2SfpInfoEntry	 OBJECT-TYPE
+			 SYNTAX 		 Hm2SfpInfoEntry
+			 MAX-ACCESS 	 not-accessible
+			 STATUS 		 current
+			 DESCRIPTION     
+			 	"Entry for a detected SFP."
+			 INDEX	 { ifIndex }
+			 ::= { hm2SfpInfoTable 1 }
+
+Hm2SfpInfoEntry ::= SEQUENCE {
+			 hm2SfpModuleType		INTEGER,
+			 hm2SfpMediaType		INTEGER,
+			 hm2SfpConnector		INTEGER,
+			 hm2SfpVendorName		SnmpAdminString,
+			 hm2SfpVendorOUI		OCTET STRING,
+			 hm2SfpPartNumber 		SnmpAdminString,
+			 hm2SfpPartRev 			SnmpAdminString,
+			 hm2SfpSerialNum		SnmpAdminString,
+			 hm2SfpDateCode			SnmpAdminString,
+			 hm2SfpInfoVersion		Integer32,
+			 hm2SfpInfoPartNumber 	SnmpAdminString,
+			 hm2SfpInfoPartId		SnmpAdminString,
+			 hm2SfpBitRateNominal	Integer32,
+			 hm2SfpBitRateMin		Integer32,
+			 hm2SfpBitRateMax		Integer32,
+			 hm2SfpMaxLength-fiber-9	Integer32,
+			 hm2SfpMaxLength-fiber-50	Integer32,
+			 hm2SfpMaxLength-fiber-e50	Integer32,
+			 hm2SfpMaxLength-fiber-62-5	Integer32,
+			 hm2SfpMaxLength-copper		Integer32,
+			 hm2SfpWaveLength		Integer32,
+ 			 hm2SfpWaveLengthTolerance	Integer32,
+			 hm2SfpEnhancedOptions		BITS,
+			 hm2SfpSupported		TruthValue,
+			 hm2SfpSupportedReason  INTEGER
+			 }
+
+
+hm2SfpModuleType OBJECT-TYPE
+			 SYNTAX		INTEGER {
+						sfp(3),
+						xfp(6)
+						}
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				 "Type of the module. SFP or SFP+ (3), XFP (6)." 
+			 ::= { hm2SfpInfoEntry 1 }
+
+hm2SfpMediaType OBJECT-TYPE
+			 SYNTAX		INTEGER {
+						ge-1000-base-sx (1),
+						ge-1000-base-lx (2),
+						ge-1000-base-cx (4),
+						fe-100base-lx (5),
+						fe-100base-fx (6),
+						ge-1000-base-t (8),
+						unsupported (9),
+						oc3-mm-sr (10),
+						oc3-sm-ir (11),
+						oc3-sm-lr (12),
+						oc12-mm-sr (13),
+						oc12-sm-ir (14),
+						oc12-sm-lr (15),
+						oc48-sr (16),
+						oc48-ir (17),
+						oc48-lr (18),
+						xfp-10gbase-sr(30),
+						xfp-10gbase-lr(31),
+						xfp-10gbase-er(32),
+						microfx(40),
+						pof(41),
+						m-sfp-2500(50)
+						}
+			 MAX-ACCESS 	 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				 "The SFP's Media Type"
+			 ::= { hm2SfpInfoEntry 2 }
+
+hm2SfpConnector OBJECT-TYPE
+			 SYNTAX 	INTEGER {
+						nonSfp (1),
+						fiberjack (6),
+						lc (7),
+						mtrj (8),
+						opticalPigtail (11),
+						copperPigtail (33),
+						rj45 (34),
+						vendorSpecific (128)
+						}
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				 "The SFP's Connector Type." 
+			 ::= { hm2SfpInfoEntry 3 }
+
+hm2SfpVendorName	 OBJECT-TYPE
+			 SYNTAX 		 SnmpAdminString
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				 "The SFP's vendor name (ASCII)."
+			 ::= { hm2SfpInfoEntry 4 }
+
+hm2SfpVendorOUI	OBJECT-TYPE
+			 SYNTAX 		 OCTET STRING
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				 "The vendor organizationally unique identifier field (OUI)."
+			 ::= { hm2SfpInfoEntry 5 }
+
+hm2SfpPartNumber	 OBJECT-TYPE
+			 SYNTAX 		 SnmpAdminString 
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				"The part number of the module (ASCII)."
+			 ::= { hm2SfpInfoEntry 6 }
+
+hm2SfpPartRev	 OBJECT-TYPE
+			 SYNTAX 		 SnmpAdminString 
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				"The revision number of the module (ASCII)."
+			 ::= { hm2SfpInfoEntry 7 }
+
+hm2SfpSerialNum	 OBJECT-TYPE
+			 SYNTAX 		 SnmpAdminString 
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				"The SFP's serial number provided by vendor (ASCII)."
+			 ::= { hm2SfpInfoEntry 8 }
+
+hm2SfpDateCode	 OBJECT-TYPE
+			 SYNTAX 		 SnmpAdminString 
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				"The SFP's vendor manufacturing date code. Format is YY:MM:DD."
+			 ::= { hm2SfpInfoEntry 9 }
+
+hm2SfpInfoVersion OBJECT-TYPE
+			 SYNTAX 		 Integer32
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				"Version of SFP's Hirschmann information. 
+				Contains -1 in case of a device read error."
+			 ::= { hm2SfpInfoEntry 10 }
+
+hm2SfpInfoPartNumber	 OBJECT-TYPE
+			 SYNTAX 		 SnmpAdminString (SIZE (0..11))
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				"Part Number of SFP's Hirschmann information."
+		 	 ::= { hm2SfpInfoEntry 11 }
+
+hm2SfpInfoPartId		OBJECT-TYPE
+			 SYNTAX 		 SnmpAdminString (SIZE (0..16))
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				"Part Identifier of SFP's Hirschmann information."
+			 ::= { hm2SfpInfoEntry 12 }
+			 
+hm2SfpBitRateNominal	 OBJECT-TYPE
+			 SYNTAX 		 Integer32 
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				 "The SFP's nominal bitrate in units of MBits/sec. 
+				 Contains -1 in case of a device read error."
+			 ::= { hm2SfpInfoEntry 13 }
+
+hm2SfpBitRateMin	 OBJECT-TYPE
+			 SYNTAX 		 Integer32 
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+					"The minimum bit rate is specified in
+					units of 100 Megabits per second, rounded off
+					to the nearest 100 Megabits per second.
+					A value of 0 indicates that the minimum bit rate
+					is not specified."
+			 ::= { hm2SfpInfoEntry 14 }
+
+hm2SfpBitRateMax	 OBJECT-TYPE
+			 SYNTAX 		 Integer32 
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+					"The maximum bit rate is specified in
+					units of 100 Megabits per second, rounded off
+					to the nearest 100 Megabits per second.
+					A value of 0 indicates that the maximum bit rate
+					is not specified."
+			 ::= { hm2SfpInfoEntry 15 }
+
+
+hm2SfpMaxLength-fiber-9	OBJECT-TYPE
+			 SYNTAX 		 Integer32
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+		           "Max. usable length for the cable type '9/125 micrometer fiber'
+		            with this SFP in units of meters."
+			 ::= { hm2SfpInfoEntry 16 }
+
+hm2SfpMaxLength-fiber-50	OBJECT-TYPE
+			 SYNTAX 		 Integer32
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+		           "Max. usable length for the cable type '50/125 micrometer fiber'
+		            with this SFP in units of meters."
+			 ::= { hm2SfpInfoEntry 17 }
+
+hm2SfpMaxLength-fiber-e50	OBJECT-TYPE
+			 SYNTAX 		 Integer32
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+		           "Max. usable length for the cable type 'EBW 50/125 micrometer fiber'
+		            with this SFP in units of meters or -1 if not supported."
+			 ::= { hm2SfpInfoEntry 18 }
+
+hm2SfpMaxLength-fiber-62-5	OBJECT-TYPE
+			 SYNTAX 		 Integer32
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+		           "Max. usable length for the cable type '62.5/125 micrometer fiber'
+		            with this SFP in units of meters."
+			 ::= { hm2SfpInfoEntry 19 }
+
+hm2SfpMaxLength-copper	OBJECT-TYPE
+			 SYNTAX 		 Integer32
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+		           "Max. usable length for the cable type 'copper'
+		            with this SFP in units of meters."
+			 ::= { hm2SfpInfoEntry 20 }
+
+hm2SfpWaveLength	OBJECT-TYPE
+			 SYNTAX 		 Integer32
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+		           "Nominal transmitter output wavelength at room temperature.
+			   The laser wavelength in nm (units of 0.05nm)."
+			 ::= { hm2SfpInfoEntry 21 }
+
+hm2SfpWaveLengthTolerance	OBJECT-TYPE
+			 SYNTAX 		 Integer32
+			 MAX-ACCESS 	 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+				"The +/- range of transmitter output wavelength under normal operating conditions 
+				or -1 if not supported."
+			 ::= { hm2SfpInfoEntry 22 }
+
+hm2SfpEnhancedOptions	OBJECT-TYPE
+			 SYNTAX 		 BITS {
+		            				none(0)
+			 	 	 	 	 	  }
+			 MAX-ACCESS 	 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+		           "Not supported."
+			 ::= { hm2SfpInfoEntry 23 }
+
+hm2SfpSupported OBJECT-TYPE
+			 SYNTAX 	TruthValue
+			 MAX-ACCESS read-only
+			 STATUS 	current
+			 DESCRIPTION
+				 "The SFP is supported by the device (true) or not (false)." 
+			 ::= { hm2SfpInfoEntry 24 }
+
+hm2SfpSupportedReason OBJECT-TYPE
+			 SYNTAX 	INTEGER{
+					hirschmannID (1),
+					whiteList (2),
+					wrongSpeed (3),
+					noneEthernet (4),
+					tpSfpNotSupported (5),
+					otnID (6)
+					}
+			 MAX-ACCESS 	read-only
+			 STATUS 	current
+			 DESCRIPTION
+				 "The reason why this SFP is supported." 
+			 ::= { hm2SfpInfoEntry 25 }
+
+hm2SfpDiagTable   OBJECT-TYPE
+			 SYNTAX 	 	SEQUENCE OF Hm2SfpDiagEntry
+			 MAX-ACCESS 	not-accessible
+			 STATUS 		current
+			 DESCRIPTION
+				 "This table contains variables for each SFP."
+			 ::= { hm2SfpGroup 2 }
+
+hm2SfpDiagEntry	 OBJECT-TYPE
+			 SYNTAX 		 Hm2SfpDiagEntry
+			 MAX-ACCESS 	 not-accessible
+			 STATUS 		 current
+			 DESCRIPTION     
+			 	"Entry for a detected SFP."
+			 INDEX	 { ifIndex }
+			 ::= { hm2SfpDiagTable 1 }
+
+Hm2SfpDiagEntry ::= SEQUENCE {
+			 hm2SfpCurrentBitRate				Integer32,
+			 hm2SfpCurrentTemperature			Integer32,
+			 hm2SfpCurrentTxPower				Integer32,
+			 hm2SfpCurrentRxPower				Integer32,
+			 hm2SfpCurrentTxPowerdBm 			SnmpAdminString,
+			 hm2SfpCurrentRxPowerdBm 			SnmpAdminString,
+			 hm2SfpCurrentRxPowerState			INTEGER
+			 }
+
+hm2SfpCurrentBitRate	OBJECT-TYPE
+			 SYNTAX 		 Integer32 
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+ 	 			"The current bit rate in units of Megabits per second."
+			 ::= { hm2SfpDiagEntry 1 }
+
+hm2SfpCurrentTemperature	OBJECT-TYPE
+			 SYNTAX 		 Integer32 
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+ 	 			"This signed integer is used to identify
+ 				the temperature within the SFP in units of centigrade (Celsius). 
+ 				Contains -1000 in case of a device read error."
+			 ::= { hm2SfpDiagEntry 2 }
+
+hm2SfpCurrentTxPower	 OBJECT-TYPE
+			 SYNTAX 		 Integer32 
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+ 	 			"The SFP's internally measured Tx Power in units of 1/10 microwatt
+ 	 			or -1 if it is not supported."
+	 		 ::= { hm2SfpDiagEntry 3}
+
+hm2SfpCurrentRxPower	 OBJECT-TYPE
+			 SYNTAX 		 Integer32 
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+  	 			"The SFP's internally measured Rx Power in units of 1/10 microWatts
+  	 			or -10000 if not supportted."
+			 ::= { hm2SfpDiagEntry 4}
+
+hm2SfpCurrentTxPowerdBm	 OBJECT-TYPE
+			 SYNTAX 		 SnmpAdminString 
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+ 	 			"The SFP's internally measured Tx Power in units of dBm.
+				(ASCII representation of a floating point number).
+				- if not supported."
+	 		 ::= { hm2SfpDiagEntry 5}
+
+hm2SfpCurrentRxPowerdBm	 OBJECT-TYPE
+			 SYNTAX 		 SnmpAdminString 
+			 MAX-ACCESS 		 read-only
+			 STATUS 		 current
+			 DESCRIPTION
+ 	 			"The SFP's internally measured Rx Power in units of dBm.
+				(ASCII representation of a floating point number).
+				- if not supported."
+			 ::= { hm2SfpDiagEntry 6}
+
+hm2SfpCurrentRxPowerState  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                   ok(1),
+                   warning(2),
+                   alarm(3),
+                   unsupported(4)
+           }
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION
+           "The state of the SFP's internally measured Rx."
+           ::= { hm2SfpDiagEntry 7}
+
+
+hm2SfpWLGroup OBJECT IDENTIFIER ::= { hm2SfpGroup 3 }
+			 
+hm2SfpWLStatus OBJECT-TYPE
+   			SYNTAX INTEGER
+   			{
+      			present(1),
+      			absent(2),
+      			not-supported(3)
+		   	}
+		   	MAX-ACCESS read-only
+		   	STATUS     current
+		   	DESCRIPTION
+		   	"Status of the SFP White List.
+		   	present(1): a white list is present on the device
+		   	absent(2): no white list is present on the device
+		   	not-supported(3): white list feature is not supported in this device"
+		   	::= { hm2SfpWLGroup 1 }
+
+
+hm2SfpThresholdTable   OBJECT-TYPE
+             SYNTAX         SEQUENCE OF Hm2SfpThresholdEntry
+             MAX-ACCESS     not-accessible
+             STATUS         current
+             DESCRIPTION
+                 "This table contains the thresholds for each SFP."
+             ::= { hm2SfpGroup 4 }
+
+hm2SfpThresholdEntry  OBJECT-TYPE
+             SYNTAX          Hm2SfpThresholdEntry
+             MAX-ACCESS      not-accessible
+             STATUS          current
+             DESCRIPTION     
+                "Entry for a detected SFP."
+             INDEX   { ifIndex }
+             ::= { hm2SfpThresholdTable 1 }
+
+Hm2SfpThresholdEntry ::= SEQUENCE {
+             hm2SfpTemperatureHighAlarm         Integer32,
+             hm2SfpTemperatureHighWarning       Integer32,
+             hm2SfpTemperatureLowAlarm          Integer32,
+             hm2SfpTemperatureLowWarning        Integer32,
+             hm2SfpTxPowerHighAlarm             Integer32,
+             hm2SfpTxPowerHighWarning           Integer32,
+             hm2SfpTxPowerLowAlarm              Integer32,
+             hm2SfpTxPowerLowWarning            Integer32,
+             hm2SfpRxPowerHighAlarm             Integer32,
+             hm2SfpRxPowerHighWarning           Integer32,
+             hm2SfpRxPowerLowAlarm              Integer32,
+             hm2SfpRxPowerLowWarning            Integer32,
+             hm2SfpTxPowerdBmHighAlarm          SnmpAdminString,
+             hm2SfpTxPowerdBmHighWarning        SnmpAdminString,
+             hm2SfpTxPowerdBmLowAlarm           SnmpAdminString,
+             hm2SfpTxPowerdBmLowWarning         SnmpAdminString,
+             hm2SfpRxPowerdBmHighAlarm          SnmpAdminString,
+             hm2SfpRxPowerdBmHighWarning        SnmpAdminString,
+             hm2SfpRxPowerdBmLowAlarm           SnmpAdminString,
+             hm2SfpRxPowerdBmLowWarning         SnmpAdminString
+             }
+
+hm2SfpTemperatureHighAlarm         OBJECT-TYPE
+             SYNTAX          Integer32 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Temperature High Alarm threshold in units of
+                 centigrade (Celsius). It is -1000 if the SFP device does
+                 not support it or in case of a device read error."
+             ::= { hm2SfpThresholdEntry 1}
+
+hm2SfpTemperatureHighWarning      OBJECT-TYPE
+             SYNTAX          Integer32 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Temperature High Warning threshold in units of
+                 centigrade (Celsius). It is -1000 if the SFP device does
+                 not support it or in case of a device read error."
+             ::= { hm2SfpThresholdEntry 2}
+
+hm2SfpTemperatureLowAlarm      OBJECT-TYPE
+             SYNTAX          Integer32 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Temperature Low Alarm threshold in units of
+                 centigrade (Celsius). It is -1000 if the SFP device does
+                 not support it or in case of a device read error."
+             ::= { hm2SfpThresholdEntry 3}
+
+hm2SfpTemperatureLowWarning      OBJECT-TYPE
+             SYNTAX          Integer32 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Temperature Low Warning threshold in units of
+                 centigrade (Celsius). It is -1000 if the SFP device does
+                 not support it or in case of a device read error."
+             ::= { hm2SfpThresholdEntry 4}
+
+hm2SfpTxPowerHighAlarm         OBJECT-TYPE
+             SYNTAX          Integer32 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Tx Power High Alarm threshold in units of
+                 0.1uW. It is -10000 if the SFP device does
+                 not support it or in case of a device read error."
+             ::= { hm2SfpThresholdEntry 5}
+
+hm2SfpTxPowerHighWarning      OBJECT-TYPE
+             SYNTAX          Integer32 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Tx Power High Warning threshold in units of
+                 0.1uW. It is -10000 if the SFP device does
+                 not support it or in case of a device read error."
+             ::= { hm2SfpThresholdEntry 6}
+
+hm2SfpTxPowerLowAlarm      OBJECT-TYPE
+             SYNTAX          Integer32 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Tx Power Low Alarm threshold in units of
+                 0.1uW. It is -10000 if the SFP device does
+                 not support it or in case of a device read error."
+             ::= { hm2SfpThresholdEntry 7}
+
+hm2SfpTxPowerLowWarning      OBJECT-TYPE
+             SYNTAX          Integer32 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Tx Power Low Warning threshold in units of
+                 0.1uW. It is -10000 if the SFP device does
+                 not support it or in case of a device read error."
+             ::= { hm2SfpThresholdEntry 8}
+
+hm2SfpRxPowerHighAlarm         OBJECT-TYPE
+             SYNTAX          Integer32 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Rx Power High Alarm threshold in units of
+                 0.1uW. It is -10000 if the SFP device does
+                 not support it or in case of a device read error."
+             ::= { hm2SfpThresholdEntry 9}
+
+hm2SfpRxPowerHighWarning      OBJECT-TYPE
+             SYNTAX          Integer32 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Rx Power High Warning threshold in units of
+                 0.1uW. It is -10000 if the SFP device does
+                 not support it or in case of a device read error."
+             ::= { hm2SfpThresholdEntry 10}
+
+hm2SfpRxPowerLowAlarm      OBJECT-TYPE
+             SYNTAX          Integer32 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Rx Power Low Alarm threshold in units of
+                 0.1uW. It is -10000 if the SFP device does
+                 not support it or in case of a device read error."
+             ::= { hm2SfpThresholdEntry 11}
+
+hm2SfpRxPowerLowWarning      OBJECT-TYPE
+             SYNTAX          Integer32 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Rx Power Low Warning threshold in units of
+                 0.1uW. It is -10000 if the SFP device does
+                 not support it or in case of a device read error."
+             ::= { hm2SfpThresholdEntry 12}
+
+hm2SfpTxPowerdBmHighAlarm         OBJECT-TYPE
+             SYNTAX          SnmpAdminString 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Tx Power High Alarm threshold in units of
+                 dBm (ASCII representation of floating point number). 
+                 It is N/A if the SFP device does not support it or
+                 in case of a device read error."
+             ::= { hm2SfpThresholdEntry 13}
+
+hm2SfpTxPowerdBmHighWarning      OBJECT-TYPE
+             SYNTAX          SnmpAdminString 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Tx Power High Warning threshold in units of
+                 dBm (ASCII representation of floating point number). 
+                 It is N/A if the SFP device does not support it or
+                 in case of a device read error."
+             ::= { hm2SfpThresholdEntry 14}
+
+hm2SfpTxPowerdBmLowAlarm      OBJECT-TYPE
+             SYNTAX          SnmpAdminString 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Tx Power Low Alarm threshold in units of
+                 dBm (ASCII representation of floating point number). 
+                 It is N/A if the SFP device does not support it or
+                 in case of a device read error."
+             ::= { hm2SfpThresholdEntry 15}
+
+hm2SfpTxPowerdBmLowWarning      OBJECT-TYPE
+             SYNTAX          SnmpAdminString 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Tx Power Low Warning threshold in units of
+                 dBm (ASCII representation of floating point number). 
+                 It is N/A if the SFP device does not support it or
+                 in case of a device read error."
+             ::= { hm2SfpThresholdEntry 16}
+
+hm2SfpRxPowerdBmHighAlarm         OBJECT-TYPE
+             SYNTAX          SnmpAdminString 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Rx Power High Alarm threshold in units of
+                 dBm (ASCII representation of floating point number). 
+                 It is N/A if the SFP device does not support it or
+                 in case of a device read error."
+             ::= { hm2SfpThresholdEntry 17}
+
+hm2SfpRxPowerdBmHighWarning      OBJECT-TYPE
+             SYNTAX          SnmpAdminString 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Rx Power High Warning threshold in units of
+                 dBm (ASCII representation of floating point number). 
+                 It is N/A if the SFP device does not support it or
+                 in case of a device read error."
+             ::= { hm2SfpThresholdEntry 18}
+
+hm2SfpRxPowerdBmLowAlarm      OBJECT-TYPE
+             SYNTAX          SnmpAdminString 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Rx Power Low Alarm threshold in units of
+                 dBm (ASCII representation of floating point number). 
+                 It is N/A if the SFP device does not support it or
+                 in case of a device read error."
+             ::= { hm2SfpThresholdEntry 19}
+
+hm2SfpRxPowerdBmLowWarning      OBJECT-TYPE
+             SYNTAX          SnmpAdminString 
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                "The SFP's Rx Power Low Warning threshold in units of
+                 dBm (ASCII representation of floating point number). 
+                 It is N/A if the SFP device does not support it or
+                 in case of a device read error."
+             ::= { hm2SfpThresholdEntry 20}
+
+
+-- 
+-- ***********************************************************
+-- hm2ExtNvmGroup
+-- ***********************************************************
+--
+
+hm2ExtNvmGeneralGroup OBJECT IDENTIFIER ::= { hm2ExtNvmGroup 1 }	
+
+hm2ExtNvmChooseActive	OBJECT-TYPE
+						 SYNTAX Hm2DeviceExtNVMType
+						 MAX-ACCESS	read-write
+						 STATUS			 current
+						 DESCRIPTION
+							 "The user can choose which external NV memory to use for file operations."
+					     DEFVAL { sd }
+						 ::= { hm2ExtNvmGeneralGroup 1 }
+						 
+hm2ExtNvmLogDevice		OBJECT-TYPE
+						 SYNTAX Hm2DeviceExtNVMType
+						 MAX-ACCESS	read-write
+						 STATUS			 current
+						 DESCRIPTION
+							 "The user can choose which external NV memory to use for persistent logging."
+					     DEFVAL { sd }
+						 ::= { hm2ExtNvmGeneralGroup 2 }
+						 
+hm2ExtNvmAdminMode		OBJECT-TYPE
+						 SYNTAX INTEGER {
+						 					normal(1),
+						 					compatibility(2)
+						 				}
+						 MAX-ACCESS	read-write
+						 STATUS			 current
+						 DESCRIPTION
+							 "Switches the USB bus between High Speed (normal) and Full Speed (compatibility).
+							 This setting only takes effect after a reboot."
+					     DEFVAL { normal }
+						 ::= { hm2ExtNvmGeneralGroup 3 }
+						 
+hm2ExtNvmOperMode		OBJECT-TYPE
+						 SYNTAX INTEGER {
+						 					normal(1),
+						 					compatibility(2)
+						 				}
+						 MAX-ACCESS	read-only
+						 STATUS			 current
+						 DESCRIPTION
+							 "Shows the USB mode the device is currently operating in."
+						 ::= { hm2ExtNvmGeneralGroup 4 }
+		
+hm2ExtNvmTable		OBJECT-TYPE
+			SYNTAX		SEQUENCE OF Hm2ExtNvmEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION
+				"This table contains variables for each nvram."
+			::= { hm2ExtNvmGroup 2 }
+
+hm2ExtNvmEntry		OBJECT-TYPE
+			SYNTAX		Hm2ExtNvmEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION
+				"Entry for an external nvram."
+			INDEX	{ hm2ExtNvmTableIndex }
+			::= { hm2ExtNvmTable 1 }
+
+Hm2ExtNvmEntry ::= SEQUENCE {
+			hm2ExtNvmTableIndex					Hm2DeviceExtNVMType,
+			hm2ExtNvmStatus						INTEGER,
+			hm2ExtNvmManufacturerId				DisplayString,
+			hm2ExtNvmHWRevision					DisplayString,
+			hm2ExtNvmProductName				DisplayString,
+			hm2ExtNvmVersion					DisplayString,
+			hm2ExtNvmSerialNum					DisplayString,
+			hm2ExtNvmAutomaticSoftwareLoad		HmEnabledStatus,
+			hm2ExtNvmConfigLoadPriority			INTEGER,
+			hm2ExtNvmConfigSave					HmEnabledStatus,
+			hm2ExtNvmWritable					HmEnabledStatus,
+			hm2ExtNvmAutomaticSshKeyLoad		HmEnabledStatus
+}
+
+hm2ExtNvmTableIndex		OBJECT-TYPE
+			SYNTAX		Hm2DeviceExtNVMType
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION
+				"Index"
+			::= { hm2ExtNvmEntry 1 }
+
+hm2ExtNvmStatus			OBJECT-TYPE
+			SYNTAX INTEGER {
+						notPresent(1),
+						removed(2),
+						ok(3),
+						outOfMemory(4),
+						genericErr(5)
+						}
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Status of the external non-volatile memory.
+				notPresent(1): external non-volatile memory has not been detected.
+				removed(2): external non-volatile memory was removed in running mode of the agent.
+				ok(3): external non-volatile memory is present and OK.
+				outOfMemory(4): external non-volatile memory is full.
+				genericErr(5): Any other failure, e.g. hardware malfunction."
+			::= { hm2ExtNvmEntry 2 }
+ 
+hm2ExtNvmManufacturerId	OBJECT-TYPE
+			SYNTAX		DisplayString 
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"The manufacturer ID."
+			 ::= { hm2ExtNvmEntry 3 }
+
+hm2ExtNvmHWRevision	OBJECT-TYPE
+			SYNTAX		DisplayString 
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"The application ID."
+			 ::= { hm2ExtNvmEntry 4 }
+
+hm2ExtNvmProductName	OBJECT-TYPE
+			SYNTAX		DisplayString 
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"The product name."
+			 ::= { hm2ExtNvmEntry 5 }
+
+hm2ExtNvmVersion		OBJECT-TYPE
+			SYNTAX		DisplayString 
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"The version."
+			 ::= { hm2ExtNvmEntry 6 }
+
+hm2ExtNvmSerialNum		OBJECT-TYPE
+			SYNTAX		DisplayString 
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"The serial number provided by vendor (ASCII)."
+			 ::= { hm2ExtNvmEntry 7 }
+
+hm2ExtNvmAutomaticSoftwareLoad OBJECT-TYPE
+			SYNTAX		HmEnabledStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+				"Enable or disable Automatic loading of a software image
+				from the external non-volatile memory. A file named 'startup.txt'
+				must be present on the external non-volatile memory and contain the
+				line 'autoUpdate=filename'."
+			DEFVAL { enable }
+			::= { hm2ExtNvmEntry 8 }
+
+hm2ExtNvmConfigLoadPriority OBJECT-TYPE
+			SYNTAX		INTEGER {
+						disable(0),
+						first(1),
+						second(2),
+						third(3)
+						}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+				"Set the priority of this external non-volatile memory for
+				loading the configuration while booting. The configuration
+				on the device with the lowest priority is loaded.
+				Setting this variable to 0 disables loading of a configuration
+				from this device."
+			::= { hm2ExtNvmEntry 9 }
+
+hm2ExtNvmConfigSave OBJECT-TYPE
+			SYNTAX		HmEnabledStatus
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+				"Enable or disable Automatic saving of the configuration to the
+				external non-volatile memory. If this is enabled, saving the
+				configuration of the device to its internal nvram also stores
+				in on this external nvram."
+			DEFVAL { enable }
+			::= { hm2ExtNvmEntry 10 }
+
+hm2ExtNvmWritable OBJECT-TYPE
+			SYNTAX		HmEnabledStatus
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Shows if writing to the device is possible, i.e. if it is
+				write protected."
+			::= { hm2ExtNvmEntry 11 }
+
+hm2ExtNvmAutomaticSshKeyLoad OBJECT-TYPE
+			SYNTAX      HmEnabledStatus
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+				"Enable or disable automatic loading of a SSH key
+				 from the external non-volatile memory. A file named 'startup.txt'
+				 must be present on the external non-volatile memory and contain 
+				 the line 'autoUpdateRSA=' and/or 'autoUpdateDSA='."
+			DEFVAL { enable }
+			::= { hm2ExtNvmEntry 12 }
+			
+-- 
+-- ***********************************************************
+-- hm2AutoDisableGroup
+-- ***********************************************************
+--	
+
+
+		
+hm2AutoDisableIntfTable	OBJECT-TYPE
+					SYNTAX	SEQUENCE OF Hm2AutoDisableIntfEntry
+					MAX-ACCESS	not-accessible
+					STATUS		current
+					DESCRIPTION
+					"Port Auto Disable interface table."
+					::= { hm2AutoDisableGroup 1 }
+
+hm2AutoDisableIntfEntry	OBJECT-TYPE
+					SYNTAX			Hm2AutoDisableIntfEntry
+					MAX-ACCESS		not-accessible
+					STATUS			current
+					DESCRIPTION
+					"Port Auto Disable interface entry."
+					INDEX	{ ifIndex }
+					::= { hm2AutoDisableIntfTable 1 }
+
+Hm2AutoDisableIntfEntry ::=
+					SEQUENCE		{									 
+					hm2AutoDisableIntfRemainingTime 	Unsigned32,
+					hm2AutoDisableIntfComponentName 	SnmpAdminString,
+					hm2AutoDisableIntfErrorReason 		INTEGER,
+					hm2AutoDisableIntfTimer 			Unsigned32,
+					hm2AutoDisableIntfReset 			TruthValue,
+					hm2AutoDisableIntfOperState 		INTEGER,	
+					hm2AutoDisableIntfErrorTime 	    HmTimeSeconds1970		
+					}
+
+
+hm2AutoDisableIntfRemainingTime	OBJECT-TYPE
+					SYNTAX		Unsigned32
+				 	MAX-ACCESS	read-only
+					STATUS		current
+					DESCRIPTION
+					"Remaining time in seconds until the re-activation of the port."
+					DEFVAL		{0}
+					::= { hm2AutoDisableIntfEntry 1}
+
+hm2AutoDisableIntfComponentName
+					OBJECT-TYPE
+					SYNTAX		SnmpAdminString
+				 	MAX-ACCESS	read-only
+					STATUS		current
+					DESCRIPTION
+					"Name of the component that triggered the error"				
+					::= { hm2AutoDisableIntfEntry 2}
+
+hm2AutoDisableIntfErrorReason
+					OBJECT-TYPE
+					SYNTAX INTEGER {
+									none(0), 
+									link-flap(1), 
+									crc-error(2),
+									duplex-mismatch(3), 
+									dhcp-snooping(4),
+									arp-rate(5),
+									bpdu-rate(6),
+									mac-based-port-security(7),
+									overload-detection(8),
+									speed-duplex(9),
+									loop-protection(10)
+								   }
+				 	MAX-ACCESS	read-only
+					STATUS		current
+					DESCRIPTION
+					"Error disable reason"
+					::= { hm2AutoDisableIntfEntry 3}
+					
+hm2AutoDisableIntfTimer OBJECT-TYPE
+ 					SYNTAX		Unsigned32 (0|30..4294967295) 
+				 	MAX-ACCESS	read-write
+					STATUS		current
+					DESCRIPTION
+					"Timer value in seconds after a deactivated port is activated again.
+					Possible values are: 30-4294967295.
+					A value of 0 disables the timer."
+					DEFVAL	{0}
+					::= {hm2AutoDisableIntfEntry 4}
+					
+
+hm2AutoDisableIntfReset	OBJECT-TYPE
+					SYNTAX			TruthValue
+					MAX-ACCESS		read-write
+					STATUS			current
+					DESCRIPTION
+					"Port Auto Disable interface reset."
+					DEFVAL			{ false }
+					::= { hm2AutoDisableIntfEntry 5 }					
+					
+hm2AutoDisableIntfOperState OBJECT-TYPE
+			SYNTAX		INTEGER {
+						active(1),
+						inactive(2)					
+						}
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Status of Auto Disable interface admin state.
+				Active means that a component has encountered an error 
+				and Auto-Disable has turned off the interface. 
+				Inactive means that currently there is no error"
+				DEFVAL			{inactive}
+			::= { hm2AutoDisableIntfEntry 6 }			
+					
+
+					
+hm2AutoDisableIntfErrorTime OBJECT-TYPE
+			SYNTAX		HmTimeSeconds1970 
+		 	MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Local system time (hm2SystemLocalTime) when the error occured."
+			::= {hm2AutoDisableIntfEntry 7}										
+										
+
+hm2AutoDisableReasonTable OBJECT-TYPE
+					SYNTAX	SEQUENCE OF Hm2AutoDisableReasonEntry
+					MAX-ACCESS	not-accessible
+					STATUS		current
+					DESCRIPTION
+					"Possible reasons for Auto Disable"
+					::= { hm2AutoDisableGroup 2 }
+
+hm2AutoDisableReasonEntry	OBJECT-TYPE
+					SYNTAX			Hm2AutoDisableReasonEntry
+					MAX-ACCESS		not-accessible
+					STATUS			current
+					DESCRIPTION
+					"Port Auto Disable interface entry."
+					INDEX	{ hm2AutoDisableReasons }
+					::= { hm2AutoDisableReasonTable 1 }
+
+Hm2AutoDisableReasonEntry ::=
+					SEQUENCE		{									 
+					hm2AutoDisableReasons 			INTEGER,			
+					hm2AutoDisableReasonOperation 	HmEnabledStatus,
+					hm2AutoDisableReasonCategory 	INTEGER			 
+					}
+					
+hm2AutoDisableReasons   OBJECT-TYPE
+						SYNTAX INTEGER {
+										link-flap(1), 
+										crc-error(2),
+										duplex-mismatch(3), 
+										dhcp-snooping(4),
+										arp-rate(5),
+										bpdu-rate(6),
+										mac-based-port-security(7),
+										overload-detection(8),
+										speed-duplex(9),
+										loop-protection(10)
+								   	   }
+				     	MAX-ACCESS	not-accessible
+					    STATUS		current
+					    DESCRIPTION
+					    "Reason for deactivation a port"
+					    ::= { hm2AutoDisableReasonEntry 1}			
+					    
+hm2AutoDisableReasonOperation	OBJECT-TYPE
+					SYNTAX			HmEnabledStatus
+					MAX-ACCESS		read-write
+					STATUS			current
+					DESCRIPTION
+					"Enables/disables recovery by resaon on this device."
+					DEFVAL  		{ disable }
+					::= { hm2AutoDisableReasonEntry 2 }					    		
+
+hm2AutoDisableReasonCategory OBJECT-TYPE
+					SYNTAX INTEGER {
+									other(1), 
+									port-monitor(2), 
+									network-security(3), 
+									l2-redundancy(4)
+								   }
+				 	MAX-ACCESS	read-only
+					STATUS		current
+					DESCRIPTION
+					"Auto Disable Reason Category"
+					::= { hm2AutoDisableReasonEntry 3}
+
+-- 
+-- ***********************************************************
+-- hm2UnitGroup
+-- ***********************************************************
+--
+
+-- Unit table
+hm2UnitTable   OBJECT-TYPE
+			SYNTAX		SEQUENCE OF Hm2UnitEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION
+			"This table contains unit capabilities and
+			configuration options."
+			::= { hm2UnitGroup 100 }
+
+hm2UnitEntry	 OBJECT-TYPE
+			SYNTAX		Hm2UnitEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION
+			"Entry with the configuration options and supported
+			features of a unit."
+			INDEX		{ hm2UnitIndex }
+			::= { hm2UnitTable 1 }
+
+Hm2UnitEntry ::= SEQUENCE {
+			hm2UnitIndex					Integer32,
+			hm2UnitMaxModuleCapacity 		Integer32,
+			hm2UnitMaxModulePortCapacity	Integer32
+			}
+
+hm2UnitIndex OBJECT-TYPE
+			SYNTAX		Integer32 
+			MAX-ACCESS	accessible-for-notify
+			STATUS		current
+			DESCRIPTION
+			"The index of the available unit." 
+			::= { hm2UnitEntry 1 }
+
+hm2UnitMaxModuleCapacity OBJECT-TYPE
+			SYNTAX		Integer32 
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"Maximum number of modules that this unit can
+			contain in this system."
+			::= { hm2UnitEntry 2 }
+
+hm2UnitMaxModulePortCapacity OBJECT-TYPE
+			SYNTAX 		Integer32 
+			MAX-ACCESS	read-only
+			STATUS 		current
+			DESCRIPTION
+			"Maximum number of ports that a module can 
+			contain in this unit."
+			::= { hm2UnitEntry 3 }
+			
+-- 
+-- ***********************************************************
+-- hm2ModuleGroup
+-- ***********************************************************
+--
+
+
+-- Module table
+hm2ModuleTable   OBJECT-TYPE
+			SYNTAX		SEQUENCE OF Hm2ModuleEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION
+			"This table contains capabilities and
+			configuration options of device modules."
+			::= { hm2ModuleGroup 100 }
+
+hm2ModuleEntry	 OBJECT-TYPE
+			SYNTAX		Hm2ModuleEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION
+			"Entry with the configuration options and supported
+			features of a device module."
+			INDEX		{ hm2UnitIndex, hm2ModuleIndex }
+			::= { hm2ModuleTable 1 }
+
+Hm2ModuleEntry ::= SEQUENCE {
+			hm2ModuleIndex				Integer32,
+			hm2ModuleId					OBJECT IDENTIFIER,
+			hm2ModuleDescription		SnmpAdminString,
+			hm2ModuleProductCode		SnmpAdminString,
+			hm2ModuleVersion			SnmpAdminString,
+			hm2ModuleNumOfPorts			Integer32,
+			hm2ModuleFirstMauIndex		Integer32,
+			hm2ModuleStatus				INTEGER,
+			hm2ModuleSerialNum			SnmpAdminString,
+			hm2ModuleMinSWVersion		Integer32,
+			hm2ModuleCapability			BITS,
+			hm2ModuleInternalID			Integer32,
+			hm2ModuleInternalIDVariant	Integer32,
+			hm2ModuleFirstIfIndex		Integer32,
+			hm2ModuleAdminState			HmEnabledStatus
+			}
+
+hm2ModuleIndex OBJECT-TYPE
+			SYNTAX		Integer32 
+			MAX-ACCESS	accessible-for-notify
+			STATUS		current
+			DESCRIPTION
+			"The index of the available module." 
+			::= { hm2ModuleEntry 1 }
+		 
+hm2ModuleId OBJECT-TYPE
+			SYNTAX		OBJECT IDENTIFIER
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"Manufacturer-defined product identifier (module family + product ID).
+			Example: Object-ID 1.3.6.1.4.1.248.11.2.2.1 is the hm2ModuleFamily MSM and
+			Object-ID 1.3.6.1.4.1.248.11.2.2.1.1 is the Product ID for msm-4tx"
+			::= { hm2ModuleEntry 2 }
+ 
+hm2ModuleDescription OBJECT-TYPE
+			SYNTAX		SnmpAdminString
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Description of the module. This value cannot be written by external 
+			entities (only for internal purposes)."
+			::= { hm2ModuleEntry 3 }
+
+hm2ModuleProductCode OBJECT-TYPE
+			SYNTAX		SnmpAdminString
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"Product Code of the module."
+			::= { hm2ModuleEntry 4 }
+
+hm2ModuleVersion OBJECT-TYPE
+			SYNTAX		SnmpAdminString
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"Version of the module."
+			::= { hm2ModuleEntry 5 }
+
+hm2ModuleNumOfPorts	 OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The numberOfPorts is the number of ports contained within
+			the module. Within each module, the ports are uniquely
+			numbered in the range from 1 to numberOfPorts."
+			::= { hm2ModuleEntry 6 }
+ 
+hm2ModuleFirstMauIndex	OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		obsolete
+			DESCRIPTION
+			"Value of the first mauIndex used by the module.
+			 **NOTE: This object is obsolete in favour of hm2ModuleFirstIfIndex.**"
+			::= { hm2ModuleEntry 7 }
+
+hm2ModuleStatus	OBJECT-TYPE
+			SYNTAX		INTEGER {
+						physical (1),
+						configurable (2),
+						remove (3),
+						fix (4)
+						}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"Status of the module.
+			If the value is physical(1), then the module is plugged in,
+			if the value is configurable, the ports can be configured,
+			but the card is absent, with the value remove(3) written to
+			the agent the card can be logically removed.
+			The value fix(4) is for modules which cannot be removed."
+			::= { hm2ModuleEntry 8 }
+
+hm2ModuleSerialNum OBJECT-TYPE
+			SYNTAX		SnmpAdminString
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The serial number provided by vendor (ASCII)."
+			::= { hm2ModuleEntry 9 }
+
+hm2ModuleMinSWVersion OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"The minimum software version required to support this module."
+			::= { hm2ModuleEntry 10 }
+
+hm2ModuleCapability OBJECT-TYPE
+			SYNTAX		BITS 	{
+						poe(0),
+						fpga(1),
+						ptp(2),
+						io-module(3)
+						}
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"poe - module supports Power over Ethernet,
+			fpga - module has a FPGA,
+			ptp - module supports PTP,
+			io-module - module is an IO module. 
+			This value cannot be written by external entities (only for internal purposes)."
+			::= { hm2ModuleEntry 11 }
+			
+hm2ModuleInternalID	 OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+			"An internal ID of the Module. This value cannot be written by external 
+			entities (only for internal purposes)."
+			DEFVAL  { 0 }
+			::= { hm2ModuleEntry 12 }
+			
+hm2ModuleInternalIDVariant	OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-write
+			STATUS		obsolete
+			DESCRIPTION
+			"An internal variant ID of the Module.
+			 **NOTE: This object is obsolete.**"
+			DEFVAL  { 0 }
+			::= { hm2ModuleEntry 13 }
+			
+hm2ModuleFirstIfIndex	OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+			"Value of the first ifIndex used by the module."
+			::= { hm2ModuleEntry 14 }
+
+hm2ModuleAdminState		OBJECT-TYPE
+		SYNTAX  HmEnabledStatus
+		 MAX-ACCESS 	read-write
+		 STATUS 	 	current
+		 DESCRIPTION
+			"Enable or disable the module. If disabled, module 
+ plugged in this slot will not be activated. "
+DEFVAL { enable }
+	::= { hm2ModuleEntry 15 }
+
+-- 
+-- ***********************************************************
+-- hm2DeviceMgmtMibNotifications
+-- ***********************************************************
+--
+
+hm2SfpChangeTrap	NOTIFICATION-TYPE
+		OBJECTS		{ ifIndex }
+		STATUS  	current
+		DESCRIPTION	
+			"This trap is sent when a SFP has been added or removed.
+			It is also sent for an otherwise unsupported SFP."
+		::= { hm2DeviceMgmtMibNotifications 1 }	
+
+hm2AutoDisablePortTrap	NOTIFICATION-TYPE
+		OBJECTS  { ifIndex,
+			   hm2IfaceOperAdminStatus,
+			   hm2AutoDisableIntfErrorReason
+			 }
+		STATUS current
+		DESCRIPTION
+			"This trap is sent if the port has been disabled or enabled by auto disable feature."
+		::= { hm2DeviceMgmtMibNotifications 2 }   		
+
+hm2ModulePluggedTrap	NOTIFICATION-TYPE
+	OBJECTS	{	hm2UnitIndex, 
+				hm2ModuleIndex
+			}
+		STATUS current
+		DESCRIPTION
+		"This trap is sent if a module is plugged into a unit."
+		::= { hm2DeviceMgmtMibNotifications 3 }
+
+hm2ModuleRemovedTrap	NOTIFICATION-TYPE
+	OBJECTS	{	hm2UnitIndex, 
+				hm2ModuleIndex
+			}
+		STATUS current
+		DESCRIPTION
+		"This trap is sent if a module is removed from a unit."
+		::= { hm2DeviceMgmtMibNotifications 4 }
+
+hm2SFPRxPowerChangeTrap	NOTIFICATION-TYPE
+		OBJECTS		{ hm2SfpCurrentRxPowerState }
+		STATUS  	current
+		DESCRIPTION	
+			"This trap is sent when the state (hm2SfpCurrentRxPowerState) of the rx power of a SFP changes."
+		::= { hm2DeviceMgmtMibNotifications 5 }	
+
+END
+

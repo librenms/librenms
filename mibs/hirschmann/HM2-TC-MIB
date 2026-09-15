@@ -1,0 +1,151 @@
+
+HM2-TC-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann TEXTUAL-CONVENTIONs MIB
+-- *************************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, enterprises, Unsigned32
+        FROM SNMPv2-SMI -- RFC 2578
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC; -- RFC 2579
+
+hm2TcMib MODULE-IDENTITY
+	LAST-UPDATED "201103160000Z" -- March 16, 2011
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Textual conventions used throughout the various Hirschmann MIB modules.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION     "201103160000Z" -- March 16, 2011
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 1 }
+
+hirschmann					  OBJECT IDENTIFIER ::= { enterprises 248 }
+hm2ConfigurationMibs 		  OBJECT IDENTIFIER ::= { hirschmann 11 }
+hm2PlatformMibs	 		  	  OBJECT IDENTIFIER ::= { hirschmann 12 }
+
+--
+-- *************************************************************
+-- Textual Conventions
+-- *************************************************************
+--
+
+HmEnabledStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Status of a feature"
+    SYNTAX       INTEGER { 
+					        enable(1),      -- feature is enabled
+        					disable(2)      -- feature is disabled
+        				 }
+
+HmActionValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Trigger a action on the device.
+    			  Reading the variable normally returns noop.
+    			  The processing state and the termination result can be monitored with SNMP Protocol Extension MIB."
+    SYNTAX       INTEGER { 
+					        noop(1),        -- no operation ongoing
+        					action(2)       -- trigger the action specified by the variable
+        				 }
+
+HmTimeHHMM24 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "5a"    
+    STATUS       current
+    DESCRIPTION  "The time in hh:mm format:
+                   range for hh: 0 to 23
+                   range for mm: 0 to 59"
+    SYNTAX       OCTET STRING (SIZE(0..5))
+
+HmTimeSeconds1970 ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Time in seconds since Jan, 1st, 1970."
+    SYNTAX       Unsigned32
+    
+HmLargeDisplayString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1024a"
+    STATUS       current
+    DESCRIPTION
+            "Represents textual information taken from the NVT ASCII
+            character set, as defined in pages 4, 10-11 of RFC 854.
+
+            To summarize RFC 854, the NVT ASCII repertoire specifies:
+
+              - the use of character codes 0-127 (decimal)
+
+              - the graphics characters (32-126) are interpreted as
+                US ASCII
+
+              - NUL, LF, CR, BEL, BS, HT, VT and FF have the special
+                meanings specified in RFC 854
+
+              - the other 25 codes have no standard interpretation
+
+              - the sequence 'CR LF' means newline
+
+              - the sequence 'CR NUL' means carriage-return
+
+              - an 'LF' not preceded by a 'CR' means moving to the
+                same column on the next line.
+
+              - the sequence 'CR x' for any x other than LF or NUL is
+                illegal.  (Note that this also means that a string may
+                end with either 'CR LF' or 'CR NUL', but not with CR.)
+
+            Any object defined using this syntax may not exceed 1024
+            characters in length."
+    SYNTAX       OCTET STRING (SIZE (0..1024))
+
+HmExtraLargeDisplayString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1400a"
+    STATUS       current
+    DESCRIPTION
+            "Represents textual information taken from the NVT ASCII
+            character set, as defined in pages 4, 10-11 of RFC 854.
+
+            To summarize RFC 854, the NVT ASCII repertoire specifies:
+
+              - the use of character codes 0-127 (decimal)
+
+              - the graphics characters (32-126) are interpreted as
+                US ASCII
+
+              - NUL, LF, CR, BEL, BS, HT, VT and FF have the special
+                meanings specified in RFC 854
+
+              - the other 25 codes have no standard interpretation
+
+              - the sequence 'CR LF' means newline
+
+              - the sequence 'CR NUL' means carriage-return
+
+              - an 'LF' not preceded by a 'CR' means moving to the
+                same column on the next line.
+
+              - the sequence 'CR x' for any x other than LF or NUL is
+                illegal.  (Note that this also means that a string may
+                end with either 'CR LF' or 'CR NUL', but not with CR.)
+
+            Any object defined using this syntax may not exceed 1400
+            characters in length."
+    SYNTAX       OCTET STRING (SIZE (0..1400))
+
+HmAccessLevel ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "Access level for the item."
+    SYNTAX        INTEGER {
+                            readWrite (1),
+                            readOnly (2)
+                          }
+
+END
+

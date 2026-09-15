@@ -1,0 +1,379 @@
+HM2-DUAL-RSTP-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann DualRSTP MIB
+-- ***********************************************************
+--
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    NOTIFICATION-TYPE, OBJECT-IDENTITY, 
+    IpAddress, Integer32, Unsigned32, Counter32,
+    Gauge32, TimeTicks
+                                        FROM SNMPv2-SMI
+    RowStatus, TruthValue, MacAddress,
+    TEXTUAL-CONVENTION, DisplayString
+                                        FROM SNMPv2-TC
+    InterfaceIndexOrZero, InterfaceIndex,
+    ifIndex										FROM IF-MIB
+    hm2ConfigurationMibs, HmEnabledStatus      	FROM HM2-TC-MIB;
+
+hm2DualRstpMib MODULE-IDENTITY
+    LAST-UPDATED "201903290000Z" -- March 29, 2019
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann DualRSTP MIB.
+         Copyright (C) 2019. All Rights Reserved."
+    REVISION     "201903290000Z" -- March 29, 2019
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 150 }
+
+-- 
+-- ***********************************************************
+-- hm2DualRSTPMib
+-- ***********************************************************
+--
+
+hm2DualRstpMibNotifications                              OBJECT IDENTIFIER ::= { hm2DualRstpMib 0 }
+hm2DualRstpMibObjects                                    OBJECT IDENTIFIER ::= { hm2DualRstpMib 1 }
+-- hm2DualRstpMibConformance                         OBJECT IDENTIFIER ::= { hm2DualRstpMib 2 }
+
+-- 
+-- ***********************************************************
+-- hm2DualRstpMibObjects
+-- ***********************************************************
+--
+
+hm2DualRstpCstConfigGroup                                OBJECT IDENTIFIER ::= { hm2DualRstpMibObjects 0 }
+hm2DualRstpCstPortConfigGroup							 OBJECT IDENTIFIER ::= { hm2DualRstpMibObjects 1 }
+
+--
+--**************************************************************************************
+-- hm2DualRstpCstConfigGroup
+--**************************************************************************************
+--
+hm2DualRstpAdminMode OBJECT-TYPE
+	 SYNTAX      HmEnabledStatus
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "The spanning tree operational status.
+
+                 enable(1)  - enables spanning tree operational status on the switch.
+                 disable(2) - disables spanning tree operational status on the switch.
+
+                 The default status is disabled."
+     DEFVAL { disable }
+	::= { hm2DualRstpCstConfigGroup 1 }
+
+hm2DualRstpCstHelloTime OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "The MSTP root port hello time for the CIST."
+     ::= { hm2DualRstpCstConfigGroup 2 }
+
+hm2DualRstpCstMaxAge OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "The MSTP root port max age for the CIST."
+     ::= { hm2DualRstpCstConfigGroup 3 }
+
+hm2DualRstpCstRegionalRootId OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE(8))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "The MSTP regional root identifier for the CIST."
+     ::= { hm2DualRstpCstConfigGroup 4 }
+
+hm2DualRstpCstRegionalRootPathCost OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "The MSTP regional root path cost for the CIST."
+     ::= { hm2DualRstpCstConfigGroup 5 }
+
+hm2DualRstpCstRootFwdDelay OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "The MSTP root port forward delay for the CIST."
+     ::= { hm2DualRstpCstConfigGroup 6 }
+
+hm2DualRstpCstBridgeMaxAge OBJECT-TYPE
+     SYNTAX      Unsigned32 (6..40)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "The MSTP bridge max age for the CIST. The default value is 20."
+     DEFVAL { 20 }
+     ::= { hm2DualRstpCstConfigGroup 7 }
+
+hm2DualRstpCstBridgeHelloTime OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..2)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "The MSTP bridge hello time for the CIST. The default
+                  value is 2. According to IEEE 802.1Q-REV 2005 updating
+                  hello time is disallowed"
+     DEFVAL { 2 }
+     ::= { hm2DualRstpCstConfigGroup 8 }
+
+hm2DualRstpCstBridgeHoldTime OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "The MSTP bridge hold time for the CIST."
+     ::= { hm2DualRstpCstConfigGroup 9 }
+
+hm2DualRstpCstBridgeFwdDelay OBJECT-TYPE
+     SYNTAX      Unsigned32 (4..30)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "The MSTP bridge forward delay for the CIST. The default value is 15."
+     DEFVAL { 15 }
+     ::= { hm2DualRstpCstConfigGroup 10 }
+
+hm2DualRstpCstBridgeMaxHops OBJECT-TYPE
+	 SYNTAX      Unsigned32 (6..40)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "The MSTP bridge max hops for the CIST. The default value is 20."
+     DEFVAL { 20 }
+     ::= { hm2DualRstpCstConfigGroup 11 }
+
+hm2DualRstpCstBridgePriority OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..61440)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "The MSTP bridge priority for the CIST. The default value is 32768."
+     DEFVAL { 32768 }
+     ::= { hm2DualRstpCstConfigGroup 12 }
+
+hm2DualRstpCstBridgeTimeSinceTopologyChange OBJECT-TYPE
+      SYNTAX  TimeTicks
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+              "The time (in hundredths of a second) since the
+              last time a topology change was detected by the
+              bridge entity."
+      REFERENCE
+              "IEEE 802.1D-1990: Section 6.8.1.1.3"
+      ::= { hm2DualRstpCstConfigGroup 13 }
+hm2DualRstpCstBridgeTopChanges OBJECT-TYPE
+      SYNTAX  Counter32
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+              "The total number of topology changes detected by
+              this bridge since the management entity was last
+              reset or initialized."
+      REFERENCE
+              "IEEE 802.1D-1990: Section 6.8.1.1.3"
+      ::= { hm2DualRstpCstConfigGroup 14 }
+
+hm2DualRstpCstBridgeTopologyChangeParm OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     true(1),
+                     false(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+					"The topology change parameter detected by
+		             this bridge since the management entity was last
+		             reset or initialized."
+         ::= { hm2DualRstpCstConfigGroup 15 }
+
+hm2DualRstpCstBridgeRootCost OBJECT-TYPE
+      SYNTAX  Unsigned32
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+              "The cost of the path to the DualRstp root as seen from
+              this bridge."
+      REFERENCE
+              "IEEE 802.1D-1990: Section 4.5.3.2"
+      ::= { hm2DualRstpCstConfigGroup 16 }
+
+hm2DualRstpCstBridgeRootPort OBJECT-TYPE
+      SYNTAX  	  OCTET STRING (SIZE (2))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+              "The port number of the port which offers the
+              lowest cost path from this bridge to the DualRstp 
+              root bridge."
+      ::= { hm2DualRstpCstConfigGroup 17 }
+
+hm2DualRstpCstBridgeHoldCount OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..40)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "The MSTP bridge hold count for the CIST. This command sets the value of
+                  maximum bpdus that a bridge is allowed to send within a hello time window.
+                  The default value is 6."
+     DEFVAL { 10 }
+     ::= { hm2DualRstpCstConfigGroup 18 }
+  
+hm2DualRstpBpduGuardMode OBJECT-TYPE
+	 SYNTAX      HmEnabledStatus
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "The spanning tree BPDU Guard Mode.
+                  enable(1)  - enables BPDU Guard Mode on the switch.
+                  disable(2) - disables BPDU Guard Mode on the switch.
+                  The default status is disabled."
+	 DEFVAL { disable }                     
+     ::= { hm2DualRstpCstConfigGroup 19 }
+		 
+hm2DualRstpBpduFilterDefault OBJECT-TYPE
+	 SYNTAX      HmEnabledStatus
+	 MAX-ACCESS  read-write
+	 STATUS      current
+	 DESCRIPTION
+				 "The spanning tree BPDU Filter Mode, it enables BPDU Filter on all
+				  edge ports.
+				  enable(1)  - enables BPDU Filter Mode on the switch.
+				  disable(2) - disables BPDU Filter Mode on the switch.
+				  The default status is disabled."
+	 DEFVAL { disable }             
+	 ::= { hm2DualRstpCstConfigGroup 20 }
+    
+hm2DualRstpBridgeIdentifier OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE (8))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "The bridge identifier of the DualRstp instance."
+        ::= { hm2DualRstpCstConfigGroup 21 }
+  
+hm2DualRstpCstBridgeDesignatedRoot OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (8))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The DualRstp Designated Root like in dot1dStpDesignatedRoot."
+         ::= { hm2DualRstpCstConfigGroup 22 }
+
+hm2DualRstpRingOnlyMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "When RSTP Ring Only Mode is enabled the switch ignores the BPDUs age on Ring Only Mode ports.
+                     The topology change BPDUs sent on Ring Only Mode ports will have a message age of 1.
+
+                     enable(1)  - enables RSTP Ring Only Mode globally.
+                     disable(2) - disables RSTP Ring Only Mode globally.
+
+                     The default status is disabled."
+		 DEFVAL		{disable}
+         ::= { hm2DualRstpCstConfigGroup 23 }
+
+hm2DualRstpRingOnlyModeIntfOne     OBJECT-TYPE
+        SYNTAX           InterfaceIndexOrZero
+        MAX-ACCESS       read-write
+        STATUS           current
+        DESCRIPTION
+                         "Interface index of the first interface."
+        DEFVAL           { 0 }
+        ::= { hm2DualRstpCstConfigGroup 24 }
+
+hm2DualRstpRingOnlyModeIntfTwo     OBJECT-TYPE
+        SYNTAX           InterfaceIndexOrZero
+        MAX-ACCESS       read-write
+        STATUS           current
+        DESCRIPTION
+                         "Interface index of the second interface."
+        DEFVAL           { 0 }
+        ::= { hm2DualRstpCstConfigGroup 25 }
+        
+hm2DualRstpTrapMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The spanning tree trap status.
+
+                     enable(1)  - enables spanning tree traps on the switch.
+                     disable(2) - disables spanning tree traps on the switch.
+
+                     The default status is enabled."
+         DEFVAL { enable }            
+         ::= { hm2DualRstpCstConfigGroup 26 }
+         
+hm2DualRstpMstId OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Additional index for RSTP MST ID."
+         DEFVAL { 0 } 
+         ::= { hm2DualRstpCstConfigGroup 27 }
+     
+--
+--**************************************************************************************
+-- hm2DualRstpCstPortTable
+--**************************************************************************************
+--
+
+hm2DualRstpCstPortTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2DualRstpCstPortEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "DualRstp CIST port table."
+         ::= { hm2DualRstpCstPortConfigGroup 1 }
+
+hm2DualRstpCstPortEntry OBJECT-TYPE
+     SYNTAX      Hm2DualRstpCstPortEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "DualRstp CIST port entry."
+     INDEX       { hm2DualRstpMstId, ifIndex }
+     ::= { hm2DualRstpCstPortTable 1 }
+     
+Hm2DualRstpCstPortEntry ::=
+     SEQUENCE {
+     hm2DualRstpCstPortDrstpInstance
+             INTEGER
+     }
+
+hm2DualRstpCstPortDrstpInstance OBJECT-TYPE
+     SYNTAX      INTEGER {
+                 true(1),
+                 false(2)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "Member of DRSTP if true "
+     DEFVAL { false }
+     ::= { hm2DualRstpCstPortEntry 1 }
+
+END

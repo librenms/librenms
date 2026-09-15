@@ -1,0 +1,565 @@
+
+HM2-POE-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann Power over Ethernet Management MIB
+-- *************************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE,
+    OBJECT-TYPE, 
+    Integer32			        FROM SNMPv2-SMI -- RFC 2578
+    SnmpAdminString				FROM SNMP-FRAMEWORK-MIB
+    hm2IfacePhysIndex           FROM HM2-DEVMGMT-MIB
+    HmEnabledStatus, HmTimeHHMM24,
+    hm2ConfigurationMibs        FROM HM2-TC-MIB;
+
+hm2PoeMgmtMib MODULE-IDENTITY
+	LAST-UPDATED "201110310000Z" -- October 31, 2011
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann Power over Ethernet Management MIB. This MIB contains
+         the private extensions to the RFC 3621.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION     "201110310000Z" -- October 31, 2011
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 12 }
+
+--
+-- *************************************************************
+-- hm2PoeMgmtMib
+-- *************************************************************
+--
+
+hm2PoeMgmtMibNotifications	OBJECT IDENTIFIER ::= { hm2PoeMgmtMib 0 }
+hm2PoeMgmtMibObjects		OBJECT IDENTIFIER ::= { hm2PoeMgmtMib 1 }
+-- hm2PoeMgmtMibConformance		OBJECT IDENTIFIER ::= { hm2PoeMgmtMib 2 }
+
+
+--
+-- *************************************************************
+-- hm2PoeMgmtMib groups
+-- *************************************************************
+--
+
+hm2PoeMgmtGroup 		OBJECT IDENTIFIER ::= { hm2PoeMgmtMibObjects 1 }
+
+
+--
+-- *************************************************************
+-- hm2PoeMgmtGlobalGroup
+-- *************************************************************
+--
+
+hm2PoeMgmtGlobalGroup	OBJECT IDENTIFIER ::= { hm2PoeMgmtGroup 1 }
+
+hm2PoeMgmtAdminStatus	OBJECT-TYPE
+						SYNTAX HmEnabledStatus
+						MAX-ACCESS read-write
+						STATUS current
+						DESCRIPTION
+							"Enables/disables Power over Ethernet management on this device."
+						DEFVAL  { enable }
+						::= { hm2PoeMgmtGlobalGroup 1 }
+
+hm2PoeMgmtReservedPower	OBJECT-TYPE
+						SYNTAX Integer32
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"Reserved system power for active Power over Ethernet ports in Watts."
+						::= { hm2PoeMgmtGlobalGroup 2 }
+						
+hm2PoeMgmtDeliveredCurrent 	OBJECT-TYPE
+						SYNTAX Integer32
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"The measured current delivered over Ethernet ports in milliamperes"
+						::= { hm2PoeMgmtGlobalGroup 3 }
+
+--
+-- *************************************************************
+-- hm2PoeMgmtPsuTable
+-- *************************************************************
+--
+
+hm2PoeMgmtPsuTable		OBJECT-TYPE
+						SYNTAX SEQUENCE OF Hm2PoeMgmtPsuEntry
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION
+							"This table contains objects for each power supply type of
+							 the device (internal or external power supply)."
+						::= { hm2PoeMgmtGroup 2 }
+
+hm2PoeMgmtPsuEntry		OBJECT-TYPE
+						SYNTAX Hm2PoeMgmtPsuEntry
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION
+							"The entries of the hm2PoeMgmtPsuTable."
+						INDEX { hm2PoeMgmtModulePowerSource }
+						::= { hm2PoeMgmtPsuTable 1 }
+
+Hm2PoeMgmtPsuEntry		::= SEQUENCE {
+							hm2PoeMgmtPsuPower							Integer32,
+							hm2PoeMgmtPsuReservedPower					Integer32,
+							hm2PoeMgmtPsuDeliveredPower					Integer32,
+							hm2PoeMgmtPsuDeliveredCurrent				Integer32
+						}
+
+hm2PoeMgmtPsuPower		OBJECT-TYPE
+						SYNTAX Integer32
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"The power budget per psu type expressed in Watts. Psu types could
+							 be internal or external."
+						::= { hm2PoeMgmtPsuEntry 1 }
+
+hm2PoeMgmtPsuReservedPower	OBJECT-TYPE
+						SYNTAX Integer32
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"The reserved power (depending on actual power classes) 
+							per psu type expressed in Watts."
+						::= { hm2PoeMgmtPsuEntry 2 }
+
+hm2PoeMgmtPsuDeliveredPower 	OBJECT-TYPE
+						SYNTAX Integer32
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"The measured usage power per psu type expressed in Watts."
+						::= { hm2PoeMgmtPsuEntry 3 }
+						
+hm2PoeMgmtPsuDeliveredCurrent 	OBJECT-TYPE
+						SYNTAX Integer32
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"The measured current delivered per psu type expressed in milliamperes"
+						::= { hm2PoeMgmtPsuEntry 4 }
+						
+--
+-- *************************************************************
+-- hm2PoeMgmtPortTable
+-- *************************************************************
+--
+
+hm2PoeMgmtPortTable		OBJECT-TYPE
+						SYNTAX SEQUENCE OF Hm2PoeMgmtPortEntry
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION
+							"This table contains objects for each Power over Ethernet interface of
+							the device."
+						::= { hm2PoeMgmtGroup 3 }
+
+hm2PoeMgmtPortEntry		OBJECT-TYPE
+						SYNTAX Hm2PoeMgmtPortEntry
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION
+							"The entry of the hm2PoeMgmtPortTable."
+						INDEX { hm2IfacePhysIndex }
+						::= { hm2PoeMgmtPortTable 1 }
+
+Hm2PoeMgmtPortEntry 	::= SEQUENCE {
+						hm2PoeMgmtPortAdminEnable			HmEnabledStatus,
+						hm2PoeMgmtPortConsumptionPower		Integer32,
+						hm2PoeMgmtPortDetectionStatus   	INTEGER,
+						hm2PoeMgmtPortPowerPriority			INTEGER,
+						hm2PoeMgmtPortPowerClassification  	INTEGER,
+						hm2PoeMgmtPortName					SnmpAdminString,
+						hm2PoeMgmtPortAllowedClassBits  	BITS,
+						hm2PoeMgmtPortAutoShutdown			HmEnabledStatus,
+						hm2PoeMgmtPortAutoShutdownTimeStart HmTimeHHMM24,
+						hm2PoeMgmtPortAutoShutdownTimeEnd	HmTimeHHMM24,
+						hm2PoeMgmtPortClassValid            INTEGER,
+						hm2PoeMgmtPortFastStartup			HmEnabledStatus,
+						hm2PoeMgmtPortMaxConsumptionPower   Integer32,
+						hm2PoeMgmtPortPowerLimit            Integer32,
+						hm2PoeMgmtPortConsumptionCurrent	Integer32
+						}
+
+hm2PoeMgmtPortAdminEnable OBJECT-TYPE
+    					SYNTAX HmEnabledStatus
+    					MAX-ACCESS read-write
+    					STATUS current
+					    DESCRIPTION
+					        "enable (1) An interface which can provide the PSE functions.
+					         disable(2) The interface will act - as it would - if it had no PSE
+					         function."
+					    DEFVAL { enable }
+					    ::= { hm2PoeMgmtPortEntry 1 }
+
+hm2PoeMgmtPortConsumptionPower OBJECT-TYPE
+						SYNTAX Integer32
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"Measured usage power per interface expressed in Milliwatts."
+						::= { hm2PoeMgmtPortEntry 2 }
+
+hm2PoeMgmtPortDetectionStatus OBJECT-TYPE
+					    SYNTAX INTEGER   {
+					             disabled(1),
+					             searching(2),
+					             deliveringPower(3),
+					             fault(4),
+					             test(5),
+					             otherFault(6)
+					    }
+					    MAX-ACCESS read-only
+					    STATUS current
+					    DESCRIPTION
+					        "Describes the operational status of the port PD detection.
+					         A value of disabled(1)- indicates that the PSE State diagram
+					         is in the state DISABLED.
+					         A value of deliveringPower(3) - indicates that the PSE State
+					         diagram is in the state POWER_ON.
+					         A value of fault(4) - indicates that the PSE State diagram is
+					         in the state TEST_ERROR.
+					         A value of test(5) - indicates that the PSE State diagram is
+					         in the state TEST_MODE.
+					         A value of otherFault(6) - indicates that the PSE State
+					         diagram is in the state IDLE due to the variable
+					         error_conditions.
+					         A value of searching(2)- indicates the PSE State diagram is
+					         in a state other than those listed above."
+					         
+					    ::= { hm2PoeMgmtPortEntry 3 }
+					    
+hm2PoeMgmtPortPowerPriority OBJECT-TYPE
+					    SYNTAX INTEGER   {
+					               critical(1),
+					               high(2),
+					               low(3)
+					     }
+					    MAX-ACCESS read-write
+					    STATUS current
+					    DESCRIPTION
+					        "This object controls the priority of the port from the point
+					         of view of a power management algorithm.  The priority that
+					         is set by this variable could be used by a control mechanism
+					         that prevents over current situations by disconnecting first
+					         ports with lower power priority.  Ports that connect devices
+					         critical to the operation of the network - like the E911
+					         telephones ports - should be set to higher priority."
+					         
+					    DEFVAL { low }     
+					    ::= { hm2PoeMgmtPortEntry 4 }
+					    
+hm2PoeMgmtPortPowerClassification OBJECT-TYPE
+					    SYNTAX INTEGER    {
+					               class0(1),
+					               class1(2),
+					               class2(3),
+					               class3(4),
+					               class4(5)
+					    }
+					    MAX-ACCESS read-only
+					    STATUS current
+					    DESCRIPTION
+					        "Classification is a way to tag different terminals on the
+					        Power over LAN network according to their power consumption.
+					        Devices such as IP telephones, WLAN access points and others,
+					        will be classified according to their power requirements.
+					
+					        The meaning of the classification labels is defined in the
+					        IEEE specification.
+					
+					       This variable is valid only while a PD is being powered,
+					        that is, while the attribute hm2PoeMgmtPortDetectionStatus
+					        is reporting the enumeration deliveringPower."
+					    DEFVAL { class0 }
+					    ::= { hm2PoeMgmtPortEntry 5 }
+   
+hm2PoeMgmtPortName		OBJECT-TYPE
+					    SYNTAX SnmpAdminString (SIZE(1..32))
+					    MAX-ACCESS read-write
+					    STATUS current
+					    DESCRIPTION
+					        "A manager will set the value of this variable to indicate
+					         the type of powered device that is connected to the port.
+					         The default value supplied by the agent if no value has
+					         ever been set should be a zero-length octet string."
+					    DEFVAL { " " }     
+					    ::= { hm2PoeMgmtPortEntry 6 }
+
+hm2PoeMgmtPortAllowedClassBits	OBJECT-TYPE
+						SYNTAX      BITS {
+							class0(0),
+							class1(1),
+							class2(2),
+							class3(3),
+							class4(4)
+						}
+						MAX-ACCESS read-write
+						STATUS current
+						DESCRIPTION
+							"Bit mask which defines allowed classes per interface."
+						DEFVAL { { class0, class1, class2, class3, class4 } }
+						::= { hm2PoeMgmtPortEntry 7 }
+
+hm2PoeMgmtPortAutoShutdown	OBJECT-TYPE
+						SYNTAX HmEnabledStatus
+						MAX-ACCESS read-write
+						STATUS current
+						DESCRIPTION
+							"Enables/disables automatic shutdown functionality per interface."
+						DEFVAL { disable }
+						::= { hm2PoeMgmtPortEntry 8 }
+						
+hm2PoeMgmtPortAutoShutdownTimeStart	OBJECT-TYPE
+						SYNTAX HmTimeHHMM24
+						MAX-ACCESS read-write
+						STATUS current
+						DESCRIPTION
+							"Start time for the automatic shutdown functionality per interface."
+						DEFVAL { "00:00" }
+						::= { hm2PoeMgmtPortEntry 9 }
+
+hm2PoeMgmtPortAutoShutdownTimeEnd	OBJECT-TYPE
+						SYNTAX HmTimeHHMM24
+						MAX-ACCESS read-write
+						STATUS current
+						DESCRIPTION
+							"End time for the automatic shutdown functionality per interface."
+						DEFVAL { "00:00" }
+						::= { hm2PoeMgmtPortEntry 10 }
+						
+hm2PoeMgmtPortClassValid	OBJECT-TYPE
+						SYNTAX INTEGER   {
+									        invalid(0),
+									          valid(1)
+									     }
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"Evaluates if class represented through pethPsePortPowerClassifications
+							 is valid or not. Class is valid if PD is delivered with power or in case
+							 of power exceeding through a connected device."
+						::= { hm2PoeMgmtPortEntry 11 }
+
+hm2PoeMgmtPortFastStartup	OBJECT-TYPE
+						SYNTAX HmEnabledStatus
+						MAX-ACCESS read-write
+						STATUS current
+						DESCRIPTION
+							"Enables/disables Power over Ethernet fast startup mode on given port.
+							 The default value is 'disable'."
+						DEFVAL { disable }
+						::= { hm2PoeMgmtPortEntry 12 }
+
+hm2PoeMgmtPortMaxConsumptionPower  OBJECT-TYPE
+						SYNTAX Integer32
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"The  maximum observed power consumption (hm2PoeMgmtPortMaxConsumptionPower)
+							value expressed in milliwatts used by the PD.
+							The value is reset to 0 if the PoE admin state is set to disable
+							or if a disconnect of the PD is detected."
+						::= { hm2PoeMgmtPortEntry 13 }
+
+hm2PoeMgmtPortPowerLimit OBJECT-TYPE
+						SYNTAX Integer32 (0..30000)
+						MAX-ACCESS read-write
+						STATUS current
+						DESCRIPTION
+							"The power limit per port expressed in milliwatts. If set to
+							zero the power consumption limitation is disabled."
+						DEFVAL { 0 }
+						::= { hm2PoeMgmtPortEntry 14 }
+
+hm2PoeMgmtPortConsumptionCurrent	OBJECT-TYPE
+						SYNTAX Integer32
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"Measured current consumption per interface expressed in milliamperes (mA)."
+						::= { hm2PoeMgmtPortEntry 15 }
+
+--
+-- *************************************************************
+-- hm2PoeMgmtModuleTable
+-- *************************************************************
+--
+
+hm2PoeMgmtModuleTable	OBJECT-TYPE
+						SYNTAX SEQUENCE OF Hm2PoeMgmtModuleEntry
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION
+							"This table contains objects for each plugged PoE module of
+							the device. If the device is non-modular and supports PoE it
+							contains only one entry."
+						::= { hm2PoeMgmtGroup 4 }
+
+hm2PoeMgmtModuleEntry	OBJECT-TYPE
+						SYNTAX Hm2PoeMgmtModuleEntry
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION
+							"The entries of the hm2PoeMgmtModuleTable."
+						INDEX { hm2PoeMgmtModuleUnitIndex, hm2PoeMgmtModuleSlotIndex }
+						::= { hm2PoeMgmtModuleTable 1 }
+
+Hm2PoeMgmtModuleEntry	::= SEQUENCE {
+							hm2PoeMgmtModuleUnitIndex					Integer32,
+							hm2PoeMgmtModuleSlotIndex					Integer32,
+							hm2PoeMgmtModulePower						Integer32,
+							hm2PoeMgmtModuleMaximumPower				Integer32,
+							hm2PoeMgmtModuleReservedPower				Integer32,
+							hm2PoeMgmtModuleDeliveredPower				Integer32,
+							hm2PoeMgmtModulePowerSource					INTEGER,
+							hm2PoeMgmtModuleUsageThreshold				Integer32,
+							hm2PoeMgmtModuleNotificationControlEnable	HmEnabledStatus,
+							hm2PoeMgmtModuleDeliveredCurrent			Integer32
+						}
+
+hm2PoeMgmtModuleUnitIndex	OBJECT-TYPE
+						SYNTAX Integer32
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION
+							"Unit number - for stacking devices."
+						::= { hm2PoeMgmtModuleEntry 1 }
+
+hm2PoeMgmtModuleSlotIndex	OBJECT-TYPE
+						SYNTAX Integer32
+						MAX-ACCESS not-accessible
+						STATUS current
+						DESCRIPTION
+							"Slot number of the plugged PoE module."
+						::= { hm2PoeMgmtModuleEntry 2 }
+
+hm2PoeMgmtModulePower	OBJECT-TYPE
+						SYNTAX Integer32 (0..1000)
+						MAX-ACCESS read-write
+						STATUS current
+						DESCRIPTION
+							"Configurable power budget per module expressed in Watts. The default
+							value is hm2PoeMgmtModuleMaximumPower and depends on the hardware."
+						DEFVAL { 1000 }
+						::= { hm2PoeMgmtModuleEntry 3 }
+
+hm2PoeMgmtModuleMaximumPower	OBJECT-TYPE
+						SYNTAX Integer32 (0..1000)
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"Maximum available power budget per module expressed in Watts. This
+							value depends on the device or module."
+						::= { hm2PoeMgmtModuleEntry 4 }
+
+hm2PoeMgmtModuleReservedPower	OBJECT-TYPE
+						SYNTAX Integer32
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"The reserved power (depending on actual power classes) 
+							per module expressed in Watts."
+						::= { hm2PoeMgmtModuleEntry 5 }
+
+hm2PoeMgmtModuleDeliveredPower	OBJECT-TYPE
+						SYNTAX Integer32
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"The measured usage power per module expressed in Watts."
+						::= { hm2PoeMgmtModuleEntry 6 }
+						
+hm2PoeMgmtModulePowerSource 	OBJECT-TYPE
+						SYNTAX INTEGER   {
+									        internal(0),
+									        external(1)
+									     }
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"This object displays the type of the PoE power source.
+							 internal (0) means that the PoE power is used from the internal PSU and
+							 external (1) means that a external PoE PSU must be installed and connected to this module."
+						::= { hm2PoeMgmtModuleEntry 7 }
+	
+hm2PoeMgmtModuleUsageThreshold OBJECT-TYPE
+						SYNTAX Integer32 (1..99)
+						MAX-ACCESS read-write
+						STATUS current
+						DESCRIPTION
+							"The usage power threshold per module expressed in percent. 
+							If this threshold is exceeded a alarm is initiated."
+						DEFVAL { 90 }
+						::= { hm2PoeMgmtModuleEntry 8 }
+	
+hm2PoeMgmtModuleNotificationControlEnable OBJECT-TYPE
+						SYNTAX 	HmEnabledStatus
+						MAX-ACCESS 	read-write
+						STATUS current
+						DESCRIPTION
+							"This object controls, on a per-module basis, whether
+							or not notifications from the agent are enabled. "
+						DEFVAL { enable }
+						::= { hm2PoeMgmtModuleEntry 9 }
+						
+hm2PoeMgmtModuleDeliveredCurrent	OBJECT-TYPE
+						SYNTAX Integer32
+						MAX-ACCESS read-only
+						STATUS current
+						DESCRIPTION
+							"The measured current consumption per module expressed in milliamperes (mA)."
+						::= { hm2PoeMgmtModuleEntry 10 }
+
+--
+-- *************************************************************
+-- hm2PoeMgmtMibNotifications
+-- *************************************************************
+--
+
+hm2PoeMgmtModulePowerUsageOnNotification NOTIFICATION-TYPE
+						OBJECTS { hm2PoeMgmtModuleDeliveredPower }
+						STATUS current
+						DESCRIPTION 
+							"This Notification indicate PSE Threshold usage indication 
+							is on, the usage power is above the threshold. 
+							At least 500 msec must elapse between notifications being 
+							emitted by the same object instance."
+						::= { hm2PoeMgmtMibNotifications 1 }
+
+hm2PoeMgmtModulePowerUsageOffNotification NOTIFICATION-TYPE
+						OBJECTS { hm2PoeMgmtModuleDeliveredPower }
+						STATUS current
+						DESCRIPTION 
+							"This Notification indicate PSE Threshold usage indication 
+							is on, the usage power is below the threshold. 
+							At least 500 msec must elapse between notifications being 
+							emitted by the same object instance."
+						::= { hm2PoeMgmtMibNotifications 2 }
+
+
+hm2PoeMgmtPortMaxConfiguredPowerLimitExceeded NOTIFICATION-TYPE
+						OBJECTS	{ hm2IfacePhysIndex, hm2PoeMgmtPortMaxConsumptionPower, hm2PoeMgmtPortPowerLimit }
+						STATUS  current
+						DESCRIPTION
+							"This trap reports an exceeding of the configured power limit.
+							This notification indicates that a PD consumes more power
+							that the maximum configured on the port and the system reserved
+							the maximum power required for the negotiated class."
+						::= { hm2PoeMgmtMibNotifications 3 }
+
+END
+

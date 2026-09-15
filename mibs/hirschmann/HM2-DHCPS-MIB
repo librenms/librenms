@@ -1,0 +1,826 @@
+HM2-DHCPS-MIB DEFINITIONS ::= BEGIN
+
+--
+-- ***********************************************************
+-- Hirschmann DHCP Server MIB
+-- ***********************************************************
+--
+
+IMPORTS
+	OBJECT-IDENTITY,
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+	Integer32,
+	Counter32,  
+	Unsigned32, 
+	IpAddress                   FROM SNMPv2-SMI -- RFC 2578
+    RowStatus, 
+	DisplayString, 
+	MacAddress	                FROM SNMPv2-TC
+    hm2ConfigurationMibs,
+    HmEnabledStatus             FROM HM2-TC-MIB
+    InterfaceIndex              FROM IF-MIB;
+
+
+hm2DhcpsMib MODULE-IDENTITY
+	LAST-UPDATED "201203160000Z" -- March 16, 2012
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann DHCP server MIB.
+         Copyright (C) 2012. All Rights Reserved."
+    REVISION     "201203160000Z" -- March 16, 2012
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 91 }
+
+-- 
+-- DHCP Server MIB
+--
+hm2DHCPServerMibNotifications			OBJECT IDENTIFIER ::= { hm2DhcpsMib 0 }
+hm2DHCPServerMibObjects					OBJECT IDENTIFIER ::= { hm2DhcpsMib 1 }
+-- hm2DHCPServerMibConformance				OBJECT IDENTIFIER ::= { hm2DhcpsMib 2 }
+hm2DHCPServerSNMPExtensionGroup 		OBJECT IDENTIFIER ::= { hm2DhcpsMib 3 }
+
+-- 
+-- DHCP Server Group
+--
+
+hm2DHCPServerGroup  			OBJECT IDENTIFIER ::= { hm2DHCPServerMibObjects 1 }
+hm2DHCPServerConfigGroup     	OBJECT IDENTIFIER ::= { hm2DHCPServerGroup 1 }
+hm2DHCPServerLeaseGroup      	OBJECT IDENTIFIER ::= { hm2DHCPServerGroup 2 }
+hm2DHCPServerInterfaceGroup  	OBJECT IDENTIFIER ::= { hm2DHCPServerGroup 3 }
+hm2DHCPServerCounterGroup    	OBJECT IDENTIFIER ::= { hm2DHCPServerGroup 4 }
+
+
+--   
+-- DHCP Server Config Group
+--
+hm2DHCPServerMode  OBJECT-TYPE 
+   SYNTAX      HmEnabledStatus
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Enable or disable DHCP server global." 
+   DEFVAL  { disable } 
+   ::= { hm2DHCPServerConfigGroup 1 }
+
+hm2DHCPServerMaxPoolEntries  OBJECT-TYPE 
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "Maximum possible entries in hm2DHCPServerPoolTable."
+   ::= { hm2DHCPServerConfigGroup 2 }
+
+hm2DHCPServerMaxLeaseEntries  OBJECT-TYPE 
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only 
+   STATUS      current
+   DESCRIPTION 
+      "Maximum possible entries in hm2DHCPServerLeaseTable."
+   ::= { hm2DHCPServerConfigGroup 3 }
+
+hm2DHCPServerAddrProbe  OBJECT-TYPE
+   SYNTAX      HmEnabledStatus
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "If set to enable the DHCP server probes the allocated address
+      with an ICMP Echo Request before offering to the client."
+   DEFVAL  { enable }
+   ::= { hm2DHCPServerConfigGroup 4 }
+
+-- DHCP Pool
+hm2DHCPServerPoolTable  OBJECT-TYPE 
+   SYNTAX      SEQUENCE OF Hm2DHCPServerPoolEntry 
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "A table containing the DHCP server pools."
+   ::= { hm2DHCPServerConfigGroup 5 } 
+ 
+hm2DHCPServerPoolEntry  OBJECT-TYPE 
+   SYNTAX      Hm2DHCPServerPoolEntry 
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "A logical row in the hm2DHCPServerPoolTable." 
+   INDEX { 
+      hm2DHCPServerPoolIndex 
+   } 
+   ::= { hm2DHCPServerPoolTable 1}
+ 
+Hm2DHCPServerPoolEntry ::= SEQUENCE { 
+   hm2DHCPServerPoolIndex              Unsigned32,
+   hm2DHCPServerPoolStartIpAddress     IpAddress,
+   hm2DHCPServerPoolEndIpAddress       IpAddress,
+   hm2DHCPServerPoolLeaseTime          Unsigned32,
+   hm2DHCPServerPoolFlags              BITS,
+   hm2DHCPServerPoolIfIndex            Integer32,
+   hm2DHCPServerPoolMacAddress         MacAddress,
+   hm2DHCPServerPoolGateway            IpAddress,
+   hm2DHCPServerPoolClientId           OCTET STRING,
+   hm2DHCPServerPoolRemoteId           OCTET STRING,
+   hm2DHCPServerPoolCircuitId          OCTET STRING,
+   hm2DHCPServerPoolHirschmannClient   HmEnabledStatus,
+   hm2DHCPServerPoolVlanId             Integer32,
+   hm2DHCPServerPoolOptionConfFileName DisplayString,
+   hm2DHCPServerPoolOptionGateway      IpAddress,
+   hm2DHCPServerPoolOptionNetmask      IpAddress,
+   hm2DHCPServerPoolOptionWINS         IpAddress,
+   hm2DHCPServerPoolOptionDNS          IpAddress,
+   hm2DHCPServerPoolOptionHostname     DisplayString,
+   hm2DHCPServerPoolMethod			   INTEGER,
+   hm2DHCPServerPoolErrorStatus        Unsigned32,
+   hm2DHCPServerPoolRowStatus          RowStatus
+}
+
+hm2DHCPServerPoolIndex  OBJECT-TYPE 
+   SYNTAX      Unsigned32 (1..128)
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The index of hm2DHCPServerPoolTable." 
+   ::= { hm2DHCPServerPoolEntry 1 }
+
+hm2DHCPServerPoolStartIpAddress  OBJECT-TYPE 
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-create
+   STATUS      current 
+   DESCRIPTION 
+      "The IPv4 address of the first address in the range.  The 
+      value of hm2DHCPServerPoolStartIpAddress MUST be less than or 
+      equal to the value of hm2DHCPServerPoolEndIpAddress." 
+   ::= { hm2DHCPServerPoolEntry 2 }
+
+hm2DHCPServerPoolEndIpAddress  OBJECT-TYPE 
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-create
+   STATUS      current 
+   DESCRIPTION 
+      "The IPv4 address of the last address in the range.  The value 
+      of hm2DHCPServerPoolEndIpAddress MUST be greater than or equal 
+      to the value of hm2DHCPServerPoolStartIpAddress."
+   ::= { hm2DHCPServerPoolEntry 3 }
+
+hm2DHCPServerPoolLeaseTime  OBJECT-TYPE 
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-create
+   STATUS      current 
+   DESCRIPTION 
+      "The pools lease time in number of seconds. 
+      A value of 4294967295 SHOULD be used for leases that  
+      have a lease time which is 'infinite' and for BOOTP leases." 
+   DEFVAL  { 86400 }      
+   ::= { hm2DHCPServerPoolEntry 4 }
+      
+hm2DHCPServerPoolFlags  OBJECT-TYPE 
+   SYNTAX      BITS {
+                  interface(0),
+                  mac(1),
+                  gateway(2),
+                  clientid(3),
+                  remoteid(4),
+                  circuitid(5),
+                  dynamic(6),
+                  vlanid(7)
+               }
+   MAX-ACCESS  read-create
+   STATUS      current 
+   DESCRIPTION 
+      "This object shows the parameters
+      that are used to lease the IP Address."
+   ::= { hm2DHCPServerPoolEntry 5 }
+
+hm2DHCPServerPoolIfIndex  OBJECT-TYPE 
+   SYNTAX      Integer32
+   MAX-ACCESS  read-create
+   STATUS      current 
+   DESCRIPTION 
+      "The index of the interface." 
+   ::= { hm2DHCPServerPoolEntry 6 }
+    
+hm2DHCPServerPoolMacAddress  OBJECT-TYPE 
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-create
+   STATUS      current 
+   DESCRIPTION 
+      "The MAC Address of the  entry
+      that is used to lease the IP Address."    
+   ::= { hm2DHCPServerPoolEntry 7 }
+
+hm2DHCPServerPoolGateway  OBJECT-TYPE 
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-create
+   STATUS      current 
+   DESCRIPTION 
+      "The IPv4 address of the Gatewayinterface
+      that is used to lease the IP Address." 
+   ::= { hm2DHCPServerPoolEntry 8 }
+
+hm2DHCPServerPoolClientId  OBJECT-TYPE 
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-create
+   STATUS      current 
+   DESCRIPTION 
+      "The Client Identifier of the entry
+      that is used to lease the IP Address."
+   ::= { hm2DHCPServerPoolEntry 9 }
+    
+hm2DHCPServerPoolRemoteId  OBJECT-TYPE 
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-create
+   STATUS      current 
+   DESCRIPTION 
+      "The Remote Identifier of the  entry
+      that is used to lease the IP Address.
+      The Remote Identifier must be send in
+      Option 82 as defined in RFC 3046."
+   ::= { hm2DHCPServerPoolEntry 10 }
+
+hm2DHCPServerPoolCircuitId  OBJECT-TYPE 
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-create
+   STATUS      current 
+   DESCRIPTION 
+      "The Cicuit Identifier of the  entry
+      that is used to lease the IP Address.
+      The Circuit Identifier must be send in
+      Option 82 as defined in RFC 3046."
+   ::= { hm2DHCPServerPoolEntry 11 }
+
+hm2DHCPServerPoolHirschmannClient  OBJECT-TYPE 
+   SYNTAX      HmEnabledStatus
+   MAX-ACCESS  read-create 
+   STATUS      current 
+   DESCRIPTION 
+      "Enable or disable Hirschmann Multicast." 
+   DEFVAL  { disable } 
+   ::= { hm2DHCPServerPoolEntry 12 }
+
+hm2DHCPServerPoolVlanId  OBJECT-TYPE 
+   SYNTAX      Integer32
+   MAX-ACCESS  read-create
+   STATUS      current 
+   DESCRIPTION 
+      "The Vlan ID of the entry that is used
+      to lease the IP Address. A value of -1 
+      corresponds to management vlan (the default),
+      any other value (1-4042) represents a specific VLAN"
+   ::= { hm2DHCPServerPoolEntry 13 }
+   
+-- Pool Options
+hm2DHCPServerPoolOptionConfFileName  OBJECT-TYPE 
+   SYNTAX      DisplayString (SIZE (0..70)) 
+   MAX-ACCESS  read-create 
+   STATUS      current 
+   DESCRIPTION 
+      "Full specified name of the configuration file
+      e.g. tftp://192.9.200.1/cfg/config1.sav.
+      An empty string zeros the SNAME and the FILE field 
+      in the DHCP header."     
+   ::= { hm2DHCPServerPoolEntry 30 } 
+
+hm2DHCPServerPoolOptionGateway  OBJECT-TYPE 
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-create 
+   STATUS      current 
+   DESCRIPTION 
+      "The IPv4 address of the Gateway.
+      A value of 0 disables the attachment of the
+      option field in the DHCP message."
+   ::= { hm2DHCPServerPoolEntry 31 }
+
+hm2DHCPServerPoolOptionNetmask  OBJECT-TYPE 
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-create 
+   STATUS      current 
+   DESCRIPTION 
+      "The subnet mask.
+      A value of 0 disables the attachment of the
+      option field in the DHCP message."
+   ::= { hm2DHCPServerPoolEntry 32 }
+   
+hm2DHCPServerPoolOptionWINS  OBJECT-TYPE 
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-create 
+   STATUS      current 
+   DESCRIPTION 
+      "The IPv4 address of the WINS Server.
+      A value of 0 disables the attachment of the
+      option field in the DHCP message."
+   ::= { hm2DHCPServerPoolEntry 33 }
+
+hm2DHCPServerPoolOptionDNS  OBJECT-TYPE 
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-create 
+   STATUS      current 
+   DESCRIPTION 
+      "The IPv4 address of the DNS Server.
+      A value of 0 disables the attachment of the
+      option field in the DHCP message."
+   ::= { hm2DHCPServerPoolEntry 34 }
+
+hm2DHCPServerPoolOptionHostname  OBJECT-TYPE 
+   SYNTAX      DisplayString (SIZE (0..64))
+   MAX-ACCESS  read-create 
+   STATUS      current 
+   DESCRIPTION 
+      "The name of the client (Option 12).
+      An empty string disables the attachment of the
+      option field in the DHCP message."
+   ::= { hm2DHCPServerPoolEntry 35 }
+
+hm2DHCPServerPoolMethod  OBJECT-TYPE
+   SYNTAX      INTEGER
+   {
+         none (1),
+         config (2),
+         ttdp (3)
+   }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+          "The source of the DHCP Server Pool. User can set the object to none(1), config(2), ttdp(3)."
+   DEFVAL  { none } 
+   ::= { hm2DHCPServerPoolEntry 36 }
+
+hm2DHCPServerPoolErrorStatus  OBJECT-TYPE 
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The error Code by create a new Pool." 
+   ::= { hm2DHCPServerPoolEntry 99 }
+
+hm2DHCPServerPoolRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { hm2DHCPServerPoolEntry 100 }
+    
+--
+-- DHCP Server Lease Group
+--
+hm2DHCPServerLeaseTable  OBJECT-TYPE 
+   SYNTAX      SEQUENCE OF Hm2DHCPServerLeaseEntry 
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "A table containing the DHCP server leases."
+   ::= { hm2DHCPServerLeaseGroup 1 } 
+ 
+hm2DHCPServerLeaseEntry  OBJECT-TYPE 
+   SYNTAX      Hm2DHCPServerLeaseEntry 
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "A logical row in the hm2DHCPServerLeaseTable." 
+   INDEX { 
+      hm2DHCPServerLeasePoolIndex,
+      hm2DHCPServerLeaseIpAddress
+   } 
+   ::= { hm2DHCPServerLeaseTable 1}
+ 
+Hm2DHCPServerLeaseEntry ::= SEQUENCE { 
+   hm2DHCPServerLeasePoolIndex              Unsigned32,
+   hm2DHCPServerLeaseIpAddress              IpAddress,
+   hm2DHCPServerLeaseState                  INTEGER,
+   hm2DHCPServerLeaseTimeRemaining          Unsigned32,
+   hm2DHCPServerLeaseIfIndex                Integer32,
+   hm2DHCPServerLeaseClientMacAddress       MacAddress,
+   hm2DHCPServerLeaseGateway                IpAddress,
+   hm2DHCPServerLeaseClientId               OCTET STRING,
+   hm2DHCPServerLeaseRemoteId               OCTET STRING,
+   hm2DHCPServerLeaseCircuitId              OCTET STRING,
+   hm2DHCPServerLeaseStartTime              Unsigned32,  
+   hm2DHCPServerLeaseAction                 INTEGER,
+   hm2DHCPServerLeaseVlanId			  	   Integer32
+}
+
+hm2DHCPServerLeasePoolIndex  OBJECT-TYPE 
+   SYNTAX      Unsigned32 (1..128)
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The index of the hm2DHCPServerPoolTable above." 
+   ::= { hm2DHCPServerLeaseEntry 1 }
+   
+hm2DHCPServerLeaseIpAddress  OBJECT-TYPE 
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "This is an IP address from the pool with
+      index hm2DHCPServerLeasePoolIndex."
+   ::= { hm2DHCPServerLeaseEntry 2 }   
+
+hm2DHCPServerLeaseState  OBJECT-TYPE 
+   SYNTAX      INTEGER  {
+               bootp(1),
+               offering(2),
+               requesting(3),
+               bound(4),
+               renewing(5),
+               rebinding(6),
+               declined(7),
+               released(8)  
+               }
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The state of the lease."
+   ::= { hm2DHCPServerLeaseEntry 3 }
+
+hm2DHCPServerLeaseTimeRemaining  OBJECT-TYPE 
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The remaining time of the lease configured in
+      hm2DHCPServerPoolLeaseTime."
+   ::= { hm2DHCPServerLeaseEntry 4 }  
+
+hm2DHCPServerLeaseIfIndex  OBJECT-TYPE 
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The interface index where the lease
+      is currently active."
+   ::= { hm2DHCPServerLeaseEntry 5 }  
+
+hm2DHCPServerLeaseClientMacAddress  OBJECT-TYPE 
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The MAC Address of the  entry
+      that has leased the IP Address."
+   ::= { hm2DHCPServerLeaseEntry 6 } 
+
+hm2DHCPServerLeaseGateway  OBJECT-TYPE 
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The IPv4 address of the Gatewayinterface
+      that was used to lease the IP Address."
+   ::= { hm2DHCPServerLeaseEntry 7 }
+
+hm2DHCPServerLeaseClientId  OBJECT-TYPE 
+   SYNTAX      OCTET STRING (SIZE (0..255))
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The Client Identifier of the entry
+      that was used to lease the IP Address."
+   ::= { hm2DHCPServerLeaseEntry 8 }
+    
+hm2DHCPServerLeaseRemoteId  OBJECT-TYPE 
+   SYNTAX      OCTET STRING (SIZE (0..255))
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The Remote Identifier of the entry
+      that was used to lease the IP Address."
+   ::= { hm2DHCPServerLeaseEntry 9 }
+
+hm2DHCPServerLeaseCircuitId  OBJECT-TYPE 
+   SYNTAX      OCTET STRING (SIZE (0..255))
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The Cicuit Identifier of the entry
+      that was used to lease the IP Address."
+   ::= { hm2DHCPServerLeaseEntry 10 }
+
+hm2DHCPServerLeaseStartTime  OBJECT-TYPE 
+   SYNTAX      Unsigned32  
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "Lease start Time."
+   ::= { hm2DHCPServerLeaseEntry 11 }
+
+hm2DHCPServerLeaseAction  OBJECT-TYPE 
+   SYNTAX      INTEGER  {
+   			   other(1),
+               release(2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current 
+   DESCRIPTION 
+      "Manually release this ip address for new assignment."
+   ::= { hm2DHCPServerLeaseEntry 12 }
+
+hm2DHCPServerLeaseVlanId  OBJECT-TYPE 
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The Vlan ID of the entry that is used
+      to lease the IP Address. A value of -1 
+      corresponds to management vlan (the default),
+      any other value (1-4042) represents a specific VLAN"
+   ::= { hm2DHCPServerLeaseEntry 13 }
+
+--
+-- DHCP Server Interface Group
+--
+hm2DHCPServerIfConfigTable  OBJECT-TYPE 
+   SYNTAX      SEQUENCE OF Hm2DHCPServerIfConfigEntry 
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "A table containing current configuration information
+      for each interface." 
+   ::= { hm2DHCPServerInterfaceGroup 1 } 
+ 
+hm2DHCPServerIfConfigEntry  OBJECT-TYPE 
+   SYNTAX      Hm2DHCPServerIfConfigEntry 
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "A logical row in the hm2DHCPServerIfConfigTable." 
+   INDEX { 
+      hm2DHCPServerIfConfigIndex 
+   } 
+   ::= { hm2DHCPServerIfConfigTable 1}
+ 
+Hm2DHCPServerIfConfigEntry ::= SEQUENCE { 
+   hm2DHCPServerIfConfigIndex                   InterfaceIndex,
+   hm2DHCPServerIfConfigMode                    HmEnabledStatus
+}
+
+hm2DHCPServerIfConfigIndex  OBJECT-TYPE 
+   SYNTAX      InterfaceIndex
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The index of the interface." 
+   ::= { hm2DHCPServerIfConfigEntry 1 }
+
+hm2DHCPServerIfConfigMode  OBJECT-TYPE 
+   SYNTAX      HmEnabledStatus
+   MAX-ACCESS  read-write 
+   STATUS      current 
+   DESCRIPTION 
+      "Enable or disable DHCP server on this interface." 
+   DEFVAL  { enable } 
+   ::= { hm2DHCPServerIfConfigEntry 2 }
+
+
+
+--
+-- DHCP Server Counter Group
+--
+hm2DHCPServerCounterIfTable  OBJECT-TYPE 
+   SYNTAX      SEQUENCE OF Hm2DHCPServerCounterIfEntry 
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "A table containing current configuration information
+      for each interface." 
+   ::= { hm2DHCPServerCounterGroup 2 } 
+ 
+hm2DHCPServerCounterIfEntry  OBJECT-TYPE 
+   SYNTAX      Hm2DHCPServerCounterIfEntry 
+   MAX-ACCESS  not-accessible 
+   STATUS      current 
+   DESCRIPTION 
+      "A logical row in the hm2DHCPServerCounterIfTable." 
+   INDEX { 
+      hm2DHCPServerCounterIfIndex 
+   } 
+   ::= { hm2DHCPServerCounterIfTable 1}
+ 
+Hm2DHCPServerCounterIfEntry ::= SEQUENCE { 
+   hm2DHCPServerCounterIfIndex                       InterfaceIndex,
+   hm2DHCPServerCounterBootpRequests                 Counter32,
+   hm2DHCPServerCounterBootpInvalids                 Counter32,
+   hm2DHCPServerCounterBootpReplies                  Counter32,
+   hm2DHCPServerCounterBootpDroppedUnknownClients    Counter32,
+   hm2DHCPServerCounterBootpDroppedNotServingSubnet  Counter32,
+   hm2DHCPServerCounterDhcpv4Discovers               Counter32,
+   hm2DHCPServerCounterDhcpv4Offers                  Counter32,
+   hm2DHCPServerCounterDhcpv4Requests                Counter32,
+   hm2DHCPServerCounterDhcpv4Declines                Counter32,
+   hm2DHCPServerCounterDhcpv4Acks                    Counter32,
+   hm2DHCPServerCounterDhcpv4Naks                    Counter32,
+   hm2DHCPServerCounterDhcpv4Releases                Counter32,
+   hm2DHCPServerCounterDhcpv4Informs                 Counter32,
+   hm2DHCPServerCounterDhcpv4ForcedRenews            Counter32,
+   hm2DHCPServerCounterDhcpv4Invalids                Counter32,
+   hm2DHCPServerCounterDhcpv4DroppedUnknownClient    Counter32,
+   hm2DHCPServerCounterDhcpv4DroppedNotServingSubnet Counter32,
+   hm2DHCPServerCounterMiscOtherDhcpServer           Counter32
+   }
+
+hm2DHCPServerCounterIfIndex  OBJECT-TYPE 
+   SYNTAX      InterfaceIndex
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+      "The index of the interface." 
+   ::= { hm2DHCPServerCounterIfEntry 1 }
+   
+-- BOOTP Counter
+hm2DHCPServerCounterBootpRequests  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of packets received that contain a Message Type of 
+      1 (BOOTREQUEST) in the first octet and do not contain option 
+      number 53 (DHCP Message Type) in the options." 
+   ::= { hm2DHCPServerCounterIfEntry 2 } 
+ 
+hm2DHCPServerCounterBootpInvalids  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of packets received that do not contain a Message 
+      Type of 1 (BOOTREQUEST) in the first octet or are not valid 
+      BOOTP packets (e.g., too short, invalid field in packet 
+      header)." 
+   ::= { hm2DHCPServerCounterIfEntry 3 } 
+ 
+hm2DHCPServerCounterBootpReplies  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of packets sent that contain a Message Type of 2 
+      (BOOTREPLY) in the first octet and do not contain option 
+      number 53 (DHCP Message Type) in the options." 
+   ::= { hm2DHCPServerCounterIfEntry 4 } 
+ 
+hm2DHCPServerCounterBootpDroppedUnknownClients  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of BOOTP packets dropped due to the server not 
+      recognizing or not providing service to the hardware address 
+      received in the incoming packet." 
+   ::= { hm2DHCPServerCounterIfEntry 5 } 
+ 
+hm2DHCPServerCounterBootpDroppedNotServingSubnet  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of BOOTP packets dropped due to the server not 
+      being configured or not otherwise able to serve addresses on 
+      the subnet from which this message was received." 
+   ::= { hm2DHCPServerCounterIfEntry 6 }
+
+-- DHCPv4 Counter
+hm2DHCPServerCounterDhcpv4Discovers  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of DHCPDISCOVER (option 53 with value 1) packets 
+      received." 
+   ::= { hm2DHCPServerCounterIfEntry 20 } 
+ 
+hm2DHCPServerCounterDhcpv4Offers  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of DHCPOFFER (option 53 with value 2) packets 
+      sent." 
+   ::= { hm2DHCPServerCounterIfEntry 21 } 
+ 
+hm2DHCPServerCounterDhcpv4Requests  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of DHCPREQUEST (option 53 with value 3) packets 
+      received." 
+   ::= { hm2DHCPServerCounterIfEntry 22 } 
+
+hm2DHCPServerCounterDhcpv4Declines  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of DHCPDECLINE (option 53 with value 4) packets 
+      received." 
+   ::= { hm2DHCPServerCounterIfEntry 23 } 
+ 
+hm2DHCPServerCounterDhcpv4Acks  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of DHCPACK (option 53 with value 5) packets sent." 
+   ::= { hm2DHCPServerCounterIfEntry 24 } 
+ 
+hm2DHCPServerCounterDhcpv4Naks  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of DHCPNACK (option 53 with value 6) packets 
+      sent." 
+   ::= { hm2DHCPServerCounterIfEntry 25 } 
+ 
+hm2DHCPServerCounterDhcpv4Releases  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of DHCPRELEASE (option 53 with value 7) packets 
+      received." 
+   ::= { hm2DHCPServerCounterIfEntry 26 } 
+ 
+hm2DHCPServerCounterDhcpv4Informs  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of DHCPINFORM (option 53 with value 8) packets 
+      received." 
+   ::= { hm2DHCPServerCounterIfEntry 27 } 
+ 
+hm2DHCPServerCounterDhcpv4ForcedRenews  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of DHCPFORCERENEW (option 53 with value 9) packets 
+      sent." 
+   ::= { hm2DHCPServerCounterIfEntry 28 } 
+ 
+hm2DHCPServerCounterDhcpv4Invalids  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of DHCP packets received whose DHCP message type 
+      (i.e., option number 53) is not understood or handled by the 
+      server." 
+   ::= { hm2DHCPServerCounterIfEntry 29 } 
+ 
+hm2DHCPServerCounterDhcpv4DroppedUnknownClient  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of DHCP packets dropped due to the server not 
+      recognizing or not providing service to the client-id and/or 
+      hardware address received in the incoming packet." 
+   ::= { hm2DHCPServerCounterIfEntry 30 } 
+ 
+hm2DHCPServerCounterDhcpv4DroppedNotServingSubnet  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of DHCP packets dropped due to the server not 
+      being configured or not otherwise able to serve addresses on 
+      the subnet from which this message was received." 
+   ::= { hm2DHCPServerCounterIfEntry 31 }
+
+-- Misc Counter
+hm2DHCPServerCounterMiscOtherDhcpServer  OBJECT-TYPE 
+   SYNTAX      Counter32 
+   MAX-ACCESS  read-only 
+   STATUS      current 
+   DESCRIPTION 
+      "The number of BOOTP and DHCP packets from another
+      DHCP server seen on this interface." 
+   ::= { hm2DHCPServerCounterIfEntry 40 }
+
+--
+-- ***********************************************************
+-- hm2DHCPServerSNMPExtensionGroup
+-- ***********************************************************
+--
+
+hm2DHCPServerRowStatusInvalidConfigurationErrorReturn OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION "DHCP Server pool with index {0} cannot be enabled, errors in data entry."
+   ::= { hm2DHCPServerSNMPExtensionGroup 1 }
+
+hm2DHCPServerConflictDHCPRrelayErrorReturn OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION "{0} and {1} cannot be active at the same time."
+   ::= { hm2DHCPServerSNMPExtensionGroup 2 }
+
+END
+

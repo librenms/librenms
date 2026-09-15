@@ -1,0 +1,938 @@
+
+HM2-PLATFORM-QOS-COS-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann Platform QOS-COS MIB
+-- ***********************************************************
+--
+
+IMPORTS
+    Unsigned32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    InterfaceIndexOrZero                 
+    	FROM IF-MIB
+	TEXTUAL-CONVENTION    	
+        FROM SNMPv2-TC
+	hm2PlatformQoS        
+		FROM HM2-PLATFORM-QOS-MIB
+	HmEnabledStatus
+		FROM HM2-TC-MIB;
+
+hm2PlatformQosCos MODULE-IDENTITY
+    LAST-UPDATED "201110120000Z"
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION 
+        "The Hirschmann Private Platform2 MIB for Quality of Service - CoS.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION "201110120000Z"
+    DESCRIPTION
+             "Initial version."
+    ::= { hm2PlatformQoS 3 }
+
+Percent ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION 
+                 "An unsigned integer representing a value expressed 
+                 as a percentage with one percent increments."
+     SYNTAX      Unsigned32 (0..100)
+
+Sixteenths ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION 
+                 "An unsigned integer representing the numerator of a 
+                 value expressing a fraction in terms of sixteenths 
+                 (0/16, 1/16, 2/16, up to 16/16)."
+     SYNTAX      Unsigned32 (0..16)
+
+--*********************************************************************
+--   agentCosMapCfgGroup
+--
+--      Note: System-wide configuration is supported for this 
+--            group by using an index value of 0.
+--*********************************************************************
+    hm2AgentCosMapCfgGroup         OBJECT IDENTIFIER ::= { hm2PlatformQosCos 1 }
+
+    -- IP Precedence mapping table (global and per-port)
+    hm2AgentCosMapIpPrecTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentCosMapIpPrecEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table mapping evaluated IP precedence to Traffic 
+                     Class for a specific physical port.  Traffic class 
+                     is a number in the range 
+                     (0..(dot1dPortNumTrafficClasses-1))."
+         
+         ::= { hm2AgentCosMapCfgGroup 1 }             
+         
+    hm2AgentCosMapIpPrecEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentCosMapIpPrecEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "IP Precedence to Traffic Class mapping for a port."
+         INDEX   { hm2AgentCosMapIpPrecIntfIndex, hm2AgentCosMapIpPrecValue }
+         ::= { hm2AgentCosMapIpPrecTable 1 }
+
+    Hm2AgentCosMapIpPrecEntry ::=
+         SEQUENCE {
+            hm2AgentCosMapIpPrecIntfIndex
+                InterfaceIndexOrZero,
+            hm2AgentCosMapIpPrecValue
+                Unsigned32,
+            hm2AgentCosMapIpPrecTrafficClass
+                Unsigned32
+         }
+
+    hm2AgentCosMapIpPrecIntfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This is a unique index for an entry in the  
+                     hm2AgentCosMapIpPrecTable.  A non-zero value indicates  
+                     the ifIndex for the corresponding interface entry  
+                     in the ifTable.  A value of zero represents global
+                     configuration, which in turn causes all interface
+                     entries to be updated for a set operation, or 
+                     reflects the most recent global setting for a get
+                     operation."
+                    
+         ::= { hm2AgentCosMapIpPrecEntry 1 }
+
+    hm2AgentCosMapIpPrecValue OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The IP precedence value contained in the received 
+                     frame.  This value is only indicated in IP packets, 
+                     but is independent of both media-type and frame 
+                     tagging.
+                      
+                     Non-IP packets are handled in accordance with the 
+                     dot1dPortDefaultUserPriority value of the ingress 
+                     port."
+
+         ::= { hm2AgentCosMapIpPrecEntry 2 }
+
+    hm2AgentCosMapIpPrecTrafficClass OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Traffic class priority queue the received frame is 
+                     mapped to.  This represents the actual configuration 
+                     setting the port is using."
+                    
+         ::= { hm2AgentCosMapIpPrecEntry 3 }
+
+
+    -- IP DSCP mapping table (global and per-port)
+    hm2AgentCosMapIpDscpTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentCosMapIpDscpEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table mapping evaluated IP DSCP to Traffic Class 
+                     for a specific physical port.  Traffic class is a 
+                     number in the range 
+                     (0..(dot1dPortNumTrafficClasses-1))."
+         
+         ::= { hm2AgentCosMapCfgGroup 2 }             
+         
+    hm2AgentCosMapIpDscpEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentCosMapIpDscpEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "IP DSCP to Traffic Class mapping for a port."
+         INDEX   { hm2AgentCosMapIpDscpIntfIndex, hm2AgentCosMapIpDscpValue }
+         ::= { hm2AgentCosMapIpDscpTable 1 }
+
+    Hm2AgentCosMapIpDscpEntry ::=
+         SEQUENCE {
+            hm2AgentCosMapIpDscpIntfIndex
+                InterfaceIndexOrZero,
+            hm2AgentCosMapIpDscpValue
+                Unsigned32,
+            hm2AgentCosMapIpDscpTrafficClass
+                Unsigned32
+         }
+
+    hm2AgentCosMapIpDscpIntfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This is a unique index for an entry in the  
+                     hm2AgentCosMapIpDscpTable.  A non-zero value indicates  
+                     the ifIndex for the corresponding interface entry  
+                     in the ifTable.  A value of zero represents global
+                     configuration, which in turn causes all interface
+                     entries to be updated for a set operation, or 
+                     reflects the most recent global setting for a get
+                     operation."
+                    
+         ::= { hm2AgentCosMapIpDscpEntry 1 }
+
+    hm2AgentCosMapIpDscpValue OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..63)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The IP DSCP value contained in the received frame.  
+                     This value is only indicated in IP packets, but is 
+                     independent of both media-type and frame tagging.
+                     
+                     Non-IP packets are handled in accordance with the 
+                     dot1dPortDefaultUserPriority value of the ingress 
+                     port."
+
+         ::= { hm2AgentCosMapIpDscpEntry 2 }
+
+    hm2AgentCosMapIpDscpTrafficClass OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..7)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Traffic class priority queue the received frame is 
+                     mapped to."
+                    
+         ::= { hm2AgentCosMapIpDscpEntry 3 }
+
+
+    -- Interface trust mode (global and per-port)
+    hm2AgentCosMapIntfTrustTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentCosMapIntfTrustEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Specifies the interface trust mode of operation for 
+                     a port.  The trust mode setting determines which COS 
+                     mapping table is used for directing ingress packets 
+                     to a Traffic Class."
+         
+         ::= { hm2AgentCosMapCfgGroup 3 }             
+         
+    hm2AgentCosMapIntfTrustEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentCosMapIntfTrustEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "COS interface trust mode."
+         INDEX   { hm2AgentCosMapIntfTrustIntfIndex }
+         ::= { hm2AgentCosMapIntfTrustTable 1 }
+
+    Hm2AgentCosMapIntfTrustEntry ::=
+         SEQUENCE {
+            hm2AgentCosMapIntfTrustIntfIndex
+                InterfaceIndexOrZero,
+            hm2AgentCosMapIntfTrustMode
+                INTEGER,
+            hm2AgentCosMapUntrustedTrafficClass
+                Unsigned32
+         }
+
+    hm2AgentCosMapIntfTrustIntfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This is a unique index for an entry in the  
+                     hm2AgentCosMapIntfTrustTable.  A non-zero value indicates  
+                     the ifIndex for the corresponding interface entry  
+                     in the ifTable.  A value of zero represents global
+                     configuration, which in turn causes all interface
+                     entries to be updated for a set operation, or 
+                     reflects the most recent global setting for a get
+                     operation."
+                    
+         ::= { hm2AgentCosMapIntfTrustEntry 1 }
+
+    hm2AgentCosMapIntfTrustMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       untrusted(1),
+                       trustDot1p(2),
+                       trustIpPrecedence(3),
+                       trustIpDscp(4)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The class of service trust mode of an interface.  
+                     When set to a trusted mode, the appropriate COS 
+                     mapping table is used as follows:
+                       
+                         trustDot1p(2) : dot1dTrafficClassTable
+                         trustIpPrecedence(3): hm2AgentCosMapIpPrecTable
+                         trustIpDscp(4): hm2AgentCosMapIpDscpTable 
+                       
+                     For an untrusted(1) interface, packets are handled in 
+                     accordance with the dot1dPortDefaultUserPriority value 
+                     of the ingress port."
+		 DEFVAL { trustDot1p }
+         ::= { hm2AgentCosMapIntfTrustEntry 2 }
+
+    hm2AgentCosMapUntrustedTrafficClass OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION 
+                     "The traffic class (i.e. hardware queue) to which all
+                     untrusted traffic is assigned.  This includes all 
+                     traffic when the hm2AgentCosMapIntfTrustMode is set to 
+                     untrusted(1), or just non-IP packets when in 
+                     trustIpPrecedence(3) or trustIpDscp(4) modes.
+
+                     This is a read-only object that reflects the current setting
+                     of the dot1dPortDefaultUserPriority object as mapped 
+                     to a traffic class through the dot1dTrafficClassEntry."
+         ::= { hm2AgentCosMapIntfTrustEntry 3 }
+
+
+
+--*********************************************************************
+--   hm2AgentCosQueueCfgGroup
+--
+--      Note: System-wide configuration is supported for this 
+--            group by using an index value of 0.
+--*********************************************************************
+hm2AgentCosQueueCfgGroup   OBJECT IDENTIFIER ::= { hm2PlatformQosCos 2 }
+
+    hm2AgentCosQueueNumQueuesPerPort OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION 
+                     "The number of configurable COS queues per port  
+                     supported by the hardware device."
+         ::= { hm2AgentCosQueueCfgGroup 1 }
+
+    hm2AgentCosQueueNumDropPrecedenceLevels OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION 
+                     "The number of distinct drop precedence levels per 
+                     queue supported by the hardware device.  These levels 
+                     are typically used when configuring the queue 
+                     management tail drop and WRED parameters."
+         ::= { hm2AgentCosQueueCfgGroup 2 }
+
+    -- Control table for managing queue configuration for the interface    
+    hm2AgentCosQueueControlTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentCosQueueControlEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Table of class-of-service queue configuration 
+                     controls for the specified interface."
+         ::= { hm2AgentCosQueueCfgGroup 3 }
+
+    hm2AgentCosQueueControlEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentCosQueueControlEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Provides a general control mechanism that affects 
+                     all queues on a given interface."
+         INDEX       { hm2AgentCosQueueIntfIndex }
+         ::= { hm2AgentCosQueueControlTable 1 }
+         
+    Hm2AgentCosQueueControlEntry ::= SEQUENCE {         
+           hm2AgentCosQueueIntfIndex
+               InterfaceIndexOrZero,
+           hm2AgentCosQueueIntfShapingRate
+               Unsigned32,
+           hm2AgentCosQueueMgmtTypeIntf
+               INTEGER,
+           hm2AgentCosQueueWredDecayExponent
+               Unsigned32,
+           hm2AgentCosQueueDefaultsRestore
+               HmEnabledStatus,
+           hm2AgentCosQueueIntfShapingRateUnits
+               INTEGER
+           }
+    
+    hm2AgentCosQueueIntfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This is a unique index for an entry in the  
+                     hm2AgentCosQueueControlTable, hm2AgentCosQueueTable,
+                     or hm2AgentCosQueueMgmtTable.  A non-zero value indicates  
+                     the ifIndex for the corresponding interface entry  
+                     in the ifTable.  A value of zero represents global
+                     configuration, which in turn causes all interface
+                     entries to be updated for a set operation, or 
+                     reflects the most recent global setting for a get
+                     operation."
+                    
+         ::= { hm2AgentCosQueueControlEntry 1 }
+
+    hm2AgentCosQueueIntfShapingRate OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION 
+                     "Maximum bandwidth allowed for this interface as a 
+                     whole, typically used to shape the outbound 
+                     transmission rate. The value is specified in terms 
+                     of percentage of overall link speed for the port in 
+                     1% increments.  A value of 0 means there is no 
+                     maximum bandwidth limit in effect and that the 
+                     interface is allowed to transmit up to its maximum 
+                     line rate (i.e., work conserving method).  
+                     The default value is 0.
+                     
+                     When set to a non-zero value, the interface is 
+                     restricted to using at most the bandwidth specified 
+                     in this object for the outbound transmission rate 
+                     (i.e., non-work-conserving method).  This bandwidth 
+                     value is independent of any per-queue maximum 
+                     bandwidth value(s) in effect for the interface, as 
+                     specified in the hm2AgentCosQueueMaxBandwidth ohject, 
+                     and should be considered as a second-level 
+                     transmission rate control mechanism that regulates 
+                     the output of the entire interface regardless of 
+                     which queues originate the outbound traffic.
+
+                     Valid value ranges depend on the value returned by 
+                     object hm2AgentCosQueueIntfShapingRateUnits.  If that 
+                     object returns percent(1), hm2AgentCosQueueIntfShapingRate
+                     accepts values 0..100.  If that object returns kbps(2),
+                     hm2AgentCosQueueIntfShapingRate accepts values 
+                     0,64..4294967295."
+         DEFVAL { 0 }
+         ::= { hm2AgentCosQueueControlEntry 2 }
+
+    hm2AgentCosQueueMgmtTypeIntf OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       taildrop(1),
+                       wred(2)
+                       }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The management technique used for all queues on this 
+                     interface.  If taildrop(1), then all new packets 
+                     presented to the queues are dropped based on some 
+                     maximum threshold value(s). If wred(2), then an 
+                     active queue management scheme is employed whereby 
+                     packet drop precedence is considered during times of 
+                     queue congestion using WRED parameters.   The 
+                     necessary queue management parameters are specified 
+                     in the hm2AgentCosQueueMgmtTable for the corresponding 
+                     hm2AgentCosQueueIntfIndex value.  The default for this
+                     object is taildrop(1).
+                     
+                     Implementations that support this object but do not 
+                     support weighted RED must return taildrop(1) for this 
+                     value and must not allow a value of wred(2) to be set."
+         DEFVAL { taildrop }
+         ::= { hm2AgentCosQueueControlEntry 3 }
+
+    hm2AgentCosQueueWredDecayExponent OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..15)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION 
+                     "The decay exponent value used with the weighted 
+                     random early discard (WRED) algorithm to determine 
+                     how quickly the average queue length calculation 
+                     reacts to the current length of the queue.  A higher 
+                     value produces a slower response, meaning previously 
+                     sampled queue length values are factored into the 
+                     calculation for a longer period of time.  The default 
+                     value is 9.
+                     
+                     Use caution when changing this value from its 
+                     default.  If set too low, short traffic bursts can 
+                     cause WRED to drop too many packets.  If set too 
+                     high, WRED might not detect queue congestion in a 
+                     timely manner and becomes ineffective.  The default 
+                     value should be sufficient for most users.
+                     
+                     This object value is only used when the 
+                     hm2AgentCosQueueMgmtType is set to wred(2) and is 
+                     otherwise ignored."
+         DEFVAL { 9 }
+         ::= { hm2AgentCosQueueControlEntry 4 }
+
+    hm2AgentCosQueueDefaultsRestore OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Causes the default values to be restored for all COS 
+                     queue objects defined for this interface.  This 
+                     includes objects in the following tables:  
+                           hm2AgentCosQueueTable
+                           hm2AgentCosQueueMgmtTable
+                           
+                      This object always reads as disable(2). This object may 
+                      only be set to enable(1), which immediately causes the 
+                      default value restoration action as described above. 
+                      In essence, this models a momentary-style push button 
+                      switch that triggers a restoration of the original 
+                      default values for all affected objects."
+         ::= { hm2AgentCosQueueControlEntry 5 }
+
+    hm2AgentCosQueueIntfShapingRateUnits OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     percent(1),
+                     kbps(2)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Gets the units of the threshold value to percentage of
+                     port speed or kilobits per second (kbps)."
+         DEFVAL { percent }
+         ::= { hm2AgentCosQueueControlEntry 6 }
+
+
+    -- Queue table for specifying attributes of each COS queue on an interface
+    hm2AgentCosQueueTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentCosQueueEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Table of class-of-service queue configuration 
+                     parameters for the specified interface."
+         ::= { hm2AgentCosQueueCfgGroup 4 }
+
+    hm2AgentCosQueueEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentCosQueueEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Each entry describes a single class-of-service (COS) 
+                     queue for a given Interface Index. The number of 
+                     configurable COS queues for an interface vary based 
+                     on device capabilities.
+
+                     All objects defined for this table entry contain a 
+                     default value corresponding to a typical, 
+                     non-preferential treatment of packets traversing the 
+                     interface's COS queues."
+         INDEX       { hm2AgentCosQueueIntfIndex, hm2AgentCosQueueIndex }
+         ::= { hm2AgentCosQueueTable 1 }
+         
+    Hm2AgentCosQueueEntry ::= SEQUENCE {         
+           hm2AgentCosQueueIndex
+               Unsigned32,
+           hm2AgentCosQueueSchedulerType
+               INTEGER,
+           hm2AgentCosQueueMinBandwidth
+               Percent,
+           hm2AgentCosQueueMaxBandwidth
+               Percent,
+           hm2AgentCosQueueMgmtType
+               INTEGER
+           }
+    
+    hm2AgentCosQueueIndex OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The COS queue index, numbered 0 to (n-1), where n is 
+                     the total number of configurable interface queues for 
+                     the device as indicated by hm2AgentCosQueueNumQueuesPerPort.
+                     In general, a higher numbered queue index is used to 
+                     support higher priority traffic, although actual 
+                     operation may be altered via configuration through 
+                     this table."
+         ::= { hm2AgentCosQueueEntry 1 }
+
+    hm2AgentCosQueueSchedulerType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       strict(1),
+                       weighted(2)
+                       }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The type of scheduling used for this queue.  If 
+                     strict(1), then all traffic placed on this queue is 
+                     transmitted before any queue with a lower precedence 
+                     (lower hm2AgentCosQueueIndex).  A weighted(2) scheme 
+                     gives this queue service relative to other weighted 
+                     queues based on their relative hm2AgentCosQueueMinBandwidth 
+                     object values.  The default is strict(1)."
+         DEFVAL { strict }
+         ::= { hm2AgentCosQueueEntry 2 }
+
+    hm2AgentCosQueueMinBandwidth OBJECT-TYPE
+         SYNTAX      Percent
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Minimum guaranteed bandwidth allotted to this queue. 
+                     The value is specified in terms of percentage of 
+                     overall link speed for the port in 1% increments.  A 
+                     value of 0 means there is no guaranteed minimum 
+                     bandwidth in effect (best-effort service).  
+                     The default value is 0.
+                     
+                     The sum of all hm2AgentCosQueueMinBandwidth object 
+                     values for the queues on the same interface must not 
+                     exceed 100%.
+                     
+                     If the hm2AgentCosQueueMaxBandwidth corresponding to the 
+                     same hm2AgentCosQueueIndex on this interface is 
+                     currently set to a non-zero value, then setting this 
+                     object to a value greater than 
+                     hm2AgentCosQueueMaxBandwidth automatically updates 
+                     hm2AgentCosQueueMaxBandwidth to the same value to 
+                     maintain a proper relationship between the minimum 
+                     and maximum queue bandwidth specification.
+                     
+                     The value of this object is ignored when 
+                     hm2AgentCosQueueSchedulerType is set to strict(1)."
+         DEFVAL { 0 }
+         ::= { hm2AgentCosQueueEntry 3 }
+         
+    hm2AgentCosQueueMaxBandwidth OBJECT-TYPE
+         SYNTAX      Percent
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION 
+                     "Maximum bandwidth allowed for this queue, typically 
+                     used to shape the outbound transmission rate. The 
+                     value is specified in terms of percentage of overall 
+                     link speed for the port in 1% increments.  A value 
+                     of 0 means there is no maximum bandwidth limit in 
+                     effect and that the queue is allowed to use any 
+                     available excess bandwidth (i.e., work conserving 
+                     method).  The default value is 0.
+                     
+                     When set to a non-zero value, the queue is restricted 
+                     to using at most the bandwidth specified in this 
+                     object for the outbound transmission rate (i.e., 
+                     non-work-conserving method).  Any non-zero value set 
+                     for this object must be equal to or greater than the 
+                     value of hm2AgentCosQueueMinBandwidth for the same 
+                     hm2AgentCosQueueIndex on this interface."
+         DEFVAL { 0 }
+         ::= { hm2AgentCosQueueEntry 4 }
+
+    hm2AgentCosQueueMgmtType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       taildrop(1),
+                       wred(2)
+                       }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The queue depth management technique used when 
+                     per-queue specification is supported.  If 
+                     taildrop(1), then all new packets presented to the 
+                     queue are dropped based on some maximum threshold 
+                     value(s). If wred(2), then an active queue management 
+                     scheme is employed whereby packet drop precedence is 
+                     considered during times of queue congestion using 
+                     WRED parameters.   The necessary queue management 
+                     parameters are specified in the 
+                     hm2AgentCosQueueMgmtEntry for the corresponding 
+                     hm2AgentCosQueueIntfIndex and hm2AgentCosQueueIndex values.
+                     The default for this object is taildrop(1).
+                     
+                     Implementations that do not support weighted RED must 
+                     return taildrop(1) for this value and must not allow 
+                     a value of wred(2) to be set."
+         DEFVAL { taildrop }
+         ::= { hm2AgentCosQueueEntry 5 }
+
+
+    -- Queue management table for setting parameters related to queue depth
+    hm2AgentCosQueueMgmtTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentCosQueueMgmtEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Table of class-of-service queue drop precedence 
+                     configuration parameters.  The values in this table 
+                     are used based on the hm2AgentCosQueueMgmtType for the 
+                     corresponding hm2AgentCosQueueIntfIndex and hm2AgentCosQueueIndex 
+                     values.  These parameters are specified for each 
+                     drop precedence level supported within a queue."
+         ::= { hm2AgentCosQueueCfgGroup 5 }
+
+    hm2AgentCosQueueMgmtEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentCosQueueMgmtEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "The individual objects in this table are specified 
+                     for each drop precedence level supported within a 
+                     particular queue on a given interface.  Each object's 
+                     usage is based on the current setting of the 
+                     hm2AgentCosQueueMgmtType.  
+                     
+                     See the individual object descriptions for details."
+         INDEX       { hm2AgentCosQueueIntfIndex, hm2AgentCosQueueIndex, hm2AgentCosQueueDropPrecIndex }
+         ::= { hm2AgentCosQueueMgmtTable 1 }
+         
+    Hm2AgentCosQueueMgmtEntry ::= SEQUENCE {         
+           hm2AgentCosQueueDropPrecIndex
+               Unsigned32,
+           hm2AgentCosQueueMgmtTailDropThreshold
+               Sixteenths,
+           hm2AgentCosQueueMgmtWredMinThreshold
+               Sixteenths,
+           hm2AgentCosQueueMgmtWredMaxThreshold
+               Sixteenths,
+           hm2AgentCosQueueMgmtWredDropProbScale
+               Unsigned32, 
+           hm2AgentCosQueueMgmtPercentTailDropThreshold
+                Percent,
+           hm2AgentCosQueueMgmtPercentWredMinThreshold
+                Percent,
+           hm2AgentCosQueueMgmtPercentWredMaxThreshold
+                Percent,
+           hm2AgentCosQueueMgmtWredDropProbability
+                Percent
+   }
+    
+    hm2AgentCosQueueDropPrecIndex OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The COS queue drop precedence level, numbered 1 to 
+                     p, where p is the total number of drop precedences 
+                     supported per queue, as indicated by 
+                     hm2AgentCosQueueNumDropPrecedenceLevels.  This is used as 
+                     the minor index into the table.  Each supported drop 
+                     precedence level for a queue has its own set of 
+                     configuration parameters.
+                     
+                     The actual number of drop precedence levels supported 
+                     depends on the device characteristics.  For example, 
+                     some implementations may allow for three levels of 
+                     drop precedence (1/2/3, sometimes referred to as 
+                     green/yellow/red), some may support two levels 
+                     (1/2, or high/low), while others only one. Some devices 
+                     use the lowest (highest-numbered) drop precedence 
+                     level to represent non-TCP traffic."
+         ::= { hm2AgentCosQueueMgmtEntry 1 }
+
+    hm2AgentCosQueueMgmtTailDropThreshold OBJECT-TYPE
+         SYNTAX      Sixteenths
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "Tail drop queue threshold above which all packets 
+                     are dropped for the current drop precedence level. 
+                     The value specifies the threshold based on a fraction 
+                     of the overall device queue size in terms of 
+                     sixteenths (0/16, 1/16, 2/16, ... 16/16). Since device 
+                     implementations vary, the actual value deployed may 
+                     be rounded up or down accordingly. 
+                     
+                     The default value is calculated from the 
+                     hm2AgentCosQueueIndex and hm2AgentCosQueueDropPrecIndex as 
+                     shown in the following table (values listed for drop 
+                     precedence levels 1, 2, and 3, respectively):
+                              Queue Index 0:  16, 14, 12
+                              Queue Index 1:  16, 14, 12
+                              Queue Index 2:  16, 14, 12
+                              Queue Index 3:  16, 14, 12
+                              Queue Index 4:  16, 14, 12
+                              Queue Index 5:  16, 14, 12
+                              Queue Index 6:  16, 14, 12
+                              Queue Index 7:  16, 14, 12
+                              
+                     This object is only used when hm2AgentCosQueueMgmtType 
+                     is set to taildrop(1)."
+         ::= { hm2AgentCosQueueMgmtEntry 2 }
+         
+    hm2AgentCosQueueMgmtWredMinThreshold OBJECT-TYPE
+         SYNTAX      Sixteenths
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "Weighted RED minimum queue threshold, below which no 
+                     packets are dropped for the current drop precedence 
+                     level. The value specifies the threshold based on a 
+                     fraction of the overall device queue size in terms of 
+                     sixteenths (0/16, 1/16, 2/16, ... 16/16). Since device 
+                     implementations vary, the actual value deployed may 
+                     be rounded up or down accordingly. 
+                     
+                     The default value is calculated from the 
+                     hm2AgentCosQueueIndex and hm2AgentCosQueueDropPrecIndex as 
+                     shown in the following table (values listed for drop 
+                     precedence levels 1, 2, and 3, respectively):
+                              Queue Index 0:   8,  6,  4
+                              Queue Index 1:   9,  7,  5
+                              Queue Index 2:  10,  8,  6
+                              Queue Index 3:  11,  9,  7
+                              Queue Index 4:  12, 10,  8
+                              Queue Index 5:  13, 11,  9
+                              Queue Index 6:  14, 12, 10
+                              Queue Index 7:  15, 13, 11
+                              
+                     This object is only used when hm2AgentCosQueueMgmtType 
+                     is set to wred(2). Any value set for this object must 
+                     be equal to or less than the value of 
+                     hm2AgentCosQueueMgmtWredMaxThreshold."
+         ::= { hm2AgentCosQueueMgmtEntry 3 }
+         
+    hm2AgentCosQueueMgmtWredMaxThreshold OBJECT-TYPE
+         SYNTAX      Sixteenths
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "Weighted RED maximum queue threshold, above which 
+                     all packets are dropped for the current drop 
+                     precedence level. The value specifies the threshold 
+                     based on a fraction the overall device queue size in 
+                     terms of sixteenths (0/16, 1/16, 2/16, ... 16/16). Since 
+                     device implementations vary, the actual value 
+                     deployed may be rounded up or down accordingly. 
+                     
+                     The default value is calculated from the 
+                     hm2AgentCosQueueIndex and hm2AgentCosQueueDropPrecIndex as 
+                     shown in the following table (values listed for drop 
+                     precedence levels 1, 2, and 3, respectively):
+                              Queue Index 0:  16, 14, 12
+                              Queue Index 1:  16, 14, 12
+                              Queue Index 2:  16, 14, 12
+                              Queue Index 3:  16, 14, 12
+                              Queue Index 4:  16, 14, 12
+                              Queue Index 5:  16, 14, 12
+                              Queue Index 6:  16, 14, 12
+                              Queue Index 7:  16, 14, 12
+                              
+                     This object is only used when hm2AgentCosQueueMgmtType 
+                     is set to wred(2). Any value set for this object must 
+                     be equal to or greater than the value of 
+                     hm2AgentCosQueueMgmtWredMinThreshold."
+         ::= { hm2AgentCosQueueMgmtEntry 4 }
+         
+    hm2AgentCosQueueMgmtWredDropProbScale OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..15)
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION 
+                     "A scaling factor used for the WRED calculation to 
+                     determine the packet drop probability for the current 
+                     drop precedence level. The value is specified as a 
+                     number S from 1-15 and is used in the formula: 1/(2**
+                     S), meaning one packet is dropped out of every (2**
+                     S). Packet dropping begins when 
+                     hm2AgentCosQueueMgmtWredMinThreshold is reached and 
+                     proceeds linearly up to the (2**S) value specified by 
+                     this object until the 
+                     hm2AgentCosQueueMgmtWredMaxThreshold is reached, beyond 
+                     which all packets are dropped. Smaller values of S 
+                     produce a steeper slope, hence a higher incidence of 
+                     randomly dropped packets.  
+                     
+                     The default value is 10, which corresponds to a drop 
+                     rate of 1 out of every (2**10)=1024 packets.                     
+                     
+                     This object is only used when hm2AgentCosQueueMgmtType 
+                     is set to wred(2)."
+         DEFVAL { 10 }
+         ::= { hm2AgentCosQueueMgmtEntry 5 }
+
+    hm2AgentCosQueueMgmtPercentTailDropThreshold OBJECT-TYPE
+         SYNTAX      Percent
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Tail drop queue threshold above which all packets 
+                     are dropped for the current drop precedence level. 
+                     The value specifies the threshold based on a percentage
+                     of the overall device queue size. Since device 
+                     implementations vary, the actual value deployed may 
+                     be rounded up or down accordingly. 
+                     
+                     The default value, for all queues, is 100% for drop 
+                     precedence 1 and non-TCP traffic, 90% and 80% for 
+                     drop precedences 2 and 3.
+                              
+                     This object is only used when hm2AgentCosQueueMgmtType 
+                     is set to taildrop(1)."
+         ::= { hm2AgentCosQueueMgmtEntry 6 }
+         
+    hm2AgentCosQueueMgmtPercentWredMinThreshold OBJECT-TYPE
+         SYNTAX      Percent
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Weighted RED minimum queue threshold, below which no 
+                     packets are dropped for the current drop precedence 
+                     level. The value specifies the threshold based on a 
+                     percentage of the overall device queue size. Since device 
+                     implementations vary, the actual value deployed may 
+                     be rounded up or down accordingly. 
+                     
+                     The default value, for all queues, is 100% for non-TCP 
+                     traffic, 40%, 30% and 20% for TCP drop precedences 1, 2 
+                     and 3.
+                                                            
+                     This object is only used when hm2AgentCosQueueMgmtType 
+                     is set to wred(2). Any value set for this object must 
+                     be equal to or less than the value of 
+                     hm2AgentCosQueueMgmtPercentWredMaxThreshold."
+         ::= { hm2AgentCosQueueMgmtEntry 7 }
+         
+    hm2AgentCosQueueMgmtPercentWredMaxThreshold OBJECT-TYPE
+         SYNTAX      Percent
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Weighted RED maximum queue threshold, above which 
+                     all packets are dropped for the current drop 
+                     precedence level. The value specifies the threshold 
+                     based on a percentage of the overall device queue size. 
+                     Since device implementations vary, the actual value 
+                     deployed may be rounded up or down accordingly. 
+                     
+                     The default value, for all queues, is 100% for drop 
+                     precedence 1 and non-TCP traffic, 90% and 80% for 
+                     drop precedences 2 and 3.
+                                                            
+                     This object is only used when hm2AgentCosQueueMgmtType 
+                     is set to wred(2). Any value set for this object must 
+                     be equal to or greater than the value of 
+                     hm2AgentCosQueueMgmtPercentWredMinThreshold."
+         ::= { hm2AgentCosQueueMgmtEntry 8 }
+         
+    hm2AgentCosQueueMgmtWredDropProbability OBJECT-TYPE
+         SYNTAX      Percent
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION 
+                     "A scaling factor used for the WRED calculation to 
+                     determine the packet drop probability for the current 
+                     drop precedence level. Packet dropping begins when 
+                     hm2AgentCosQueueMgmtWredMinThreshold is reached and 
+                     proceeds linearly up to the percentage value specified by 
+                     this object until the hm2AgentCosQueueMgmtWredMaxThreshold 
+                     is reached, beyond which all packets are dropped.   
+                     
+                     The default value is 10.                     
+                     
+                     This object is only used when hm2AgentCosQueueMgmtType 
+                     is set to wred(2)."
+         DEFVAL { 10 }
+         ::= { hm2AgentCosQueueMgmtEntry 9 }
+
+END
+
+

@@ -1,0 +1,988 @@
+HM2-PORTLOCKING-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Emerson Port Locking MIB
+-- *************************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    NOTIFICATION-TYPE, IpAddress, Counter32,
+    Unsigned32, Integer32		FROM SNMPv2-SMI
+    RowStatus, MacAddress, StorageType		FROM SNMPv2-TC
+    ifIndex						FROM IF-MIB
+    DisplayString, TruthValue,
+    PhysAddress					FROM SNMPv2-TC
+    hm2ConfigurationMibs		FROM HM2-TC-MIB;
+
+hm2PortLocking MODULE-IDENTITY
+    LAST-UPDATED "202307120000Z" -- July 12, 2023
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "The Hirschmann Private Platform2 MIB for Port Locking.
+         Copyright (C) 2021. All Rights Reserved."
+    REVISION  "202104280000Z" -- April 28, 2021
+    DESCRIPTION "Initial version."
+    ::= { hm2ConfigurationMibs 250 }
+
+--
+-- *************************************************************
+-- hm2PortLocking
+-- *************************************************************
+--
+hm2PortLockingMibNotifications		OBJECT IDENTIFIER ::= { hm2PortLocking 0 }
+hm2PortLockingMibObjects			OBJECT IDENTIFIER ::= { hm2PortLocking 1 }
+
+-- **************************************************************************************
+-- hm2PortLockingGroup -> contains MIB objects displaying Port Locking
+-- and associated Functionality
+-- **************************************************************************************
+--
+hm2PortLockingGroup OBJECT IDENTIFIER ::= { hm2PortLockingMibObjects 1}
+
+hm2GlobalPortLockingMode OBJECT-TYPE
+	SYNTAX     INTEGER {
+	              enable(1),
+	              disable(2)
+	           }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enables or disables the global port locking mode.
+		The locking method can be chosen via hm2GlobalPortLockingMethod.
+		Setting this value to enable when hm2GlobalPortLockingMethod is set to
+		lockMacAndDisableUnusedPorts performs the complete lockdown of the device, i.e.
+		unused ports are disabled,the FDBs are freezed and only frames from known users
+		are forwarded.
+		Setting this value to enable when hm2GlobalPortLockingMethod is set to
+		disableUnusedPortsOnly disables only the unused ports.
+		Setting this value to enable when hm2GlobalPortLockingMethod is set to
+		lockMacOnly freezes the FDB and only frames from known users are forwarded.
+		Setting this value to disable reverses this security feature.
+		All ports which were previously disabled are re-enabled and the switch performs
+		the transparent learning and forwarding.
+		If the hm2GlobalPortLockingFallbackTimer is not zero, the switch re-enters
+		the locked state automatically after the configured amount of time"
+	DEFVAL { disable }
+	::={ hm2PortLockingGroup 1 }
+
+hm2GlobalPortLockingOperMode OBJECT-TYPE
+	SYNTAX     INTEGER {
+	              locked(1),
+	              unlocked(2),
+	              lockpending(3)
+	           }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Displays the current locking state of the device."
+	::={ hm2PortLockingGroup 2 }
+
+hm2GlobalPortLockingLockOnlyPorts OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS deprecated
+	DESCRIPTION
+		"If this variable is set to TRUE, only the ports are locked when
+		 hm2GlobalPortLockingMode is set to enable. "
+	DEFVAL { false }
+	::={ hm2PortLockingGroup 3 }
+
+hm2GlobalPortLockingFallbackTimer OBJECT-TYPE
+	SYNTAX     Integer32 (0..86400)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The amount of seconds after which the device automatically falls back
+		into the locked state,after the unlockes state was set.
+		A value of 0 has the special meaning of persistent unlock."
+	DEFVAL { 0 }
+	::={ hm2PortLockingGroup 4 }
+
+hm2GlobalPortLockingFallbackTimeRemaining OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS 	current
+	DESCRIPTION
+		"The remaining time in seconds until the device reenters the locked state
+		 automatically"
+	::={ hm2PortLockingGroup 5 }
+
+hm2GlobalPortLockingStatusMessage OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "A textual description of the status of the lockdown process."
+	::={ hm2PortLockingGroup 6 }
+
+hm2GlobalPortLockingNumDynamicEntries OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current number of dynamically learned MAC addresses on this device."
+	::={ hm2PortLockingGroup 7 }
+
+hm2GlobalPortLockingNumStaticEntries OBJECT-TYPE
+	SYNTAX      Unsigned32
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+		"The current number of statically locked MAC addresses on this device."
+	::={ hm2PortLockingGroup 8 }
+
+hm2GlobalPortLockingIgnoreUplinkPorts OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "If this variable is set to TRUE, uplink ports are not locked."
+	DEFVAL { true }
+	::={ hm2PortLockingGroup 9 }
+
+hm2GlobalPortLockingMethod OBJECT-TYPE
+	SYNTAX     INTEGER {
+	              lockMacAndDisableUnusedPorts(0),
+	              disableUnusedPortsOnly(1),
+	              lockMacOnly(2)
+	           }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Selects the global locking method when locking is enabled via
+		 hm2GlobalPortLockingMode. The value lockMacAndDisableUnusedPorts
+		 locks the MAC addresses and disables all unused ports.
+		 The value disableUnusedPortsOnly disables only the unused ports and performs
+		 no MAC locking. The value lockMacOnly locks only the MAC addresses."
+	DEFVAL { 0 }
+	::={ hm2PortLockingGroup 15 }
+
+hm2GlobalPortLockingResetMacViolation OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"If this variable is set to zero, the variables hm2PortLockingLastDiscardedMAC
+		 and hm2PortLockingNumViolationEntries are cleared once for all ports.
+		 If this variable is set to specific ifIndex (1..xx),
+		 only the hm2PortLockingLastDiscardedMAC and hm2PortLockingNumViolationEntries
+		 for the specified interface is cleared once"
+	DEFVAL { 0 }
+	::={ hm2PortLockingGroup 16 }
+
+hm2GlobalPortLockingUplinkDetectionMode OBJECT-TYPE
+	SYNTAX     INTEGER {
+	              numMac (0),
+	              pdu(1)
+	           }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		""
+	DEFVAL { 1 }
+	::={ hm2PortLockingGroup 17 }
+
+hm2GlobalPortLockingUplinkFreezeMacAddresses  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		""
+	DEFVAL { true }
+	::={ hm2PortLockingGroup 18 }
+
+hm2GlobalPortLockingUplinkReportMacAddresses  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		""
+	DEFVAL { true }
+	::={ hm2PortLockingGroup 19 }
+
+--
+--  Port Locking Table
+--
+
+hm2PortLockingTable OBJECT-TYPE
+	SYNTAX	     SEQUENCE OF Hm2PortLockingEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION "A table for Port Locking and associated functionality."
+	::= { hm2PortLockingGroup 10 }
+
+hm2PortLockingEntry OBJECT-TYPE
+	SYNTAX Hm2PortLockingEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Represents entry for port security table"
+	INDEX       { ifIndex }
+	::={ hm2PortLockingTable 1}
+
+Hm2PortLockingEntry ::= SEQUENCE {
+	hm2PortLockingMode
+			Integer32,
+	hm2PortLockingDisabledByLocking
+			TruthValue,
+	hm2PortLockingStaticLimit
+			Unsigned32,
+	hm2PortLockingViolationTrapMode
+			Integer32,
+	hm2PortLockingLastDiscardedMAC
+			DisplayString,
+	hm2PortLockingNumDynamicEntries
+			Unsigned32,
+	hm2PortLockingNumStaticEntries
+			Unsigned32,
+	hm2PortLockingMACAddressAdd
+			DisplayString,
+	hm2PortLockingMACAddressRemove
+			DisplayString,
+	hm2PortLockingStatusMessage
+			DisplayString,
+	hm2PortLockingNumViolationEntries
+			Unsigned32,
+	hm2PortLockingIsUplinkPort
+			TruthValue,
+	hm2PortLockingIsMacLockedPort
+			TruthValue
+	}
+
+hm2PortLockingMode OBJECT-TYPE
+	SYNTAX     INTEGER {
+	              enable(1),
+	              disable(2)
+	           }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Mode showing whether a port is enabled for port locking."
+	DEFVAL { enable }
+	::={ hm2PortLockingEntry 1 }
+
+hm2PortLockingDisabledByLocking OBJECT-TYPE
+	SYNTAX     TruthValue
+	-- Could be written only by Cfg. Manager
+	-- OEM mib will remain read-only
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Indicates wheter a port was disabled by the locking or not."
+	DEFVAL { false }
+	::={ hm2PortLockingEntry 2 }
+
+hm2PortLockingStaticLimit OBJECT-TYPE
+	SYNTAX     Unsigned32(0..1024)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"This variable signifies the limit of statically locked MAC addresses
+		allowed on a specific port."
+	 DEFVAL { 1024 }
+	 ::={ hm2PortLockingEntry 3 }
+
+hm2PortLockingViolationTrapMode OBJECT-TYPE
+	SYNTAX     INTEGER {
+	              enable(1),
+	              disable(2)
+	           }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"This variable is used to enable or disable the sending of new violation
+		 traps designating when a packet with a disallowed MAC address is
+		 received on a locked port."
+	DEFVAL { enable }
+	::={ hm2PortLockingEntry 4 }
+
+hm2PortLockingLastDiscardedMAC OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This variable displays the vlan-id and source MAC address of the last packet that was
+		 discarded on a locked port."
+	::={ hm2PortLockingEntry 5 }
+
+hm2PortLockingNumDynamicEntries OBJECT-TYPE
+	SYNTAX      Unsigned32
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+		"The current number of dynamically learned MAC addresses on this port.
+		 All these MAC addresses will be locked when the devices enters the locking state"
+	::={ hm2PortLockingEntry 6 }
+
+hm2PortLockingNumStaticEntries OBJECT-TYPE
+	SYNTAX      Unsigned32
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+		"The current number of statically locked MAC addresses on this port."
+	::={ hm2PortLockingEntry 7 }
+
+hm2PortLockingMACAddressAdd OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-write
+	STATUS current
+	DESCRIPTION
+		"This MIB variable accepts a VLAN id and MAC address to be added to the list
+		 of statically locked MAC addresses on a port. The VLAN id and MAC address combination
+		 would be entered in a particular fashion like :- 2 a0:b0:c0:d1:e2:a1(the vlan-id and
+		 MAC address separated by a blank-space)."
+	::={ hm2PortLockingEntry 8 }
+
+hm2PortLockingMACAddressRemove OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-write
+	STATUS current
+	DESCRIPTION
+		"This MIB variable accepts a VLAN id and MAC address to be removed from the list
+		 of statically locked MAC addresses on a port.. The VLAN id and MAC address combination
+		 would be entered in a particular fashion like :- 2 a0:b0:c0:d1:e2:a1(the vlan-id and
+		 MAC address separated by a blank-space)."
+	::={ hm2PortLockingEntry 9 }
+
+hm2PortLockingStatusMessage OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A textual description of the status of the lockdown process for this port."
+	::={ hm2PortLockingEntry 10 }
+
+hm2PortLockingNumViolationEntries OBJECT-TYPE
+	SYNTAX      Unsigned32
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+		"The current number of violating MAC addresses on this port."
+	::={ hm2PortLockingEntry 11 }
+
+hm2PortLockingIsUplinkPort OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Shows whether this port is treated as uplink port."
+	::={ hm2PortLockingEntry 12 }
+
+hm2PortLockingIsMacLockedPort OBJECT-TYPE
+	SYNTAX     TruthValue
+	-- Could be written only by Cfg. Manager
+	-- OEM mib will remain read-only
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Shows whether this port is MAC locked."
+	DEFVAL { false }
+	::={ hm2PortLockingEntry 13 }
+
+--
+-- Port Locking Dynamic Table
+--
+
+hm2PortLockingDynamicTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF Hm2PortLockingDynamicEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION "A table which contains all dynamically learned MAC addresses on a given port.
+		These dynamic entries will be subject of static locking when the locking is enabled"
+	::= { hm2PortLockingGroup 11 }
+
+hm2PortLockingDynamicEntry OBJECT-TYPE
+	SYNTAX Hm2PortLockingDynamicEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Represents entry for the dynamic port MAC Locking table"
+	INDEX       { ifIndex,hm2PortLockingDynamicVLANId,hm2PortLockingDynamicMACAddress }
+	::={ hm2PortLockingDynamicTable 1}
+
+Hm2PortLockingDynamicEntry ::= 	SEQUENCE {
+		hm2PortLockingDynamicVLANId
+				Unsigned32,
+		hm2PortLockingDynamicMACAddress
+				MacAddress
+}
+
+hm2PortLockingDynamicVLANId OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Source VLAN id of the packet that is received on the port."
+	::={ hm2PortLockingDynamicEntry 1 }
+
+hm2PortLockingDynamicMACAddress OBJECT-TYPE
+	SYNTAX     MacAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Source MAC address of the packet that is received on the port."
+	::={ hm2PortLockingDynamicEntry 2 }
+
+--
+-- Port Locking Static Table
+--
+
+hm2PortLockingStaticTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF Hm2PortLockingStaticEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION "A table which contains all statically locked MAC addresses on a given port."
+	::= { hm2PortLockingGroup 12 }
+
+hm2PortLockingStaticEntry OBJECT-TYPE
+	SYNTAX Hm2PortLockingStaticEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Represents entry for the static port MAC Locking table."
+	INDEX       { ifIndex,hm2PortLockingStaticVLANId,hm2PortLockingStaticMACAddress }
+	::={ hm2PortLockingStaticTable 1}
+
+Hm2PortLockingStaticEntry ::= SEQUENCE {
+		hm2PortLockingStaticVLANId
+				Unsigned32,
+		hm2PortLockingStaticMACAddress
+				MacAddress
+}
+
+hm2PortLockingStaticVLANId OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Associating VLAN id of the MAC address which is locked on this port."
+	::={ hm2PortLockingStaticEntry 1 }
+
+hm2PortLockingStaticMACAddress OBJECT-TYPE
+	SYNTAX     MacAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Source MAC address which is locked on this port."
+	::={ hm2PortLockingStaticEntry 2 }
+
+
+-- **************************************************************************************
+-- hm2PortLockingArpGroup -> contains MIB objects for Port Locking Arp Inspection
+-- **************************************************************************************
+
+hm2PortLockingArpGroup OBJECT IDENTIFIER ::= { hm2PortLockingMibObjects 5}
+
+hm2GlobalPortLockingArpInspectionMode OBJECT-TYPE
+	SYNTAX     INTEGER {
+	              enable(1),
+	              disable(2)
+	           }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enables or disables the global ARP inspection mode."
+	DEFVAL { enable }
+	::={ hm2PortLockingArpGroup 1 }
+
+hm2GlobalPortLockingArpInspectionDropMode OBJECT-TYPE
+	SYNTAX     INTEGER {
+	              enable(1),
+	              disable(2)
+	           }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enables or disables the dropping/filtering of invalid ARP packets.
+		 An ARP packet is considered as invalid when it does not match with the entry
+		 in the database in locked state (DatabaseAlarm) or when a header check fails."
+	DEFVAL { disable }
+	::={ hm2PortLockingArpGroup 2 }
+
+hm2GlobalPortLockingArpVerifySrcMac OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"If this variable is set to TRUE, the Src MAC address of snooped ARP frames is checked."
+	DEFVAL { true }
+	::={ hm2PortLockingArpGroup 3 }
+
+hm2GlobalPortLockingArpVerifyDstMac OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"If this variable is set to TRUE, the Dst MAC address of snooped ARP frames is checked."
+	DEFVAL { true }
+	::={ hm2PortLockingArpGroup 4 }
+
+hm2GlobalPortLockingArpVerifyIp OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"If this variable is set to TRUE, the IP address of snooped ARP frames is checked."
+	DEFVAL { true }
+	::={ hm2PortLockingArpGroup 5 }
+
+hm2GlobalPortLockingArpVerifySubnet OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"If this variable is set to TRUE, the subnet of snooped ARP frames is checked."
+	DEFVAL { false }
+	::={ hm2PortLockingArpGroup 6 }
+
+hm2GlobalPortLockingSendVerificationTrap OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"If this variable is set to TRUE, Traps are sent when an error is detected
+		 during header verification."
+	DEFVAL { true }
+	::={ hm2PortLockingArpGroup 7 }
+
+hm2GlobalPortLockingSendDatabaseModificationTrap OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"If this variable is set to TRUE, Traps are sent when an existing entry was
+		 modified in Learning Mode."
+	DEFVAL { true }
+	::={ hm2PortLockingArpGroup 8 }
+
+hm2GlobalPortLockingSendDatabaseAlarmTrap OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"If this variable is set to TRUE, Traps are sent when a new entry was created in
+		 Inspection Mode or when a modification was detected in Inspection Mode."
+	DEFVAL { true }
+	::={ hm2PortLockingArpGroup 9 }
+
+hm2GlobalPortLockingArpResetCache OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"If this variable is set to true, all dynamic entries of the Switch ARP Database are flushed."
+	DEFVAL { false }
+	::={ hm2PortLockingArpGroup 10 }
+
+hm2GlobalPortLockingArpInspectionTableEntries OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of entries in ARP inspection table."
+	::= { hm2PortLockingArpGroup 11 }
+
+-- ******************************************************************************************
+-- hm2PortLockingArpDatabaseTable -> contains MIB objects for Port Locking Arp Database
+-- ******************************************************************************************
+
+hm2PortLockingArpDatabaseTable OBJECT-TYPE
+	SYNTAX	     SEQUENCE OF Hm2PortLockingArpDatabaseEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION "A table for Port Locking ARP database entries."
+	::= { hm2PortLockingArpGroup  20 }
+
+hm2PortLockingArpDatabaseEntry OBJECT-TYPE
+	SYNTAX Hm2PortLockingArpDatabaseEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Represents entry for ARP database table."
+	INDEX       { hm2PortLockingArpDatabaseIpAddr}
+	::={ hm2PortLockingArpDatabaseTable 1}
+
+Hm2PortLockingArpDatabaseEntry ::= SEQUENCE {
+		hm2PortLockingArpDatabaseIpAddr
+			IpAddress,
+		hm2PortLockingArpDatabaseIfIndex
+			Integer32,
+		hm2PortLockingArpDatabaseVlanId
+			Integer32,
+		hm2PortLockingArpDatabaseMacAddr
+		        PhysAddress,
+		hm2PortLockingArpDatabaseHitCounter
+			Counter32,
+		hm2PortLockingArpDatabaseIfAlarmCounter
+			Counter32,
+		hm2PortLockingArpDatabaseMacAlarmCounter
+			Counter32,
+		hm2PortLockingArpDatabaseDropCounter
+			Counter32,
+		hm2PortLockingArpDatabaseType
+			Integer32,
+		hm2PortLockingArpDatabaseStorageType           
+			StorageType,
+		hm2PortLockingArpDatabaseRowStatus
+			RowStatus
+		}
+
+hm2PortLockingArpDatabaseIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "IP Address of ARP Entry."
+	::={ hm2PortLockingArpDatabaseEntry 1 }
+
+hm2PortLockingArpDatabaseIfIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION "Interface on which ARP entry was learned."
+	::={ hm2PortLockingArpDatabaseEntry 2 }
+
+hm2PortLockingArpDatabaseVlanId OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION "VLAN ID on which ARP entry was learned."
+	::={ hm2PortLockingArpDatabaseEntry 3 }
+
+hm2PortLockingArpDatabaseMacAddr OBJECT-TYPE
+	SYNTAX     PhysAddress
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION "MAC Address of ARP Entry."
+	::={ hm2PortLockingArpDatabaseEntry 4 }
+
+hm2PortLockingArpDatabaseHitCounter OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of times an ARP frame was received for this IP Address."
+	::={ hm2PortLockingArpDatabaseEntry 5 }
+
+hm2PortLockingArpDatabaseIfAlarmCounter OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of times the Interface was changed for this IP Address."
+	::={ hm2PortLockingArpDatabaseEntry 6 }
+
+hm2PortLockingArpDatabaseMacAlarmCounter OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of times the MAC Address was changed for this IP Address."
+	::={ hm2PortLockingArpDatabaseEntry 7 }
+
+hm2PortLockingArpDatabaseDropCounter OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of times the ARP packet was dropped for this IP address
+		  because it does not match with the current entry in locked state."
+	::={ hm2PortLockingArpDatabaseEntry 8 }
+
+hm2PortLockingArpDatabaseType OBJECT-TYPE
+	SYNTAX     INTEGER {
+	              dynamic(0),
+	              static(1)
+	           }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Entry Type."
+	::={ hm2PortLockingArpDatabaseEntry 9 }
+
+hm2PortLockingArpDatabaseStorageType OBJECT-TYPE
+	SYNTAX     StorageType
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Entry Storage Type. Dynamic entries are of storage type volatile and
+		 Static entries are of storage type nonVolatile."
+	DEFVAL { nonVolatile }
+	::={ hm2PortLockingArpDatabaseEntry 10 }
+
+hm2PortLockingArpDatabaseRowStatus OBJECT-TYPE
+	SYNTAX 		RowStatus
+	MAX-ACCESS 	read-create
+	STATUS 		current
+	DESCRIPTION
+		"Describes the status of a row in the table.
+		 Supports creation, deletion and activation of rows.
+		 A row will be of notReady(3) status, if all values 
+		 of the row are not available yet.
+		 A row can be set to active(1) as soon as all values
+		 are available. A row must not be active(1) in order 
+		 to be modified.
+		 A row, which is of type static, can be taken out of
+		 service by setting the value notInService(2)."
+	::= { hm2PortLockingArpDatabaseEntry 11 }
+
+
+-- ******************************************************************************************
+-- hm2GlobalPortLockingArpStatistics -> contains MIB objects for Statistics
+-- ******************************************************************************************
+
+hm2GlobalPortLockingArpStatistics OBJECT IDENTIFIER ::= { hm2PortLockingArpGroup  21 }
+
+hm2GlobalPortLockingArpStatisticsPacketsReceived OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION "The total number of ARP packets received."
+	::= { hm2GlobalPortLockingArpStatistics 1 }
+
+hm2GlobalPortLockingArpStatisticsUcPacketsReceived OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION "The total number of ARP Unicast packets received."
+	::= { hm2GlobalPortLockingArpStatistics 2 }
+
+hm2GlobalPortLockingArpStatisticsSrcMacFailure OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION "The total number of ARP packets with Src MAC failures."
+	::= { hm2GlobalPortLockingArpStatistics 3 }
+
+hm2GlobalPortLockingArpStatisticsDstMacFailure OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The total number of ARP packets with Dst MAC failures."
+	::= { hm2GlobalPortLockingArpStatistics 4 }
+
+hm2GlobalPortLockingArpStatisticsIpFailure OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION "The total number of ARP packets with IP Address failures."
+	::= { hm2GlobalPortLockingArpStatistics 5 }
+
+hm2GlobalPortLockingArpStatisticsSubnetFailure OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The total number of ARP packets with Subnet failures."
+	::= { hm2GlobalPortLockingArpStatistics 6 }
+
+	hm2GlobalPortLockingArpStatisticsDropCounter OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The total number of invalid ARP packets dropped in locked state."
+	::= { hm2GlobalPortLockingArpStatistics 7 }
+
+-- ******************************************************************************************
+-- hm2PortLockingArpLastVerificationTable -> Information about Header Verification
+-- ******************************************************************************************
+
+hm2PortLockingArpLastVerificationTable OBJECT-TYPE
+	SYNTAX	     SEQUENCE OF Hm2PortLockingArpLastVerificationEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION "A table for Port Locking ARP header failures."
+	::= { hm2PortLockingArpGroup  22 }
+
+hm2PortLockingArpLastVerificationEntry OBJECT-TYPE
+	SYNTAX Hm2PortLockingArpLastVerificationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Represents entry for ARP header failure entry."
+	INDEX       { ifIndex }
+	::={ hm2PortLockingArpLastVerificationTable 1}
+
+Hm2PortLockingArpLastVerificationEntry ::= SEQUENCE {
+	hm2PortLockingArpLastVerificationError
+			Integer32,
+	hm2PortLockingArpLastVerificationType
+			Integer32,
+	hm2PortLockingArpLastVerificationSA
+			MacAddress,
+	hm2PortLockingArpLastVerificationDA
+			MacAddress,
+	hm2PortLockingArpLastVerificationSHA
+			MacAddress,
+	hm2PortLockingArpLastVerificationTHA
+			MacAddress,
+	hm2PortLockingArpLastVerificationSPA
+			IpAddress,
+	hm2PortLockingArpLastVerificationTPA
+			IpAddress
+	}
+
+hm2PortLockingArpLastVerificationError OBJECT-TYPE
+	SYNTAX     INTEGER {
+	              none(0),
+	              da(1),
+	              sa(2),
+	              ip(3),
+	              subnet(4)
+	           }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Shows type of last ARP inspection error on the given interface."
+	::={ hm2PortLockingArpLastVerificationEntry 1 }
+
+hm2PortLockingArpLastVerificationType OBJECT-TYPE
+	SYNTAX     INTEGER {
+	              none(0),
+	              arpRequest(1),
+	              arpReply(2)
+	           }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Shows ARP type of last ARP inspection error for the given interface."
+	::={ hm2PortLockingArpLastVerificationEntry 2 }
+
+hm2PortLockingArpLastVerificationSA OBJECT-TYPE
+	SYNTAX     MacAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "SRC Address in MAC Header."
+	::={ hm2PortLockingArpLastVerificationEntry 3 }
+
+hm2PortLockingArpLastVerificationDA OBJECT-TYPE
+	SYNTAX     MacAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "DST Address in MAC Header."
+	::={ hm2PortLockingArpLastVerificationEntry 4 }
+
+hm2PortLockingArpLastVerificationSHA OBJECT-TYPE
+	SYNTAX     MacAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "SHA Field Header."
+	::={ hm2PortLockingArpLastVerificationEntry 5 }
+
+hm2PortLockingArpLastVerificationTHA OBJECT-TYPE
+	SYNTAX     MacAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "THA Field Header."
+	::={ hm2PortLockingArpLastVerificationEntry 6 }
+
+hm2PortLockingArpLastVerificationSPA OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "SPA Field Header."
+	::={ hm2PortLockingArpLastVerificationEntry 7 }
+
+hm2PortLockingArpLastVerificationTPA OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "SPA Field Header."
+	::={ hm2PortLockingArpLastVerificationEntry 8 }
+
+-- ******************************************************************************************
+-- hm2PortLockingArpLastAlarmTable -> Information about ARP Table Alarms
+-- ******************************************************************************************
+
+hm2PortLockingArpLastAlarmTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF Hm2PortLockingArpLastAlarmEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION "A table for Port Locking ARP Alarms."
+	::= { hm2PortLockingArpGroup  23 }
+
+hm2PortLockingArpLastAlarmEntry OBJECT-TYPE
+	SYNTAX Hm2PortLockingArpLastAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Represents entry for ARP inspection table."
+	INDEX       { ifIndex }
+	::={ hm2PortLockingArpLastAlarmTable 1}
+
+Hm2PortLockingArpLastAlarmEntry ::= SEQUENCE {
+	hm2PortLockingArpLastAlarmError
+			Integer32,
+	hm2PortLockingArpLastAlarmIpAddress
+			IpAddress,
+	hm2PortLockingArpLastAlarmOldMacAddress
+			MacAddress,
+	hm2PortLockingArpLastAlarmNewMacAddress
+			MacAddress
+	}
+
+hm2PortLockingArpLastAlarmError OBJECT-TYPE
+	SYNTAX     INTEGER {
+	              none(0),
+	              newEntry(5),
+	              changedEntry(6),
+	              violation(7)
+	           }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Shows type of last ARP alarm."
+	::={ hm2PortLockingArpLastAlarmEntry 1 }
+
+hm2PortLockingArpLastAlarmIpAddress OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "IP Address."
+	::={ hm2PortLockingArpLastAlarmEntry 2 }
+
+hm2PortLockingArpLastAlarmOldMacAddress OBJECT-TYPE
+	SYNTAX     MacAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Old/original MAC Address in ARP table."
+	::={ hm2PortLockingArpLastAlarmEntry 3 }
+
+hm2PortLockingArpLastAlarmNewMacAddress OBJECT-TYPE
+	SYNTAX     MacAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Old/original MAC Address in ARP table."
+	::={ hm2PortLockingArpLastAlarmEntry 4 }
+
+
+-- **************************************************************************************
+-- PortLocking   Traps
+--
+-- **************************************************************************************
+
+hm2PortLockingViolation NOTIFICATION-TYPE
+	OBJECTS	{ ifIndex, hm2PortLockingLastDiscardedMAC }
+	STATUS  current
+	DESCRIPTION
+		"Sent when a packet is received on a locked port with a source MAC address
+		that is not allowed."
+	::= { hm2PortLockingMibNotifications 1 }
+
+-- **************************************************************************************
+-- PortLockingArp   Traps
+--
+-- **************************************************************************************
+
+hm2PortLockingArpVerificationError NOTIFICATION-TYPE
+	OBJECTS	{ ifIndex, hm2PortLockingArpLastVerificationType, hm2PortLockingArpLastVerificationError, hm2PortLockingArpLastVerificationSA,
+	          hm2PortLockingArpLastVerificationDA, hm2PortLockingArpLastVerificationSHA, hm2PortLockingArpLastVerificationTHA,
+	          hm2PortLockingArpLastVerificationTPA}
+	STATUS  current
+	DESCRIPTION "Sent when the ARP Inspection detects an invalid ARP frame."
+	::= { hm2PortLockingMibNotifications 2 }
+
+hm2PortLockingArpAlarm NOTIFICATION-TYPE
+	OBJECTS	{ ifIndex, hm2PortLockingArpLastAlarmError, hm2PortLockingArpLastAlarmIpAddress,
+	          hm2PortLockingArpLastAlarmOldMacAddress,hm2PortLockingArpLastAlarmNewMacAddress}
+	STATUS  current
+	DESCRIPTION
+		"Send in ARP-Learning Mode when the received ARP information (MAC-Address or Interface)
+		does not match with the current entry in the ARP Database.
+		Send in ARP-Inspection Mode when a new entry is created (new IP Address in network) or when
+		the received ARP information (MAC-Address or Interface) does not match with the current
+		entry in the ARP Database."
+	::= { hm2PortLockingMibNotifications 3 }
+
+END

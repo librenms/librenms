@@ -1,0 +1,1645 @@
+--
+-- *************************************************************
+-- Hirschmann WWAN Management MIB
+-- *************************************************************
+--
+HM2-WWAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS 
+    OBJECT-TYPE, MODULE-IDENTITY, 
+    NOTIFICATION-TYPE, Integer32, 
+    Unsigned32,
+    Counter64                       FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION              FROM SNMPv2-TC
+    hm2ConfigurationMibs,
+    HmEnabledStatus, 
+    HmActionValue, 
+    HmTimeSeconds1970, 
+    HmLargeDisplayString            FROM HM2-TC-MIB
+    InetAddressType, 
+    InetAddress                     FROM INET-ADDRESS-MIB
+    SnmpAdminString                 FROM SNMP-FRAMEWORK-MIB;
+
+hm2WwanMib MODULE-IDENTITY
+    LAST-UPDATED "201505291200Z" -- May 29, 2015
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 - 7127 -14 -0
+         E-mail:     hac.support@belden.com"
+        DESCRIPTION
+         "This MIB defines the SNMP interface for Hirschmann WWAN
+          implementation."
+        REVISION     "201505291200Z" -- May 29, 2015
+        DESCRIPTION
+          "Initial version."
+    ::= { hm2ConfigurationMibs 125 }
+
+
+hm2WwanMibNotifications         OBJECT IDENTIFIER ::= { hm2WwanMib 0 }
+hm2WwanMibObjects               OBJECT IDENTIFIER ::= { hm2WwanMib 1 }
+
+hm2WwanGeneralGroup             OBJECT IDENTIFIER ::= { hm2WwanMibObjects 1 }
+hm2WwanDataGroup                OBJECT IDENTIFIER ::= { hm2WwanMibObjects 2 }
+hm2WwanSimCardGroup             OBJECT IDENTIFIER ::= { hm2WwanMibObjects 3 }
+hm2WwanInformationGroup         OBJECT IDENTIFIER ::= { hm2WwanMibObjects 4 }
+
+
+--
+-- *************************************************************
+-- Textual Conventions
+-- *************************************************************
+--
+
+Hm2CellularNetworks ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "Cellular Networks list."
+    SYNTAX          INTEGER {
+                        auto (1), 
+                        gsm (2), 
+                        umts (3), 
+                        lte (4), 
+                        gsmumts (5), 
+                        gsmlte (6), 
+                        umtslte (7), 
+                        none (8)
+                    }
+
+Hm2TechnologyLevel ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "Cellular Networks Technology levels."
+    SYNTAX          INTEGER {
+                        lte (1), 
+                        utms (2)
+                    }
+
+Hm2AuthType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "WWAN Data Authentication list."
+    SYNTAX          INTEGER {
+                        none (1), 
+                        pap (2), 
+                        chap (3), 
+                        papchap (4)
+                    }
+
+Hm2PdpType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "WWAN Data IP Addressing types."
+    SYNTAX          INTEGER {
+                        ipv4 (1), 
+                        ipv6 (2), 
+                        ipv4v6 (3)
+                    }
+
+Hm2ConnectionStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "WWAN Data Connection Status list."
+    SYNTAX          INTEGER {
+                        inactive (1), 
+                        active (2), 
+                        idle (3), 
+                        connecting (4), 
+                        reconnecting (5), 
+                        failure (6)
+                    }
+
+Hm2LimitUnit ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "WWAN Data Plan measuring unit."
+    SYNTAX          INTEGER {
+                        kb (1), 
+                        mb (2), 
+                        gb (3)
+                    }
+
+Hm2SimCardRole ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "WWAN Sim Card Role."
+    SYNTAX          INTEGER {
+                        auto (1), 
+                        primary (2), 
+                        backup (3)
+                    }
+
+Hm2SimCardStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "WWAN Sim Card Status."
+    SYNTAX          INTEGER {
+                        simPresent (1), 
+                        simAbsent (2), 
+                        simLocked (3), 
+                        simUnlocked (4), 
+                        simInactive (5), 
+                        simActive (6)
+                    }
+
+Hm2Pin1Status ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "WWAN Sim Card Pin1 Status."
+    SYNTAX          INTEGER {
+                        notVerified (1), 
+                        verified (2), 
+                        blocked (3), 
+                        disabled (4), 
+                        wrongCode(5)
+                    }
+
+Hm2RegistrationStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "WWAN Sim Card Registration Status."
+    SYNTAX          INTEGER {
+                        notRegistered (1), 
+                        registering (2), 
+                        registered (3), 
+                        failure (4) 
+                    }
+
+Hm2RoamingStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "WWAN Carrier Roaming Status."
+    SYNTAX          INTEGER {
+                        home (1), 
+                        roaming (2), 
+                        roamingDisabled (3)
+                    }
+
+Hm2TrapBits ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "Traps enable/disable bit list."
+    SYNTAX          BITS {
+                        roamingActive(0), 
+                        ltePersistenceSwitch(1), 
+                        cellularRegistrationFailed(2), 
+                        dataConnectionSetup(3), 
+                        dataPlanWarningThreshold(4), 
+                        simPin1Status(5), 
+                        failoverConnectionBackupSim(6), 
+                        failoverRegistrationBackupSim(7), 
+                        failoverRoamingBackupSim(8), 
+                        failoverDataLimitBackupSim(9), 
+                        failoverRegistrationModemReset(10)
+                    }
+
+Hm2SimCardsListIndex ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "SIM Cards list."
+    SYNTAX          INTEGER {
+                        sim1 (0), 
+                        sim2 (1), 
+                        sim3 (2), 
+                        sim4 (3)
+                    }
+
+Hm2SimCardsListActive ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "SIM Cards list."
+    SYNTAX          INTEGER {
+                        noSim (0), 
+                        sim1 (1), 
+                        sim2 (2), 
+                        sim3 (3), 
+                        sim4 (4)
+                    }
+
+Hm2ModemOperationalState ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "Modem power states."
+    SYNTAX          INTEGER {
+                        online(0), 
+                        low-power(1), 
+                        offline(2), 
+                        reset(3), 
+                        shutting-down(4), 
+                        persistent-low-power(5), 
+                        unknown(255)
+                    }
+
+Hm2CellularDataTech ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "Data technology list."
+    SYNTAX          INTEGER {
+                        unknown(0), 
+                        gsm(1), 
+                        umts(2), 
+                        edge(3), 
+                        hsdpa(4), 
+                        hsupa(5), 
+                        hsdpa-hsupda(6), 
+                        lte(7), 
+                        hsdpaplus(8), 
+                        hsdpaplus-hsupa(9), 
+                        dchsdpaplus(10), 
+                        dchsdpaplus-hsupa(11)
+                    }
+
+--
+-- *************************************************************
+-- General Group Objects
+-- *************************************************************
+--
+hm2WwanAdminStatus OBJECT-TYPE
+        SYNTAX          HmEnabledStatus
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "WWAN Global mode operation change."
+        DEFVAL          { disable }
+        ::= { hm2WwanGeneralGroup 1 }
+
+hm2WwanCellularSelection OBJECT-TYPE
+        SYNTAX          Hm2CellularNetworks
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+                        "Cellular network selection supported combinations.
+                        'auto' value means all supported networks (GSM/UMTS/LTE)."
+        DEFVAL          { auto }
+        ::= { hm2WwanGeneralGroup 2 }
+
+hm2WwanLtePersistence OBJECT-TYPE
+        SYNTAX          HmEnabledStatus
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+                        "When an LTE capable device is connected to a non-LTE network
+                        it may not handover to an LTE network when one becomes available
+                        if data is being continuously transmitted or received. Enabling
+                        this function will insure that a connection over LTE will be
+                        maintained whenever LTE is available."
+        DEFVAL          { disable }
+        ::= { hm2WwanGeneralGroup 4 }
+
+hm2WwanLtePersistenceInterval OBJECT-TYPE
+        SYNTAX          Integer32 ( 0..3600 )
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+                        "The number of seconds after which LTE Persistence switch will be
+                        attempted. A 0 value means switch without waiting. This time
+                        interval is needed to avoid intermittent switches."
+        DEFVAL          { 30 }
+        ::= { hm2WwanGeneralGroup 5 }
+
+hm2WwanFailoverTechnologyLevel OBJECT-TYPE
+        SYNTAX          Hm2TechnologyLevel
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Desired cellular technology limit. If the current cellular
+                        network technology falls below this level then failover can
+                        be triggered. This mib node is meant to be used in conjunction
+                        with hm2WwanBackupSimTechnologyLevel failover scenario."
+        DEFVAL          { utms }
+        ::= { hm2WwanGeneralGroup 6 }
+
+hm2WwanBackupSimFailoverConnection OBJECT-TYPE
+        SYNTAX          HmEnabledStatus
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+                        "Switch to Backup SIM card when data connection fails."
+        DEFVAL          { disable }
+        ::= { hm2WwanGeneralGroup 7 }
+
+hm2WwanBackupSimFailoverRegistration OBJECT-TYPE
+        SYNTAX          HmEnabledStatus
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+                        "Switch to Backup SIM when registration fails."
+        DEFVAL          { disable }
+        ::= { hm2WwanGeneralGroup 8 }
+
+hm2WwanBackupSimFailoverRoaming OBJECT-TYPE
+        SYNTAX          HmEnabledStatus
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+                        "Switch to Backup SIM when roaming is detected."
+        DEFVAL          { disable }
+        ::= { hm2WwanGeneralGroup 9 }
+
+hm2WwanBackupSimFailoverDataLimit OBJECT-TYPE
+        SYNTAX          HmEnabledStatus
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+                        "Switch to Backup SIM card when data limit is reached and
+                        switch to Primary SIM when data limit is recovered."
+        DEFVAL          { disable }
+        ::= { hm2WwanGeneralGroup 10 }
+
+hm2WwanModemResetFailoverRegistration OBJECT-TYPE
+        SYNTAX          HmEnabledStatus
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+                        "Attempt a Modem reset if both Primary and Backup SIM cards
+                        report registration failures. Backup SIM card registration
+                        failure might not be needed depending if 
+                        hm2WwanBackupSimFailoverRegistration is enabled or if the
+                        SIM is physical present."
+        DEFVAL          { disable }
+        ::= { hm2WwanGeneralGroup 11 }
+
+hm2WwanBackupSimTechnologyLevel OBJECT-TYPE
+        SYNTAX          HmEnabledStatus
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Switch to Backup SIM card when current cellular technology 
+                        drops bellow a limit. Configure limit with hm2WwanFailoverTechnologyLevel."
+        DEFVAL          { disable }
+        ::= { hm2WwanGeneralGroup 12 }
+
+hm2WwanFailoverCycle OBJECT-TYPE
+        SYNTAX          HmEnabledStatus
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+                        "By default 
+                            hm2WwanBackupSimFailoverConnection 
+                            hm2WwanBackupSimFailoverRegistration
+                        will not fallback to using the Primary SIM card if failure
+                        is encountered on the Backup SIM card. This mib node will 
+                        allow falling back to Primary SIM card if Backup SIM card 
+                        is unable to register or create a connection. The cycled
+                        fallback will be done after 60 seconds."
+        DEFVAL          { disable }
+        ::= { hm2WwanGeneralGroup 13 }
+
+hm2WwanSetTrap OBJECT-TYPE
+        SYNTAX          Hm2TrapBits
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                       "A bitmap string serving as a enable/disable method for
+                       the trap events defined by the WWAN notifications. All
+                       traps are enabled by default."
+        DEFVAL         { {  roamingActive, ltePersistenceSwitch, cellularRegistrationFailed, dataConnectionSetup, dataPlanWarningThreshold, simPin1Status, failoverConnectionBackupSim, failoverRegistrationBackupSim, failoverRoamingBackupSim, failoverDataLimitBackupSim, failoverRegistrationModemReset } }
+        ::= { hm2WwanGeneralGroup 14 }
+
+--
+-- *************************************************************
+-- WWAN Data Group
+-- *************************************************************
+--
+--
+
+-- *************************************************************
+-- WWAN Data Connections Table
+-- *************************************************************
+--
+hm2WwanDataConnectionTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  Hm2WwanDataConnectionEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+                            "This table contains configuration options for each
+                            WWAN Data connection per SIM card."
+        ::= { hm2WwanDataGroup 1 }
+
+ 
+hm2WwanDataConnectionEntry OBJECT-TYPE
+        SYNTAX              Hm2WwanDataConnectionEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+                            "The entries of the table."
+        INDEX               { hm2WwanDataConnectionSimId } 
+        ::= { hm2WwanDataConnectionTable 1 }
+
+
+Hm2WwanDataConnectionEntry ::= SEQUENCE {
+        hm2WwanDataConnectionSimId                      Integer32,
+        hm2WwanDataConnectionAdminStatus                HmEnabledStatus, 
+        hm2WwanDataConnectionApn                        SnmpAdminString,
+        hm2WwanDataConnectionApnCurrent                 SnmpAdminString, 
+        hm2WwanDataConnectionUser                       SnmpAdminString, 
+        hm2WwanDataConnectionPassword                   SnmpAdminString, 
+        hm2WwanDataConnectionAuth                       Hm2AuthType, 
+        hm2WwanDataConnectionPdpType                    Hm2PdpType, 
+        hm2WwanDataConnectionIpAddressType              InetAddressType, 
+        hm2WwanDataConnectionIpAddress                  InetAddress, 
+        hm2WwanDataConnectionDnsPrimaryType             InetAddressType, 
+        hm2WwanDataConnectionDnsPrimary                 InetAddress, 
+        hm2WwanDataConnectionDnsSecondaryType           InetAddressType, 
+        hm2WwanDataConnectionDnsSecondary               InetAddress, 
+        hm2WwanDataConnectionIpAddressCurrentType       InetAddressType, 
+        hm2WwanDataConnectionIpAddressCurrent           InetAddress, 
+        hm2WwanDataConnectionDnsPrimaryCurrentType      InetAddressType, 
+        hm2WwanDataConnectionDnsPrimaryCurrent          InetAddress, 
+        hm2WwanDataConnectionDnsSecondaryCurrentType    InetAddressType, 
+        hm2WwanDataConnectionDnsSecondaryCurrent        InetAddress, 
+        hm2WwanDataConnectionMtu                        Integer32, 
+        hm2WwanDataConnectionFailedRetry                Integer32, 
+        hm2WwanDataConnectionFailedRetryCurrent         Unsigned32, 
+        hm2WwanDataConnectionStatus                     Hm2ConnectionStatus, 
+        hm2WwanDataConnectionStatusErrorReason          HmLargeDisplayString, 
+        hm2WwanDataConnectionActivatedCount             Unsigned32, 
+        hm2WwanDataConnectionStartTime                  Unsigned32, 
+        hm2WwanDataConnectionUpTime                     Unsigned32, 
+        hm2WwanDataConnectionTotalUpTime                Unsigned32
+        }
+
+ 
+hm2WwanDataConnectionSimId OBJECT-TYPE
+        SYNTAX              Hm2SimCardsListIndex
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         
+                            "SIM ID for which this connection entry belongs to. Also
+                            used as the table's index."
+        ::= { hm2WwanDataConnectionEntry 1 }
+
+hm2WwanDataConnectionAdminStatus OBJECT-TYPE
+        SYNTAX              HmEnabledStatus
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "Operational mode of the connection."
+        DEFVAL              { disable }
+        ::= { hm2WwanDataConnectionEntry 2 }
+
+hm2WwanDataConnectionApn OBJECT-TYPE
+        SYNTAX              SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "Access Point Name used to identify the data connection's
+                            gateway name in the carriers network. If empty then the
+                            default APN configured on the SIM card will be used. APN
+                            value change while the connection is active, will take effect
+                            after toggling hm2WwanDataConnectionAdminStatus."
+        DEFVAL              { ''H }
+        ::= { hm2WwanDataConnectionEntry 3 }
+
+hm2WwanDataConnectionApnCurrent OBJECT-TYPE
+        SYNTAX              SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "Current Access Point Name used for data connections. If
+                            hm2WwanDataConnectionApn is empty then the value shown here
+                            represents the automatically detected APN stored on the
+                            Sim Card."
+        ::= { hm2WwanDataConnectionEntry 4 }
+
+hm2WwanDataConnectionUser OBJECT-TYPE
+        SYNTAX              SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "User name used for authentication when settting up a new
+                            data connection. Empty value means its not required."
+        DEFVAL              { ''H }
+        ::= { hm2WwanDataConnectionEntry 5 }
+
+hm2WwanDataConnectionPassword OBJECT-TYPE
+        SYNTAX              SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "Pasword asociated with the user name used for authentication
+                            when settting up a new data connection. Not readable by the user."
+        DEFVAL              { ''H }
+        ::= { hm2WwanDataConnectionEntry 6 }
+
+hm2WwanDataConnectionAuth OBJECT-TYPE
+        SYNTAX              Hm2AuthType
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "The type of authentication used when setting up a data
+                            connection."
+        DEFVAL              { none }
+        ::= { hm2WwanDataConnectionEntry 7 }
+
+hm2WwanDataConnectionPdpType OBJECT-TYPE
+        SYNTAX              Hm2PdpType
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "The IP type of the data connection to set up. It can be
+                            IPv4 or IPv6. Currently only IPv4 is supported."
+        DEFVAL              { ipv4 }
+        ::= { hm2WwanDataConnectionEntry 8 }
+
+hm2WwanDataConnectionIpAddressType OBJECT-TYPE
+        SYNTAX              InetAddressType
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "hm2WwanDataConnectionIpAddress value type, either IPv4
+                            or IPv6."
+        DEFVAL              { ipv4 }
+        ::= { hm2WwanDataConnectionEntry 9 }
+
+hm2WwanDataConnectionIpAddress OBJECT-TYPE
+        SYNTAX              InetAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "Manual IP address to be used for configuring a new data
+                            connection. If 0.0.0.0 then a dynamic IP Address will be
+                            assigned by the carrier."
+        DEFVAL              { '00000000'H }
+        ::= { hm2WwanDataConnectionEntry 10 }
+
+hm2WwanDataConnectionDnsPrimaryType OBJECT-TYPE
+        SYNTAX              InetAddressType
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "hm2WwanDataConnectionDnsPrimary value type, either IPv4
+                            or IPv6."
+        DEFVAL              { ipv4 }
+        ::= { hm2WwanDataConnectionEntry 11 }
+
+hm2WwanDataConnectionDnsPrimary OBJECT-TYPE
+        SYNTAX              InetAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "Manual IP address to be used for configuring the primary
+                            DNS server address for the data connection. If 0.0.0.0 
+                            then a dynamic DNS IP Address will be assigned by the carrier."
+        DEFVAL              { '00000000'H }
+        ::= { hm2WwanDataConnectionEntry 12 }
+
+hm2WwanDataConnectionDnsSecondaryType OBJECT-TYPE
+        SYNTAX              InetAddressType
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "hm2WwanDataConnectionDnsSecondary value type, either IPv4
+                            or IPv6."
+        DEFVAL              { ipv4 }
+        ::= { hm2WwanDataConnectionEntry 13 }
+
+hm2WwanDataConnectionDnsSecondary OBJECT-TYPE
+        SYNTAX              InetAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "Manual IP address to be used for configuring the secondary
+                            DNS server address for the data connection. If 0.0.0.0 
+                            then a dynamic DNS IP Address will be assigned by the carrier."
+        DEFVAL              { '00000000'H }
+        ::= { hm2WwanDataConnectionEntry 14 }
+
+hm2WwanDataConnectionIpAddressCurrentType OBJECT-TYPE
+        SYNTAX              InetAddressType
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "hm2WwanDataConnectionIpAddressCurrent value type, either IPv4
+                            or IPv6."
+        ::= { hm2WwanDataConnectionEntry 15 }
+
+hm2WwanDataConnectionIpAddressCurrent OBJECT-TYPE
+        SYNTAX              InetAddress
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "The IP Address that the WWAN data interface is currently
+                            using."
+        DEFVAL              { '00000000'H }
+        ::= { hm2WwanDataConnectionEntry 16 }
+
+hm2WwanDataConnectionDnsPrimaryCurrentType OBJECT-TYPE
+        SYNTAX              InetAddressType
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "hm2WwanDataConnectionDnsPrimaryCurrent value type, either IPv4
+                            or IPv6."
+        ::= { hm2WwanDataConnectionEntry 17 }
+
+hm2WwanDataConnectionDnsPrimaryCurrent OBJECT-TYPE
+        SYNTAX              InetAddress
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "The Primary DNS Address that the WWAN data interface 
+                            is currently using."
+        DEFVAL              { '00000000'H }
+        ::= { hm2WwanDataConnectionEntry 18 }
+
+hm2WwanDataConnectionDnsSecondaryCurrentType OBJECT-TYPE
+        SYNTAX              InetAddressType
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "hm2WwanDataConnectionDnsSecondaryCurrent value type, either IPv4
+                            or IPv6."
+        ::= { hm2WwanDataConnectionEntry 19 }
+
+hm2WwanDataConnectionDnsSecondaryCurrent OBJECT-TYPE
+        SYNTAX              InetAddress
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "The Secondary DNS Address that the WWAN data interface 
+                            is currently using."
+        DEFVAL              { '00000000'H }
+        ::= { hm2WwanDataConnectionEntry 20 }
+
+hm2WwanDataConnectionMtu OBJECT-TYPE
+        SYNTAX              Integer32 (0..1500)
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "Maximum Transmision Unit used when sending IP packets
+                            over the WWAN data interface. The MTU value is reported
+                            by the wwan modem."
+        ::= { hm2WwanDataConnectionEntry 21 }
+
+hm2WwanDataConnectionFailedRetry OBJECT-TYPE
+        SYNTAX              Integer32 (-1..32)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "How many times should a failed WWAN data connection
+                            attempt to try reconnecting before aborting and using
+                            fallback options or logging error. A value of 0 means 
+                            no retry attempts and a value of -1 means 'infinite'
+                            attempts."
+        DEFVAL              { 3 }
+        ::= { hm2WwanDataConnectionEntry 22 }
+
+hm2WwanDataConnectionFailedRetryCurrent OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "The current number o data reconnect attempts made.
+                            Value 0 means no retries have been made."
+        ::= { hm2WwanDataConnectionEntry 23 }
+
+hm2WwanDataConnectionStatus OBJECT-TYPE
+        SYNTAX              Hm2ConnectionStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "Current status of this WWAN Data connection. If in 'Error'
+                            state then a reason for the error will be found under
+                            hm2WwanDataConnectionStatusErrorReason."
+        ::= { hm2WwanDataConnectionEntry 24 }
+
+hm2WwanDataConnectionStatusErrorReason OBJECT-TYPE
+        SYNTAX              HmLargeDisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "The reason why this WWAN Data connection is in 'Error'
+                            state."
+        ::= { hm2WwanDataConnectionEntry 25 }
+
+hm2WwanDataConnectionActivatedCount OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "How many times this WWAN Data connection was successfuly 
+                            established."
+        ::= { hm2WwanDataConnectionEntry 26 }
+
+hm2WwanDataConnectionStartTime OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "Time in seconds since Jan 1, 1970."
+        ::= { hm2WwanDataConnectionEntry 27 }
+
+hm2WwanDataConnectionUpTime OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "Time in seconds since this connection is active."
+        ::= { hm2WwanDataConnectionEntry 28 }
+
+hm2WwanDataConnectionTotalUpTime OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "Total time in which this connection was active."
+        ::= { hm2WwanDataConnectionEntry 29 }
+
+
+-- *************************************************************
+-- WWAN Data Plan Management Table
+-- *************************************************************
+--
+hm2WwanDataPlanTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  Hm2WwanDataPlanEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+                            "This table contains configuration options for each
+                            WWAN Data Plan per SIM card."
+        ::= { hm2WwanDataGroup 2 }
+
+ 
+hm2WwanDataPlanEntry OBJECT-TYPE
+        SYNTAX              Hm2WwanDataPlanEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+                            "The entries of the table."
+        INDEX               { hm2WwanDataPlanSimId } 
+        ::= { hm2WwanDataPlanTable 1 }
+
+
+Hm2WwanDataPlanEntry ::= SEQUENCE {
+        hm2WwanDataPlanSimId                Integer32,
+        hm2WwanDataPlanMonthlyLimit         Unsigned32,
+        hm2WwanDataPlanLimitMeasureUnit     Hm2LimitUnit, 
+        hm2WwanDataPlanWarningThreshold     Integer32, 
+        hm2WwanDataPlanReset                HmActionValue, 
+        hm2WwanDataPlanResetDay             Integer32, 
+        hm2WwanDataPlanLastReset            HmTimeSeconds1970, 
+        hm2WwanDataPlanCutoffThreshold      Integer32, 
+        hm2WwanDataPlanMonthlyUsageTx       Counter64, 
+        hm2WwanDataPlanMonthlyUsageRx       Counter64
+        }
+
+ 
+hm2WwanDataPlanSimId OBJECT-TYPE
+        SYNTAX              Hm2SimCardsListIndex
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         
+                            "SIM ID for which this connection entry belongs. Also
+                            used as the table's index."
+        ::= { hm2WwanDataPlanEntry 1 }
+
+hm2WwanDataPlanMonthlyLimit OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "The amount of data that the carrier will charge as
+                            per a WWAN data contract per month. A value 0 means
+                            unlimited."
+        DEFVAL              { 0 }
+        ::= { hm2WwanDataPlanEntry 2 }
+
+hm2WwanDataPlanLimitMeasureUnit OBJECT-TYPE
+        SYNTAX              Hm2LimitUnit
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "Which measure unit is used to interpret the volume
+                            of the data traffic. Possible units are: Kilobytes, 
+                            Megabytes, Gigabytes."
+        DEFVAL              { kb }
+        ::= { hm2WwanDataPlanEntry 3 }
+
+hm2WwanDataPlanWarningThreshold OBJECT-TYPE
+        SYNTAX              Integer32 (0..100)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "The percentage of the volume of data that when reached
+                            will generate a warning. A value of 0 will disable the
+                            warning."
+        DEFVAL              { 90 }
+        ::= { hm2WwanDataPlanEntry 4 }
+
+hm2WwanDataPlanReset OBJECT-TYPE
+        SYNTAX              HmActionValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "Manually reset the data plan counters. Only the value
+                            'action(2)' can be written and when read 'noop(1)' will
+                            always be returned."
+        DEFVAL              { noop }
+        ::= { hm2WwanDataPlanEntry 5 }
+
+hm2WwanDataPlanResetDay OBJECT-TYPE
+        SYNTAX              Integer32 (0..31)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "Which day of the month will be used to auto reset the data
+                            plan counters. A value of 0 will disable the reset action.
+                            The reset action will be performed at 00:00am in the 
+                            selected day."
+        DEFVAL              { 0 }
+        ::= { hm2WwanDataPlanEntry 6 }
+
+hm2WwanDataPlanLastReset OBJECT-TYPE
+        SYNTAX              HmTimeSeconds1970
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "Time in seconds since Jan 1st, 1970 when the last data
+                            plan counters were resetted."
+        ::= { hm2WwanDataPlanEntry 7 }
+
+hm2WwanDataPlanCutoffThreshold OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "The percentage of the volume of used data that when reached
+                            will completely disable any data connections associated with
+                            this SIM ID. A value of 0 will disable the cutoff."
+        DEFVAL              { 100 }
+        ::= { hm2WwanDataPlanEntry 8 }
+
+hm2WwanDataPlanMonthlyUsageTx OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "The amount of data that was transmitted since last reset. The 
+                            measure unit is the same as hm2WwanDataPlanLimitMeasureUnit."
+        ::= { hm2WwanDataPlanEntry 9 }
+
+hm2WwanDataPlanMonthlyUsageRx OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "The amount of data that was received since last reset. The
+                            measure unit is the same as hm2WwanDataPlanLimitMeasureUnit."
+        ::= { hm2WwanDataPlanEntry 10 }
+
+--
+-- *************************************************************
+-- Data Packet Stats Table
+-- *************************************************************
+--
+
+hm2WwanDataPacketStatsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  Hm2WwanDataPacketStatsEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+                            "This table contains packet statistics for each
+                            WWAN Data connection per SIM card."
+        ::= { hm2WwanDataGroup 3 }
+ 
+hm2WwanDataPacketStatsEntry OBJECT-TYPE
+        SYNTAX              Hm2WwanDataPacketStatsEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+                            "The entries of the table."
+        INDEX               { hm2WwanDataPacketStatsSimId } 
+        ::= { hm2WwanDataPacketStatsTable 1 }
+
+Hm2WwanDataPacketStatsEntry ::= SEQUENCE {
+        hm2WwanDataPacketStatsSimId                 Integer32,
+        hm2WwanDataPacketStatsTxOk                  Counter64, 
+        hm2WwanDataPacketStatsRxOk                  Counter64, 
+        hm2WwanDataPacketStatsTxErrors              Counter64, 
+        hm2WwanDataPacketStatsRxErrors              Counter64, 
+        hm2WwanDataPacketStatsTxOverflows           Counter64, 
+        hm2WwanDataPacketStatsRxOverflows           Counter64, 
+        hm2WwanDataPacketStatsTxBytesOk             Counter64, 
+        hm2WwanDataPacketStatsRxBytesOk             Counter64, 
+        hm2WwanDataPacketStatsTxDropped             Counter64, 
+        hm2WwanDataPacketStatsRxDropped             Counter64
+        }
+ 
+hm2WwanDataPacketStatsSimId OBJECT-TYPE
+        SYNTAX              Hm2SimCardsListIndex
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         
+                            "SIM ID for which this data connection packet statistics
+                            entry belongs to. Also used as the table's index."
+        ::= { hm2WwanDataPacketStatsEntry 1 }
+
+hm2WwanDataPacketStatsTxOk OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "The number of successfully transmitted data packets."
+        ::= { hm2WwanDataPacketStatsEntry 2 }
+
+hm2WwanDataPacketStatsRxOk OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "The number of successfully received data packets."
+        ::= { hm2WwanDataPacketStatsEntry 3 }
+
+hm2WwanDataPacketStatsTxErrors OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "The number of errors encountered during packet transmission."
+        ::= { hm2WwanDataPacketStatsEntry 4 }
+
+hm2WwanDataPacketStatsRxErrors OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "The number of errors encountered during packet reception."
+        ::= { hm2WwanDataPacketStatsEntry 5 }
+
+hm2WwanDataPacketStatsTxOverflows OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "The number of overflows encountered during packet transmission."
+        ::= { hm2WwanDataPacketStatsEntry 6 }
+
+hm2WwanDataPacketStatsRxOverflows OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "The number of overflows encountered during packet reception."
+        ::= { hm2WwanDataPacketStatsEntry 7 }
+
+hm2WwanDataPacketStatsTxBytesOk OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "The number of successfully transmitted bytes."
+        ::= { hm2WwanDataPacketStatsEntry 8 }
+
+hm2WwanDataPacketStatsRxBytesOk OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "The number of successfully received bytes."
+        ::= { hm2WwanDataPacketStatsEntry 9 }
+
+hm2WwanDataPacketStatsTxDropped OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "The number of packets dropped during transmission."
+        ::= { hm2WwanDataPacketStatsEntry 10 }
+
+hm2WwanDataPacketStatsRxDropped OBJECT-TYPE
+        SYNTAX              Counter64
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "The number of packets dropped during reception."
+        ::= { hm2WwanDataPacketStatsEntry 11 }
+
+--
+-- *************************************************************
+-- Sim Card Group Objects
+-- *************************************************************
+--
+
+--
+-- *************************************************************
+-- Sim Card Table
+-- *************************************************************
+--
+hm2WwanSimCardTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  Hm2WwanSimCardEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+                            "This table contains configuration options for each
+                            WWAN SIM card."
+        ::= { hm2WwanSimCardGroup 1 }
+
+ 
+hm2WwanSimCardEntry OBJECT-TYPE
+        SYNTAX              Hm2WwanSimCardEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+                            "The entries of the table."
+        INDEX               { hm2WwanSimCardSimId } 
+        ::= { hm2WwanSimCardTable 1 }
+
+
+Hm2WwanSimCardEntry ::= SEQUENCE {
+        hm2WwanSimCardSimId                 Integer32,
+        hm2WwanSimCardAdminStatus           HmEnabledStatus, 
+        hm2WwanSimCardRole                  Hm2SimCardRole, 
+        hm2WwanSimCardRoleCurrent           Hm2SimCardRole, 
+        hm2WwanSimCardStatus                Hm2SimCardStatus, 
+        hm2WwanSimCardSetActive             HmActionValue, 
+        hm2WwanSimCardPin1                  SnmpAdminString, 
+        hm2WwanSimCardPin1Mode              HmEnabledStatus, 
+        hm2WwanSimCardPin1Status            Hm2Pin1Status, 
+        hm2WwanSimCardPin1VerifyTries       Integer32, 
+        hm2WwanSimCardPin1UnblockTries      Integer32, 
+        hm2WwanSimCardPuk1                  SnmpAdminString, 
+        hm2WwanSimCardRoamingMode           HmEnabledStatus, 
+        hm2WwanSimCardIccid                 SnmpAdminString, 
+        hm2WwanSimCardImsi                  SnmpAdminString
+        }
+ 
+hm2WwanSimCardSimId OBJECT-TYPE
+        SYNTAX              Hm2SimCardsListIndex
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         
+                            "SIM ID for which this connection entry belongs. Also
+                            used as the table's index."
+        ::= { hm2WwanSimCardEntry 1 }
+
+hm2WwanSimCardAdminStatus OBJECT-TYPE
+        SYNTAX              HmEnabledStatus
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "Sim Card enable/disable function."
+        DEFVAL              { enable }
+        ::= { hm2WwanSimCardEntry 2 }
+
+hm2WwanSimCardRole OBJECT-TYPE
+        SYNTAX              Hm2SimCardRole
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "The role this Sim Card will be assigned. The role is
+                            important for failover scenarios configured under
+                            General Configuration Group. 'auto' setting will 
+                            automatically choose a role."
+        DEFVAL              { auto }
+        ::= { hm2WwanSimCardEntry 3 }
+
+hm2WwanSimCardRoleCurrent OBJECT-TYPE
+        SYNTAX              Hm2SimCardRole
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "The role this Sim Card is currently using."
+        ::= { hm2WwanSimCardEntry 4 }
+
+hm2WwanSimCardStatus OBJECT-TYPE
+        SYNTAX              Hm2SimCardStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "Sim Card Status information:
+                                * simPresent: the SIM is physicaly present.
+                                * simAbsent: the SIM is physicaly absent.
+                                * simLocked: the SIM is physicaly present
+                                             but was not unlocked using PIN1.
+                                * simUnlocked: the SIM is physicaly present
+                                               and it was unlocked unsing PIN1.
+                                * simInactive: the sim is physicaly present
+                                               but it is not used for data 
+                                               connections.
+                                * simActive: the sim is physicaly present and
+                                             is used for data connections."
+        ::= { hm2WwanSimCardEntry 5 }
+
+hm2WwanSimCardSetActive OBJECT-TYPE
+        SYNTAX              HmActionValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "Manual operation to set the active status of this
+                            sim card. When in active state this sim card will be
+                            used for establishing data connections."
+        DEFVAL              { noop }
+        ::= { hm2WwanSimCardEntry 6 }
+
+hm2WwanSimCardPin1 OBJECT-TYPE
+        SYNTAX              SnmpAdminString (SIZE(0|4..8))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "Sim Card's PIN1 code. PIN1 is used to unlock main Sim 
+                            functions which will allow Network Carrier Registration."
+        DEFVAL              { ''H }
+        ::= { hm2WwanSimCardEntry 7 }
+
+hm2WwanSimCardPin1Mode OBJECT-TYPE
+        SYNTAX              HmEnabledStatus
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "Allows to enable or disable PIN1 code. With PIN1 disabled
+                            the Sim Card will automatically unlock all it's functions."
+        ::= { hm2WwanSimCardEntry 8 }
+
+
+hm2WwanSimCardPin1Status OBJECT-TYPE
+        SYNTAX              Hm2Pin1Status
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "Pin1 status information:
+                                * NotVerified: Pin1 was not verified.
+                                * Verified: Pin1 was successfuly verified.
+                                * Blocked: Wrong Pin1 was used too many times
+                                           and the Sim Card blocked it.
+                                * Disabled: Pin1 was manually disabled or the
+                                            Sim Card does not requires it.
+                                * WrongCode: The configured Pin1 code is not 
+                                             accepted by the Sim Card unlock function."
+        ::= { hm2WwanSimCardEntry 9 }
+
+hm2WwanSimCardPin1VerifyTries OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "The amount of times a wrong Pin1 code can be used
+                            to unlock the Sim Card until it is blocked."
+        ::= { hm2WwanSimCardEntry 10 }
+
+hm2WwanSimCardPin1UnblockTries OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "The amount of times a wrong PUK1 code can be entered
+                            to unblock a PIN1 code."
+        ::= { hm2WwanSimCardEntry 11 }
+
+hm2WwanSimCardPuk1 OBJECT-TYPE
+        SYNTAX              SnmpAdminString (SIZE(0..8))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "PUK1 code is used to unblock a PIN1 code. Writing a PUK1
+                            value will attempt to unblock a PIN1 code if the PIN1 code
+                            is in 'Blocked' state. PUK1 code will not be saved.
+                            hm2WwanSimCardPin1UnblockTries is a counter on how many
+                            times a wrong PUK1 code can be entered. Empty value write
+                            operation will be ignored. New PIN code configured during
+                            the unblock operation will be the current PIN1 stored in 
+                            hm2WwanSimCardPin1 mib."
+        ::= { hm2WwanSimCardEntry 12 }
+
+hm2WwanSimCardRoamingMode OBJECT-TYPE
+        SYNTAX          HmEnabledStatus
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+                        "Roaming will allow the modem to perform registration
+                        with carriers other than the one that emitted the current
+                        SIM card. Data connections established when attached to
+                        Roaming partners will probably incur additional costs."
+        DEFVAL          { disable }
+        ::= { hm2WwanSimCardEntry 13 }
+
+hm2WwanSimCardIccid OBJECT-TYPE
+        SYNTAX              SnmpAdminString (SIZE(0|22))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         
+                            "Integrated Circuit Card Identifier is the international
+                            SIM's identifier. This value is preserved over reboots
+                            so that when a new SIM is inserted the operation can be 
+                            detected and the settings relevant for the old SIM can
+                            be resetted. The user can only read this mib value."
+        DEFVAL              { ''H }
+        ::= { hm2WwanSimCardEntry 14 }
+
+hm2WwanSimCardImsi OBJECT-TYPE
+        SYNTAX              SnmpAdminString (SIZE(0|15))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "International Mobile Subscriber Identity is an individual
+                            identifier on operator networks. Mobile network operators 
+                            connect mobile phone calls and communicate with their market
+                            SIM cards using their IMSIs."
+        ::= { hm2WwanSimCardEntry 15 }
+
+--
+-- *************************************************************
+-- Information Group Objects
+-- *************************************************************
+--
+hm2WwanCellularInformationGroup     OBJECT IDENTIFIER ::= { hm2WwanInformationGroup 1 }
+hm2WwanModemInformationGroup        OBJECT IDENTIFIER ::= { hm2WwanInformationGroup 2 }
+
+--
+-- *************************************************************
+-- Cellular Information Group Objects
+-- *************************************************************
+--
+hm2WwanCellularActiveSimId OBJECT-TYPE
+        SYNTAX          Hm2SimCardsListActive
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "The Sim Card id for the current active SIM:
+                           * '0' value means no SIM Card is active.
+                           * '1' value means Primary SIM Card is active.
+                           * '2' value means Backup SIM Card is active."
+        ::= { hm2WwanCellularInformationGroup 1 }
+
+hm2WwanCellularRegistration OBJECT-TYPE
+        SYNTAX          Hm2RegistrationStatus
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "The current status of the Sim's Carrier Registration."
+        ::= { hm2WwanCellularInformationGroup 2 }
+
+hm2WwanCellularOperator OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Network Operator Name"
+        ::= { hm2WwanCellularInformationGroup 3 }
+
+hm2WwanCellularNetwork OBJECT-TYPE
+        SYNTAX          Hm2CellularNetworks
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Current Cellular Network Technology being used."
+        ::= { hm2WwanCellularInformationGroup 4 }
+
+hm2WwanCellularMcc OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Mobile Country Code is a 3 digits code used to 
+                        identify the country where the Public Land 
+                        Mobile Network (PLMN) resides."
+        ::= { hm2WwanCellularInformationGroup 5 }
+
+hm2WwanCellularMnc OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Mobile Network Code is a 2 to 3 digits code used to 
+                        identify the Public Land Mobile Network (PLMN) 
+                        in that country."
+        ::= { hm2WwanCellularInformationGroup 6 }
+
+hm2WwanCellularLac OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Location area code together with PLMN (MCC + MNC) 
+                        creates an internationally unique identifier known 
+                        as Location Area Identity (LAI). The LAI is used 
+                        for location updating of the mobile subscribers."
+        ::= { hm2WwanCellularInformationGroup 7 }
+
+hm2WwanCellularBsic OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Base Station Identity Code is a code used in WWAN networks
+                        to uniquely identify a base station."
+        ::= { hm2WwanCellularInformationGroup 8 }
+
+hm2WwanCellularCellId OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "The identifier of the current used WWAN Cell."
+        ::= { hm2WwanCellularInformationGroup 9 }
+
+hm2WwanCellularBand OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "The current Cellular Band used for radio transmissions."
+        ::= { hm2WwanCellularInformationGroup 10 }
+
+hm2WwanCellularChannel OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "The current channel number within the Cellular Band
+                        used for radio transmissions. A value of 0 means the
+                        channel is not relevant to the network technology
+                        currently in use."
+        ::= { hm2WwanCellularInformationGroup 11 }
+
+hm2WwanCellularSignalStrength OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "In GSM/UMTS mobile networks signal strength is based 
+                        on RSSI (Received Signal Strength Indication) value 
+                        measuring the power level being received by the antena.
+                        The higher the RSSI the stronger the signal. A value 
+                        of -125 means 'no signal'."
+        ::= { hm2WwanCellularInformationGroup 12 }
+
+hm2WwanCellularSignalStrengthLte OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "In LTE mobile networks signal strength is based on 
+                        RSRP (Reference Signal Received Power) value."
+        ::= { hm2WwanCellularInformationGroup 13 }
+
+hm2WwanCellularSignalQuality OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "UMTS signal quality indicator based on ECIO
+                        (Energy to Interference Ratio)."
+        ::= { hm2WwanCellularInformationGroup 14 }
+
+hm2WwanCellularSignalQualityLte OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "LTE signal quality indicator based on RSRQ
+                        (Reference Signal Received Quality)."
+        ::= { hm2WwanCellularInformationGroup 15 }
+
+hm2WwanCellularRoamingStatus OBJECT-TYPE
+        SYNTAX          Hm2RoamingStatus
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Current Roaming status:
+                            * Home: registration done in home network.
+                            * Roaming: registration done in partner network in 
+                                       roaming mode. Roaming has to be admin enabled.
+                            * RoamingDisabled: no home network detected and
+                                               Roaming is admin disabled."
+        ::= { hm2WwanCellularInformationGroup 16 }
+
+hm2WwanCellularBitErrorRate OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Cellular transmission error rate displayed in hundredths 
+                        of percentage units. A value of 1000 means 10% bit error ratio."
+        ::= { hm2WwanCellularInformationGroup 17 }
+
+hm2WwanCellularCurrentTxRate OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Current channel TX rate displayed in kbps."
+        ::= { hm2WwanCellularInformationGroup 18 }
+
+hm2WwanCellularCurrentRxRate OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Current channel RX rate displayed in kbps."
+        ::= { hm2WwanCellularInformationGroup 19 }
+
+hm2WwanCellularMaxTxRate OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Maximum channel TX rate that can be achieved, 
+                        displayed in kbps."
+        ::= { hm2WwanCellularInformationGroup 20 }
+
+hm2WwanCellularMaxRxRate OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Maximum channel RX rate that can be achieved, 
+                        displayed in kbps."
+        ::= { hm2WwanCellularInformationGroup 21 }
+
+hm2WwanCellularDataTech OBJECT-TYPE
+        SYNTAX          Hm2CellularDataTech
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Data technology in use for the active
+                        data connection."
+        ::= { hm2WwanCellularInformationGroup 22 }
+
+--
+-- *************************************************************
+-- Modem Information Group
+-- *************************************************************
+--
+hm2WwanModemManufacturer OBJECT-TYPE
+        SYNTAX          SnmpAdminString(SIZE(0..128))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Radio Modem Manufacturer"
+        ::= { hm2WwanModemInformationGroup 1 }
+
+hm2WwanModemModel OBJECT-TYPE
+        SYNTAX          SnmpAdminString(SIZE(0..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "The model of the Radio Modem."
+        ::= { hm2WwanModemInformationGroup 2 }
+
+hm2WwanModemRevision OBJECT-TYPE
+        SYNTAX          SnmpAdminString(SIZE(0..128))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Modem Software version and revision."
+        ::= { hm2WwanModemInformationGroup 3 }
+
+hm2WwanModemImei OBJECT-TYPE
+        SYNTAX          SnmpAdminString(SIZE(0..20))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Internation Mobile Equipment Identity is a unique number
+                        given to mobile capable devices."
+        ::= { hm2WwanModemInformationGroup 4 }
+
+hm2WwanModemOperationalState OBJECT-TYPE
+        SYNTAX          Hm2ModemOperationalState
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "ONLINE: Modem is fully operational
+                        LOW_POWER: Modem has temporarily disabled RF
+                        OFFLINE: Modem has deactivated RF and is partially shutdown
+                        RESET: Modem is in the process of power cycling
+                        SHUTTING_DOWN: Modem is in the process of shutting down
+                        PERSISTENT_LOW_POWER: Modem has disabled RF and state persists after reset
+                        UNKNOWN: Unknown state."
+        ::= { hm2WwanModemInformationGroup 5 }
+
+
+
+--
+-- *************************************************************
+-- WWAN Traps
+-- *************************************************************
+--
+hm2WwanRoamingActiveTrap NOTIFICATION-TYPE
+    OBJECTS         {
+                        hm2WwanCellularRoamingStatus, 
+                        hm2WwanCellularOperator, 
+                        hm2WwanCellularActiveSimId
+                    }
+    STATUS          current
+    DESCRIPTION     
+                    "Notification generated whenever Roaming status will
+                    become active."
+    ::= { hm2WwanMibNotifications 1 }
+ 
+hm2WwanLtePersistenceSwitchTrap NOTIFICATION-TYPE
+    OBJECTS         {
+                        hm2WwanLtePersistence, 
+                        hm2WwanLtePersistenceInterval, 
+                        hm2WwanCellularActiveSimId
+                    }
+    STATUS          current
+    DESCRIPTION     
+                    "Notification generated when LTE Persistence function
+                    will perform a switch back to LTE."
+    ::= { hm2WwanMibNotifications 2 }
+
+hm2WwanCelluarRegistrationFailedTrap NOTIFICATION-TYPE
+    OBJECTS         {
+                        hm2WwanCellularRegistration, 
+                        hm2WwanCellularActiveSimId
+                    }
+    STATUS          current
+    DESCRIPTION     
+                    "Notification generated whenever a Cellular Network
+                    Registration failure occurs."
+    ::= { hm2WwanMibNotifications 3 }
+
+hm2WwanDataConnectionSetupTrap NOTIFICATION-TYPE
+    OBJECTS         {
+                        hm2WwanDataConnectionStatus, 
+                        hm2WwanCellularActiveSimId, 
+                        hm2WwanDataConnectionApnCurrent
+                    }
+    STATUS          current
+    DESCRIPTION     
+                    "Notification generated whenever a Cellular Data
+                    Connection will change its status."
+    ::= { hm2WwanMibNotifications 4 }
+
+hm2WwanDataPlanWarningThresholdTrap NOTIFICATION-TYPE
+    OBJECTS         {
+                        hm2WwanDataPlanWarningThreshold, 
+                        hm2WwanCellularActiveSimId, 
+                        hm2WwanDataPlanMonthlyLimit, 
+                        hm2WwanDataPlanLimitMeasureUnit, 
+                        hm2WwanDataPlanMonthlyUsageTx, 
+                        hm2WwanDataPlanMonthlyUsageRx
+                    }
+    STATUS          current
+    DESCRIPTION     
+                    "Notification generated when the Data Plan 
+                    Warning Threshold is reached. The trap is 
+                    resent after each 25% of remaining data
+                    is consumed all the way up until the
+                    Data Plan Limit is reached."
+    ::= { hm2WwanMibNotifications 5 }
+
+hm2WwanSimCardPin1StatusTrap NOTIFICATION-TYPE
+    OBJECTS         {
+                        hm2WwanSimCardPin1Status, 
+                        hm2WwanCellularActiveSimId, 
+                        hm2WwanSimCardRoleCurrent, 
+                        hm2WwanSimCardStatus
+                    }
+    STATUS          current
+    DESCRIPTION     
+                    "Notification generated whenever SIM Card
+                    PIN1 access functions are used and their 
+                    status changes."
+    ::= { hm2WwanMibNotifications 6 }
+
+hm2WwanBackupSimFailoverConnectionTrap NOTIFICATION-TYPE
+    OBJECTS         {
+                        hm2WwanCellularActiveSimId, 
+                        hm2WwanSimCardRoleCurrent
+                    }
+    STATUS          current
+    DESCRIPTION     
+                    "Notification generated whenever a data
+                    connection on the Primary SIM Card fails
+                    and a failover to Backup SIM Card is done."
+    ::= { hm2WwanMibNotifications 7 }
+
+hm2WwanBackupSimFailoverRegistrationTrap NOTIFICATION-TYPE
+    OBJECTS         {
+                        hm2WwanCellularActiveSimId, 
+                        hm2WwanSimCardRoleCurrent
+                    }
+    STATUS          current
+    DESCRIPTION     
+                    "Notification generated whenever a cellular
+                    network registration the Primary SIM Card fails
+                    and a failover to Backup SIM Card is done."
+    ::= { hm2WwanMibNotifications 8 }
+
+hm2WwanBackupSimFailoverRoamingTrap NOTIFICATION-TYPE
+    OBJECTS         {
+                        hm2WwanCellularActiveSimId, 
+                        hm2WwanSimCardRoleCurrent
+                    }
+    STATUS          current
+    DESCRIPTION     
+                    "Notification generated whenever a cellular
+                    network registration to a Roaming Carrier 
+                    is detected on the Primary SIM Card and as
+                    a result a failover to the Backup SIM Card is done."
+    ::= { hm2WwanMibNotifications 9 }
+
+hm2WwanBackupSimFailoverDataLimitTrap NOTIFICATION-TYPE
+    OBJECTS         {
+                        hm2WwanCellularActiveSimId, 
+                        hm2WwanSimCardRoleCurrent
+                    }
+    STATUS          current
+    DESCRIPTION     
+                    "Notification generated when the current
+                    Data Plan Limit is reached and a failover 
+                    to the Backup SIM Card is done."
+    ::= { hm2WwanMibNotifications 10 }
+
+hm2WwanModemResetFailoverRegistrationTrap NOTIFICATION-TYPE
+    OBJECTS         {
+                        hm2WwanCellularActiveSimId, 
+                        hm2WwanSimCardRoleCurrent
+                    }
+    STATUS          current
+    DESCRIPTION     
+                    "Notification generated when cellular network
+                    registration fails on the Primary SIM Card and
+                    also the fallback to Backup SIM Card registration
+                    fails."
+    ::= { hm2WwanMibNotifications 11 }
+
+END

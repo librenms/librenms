@@ -1,0 +1,654 @@
+HM2-PLATFORM-RADIUS-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann Platform Radius MIB
+-- ***********************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, 
+    IpAddress, 
+    Unsigned32,
+    Integer32                           FROM SNMPv2-SMI
+    RowStatus, DisplayString            FROM SNMPv2-TC
+    InetAddress, InetAddressType        FROM INET-ADDRESS-MIB
+    InterfaceIndexOrZero           	    FROM IF-MIB
+    hm2PlatformMibs, HmEnabledStatus	FROM HM2-TC-MIB;
+
+hm2PlatformRadius MODULE-IDENTITY
+	LAST-UPDATED "201306050000Z" -- June 05, 2013
+   	ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+          "The Hirschmann Private Platform2 MIB for Client Radius Authentication and Accounting.
+           Copyright (C) 2011-2013. All Rights Reserved."
+    -- Revision history.
+    REVISION
+          "201306050000Z" -- June 05, 2013
+    DESCRIPTION
+          "Range of hm2AgentRadiusServerRetransmit adjusted.
+           Behavior of hm2AgentRadiusServerTimeout, hm2AgentRadiusServerRetransmit,
+           hm2AgentRadiusServerDeadtime and hm2AgentRadiusServerSourceIPAddr clarified."
+    REVISION
+          "201303010000Z" -- March 01, 2013
+    DESCRIPTION
+          "Shared secret key length updated. Radius source interface related object added."
+    REVISION
+          "201106210000Z"
+    DESCRIPTION
+          "Initial version."
+    ::= { hm2PlatformMibs 8 }
+
+    --**************************************************************************************
+    -- hm2AgentRadiusConfigGroup
+    --
+    --**************************************************************************************
+
+    hm2AgentRadiusConfigGroup 				 OBJECT IDENTIFIER ::= { hm2PlatformRadius 1 }
+    hm2SNMPExtensionRadiusGroup				 OBJECT IDENTIFIER ::= { hm2PlatformRadius 2 }
+
+    hm2AgentRadiusMaxTransmit OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..15)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Maximum number of retransmissions of a RADIUS request packet"
+         DEFVAL { 4 }
+         ::= { hm2AgentRadiusConfigGroup 1 }
+
+    hm2AgentRadiusTimeout OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..30)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Time out duration (in seconds) before packets are retransmitted."
+         DEFVAL { 5 }
+         ::= { hm2AgentRadiusConfigGroup 2 } 
+         
+    hm2AgentRadiusAccountingMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Identifies if RADIUS accounting has been enabled or not."
+         DEFVAL { disable }
+         ::= { hm2AgentRadiusConfigGroup 3 }
+         
+    hm2AgentRadiusStatsClear OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "When set to enable(1), all RADIUS statistics will be reset."
+         DEFVAL { disable }
+         ::= { hm2AgentRadiusConfigGroup 4 }
+         
+    hm2AgentRadiusAccountingIndexNextValid OBJECT-TYPE
+         SYNTAX      Integer32 (0|1..2147483647)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates the next valid index into the hm2AgentRadiusAccountingConfigTable 
+                     for creation.  If no additional entries are allowed, this will be 0."
+         ::= { hm2AgentRadiusConfigGroup 5 }
+
+    --**************************************************************************************
+    -- hm2AgentRadiusAccountingConfigTable
+    --
+    --**************************************************************************************
+
+    hm2AgentRadiusAccountingConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentRadiusAccountingConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Table with information about RADIUS accounting server IP
+                     addresses, port numbers and shared secrets. Only one entry is
+                     supported at this time."
+         ::= { hm2AgentRadiusConfigGroup 6 }
+
+    hm2AgentRadiusAccountingConfigEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentRadiusAccountingConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Entry consisting of configuration data for a RADIUS accounting server."
+         INDEX       { hm2AgentRadiusAccountingServerIndex }
+         ::= { hm2AgentRadiusAccountingConfigTable 1 }
+         
+    Hm2AgentRadiusAccountingConfigEntry ::=
+         SEQUENCE {
+         hm2AgentRadiusAccountingServerIndex
+                 Integer32,
+         hm2AgentRadiusAccountingServerAddress
+                 InetAddress,
+         hm2AgentRadiusAccountingServerAddressType
+                 InetAddressType,
+         hm2AgentRadiusAccountingPort
+                 Unsigned32,
+         hm2AgentRadiusAccountingSecret
+                 DisplayString,
+         hm2AgentRadiusAccountingStatus
+                 RowStatus,
+         hm2AgentRadiusAccountingServerName
+                 DisplayString,
+         hm2AgentRadiusAccountingServerAddrType
+                 InetAddressType,
+         hm2AgentRadiusAccountingServerAddr
+                 InetAddress
+         }
+
+    hm2AgentRadiusAccountingServerIndex OBJECT-TYPE
+         SYNTAX      Integer32 (1..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Unique index of the configured RADIUS accounting server.  The next valid
+                     value of this object for creation is specified by 
+                     hm2AgentRadiusAccountingIndexNextValid."
+         ::= { hm2AgentRadiusAccountingConfigEntry 1 }
+
+    hm2AgentRadiusAccountingServerAddress OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  read-create
+         STATUS      deprecated
+         DESCRIPTION
+                     "This object is deprecated in favour of hm2AgentRadiusAccountingServerAddr.
+                     IP Address of the configured RADIUS accounting server.
+                     This object cannot be changed after creation."
+         ::= { hm2AgentRadiusAccountingConfigEntry 2 }
+     
+   hm2AgentRadiusAccountingServerAddressType OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  read-create
+         STATUS      deprecated
+         DESCRIPTION
+                     "This object is deprecated in favour of hm2AgentRadiusAccountingServerAddrType.
+                     IP Address Type of the configured RADIUS accounting server.
+                     This object cannot be changed after creation."
+         ::= { hm2AgentRadiusAccountingConfigEntry 3 }
+
+    hm2AgentRadiusAccountingPort OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..65535)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Port number for the RADIUS accounting server."
+         DEFVAL { 1813 }
+         ::= { hm2AgentRadiusAccountingConfigEntry 4 }
+
+    hm2AgentRadiusAccountingSecret OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0|1..64))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Configured shared sercret for the RADIUS accounting server."
+         ::= { hm2AgentRadiusAccountingConfigEntry 5 }
+
+    hm2AgentRadiusAccountingStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Creates or destroys a RADIUS accounting server entry.
+                     During creation, the next available index is specified by the
+                     hm2AgentRadiusAccountingIndexNextValid object.  Rows creation using
+                     a different value for hm2AgentRadiusAccountingServerIndex will fail.
+                     
+                     active(1)       - This entry is active.
+                     notInService(2) - This entry is administratively disabled.
+                     notReady(3)     - DNS resolution of host name has failed.
+                     createAndGo(4)  - Creates a new entry.
+                     createAndWait(5)- Creates a new entry.
+                     destroy(6)      - Deletes an entry."
+         ::= { hm2AgentRadiusAccountingConfigEntry 6 }
+
+    hm2AgentRadiusAccountingServerName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..32))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Configured identification name for the RADIUS accounting
+                      server."
+         ::= { hm2AgentRadiusAccountingConfigEntry 7 }
+
+    hm2AgentRadiusAccountingServerAddrType OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Inet address type of the configured RADIUS accounting server.
+                     This object cannot be changed after creation."
+         ::= { hm2AgentRadiusAccountingConfigEntry 248 }
+
+    hm2AgentRadiusAccountingServerAddr OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Inet address of the configured RADIUS accounting server.
+                     This object cannot be changed after creation."
+         ::= { hm2AgentRadiusAccountingConfigEntry 249 }
+
+    --**************************************************************************************
+    
+    hm2AgentRadiusServerIndexNextValid OBJECT-TYPE
+         SYNTAX      Integer32 (0|1..2147483647)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates the next valid index into the hm2AgentRadiusServerConfigTable 
+                     for creation.  If no additional entries are allowed, this will be 0."
+         ::= { hm2AgentRadiusConfigGroup 7 }
+    
+    --**************************************************************************************
+    -- hm2AgentRadiusServerConfigTable
+    --
+    --**************************************************************************************
+
+    hm2AgentRadiusServerConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentRadiusServerConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Table with information about RADIUS authentication server IP
+                     addresses, port numbers and shared secrets."
+         ::= { hm2AgentRadiusConfigGroup 8 }
+
+    hm2AgentRadiusServerConfigEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentRadiusServerConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Entry consisting of configuration data for a RADIUS 
+                     authentication server."
+         INDEX       { hm2AgentRadiusServerIndex }
+         ::= { hm2AgentRadiusServerConfigTable 1 }
+         
+    Hm2AgentRadiusServerConfigEntry ::=
+         SEQUENCE {
+         hm2AgentRadiusServerIndex
+                 Integer32,
+         hm2AgentRadiusServerAddressType
+                 InetAddressType,
+         hm2AgentRadiusServerPort
+                 Unsigned32,
+         hm2AgentRadiusServerSecret
+                 DisplayString,
+         hm2AgentRadiusServerPrimaryMode
+                 HmEnabledStatus,
+         hm2AgentRadiusServerCurrentMode
+                 INTEGER,
+         hm2AgentRadiusServerMsgAuth
+                 HmEnabledStatus,
+         hm2AgentRadiusServerRowStatus
+                 RowStatus,
+         hm2AgentRadiusServerName
+                 DisplayString,
+         hm2AgentRadiusServerInetAddress
+                 InetAddress,
+         hm2AgentRadiusServerTimeout               
+                 Unsigned32,
+         hm2AgentRadiusServerRetransmit            
+                 Unsigned32,
+         hm2AgentRadiusServerDeadtime              
+                 Unsigned32,
+         hm2AgentRadiusServerSourceIPAddr          
+                 IpAddress,
+         hm2AgentRadiusServerPriority              
+                 Unsigned32,
+         hm2AgentRadiusServerUsageType             
+                 INTEGER,
+         hm2AgentRadiusServerInetAddrType
+                 InetAddressType,
+         hm2AgentRadiusServerInetAddr
+         		 InetAddress
+         }
+
+    hm2AgentRadiusServerIndex OBJECT-TYPE
+         SYNTAX      Integer32 (1..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Unique index of the configured RADIUS server"
+         ::= { hm2AgentRadiusServerConfigEntry 1 }
+  
+    hm2AgentRadiusServerAddressType OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  read-create
+         STATUS      deprecated
+         DESCRIPTION
+                     "This object is deprecated in favour of hm2AgentRadiusServerInetAddrType.
+                     IP Address Type of the configured RADIUS server.
+                     This object cannot be changed after creation."
+         ::= { hm2AgentRadiusServerConfigEntry 3 }
+
+    hm2AgentRadiusServerPort OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..65535)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Port number for the RADIUS server."
+         DEFVAL { 1812 }
+         ::= { hm2AgentRadiusServerConfigEntry 4 }
+
+    hm2AgentRadiusServerSecret OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0|1..64))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Configured shared sercret for the RADIUS server."
+         ::= { hm2AgentRadiusServerConfigEntry 5 }
+
+    hm2AgentRadiusServerPrimaryMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Configure the RADIUS server to be the primary server. If there is any 
+                     other server that is configured to be primary, that server is set to be 
+                     a seconday server and this entry is set primary."
+         ::= { hm2AgentRadiusServerConfigEntry 6 }
+
+    hm2AgentRadiusServerCurrentMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     yes(1),
+                     no(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicate if the RADIUS server is the current server in use for
+                     authentication."
+         ::= { hm2AgentRadiusServerConfigEntry 7 }
+
+    hm2AgentRadiusServerMsgAuth OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enable or disable the message authenticator attribute for this 
+                     RADIUS server."
+         ::= { hm2AgentRadiusServerConfigEntry 8 }
+
+    hm2AgentRadiusServerRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Creates or destroys a RADIUS authentication server entry.
+                     During creation, the next available index is specified by the
+                     hm2AgentRadiusServerIndexNextValid object.  Rows creation using
+                     a different value for hm2AgentRadiusServerIndex will fail.
+                     
+                     active(1)       - This entry is active.
+                     notInService(2) - This entry is administratively disabled.
+                     notReady(3)     - DNS resolution of host name has failed.
+                     createAndGo(4)  - Creates a new entry.
+                     createAndWait(5)- Creates a new entry.
+                     destroy(6)      - Deletes an entry."
+         ::= { hm2AgentRadiusServerConfigEntry 9 }
+
+    hm2AgentRadiusServerName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..32))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Configured identification name for the RADIUS server."
+         ::= { hm2AgentRadiusServerConfigEntry 10 }
+
+    hm2AgentRadiusServerInetAddress OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  read-create
+         STATUS      deprecated
+         DESCRIPTION
+                     "This object is deprecated in favour of hm2AgentRadiusServerInetAddr.
+                     IP Address of the configured RADIUS server.
+                     This object cannot be changed after creation."
+         ::= { hm2AgentRadiusServerConfigEntry 11 }
+  
+    hm2AgentRadiusServerTimeout            OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..30)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Time out duration (in seconds) before packets are retransmitted.
+                      Note that hm2AgentRadiusTimeout will override this MIB object:
+                      - During row creation, hm2AgentRadiusTimeout specifies the default value.
+                      - Writing to hm2AgentRadiusTimeout will also update the value of this MIB
+                        object for all existing rows."
+         ::= { hm2AgentRadiusServerConfigEntry 12 }
+
+    hm2AgentRadiusServerRetransmit         OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..15)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Maximum number of retransmissions of a RADIUS request packet																																													
+                      Note that hm2AgentRadiusMaxTransmit will override this MIB object:
+                      - During row creation, hm2AgentRadiusMaxTransmit specifies the default value.
+                      - Writing to hm2AgentRadiusMaxTransmit will also update the value of this MIB
+                        object for all existing rows."
+         ::= { hm2AgentRadiusServerConfigEntry 13 }
+
+    hm2AgentRadiusServerDeadtime         OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..2000)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Length of time (in minutes) for which a RADIUS server is skipped over by transaction requests.
+                      Note that hm2AgentRadiusDeadTime will override this MIB object:
+                      - During row creation, hm2AgentRadiusDeadTime specifies the default value.
+                      - Writing to hm2AgentRadiusDeadTime will also update the value of this MIB
+                        object for all existing rows."
+         ::= { hm2AgentRadiusServerConfigEntry 14 }
+
+    hm2AgentRadiusServerSourceIPAddr       OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Source IP address that will be used for the communication with RADIUS servers.
+                      Note that hm2AgentRadiusSourceIPAddr will override this MIB object:
+                      - During row creation, hm2AgentRadiusSourceIPAddr specifies the default value.
+                      - Writing to hm2AgentRadiusSourceIPAddr will also update the value of this MIB
+                        object for all existing rows."
+         ::= { hm2AgentRadiusServerConfigEntry 15 }
+
+    hm2AgentRadiusServerPriority   OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..65535)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Priority specifies the order in which the servers will be used, where 0 is the highest
+                     priority in radius server config mode."
+         DEFVAL { 0 }
+         ::= { hm2AgentRadiusServerConfigEntry 16 }
+
+    hm2AgentRadiusServerUsageType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     all(1),
+                     login(2),
+                     dot1x(3)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Specify the usage type of the server."
+         DEFVAL  { all }
+         ::= { hm2AgentRadiusServerConfigEntry 17 }
+
+    hm2AgentRadiusServerInetAddrType OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Inet address type of the configured RADIUS server.
+                     This object cannot be changed after creation."
+         ::= { hm2AgentRadiusServerConfigEntry 248 }
+         
+    hm2AgentRadiusServerInetAddr OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Inet address of the configured RADIUS server.
+                     This object cannot be changed after creation."
+         ::= { hm2AgentRadiusServerConfigEntry 249 }
+
+    --**************************************************************************************
+
+    hm2AgentRadiusAuthenticationServers OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of RADIUS authentication servers that have been configured."         
+         ::= { hm2AgentRadiusConfigGroup 9 }
+    
+    hm2AgentRadiusAccountingServers OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of RADIUS accounting servers that have been configured."         
+         ::= { hm2AgentRadiusConfigGroup 10 }
+    
+    hm2AgentRadiusNamedAuthenticationServerGroups OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of configured RADIUS named authentication server groups."         
+         ::= { hm2AgentRadiusConfigGroup 11 }
+    
+    hm2AgentRadiusNamedAccountingServerGroups OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of configured RADIUS named accounting server groups."         
+         ::= { hm2AgentRadiusConfigGroup 12 }
+    
+    hm2AgentRadiusDeadTime OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..2000)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Length of time (in minutes) for which a RADIUS server is skipped over by transaction requests."
+         DEFVAL { 1 }
+         ::= { hm2AgentRadiusConfigGroup 13 }
+
+    hm2AgentRadiusSourceIPAddr OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Source IP address that will be used for the communication with RADIUS servers."
+         DEFVAL 	{ '00000000'H }
+         ::= { hm2AgentRadiusConfigGroup 15 }
+
+    hm2AgentRadiusNasIpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Used to set the NAS-IP address for the radius server."
+         DEFVAL 	{ '00000000'H }
+         ::= { hm2AgentRadiusConfigGroup  16 }
+
+    hm2AgentAuthorizationNetworkRadiusMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Used to enable/disable VLAN assignment mode."
+         DEFVAL  { disable }
+         ::= { hm2AgentRadiusConfigGroup 17}
+
+   hm2AgentRadiusSourceInterface OBJECT-TYPE
+       SYNTAX      InterfaceIndexOrZero
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A source-interface selection on an Interface Index (like vlan based
+               routing interface, port based routing interface, loopback interface).
+               A non-zero value indicates ifIndex for the corresponding interface 
+               entry in the ifTable is selected. A zero value indicates the 
+               source-interface un-selection.
+               The frames will not necessarily be sent on this interface, only the
+               IP address of the interface will be used as source."
+       DEFVAL { 0 }
+       ::= { hm2AgentRadiusConfigGroup 18 }
+
+    --**************************************************************************************
+    -- hm2SNMPExtensionRadiusGroup
+    --**************************************************************************************
+
+   hm2SNMPExtensionRadiusVLANAssignModeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the VLAN assignment mode contains an invalid value. It can
+                       only be enabled or disabled."
+           ::= { hm2SNMPExtensionRadiusGroup 1 }
+
+   hm2SNMPExtensionRadiusServerDeadTimeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the radius authentication server entry contains
+                        an invalid value for dead time that cannot be processed."
+           ::= { hm2SNMPExtensionRadiusGroup 2 }
+
+   hm2SNMPExtensionRadiusServerSecretInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the radius authentication server entry contains
+                        an invalid value for secret that cannot be processed."
+           ::= { hm2SNMPExtensionRadiusGroup 3 }
+
+   hm2SNMPExtensionRadiusServerPrimaryModeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the radius authentication server entry contains
+                        an invalid value for primary server that cannot be processed."
+           ::= { hm2SNMPExtensionRadiusGroup 4 }
+
+   hm2SNMPExtensionRadiusServerNameInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the radius authentication server entry contains
+                        an invalid value for server name that cannot be processed."
+           ::= { hm2SNMPExtensionRadiusGroup 5 }
+
+   hm2SNMPExtensionRadiusRetransmitInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the radius global entry contains an invalid value
+                        for retransmits (max.) that cannot be processed."
+           ::= { hm2SNMPExtensionRadiusGroup 6 }
+
+   hm2SNMPExtensionRadiusTimeoutInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the radius global entry contains an invalid value
+                        for timeout(s) that cannot be processed."
+           ::= { hm2SNMPExtensionRadiusGroup 7 }
+
+   hm2SNMPExtensionRadiusNASIPAddrInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the radius global entry contains an invalid value
+                        for NAS IP address(attribute 4) that cannot be processed."
+           ::= { hm2SNMPExtensionRadiusGroup 8 }
+
+   hm2SNMPExtensionRadiusServerMSGAuthInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the message authenticator contains an invalid value. It can
+                       only be enabled or disabled."
+           ::= { hm2SNMPExtensionRadiusGroup 9 }
+
+   hm2SNMPExtensionRadiusServerUsageTypeInvalid OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that the entry for server usage type is invalid. It can
+                       only have values 'all' or 'login'."
+           ::= { hm2SNMPExtensionRadiusGroup 10 }
+
+END

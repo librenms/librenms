@@ -1,0 +1,396 @@
+HM2-PLATFORM-TIMERANGE-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann Platform Timerange MIB
+-- ***********************************************************
+--
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	Integer32                     FROM SNMPv2-SMI
+	Unsigned32                    FROM SNMPv2-SMI
+	RowStatus, DisplayString      FROM SNMPv2-TC
+	TEXTUAL-CONVENTION            FROM SNMPv2-TC
+	hm2PlatformMibs               FROM HM2-TC-MIB;
+	
+	
+	hm2PlatformTimeRange MODULE-IDENTITY
+	LAST-UPDATED "201101260000Z" -- 26 January 2011 12:00:00 GMT
+	ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+	DESCRIPTION
+		"The Hirschmann MIB for Time Ranges.
+	     Copyright (C) 2011. All Rights Reserved."
+	REVISION
+		"201101260000Z" -- 26 January 2011 12:00:00 GMT
+	DESCRIPTION
+		"Initial version."
+		
+	::= { hm2PlatformMibs 53 }
+	
+hm2AgentTimeRangeGroup OBJECT IDENTIFIER ::= {hm2PlatformTimeRange 1}
+
+--**************************************************************************************
+  Hm2AgentTimeRangeAbsoluteDateAndTime ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT
+      "2d-1d-1d,1d:1d"
+    STATUS current
+    DESCRIPTION
+	  "A date-time specification for absolute time entry in a time range.
+	
+	  field  octets  contents                  range 
+	  -----  ------  --------                  -----
+	    1     1-2    year                      0..65536
+	    2      3     month                     1..12
+	    3      4     day                       1..31
+	    4      5     hour                      0..23
+	    5      6     minutes                   0..59
+	    
+	  For example, Oct 9, 2009 at 1:30 PM would be
+	  displayed as:
+	  
+	                  2009-10-9,13:30."
+    SYNTAX OCTET STRING (SIZE (6))
+    
+Hm2AgentTimeRangePeriodicTime ::= TEXTUAL-CONVENTION
+  DISPLAY-HINT
+	"1d:1d"
+  STATUS current
+  DESCRIPTION
+    "A time specification for periodic time entry in a time range.
+    
+	field  octets  contents                  range
+	-----  ------  --------                  -----
+	  1       1    hour                      0..23
+	  1       1    minutes                   0..59
+	
+	For example,1:30 PM would be 
+	displayed as: 13:30."
+  SYNTAX OCTET STRING (SIZE (2))
+  
+hm2AgentTimeRangeIndexNextFree OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION 
+                 "This object contains an unused value for the hm2AgentTimeRangeIndex
+                  to be used when creating a new Hm2AgentTimeRange. A value of zero
+                  indicates the Hm2AgentTimeRange table is full."
+     ::= { hm2AgentTimeRangeGroup 1 }
+	                  
+hm2AgentTimeRangeAdminMode OBJECT-TYPE
+	   SYNTAX      INTEGER {
+				   enable(1),
+				   disable(2)
+				}
+	   MAX-ACCESS  read-write
+	   STATUS      current
+	   DESCRIPTION
+				   "TimeRange admin mode:
+				   enable - enable TimeRange
+				   disable - disable TimeRange."
+	   DEFVAL { enable }
+  ::= { hm2AgentTimeRangeGroup 248 }	                  
+
+--*************************************************************************
+
+hm2AgentTimeRangeTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF Hm2AgentTimeRangeEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION 
+                 "A table of Hm2AgentTimeRange instances."
+     ::= { hm2AgentTimeRangeGroup 2 }
+
+hm2AgentTimeRangeEntry OBJECT-TYPE
+     SYNTAX      Hm2AgentTimeRangeEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "hm2AgentTimeRangeIndex and hm2AgentTimeRangeName must be set to
+                  complete a new hm2AgentTimeRangeEntry instance"
+                  
+     INDEX       { hm2AgentTimeRangeIndex }
+     ::= { hm2AgentTimeRangeTable 1 }
+
+Hm2AgentTimeRangeEntry ::= SEQUENCE {
+       hm2AgentTimeRangeIndex
+           Unsigned32,
+       hm2AgentTimeRangeName
+           DisplayString,
+       hm2AgentTimeRangeOperState
+           INTEGER,
+       hm2AgentTimeRangeStatus
+           RowStatus
+       }
+       
+hm2AgentTimeRangeIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "The Hm2AgentTimeRange table index this instance is associated with."
+     ::= { hm2AgentTimeRangeEntry 1 }
+	
+hm2AgentTimeRangeName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE(1..31))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+                 "The name of this Hm2AgentTimeRange entry, which must consist of
+                  1 to 31 alphanumeric characters and uniquely identify
+                  this Hm2AgentTimeRange.
+                  This object must be set to complete a new Hm2AgentTimeRange
+                  row instance."
+     ::= { hm2AgentTimeRangeEntry 2 }
+	
+hm2AgentTimeRangeOperState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                           active(0),
+                           inactive(1)
+                         }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "Operating status of the time-range. It depends on the current time
+                  and the periodic and absolute time entries defined in the time-range"
+     ::= { hm2AgentTimeRangeEntry 3 }
+	
+hm2AgentTimeRangeStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+                 "Status of this instance.
+                  active(1) - this Hm2AgentTimeRange instance is active
+                  createAndGo(4) - set to this value to create an instance
+                  destroy(6) - set to this value to delete an instance"
+     ::= { hm2AgentTimeRangeEntry 4 }
+
+
+
+--*************************************************************************
+
+
+
+--*************************************************************************
+-- Time Range Entry tables
+--***************************************************************************
+
+hm2AgentTimeRangeAbsoluteTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF Hm2AgentTimeRangeAbsoluteEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "A table of absolute entries for time ranges"
+     ::= { hm2AgentTimeRangeGroup 3 }
+	 
+hm2AgentTimeRangeAbsoluteEntry OBJECT-TYPE
+     SYNTAX      Hm2AgentTimeRangeAbsoluteEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "A table of absolute entries for time ranges. Atleast one of
+                  hm2AgentTimeRangeAbsoluteStartDateAndTime and hm2AgentTimeRangeAbsoluteEndDateAndTime
+                  must be set to complete a new Absolute entry instance."
+                  
+     INDEX       { hm2AgentTimeRangeIndex, hm2AgentTimeRangeAbsoluteEntryIndex }
+     ::= { hm2AgentTimeRangeAbsoluteTable 1 }
+	 
+Hm2AgentTimeRangeAbsoluteEntry ::= SEQUENCE {
+       hm2AgentTimeRangeAbsoluteEntryIndex
+                Integer32,
+       hm2AgentTimeRangeAbsoluteStartDateAndTime
+                Hm2AgentTimeRangeAbsoluteDateAndTime,
+       hm2AgentTimeRangeAbsoluteEndDateAndTime
+                Hm2AgentTimeRangeAbsoluteDateAndTime,
+       hm2AgentTimeRangeAbsoluteStatus
+                RowStatus
+       }
+       
+hm2AgentTimeRangeAbsoluteEntryIndex OBJECT-TYPE
+     SYNTAX      Integer32 (0..10)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "The index of this absolute time entry within time range."
+     ::= { hm2AgentTimeRangeAbsoluteEntry 1 }
+     
+hm2AgentTimeRangeAbsoluteStartDateAndTime OBJECT-TYPE
+     SYNTAX      Hm2AgentTimeRangeAbsoluteDateAndTime
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+                 "The start time for an absolute entry in the time range"
+     ::= { hm2AgentTimeRangeAbsoluteEntry 2 }
+     
+hm2AgentTimeRangeAbsoluteEndDateAndTime OBJECT-TYPE
+     SYNTAX      Hm2AgentTimeRangeAbsoluteDateAndTime
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+                 " The end time for an absolute entry in the time range."
+     ::= { hm2AgentTimeRangeAbsoluteEntry 3 }
+     
+hm2AgentTimeRangeAbsoluteStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+                 "Status of this instance.
+                 
+                  active(1) - this hm2AgentTimeRangeAbsoluteEntry is active
+                  createAndGo(4) - set to this value to create an instance
+                  destroy(6) - set to this value to delete an instance"
+     ::= { hm2AgentTimeRangeAbsoluteEntry 4}
+     
+hm2AgentTimeRangePeriodicTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF Hm2AgentTimeRangePeriodicEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "A table periodic entries for time ranges"
+     ::= { hm2AgentTimeRangeGroup 4 }
+     
+hm2AgentTimeRangePeriodicEntry OBJECT-TYPE
+     SYNTAX      Hm2AgentTimeRangePeriodicEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "A table periodic entries for time ranges. All the objects
+                  in the periodic entry must be set to complete a new periodic
+                  entry instance. Objects hm2AgentTimeRangePeriodicStartDay and
+                  hm2AgentTimeRangePeriodicStartTime together forms the start dayandtime
+                  and objects hm2AgentTimeRangePeriodicEndDay and hm2AgentTimeRangePeriodicEndTime
+                  together forms end dayandtime. The time range to which the
+                  periodic entry belongs is active between start dayandtime and
+                  end dayandtime. If more than one day is specified in the
+                  hm2AgentTimeRangePeriodicStartDay, then the same days should be specified
+                  in the hm2AgentTimeRangePeriodicEndDay "
+                  
+     INDEX        {hm2AgentTimeRangeIndex, hm2AgentTimeRangePeriodicEntryIndex}
+     ::= { hm2AgentTimeRangePeriodicTable 1 }
+     
+Hm2AgentTimeRangePeriodicEntry ::= SEQUENCE {
+       hm2AgentTimeRangePeriodicEntryIndex
+               Integer32,
+       hm2AgentTimeRangePeriodicStartDay
+               BITS,
+       hm2AgentTimeRangePeriodicStartTime
+               Hm2AgentTimeRangePeriodicTime,
+       hm2AgentTimeRangePeriodicEndDay
+               BITS,
+       hm2AgentTimeRangePeriodicEndTime
+               Hm2AgentTimeRangePeriodicTime,
+       hm2AgentTimeRangePeriodicStatus
+               RowStatus
+       }
+       
+hm2AgentTimeRangePeriodicEntryIndex OBJECT-TYPE
+     SYNTAX      Integer32 (0..10)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "The index of this periodic entry within time range."
+     ::= { hm2AgentTimeRangePeriodicEntry 1 }
+     
+hm2AgentTimeRangePeriodicStartDay OBJECT-TYPE
+     SYNTAX      BITS {
+     sunday(1),
+     monday(2),
+     tuesday(3),
+     wednesday(4),
+     thursday(5),
+     friday(6),
+     saturday(7)
+     }
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+                 "The starting day or days on which the configuration that
+                  referenced the time range starts going into effect.
+                  Same day can be set for both hm2AgentTimeRangePeriodicStartDay and
+                  hm2AgentTimeRangePeriodicEndDay objects "
+     ::= { hm2AgentTimeRangePeriodicEntry 2 }
+     
+hm2AgentTimeRangePeriodicStartTime OBJECT-TYPE
+     SYNTAX      Hm2AgentTimeRangePeriodicTime
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+                 "The starting time for an periodic entry in the time range."
+     ::= { hm2AgentTimeRangePeriodicEntry 3}
+     
+hm2AgentTimeRangePeriodicEndDay OBJECT-TYPE
+     SYNTAX      BITS {
+     sunday(1),
+     monday(2),
+     tuesday(3),
+     wednesday(4),
+     thursday(5),
+     friday(6),
+     saturday(7)
+     }
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+                 "The ending day or days on which the configuration that
+                  referenced the time range is no longer in efect.
+                  Same day can be set for both hm2AgentTimeRangePeriodicStartDay
+                  and hm2AgentTimeRangePeriodicEndDay objects"
+     ::= { hm2AgentTimeRangePeriodicEntry 4}
+     
+hm2AgentTimeRangePeriodicEndTime OBJECT-TYPE
+     SYNTAX      Hm2AgentTimeRangePeriodicTime
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+                 "The end time for an periodic entry in the time range."
+     ::= { hm2AgentTimeRangePeriodicEntry 5}
+     
+hm2AgentTimeRangePeriodicStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+                 "Status of this instance.
+                 
+                  active(1) - this hm2AgentTimeRangePeriodicEntry is active
+                  createAndGo(4) - set to this value to create an instance
+                  destroy(6) - set to this value to delete an instance"
+     ::= { hm2AgentTimeRangePeriodicEntry 6}
+
+
+   --***************************************************************************
+   -- hm2AgentTimeRangeSNMPExtensionGroup
+   --***************************************************************************
+
+    hm2AgentTimeRangeSNMPExtensionGroup   OBJECT IDENTIFIER ::= { hm2PlatformTimeRange 260 }
+
+    hm2AgentTimeRangeEndGreaterThanStartErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "The end time must be after the start time."
+       ::= { hm2AgentTimeRangeSNMPExtensionGroup 1 }
+
+    hm2AgentTimeRangeEntriesOverlapErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "Time spans must not overlap."
+       ::= { hm2AgentTimeRangeSNMPExtensionGroup 2 }
+
+    hm2AgentTimeRangeTooManyAbsoluteEntriesErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "Only one absolute entry per time profile is supported."
+       ::= { hm2AgentTimeRangeSNMPExtensionGroup 3 }
+
+    hm2AgentTimeRangeDifferentMultiDayListsErrorReturn OBJECT-IDENTITY
+       STATUS        current
+       DESCRIPTION   "If you specify more than one starting day, the ending days must be the same."
+       ::= { hm2AgentTimeRangeSNMPExtensionGroup 4 }
+
+END

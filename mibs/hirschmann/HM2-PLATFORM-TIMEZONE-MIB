@@ -1,0 +1,281 @@
+
+HM2-PLATFORM-TIMEZONE-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann Platform Timezone MIB
+-- ***********************************************************
+--
+
+IMPORTS
+    hm2PlatformMibs
+        FROM HM2-TC-MIB
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+hm2PlatformTimeZone MODULE-IDENTITY
+    LAST-UPDATED "201110120000Z"
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION 
+        "The Hirschmann Private Platform2 MIB for system time and time zone settings.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION "201110120000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { hm2PlatformMibs 42 }
+
+
+hm2AgentSystemTimeGroup OBJECT IDENTIFIER
+    ::= { hm2PlatformTimeZone 1 }
+
+hm2AgentSystemTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current system time (includes the TimeZone offset and  summertime Offset)"
+    ::= { hm2AgentSystemTimeGroup 1 }
+
+hm2AgentSystemDate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current system date."
+    ::= { hm2AgentSystemTimeGroup 2 }
+
+hm2AgentSystemTimeZoneAcronym OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The zone acronym of summertime when summertime is in effect 
+         If summer-time is not in effect or if there is no acronym for summer-time it defaults    
+         To TimeZone acronym."
+    ::= { hm2AgentSystemTimeGroup 3 }
+
+hm2AgentSystemSummerTimeState OBJECT-TYPE
+    SYNTAX      INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "enabled  :  summer-time is in effect currently
+         disabled :  summer-time is not in effect currently"
+    ::= { hm2AgentSystemTimeGroup 5 }
+
+hm2AgentTimeZoneGroup OBJECT IDENTIFIER
+    ::= { hm2PlatformTimeZone 2 }
+
+hm2AgentTimeZoneHoursOffset OBJECT-TYPE
+    SYNTAX      Integer32 (-12..14)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The hours to be added to the UTC time"
+    DEFVAL      { 0 }
+    ::= { hm2AgentTimeZoneGroup 1 }
+
+hm2AgentTimeZoneMinutesOffset OBJECT-TYPE
+    SYNTAX      Integer32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The minutes to be added to the UTC time."
+    DEFVAL      { 0 }
+    ::= { hm2AgentTimeZoneGroup 2 }
+
+hm2AgentTimeZoneAcronym OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..4))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The acronym associated with the zone."
+    DEFVAL      { "" }
+    ::= { hm2AgentTimeZoneGroup 3 }
+
+hm2AgentSummerTimeGroup OBJECT IDENTIFIER
+    ::= { hm2PlatformTimeZone 3 }
+
+hm2AgentSummerTimeMode OBJECT-TYPE
+    SYNTAX      INTEGER { noSummertime(0), 
+                          recurring(1),
+                          recurringEu(2), 
+                          recurringUsa(3)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Recurring - set the parameters for recurring summer-time
+         no-summertime- disable the summer-time  "
+    DEFVAL      { noSummertime }
+    ::= { hm2AgentSummerTimeGroup 1 }
+
+hm2AgentSummerTimeRecurringGroup OBJECT IDENTIFIER
+    ::= { hm2AgentSummerTimeGroup 2 }
+
+hm2AgentStRecurringStartingWeek OBJECT-TYPE
+    SYNTAX      INTEGER { none(0),
+                          first(1),
+                          second(2),
+                          third(3), 
+                          fourth(4),
+                          last(5)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The week of the month from which the summer-time should be effective."
+    DEFVAL      { none }
+    ::= { hm2AgentSummerTimeRecurringGroup 1 }
+
+hm2AgentStRecurringStartingDay OBJECT-TYPE
+    SYNTAX      INTEGER { none(0),
+                          sun(1),
+                          mon(2), 
+                          tue(3), 
+                          wed(4), 
+                          thu(5), 
+                          fri(6), 
+                          sat(7) 
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The day of the hm2AgentStRecurringStartingWeek  from 
+         which the summer-time should be effective."
+    DEFVAL      { none }
+    ::= { hm2AgentSummerTimeRecurringGroup 2 }
+
+hm2AgentStRecurringStartingMonth OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), 
+                          jan(1), 
+                          feb(2), 
+                          mar(3), 
+                          apr(4), 
+                          may(5), 
+                          jun(6), 
+                          jul(7), 
+                          aug(8), 
+                          sep(9), 
+                          oct(10), 
+                          nov(11), 
+                          dec(12) 
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The month of the year  from which the 
+         summer-time should be effective."
+    DEFVAL      { none }
+    ::= { hm2AgentSummerTimeRecurringGroup 3 }
+
+hm2AgentStRecurringStartingTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(5))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The time in the hh:mm format  from 
+         which the summer-time should be effective.
+         range for hh: 0 to 23
+         range for mm: 0 to 59 "
+    DEFVAL		{ "00:00" }
+    ::= { hm2AgentSummerTimeRecurringGroup 4 }
+
+hm2AgentStRecurringEndingWeek OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), 
+    					  first(1), 
+    					  second(2), 
+    					  third(3), 
+                          fourth(4), 
+                          last(5) 
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The week of the Month in which the 
+         summer-time should end."
+    DEFVAL      { none }
+    ::= { hm2AgentSummerTimeRecurringGroup 5 }
+
+hm2AgentStRecurringEndingDay OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), 
+                          sun(1), 
+                          mon(2), 
+                          tue(3), 
+                          wed(4), 
+                          thu(5), 
+                          fri(6), 
+                          sat(7) 
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The day of the hm2AgentStRecurringStartingWeek  on which the 
+         summer-time should end."
+    DEFVAL      { none }
+    ::= { hm2AgentSummerTimeRecurringGroup 6 }
+
+hm2AgentStRecurringEndingMonth OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), 
+                          jan(1), 
+                          feb(2), 
+                          mar(3), 
+                          apr(4), 
+                          may(5), 
+                          jun(6), 
+                          jul(7), 
+                          aug(8), 
+                          sep(9), 
+                          oct(10), 
+                          nov(11), 
+                          dec(12) 
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The month  of the year in which the summer-time should end."
+    DEFVAL      { none }
+    ::= { hm2AgentSummerTimeRecurringGroup 7 }
+
+hm2AgentStRecurringEndingTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(5))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The time of the hm2AgentStRecurringEndingDay  in hh:mm format
+         at which the summer-time should end.
+         range for hh: 0 to 23
+            range for mm: 0 to 59"
+    DEFVAL		{ "00:00" }
+    ::= { hm2AgentSummerTimeRecurringGroup 8 }
+
+hm2AgentStRecurringZoneAcronym OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..4))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The zone associated with the summer-time 
+         recurring configuration.
+         the acronym maximum legth is 4 characters"
+    DEFVAL { "" }
+    ::= { hm2AgentSummerTimeRecurringGroup 9 }
+
+hm2AgentStRecurringZoneOffset OBJECT-TYPE
+    SYNTAX      Integer32 (0..1440)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The zone offset in minutes which will be added to the UTC time 
+         during the  summer-time of every year."
+    DEFVAL      { 60 }
+    ::= { hm2AgentSummerTimeRecurringGroup 10 }
+
+END

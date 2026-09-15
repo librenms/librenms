@@ -1,0 +1,55 @@
+
+HM2-OEM-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann OEM MIB
+-- *************************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32					FROM SNMPv2-SMI -- RFC 2578
+    hm2ConfigurationMibs        FROM HM2-TC-MIB;
+
+hm2OemMib MODULE-IDENTITY
+	LAST-UPDATED "201103310000Z" -- March 31, 2011
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann OEM MIB.
+         Copyright (C) 2011. All Rights Reserved."
+    REVISION     "201103310000Z" -- March 31, 2011
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 15 }
+
+--
+-- *************************************************************
+-- hm2OemMib
+-- *************************************************************
+--
+hm2OemMibObjects			OBJECT IDENTIFIER ::= { hm2OemMib 1 }
+-- hm2OemMibConformance			OBJECT IDENTIFIER ::= { hm2OemMib 2 }
+
+--
+-- *************************************************************
+-- hm2OemMibObjects
+-- *************************************************************
+--
+
+hm2OemID		OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Unique OEM ID."
+	::= { hm2OemMibObjects 1 }
+
+END

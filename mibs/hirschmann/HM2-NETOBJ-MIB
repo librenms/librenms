@@ -1,0 +1,230 @@
+--******************************************************************************
+-- HM-NETOBJ-MIB: Managed objects for 
+--
+-- May 2011
+-- 
+-- Copyright (c) Hirschmann Automation & Control GmbH 2011
+--******************************************************************************
+
+HM2-NETOBJ-MIB DEFINITIONS ::= BEGIN
+IMPORTS 
+	OBJECT-TYPE, MODULE-IDENTITY,
+	Integer32
+		FROM SNMPv2-SMI
+	DisplayString, RowStatus
+		FROM SNMPv2-TC	
+	MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+        hm2ConfigurationMibs		   
+        	FROM HM2-TC-MIB        
+	;
+
+hm2NetobjMib MODULE-IDENTITY
+	LAST-UPDATED "201110200000Z"
+	ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+     DESCRIPTION
+         "This MIB defines the SNMP interface for Netobjects.
+          Copyright (C) 2012. All Rights Reserved."
+     REVISION    "201110200000Z" -- Oct 20, 2011
+     DESCRIPTION
+         	 "- Added row status to both tables
+         	 " 
+     REVISION    "201107010000Z" -- July 1, 2011
+     DESCRIPTION
+         	 "- Modifications to address representation
+         	 "
+     REVISION     "201105310000Z" -- May 31, 2011
+     DESCRIPTION
+          "Initial version."
+	::= { hm2ConfigurationMibs 60 }
+
+hm2NetobjNotifications 	OBJECT IDENTIFIER ::= { hm2NetobjMib 0 }
+hm2NetobjObjects 		OBJECT IDENTIFIER ::= { hm2NetobjMib 1 }
+hm2NetobjConformance 	OBJECT IDENTIFIER ::= { hm2NetobjMib 2}
+
+
+--******************************************************************************
+--                             Netobjects
+--******************************************************************************
+
+hm2NetobjectsObjects OBJECT IDENTIFIER ::= {hm2NetobjObjects 1 }
+
+hm2NetobjectsCount OBJECT-TYPE
+	SYNTAX Integer32 (0..1024)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current number of netobject entries in the netobjects 
+		 table."
+		 ::= { hm2NetobjectsObjects 1 }
+
+hm2NetobjectsTables OBJECT IDENTIFIER ::= { hm2NetobjObjects 2 }
+	 
+hm2NetobjectsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2NetobjectsTableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The table containing the current defined netobjects."
+		::= { hm2NetobjectsTables 1 }
+	
+ hm2NetobjectsTableEntry OBJECT-TYPE
+	SYNTAX Hm2NetobjectsTableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"An entry for a netobjects in the netobjects table."
+	INDEX { hm2NetobjectsIndex } 
+	::= { hm2NetobjectsTable 1 }
+	
+Hm2NetobjectsTableEntry ::= SEQUENCE {
+	hm2NetobjectsIndex Integer32,
+	hm2NetobjectsName DisplayString,
+	hm2NetobjectsDataEntriesCount Integer32,
+	hm2NetobjectsRowStatus RowStatus
+}
+	
+hm2NetobjectsIndex OBJECT-TYPE
+	SYNTAX Integer32 (1..1024)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The index of the hm2Netobject within the table."
+		::= { hm2NetobjectsTableEntry 1 }
+	
+hm2NetobjectsName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE(1..50))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"A descriptive name of the hm2Netobject."
+		::= { hm2NetobjectsTableEntry 2 }
+	
+hm2NetobjectsDataEntriesCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of entries for this object in the hm2Netobjects data 
+		table."
+		::= { hm2NetobjectsTableEntry 3 }
+	
+hm2NetobjectsRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Creates/Deletes/Activates this rule"
+		::= { hm2NetobjectsTableEntry 4 }
+
+hm2NetobjectsDataTableEntriesCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of entries within the hm2Netobjects data table."
+		::= { hm2NetobjectsObjects 2 }
+	
+hm2NetobjectsDataTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF Hm2NetobjectsDataTableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The table containing the contents of the different netobjects."
+		::= { hm2NetobjectsTables 2 }
+	
+hm2NetobjectsDataTableEntry OBJECT-TYPE
+	SYNTAX Hm2NetobjectsDataTableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The entry representing netobjects data."
+	INDEX {hm2NetobjectsDataTableIndex }	
+	::= { hm2NetobjectsDataTable 1 }
+	
+Hm2NetobjectsDataTableEntry ::= SEQUENCE {
+	hm2NetobjectsDataTableIndex Integer32,
+	hm2NetobjectsDataTableObjIndex Integer32,
+	hm2NetobjectsDataTableData DisplayString,
+	hm2NetobjectsDataTableRowStatus RowStatus
+}
+
+hm2NetobjectsDataTableIndex OBJECT-TYPE
+	SYNTAX Integer32 (1..1024)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The index of this entry within the hm2Netobjects data table."
+		::= { hm2NetobjectsDataTableEntry 1 }
+	
+hm2NetobjectsDataTableObjIndex OBJECT-TYPE
+	SYNTAX Integer32 (1..1024)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The index of the hm2Netobject this data entry is assigned to."
+		::= { hm2NetobjectsDataTableEntry 2 }
+	
+hm2NetobjectsDataTableData OBJECT-TYPE
+	SYNTAX DisplayString (SIZE(1..100))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"A string representing a data portion of the hm2Netobject.
+		 This may be 
+		 o a single address (a.b.c.d) 
+		 o an address range in CIDR notation (a.b.c.d/n) 
+		 o an address range with start and end address (a.b.c.d-a.b.c.f)		
+		"
+		::= { hm2NetobjectsDataTableEntry 3 }
+	
+hm2NetobjectsDataTableRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Creates/Deletes/Activates this rule"
+		::= { hm2NetobjectsDataTableEntry 4 }
+
+--******************************************************************************
+--			Compliance statements
+--******************************************************************************
+
+hm2NetobjCompliances OBJECT IDENTIFIER ::= { hm2NetobjConformance 1 }
+hm2NetobjGroups OBJECT IDENTIFIER ::= { hm2NetobjConformance 2 }
+
+hm2NetobjCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for an SNMP entity which
+         implements the Hirschmann Firewall MIB."
+    MODULE     -- this module
+    MANDATORY-GROUPS { hm2NetobjGeneralGroup }
+    ::= { hm2NetobjCompliances 1 }
+
+hm2NetobjGeneralGroup OBJECT-GROUP
+    OBJECTS {
+    	hm2NetobjectsName,
+    	hm2NetobjectsCount,
+    	hm2NetobjectsDataEntriesCount,
+    	hm2NetobjectsRowStatus,
+    	hm2NetobjectsDataTableEntriesCount,
+    	hm2NetobjectsDataTableObjIndex,
+	hm2NetobjectsDataTableData,
+	hm2NetobjectsDataTableRowStatus
+	
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of all Hirschmann objects provided by Netobjects."
+    ::= { hm2NetobjGroups 1 }
+
+
+END
+

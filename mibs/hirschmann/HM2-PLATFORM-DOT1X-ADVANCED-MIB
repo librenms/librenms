@@ -1,0 +1,831 @@
+HM2-PLATFORM-DOT1X-ADVANCED-MIB DEFINITIONS ::= BEGIN
+
+-- 
+-- ***********************************************************
+-- Hirschmann Platform DOT1X MIB
+-- ***********************************************************
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,  
+    Unsigned32, TimeTicks               FROM SNMPv2-SMI
+    dot1xPaePortNumber                  FROM IEEE8021-PAE-MIB
+    TEXTUAL-CONVENTION,
+    MacAddress, DisplayString	        FROM SNMPv2-TC
+    hm2PlatformMibs, HmTimeSeconds1970,
+    HmEnabledStatus	
+    									FROM HM2-TC-MIB
+    SnmpAdminString                     FROM SNMP-FRAMEWORK-MIB;
+
+hm2PlatformDot1xAdvanced  MODULE-IDENTITY
+	LAST-UPDATED "201110180000Z" -- October 18, 2011
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+          "The Hirschmann Private Platform2 MIB for advanced 802.1x support.
+		   Copyright (C) 2011. All Rights Reserved."
+    REVISION
+          "201110180000Z"
+    DESCRIPTION
+          "Initial version."
+    ::= { hm2PlatformMibs 36 }
+ 
+Dot1xPortControlMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The control values of the Authenticator PAE controlled
+        Port."
+    SYNTAX      INTEGER {
+                    forceUnauthorized(1),
+                    auto(2),
+                    forceAuthorized(3),
+                    multiClient(4)
+					}
+
+Dot1xSessionTerminationAction ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION
+		  "The action to be taken on session termination ."
+	SYNTAX      INTEGER {
+					default(1),
+					reauthenticate(2)
+					} 
+                         
+hm2AgentDot1xEnhancementConfigGroup OBJECT IDENTIFIER ::= { hm2PlatformDot1xAdvanced 1 }
+
+    hm2AgentDot1xRadiusVlanAssignment OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+               "Enable/Disable dot1x Vlan Assignment Support on the switch."
+         DEFVAL { disable }
+         ::= { hm2AgentDot1xEnhancementConfigGroup 1 }
+
+    hm2AgentDot1xDynamicVlanCreationMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+               "Enable/Disable dot1x dynamic vlan creation Support on the switch."
+         DEFVAL { disable }
+         ::= { hm2AgentDot1xEnhancementConfigGroup 2 }
+
+	--***********************************************
+	-- clear dot1x statistics [ <slot>/<port> | all ]
+	--***********************************************
+
+	hm2AgentDot1xStatisticsClear OBJECT-TYPE
+		SYNTAX		HmEnabledStatus
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+			"When set to enable(1), all Dot1x statistics will be reset."
+		DEFVAL 	{ disable }
+		::= { hm2AgentDot1xEnhancementConfigGroup 248 }
+
+	hm2AgentDot1xPortStatsClearTable OBJECT-TYPE
+		SYNTAX      	SEQUENCE OF Hm2AgentDot1xPortStatsClearEntry
+		MAX-ACCESS  	not-accessible
+		STATUS      	current
+		DESCRIPTION 
+			"A table to clear the dot1x statistics per interface."
+		::= { hm2AgentDot1xEnhancementConfigGroup 249 }
+		
+	hm2AgentDot1xMABFormatGroupSize OBJECT-TYPE
+        SYNTAX       INTEGER {
+                        group-size-1(1),
+                        group-size-2(2),
+                        group-size-4(4),
+                        group-size-12(12)  
+                        }  
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            " Specifies the number of characters the MAC address will be splitted into and separated by the character specified by hm2AgentDot1xMABFormatGroupSeparator. For the value of 2, the separator - and the MAC address 001122334455 the username MAB will use to authenticate the client will be 00-11-22-33-44-55 ."
+        DEFVAL { group-size-12 }
+        ::= {  hm2AgentDot1xEnhancementConfigGroup 250}
+        
+    hm2AgentDot1xMABFormatGroupSeparator OBJECT-TYPE
+        SYNTAX          INTEGER {
+                        hyphen(1),
+                        colon(2),
+                        dot(3)  
+                        }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            " Specifies which one of {- | : | .} characters separates the groups of characters of size defined by hm2AgentDot1xMABFormatGroupSize. "
+        DEFVAL { hyphen }
+        ::= {  hm2AgentDot1xEnhancementConfigGroup 251}
+      
+    hm2AgentDot1xMABFormatLetterCase OBJECT-TYPE
+        SYNTAX       INTEGER {
+                        lower-case(1),
+                        upper-case(2)
+                            }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            " Specifies how MAB formats the letters of the username and password. "
+        DEFVAL { upper-case }
+        ::= {  hm2AgentDot1xEnhancementConfigGroup 252}
+        
+    hm2AgentDot1xMABPassword OBJECT-TYPE
+        SYNTAX       SnmpAdminString(SIZE(0..64))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            " Specifies a global password for all MAB clients. 
+            If the password is an empty string then client's username is used as password. The password is displayed as an empty string or asterisks."
+        DEFVAL { "" }
+        ::= {  hm2AgentDot1xEnhancementConfigGroup 253}
+        
+	hm2AgentDot1xPortStatsClearEntry OBJECT-TYPE
+		SYNTAX      	Hm2AgentDot1xPortStatsClearEntry
+		MAX-ACCESS  	not-accessible
+		STATUS      	current
+		DESCRIPTION 	"Represents entry to clear the Dot1x statistics per interface."
+		INDEX       	{ hm2AgentDot1xStatsIfIndex }
+			 ::= { hm2AgentDot1xPortStatsClearTable 1 }
+
+	Hm2AgentDot1xPortStatsClearEntry ::= SEQUENCE {
+			hm2AgentDot1xStatsIfIndex    	Unsigned32,
+			hm2AgentDot1xPortStatsClear    	INTEGER
+	}
+
+	hm2AgentDot1xStatsIfIndex 	OBJECT-TYPE
+		SYNTAX           Unsigned32
+		MAX-ACCESS       read-only
+		STATUS           current
+		DESCRIPTION
+			"This object represents the physical port on which dot1x statistics are counted."
+		::= { hm2AgentDot1xPortStatsClearEntry 1 }
+
+	hm2AgentDot1xPortStatsClear    OBJECT-TYPE
+		SYNTAX		HmEnabledStatus
+		MAX-ACCESS	read-write
+		STATUS      current
+		DESCRIPTION
+			"When set to enable(1), all Dot1x statistics for the given port will be reset. The value is write-only. Attempt to read will return disable(2)."
+		DEFVAL 	{ disable }
+		::= { hm2AgentDot1xPortStatsClearEntry 2 }
+
+--**************************************************************************************
+-- hm2AgentDot1xPortConfigGroup -> Contains MIB objects configuring/displaying Dot1x port details 
+-- and associated functionality
+--
+--**************************************************************************************
+
+    hm2AgentDot1xPortConfigGroup OBJECT IDENTIFIER ::= { hm2PlatformDot1xAdvanced 2 }
+
+--------------------------------------------------------------
+-- The Dot1x Enhanced Port Table
+--------------------------------------------------------------
+
+    hm2AgentDot1xPortConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentDot1xPortConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A table for dot1x enhanced Port details and associated functionality."
+         ::= { hm2AgentDot1xPortConfigGroup 1 }
+
+    hm2AgentDot1xPortConfigEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentDot1xPortConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "Represents entry for port config table."
+         INDEX       { dot1xPaePortNumber}
+         ::= {hm2AgentDot1xPortConfigTable 1 }
+
+    Hm2AgentDot1xPortConfigEntry ::= SEQUENCE { 
+        hm2AgentDot1xPortControlMode
+             Dot1xPortControlMode,
+        hm2AgentDot1xGuestVlanId
+             Unsigned32,
+        hm2AgentDot1xGuestVlanPeriod
+             Unsigned32,
+        hm2AgentDot1xUnauthenticatedVlan  
+             Unsigned32,
+        hm2AgentDot1xMaxUsers
+             Unsigned32,    
+        hm2AgentDot1xPortVlanAssigned
+             Unsigned32,
+        hm2AgentDot1xPortVlanAssignedReason
+             INTEGER,
+        hm2AgentDot1xPortSessionTimeout
+             Unsigned32,
+        hm2AgentDot1xPortTerminationAction
+             Dot1xSessionTerminationAction,
+        hm2AgentDot1xPortMABenabled
+             HmEnabledStatus,
+        hm2AgentDot1xPortMABenabledOperational
+             HmEnabledStatus            
+                
+    }
+
+		hm2AgentDot1xPortControlMode  OBJECT-TYPE
+                SYNTAX       Dot1xPortControlMode
+                MAX-ACCESS   read-write
+                STATUS       current
+                DESCRIPTION
+                       "Dot1x port control mode of this port.The Port control mode . 
+                        The port control mode for this interface can take the following values ,
+                                force-unauthorized - the port is in unauthorized mode,
+                                auto-Port based mode. If a client authenticates suscessfully, then the interface is authorized .
+                                     Otherwise, the port is in unauthorized mode. 
+                                     If more than one clients are attached to the port , then only one client needs to authenticate to allow other clients access.
+                                force-authorized - The port is placed in authorized mode
+                                multiClient - If more than one client is attached to the port, then each client needs to authenticate separately.
+                        This object depcreates dot1xAuthAuthControlledPortControl object in IEEE8021-PAE-MIB"
+                DEFVAL {forceAuthorized}
+                ::= {  hm2AgentDot1xPortConfigEntry 1}
+
+        hm2AgentDot1xGuestVlanId  OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS   read-write
+                STATUS       current
+                DESCRIPTION
+                        "Specifies the Guest Vlan of the port. A port will
+                         be moved to its Guest Vlan if no client sucessfully
+                         authenticates on that port for the Guest Vlan Period. 
+                         A value of zero indicates no Guest Vlan is configured for the interface."
+                DEFVAL {0}
+                ::= { hm2AgentDot1xPortConfigEntry 2}
+
+        hm2AgentDot1xGuestVlanPeriod OBJECT-TYPE
+                SYNTAX      Unsigned32 (1..300)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                         "The value, in seconds, of the guestVlanPeriod constant
+                         currently in use for Guest Vlan Assignment for the 
+                         port. This is always three times the value of dot1xAuthTxPeriod."
+                DEFVAL { 90 }
+                ::= { hm2AgentDot1xPortConfigEntry 3 }
+
+
+        hm2AgentDot1xUnauthenticatedVlan  OBJECT-TYPE
+                SYNTAX       Unsigned32 
+                MAX-ACCESS   read-write
+                STATUS       current
+                DESCRIPTION
+                        "Specifies the Unauthenticated Vlan of the port. A port will
+                         be moved to its unauthenticated Vlan if the client authenticates unsucessfully
+                         on that port . 
+                         A value of zero indicates no Unauthenticated Vlan is configured for the port. "
+                DEFVAL {0}
+                ::= {  hm2AgentDot1xPortConfigEntry 4}
+
+        hm2AgentDot1xMaxUsers OBJECT-TYPE
+                SYNTAX      Unsigned32 
+                MAX-ACCESS   read-write
+                STATUS       current
+                DESCRIPTION
+                        " Specifies the maximum users or clients that can authenticate on this port when the port control mode is multiClient.  "
+                DEFVAL { 16 }
+                ::= {  hm2AgentDot1xPortConfigEntry 5}
+
+        hm2AgentDot1xPortVlanAssigned OBJECT-TYPE
+                SYNTAX       Unsigned32 
+                MAX-ACCESS   read-only
+                STATUS       current
+                DESCRIPTION
+                        " Specifies the vlan the port is assigned to by Dot1x  . 
+                          Only relevant if the port control mode of the port is auto. "
+                DEFVAL {0}
+                ::= {  hm2AgentDot1xPortConfigEntry 6}
+
+        hm2AgentDot1xPortVlanAssignedReason OBJECT-TYPE
+                SYNTAX       INTEGER {
+                              default(1),
+                              radius(2),
+                              unauthenticatedVlan(3),
+                              guestVlan(4),
+                              voiceVlan(5),
+                              monitorVlan(6),
+                              notAssigned(7)  
+                        }  
+                MAX-ACCESS   read-only
+                STATUS       current
+                DESCRIPTION
+                        " Reason the port is assigned to the vlan specified by hm2AgentDot1xPortVlanAssigned . 
+                          Only relevant if the port control mode of the port is auto. "
+                DEFVAL { notAssigned }
+                ::= {  hm2AgentDot1xPortConfigEntry 7}
+
+        hm2AgentDot1xPortSessionTimeout OBJECT-TYPE
+                SYNTAX       Unsigned32
+                MAX-ACCESS   read-only
+                STATUS       current
+                DESCRIPTION
+                        " Specifies the session timeout value assigned by the Radius server for this port  . 
+                        Only relevant if the port control mode of the port is auto. "
+                ::= {  hm2AgentDot1xPortConfigEntry 8}
+
+        hm2AgentDot1xPortTerminationAction OBJECT-TYPE
+                SYNTAX      Dot1xSessionTerminationAction 
+                MAX-ACCESS   read-only
+                STATUS       current
+                DESCRIPTION
+                        " Specifies the session termination action assigned by the Radius Server .This is the action taken when the session times out . 
+                          Only relevant if the port control mode of the port is auto. "
+                DEFVAL {1}
+                ::= {  hm2AgentDot1xPortConfigEntry 9}
+
+		hm2AgentDot1xPortMABenabled OBJECT-TYPE
+                SYNTAX       HmEnabledStatus  
+                MAX-ACCESS   read-write
+                STATUS       current
+                DESCRIPTION
+                        " Specifies if Mac-based bypass authentication is configured for the port. "
+                DEFVAL { disable }
+                ::= {  hm2AgentDot1xPortConfigEntry 10}
+
+        hm2AgentDot1xPortMABenabledOperational OBJECT-TYPE
+                SYNTAX		HmEnabledStatus
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        " Displays the operational value of the Mac-based authentication bypass mode (MAB) on the port. "
+                DEFVAL { disable }
+                ::= {  hm2AgentDot1xPortConfigEntry 11}
+
+--**************************************************************************************
+-- hm2AgentDot1xClientConfigGroup -> Contains MIB objects displaying Dot1x Client details and
+-- associated Functionality
+--
+--**************************************************************************************
+
+        hm2AgentDot1xClientConfigGroup OBJECT IDENTIFIER ::= { hm2PlatformDot1xAdvanced 3 }
+
+        hm2AgentDot1xClientConfigTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF Hm2AgentDot1xClientConfigEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION "A table for dot1x Client details and associated functionality."
+                ::= { hm2AgentDot1xClientConfigGroup 1 }
+
+        hm2AgentDot1xClientConfigEntry OBJECT-TYPE
+                SYNTAX      Hm2AgentDot1xClientConfigEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION "Represents entry for port config table."
+                INDEX       { hm2AgentDot1xClientMacAddress}
+                ::= {hm2AgentDot1xClientConfigTable 1 }
+
+        Hm2AgentDot1xClientConfigEntry ::= SEQUENCE { 
+                hm2AgentDot1xClientMacAddress
+                        MacAddress,
+                hm2AgentDot1xLogicalPort
+                        Unsigned32,
+                hm2AgentDot1xInterface
+                        Unsigned32,
+                hm2AgentDot1xClientAuthPAEstate
+                        INTEGER,
+                hm2AgentDot1xClientBackendState
+                        INTEGER,
+                hm2AgentDot1xClientUserName
+                        DisplayString,
+                hm2AgentDot1xClientSessionTime
+                        Unsigned32,
+                hm2AgentDot1xClientFilterID
+                        DisplayString,
+                hm2AgentDot1xClientVlanAssigned
+                        Unsigned32,
+                hm2AgentDot1xClientVlanAssignedReason
+                        INTEGER,
+                hm2AgentDot1xClientSessionTimeout
+                        Unsigned32,
+                hm2AgentDot1xClientTerminationAction
+                        Dot1xSessionTerminationAction
+    }    
+    
+     hm2AgentDot1xClientMacAddress  OBJECT-TYPE
+                SYNTAX           MacAddress
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the client MAC address of the client. "
+                ::= { hm2AgentDot1xClientConfigEntry 1}
+
+      hm2AgentDot1xLogicalPort      OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the client MAC address of the client . "
+                ::= { hm2AgentDot1xClientConfigEntry 2}
+
+        hm2AgentDot1xInterface      OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the physical interface to which the client is attached . "
+                ::= { hm2AgentDot1xClientConfigEntry 3}
+
+        hm2AgentDot1xClientAuthPAEstate OBJECT-TYPE
+                 SYNTAX      INTEGER {
+                                 initialize(1),
+                                 disconnected(2),
+                                 connecting(3),
+                                 authenticating(4),
+                                 authenticated(5),
+                                 aborting(6),
+                                 held(7),
+                                 forceAuth(8),
+                                forceUnauth(9)
+                             }
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The current value of the Authenticator PAE state
+                        machine for the client."
+                ::={ hm2AgentDot1xClientConfigEntry 4}
+
+        hm2AgentDot1xClientBackendState OBJECT-TYPE
+                SYNTAX      INTEGER {
+                                request(1),
+                                response(2),
+                                success(3),
+                                fail(4),
+                                timeout(5),
+                                idle(6),
+                                initialize(7)
+                            }
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The current state of the Backend Authentication
+                        state machine."
+                ::={ hm2AgentDot1xClientConfigEntry 5} 
+
+        hm2AgentDot1xClientUserName OBJECT-TYPE
+                SYNTAX           DisplayString
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the username with which the client is authenticated to the Radius server .
+                         This value is only valid when the client is in authenticated state.  "
+                ::= { hm2AgentDot1xClientConfigEntry 6}
+
+        hm2AgentDot1xClientSessionTime OBJECT-TYPE
+                SYNTAX              Unsigned32
+                MAX-ACCESS          read-only
+                STATUS              current
+                DESCRIPTION
+                        "Specifies the time elapsed in seconds since the client was authenticated in this session.
+                         This value is only valid when the client is in authenticated state. "
+                ::= { hm2AgentDot1xClientConfigEntry 7}
+
+        hm2AgentDot1xClientFilterID OBJECT-TYPE
+                SYNTAX              DisplayString
+                MAX-ACCESS          read-only
+                STATUS              current
+                DESCRIPTION
+                        "Specifies the Filter ID or Diffserv Policy name to be applied to the session . 
+                         This vlaue is populated only if it has been assigned by the RADIUS server.
+                         This value is only valid when the client is in authenticated state."
+                ::= { hm2AgentDot1xClientConfigEntry 8}
+
+        hm2AgentDot1xClientVlanAssigned OBJECT-TYPE
+                SYNTAX              Unsigned32
+                MAX-ACCESS          read-only
+                STATUS              current
+                DESCRIPTION
+                        "Specifies the vlan the client is associated with by Dot1x  .
+                         This value is only valid when the client is in authenticated state."
+                ::= { hm2AgentDot1xClientConfigEntry 9}
+
+        hm2AgentDot1xClientVlanAssignedReason OBJECT-TYPE
+                SYNTAX       INTEGER {
+                              default(1),
+                              radius(2),
+                              unauthenticatedVlan(3),
+                              guestVlan(4),
+                              voiceVlan(5),
+                              monitorVlan(6),
+                              invalid(7)
+                            }  
+                MAX-ACCESS   read-only
+                STATUS       current
+                DESCRIPTION
+                        " Reason the client is associated to the vlan specified by hm2AgentDot1xClientVlanAssigned .
+                          This value is only valid when the client is in authenticated state." 
+                ::= {  hm2AgentDot1xClientConfigEntry 10}
+
+        hm2AgentDot1xClientSessionTimeout OBJECT-TYPE
+                SYNTAX              Unsigned32
+                MAX-ACCESS          read-only
+                STATUS              current
+                DESCRIPTION
+                        "Specifies the session time remaining for the client if  assigned by the Radius server  . 
+                         A value of 0 indicates that no session timeout was assigned by the RADIUS server.
+                         This value is only valid when the client is in authenticated state. "
+                ::= { hm2AgentDot1xClientConfigEntry 11}
+
+         hm2AgentDot1xClientTerminationAction OBJECT-TYPE
+                SYNTAX              Dot1xSessionTerminationAction
+                MAX-ACCESS          read-only
+                STATUS              current
+                DESCRIPTION
+                        "Specifies the session termination action assigned by the Radius Server .
+                        This is the action taken when the session times out .
+                        This value is only valid when the client is in authenticated state. "
+                ::= { hm2AgentDot1xClientConfigEntry 12} 
+
+ 
+
+--**************************************************************************************
+-- hm2AgentDot1xMonitorModeConfigGroup -> Contains MIB objects configuring/displaying Dot1x 
+-- Monitor Mode details and associated Functionality
+--
+--**************************************************************************************
+    hm2AgentDot1xMonitorModeConfigGroup OBJECT IDENTIFIER ::= { hm2PlatformDot1xAdvanced 4 }
+    
+    hm2AgentDot1xMonitorModeEnabled OBJECT-TYPE
+                   SYNTAX        HmEnabledStatus
+                   MAX-ACCESS    read-write
+                   STATUS        current
+                   DESCRIPTION   "Enable/Disable Dot1x Monitor mode 
+                                  Support on the switch."
+                   DEFVAL        { disable }
+                   ::= { hm2AgentDot1xMonitorModeConfigGroup 1 }
+    
+    hm2AgentDot1xMonitorModeClients OBJECT-TYPE
+           SYNTAX        Unsigned32
+           MAX-ACCESS    read-only
+           STATUS        current
+           DESCRIPTION   "Retrieves the number of clients that got 
+                          authenticated by Monitor mode globally."
+           ::= { hm2AgentDot1xMonitorModeConfigGroup 2 }
+
+    hm2AgentDot1xNonMonitorModeClients OBJECT-TYPE
+           SYNTAX        Unsigned32
+           MAX-ACCESS    read-only
+           STATUS        current
+           DESCRIPTION   "Retrieves the number of clients that are granted access by Dot1x with no monitor mode enabled."
+           ::= { hm2AgentDot1xMonitorModeConfigGroup 3 }
+
+
+--**************************************************************************************
+-- hm2AgentDot1xMonitorModeConfigGroup -> Contains MIB objects configuring/displaying Dot1x 
+-- Monitor Mode details and associated Functionality
+--
+--**************************************************************************************
+    hm2AgentDot1xAuthHistoryResultsGroup OBJECT IDENTIFIER ::= { hm2PlatformDot1xAdvanced 5 }
+
+    hm2AgentDot1xPortAuthHistoryResultTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentDot1xPortAuthHistoryResultEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A table to display the dot1x monitor mode results."
+         ::= { hm2AgentDot1xAuthHistoryResultsGroup 1 }
+
+    hm2AgentDot1xPortAuthHistoryResultEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentDot1xPortAuthHistoryResultEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "Represents Dot1x Authentication results for a Dot1x Authentication History table."
+         INDEX       { hm2AgentDot1xAuthHistoryResultIfaceIndex,         
+                       hm2AgentDot1xAuthHistoryResultIndex}
+         ::= {hm2AgentDot1xPortAuthHistoryResultTable 1 }
+
+    Hm2AgentDot1xPortAuthHistoryResultEntry ::= SEQUENCE {
+         hm2AgentDot1xAuthHistoryResultIfaceIndex    Unsigned32,
+         hm2AgentDot1xAuthHistoryResultIndex             Unsigned32,
+         hm2AgentDot1xAuthHistoryResultTimeStamp         HmTimeSeconds1970,
+         hm2AgentDot1xAuthHistoryResultAge               TimeTicks,
+         hm2AgentDot1xAuthHistoryResultMacAddress        MacAddress,
+         hm2AgentDot1xAuthHistoryResultVlanId            Unsigned32,
+         hm2AgentDot1xAuthHistoryResultAuthStatus        INTEGER,
+         hm2AgentDot1xAuthHistoryResultAccessStatus      INTEGER,
+         hm2AgentDot1xAuthHistoryResultFilterID          DisplayString,
+         hm2AgentDot1xAuthHistoryResultVlanAssigned      Unsigned32,
+         hm2AgentDot1xAuthHistoryResultVlanAssignedType  INTEGER,
+         hm2AgentDot1xAuthHistoryResultReasonCode        INTEGER
+    }	
+
+    hm2AgentDot1xAuthHistoryResultIfaceIndex     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION      
+                   "This object represents the  physical Bridge Port on which dot1x Auth event 
+                    might be received."
+                ::= { hm2AgentDot1xPortAuthHistoryResultEntry 1 }
+
+    hm2AgentDot1xAuthHistoryResultIndex     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Reference to the Dot1x Authentication history table maintained."
+                ::= { hm2AgentDot1xPortAuthHistoryResultEntry 2 }
+
+    hm2AgentDot1xAuthHistoryResultTimeStamp     OBJECT-TYPE
+                SYNTAX           HmTimeSeconds1970
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the exact time of Dot1x Authentication 
+                         event information occurred maintained in the 
+                         history table."
+                ::= { hm2AgentDot1xPortAuthHistoryResultEntry 3 }
+
+    hm2AgentDot1xAuthHistoryResultAge OBJECT-TYPE
+         SYNTAX      TimeTicks
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Time since the authentication entry was added to the history table. It is displayed in days, hours, minutes, and seconds."
+         ::= { hm2AgentDot1xPortAuthHistoryResultEntry 4 }
+
+    hm2AgentDot1xAuthHistoryResultMacAddress     OBJECT-TYPE
+                SYNTAX           MacAddress
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the client.s MAC Address maintained in 
+                         the Dot1x Authentication history table."
+                ::= { hm2AgentDot1xPortAuthHistoryResultEntry 5 }
+
+    hm2AgentDot1xAuthHistoryResultVlanId     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the VLANID maintained in the history 
+                         table (It is the VLANID on which the Dot1x                          table. It is the VLANID which is failed to 
+                         associate to the port during authentication process.
+                         The VLANID is identified distinctly by the Reason 
+                         code for the respective entry. Valid only when the
+                         reason code is set to 13 (VLAN assignment failure). 
+                         In all the other cases, VLANID is set to 0. "
+                ::= { hm2AgentDot1xPortAuthHistoryResultEntry 6 }
+
+    hm2AgentDot1xAuthHistoryResultAuthStatus     OBJECT-TYPE
+                SYNTAX       INTEGER {
+                              success(1),
+                              failure(2)
+                            }           
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the Dot1x Authentication status (Success or Failure) for the Dot1x Authentication event takes place. "
+                ::= { hm2AgentDot1xPortAuthHistoryResultEntry 7 }
+
+    hm2AgentDot1xAuthHistoryResultAccessStatus     OBJECT-TYPE
+                SYNTAX       INTEGER {
+                              granted(1),
+                              denied(2)
+                            }           
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        " Authentication access status indicates the exact status of the dot1x client. 
+                          Granted means the client is allowed access to the network using dot1x or monitor mode. 
+                          Denied means the client is not allowed access to the network."
+                ::= { hm2AgentDot1xPortAuthHistoryResultEntry 8 }
+
+    hm2AgentDot1xAuthHistoryResultFilterID OBJECT-TYPE
+          SYNTAX              DisplayString
+          MAX-ACCESS          read-only
+          STATUS              current
+          DESCRIPTION
+                        "Specifies the Filter ID or Diffserv Policy name assigned by the RADIUS server. 
+                         This value is only valid when the client is in authenticated state."
+                ::= { hm2AgentDot1xPortAuthHistoryResultEntry 9 }
+
+    hm2AgentDot1xAuthHistoryResultVlanAssigned     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the VLANID maintained in the history 
+                         table (It is the VLANID Assigned to a Port or Client authenticate)."
+                ::= { hm2AgentDot1xPortAuthHistoryResultEntry 10 }
+
+    hm2AgentDot1xAuthHistoryResultVlanAssignedType     OBJECT-TYPE
+                SYNTAX           INTEGER {
+                                   default(1),
+                                   radius(2),
+                                   unauthenticatedVlan(3),
+                                   guestVlan(4),
+                                   voiceVlan(5),
+                                   monitorVlan(6),
+                                   notAssigned(7)  
+                                 }  
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the VLAN Assigned Reason maintained in the history 
+                         table."
+                ::= { hm2AgentDot1xPortAuthHistoryResultEntry 11 }
+
+
+    hm2AgentDot1xAuthHistoryResultReasonCode OBJECT-TYPE
+          SYNTAX       INTEGER {
+                          supplicant-timeout(1),                        
+                          eapol-timeout(2),
+                          radius-request-timeout(3),
+                          radius-auth-failure(4),
+                          radius-auth-comm-failure(5),
+                          radius-challenge-process-invalid-nas-port(6),
+                          radius-challenge-process-wrong-eap-msg(7),
+                          radius-request-send-msg-error(8),
+                          radius-accept-process-invalid-nas-port(9),
+                          radius-accept-process-wrong-eap-msg(10),
+                          radius-accept-filter-assignment-failure(11),
+                          radius-accept-diffserv-not-present(12),
+                          radius-accept-vlan-assignment-failure(13),
+                          vlan-assignment-feature-not-enabled(14),
+                          radius-success(15),
+                          local-auth-user-not-found(16),
+                          local-auth-user-no-access(17),
+                          local-auth-md5-validation-failure(18),
+                          local-auth-invalid-eap-type(19),
+                          local-failure(20),
+                          local-success(21),
+                          radius-invalid-radius-status(22),
+                          guest-vlan-timer-expiry(23),
+                          undefined-auth-method(24),
+                          reject-auth-method(25),
+                          invalid-auth-method(26),
+                          auth-method-not-configured(27),
+                          unauth-vlan-not-created(28),
+                          guest-vlan-not-created(29),
+                          radius-accept-invalid-vlan-failure(30)
+
+                    }
+           MAX-ACCESS    read-only
+           STATUS        current
+           DESCRIPTION   "Specifies the Dot1x authentication reason 
+                          refered by the result index on a port."
+           ::= { hm2AgentDot1xPortAuthHistoryResultEntry 12 }
+
+
+    hm2AgentDot1xAuthHistoryResultsClear OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "When set to enable(1), all Dot1x Authentication History information will be reset."
+         DEFVAL { disable }
+         ::= { hm2AgentDot1xAuthHistoryResultsGroup 2 }
+
+    --**************************************************************************************
+    -- hm2AgentDot1xPortAuthHistoryResultClearTable
+    --
+    --**************************************************************************************
+
+    hm2AgentDot1xPortAuthHistoryResultClearTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2AgentDot1xPortAuthHistoryResultClearEntry 
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A table to clear the dot1x monitor mode results per interface."
+         ::= { hm2AgentDot1xAuthHistoryResultsGroup 3 }
+
+    hm2AgentDot1xPortAuthHistoryResultClearEntry OBJECT-TYPE
+         SYNTAX      Hm2AgentDot1xPortAuthHistoryResultClearEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "Represents to clear the Dot1x Authentication results for a Dot1x Authentication History table."
+         INDEX       { hm2AgentDot1xAuthHistoryResultIfIndex }         
+         ::= {hm2AgentDot1xPortAuthHistoryResultClearTable 1 }
+
+    Hm2AgentDot1xPortAuthHistoryResultClearEntry ::= SEQUENCE {
+         hm2AgentDot1xAuthHistoryResultIfIndex    Unsigned32,
+         hm2AgentDot1xPortAuthHistoryResultsClear    INTEGER 
+    }
+ 
+    hm2AgentDot1xAuthHistoryResultIfIndex     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION      
+                   "This object represents the  physical Bridge Port on which dot1x Auth event 
+                    might be received."
+                ::= { hm2AgentDot1xPortAuthHistoryResultClearEntry 1 }
+
+
+    hm2AgentDot1xPortAuthHistoryResultsClear OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "When set to enable(1), all Dot1x Authentication History information for 
+                      the given port will be reset. The value is write-only. Attempt to read
+                      will return disable(2)."
+         DEFVAL { disable }
+         ::= { hm2AgentDot1xPortAuthHistoryResultClearEntry 2 }
+
+
+END
+

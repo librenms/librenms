@@ -1,0 +1,1586 @@
+--
+-- *************************************************************
+-- Hirschmann VPN Management MIB
+-- *************************************************************
+--
+HM2-VPN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS 
+    OBJECT-TYPE, MODULE-IDENTITY, 
+    NOTIFICATION-TYPE, OBJECT-IDENTITY,
+    Integer32, Unsigned32, Counter64 FROM SNMPv2-SMI
+    TruthValue,
+    RowStatus, DisplayString    FROM SNMPv2-TC  
+    hm2ConfigurationMibs,                       
+    HmTimeSeconds1970,
+    HmLargeDisplayString        FROM HM2-TC-MIB;
+
+hm2VpnMib MODULE-IDENTITY
+    LAST-UPDATED "201403141200Z" -- Mar 14, 2014
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 - 7127 -14 -0
+         E-mail:     hac.support@belden.com"
+        DESCRIPTION
+         "This MIB defines the SNMP interface for Hirschmann VPN 
+          implementations."
+        REVISION     "201403141200Z" -- Mar 14, 2014
+        DESCRIPTION
+          "Initial version."
+    ::= { hm2ConfigurationMibs 120 }
+
+
+hm2VpnMibNotifications          OBJECT IDENTIFIER       ::= { hm2VpnMib 0 }
+hm2VpnMibObjects                OBJECT IDENTIFIER       ::= { hm2VpnMib 1 }
+-- hm2VpnMibConformance         OBJECT IDENTIFIER       ::= { hm2VpnMib 2 }
+hm2VpnMibSNMPExtensionGroup     OBJECT IDENTIFIER       ::= { hm2VpnMib 3 }
+
+hm2VpnGeneralGroup              OBJECT IDENTIFIER ::= { hm2VpnMibObjects 1 }
+hm2VpnConnectionGroup           OBJECT IDENTIFIER ::= { hm2VpnMibObjects 2 }
+hm2VpnTrafficSelGroup           OBJECT IDENTIFIER ::= { hm2VpnMibObjects 3 }
+hm2VpnCertificateGroup          OBJECT IDENTIFIER ::= { hm2VpnMibObjects 4 }
+
+--
+-- *************************************************************
+-- General Group Objects
+-- *************************************************************
+--
+
+--
+-- *************************************************************
+-- VPN Connection Definition
+-- *************************************************************
+--
+hm2VpnConnMax OBJECT-TYPE
+                         SYNTAX                  Integer32 (0..256)
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "Maximum number of VPN connections
+                              supported. Notice that the maximum number of
+                              active and up VPN connections is limited
+                              to hm2VpnConnActiveMax."
+                         ::= { hm2VpnConnectionGroup 1 }
+
+hm2VpnConnActiveMax OBJECT-TYPE
+                         SYNTAX                  Integer32 (0..256)
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "Maximum number of active (and up) VPN connections
+                              supported."
+                         ::= { hm2VpnConnectionGroup 2 }
+
+hm2VpnConnNext OBJECT-TYPE
+                         SYNTAX                  Integer32 (0..256)
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "This object always holds an appropriate value to be
+                              used for hm2VpnConnIndex when creating entries
+                              in the hm2VpnConnTable. The value 0 indicates
+                              that no unassigned entries are available. To
+                              obtain the hm2VpnConnIndex value for a new
+                              entry, the management station issues a SNMP
+                              retrieval operation to obtain the current value of
+                              this object. After each row creation or deletion
+                              the agent modifies the value to the next
+                              unassigned index."
+                          ::= { hm2VpnConnectionGroup 3 }
+
+--
+-- *************************************************************
+-- VPN Connection Table
+-- *************************************************************
+--
+hm2VpnConnTable   OBJECT-TYPE
+                         SYNTAX SEQUENCE OF Hm2VpnConnEntry
+                         MAX-ACCESS not-accessible
+                         STATUS current
+                         DESCRIPTION
+                             "A list of VPN connections."
+                         ::= { hm2VpnConnectionGroup 10 }
+
+hm2VpnConnEntry   OBJECT-TYPE
+                         SYNTAX Hm2VpnConnEntry
+                         MAX-ACCESS not-accessible
+                         STATUS current
+                         DESCRIPTION
+                             "A VPN connection entry."
+                         INDEX { hm2VpnConnIndex }
+                         ::= { hm2VpnConnTable 1 }
+ 
+Hm2VpnConnEntry ::= SEQUENCE {
+                         hm2VpnConnIndex     Integer32,
+                         hm2VpnConnIkeVersion INTEGER,
+                         hm2VpnConnIkeStartup INTEGER,
+                         hm2VpnConnIkeLifetime Integer32,
+                         hm2VpnConnIkeDpdTimeout Integer32,
+                         hm2VpnConnIkeLocalAddr DisplayString,
+                         hm2VpnConnIkeRemoteAddr DisplayString,
+                         hm2VpnConnIkeAuthType INTEGER,
+                         hm2VpnConnIkeAuthMode INTEGER,
+                         hm2VpnConnIkeAuthCertCA DisplayString,
+                         hm2VpnConnIkeAuthCertRemote DisplayString,
+                         hm2VpnConnIkeAuthCertLocal DisplayString,
+                         hm2VpnConnIkeAuthPrivKey DisplayString,
+                         hm2VpnConnIkeAuthPasswd DisplayString, 
+                         hm2VpnConnIkeAuthPsk DisplayString,
+                         hm2VpnConnIkeAuthLocId DisplayString,
+                         hm2VpnConnIkeAuthLocType INTEGER,
+                         hm2VpnConnIkeAuthRemId DisplayString,
+                         hm2VpnConnIkeAuthRemType INTEGER,
+                         hm2VpnConnIkeAlgDh INTEGER,
+                         hm2VpnConnIkeAlgMac INTEGER,
+                         hm2VpnConnIkeAlgEncr INTEGER,
+                         hm2VpnConnIkeReAuth TruthValue,
+                         hm2VpnConnIpsecMode INTEGER,
+                         hm2VpnConnIpsecLifetime Integer32,
+                         hm2VpnConnMargintime Integer32,
+                         hm2VpnConnIpsecAlgDh INTEGER,
+                         hm2VpnConnIpsecAlgMac INTEGER,
+                         hm2VpnConnIpsecAlgEncr INTEGER,
+                         hm2VpnConnOperStatus INTEGER,
+                         hm2VpnConnDesc DisplayString,
+                         hm2VpnConnLastError HmLargeDisplayString,
+                         hm2VpnConnDebug BITS,
+                         hm2VpnConnRowStatus RowStatus
+                         }
+
+hm2VpnConnIndex   OBJECT-TYPE
+                         SYNTAX                  Integer32 (1..256)
+                         MAX-ACCESS              accessible-for-notify
+                         STATUS                  current
+                         DESCRIPTION
+                             "An index that uniquely identifies the entry in the
+                              table."
+                         ::= { hm2VpnConnEntry 1 }
+
+
+hm2VpnConnIkeVersion   OBJECT-TYPE
+                        SYNTAX           INTEGER {
+                                                        ike(1),
+                                                        ikev1(2),
+                                                        ikev2(3)
+                                                 }
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Version of the IKE protocol:
+                              o ike: accept IKEv1/v2 as responder, start with IKEv2 as initiator
+                              o ikev1: used protocol is IKE version 1 (ISAKMP)
+                              o ikev2: used protocol is IKE version 2"
+                         DEFVAL  { ike }
+                         ::= { hm2VpnConnEntry 2 }
+
+hm2VpnConnIkeStartup   OBJECT-TYPE
+                        SYNTAX           INTEGER {
+                                                        initiator(1),
+                                                        responder(2)
+                                                 }
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "If this host acts as a responder it does not
+                              initiate a key exchange (IKE) nor connection
+                              parameters negotiation. Otherwise, this host acts
+                              as an initiator - then it initiates an IKE
+                              actively."
+                         DEFVAL  { responder }
+                         ::= { hm2VpnConnEntry 3 }
+
+hm2VpnConnIkeLifetime   OBJECT-TYPE
+                         SYNTAX                  Integer32 ( 300..86400)
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Lifetime of IKE security association in seconds.
+                              The maximum value is 24 hours (86400 seconds)."
+                         DEFVAL  { 28800 } -- 8 hours
+                         ::= { hm2VpnConnEntry 4 }
+
+
+hm2VpnConnIkeDpdTimeout   OBJECT-TYPE
+                         SYNTAX                  Integer32 ( 0..86400) -- max. 24 hours
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "If greater than zero, the local peer sends Dead
+                              Peer Detection (DPD) messages (according to RFC
+                              3706) to the remote peer. This value specifies
+                              the timeout in seconds, the remote peer is
+                              declared dead, if not responding. The value 0
+                              disables this feature."
+                         DEFVAL  { 120 }
+                         ::= { hm2VpnConnEntry 5 }
+
+
+hm2VpnConnIkeLocalAddr   OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..128))
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Hostname (FQDN) or IP address of local
+                              security gateway. If the value is 'any', then the
+                              IP address of the matching interface is
+                              used. Establishing the connection may be
+                              delayed until the hostname (if specified) can be
+                              resolved."
+                         DEFVAL  { "any" }
+                         ::= { hm2VpnConnEntry 6 }
+
+
+hm2VpnConnIkeRemoteAddr   OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..128))
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Typically the hostname (FQDN) or IP address of
+                              remote security gateway. If this value is 'any',
+                              then any IP address is accepted when establishing
+                              an IKE-SA as responder. Also a network in CIDR
+                              notation, to be accepted when establishing the
+                              IKE-SA, is allowed as responder. As initiator
+                              such values are not allowed. Establishing the VPN
+                              connection may be delayed until the hostname (if
+                              specified) can be resolved."
+                         DEFVAL  { "any" }
+                         ::= { hm2VpnConnEntry 7 }
+
+
+hm2VpnConnIkeAuthType   OBJECT-TYPE
+                        SYNTAX           INTEGER {
+                                                        psk(1),
+                                                        individualx509(2),
+                                                        pkcs12(3)
+                                                 }
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Type of authentication to be used: pre-shared key,
+                             individual X509 certificates (separate for CA and 
+                             local identification) or one PKCS12 container with 
+                             all the needed certificates (including the CA)."
+                         DEFVAL  { psk }
+                         ::= { hm2VpnConnEntry 8 }
+                         
+
+hm2VpnConnIkeAuthMode   OBJECT-TYPE
+                        SYNTAX           INTEGER {
+                                                        main(1),
+                                                        aggressive(2)
+                                                 }
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "The phase 1 exchange mode to be used (IKEv1)."
+                         DEFVAL  { main }
+                         ::= { hm2VpnConnEntry 9 }
+
+
+hm2VpnConnIkeAuthCertCA   OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..128))
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "PEM encoded X.509 certificate file name (RFC 1422),
+                              if authentication type in 'hm2VpnConnIkeAuthType'
+                              is 'individualx509'. This certificate is used for RSA based
+                              signature verification in local and remote
+                              certificates.
+                              The file needs to be uploaded separately."
+                         DEFVAL  { "" }
+                         ::= { hm2VpnConnEntry 10 }
+
+
+hm2VpnConnIkeAuthCertRemote   OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..128))
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "PEM encoded X.509 certificate file name (RFC 1422),
+                              if authentication type in 'hm2VpnConnIkeAuthType'
+                              is 'individualx509'. This certificate is used for RSA based
+                              authentication of remote peer at the local side.
+                              This certificate binds the identity of remote peer
+                              to its public key. It is optional because it is 
+                              typically sent by the remote peer while negotiating an
+                              ISAKMP/IKE security association.
+                              The file needs to be uploaded separately."
+                         DEFVAL  { "" }
+                         ::= { hm2VpnConnEntry 11 }
+
+
+hm2VpnConnIkeAuthCertLocal   OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..128))
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "PEM encoded X.509 certificate file name (RFC 1422)
+                              to be used, if authentication type in
+                              'hm2VpnConnIkeAuthType' is 'individualx509' or 'pkcs12'. 
+                              This certificate is used for authentication
+                              of local peer at the remote side.  The
+                              certificate binds the identity of local peer to
+                              its public key, signed by the certification
+                              authority (CA) from 'hm2VpnConnIkeAuthCertCA'.
+                              The file needs to be uploaded separately."
+                         DEFVAL  { "" }
+                         ::= { hm2VpnConnEntry 12 }
+
+
+hm2VpnConnIkeAuthPrivKey   OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..128))
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Private key file name to be used, if authentication 
+                              type in 'hm2VpnConnIkeAuthType' is 'individualx509' and
+                              the key stored on the device is encrypted with a passphrase
+                              (so it cannot automatically be matched with the certificate).
+                              Note that this is only the filename of the private key. The
+                              passphrase must be added to 'hm2VpnConnIkeAuthPasswd'."
+                         DEFVAL  { "" }
+                         ::= { hm2VpnConnEntry 13 }
+
+hm2VpnConnIkeAuthPasswd   OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..128))
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Passphrase to be used for decryption of private key
+                              from 'hm2VpnConnIkeAuthPrivKey' or the certificate container
+                              for 'pkcs12' type certificates which are uploaded encrypted."
+                         DEFVAL  { "" }
+                         ::= { hm2VpnConnEntry 14 }
+
+
+hm2VpnConnIkeAuthPsk   OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..128))
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Pre-shared key (passphrase) to be used if
+                              authentication type in 'hm2VpnConnIkeAuthType'
+                              is 'psk'. The pre-shared key sequence cannot contain 
+                              newline or double-quote characters.
+                              Alternatively to characters sequence, pre-shared secrets 
+                              can be represented as hexadecimal or Base64 encoded 
+                              binary values. A character sequence beginning with 0x is 
+                              interpreted as sequence hexadecimal digits. Similarly, 
+                              a character sequence beginning with 0s is interpreted 
+                              as Base64 encoded binary data."
+                         DEFVAL  { "" }
+                         ::= { hm2VpnConnEntry 15 }
+
+
+hm2VpnConnIkeAuthLocId   OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..128))
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Local peer identifier to be sent within ID
+                              payload during negotiation. The ID payload is
+                              used to identify the initiator of the security
+                              association. The identity is used by the
+                              responder to determine the correct host system
+                              security policy requirement for the association
+                              (see RFC 2407, section 4.6.2 for details when
+                              using IKEv1 and RFC 4306, section 3.5 for IKEv2).
+                              Allowed formats for this object depend on
+                              'hm2VpnConnIkeAuthLocType':
+                              o  default: don't care
+                              o  address: don't care, take IPv4 address or host 
+                                          name from hm2VpnConnIkeLocalAddr
+                              o  id: - IPv4 address or host name
+                                     - key identifier
+                                     - fully qualified domain name
+                                     - fully qualified RFC 822 email address
+                                     - X.500 distinguished name (DN)
+                                                          "
+                         DEFVAL  { "" }
+                         ::= { hm2VpnConnEntry 16 }
+
+
+hm2VpnConnIkeAuthLocType   OBJECT-TYPE
+                        SYNTAX           INTEGER {
+                                                        default(1),
+                                                        address(2),
+                                                        id(3)
+                                                 }
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Type of local peer identifier in 'hm2VpnConnIkeAuthLocId':
+                                 o  default: If 'hm2VpnConnIkeAuthType' is 'psk' then
+                                             use the IP address or host name from 
+                                             'hm2VpnConnIkeLocalAddr' as local identifier. 
+                                             In case of 'individualx509' or 'pkcs12' 
+                                             use the DN from local certificate in 
+                                             'hm2VpnConnIkeAuthCertLocal'.
+                                 o  address: use the IP address or DNS name from 
+                                             'hm2VpnConnIkeLocalAddr'
+                                             as local identifier.
+                                 o  id: use the configured value in hm2VpnConnIkeAuthLocId
+                                                (it can be of any type in the description). 
+
+                             For further information see RFC 2407, section 4.6.2"
+                         DEFVAL  { default }
+                         ::= { hm2VpnConnEntry 17 }
+
+
+hm2VpnConnIkeAuthRemId   OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..128))
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Remote peer identifier to be compared with ID
+                              payload during negotiation. The ID payload is
+                              used to identify the initiator of the security
+                              association. The identity is used by the
+                              responder to determine the correct host system
+                              security policy requirement for the association
+                              (see RFC 2407, section 4.6.2 for details when
+                              using IKEv1 and RFC 4306, section 3.5 for IKEv2).
+                              Allowed formats for this entry depend on
+                              'hm2VpnConnIkeAuthRemType':
+                              o  any: don't care
+                              o  address: don't care, take IPv4 address or host 
+                                          name from hm2VpnConnIkeRemoteAddr 
+                              o  id: - IPv4 address or host name
+                                     - key identifier
+                                     - fully qualified domain name
+                                     - fully qualified RFC 822 email address
+                                     - X.500 distinguished name (DN)
+                                                          "
+                         DEFVAL  { "" }
+                         ::= { hm2VpnConnEntry 18 }
+
+
+hm2VpnConnIkeAuthRemType   OBJECT-TYPE
+                        SYNTAX           INTEGER {
+                                                        any(1),
+                                                        address(2),
+                                                        id(3)
+                                                 }
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Type of remote peer identifier in hm2VpnConnIkeAuthRemId:
+                              o  any: received remote identifier is not checked
+                              o  address: use the IP address or host name from 
+                                          'hm2VpnConnIkeRemoteAddr'
+                                           as remote identifier.
+                              o  id: use the configured value in hm2VpnConnIkeAuthRemId
+                                         (it can be of any type in the description). 
+
+                             For further information see RFC 2407, section 4.6.2"
+                         DEFVAL  { any }
+                         ::= { hm2VpnConnEntry 19 }
+
+
+hm2VpnConnIkeAlgDh   OBJECT-TYPE
+                        SYNTAX           INTEGER {
+                                                        any(1),
+                                                        modp1024(2),
+                                                        modp1536(3),
+                                                        modp2048(4),
+                                                        modp3072(5),
+                                                        modp4096(6),
+                                                        ecp256(7),
+                                                        ecp384(8),
+                                                        ecp521(9)
+                                                 }
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Diffie-Hellman key agreement algorithm to be used
+                              for establishment of IKE-SA:
+                              o  any: accept all supported algorithms as responder, use default as initiator
+                              o  modp1024: RSA with 1024 bits modulus (DH Group 2)
+                              o  modp1536: RSA with 1536 bits modulus (DH Group 5)
+                              o  modp2048: RSA with 2048 bits modulus (DH Group 14)
+                              o  modp3072: RSA with 3072 bits modulus (DH Group 15)
+                              o  modp4096: RSA with 4096 bits modulus (DH Group 16)
+                              o  ecp256: NIST Elliptic Curve with 256 bits (DH Group 19)
+                              o  ecp384: NIST Elliptic Curve with 384 bits (DH Group 20)
+                              o  ecp521: NIST Elliptic Curve with 521 bits (DH Group 21)"
+                         DEFVAL  { modp1024 }
+                         ::= { hm2VpnConnEntry 20 }
+
+
+hm2VpnConnIkeAlgMac   OBJECT-TYPE
+                        SYNTAX           INTEGER {
+                                                        any(1),
+                                                        hmacmd5(2),
+                                                        hmacsha1(3),
+                                                        hmacsha256(4),
+                                                        hmacsha384(5),
+                                                        hmacsha512(6)
+                                                 }
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Integrity (MAC) algorithm to be used in IKEv2:
+                              o  any: accept all supported algorithms as responder, use various pre-defined
+                                      as initiator
+                              o  hmacmd5: HMAC-MD5 (length 96 bit)
+                              o  hmacsha1: HMAC-SHA1 (length 96 bit)
+                              o  hmacsha256: HMAC-SHA256 (length 128 bit)
+                              o  hmacsha384: HMAC-SHA384 (length 196 bit)
+                              o  hmacsha512: HMAC-SHA512 (length 256 bit)
+                              "
+                         DEFVAL  { hmacsha1 }
+
+                         ::= { hm2VpnConnEntry 21 }
+
+
+hm2VpnConnIkeAlgEncr   OBJECT-TYPE
+                        SYNTAX           INTEGER {
+                                                        any(1),
+                                                        des(2),
+                                                        des3(3),
+                                                        aes128(4),
+                                                        aes192(5),
+                                                        aes256(6)
+                                                 }
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Encryption algorithm to be used in IKE:
+                              o  any: accept all supported algorithms as responder, use various pre-defined
+                                      as initiator
+                              o  des: DES
+                              o  des3: Triple-DES
+                              o  aes128: AES with 128 key bits
+                              o  aes192: AES with 192 key bits
+                              o  aes256: AES with 256 key bits"
+                         DEFVAL  { aes128 }
+                         ::= { hm2VpnConnEntry 22 }
+
+hm2VpnConnIkeReAuth   OBJECT-TYPE
+                         SYNTAX                  TruthValue
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "whether re-keying of an IKE_SA should also re-authenticate the peer. 
+                              In IKEv1, re-authentication is always done (also when set to false).
+                              In IKEv2, a value of false does re-keying without un-installing the IPsec-SAs, 
+                              a value of true creates a new IKE_SA from scratch and tries to recreate all IPsec-SAs."
+                         DEFVAL  { false }
+                         ::= { hm2VpnConnEntry 23 }
+
+hm2VpnConnIpsecMode   OBJECT-TYPE
+                         SYNTAX           INTEGER {
+                                                        tunnel(1)
+                                                  }
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "IPsec encapsulation mode."
+                         DEFVAL  { tunnel }
+                         ::= { hm2VpnConnEntry 24 }
+
+hm2VpnConnIpsecLifetime   OBJECT-TYPE
+                         SYNTAX                  Integer32 ( 300..28800)
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Lifetime of IPsec security association in seconds.
+                              The maximum value is 8 hours (28800 seconds)."
+                         DEFVAL  { 3600 } -- 1 hour
+                         ::= { hm2VpnConnEntry 25 }
+
+hm2VpnConnMargintime   OBJECT-TYPE
+                         SYNTAX                  Integer32 ( 1..1800)
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "How long before connection expiry or keying-channel expiry 
+                              should attempts to negotiate a replacement begin.
+                              The maximum value is half an hour (1800 seconds).
+                              The margin time needs to be at most half of the lifetime."
+                         DEFVAL  { 150 } -- 2 a half minutes 
+                         ::= { hm2VpnConnEntry 26 }
+
+
+hm2VpnConnIpsecAlgDh   OBJECT-TYPE
+                        SYNTAX           INTEGER {
+                                                        any(1),
+                                                        modp1024(2),
+                                                        modp1536(3),
+                                                        modp2048(4),
+                                                        modp3072(5),
+                                                        modp4096(6),
+                                                        none(7),
+                                                        ecp256(8),
+                                                        ecp384(9),
+                                                        ecp521(10)
+                                                 }
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Diffie-Hellman key agreement algorithm to be used
+                              for IPsec-SA session key establishment:
+                              o  any: accept all supported algorithms as responder, use various pre-defined
+                                      as initiator
+                              o  modp1024: RSA with 1024 bits modulus (DH Group 2)
+                              o  modp1536: RSA with 1536 bits modulus (DH Group 5)
+                              o  modp2048: RSA with 2048 bits modulus (DH Group 14)
+                              o  modp3072: RSA with 3072 bits modulus (DH Group 15)
+                              o  modp4096: RSA with 4096 bits modulus (DH Group 16)
+                              o  none: no Perfect Forward Secrecy (PFS)
+                              o  ecp256: NIST Elliptic Curve with 256 bits (DH Group 19)
+                              o  ecp384: NIST Elliptic Curve with 384 bits (DH Group 20)
+                              o  ecp521: NIST Elliptic Curve with 521 bits (DH Group 21)"
+                          DEFVAL { modp1024 }
+                          ::= { hm2VpnConnEntry 27 }
+
+
+hm2VpnConnIpsecAlgMac   OBJECT-TYPE
+                        SYNTAX           INTEGER {
+                                                        any(1),
+                                                        hmacmd5(2),
+                                                        hmacsha1(3),
+                                                        hmacsha256(4),
+                                                        hmacsha384(5),
+                                                        hmacsha512(6)
+                                                 }
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "Integrity (MAC) algorithm to be used in IPsec:
+                              o  any: accept all supported algorithms as responder, use various pre-defined
+                                      as initiator
+                              o  hmacmd5: HMAC-MD5 (length 96 bit)
+                              o  hmacsha1: HMAC-SHA1 (length 96 bit)
+                              o  hmacsha256: HMAC-SHA256 (length 128 bit)
+                              o  hmacsha384: HMAC-SHA384 (length 196 bit)
+                              o  hmacsha512: HMAC-SHA512 (length 256 bit)
+                              "
+                         DEFVAL  { hmacsha1 }
+                         ::= { hm2VpnConnEntry 28 }
+
+
+hm2VpnConnIpsecAlgEncr   OBJECT-TYPE
+                        SYNTAX          INTEGER {
+                                            any(1),
+                                            des(2),
+                                            des3(3),
+                                            aes128(4),
+                                            aes192(5),
+                                            aes256(6),
+                                            aes128ctr(7),
+                                            aes192ctr(8),
+                                            aes256ctr(9),
+                                            aes128gcm64(10),
+                                            aes128gcm96(11),
+                                            aes128gcm128(12),
+                                            aes192gcm64(13),
+                                            aes192gcm96(14),
+                                            aes192gcm128(15),
+                                            aes256gcm64(16),
+                                            aes256gcm96(17),
+                                            aes256gcm128(18)
+                                            }
+                         MAX-ACCESS     read-create
+                         STATUS         current
+                         DESCRIPTION
+                             "Encryption algorithm to be used for payload
+                              encryption in IPsec:
+                              o  any: accept all supported algorithms as responder, use various pre-defined
+                                      as initiator
+                              o  des: DES
+                              o  des3: Triple-DES
+                              o  aes128: AES-CBC with 128 key bits
+                              o  aes192: AES-CBC with 192 key bits
+                              o  aes256: AES-CBC with 256 key bits
+                              o  aes128ctr: AES-COUNTER with 128 key bits
+                              o  aes192ctr: AES-COUNTER with 192 key bits
+                              o  aes256ctr: AES-COUNTER with 256 key bits
+                              o  aes128gcm64: AES-GCM with 64 bit ICV with 128 key bits
+                              o  aes128gcm96: AES-GCM with 96 bit ICV with 128 key bits
+                              o  aes128gcm128: AES-GCM with 128 bit ICV with 128 key bits
+                              o  aes192gcm64: AES-GCM with 64 bit ICV with 192 key bits
+                              o  aes192gcm96: AES-GCM with 96 bit ICV with 192 key bits
+                              o  aes192gcm128: AES-GCM with 128 bit ICV with 192 key bits
+                              o  aes256gcm64: AES-GCM with 64 bit ICV with 256 key bits
+                              o  aes256gcm96: AES-GCM with 96 bit ICV with 256 key bits
+                              o  aes256gcm128: AES-GCM with 128 bit ICV with 256 key bits
+                              "
+                         DEFVAL  { aes128 }
+                         ::= { hm2VpnConnEntry 29 }
+
+
+hm2VpnConnOperStatus   OBJECT-TYPE
+                        SYNTAX           INTEGER {
+                                                 up (1),
+                                                 down (2),
+                                                 negotiation (3),
+                                                 constructing (4),
+                                                 dormant (5),
+                                                 re-keying (6)
+                                                 }
+                         MAX-ACCESS     read-only
+                         STATUS         current
+                         DESCRIPTION
+                             "The current operational status of the VPN
+                              connection:
+                              o 'up': the IKE-SA and all IPsec-SAs are up;
+                              o 'down': the IKE-SA and all IPsec-SAs are down;
+                              o 'negotiation': key exchange and algorithm
+                                negotiation is in progress (or, as responder,
+                                waiting to be contacted for that purpose);
+                              o 'constructing': the IKE-SA is up, but at least one
+                                IPsec-SA is not established so far;
+                              o 'dormant': waiting for a precondition
+                                to be fulfilled before connection setup, e.g.:
+                                - a dynamically assigned IP address;
+                                - successful hostname resolution;
+                                - assignment of a valid system time.
+                              o 're-keying': key exchange is in progress 
+                                after timeout of lifetime has occured,
+                                either IKE or IPSEC;
+                              "
+                         ::= { hm2VpnConnEntry 30 }
+
+hm2VpnConnDesc   OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..128))
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                                 "User defined text."
+                         DEFVAL  { "" }                
+                         ::= { hm2VpnConnEntry 31 }
+
+hm2VpnConnLastError   OBJECT-TYPE
+                         SYNTAX                 HmLargeDisplayString (SIZE (0..512))
+                         MAX-ACCESS    read-only
+                         STATUS        current
+                         DESCRIPTION
+                                 "Last error notification occurred for this 
+                                 connection. This is useful if the connection 
+                                 does not reach the up state to see if an error
+                                 has occurred in the proposal exchange or when 
+                                 establishing the tunnel. In most cases this 
+                                 variable should be empty."
+                         DEFVAL  { "" }                
+                         ::= { hm2VpnConnEntry 32 }
+
+hm2VpnConnDebug   OBJECT-TYPE
+                         SYNTAX                  BITS {
+                                                      informational(0),
+                                                      unhandled(1)
+                                                      }
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                                 "Used for debugging purpose of the VPN connections.
+                                 May affect the performance significant.
+                                 Please handle with care. If the bit is set
+                                 informational(0) messages,
+                                 unhandled(1) messages (not handled by the stack)
+                                 are logged to the event log"
+                         DEFVAL  { { } }                
+                         ::= { hm2VpnConnEntry 33 }
+
+hm2VpnConnRowStatus   OBJECT-TYPE
+                         SYNTAX                  RowStatus
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "The row status of this table entry. If the row
+                              status is 'active' then it is not allowed to
+                              change any value (this applies also to active
+                              traffic selectors). The maximum number of active
+                              VPN connections is limited to hm2VpnConnMax. 
+                              The maximum number of active and up VPN 
+                              connections is limited to hm2VpnConnActiveMax."
+                         ::= { hm2VpnConnEntry 34 }
+
+--
+-- *************************************************************
+-- VPN Connection Statistics Table
+-- *************************************************************
+--
+hm2VpnConnInfoTable   OBJECT-TYPE
+                         SYNTAX SEQUENCE OF Hm2VpnConnInfoEntry
+                         MAX-ACCESS not-accessible
+                         STATUS current
+                         DESCRIPTION
+                             "A list of VPN connections."
+                         ::= { hm2VpnConnectionGroup 15 }
+
+hm2VpnConnInfoEntry   OBJECT-TYPE
+                         SYNTAX Hm2VpnConnInfoEntry
+                         MAX-ACCESS not-accessible
+                         STATUS current
+                         DESCRIPTION
+                             "A VPN connection entry."
+                         INDEX { hm2VpnConnIndex }
+                         ::= { hm2VpnConnInfoTable 1 }
+ 
+Hm2VpnConnInfoEntry ::= SEQUENCE {
+                         hm2VpnConnInfoIkeVersionUsed INTEGER,
+                         hm2VpnConnInfoIkeProposal DisplayString,
+                         hm2VpnConnInfoIpsecProposal DisplayString,
+                         hm2VpnConnInfoLocalHost DisplayString,
+                         hm2VpnConnInfoRemoteHost DisplayString,
+                         hm2VpnConnInfoEstablished Unsigned32,
+                         hm2VpnConnInfoIKEReauth Unsigned32,
+                         hm2VpnConnInfoIKERekeying Unsigned32,
+                         hm2VpnConnInfoIpsecRekeying Unsigned32,
+                         hm2VpnConnInfoIpsecInBytes Counter64,
+                         hm2VpnConnInfoIpsecInPackets Counter64,
+                         hm2VpnConnInfoIpsecInUse Unsigned32,
+                         hm2VpnConnInfoIpsecOutBytes Counter64,
+                         hm2VpnConnInfoIpsecOutPackets Counter64, 
+                         hm2VpnConnInfoIpsecOutUse Unsigned32,
+                         hm2VpnConnInfoIKEInitiatorSPI DisplayString,
+                         hm2VpnConnInfoIKEResponderSPI DisplayString,
+                         hm2VpnConnInfoIpsecInSPI DisplayString,
+                         hm2VpnConnInfoIpsecOutSPI DisplayString,
+                         hm2VpnConnInfoIpsecNumTunnel Unsigned32
+                         }
+
+hm2VpnConnInfoIkeVersionUsed   OBJECT-TYPE
+                         SYNTAX                 INTEGER {
+                                                        ikev1(1),
+                                                        ikev2(2)
+                                                        }
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                             "Version of the IKE protocol used by connection:
+                              o ikev1: used protocol is IKE version 1 (ISAKMP)
+                              o ikev2: used protocol is IKE version 2"
+                         ::= { hm2VpnConnInfoEntry 1 }
+
+hm2VpnConnInfoIkeProposal   OBJECT-TYPE
+                         SYNTAX                 DisplayString (SIZE (0..128))
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Algorithms the IKE uses for key exchange."
+                         ::= { hm2VpnConnInfoEntry 2 }
+
+hm2VpnConnInfoIpsecProposal  OBJECT-TYPE
+                         SYNTAX                 DisplayString (SIZE (0..128))
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Algorithms IPsec uses for the data communication."
+                         ::= { hm2VpnConnInfoEntry 3 }
+
+hm2VpnConnInfoLocalHost   OBJECT-TYPE
+                         SYNTAX                 DisplayString (SIZE (0..128))
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Local host detected by IKE."
+                         ::= { hm2VpnConnInfoEntry 4 }
+
+hm2VpnConnInfoRemoteHost   OBJECT-TYPE
+                         SYNTAX                 DisplayString (SIZE (0..128))
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Remote host detected by IKE."
+                         ::= { hm2VpnConnInfoEntry 5 }
+
+hm2VpnConnInfoEstablished    OBJECT-TYPE
+                         SYNTAX                 Unsigned32
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Time in seconds since the connection has been established
+                                 (is updated after IKE re-authentication)."
+                         ::= { hm2VpnConnInfoEntry 6 }
+
+hm2VpnConnInfoIKEReauth      OBJECT-TYPE
+                         SYNTAX                 Unsigned32
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Time in seconds when the next IKE re-authentication 
+                                 will take place."
+                         ::= { hm2VpnConnInfoEntry 7 }
+
+hm2VpnConnInfoIKERekeying    OBJECT-TYPE
+                         SYNTAX                  Unsigned32
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                                 "Time in seconds when the next IKE re-keying 
+                                 will take place."
+                         ::= { hm2VpnConnInfoEntry 8 }
+
+hm2VpnConnInfoIpsecRekeying  OBJECT-TYPE
+                         SYNTAX                  Unsigned32
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                                 "Time in seconds when the next IPsec re-keying 
+                                 will take place."
+                         ::= { hm2VpnConnInfoEntry 9 }
+
+hm2VpnConnInfoIpsecInBytes  OBJECT-TYPE
+                         SYNTAX                  Counter64
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                                 "Number of input Bytes from this IPsec tunnel."
+                         ::= { hm2VpnConnInfoEntry 10 }
+
+hm2VpnConnInfoIpsecInPackets  OBJECT-TYPE
+                         SYNTAX                  Counter64
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                                 "Number of input packets from this IPsec tunnel."
+                         ::= { hm2VpnConnInfoEntry 11 }
+
+hm2VpnConnInfoIpsecInUse  OBJECT-TYPE
+                         SYNTAX                  Unsigned32
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                                 "Time in seconds since the IPsec tunnel 
+                                 has last received data."
+                         ::= { hm2VpnConnInfoEntry 12 }
+
+hm2VpnConnInfoIpsecOutBytes  OBJECT-TYPE
+                         SYNTAX                  Counter64
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                                 "Number of output Bytes to this IPsec tunnel."
+                         ::= { hm2VpnConnInfoEntry 13 }
+
+hm2VpnConnInfoIpsecOutPackets  OBJECT-TYPE
+                         SYNTAX                  Counter64
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                                 "Number of output packets to this IPsec tunnel."
+                         ::= { hm2VpnConnInfoEntry 14 }
+
+hm2VpnConnInfoIpsecOutUse  OBJECT-TYPE
+                         SYNTAX                  Unsigned32
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                                 "Time in seconds since the IPsec tunnel 
+                                 has last sent data."
+                         ::= { hm2VpnConnInfoEntry 15 }
+
+hm2VpnConnInfoIKEInitiatorSPI  OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..32))
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                                 "The IKE initiator SPI (local or remote, depends on initiator settings)."
+                         ::= { hm2VpnConnInfoEntry 16 }
+
+hm2VpnConnInfoIKEResponderSPI  OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..32))
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                                 "The IKE responder SPI (local or remote, depends on initiator settings)."
+                         ::= { hm2VpnConnInfoEntry 17 }
+
+hm2VpnConnInfoIpsecInSPI  OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..16))
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                                 "The input IPsec SPI."
+                         ::= { hm2VpnConnInfoEntry 18 }
+
+hm2VpnConnInfoIpsecOutSPI  OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..16))
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                                 "The output IPsec SPI."
+                         ::= { hm2VpnConnInfoEntry 19 }
+
+hm2VpnConnInfoIpsecNumTunnel   OBJECT-TYPE
+                         SYNTAX                  Unsigned32 
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                                 "The number of IPsec tunnels (IPsec-SAs) 
+                                  within this VPN connection."
+                         ::= { hm2VpnConnInfoEntry 20 }
+
+--
+-- *************************************************************
+-- VPN Connection Statistics Table for Tunnels
+-- *************************************************************
+--
+hm2VpnConnInfoTunnelTable   OBJECT-TYPE
+                         SYNTAX SEQUENCE OF Hm2VpnConnInfoTunnelEntry
+                         MAX-ACCESS not-accessible
+                         STATUS current
+                         DESCRIPTION
+                             "A list of IPsec tunnels (IPsec-SAs) for 
+                              a VPN connection (IKE-SA)."
+                         ::= { hm2VpnConnectionGroup 16 }
+
+hm2VpnConnInfoTunnelEntry   OBJECT-TYPE
+                         SYNTAX Hm2VpnConnInfoTunnelEntry
+                         MAX-ACCESS not-accessible
+                         STATUS current
+                         DESCRIPTION
+                             "An IPsec tunnel entry (per traffic selector)."
+                         INDEX { hm2VpnConnIndex , hm2VpnConnInfoTunnelIndex }
+                         ::= { hm2VpnConnInfoTunnelTable 1 }
+ 
+Hm2VpnConnInfoTunnelEntry ::= SEQUENCE {
+                                hm2VpnConnInfoTunnelIndex Integer32,
+                                hm2VpnConnInfoTSelIndex Integer32,
+                                hm2VpnConnInfoTunnelStatus INTEGER,
+                                hm2VpnConnInfoTunnelRekeying Unsigned32,
+                                hm2VpnConnInfoTunnelInBytes Counter64,
+                                hm2VpnConnInfoTunnelInPackets Counter64,
+                                hm2VpnConnInfoTunnelInUse Unsigned32,
+                                hm2VpnConnInfoTunnelOutBytes Counter64,
+                                hm2VpnConnInfoTunnelOutPackets Counter64, 
+                                hm2VpnConnInfoTunnelOutUse Unsigned32,
+                                hm2VpnConnInfoTunnelInSPI DisplayString,
+                                hm2VpnConnInfoTunnelOutSPI DisplayString,
+                                hm2VpnConnInfoTunnelLocalSel DisplayString,
+                                hm2VpnConnInfoTunnelRemoteSel DisplayString
+                                }
+
+hm2VpnConnInfoTunnelIndex   OBJECT-TYPE
+                         SYNTAX                  Integer32 (1..32)
+                         MAX-ACCESS              not-accessible
+                         STATUS                  current
+                         DESCRIPTION
+                             "An index that (together with the connection
+                              index hm2VpnConnIndex) identifies the entry
+                              in the connection info tunnel table."
+                         ::= { hm2VpnConnInfoTunnelEntry 1 }
+
+hm2VpnConnInfoTSelIndex   OBJECT-TYPE
+                         SYNTAX                  Integer32 (0..16)
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "An index that (together with the connection
+                              index hm2VpnConnIndex) identifies the entry
+                              in the traffic selector table which is mapped 
+                              with this IPsec tunnel. This index can
+                              be choosen freely, 0 is for unknown traffic 
+                              selector index."
+                         ::= { hm2VpnConnInfoTunnelEntry 2 }
+
+hm2VpnConnInfoTunnelStatus   OBJECT-TYPE
+                        SYNTAX                   INTEGER {
+                                                     unknown (0),
+                                                     created (1),
+                                                     routed (2),
+                                                     installing (3),
+                                                     installed (4),
+                                                     updating (5),
+                                                     re-keying (6),
+                                                     re-keyed (7),
+                                                     re-trying (8),
+                                                     deleting (9),
+                                                     destroying (10)
+                                                     }
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "The current operational status of the IPsec tunnel:
+                              o 'unknown': the IPsec-SA state is not (yet) known;
+                              o 'created': the IPsec-SA has been created;
+                              o 'routed': the SPD has been installed, but no SAD entries 
+                              o 'installing': the in-use IPsec-SA is currently installing;
+                              o 'installed': the in-use IPsec-SA is installed;
+                              o 'updating': updating hosts;
+                              o 're-keying': the IPsec-SA is currently re-keying;
+                              o 're-keyed': the IPsec-SA has been re-keyed but is still installed;
+                              o 're-trying': the IPsec-SA negotian failed, but still is re-trying;
+                              o 'deleting': the IPsec-SA is in progress of delete;
+                              o 'destroying': the IPsec-SA object gets destroyed;
+                              "
+                         ::= { hm2VpnConnInfoTunnelEntry 3 }
+
+hm2VpnConnInfoTunnelRekeying  OBJECT-TYPE
+                         SYNTAX                  Unsigned32
+                         UNITS                   "seconds"
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "Time in seconds when the next IPsec re-keying 
+                             will take place for this tunnel."
+                         ::= { hm2VpnConnInfoTunnelEntry 4 }
+
+hm2VpnConnInfoTunnelInBytes  OBJECT-TYPE
+                         SYNTAX                  Counter64
+                         UNITS                   "bytes"
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "Number of input Bytes from this IPsec tunnel."
+                         ::= { hm2VpnConnInfoTunnelEntry 5 }
+
+hm2VpnConnInfoTunnelInPackets  OBJECT-TYPE
+                         SYNTAX                  Counter64
+                         UNITS                   "packets"
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "Number of input packets from this IPsec tunnel."
+                         ::= { hm2VpnConnInfoTunnelEntry 6 }
+
+hm2VpnConnInfoTunnelInUse  OBJECT-TYPE
+                         SYNTAX                  Unsigned32
+                         UNITS                   "seconds"
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "Time in seconds since the IPsec tunnel 
+                             has last received data."
+                         ::= { hm2VpnConnInfoTunnelEntry 7 }
+
+hm2VpnConnInfoTunnelOutBytes  OBJECT-TYPE
+                         SYNTAX                  Counter64
+                         UNITS                   "bytes"
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "Number of output Bytes to this IPsec tunnel."
+                         ::= { hm2VpnConnInfoTunnelEntry 8 }
+
+hm2VpnConnInfoTunnelOutPackets  OBJECT-TYPE
+                         SYNTAX                  Counter64
+                         UNITS                   "packets"
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "Number of output packets to this IPsec tunnel."
+                         ::= { hm2VpnConnInfoTunnelEntry 9 }
+
+hm2VpnConnInfoTunnelOutUse  OBJECT-TYPE
+                         SYNTAX                  Unsigned32
+                         UNITS                   "seconds"
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "Time in seconds since the IPsec tunnel 
+                             has last sent data."
+                         ::= { hm2VpnConnInfoTunnelEntry 10 }
+
+hm2VpnConnInfoTunnelInSPI  OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..16))
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "The input IPsec SPI for this tunnel."
+                         ::= { hm2VpnConnInfoTunnelEntry 11 }
+
+hm2VpnConnInfoTunnelOutSPI  OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..16))
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "The output IPsec SPI for this tunnel."
+                         ::= { hm2VpnConnInfoTunnelEntry 12 }
+
+hm2VpnConnInfoTunnelLocalSel  OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..64))
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "The local traffic selector for this tunnel (negociated)."
+                         ::= { hm2VpnConnInfoTunnelEntry 13 }
+
+hm2VpnConnInfoTunnelRemoteSel  OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..64))
+                         MAX-ACCESS              read-only
+                         STATUS                  current
+                         DESCRIPTION
+                             "The remote traffic selector for this tunnel (negociated)."
+                         ::= { hm2VpnConnInfoTunnelEntry 14 }
+
+--
+-- *************************************************************
+-- VPN Traffic Selector Table
+-- *************************************************************
+--
+hm2VpnTrafficSelTable        OBJECT-TYPE
+             SYNTAX SEQUENCE OF Hm2VpnTrafficSelEntry
+             MAX-ACCESS not-accessible
+             STATUS current
+             DESCRIPTION
+                 "A list of traffic selectors. For details on the
+                  role of traffic selectors in IPsec protocol see
+                  RFC 2409, section 5.5 and RFC 4306, section 2.9."
+             ::= { hm2VpnTrafficSelGroup 1 }
+
+hm2VpnTrafficSelEntry   OBJECT-TYPE
+             SYNTAX Hm2VpnTrafficSelEntry
+             MAX-ACCESS not-accessible
+             STATUS current
+             DESCRIPTION
+                 "A traffic selector entry. A traffic selector
+                  defines the subnet/host addresses for which
+                  this VPN connection is responsible.
+                  A VPN connection (IKE-SA) can be associated with 
+                  multiple traffic selectors. Each one will be 
+                  mapped to a single IPsec tunnel (IPsec-SA)."
+             INDEX { hm2VpnConnIndex, hm2VpnTrafficSelIndex }
+             ::= { hm2VpnTrafficSelTable 1 }
+ 
+Hm2VpnTrafficSelEntry ::= SEQUENCE {
+             hm2VpnTrafficSelIndex       Integer32,
+             hm2VpnTrafficSelSrcAddr     DisplayString,
+             hm2VpnTrafficSelDstAddr     DisplayString,
+             hm2VpnTrafficSelSrcRest     DisplayString,
+             hm2VpnTrafficSelDstRest     DisplayString,
+             hm2VpnTrafficSelDesc        DisplayString,
+             hm2VpnTrafficSelRowStatus   RowStatus
+             }
+
+hm2VpnTrafficSelIndex   OBJECT-TYPE
+             SYNTAX                  Integer32 (1..16)
+             MAX-ACCESS              not-accessible
+             STATUS                  current
+             DESCRIPTION
+                     "An index that (together with the connection
+                      index hm2VpnConnIndex) identifies the entry
+                      in the traffic selector table. This index can
+                      be choosen freely, but must be greater than 0."
+             ::= { hm2VpnTrafficSelEntry 1 }
+
+
+hm2VpnTrafficSelSrcAddr   OBJECT-TYPE
+             SYNTAX                  DisplayString (SIZE (0..32))
+             MAX-ACCESS              read-create
+             STATUS                  current
+             DESCRIPTION
+                 "Host or subnet address in CIDR notation (a.b.c.d/n)
+                  for which this traffic descriptor (and the
+                  associated VPN connection) is responsible. This
+                  address is compared to the source address of
+                  IP packets sent, when determining the associated
+                  IPsec and IKE-SA. The special keyword 'any' means
+                  that the address comparison always matches."
+             DEFVAL  { "any" }
+             ::= { hm2VpnTrafficSelEntry 2 }
+
+
+hm2VpnTrafficSelDstAddr   OBJECT-TYPE
+             SYNTAX                  DisplayString (SIZE (0..32))
+             MAX-ACCESS              read-create
+             STATUS                  current
+             DESCRIPTION
+                 "Host or subnet address in CIDR notation (a.b.c.d/n)
+                  for which this traffic descriptor (and the
+                  associated VPN connection) is responsible. This
+                  address is compared to the destination address of
+                  IP packets sent, when determining the associated
+                  IPsec and IKE-SA. The special keyword 'any' means
+                  that the address comparison always matches."
+             DEFVAL  { "any" }
+             ::= { hm2VpnTrafficSelEntry 3 }
+
+
+hm2VpnTrafficSelSrcRest   OBJECT-TYPE
+             SYNTAX          DisplayString (SIZE (0..32))
+             MAX-ACCESS      read-create
+             STATUS          current
+             DESCRIPTION
+                 "The optional source restrictions (names or numbers) 
+                 <protocol/port>, e.g.
+                 tcp/http  which is equal to 6/80,
+                 or udp which is equal to udp/any
+                 or /53 which is equal to any/53
+                 "
+             DEFVAL  { "" }                
+             ::= { hm2VpnTrafficSelEntry 4 }
+
+
+hm2VpnTrafficSelDstRest   OBJECT-TYPE
+             SYNTAX          DisplayString (SIZE (0..32))
+             MAX-ACCESS      read-create
+             STATUS          current
+             DESCRIPTION
+                 "The optional destination restrictions (names or numbers) 
+                 <protocol/port>, e.g.
+                 tcp/http  which is equal to 6/80,
+                 or udp which is equal to udp/any
+                 or /53 which is equal to any/53
+                 "
+             DEFVAL  { "" }                
+             ::= { hm2VpnTrafficSelEntry 5 }
+
+
+hm2VpnTrafficSelDesc   OBJECT-TYPE
+                         SYNTAX                  DisplayString (SIZE (0..128))
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                                 "User defined text."
+                         DEFVAL  { "" }                
+                         ::= { hm2VpnTrafficSelEntry 6 }
+
+
+hm2VpnTrafficSelRowStatus   OBJECT-TYPE
+                         SYNTAX                  RowStatus
+                         MAX-ACCESS              read-create
+                         STATUS                  current
+                         DESCRIPTION
+                             "The row status of this table entry. Only traffic
+                              selector entries with an 'active' row status will
+                              be considered if the connections row status is set
+                              'active'. Independent of that dependency any value
+                              in this entry can be changed only if the row
+                              status is not 'active'."
+                         ::= { hm2VpnTrafficSelEntry 7 }
+
+--
+-- *************************************************************
+-- VPN Certificate Group
+-- *************************************************************
+--
+hm2VpnCertificateUploadPassphrase OBJECT-TYPE
+                SYNTAX                  DisplayString (SIZE (0..128))
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION
+                    "Setting the correct passphrase here before uploading an
+                    encrypted private key or an encrypted PKCS12 container will
+                    trigger the decryption of the uploaded file before storing 
+                    on the device. The value cannot be read and is not stored
+                    after the file transfer.
+                    WARNING: the file is stored unencrypted on the device. Use with
+                    care!"
+        ::= {hm2VpnCertificateGroup 1 }
+
+hm2VpnCertificateTable        OBJECT-TYPE
+             SYNTAX SEQUENCE OF Hm2VpnCertificateEntry
+             MAX-ACCESS not-accessible
+             STATUS current
+             DESCRIPTION
+                 "The list of certificates available on the device."
+             ::= { hm2VpnCertificateGroup 10 }
+
+hm2VpnCertificateEntry   OBJECT-TYPE
+             SYNTAX Hm2VpnCertificateEntry
+             MAX-ACCESS not-accessible
+             STATUS current
+             DESCRIPTION
+                 "A certificate file entry. A certificate file which 
+                  has been copied to the device and can be used for 
+                  VPN connections."
+             INDEX { hm2VpnCertificateIndex }
+             ::= { hm2VpnCertificateTable 1 }
+
+Hm2VpnCertificateEntry ::= SEQUENCE {
+            hm2VpnCertificateIndex              Integer32,
+            hm2VpnCertificateSubject            DisplayString,
+            hm2VpnCertificateIssuer             DisplayString,
+            hm2VpnCertificateStartDate          HmTimeSeconds1970,
+            hm2VpnCertificateEndDate            HmTimeSeconds1970,
+            hm2VpnCertificateFileName           DisplayString,
+            hm2VpnCertificateType               INTEGER,
+                hm2VpnCertificateCertUploadDate     HmTimeSeconds1970, 
+            hm2VpnCertificatePrivateKeyStatus   INTEGER,
+            hm2VpnCertificatePrivateKeyFile     DisplayString,
+            hm2VpnCertificateNoConnections      Integer32,
+            hm2VpnCertificateUserActions        INTEGER
+                        }
+
+hm2VpnCertificateIndex OBJECT-TYPE
+                         SYNTAX                 Integer32 (1..100)
+                         MAX-ACCESS     not-accessible
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Index of the entry."
+                         ::= { hm2VpnCertificateEntry 1 }
+
+                         
+hm2VpnCertificateSubject OBJECT-TYPE
+                         SYNTAX                 DisplayString (SIZE(0..128))
+                         MAX-ACCESS     read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Subject field of certificate."
+                         ::= { hm2VpnCertificateEntry 2 }
+        
+                         
+hm2VpnCertificateIssuer OBJECT-TYPE
+                         SYNTAX                 DisplayString (SIZE(0..128))
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Certificate issuer."
+                         ::= { hm2VpnCertificateEntry 3 }
+
+hm2VpnCertificateStartDate OBJECT-TYPE
+                         SYNTAX                 HmTimeSeconds1970
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Time and date when certificate is begining
+                 to be valid."
+                         ::= { hm2VpnCertificateEntry 4 }
+
+
+hm2VpnCertificateEndDate OBJECT-TYPE
+                         SYNTAX                 HmTimeSeconds1970
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Time and date when certificate will expire."
+                         ::= { hm2VpnCertificateEntry 5 }
+
+hm2VpnCertificateFileName OBJECT-TYPE
+                         SYNTAX                 DisplayString (SIZE(0..64))
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Name of the file consisting of alphanumeric
+                                 characters plus hyphen, underscore and dot."
+                         ::= { hm2VpnCertificateEntry 6 }
+        
+hm2VpnCertificateType OBJECT-TYPE
+                         SYNTAX                 INTEGER{
+                                                                ca (1),
+                                                                peer (2),
+                                encryptedkey(3),
+                                                                pkcs12 (4),
+                                encryptedpkcs12(5)
+                                                        }
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Type of the container file used."
+                         ::= { hm2VpnCertificateEntry 7 }
+
+hm2VpnCertificateCertUploadDate OBJECT-TYPE
+                         SYNTAX                 HmTimeSeconds1970
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Time and date of last write access using the
+                                 content of the variable hm2SystemTime."
+                         ::= { hm2VpnCertificateEntry 8 }
+
+hm2VpnCertificatePrivateKeyStatus OBJECT-TYPE
+             SYNTAX         INTEGER{
+                                none(1),
+                                present(2),
+                                notFound(3)
+                            }
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION
+                "Shows if a Peer certificate has a private
+                key uploaded on the device. A Peer certificate
+                cannot be used without a private key uploaded
+                to the device. Does not apply to CA certificates."
+            ::= { hm2VpnCertificateEntry 9 }
+
+hm2VpnCertificatePrivateKeyFile OBJECT-TYPE
+                         SYNTAX                 DisplayString (SIZE(0..64))
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Name of the file consisting of alphanumeric
+                                 characters plus hyphen, underscore and dot."
+                         ::= { hm2VpnCertificateEntry 10 }
+
+hm2VpnCertificateNoConnections OBJECT-TYPE
+                         SYNTAX                 Integer32 (0..256)
+                         MAX-ACCESS             read-only
+                         STATUS                 current
+                         DESCRIPTION
+                                 "Number of active connections that use this
+                 certificate. The certificate cannot be deleted
+                 from the device unless there are no active
+                 connections using it (this field is set to 0)."
+                         ::= { hm2VpnCertificateEntry 11 }
+
+hm2VpnCertificateUserActions OBJECT-TYPE
+             SYNTAX         INTEGER{
+                                other(1),
+                                delete(2)
+                            }
+            MAX-ACCESS      read-write
+            STATUS          current
+            DESCRIPTION
+                "Provides a way to delete unused certificate
+                files from the device. A certificate can only
+                be deleted if there are no active connections 
+                using it (see hm2VpnCertificateNoConnections).
+                Deleting a Peer certificate automatically deletes
+                the private key asociated with it (if any)."
+            ::= { hm2VpnCertificateEntry 12 }
+                         
+
+--
+-- *************************************************************
+-- VPN SNMP Extension Group (extended error/event handling)
+-- *************************************************************
+--
+
+hm2VpnMibSNMPExtensionNoTrafficSelector OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that for a VPN connection no active traffic selectors are available."
+           ::= { hm2VpnMibSNMPExtensionGroup 1 }
+
+hm2VpnMibSNMPExtensionTooManyActive OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that too many VPN connections are in active state."
+           ::= { hm2VpnMibSNMPExtensionGroup 2 }
+
+hm2VpnMibSNMPExtensionTooManyConns OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that too many VPN connections shall be added to the configuration."
+           ::= { hm2VpnMibSNMPExtensionGroup 3 }
+
+hm2VpnMibSNMPExtensionActiveRow OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that an active row shall be changed."
+           ::= { hm2VpnMibSNMPExtensionGroup 4 }
+
+hm2VpnMibSNMPExtensionInitiatorAny OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that for a VPN connection as initiator the remote end point is set to any."
+           ::= { hm2VpnMibSNMPExtensionGroup 5 }
+
+--
+-- *************************************************************
+-- VPN Trap/Notification Group
+-- *************************************************************
+--
+hm2VpnUpTrap NOTIFICATION-TYPE
+    OBJECTS { hm2VpnConnIndex, hm2VpnConnOperStatus }
+    STATUS  current
+    DESCRIPTION
+        "A hm2VpnUpTrap trap signals that a VPN connection
+        is about to enter the up state from some other state
+        (see 'hm2VpnConnOperStatus')."
+    ::= { hm2VpnMibNotifications 1 }
+
+hm2VpnDownTrap NOTIFICATION-TYPE
+    OBJECTS { hm2VpnConnIndex, hm2VpnConnOperStatus }
+    STATUS  current
+    DESCRIPTION
+        "A hm2VpnDownTrap trap signals that a VPN connection
+        is about to enter the down state from some other state
+        (see 'hm2VpnConnOperStatus')."
+    ::= { hm2VpnMibNotifications 2 }
+
+END
+

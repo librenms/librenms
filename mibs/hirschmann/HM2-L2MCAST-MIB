@@ -1,0 +1,383 @@
+
+HM2-L2MCAST-MIB DEFINITIONS ::= BEGIN
+
+--
+-- *************************************************************
+-- Hirschmann L2 Multicast MIB
+-- *************************************************************
+--
+
+IMPORTS
+	OBJECT-IDENTITY,
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    Counter32                   FROM SNMPv2-SMI -- RFC 2578
+    PortList					FROM Q-BRIDGE-MIB
+    hm2ConfigurationMibs        FROM HM2-TC-MIB
+    dot1qVlanIndex				FROM Q-BRIDGE-MIB
+    ifIndex                     FROM IF-MIB;
+
+hm2L2McastMib MODULE-IDENTITY
+	LAST-UPDATED "201201100000Z" -- January 10, 2012
+    ORGANIZATION "Hirschmann Automation and Control GmbH"
+    CONTACT-INFO
+        "Postal:     Stuttgarter Str. 45-51
+                     72654 Neckartenzlingen
+                     Germany
+         Phone:      +49 7127 140
+         E-mail:     hac.support@belden.com"
+    DESCRIPTION
+        "Hirschmann L2 Multicast MIB.
+         Copyright (C) 2012. All Rights Reserved."
+    REVISION     "201201100000Z" -- January 10, 2012
+    DESCRIPTION
+         "Initial version."
+    ::= { hm2ConfigurationMibs 33 }
+
+--
+-- *************************************************************
+-- hm2L2McastMib
+-- *************************************************************
+--
+hm2L2McastMibNotifications		OBJECT IDENTIFIER ::= { hm2L2McastMib 0 }
+hm2L2McastMibObjects			OBJECT IDENTIFIER ::= { hm2L2McastMib 1 }
+-- hm2L2McastMibConformance		OBJECT IDENTIFIER ::= { hm2L2McastMib 2 }
+hm2L2McastSNMPExtensionGroup 	OBJECT IDENTIFIER ::= { hm2L2McastMib 3 }
+
+--
+-- *************************************************************
+-- hm2L2Multicast groups
+-- *************************************************************
+--                                                                         
+hm2L2McastSnoopingObjects  OBJECT IDENTIFIER ::= { hm2L2McastMibObjects 1 }
+hm2L2McastFilteringObjects OBJECT IDENTIFIER ::= { hm2L2McastMibObjects 2 }
+hm2L2McastSnoopingStatistics OBJECT IDENTIFIER ::= { hm2L2McastMibObjects 3 }
+
+--
+-- *************************************************************
+-- hm2L2McastSnoopingObjects group
+-- *************************************************************
+--
+
+hm2L2McastSnoopingGroup  OBJECT IDENTIFIER ::= { hm2L2McastSnoopingObjects 1 }
+
+--
+-- Querier Table (Learnt, Static and Automatic Query Ports)
+--
+hm2L2McastSnoopingQuerierTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2L2McastSnoopingQuerierEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table for displaying and configuring the IGMP query ports."
+         ::= { hm2L2McastSnoopingGroup 1 }
+
+hm2L2McastSnoopingQuerierEntry OBJECT-TYPE
+         SYNTAX      Hm2L2McastSnoopingQuerierEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table for displaying and configuring the IGMP query ports.
+                      An entry appears in this table for all VLANs that are currently instantiated."
+         INDEX       { dot1qVlanIndex }
+         ::= { hm2L2McastSnoopingQuerierTable 1 }
+
+Hm2L2McastSnoopingQuerierEntry ::= SEQUENCE {
+           hm2L2McastSnoopingQueryPorts	 		 			PortList,
+           hm2L2McastSnoopingQueryStaticPorts	 			PortList,
+           hm2L2McastSnoopingQueryPortsAutoPorts			PortList,
+           hm2L2McastSnoopingQueryPortsAutoPortsState		PortList
+          }
+
+hm2L2McastSnoopingQueryPorts OBJECT-TYPE
+    	SYNTAX 		PortList
+    	MAX-ACCESS 	read-only
+    	STATUS		current
+    	DESCRIPTION
+    	"This read-only object displays the set of ports that have received
+    	 IGMP query PDUs for this VLAN as determined by the snooping task."
+   		::= { hm2L2McastSnoopingQuerierEntry 1 }
+
+hm2L2McastSnoopingQueryStaticPorts OBJECT-TYPE
+    	SYNTAX 		PortList
+    	MAX-ACCESS 	read-write
+    	STATUS 		current
+    	DESCRIPTION
+    	"The set of ports explicitly configured by management to
+         be IGMP query ports for this VLAN."
+    	::= { hm2L2McastSnoopingQuerierEntry 2 }
+
+hm2L2McastSnoopingQueryPortsAutoPorts OBJECT-TYPE
+    	SYNTAX 		PortList
+    	MAX-ACCESS 	read-only
+    	STATUS 		current
+    	DESCRIPTION
+    	"The set of ports that are automatically learned by LLDP protocol to
+     	 be IGMP query ports for this VLAN."
+    	::= { hm2L2McastSnoopingQuerierEntry 3 }
+
+hm2L2McastSnoopingQueryPortsAutoPortsState OBJECT-TYPE
+    	SYNTAX 		PortList
+    	MAX-ACCESS 	read-write
+    	STATUS 		current
+    	DESCRIPTION
+    	"The set of ports that are allowed to be learned automatically by LLDP protocol to
+     	 be IGMP query ports for this VLAN."
+    	::= { hm2L2McastSnoopingQuerierEntry 4 }
+
+--
+-- ForwardAll Table
+--
+
+hm2L2McastSnoopingForwardAllTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2L2McastSnoopingForwardAllEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table containing forwarding information for each
+					  VLAN, specifying the set of ports to which forwarding of
+ 					  all multicasts applies, which are dynamically learnt."
+         ::= { hm2L2McastSnoopingGroup 2 }
+
+hm2L2McastSnoopingForwardAllEntry OBJECT-TYPE
+         SYNTAX      Hm2L2McastSnoopingForwardAllEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Forwarding information for a VLAN, specifying the set
+ 					  of ports to which all multicasts should be forwarded,
+ 					  which are dynamically learnt. An entry appears in this
+ 					  table for all VLANs that are currently instantiated."
+         INDEX       { dot1qVlanIndex }
+         ::= { hm2L2McastSnoopingForwardAllTable 1 }
+
+Hm2L2McastSnoopingForwardAllEntry ::= SEQUENCE {
+           hm2L2McastSnoopingForwardAllStaticPorts PortList
+          }
+
+hm2L2McastSnoopingForwardAllStaticPorts OBJECT-TYPE
+    	SYNTAX 		PortList
+    	MAX-ACCESS 	read-write
+    	STATUS 		current
+    	DESCRIPTION
+    	"The set of ports configured by management in this VLAN
+ 		 to which all dyamically learnt multicast group-addressed
+ 		 frames are to be forwarded."
+ 		::= { hm2L2McastSnoopingForwardAllEntry 1 }
+
+--
+-- *************************************************************
+-- hm2L2McastFilteringObjects group
+-- *************************************************************
+--
+hm2L2McastFilteringGroup  OBJECT IDENTIFIER ::= { hm2L2McastFilteringObjects 1 }
+
+    hm2L2McastFilteringTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2L2McastFilteringEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table for configuring the filtering behaviour for
+                      known multicast group-addressed frames."
+         ::= { hm2L2McastFilteringGroup 1 }
+
+    hm2L2McastFilteringEntry OBJECT-TYPE
+         SYNTAX      Hm2L2McastFilteringEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table for configuring the filtering behaviour for
+                      known multicast group-addressed frames. An entry appears
+                      in this table for all VLANs that are currently instantiated."
+         INDEX       { dot1qVlanIndex }
+         ::= { hm2L2McastFilteringTable 1 }
+
+    Hm2L2McastFilteringEntry ::= SEQUENCE {
+           hm2L2McastFilteringKnownMode	 INTEGER
+          }
+
+    hm2L2McastFilteringKnownMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      query-and-registered-ports(1),
+				 	  registered-ports-only(2)
+                     }                  
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Sets the mode how known multicast packets 
+					  will be treated. 
+ 					  The default value is registered-ports-only(2)."
+         DEFVAL { registered-ports-only }
+         ::= { hm2L2McastFilteringEntry 1 }
+
+
+    hm2L2McastFilteringUnknownMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      discard(1),
+				 	  flood(2),
+					  query-ports(3)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Sets the mode how unknown multicast packets 
+					  will be treated.
+ 					  The default value is flood(2)."
+         DEFVAL { flood }
+         ::= { hm2L2McastFilteringGroup 2 }
+         
+--
+-- *************************************************************
+-- hm2L2McastSnoopingStatistics group
+-- *************************************************************
+--
+hm2L2McastSnoopingStatisticsGroup  OBJECT IDENTIFIER ::= { hm2L2McastSnoopingStatistics 1 }
+
+    hm2L2McastSnoopingIgmpReportsFramesProcessed OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "IGMP reports, joins or leaves processed by CPU. 
+                     The number of multicast control frames that have been processed by the CPU."
+         ::= { hm2L2McastSnoopingStatisticsGroup 1 }
+
+    hm2L2McastSnoopingIgmpQueriesV1FramesProcessed OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "IGMP queries version 1 processed by CPU. 
+                     The number of multicast control frames that have been processed by the CPU."
+         ::= { hm2L2McastSnoopingStatisticsGroup 2 }
+
+    hm2L2McastSnoopingIgmpQueriesV2FramesProcessed OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "IGMP queries version 2 processed by CPU. 
+                     The number of multicast control frames that have been processed by the CPU."
+         ::= { hm2L2McastSnoopingStatisticsGroup 3 }
+
+    hm2L2McastSnoopingIgmpQueriesV3FramesProcessed OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "IGMP queries version 3 processed by CPU. 
+                     The number of multicast control frames that have been processed by the CPU."
+         ::= { hm2L2McastSnoopingStatisticsGroup 4 }
+
+    hm2L2McastSnoopingIgmpWrongVersionQueries OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The number of general queries received whose IGMP version does not match
+                      the equivalent hm2AgentSwitchSnoopingQuerierVersion."
+         ::= { hm2L2McastSnoopingStatisticsGroup 5 }
+
+    hm2L2McastSnoopingPimDvmrpFramesProcessed OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "PIM or DVMRP frames processed by CPU. 
+                     The number of multicast control frames that have been processed by the CPU."
+         ::= { hm2L2McastSnoopingStatisticsGroup 6 }
+
+
+    hm2L2McastSnoopingStatisticsTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Hm2L2McastSnoopingStatisticsEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table for multicast control frames that have been processed by the CPU."
+         ::= { hm2L2McastSnoopingStatisticsGroup 10 }
+
+    hm2L2McastSnoopingStatisticsEntry OBJECT-TYPE
+         SYNTAX      Hm2L2McastSnoopingStatisticsEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table for multicast control frames that have been processed by the CPU.
+                      An entry appears in this table for any physical interfaces."
+         INDEX       { ifIndex }
+         ::= { hm2L2McastSnoopingStatisticsTable 1 }
+
+    Hm2L2McastSnoopingStatisticsEntry ::= SEQUENCE {
+           hm2L2McastSnoopingIntfIgmpReportsFramesProcessed	  Counter32,
+           hm2L2McastSnoopingIntfIgmpQueriesV1FramesProcessed Counter32,
+           hm2L2McastSnoopingIntfIgmpQueriesV2FramesProcessed Counter32,
+           hm2L2McastSnoopingIntfIgmpQueriesV3FramesProcessed Counter32,
+           hm2L2McastSnoopingIntfIgmpWrongVersionQueries      Counter32,
+           hm2L2McastSnoopingIntfPimDvmrpFramesProcessed      Counter32
+          }
+
+    hm2L2McastSnoopingIntfIgmpReportsFramesProcessed OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "IGMP reports, joins or leaves processed by CPU and received on the interface. 
+                     The number of multicast control frames that have been processed by the CPU."
+         ::= { hm2L2McastSnoopingStatisticsEntry 2 }
+
+    hm2L2McastSnoopingIntfIgmpQueriesV1FramesProcessed OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "IGMP queries version 1 processed by CPU and received on the interface. 
+                     The number of multicast control frames that have been processed by the CPU."
+         ::= { hm2L2McastSnoopingStatisticsEntry 3 }
+
+    hm2L2McastSnoopingIntfIgmpQueriesV2FramesProcessed OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "IGMP queries version 2 processed by CPU and received on the interface. 
+                     The number of multicast control frames that have been processed by the CPU."
+         ::= { hm2L2McastSnoopingStatisticsEntry 4 }
+
+    hm2L2McastSnoopingIntfIgmpQueriesV3FramesProcessed OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "IGMP queries version 3 processed by CPU and received on the interface. 
+                     The number of multicast control frames that have been processed by the CPU."
+         ::= { hm2L2McastSnoopingStatisticsEntry 5 }
+
+    hm2L2McastSnoopingIntfIgmpWrongVersionQueries OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The number of general queries received whose IGMP version does not match
+                      the equivalent hm2AgentSwitchSnoopingQuerierVersion."
+         ::= { hm2L2McastSnoopingStatisticsEntry 6 }
+
+    hm2L2McastSnoopingIntfPimDvmrpFramesProcessed OBJECT-TYPE
+         SYNTAX      Counter32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "PIM or DVMRP frames processed by CPU and received on the interface. 
+                     The number of multicast control frames that have been processed by the CPU."
+         ::= { hm2L2McastSnoopingStatisticsEntry 7 }
+         
+--
+-- ***********************************************************
+-- hm2L2McastSNMPExtensionGroup
+-- ***********************************************************
+--
+
+hm2L2McastGroupMembershipErrorReturn OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "Indicates that Max Response Time is greater than the Group Membership Interval"
+           ::= { hm2L2McastSNMPExtensionGroup 1 }
+
+END
