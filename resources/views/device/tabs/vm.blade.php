@@ -2,42 +2,37 @@
 
 @section('content')
     <x-device.page :device="$device">
-        @isset($data['submenu'])
-            <x-submenu :title="$title" :menu="$data['submenu']" :device-id="$device_id" :current-tab="$current_tab" :selected="$vars" />
-        @endisset
-
-        <table class="table table-hover table-condensed table-striped">
-        <thead>
-            <tr>
-                <th>{{ __('VM Name') }}</th>
-                <th>{{ __('Power Status') }}</th>
-                <th>{{ __('Operating System') }}</th>
-                <th>{{ __('Memory') }}</th>
-                <th>{{ __('CPU') }}</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach($data['vms'] as $vm)
-            <tr>
-                <td>
-                    @if ($vm->parentDevice)
-                        <x-device-link :device="$vm->parentDevice" />
-                    @else
-                        {{ $vm->vmwVmDisplayName }}
-                    @endif
-                </td>
-                <td>
-                    <span style="min-width:40px; display:inline-block;" class="label {{ $vm->stateLabel[1] }}">{{ $vm->stateLabel[0] }}</span>
-                </td>
-                <td>{{ $vm->operatingSystem }}</td>
-                <td>{{ $vm->memoryFormatted }}</td>
-                <td>{{ $vm->vmwVmCpus }}</td>
-            </tr>
-        @endforeach
-        </tbody>
-    </table>
-</x-device.page>
+        <x-panel>
+            <div class="table-responsive">
+                <table id="vminfo" class="table table-hover table-condensed table-striped"
+                       data-url="{{ route('table.vminfo') }}"
+                       data-params="device_id={{ $device->device_id }}">
+                    <thead>
+                        <tr>
+                            <th data-column-id="vmwVmDisplayName" data-order="asc">{{ __('VM Name') }}</th>
+                            <th data-column-id="vmwVmState">{{ __('Power Status') }}</th>
+                            <th data-column-id="vm_type">{{ __('Type') }}</th>
+                            <th data-column-id="vmwVmGuestOS" data-searchable="false">{{ __('Operating System') }}</th>
+                            <th data-column-id="vmwVmMemSize" data-searchable="false">{{ __('Memory') }}</th>
+                            <th data-column-id="vmwVmCpus" data-searchable="false">{{ __('vCPUs') }}</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </x-panel>
+    </x-device.page>
 @endsection
 
-
-
+@section('scripts')
+<script>
+    $("#vminfo").bootgrid({
+        ajax: true,
+        rowCount: [50, 100, 250, -1],
+        post: function () {
+            return {
+                device_id: {{ $device->device_id }},
+            }
+        }
+    })
+</script>
+@endsection
