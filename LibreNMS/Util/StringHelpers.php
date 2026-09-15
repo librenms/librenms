@@ -36,6 +36,7 @@ class StringHelpers
     public static function niceCase($string)
     {
         $replacements = [
+            'adguard' => 'AdGuard Home',
             'bind' => 'BIND',
             'cape' => 'CAPEv2',
             'dbm' => 'dBm',
