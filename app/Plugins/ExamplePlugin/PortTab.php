@@ -3,7 +3,6 @@
 namespace App\Plugins\ExamplePlugin;
 
 use App\Models\User;
-
 use App\Plugins\Hooks\PortTabHook;
 
 // this will insert a tab into every port view

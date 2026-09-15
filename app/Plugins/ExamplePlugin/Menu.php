@@ -3,7 +3,6 @@
 namespace App\Plugins\ExamplePlugin;
 
 use App\Models\User;
-
 use App\Plugins\Hooks\MenuEntryHook;
 
 // this will create a menu entry in the plugin menu

@@ -27,7 +27,6 @@
 namespace App\Plugins\ExamplePlugin;
 
 use App\Models\User;
-
 use App\Plugins\Hooks\PageHook;
 
 // this page will be shown when the user clicks on the plugin from the plugins menu.

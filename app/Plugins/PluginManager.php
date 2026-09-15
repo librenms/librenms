@@ -265,6 +265,7 @@ class PluginManager implements PluginManagerInterface
 
         // always inject the user
         $defaults = Auth::check() ? ['user' => Auth::user()] : [];
+
         return array_merge($defaults, $args, [
             'pluginName' => $pluginName,
             'settings' => $this->getSettings($pluginName),
