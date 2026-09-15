@@ -31,15 +31,16 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use App\Models\Service as ServiceModel;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Util\Clean;
 
 class Services
 {
     /**
      * List all available services from nagios plugins directory
      *
-     * @return array
+     * @return string[]
      */
-    public static function list()
+    public static function list(): array
     {
         $services = [];
         if (is_dir(LibrenmsConfig::get('nagios_plugins'))) {
@@ -115,5 +116,12 @@ class Services
         }
 
         return false;
+    }
+
+    public static function customCheckPath(string $check_name): string
+    {
+        $check = strtolower(Clean::fileName($check_name));
+
+        return LibrenmsConfig::get('install_dir') . '/includes/services/check_' . $check . '.inc.php';
     }
 }

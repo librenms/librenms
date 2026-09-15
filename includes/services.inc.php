@@ -60,7 +60,7 @@ function poll_service($service)
     $check_cmd = '';
 
     // if we have a script for this check, use it.
-    $check_script = LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower((string) $service['service_type']) . '.inc.php';
+    $check_script = \LibreNMS\Services::customCheckPath($service['service_type']);
     if (is_file($check_script)) {
         include $check_script;
     }
