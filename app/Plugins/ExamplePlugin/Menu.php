@@ -2,6 +2,8 @@
 
 namespace App\Plugins\ExamplePlugin;
 
+use App\Models\User;
+
 use App\Plugins\Hooks\MenuEntryHook;
 
 // this will create a menu entry in the plugin menu
@@ -15,7 +17,7 @@ class Menu extends MenuEntryHook
 //    public string $view = 'resources.views.menu';
 
     // this will determine if the menu entry should be shown to the user
-    public function authorize(\Illuminate\Contracts\Auth\Authenticatable $user, array $settings = []): bool
+    public function authorize(User $user, array $settings = []): bool
     {
         /**
          * // menu entry shown if users has the global-read role and there is a setting that has > one entries in it

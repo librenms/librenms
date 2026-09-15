@@ -2,6 +2,8 @@
 
 namespace App\Plugins\ExamplePlugin;
 
+use App\Models\User;
+
 use App\Plugins\Hooks\PortTabHook;
 
 // this will insert a tab into every port view
@@ -31,7 +33,7 @@ class PortTab extends PortTabHook
 
     // The authorize method will determine if the user will see this tab or not
     // if you want all users to see it, simple return true
-    public function authorize(\Illuminate\Contracts\Auth\Authenticatable $user, \App\Models\Port $port): bool
+    public function authorize(User $user, \App\Models\Port $port): bool
     {
         // you can check user's roles like this:
 //        return $user->can('admin');
