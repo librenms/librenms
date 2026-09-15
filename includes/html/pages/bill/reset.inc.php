@@ -30,7 +30,7 @@
   <br>
   <div class="alert alert-danger" id="warning" style="display: none;">
     <h4 class="alert-heading"><i class="fa fa-exclamation-triangle"></i> Warning</h4>
-    Are you sure you want to reset all <strong>MySQL</strong> and/or <strong>RRD</strong> data for all interface on this bill?
+    Are you sure you want to reset all <strong>MySQL</strong> data for all interface on this bill?
   </div>
   <div class="form-actions">
     <button id="resetBtn" type="submit" class="btn btn-danger" disabled="disabled"><i class="fa fa-refresh"></i> <strong>Reset Bill</strong></button>
