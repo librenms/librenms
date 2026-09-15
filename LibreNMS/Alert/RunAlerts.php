@@ -167,7 +167,7 @@ class RunAlerts
         $template = $tpl->getTemplate($obj);
 
         if ($alert['state'] >= AlertState::ACTIVE) {
-            $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . $alert['name'];
+            $obj['title'] = 'Alert for device ' . $obj['display'] . ' - ' . $alert['name'];
             if ($alert['state'] == AlertState::ACKNOWLEDGED) {
                 $obj['title'] .= ' Has been acknowledged';
             } elseif ($alert['state'] == AlertState::WORSE) {
@@ -208,7 +208,7 @@ class RunAlerts
             $extra['count'] = 0;
             dbUpdate(['details' => gzcompress(json_encode($id['details']), 9)], 'alert_log', 'id = ?', [$alert['id']]);
 
-            $obj['title'] = $template->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']);
+            $obj['title'] = 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']);
             $obj['elapsed'] = Time::formatInterval(strtotime((string) $alert['time_logged']) - strtotime((string) $id['time_logged']), true) ?: 'none';
             $obj['id'] = $id['id'];
             foreach ($extra['rule'] as $incident) {

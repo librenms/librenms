@@ -90,11 +90,31 @@ class Template
      */
     public function bladeTitle($data)
     {
-        $alert['alert'] = new AlertData($data['alert']);
+        $template = $data['template'] ?? null;
+        $state = $data['state'] ?? ($data['alert']['state'] ?? null);
+        $isRecovered = $state == AlertState::RECOVERED;
+        $templateTitle = $isRecovered ? ($template->title_rec ?? null) : ($template->title ?? null);
+
+        if (empty($templateTitle)) {
+            return (string) ($data['title'] ?? '');
+        }
+
+        $alert['alert'] = new AlertData($data['alert'] ?? $data);
         try {
-            return Blade::render($data['title'], $alert);
+            $title = Blade::render($templateTitle, $alert);
+            if ($state == AlertState::ACKNOWLEDGED) {
+                $title .= ' Has been acknowledged';
+            } elseif ($state == AlertState::WORSE) {
+                $title .= ' Has worsened';
+            } elseif ($state == AlertState::BETTER) {
+                $title .= ' Has improved';
+            } elseif ($state == AlertState::CHANGED) {
+                $title .= ' changed';
+            }
+
+            return $title;
         } catch (\Exception) {
-            return $data['title'] ?: Blade::render('Template ' . $data['name'], $alert);
+            return (string) ($data['title'] ?? '');
         }
     }
 
