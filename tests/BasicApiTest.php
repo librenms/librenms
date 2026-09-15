@@ -28,6 +28,7 @@ namespace LibreNMS\Tests;
 
 use App\Models\ApiToken;
 use App\Models\Device;
+use App\Models\Sensor;
 use App\Models\User;
 use App\Models\WirelessSensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -36,7 +37,7 @@ final class BasicApiTest extends DBTestCase
 {
     use DatabaseTransactions;
 
-    public function testListDevices(): void
+    public function test_list_devices(): void
     {
         /** @var User $user */
         $user = User::factory()->admin()->create();
@@ -52,7 +53,7 @@ final class BasicApiTest extends DBTestCase
             ]);
     }
 
-    public function testDisabledUserTokenCannotAccessApi(): void
+    public function test_disabled_user_token_cannot_access_api(): void
     {
         /** @var User $user */
         $user = User::factory()->admin()->create(['enabled' => false]);
@@ -65,7 +66,7 @@ final class BasicApiTest extends DBTestCase
         $this->assertNull(ApiToken::userFromToken($token->token_hash));
     }
 
-    public function testTokenWithoutUserIsInvalid(): void
+    public function test_token_without_user_is_invalid(): void
     {
         $token = new ApiToken;
         $token->user_id = 999999;
@@ -78,7 +79,7 @@ final class BasicApiTest extends DBTestCase
         $this->assertNull(ApiToken::userFromToken($token->token_hash));
     }
 
-    public function testGetDeviceWirelessSensors(): void
+    public function test_get_device_wireless_sensors(): void
     {
         /** @var User $user */
         $user = User::factory()->admin()->create();
@@ -117,7 +118,7 @@ final class BasicApiTest extends DBTestCase
         $this->assertSame('snr', $response->json('wireless_sensors.1.sensor_class'));
     }
 
-    public function testGetDeviceWirelessSensorsSupportsFilteringAndColumns(): void
+    public function test_get_device_wireless_sensors_supports_filtering_and_columns(): void
     {
         /** @var User $user */
         $user = User::factory()->admin()->create();
@@ -159,7 +160,7 @@ final class BasicApiTest extends DBTestCase
         $this->assertArrayNotHasKey('sensor_type', $row);
     }
 
-    public function testGetDeviceWirelessSensorsRejectsInvalidClass(): void
+    public function test_get_device_wireless_sensors_rejects_invalid_class(): void
     {
         /** @var User $user */
         $user = User::factory()->admin()->create();
@@ -176,5 +177,121 @@ final class BasicApiTest extends DBTestCase
                 'status' => 'error',
                 'message' => "Invalid wireless sensor class 'bogus'",
             ]);
+    }
+
+    public function test_update_sensor_thresholds(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = ApiToken::generateToken($user);
+        $device = Device::factory()->create();
+        $sensor = Sensor::factory()->for($device)->create([
+            'sensor_class' => 'temperature',
+            'sensor_limit_low' => 5,
+            'sensor_limit_low_warn' => 10,
+            'sensor_limit_warn' => 70,
+            'sensor_limit' => 80,
+            'sensor_custom' => 'No',
+        ]);
+
+        $this->json('PATCH', "/api/v0/resources/sensors/{$sensor->sensor_id}", [
+            'sensor_limit_warn' => 75,
+            'sensor_limit' => 85,
+        ], ['X-Auth-Token' => $token->token_hash])
+            ->assertStatus(200)
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonPath('count', 1)
+            ->assertJsonPath('sensors.0.sensor_limit_warn', 75)
+            ->assertJsonPath('sensors.0.sensor_limit', 85)
+            ->assertJsonPath('sensors.0.sensor_custom', 'Yes');
+
+        $sensor->refresh();
+        $this->assertEquals(75, $sensor->sensor_limit_warn);
+        $this->assertEquals(85, $sensor->sensor_limit);
+        $this->assertSame('Yes', $sensor->sensor_custom);
+    }
+
+    public function test_bulk_update_sensor_thresholds(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = ApiToken::generateToken($user);
+        $device = Device::factory()->create();
+        $sensors = Sensor::factory()->count(2)->for($device)->create([
+            'sensor_class' => 'temperature',
+            'sensor_limit_low' => 5,
+            'sensor_limit_low_warn' => 10,
+            'sensor_limit_warn' => 70,
+            'sensor_limit' => 80,
+            'sensor_custom' => 'No',
+        ]);
+
+        $this->json('PATCH', '/api/v0/resources/sensors', [
+            'sensor_ids' => $sensors->pluck('sensor_id')->all(),
+            'sensor_limit_warn' => 72,
+            'sensor_limit' => 82,
+        ], ['X-Auth-Token' => $token->token_hash])
+            ->assertStatus(200)
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonPath('count', 2)
+            ->assertJsonCount(2, 'sensors');
+
+        foreach ($sensors as $sensor) {
+            $sensor->refresh();
+            $this->assertEquals(72, $sensor->sensor_limit_warn);
+            $this->assertEquals(82, $sensor->sensor_limit);
+            $this->assertSame('Yes', $sensor->sensor_custom);
+        }
+    }
+
+    public function test_sensor_thresholds_reject_invalid_order(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = ApiToken::generateToken($user);
+        $device = Device::factory()->create();
+        $sensor = Sensor::factory()->for($device)->create([
+            'sensor_class' => 'temperature',
+            'sensor_limit_low' => 5,
+            'sensor_limit_low_warn' => 10,
+            'sensor_limit_warn' => 70,
+            'sensor_limit' => 80,
+            'sensor_custom' => 'No',
+        ]);
+
+        $this->json('PATCH', "/api/v0/resources/sensors/{$sensor->sensor_id}", [
+            'sensor_limit_warn' => 90,
+            'sensor_limit' => 85,
+        ], ['X-Auth-Token' => $token->token_hash])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('sensor_limit');
+
+        $sensor->refresh();
+        $this->assertEquals(70, $sensor->sensor_limit_warn);
+        $this->assertEquals(80, $sensor->sensor_limit);
+        $this->assertSame('No', $sensor->sensor_custom);
+    }
+
+    public function test_read_only_user_cannot_update_sensor_thresholds(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->read()->create();
+        $token = ApiToken::generateToken($user);
+        $device = Device::factory()->create();
+        $sensor = Sensor::factory()->for($device)->create([
+            'sensor_class' => 'temperature',
+            'sensor_limit_warn' => 70,
+            'sensor_limit' => 80,
+            'sensor_custom' => 'No',
+        ]);
+
+        $this->json('PATCH', "/api/v0/resources/sensors/{$sensor->sensor_id}", [
+            'sensor_limit' => 85,
+        ], ['X-Auth-Token' => $token->token_hash])
+            ->assertStatus(403);
+
+        $sensor->refresh();
+        $this->assertEquals(80, $sensor->sensor_limit);
+        $this->assertSame('No', $sensor->sensor_custom);
     }
 }
