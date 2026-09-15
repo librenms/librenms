@@ -681,7 +681,8 @@ foreach ($ports as $port) {
                 $ifAlias_override = DeviceCache::getPrimary()->getAttrib('ifName:' . $port['ifName']);
                 if ($ifAlias_override !== null) {
                     // handle legacy '1' setting, otherwise use value set by override
-                    $current_oid = $ifAlias_override === '1' ? $port['ifAlias'] : $ifAlias_override;
+                    $ifAlias_override = $ifAlias_override === '1' ? $port['ifAlias'] : $ifAlias_override;
+                    $current_oid = $ifAlias_override;
                 } else {
                     $current_oid = $this_port['ifAlias'];
                 }
@@ -764,7 +765,8 @@ foreach ($ports as $port) {
             // handle functional style parsers
             if (is_callable($port_parser)) {
                 $port_ifAlias = app()->call($port_parser, [
-                    'ifAlias' => $this_port['ifAlias'] ?? '',
+                    // $ifAlias_override override device ifAlias
+                    'ifAlias' => $ifAlias_override ?? ($this_port['ifAlias'] ?? ''),
                     'ifIndex' => $port['ifIndex'] ?? '',
                     'ifName' => $this_port['ifName'] ?? '',
                     'port_id' => $port['port_id'] ?? 0,
