@@ -50,7 +50,9 @@ foreach ($bgpPeers as $bgpPeer) {
 
         DeviceCache::getPrimary()->bgppeers()->create($peers);
 
-        if (LibrenmsConfig::get('autodiscovery.bgp')) {
+        // Only reverse-resolve / autodiscover when there is a real peer IP. Unnumbered
+        // peers that have never established report bgpPeerRemoteAddr = "Unknown".
+        if (LibrenmsConfig::get('autodiscovery.bgp') && filter_var($bgpPeer['bgpPeerRemoteAddr'], FILTER_VALIDATE_IP)) {
             $name = gethostbyaddr($bgpPeer['bgpPeerRemoteAddr']);
             discover_new_device($name, $device, 'BGP');
         }
