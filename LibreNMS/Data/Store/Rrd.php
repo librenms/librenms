@@ -122,7 +122,7 @@ class Rrd extends BaseDatastore
 
         if (isset($meta['rrd_proxmox_name'])) {
             $pmxvars = $meta['rrd_proxmox_name'];
-            $rrd = self::proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport']);
+            $rrd = self::proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport'])->checkDirExists();
         } else {
             $rrd = RrdPath::make($device_model->hostname)->setFileName($rrd_name, '.rrd');
         }
@@ -250,7 +250,6 @@ class Rrd extends BaseDatastore
     public function proxmoxName(string $pmxcluster, string $vmid, string $vmport): RrdPath
     {
         return RrdPath::make(['proxmox', $pmxcluster])
-            ->checkDirExists()
             ->setFileName($vmid . '_netif_' . $vmport . '.rrd');
     }
 
