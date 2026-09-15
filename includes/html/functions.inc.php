@@ -697,13 +697,13 @@ function get_oxidized_nodes_list()
             $formatted_local_time = $object['time'];
         }
         echo '<tr>
-        <td>' . $device->device_id . '</td>
-        <td>' . $object['name'] . '</td>
-        <td>' . $device->sysName . '</td>
-        <td>' . $object['status'] . '</td>
-        <td>' . $formatted_local_time . '</td>
-        <td>' . $object['model'] . '</td>
-        <td>' . $object['group'] . '</td>
+        <td>' . e($device->device_id) . '</td>
+        <td>' . e($object['name']) . '</td>
+        <td>' . e($device->sysName) . '</td>
+        <td>' . e($object['status']) . '</td>
+        <td>' . e($formatted_local_time) . '</td>
+        <td>' . e($object['model']) . '</td>
+        <td>' . e($object['group']) . '</td>
         <td></td>
         </tr>';
     }

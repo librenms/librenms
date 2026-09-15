@@ -78,13 +78,17 @@ class VminfoController extends TableController
             'vmwVmCpus' => $model->vmwVmCpus,
             'hostname' => self::getHostname($model->device),
             'deviceid' => $model->device_id,
-            'sysname' => $model->device->sysName,
+            'sysname' => $model->device?->sysName,
 
         ];
     }
 
-    private static function getHostname(Device $device): string
+    private static function getHostname(?Device $device): string
     {
+        if ($device === null) {
+            return '';
+        }
+
         return '<a class="list-device" href="' . Url::deviceUrl($device) . '">' . $device->displayName() . '</a>';
     }
 }

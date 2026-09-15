@@ -73,6 +73,11 @@
             display: grid;
             grid-template: 1fr / 1fr;
             place-items: center;
+            width: max-content;
+            max-width: 100%;
+            margin: 0 auto;
+            overflow: hidden;
+            position: relative;
         }
         #custom-map {
             grid-column: 1 / 1;
@@ -314,13 +319,17 @@
         network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
 
         // width/height might be % get values in pixels
-        network_height = $($(container).children(".vis-network")[0]).height();
-        network_width = $($(container).children(".vis-network")[0]).width();
+        network_height = $($(container).children(".vis-network")[0]).height() || $(container).height();
+        network_width = $($(container).children(".vis-network")[0]).width() || $(container).width();
+        container._mapWidth = network_width;
+        container._mapHeight = network_height;
+        container._visNetwork = network;
+
         var centreY = Math.round(network_height / 2);
         var centreX = Math.round(network_width / 2);
         network.moveTo({position: {x: centreX, y: centreY}, scale: 1});
 
-        setCustomMapBackground('custom-map', bgtype, bgdata);
+        setCustomMapBackground('custom-map', bgtype, bgdata, network);
 
         network.on('doubleClick', function (properties) {
             edge_id = null;
