@@ -55,33 +55,17 @@ final readonly class RrdPath implements \Stringable
 
     public function fullPath(): string
     {
-        return $this->fileName($this->fullDir());
+        return $this->fileName(LibrenmsConfig::get('rrd_dir') . DIRECTORY_SEPARATOR . $this->relativeDir);
     }
 
     public function defaultPath(): string
     {
-        return $this->fileName($this->defaultDir());
+        return LibrenmsConfig::get('rrdcached') ? $this->relativePath() : $this->fullPath();
     }
 
     public function __toString(): string
     {
         return $this->defaultPath();
-    }
-
-    /**
-     * Return the directory component for a full path
-     */
-    public function fullDir(): string
-    {
-        return LibrenmsConfig::get('rrd_dir') . DIRECTORY_SEPARATOR . $this->relativeDir;
-    }
-
-    /**
-     * Return the default directory component depending on whether rrdcached is enabled or not
-     */
-    public function defaultDir(): string
-    {
-        return LibrenmsConfig::get('rrdcached') ? $this->relativeDir : $this->fullDir();
     }
 
     /**

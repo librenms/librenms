@@ -123,7 +123,7 @@ class Rrd extends BaseDatastore
         if (isset($meta['rrd_proxmox_name'])) {
             $pmxvars = $meta['rrd_proxmox_name'];
             $rrd = self::proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport']);
-            self::checkDirExists($rrd);
+            self::checkDirExists(RrdPath::make('proxmox-' . $pmxvars['pmxcluster']));
         } else {
             $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
         }
@@ -460,7 +460,7 @@ class Rrd extends BaseDatastore
             return true;
         }
 
-        $rrd_dir = $rrdpath->fullDir();
+        $rrd_dir = $rrdpath->fullPath();
         if (! is_dir($rrd_dir)) {
             if (mkdir($rrd_dir, 0775, true)) {
                 Log::info("Created directory : $rrd_dir");
@@ -620,34 +620,6 @@ class Rrd extends BaseDatastore
         $host_dir = RrdPath::make($hostname)->fullPath();
         if (! File::deleteDirectory($host_dir)) {
             throw new RrdPermissionException("Could not delete RRD files for: $hostname");
-        }
-    }
-
-    /**
-     * Get storage stats for a device
-     */
-    public function getStorageSize(Device $device): array
-    {
-        $directory = RrdPath::make($device->hostname)->fullPath();
-
-        if (! File::isDirectory($directory) || ! File::isReadable($directory)) {
-            return [0, 0];
-        }
-
-        try {
-            $files = collect(File::allFiles($directory));
-
-            $size = $files->sum(function (SplFileInfo $file): int {
-                try {
-                    return $file->getSize();
-                } catch (Throwable) {
-                    return 0;
-                }
-            });
-
-            return [$size, $files->count()];
-        } catch (Throwable) {
-            return [0, 0];
         }
     }
 }

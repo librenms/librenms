@@ -57,8 +57,6 @@ class EditDeviceController
             ]);
         }
 
-        [$rrd_size, $rrd_num] = Rrd::getStorageSize($device);
-
         $alertSchedules = $device->alertSchedules()->isActive()->get();
         $isUnderMaintenance = $alertSchedules->isNotEmpty();
         $exclusiveSchedules = $alertSchedules->filter(function ($schedule) {
@@ -88,8 +86,6 @@ class EditDeviceController
             'maintenance' => $isUnderMaintenance,
             'default_maintenance_behavior' => MaintenanceBehavior::from((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'))->value,
             'exclusive_maintenance_id' => $exclusive_schedule_id,
-            'rrd_size' => Number::formatBi($rrd_size),
-            'rrd_num' => $rrd_num,
         ]);
     }
 
