@@ -36,6 +36,7 @@ $routing_snmp_contexts_raw = DeviceCache::getPrimary()->getAttrib('routing_snmp_
 $routing_snmp_contexts = json_decode((string) $routing_snmp_contexts_raw, true);
 
 $contexts = array_values(array_unique(array_merge(
+    [''],
     DeviceCache::getPrimary()->getVrfContexts(),
     $routing_snmp_contexts
 )));
@@ -229,6 +230,7 @@ $contexts = BgpPeer::where('device_id', $device['device_id'])
     ->all();
 
 $existing_contexts = array_values(array_unique(array_merge(
+    [''],
     DeviceCache::getPrimary()->getVrfContexts(),
     $routing_snmp_contexts
 )));
