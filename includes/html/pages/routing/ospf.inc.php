@@ -26,12 +26,31 @@ echo '
 $data = OspfInstance::where('ospfAdminStat', 'enabled')
     ->with('device')->get();
 
+$device_ids = $data->pluck('device_id');
+$area_counts = OspfArea::selectRaw('device_id, COUNT(*) as total')
+    ->whereIn('device_id', $device_ids)
+    ->groupBy('device_id')
+    ->pluck('total', 'device_id');
+$port_counts = OspfPort::selectRaw('device_id, COUNT(*) as total')
+    ->whereIn('device_id', $device_ids)
+    ->groupBy('device_id')
+    ->pluck('total', 'device_id');
+$port_counts_enabled = OspfPort::selectRaw('device_id, COUNT(*) as total')
+    ->where('ospfIfAdminStat', 'enabled')
+    ->whereIn('device_id', $device_ids)
+    ->groupBy('device_id')
+    ->pluck('total', 'device_id');
+$nbr_counts = OspfNbr::selectRaw('device_id, COUNT(*) as total')
+    ->whereIn('device_id', $device_ids)
+    ->groupBy('device_id')
+    ->pluck('total', 'device_id');
+
 /** @var OspfInstance $instance */
 foreach ($data as $instance) {
-    $area_count = OspfArea::where('device_id', $instance->device_id)->count();
-    $port_count = OspfPort::where('device_id', $instance->device_id)->count();
-    $port_count_enabled = OspfPort::where('ospfIfAdminStat', 'enabled')->where('device_id', $instance->device_id)->count();
-    $nbr_count = OspfNbr::where('device_id', $instance->device_id)->count();
+    $area_count = $area_counts[$instance->device_id] ?? 0;
+    $port_count = $port_counts[$instance->device_id] ?? 0;
+    $port_count_enabled = $port_counts_enabled[$instance->device_id] ?? 0;
+    $nbr_count = $nbr_counts[$instance->device_id] ?? 0;
 
     $status_color = $instance->ospfAdminStat == 'enabled' ? 'success' : 'default';
     $abr_status_color = $instance->ospfAreaBdrRtrStatus == 'true' ? 'success' : 'default';
