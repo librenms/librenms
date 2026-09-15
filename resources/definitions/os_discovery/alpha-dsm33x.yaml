@@ -1,0 +1,258 @@
+modules:
+    os:
+        sysDescr_regex: '/SW_REV:\s*(?<version>[^;]+);\s*MODEL:\s*(?<hardware>[^>]+)>>/'
+
+    sensors:
+        voltage:
+            data:
+                # Profile 12
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.1
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.1{{ $noindex }}'
+                  descr: 'Input Voltage'
+                  index: 'alphaInputVoltageP12'
+                  group: 'Power Supply'
+                  divisor: 100
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.3
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.3{{ $noindex }}'
+                  descr: 'Output Voltage'
+                  index: 'alphaOutputVoltageP12'
+                  group: 'Power Supply'
+                  divisor: 100
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.9
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.9{{ $noindex }}'
+                  descr: 'Battery Voltage'
+                  index: 'alphaBatteryVoltageP12'
+                  group: 'Battery'
+                  divisor: 100
+
+                # Profile 13
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.1
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.1{{ $noindex }}'
+                  descr: 'Input Voltage'
+                  index: 'alphaInputVoltage'
+                  group: 'Power Supply'
+                  divisor: 100
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.3
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.3{{ $noindex }}'
+                  descr: 'Output Voltage'
+                  index: 'alphaOutputVoltage'
+                  group: 'Power Supply'
+                  divisor: 100
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.8
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.8{{ $noindex }}'
+                  descr: 'Battery Voltage'
+                  index: 'alphaBatteryVoltage'
+                  group: 'Battery'
+                  divisor: 100
+
+        current:
+            data:
+                # Profile 12
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.4
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.4{{ $noindex }}'
+                  descr: 'Output Current 1'
+                  index: 'alphaOutputCurrent1P12'
+                  group: 'Power Supply'
+                  divisor: 100
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.5
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.5{{ $noindex }}'
+                  descr: 'Output Current 2'
+                  index: 'alphaOutputCurrent2P12'
+                  group: 'Power Supply'
+                  divisor: 100
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.10
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.10{{ $noindex }}'
+                  descr: 'Charger Current'
+                  index: 'alphaChargerCurrentP12'
+                  group: 'Battery'
+                  divisor: 100
+
+                # Profile 13
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.4
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.4{{ $noindex }}'
+                  descr: 'Output Current'
+                  index: 'alphaOutputCurrent'
+                  group: 'Power Supply'
+                  divisor: 100
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.9
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.9{{ $noindex }}'
+                  descr: 'Charger Current'
+                  index: 'alphaChargerCurrent'
+                  group: 'Battery'
+                  divisor: 100
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.18
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.18{{ $noindex }}'
+                  descr: 'Input Current'
+                  index: 'alphaInputCurrent'
+                  group: 'Power Supply'
+                  divisor: 100
+
+        frequency:
+            data:
+                # Profile 12
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.2
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.2{{ $noindex }}'
+                  descr: 'Input Frequency'
+                  index: 'alphaInputFrequencyP12'
+                  group: 'Power Supply'
+                  divisor: 100
+
+                # Profile 13
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.2
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.2{{ $noindex }}'
+                  descr: 'Input Frequency'
+                  index: 'alphaInputFrequency'
+                  group: 'Power Supply'
+                  divisor: 100
+
+        load:
+            data:
+                # Profile 12
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.6
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.6{{ $noindex }}'
+                  descr: 'Output Load'
+                  index: 'alphaOutputLoadP12'
+                  group: 'Power Supply'
+                  divisor: 100
+
+                # Profile 13
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.5
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.5{{ $noindex }}'
+                  descr: 'Output Load'
+                  index: 'alphaOutputLoad'
+                  group: 'Power Supply'
+                  divisor: 100
+
+        power:
+            data:
+                # Profile 12
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.8
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.8{{ $noindex }}'
+                  descr: 'Output Power'
+                  index: 'alphaOutputPowerP12'
+                  group: 'Power Supply'
+                  divisor: 100
+
+                # Profile 13
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.7
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.7{{ $noindex }}'
+                  descr: 'Output Power'
+                  index: 'alphaOutputPower'
+                  group: 'Power Supply'
+                  divisor: 100
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.19
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.19{{ $noindex }}'
+                  descr: 'Input Power'
+                  index: 'alphaInputPower'
+                  group: 'Power Supply'
+                  divisor: 100
+
+        temperature:
+            data:
+                # Profile 12
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.11
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.12.1.11{{ $noindex }}'
+                  descr: 'Battery Temperature'
+                  index: 'alphaBatteryTemperatureP12'
+                  group: 'Battery'
+                  divisor: 100
+
+                # Profile 13
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.10
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.10{{ $noindex }}'
+                  descr: 'Battery Temperature'
+                  index: 'alphaBatteryTemperature'
+                  group: 'Battery'
+                  divisor: 100
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.22
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.22{{ $noindex }}'
+                  descr: 'Controller Temperature'
+                  index: 'alphaControllerTemperature'
+                  group: 'Power Supply'
+                  divisor: 100
+                - oid: .1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.23
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.2.1.2.1.5.13.1.23{{ $noindex }}'
+                  descr: 'Inverter Temperature'
+                  index: 'alphaInverterTemperature'
+                  group: 'Power Supply'
+                  divisor: 100
+
+        state:
+            data:
+                - oid: .1.3.6.1.4.1.926.1.4.1.1.2.1.0
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.4.1.1.2.1.0{{ $noindex }}'
+                  descr: 'Major Alarm'
+                  index: 'alphaMajorAlarm'
+                  group: 'Alarms'
+                  state_name: alphaDsm33xMajorAlarm
+                  states:
+                      - { value: 1, generic: 0, descr: 'OK' }
+                      - { value: 2, generic: 2, descr: 'Alarm' }
+
+                - oid: .1.3.6.1.4.1.926.1.4.1.1.2.2.0
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.4.1.1.2.2.0{{ $noindex }}'
+                  descr: 'Minor Alarm'
+                  index: 'alphaMinorAlarm'
+                  group: 'Alarms'
+                  state_name: alphaDsm33xMinorAlarm
+                  states:
+                      - { value: 1, generic: 0, descr: 'OK' }
+                      - { value: 2, generic: 1, descr: 'Alarm' }
+
+                - oid: .1.3.6.1.4.1.926.1.4.1.1.2.3.0
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.4.1.1.2.3.0{{ $noindex }}'
+                  descr: 'Self Test'
+                  index: 'alphaSelfTest'
+                  group: 'Status'
+                  state_name: alphaDsm33xBinaryStatus
+                  states:
+                      - { value: 1, generic: 0, descr: 'OK' }
+                      - { value: 2, generic: 2, descr: 'Failed' }
+
+                - oid: .1.3.6.1.4.1.926.1.4.1.1.2.4.0
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.4.1.1.2.4.0{{ $noindex }}'
+                  descr: 'Battery Temperature Probe'
+                  index: 'alphaBatteryTempProbe'
+                  group: 'Status'
+                  state_name: alphaDsm33xBinaryStatus
+                  states:
+                      - { value: 1, generic: 0, descr: 'OK' }
+                      - { value: 2, generic: 2, descr: 'Failed' }
+
+                - oid: .1.3.6.1.4.1.926.1.4.1.1.2.5.0
+                  value: enterprises
+                  num_oid: '.1.3.6.1.4.1.926.1.4.1.1.2.5.0{{ $noindex }}'
+                  descr: 'AC Input'
+                  index: 'alphaAcInput'
+                  group: 'Status'
+                  state_name: alphaDsm33xBinaryStatus
+                  states:
+                      - { value: 1, generic: 0, descr: 'OK' }
+                      - { value: 2, generic: 2, descr: 'Failed' }
