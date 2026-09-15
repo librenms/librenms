@@ -93,11 +93,9 @@ class Template
         $template = $data['template'] ?? null;
         $state = $data['state'] ?? ($data['alert']['state'] ?? null);
         $isRecovered = $state == AlertState::RECOVERED;
-        $templateTitle = $isRecovered ? ($template->title_rec ?? null) : ($template->title ?? null);
-
-        if (empty($templateTitle)) {
-            return (string) ($data['title'] ?? '');
-        }
+        $templateTitle = $isRecovered
+            ? ($template->title_rec ?: 'Device {{ $alert->display }} recovered from {{ $alert->name ?: $alert->rule }}')
+            : ($template->title ?: 'Alert for device {{ $alert->display }} - {{ $alert->name }}');
 
         $alert['alert'] = new AlertData($data['alert'] ?? $data);
         try {
