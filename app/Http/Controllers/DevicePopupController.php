@@ -62,23 +62,44 @@ class DevicePopupController
             return [
                 [
                     'device' => $device,
-                    'type' => $type,
-                    'title' => Str::title(str_replace('_', ' ', $type)),
-                    'graphs' => [['from' => '-1d'], ['from' => '-7d']],
+                    'type' => $type->value(),
+                    'title' => $request->string('title', Str::title(str_replace('_', ' ', $type->value())))->value(),
+                    'graphs' => $this->parseGraphRanges($request, [['from' => '-1d'], ['from' => '-7d'], ['from' => '-14d'], ['from' => '-30d']]),
                 ],
             ];
         }
 
         $overview = Graph::getOverviewGraphsForDevice($device);
-        $primaryGraph = $overview[0] ?? ['graph' => 'device_bits', 'text' => __('Device Traffic')];
+        if ($request->has('limit')) {
+            $overview = array_slice($overview, 0, (int) $request->input('limit'));
+        }
+        $defaultRanges = $this->parseGraphRanges($request, [['from' => '-1d'], ['from' => '-7d']]);
 
-        return [
-            [
-                'device' => $device,
-                'type' => $primaryGraph['graph'] ?? 'device_bits',
-                'title' => $primaryGraph['text'] ?? __('Device Traffic'),
-                'graphs' => [['from' => '-1d'], ['from' => '-7d']],
-            ],
-        ];
+        $graphs = [];
+        foreach ($overview as $graph) {
+            if (isset($graph['text'], $graph['graph'])) {
+                $graphs[] = [
+                    'device' => $device,
+                    'type' => $graph['graph'],
+                    'title' => $graph['text'],
+                    'graphs' => $defaultRanges,
+                ];
+            }
+        }
+
+        return $graphs;
+    }
+
+    /**
+     * @param  array<int, array<string, string>>  $default
+     * @return array<int, array<string, string>>
+     */
+    private function parseGraphRanges(Request $request, array $default): array
+    {
+        if (! $request->has('from')) {
+            return $default;
+        }
+
+        return array_map(fn ($f) => ['from' => (string) $f], (array) $request->input('from'));
     }
 }

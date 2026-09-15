@@ -527,7 +527,7 @@
                     $popup.show().removeClass('tw:hidden');
                     custommap.positionPopup(domX, domY);
 
-                    var url = (custommap.baseUrl || '') + 'device/' + deviceId + '/popup';
+                    var url = (custommap.baseUrl || '') + 'device/' + deviceId + '/popup?limit=1&from[]=-1d&from[]=-7d';
                     $.get(url, function (html) {
                         custommap.popupCache['device_' + deviceId] = html;
                         renderHtml(html);
@@ -567,7 +567,7 @@
                     $popup.show().removeClass('tw:hidden');
                     custommap.positionPopup(domX, domY);
 
-                    var url = (custommap.baseUrl || '') + 'port/' + portId + '/popup';
+                    var url = (custommap.baseUrl || '') + 'port/' + portId + '/popup?from=-1d';
                     $.get(url, function (html) {
                         custommap.popupCache['port_' + portId] = html;
                         renderHtml(html);
