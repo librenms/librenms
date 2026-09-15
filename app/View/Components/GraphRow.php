@@ -35,9 +35,8 @@ class GraphRow extends Component
         public array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']],
         public int $absoluteSize = 0,
         public int|Device|null $device = null,
-        public int|Port|null $port = null
-    )
-    {
+        public int|Port|null $port = null,
+    ) {
         $this->responsive = $columns == 'responsive';
         $this->rowWidth = $this->calculateRowWidth((int) $columns);
         $this->graphColumns = $this->responsive ? ['sm' => 2, 'lg' => 4] : [];
