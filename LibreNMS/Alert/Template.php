@@ -75,6 +75,10 @@ class Template
         $templateBody = $template instanceof AlertTemplate ? $template->template : ($template['template'] ?? null);
         $templateName = $template instanceof AlertTemplate ? $template->name : ($template['name'] ?? '');
 
+        if (empty($templateBody)) {
+            return Blade::render($this->getDefaultTemplate($templateName, 'No template defined'), ['alert' => $alert]);
+        }
+
         try {
             return Blade::render((string) $templateBody, ['alert' => $alert]);
         } catch (\Exception $e) {
