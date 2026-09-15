@@ -52,6 +52,7 @@ TRAP,
 
             'Output EDFA changed to disabled.',
             'Failed to handle XklEdfaAlarmChange EDFA disabled alarm trap.',
+            [Severity::Warning]
         );
     }
 
@@ -129,7 +130,7 @@ TRAP,
 
             'Output EDFA modules alarms: LOS AOP.',
             'Failed to handle EDFA module alarms',
-            [Severity::Warning],
+            [Severity::Error],
         );
     }
 }
