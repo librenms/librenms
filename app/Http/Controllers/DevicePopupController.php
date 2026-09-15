@@ -70,9 +70,6 @@ class DevicePopupController
         }
 
         $overview = Graph::getOverviewGraphsForDevice($device);
-        if ($request->has('limit')) {
-            $overview = array_slice($overview, 0, (int) $request->input('limit'));
-        }
         $defaultRanges = $this->parseGraphRanges($request, [['from' => '-1d'], ['from' => '-7d']]);
 
         $graphs = [];

@@ -527,7 +527,7 @@
                     $popup.show().removeClass('tw:hidden');
                     custommap.positionPopup(domX, domY);
 
-                    var url = (custommap.baseUrl || '') + 'device/' + deviceId + '/popup?limit=1&from[]=-1d&from[]=-7d';
+                    var url = (custommap.baseUrl || '') + 'device/' + deviceId + '/popup?type=device_bits&from[]=-1d&from[]=-7d';
                     $.get(url, function (html) {
                         custommap.popupCache['device_' + deviceId] = html;
                         renderHtml(html);
