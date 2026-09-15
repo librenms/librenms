@@ -64,7 +64,8 @@ class DevicePoll extends LnmsCommand
                 DevicePolled::class,
                 ModuleList::fromUserOverrides($this->option('modules')),
                 $this->option('os'),
-                $this->option('type')
+                $this->option('type'),
+                $this->option('no-data') ?? false
             );
 
             $this->line(__('commands.device:poll.starting'));
@@ -89,7 +90,7 @@ class DevicePoll extends LnmsCommand
         }
 
         foreach ($devices as $device_id) {
-            PollDevice::dispatch($device_id, $modules);
+            PollDevice::dispatch($device_id, $modules, $this->option('no-data') ?? false);
         }
 
         $this->line('Submitted work for ' . $devices->count() . ' devices');
