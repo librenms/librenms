@@ -26,6 +26,7 @@
 
 namespace App\Plugins\ExamplePlugin;
 
+use App\Models\User;
 use App\Plugins\Hooks\PageHook;
 
 // this page will be shown when the user clicks on the plugin from the plugins menu.
@@ -40,7 +41,7 @@ class Page extends PageHook
 
     // The authorize method will determine if the user has access to this page.
     // if you want all users to be able to access this page simple return true
-    public function authorize(\Illuminate\Contracts\Auth\Authenticatable $user): bool
+    public function authorize(User $user): bool
     {
         // you can check user's roles like this:
 //        return $user->can('admin');
