@@ -4,9 +4,8 @@ namespace LibreNMS\Polling\Method\Config;
 
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethodConfigInterface;
 
-readonly class UnixAgentConfig implements PollingMethodConfigInterface
+class UnixAgentConfig extends PollingMethodConfig
 {
     public function __construct(
         public bool $enabled,

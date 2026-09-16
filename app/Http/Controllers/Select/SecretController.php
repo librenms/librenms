@@ -14,6 +14,9 @@ class SecretController extends SelectController
     protected ?string $idField = 'id';
     protected ?string $textField = 'description';
 
+    /**
+     * @return array<string, string>
+     */
     protected function rules(): array
     {
         return [
@@ -22,11 +25,17 @@ class SecretController extends SelectController
         ];
     }
 
+    /**
+     * @return array<int, string>
+     */
     protected function searchFields(Request $request): array
     {
         return ['description'];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function filterFields(Request $request): array
     {
         return [

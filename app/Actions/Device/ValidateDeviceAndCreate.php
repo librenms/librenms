@@ -40,7 +40,6 @@ use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
-use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use SnmpQuery;
 
 class ValidateDeviceAndCreate
@@ -141,20 +140,26 @@ class ValidateDeviceAndCreate
             : null;
 
         if ($existingSnmpSecret !== null) {
-            $secretData = $existingSnmpSecret->asSecretData(SnmpSecretData::class);
-            $snmp_versions = [$secretData->version];
-            if ($secretData->version === 'v3') {
-                $v3_credentials = [[
-                    'authlevel' => $secretData->authlevel,
-                    'authname' => $secretData->authname,
-                    'authpass' => $secretData->authpass,
-                    'authalgo' => $secretData->authalgo,
-                    'cryptopass' => $secretData->cryptopass,
-                    'cryptoalgo' => $secretData->cryptoalgo,
-                ]];
-                $communities = [];
+            $secretData = $existingSnmpSecret->toSecretData();
+            if ($secretData instanceof \LibreNMS\Polling\Secrets\Data\SnmpSecretData) {
+                $snmp_versions = [$secretData->version];
+                if ($secretData->version === 'v3') {
+                    $v3_credentials = [[
+                        'authlevel' => $secretData->authlevel,
+                        'authname' => $secretData->authname,
+                        'authpass' => $secretData->authpass,
+                        'authalgo' => $secretData->authalgo,
+                        'cryptopass' => $secretData->cryptopass,
+                        'cryptoalgo' => $secretData->cryptoalgo,
+                    ]];
+                    $communities = [];
+                } else {
+                    $communities = [$secretData->community];
+                    $v3_credentials = [];
+                }
             } else {
-                $communities = [$secretData->community];
+                $snmp_versions = ['v2c'];
+                $communities = [];
                 $v3_credentials = [];
             }
         } else {

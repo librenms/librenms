@@ -5,9 +5,9 @@ namespace LibreNMS\Polling\Method;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethodConfigInterface;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
+use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 
@@ -19,16 +19,17 @@ readonly class PollingMethodAccessor
     }
 
     /**
-     * @template T of PollingMethodConfigInterface
+     * @template T of PollingMethodConfig
      *
      * @param  class-string<T>  $class
      * @return T
      */
-    private function get(PollingMethodType $type, string $class): PollingMethodConfigInterface
+    private function get(PollingMethodType $type, string $class): PollingMethodConfig
     {
         $method = $this->device->pollingMethod($type)
             ?? DevicePollingMethod::transient($type, device: $this->device, enabled: false);
 
+        /** @var T */
         return $method->toConfig();
     }
 

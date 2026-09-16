@@ -28,14 +28,9 @@ namespace LibreNMS\Polling\Secrets\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
 use App\View\FieldSchema\HandlesFieldSchema;
-use LibreNMS\Enum\SecretType;
-use LibreNMS\Interfaces\SecretDefinitionInterface;
-use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
+use App\View\FieldSchema\HasFieldSchema;
 
-/**
- * @implements SecretDefinitionInterface<SnmpSecretData>
- */
-class SnmpSecretDefinition implements SecretDefinitionInterface
+class SnmpSecretDefinition implements HasFieldSchema
 {
     use HandlesFieldSchema;
 
@@ -139,18 +134,5 @@ class SnmpSecretDefinition implements SecretDefinitionInterface
                 ])
                 ->rules(['nullable', 'string']),
         ];
-    }
-
-    public function type(): SecretType
-    {
-        return SecretType::Snmp;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function class(): string
-    {
-        return SnmpSecretData::class;
     }
 }

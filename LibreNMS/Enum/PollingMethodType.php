@@ -2,10 +2,10 @@
 
 namespace LibreNMS\Enum;
 
-use LibreNMS\Interfaces\PollingMethodConfigInterface;
-use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
+use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Definitions\IcmpPollingMethodDefinition;
 use LibreNMS\Polling\Method\Definitions\IpmiPollingMethodDefinition;
+use LibreNMS\Polling\Method\Definitions\PollingMethodDefinition;
 use LibreNMS\Polling\Method\Definitions\SnmpPollingMethodDefinition;
 use LibreNMS\Polling\Method\Definitions\UnixAgentPollingMethodDefinition;
 
@@ -17,9 +17,9 @@ enum PollingMethodType: string
     case UnixAgent = 'unix-agent';
 
     /**
-     * @return PollingMethodDefinitionInterface<PollingMethodConfigInterface>
+     * @return PollingMethodDefinition<PollingMethodConfig>
      */
-    public function definition(): PollingMethodDefinitionInterface
+    public function definition(): PollingMethodDefinition
     {
         return match ($this) {
             self::Icmp => app(IcmpPollingMethodDefinition::class),

@@ -652,6 +652,7 @@ class EditPollingControllerTest extends TestCase
         $freshMethod = $method->fresh();
         $this->assertEquals([], $freshMethod->settings);
         $config = $freshMethod->toConfig();
+        $this->assertInstanceOf(\LibreNMS\Polling\Method\Config\UnixAgentConfig::class, $config);
         $this->assertEquals(6556, $config->port);
         $this->assertEquals(10, $config->timeout);
 
@@ -673,6 +674,7 @@ class EditPollingControllerTest extends TestCase
         $freshMethod = $method->fresh();
         $this->assertEquals(['port' => 6557], $freshMethod->settings);
         $config = $freshMethod->toConfig();
+        $this->assertInstanceOf(\LibreNMS\Polling\Method\Config\UnixAgentConfig::class, $config);
         $this->assertEquals(6557, $config->port);
 
         // 3. Clear the override by submitting empty port
@@ -693,6 +695,7 @@ class EditPollingControllerTest extends TestCase
         $freshMethod = $method->fresh();
         $this->assertEquals([], $freshMethod->settings);
         $config = $freshMethod->toConfig();
+        $this->assertInstanceOf(\LibreNMS\Polling\Method\Config\UnixAgentConfig::class, $config);
         $this->assertEquals(6556, $config->port);
     }
 }

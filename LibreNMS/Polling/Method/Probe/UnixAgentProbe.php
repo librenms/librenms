@@ -4,11 +4,10 @@ namespace LibreNMS\Polling\Method\Probe;
 
 use App\Models\Device;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethodProbeInterface;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Util\Rewrite;
 
-final readonly class UnixAgentProbe implements PollingMethodProbeInterface
+class UnixAgentProbe extends PollingMethodProbe
 {
     public function check(Device $device): ProbeResult
     {

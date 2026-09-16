@@ -182,7 +182,7 @@ class FieldDefinition
             $generated[] = 'in:' . implode(',', array_keys($this->options));
         }
 
-        return ! empty($generated) ? $generated : null;
+        return $generated;
     }
 
     public function castValue(mixed $value): mixed

@@ -28,14 +28,9 @@ namespace LibreNMS\Polling\Secrets\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
 use App\View\FieldSchema\HandlesFieldSchema;
-use LibreNMS\Enum\SecretType;
-use LibreNMS\Interfaces\SecretDefinitionInterface;
-use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
+use App\View\FieldSchema\HasFieldSchema;
 
-/**
- * @implements SecretDefinitionInterface<IpmiSecretData>
- */
-class IpmiSecretDefinition implements SecretDefinitionInterface
+class IpmiSecretDefinition implements HasFieldSchema
 {
     use HandlesFieldSchema;
 
@@ -57,18 +52,5 @@ class IpmiSecretDefinition implements SecretDefinitionInterface
                 ->label('KG/BMC Key')
                 ->rules(['nullable', 'string', 'size:40', 'regex:/^[a-fA-F0-9]+$/']),
         ];
-    }
-
-    public function type(): SecretType
-    {
-        return SecretType::Ipmi;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function class(): string
-    {
-        return IpmiSecretData::class;
     }
 }

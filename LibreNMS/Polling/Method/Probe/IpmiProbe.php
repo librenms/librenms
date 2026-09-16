@@ -4,9 +4,8 @@ namespace LibreNMS\Polling\Method\Probe;
 
 use App\Models\Device;
 use LibreNMS\Data\Source\Ipmitool;
-use LibreNMS\Interfaces\PollingMethodProbeInterface;
 
-final readonly class IpmiProbe implements PollingMethodProbeInterface
+class IpmiProbe extends PollingMethodProbe
 {
     public function check(Device $device): ProbeResult
     {

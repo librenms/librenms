@@ -5,9 +5,8 @@ namespace LibreNMS\Polling\Method\Probe;
 use App\Actions\Device\DeviceMtuTest;
 use App\Models\Device;
 use LibreNMS\Data\Source\Icmp\Fping;
-use LibreNMS\Interfaces\PollingMethodProbeInterface;
 
-final readonly class IcmpProbe implements PollingMethodProbeInterface
+class IcmpProbe extends PollingMethodProbe
 {
     public function check(Device $device): ProbeResult
     {

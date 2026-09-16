@@ -96,8 +96,8 @@ class AddDeviceControllerTest extends TestCase
                     $calledCredentials[] = $secret->data;
                 }
 
-                $queryMock = Mockery::mock(\LibreNMS\Data\Source\SnmpQueryInterface::class);
-                $queryMock->shouldReceive('get')->andReturn(new \LibreNMS\Data\Source\SnmpResponse('', '', 1));
+                $queryMock = Mockery::mock(\LibreNMS\Data\Source\Snmp\SnmpQueryInterface::class);
+                $queryMock->shouldReceive('get')->andReturn(new \LibreNMS\Data\Source\Snmp\SnmpResponse([], '', 1));
 
                 return $queryMock;
             });

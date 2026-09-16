@@ -7,10 +7,10 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethodConfigInterface;
-use LibreNMS\Interfaces\PollingMethodProbeInterface;
 use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\Probe\PollingMethodProbe;
 use LibreNMS\Polling\Method\Probe\ProbeResult;
 use LibreNMS\Polling\PollingMethodFactory;
 use LibreNMS\Tests\TestCase;
@@ -35,12 +35,12 @@ final class ConnectivityHelperTest extends TestCase
             ProbeResult::failure(['duplicates' => false]),
         ];
 
-        $icmpProbeMock = Mockery::mock(PollingMethodProbeInterface::class);
+        $icmpProbeMock = Mockery::mock(PollingMethodProbe::class);
         $icmpProbeMock->shouldReceive('check')
             ->times(8)
             ->andReturnValues($icmpResults);
 
-        $icmpMock = Mockery::mock(PollingMethodConfigInterface::class);
+        $icmpMock = Mockery::mock(PollingMethodConfig::class);
         $icmpMock->shouldReceive('isEnabled')
             ->andReturnUsing(function () use (&$icmpMethod) {
                 return $icmpMethod->enabled;
@@ -57,12 +57,12 @@ final class ConnectivityHelperTest extends TestCase
             ProbeResult::failure(),
         ];
 
-        $snmpProbeMock = Mockery::mock(PollingMethodProbeInterface::class);
+        $snmpProbeMock = Mockery::mock(PollingMethodProbe::class);
         $snmpProbeMock->shouldReceive('check')
             ->times(8)
             ->andReturnValues($snmpResults);
 
-        $snmpMock = Mockery::mock(PollingMethodConfigInterface::class);
+        $snmpMock = Mockery::mock(PollingMethodConfig::class);
         $snmpMock->shouldReceive('isEnabled')
             ->andReturnUsing(function () use (&$snmpMethod) {
                 return $snmpMethod->enabled;
@@ -222,10 +222,10 @@ final class ConnectivityHelperTest extends TestCase
         $ipmiMethod = new DevicePollingMethod();
         $unixAgentMethod = new DevicePollingMethod();
 
-        $ipmiProbeMock = Mockery::mock(PollingMethodProbeInterface::class);
+        $ipmiProbeMock = Mockery::mock(PollingMethodProbe::class);
         $ipmiProbeMock->shouldReceive('check')->andReturn(ProbeResult::success(), ProbeResult::failure());
 
-        $unixAgentProbeMock = Mockery::mock(PollingMethodProbeInterface::class);
+        $unixAgentProbeMock = Mockery::mock(PollingMethodProbe::class);
         $unixAgentProbeMock->shouldReceive('check')->andReturn(ProbeResult::success(), ProbeResult::failure());
 
         $this->swap(CheckDeviceAvailability::class, new CheckDeviceAvailabilityMock([

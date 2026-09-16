@@ -4,9 +4,8 @@ namespace LibreNMS\Polling\Method\Config;
 
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethodConfigInterface;
 
-readonly class IpmiConfig implements PollingMethodConfigInterface
+class IpmiConfig extends PollingMethodConfig
 {
     public function __construct(
         public bool $enabled,
@@ -37,15 +36,16 @@ readonly class IpmiConfig implements PollingMethodConfigInterface
         $secretDefinition = $definition->secretDefinition();
 
         $settings = $definition->resolveValues($method->settings ?? []);
-        $secretData = $secretDefinition ? $secretDefinition->resolveValues($method->secret->data ?? []) : [];
+        $resolvedData = $secretDefinition ? $secretDefinition->resolveValues($method->secret->data ?? []) : [];
+        $secretData = \LibreNMS\Polling\Secrets\Data\IpmiSecretData::fromArray($resolvedData);
 
         return new static(
             $method->enabled,
             $method->affects_availability,
-            $secretData['username'] ?? '',
-            $secretData['password'] ?? '',
-            $secretData['kg_key'] ?? '',
-            ! empty($settings['hostname']) ? $settings['hostname'] : ($method->device?->hostname ?? ''),
+            $secretData->username,
+            $secretData->password,
+            $secretData->kgKey,
+            ! empty($settings['hostname']) ? $settings['hostname'] : ($method->device->hostname ?? ''),
             $settings['port'] ?? 623,
             (int) ($settings['ciphersuite'] ?? 0),
             $settings['timeout'] ?? 3,

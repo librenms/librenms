@@ -3,18 +3,14 @@
 namespace LibreNMS\Polling\Method\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
-use App\View\FieldSchema\HandlesFieldSchema;
-use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
 
 /**
- * @implements PollingMethodDefinitionInterface<IpmiConfig>
+ * @extends PollingMethodDefinition<IpmiConfig>
  */
-class IpmiPollingMethodDefinition implements PollingMethodDefinitionInterface
+class IpmiPollingMethodDefinition extends PollingMethodDefinition
 {
-    use HandlesFieldSchema;
-
     /**
      * @inheritDoc
      */
