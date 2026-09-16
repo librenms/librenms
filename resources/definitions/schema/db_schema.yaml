@@ -801,9 +801,9 @@ entPhysical:
     - { Field: entPhysicalDescr, Type: text, 'Null': true, Extra: '' }
     - { Field: entPhysicalClass, Type: text, 'Null': true, Extra: '' }
     - { Field: entPhysicalName, Type: text, 'Null': true, Extra: '' }
-    - { Field: entPhysicalHardwareRev, Type: varchar(96), 'Null': true, Extra: '' }
-    - { Field: entPhysicalFirmwareRev, Type: varchar(96), 'Null': true, Extra: '' }
-    - { Field: entPhysicalSoftwareRev, Type: varchar(96), 'Null': true, Extra: '' }
+    - { Field: entPhysicalHardwareRev, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: entPhysicalFirmwareRev, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: entPhysicalSoftwareRev, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: entPhysicalAlias, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: entPhysicalAssetID, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: entPhysicalIsFRU, Type: varchar(8), 'Null': true, Extra: '' }
