@@ -52,7 +52,7 @@ TRAP,
 
             'Output EDFA changed to disabled.',
             'Failed to handle XklEdfaAlarmChange EDFA disabled alarm trap.',
-            [Severity::Warning]
+            [Severity::Warning],
         );
     }
 
