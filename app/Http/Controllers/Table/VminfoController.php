@@ -26,12 +26,11 @@
 
 namespace App\Http\Controllers\Table;
 
-use App\Models\Device;
 use App\Models\Vminfo;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Blade;
+use LibreNMS\Util\Url;
 
 /**
  * @extends TableController<Vminfo>
@@ -102,12 +101,12 @@ class VminfoController extends TableController
     {
         return [
             'vmwVmState' => '<span class="label ' . $model->stateLabel[1] . '">' . $model->stateLabel[0] . '</span>',
-            'vmwVmDisplayName' => is_null($model->parentDevice) ? $model->vmwVmDisplayName : self::getHostname($model->parentDevice),
+            'vmwVmDisplayName' => is_null($model->parentDevice) ? $model->vmwVmDisplayName : Url::modernDeviceLink($model->parentDevice),
             'vm_type' => $model->vm_type,
             'vmwVmGuestOS' => $model->operatingSystem,
             'vmwVmMemSize' => $model->memoryFormatted,
             'vmwVmCpus' => $model->vmwVmCpus,
-            'hostname' => self::getHostname($model->device),
+            'hostname' => Url::modernDeviceLink($model->device),
             'deviceid' => $model->device_id,
             'sysname' => $model->device?->sysName,
         ];
@@ -130,14 +129,5 @@ class VminfoController extends TableController
             'deviceid' => $item->device_id,
             'sysname' => $item->device?->sysName,
         ];
-    }
-
-    private static function getHostname(?Device $device): string
-    {
-        if ($device === null) {
-            return '';
-        }
-
-        return Blade::render('<x-device-link :device="$device"/>', ['device' => $device]);
     }
 }
