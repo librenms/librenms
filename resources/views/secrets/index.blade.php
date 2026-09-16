@@ -28,7 +28,6 @@
                             <tr>
                                 <th>{{ __('Description') }}</th>
                                 <th>{{ __('Type') }}</th>
-                                <th>{{ __('Default') }}</th>
                                 <th class="tw:text-center">{{ __('Devices') }}</th>
                                 <th class="tw:w-32 tw:text-center">{{ __('Actions') }}</th>
                             </tr>
@@ -43,13 +42,6 @@
                                     </td>
                                     <td class="tw:align-middle">
                                         {{ Str::upper($secret->secret_type->value) }}
-                                    </td>
-                                    <td class="tw:align-middle">
-                                        @if($secret->default)
-                                            <span class="label label-success">{{ __('Yes') }}</span>
-                                        @else
-                                            <span class="label label-default">{{ __('No') }}</span>
-                                        @endif
                                     </td>
                                     <td class="tw:text-center tw:align-middle">
                                         <a href="{{ route('devices', ['filter' => ['secrets.secret_id' => ['eq' => $secret->id]]]) }}" class="tw:font-semibold tw:text-blue-600 tw:dark:text-blue-400 tw:hover:underline">

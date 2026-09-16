@@ -314,8 +314,6 @@
                                                             :description-name="'polling_methods[' . $method['type'] . '][description]'"
                                                             :description-model="'methods[\'' . $method['type'] . '\'].description'"
                                                             :description-placeholder="__('Optional')"
-                                                            :default-name="'polling_methods[' . $method['type'] . '][default]'"
-                                                            :default-model="'methods[\'' . $method['type'] . '\'].default'"
                                                             :error-key="'polling_methods.' . $method['type'] . '.description'"
                                                         />
                                                     </template>
@@ -564,7 +562,6 @@
                             methodPayload.secret_id = m.secret_id;
                         } else if (m.credential_mode === 'new') {
                             methodPayload.description = m.description;
-                            methodPayload.default = m.default ? 1 : 0;
                             methodPayload.secret_data = m.formData || {};
                         }
 

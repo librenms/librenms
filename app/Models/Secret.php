@@ -17,7 +17,6 @@ class Secret extends BaseModel
     protected $fillable = [
         'description',
         'secret_type',
-        'default',
         'data',
     ];
 
@@ -68,9 +67,14 @@ class Secret extends BaseModel
         }
 
         return $query->where(function (Builder $query) use ($user): void {
+            $defaultSecretIds = \App\Facades\LibrenmsConfig::get('snmp.default_credentials', []);
             $query->whereHas('devices', function (Builder $query) use ($user): void {
                 $query->whereIntegerInRaw('devices.device_id', \Permissions::devicesForUser($user));
-            })->orWhere($query->qualifyColumn('default'), true);
+            });
+
+            if (! empty($defaultSecretIds)) {
+                $query->orWhereIntegerInRaw('secrets.id', $defaultSecretIds);
+            }
         });
     }
 

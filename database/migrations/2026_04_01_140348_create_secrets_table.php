@@ -16,7 +16,6 @@ return new class extends Migration
             $table->timestamps();
             $table->string('description')->unique();
             $table->string('secret_type')->index();
-            $table->boolean('default')->default(false);
             $table->text('data');
         });
     }

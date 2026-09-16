@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Feature\Http;
 
+use App\Models\Device;
 use App\Models\User;
 use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Tests\TestCase;
@@ -102,18 +103,21 @@ class AddDeviceControllerTest extends TestCase
                 return $queryMock;
             });
 
-        // Set global configured SNMP credentials to something we shouldn't attempt
-        \App\Facades\LibrenmsConfig::set('snmp.version', ['v2c', 'v3']);
-        \App\Facades\LibrenmsConfig::set('snmp.community', ['global-community']);
-        \App\Facades\LibrenmsConfig::set('snmp.v3', [
-            ['authname' => 'global-v3-user', 'authlevel' => 'authNoPriv', 'authpass' => 'globalpass'],
+        // Set global configured default credentials to something we shouldn't attempt
+        $globalSecret = \App\Models\Secret::create([
+            'description' => 'Global Default Secret',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'data' => [
+                'version' => 'v2c',
+                'community' => 'global-community',
+            ],
         ]);
+        \App\Facades\LibrenmsConfig::set('snmp.default_credentials', [$globalSecret->id]);
 
         // Create an existing secret
         $secret = \App\Models\Secret::create([
             'description' => 'Target Secret',
             'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
-            'default' => false,
             'data' => [
                 'version' => 'v2c',
                 'community' => 'target-community',
@@ -399,5 +403,57 @@ class AddDeviceControllerTest extends TestCase
 
         $response->assertOk();
         $this->assertEquals('ok', $response->json('status'));
+    }
+
+    public function testDetectCredentialsAttemptsDefaultCredentialsInOrderAndAssociatesWinningSecret(): void
+    {
+        $secret1 = \App\Models\Secret::create([
+            'description' => 'Default SNMP 1',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'data' => [
+                'version' => 'v2c',
+                'community' => 'wrong-comm',
+            ],
+        ]);
+        $secret2 = \App\Models\Secret::create([
+            'description' => 'Default SNMP 2',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'data' => [
+                'version' => 'v2c',
+                'community' => 'correct-comm',
+            ],
+        ]);
+
+        \App\Facades\LibrenmsConfig::set('snmp.default_credentials', [$secret1->id, $secret2->id]);
+
+        $triedCommunities = [];
+        \SnmpQuery::partialMock()->shouldReceive('device')
+            ->andReturnUsing(function ($device) use (&$triedCommunities) {
+                $snmpMethod = $device?->pollingMethods->firstWhere('method_type', \LibreNMS\Enum\PollingMethodType::Snmp);
+                $comm = $snmpMethod?->secret?->data['community'] ?? null;
+                $triedCommunities[] = $comm;
+
+                $queryMock = Mockery::mock(\LibreNMS\Data\Source\Snmp\SnmpQueryInterface::class);
+                if ($comm === 'correct-comm') {
+                    $queryMock->shouldReceive('get')->andReturn(new \LibreNMS\Data\Source\Snmp\SnmpResponse(['.1.3.6.1.2.1.1.1.0' => 'Test System'], '', 0));
+                } else {
+                    $queryMock->shouldReceive('get')->andReturn(new \LibreNMS\Data\Source\Snmp\SnmpResponse([], 'Timeout', 1));
+                }
+
+                return $queryMock;
+            });
+
+        $device = new Device([
+            'hostname' => 'detect-test.example.com',
+        ]);
+
+        $action = new \App\Actions\Device\ValidateDeviceAndCreate($device, force: false, ping_fallback: false);
+        $result = $action->execute();
+
+        $this->assertTrue($result);
+        $this->assertEquals(['wrong-comm', 'correct-comm'], $triedCommunities);
+        $snmpMethod = $device->pollingMethods->firstWhere('method_type', \LibreNMS\Enum\PollingMethodType::Snmp);
+        $this->assertNotNull($snmpMethod);
+        $this->assertEquals($secret2->id, $snmpMethod->secret_id);
     }
 }

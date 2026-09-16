@@ -44,7 +44,6 @@ class SecretControllerTest extends TestCase
         $response = $this->actingAs($admin)->post(route('secrets.store'), [
             'description' => 'Unique SNMP Secret',
             'secret_type' => 'snmp',
-            'default' => '0',
             'version' => 'v2c',
             'community' => 'public',
         ]);
@@ -63,14 +62,12 @@ class SecretControllerTest extends TestCase
         Secret::create([
             'description' => 'Existing Secret',
             'secret_type' => SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
         $response = $this->actingAs($admin)->post(route('secrets.store'), [
             'description' => 'Existing Secret',
             'secret_type' => 'snmp',
-            'default' => '0',
             'version' => 'v2c',
             'community' => 'public',
         ]);
@@ -86,13 +83,11 @@ class SecretControllerTest extends TestCase
         $secret = Secret::create([
             'description' => 'Existing Secret',
             'secret_type' => SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
         $response = $this->actingAs($admin)->put(route('secrets.update', $secret), [
             'description' => 'Existing Secret',
-            'default' => '0',
             'version' => 'v2c',
             'community' => 'private',
         ]);
@@ -112,20 +107,17 @@ class SecretControllerTest extends TestCase
         Secret::create([
             'description' => 'First Secret',
             'secret_type' => SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
         $secret2 = Secret::create([
             'description' => 'Second Secret',
             'secret_type' => SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
         $response = $this->actingAs($admin)->put(route('secrets.update', $secret2), [
             'description' => 'First Secret',
-            'default' => '0',
             'version' => 'v2c',
             'community' => 'public',
         ]);
@@ -155,7 +147,6 @@ class SecretControllerTest extends TestCase
         $secret = Secret::create([
             'description' => 'Test SNMP v3 Secret',
             'secret_type' => SecretType::Snmp,
-            'default' => false,
             'data' => [
                 'version' => 'v3',
                 'authname' => 'myuser',
@@ -184,7 +175,6 @@ class SecretControllerTest extends TestCase
         $secret = Secret::create([
             'description' => 'Unused Secret',
             'secret_type' => SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -205,7 +195,6 @@ class SecretControllerTest extends TestCase
         $secret = Secret::create([
             'description' => 'In Use Secret',
             'secret_type' => SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -234,7 +223,6 @@ class SecretControllerTest extends TestCase
         $secret = Secret::create([
             'description' => 'In Use Secret',
             'secret_type' => SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 

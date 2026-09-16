@@ -29,9 +29,10 @@ namespace App\Actions\Device;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
-use Illuminate\Support\Arr;
+use App\Models\Secret;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostNameEmptyException;
 use LibreNMS\Exceptions\HostnameExistsException;
@@ -134,102 +135,57 @@ class ValidateDeviceAndCreate
 
         $host_unreachable_exception = new HostUnreachableSnmpException($this->device->hostname);
 
-        // Retrieve existing SNMP secret from relations if set
-        $existingSnmpSecret = $this->device->relationLoaded('pollingMethods')
-            ? $this->device->pollingMethods->firstWhere('method_type', PollingMethodType::Snmp)?->secret
-            : null;
-
-        if ($existingSnmpSecret !== null) {
-            $secretData = $existingSnmpSecret->toSecretData();
-            if ($secretData instanceof \LibreNMS\Polling\Secrets\Data\SnmpSecretData) {
-                $snmp_versions = [$secretData->version];
-                if ($secretData->version === 'v3') {
-                    $v3_credentials = [[
-                        'authlevel' => $secretData->authlevel,
-                        'authname' => $secretData->authname,
-                        'authpass' => $secretData->authpass,
-                        'authalgo' => $secretData->authalgo,
-                        'cryptopass' => $secretData->cryptopass,
-                        'cryptoalgo' => $secretData->cryptoalgo,
-                    ]];
-                    $communities = [];
-                } else {
-                    $communities = [$secretData->community];
-                    $v3_credentials = [];
-                }
-            } else {
-                $snmp_versions = ['v2c'];
-                $communities = [];
-                $v3_credentials = [];
-            }
-        } else {
-            $snmp_versions = array_unique(LibrenmsConfig::get('snmp.version', []));
-            $communities = array_unique(Arr::where(Arr::wrap(LibrenmsConfig::get('snmp.community')), fn ($community) => $community && is_string($community)));
-            $v3_credentials = array_unique(LibrenmsConfig::get('snmp.v3', []), SORT_REGULAR);
-        }
-
         // Keep track of other polling methods so we do not overwrite them when setting the relation
         $otherPollingMethods = collect();
         if ($this->device->relationLoaded('pollingMethods')) {
             $otherPollingMethods = $this->device->pollingMethods->filter(fn ($m) => $m->method_type !== PollingMethodType::Snmp);
         }
 
-        foreach ($snmp_versions as $snmp_version) {
-            if ($snmp_version === 'v3') {
-                // Try each set of parameters from config
-                foreach ($v3_credentials as $v3) {
-                    $snmpData = [
-                        'version' => 'v3',
-                        'authlevel' => $v3['authlevel'] ?? 'noAuthNoPriv',
-                        'authname' => $v3['authname'] ?? null,
-                        'authpass' => $v3['authpass'] ?? null,
-                        'authalgo' => $v3['authalgo'] ?? 'SHA',
-                        'cryptopass' => $v3['cryptopass'] ?? null,
-                        'cryptoalgo' => $v3['cryptoalgo'] ?? 'AES',
-                    ];
+        $existingSnmpMethod = $this->device->relationLoaded('pollingMethods')
+            ? $this->device->pollingMethods->firstWhere('method_type', PollingMethodType::Snmp)
+            : null;
 
-                    $snmpMethod = DevicePollingMethod::transient(
-                        PollingMethodType::Snmp,
-                        secretData: $snmpData,
-                        device: $this->device,
-                        affectsAvailability: true,
-                    );
+        // If a specific secret or specific secret_data was supplied on the method, test that directly
+        if ($existingSnmpMethod !== null && ($existingSnmpMethod->secret !== null || ! empty(array_filter($existingSnmpMethod->getSecretData())))) {
+            if (PollingMethodType::Snmp->definition()->probe()->check($this->device)->isSuccess()) {
+                return;
+            }
 
-                    // Set the relation temporarily for testing
-                    $this->device->setRelation('pollingMethods', $otherPollingMethods->concat([$snmpMethod]));
+            $secretData = $existingSnmpMethod->getSecretData();
+            $version = $secretData['version'] ?? 'unknown';
+            $target = $existingSnmpMethod->secret?->description ?? ($secretData['community'] ?? ($secretData['authname'] ?? 'custom'));
+            $host_unreachable_exception->addReason($version, (string) $target);
+        } else {
+            // Otherwise, attempt ordered default credentials
+            /** @var array<int, int> $defaultSecretIds */
+            $defaultSecretIds = (array) LibrenmsConfig::get('snmp.default_credentials', []);
+            $defaultSecrets = Secret::where('secret_type', SecretType::Snmp)
+                ->whereIn('id', $defaultSecretIds)
+                ->get()
+                ->sortBy(fn ($s) => array_search($s->id, $defaultSecretIds));
 
-                    if (PollingMethodType::Snmp->definition()->probe()->check($this->device)->isSuccess()) {
-                        return;
-                    } else {
-                        $host_unreachable_exception->addReason($snmp_version, $snmpData['authname'] . '/' . $snmpData['authlevel']);
-                    }
+            $settings = $existingSnmpMethod?->getSettings() ?? [];
+
+            foreach ($defaultSecrets as $secret) {
+                $secretData = $secret->toSecretData();
+                $snmpMethod = DevicePollingMethod::transient(
+                    PollingMethodType::Snmp,
+                    settings: $settings,
+                    secretData: $secretData->toArray(),
+                    device: $this->device,
+                    affectsAvailability: true,
+                );
+                $snmpMethod->setRelation('secret', $secret);
+                $snmpMethod->secret_id = $secret->id;
+
+                // Set relation temporarily for probe check
+                $this->device->setRelation('pollingMethods', $otherPollingMethods->concat([$snmpMethod]));
+
+                if (PollingMethodType::Snmp->definition()->probe()->check($this->device)->isSuccess()) {
+                    return;
                 }
-            } elseif ($snmp_version === 'v2c' || $snmp_version === 'v1') {
-                // try each community from config
-                foreach ($communities as $community) {
-                    $snmpData = [
-                        'version' => $snmp_version,
-                        'community' => $community,
-                    ];
 
-                    $snmpMethod = DevicePollingMethod::transient(
-                        PollingMethodType::Snmp,
-                        secretData: $snmpData,
-                        device: $this->device,
-                        affectsAvailability: true,
-                    );
-
-                    // Set the relation temporarily for testing
-                    $this->device->setRelation('pollingMethods', $otherPollingMethods->concat([$snmpMethod]));
-
-                    if (PollingMethodType::Snmp->definition()->probe()->check($this->device)->isSuccess()) {
-                        return;
-                    } else {
-                        $host_unreachable_exception->addReason($snmp_version, (string) ($community ?? ''));
-                    }
-                }
-            } else {
-                throw new SnmpVersionUnsupportedException($snmp_version);
+                $host_unreachable_exception->addReason($secretData->version, $secret->description);
             }
         }
 
