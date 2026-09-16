@@ -35,7 +35,7 @@ $('#delete-oid-button').on('click', function(event) {
     var customoid_id = $("#dcustomoid_id").val();
     $.ajax({
         type: 'DELETE',
-        url: '<?php echo route("customoid.destroy", ["customoid" => ":customoid"]) ?>'.replace(':customoid', customoid_id),
+        url: '<?php echo route('customoid.destroy', ['customoid' => ':customoid']) ?>'.replace(':customoid', customoid_id),
         dataType: "json",
         success: function(data) {
             if (data.status == 'ok') {
