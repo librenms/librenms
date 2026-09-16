@@ -9,8 +9,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $this->dropNullDuplicates('bgpPeers', ['device_id', 'bgpPeerIdentifier']);
-        $this->dropNullDuplicates('bgpPeers_cbgp', ['device_id', 'bgpPeerIdentifier', 'afi', 'safi']);
+        $this->dropNullDuplicates();
 
         DB::table('bgpPeers')->whereNull('context_name')->update(['context_name' => '']);
         DB::table('bgpPeers_cbgp')->whereNull('context_name')->update(['context_name' => '']);
@@ -38,37 +37,36 @@ return new class extends Migration
     /**
      * The os specific discovery modules stored a null context while the generic module
      * looked for an empty string, so each peer ended up with two rows. Drop the null row
-     * where an empty string row already exists. Polling updated both, so they only
-     * differ by id, and the empty string row is the one discovery matches from now on.
+     * where an empty string row already exists. Polling updated both, so they only differ
+     * by id, and the empty string row is the one discovery matches from now on.
      *
-     * @param  list<string>  $keyColumns
+     * bgpPeers_cbgp needs no such pass. Its device_id, bgpPeerIdentifier, afi and safi
+     * unique index already prevented a second row, so only the context differs there.
      */
-    private function dropNullDuplicates(string $table, array $keyColumns): void
+    private function dropNullDuplicates(): void
     {
-        $duplicates = DB::table($table)
-            ->select($keyColumns)
+        $duplicates = DB::table('bgpPeers')
+            ->select(['device_id', 'bgpPeerIdentifier'])
             ->whereNull('context_name')
-            ->groupBy($keyColumns)
+            ->groupBy(['device_id', 'bgpPeerIdentifier'])
             ->get();
 
         foreach ($duplicates as $duplicate) {
-            $hasEmptyContext = DB::table($table)->where('context_name', '');
+            $hasEmptyContext = DB::table('bgpPeers')
+                ->where('context_name', '')
+                ->where('device_id', $duplicate->device_id)
+                ->where('bgpPeerIdentifier', $duplicate->bgpPeerIdentifier)
+                ->exists();
 
-            foreach ($keyColumns as $column) {
-                $hasEmptyContext->where($column, $duplicate->$column);
-            }
-
-            if (! $hasEmptyContext->exists()) {
+            if (! $hasEmptyContext) {
                 continue;
             }
 
-            $nullRows = DB::table($table)->whereNull('context_name');
-
-            foreach ($keyColumns as $column) {
-                $nullRows->where($column, $duplicate->$column);
-            }
-
-            $nullRows->delete();
+            DB::table('bgpPeers')
+                ->whereNull('context_name')
+                ->where('device_id', $duplicate->device_id)
+                ->where('bgpPeerIdentifier', $duplicate->bgpPeerIdentifier)
+                ->delete();
         }
     }
 };
