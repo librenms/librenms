@@ -272,7 +272,6 @@ final class ConnectivityHelperTest extends TestCase
 
         $device = new Device;
         $snmpConfig = new SnmpConfig(
-            target: '127.0.0.1',
             enabled: true,
             affectsAvailability: true,
             version: 'v2c',
@@ -283,9 +282,9 @@ final class ConnectivityHelperTest extends TestCase
             authalgo: 'SHA',
             cryptopass: null,
             cryptoalgo: 'AES',
-            context: null,
             transport: 'udp',
             port: 161,
+            context: null,
             timeout: 3,
             retries: 1,
             maxRepeaters: 0,

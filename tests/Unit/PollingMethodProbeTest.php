@@ -182,4 +182,33 @@ final class PollingMethodProbeTest extends TestCase
         $this->assertEquals('v3', $config2Updated->version);
         $this->assertEquals('user1', $config2Updated->authname);
     }
+
+    public function testCheckDeviceAvailabilityHandlesSecretDecryptionGracefully(): void
+    {
+        $device = new Device(['hostname' => 'corrupt-key.example.com']);
+        $device->device_id = 1;
+
+        $badSecret = \Mockery::mock(Secret::class)->makePartial();
+        $badSecret->shouldReceive('getAttribute')->with('data')->andThrow(
+            SecretDecryptionException::failedToDecrypt('The payload is invalid.')
+        );
+
+        $method = DevicePollingMethod::transient(
+            type: PollingMethodType::Snmp,
+            settings: [],
+            device: $device,
+            affectsAvailability: true,
+            enabled: true,
+        );
+        $method->setRelation('secret', $badSecret);
+        $device->setRelation('pollingMethods', collect([$method]));
+
+        $checker = app(\App\Actions\Device\CheckDeviceAvailability::class);
+
+        $status = $checker->execute($device, false);
+
+        $this->assertFalse($status);
+        $this->assertFalse($method->last_check_successful);
+        $this->assertEquals('snmp', $device->status_reason);
+    }
 }

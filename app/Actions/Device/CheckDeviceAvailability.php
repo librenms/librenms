@@ -19,26 +19,32 @@ readonly class CheckDeviceAvailability
         $enabledPollingMethods = $device->pollingMethods->filter(fn ($m) => $m->enabled);
 
         foreach ($enabledPollingMethods as $method) {
-            $definition = $method->method_type->definition();
-            $result = $definition->probe()->check($device);
+            try {
+                $definition = $method->method_type->definition();
+                $result = $definition->probe()->check($device);
 
-            $method->last_check_successful = $result->isSuccess();
-            $method->last_checked_at = now();
+                $method->last_check_successful = $result->isSuccess();
+                $method->last_checked_at = now();
 
-            if ($method->method_type === PollingMethodType::Icmp) {
-                if ($result->stat('duplicates')) {
-                    Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $device, 'icmp', Severity::Warning);
+                if ($method->method_type === PollingMethodType::Icmp) {
+                    if ($result->stat('duplicates')) {
+                        Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $device, 'icmp', Severity::Warning);
+                    }
+
+                    $fpingStatus = $result->stat('fping_status');
+                    if ($commit && $fpingStatus) {
+                        $fpingStatus->saveStats($device);
+                    }
+
+                    $mtuStatus = $result->stat('mtu_status');
+                    if ($result->isSuccess() && $mtuStatus !== null) {
+                        $device->mtu_status = $mtuStatus;
+                    }
                 }
-
-                $fpingStatus = $result->stat('fping_status');
-                if ($commit && $fpingStatus) {
-                    $fpingStatus->saveStats($device);
-                }
-
-                $mtuStatus = $result->stat('mtu_status');
-                if ($result->isSuccess() && $mtuStatus !== null) {
-                    $device->mtu_status = $mtuStatus;
-                }
+            } catch (\LibreNMS\Exceptions\SecretDecryptionException) {
+                $method->last_check_successful = false;
+                $method->last_checked_at = now();
+                Eventlog::log("Failed to decrypt credentials for {$method->method_type->value} polling. Verify that APP_KEY matches the primary installation.", $device, 'auth', Severity::Error);
             }
         }
 
