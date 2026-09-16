@@ -28,9 +28,10 @@
                             <th class="col-sm-2">{{ __('Name') }}</th>
                             <th class="col-sm-1">{{ __('Check Type') }}</th>
                             <th class="col-sm-1">{{ __('Remote Host') }}</th>
-                            <th class="col-sm-4">{{ __('Message') }}</th>
+                            <th class="col-sm-3">{{ __('Message') }}</th>
                             <th class="col-sm-2">{{ __('Description') }}</th>
                             <th class="col-sm-1">{{ __('Last Changed') }}</th>
+                            <th class="col-sm-1">{{ __('Last Checked') }}</th>
                             <th class="col-sm-1"></th>
                         </tr>
                     </thead>
@@ -38,18 +39,18 @@
                     @forelse($data['services'] as $item)
                         @php $service = $item['service']; @endphp
                         <tr id="row_{{ $service->service_id }}">
-                            <td class="col-sm-2">
-                                <span class="alert-status {{ $item['status_class'] }}">
-                                    <span class="device-services-page text-nowrap">
-                                        {{ $service->service_name ?: $service->service_type }}
-                                    </span>
+                            <td class="col-sm-2 text-nowrap">
+                                <span class="alert-status {{ $item['status_class'] }}" style="vertical-align: middle;"></span>
+                                <span class="device-services-page">
+                                    {{ $service->service_name ?: $service->service_type }}
                                 </span>
                             </td>
                             <td class="col-sm-1 text-muted">{{ $service->service_type }}</td>
                             <td class="col-sm-1 text-muted">{!! nl2br(e($service->service_ip)) !!}</td>
-                            <td class="col-sm-4">{!! nl2br(e(trim($service->service_message))) !!}</td>
+                            <td class="col-sm-3">{!! nl2br(e(trim($service->service_message))) !!}</td>
                             <td class="col-sm-2 text-muted">{{ $service->service_desc }}</td>
                             <td class="col-sm-1 text-muted">{{ $item['last_changed'] }}</td>
+                            <td class="col-sm-1 text-muted">{{ $item['last_checked'] }}</td>
                             <td class="col-sm-1 text-right">
                                 <div class="btn-group">
                                     @can('service.update')
@@ -68,7 +69,7 @@
                         @if($data['view'] === 'details' && !empty($item['graphs']))
                             @foreach($item['graphs'] as $graph)
                                 <tr>
-                                    <td colspan="7" class="tw:p-2.5 tw:bg-gray-50 tw:dark:bg-dark-gray-500">
+                                    <td colspan="8" class="tw:p-2.5 tw:bg-gray-50 tw:dark:bg-dark-gray-500">
                                         <x-graph-row
                                             :device="$device"
                                             type="service_graph"
@@ -82,7 +83,7 @@
                         @endif
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center tw:p-5">
+                            <td colspan="8" class="text-center tw:p-5">
                                 <em>{{ __('No services found for this device.') }}</em>
                             </td>
                         </tr>
