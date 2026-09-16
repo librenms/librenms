@@ -71,7 +71,6 @@ class SecretController extends Controller
         $validated = $request->validate([
             'description' => ['required', 'string', 'max:255', 'unique:secrets,description'],
             'secret_type' => 'required|string',
-            'default' => 'boolean',
         ]);
 
         $secretType = SecretType::tryFrom($validated['secret_type']);
@@ -85,7 +84,6 @@ class SecretController extends Controller
         Secret::create([
             'description' => $validated['description'],
             'secret_type' => $secretType,
-            'default' => $request->boolean('default'),
             'data' => $data,
         ]);
 
@@ -119,7 +117,6 @@ class SecretController extends Controller
 
         $validated = $request->validate([
             'description' => ['required', 'string', 'max:255', Rule::unique('secrets', 'description')->ignore($secret->id)],
-            'default' => 'boolean',
         ]);
 
         $definition = $secret->secret_type->definition();
@@ -131,7 +128,6 @@ class SecretController extends Controller
 
         $secret->update([
             'description' => $validated['description'],
-            'default' => $request->boolean('default'),
             'data' => $data,
         ]);
 

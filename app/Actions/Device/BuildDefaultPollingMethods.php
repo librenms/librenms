@@ -52,7 +52,6 @@ class BuildDefaultPollingMethods
                 } elseif ($credentialMode === 'new' && ! empty($secretData) && ! empty($data['description'])) {
                     if ($pollingMethod->secret) {
                         $pollingMethod->secret->description = $data['description'];
-                        $pollingMethod->secret->default = (bool) ($data['default'] ?? false);
                     }
                 }
 

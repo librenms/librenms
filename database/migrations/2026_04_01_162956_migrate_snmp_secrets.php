@@ -46,7 +46,6 @@ return new class extends Migration
                             $secretId = DB::table('secrets')->insertGetId([
                                 'description' => "SNMP for device $device->hostname",
                                 'secret_type' => 'snmp',
-                                'default' => false,
                                 'data' => encrypt(json_encode($data)),
                                 'created_at' => now(),
                                 'updated_at' => now(),
@@ -100,6 +99,97 @@ return new class extends Migration
                         'updated_at' => now(),
                     ]);
                 }
+            }
+
+            // Migrate default SNMP credentials into secrets and set snmp.default_credentials
+            $defaultSecretIds = [];
+            $snmpVersions = \App\Facades\LibrenmsConfig::get('snmp.version', ['v2c', 'v3', 'v1']);
+            $communities = \Illuminate\Support\Arr::wrap(\App\Facades\LibrenmsConfig::get('snmp.community', ['public']));
+            $v3Credentials = \App\Facades\LibrenmsConfig::get('snmp.v3', []);
+
+            foreach ($snmpVersions as $version) {
+                if ($version === 'v3') {
+                    foreach ($v3Credentials as $v3) {
+                        $v3Data = [
+                            'version' => 'v3',
+                            'authlevel' => $v3['authlevel'] ?? 'noAuthNoPriv',
+                            'authname' => $v3['authname'] ?? 'root',
+                            'authpass' => $v3['authpass'] ?? null,
+                            'authalgo' => $v3['authalgo'] ?? 'MD5',
+                            'cryptopass' => $v3['cryptopass'] ?? null,
+                            'cryptoalgo' => $v3['cryptoalgo'] ?? 'AES',
+                        ];
+                        $hash = hash('sha256', serialize($v3Data));
+                        if (! isset($secretMap[$hash])) {
+                            $desc = 'Default SNMP v3 (' . ($v3Data['authname'] ?: 'root') . ')';
+                            $existingCount = DB::table('secrets')->where('description', $desc)->count();
+                            if ($existingCount > 0) {
+                                $desc .= ' #' . ($existingCount + 1);
+                            }
+                            $secretId = DB::table('secrets')->insertGetId([
+                                'description' => $desc,
+                                'secret_type' => 'snmp',
+                                'data' => encrypt(json_encode($v3Data)),
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
+                            $secretMap[$hash] = $secretId;
+                        }
+                        $defaultSecretIds[] = $secretMap[$hash];
+                    }
+                } elseif (in_array($version, ['v1', 'v2c'])) {
+                    foreach ($communities as $community) {
+                        if (! is_string($community) || $community === '') {
+                            continue;
+                        }
+                        $v2Data = [
+                            'version' => $version,
+                            'community' => $community,
+                        ];
+                        $hash = hash('sha256', serialize($v2Data));
+                        if (! isset($secretMap[$hash])) {
+                            $desc = "Default SNMP $version ($community)";
+                            $existingCount = DB::table('secrets')->where('description', $desc)->count();
+                            if ($existingCount > 0) {
+                                $desc .= ' #' . ($existingCount + 1);
+                            }
+                            $secretId = DB::table('secrets')->insertGetId([
+                                'description' => $desc,
+                                'secret_type' => 'snmp',
+                                'data' => encrypt(json_encode($v2Data)),
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
+                            $secretMap[$hash] = $secretId;
+                        }
+                        $defaultSecretIds[] = $secretMap[$hash];
+                    }
+                }
+            }
+
+            if (empty($defaultSecretIds)) {
+                $v2Data = ['version' => 'v2c', 'community' => 'public'];
+                $desc = 'Default SNMP v2c (public)';
+                $existingCount = DB::table('secrets')->where('description', $desc)->count();
+                if ($existingCount > 0) {
+                    $desc .= ' #' . ($existingCount + 1);
+                }
+                $secretId = DB::table('secrets')->insertGetId([
+                    'description' => $desc,
+                    'secret_type' => 'snmp',
+                    'data' => encrypt(json_encode($v2Data)),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                $defaultSecretIds[] = $secretId;
+            }
+
+            $defaultSecretIds = array_values(array_unique($defaultSecretIds));
+            if (! empty($defaultSecretIds)) {
+                DB::table('config')->updateOrInsert(
+                    ['config_name' => 'snmp.default_credentials'],
+                    ['config_value' => json_encode($defaultSecretIds)]
+                );
             }
         });
     }

@@ -48,7 +48,6 @@ return new class extends Migration
                                 $secretId = DB::table('secrets')->insertGetId([
                                     'description' => "IPMI for device {$hostnamesByDevice[$deviceId]}",
                                     'secret_type' => 'ipmi',
-                                    'default' => false,
                                     'data' => encrypt(json_encode($data)),
                                     'created_at' => now(),
                                     'updated_at' => now(),

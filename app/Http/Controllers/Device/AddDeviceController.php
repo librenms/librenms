@@ -68,7 +68,6 @@ class AddDeviceController
                     'credential_mode' => old("polling_methods.{$type}.credential_mode", 'default'),
                     'secret_id' => old("polling_methods.{$type}.secret_id", ''),
                     'description' => old("polling_methods.{$type}.description", ''),
-                    'default' => (bool) old("polling_methods.{$type}.default"),
                     'formData' => old("polling_methods.{$type}.secret_data", $method['schema_defaults'] ?? []),
                     'settingsData' => old("polling_methods.{$type}.settings", $method['settings_form_defaults'] ?? []),
                 ]];

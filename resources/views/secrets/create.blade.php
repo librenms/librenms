@@ -43,14 +43,6 @@
                     @endif
                 </div>
 
-                <div class="form-group">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" name="default" value="1" {{ old('default') ? 'checked' : '' }}> {{ __('Default') }}
-                        </label>
-                    </div>
-                </div>
-
                 <x-field-schema-fields
                     :fields="$schema"
                     :data="$data"
