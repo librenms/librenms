@@ -40,9 +40,11 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\RouteDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
+use LibreNMS\Util\Number;
 use SnmpQuery;
 
 class Routes implements Module
@@ -60,15 +62,15 @@ class Routes implements Module
     /**
      * @inheritDoc
      */
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
         return false;
     }
@@ -147,7 +149,7 @@ class Routes implements Module
             $data->inetCidrRouteIfIndex = intval($data->inetCidrRouteIfIndex);
             $data->inetCidrRouteType = intval($data->inetCidrRouteType);
             $data->inetCidrRouteProto = intval($data->inetCidrRouteProto);
-            $data->inetCidrRouteNextHopAS = intval($data->inetCidrRouteNextHopAS);
+            $data->inetCidrRouteNextHopAS = Number::correctIntegerOverflow(intval($data->inetCidrRouteNextHopAS)); //32bit ASN wrapped negative by signed Integer32 in RFC2096 ipCidrRouteTable
             $data->inetCidrRouteMetric1 = intval($data->inetCidrRouteMetric1) < 0 ? 0 : intval($data->inetCidrRouteMetric1); //negative val from RFC1213
             $data->inetCidrRouteDestType ??= '';
             $data->inetCidrRouteDest = $dst;

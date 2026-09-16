@@ -27,22 +27,26 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Bill;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<Bill>
+ */
 class BillController extends SelectController
 {
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['bill_name', 'bill_notes'];
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Bill::class);
+
         return Bill::hasAccess($request->user())
             ->select('bill_id', 'bill_name');
     }

@@ -7,7 +7,7 @@
  * on a single graph. Sensors are specified as comma-separated IDs.
  *
  * Example URL:
- * graph.php?type=multisensor_graph&id=123,456,789
+ * graph?type=multisensor_graph&id=123,456,789
  */
 
 use App\Models\Sensor;
@@ -39,4 +39,4 @@ if (! $auth) {
     }
 }
 
-$title = 'Multi Sensor :: ';
+$title = 'Multi Sensor';

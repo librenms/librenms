@@ -1,9 +1,8 @@
 # Dell OpenManage Support
 
-For Dell OpenManage support you will need to install Dell OpenManage
-(yeah - really :)) (minimum 5.1) onto the device you want to
-monitor. Ensure that net-snmp is using srvadmin, you should see
-something similar to:
+For Dell OpenManage support, install Dell OpenManage 5.1 or later on
+the device to monitor. Make sure that net-snmp uses srvadmin. The
+configuration looks like this:
 
 ```bash
 master agentx
@@ -18,21 +17,22 @@ Restart net-snmp:
 service snmpd restart
 ```
 
-Ensure that srvadmin is started, this is usually done by executing:
+Make sure that srvadmin runs. This command usually starts it:
 
 ```bash
 /opt/dell/srvadmin/sbin/srvadmin-services.sh start
 ```
 
-Once this has been done, add the device to LibreNMS as normal and you
-will start to receive Temperatures and Fan speed data.
+Then add the device to LibreNMS in the normal way. LibreNMS then
+collects the temperature data and the fan speed data.
 
 ## Windows
 
 Download OpenManage from Dell's support page
 [Link](http://www.dell.com/support/contents/us/en/04/article/product-support/self-support-knowledgebase/enterprise-resource-center/systemsmanagement/OMSA)
-and install OpenManage on your windows server. Make sure you have [SNMP](../Support/SNMP-Configuration-Examples.md#windows-server-2012-r2-and-newer)
-setup and running on your windows server.
+and install OpenManage on your Windows server. Also install and start
+[SNMP](../Support/SNMP-Configuration-Examples.md#windows-server-2012-r2-and-newer)
+on your Windows server.
 
 
 

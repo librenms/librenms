@@ -36,6 +36,17 @@ LIBRENMS_USER="${LIBRENMS_USER:-librenms}"
 LIBRENMS_USER_ID=$(id -u "$LIBRENMS_USER")
 
 #######################################
+# Append a timestamped line to the daily log
+# Globals:
+#   LOG_DIR
+# Arguments:
+#   Text
+#######################################
+log_line() {
+    printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1" >> "${LOG_DIR}/daily.log"
+}
+
+#######################################
 # Fancy-Print and run commands
 # Globals:
 #   LOG_DIR
@@ -59,11 +70,11 @@ status_run() {
     # otherwise we default to ./logs/daily.log
 
     printf "%-50s" "${arg_text}"
-    echo "${arg_text}" >> "${log_file}"
+    log_line "${arg_text}"
     tmp=$(bash -c "${arg_command}" 2>&1)
     exit_code=$?
     echo "${tmp}" >> "${log_file}"
-    echo "Returned: ${exit_code}" >> "${log_file}"
+    log_line "Returned: ${exit_code}"
 
     # print OK if the command ran successfully
     # or FAIL otherwise (non-zero exit code)
@@ -130,10 +141,12 @@ set_notifiable_result() {
 #   Exit-Code: 0 >= min ver, 1 < min ver
 #######################################
 check_dependencies() {
-    local branch ver_71 ver_72 ver_73 ver_81 ver_82 python3 python_deps phpver pythonver old_branches msg
+    local branch ver_71 ver_72 ver_73 ver_81 ver_82 python3 phpver pythonver old_branches msg
 
     branch=$(git rev-parse --abbrev-ref HEAD)
-    scripts/check_requirements.py > /dev/null 2>&1 || pip3 install -r requirements.txt > /dev/null 2>&1
+
+    # attempt to install python requirements, will likely fail
+    pip3 install -r requirements.txt > /dev/null 2>&1
 
     ver_71=$(php -r "echo (int)version_compare(PHP_VERSION, '7.1.3', '<');")
     ver_72=$(php -r "echo (int)version_compare(PHP_VERSION, '7.2.5', '<');")
@@ -141,19 +154,18 @@ check_dependencies() {
     ver_81=$(php -r "echo (int)version_compare(PHP_VERSION, '8.1', '<');")
     ver_82=$(php -r "echo (int)version_compare(PHP_VERSION, '8.2', '<');")
     python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 4)))" 2> /dev/null)
-    python_deps=$("${LIBRENMS_DIR}/scripts/check_requirements.py" > /dev/null 2>&1; echo $?)
     phpver="master"
     pythonver="master"
 
     old_branches="^(php53|php56|php71-python2|php72|php73|php81)$"
-    if [[ $branch =~ $old_branches ]] && [[ "$ver_82" == "0" && "$python3" == "0" && "$python_deps" == "0" ]]; then
+    if [[ $branch =~ $old_branches ]] && [[ "$ver_82" == "0" && "$python3" == "0" ]]; then
         status_run "Supported PHP and Python version, switched back to master branch." 'git checkout master'
     elif [[ "$ver_71" != "0" ]]; then
         phpver="php56"
         if [[ "$branch" != "php56" ]]; then
             status_run "Unsupported PHP version, switched to php56 branch." 'git checkout php56'
         fi
-    elif [[ "$ver_72" != "0" || "$python3" != "0" || "$python_deps" != "0" ]]; then
+    elif [[ "$ver_72" != "0" || "$python3" != "0" ]]; then
         msg=""
         if [[ "$ver_72" != "0" ]]; then
             msg="Unsupported PHP version, $msg"
@@ -162,9 +174,6 @@ check_dependencies() {
         if [[ "$python3" != "0" ]]; then
             msg="python3 is not available, $msg"
             pythonver="python3-missing"
-        elif [[ "$python_deps" != "0" ]]; then
-            msg="Python 3 dependencies missing, $msg"
-            pythonver="python3-deps"
         fi
 
         if [[ "$branch" != "php71-python2" ]]; then
@@ -293,7 +302,7 @@ main () {
         git checkout --quiet -- composer.json composer.lock
 
         update_res=0
-        if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "1" ]]; then
+        if [[ "$up" == "2" ]] || [[ "$php_ver_ret" == "1" ]]; then
             # Update current branch to latest
             branch=$(git rev-parse --abbrev-ref HEAD)
             if [[ "$branch" == "HEAD" ]]; then

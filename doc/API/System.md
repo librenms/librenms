@@ -1,6 +1,6 @@
 ### `ping`
 
-Simple endpoint to check API availability.
+A simple endpoint for the availability of the API.
 
 Route: `/api/v0/ping`
 
@@ -11,7 +11,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ping
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ping
 ```
 
 Output:
@@ -24,7 +24,7 @@ Output:
 
 ### `system`
 
-Display Librenms instance information.
+It shows the information of the LibreNMS instance.
 
 Route: `/api/v0/system`
 
@@ -35,7 +35,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/system
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/system
 ```
 
 Output:

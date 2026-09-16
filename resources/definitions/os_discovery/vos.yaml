@@ -1,0 +1,116 @@
+modules:
+    os:
+        hardware: DEVICE-MIB::deviceHardwareModelV2.0
+        serial: DEVICE-MIB::deviceHardwareSerialnumberV2.0
+        version:
+            - DEVICE-MIB::packageVersionMajor.0
+            - DEVICE-MIB::packageVersionMinor.0
+            - DEVICE-MIB::packageVersionService.0
+        version_template: '{{ DEVICE-MIB::packageVersionMajor.0 }}.{{ DEVICE-MIB::packageVersionMinor.0 }}.{{ DEVICE-MIB::packageVersionService.0 }}'
+    processors:
+        data:
+            -
+                oid: DEVICE-MIB::deviceCPULoad
+                num_oid: '.1.3.6.1.4.1.42359.2.2.1.1.1.1.2.{{ $index }}'
+                descr: CPU
+    sensors:
+        state:
+            data:
+                -
+                    oid: MONITOR-MIB::monitorInfoTable
+                    value: MONITOR-MIB::monitorState
+                    num_oid: '.1.3.6.1.4.1.42359.2.2.1.3.11.1.6.{{ $index }}'
+                    index: 'monitorState.{{ $index }}'
+                    descr: '{{ MONITOR-MIB::monitorTenant }} - {{ MONITOR-MIB::monitorName }}'
+                    state_name: MONITOR-MIB::versaMonitorState
+                    group: 'SD-WAN Monitors'
+                    states:
+                        - { value: 0, generic: 2, descr: Down }
+                        - { value: 1, generic: 0, descr: Up }
+        count:
+            data:
+                -
+                    oid: DEVICE-MIB::deviceActiveSessions
+                    num_oid: '.1.3.6.1.4.1.42359.2.2.1.1.1.1.5.{{ $index }}'
+                    index: 'deviceActiveSessions.{{ $index }}'
+                    descr: Active Sessions
+                -
+                    oid: IPSEC-MIB::ipsecMibProfileStatsTable
+                    value: IPSEC-MIB::ipsecMibProfileStatsInBytes
+                    num_oid: '.1.3.6.1.4.1.42359.2.2.1.2.1.9.2.1.6.{{ $index }}'
+                    index: 'ipsecMibProfileStatsInBytes.{{ $index }}'
+                    descr: 'IPsec {{ IPSEC-MIB::ipsecMibProfileStatsProfileName }} In Bytes'
+                    group: IPsec
+                    rrd_type: COUNTER
+                -
+                    oid: IPSEC-MIB::ipsecMibProfileStatsTable
+                    value: IPSEC-MIB::ipsecMibProfileStatsOutBytes
+                    num_oid: '.1.3.6.1.4.1.42359.2.2.1.2.1.9.2.1.15.{{ $index }}'
+                    index: 'ipsecMibProfileStatsOutBytes.{{ $index }}'
+                    descr: 'IPsec {{ IPSEC-MIB::ipsecMibProfileStatsProfileName }} Out Bytes'
+                    group: IPsec
+                    rrd_type: COUNTER
+                -
+                    oid: IPSEC-MIB::ipsecMibProfileStatsTable
+                    value: IPSEC-MIB::ipsecMibProfileStatsInPkts
+                    num_oid: '.1.3.6.1.4.1.42359.2.2.1.2.1.9.2.1.5.{{ $index }}'
+                    index: 'ipsecMibProfileStatsInPkts.{{ $index }}'
+                    descr: 'IPsec {{ IPSEC-MIB::ipsecMibProfileStatsProfileName }} In Packets'
+                    group: IPsec
+                    rrd_type: COUNTER
+                -
+                    oid: IPSEC-MIB::ipsecMibProfileStatsTable
+                    value: IPSEC-MIB::ipsecMibProfileStatsOutPkts
+                    num_oid: '.1.3.6.1.4.1.42359.2.2.1.2.1.9.2.1.14.{{ $index }}'
+                    index: 'ipsecMibProfileStatsOutPkts.{{ $index }}'
+                    descr: 'IPsec {{ IPSEC-MIB::ipsecMibProfileStatsProfileName }} Out Packets'
+                    group: IPsec
+                    rrd_type: COUNTER
+                -
+                    oid: SDWAN-MIB::sdwanForwardingProfileTable
+                    value: SDWAN-MIB::sdwanFpHitCount
+                    num_oid: '.1.3.6.1.4.1.42359.2.2.1.2.1.10.2.1.5.{{ $index }}'
+                    index: 'sdwanFpHitCount.{{ $index }}'
+                    descr: 'SD-WAN {{ SDWAN-MIB::sdwanForwardingProfileName }} Hits'
+                    group: SD-WAN
+                    rrd_type: COUNTER
+                -
+                    oid: SDWAN-MIB::sdwanForwardingProfileTable
+                    value: SDWAN-MIB::sdwanFpNoValidLinkDropCount
+                    num_oid: '.1.3.6.1.4.1.42359.2.2.1.2.1.10.2.1.6.{{ $index }}'
+                    index: 'sdwanFpNoValidLinkDropCount.{{ $index }}'
+                    descr: 'SD-WAN {{ SDWAN-MIB::sdwanForwardingProfileName }} No Valid Link Drops'
+                    group: SD-WAN
+                    rrd_type: COUNTER
+                -
+                    oid: SDWAN-MIB::sdwanForwardingProfileTable
+                    value: SDWAN-MIB::sdwanFpSlaFailDropCount
+                    num_oid: '.1.3.6.1.4.1.42359.2.2.1.2.1.10.2.1.7.{{ $index }}'
+                    index: 'sdwanFpSlaFailDropCount.{{ $index }}'
+                    descr: 'SD-WAN {{ SDWAN-MIB::sdwanForwardingProfileName }} SLA Fail Drops'
+                    group: SD-WAN
+                    rrd_type: COUNTER
+                -
+                    oid: SDWAN-MIB::sdwanPolicyTable
+                    value: SDWAN-MIB::sdwanPolicyHitCount
+                    num_oid: '.1.3.6.1.4.1.42359.2.2.1.2.1.10.1.1.8.{{ $index }}'
+                    index: 'sdwanPolicyHitCount.{{ $index }}'
+                    descr: 'SD-WAN {{ SDWAN-MIB::sdwanPolicyName }}/{{ SDWAN-MIB::sdwanPolicyRuleName }} Hits'
+                    group: SD-WAN
+                    rrd_type: COUNTER
+                -
+                    oid: SDWAN-MIB::sdwanPolicyTable
+                    value: SDWAN-MIB::sdwanPolicyTxBytesTunnel
+                    num_oid: '.1.3.6.1.4.1.42359.2.2.1.2.1.10.1.1.14.{{ $index }}'
+                    index: 'sdwanPolicyTxBytesTunnel.{{ $index }}'
+                    descr: 'SD-WAN {{ SDWAN-MIB::sdwanPolicyRuleName }} Tx Bytes'
+                    group: SD-WAN
+                    rrd_type: COUNTER
+                -
+                    oid: SDWAN-MIB::sdwanPolicyTable
+                    value: SDWAN-MIB::sdwanPolicyRxBytesTunnel
+                    num_oid: '.1.3.6.1.4.1.42359.2.2.1.2.1.10.1.1.16.{{ $index }}'
+                    index: 'sdwanPolicyRxBytesTunnel.{{ $index }}'
+                    descr: 'SD-WAN {{ SDWAN-MIB::sdwanPolicyRuleName }} Rx Bytes'
+                    group: SD-WAN
+                    rrd_type: COUNTER

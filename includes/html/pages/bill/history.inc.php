@@ -7,10 +7,13 @@ $pagetitle[] = 'Historical Usage';
 // $url         = $PHP_SELF."/bill/".$bill_id."/history/";
 $i = 0;
 
-$img['his'] = '<img src="graph.php?id=' . $bill_id;
-$img['his'] .= '&amp;type=bill_historicmonthly';
-$img['his'] .= '&amp;width=1190&amp;height=250';
-$img['his'] .= '" style="margin: 15px 5px 25px 5px;" />';
+$graph_args = [
+    'id' => $bill_id,
+    'type' => 'bill_historicmonthly',
+    'width' => 1190,
+    'height' => 250,
+];
+$img['his'] = '<img src="' . route('graph', $graph_args) . '" style="margin: 15px 5px 25px 5px;" />';
 ?>
 
 <h3>Historical Usage</h3>
@@ -26,21 +29,24 @@ $img['his'] .= '" style="margin: 15px 5px 25px 5px;" />';
 
 function showDetails($bill_id, $imgtype, $bill_hist_id)
 {
-    $res = '<img src="graph.php?id=' . $bill_id;
+    $graph_args = [
+        'id' => $bill_id,
+        'width' => 1190,
+        'height' => 250,
+    ];
 
     if ($imgtype == 'bitrate') {
-        $res .= '&amp;type=bill_historicbits';
+        $graph_args['type'] = 'bill_historicbits';
     } else {
-        $res .= '&amp;type=bill_historictransfer';
-        $res .= '&amp;imgtype=' . $imgtype;
+        $graph_args['type'] = 'bill_historictransfer';
+        $graph_args['imgtype'] = $imgtype;
     }
-    $res .= '&amp;width=1190&amp;height=250';
-    if (is_numeric($bill_hist_id)) {
-        $res .= '&amp;bill_hist_id=' . $bill_hist_id;
-    }
-    $res .= '" style="margin: 15px 5px 25px 5px;" />';
 
-    return $res;
+    if (is_numeric($bill_hist_id)) {
+        $graph_args['bill_hist_id'] = $bill_hist_id;
+    }
+
+    return '<img src="' . route('graph', $graph_args) . '" style="margin: 15px 5px 25px 5px;" />';
 }//end showDetails()
 
 // $url        = generate_url($vars, array('detail' => 'yes'));
@@ -82,13 +88,11 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
 
         if ($type == 'CDR') {
             $allowed = Number::formatSi($history['bill_allowed'], 2, 0, 'bps');
-            $used = Number::formatSi($history['rate_95th'], 2, 0, 'bps');
             $in = Number::formatSi($history['rate_95th_in'], 2, 0, 'bps');
             $out = Number::formatSi($history['rate_95th_out'], 2, 0, 'bps');
             $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #' . $background['left'] . '; font-weight: bold;">' . Number::formatSi($history['bill_overuse'], 2, 0, 'bps') . '</span>');
         } elseif ($type == 'Quota') {
             $allowed = Number::formatBase($history['bill_allowed'], \App\Facades\LibrenmsConfig::get('billing.base'), 2, 0, '');
-            $used = Number::formatBase($history['total_data'], \App\Facades\LibrenmsConfig::get('billing.base'), 2, 0, '');
             $in = Number::formatBase($history['traf_in'], \App\Facades\LibrenmsConfig::get('billing.base'), 2, 0, '');
             $out = Number::formatBase($history['traf_out'], \App\Facades\LibrenmsConfig::get('billing.base'), 2, 0, '');
             $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #' . $background['left'] . '; font-weight: bold;">' . Number::formatBase($history['bill_overuse'], \App\Facades\LibrenmsConfig::get('billing.base')) . '</span>');

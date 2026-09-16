@@ -49,8 +49,8 @@ class Openwrt extends OS implements
      */
     public function discoverOS(Device $device): void
     {
-        [, $device->version] = explode(' ', snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"', '-Osqnv'));
-        $device->hardware = snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"', '-Osqnv');
+        [, $device->version] = explode(' ', \SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"')->value());
+        $device->hardware = \SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"')->value();
     }
 
     /**
@@ -62,7 +62,7 @@ class Openwrt extends OS implements
     private function getInterfaces()
     {
         // Need to use PHP_EOL, found newline (\n) not near as reliable / consistent! And this is as PHP says it should be done.
-        $interfaces = explode(PHP_EOL, snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"', '-Osqnv'));
+        $interfaces = explode(PHP_EOL, \SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"')->value());
         $arrIfaces = [];
         foreach ($interfaces as $interface) {
             [$k, $v] = explode(',', $interface);

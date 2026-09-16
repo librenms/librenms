@@ -7,27 +7,24 @@
         <form class="form-inline">
             <table class="table table-striped table-condensed table-bordered">
                 <tr>
-                    <th>Class</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                    <th>Current</th>
-                    <th class="col-sm-1">High</th>
-                    <th class="col-sm-1">High warn</th>
-                    <th class="col-sm-1">Low warn</th>
-                    <th class="col-sm-1">Low</th>
-                    <th class="col-sm-2">Alerts</th>
+                    <th>{{ __('Class') }}</th>
+                    <th>{{ __('Type') }}</th>
+                    <th>{{ __('Description') }}</th>
+                    <th>{{ __('Current') }}</th>
+                    <th class="col-sm-1">{{ __('High Limit') }}</th>
+                    <th class="col-sm-1">{{ __('High warn') }}</th>
+                    <th class="col-sm-1">{{ __('Low warn') }}</th>
+                    <th class="col-sm-1">{{ __('Low Limit') }}</th>
+                    <th class="col-sm-2">{{ __('Alerts') }}</th>
                     <th></th>
                 </tr>
                 @foreach ($sensors as $sensor)
                     <tr>
-                        <td>{{ $sensor->sensor_class }}</td>
+                        <td>{{ $sensor->classDescrLong() }}</td>
                         <td>{{ $sensor->sensor_type }}</td>
                         <td style="white-space: nowrap">{{ $sensor->sensor_descr }}</td>
                         <td>
-                            {{ $sensor->sensor_current }}
-                            @if ($sensor->sensor_class === 'temperature')
-                                °C
-                            @endif
+                            {{ $sensor->sensor_current . ' ' . $sensor->unit() }}
                         </td>
                         <td>
                             <div class="form-group has-feedback">
@@ -92,7 +89,7 @@
                                id="remove-custom"
                                name="remove-custom"
                                data-sensor_id="{{ $sensor->sensor_id }}"
-                               data-alert-url="{{ route('device.edit.health.sensor.alert', [$device, $sensor]) }}">Reset</a>
+                               data-alert-url="{{ route('device.edit.health.sensor.alert', [$device, $sensor]) }}">{{ __('Reset') }}</a>
                         </td>
                     </tr>
                 @endforeach
@@ -104,7 +101,7 @@
             @foreach ($sensors as $sensor)
                 <input type="hidden" name="sensor_id[]" value="{{ $sensor->sensor_id }}">
             @endforeach
-            <button id="newThread" class="btn btn-primary btn-sm" type="submit">Reset values</button>
+            <button id="newThread" class="btn btn-primary btn-sm" type="submit">{{ __('Reset values') }}</button>
         </form>
     </x-device.page>
 @endsection

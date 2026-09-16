@@ -1,11 +1,12 @@
 # Environment Variables
 
-LibreNMS allows certain settings to be set via the environment or
-through the .env file.
+You can set some LibreNMS settings in the environment or in the `.env`
+file.
 
 ## Database
 
-Set the variables to connect to the database.  The default values are shown below.
+Set these variables for the connection to the database. The default
+values are below.
 
 ```dotenv
 DB_HOST=localhost
@@ -18,10 +19,15 @@ DB_SOCKET=
 
 ## Trusted Reverse Proxies
 
-A comma separated list of trusted reverse proxy IPs or CIDR.
+This variable holds a comma separated list of trusted reverse proxy IP
+addresses or CIDR ranges.
 
-For legacy reasons the default is `'*'`, which means any proxy is allowed.
-`'**'` means trust any proxy up the chain.
+The default value is `127.0.0.1`. This value permits reverse proxies
+only on the localhost.
+
+Do not use these two values, because they are not secure:
+`'*'` trusts any proxy.
+`'**'` trusts any proxy in the chain.
 
 ```dotenv
 APP_TRUSTED_PROXIES=192.168.1.0/24,192.167.8.20
@@ -29,13 +35,13 @@ APP_TRUSTED_PROXIES=192.168.1.0/24,192.167.8.20
 
 ## Base url
 
-Set the base url for generated urls.
+This variable sets the base URL for the generated URLs.
 
-This will be needed when using signed graph urls for alerting. It may
-be needed when using reverse proxies combined with a subdirectory.
+Signed graph URLs for alerting need this variable. A reverse proxy with
+a subdirectory can also need it.
 
-Generally, LibreNMS will make correct URLs (especially if you have set
-up your proxy variables correctly)
+LibreNMS usually builds correct URLs. This is true when your proxy
+variables are correct.
 
 ```dotenv
 APP_URL=http://librenms/
@@ -43,8 +49,8 @@ APP_URL=http://librenms/
 
 ## User / Group
 
-The user and group that LibreNMS should operate as.
-Group will default to the same as the user if unset.
+These variables set the user and the group for LibreNMS.
+If you do not set the group, the group takes the value of the user.
 
 ```dotenv
 LIBRENMS_USER=librenms
@@ -53,9 +59,9 @@ LIBRENMS_GROUP=librenms
 
 ## Debug
 
-Increases the amount of information shown when an error occurs.
+This variable increases the information that LibreNMS shows for an error.
 
-> WARNING: This may leak information, do not leave enabled.
+> WARNING: Do not leave this variable enabled. It can leak information.
 
 ```dotenv
 APP_DEBUG=true

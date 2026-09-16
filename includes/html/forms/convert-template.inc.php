@@ -27,13 +27,12 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use App\Models\AlertTemplate;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 header('Content-type: application/json');
 
-if (Gate::denies('update', AlertTemplate::class)) {
+if (Gate::denies('alert-template.update')) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'You need to be admin',

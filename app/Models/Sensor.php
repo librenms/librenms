@@ -3,22 +3,24 @@
 namespace App\Models;
 
 use App\Facades\LibrenmsConfig;
-use App\Models\Traits\HasThresholds;
+use App\Observers\SensorObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Enum\SensorState;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 
-class Sensor extends DeviceRelatedModel implements Keyable
+#[ObservedBy([SensorObserver::class])]
+class Sensor extends SensorModel implements Keyable
 {
     use HasFactory;
-    use HasThresholds;
 
     public $timestamps = false;
     protected $primaryKey = 'sensor_id';
@@ -113,7 +115,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return match ($this->sensor_class) {
             'temperature' => $user && UserPref::getPref($user, 'temp_units') == 'f' ? Rewrite::celsiusToFahrenheit($value) . ' °F' : round($value, 2) . ' °C',
             'state' => $this->currentTranslation()->state_descr ?? 'Unknown',
-            'current', 'power' => Number::formatSi($value, 3, 0, $this->unit()),
+            'current', 'power', 'frequency' => Number::formatSi($value, 3, 0, $this->unit()),
             'runtime' => Time::formatInterval($value * 60),
             'power_consumed' => trim(Number::formatSi($value * 1000, 5, 5, 'Wh')),
             'dbm' => round($value, 3) . ' ' . $this->unit(),
@@ -237,6 +239,11 @@ class Sensor extends DeviceRelatedModel implements Keyable
             'type' => $this->sensor_type,
             'index' => $this->sensor_index,
         ];
+    }
+
+    public function icon(): string
+    {
+        return SensorEnum::tryFrom($this->sensor_class)->icon() ?? '';
     }
 
     public function __toString(): string

@@ -7,8 +7,8 @@
  * on a single graph for comparison.
  *
  * URL format:
- * graph.php?type=multisensor_graph&id=123,456,789
- * graph.php?type=multisensor_graph&id=123,456,789&stack=1  (stacked with aggregate)
+ * graph?type=multisensor_graph&id=123,456,789
+ * graph?type=multisensor_graph&id=123,456,789&stack=1  (stacked with aggregate)
  *
  * All sensors must be of the same class (e.g., all power, all temperature).
  */

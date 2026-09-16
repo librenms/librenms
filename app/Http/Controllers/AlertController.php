@@ -12,6 +12,8 @@ class AlertController extends Controller
 {
     public function ack(Request $request, Alert $alert): \Illuminate\Http\JsonResponse
     {
+        $this->authorize('update', $alert);
+
         $this->validate($request, [
             'state' => 'required|int',
             'ack_msg' => 'nullable|string',

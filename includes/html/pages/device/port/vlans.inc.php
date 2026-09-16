@@ -11,8 +11,8 @@ echo '<tr><th>VLAN</th><th>Description</th><th>Cost</th><th>Priority</th><th>Sta
 foreach ($vlans as $vlan) {
     echo '<tr>';
 
-    echo '<td width=100 class=list-large> Vlan ' . $vlan['vlan'] . '</td>';
-    echo '<td width=200 class=box-desc>' . $vlan['vlan_name'] . '</td>';
+    echo '<td width=100 class=list-large> Vlan ' . e($vlan['vlan']) . '</td>';
+    echo '<td width=200 class=box-desc>' . e($vlan['vlan_name']) . '</td>';
 
     if ($vlan['state'] == 'blocking') {
         $class = 'red';
@@ -22,7 +22,7 @@ foreach ($vlans as $vlan) {
         $class = 'none';
     }
 
-    echo '<td>' . $vlan['cost'] . '</td><td>' . $vlan['priority'] . "</td><td class=$class>" . $vlan['state'] . '</td>';
+    echo '<td>' . e($vlan['cost']) . '</td><td>' . e($vlan['priority']) . "</td><td class=$class>" . e($vlan['state']) . '</td>';
 
     $traverse_ifvlan = true;
     $vlan_ports = [];

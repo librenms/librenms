@@ -1,12 +1,10 @@
-To run LibreNMS under a subdirectory on your Apache server, the
-directives for the LibreNMS directory are placed in the base server
-configuration, or in a virtual host container of your choosing. If
-using a virtual host, place the directives in the file where the
-virtual host is configured. If using the base server on RHEL
-distributions (CentOS, Scientific Linux, etc.) the directives can be
-placed in `/etc/httpd/conf.d/librenms.conf`. For Debian distributions
-(Ubuntu, etc.) place the directives in
-`/etc/apache2/sites-available/default`.
+To run LibreNMS in a subdirectory on your Apache server, put the
+directives of the LibreNMS directory into the base server
+configuration. You can also put them into a virtual host container. For
+a virtual host, put the directives into the configuration file of that
+virtual host. On an RHEL distribution such as CentOS, the base server
+file is `/etc/httpd/conf.d/librenms.conf`. On a Debian distribution
+such as Ubuntu, the file is `/etc/apache2/sites-available/default`.
 
 ```apache
 #These directives can be inside a virtual host or in the base server configuration
@@ -19,9 +17,9 @@ Alias /librenms /opt/librenms/html
 </Directory>
 ```
 
-The `RewriteBase` directive in `html/.htaccess` must be rewritten to
-reference the subdirectory name. Assuming LibreNMS is running at
-<http://example.com/librenms/>, you will need to change `RewriteBase /`
-to `RewriteBase /librenms`.
+Change the `RewriteBase` directive in `html/.htaccess` to your
+subdirectory name. For LibreNMS at <http://example.com/librenms/>,
+change `RewriteBase /` to `RewriteBase /librenms`.
 
-Finally, set `APP_URL=/librenms/` in .env and `lnms config:set base_url '/librenms/'`.
+Then set `APP_URL=/librenms/` in `.env`. Then run
+`lnms config:set base_url '/librenms/'`.

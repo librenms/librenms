@@ -26,12 +26,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use LibreNMS\Util\StringHelpers;
 
 class Application extends DeviceRelatedModel
 {
+    use HasFactory;
     use SoftDeletes;
     public $timestamps = false;
     protected $primaryKey = 'app_id';

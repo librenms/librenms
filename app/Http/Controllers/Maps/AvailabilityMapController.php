@@ -28,8 +28,11 @@ namespace App\Http\Controllers\Maps;
 
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
+use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class AvailabilityMapController extends Controller
@@ -37,6 +40,10 @@ class AvailabilityMapController extends Controller
     // Availability Map
     public function availabilityMap(Request $request): View
     {
+        if (! (Gate::allows('viewAny', Device::class) || Gate::allows('viewAny', Service::class))) {
+            abort(403);
+        }
+
         $data = [
             'page_refresh' => LibrenmsConfig::get('page_refresh', 300),
             'compact' => LibrenmsConfig::get('webui.availability_map_compact'),

@@ -106,26 +106,6 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
 }//end dbUpdate()
 
 /**
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#deleting-models
- * @see https://laravel.com/docs/eloquent#deleting-models
- */
-function dbDelete($table, $where = null, $parameters = [])
-{
-    $sql = 'DELETE FROM `' . $table . '`';
-    if ($where) {
-        $sql .= ' WHERE ' . $where;
-    }
-
-    try {
-        $result = Eloquent::DB()->delete($sql, (array) $parameters);
-    } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
-    }
-
-    return $result;
-}//end dbDelete()
-
-/**
  * Fetches all of the rows (associatively) from the last performed query.
  * Most other retrieval functions build off this
  *
@@ -281,40 +261,4 @@ function dbPlaceHolders(&$values)
 function dbGenPlaceholders($count)
 {
     return '(' . implode(',', array_fill(0, $count, '?')) . ')';
-}
-
-/**
- * Synchronize a relationship to a list of related ids
- *
- * @param  string  $table
- * @param  string  $target_column  column name for the target
- * @param  int  $target  column target id
- * @param  string  $list_column  related column names
- * @param  array  $list  list of related ids
- * @return array [$inserted, $deleted]
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
- * @see https://laravel.com/docs/eloquent
- */
-function dbSyncRelationship($table, $target_column = null, $target = null, $list_column = null, $list = null)
-{
-    $inserted = 0;
-
-    $delete_query = "`$target_column`=? AND `$list_column`";
-    $delete_params = [$target];
-    if (! empty($list)) {
-        $delete_query .= ' NOT IN ' . dbGenPlaceholders(count($list));
-        $delete_params = array_merge($delete_params, $list);
-    }
-    $deleted = (int) dbDelete($table, $delete_query, $delete_params);
-
-    $db_list = DB::table($table)->where($target_column, $target)->pluck($list_column)->all();
-    foreach ($list as $item) {
-        if (! in_array($item, $db_list)) {
-            dbInsert([$target_column => $target, $list_column => $item], $table);
-            $inserted++;
-        }
-    }
-
-    return [$inserted, $deleted];
 }

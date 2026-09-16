@@ -15,7 +15,7 @@ class PortPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
+        return $this->hasGlobalPermission($user, 'view', true)
             || $this->hasGlobalPermission($user, 'viewAll')
             || $this->hasGlobalPermission($user, 'update')
             || $this->hasGlobalPermission($user, 'delete');
@@ -38,25 +38,29 @@ class PortPolicy
             return true;
         }
 
-        return $this->hasGlobalPermission($user, 'view')
+        return $this->hasGlobalPermission($user, 'view', true)
             && (Permissions::canAccessDevice($port->device_id, $user)
-            || Permissions::canAccessPort($port, $user));
+                || Permissions::canAccessPort($port, $user));
     }
 
     /**
      * Determine whether the user can update the port.
      */
-    public function update(User $user): bool
+    public function update(User $user, Port $port): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        return $this->hasGlobalPermission($user, 'update')
+            && (Permissions::canAccessDevice($port->device_id, $user)
+                || Permissions::canAccessPort($port, $user));
     }
 
     /**
      * Determine whether the user can delete the port.
      */
-    public function delete(User $user): bool
+    public function delete(User $user, Port $port): bool
     {
-        return $this->hasGlobalPermission($user, 'delete');
+        return $this->hasGlobalPermission($user, 'delete')
+            && (Permissions::canAccessDevice($port->device_id, $user)
+                || Permissions::canAccessPort($port, $user));
     }
 
     /**

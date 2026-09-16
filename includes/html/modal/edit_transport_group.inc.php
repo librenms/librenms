@@ -155,9 +155,8 @@
         event.preventDefault();
         var group_id = $("#delete_group_id").val();
         $.ajax({
-            type: "POST",
-            url: "ajax_form.php",
-            data: { type: "delete-transport-group", group_id: group_id},
+            type: "DELETE",
+            url: '<?php echo route("alert.transport-groups.destroy", ["alert_transport_group" => ":alert_transport_group"]) ?>'.replace(':alert_transport_group', group_id),
             dataType: "json",
             success: function(data) {
                 if (data.status == 'ok') {

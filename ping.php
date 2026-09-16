@@ -22,6 +22,9 @@ END;
     exit;
 }
 
+Debug::set(isset($options['d']));
+Debug::setVerbose(isset($options['v']));
+
 $scheduler = \App\Facades\LibrenmsConfig::get('schedule_type.ping');
 if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
     if (Debug::isEnabled()) {
@@ -29,9 +32,6 @@ if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
     }
     exit(0);
 }
-
-Debug::set(isset($options['d']));
-Debug::setVerbose(isset($options['v']));
 
 Datastore::init($options);
 

@@ -391,6 +391,13 @@
             "order": 3,
             "type": "array"
         },
+        "api.v1.enabled": {
+            "default": false,
+            "group": "api",
+            "section": "v1",
+            "order": 1,
+            "type": "boolean"
+        },
         "apps.powerdns-recursor.api-key": {
             "type": "text",
             "group": "apps",
@@ -560,7 +567,7 @@
             "type": "select",
             "default": "none",
             "options" : {
-                "none" : "No Access",
+                "none" : "No Permissions",
                 "normal" : "Normal Access",
                 "global-read" : "Global Viewing Access",
                 "admin" : "Global Administrative Access"
@@ -1160,7 +1167,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 2
+            "order": 41
         },
         "cpu_details_overview": {
             "default": false,
@@ -1171,7 +1178,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 4
+            "order": 51
         },
         "custom_map.background_type": {
             "default": "none",
@@ -1396,7 +1403,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 3
+            "order": 11
         },
         "dateformat.byminute": {
             "default": "Y-m-d H:i",
@@ -1495,10 +1502,15 @@
             "default": 0.05,
             "group": "poller",
             "section": "ping",
-            "order": 4,
+            "order": 5,
             "type": "float",
             "validate": {
                 "value": "numeric|between:0.000001,0.9"
+            },
+            "when": {
+                "setting": "icmp_check",
+                "operator": "equals",
+                "value": true
             }
         },
         "device_traffic_descr": {
@@ -2250,13 +2262,6 @@
             "section": "device",
             "order": 8
         },
-        "enable_footer": {
-            "default": false,
-            "type": "boolean",
-            "group": "webui",
-            "section": "general",
-            "order": 0
-        },
         "enable_inventory": {
             "default": true,
             "type": "boolean",
@@ -2362,24 +2367,39 @@
             "default": 3,
             "group": "poller",
             "section": "ping",
-            "order": 1,
-            "type": "text"
+            "order": 2,
+            "type": "text",
+            "when": {
+                "setting": "icmp_check",
+                "operator": "equals",
+                "value": true
+            }
         },
         "fping_options.interval": {
             "default": 500,
             "units": "ms",
             "group": "poller",
             "section": "ping",
-            "order": 2,
-            "type": "text"
+            "order": 3,
+            "type": "text",
+            "when": {
+                "setting": "icmp_check",
+                "operator": "equals",
+                "value": true
+            }
         },
         "fping_options.timeout": {
             "default": 500,
             "units": "ms",
             "group": "poller",
             "section": "ping",
-            "order": 3,
-            "type": "text"
+            "order": 4,
+            "type": "text",
+            "when": {
+                "setting": "icmp_check",
+                "operator": "equals",
+                "value": true
+            }
         },
         "front_page": {
             "default": "default",
@@ -2914,6 +2934,14 @@
             },
             "type": "graph"
         },
+        "graph_types.device.cambium_epmp_gps": {
+            "default": {
+                "section": "wireless",
+                "order": 5,
+                "descr": "GPS Satellites"
+            },
+            "type": "graph"
+        },
         "graph_types.device.cambium_epmp_freq": {
             "default": {
                 "section": "wireless",
@@ -2925,8 +2953,8 @@
         "graph_types.device.cambium_epmp_gpsSync": {
             "default": {
                 "section": "wireless",
-                "order": 5,
-                "descr": "GPS Sync Status"
+                "order": 8,
+                "descr": "GPS Sync State"
             },
             "type": "graph"
         },
@@ -2935,6 +2963,14 @@
                 "section": "wireless",
                 "order": 2,
                 "descr": "ePMP Modulation"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.cambium_epmp_traffic": {
+            "default": {
+                "section": "wireless",
+                "order": 1,
+                "descr": "Traffic"
             },
             "type": "graph"
         },
@@ -4522,6 +4558,13 @@
             "section": "graylog",
             "order": 10
         },
+        "graylog.match-any-address": {
+            "default": false,
+            "type": "boolean",
+            "group": "external",
+            "section": "graylog",
+            "order": 11
+        },
         "group": {
             "type": "text",
             "default": "librenms"
@@ -4613,7 +4656,7 @@
             "default": true,
             "group": "poller",
             "section": "ping",
-            "order": 5,
+            "order": 1,
             "type": "boolean"
         },
         "ignore_bsd_os_drives": {
@@ -5069,16 +5112,16 @@
         "int_core": {
             "default": true,
             "group": "webui",
-            "section": "menu",
+            "section": "port-descr",
             "type": "boolean",
-            "order": 3
+            "order": 40
         },
         "int_customers": {
             "default": true,
             "group": "webui",
-            "section": "menu",
+            "section": "port-descr",
             "type": "boolean",
-            "order": 4
+            "order": 10
         },
         "int_l2tp": {
             "default": false,
@@ -5090,16 +5133,16 @@
         "int_peering": {
             "default": true,
             "group": "webui",
-            "section": "menu",
+            "section": "port-descr",
             "type": "boolean",
-            "order": 6
+            "order": 30
         },
         "int_transit": {
             "default": true,
             "group": "webui",
-            "section": "menu",
+            "section": "port-descr",
             "type": "boolean",
-            "order": 7
+            "order": 20
         },
         "ipmi.type": {
             "default": [
@@ -5424,7 +5467,10 @@
         },
         "network_map_vis_options": {
             "default": "{\n  layout:{\n      randomSeed:2\n  },\n  \"edges\": {\n    arrows: {\n          to:     {enabled: true, scaleFactor:0.5},\n    },\n    \"smooth\": {\n        enabled: false\n    },\n    font: {\n        size: 14,\n        color: \"red\",\n        face: \"sans\",\n        background: \"white\",\n        strokeWidth:3,\n        align: \"middle\",\n        strokeWidth: 2\n    }\n  },\n  \"physics\": {\n     \"barnesHut\": {\n      \"gravitationalConstant\": -2000,\n      \"centralGravity\": 0.3,\n      \"springLength\": 200,\n      \"springConstant\": 0.04,\n      \"damping\": 0.09,\n      \"avoidOverlap\": 1\n    },\n\n     \"forceAtlas2Based\": {\n      \"gravitationalConstant\": -50,\n      \"centralGravity\": 0.01,\n      \"springLength\": 200,\n      \"springConstant\": 0.08,\n      \"damping\": 0.4,\n      \"avoidOverlap\": 1\n    },\n\n     \"repulsion\": {\n      \"centralGravity\": 0.2,\n      \"springLength\": 250,\n      \"springConstant\": 0.2,\n      \"nodeDistance\": 200,\n      \"damping\": 0.07\n    },\n\n     \"hierarchicalRepulsion\": {\n      \"nodeDistance\": 300,\n      \"centralGravity\": 0.2,\n      \"springLength\": 300,\n      \"springConstant\": 0.2,\n      \"damping\": 0.07\n    },\n\n  \"maxVelocity\": 50,\n  \"minVelocity\": 0.4,\n  \"solver\": \"hierarchicalRepulsion\",\n  \"stabilization\": {\n    \"enabled\": true,\n    \"iterations\": 1000,\n    \"updateInterval\": 100,\n    \"onlyDynamicEdges\": false,\n    \"fit\": true\n  },\n\n  \"timestep\": 0.4,\n }\n}",
-            "type": "text"
+            "type": "text",
+            "group": "webui",
+            "section": "worldmap",
+            "order": 30
         },
         "network_map_worldmap_link_type": {
             "default": "xdp",
@@ -5757,7 +5803,6 @@
                         {"match": "ciscosb", "value": "ciscosmb"},
                         {"match": "f5", "value": "tmos"},
                         {"match": "fireware", "value": "firewareos"},
-                        {"match": "fortigate", "value": "fortios"},
                         {"match": "fortiswitch", "value": "fortios"},
                         {"match": "siklu-mhtg", "value": "siklumhtg"},
                         {"match": "vyos", "value": "vyatta"},
@@ -5884,7 +5929,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 0
+            "order": 31
         },
         "peeringdb.enabled": {
             "default": false,
@@ -6023,6 +6068,13 @@
             "group": "poller",
             "section": "poller_modules",
             "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.ports-stack": {
+            "order": 341,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
             "type": "boolean"
         },
         "poller_modules.xdsl": {
@@ -6708,12 +6760,14 @@
             "units": "Workers"
         },
         "service_poller_frequency": {
-            "default": 300,
             "group": "poller",
             "section": "dispatcherservice",
             "order": 7,
             "type": "integer",
-            "units": "Seconds"
+            "units": "Seconds",
+            "validate": {
+                "value": "int|nullable|between:1,3600"
+            }
         },
         "service_poller_down_retry": {
             "default": 60,
@@ -6779,7 +6833,7 @@
             "type": "integer",
             "units": "Seconds"
         },
-        "ping_rrd_step": {
+        "service_ping_frequency": {
             "default": 300,
             "group": "poller",
             "section": "dispatcherservice",
@@ -7233,7 +7287,7 @@
             "type": "array",
             "group": "webui",
             "section": "port-descr",
-            "order": 1
+            "order": 21
         },
         "twofactor": {
             "default": false,
@@ -7248,6 +7302,36 @@
             "group": "auth",
             "section": "general",
             "order": 2
+        },
+        "unimus.enabled": {
+            "default": false,
+            "group": "external",
+            "section": "unimus",
+            "order": 0,
+            "type": "boolean"
+        },
+        "unimus.url": {
+            "group": "external",
+            "section": "unimus",
+            "order": 1,
+            "type": "text",
+            "validate": {
+                "value": "url"
+            }
+        },
+        "unimus.api_version": {
+            "default": "v2",
+            "group": "external",
+            "section": "unimus",
+            "order": 2,
+            "type": "text",
+            "hidden": true
+        },
+        "unimus.token": {
+            "group": "external",
+            "section": "unimus",
+            "order": 3,
+            "type": "password"
         },
         "unix-agent-connection-time-out": {
             "default": 10,
@@ -7295,6 +7379,26 @@
                 "master": "master",
                 "release": "release"
             }
+        },
+        "update_on_days": {
+            "default": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+            "type": "array",
+            "options": {
+                "monday": "Monday",
+                "tuesday": "Tuesday",
+                "wednesday": "Wednesday",
+                "thursday": "Thursday",
+                "friday": "Friday",
+                "saturday": "Saturday",
+                "sunday": "Sunday"
+            },
+            "validate": {
+                "value": "array",
+                "value.*": "distinct|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday"
+            },
+            "group": "system",
+            "section": "updates",
+            "order": 2
         },
         "uptime_warning": {
             "group": "webui",
@@ -7429,6 +7533,48 @@
             "section": "search",
             "order": 0,
             "type": "integer"
+        },
+        "webui.global_search.arp": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 1,
+            "type": "boolean"
+        },
+        "webui.global_search.fdb": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 1,
+            "type": "boolean"
+        },
+        "webui.global_search.eventlogs": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 2,
+            "type": "boolean"
+        },
+        "webui.global_search.health": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 3,
+            "type": "boolean"
+        },
+        "webui.global_search.ports": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 4,
+            "type": "boolean"
+        },
+        "webui.global_search.routing": {
+            "default": true,
+            "group": "webui",
+            "section": "search",
+            "order": 5,
+            "type": "boolean"
         },
         "webui.graph_stacked": {
             "default": false,

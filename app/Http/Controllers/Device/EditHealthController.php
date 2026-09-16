@@ -28,15 +28,20 @@ namespace App\Http\Controllers\Device;
 use App\Models\Device;
 use App\Models\Sensor;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class EditHealthController
 {
+    use AuthorizesRequests;
+
     public function index(Device $device): View
     {
-        Gate::authorize('view', Sensor::class);
+        $this->authorize('update', $device);
+        $this->authorize('sensor.update');
+
         $sensors = $device->sensors()
             ->where('sensor_deleted', 0)
             ->orderBy('sensor_class')
@@ -52,12 +57,14 @@ class EditHealthController
 
     public function reset(Device $device, Request $request): JsonResponse
     {
-        if (Gate::denies('update', Sensor::class)) {
+        $this->authorize('update', $device);
+        if (Gate::denies('sensor.update')) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Unauthorized',
             ], 403);
         }
+
         $validated = $request->validate([
             'sensor_id' => 'required|array|min:1',
             'sensor_id.*' => 'integer',
@@ -97,12 +104,14 @@ class EditHealthController
 
     public function update(Device $device, Sensor $sensor, Request $request): JsonResponse
     {
-        if (Gate::denies('update', Sensor::class)) {
+        $this->authorize('update', $device);
+        if (Gate::denies('sensor.update')) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Unauthorized',
             ], 403);
         }
+
         $validated = $request->validate([
             'value_type' => 'required|in:sensor_limit,sensor_limit_warn,sensor_limit_low_warn,sensor_limit_low',
             'data' => 'present',
@@ -125,12 +134,14 @@ class EditHealthController
 
     public function updateAlert(Device $device, Sensor $sensor, Request $request): JsonResponse
     {
-        if (Gate::denies('update', Sensor::class)) {
+        $this->authorize('update', $device);
+        if (Gate::denies('sensor.update')) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Unauthorized',
             ], 403);
         }
+
         $validated = $request->validate([
             'sub_type' => 'nullable|in:remove-custom',
             'state' => 'nullable',

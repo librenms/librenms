@@ -25,7 +25,7 @@
                     </div>
                     <div class="row"><x-graph-row :type="'device_smokeping_' . $direction . '_all'" title="Aggregate" :device="$device" columns="responsive"></x-graph-row>
                         @foreach($data['smokeping']->otherGraphs($direction) as $info)
-                            <x-graph-row :type="$info['graph']" :device="$info['device']" columns="responsive">
+                            <x-graph-row :type="$info['graph']['type']" :device="$info['graph']['device']" columns="responsive">
                                 <x-slot name="title"><x-device-link device="$info['device']" /></x-slot>
                             </x-graph-row>
                         @endforeach

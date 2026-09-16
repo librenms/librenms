@@ -42,7 +42,7 @@ class WidgetSettingsController extends Controller
         $widget_settings = (array) $request->input('settings', []);
         unset($widget_settings['_token']);
 
-        if (! $request->user()->can('update', $widget->dashboard)) {
+        if (! $widget->dashboard || ! $request->user()->can('update', $widget->dashboard)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'ERROR: You have no write-access to this dashboard',

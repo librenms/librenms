@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Util\IPv6;
+use LibreNMS\Util\Mac;
 
 $no_refresh = true;
 ?>
@@ -18,12 +19,12 @@ $no_refresh = true;
     <?php
 
     foreach($port->nd as $nd) {
-        $vendor = \LibreNMS\Util\Mac::parse($nd->mac_address)->vendor();
+        $mac = Mac::parse($nd->mac_address);
         $ipv6 = IPv6::parse($nd->ipv6_address, true);
         $port = PortCache::getByIp($ipv6);
         $device = $port?->device;
-        echo Blade::render('<tr><td>{{ $nd->mac_address }}</td><td>{{ $vendor }}</td><td>{{ $ipv6 }}</td><td><x-device-link :device="$device" /></td><td>@if($port)<x-port-link :port="$port" />@endif</td></tr>',
-            ['nd' => $nd, 'vendor' => $vendor, 'ipv6' => $ipv6->compressed(), 'device' => $device, 'port' => $port]);
+        echo Blade::render('<tr><td>{{ $mac->readable() }}</td><td>{{ $vendor }}</td><td>{{ $ipv6 }}</td><td><x-device-link :device="$device" /></td><td>@if($port)<x-port-link :port="$port" />@endif</td></tr>',
+            ['nd' => $nd, 'vendor' => $mac->vendor(), 'ipv6' => $ipv6->compressed(), 'device' => $device, 'port' => $port]);
     }
     ?>
     </tbody>

@@ -110,7 +110,7 @@ class Discord extends Transport
 
     private function includeINIFields(): array
     {
-        $ini_fileds = $this->parseUserOptions($this->config['options']);
+        $ini_fileds = $this->parseUserOptions($this->config['options'] ?? '');
 
         if (! empty($ini_fileds)) {
             $this->discord_message = array_merge($this->discord_message, $ini_fileds);

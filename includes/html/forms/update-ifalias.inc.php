@@ -17,7 +17,7 @@ use LibreNMS\Enum\Severity;
  * the source code distribution for details.
 */
 
-Gate::authorize('update', Port::class);
+Gate::authorize('port.update');
 
 header('Content-type: application/json');
 

@@ -1,0 +1,477 @@
+--
+
+OPTICSIM-COMMON-TC DEFINITIONS ::= BEGIN
+  IMPORTS
+    MODULE-IDENTITY, Integer32, Unsigned32        FROM SNMPv2-SMI
+    TimeInterval, TruthValue, TEXTUAL-CONVENTION  FROM SNMPv2-TC
+    TsdimEventTimeInt                             FROM TSDIM-SNMP-TC
+    tsdimBasicMib                                 FROM TSDIM-BASICREG-MIB;
+opticsICommonTc MODULE-IDENTITY
+  LAST-UPDATED "202504080000Z"
+  ORGANIZATION "Alcatel TND"
+  CONTACT-INFO "Alcatel TND"
+  DESCRIPTION
+    "Optics-IM Common Textual Conventions."
+
+  REVISION "202504080000Z"
+  DESCRIPTION
+        " Updates OpticsIMIpRoutingProtocol TEXTUAL-CONVENTION adding 'static (16)' new value.
+        "
+
+ REVISION "202403190000Z"
+  DESCRIPTION
+        " Updates for some mistakes for a new SNMP compiler (missing space on OpticsIMProtectionUnitType.
+        "
+
+  REVISION "201511130000Z"
+  DESCRIPTION
+        "- SNMPIDL-507, update LAST-UPDATED and REVISION date format adding the 2 digits missing (20) for yers after 1999.
+Added a REVISION block corresponding to the LAST-UPDATED timestamp.
+        "
+
+  REVISION "201107270000Z"
+  DESCRIPTION
+    "OPTnm01651: P.Villa.
+     Changed description of OpticsIMPmElapsedTime"
+
+  REVISION "201009300000Z"
+  DESCRIPTION
+    "TSDnm85570: (D.Spreafico)
+     Added new enumerated value (cLAFailure) for OpticsIMEquipmentProtectionSwitchCriteria
+     textual convention"
+
+  REVISION "200909300000Z"
+  DESCRIPTION
+    "Added new enumerated values for OpticsIMEquipmentProtectionSwitchCriteria
+     textual convention"
+
+  REVISION "200710110000Z"
+  DESCRIPTION
+    "Added new enumerated values for OpticsIMEquipmentProtectionSwitchCriteria
+     textual convention"
+
+  REVISION "200506070000Z"
+  DESCRIPTION
+    "Ed. 08
+      Added OpticsIMigmpVersion
+      Added OpticImFileTrasferProtocolList
+    "
+    REVISION "200404020000Z"
+    DESCRIPTION
+      "Added news value  on opticsIMPtpIpMode (dce,normal,crossover)
+       and on opticsIMPtpIpInterface (repeater, multitype)"
+
+    REVISION "200302140000Z"
+    DESCRIPTION
+      "Modified pm related tc names to avoids conflicts with atm tc ones"
+    REVISION "200212200000Z"
+    DESCRIPTION
+      "Added some common attributes from ethernet world"
+    REVISION "200211050000Z"
+    DESCRIPTION
+      "Added the PmFilterGranularityPeriod TC and extended the
+       OpticsIMIpRoutingProtocol syntax.
+       OpticsIMRadioChannelNumber object syntax is changed."
+    REVISION "200207240000Z"
+    DESCRIPTION
+      "Added IP routing related TC"
+    REVISION "200205100000Z"
+    DESCRIPTION
+      "Change of opticsIMProtectionUnitType syntax."
+    REVISION "200201250000Z"
+    DESCRIPTION
+      "Initial Release of Optics-IM Common Textual Conventions."
+::= {  tsdimBasicMib 101 }
+
+-- OpticsIMProtectionGroupType
+
+OpticsIMProtectionGroupType ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This object specifies whether the protection scheme used is 1+1 or 1:N."
+  SYNTAX INTEGER {
+    onePlusOne  (1),
+    oneToN  (2)
+  }
+
+-- OpticsIMRevertive
+
+OpticsIMRevertive ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This object indicates whether the protection scheme is revertive or not.
+     If the value is TRUE, the traffic is returned to the protected channel
+     that initiated the switch after the fault has cleared and the
+     waitToRestoteTime (if any) has exipered. If the value is FALSE, then
+     after the fault has cleared, traffic does not revert to the protected
+     channel that initiated the switch."
+  SYNTAX TruthValue
+
+-- OpticsIMProtectionUnitType
+
+OpticsIMProtectionUnitType ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This object specifies the type of protection unit: main or spare."
+  SYNTAX INTEGER {
+    main   (1),
+    spare   (2)
+  }
+
+-- OpticsIMProtectionSwitchStatus
+
+OpticsIMProtectionSwitchStatus  ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This object indicates the status of the protection unit: active or
+     standby. "
+  SYNTAX INTEGER {
+    active   (1),
+    standby   (2)
+  }
+
+-- OpticsIMProtectionSwitchCommand
+
+OpticsIMProtectionSwitchCommand ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This object specifies the operator switch command currently active (if
+     any)on the protection unit.
+     The forced and manual switch commands have to be addressed to a protected
+     unit if revertive mode is supported, instead can be addressed both to
+     protected and protecting unit in case not Revertive mode is supported.
+     Each request has to be checked to verify if the command can be executed,
+     according to the priority implicitely associated to each type of command.
+     In order to remove a switch or lockout command the noRequest value has
+     to be used. "
+  SYNTAX INTEGER {
+    noRequest   (1),
+    manualSwitch   (2),
+    forcedSwitch   (3),
+    lockout   (4)
+  }
+
+-- OpticsIMProtectionPriority
+
+OpticsIMProtectionPriority ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This object specifies the priority of the traffic carried on the resource
+     associated with the protected instance. Valid values for this object are
+     integers, where the value 1 indicates the highest priority and a larger
+     value indicates a lower priority."
+  SYNTAX Integer32
+
+-- OpticsIMEquipmentProtectionSwitchCriteria
+
+OpticsIMEquipmentProtectionSwitchCriteria ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This object contains the highest priority automatic switch request
+     currently active on the protection unit. "
+  SYNTAX  INTEGER {
+    noOne                          (1),
+    equipmentFailure               (2),
+    equipmentMissing               (3),
+    flashCardRealignmentInProgress (4),
+    flashCardFailure               (5),
+    controlPlatformFailure         (6),
+    portFailure                    (7),
+    cLAProcedureInProgress         (8),
+    cLAfailure               (9)
+  }
+
+-- OpticsIMStmLevel
+
+OpticsIMStmLevel ::= TEXTUAL-CONVENTION
+  STATUS   current
+  DESCRIPTION
+    "This object specifies the level, n, of the STM-n signal being
+     received, transmitted, or received and  transmitted. "
+  SYNTAX Unsigned32
+
+-- OpticsIMRadioChannelNumber
+
+OpticsIMRadioChannelNumber ::= TEXTUAL-CONVENTION
+  STATUS   current
+  DESCRIPTION
+    "This object indicates the channel number associated to a radio
+     physical port. "
+  SYNTAX INTEGER {
+    ch0      (0),
+    ch1      (1),
+    ch2      (2),
+    ch3      (3),
+    ch4      (4),
+    ch5      (5),
+    ch6      (6),
+    ch7      (7),
+    ch8      (8),
+    ch9      (9),
+    chA      (21),
+    chB      (22),
+    chC      (23),
+    chD      (24),
+    chE      (25),
+    chF      (26),
+    chG      (27),
+    chH      (28),
+    chK      (29),
+    chI      (30),
+    chCommon (99)
+  }
+
+-- PM Textual Conventions
+
+-- OpticsIMPmIndex
+
+OpticsIMPmIndex ::= TEXTUAL-CONVENTION
+  STATUS   current
+  DESCRIPTION
+    "It represents an index for PM entries."
+  SYNTAX   INTEGER
+
+-- OpticsIMPmElapsedTime
+
+OpticsIMPmElapsedTime ::= TEXTUAL-CONVENTION
+  STATUS   current
+  DESCRIPTION
+    "It specifies the amount of time,
+---  measured in units of 0.01 second,
+     whose time granularity is NE-product specific (NE time granularity
+     in units of 1 second) and independent from TimeInterval SNMP SYNTAX,
+     that statistics for this entry (the current interval) have been
+     counted."
+
+  SYNTAX TimeInterval
+
+-- OpticsIMPmGranularityPeriod
+
+OpticsIMPmGranularityPeriod ::= TEXTUAL-CONVENTION
+  STATUS   current
+  DESCRIPTION
+    "It indicates the time base for measuring: 15 minutes,24 hours or
+     one hour."
+  SYNTAX INTEGER  {
+    fifteenMin      (1),
+    twentyFourHours (2),
+    oneHour         (3)
+  }
+
+-- OpticsIMPmFilterGranularityPeriod
+
+OpticsIMPmFilterGranularityPeriod ::= TEXTUAL-CONVENTION
+  STATUS   current
+  DESCRIPTION
+    "It indicates the time base for measuring: 15 minutes, 24 hours or
+     one hour.
+     The null value is used as a shortcut when retrieving history data
+     with the filtering criteria. "
+  SYNTAX INTEGER  {
+    null            (0),
+    fifteenMin      (1),
+    twentyFourHours (2),
+    oneHour         (3)
+  }
+
+-- OpticsIMPmMaxSuppressedIntervals
+OpticsIMPmMaxSuppressedIntervals ::= TEXTUAL-CONVENTION
+  STATUS   current
+  DESCRIPTION
+    "The PmMaxSuppressedIntervals object limits the maximum number of
+     suppressed intervals that will be collected without creating an
+     instance of the historyData object.
+     For example, consider an instance of current Data associated to one
+     resource with maxSuppressedIntervals set to 32, and the interval set
+     to 15 minutes: it means that after 32 consecutive suppressed (e.g.,
+     all-zero) intervals (8 hours) at least one historyData record (with
+     all zero PM Parameters) will be generated with a NumSuppressedIntervals
+     equal to 32.
+     This ensures that at least one historyData record per
+     maxSuppressedIntervals will be created.
+     The value of this attribute cannot exceed the maximum possible value of
+     the numSuppressedIntervals attribute.
+     A value of (2^32)-1 implies infinite zero suppression, i.e. always
+     suppress the zero intervals."
+  SYNTAX INTEGER
+
+-- OpticsIMPmNumSuppressedIntervals
+
+OpticsIMPmNumSuppressedIntervals ::= TEXTUAL-CONVENTION
+  STATUS   current
+  DESCRIPTION
+    "This attribute is non-zero only if the NE is suppressing History Data
+     entry creation for the measured resource when the current interval
+     terminates with 'all-zeroes' performance measurements.
+     When non-zero, this attribute represents the number of 'all-zeroes'
+     intervals that were suppressed immediately prior to the current interval.
+     This attribute gets increment at the end of an interval if suppression
+     has occurred, otherwise, the attribute is reset. "
+  SYNTAX INTEGER
+
+-- OpticsIMPmPeriodTime
+
+OpticsIMPmPeriodTime ::= TEXTUAL-CONVENTION
+  STATUS   current
+  DESCRIPTION
+    "The 0 value indicates the null value."
+  SYNTAX TsdimEventTimeInt
+
+-- OpticsIMPmSuspectIntervalFlag
+
+OpticsIMPmSuspectIntervalFlag ::= TEXTUAL-CONVENTION
+  STATUS   current
+  DESCRIPTION
+    "This attribute is used to indicate that the performance data for the
+     current period may not be reliable.
+     Some reasons for this to occur are:
+     - Suspect data were detected by the actual resource doing data collection
+     - Transition of the row status attribute to/from the 'inService' state.
+     - The performance counters were reset during the interval.
+     - The current Data object associated to a resource was created during the
+       monitoring period."
+  SYNTAX TruthValue
+
+-- OpticsIMPmThresholdDataInstance
+
+OpticsIMPmThresholdDataInstance ::= TEXTUAL-CONVENTION
+  STATUS   current
+  DESCRIPTION
+    "It indicates a threshold data table entry: the value of this object is
+     the value of the relative PM Threshold Index."
+  SYNTAX INTEGER
+
+-- OpticsIMThrIndexNext2
+
+OpticsIMThrIndexNext2 ::= TEXTUAL-CONVENTION
+  STATUS   current
+  DESCRIPTION
+    "This object contains an appropriate value to be used for pm*ThrIndex
+     when creating entries in the opticsIM*ThresholdDataTable (where *=Rs/Ms/0).
+     The value -1 indicates that no unassigned entries are available.
+     To obtain the index value for a new entry, the manager issues a management
+     protocol retrieval operation to obtain the current value of this object.
+     After each retrieval, the agent should modify the value to the next
+     unassigned index (or -1)."
+  SYNTAX Integer32
+
+-- opticsIMIpRoutingProtocol
+
+OpticsIMIpRoutingProtocol ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This textual convention represents the IP routing protocol."
+  SYNTAX INTEGER {
+    none       (1),
+    local      (2),
+    netmgmt    (3),
+    icmp       (4),
+    egp        (5),
+    ggp        (6),
+    hello      (7),
+    rip        (8),
+    isis       (9),
+    esis       (10),
+    ciscolgrp  (11),
+    bbnSpflgp  (12),
+    ospf       (13),
+    bgp        (14),
+    ospfAndRip (15),
+    static     (16)
+  }
+
+-- opticsIMPtpIpInterfaceType
+
+OpticsIMPtpIpInterfaceType ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This  textual convention represents the point-to-point port type."
+  SYNTAX INTEGER {
+    rf        (1),
+    v11       (2),
+    g703      (3),
+    repeater  (4),
+    multitype (5)
+  }
+
+-- opticsIMPtpIpInterfaceMode
+
+OpticsIMPtpIpInterfaceMode  ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This textual convention represents the mode of working of the
+     point-to-point interface."
+  SYNTAX INTEGER {
+    notUsed        (1),
+    dte            (2),
+    asynchronous   (3),
+    inE1orDs1Frame (4),
+    dce            (5),
+    normal         (6),
+    crossover      (7)
+  }
+
+-- opticsIMSwdlStatusIndicator
+
+OpticsIMSwdlStatusIndicator ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This Textual Convention defines the Status of Software Download
+     operation."
+    SYNTAX INTEGER {
+      downloading (1),
+      idle        (2)
+  }
+
+-- OpticsIMPmRetrievingTime
+OpticsIMPmRetrievingTime ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "The NE time when counters are retrieved cause a maintenance action"
+  SYNTAX TsdimEventTimeInt
+
+-- OpticsIMPmLastDiscontinuityTimeStamp
+
+OpticsIMPmLastDiscontinuityTimeStamp ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "Reporting the time when the last counters updating discontinuity event
+     occurred and involved the measurement point; the events can be for
+     example board insertion or board reset.
+     Also date change is considered such a discontinuity even if counters
+     updating is not involved in a change.
+     This time is synchronized with the EC controller time."
+  SYNTAX TsdimEventTimeInt
+
+-- OpticsIMPmStartTime
+
+OpticsIMPmStartTime ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "Indicate the time when the performance monitoring point has been
+     activated in NE and so when relative Current Datas have been created."
+  SYNTAX TsdimEventTimeInt
+
+OpticsIMigmpVersion ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "This object specifies the IGMP Snooping mode:
+     IGMP v1, IGMP v2 or IGMP v3."
+  SYNTAX INTEGER {
+    iGMPv1 (1),
+    iGMPv2 (2),
+    iGMPv3 (3)
+  }
+
+OpticImFileTrasferProtocolList ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION
+    "The list of the possible file transfer protocols that can be supported
+     and/or used by the NE."
+     SYNTAX BITS {
+       ieee802-1e (0), -- ieee 802.1e protocol
+       clientFtp  (1), -- client of ftp protocol
+       serverFtp  (2)  -- server of ftp protocol
+  }
+
+END

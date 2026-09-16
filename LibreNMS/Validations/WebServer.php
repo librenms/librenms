@@ -45,6 +45,10 @@ class WebServer extends BaseValidation
     public function validate(Validator $validator): void
     {
         if (! app()->runningInConsole()) {
+            if (request()->server('QUERY_STRING', '') === 'query_string') {
+                $validator->fail('Webserver is not passing query strings to LibreNMS correctly', 'For nginx, update try_files to use /index.php?$query_string');
+            }
+
             $url = $this->removeStandardPorts(request()->url());
             $base_url = LibrenmsConfig::get('base_url');
             $expected = $this->removeStandardPorts(Str::finish($base_url, '/') . 'validate/results/webserver');

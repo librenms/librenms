@@ -2,7 +2,7 @@
 
 NGINX is a free, open-source, high-performance HTTP server: <https://www.nginx.org/>
 
-It's required to have the following directive in your nginx
+Your nginx configuration needs this directive
 configuration responsible for the localhost server:
 
 ```nginx
@@ -18,33 +18,33 @@ location /nginx-status {
 
 === "SNMP Extend"
 
-    1. Download the script onto the desired host.
+    1. Download the script onto the host.
 
         ```bash
         wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nginx -O /etc/snmp/nginx
         ```
 
-    2. Make the script executable
+    2. Make the script executable.
 
         ```bash
         chmod +x /etc/snmp/nginx
         ```
 
-    3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+    3. Edit your `snmpd.conf` file, usually `/etc/snmp/snmpd.conf`, and add:
 
         ```bash
         extend nginx /etc/snmp/nginx
         ```
 
-    4. Restart snmpd on your host
+    4. Restart snmpd on your host.
 
-    The application should be auto-discovered as described at the top of
-    the page. If it is not, please follow the steps set out under `SNMP
-    Extend` heading top of page.
+    LibreNMS discovers the application automatically, as described at
+    the top of the page. If the discovery fails, do the steps under the
+    `SNMP Extend` heading at the top of the page.
 
 === "Agent"
 
-    [Install the agent](../Agent-Setup.md) on this device if it isn't already
+    If this device has no agent, [install the agent](../Agent-Setup.md)
     and copy the `nginx` script to `/usr/lib/check_mk_agent/local/`
 
 #### SELinux

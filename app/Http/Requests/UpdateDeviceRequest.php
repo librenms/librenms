@@ -20,7 +20,7 @@ class UpdateDeviceRequest extends FormRequest
     {
         return [
             'hostname' => 'nullable|ip_or_hostname',
-            'display' => 'nullable|string',
+            'display_template' => 'nullable|string',
             'overwrite_ip' => 'nullable|ip',
             'purpose' => 'nullable|string',
             'type' => 'nullable|string',

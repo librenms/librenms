@@ -55,7 +55,7 @@ if (php_sapi_name() == 'cli' && isset($_SERVER['TERM'])) {
 }
 
 if (is_file($install_dir . '/composer.phar')) {
-    $exec = PHP_BINARY . " '" . $install_dir . "/composer.phar'";
+    $exec = PHP_BINARY . ' ' . escapeshellarg($install_dir . '/composer.phar');
 
     // If older than 1 week, try update
     if (time() - filemtime($install_dir . '/composer.phar') > 60 * 60 * 24 * 7) {
@@ -81,8 +81,8 @@ if (is_file($install_dir . '/composer.phar')) {
             echo "Error: Failed to download $installer_url\n";
         } elseif (@hash_file('SHA384', $dest) === $good_sha) {
             // Installer verified
-            shell_exec(PHP_BINARY . " $dest");
-            $exec = PHP_BINARY . " '$install_dir/composer.phar'";
+            shell_exec(PHP_BINARY . ' ' . escapeshellarg($dest));
+            $exec = PHP_BINARY . ' ' . escapeshellarg($install_dir . '/composer.phar');
         } else {
             echo "Error: Corrupted download, signature doesn't match for $installer_url\n";
         }
@@ -94,12 +94,17 @@ if (is_file($install_dir . '/composer.phar')) {
 if (! $exec) {
     $path_exec = trim(shell_exec('which composer 2> /dev/null'));
     if ($path_exec) {
-        $exec = $path_exec;
+        $exec = escapeshellcmd($path_exec);
     }
 }
 
 if ($exec) {
-    passthru("$exec " . implode(' ', array_splice($argv, 1)) . "$extra_args 2>&1", $exit_code);
+    $escaped_args = [];
+    foreach (array_slice($argv, 1) as $arg) {
+        $escaped_args[] = escapeshellarg($arg);
+    }
+    $user_args = implode(' ', $escaped_args);
+    passthru("$exec $user_args$extra_args 2>&1", $exit_code);
     exit($exit_code);
 } else {
     echo "Composer not available, please manually install composer.\n";

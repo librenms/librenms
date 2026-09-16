@@ -216,7 +216,7 @@
         // Initialise map if we haven't already.  If we do it earlier, the radom seeding doesn not work
         if (! network) {
             var container = document.getElementById('visualization');
-            var options = {!! $options !!};
+            var options = {{ Js::from($options) }};
             network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
 
             network.on('click', function (properties) {

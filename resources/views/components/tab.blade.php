@@ -6,6 +6,7 @@
         value: {{ Js::from($value ?: $name) }}
     }"
      x-show="value === activeTab"
+     style="display: none"
      role="tabpanel"
      :aria-labelledby="`tab-${id}`"
      :id="`tab-panel-${id}`"

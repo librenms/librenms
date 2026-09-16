@@ -3,9 +3,14 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\AlertOperation;
+use App\Models\AlertRule;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<AlertOperation>
+ */
 class AlertOperationController extends SelectController
 {
     /**
@@ -21,6 +26,8 @@ class AlertOperationController extends SelectController
      */
     public function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', AlertRule::class);
+
         return AlertOperation::query()
             ->select(['id', 'name'])
             ->orderBy('name');
@@ -28,9 +35,9 @@ class AlertOperationController extends SelectController
 
     /**
      * @param  AlertOperation  $model
-     * @return array{id: int, text: string}
+     * @return array{id: int|string, text: string, icon?: string}
      */
-    public function formatItem($model): array
+    public function formatItem(Model $model): array
     {
         return [
             'id' => $model->id,

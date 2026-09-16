@@ -11,7 +11,6 @@
  * the source code distribution for details.
  */
 
-use App\Models\Device;
 use Illuminate\Support\Facades\Gate;
 
 $no_refresh = true;
@@ -76,7 +75,7 @@ var grid = $("#hostdeps").bootgrid({
             var content = document.createElement('div');
             content.style.whiteSpace = "nowrap";
 
-            <?php if (Gate::allows('update', Device::class)) { ?>
+            <?php if (Gate::allows('device.update')) { ?>
             var edit_button = document.createElement('button');
             edit_button.setAttribute('type', 'button');
             edit_button.setAttribute('class', 'btn btn-primary btn-sm command-edit');
@@ -96,7 +95,7 @@ var grid = $("#hostdeps").bootgrid({
             content.appendChild(document.createTextNode(' '))
             <?php } ?>
 
-            <?php if (Gate::allows('delete', Device::class)) { ?>
+            <?php if (Gate::allows('device.delete')) { ?>
             var delete_button = document.createElement('button');
             delete_button.setAttribute('type', 'button');
             delete_button.setAttribute('class', 'btn btn-danger btn-sm command-delete');

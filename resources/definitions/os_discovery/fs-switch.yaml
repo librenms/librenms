@@ -29,6 +29,8 @@ modules:
         serial:
             - SWITCH::lswSlotSerialNo.1.1
             - FS-MIB::swSerialNumber.1
+            - ENTITY-MIB::entPhysicalSerialNum.1
+            - ENTITY-MIB::entPhysicalSerialNum.2
     processors:
         data:
             -

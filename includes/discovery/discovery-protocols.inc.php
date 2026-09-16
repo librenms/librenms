@@ -98,7 +98,7 @@ if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
     echo PHP_EOL;
 }//end if
 
-if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', '<')) {
+if (($device['os'] == 'routeros') && isset($device['version']) && version_compare($device['version'], '7.7', '<')) {
     echo ' LLDP-MIB: ';
     $lldp_array = SnmpQuery::hideMib()->walk('LLDP-MIB::lldpRemEntry')->table(3);
     if (! empty($lldp_array)) {
@@ -383,6 +383,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             }
 
             foreach ($lldp_instance as $lldp) {
+                unset($remote_device); // prevent stale remote_device leaking into neighbors with empty lldpRemSysName
                 // If lldpRemPortIdSubtype is 5 and lldpRemPortId is hex, convert it to ASCII.
                 if (isset($lldp['lldpRemPortId']) && $lldp['lldpRemPortIdSubtype'] == 5 && ctype_xdigit(str_replace([' ', ':', '-'], '', strtolower((string) $lldp['lldpRemPortId'])))) {
                     $lldp['lldpRemPortId'] = StringHelpers::hexToAscii($lldp['lldpRemPortId'], ':');
@@ -570,7 +571,7 @@ foreach (dbFetchRows($sql, [$device['device_id']]) as $test) {
 }
 
 // remove orphaned links
-$deleted = Link::doesntHave('device')->delete();
+$deleted = Link::deleteOrphans();
 echo str_repeat('-', $deleted);
 d_echo(" $deleted orphaned links deleted\n");
 

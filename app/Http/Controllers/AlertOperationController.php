@@ -5,19 +5,21 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AlertOperationRequest;
 use App\Models\AlertOperation;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\AlertRuleOperationPhase;
 
 class AlertOperationController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Web UI: list alert operations (named operations + segment summary).
      */
     public function index(): View
     {
-        Gate::authorize('viewAny', AlertOperation::class);
+        $this->authorize('viewAny', AlertOperation::class);
 
         $operations = AlertOperation::query()
             ->withCount('alertRules')
@@ -35,7 +37,7 @@ class AlertOperationController extends Controller
 
     public function show(AlertOperation $alertOperation): JsonResponse
     {
-        Gate::authorize('view', $alertOperation);
+        $this->authorize('view', $alertOperation);
 
         $alertOperation->loadMissing([
             'segments.transportSingles:alert_transports.transport_id,transport_type,transport_name',
@@ -50,13 +52,14 @@ class AlertOperationController extends Controller
 
     public function store(AlertOperationRequest $request): JsonResponse
     {
-        Gate::authorize('create', AlertOperation::class);
+        $this->authorize('create', AlertOperation::class);
 
         try {
             $validated = $request->validated();
             $op = new AlertOperation;
             $op->name = $validated['name'];
             $op->default_operation_step_duration_seconds = $validated['default_operation_step_duration_seconds'] ?? null;
+            $op->notifications_suppressed = (bool) ($validated['notifications_suppressed'] ?? false);
             $op->save();
             $this->syncSegments($op, $request);
 
@@ -75,12 +78,13 @@ class AlertOperationController extends Controller
 
     public function update(AlertOperationRequest $request, AlertOperation $alertOperation): JsonResponse
     {
-        Gate::authorize('update', $alertOperation);
+        $this->authorize('update', $alertOperation);
 
         try {
             $validated = $request->validated();
             $alertOperation->name = $validated['name'];
             $alertOperation->default_operation_step_duration_seconds = $validated['default_operation_step_duration_seconds'] ?? null;
+            $alertOperation->notifications_suppressed = (bool) ($validated['notifications_suppressed'] ?? false);
             $alertOperation->save();
             $this->syncSegments($alertOperation, $request);
 
@@ -98,7 +102,7 @@ class AlertOperationController extends Controller
 
     public function destroy(AlertOperation $alertOperation): JsonResponse
     {
-        Gate::authorize('delete', $alertOperation);
+        $this->authorize('delete', $alertOperation);
 
         if ($alertOperation->alertRules()->exists()) {
             return response()->json([
@@ -129,7 +133,6 @@ class AlertOperationController extends Controller
                 'escalation_step_to' => $to,
                 'start_in_seconds' => max(0, (int) ($row['start_in_seconds'] ?? 0)),
                 'step_duration_seconds' => max(0, (int) ($row['step_duration_seconds'] ?? 0)),
-                'notifications_suppressed' => false,
             ]);
 
             $transportsRaw = $row['transports'] ?? [];

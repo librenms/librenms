@@ -150,8 +150,8 @@ $basic_rrd_def = RrdDefinition::make()
     ->addDataset('mode', 'GAUGE', 0, 4)
     ->addDataset('hdop', 'GAUGE', 0, 100)
     ->addDataset('vdop', 'GAUGE', 0, 100)
-    ->addDataset('satellites', 'GAUGE', 0, 40)
-    ->addDataset('satellites_used', 'GAUGE', 0, 40);
+    ->addDataset('satellites', 'GAUGE', 0, 200)
+    ->addDataset('satellites_used', 'GAUGE', 0, 200);
 
 // Update basic RRD
 $basic_tags = [

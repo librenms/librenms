@@ -41,10 +41,10 @@ if (Gate::denies('debug', Device::class)) {
     <div class="tab-content">
     <?php
     $tabs = [
-        'discovery' => 'ajax_output.php?id=capture&format=text&type=discovery&hostname=' . htmlentities((string) $device['hostname']),
-        'poller'    => 'ajax_output.php?id=capture&format=text&type=poller&hostname=' . htmlentities((string) $device['hostname']),
-        'snmp'      => 'ajax_output.php?id=capture&format=text&type=snmpwalk&hostname=' . htmlentities((string) $device['hostname']),
-        'alerts'    => 'ajax_output.php?id=query&format=text&type=alerts&hostname=' . htmlentities((string) $device['hostname']),
+        'discovery' => route('device.debug.process', ['device' => $device['device_id'], 'format' => 'text', 'type' => 'discovery', 'verbose' => 1]),
+        'poller' => route('device.debug.process', ['device' => $device['device_id'], 'format' => 'text', 'type' => 'poller', 'verbose' => 1]),
+        'snmp' => route('device.debug.snmp', ['device' => $device['device_id'], 'format' => 'text']),
+        'alerts' => route('device.debug.alerts', ['device' => $device['device_id'], 'format' => 'text']),
     ];
 
     foreach ($tabs as $tab => $url) {

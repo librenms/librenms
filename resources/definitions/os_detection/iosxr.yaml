@@ -31,3 +31,7 @@ discovery:
     -
         sysDescr:
             - 'IOS XR'
+bad_iftype:
+    - macSecControlledIF
+    - macSecUncontrolledIF
+    - opticalChannel

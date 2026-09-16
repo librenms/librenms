@@ -15,26 +15,20 @@ use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-if (Gate::denies('view', AlertTransport::class)) {
+$transport_id = $vars['transport_id'];
+$transport = AlertTransport::findOrFail($transport_id);
+if (Gate::denies('view', $transport)) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'You need permission',
     ]));
 }
 
-$transport_id = $vars['transport_id'];
 // Retrieve alert transport
 if (is_numeric($transport_id) && $transport_id > 0) {
-    $transport = dbFetchRow('SELECT * FROM `alert_transports` WHERE `transport_id` =? LIMIT 1', [$transport_id]);
-
-    if ($transport['is_default'] == true) {
-        $is_default = true;
-    } else {
-        $is_default = false;
-    }
     $details = [];
     // Get alert transport configuration details
-    foreach (json_decode((string) $transport['transport_config'], true) as $key => $value) {
+    foreach ($transport->transport_config as $key => $value) {
         $details[] = [
             'name' => $key,
             'value' => $value,
@@ -42,14 +36,15 @@ if (is_numeric($transport_id) && $transport_id > 0) {
     }
 }
 
-if (is_array($transport)) {
+if ($transport->exists) {
     exit(json_encode([
-        'name' => $transport['transport_name'],
-        'type' => $transport['transport_type'],
-        'is_default' => $is_default,
+        'name' => $transport->transport_name,
+        'type' => $transport->transport_type,
+        'is_default' => $transport->is_default,
         'details' => $details,
     ]));
 } else {
+    // not reachable
     exit(json_encode([
         'status' => 'error',
         'message' => 'No alert transport found',

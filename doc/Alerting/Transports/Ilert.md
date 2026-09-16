@@ -1,17 +1,22 @@
 ## Ilert
-This integration uses the [ilert LibreNMS integration](https://docs.ilert.com/integrations/inbound-integrations/librenms) 
-which allows you to use all available ilert parameters such as links, images, comments, etc.
+This integration uses the [ilert LibreNMS
+integration](https://docs.ilert.com/integrations/inbound-integrations/librenms).
+It accepts all ilert parameters, such as links, images, and comments.
 
-This transport will send over the following fields:
+This transport sends these fields:
 
-`integrationKey` - The integration key you generated earlier.
-`eventType` - The type of alert such as Alerting, Acknowledged or Recovered translated to ilert event types.
-`summary` - The title of the alert.
-`details` - The output from the alert template associated with the rule.
-`alertKey` - The alert id.
-`priority` - The priority translated to the ilert priority values of HIGH (Critical) or LOW (Warning or OK)
+`integrationKey` - the integration key from the earlier step.
+`eventType` - the alert type, that is Alerting, Acknowledged, or
+Recovered, converted to an ilert event type.
+`summary` - the title of the alert.
+`details` - the output of the alert template of the rule.
+`alertKey` - the alert id.
+`priority` - the priority as an ilert priority value. HIGH is critical.
+LOW is warning or OK.
 
-To customise what is sent to ilert and override or add additional fields, you can create a custom template which outputs the correct information via JSON. For this to work you **must** send over a summary and details values. As an example:
+To change the data to ilert, or to override or add fields, create your
+own template. This template gives the correct information in JSON. It
+**must** send a summary value and a details value. For example:
 
 ```json
 {
@@ -36,7 +41,8 @@ To customise what is sent to ilert and override or add additional fields, you ca
     ]
 }
 ```
-If you are using more than one transport for an alert rule and need to customise the output per transport then you can do the following:
+If an alert rule uses more than one transport, you can change the
+output for each transport. Use this method:
 
 ```
 @if ($alert->transport == 'ilert')

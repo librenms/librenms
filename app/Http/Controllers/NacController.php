@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PortsNac;
+
 class NacController extends Controller
 {
     public function index()
     {
-        $data = [];
+        $this->authorize('viewAny', PortsNac::class);
 
-        return view('nac', $data);
+        return view('nac');
     }
 }
