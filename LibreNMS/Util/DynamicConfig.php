@@ -29,6 +29,7 @@ namespace LibreNMS\Util;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class DynamicConfig
 {
@@ -49,24 +50,42 @@ class DynamicConfig
 
     /**
      * Check if a setting is valid
-     *
-     * @param  string  $name
-     * @return bool
      */
-    public function isValidSetting($name)
+    public function isValidSetting(string $name): bool
     {
-        return $this->definitions->has($name) && $this->definitions->get($name)->isValid();
+        if ($this->definitions->has($name) && $this->definitions->get($name)->isValid()) {
+            return true;
+        }
+
+        $wildcard = $this->getWildcardDefinition($name);
+
+        return $wildcard && $wildcard->isValid();
     }
 
     /**
      * Get config item by name
-     *
-     * @param  string  $name
-     * @return DynamicConfigItem|null
      */
-    public function get($name)
+    public function get(string $name): ?DynamicConfigItem
     {
-        return $this->definitions->get($name);
+        if ($this->definitions->has($name)) {
+            return $this->definitions->get($name);
+        }
+
+        return $this->getWildcardDefinition($name);
+    }
+
+    private function getWildcardDefinition($name): ?DynamicConfigItem
+    {
+        foreach ($this->definitions as $key => $item) {
+            if (str_contains((string) $key, '*') && Str::is($key, $name)) {
+                $settings = $item->toArray();
+                $settings['name'] = $name;
+
+                return new DynamicConfigItem($name, $settings);
+            }
+        }
+
+        return null;
     }
 
     /**
