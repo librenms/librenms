@@ -493,4 +493,64 @@ class NetSnmpTest extends TestCase
         $resultWithoutDot = $this->backend->translate('1.3.6.1.2.1.1.1.0', $options);
         $this->assertSame('.1.3.6.1.2.1.1.1.0', $resultWithoutDot);
     }
+
+    public function testSnmpConfigFromDeviceWithoutPollingMethod(): void
+    {
+        $device = (new Device())->forceFill([
+            'hostname' => 'legacy.device.local',
+            'snmpver' => 'v2c',
+            'community' => 'custom-comm',
+            'port' => 1161,
+            'timeout' => 3,
+            'retries' => 2,
+        ]);
+
+        $config = SnmpConfig::fromDevice($device);
+
+        $this->assertTrue($config->enabled);
+        $this->assertSame('v2c', $config->version);
+        $this->assertSame('custom-comm', $config->community);
+        $this->assertSame(1161, $config->port);
+        $this->assertEquals(3, $config->timeout);
+        $this->assertSame(2, $config->retries);
+    }
+
+    public function testSnmpConfigFromDeviceArray(): void
+    {
+        $deviceArray = [
+            'hostname' => 'legacy-array.device.local',
+            'snmpver' => 'v3',
+            'authlevel' => 'authPriv',
+            'authname' => 'testuser',
+            'authpass' => 'authpass123',
+            'authalgo' => 'SHA',
+            'cryptopass' => 'privpass123',
+            'cryptoalgo' => 'AES',
+            'transport' => 'udp6',
+            'port' => 161,
+        ];
+
+        $config = SnmpConfig::fromDeviceArray($deviceArray);
+
+        $this->assertSame('v3', $config->version);
+        $this->assertSame('authPriv', $config->authlevel);
+        $this->assertSame('testuser', $config->authname);
+        $this->assertSame('authpass123', $config->authpass);
+        $this->assertSame('SHA', $config->authalgo);
+        $this->assertSame('privpass123', $config->cryptopass);
+        $this->assertSame('AES', $config->cryptoalgo);
+        $this->assertSame('udp6', $config->transport);
+        $this->assertSame(161, $config->port);
+    }
+
+    public function testSnmpConfigFromNullDeviceArray(): void
+    {
+        $config = SnmpConfig::fromDeviceArray(null);
+
+        $this->assertTrue($config->enabled);
+        $this->assertSame('v2c', $config->version);
+        $this->assertSame('public', $config->community);
+        $this->assertSame('udp', $config->transport);
+        $this->assertSame(161, $config->port);
+    }
 }

@@ -42,8 +42,8 @@ class FieldDefinition
         public ?array $visibleIf = null,
         public array|string|null $rules = null,
         public ?string $cast = null,
-        public ?int $min = null,
-        public ?int $max = null,
+        public int|float|null $min = null,
+        public int|float|null $max = null,
         public ?string $placeholder = null,
     ) {
     }
@@ -104,14 +104,14 @@ class FieldDefinition
         return $this;
     }
 
-    public function min(?int $min): static
+    public function min(int|float|null $min): static
     {
         $this->min = $min;
 
         return $this;
     }
 
-    public function max(?int $max): static
+    public function max(int|float|null $max): static
     {
         $this->max = $max;
 
