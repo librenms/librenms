@@ -181,16 +181,6 @@ alert_transport_map:
     - { Field: target_type, Type: varchar(16), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-api_tokens:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: token_hash, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: description, Type: varchar(100), 'Null': false, Extra: '' }
-    - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    api_tokens_token_hash_unique: { Name: api_tokens_token_hash_unique, Columns: [token_hash], Unique: true, Type: BTREE }
 applications:
   Columns:
     - { Field: app_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -811,9 +801,9 @@ entPhysical:
     - { Field: entPhysicalDescr, Type: text, 'Null': true, Extra: '' }
     - { Field: entPhysicalClass, Type: text, 'Null': true, Extra: '' }
     - { Field: entPhysicalName, Type: text, 'Null': true, Extra: '' }
-    - { Field: entPhysicalHardwareRev, Type: varchar(96), 'Null': true, Extra: '' }
-    - { Field: entPhysicalFirmwareRev, Type: varchar(96), 'Null': true, Extra: '' }
-    - { Field: entPhysicalSoftwareRev, Type: varchar(96), 'Null': true, Extra: '' }
+    - { Field: entPhysicalHardwareRev, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: entPhysicalFirmwareRev, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: entPhysicalSoftwareRev, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: entPhysicalAlias, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: entPhysicalAssetID, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: entPhysicalIsFRU, Type: varchar(8), 'Null': true, Extra: '' }
