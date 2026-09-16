@@ -30,10 +30,9 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethodConfigInterface;
 use LibreNMS\Util\IP;
 
-readonly class SnmpConfig implements PollingMethodConfigInterface
+class SnmpConfig extends PollingMethodConfig
 {
     public function __construct(
         public bool $enabled = true,
@@ -77,7 +76,8 @@ readonly class SnmpConfig implements PollingMethodConfigInterface
         $secretDefinition = $definition->secretDefinition();
 
         $settings = $definition->resolveValues($method->settings ?? []);
-        $secretData = $secretDefinition->resolveValues($method->secret->data ?? []);
+        $resolvedData = $secretDefinition ? $secretDefinition->resolveValues($method->secret->data ?? []) : [];
+        $secretData = \LibreNMS\Polling\Secrets\Data\SnmpSecretData::fromArray($resolvedData);
 
         $os = $method->device->os ?? 'generic';
 
@@ -90,17 +90,17 @@ readonly class SnmpConfig implements PollingMethodConfigInterface
         return new static(
             enabled: $method->enabled,
             affectsAvailability: $method->affects_availability,
-            version: $secretData['version'],
-            community: $secretData['community'] ?? null,
-            authname: $secretData['authname'] ?? null,
-            authpass: $secretData['authpass'] ?? null,
-            authlevel: $secretData['authlevel'],
-            authalgo: $secretData['authalgo'],
-            cryptopass: $secretData['cryptopass'] ?? null,
-            cryptoalgo: $secretData['cryptoalgo'],
+            version: $secretData->version,
+            community: $secretData->community,
+            authname: $secretData->authname,
+            authpass: $secretData->authpass,
+            authlevel: $secretData->authlevel,
+            authalgo: $secretData->authalgo,
+            cryptopass: $secretData->cryptopass,
+            cryptoalgo: $secretData->cryptoalgo,
             transport: $settings['transport'],
             port: (int) ($settings['port'] ?? 161),
-            context: $secretData['context'] ?? null,
+            context: $secretData->context,
             timeout: max(0.1, $timeout),
             retries: max(0, $retries),
             maxRepeaters: max(0, $maxRepeaters),

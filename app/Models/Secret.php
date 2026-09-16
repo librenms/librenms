@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\SecretType;
-use LibreNMS\Polling\Secrets\SecretData;
 
 class Secret extends BaseModel
 {
@@ -27,20 +26,9 @@ class Secret extends BaseModel
         'data' => EncryptedArray::class,
     ];
 
-    /**
-     * Cast the secret data array into the specified SecretData class.
-     * If no class is specified, it is inferred from the secret type.
-     *
-     * @template T of SecretData
-     *
-     * @param  class-string<T>|null  $secretClass
-     * @return ($secretClass is null ? SecretData : T)
-     */
-    public function asSecretData(?string $secretClass = null): SecretData
+    public function toSecretData(): \LibreNMS\Polling\Secrets\Data\SnmpSecretData|\LibreNMS\Polling\Secrets\Data\IpmiSecretData
     {
-        $class = $this->secret_type->definition()->class();
-
-        return $class::fromArray($this->data);
+        return $this->secret_type->createData($this->data);
     }
 
     /**
@@ -73,7 +61,7 @@ class Secret extends BaseModel
      * @param  Builder<Secret>  $query
      * @return Builder<Secret>
      */
-    public function scopeHasAccess(Builder $query, User $user): Builder
+    protected function scopeHasAccess(Builder $query, User $user): Builder
     {
         if (Gate::forUser($user)->allows('viewAll', Secret::class) || Gate::forUser($user)->allows('viewAll', Device::class)) {
             return $query;

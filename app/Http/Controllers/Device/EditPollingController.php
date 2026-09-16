@@ -17,7 +17,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
 
@@ -381,7 +381,7 @@ class EditPollingController
                         'secret_type' => $type->value,
                         'description' => $description ?: ('Custom ' . strtoupper($type->value) . ' (' . $device->hostname . ')'),
                         'default' => false,
-                        'data' => $secretData ?? ($targetSecret?->data ?? []),
+                        'data' => $secretData ?? ($targetSecret ? $targetSecret->data : []),
                     ]);
                     $pollingMethod->secret()->associate($secret)->save();
                 } else {

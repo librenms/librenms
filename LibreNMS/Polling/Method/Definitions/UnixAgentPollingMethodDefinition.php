@@ -4,17 +4,13 @@ namespace LibreNMS\Polling\Method\Definitions;
 
 use App\Facades\LibrenmsConfig;
 use App\View\FieldSchema\FieldDefinition;
-use App\View\FieldSchema\HandlesFieldSchema;
-use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 
 /**
- * @implements PollingMethodDefinitionInterface<UnixAgentConfig>
+ * @extends PollingMethodDefinition<UnixAgentConfig>
  */
-class UnixAgentPollingMethodDefinition implements PollingMethodDefinitionInterface
+class UnixAgentPollingMethodDefinition extends PollingMethodDefinition
 {
-    use HandlesFieldSchema;
-
     /**
      * @inheritDoc
      */

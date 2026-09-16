@@ -3,10 +3,9 @@
 namespace LibreNMS\Polling\Method\Probe;
 
 use App\Models\Device;
-use LibreNMS\Interfaces\PollingMethodProbeInterface;
 use SnmpQuery;
 
-final readonly class SnmpProbe implements PollingMethodProbeInterface
+class SnmpProbe extends PollingMethodProbe
 {
     public function check(Device $device): ProbeResult
     {

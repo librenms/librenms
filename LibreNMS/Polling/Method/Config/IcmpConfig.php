@@ -4,9 +4,8 @@ namespace LibreNMS\Polling\Method\Config;
 
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethodConfigInterface;
 
-readonly class IcmpConfig implements PollingMethodConfigInterface
+class IcmpConfig extends PollingMethodConfig
 {
     public function __construct(
         public bool $enabled,

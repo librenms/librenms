@@ -1,54 +1,37 @@
 <?php
 
-/**
- * IpmiSecretData.php
- *
- * -Description-
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * @link       https://www.librenms.org
- *
- * @copyright  2026 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
- */
-
 namespace LibreNMS\Polling\Secrets\Data;
 
-use LibreNMS\Polling\Secrets\SecretData;
-
-class IpmiSecretData extends SecretData
+readonly class IpmiSecretData
 {
     public function __construct(
-        public ?string $username = null,
-        public ?string $password = null,
-        public ?string $kg_key = null,
+        public string $username = '',
+        public string $password = '',
+        public string $kgKey = '',
     ) {
     }
 
     /**
      * @param  array<string, mixed>  $data
      */
-    public static function fromArray(array $data): static
+    public static function fromArray(array $data): self
     {
-        $definition = new \LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
-        $resolved = $definition->resolveValues($data);
-
-        return new static(
-            username: $resolved['username'] ?? null,
-            password: $resolved['password'] ?? null,
-            kg_key: $resolved['kg_key'] ?? null,
+        return new self(
+            username: (string) ($data['username'] ?? ''),
+            password: (string) ($data['password'] ?? ''),
+            kgKey: (string) ($data['kg_key'] ?? $data['kgKey'] ?? ''),
         );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        return [
+            'username' => $this->username,
+            'password' => $this->password,
+            'kg_key' => $this->kgKey,
+        ];
     }
 }

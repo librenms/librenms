@@ -4,20 +4,16 @@ namespace LibreNMS\Polling\Method\Definitions;
 
 use App\Facades\LibrenmsConfig;
 use App\View\FieldSchema\FieldDefinition;
-use App\View\FieldSchema\HandlesFieldSchema;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PortAssociationMode;
-use LibreNMS\Interfaces\PollingMethodDefinitionInterface;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
 
 /**
- * @implements PollingMethodDefinitionInterface<SnmpConfig>
+ * @extends PollingMethodDefinition<SnmpConfig>
  */
-class SnmpPollingMethodDefinition implements PollingMethodDefinitionInterface
+class SnmpPollingMethodDefinition extends PollingMethodDefinition
 {
-    use HandlesFieldSchema;
-
     /**
      * @inheritDoc
      */

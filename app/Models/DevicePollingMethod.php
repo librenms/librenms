@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\PollingMethodConfigInterface;
+use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\PollingMethodFactory;
 
 #[ObservedBy([DevicePollingMethodObserver::class])]
@@ -36,7 +36,7 @@ class DevicePollingMethod extends Model
         'last_check_successful' => 'boolean',
     ];
 
-    private ?PollingMethodConfigInterface $configCache = null;
+    private ?PollingMethodConfig $configCache = null;
 
     /**
      * Save or update a DevicePollingMethod row settings for a device.
@@ -112,7 +112,7 @@ class DevicePollingMethod extends Model
         return $method;
     }
 
-    public function toConfig(): PollingMethodConfigInterface
+    public function toConfig(): PollingMethodConfig
     {
         if ($this->configCache !== null) {
             return $this->configCache;
