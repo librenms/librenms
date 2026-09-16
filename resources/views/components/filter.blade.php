@@ -26,7 +26,7 @@
                           class="tw:absolute tw:-top-0.5 tw:-right-0.5 tw:w-2 tw:h-2 tw:bg-neutral-600 tw:dark:bg-dark-white-300 tw:rounded-full tw:ring-1 tw:ring-white tw:dark:ring-dark-gray-500"></span>
                 </div>
                 <span class="tw:font-bold" x-show="!filters.length">{{ __('Filter') }}</span>
-                <span class="tw:text-xs" x-show="filters.length" x-text="filters.length"></span>
+                <span class="tw:font-semibold" x-show="filters.length" x-text="filters.length"></span>
             </button>
 
             {{-- Options Menu --}}
@@ -128,7 +128,7 @@
              class="tw:fixed tw:inset-0 tw:z-100 tw:flex tw:items-center tw:justify-center tw:p-6 tw:bg-neutral-950/60 tw:backdrop-blur-xs"
              @click="close()">
             <div x-show="dialog" x-transition @click.stop
-                 class="tw:w-full tw:max-w-sm tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-2xl tw:shadow-2xl tw:text-sm"
+                 class="tw:w-full tw:max-w-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-2xl tw:shadow-2xl tw:text-sm"
                  role="dialog" aria-modal="true">
 
                 {{-- Header --}}
