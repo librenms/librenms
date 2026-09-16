@@ -59,7 +59,8 @@ class VmInfoController implements DeviceTab
         $request->validate(Vminfo::filterValidationRules());
 
         return [
-            'filterFields' => Vminfo::filterFieldDefinitions(),
+            'filterFields' => collect(Vminfo::filterFieldDefinitions())
+                ->filter(fn ($field) => $field['key'] !== 'device_id')->values()->all(),
             'filter' => $request->array('filter'),
         ];
     }
