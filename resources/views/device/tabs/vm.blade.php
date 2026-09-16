@@ -2,23 +2,25 @@
 
 @section('content')
     <x-device.page :device="$device">
+        <template id="vminfo-filter-template"><x-filter name="vminfo" :fields="$data['filterFields']" :initial="$data['filter']"/></template>
         <x-panel>
-            <div class="table-responsive">
-                <template id="vminfo-filter-template"><x-filter name="vminfo" :fields="$data['filterFields']" :initial="$data['filter']"/></template>
-                <table id="vminfo" class="table table-hover table-condensed table-striped"
-                       data-url="{{ route('table.vminfo') }}">
-                    <thead>
-                        <tr>
-                            <th data-column-id="vmwVmDisplayName" data-order="asc">{{ __('VM Name') }}</th>
-                            <th data-column-id="vmwVmState">{{ __('Power Status') }}</th>
-                            <th data-column-id="vm_type">{{ __('Type') }}</th>
-                            <th data-column-id="vmwVmGuestOS" data-searchable="false">{{ __('Operating System') }}</th>
-                            <th data-column-id="vmwVmMemSize" data-searchable="false">{{ __('Memory') }}</th>
-                            <th data-column-id="vmwVmCpus" data-searchable="false">{{ __('vCPUs') }}</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
+            <x-slot:table>
+                <div class="table-responsive">
+                    <table id="vminfo" class="table table-hover table-condensed table-striped"
+                           data-url="{{ route('table.vminfo') }}">
+                        <thead>
+                            <tr>
+                                <th data-column-id="vmwVmDisplayName" data-order="asc">{{ __('VM Name') }}</th>
+                                <th data-column-id="vmwVmState">{{ __('Power Status') }}</th>
+                                <th data-column-id="vm_type">{{ __('Type') }}</th>
+                                <th data-column-id="vmwVmGuestOS" data-searchable="false">{{ __('Operating System') }}</th>
+                                <th data-column-id="vmwVmMemSize" data-searchable="false">{{ __('Memory') }}</th>
+                                <th data-column-id="vmwVmCpus" data-searchable="false">{{ __('vCPUs') }}</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </x-slot:table>
         </x-panel>
     </x-device.page>
 @endsection
