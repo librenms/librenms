@@ -119,3 +119,8 @@
 .lnms-btn-warning .lnms-btn-badge {
   @apply tw:bg-white tw:text-[#f0ad4e];
 }
+
+.dark .leaflet-tile,
+html.dark .leaflet-tile {
+    filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
