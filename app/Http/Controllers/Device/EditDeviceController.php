@@ -27,7 +27,6 @@
 namespace App\Http\Controllers\Device;
 
 use App\Facades\LibrenmsConfig;
-use App\Facades\Rrd;
 use App\Http\Requests\UpdateDeviceRequest;
 use App\Models\Device;
 use App\Models\DeviceGroup;
@@ -38,7 +37,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Exceptions\HostRenameException;
-use LibreNMS\Util\Number;
 
 class EditDeviceController
 {

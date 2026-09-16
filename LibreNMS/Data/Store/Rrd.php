@@ -44,9 +44,7 @@ use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
 use Log;
-use SplFileInfo;
 use Symfony\Component\Process\Process;
-use Throwable;
 
 class Rrd extends BaseDatastore
 {
