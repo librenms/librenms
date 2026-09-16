@@ -4,9 +4,9 @@
     <x-device.page :device="$device">
         <x-panel>
             <div class="table-responsive">
+                <template id="vminfo-filter-template"><x-filter name="vminfo" :fields="$data['filterFields']" :initial="$data['filter']"/></template>
                 <table id="vminfo" class="table table-hover table-condensed table-striped"
-                       data-url="{{ route('table.vminfo') }}"
-                       data-params="device_id={{ $device->device_id }}">
+                       data-url="{{ route('table.vminfo') }}">
                     <thead>
                         <tr>
                             <th data-column-id="vmwVmDisplayName" data-order="asc">{{ __('VM Name') }}</th>
@@ -25,13 +25,34 @@
 
 @section('scripts')
 <script>
-    $("#vminfo").bootgrid({
+    var filter = @js($data['filter']);
+
+    var grid = $("#vminfo").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
+        templates: {
+            search: ""
+        },
         post: function () {
             return {
-                device_id: {{ $device->device_id }},
+                filter: filter,
+                device_id: {{ $device->device_id }}
             }
+        }
+    })
+
+    const $template = $('#vminfo-filter-template');
+    if ($template.length) {
+        const $content = $($template[0].content.cloneNode(true));
+        const $wrapper = $('<div class="pull-left"></div>');
+        $wrapper.append($content);
+        $(".actionBar").append($wrapper);
+    }
+
+    $(window).on('filter:apply', function (event) {
+        if (event.originalEvent.detail.name === 'vminfo') {
+            filter = event.originalEvent.detail.filters;
+            grid.bootgrid('reload');
         }
     })
 </script>
