@@ -11,6 +11,38 @@ $check_cmd = \App\Facades\LibrenmsConfig::get('nagios_plugins') . '/check_mysql 
 // Check DS is a json array of the graphs that are available
 $check_ds = '{"mysqlqueries":"c","mysql":"c","mysqluptime":"c","mysqlQcache":"c"}';
 
+$check_parser = function (string $output, array $metrics = []): array {
+    $metrics = [
+        'Uptime' => ['value' => 'U', 'uom' => 's', 'full_name' => 'Uptime'],
+        'Threads_connected' => ['value' => 'U', 'uom' => '', 'full_name' => 'Threads_connected', 'alias' => 'Threads'],
+        'Questions' => ['value' => 'U', 'uom' => '', 'full_name' => 'Questions'],
+        'Open_files' => ['value' => 'U', 'uom' => '', 'full_name' => 'Open_files', 'alias' => 'Opens'],
+        'Open_tables' => ['value' => 'U', 'uom' => '', 'full_name' => 'Open_tables'],
+        'Queries'  => ['value' => 'U', 'uom' => '', 'full_name' => 'Queries', 'alias' => 'Queries_per_second_'],
+        'Table_locks_waited'  => ['value' => 'U', 'uom' => '', 'full_name' => 'Table_locks_waited'],
+        'Connections'  => ['value' => 'U', 'uom' => '', 'full_name' => 'Connections'],
+        'Threads_running'  => ['value' => 'U', 'uom' => '', 'full_name' => 'Threads_running'],
+        'Qcache_free_memory'  => ['value' => 'U', 'uom' => '', 'full_name' => 'Qcache_free_memory'],
+        'Qcache_hits'  => ['value' => 'U', 'uom' => '', 'full_name' => 'Qcache_hits'],
+        'Qcache_inserts'  => ['value' => 'U', 'uom' => '', 'full_name' => 'Qcache_inserts'],
+        'Qcache_lowmem_prune'  => ['value' => 'U', 'uom' => '', 'full_name' => 'Qcache_lowmem_prune'],
+        'Qcache_not_cached'  => ['value' => 'U', 'uom' => '', 'full_name' => 'Qcache_not_cached'],
+        'Qcache_queries_in_c'  => ['value' => 'U', 'uom' => '', 'full_name' => 'Qcache_queries_in_c'],
+    ];
+
+    $parsed = \LibreNMS\Services::parseStats($output);
+    foreach ($metrics as $key => $defaults) {
+        $name = $defaults['alias'] ?? $key;
+        if (isset($parsed[$name]['value'])) {
+            $value = $parsed[$name]['value'];
+            $metrics[$key]['value'] = $value;
+            d_echo('Perf Data - DS: ' . $defaults['full_name'] . ', Value: ' . $value . ', UOM: ' . $defaults['uom'] . "\n");
+        }
+    }
+
+    return $metrics;
+};
+
 if (isset($rrd_filename)) {
     // Build the graph data
     $check_graph = [];

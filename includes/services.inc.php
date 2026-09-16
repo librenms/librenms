@@ -58,6 +58,7 @@ function poll_service($service)
     $service['hostname'] = IP::isValid($service['hostname']) ? $service['hostname'] : Clean::fileName($service['hostname']);
     $service['overwrite_ip'] = IP::isValid($service['overwrite_ip']) ? $service['overwrite_ip'] : Clean::fileName($service['overwrite_ip']);
     $check_cmd = '';
+    $check_parser = null;
 
     // if we have a script for this check, use it.
     $check_script = \LibreNMS\Services::customCheckPath($service['service_type']);
@@ -75,7 +76,7 @@ function poll_service($service)
     // Some debugging
     d_echo("\nNagios Service - $service_id\n");
     // the check_service function runs $check_cmd through escapeshellcmd, so
-    [$new_status, $msg, $perf] = check_service($check_cmd);
+    [$new_status, $msg, $perf] = check_service($check_cmd, $check_parser ?? null);
     d_echo("Response: $msg\n");
 
     // If we have performance data we will store it.
@@ -152,13 +153,8 @@ function poll_service($service)
     return true;
 }
 
-function check_service($command)
+function check_service($command, ?callable $parser = null)
 {
-    // This array is used to test for valid UOM's to be used for graphing.
-    // Valid values from: https://nagios-plugins.org/doc/guidelines.html#AEN200
-    // Note: This array must be decend from 2 char to 1 char so that the search works correctly.
-    $valid_uom = ['us', 'ms', 'KB', 'MB', 'GB', 'TB', 'c', 's', '%', 'B'];
-
     // Make our command safe.
     $parts = preg_split('~(?:\'[^\']*\'|"[^"]*")(*SKIP)(*F)|\h+~', trim((string) $command));
     $safe_command = implode(' ', array_map(function ($part) {
@@ -178,133 +174,12 @@ function check_service($command)
     // Split out the response and the performance data.
     [$response, $perf] = explode('|', $response_string, 2) + ['', ''];
 
-    // Split performance metrics into an array
-    preg_match_all('/\'[^\']*\'\S*|\S+/', $perf, $perf_arr);
-    // preg_match_all returns a 2D array, we only need the first one
-    $perf_arr = $perf_arr[0];
+    $metrics = \LibreNMS\Services::parsePerfdata($perf);
 
-    // Create an array for our metrics.
-    $metrics = [];
-
-    // Loop through the perf string extracting our metric data
-    foreach ($perf_arr as $string) {
-        // Separate the DS and value: DS=value
-        [$ds,$values] = array_pad(explode('=', trim($string)), 2, '');
-
-        // Keep the first value, discard the others.
-        $value = $values ? explode(';', trim($values)) : [];
-        $value = trim($value[0] ?? '');
-
-        // Set an empty uom
-        $uom = '';
-
-        // is the UOM valid - https://nagios-plugins.org/doc/guidelines.html#AEN200
-        foreach ($valid_uom as $v) {
-            if ((strlen($value) - strlen($v)) === strpos($value, $v)) {
-                // Yes, store and strip it off the value
-                $uom = $v;
-                $value = substr($value, 0, -strlen($v));
-                break;
-            }
-        }
-
-        if ($ds != '') {
-            $ds = trim($ds, "'\"");
-            // Normalize ds for rrd : ds-name must be 1 to 19 characters long in the characters [a-zA-Z0-9_]
-            // http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
-            if (preg_match('/(?:.+)?(rta|rtmin|rtmax|pl)$/', $ds, $matches)) {
-                $normalized_ds = $matches[1];
-            } else {
-                $normalized_ds = preg_replace('/[^a-zA-Z0-9_]/', '', $ds);
-            }
-            // if ds_name is longer than 19 characters, only use the first 19
-            if (strlen((string) $normalized_ds) > 19) {
-                $normalized_ds = substr((string) $normalized_ds, 0, 19);
-                d_echo($ds . ' exceeded 19 characters, renaming to ' . $normalized_ds . "\n");
-            }
-            if ($ds != $normalized_ds) {
-                // ds has changed. check if normalized_ds is already in the array
-                if (isset($metrics[$normalized_ds])) {
-                    d_echo($normalized_ds . " collides with an existing index\n");
-                    $perf_unique = 0;
-                    // Try to generate a unique name
-                    for ($i = 0; $i < 10; $i++) {
-                        $tmp_ds_name = substr((string) $normalized_ds, 0, 18) . $i;
-                        if (! isset($metrics[$tmp_ds_name])) {
-                            d_echo($normalized_ds . " collides with an existing index\n");
-                            $normalized_ds = $tmp_ds_name;
-                            $perf_unique = 1;
-                            break;
-                        }
-                    }
-                    if ($perf_unique == 0) {
-                        // Try harder to generate a unique name
-                        for ($i = 0; $i < 10; $i++) {
-                            for ($j = 0; $j < 10; $j++) {
-                                $tmp_ds_name = substr((string) $normalized_ds, 0, 17) . $j . $i;
-                                if (! isset($perf[$tmp_ds_name])) {
-                                    $normalized_ds = $tmp_ds_name;
-                                    $perf_unique = 1;
-                                    break 2;
-                                }
-                            }
-                        }
-                    }
-                    if ($perf_unique == 0) {
-                        d_echo('could not generate a unique ds-name for ' . $ds . "\n");
-                    }
-                }
-            }
-            // We have a DS. Add an entry to the array.
-            d_echo('Perf Data - DS: ' . $normalized_ds . ', Value: ' . $value . ', UOM: ' . $uom . "\n");
-            $metrics[$normalized_ds] = ['value' => $value, 'uom' => $uom, 'full_name' => $ds];
-        } else {
-            // No DS. Don't add an entry to the array.
-            d_echo("Perf Data - None.\n");
-        }
-    }
-
-    if (empty($metrics) && preg_match('/retrieved stats:\s*(.*)/i', $response_string, $stat_matches)) {
-        $stat_map = [
-            'uptime' => ['name' => 'Uptime', 'uom' => 's'],
-            'threads' => ['name' => 'Threads_connected', 'uom' => ''],
-            'threads connected' => ['name' => 'Threads_connected', 'uom' => ''],
-            'questions' => ['name' => 'Questions', 'uom' => 'c'],
-            'opens' => ['name' => 'Open_files', 'uom' => 'c'],
-            'open files' => ['name' => 'Open_files', 'uom' => 'c'],
-            'open tables' => ['name' => 'Open_tables', 'uom' => ''],
-            'queries per second avg' => ['name' => 'Queries', 'uom' => ''],
-            'queries' => ['name' => 'Queries', 'uom' => ''],
-        ];
-
-        preg_match_all('/([A-Za-z ]+):\s*([0-9.]+)/', $stat_matches[1], $matched_stats, PREG_SET_ORDER);
-        foreach ($matched_stats as $stat) {
-            $key = strtolower(trim($stat[1]));
-            $val = trim($stat[2]);
-            if (isset($stat_map[$key])) {
-                $dsName = $stat_map[$key]['name'];
-                $uom = $stat_map[$key]['uom'];
-                $metrics[$dsName] = ['value' => $val, 'uom' => $uom, 'full_name' => $dsName];
-                d_echo('Perf Data - DS: ' . $dsName . ', Value: ' . $val . ', UOM: ' . $uom . "\n");
-            }
-        }
-
-        $extra_defaults = [
-            'Connections' => ['value' => 0, 'uom' => 'c'],
-            'Table_locks_waited' => ['value' => 0, 'uom' => 'c'],
-            'Threads_running' => ['value' => 0, 'uom' => ''],
-            'Qcache_free_memory' => ['value' => 0, 'uom' => ''],
-            'Qcache_hits' => ['value' => 0, 'uom' => 'c'],
-            'Qcache_inserts' => ['value' => 0, 'uom' => 'c'],
-            'Qcache_lowmem_prune' => ['value' => 0, 'uom' => 'c'],
-            'Qcache_not_cached' => ['value' => 0, 'uom' => 'c'],
-            'Qcache_queries_in_c' => ['value' => 0, 'uom' => ''],
-        ];
-        foreach ($extra_defaults as $dsName => $info) {
-            if (! isset($metrics[$dsName])) {
-                $metrics[$dsName] = ['value' => $info['value'], 'uom' => $info['uom'], 'full_name' => $dsName];
-            }
-        }
+    if ($parser) {
+        $metrics = $parser($response_string, $metrics);
+    } elseif (empty($metrics)) {
+        $metrics = \LibreNMS\Services::parseStats($response_string);
     }
 
     return [$status, $response, $metrics];
