@@ -288,6 +288,13 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                         urlParams.push('searchPhrase=' + encodeURIComponent(searchPhrase));
                     }
 
+                    const currentParams = new URLSearchParams(window.location.search);
+                    currentParams.forEach((value, key) => {
+                        if (key.startsWith("filter[")) {
+                            urlParams.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
+                        }
+                    });
+
                     // Only include pagination for visible records export
                     if (exportType === 'visible') {
                         var currentPage = grid.bootgrid('getCurrentPage');
@@ -364,6 +371,25 @@ function loadjs(filename, func){
     } else {
         func();
     }
+}
+
+function build_tile_url(url) {
+    url ||= '{s}.tile.openstreetmap.org';
+
+    // protocol
+    if (!/^([a-z][a-z0-9+.-]*:)?\/\//i.test(url)) {
+        url = '//' + url;
+    }
+
+    // check for templates
+    if (url.includes('{z}') && url.includes('{x}') && url.includes('{y}')) {
+        return url;
+    }
+
+    // separate path and suffix
+    const path = url.split(/[?#]/)[0];
+
+    return path.replace(/\/+$/, '') + '/{z}/{x}/{y}.png' + url.slice(path.length);
 }
 
 function init_map(id, config = {}) {
@@ -484,8 +510,7 @@ function init_map(id, config = {}) {
         }
     } else {
         leaflet.setMaxZoom(20);
-        const tile_url = config.tile_url ? config.tile_url : '{s}.tile.openstreetmap.org';
-        L.tileLayer('//' + tile_url + '/{z}/{x}/{y}.png', {
+        L.tileLayer(build_tile_url(config.tile_url), {
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(leaflet);
@@ -575,31 +600,106 @@ function init_map_marker(leaflet, latlng) {
     return marker;
 }
 
-function setCustomMapBackground(id, type, data) {
-    let image = '';
-    let color = '';
-
-    if(type === 'image') {
-        image = `url(${data.image_url})`;
-    } else if(type === 'color') {
-        color = data.color;
+function setCustomMapBackground(id, type, data, network) {
+    var container = document.getElementById(id);
+    if (!container) {
+        return;
     }
+
+    if (network) {
+        container._visNetwork = network;
+    }
+    var currentNetwork = container._visNetwork || (id === 'custom-map' && typeof window.network !== 'undefined' ? window.network : null);
+
+    container._customMapBg = container._customMapBg || {};
+    container._customMapBg.type = type;
+    container._customMapBg.data = data;
+    container._customMapBg.imageLoaded = false;
+    container._customMapBg.image = null;
+
     $(`#${id} .vis-network canvas`)
-        .css('background-image', image)
-        .css('background-size', 'cover')
-        .css('background-color', color);
+        .css('background-image', '')
+        .css('background-color', '');
 
     const mapBackgroundId = `${id}-bg-geo-map`;
+    const mapBgElem = document.getElementById(mapBackgroundId);
+
+    if (type === 'image' && data && data.image_url) {
+        let img = new Image();
+        img.onload = function () {
+            if (container._customMapBg && container._customMapBg.type === 'image' && container._customMapBg.image === img) {
+                container._customMapBg.imageLoaded = true;
+                if (container._visNetwork) {
+                    container._visNetwork.redraw();
+                } else if (id === 'custom-map' && typeof window.network !== 'undefined') {
+                    window.network.redraw();
+                }
+            }
+        };
+        img.src = data.image_url;
+        container._customMapBg.image = img;
+        if (img.complete && img.naturalWidth !== 0) {
+            container._customMapBg.imageLoaded = true;
+        }
+    }
+
     if (type === 'map') {
-        $(`#${id}-bg-geo-map`).show();
-        let config = data;
+        if (mapBgElem) {
+            $(mapBgElem).show();
+        }
+        let config = data || {};
         config['readonly'] = true;
         init_map(mapBackgroundId, config)
             .setView(L.latLng(data.lat, data.lng), data.zoom);
     } else {
-        // destroy the map if it exists
-        destroy_map(mapBackgroundId)
+        destroy_map(mapBackgroundId);
+        if (mapBgElem) {
+            $(mapBgElem).hide();
+            mapBgElem.style.transform = 'none';
+        }
     }
+
+    if (currentNetwork) {
+        attachCustomMapBackgroundHooks(container, currentNetwork, id);
+        currentNetwork.redraw();
+    }
+}
+
+function attachCustomMapBackgroundHooks(container, network, id) {
+    if (!network || network._customMapBgHookAttached) {
+        return;
+    }
+    network._customMapBgHookAttached = true;
+
+    network.on('beforeDrawing', function (ctx) {
+        var bg = container._customMapBg;
+        if (!bg) {
+            return;
+        }
+
+        var visDiv = $(container).children('.vis-network')[0];
+        var clientW = visDiv ? $(visDiv).width() : $(container).width();
+        var clientH = visDiv ? $(visDiv).height() : $(container).height();
+        var mapWidth = container._mapWidth || clientW;
+        var mapHeight = container._mapHeight || clientH;
+
+        if (bg.type === 'color' && bg.data && bg.data.color) {
+            ctx.fillStyle = bg.data.color;
+            ctx.fillRect(0, 0, mapWidth, mapHeight);
+        } else if (bg.type === 'image' && bg.imageLoaded && bg.image) {
+            ctx.drawImage(bg.image, 0, 0, mapWidth, mapHeight);
+        }
+
+        if (bg.type === 'map') {
+            var bgGeoMap = document.getElementById(`${id}-bg-geo-map`);
+            if (bgGeoMap && bgGeoMap.style.zIndex !== '3') {
+                var topLeft = network.canvasToDOM({x: 0, y: 0});
+                var scale = network.getScale();
+                bgGeoMap.style.transformOrigin = '0 0';
+                bgGeoMap.style.transform = 'translate(' + topLeft.x + 'px, ' + topLeft.y + 'px) scale(' + scale + ')';
+            }
+        }
+    });
 }
 
 function update_location(id, latlng, callback) {
@@ -656,9 +756,10 @@ function init_select2(selector, type, data, selected, placeholder, config) {
 
     // allow function to be assigned to pass data
     const data_function = $.isFunction(data) ? data : function (params) {
-        data.term = params.term;
-        data.page = params.page || 1;
-        return data;
+        return Object.assign({}, data, {
+            term: params.term,
+            page: params.page || 1
+        });
     };
 
     const init = {
@@ -671,7 +772,21 @@ function init_select2(selector, type, data, selected, placeholder, config) {
         ajax: {
             url: ajax_url + '/select/' + type,
             delay: 150,
-            data: data_function
+            data: data_function,
+            error: function (jqXHR) {
+                if (jqXHR.status === 403 && jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                    $select.data('select2-last-error', jqXHR.responseJSON.message);
+                }
+            }
+        },
+        language: {
+            errorLoading: function () {
+                var message = $select.data('select2-last-error') || "The results could not be loaded.";
+
+                $select.removeData('select2-last-error');
+
+                return message;
+            }
         }
     };
 

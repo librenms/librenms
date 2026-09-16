@@ -35,7 +35,7 @@ foreach ($components as $array) {
         $color = \App\Facades\LibrenmsConfig::get("graph_colours.mixed.$count", \App\Facades\LibrenmsConfig::get('graph_colours.oranges.' . ($count - 7)));
 
         $rrd_options[] = 'DEF:DS' . $count . '=' . $rrd_filename . ':offset:AVERAGE';
-        $rrd_options[] = 'LINE1.25:DS' . $count . '#' . $color . ':' . str_pad(substr((string) $array['peer'], 0, 15), 15) . $stack;
+        $rrd_options[] = 'LINE1.25:DS' . $count . '#' . $color . ':' . str_pad(substr((string) $array['peer'], 0, 15), 15);
         $rrd_options[] = 'GPRINT:DS' . $count . ':LAST:%7.2lf';
         $rrd_options[] = 'GPRINT:DS' . $count . ':MIN:%7.2lf';
         $rrd_options[] = 'GPRINT:DS' . $count . ':MAX:%7.2lf\\l';

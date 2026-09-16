@@ -61,7 +61,7 @@ class LinkDown implements SnmptrapHandler
         if ($trapAdminStatus) {
             $port->ifAdminStatus = $trapAdminStatus;
         }
-        $trap->log("SNMP Trap: linkDown {$port->ifAdminStatus?->value}/{$port->ifOperStatus?->value} " . $port->ifDescr, Severity::Error, 'interface', $port->port_id);
+        $trap->log("SNMP Trap: linkDown {$port->ifAdminStatus->value}/{$port->ifOperStatus->value} " . $port->ifDescr, Severity::Error, 'interface', $port->port_id);
 
         if ($port->isDirty('ifAdminStatus')) {
             $trap->log("Interface Disabled : $port->ifDescr (TRAP)", Severity::Notice, 'interface', $port->port_id);

@@ -119,6 +119,12 @@ return [
         'unit' => 'kPa',
         'unit_long' => 'Kilopascal',
     ],
+    'printer-supply' => [
+        'short' => 'Drucker',
+        'long' => 'Drucker Verbrauchsmaterial',
+        'unit' => '%',
+        'unit_long' => 'Prozent',
+    ],
     'quality_factor' => [
         'short' => 'Qualitätsfaktor',
         'long' => 'Qualitätsfaktor',

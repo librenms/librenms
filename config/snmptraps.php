@@ -188,5 +188,8 @@ return [
         'MPLS-LDP-MIB::mplsLdpSessionUp' => LibreNMS\Snmptrap\Handlers\CiscoLdpSesUp::class,
         'ZEBRA-QL-MIB::zebra.1.0.1' => LibreNMS\Snmptrap\Handlers\ZebraPrinterAlert::class,
         'ZEBRA-QL-MIB::zebra.1.0.2' => LibreNMS\Snmptrap\Handlers\ZebraPrinterAlertCleared::class,
+        'EES-POWER-MIB::alarmTrap' => LibreNMS\Snmptrap\Handlers\EesPowerAlarm::class,
+        'EES-POWER-MIB::alarmActiveTrap' => LibreNMS\Snmptrap\Handlers\EesPowerAlarm::class,
+        'EES-POWER-MIB::alarmCeaseTrap' => LibreNMS\Snmptrap\Handlers\EesPowerAlarm::class,
     ],
 ];

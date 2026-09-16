@@ -1,10 +1,10 @@
 
 --
--- 		whisp-box-mib.mib
---		GENERATED FROM ui_db.xml
+--      whisp-box-mib.mib
+--      GENERATED FROM ui_db.xml
 --
 --      ****************************************************************************************************
---		Copyright 2005 - 2015 (c), Cambium Networks
+--      Copyright 2005 - 2015 (c), Cambium Networks
 --      Cambium Networks Confidential Proprietary
 --      ****************************************************************************************************
 --
@@ -40,7 +40,10 @@ whispBoxLevelMibModule  MODULE-IDENTITY
 -- Top Level Registrations
 
 whispBoxStatus		OBJECT IDENTIFIER ::= {whispBox 1}
+whispBoxMACAddressFiltering		OBJECT IDENTIFIER ::= {whispBox 23}
+whispMACAddressFilterConfig		OBJECT IDENTIFIER ::= {whispBoxMACAddressFiltering 1}
 whispBoxConfig		OBJECT IDENTIFIER ::= {whispBox 2}
+whispAfcStatus		OBJECT IDENTIFIER ::= {whispBox 24}
 whispBoxControls		OBJECT IDENTIFIER ::= {whispBox 3}
 whispBoxEventLog		OBJECT IDENTIFIER ::= {whispBox 5}
 whispBoxConf		OBJECT IDENTIFIER ::= {whispBox 6}
@@ -51,6 +54,7 @@ whispBoxEvent		OBJECT IDENTIFIER ::= {whispBox 12}
 whispBoxDHCPClientEvent		OBJECT IDENTIFIER ::= {whispBoxEvent 1}
 whispBoxPoEEvent		OBJECT IDENTIFIER ::= {whispBoxEvent 2}
 whispBoxRadioAlarmEvent		OBJECT IDENTIFIER ::= {whispBoxEvent 3}
+whispBoxMinModRateEvent		OBJECT IDENTIFIER ::= {whispBoxEvent 4}
 whispBoxDNS		OBJECT IDENTIFIER ::= {whispBox 13}
 whispBoxSNMPv3		OBJECT IDENTIFIER ::= {whispBox 14}
 whispBoxLink		OBJECT IDENTIFIER ::= {whispBox 18}
@@ -60,6 +64,8 @@ whispBoxLinkTestMVCResult		OBJECT IDENTIFIER ::= {whispBoxLink 5}
 whispUserAuthSecurity		OBJECT IDENTIFIER ::= {whispBox 19}
 whispBoxRFPhysical		OBJECT IDENTIFIER ::= {whispBox 15}
 whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
+whispBoxCbrsConfig		OBJECT IDENTIFIER ::= {whispBox 21}
+whispBoxGPS		OBJECT IDENTIFIER ::= {whispBox 22}
 
 -- -------------------------------------------------------------------------
 
@@ -128,7 +134,23 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Device encryption type. Note: Returns DES also when encryption is set to None on AP."
+			"Disclaimer:
+                            This OID remains current for backwards compatibility with external tools.
+							Please use boxEncryptionDetailed for more accurate info.
+
+                            Pre-15.2 software - Returns device encryption configuration as follows:
+                            AES when configured to AES.
+                            DES when configured to DES or when encryption is not enabled.
+                        
+                            Note that as of 15.2, DES encryption is no longer supported.
+                            15.2 software and newer - Returns device encryption configuration as follows for AP:
+                            AES when configured to AES.
+                            DES when encryption is not enabled or if not capable of encryption.
+                            
+                            15.2 software and newer - Returns device encryption capabilities as follows for SM:
+                            Note that this only indicates encryption capabilities but it does not indicate if the device has encryption enabled.
+                            AES if device is capable AES encryption.
+                            DES if device is not capable of encryption."
 		::={whispBoxStatus 8}
 
 	etherLinkStatus	OBJECT-TYPE
@@ -247,7 +269,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 	pllOutLockCount	OBJECT-TYPE
 		SYNTAX		INTEGER
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
 			"Counter for number of PLL out of Lock."
 		::={whispBoxStatus 23}
@@ -273,7 +295,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"PLD version information."
+			"PLD version information.
+                        Only applicable on P10 and P12 platforms."
 		::={whispBoxStatus 26}
 
 	platformInfo	OBJECT-TYPE
@@ -631,7 +654,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 	rfStatPLLOutOfLockCnt	OBJECT-TYPE
 		SYNTAX		Counter32
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
 			"RF Scheduler Stats PLL Out of Lock Count"
 		::={whispBoxStatus 71}
@@ -641,7 +664,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"RF Scheduler Stats Beacon version Mismatch Count"
+			"RF Scheduler Stats Beacon version mismatch count
+                            Count of the beacons where the version in the beacon mismatched and prevented registration."
 		::={whispBoxStatus 72}
 
 	rfStatBadFreqBcnRcvCnt	OBJECT-TYPE
@@ -649,15 +673,17 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"RF Scheduler Stats Wrong Frequency Beacon Received Count"
+			"RF Scheduler Stats Wrong Frequency Beacon Received Count
+                            Count of beacons that was reported on a different frequency than was received."
 		::={whispBoxStatus 73}
 
 	rfStatnonLiteBcnRcvCnt	OBJECT-TYPE
 		SYNTAX		Counter32
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
-			"RF Scheduler Stats Non Lite Beacon Received Count"
+			"RF Scheduler Stats Non Lite Beacon Received Count
+                            This stat is not applicable on the 450 platform."
 		::={whispBoxStatus 74}
 
 	rfStatUnsupFeatBcnRcvCnt	OBJECT-TYPE
@@ -665,7 +691,9 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"RF Scheduler Stats Unsupported Feature Beacon Received Count"
+			"RF Scheduler Stats Unsupported Feature Beacon Received Count
+                            Count of beacons that the SM has received that is from a beacon that is running a feature this radio does not support, 
+                            which will prevent registration. If this stat is encountered, upgrade the device to the latest supported software version."
 		::={whispBoxStatus 75}
 
 	rfStatUnkwnFeatBcnRcvCnt	OBJECT-TYPE
@@ -673,13 +701,15 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"RF Scheduler Stats Unknown Feature Beacon Received Count"
+			"RF Scheduler Stats Unknown Feature Beacon Received Count
+                            Count of beacons that the SM has received that is from a beacon that is running a feature that is unknown, 
+                            which will prevent registration. If this stat is encountered, upgrade the device to the latest supported software version."
 		::={whispBoxStatus 76}
 
 	rfStatTxCalFailCnt	OBJECT-TYPE
 		SYNTAX		Counter32
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
 			"RF Scheduler Stats TX Calibration Failures Count"
 		::={whispBoxStatus 77}
@@ -695,7 +725,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 	rfStatTempOutOfRange	OBJECT-TYPE
 		SYNTAX		Counter32
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
 			"RF Scheduler Stats Temperature Out of Range Count"
 		::={whispBoxStatus 79}
@@ -703,7 +733,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 	rfStatRSSIOutOfRange	OBJECT-TYPE
 		SYNTAX		Counter32
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
 			"RF Scheduler Stats RSSI Out of Range Count"
 		::={whispBoxStatus 80}
@@ -711,7 +741,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 	rfStatRangeCapEnf	OBJECT-TYPE
 		SYNTAX		Counter32
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
 			"RF Scheduler Stats Range Cap Enforced Count"
 		::={whispBoxStatus 81}
@@ -1255,7 +1285,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Uptime of main ethernet link in seconds"
+			"Uptime of Main Ethernet link in seconds"
 		::={whispBoxStatus 149}
 
 	fecAuxStatLinkUptime	OBJECT-TYPE
@@ -1263,7 +1293,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Uptime of main ethernet link in seconds"
+			"Uptime of 450i/450m Aux Ethernet link in seconds"
 		::={whispBoxStatus 150}
 
 	rfStatXmtMDataCnt	OBJECT-TYPE
@@ -1295,7 +1325,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Error count in Babble Receiver."
+			"Error count in Babble Receiver.
+                                Applies only to P9 radios and earlier."
 		::={whispBoxStatus 220}
 
 	fecTxHbErr	OBJECT-TYPE
@@ -1303,7 +1334,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of packets having Transmit heartbeat error."
+			"Number of packets having Transmit heartbeat error.
+                                Applies only to P9 radios and earlier."
 		::={whispBoxStatus 221}
 
 	fecEthBusErr	OBJECT-TYPE
@@ -1311,7 +1343,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Ethernet Busy Error Count"
+			"Ethernet Busy Error Count
+                                Applies only to P9 radios and earlier."
 		::={whispBoxStatus 222}
 
 	fecCRCError	OBJECT-TYPE
@@ -1335,7 +1368,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of times Rx Fifo Overrun."
+			"Number of times Rx Fifo Overrun.
+                                Applies only to P9, P13, P15 and P16 radios."
 		::={whispBoxStatus 225}
 
 	fecLateCollision	OBJECT-TYPE
@@ -1395,7 +1429,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Current transmit power level, including potential power backoff information.
-							Not applicable to PMP 450m."
+                            Not applicable to PMP 450m."
 		::={whispBoxStatus 232}
 
 	activeTxPowerHdths	OBJECT-TYPE
@@ -1404,7 +1438,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Current transmit power level, in hundredths of dBm.
-							Not appliable on PMP 450m."
+                            Not appliable on PMP 450m."
 		::={whispBoxStatus 233}
 
 	poeT2Status	OBJECT-TYPE
@@ -1424,7 +1458,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet link detected count"
+			"450i/450m Aux Ethernet link detected count"
 		::={whispBoxStatus 235}
 
 	fecAuxStatLinkLost	OBJECT-TYPE
@@ -1432,7 +1466,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet ink lost count"
+			"450i/450m Aux Ethernet ink lost count"
 		::={whispBoxStatus 236}
 
 	fecAuxInDiscardsCount	OBJECT-TYPE
@@ -1440,7 +1474,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet in discards count."
+			"450i/450m Aux Ethernet in discards count."
 		::={whispBoxStatus 237}
 
 	fecAuxInErrorsCount	OBJECT-TYPE
@@ -1448,7 +1482,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet in errors count."
+			"450i/450m Aux Ethernet in errors count."
 		::={whispBoxStatus 238}
 
 	fecAuxOutDiscardsCount	OBJECT-TYPE
@@ -1456,7 +1490,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet out discards count."
+			"450i/450m Aux Ethernet out discards count."
 		::={whispBoxStatus 239}
 
 	fecAuxOutErrorsCount	OBJECT-TYPE
@@ -1464,7 +1498,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet out errors count."
+			"450i/450m Aux Ethernet out errors count."
 		::={whispBoxStatus 240}
 
 	fecAuxCRCError	OBJECT-TYPE
@@ -1472,7 +1506,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet Number of packets having CRC Error."
+			"450i/450m Aux Ethernet Number of packets having CRC Error."
 		::={whispBoxStatus 241}
 
 	fecAuxRxOverrun	OBJECT-TYPE
@@ -1480,7 +1514,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet Number of times Rx Fifo Overrun."
+			"450i/450m Aux Ethernet Number of times Rx Fifo Overrun."
 		::={whispBoxStatus 242}
 
 	fecAuxLateCollision	OBJECT-TYPE
@@ -1488,7 +1522,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet Number of packets having late collision."
+			"450i/450m Aux Ethernet Number of packets having late collision."
 		::={whispBoxStatus 243}
 
 	fecAuxRetransLimitExp	OBJECT-TYPE
@@ -1496,7 +1530,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet Number of packets whose retransmision limit expired."
+			"450i/450m Aux Ethernet Number of packets whose retransmision limit expired."
 		::={whispBoxStatus 244}
 
 	fecAuxTxUnderrun	OBJECT-TYPE
@@ -1504,7 +1538,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet Number of times Tx queue underrun."
+			"450i/450m Aux Ethernet Number of times Tx queue underrun."
 		::={whispBoxStatus 245}
 
 	fecAuxCarSenseLost	OBJECT-TYPE
@@ -1512,7 +1546,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet Carrier Sense Lost count."
+			"450i/450m Aux Ethernet Carrier Sense Lost count."
 		::={whispBoxStatus 246}
 
 	fecAuxNoCarrier	OBJECT-TYPE
@@ -1520,7 +1554,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet No carrier asserted by external transceiver during transmission."
+			"450i/450m Aux Ethernet No carrier asserted by external transceiver during transmission."
 		::={whispBoxStatus 247}
 
 	fecAuxLargeFrame	OBJECT-TYPE
@@ -1528,7 +1562,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet Large Frame Error."
+			"450i/450m Aux Ethernet Large Frame Error."
 		::={whispBoxStatus 248}
 
 	fecAuxRuntFrame	OBJECT-TYPE
@@ -1536,7 +1570,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"450i Aux Ethernet Runt Frame Error."
+			"450i/450m Aux Ethernet Runt Frame Error."
 		::={whispBoxStatus 249}
 
 	fecLargeFrame	OBJECT-TYPE
@@ -1554,63 +1588,6 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		DESCRIPTION		
 			"Runt Frame Error."
 		::={whispBoxStatus 251}
-
-	soundingStatClear	OBJECT-TYPE
-		SYNTAX		INTEGER
-		MAX-ACCESS	read-write
-		STATUS		current
-		DESCRIPTION		
-			"Sounding Stat Clear                       
-                        Set to any value to clear all Sounding Stats"
-		::={whispBoxStatus 252}
-
-	soundingStatRequestCount	OBJECT-TYPE
-		SYNTAX		Counter32
-		MAX-ACCESS	read-only
-		STATUS		current
-		DESCRIPTION		
-			"Sounding Stats Request Count"
-		::={whispBoxStatus 253}
-
-	soundingStatResponseCount	OBJECT-TYPE
-		SYNTAX		Counter32
-		MAX-ACCESS	read-only
-		STATUS		current
-		DESCRIPTION		
-			"Sounding Stats Response Count"
-		::={whispBoxStatus 254}
-
-	soundingStatRequestsIgnored	OBJECT-TYPE
-		SYNTAX		Counter32
-		MAX-ACCESS	read-only
-		STATUS		current
-		DESCRIPTION		
-			"Sounding Stats Requests Ignored"
-		::={whispBoxStatus 255}
-
-	soundingStatAvgRequestInterval	OBJECT-TYPE
-		SYNTAX		Counter32
-		MAX-ACCESS	read-only
-		STATUS		current
-		DESCRIPTION		
-			"Sounding Stats Avg Request Interval (ms)"
-		::={whispBoxStatus 256}
-
-	soundingStatMaxRequestInterval	OBJECT-TYPE
-		SYNTAX		Counter32
-		MAX-ACCESS	read-only
-		STATUS		current
-		DESCRIPTION		
-			"Sounding Stats Max Request Interval (ms)"
-		::={whispBoxStatus 257}
-
-	soundingStatErrorCount	OBJECT-TYPE
-		SYNTAX		Counter32
-		MAX-ACCESS	read-only
-		STATUS		current
-		DESCRIPTION		
-			"Sounding Stats Error Count"
-		::={whispBoxStatus 258}
 
 	camAccID	OBJECT-TYPE
 		SYNTAX		DisplayString
@@ -1636,28 +1613,13 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			"Device Agent Version number."
 		::={whispBoxStatus 261}
 
-	soundingStatRequestsDropped	OBJECT-TYPE
-		SYNTAX		Counter32
+	radioStatusOverTemperature	OBJECT-TYPE
+		SYNTAX		INTEGER
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Sounding Stats Requests Dropped"
-		::={whispBoxStatus 262}
-
-	soundingStatResponsesSuppressed	OBJECT-TYPE
-		SYNTAX		Counter32
-		MAX-ACCESS	read-only
-		STATUS		current
-		DESCRIPTION		
-			"Sounding Stats Responses Suppressed"
-		::={whispBoxStatus 263}
-
-	soundingStatVersionMismatch	OBJECT-TYPE
-		SYNTAX		Counter32
-		MAX-ACCESS	read-only
-		STATUS		current
-		DESCRIPTION		
-			"Sounding Stats Version Mismatch"
+			"Radio operation exceeds max operating temperature - Transmit disabled
+                            PMP 450m only."
 		::={whispBoxStatus 264}
 
 	hardwareVersion	OBJECT-TYPE
@@ -1814,6 +1776,24 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			"Extended RF out errors count with 64 bit counters."
 		::={whispBoxStatus 281}
 
+	minModRateSatisfied	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					minModRateNotSatisfied(0),
+					minModRateSatisfied(1)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Indicates that the minimum modulation rate was satisfied by both devices of the PTP link."
+		::={whispBoxStatus 282}
+
+	ethernetPortDisableCounter	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Counts the nubmer of times the ethernet port has been disabled due to minimum modulation rate not being satisfied."
+		::={whispBoxStatus 283}
+
 	boardModel	OBJECT-TYPE
 		SYNTAX		DisplayString
 		MAX-ACCESS	read-only
@@ -1822,21 +1802,573 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			"Returns Board model of the device."
 		::={whispBoxStatus 284}
 
--- The following definitions deal with Canopy Box Level configuration variables.
+	txTempPowerCompensation	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Transmit Temperature Power Adjustment. Return path B in upper portion and A in lower portion
+                            Engineering use only."
+		::={whispBoxStatus 285}
 
-	linkNegoSpeed	OBJECT-TYPE
+	rxTempPowerOffset	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Receive Temperature Power Adjustment in hundredths of dB for RF Path A.
+                            Not supported on PMP 450m.  Engineering use only."
+		::={whispBoxStatus 286}
+
+	boxEncryptionDetailed	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Device encryption type."
+		::={whispBoxStatus 287}
+
+	currentCpuUsage	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Returns the current CPU usage as a percentage."
+		::={whispBoxStatus 288}
+
+	fccId	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"FCC ID"
+		::={whispBoxStatus 289}
+
+	fecJabbers	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Transmit Jabber TO. Indicates tried to send a packet > 2048  bytes.  Only valid on 450i and 450b devices."
+		::={whispBoxStatus 290}
+
+	fecAuxExcessiveDeferrals	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"450i Aux Ethernet Excessive Deferrals."
+		::={whispBoxStatus 291}
+
+	fecAuxJabbers	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"450i Aux Ethernet Port Transmit Jabber Error. Indicates tried to send a packet > 2048  bytes."
+		::={whispBoxStatus 292}
+
+	radioStatusFeedbackRssi	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Feedback RSSI.
+                               PMP 450m only."
+		::={whispBoxStatus 293}
+
+	radioStatusFeedbackOvrg	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Feedback OverRange status flags
+                               PMP 450m only."
+		::={whispBoxStatus 294}
+
+	txCatAttenChA	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Transmit Catalina Attenuation Channel A.
+                            Engineering use only."
+		::={whispBoxStatus 295}
+
+	txCatAttenChB	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Transmit Catalina Attenuation Channel B.
+                            Engineering use only."
+		::={whispBoxStatus 296}
+
+	fecRxPauseFrames	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Ethernet RX Pause Frames Discarded."
+		::={whispBoxStatus 297}
+
+	fecAuxRxPauseFrames	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"450i Aux Ethernet RX Pause Frames Discarded."
+		::={whispBoxStatus 298}
+
+	fecRxEthernetBounce	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Ethernet RX Bounced."
+		::={whispBoxStatus 299}
+
+	fecTxEthernetBounce	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Ethernet TX Bounced."
+		::={whispBoxStatus 300}
+
+	applyConfigStatus	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current Status of Configuration file applied"
+		::={whispBoxStatus 301}
+
+	warningText	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Returns the current warning text that is being displayed on the GUI."
+		::={whispBoxStatus 302}
+
+	activeEirp	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"EIRP in dBm that is currently active on radio. Not supported by 450v."
+		::={whispBoxStatus 303}
+
+	primaryDnsCurrentIp	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current Primary DNS IP"
+		::={whispBoxStatus 304}
+
+	secondaryDnsCurrentIp	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current Secondary DNS IP"
+		::={whispBoxStatus 305}
+
+	activeEirpStr	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"EIRP in dBm that is currently active on radio per carrier."
+		::={whispBoxStatus 306}
+
+	boxSystemTime	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Box System Time."
+		::={whispBoxStatus 307}
+
+	fecL3L4ChecksumErrs	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of packets detected with L3/L4 checksum errors.  Only valid on 450v, 450b, and 450i devices."
+		::={whispBoxStatus 308}
+
+	fecAuxL3L4ChecksumErrs	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Aux Ethernet Number of packets detected with L3/L4 checksum errors.   Only valid on 450v and 450i devices."
+		::={whispBoxStatus 309}
+
+	rfStatPARspOosCount	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats Power Adjust Response OOS Count"
+		::={whispBoxStatus 310}
+
+	rfStatPAReqAsync	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats Asynchronous Power Adjust Requests"
+		::={whispBoxStatus 311}
+
+	rfStatFrameTooBig	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats Frame Too Big Count"
+		::={whispBoxStatus 312}
+
+	rfStatBadRcvAck	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats Bad Receive Ack Count"
+		::={whispBoxStatus 313}
+
+	rfStatBadRcvFragNum	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats Bad Receive Frag Count"
+		::={whispBoxStatus 314}
+
+	rfStatRfSYncQMsgsDropped	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats RF Sync Q Messages Dropped"
+		::={whispBoxStatus 315}
+
+	rfStatBadRcvFragLen	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats Bad Receive Frag Length"
+		::={whispBoxStatus 316}
+
+	rfStatSchedulerErrors	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats Scheduler Error Count"
+		::={whispBoxStatus 317}
+
+	rfStatEVMSamples	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats EVM Samples"
+		::={whispBoxStatus 318}
+
+	rfStatEVMErrors	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats EVM Errors"
+		::={whispBoxStatus 319}
+
+	rfStatTxRingError	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats TX Ring Errors"
+		::={whispBoxStatus 320}
+
+	rfStatRxRingError	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats RX Ring Errors"
+		::={whispBoxStatus 321}
+
+	rfStatUnexpectedNonzeroBitmap	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats Unexpected Nonzero Bitmaps"
+		::={whispBoxStatus 322}
+
+	rfStatTDDSlips	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats TDD Slips"
+		::={whispBoxStatus 324}
+
+	rfStatVCClearErrors	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats VC Clear Errors"
+		::={whispBoxStatus 325}
+
+	rfStatRxNoBuffer	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats RX No Buffer Count"
+		::={whispBoxStatus 326}
+
+	rfStatOTARCount	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats OTAR Count"
+		::={whispBoxStatus 327}
+
+	rfStatOTARErrors	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats OTAR Errors"
+		::={whispBoxStatus 328}
+
+	rfStatWMACFDISRcvOverruns	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats WMAC FDIS Receive Overruns"
+		::={whispBoxStatus 329}
+
+	rfStatWMACDLCRcvOverruns	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats WMAC DLC Receive Overruns"
+		::={whispBoxStatus 330}
+
+	rfStatWMACDLCRInfoUnknowns	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats WMAC DLC RInfo Unknowns"
+		::={whispBoxStatus 331}
+
+	rfStatWMACDLCRinfoSheds	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats DLS RInfo Sheds"
+		::={whispBoxStatus 332}
+
+	rfStatWPHYChokeCount	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats Choke Count"
+		::={whispBoxStatus 333}
+
+	rfStatInvalidVCRFeceived	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"RF Scheduler Stats Invalid VC Received"
+		::={whispBoxStatus 334}
+
+	bridgeCbEthSfpStatbin	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Bridge CB Eth SFP Stats bin"
+		::={whispBoxStatus 3000}
+
+	bridgeCbEthSfpStatbout	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Bridge CB Eth SFP Stats bout"
+		::={whispBoxStatus 3001}
+
+	bridgeCbEthSfpStatbtoss	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Bridge CB Eth SFP Stats btoss"
+		::={whispBoxStatus 3002}
+
+	bridgeCbEthSfpStatbtosscap	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Bridge CB Eth SFP Stats btosscap"
+		::={whispBoxStatus 3003}
+
+	bridgeCbEthSfpStatuin	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Bridge CB Eth SFP Stats uin"
+		::={whispBoxStatus 3004}
+
+	bridgeCbEthSfpStatuout	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Bridge CB Eth SFP Stats uout"
+		::={whispBoxStatus 3005}
+
+	bridgeCbEthSfpStatutoss	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Bridge CB Eth SFP Stats utoss"
+		::={whispBoxStatus 3006}
+
+	bridgeCbEthSfpStatutosscap	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Bridge CB Eth SFP Stats utosscap"
+		::={whispBoxStatus 3007}
+
+	bridgeCbEthSfpStatfloods	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Bridge CB Eth SFP Stats Floods (Multipoint AP only)"
+		::={whispBoxStatus 3010}
+
+	boxVcDepth	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					notAvailable(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The current VC Depth on this device. SM value is only valid when in session."
+		::={whispBoxStatus 3011}
+
+	enableMACAddressFilter	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable (1)  or Disable(0) MAC Access filtering."
+		::={whispMACAddressFilterConfig 1}
+
+	defaultMACAddressFilterAction	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Allow (1) or Deny(0) unlisted MAC Addresses by default."
+		::={whispMACAddressFilterConfig 2}
+
+	addModifyMACAddressFilterAction	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					deny(0),
+					allow(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Allow (1)  or Deny (0) Access for MAC address."
+		::={whispMACAddressFilterConfig 3}
+
+	addModifyMACAddressFilter	OBJECT-TYPE
 		SYNTAX		DisplayString
 		MAX-ACCESS	read-write
-		STATUS		obsolete
+		STATUS		current
 		DESCRIPTION		
-			"Link negotiation speeds.
-            H10BT -- 10 Base T Half Duplex,
-            F10BT -- 10 Base T Full Duplex,
-            H100BT -- 100 Base T Half Duplex,
-            F100BT -- 100 Base T Full Duplex.
-            Separate the values with comma when doing a set.
-            e.g. H10BT,F10BT,H100BT,F100BT"
-		::={whispBoxConfig 1}
+			"Add MAC address for address filters, MAC can be specified in any of the following formats
+                            aa:bb:cc:dd:ee:ff, aa-bb-cc-dd-ee-ff, aabbccddeeff.
+                            For allowing all MAC addresses of a particular OUI use aa:bb:cc:* or aa-bb-cc-* or aabbcc* 
+                            format."
+		::={whispMACAddressFilterConfig 4}
+
+	rmMACAddressFilter	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Remove MAC address for address filters, MAC can be specified in any of the following formats
+                            aa:bb:cc:dd:ee:ff, aa-bb-cc-dd-ee-ff, aabbccddeeff.
+                            For removing OUI MAC  use aa:bb:cc:* or aa-bb-cc-* or aabbcc* format."
+		::={whispMACAddressFilterConfig 5}
+
+	whispMacAddressFilterTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF WhispMacAddressFilterEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The table of MAC Address filters."
+		::= {whispBoxMACAddressFiltering 2}
+
+	whispMacAddressFilterEntry OBJECT-TYPE
+		SYNTAX		WhispMacAddressFilterEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Entry of configured Mac Address filtering."
+		INDEX		{filterMacAddressEntry}
+		::= {whispMacAddressFilterTable 1}
+
+		WhispMacAddressFilterEntry ::= SEQUENCE{
+			filterMacAddressEntry		DisplayString,
+			filterMacAddressAction	DisplayString
+			}
+
+	filterMacAddressEntry	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Configured MAC Access filter"
+		::={whispMacAddressFilterEntry 1}
+
+	filterMacAddressAction	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Configured MAC Address filter action (allow/deny)"
+		::={whispMacAddressFilterEntry 2}
 
 	colorCode	OBJECT-TYPE
 		SYNTAX		INTEGER (0..254)
@@ -1845,14 +2377,6 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		DESCRIPTION		
 			"Color code."
 		::={whispBoxConfig 2}
-
-	displayOnlyAccess	OBJECT-TYPE
-		SYNTAX		DisplayString
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"This variable is deprecated."
-		::={whispBoxConfig 3}
 
 	fullAccess	OBJECT-TYPE
 		SYNTAX		DisplayString
@@ -1917,36 +2441,16 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
             For Backhaul units only."
 		::={whispBoxConfig 10}
 
-	bhModulation	OBJECT-TYPE
-		SYNTAX		INTEGER {
-					tenMbitsPerSecond(0),
-					twentyMbitsPerSecond(1)}
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"Modulation scheme. For Backhaul units only. Only level 4
-            backhaul can be changed to 20Mbits/Second."
-		::={whispBoxConfig 11}
-
 	powerControl	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					low(0),
 					normal(1)}
 		MAX-ACCESS	read-write
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
 			"Power control.
                          FSK Only."
 		::={whispBoxConfig 12}
-
-	extFilterDelay	OBJECT-TYPE
-		SYNTAX		INTEGER
-		UNITS		"nanoseconds"
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"Obsoleted. External Filters Delay. For 900MHz FSK radios only."
-		::={whispBoxConfig 13}
 
 	antennaGain	OBJECT-TYPE
 		SYNTAX		INTEGER
@@ -1955,7 +2459,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"External Antenna Gain. For radios that uses an external antenna or the DFS feature.
-                        	Not applicable to PMP 450m."
+                            Not applicable to PMP 450m."
 		::={whispBoxConfig 14}
 
 	eirp	OBJECT-TYPE
@@ -2022,15 +2526,6 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
                         If Vlan doesnot exist an error will be returned."
 		::={whispBoxConfig 21}
 
-	scheduling	OBJECT-TYPE
-		SYNTAX		INTEGER {
-					hardware(1)}
-		MAX-ACCESS	read-write
-		STATUS		current
-		DESCRIPTION		
-			"To use hardware or software scheduling"
-		::={whispBoxConfig 22}
-
 	transmitterOP	OBJECT-TYPE
 		SYNTAX		INTEGER
 		UNITS		"dBm"
@@ -2038,7 +2533,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Transmitter output power.  This is not available on OFDM SMs.
-                        	Not applicable for PMP 450m. See EIRP OID."
+                            Not applicable for PMP 450m. See EIRP OID.
+                            Not applicable for 450v, see carrierTxPower."
 		::={whispBoxConfig 23}
 
 	bridgeEnable	OBJECT-TYPE
@@ -2056,91 +2552,12 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					enable(1),
 					disable(0)}
 		MAX-ACCESS	read-write
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
 			"Disable or enable FEC error correction functionality
-            for multipoint units."
+            for multipoint units.
+            This OID has no effect since 14.0 and is deprecated."
 		::={whispBoxConfig 25}
-
-	trapIP1	OBJECT-TYPE
-		SYNTAX		IpAddress
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"Obsoleted.  Configure with whispBoxDNS.trap1."
-		::={whispBoxConfig 26}
-
-	trapIP2	OBJECT-TYPE
-		SYNTAX		IpAddress
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"Obsoleted.  Configure with whispBoxDNS.trap2."
-		::={whispBoxConfig 27}
-
-	trapIP3	OBJECT-TYPE
-		SYNTAX		IpAddress
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"Obsoleted.  Configure with whispBoxDNS.trap3."
-		::={whispBoxConfig 28}
-
-	trapIP4	OBJECT-TYPE
-		SYNTAX		IpAddress
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"Obsoleted.  Configure with whispBoxDNS.trap4."
-		::={whispBoxConfig 29}
-
-	trapIP5	OBJECT-TYPE
-		SYNTAX		IpAddress
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"Obsoleted.  Configure with whispBoxDNS.trap5."
-		::={whispBoxConfig 30}
-
-	trapIP6	OBJECT-TYPE
-		SYNTAX		IpAddress
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"Obsoleted.  Configure with whispBoxDNS.trap6."
-		::={whispBoxConfig 31}
-
-	trapIP7	OBJECT-TYPE
-		SYNTAX		IpAddress
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"Obsoleted.  Configure with whispBoxDNS.trap7."
-		::={whispBoxConfig 32}
-
-	trapIP8	OBJECT-TYPE
-		SYNTAX		IpAddress
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"Obsoleted.  Configure with whispBoxDNS.trap8."
-		::={whispBoxConfig 33}
-
-	trapIP9	OBJECT-TYPE
-		SYNTAX		IpAddress
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"Obsoleted.  Configure with whispBoxDNS.trap9."
-		::={whispBoxConfig 34}
-
-	trapIP10	OBJECT-TYPE
-		SYNTAX		IpAddress
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"Obsoleted.  Configure with whispBoxDNS.trap10."
-		::={whispBoxConfig 35}
 
 	commStringRWrite	OBJECT-TYPE
 		SYNTAX		DisplayString
@@ -2186,16 +2603,6 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			"If enabled parameters are set to Factory Defaults upon default plug mode detection."
 		::={whispBoxConfig 40}
 
-	hwsCompatibility	OBJECT-TYPE
-		SYNTAX		INTEGER {
-					enable(0),
-					disable(1)}
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"If enable, it ensures 6.0 compatibility with HWS."
-		::={whispBoxConfig 41}
-
 	gpsInput	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					generateSyncSignal(0),
@@ -2209,7 +2616,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		DESCRIPTION		
 			"Values 1, 2, 3 have been deprecated.
                                 (0) Generate AP sync signal.
-                                (1) Deprecated. Sync AP to received signal (Timing Port/UGPS). It will set AutoSync.
+                                (1) Deprecated. Sync AP to received signal (Timing Port (UGPS/cnPulse)). It will set AutoSync.
                                 (2) Deprecated. Sync AP to received signal (Power Port). It will set AutoSync plus Free Run.
                                 (3) Deprecated. Sync AP using iGPS (Only on devices which support it). It will set AutoSync plus Free Run.
                                 (4) AutoSync.
@@ -2226,22 +2633,13 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			"Enable ISM on 5.7GHz frequency band radios."
 		::={whispBoxConfig 43}
 
-	hiPriority	OBJECT-TYPE
-		SYNTAX		INTEGER {
-					disable(0),
-					enable(1)}
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"Enable Hi Priority Data Queue on BH radios."
-		::={whispBoxConfig 44}
-
 	userName	OBJECT-TYPE
 		SYNTAX		DisplayString
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
 			"User name.To create read-only user set userMode OID first.
+                        First set userChangePassword OID for user must change password.
                         Maximum of 4 users can exist in system."
 		::={whispBoxConfig 45}
 
@@ -2250,7 +2648,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"User password.To create read-only user set userMode OID first."
+			"User password.To create read-only user set userMode OID first.
+                        Set userChangePassword OID to make user change password at first login.."
 		::={whispBoxConfig 46}
 
 	userAccessLevel	OBJECT-TYPE
@@ -2259,9 +2658,10 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"User access level.To create read-only user set userMode OID first.
+                        Set userChangePassword OID to make user change password at first login.
                         1=TECH
-						2=INSTALL
-						3=ADMIN"
+                        2=INSTALL
+                        3=ADMIN"
 		::={whispBoxConfig 47}
 
 	deleteUser	OBJECT-TYPE
@@ -2271,16 +2671,6 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		DESCRIPTION		
 			"User name to remove."
 		::={whispBoxConfig 48}
-
-	twoXRate	OBJECT-TYPE
-		SYNTAX		INTEGER {
-					disabled(0),
-					enabled(1)}
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"To enable or disable double rate."
-		::={whispBoxConfig 49}
 
 	lanDhcpState	OBJECT-TYPE
 		SYNTAX		INTEGER {
@@ -2317,7 +2707,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Add Custom Frequencies.
-                        The frequencies can be in a variety of units up to KHz.
+                        The frequencies can be in a variety of units up to kHz.
                         Frequencies can be added in a list separated by commas.  
                         Example: 3550, 356000, 3450001.
                         A get will return the current custom frequency list.
@@ -2332,22 +2722,12 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Remove Custom Frequencies.
-                        The frequencies can be in a variety of units up to KHz.
+                        The frequencies can be in a variety of units up to kHz.
                         Frequencies can be removed in a list separated by commas.
                         Example: 3550, 356000, 3450001.
                         A get will return the current custom frequencies.
                         Only valid for use on 3.5/3.6 GHz MIMO OFDM Radios, or 450i in 4.9 GHz."
 		::={whispBoxConfig 54}
-
-	allowColocation	OBJECT-TYPE
-		SYNTAX		INTEGER {
-					disable(0),
-					enable(1)}
-		MAX-ACCESS	read-write
-		STATUS		obsolete
-		DESCRIPTION		
-			"Allow or disallow Colocation for software scheduling Backhaul Timing Masters with hardware scheduling Backhaul Timing Masters."
-		::={whispBoxConfig 55}
 
 	changeUsrPwd	OBJECT-TYPE
 		SYNTAX		DisplayString
@@ -2637,41 +3017,27 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 	radioRateAdapt	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					onex(0),
-					onexmimo(4),
-					onextwox(1),
-					onextwoxmimo(5),
-					onextwoxthreex(2),
-					onextwoxthreexfourx(3),
-					onextwoxfourx(7),
-					onextwoxfourxsixx(8),
-					onextwoxfourxsixxeightx(9),
-					onextwoxmimoa(10),
-					onextwoxthreexmimoa(11),
-					onextwoxthreexfourxmimoa(12)}
+					twox(1),
+					threex(2),
+					fourx(3),
+					fivex(6),
+					sixx(4),
+					sevenx(7),
+					eightx(5)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Rate adaptation parameter
-                            0:  1x No rate adaptation (FSK and SISO OFDM QPSK)
-                            1:  1x/2x (FSK and SISO OFDM 16-QAM)
+			"Downlink Maximum Modulation Rate
+                            0:  1x (MIMO-A QPSK)
+                            1:  2x (MIMO-A QPSK 16-QAM, and MIMO-B QPSK)
+                            2:  3x (MIMO-A 64-QAM, and MIMO-B 8-QAM)
+                            3:  4x (MIMO-A 256-QAM, and MIMO-B 16-QAM)
+                            4:  6x (MIMO-B 64-QAM)
+                            5:  8x (MIMO-B 256-QAM)
+                            6:  5x (MIMO-B 32-QAM)
+                            7:  7x (MIMO-B 128-QAM)
 
-                            Following are OFDM only:
-                            2:  1x/2x/3x (SISO OFDM 64-QAM)
-                            3:  1x/2x/3x/4x (SISO OFDM 256-QAM) Engineering only
-
-                            Following are MIMO OFDM only:
-                            4:  1x MIMO-A (QPSK duplicated on both paths)
-                            5:  1x/2x MIMO-B (QPSK on each path)
-                            7:  1x/2x/4x MIMO-B (16-QAM on each path)
-                            8:  1x/2x/4x/6x MIMO-B (64-QAM on each path)
-                            9:  1x/2x/4x/6x/8x MIMO-B (256-QAM on each path)
-                            10: 1x/2x MIMO-A (16-QAM duplicated on both paths)
-                            11: 1x/2x/3x MIMO-A (64-QAM duplicated on both paths)
-                            12: 1x/2x/3x/4x MIMO-A (256-QAM duplicated on both paths)
-
-                            For PMP 430 radios this applies to Downlink Rate Adapt only.
-                            Use radioRateAdaptUL for setting uplink rate adapt on PMP 430 radios.
-                            For PMP 450 radios, write access for engineering use only."
+                            Use radioRateAdaptUL for setting uplink rate adapt."
 		::={whispBoxConfig 85}
 
 	siteInfoViewable	OBJECT-TYPE
@@ -2731,18 +3097,9 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Radio bandwidth setting.
-                        Obsoleted for MIMO SMs. Instead for MIMO SMs use OID bandwidthScan."
+                        Obsoleted for MIMO SMs. Instead for MIMO SMs use OID bandwidthScan.
+                        As of Release 16.1, reboot is not required to change, except on PMP 450m."
 		::={whispBoxConfig 91}
-
-	dataScramblingMethod	OBJECT-TYPE
-		SYNTAX		INTEGER {
-					legacyDataScrambling(0),
-					r10DataScrambling(1)}
-		MAX-ACCESS	read-only
-		STATUS		obsolete
-		DESCRIPTION		
-			"This OID is for OFDM only and is obsolete."
-		::={whispBoxConfig 92}
 
 	portVID	OBJECT-TYPE
 		SYNTAX		INTEGER
@@ -2755,41 +3112,27 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 	radioRateAdaptUL	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					onex(0),
-					onexmimo(4),
-					onextwox(1),
-					onextwoxmimo(5),
-					onextwoxthreex(2),
-					onextwoxthreexfourx(3),
-					onextwoxfourx(7),
-					onextwoxfourxsixx(8),
-					onextwoxfourxsixxeightx(9),
-					onextwoxmimoa(10),
-					onextwoxthreexmimoa(11),
-					onextwoxthreexfourxmimoa(12)}
+					twox(1),
+					threex(2),
+					fourx(3),
+					fivex(6),
+					sixx(4),
+					sevenx(7),
+					eightx(5)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Uplink Rate adaptation parameter
-                            0:  1x No rate adaptation (FSK and SISO OFDM QPSK)
-                            1:  1x/2x (FSK and SISO OFDM 16-QAM)
+			"Uplink Maximum Modulation Rate
+                            0:  1x (MIMO-A QPSK)
+                            1:  2x (MIMO-A QPSK 16-QAM, and MIMO-B QPSK)
+                            2:  3x (MIMO-A 64-QAM, and MIMO-B 8-QAM)
+                            3:  4x (MIMO-A 256-QAM, and MIMO-B 16-QAM)
+                            4:  6x (MIMO-B 64-QAM)
+                            5:  8x (MIMO-B 256-QAM)
+                            6:  5x (MIMO-B 32-QAM)
+                            7:  7x (MIMO-B 128-QAM)
 
-                            Following are OFDM only:
-                            2:  1x/2x/3x (SISO OFDM 64-QAM)
-                            3:  1x/2x/3x/4x (SISO OFDM 256-QAM) Engineering only
-
-                            Following are MIMO OFDM only:
-                            4:  1x MIMO-A (QPSK duplicated on both paths)
-                            5:  1x/2x MIMO-B (QPSK on each path)
-                            7:  1x/2x/4x MIMO-B (16-QAM on each path)
-                            8:  1x/2x/4x/6x MIMO-B (64-QAM on each path)
-                            9:  1x/2x/4x/6x/8x MIMO-B (256-QAM on each path)
-                            10: 1x/2x MIMO-A (16-QAM duplicated on both paths)
-                            11: 1x/2x/3x MIMO-A (64-QAM duplicated on both paths)
-                            12: 1x/2x/3x/4x MIMO-A (256-QAM duplicated on both paths)
-
-                            For PMP 430 radios this applies to Uplink Rate Adapt only.
-                            Use radioRateAdapt for setting downlink rate adapt on PMP 430 radios.
-                            For PMP 450 radios, engineering use only."
+                            Use radioRateAdapt for setting downlink rate adapt."
 		::={whispBoxConfig 94}
 
 	providerVID	OBJECT-TYPE
@@ -2989,7 +3332,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"This variable selects if web page users for the radio should be authenticated locally or
-            				via a centralised remote Radius server"
+                            via a centralised remote Radius server"
 		::={whispBoxConfig 118}
 
 	usrAccountEnableAccounting	OBJECT-TYPE
@@ -3042,7 +3385,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Installation Color Code.  Allows non-configured SMs to register to an AP with UCC enabled
-                        	in order to facilitate remote provisioning."
+                            in order to facilitate remote provisioning."
 		::={whispBoxConfig 123}
 
 	apSmMode	OBJECT-TYPE
@@ -3053,7 +3396,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Set AP to SM or SM to AP. Useful for facillitating scripting of running Spectrum Analyzer on an AP.
-                        	Radio must have AP Feature Key.  1 - Set to SM, 0 - Set to AP."
+                            Radio must have AP Feature Key.  1 - Set to SM, 0 - Set to AP."
 		::={whispBoxConfig 124}
 
 	pppoeFilter	OBJECT-TYPE
@@ -3063,7 +3406,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set PPPoE packet filter."
+			"To set PPPoE packet filter when NAT is disabled."
 		::={whispBoxConfig 125}
 
 	smbFilter	OBJECT-TYPE
@@ -3073,7 +3416,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set SMB packet filter."
+			"To set SMB packet filter when NAT is disabled."
 		::={whispBoxConfig 126}
 
 	snmpFilter	OBJECT-TYPE
@@ -3083,7 +3426,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set SNMP packet filter."
+			"To set SNMP packet filter when NAT is disabled."
 		::={whispBoxConfig 127}
 
 	userP1Filter	OBJECT-TYPE
@@ -3123,7 +3466,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set all other IPv4 packet filter."
+			"To set all other IPv4 packet filter when NAT is disabled."
 		::={whispBoxConfig 131}
 
 	allIpv4Filter	OBJECT-TYPE
@@ -3133,8 +3476,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set all IPv4 packet filter.  Enabling this will automatically enable all of the known IP filters (SMB, SNMP, Bootp,
-            				IPv4 Mcast, User Defined Ports, and All Other IPv4)."
+			"To set all IPv4 packet filter when NAT is disabled.  Enabling this will automatically enable all of the known IPv4 filters (SMB, SNMP, Bootp,
+                            IPv4 Mcast, User Defined Ports, and All Other IPv4)."
 		::={whispBoxConfig 132}
 
 	arpFilter	OBJECT-TYPE
@@ -3144,7 +3487,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set ARP packet filter."
+			"To set ARP packet filter when NAT is disabled."
 		::={whispBoxConfig 133}
 
 	allOthersFilter	OBJECT-TYPE
@@ -3154,7 +3497,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set all other packet filter when."
+			"To set all other packet filter when NAT is disabled."
 		::={whispBoxConfig 134}
 
 -- User Defined Port Filtering Configuration
@@ -3250,7 +3593,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set bootp client sourced packets filter."
+			"To set bootp client sourced packets filter when NAT is disabled."
 		::={whispBoxConfig 144}
 
 	bootpsFilter	OBJECT-TYPE
@@ -3260,7 +3603,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set bootp server sourced packets filter."
+			"To set bootp server sourced packets filter when NAT is disabled."
 		::={whispBoxConfig 145}
 
 	ip4MultFilter	OBJECT-TYPE
@@ -3271,7 +3614,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"To set IPv4 MultiCast packets filter when
-            					NAT is disabled."
+                                NAT is disabled."
 		::={whispBoxConfig 146}
 
 	packetFilterDirection	OBJECT-TYPE
@@ -3291,8 +3634,12 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"For supported radio, set the encryption algorithm to use.
-                      DES by default.  Cannot be set if encryption is disabled."
+			"Set the encryption algorithm to use.
+               Applicable only on radios that support encryption configuration.
+               Prior to 20.3, cannot be set on AP if encryption is disabled (enabled via encryptionMode OID).
+               Only able to set to DES on pre 15.2 radios.
+               Post 15.2, only AES is supported.
+               Not applicable to SM/BHS running 15.2 or newer."
 		::={whispBoxConfig 148}
 
 	pppoeCtlPriority	OBJECT-TYPE
@@ -3411,8 +3758,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set all IPv6 packet filter.  Enabling this will automatically enable all of the known IPv6 filters (SMB, SNMP, Bootp,
-            				IPv6 Mcast, User Defined Ports, and All Other IPv6)."
+			"To set all IPv6 packet filter when NAT is disabled.  Enabling this will automatically enable all of the known IPv6 filters (SMB, SNMP, Bootp,
+                            IPv6 Mcast, User Defined Ports, and All Other IPv6)."
 		::={whispBoxConfig 160}
 
 	ipv6smbFilter	OBJECT-TYPE
@@ -3422,7 +3769,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set IPv6 SMB packet filter."
+			"To set IPv6 SMB packet filter when NAT is disabled."
 		::={whispBoxConfig 161}
 
 	ipv6snmpFilter	OBJECT-TYPE
@@ -3432,7 +3779,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set IPv6 SNMP packet filter."
+			"To set IPv6 SNMP packet filter when NAT is disabled."
 		::={whispBoxConfig 162}
 
 	ipv6bootpcFilter	OBJECT-TYPE
@@ -3442,7 +3789,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set IPv6 bootp client sourced packets filter."
+			"To set IPv6 bootp client sourced packets filter when NAT is disabled."
 		::={whispBoxConfig 163}
 
 	ipv6bootpsFilter	OBJECT-TYPE
@@ -3452,7 +3799,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set IPv6 bootp server sourced packets filter."
+			"To set IPv6 bootp server sourced packets filter when NAT is disabled."
 		::={whispBoxConfig 164}
 
 	ipv6MultFilter	OBJECT-TYPE
@@ -3463,7 +3810,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"To set IPv6 MultiCast packets filter when
-            					NAT is disabled."
+                                NAT is disabled."
 		::={whispBoxConfig 165}
 
 	allOtherIpv6Filter	OBJECT-TYPE
@@ -3473,11 +3820,12 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"To set all other IPv6 packet filter."
+			"To set all other IPv6 packet filter when NAT is disabled."
 		::={whispBoxConfig 166}
 
 	snmpStatus	OBJECT-TYPE
 		SYNTAX		INTEGER {
+					snmpDisable(0),
 					snmpv2only(1),
 					snmpv3only(2),
 					snmpv2-and-snmpv3(3)}
@@ -3485,7 +3833,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"This variable determines SNMP operation mode.
-                          1: Enable SNMPv2c only
+                          0: Disable SNMP
+                          1: Enable SNMPv2c only (default)
                           2: Enable SNMPv3 only
                           3: Enable SNMPv2c and SNMPv3"
 		::={whispBoxConfig 167}
@@ -3553,7 +3902,6 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					cp5(5),
 					cp6(6),
 					cp7(7),
-					cp8(8),
 					cp9(9),
 					cp10(10),
 					cp11(11),
@@ -3561,7 +3909,6 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					cp13(13),
 					cp14(14),
 					cp15(15),
-					cp16(16),
 					cp17(17),
 					cp18(18),
 					cp19(19),
@@ -3569,7 +3916,6 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					cp21(21),
 					cp22(22),
 					cp23(23),
-					cp24(24),
 					cp25(25),
 					cp26(26),
 					cp27(27),
@@ -3577,7 +3923,6 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					cp29(29),
 					cp30(30),
 					cp31(31),
-					cp32(32),
 					cp33(33),
 					cp34(34),
 					cp35(35),
@@ -3585,7 +3930,6 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					cp37(37),
 					cp38(38),
 					cp39(39),
-					cp40(40),
 					cp41(41),
 					cp42(42),
 					cp43(43),
@@ -3636,7 +3980,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Enable(1) or Disable(0) aux ethernet port on 450i radio"
+			"Enable(1) or Disable(0) aux ethernet port on 450i or 450m radio
+                                    Enabling the Aux Ethernet port will disrupt the Aux Power to UGPS"
 		::={whispBoxConfig 175}
 
 	poeAuxEnable	OBJECT-TYPE
@@ -3646,18 +3991,62 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Enable(1) or Disable(0) aux ethernet port PoE on 450i radio"
+			"Enable(1) or Disable(0) Aux Ethernet port PoE on 450i or 450m radio"
 		::={whispBoxConfig 176}
 
 	whispUsrAuth	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					md5(0),
-					peap-mschapv2(1)}
+					peap-mschapv2(1),
+					pap(2)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
 			"Select method for User Authentication."
 		::={whispBoxConfig 177}
+
+	ipv6State	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Variable to enable/disable IPv6 protocol for management on radio.
+                               For SMs, cannot be enabled with NAT enabled. To enable IPv6, NAT must first be disabled."
+		::={whispBoxConfig 178}
+
+	dhcpv6State	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Variable to enable/disable stateful DHCPv6."
+		::={whispBoxConfig 179}
+
+	lan1Dhcpv6Release	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					releaseIPv6(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Setting the variable to '1' will release LAN1's IPv6 address
+                            and send a DHCPv6 Release Message to the DHCPv6 server.
+                            Applicable only when NAT is disabled."
+		::={whispBoxConfig 180}
+
+	lan1Dhcpv6Renew	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					renewIPv6(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Setting the variable to '1' will renew LAN1's lease time
+                            for its current IPv6 address.
+                            Applicable only when NAT is disabled."
+		::={whispBoxConfig 181}
 
 	lan1DhcpRelease	OBJECT-TYPE
 		SYNTAX		INTEGER {
@@ -3666,8 +4055,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Setting the variable to '1' will release LAN1's IP address
-							and send a DHCP Release Message to the DHCP server.
-							Applicable only when NAT is disabled."
+                            and send a DHCP Release Message to the DHCP server.
+                            Applicable only when NAT is disabled."
 		::={whispBoxConfig 201}
 
 	lan1DhcpRenew	OBJECT-TYPE
@@ -3677,8 +4066,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Setting the variable to '1' will renew LAN1's lease time
-							for its current IP address.
-							Applicable only when NAT is disabled."
+                            for its current IP address.
+                            Applicable only when NAT is disabled."
 		::={whispBoxConfig 202}
 
 	lan3DhcpRelease	OBJECT-TYPE
@@ -3688,8 +4077,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Setting the variable to '1' will release LAN3's (RF Public) IP address
-							and send a DHCP Release Message to the DHCP server.
-							Applicable only when NAT is enabled."
+                            and send a DHCP Release Message to the DHCP server.
+                            Applicable only when NAT is enabled."
 		::={whispBoxConfig 203}
 
 	lan3DhcpRenew	OBJECT-TYPE
@@ -3699,8 +4088,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Setting the variable to '1' will renew LAN3's (RF Public)
-							lease time for its current IP address.
-							Applicable only when NAT is enabled."
+                            lease time for its current IP address.
+                            Applicable only when NAT is enabled."
 		::={whispBoxConfig 204}
 
 	natDhcpRelease	OBJECT-TYPE
@@ -3710,8 +4099,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Setting the variable to '1' will release WAN's (NAT Public) IP address
-							and send a DHCP Release Message to the DHCP server.
-							Applicable only when NAT is enabled."
+                            and send a DHCP Release Message to the DHCP server.
+                            Applicable only when NAT is enabled."
 		::={whispBoxConfig 205}
 
 	natDhcpRenew	OBJECT-TYPE
@@ -3721,8 +4110,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Setting the variable to '1' will renew WAN's (NAT Public)
-							lease time for its current IP address.
-							Applicable only when NAT is enabled."
+                            lease time for its current IP address.
+                            Applicable only when NAT is enabled."
 		::={whispBoxConfig 206}
 
 	region	OBJECT-TYPE
@@ -3775,6 +4164,19 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					switzerland(12),
 					serbia(13),
 					unitedkingdom(14),
+					france(15),
+					italy(16),
+					austria(17),
+					czechrepublic(18),
+					bulgaria(19),
+					turkey(20),
+					netherlands(21),
+					latvia(22),
+					croatia(23),
+					luxembourg(24),
+					cyprus(25),
+					poland(26),
+					hungary(27),
 					other(1)}
 		MAX-ACCESS	read-write
 		STATUS		current
@@ -3825,6 +4227,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					none(0),
 					other(1),
 					fcc(2),
+					fccNoAFC(5),
 					etsi(3),
 					etsilbt(4)}
 		MAX-ACCESS	read-write
@@ -3868,15 +4271,18 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
                          In remote mode, sync over power port will not be available as a sync source.
                          Remote Device mode is where the AP or BHM timing port is connected to an SM or BHS timing port via a sync cable.  In this mode,
                          GPS data is unavailable and sync over power port shouldn't be used.  If sync over power is desired, and a CMM or other
-                         sync over power device is in use, then select standard mode.                        
-						 This should really be named deviceType because this applies to both AP and BHM, but left this as apType for legacy purposes."
+                         sync over power device is in use, then select standard mode.
+                         On 450b PTP BHM, this mode cannot be enabled while Sync Aux Port Config is set to Output or Alignment Tone, because these
+                         signals share a physical pin with the sync input signal.
+                         On MicroPoP, this feature does not have hardware support."
 		::={whispBoxConfig 216}
 
 	regionAfrica	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					none(0),
 					algeria(2),
-					nigeria(3)}
+					nigeria(3),
+					egypt(4)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
@@ -3904,7 +4310,9 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Value in seconds for a timed spectrum analysis. Range is 10-1000 seconds."
+			"Value in seconds for a timed spectrum analysis. Range is 10-1000 seconds.
+                            Note that this represents the minimum scan duration. The current scan will still be allowed to
+                            complete when this duration is elapsed, so actual scan time could be longer."
 		::={whispBoxConfig 220}
 
 	spectrumAnalysisActionBox	OBJECT-TYPE
@@ -3916,7 +4324,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					idleCompleteSpectrumAnalysis(4),
 					inProgressTimedSpectrumAnalysis(5),
 					inProgressContinuousSpectrumAnalysis(6),
-					notReady(7)}
+					notReady(7),
+					setToFullScan(8)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
@@ -3930,7 +4339,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
                             (5) - Timed or Remote Spectrum Analysis in progress.
                             (6) - Continuous Spectrum Analysis in progress.
                             Note: Continuous mode has a max of 24 hours.
-                            (7) - Spectrum Analyzer not ready."
+                            (7) - Spectrum Analyzer not ready.
+                            (8) - Set minimum and maximum frequencies to full scan."
 		::={whispBoxConfig 221}
 
 	mac1VIDMapPriority	OBJECT-TYPE
@@ -4175,32 +4585,32 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		SYNTAX		INTEGER {
 					mimobmimoa(0),
 					mimobonly(1),
-					mimoaonly(2),
-					siso(3)}
+					mimoaonly(2)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Engineering use only.
-                            Control MIMO Rate Adapt Algorithm
+			"Control MIMO Rate Adapt Algorithm
                             0 = MIMO-A/B This chooses MIMO-A or MIMO-B dynamically to maximize throughput
                             1 = MIMO-B only
-                            2 = MIMO-A only
-                            3 = SISO only"
+                            2 = MIMO-A only"
 		::={whispBoxConfig 249}
 
 	controlMessages	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					siso(1),
 					mimoa(0)}
-		MAX-ACCESS	read-write
-		STATUS		current
+		MAX-ACCESS	read-only
+		STATUS		deprecated
 		DESCRIPTION		
 			"Control Messages (Beacon/Scheduling Map/Acknowledgements/Broadcast)
                             0 = MIMO-A
                             1 = SISO
-                            MIMO Control Messages is the recommended and default setting.
+                            MIMO-A Control Messages is the recommended and default setting.
                             However, SISO Control Messages can be helpful in talking to subscribers on releases previous to 13.2, which operated in this mode.
-                            Not applicable to PMP 450m."
+                            Not applicable to PMP 450m.
+
+                            As of 16.1, PMP 430 SMs are no longer supported on the 450 platform.
+                            On that release and forward, this OID is read-only and returns MIMO-A."
 		::={whispBoxConfig 250}
 
 	enableSecurityBanner	OBJECT-TYPE
@@ -4213,19 +4623,21 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			"Shows Security Banner at the time of login"
 		::={whispBoxConfig 251}
 
-	vcDepth	OBJECT-TYPE
+	vcDepthDownlink	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					default(0),
-					eight(8),
-					sixteen(16),
-					thirty-two(32),
+					default128(1),
+					default256(2),
+					default512(3),
 					sixty-four(64),
-					one-two-eight(128)}
+					one-two-eight(128),
+					two-five-six(256),
+					five-one-two(512)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"VC Depth of radio. Not applicable with 450m.
-                        	Engineering use only."
+			"VC Depth in the downlink
+                            Not currently supported with 450m."
 		::={whispBoxConfig 252}
 
 	textSecurityBanner	OBJECT-TYPE
@@ -4234,8 +4646,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Security Banner to be dispalyed on login page.
-                        	Length should be maximum 1200 characters.Configuration from web UI can enter upto 1499 characters.
-                        	Only ASCII characters(0-9a-zA-Z,CR,LF) supported."
+                            Length should be maximum 1200 characters.Configuration from web UI can enter upto 1499 characters.
+                            Only ASCII characters(0-9a-zA-Z,CR,LF) supported."
 		::={whispBoxConfig 253}
 
 	acceptSecurityBanner	OBJECT-TYPE
@@ -4246,7 +4658,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"1: User must accept and acknowledge security banner before login.
-                        	0: Accepting security banner is not mandatory and user can login without it."
+                            0: Accepting security banner is not mandatory and user can login without it."
 		::={whispBoxConfig 254}
 
 	poeT2Classification	OBJECT-TYPE
@@ -4372,7 +4784,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		::={whispBoxConfig 266}
 
 	pingWdogInterval	OBJECT-TYPE
-		SYNTAX		INTEGER (300..86400)
+		SYNTAX		INTEGER (30..86400)
 		UNITS		"Seconds"
 		MAX-ACCESS	read-write
 		STATUS		current
@@ -4387,6 +4799,22 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		DESCRIPTION		
 			"Ping Failures count at which reboot should be initiated."
 		::={whispBoxConfig 268}
+
+	disableAes128	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enableaes128(0),
+					disableaes128(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Disables the availability of AES-128 bit authentication and encryption
+            0 - AES-128 algorithm is available.
+            1 - AES-128 algorithm is disabled.
+            This value becomes read-only when a reboot is required. 
+            Pending reboots should be completed before making changes to this parameter.
+            Caution 1: Setting this attribute may result in previously working links no longer forming.
+            Caution 2: A change of value to this attribute has immediate effect - no reboot required."
+		::={whispBoxConfig 269}
 
 	forceReassessment	OBJECT-TYPE
 		SYNTAX		INTEGER {
@@ -4411,6 +4839,15 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			"To enable or disable 802.3 link."
 		::={whispBoxConfig 276}
 
+	ethernetBounceTimeout	OBJECT-TYPE
+		SYNTAX		INTEGER (0..60)
+		UNITS		"minutes"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Ethernet Bounce time out Range : 0 -- 60 Minutes, zero for disabling the feature."
+		::={whispBoxConfig 277}
+
 	ethernetPortSelection	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					mainPort(0),
@@ -4432,6 +4869,583 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		DESCRIPTION		
 			"Set/Get Ethernet link speed and duplex settings of the SFP port. PMP 450m only. Please note that the Radio Recovery Console only supports auto1000F for the SFP."
 		::={whispBoxConfig 279}
+
+	idleTrafficEnable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Idle Traffic Enable Config
+                            0: Disabled
+                            1: Enabled
+                            Engineering use only."
+		::={whispBoxConfig 280}
+
+	idleTrafficSize	OBJECT-TYPE
+		SYNTAX		INTEGER (64..1518)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Idle Traffic Packet Size
+                            Engineering use only."
+		::={whispBoxConfig 281}
+
+	customSpecAnalyzerMinFreqSnmp	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Minimum custom frequency value in kHz."
+		::={whispBoxConfig 282}
+
+	customSpecAnalyzerMaxFreqSnmp	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Maximum custom frequency value in kHz."
+		::={whispBoxConfig 283}
+
+	minModRate	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					onex(0),
+					twox(1),
+					threex(2),
+					fourx(3),
+					fivex(6),
+					sixx(4),
+					sevenx(7),
+					eightx(5)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Minimum Modulation Rate parameter
+                            0:  1x (MIMO-A QPSK)
+                            1:  2x (MIMO-A QPSK 16-QAM, MIMO-B QPSK)
+                            2:  3x (MIMO-A 64-QAM, and MIMO-B 8-QAM)
+                            3:  4x (MIMO-A 256-QAM, and MIMO-B 16-QAM)
+                            4:  6x (MIMO-B 64-QAM)
+                            5:  8x (MIMO-B 256-QAM)
+                            6:  5x (MIMO-B 32-QAM)
+                            7:  7x (MIMO-B 128-QAM)
+
+                            PTP 450 platform only.
+                            
+                            Enabling this will prevent the link from bridging traffic when the transmit modulation rate is below this level.
+                            This option can be used for redundant PTP links with spanning tree.
+                            When the rate drops below this minimum modulation rate, the Ethernet link will be disabled for half a second.
+                            This is to alert spanning tree protocols that the link is not up.
+                            Enabling this option will also add a small amount of continuous low priority traffic when the link is idle.
+                            This is done to ensure the modulation rate is current over the RF link.
+                            Use with caution."
+		::={whispBoxConfig 284}
+
+	rateAdaptPerLuid	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enabling this (default) sets Rate Adapt per LUID mode.  Disabling this sets Rate Adapt per VC mode.
+                            Engineering Key only."
+		::={whispBoxConfig 285}
+
+	spectrumAnalysisOnBoot	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"To enable or disable Spectrum Analysis on boot up for one scan through the band.
+                            (0) - Disabled
+                            (1) - Enabled"
+		::={whispBoxConfig 286}
+
+	qosGroupingLevel	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					lowpriority(0),
+					medpriority(1),
+					highpriority(2),
+					ultrapriority(3)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"PMP 450m only.
+                            0 = Group Low Priority Data Channels
+                            1 = Group Low and Medium Priority Data Channels
+                            2 = Group Low, Medium and High Priority Data Channels
+                            3 = Group All Data Channels"
+		::={whispBoxConfig 287}
+
+	endPointMode	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					multipoint(0),
+					backhaul(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Endpoint mode: Point-To-Multipoint or Point-to-Point(Backhaul).
+                           450i and 450b PTP keyed models only.
+                           This OID can switch a PTP into PMP SM mode (and vice versa)
+                           Reboot is required after this change.
+                           Setting to Factory Defaults, does not change this parameter."
+		::={whispBoxConfig 288}
+
+	remoteDeviceType	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					other(0),
+					pmpptp100(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"If this radio is being used to give sync to a remote device, then this option must indicate what type that device is, PMP/PTP 100 or all other types.
+                         This is currently not implemented on 450m, APs, and BHMs.
+                         1 = PMP/PTP 100
+                         0 = Other"
+		::={whispBoxConfig 289}
+
+	gpsOutputEn	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					off(0),
+					on(1),
+					input(2)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Controls what the AUX port will be configured to do.
+                            On all AP/BHM's except for 450b and 450v, there are two options: 0(off) Sync Input (default value) or 1(on) Sync Output.
+
+                            On 450v AP, there are two options: 1(on) Sync Output or 2(input) Sync Input (default value).
+                            
+                            On 450b or 450v BHM, there are three options: 0(off) Alignment Tone (default value), 1(on) Sync Output, or 2(input) Sync Input.
+                            
+                            On 450b or 450v SM/BHS, there are three options: 0(off) Alignment Tone (default value), 1(on) Sync Output, or 2(input) GPS Data."
+		::={whispBoxConfig 290}
+
+	vlanSM8021pSupport	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Support for 802.1p VLAN ID Zero."
+		::={whispBoxConfig 291}
+
+	sshStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disablessh(0),
+					enablessh(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"This variable determines if ssh server is enabled or not.
+                          0: Disable SSH server
+                          1: Enable SSH server"
+		::={whispBoxConfig 292}
+
+	microPoPGPSSyncSearchMode	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Set the GNSS search mode.  This is a + separate string of possible names GPS, GLONASS, Galileo, and Beidou.
+                        For example, setting to GPS+GLONASS+Galileo will enable GPS GLONASS, and Galileo systems while GPS will only enable GPS system.
+                        Note that some of these may be rejected if they are not allowed due to regulatory reasons."
+		::={whispBoxConfig 293}
+
+	lldpVlanTagging	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					alwaysUntagged(0),
+					followVlanMvidConfiguration(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configures LLDP to be always untagged or follow VLAN MVID Configuration."
+		::={whispBoxConfig 294}
+
+	bpduFilter	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					filterOff(0),
+					filterOn(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"To set BPDU packets filter when
+                                NAT is disabled."
+		::={whispBoxConfig 295}
+
+	ingressVIDBox	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Untagged ingress VID."
+		::={whispBoxConfig 296}
+
+	ingressVIDPriorityBox	OBJECT-TYPE
+		SYNTAX		INTEGER (0..7)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"ingress VID VLAN Priority."
+		::={whispBoxConfig 297}
+
+	ingressVIDPriorityModeBox	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					promote-IP-priority(0),
+					define-priority(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"ingress VID VLAN Priority Mode."
+		::={whispBoxConfig 298}
+
+	nomadic	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"This enables or disables nomadic mode, which allows SMs to move at a slow speed and maintain the
+                            session with the AP.
+                            Feature Key required to enable on AP.
+                            Needs to be enabled on both SM and AP to function.
+                            PMP only.
+                            Not currently supported on 450m."
+		::={whispBoxConfig 300}
+
+	cnMaestroCertValidation	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					cloud(1),
+					cloud-On-Premises(2)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"cnMaestro server certficate validation.
+                            1. Only cnMaestro cloud server certificate will be validated, this is the default setting.
+                            2. Both cnMaestro cloud and On-Premises server certificates will be validated."
+		::={whispBoxConfig 304}
+
+	fccStaFrequencies	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					unsupported(0),
+					supported(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Returns 1 if AP/BHM is allowed to run the FCC Special Temporary Authority UNII-3 Band Extension 5850 - 5895 MHz.
+                    Note: In order to access the FCC STA frequencies, the operator must have an STA license.  
+                    Using these frequencies without an STA license is a violation of the FCC rules. 
+                    Please contact support@cambiumnetworks.com for more information.
+                    Setting to a 1 will enable the STA frequencies, setting to a 0 will disable the STA frequencies.
+                    Only valid for 5 GHz FCC AP/BHM radios."
+		::={whispBoxConfig 305}
+
+	csrfSetting	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					default(0),
+					disable(1),
+					enable(2)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"0: Default Cross-site Request Forgery(CSRF) protection (currently disabled, in future software 
+                                version the default CSRF setting will be treated as enabled).
+                          1: Disable Cross-site Request Forgery(CSRF) protection.
+                          2: Enable Cross-site Request Forgery(CSRF) protection."
+		::={whispBoxConfig 306}
+
+	horizontalUncertainty	OBJECT-TYPE
+		SYNTAX		INTEGER (0..450)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Horizontal distance between the GPS receiver antenna and the device in meters. This is required only if the radio detects an external GPS source."
+		::={whispBoxConfig 307}
+
+	verticalUncertainty	OBJECT-TYPE
+		SYNTAX		INTEGER (0..250)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Vertical distance between the GPS receiver antenna and the device in meters. This is required only if the radio detects an external GPS source."
+		::={whispBoxConfig 308}
+
+	afcOcspStapling	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enables OCSP Stapling while communicating with AFC system. 
+                            Engineering use only."
+		::={whispBoxConfig 311}
+
+	bridgeUpstreamInterface	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					mainEthernet(260),
+					auxEthernet(265),
+					sfp(266),
+					rf(257)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Bridge Upstream Interface.  Devices seen incoming frmo this interface are not kept in the bridge.  When the device cannot find an entry in the bridge, the device will forward the packet to this default interface.
+                            Default for PMP is Main Ethernet for AP and RF for SM.  Default for PTP is RF for both sides. 
+                            Options are Main Ethernet (260), Aux Ethernet (265), SFP+ (266), RF (257)."
+		::={whispBoxConfig 312}
+
+	lldpAdminMode	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					tx-rx(3),
+					tx-only(1),
+					rx-only(2),
+					disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Configures LLDP to be on, transmit only, receive only, or disabled."
+		::={whispBoxConfig 313}
+
+	lldpPassthrough	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enables bridging of LLDP packets"
+		::={whispBoxConfig 314}
+
+	passwdMinimumLengthRule	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"0: No minimum password length validation.
+                            1: Password must be at least 8 characters long."
+		::={whispBoxConfig 315}
+
+	passwdCharacterTypes	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"0: No mandatory character validation for password.
+                            1: Password must contain at least one lowercase letter, one uppercase letter, one digit and one special character."
+		::={whispBoxConfig 316}
+
+	passwdUsernameInclusion	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"0: Enable the password can contain the username.
+                            1: Disable the password must not contain the username."
+		::={whispBoxConfig 317}
+
+	historyRule	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"0: Disable the password history validation.
+                            1: Password cannot be one of the last 3 used passwords."
+		::={whispBoxConfig 318}
+
+	passwdMustChange	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"0: The user need not change the password immediately.
+                            1: Force the user to change password if the rules are not fulfilled."
+		::={whispBoxConfig 319}
+
+	remoteUserLoginRules	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disabled(0),
+					enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"0: No validation on remote login user password upon login.
+                            1: validate remote login user password upon login."
+		::={whispBoxConfig 320}
+
+	userChangePassword	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					noNeedTochangePassword(0),
+					mustChangePassword(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"1 = User must change password at first login.
+                        0 = (default) no need to change the password."
+		::={whispBoxConfig 321}
+
+	vcDepthUplink	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					default(0),
+					default128(1),
+					default256(2),
+					default512(3),
+					sixty-four(64),
+					one-two-eight(128),
+					two-five-six(256),
+					five-one-two(512)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"VC Depth in the uplink
+                            Not currently supported with 450m."
+		::={whispBoxConfig 322}
+
+	insecureProtocols	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					default(0),
+					allow(1),
+					deny(2)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"This variable determines if insecure protocols namely HTTP, Telnet, FTP, SSH, NTP, TFTP, SNMPv2 are allowed.
+                          0: Default
+                          1: Allow
+                          2: Deny"
+		::={whispBoxConfig 323}
+
+	passwordMaxFailedAttempts	OBJECT-TYPE
+		SYNTAX		INTEGER (0..10)
+		UNITS		"Range: 3-10, 0 = Disable"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Max successive failed attempts to qualify for a password lock out"
+		::={whispBoxConfig 324}
+
+	passwordFailedAttemptTraceDuration	OBJECT-TYPE
+		SYNTAX		INTEGER (60..300)
+		UNITS		"seconds"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Duration to monitor successive password failed attempts"
+		::={whispBoxConfig 325}
+
+	passwordLockoutDuration	OBJECT-TYPE
+		SYNTAX		INTEGER (60..300)
+		UNITS		"seconds"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Duration for the password lockout"
+		::={whispBoxConfig 326}
+
+	icmpArpRateLoggingThreshold	OBJECT-TYPE
+		SYNTAX		Unsigned32 (1..10000)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Specifies the threshold rate (packets per minute) for ICMP/ARP traffic monitoring. A syslog alert is generated if the packet rate exceeds this value."
+		::={whispBoxConfig 327}
+
+	icmpArpRateLoggingDuration	OBJECT-TYPE
+		SYNTAX		Unsigned32 (0..15)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Specifies the monitoring duration (in minutes) for ICMP/ARP traffic. A syslog alert is generated if the packet rate exceeds the configured threshold during this period."
+		::={whispBoxConfig 328}
+
+	strictTransportSecurityExpiryTime	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Expiry time for Strict Transport Security (RFC 6797) in seconds, 0 to disable"
+		::={whispBoxConfig 333}
+
+	afcSpectrumAvailListInfo	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"This gives the spectrum availability information received from Automated Frequency Coordination server"
+		::={whispAfcStatus 1}
+
+	afcSpectrumExpiry	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"This gives the spectrum availability information received from Automated Frequency Coordination server"
+		::={whispAfcStatus 2}
+
+	afcServerVersion	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Automated Frequency Coordination server version"
+		::={whispAfcStatus 3}
+
+	afcState	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current state of Automated Frequency Coordination"
+		::={whispAfcStatus 4}
+
+	afcLatitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Device latitude which is reported to the Automated Frequency Coordination server"
+		::={whispAfcStatus 5}
+
+	afcLongitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Device longitude which is reported to the Automated Frequency Coordination server"
+		::={whispAfcStatus 6}
+
+	afcDescription	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current state description of Automated Frequency Coordination"
+		::={whispAfcStatus 7}
+
+	afcAuthTokenStatus	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current status of Automated Frequency Coordination Authorization token"
+		::={whispAfcStatus 8}
 
 -- Box level control.
 
@@ -4487,7 +5501,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Set to clear the BER statistics by sending a 'clearBERStats'.  Value is set back to 'doNotClearBERStats'
-						When action is complete."
+                        When action is complete."
 		::={whispBoxControls 5}
 
 	updateDevice	OBJECT-TYPE
@@ -4531,9 +5545,74 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
-			"Setting to 1 will reset aux ethernet port PoE on 450i radio.
+			"Setting to 1 will reset Aux Ethernet port PoE on 450i or 450m radio.
                         Port will be powered off for 2 seconds during the set call, which will delay the SNMP response."
 		::={whispBoxControls 10}
+
+	clearEthernetStats	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					clearEthernetStats(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Setting to 1 will clear Ethernet stats."
+		::={whispBoxControls 11}
+
+	clearRadioStats	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					clearRadioStats(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Setting to 1 will clear Radio stats."
+		::={whispBoxControls 12}
+
+	ethernetPortAction	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					bounceMainEthernetPort(1),
+					bounceAuxEthernetPort(2),
+					bounceSfpEthernetPort(4)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Setting:
+                                1 - This will bounce the Main Ethernet Port. A 5 minute lockout period will follow a successful port bounce.
+                                    A port bounce attempt during lockout period will result in Error response.
+                                    If port is not supported or disabled this will also result in Error response.
+                                    
+                                2 - This will bounce the Aux Ethernet Port. A 5 minute lockout period will follow a successful port bounce.
+                                    A port bounce attempt during lockout period will result in Error response.
+                                    If port is not supported or disabled this will also result in Error response.
+                                    Applicable only to select platforms that support this interface.
+                                    
+                                4 - This will bounce the SFP Ethernet Port. A 5 minute lockout period will follow a successful port bounce.
+                                    A port bounce attempt during lockout period will result in Error response.
+                                    If port is not supported or disabled this will also result in Error response.
+                                    Applicable only to select platforms that support this interface.
+                                    
+                            Getting:
+                                Bit position 1:
+                                0 - Initiating this action is permitted.
+                                1 - Currently in lockout or Main Ethernet Port is not available - initiating this action will return an Error.  
+                                
+                                Bit position 2:
+                                0 - Initiating this action is permitted.
+                                1 - Currently in lockout or Aux Ethernet Port is not available - initiating this action will return an Error.
+                                
+                                Bit position 3:
+                                0 - Initiating this action is permitted.
+                                1 - Currently in lockout or SFP Ethernet Port is not available - initiating this action will return an Error."
+		::={whispBoxControls 13}
+
+	txpowertemperatureupdate	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Force an update to the transmit power based upon the current temperature.
+                            AP or BH only.
+                            Engineering use only."
+		::={whispBoxControls 14}
 
 	whispBoxEvntLog	OBJECT-TYPE
 		SYNTAX		EventString
@@ -4546,7 +5625,12 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 	whispBoxAttributesGroup	OBJECT-GROUP
 			OBJECTS {
 					vlanAcceptQinQFrames,
+					disableAes128,
+					ingressVIDBox,
+					ingressVIDPriorityBox,
+					ingressVIDPriorityModeBox,
 					providerVID,
+					vlanSM8021pSupport,
 					mac1VIDMapAddr,
 					mac1VIDMapVid,
 					mac1VIDMapPriority,
@@ -4589,7 +5673,10 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					mac10VIDMapPriorityMode,
 					vlanPortType,
 					portVID,
+					customSpecAnalyzerMinFreqSnmp,
+					customSpecAnalyzerMaxFreqSnmp,
 					timedSpectrumAnalysisDurationBox,
+					spectrumAnalysisOnBoot,
 					spectrumAnalysisActionBox,
 					calibrationStatusBox,
 					calibrationStatusBool,
@@ -4621,6 +5708,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					boxDeviceType,
 					boxDeviceTypeID,
 					boxEncryption,
+					boxEncryptionDetailed,
 					etherLinkStatus,
 					boxFrequency,
 					platformVer,
@@ -4651,14 +5739,13 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					rxOverrunPkts,
 					boxTemperatureC,
 					boxTemperatureF,
-					linkNegoSpeed,
 					installationColorCode,
 					colorCode,
-					displayOnlyAccess,
 					fullAccess,
 					webAutoUpdate,
 					pass1Status,
 					pass2Status,
+					bridgeUpstreamInterface,
 					bridgeEntryTimeout,
 					cnMaestroEnable,
 					cnMaestroUrl,
@@ -4667,12 +5754,16 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					camAccID,
 					cnMaestroStatus,
 					daVersion,
+					cnMaestroCertValidation,
+					afcOcspStapling,
 					snmpMibPerm,
 					bhTimingMode,
 					powerControl,
-					extFilterDelay,
 					antennaGain,
 					eirp,
+					activeEirp,
+					activeEirpStr,
+					boxSystemTime,
 					dynamicLearning,
 					managementVID,
 					managementVIDPriority,
@@ -4686,42 +5777,27 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					frameType,
 					addVlanMember,
 					removeVlanMember,
-					scheduling,
 					transmitterOP,
 					bridgeEnable,
 					fecEnable,
-					trapIP1,
-					trapIP2,
-					trapIP3,
-					trapIP4,
-					trapIP5,
-					trapIP6,
-					trapIP7,
-					trapIP8,
-					trapIP9,
-					trapIP10,
 					commStringRWrite,
 					subnetMask,
 					mngtIP,
 					allowVIDAccess,
 					setDefaultPlug,
-					hwsCompatibility,
 					gpsInput,
 					ism,
-					hiPriority,
 					userName,
 					userPassword,
 					userAccessLevel,
 					userMode,
 					deleteUser,
-					twoXRate,
 					lanDhcpState,
 					dnsIpState,
 					sessionTimeout,
 					vlanMemberSource,
 					addCustomFreqList,
 					removeCustomFreqList,
-					allowColocation,
 					changeUsrPwd,
 					mngtIP2,
 					subnetMask2,
@@ -4743,11 +5819,18 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					subnetMask10,
 					bhvlanEnable,
 					lldpBroadcastEnable,
-					radioRateAdapt,
+					warningText,
 					boardModel,
+					currentCpuUsage,
+					fccId,
 					productTypeName,
 					fpgaBuildDate,
 					fpgaCompileInfo,
+					txTempPowerCompensation,
+					rxTempPowerOffset,
+					txCatAttenChA,
+					txCatAttenChB,
+					nomadic,
 					syslogDomainNameAppend,
 					syslogServerAddr,
 					syslogServerPort,
@@ -4758,8 +5841,14 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					pingWdogRbtCnt,
 					syslogStatTxSuccesses,
 					syslogStatDropped,
+					primaryDnsCurrentIp,
+					secondaryDnsCurrentIp,
 					apType,
+					remoteDeviceType,
 					apSmMode,
+					endPointMode,
+					microPoPGPSSyncSearchMode,
+					gpsOutputEn,
 					region,
 					regionCode,
 					regionAsia,
@@ -4770,8 +5859,15 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					regionAfrica,
 					regionOtherRegulatory,
 					mimoRateAdaptAlgorithm,
+					radioRateAdapt,
 					radioRateAdaptUL,
+					minModRate,
+					rateAdaptPerLuid,
 					tcpAckPriority,
+					qosGroupingLevel,
+					lldpVlanTagging,
+					lldpAdminMode,
+					lldpPassthrough,
 					dnsPrimaryMgmtIP,
 					dnsAlternateMgmtIP,
 					dnsMgmtDomainName,
@@ -4791,13 +5887,20 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					httpsPort,
 					snmpPort,
 					snmpTrapPort,
+					icmpArpRateLoggingThreshold,
+					icmpArpRateLoggingDuration,
+					insecureProtocols,
+					strictTransportSecurityExpiryTime,
 					webAccess,
 					snmpStatus,
 					telnetStatus,
 					ftpStatus,
 					tftpStatus,
+					sshStatus,
 					lan1DhcpRelease,
 					lan1DhcpRenew,
+					lan1Dhcpv6Release,
+					lan1Dhcpv6Renew,
 					lan3DhcpRelease,
 					lan3DhcpRenew,
 					natDhcpRelease,
@@ -4839,19 +5942,34 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					rfStatRcvLTStartHS,
 					rfStatRcvLTResult,
 					rfStatXmtLTResult,
-					soundingStatClear,
-					soundingStatRequestCount,
-					soundingStatResponseCount,
-					soundingStatRequestsIgnored,
-					soundingStatAvgRequestInterval,
-					soundingStatMaxRequestInterval,
-					soundingStatErrorCount,
-					soundingStatRequestsDropped,
-					soundingStatResponsesSuppressed,
-					soundingStatVersionMismatch,
+					rfStatPARspOosCount,
+					rfStatPAReqAsync,
+					rfStatFrameTooBig,
+					rfStatBadRcvAck,
+					rfStatBadRcvFragNum,
+					rfStatRfSYncQMsgsDropped,
+					rfStatBadRcvFragLen,
+					rfStatSchedulerErrors,
+					rfStatEVMSamples,
+					rfStatEVMErrors,
+					rfStatTxRingError,
+					rfStatRxRingError,
+					rfStatUnexpectedNonzeroBitmap,
+					rfStatInvalidVCRFeceived,
+					rfStatWMACFDISRcvOverruns,
+					rfStatWMACDLCRcvOverruns,
+					rfStatWMACDLCRInfoUnknowns,
+					rfStatWMACDLCRinfoSheds,
+					rfStatWPHYChokeCount,
+					rfStatTDDSlips,
+					rfStatVCClearErrors,
+					rfStatRxNoBuffer,
+					rfStatOTARCount,
+					rfStatOTARErrors,
 					whispFeatureKeyOrigin,
 					poeT2Status,
 					updateStatus,
+					applyConfigStatus,
 					bridgeCbFecStatbin,
 					bridgeCbFecStatbout,
 					bridgeCbFecStatbtoss,
@@ -4868,9 +5986,18 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					bridgeCbEthAuxStatuout,
 					bridgeCbEthAuxStatutoss,
 					bridgeCbEthAuxStatutosscap,
+					bridgeCbEthSfpStatbin,
+					bridgeCbEthSfpStatbout,
+					bridgeCbEthSfpStatbtoss,
+					bridgeCbEthSfpStatbtosscap,
+					bridgeCbEthSfpStatuin,
+					bridgeCbEthSfpStatuout,
+					bridgeCbEthSfpStatutoss,
+					bridgeCbEthSfpStatutosscap,
 					bridgeCbFecStatfloods,
 					bridgeCbEthAuxStatfloods,
 					bridgeCbRFStatfloods,
+					bridgeCbEthSfpStatfloods,
 					bridgeCbRFStatbin,
 					bridgeCbRFStatbout,
 					bridgeCbRFStatbtoss,
@@ -4897,6 +6024,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					fecTxHbErr,
 					fecEthBusErr,
 					fecCRCError,
+					fecL3L4ChecksumErrs,
 					fecRxFifoNoBuf,
 					fecRxOverrun,
 					fecLateCollision,
@@ -4907,6 +6035,10 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					fecLargeFrame,
 					fecRuntFrame,
 					fecExcessiveDeferrals,
+					fecJabbers,
+					fecRxPauseFrames,
+					fecRxEthernetBounce,
+					fecTxEthernetBounce,
 					fecAuxStatLinkDetected,
 					fecAuxStatLinkUptime,
 					fecAuxStatLinkLost,
@@ -4915,6 +6047,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					fecAuxOutDiscardsCount,
 					fecAuxOutErrorsCount,
 					fecAuxCRCError,
+					fecAuxL3L4ChecksumErrs,
 					fecAuxRxOverrun,
 					fecAuxLateCollision,
 					fecAuxRetransLimitExp,
@@ -4923,10 +6056,15 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					fecAuxNoCarrier,
 					fecAuxLargeFrame,
 					fecAuxRuntFrame,
+					fecAuxExcessiveDeferrals,
+					fecAuxJabbers,
+					fecAuxRxPauseFrames,
 					rfInDiscardsCountExt,
 					rfInErrorsCountExt,
 					rfOutDiscardsCountExt,
 					rfOutErrorsCountExt,
+					minModRateSatisfied,
+					ethernetPortDisableCounter,
 					rfInDiscardsCount,
 					rfInErrorsCount,
 					rfOutDiscardsCount,
@@ -4940,13 +6078,17 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					hardwareVersion,
 					radioStatusTransmitControlOverridden,
 					radioStatusTrackingFailure,
+					radioStatusOverTemperature,
 					radioStatusSectorWeightsOff,
 					radioStatusRxBeamFormingOff,
 					radioStatusPowerDetectorInactive,
 					radioStatusCatQuadCalFail,
 					radioStatusAlarmReason,
 					radioStatusAlarm,
+					radioStatusFeedbackRssi,
+					radioStatusFeedbackOvrg,
 					atexHazlocPowerLimit,
+					boxVcDepth,
 					interleave,
 					controlMessages,
 					radioMSN,
@@ -4954,11 +6096,16 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					latitude,
 					longitude,
 					height,
+					horizontalUncertainty,
+					verticalUncertainty,
 					bandwidth,
-					dataScramblingMethod,
 					whispWebUserAccessMode,
 					whispUsrAuth,
 					usrAccountEnableAccounting,
+					userChangePassword,
+					passwordMaxFailedAttempts,
+					passwordFailedAttemptTraceDuration,
+					passwordLockoutDuration,
 					allowRejectThenLocal,
 					pppoeFilter,
 					smbFilter,
@@ -4989,10 +6136,14 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					ipv6bootpsFilter,
 					ip4MultFilter,
 					ipv6MultFilter,
+					bpduFilter,
 					packetFilterDirection,
 					encryptionConfig,
+					fccStaFrequencies,
 					activeTxPowerStr,
-					activeTxPowerHdths}
+					activeTxPowerHdths,
+					ipv6State,
+					dhcpv6State}
 		STATUS		current
 		DESCRIPTION
 			"Canopy Box Level Attributes group."
@@ -5008,16 +6159,31 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					clearBERStats,
 					updateDevice,
 					undoUnitWideSavedChanges,
+					clearEthernetStats,
+					clearRadioStats,
+					ethernetPortAction,
+					txpowertemperatureupdate,
+					ethernetBounceTimeout,
 					resetPoEAux,
 					siteInfoViewable,
 					largeVCQ,
 					snrCalculation,
 					receiveQualityDebug,
+					csrfSetting,
 					poeT2Classification,
-					vcDepth,
+					idleTrafficEnable,
+					idleTrafficSize,
+					vcDepthDownlink,
+					vcDepthUplink,
 					enableSecurityBanner,
 					textSecurityBanner,
 					acceptSecurityBanner,
+					passwdMinimumLengthRule,
+					passwdCharacterTypes,
+					passwdUsernameInclusion,
+					historyRule,
+					passwdMustChange,
+					remoteUserLoginRules,
 					importConfigFile,
 					exportConfigFile}
 		STATUS		current
@@ -5032,6 +6198,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					whispBridgeAge,
 					whispBridgeExt,
 					whispBridgeHash,
+					whispBridge802OneXStatus,
 					whispBridgeCAM}
 		STATUS		current
 		DESCRIPTION
@@ -5148,7 +6315,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			NOTIFICATIONS {
 					boxLan1DHCPClientEvent,
 					boxPoEType2PowerNotPresent,
-					radioStatusAlarmEvent}
+					radioStatusAlarmEvent,
+					minModRateEvent}
 		STATUS		current
 		DESCRIPTION
 			"Canopy Box Notification Group."
@@ -5204,6 +6372,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			OBJECTS {
 					linkTestLUIDBox,
 					linkTestDurationBox,
+					linkTestRAProgCntOverrideBox,
 					linkTestActionBox,
 					linkTestPktLengthBox,
 					linkTestModeBox,
@@ -5273,7 +6442,9 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					linkTestNumPktTxExpCnt,
 					linkTestNumPktRxActCnt,
 					linkTestNumPktRxExpCnt,
+					linkTestNumInProgCnt,
 					linkTestMVCVC,
+					linkTestMVCLuid,
 					linkTestMVCPriority,
 					linkTestMVCXmtFragsDL,
 					linkTestMVCRcvFragsDL,
@@ -5284,20 +6455,97 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					linkTestMVCMumimoModRateDL,
 					linkTestMVCMumimoXmtModeDL,
 					linkTestMVCGroupingRatioDL,
+					linkTestMVCXmtFragsUL,
+					linkTestMVCRcvFragsUL,
+					linkTestMVCThroughputUL,
+					linkTestMVCEfficiencyUL,
+					linkTestMVCSumimoModRateUL,
+					linkTestMVCSumimoXmtModeUL,
+					linkTestMVCMumimoModRateUL,
+					linkTestMVCMumimoXmtModeUL,
+					linkTestMVCGroupingRatioUL,
+					linkTestMVCAverageRateDL,
+					linkTestMVCAverageRateUL,
 					linkTestMVCXmtFragsTotalDL,
 					linkTestMVCRcvFragsTotalDL,
 					linkTestMVCThroughputTotalDL,
 					linkTestMVCThroughputTotalUntestedVCsDL,
+					linkTestMVCThroughputTotalUntestedDataChannelsDL,
 					linkTestMVCEfficiencyTotalDL,
 					linkTestMVCSlotDistributionDL,
+					linkTestMVCXmtFragsTotalUL,
+					linkTestMVCRcvFragsTotalUL,
+					linkTestMVCThroughputTotalUL,
+					linkTestMVCThroughputTotalUntestedDataChannelsUL,
+					linkTestMVCEfficiencyTotalUL,
+					linkTestMVCSlotDistributionUL,
+					linkTestMVCAverageGroupSizeDL,
+					linkTestMVCAverageGroupSizeUL,
+					linkTestMVCGroupSize,
+					linkTestMVCDistributionPercent,
+					linkTestMVCAvgSlotCount,
+					linkTestMVCDistributionPercentUL,
+					linkTestMVCAvgSlotCountUL,
+					linkTestPriorityLevelBox,
 					linkTestFloodModeBox,
 					linkTestMumimoBox,
 					linkTestVCListBox,
-					linkTestSMRestriction}
+					linkTestLUIDListBox,
+					linkTestSMRestriction,
+					linkTestDisplayUntestedPriorityChannelsBox,
+					linkTestBlockUserTrafficBox,
+					linkTestIgnoreCIRBox}
 		STATUS		current
 		DESCRIPTION
 			"Canopy Box Link Test group."
 		::= {whispBoxGroups 11}
+
+	whispBoxL3PVIDMapTableGroup	OBJECT-GROUP
+			OBJECTS {
+					l3PVIDMapKey,
+					l3PVIDIpAddress,
+					l3PVIDNetmask,
+					l3PVIDMapVlan,
+					l3PVIDPriorityMode,
+					l3PVIDPriority}
+		STATUS		current
+		DESCRIPTION
+			"Canopy Box L3 PVID Mapping Table group."
+		::= {whispBoxGroups 12}
+
+	whispBoxCBRSGroup	OBJECT-GROUP
+			OBJECTS {
+					cbsdCpiEncodedData,
+					cbsdLatitude,
+					cbsdLongitude,
+					cbsdHeight,
+					cbsdHeightType,
+					cbsdHorizontalAccuracy,
+					cbsdVerticalAccuracy,
+					cbsdAntennaAzimuth,
+					cbsdAntennaDownTilt,
+					cbsdAntennaGain,
+					cbsdAntennaBeamwidth,
+					cbsdEirpCapability,
+					cbsdCpiInstallerId,
+					cbsdCpiInstallerName,
+					cbsdCpiInstallCertTime}
+		STATUS		current
+		DESCRIPTION
+			"Canopy Box Citizens Broadband Radio Service (CBRS) group."
+		::= {whispBoxGroups 13}
+
+	whispMACAddressFilterGroup	OBJECT-GROUP
+			OBJECTS {
+					addModifyMACAddressFilter,
+					rmMACAddressFilter,
+					enableMACAddressFilter,
+					defaultMACAddressFilterAction,
+					addModifyMACAddressFilterAction}
+		STATUS		current
+		DESCRIPTION
+			"Canopy MAC Address Filtering config group."
+		::= {whispBoxGroups 14}
 
 	whispBridgeTbUsed	OBJECT-TYPE
 		SYNTAX		INTEGER
@@ -5328,7 +6576,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Code Point 0."
+			"Code Point 0. Read-only to maintain backward compatibility with IPv4 header's TOS byte."
 		::={whispBoxCPVar 1}
 
 	codePoint1	OBJECT-TYPE
@@ -5389,10 +6637,10 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 
 	codePoint8	OBJECT-TYPE
 		SYNTAX		INTEGER
-		MAX-ACCESS	read-write
+		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Code Point 8."
+			"Code Point 8. Read-only to maintain backward compatibility with IPv4 header's TOS byte."
 		::={whispBoxCPVar 9}
 
 	codePoint9	OBJECT-TYPE
@@ -5453,10 +6701,10 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 
 	codePoint16	OBJECT-TYPE
 		SYNTAX		INTEGER
-		MAX-ACCESS	read-write
+		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Code Point 16."
+			"Code Point 16. Read-only to maintain backward compatibility with IPv4 header's TOS byte."
 		::={whispBoxCPVar 17}
 
 	codePoint17	OBJECT-TYPE
@@ -5517,10 +6765,10 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 
 	codePoint24	OBJECT-TYPE
 		SYNTAX		INTEGER
-		MAX-ACCESS	read-write
+		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Code Point 24."
+			"Code Point 24. Read-only to maintain backward compatibility with IPv4 header's TOS byte."
 		::={whispBoxCPVar 25}
 
 	codePoint25	OBJECT-TYPE
@@ -5581,10 +6829,10 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 
 	codePoint32	OBJECT-TYPE
 		SYNTAX		INTEGER
-		MAX-ACCESS	read-write
+		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Code Point 32."
+			"Code Point 32. Read-only to maintain backward compatibility with IPv4 header's TOS byte."
 		::={whispBoxCPVar 33}
 
 	codePoint33	OBJECT-TYPE
@@ -5645,10 +6893,10 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 
 	codePoint40	OBJECT-TYPE
 		SYNTAX		INTEGER
-		MAX-ACCESS	read-write
+		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Code Point 40."
+			"Code Point 40. Read-only to maintain backward compatibility with IPv4 header's TOS byte."
 		::={whispBoxCPVar 41}
 
 	codePoint41	OBJECT-TYPE
@@ -5712,7 +6960,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Code Point 48."
+			"Code Point 48. Read-only to maintain backward compatibility with IPv4 header's TOS byte."
 		::={whispBoxCPVar 49}
 
 	codePoint49	OBJECT-TYPE
@@ -5776,7 +7024,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Code Point 56."
+			"Code Point 56. Read-only to maintain backward compatibility with IPv4 header's TOS byte."
 		::={whispBoxCPVar 57}
 
 	codePoint57	OBJECT-TYPE
@@ -5867,6 +7115,19 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			"Radio Alarm Event notification."
 		::={whispBoxRadioAlarmEvent 1}
 
+-- Minimum Modulation Rate Event Notification.
+
+	minModRateEvent	NOTIFICATION-TYPE
+		OBJECTS {
+					minModRateSatisfied,
+					whispBoxEsn}
+		STATUS		current
+		DESCRIPTION		
+			"Minimum Modulation Rate Event Notification.
+                            Value indicates whether or not minimum modulation rate requirement has been satisfied.
+                            PTP only."
+		::={whispBoxMinModRateEvent 1}
+
 	dnsIpState	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					manual(0),
@@ -5876,7 +7137,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		DESCRIPTION		
 			"Configuration for DNS server IP addresses of the management interface are learned:
              0 : Manual, must configure dnsPrimaryMgmtIP and dnsAlternateMgmtIP
-			 1 : Automatic, DNS servers IP addresses are learned from DHCP response of the interface"
+             1 : Automatic, DNS servers IP addresses are learned from DHCP response of the interface"
 		::={whispBoxDNS 1}
 
 	dnsPrimaryMgmtIP	OBJECT-TYPE
@@ -5913,7 +7174,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		DESCRIPTION		
 			"Select whether to append the configured management domain name to
             the configured trap names.  For example, if dnsMgmtDomainName is
-			set to 'example.com', trap1 is set to 'trap1', and trapDomainNameAppend
+            set to 'example.com', trap1 is set to 'trap1', and trapDomainNameAppend
             is set to appendDomain, the trap1 name used would be 'trap1.example.com'."
 		::={whispBoxDNS 5}
 
@@ -6012,9 +7273,9 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					enable(1),
 					disable(0)}
 		MAX-ACCESS	read-write
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
-			"Enable(1) or Disable(0) SNMPv2c access"
+			"This variable is deprecated, please use snmpStatus."
 		::={whispBoxSNMPv3 1}
 
 	snmpv3EngineId	OBJECT-TYPE
@@ -6038,22 +7299,25 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 
 	snmpv3AuthProt	OBJECT-TYPE
 		SYNTAX		INTEGER {
-					md5(0)}
+					md5(0),
+					sha(1),
+					sha256(2)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
 			"The SNMPv3 message authentication protocol to use.  
-            Currently only MD5 is supported."
+            Currently MD5, SHA1 and SHA256 are supported."
 		::={whispBoxSNMPv3 4}
 
 	snmpv3PrivProt	OBJECT-TYPE
 		SYNTAX		INTEGER {
-					cbc-des(0)}
+					cbc-des(0),
+					cfb-aes(1)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
 			"The SNMPv3 message privacy/encryption protocol to use.
-            Currently only CBC-DES is supported."
+            Currently CBC-DES and CFB-AES are supported."
 		::={whispBoxSNMPv3 5}
 
 	roUserName	OBJECT-TYPE
@@ -6123,10 +7387,10 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"SNMPv3 Trap enable option:
-			  (0) Disable - No SNMPv3 Traps Sent
-			  (1) Enable Traps to be sent for SNMPv3 Read-Only User
-			  (2) Enable Traps to be sent for SNMPv3 Read-Write User
-			NOTE:  When disabled SNMPv2c Trap configuration is used."
+              (0) Disable - No SNMPv3 Traps Sent
+              (1) Enable Traps to be sent for SNMPv3 Read-Only User
+              (2) Enable Traps to be sent for SNMPv3 Read-Write User
+            NOTE:  When disabled SNMPv2c Trap configuration is used."
 		::={whispBoxSNMPv3 13}
 
 	user1Enable	OBJECT-TYPE
@@ -6328,7 +7592,9 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
                             This is an estimation of the throughput based upon the modulation, efficiency, and data slots available.
                             It intended to provide a basic link test test without impacting service for the sector.
                             Extrapolated Link Test is not available for FSK radios.
-                            4 = Link Test with Multiple VCs (traffic sent to all registered VCs, or specified VCs) - PMP 450m only"
+                            4 = Link Test with Multiple LUIDs (traffic sent to all registered LUIDs, or specified LUIDs) - PMP 450m only
+                            
+                            Note: Link Test must NOT be running when attempting to set this or an SNMP error will occur."
 		::={whispBoxLinkTestConfig 5}
 
 	linkTestSNRCalculationBox	OBJECT-TYPE
@@ -6352,8 +7618,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Link Test with:
-                            0 = Low Priority VC only
-                            1 = High and Low Priority VCs"
+                            0 = Low Priority Data Channel only
+                            1 = All Available Data Channels"
 		::={whispBoxLinkTestConfig 7}
 
 -- Link test configuration
@@ -6364,7 +7630,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Number of packets to send. Valid range: 0-64 where 0 will
-							flood the link for the duration of the test."
+                            flood the link for the duration of the test."
 		::={whispBoxLinkTestConfig 8}
 
 	linkTestForceModulationBox	OBJECT-TYPE
@@ -6400,12 +7666,9 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					external(0),
 					internal(1)}
 		MAX-ACCESS	read-write
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
-			"PMP 450m only. Engineering use only.
-                            Link Test usage:
-                            0 = Packets will be sent out the SM ethernet port
-                            1 = Packets will not be sent out the SM ethernet port"
+			"This OID has been deprecated."
 		::={whispBoxLinkTestConfig 11}
 
 	linkTestMumimoBox	OBJECT-TYPE
@@ -6424,12 +7687,9 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 	linkTestVCListBox	OBJECT-TYPE
 		SYNTAX		DisplayString
 		MAX-ACCESS	read-write
-		STATUS		current
+		STATUS		obsolete
 		DESCRIPTION		
-			"PMP 450m only.
-                            Link Test usage:
-                            Enter VCs to be tested (eg. 18 - 22,24,32)
-                            Empty field or 0 will flood all registered VCs for duration of test"
+			"This OID is now obsolete. Please use linkTestLUIDListBox instead."
 		::={whispBoxLinkTestConfig 13}
 
 	linkTestSMRestriction	OBJECT-TYPE
@@ -6444,6 +7704,83 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
                             Enabling will only permit Link Tests that allow user traffic to pass.
                             PMP only."
 		::={whispBoxLinkTestConfig 14}
+
+	linkTestPriorityLevelBox	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					lowpriority(0),
+					medpriority(1),
+					highpriority(2),
+					ultrapriority(3)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"PMP 450m only.
+                            Link Test with:
+                            0 = Link Test Low Priority Data Channels
+                            1 = Link Test Low and Medium Priority Data Channels
+                            2 = Link Test Low, Medium and High Priority Data Channels
+                            3 = Link Test All Data Channels"
+		::={whispBoxLinkTestConfig 15}
+
+	linkTestDisplayUntestedPriorityChannelsBox	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enable(1),
+					disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION		
+			"This OID has been deprecated. All untested Data Channels with traffic are now marked as such by the 'Tested' column and always displayed."
+		::={whispBoxLinkTestConfig 16}
+
+	linkTestIgnoreCIRBox	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enable(1),
+					disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"PMP 450m only.
+                            Ignore configured CIR when performing Link Test with Multiple LUIDs
+                            0 - Use CIR
+                            1 - Ignore CIR"
+		::={whispBoxLinkTestConfig 17}
+
+	linkTestLUIDListBox	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"PMP 450m only.
+                            Link Test usage:
+                            Enter LUIDs to be tested (eg. 2 - 22,24,32)
+                            Empty field or 0 will flood all registered LUIDs for duration of test
+                            
+                            Note: Link Test must NOT be running when attempting to set this or an SNMP error will occur."
+		::={whispBoxLinkTestConfig 18}
+
+	linkTestBlockUserTrafficBox	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enable(1),
+					disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"PMP 450m only.
+                            Choose whether or not to block user traffic during a Link Test With Mulitple LUIDs. When blocking is enabled, only link test packets
+                            will be allowed to get through for the duration of the test. When blocking is disbaled, user data is allowed through, and link test fills
+                            any remaining slots.
+                            0 = Allow User Traffic (default)
+                            1 = Block User Traffic"
+		::={whispBoxLinkTestConfig 19}
+
+	linkTestRAProgCntOverrideBox	OBJECT-TYPE
+		SYNTAX		INTEGER (0..2047)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Engineering use only.
+                            Override value for rate adapt progressive count (if being applied): range 0 - 2047"
+		::={whispBoxLinkTestConfig 20}
 
 -- Link test results
 
@@ -6470,7 +7807,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		DESCRIPTION		
 			"Error status of Link Test:
             (1) Failed to recieve handshake from remote device
-            (2) No session is currently active. Please try again after session established.
+            (2) No session with selected LUID. Please try again after session established.
             (3) Received a bad transaction ID.  Please try again.
             (4) We werent able to send the test request to the remote device.
             (5) We didnt receive any results from the remote device."
@@ -6508,7 +7845,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Down Link Efficiency."
+			"Downlink Efficiency."
 		::={whispBoxLinkTestResult 7}
 
 	maxDwnLinkIndexBox	OBJECT-TYPE
@@ -6524,7 +7861,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Actual down link index."
+			"Actual downlink index."
 		::={whispBoxLinkTestResult 9}
 
 	expDwnFragCountBox	OBJECT-TYPE
@@ -6549,7 +7886,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Up link efficiency."
+			"Uplink efficiency."
 		::={whispBoxLinkTestResult 12}
 
 	expUpFragCountBox	OBJECT-TYPE
@@ -6581,7 +7918,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Actual Up link index."
+			"Actual Uplink index."
 		::={whispBoxLinkTestResult 16}
 
 	fragments1xDwnLinkVerticalBox	OBJECT-TYPE
@@ -6589,7 +7926,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on down link at 1X (QPSK).
+			"Number of fragments received on downlink at 1X (QPSK).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 17}
@@ -6599,7 +7936,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on down link at 2X (16-QAM).
+			"Number of fragments received on downlink at 2X (16-QAM).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 18}
@@ -6609,7 +7946,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on down link at 3X (64-QAM).
+			"Number of fragments received on downlink at 3X (64-QAM).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 19}
@@ -6619,7 +7956,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on down link at 4X (256-QAM).
+			"Number of fragments received on downlink at 4X (256-QAM).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 20}
@@ -6629,7 +7966,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on up link at 1X (QPSK).
+			"Number of fragments received on uplink at 1X (QPSK).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 21}
@@ -6639,7 +7976,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on up link at 2X (16-QAM).
+			"Number of fragments received on uplink at 2X (16-QAM).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 22}
@@ -6649,7 +7986,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on up link at 3X (64-QAM).
+			"Number of fragments received on uplink at 3X (64-QAM).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 23}
@@ -6659,7 +7996,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on up link at 4X (256-QAM).
+			"Number of fragments received on uplink at 4X (256-QAM).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 24}
@@ -6669,7 +8006,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on down link at 1X (QPSK).
+			"Number of bit errors corrected on average per fragment on downlink at 1X (QPSK).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 25}
@@ -6679,7 +8016,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on down link at 2X (16-QAM).
+			"Number of bit errors corrected on average per fragment on downlink at 2X (16-QAM).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 26}
@@ -6689,7 +8026,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on down link at 3X (64-QAM).
+			"Number of bit errors corrected on average per fragment on downlink at 3X (64-QAM).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 27}
@@ -6699,7 +8036,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on down link at 4X (256-QAM).
+			"Number of bit errors corrected on average per fragment on downlink at 4X (256-QAM).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 28}
@@ -6709,7 +8046,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on up link at 1X (QPSK).
+			"Number of bit errors corrected on average per fragment on uplink at 1X (QPSK).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 29}
@@ -6719,7 +8056,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on up link at 2X (16-QAM).
+			"Number of bit errors corrected on average per fragment on uplink at 2X (16-QAM).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 30}
@@ -6729,7 +8066,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on up link at 3X (64-QAM).
+			"Number of bit errors corrected on average per fragment on uplink at 3X (64-QAM).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 31}
@@ -6739,7 +8076,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on up link at 4X (256-QAM).
+			"Number of bit errors corrected on average per fragment on uplink at 4X (256-QAM).
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 32}
@@ -6749,7 +8086,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Estimated Signal to Noise Ratio in dB for the down link.
+			"Estimated Signal to Noise Ratio in dB for the downlink.
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 33}
@@ -6759,7 +8096,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Estimated Signal to Noise Ratio in dB for the up link.
+			"Estimated Signal to Noise Ratio in dB for the uplink.
                             For Gen II OFDM and forward.
                             For MIMO this is the vertical path."
 		::={whispBoxLinkTestResult 34}
@@ -6769,7 +8106,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on down link at 1X (QPSK).
+			"Number of fragments received on downlink at 1X (QPSK).
                             For MIMO only.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6780,7 +8117,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on down link at 2X (16-QAM).
+			"Number of fragments received on downlink at 2X (16-QAM).
                             For MIMO only.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6791,7 +8128,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on down link at 3X (64-QAM).
+			"Number of fragments received on downlink at 3X (64-QAM).
                             For MIMO only.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6802,7 +8139,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on down link at 4X (256-QAM).
+			"Number of fragments received on downlink at 4X (256-QAM).
                             For MIMO only.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6813,7 +8150,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on up link at 1X (QPSK).
+			"Number of fragments received on uplink at 1X (QPSK).
                             For MIMO only.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6824,7 +8161,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on up link at 2X (16-QAM).
+			"Number of fragments received on uplink at 2X (16-QAM).
                             For MIMO only.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6835,7 +8172,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on up link at 3X (64-QAM).
+			"Number of fragments received on uplink at 3X (64-QAM).
                             For MIMO only.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6846,7 +8183,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of fragments received on up link at 4X (256-QAM).
+			"Number of fragments received on uplink at 4X (256-QAM).
                             For MIMO only.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6857,7 +8194,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on down link at 1X (QPSK).
+			"Number of bit errors corrected on average per fragment on downlink at 1X (QPSK).
                             For MIMO and forward.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6868,7 +8205,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on down link at 2X (16-QAM).
+			"Number of bit errors corrected on average per fragment on downlink at 2X (16-QAM).
                             For MIMO and forward.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6879,7 +8216,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on down link at 3X (64-QAM).
+			"Number of bit errors corrected on average per fragment on downlink at 3X (64-QAM).
                             For MIMO and forward.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6890,7 +8227,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on down link at 4X (256-QAM).
+			"Number of bit errors corrected on average per fragment on downlink at 4X (256-QAM).
                             For MIMO and forward.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6901,7 +8238,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on up link at 1X (QPSK).
+			"Number of bit errors corrected on average per fragment on uplink at 1X (QPSK).
                             For MIMO and forward.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6912,7 +8249,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on up link at 2X (16-QAM).
+			"Number of bit errors corrected on average per fragment on uplink at 2X (16-QAM).
                             For MIMO and forward.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6924,7 +8261,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Engineering use only.
-                            Number of bit errors corrected on average per fragment on up link at 3X (64-QAM).
+                            Number of bit errors corrected on average per fragment on uplink at 3X (64-QAM).
                             For MIMO and forward.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6935,7 +8272,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Number of bit errors corrected on average per fragment on up link at 4X (256-QAM).
+			"Number of bit errors corrected on average per fragment on uplink at 4X (256-QAM).
                             For MIMO and forward.
                             For MIMO this is the horizontal path.
                             Fragments received in MIMO-A will only be counted on vertical."
@@ -6946,7 +8283,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Estimated Signal to Noise Ratio in dB for the down link.
+			"Estimated Signal to Noise Ratio in dB for the downlink.
                             For MIMO and forward.
                             For MIMO this is the horizontal path.
                             If operating in MIMO-A this will return 0."
@@ -6957,7 +8294,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Estimated Signal to Noise Ratio in dB for the up link.
+			"Estimated Signal to Noise Ratio in dB for the uplink.
                             For Gen II OFDM and forward.
                             For MIMO this is the horizontal path.
                             If operating in MIMO-A this will return 0."
@@ -7045,6 +8382,14 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			"Number of packets expected to be received during link test."
 		::={whispBoxLinkTestResult 61}
 
+	linkTestNumInProgCnt	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of Link Test Initiations ignored because we were actively executing a link test."
+		::={whispBoxLinkTestResult 62}
+
 	linkTestMVCXmtFragsTotalDL	OBJECT-TYPE
 		SYNTAX		INTEGER
 		MAX-ACCESS	read-only
@@ -7066,16 +8411,17 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"Total Downlink Throughput for Tested VCs"
+			"Total Downlink Throughput for Tested Data Channels"
 		::={whispBoxLinkTestMVCResult 3}
 
 	linkTestMVCThroughputTotalUntestedVCsDL	OBJECT-TYPE
 		SYNTAX		INTEGER
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
 			"Total Downlink Throughput for Untested VCs.
-							This is the amount of user traffic that was transmitted to VCs during the test that were not part of the Link Test."
+                            This is the amount of user traffic that was transmitted to VCs during the test that were not part of the Link Test.
+                            This OID is now deprecated. Please use linkTestMVCThroughputTotalUntestedDataChannelsDL instead."
 		::={whispBoxLinkTestMVCResult 4}
 
 	linkTestMVCEfficiencyTotalDL	OBJECT-TYPE
@@ -7092,9 +8438,91 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Downlink Slot Distribution.
-							Average group size per slot per frame represented as a percentage.
-							450m only."
+                            Average group size per slot per frame represented as a percentage.
+                            450m only."
 		::={whispBoxLinkTestMVCResult 6}
+
+	linkTestMVCThroughputTotalUntestedDataChannelsDL	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Total Downlink Throughput for Untested Data Channels.
+                            This is the amount of user traffic that was transmitted to Data Channels during the test that were not part of the Link Test."
+		::={whispBoxLinkTestMVCResult 7}
+
+	linkTestMVCXmtFragsTotalUL	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Total Uplink Fragments Transmitted"
+		::={whispBoxLinkTestMVCResult 8}
+
+	linkTestMVCRcvFragsTotalUL	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Total Uplink Fragments Received"
+		::={whispBoxLinkTestMVCResult 9}
+
+	linkTestMVCThroughputTotalUL	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Total Uplink Throughput for Tested Data Channels"
+		::={whispBoxLinkTestMVCResult 10}
+
+	linkTestMVCThroughputTotalUntestedDataChannelsUL	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Total Uplink Throughput for Untested Data Channels.
+                            This is the amount of user traffic that was transmitted to Data Channels during the test that were not part of the Link Test."
+		::={whispBoxLinkTestMVCResult 11}
+
+	linkTestMVCEfficiencyTotalUL	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Total Uplink Efficiency"
+		::={whispBoxLinkTestMVCResult 12}
+
+	linkTestMVCSlotDistributionUL	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Slot Distribution.
+                            Average group size per slot per frame represented as a percentage.
+                            450m only."
+		::={whispBoxLinkTestMVCResult 13}
+
+	linkTestMVCAverageGroupSizeDL	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average Downlink aggregate group size.
+                        Only Valid after Link Test with Multiple LUIDs has been run.
+                        This value is scaled up by 10 (ie. 26 = 2.6).
+                        MU-MIMO Only"
+		::={whispBoxLinkTestMVCResult 14}
+
+	linkTestMVCAverageGroupSizeUL	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average Uplink aggregate group size.
+                        Only Valid after Link Test with Multiple LUIDs has been run.
+                        This value is scaled up by 10 (ie. 26 = 2.6).
+                        MU-MIMO Only"
+		::={whispBoxLinkTestMVCResult 15}
 
 	whispBoxLinkTestMVCTable OBJECT-TYPE
 		SYNTAX		SEQUENCE OF WhispBoxLinkTestMVCEntry
@@ -7124,7 +8552,19 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			linkTestMVCSumimoXmtModeDL		INTEGER,
 			linkTestMVCMumimoModRateDL		INTEGER,
 			linkTestMVCMumimoXmtModeDL		INTEGER,
-			linkTestMVCGroupingRatioDL	INTEGER
+			linkTestMVCGroupingRatioDL		INTEGER,
+			linkTestMVCLuid		INTEGER,
+			linkTestMVCXmtFragsUL		INTEGER,
+			linkTestMVCRcvFragsUL		INTEGER,
+			linkTestMVCThroughputUL		INTEGER,
+			linkTestMVCEfficiencyUL		INTEGER,
+			linkTestMVCSumimoModRateUL		INTEGER,
+			linkTestMVCSumimoXmtModeUL		INTEGER,
+			linkTestMVCMumimoModRateUL		INTEGER,
+			linkTestMVCMumimoXmtModeUL		INTEGER,
+			linkTestMVCGroupingRatioUL		INTEGER,
+			linkTestMVCAverageRateDL		INTEGER,
+			linkTestMVCAverageRateUL	INTEGER
 			}
 
 	linkTestMVCVC	OBJECT-TYPE
@@ -7138,11 +8578,13 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 	linkTestMVCPriority	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					low(0),
-					high(1)}
+					medium(1),
+					high(2),
+					ultraHigh(3)}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"VC Priority"
+			"Data Channel Priority"
 		::={whispBoxLinkTestMVCEntry 2}
 
 	linkTestMVCXmtFragsDL	OBJECT-TYPE
@@ -7182,20 +8624,24 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					noSession(0),
 					rate1X(1),
 					rate2X(2),
-					rete3X(3),
+					rate3X(3),
 					rate4X(4),
+					rate5X(5),
 					rate6X(6),
+					rate7X(7),
 					rate8X(8)}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
 			"Downlink SU-MIMO Modulation Transmit Rate.
-							0 : No session
+                            0 : No session
                             1 : 1X QPSK MIMO-A
                             2 : 2X 16-QAM MIMO-A or QPSK MIMO-B
-                            3 : 3X 64-QAM MIMO-A
+                            3 : 3X 64-QAM MIMO-A or 8-QAM MIMO-B
                             4 : 4X 256-QAM MIMO-A or 16-QAM MIMO-B
+                            5 : 5X 32-QAM MIMO-B
                             6 : 6X 64-QAM MIMO-B
+                            7 : 7X 128-QAM MIMO-B
                             8 : 8X 256-QAM MIMO-B"
 		::={whispBoxLinkTestMVCEntry 7}
 
@@ -7203,14 +8649,14 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		SYNTAX		INTEGER {
 					mimo-b(0),
 					mimo-a(1),
-					noSession(2)}
+					noSession(3)}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
 			"Downlink SU-MIMO Transmit Mode.
-							0 : MIMO-B
+                            0 : MIMO-B
                             1 : MIMO-A
-                            2 : No session"
+                            3 : No session"
 		::={whispBoxLinkTestMVCEntry 8}
 
 	linkTestMVCMumimoModRateDL	OBJECT-TYPE
@@ -7218,21 +8664,25 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					invalid(0),
 					rate1X(1),
 					rate2X(2),
-					rete3X(3),
+					rate3X(3),
 					rate4X(4),
+					rate5X(5),
 					rate6X(6),
+					rate7X(7),
 					rate8X(8)}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
 			"Downlink MU-MIMO Modulation Transmit Rate.
-							450m only.
-							0 : Invalid
+                            450m only.
+                            0 : Invalid
                             1 : 1X QPSK MIMO-A
                             2 : 2X 16-QAM MIMO-A or QPSK MIMO-B
-                            3 : 3X 64-QAM MIMO-A
+                            3 : 3X 64-QAM MIMO-A or 8-QAM MIMO-B
                             4 : 4X 256-QAM MIMO-A or 16-QAM MIMO-B
+                            5 : 5X 32-QAM MIMO-B
                             6 : 6X 64-QAM MIMO-B
+                            7 : 7X 128-QAM MIMO-B
                             8 : 8X 256-QAM MIMO-B"
 		::={whispBoxLinkTestMVCEntry 9}
 
@@ -7240,15 +8690,15 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		SYNTAX		INTEGER {
 					mimo-b(0),
 					mimo-a(1),
-					invalid(2)}
+					invalid(3)}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
 			"Downlink MU-MIMO Transmit Mode.
-							450m only.
-							0 : MIMO-B
+                            450m only.
+                            0 : MIMO-B
                             1 : MIMO-A
-                            2 : Invalid"
+                            3 : Invalid"
 		::={whispBoxLinkTestMVCEntry 10}
 
 	linkTestMVCGroupingRatioDL	OBJECT-TYPE
@@ -7257,9 +8707,242 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Downlink Grouping Ratio.
-							The percentage of time that a VC is grouped with other VCs to make a MU-MIMO group.
-							450m only."
+                            The percentage of time that a Data Channel is grouped with other Data Channels to make a MU-MIMO group.
+                            450m only."
 		::={whispBoxLinkTestMVCEntry 11}
+
+	linkTestMVCLuid	OBJECT-TYPE
+		SYNTAX		INTEGER (2..239)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Luid"
+		::={whispBoxLinkTestMVCEntry 12}
+
+	linkTestMVCXmtFragsUL	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Fragments Transmitted"
+		::={whispBoxLinkTestMVCEntry 13}
+
+	linkTestMVCRcvFragsUL	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Fragments Received"
+		::={whispBoxLinkTestMVCEntry 14}
+
+	linkTestMVCThroughputUL	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Throughput"
+		::={whispBoxLinkTestMVCEntry 15}
+
+	linkTestMVCEfficiencyUL	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Efficiency"
+		::={whispBoxLinkTestMVCEntry 16}
+
+	linkTestMVCSumimoModRateUL	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					noSession(0),
+					rate1X(1),
+					rate2X(2),
+					rate3X(3),
+					rate4X(4),
+					rate5X(5),
+					rate6X(6),
+					rate7X(7),
+					rate8X(8)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink SU-MIMO Modulation Transmit Rate.
+                            0 : No session
+                            1 : 1X QPSK MIMO-A
+                            2 : 2X 16-QAM MIMO-A or QPSK MIMO-B
+                            3 : 3X 64-QAM MIMO-A or 8-QAM MIMO-B
+                            4 : 4X 256-QAM MIMO-A or 16-QAM MIMO-B
+                            5 : 5X 32-QAM MIMO-B
+                            6 : 6X 64-QAM MIMO-B
+                            7 : 7X 128-QAM MIMO-B
+                            8 : 8X 256-QAM MIMO-B"
+		::={whispBoxLinkTestMVCEntry 17}
+
+	linkTestMVCSumimoXmtModeUL	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					mimo-b(0),
+					mimo-a(1),
+					noSession(3)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink SU-MIMO Transmit Mode.
+                            0 : MIMO-B
+                            1 : MIMO-A
+                            3 : No session"
+		::={whispBoxLinkTestMVCEntry 18}
+
+	linkTestMVCMumimoModRateUL	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					invalid(0),
+					rate1X(1),
+					rate2X(2),
+					rate3X(3),
+					rate4X(4),
+					rate5X(5),
+					rate6X(6),
+					rate7X(7),
+					rate8X(8)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink MU-MIMO Modulation Transmit Rate.
+                            450m only.
+                            0 : Invalid
+                            1 : 1X QPSK MIMO-A
+                            2 : 2X 16-QAM MIMO-A or QPSK MIMO-B
+                            3 : 3X 64-QAM MIMO-A or 8-QAM MIMO-B
+                            4 : 4X 256-QAM MIMO-A or 16-QAM MIMO-B
+                            5 : 5X 32-QAM MIMO-B
+                            6 : 6X 64-QAM MIMO-B
+                            7 : 7X 128-QAM MIMO-B
+                            8 : 8X 256-QAM MIMO-B"
+		::={whispBoxLinkTestMVCEntry 19}
+
+	linkTestMVCMumimoXmtModeUL	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					mimo-b(0),
+					mimo-a(1),
+					invalid(3)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink MU-MIMO Transmit Mode.
+                            450m only.
+                            0 : MIMO-B
+                            1 : MIMO-A
+                            3 : Invalid"
+		::={whispBoxLinkTestMVCEntry 20}
+
+	linkTestMVCGroupingRatioUL	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Grouping Ratio.
+                            The percentage of time that a Data Channel is grouped with other Data Channels to make a MU-MIMO group.
+                            450m only."
+		::={whispBoxLinkTestMVCEntry 21}
+
+	linkTestMVCAverageRateDL	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Downlink Average Rate.
+                            The average Downlink modulation rate during the link test (SU-MIMO and MU-MIMO combined).
+                            This value is scaled up by 10 (ie. 69 = 6.9X average rate)
+                            450m only."
+		::={whispBoxLinkTestMVCEntry 22}
+
+	linkTestMVCAverageRateUL	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Uplink Average Rate.
+                            The average Uplink modulation rate during the link test (SU-MIMO and MU-MIMO combined).
+                            This value is scaled up by 10 (ie. 69 = 6.9X average rate)
+                            450m only."
+		::={whispBoxLinkTestMVCEntry 23}
+
+	whispBoxLinkTestMVCSlotGroupingTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF WhispBoxLinkTestMVCSlotGroupingEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Link Test with Multiple VC Slot Grouping results."
+		::= {whispBoxLink 7}
+
+	whispBoxLinkTestMVCSlotGroupingEntry OBJECT-TYPE
+		SYNTAX		WhispBoxLinkTestMVCSlotGroupingEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Link Test with Multiple VC Slot Grouping results.
+                            Only Valid after Link Test with Multiple VC has been run
+                            MU-MIMO Only"
+		INDEX		{linkTestMVCGroupSize}
+		::= {whispBoxLinkTestMVCSlotGroupingTable 1}
+
+		WhispBoxLinkTestMVCSlotGroupingEntry ::= SEQUENCE{
+			linkTestMVCGroupSize		INTEGER,
+			linkTestMVCDistributionPercent		INTEGER,
+			linkTestMVCAvgSlotCount		INTEGER,
+			linkTestMVCDistributionPercentUL		INTEGER,
+			linkTestMVCAvgSlotCountUL	INTEGER
+			}
+
+	linkTestMVCGroupSize	OBJECT-TYPE
+		SYNTAX		INTEGER (1..7)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Group Size
+                        Only Valid after Link Test with Multiple LUIDs has been run.
+                        MU-MIMO Only"
+		::={whispBoxLinkTestMVCSlotGroupingEntry 1}
+
+	linkTestMVCDistributionPercent	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average Downlink group size per slot per frame represented as a percentage.
+                        Only Valid after Link Test with Multiple LUIDs has been run.
+                        This value is scaled up by 10 (ie. 169 = 16.9%).
+                        MU-MIMO Only"
+		::={whispBoxLinkTestMVCSlotGroupingEntry 2}
+
+	linkTestMVCAvgSlotCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average Downlink Slot Count
+                        Only Valid after Link Test with Multiple LUIDs has been run.
+                        MU-MIMO Only"
+		::={whispBoxLinkTestMVCSlotGroupingEntry 3}
+
+	linkTestMVCDistributionPercentUL	OBJECT-TYPE
+		SYNTAX		INTEGER (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average Uplink group size per slot per frame represented as a percentage.
+                        Only Valid after Link Test with Multiple LUIDs has been run.
+                        This value is scaled up by 10 (ie. 169 = 16.9%).
+                        MU-MIMO Only"
+		::={whispBoxLinkTestMVCSlotGroupingEntry 4}
+
+	linkTestMVCAvgSlotCountUL	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Average Uplink Slot Count
+                        Only Valid after Link Test with Multiple LUIDs has been run.
+                        MU-MIMO Only"
+		::={whispBoxLinkTestMVCSlotGroupingEntry 5}
 
 	certTableUserAuth OBJECT-TYPE
 		SYNTAX		SEQUENCE OF CertEntryUserAuth
@@ -7368,7 +9051,7 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		STATUS		current
 		DESCRIPTION		
 			"Indicates number of paths.  For FSK or OFDM (non-MIMO), this is 1.
-						For MIMO, it can be greater (with a current maximum of 2)."
+                        For MIMO, it can be greater (with a current maximum of 2)."
 		::={whispBoxRFPhysicalRadioEntry 3}
 
 	whispBoxRFPhysicalRadioPaths OBJECT-TYPE
@@ -7429,6 +9112,24 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			"Frequency."
 		::={whispBoxRFPhysicalRadioFrequencyEntry 1}
 
+	carrierCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"A count of the enabled carriers.
+                            Read only. Canopy V only."
+		::={whispBoxRFConfig 4}
+
+	componentCarrierCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Count of active component carriers.
+                            Read only. Canopy V only."
+		::={whispBoxRFConfig 5}
+
 	whispBoxRFConfigRadios OBJECT-TYPE
 		SYNTAX		SEQUENCE OF WhispBoxRFConfigRadioEntry
 		MAX-ACCESS	not-accessible
@@ -7476,13 +9177,416 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 					band6050(12),
 					band3600(13),
 					band4959(14),
-					band3(15)}
+					band3(15),
+					band5170(16),
+					band65(17),
+					band67(18),
+					band5763(19),
+					band66(20)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
 			"Currently configured radio band.
-							Set is Engineering use only."
+                            Set is Engineering use only."
 		::={whispBoxRFConfigRadioEntry 2}
+
+	carrierConfig OBJECT-TYPE
+		SYNTAX		SEQUENCE OF CarrierConfigEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Canopy V carrier configuration table"
+		::= {whispBoxRFConfig 2}
+
+	carrierConfigEntry OBJECT-TYPE
+		SYNTAX		CarrierConfigEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Canopy V carrier configuration table entry"
+		INDEX		{carrierTableIndex}
+		::= {carrierConfig 1}
+
+		CarrierConfigEntry ::= SEQUENCE{
+			carrierTableIndex		INTEGER,
+			carrierBand		INTEGER,
+			carrierTxPower		INTEGER,
+			carrierRxPowerTarget	INTEGER
+			}
+
+	carrierTableIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (1..2)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Index to the Canopy V carrier config table"
+		::={carrierConfigEntry 1}
+
+	carrierBand	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					band700(0),
+					band900(1),
+					band2400(2),
+					band3500(3),
+					band3700(4),
+					band4900(5),
+					band5100(6),
+					band5200(7),
+					band5400(8),
+					band5700(9),
+					band5800(10),
+					band5900(11),
+					band6050(12),
+					band3600(13),
+					band4959(14),
+					band3(15),
+					band5170(16),
+					band65(17),
+					band67(18)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Currently configured radio band"
+		::={carrierConfigEntry 2}
+
+	carrierTxPower	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Transmit power for the carrier in dBm"
+		::={carrierConfigEntry 3}
+
+	carrierRxPowerTarget	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Desired receive power level in dBm. For point to point links bhsTxPowerControl must be enabled on the BHM for this level to be targetted."
+		::={carrierConfigEntry 4}
+
+	componentCarrierConfig OBJECT-TYPE
+		SYNTAX		SEQUENCE OF ComponentCarrierConfigEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Canopy V component carrier configuration table"
+		::= {whispBoxRFConfig 3}
+
+	componentCarrierConfigEntry OBJECT-TYPE
+		SYNTAX		ComponentCarrierConfigEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Canopy V component carrier configuration table entry"
+		INDEX		{componentCarrierTableIndex}
+		::= {componentCarrierConfig 1}
+
+		ComponentCarrierConfigEntry ::= SEQUENCE{
+			componentCarrierTableIndex		INTEGER,
+			componentCarrierAssignment		INTEGER,
+			componentCarrierFrequency	INTEGER
+			}
+
+	componentCarrierTableIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (1..4)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Index to the Canopy V component carrier config table"
+		::={componentCarrierConfigEntry 1}
+
+	componentCarrierAssignment	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"The carrier assignment of the component carrier. Assign the component carrier to a carrier before setting the component carrier frequency.
+                            Canopy V only. SM read only."
+		::={componentCarrierConfigEntry 2}
+
+	componentCarrierFrequency	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"The frequency of component carrier in kHz.
+                            Canopy V only. SM read only."
+		::={componentCarrierConfigEntry 3}
+
+	cbsdCpiEncodedData	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"The CPI installation data encoded and signed using JOSE JSON web signature. JOSE compact serialization should be used by concatenating the protectedHeader, encodedCpiSignedData and digitalSignature fields with '.'"
+		::={whispBoxCbrsConfig 1}
+
+	cbsdLatitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The Latitude of the CBSD in decimal degrees."
+		::={whispBoxCbrsConfig 2}
+
+	cbsdLongitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The Longitude of the CBSD in decimal degrees."
+		::={whispBoxCbrsConfig 3}
+
+	cbsdHeight	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The Height of the CBSD in Meters."
+		::={whispBoxCbrsConfig 4}
+
+	cbsdHeightType	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"AGL or AMSL. AGL height is measured relative to the ground level and AMSL height is measured relative to the mean sea level."
+		::={whispBoxCbrsConfig 5}
+
+	cbsdHorizontalAccuracy	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"Meters"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Indicates the accuracy of the CBSD antenna horizontal location. As per FCC requirement it should be less than 50 meters."
+		::={whispBoxCbrsConfig 6}
+
+	cbsdVerticalAccuracy	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"Meters"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Indicates the accuracy of the CBSD antenna vertical location. As per FCC requirement it should be less than 3 meters."
+		::={whispBoxCbrsConfig 7}
+
+	cbsdAntennaAzimuth	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"Degree"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Boresight direction of the horizontal plane of the antenna in degrees with respect to true north. A value of 0 degrees means true north; a value of 90 degrees means east."
+		::={whispBoxCbrsConfig 8}
+
+	cbsdAntennaDownTilt	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"Degree"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Antenna downtilt in degrees.  A negative value means the antenna is tilted up (above horizontal)."
+		::={whispBoxCbrsConfig 9}
+
+	cbsdAntennaGain	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"dBi"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Peak antenna gain in dBi."
+		::={whispBoxCbrsConfig 10}
+
+	cbsdAntennaBeamwidth	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"Degree"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"3 dB antenna beamwidth of the antenna in the horizontal-plane in degrees. This can be specified only if an external antenna is used. 
+                            Note: A value of 360 (degrees) means the antenna has an omnidirectional radiation pattern in the horizontal plane."
+		::={whispBoxCbrsConfig 11}
+
+	cbsdEirpCapability	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"dBm"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Maximum EIRP the radio is capable of."
+		::={whispBoxCbrsConfig 12}
+
+	cbsdCpiInstallerId	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"ID of the Certified Professional Installer who installed the radio."
+		::={whispBoxCbrsConfig 13}
+
+	cbsdCpiInstallerName	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Name of the Certified Professional Installer who installed the radio."
+		::={whispBoxCbrsConfig 14}
+
+	cbsdCpiInstallCertTime	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Time at which the Certified Professional Installer certified the radio installation parameters"
+		::={whispBoxCbrsConfig 15}
+
+	gpsTrackingMode	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS tracking mode. Available for AP and MicroPop as SM"
+		::={whispBoxGPS 1}
+
+	gpsTime	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS time. Available for AP and MicroPop as SM"
+		::={whispBoxGPS 2}
+
+	gpsDate	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS date. Available for AP and MicroPop as SM"
+		::={whispBoxGPS 3}
+
+	gpsSatellitesTracked	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Returns Current number of satellites GPS is tracking in string format. Use gpsSatellitesTrackedInt to get the value in integer. Available for AP and MicroPop as SM"
+		::={whispBoxGPS 4}
+
+	gpsSatellitesTrackedInt	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current number of satellites GPS is tracking in integer format. Available for AP and MicroPop as SM"
+		::={whispBoxGPS 5}
+
+	gpsSatellitesVisible	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Return Number of satellites GPS is seeing in string format. Use gpsSatellitesVisibleInt to get value in integer. Available for AP and MicroPop as SM"
+		::={whispBoxGPS 6}
+
+	gpsSatellitesVisibleInt	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of satellites the GPS sees in integer format. Available for AP and MicroPop as SM"
+		::={whispBoxGPS 7}
+
+	gpsHeight	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS height. Available for AP and MicroPop as SM"
+		::={whispBoxGPS 8}
+
+	gpsLatitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS Latitude. Available for AP and MicroPop as SM"
+		::={whispBoxGPS 9}
+
+	gpsLongitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS Longitude. Available for AP and MicroPop as SM"
+		::={whispBoxGPS 10}
+
+	gpsInvalidMsg	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of invalid messages. Available for AP and MicroPop as SM"
+		::={whispBoxGPS 11}
+
+	gpsReceiverInfo	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"A textual string contains information on GPS receiver. Available for AP and MicroPop as SM"
+		::={whispBoxGPS 12}
+
+	uGPSPower	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					off(0),
+					on(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable or Disable aux port power to Universal GPS module (UGPS capable radios only, when GPS_output_enable is NOT set)."
+		::={whispBoxGPS 13}
+
+	gnssSearchMode	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Set the GNSS search mode on applicable platforms.  This is a + separate string of possible names GPS, GLONASS, Galileo, and Beidou.
+                        For example, setting to GPS+GLONASS+Galileo will enable GPS GLONASS, and Galileo systems while GPS will only enable GPS system.
+                        Note that some of these may be rejected if they are not allowed due to regulatory reasons."
+		::={whispBoxGPS 14}
+
+	gnssDataSourceOverride	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					auto(0),
+					igps(1),
+					ugps(2)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Set the default GNSS Data source for this device.
+                        0 = Automatic: let radio algorithm choose the data source
+                        1 = iGPS: use only internal GPS data source
+                        2 = UGPS: use only external UGPS or cnPulse source"
+		::={whispBoxGPS 15}
+
+	gpsSatellitesUsed	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Returns Current number of satellites GPS is used for fix in string format. Use gpsSatellitesUsedInt to get the value in integer. Available for AP and MicroPop as SM"
+		::={whispBoxGPS 16}
+
+	gpsSatellitesUsedInt	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current number of satellites GPS is used for fix in integer format. Available for AP and MicroPop as SM"
+		::={whispBoxGPS 17}
 
 	whispBoxBridgeTable OBJECT-TYPE
 		SYNTAX		SEQUENCE OF WhispBoxBridgeEntry
@@ -7507,7 +9611,8 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			whispBridgeAge		INTEGER,
 			whispBridgeExt		INTEGER,
 			whispBridgeHash		INTEGER,
-			whispBridgeCAM	INTEGER
+			whispBridgeCAM		INTEGER,
+			whispBridge802OneXStatus	DisplayString
 			}
 
 	whispBridgeMacAddr	OBJECT-TYPE
@@ -7552,13 +9657,21 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 			"Hash table array index."
 		::={whispBoxBridgeEntry 5}
 
+	whispBridge802OneXStatus	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"802.1x Authentication Status"
+		::={whispBoxBridgeEntry 6}
+
 	whispBridgeCAM	OBJECT-TYPE
 		SYNTAX		INTEGER
 		MAX-ACCESS	read-only
 		STATUS		obsolete
 		DESCRIPTION		
 			"This entry is deprecated."
-		::={whispBoxBridgeEntry 6}
+		::={whispBoxBridgeEntry 7}
 
 	whispVLANTable OBJECT-TYPE
 		SYNTAX		SEQUENCE OF WhispVLANEntry
@@ -7671,6 +9784,80 @@ whispBoxRFConfig		OBJECT IDENTIFIER ::= {whispBox 16}
 		DESCRIPTION		
 			"Remark Priority."
 		::={whispVLANRemarkEntry 5}
+
+	whispL3PVIDMapTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF WhispL3PVIDMapEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Active VLAN L3 port VID Mapping table."
+		::= {whispBox 20}
+
+	whispL3PVIDMapEntry OBJECT-TYPE
+		SYNTAX		WhispL3PVIDMapEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"L3 Port VID Mapping entry."
+		INDEX		{l3PVIDIpAddress}
+		::= {whispL3PVIDMapTable 1}
+
+		WhispL3PVIDMapEntry ::= SEQUENCE{
+			l3PVIDIpAddress		IpAddress,
+			l3PVIDMapKey		INTEGER,
+			l3PVIDNetmask		IpAddress,
+			l3PVIDMapVlan		INTEGER,
+			l3PVIDPriorityMode		INTEGER,
+			l3PVIDPriority	INTEGER
+			}
+
+	l3PVIDMapKey	OBJECT-TYPE
+		SYNTAX		INTEGER (0..4094)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"L3 PVID Mapping Key."
+		::={whispL3PVIDMapEntry 1}
+
+	l3PVIDIpAddress	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"L3 PVID IP Address."
+		::={whispL3PVIDMapEntry 2}
+
+	l3PVIDNetmask	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"L3 PVID IP Netmask."
+		::={whispL3PVIDMapEntry 3}
+
+	l3PVIDMapVlan	OBJECT-TYPE
+		SYNTAX		INTEGER (0..4094)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"L3 PVID Mapping VLAN."
+		::={whispL3PVIDMapEntry 4}
+
+	l3PVIDPriorityMode	OBJECT-TYPE
+		SYNTAX		INTEGER (0..1)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"L3 PVID Mapping Priority mode."
+		::={whispL3PVIDMapEntry 5}
+
+	l3PVIDPriority	OBJECT-TYPE
+		SYNTAX		INTEGER (0..7)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"L3 PVID Mapping Priority."
+		::={whispL3PVIDMapEntry 6}
 
 	whispUserTable OBJECT-TYPE
 		SYNTAX		SEQUENCE OF WhispUserEntry

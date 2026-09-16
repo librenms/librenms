@@ -181,6 +181,7 @@
                 }
                 let layerChange = (event) => {this.layer = event.name};
                 leaflet._container.style.zIndex = '3';
+                leaflet._container.style.transform = 'none';
                 enable_map_interaction(leaflet);
                 leaflet.on({
                     zoomend: adjustValues,

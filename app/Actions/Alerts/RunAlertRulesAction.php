@@ -27,12 +27,16 @@
 namespace App\Actions\Alerts;
 
 use App\Models\Device;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Alert\AlertRules;
 
-class RunAlertRulesAction
+readonly class RunAlertRulesAction
 {
-    public function __construct(private readonly Device $device, private readonly AlertRules $rules)
+    private AlertRules $rules;
+
+    public function __construct(private Device $device, ?AlertRules $rules = null)
     {
+        $this->rules = $rules ?? new AlertRules($device);
     }
 
     public function execute(): void
@@ -40,6 +44,9 @@ class RunAlertRulesAction
         // TODO inline logic
         include_once base_path('includes/common.php');
         include_once base_path('includes/dbFacile.php');
-        $this->rules->runRules($this->device->device_id);
+
+        Log::debug("Running alert rules for {$this->device->hostname} ({$this->device->device_id})");
+
+        $this->rules->run();
     }
 }

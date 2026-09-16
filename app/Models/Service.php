@@ -2,10 +2,16 @@
 
 namespace App\Models;
 
+use App\Observers\ServiceObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+#[ObservedBy([ServiceObserver::class])]
 class Service extends DeviceRelatedModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $primaryKey = 'service_id';
     protected $fillable = [

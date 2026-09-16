@@ -32,7 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->api([
             \App\Http\Middleware\EnforceJson::class,  // prevent redirect to login page
-            'auth:token',
+            'auth:sanctum',
         ]);
 
         $middleware->replace(\Illuminate\Http\Middleware\TrustProxies::class, \App\Http\Middleware\TrustProxies::class);
@@ -40,6 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'deny-demo' => \App\Http\Middleware\DenyDemoUser::class,
+            'saved-filter' => \App\Http\Middleware\MergeSavedFilter::class,
         ]);
 
         $middleware->priority([
@@ -60,4 +61,9 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         new \App\Exceptions\ErrorReporting($exceptions);
+
+        $exceptions->map(
+            \Binaryk\LaravelRestify\Exceptions\RepositoryNotFoundException::class,
+            fn (\Binaryk\LaravelRestify\Exceptions\RepositoryNotFoundException $e) => new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException($e->getMessage(), $e),
+        );
     })->create();

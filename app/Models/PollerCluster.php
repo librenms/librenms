@@ -27,24 +27,28 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Exceptions\InvalidNameException;
 
 class PollerCluster extends Model
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $table = 'poller_cluster';
     protected $primaryKey = 'id';
     protected $fillable = ['poller_name'];
 
     /**
-     * @return array{last_report: 'datetime'}
+     * @return array{last_report: 'datetime', poller_details: 'array'}
      */
     protected function casts(): array
     {
         return [
             'last_report' => 'datetime',
+            'poller_details' => 'array',
         ];
     }
 
@@ -61,16 +65,16 @@ class PollerCluster extends Model
 
     // ---- Scopes ----
 
-    public function scopeIsActive(Builder $query): Builder
+    protected function scopeIsActive(Builder $query): Builder
     {
-        $default = (int) \App\Facades\LibrenmsConfig::get('service_poller_frequency');
+        $default = (int) (\App\Facades\LibrenmsConfig::get('service_poller_frequency') ?? \App\Facades\LibrenmsConfig::get('rrd.step'));
 
         return $query->where('last_report', '>=', \DB::raw("DATE_SUB(NOW(),INTERVAL COALESCE(`poller_frequency`, $default) SECOND)"));
     }
 
-    public function scopeIsInactive(Builder $query): Builder
+    protected function scopeIsInactive(Builder $query): Builder
     {
-        $default = (int) \App\Facades\LibrenmsConfig::get('service_poller_frequency');
+        $default = (int) (\App\Facades\LibrenmsConfig::get('service_poller_frequency') ?? \App\Facades\LibrenmsConfig::get('rrd.step'));
 
         return $query->where('last_report', '<', \DB::raw("DATE_SUB(NOW(),INTERVAL COALESCE(`poller_frequency`, $default) SECOND)"));
     }
@@ -142,8 +146,8 @@ class PollerCluster extends Model
             ],
             [
                 'name' => 'poller_frequency',
-                'default' => \App\Facades\LibrenmsConfig::get('service_poller_frequency'),
-                'value' => $this->poller_frequency ?? \App\Facades\LibrenmsConfig::get('service_poller_frequency'),
+                'default' => \App\Facades\LibrenmsConfig::get('service_poller_frequency') ?? \App\Facades\LibrenmsConfig::get('rrd.step'),
+                'value' => $this->poller_frequency ?? \App\Facades\LibrenmsConfig::get('service_poller_frequency') ?? \App\Facades\LibrenmsConfig::get('rrd.step'),
                 'type' => 'integer',
                 'units' => 'seconds',
                 'advanced' => true,
@@ -241,8 +245,8 @@ class PollerCluster extends Model
             ],
             [
                 'name' => 'ping_frequency',
-                'default' => \App\Facades\LibrenmsConfig::get('ping_rrd_step'),
-                'value' => $this->ping_frequency ?? \App\Facades\LibrenmsConfig::get('ping_rrd_step'),
+                'default' => \App\Facades\LibrenmsConfig::get('service_ping_frequency'),
+                'value' => $this->ping_frequency ?? \App\Facades\LibrenmsConfig::get('service_ping_frequency'),
                 'type' => 'integer',
                 'units' => 'seconds',
                 'advanced' => true,

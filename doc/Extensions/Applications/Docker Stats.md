@@ -17,20 +17,22 @@ This script requires python3 and the pip module python-dateutil
 pip3 install python-dateutil
 ```
 
-2. Copy the shell script to the desired host.
-By default, it will only show the status for containers that are running. To include all containers modify the constant in the script at the top of the file and change it to `ONLY_RUNNING_CONTAINERS = False`
+2. Copy the shell script to the host.
+By default, the script shows only the running containers. For all
+containers, change the constant at the top of the script to
+`ONLY_RUNNING_CONTAINERS = False`.
 
 ```bash
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/docker-stats.py -O /etc/snmp/docker-stats.py
 ```
 
-3. Make the script executable
+3. Make the script executable.
 
 ```bash
 chmod +x /etc/snmp/docker-stats.py
 ```
 
-4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+4. Edit your `snmpd.conf` file, usually `/etc/snmp/snmpd.conf`, and add:
 
 ```bash
 extend docker /etc/snmp/docker-stats.py
@@ -42,7 +44,7 @@ extend docker /etc/snmp/docker-stats.py
 usermod -a -G docker Debian-snmp
 ```
 
-6. Restart snmpd on your host
+6. Restart snmpd on your host.
 
 ```bash
 systemctl restart snmpd

@@ -73,8 +73,9 @@ use App\Facades\LibrenmsConfig;
                     toastr.error(data.message || 'Failed to update acknowledgement');
                 }
             },
-            error: function(){
-                toastr.error(data.message);
+            error: function(data) {
+                var msg = (data.responseJSON && data.responseJSON.message) ? data.responseJSON.message : 'Action failed';
+                toastr.error(msg);
             }
         });
     });

@@ -411,7 +411,7 @@ if ($in_phaseNum == '3') {
     $divisor = $bat_3phase_divisor;
 }
 
-if (! empty($battery_voltage1) || $battery_voltage1 == 0) {
+if (isset($battery_voltage1) && (! empty($battery_voltage1) || $battery_voltage1 == 0)) {
     $type = 'netagent2';
     $index++;
     $voltage = $battery_voltage1 / $divisor;

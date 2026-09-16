@@ -13,6 +13,7 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Ipv6NdDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Mac;
@@ -33,15 +34,15 @@ class Ipv6Nd implements Module
     /**
      * @inheritDoc
      */
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
         return false;
     }
@@ -115,7 +116,7 @@ class Ipv6Nd implements Module
                         $neighbors->push(new \App\Models\Ipv6Nd([
                             'port_id' => $port_id,
                             'device_id' => $device->device_id,
-                            'mac_address' => Mac::parse($raw_mac)->readable(),
+                            'mac_address' => Mac::parse($raw_mac)->hex(),
                             'ipv6_address' => IPv6::fromHexString($ipv6)->uncompressed(),
                             'context_name' => $context_name,
                         ]));

@@ -3,7 +3,7 @@
     <td>
         <div>
             <x-port-link :port="$port" class="tw:inline">
-                <span class="tw:text-3xl tw:font-bold"><i class="fa fa-tag" aria-hidden='true'></i> {{ $port->getLabel() }}</span>
+                <span class="tw:text-xl tw:font-bold"><i class="fa fa-tag" aria-hidden='true'></i> {{ $port->getLabel() }}</span>
             </x-port-link>
             @if($data['tab'] != 'basic')
             @foreach($port->transceivers as $transceiver)

@@ -35,6 +35,8 @@ class RipeNccApiController extends Controller
 {
     public function raw(Request $request, RipeApi $api)
     {
+        $this->authorize('tools.ripe');
+
         $this->validate($request, [
             'data_param' => 'required|in:whois,abuse-contact-finder',
             'query_param' => 'required|ip_or_hostname',

@@ -16,7 +16,6 @@
 
 /* FIXME: is there a central place we can put this? */
 
-use App\Models\Alert;
 use Illuminate\Support\Facades\Gate;
 
 $alert_states = [
@@ -39,7 +38,7 @@ $alert_severities = [
     'critical only' => 6,
 ];
 $admin_verbose_details = '';
-if (Gate::allows('detail', Alert::class)) {
+if (Gate::allows('alert.detail')) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 
@@ -262,7 +261,6 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
     post: function ()
     {
         return {
-            id: "alerts",
 ';
 
     if (is_numeric($rule_id)) {
@@ -292,15 +290,12 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
         $common_output[] = "proc: '$proc',\n";
     }
 
-    if (isset($sort) && $sort != '') {
-        $common_output[] = "sort: '$sort',\n";
-    }
-
     $common_output[] = '
             device_id: \'' . $device['device_id'] . '\'
         }
     },
-    url: "ajax_table.php",
+    url: "' . route('table.alerts') . '",
+    sort: ' . ($sort === 'severity' || $sort == 1 ? '{ severity: "desc" }' : '{ timestamp: "desc" }') . ',
     rowCount: [50, 100, 250, -1],
 
 }).on("loaded.rs.jquery.bootgrid", function() {

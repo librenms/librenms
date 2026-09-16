@@ -1,7 +1,9 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Billing;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Url;
 
 $pagetitle[] = 'Bandwidth Graphs';
 
@@ -23,8 +25,8 @@ $total_data = $bill_data['total_data'];
 $in_data = $bill_data['total_data_in'];
 $out_data = $bill_data['total_data_out'];
 
-$fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.date') . "')");
-$totext = dbFetchCell("SELECT DATE_FORMAT($dateto, '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.date') . "')");
+$fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '" . LibrenmsConfig::get('dateformat.mysql.date') . "')");
+$totext = dbFetchCell("SELECT DATE_FORMAT($dateto, '" . LibrenmsConfig::get('dateformat.mysql.date') . "')");
 $unixfrom = dbFetchCell("SELECT UNIX_TIMESTAMP('$datefrom')");
 $unixto = dbFetchCell("SELECT UNIX_TIMESTAMP('$dateto')");
 $unix_prev_from = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastfrom')");
@@ -71,7 +73,7 @@ $out['bg'] = \LibreNMS\Util\Color::percentage($out['per'], null);
 $ousage = [];
 $ousage['over'] = ($bill_data['total_data'] - ($bill_data['bill_quota']));
 $ousage['over'] = (($ousage['over'] < 0) ? '0' : $ousage['over']);
-$ousage['data'] = \LibreNMS\Util\Number::formatBase($ousage['over'], \App\Facades\LibrenmsConfig::get('billing.base'), 2, 0, '');
+$ousage['data'] = Number::formatBase($ousage['over'], LibrenmsConfig::get('billing.base'), 2, 0, '');
 $ousage['allow'] = $total['allow'];
 $ousage['ave'] = Billing::formatBytes(($ousage['over'] / $cur_days));
 $ousage['est'] = Billing::formatBytes(($ousage['over'] / $cur_days * $total_days));
@@ -167,23 +169,17 @@ function showPercent($per)
 
 
 <?php
-$bi = "<img src='graph.php?type=bill_historictransfer&id=" . $bill_id;
-$bi .= '&amp;from=' . $unixfrom . '&amp;to=' . $unixto;
-$bi .= '&amp;imgtype=day';
-$bi .= '&amp;width=1190&amp;height=250';
-$bi .= "'>";
+$graph_args = [
+    'type' => 'bill_historictransfer',
+    'id' => $bill_id,
+    'width' => 1190,
+    'height' => 250,
+];
 
-$di = "<img src='graph.php?type=bill_historictransfer&id=" . $bill_id;
-$di .= '&amp;from=' . \App\Facades\LibrenmsConfig::get('time.day') . '&amp;to=' . \App\Facades\LibrenmsConfig::get('time.now');
-$di .= '&amp;imgtype=hour';
-$di .= '&amp;width=1190&amp;height=250';
-$di .= "'>";
+$bi = array_merge($graph_args, ['from' => $unixfrom, 'to' => $unixto, 'imgtype' => 'day']);
+$di = array_merge($graph_args, ['from' => LibrenmsConfig::get('time.day'), 'to' => LibrenmsConfig::get('time.now'), 'imgtype' => 'hour']);
+$mi = array_merge($graph_args, ['from' => $lastmonth, 'to' => $rightnow, 'imgtype' => 'day']);
 
-$mi = "<img src='graph.php?type=bill_historictransfer&id=" . $bill_id;
-$mi .= '&amp;from=' . $lastmonth . '&amp;to=' . $rightnow;
-$mi .= '&amp;&imgtype=day';
-$mi .= '&amp;width=1190&amp;height=250';
-$mi .= "'>";
 ?>
 
 <div class="panel panel-default">
@@ -191,7 +187,7 @@ $mi .= "'>";
         <h3 class="panel-title">Billing Period View</h3>
     </div>
     <div class="panel-body">
-    <?php echo $bi ?>
+    <?php echo Url::graphTag($bi) ?>
     </div>
 </div>
 
@@ -200,7 +196,7 @@ $mi .= "'>";
         <h3 class="panel-title">Rolling 24 Hour View</h3>
     </div>
     <div class="panel-body">
-    <?php echo $di ?>
+    <?php echo Url::graphTag($di) ?>
     </div>
 </div>
 
@@ -209,6 +205,6 @@ $mi .= "'>";
         <h3 class="panel-title">Rolling Monthly View</h3>
     </div>
     <div class="panel-body">
-    <?php echo $mi ?>
+    <?php echo Url::graphTag($mi) ?>
     </div>
 </div>

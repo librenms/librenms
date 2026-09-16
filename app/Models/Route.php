@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class Route extends PortRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $table = 'route';
     protected $primaryKey = 'route_id';
     protected $fillable = [
@@ -63,11 +65,11 @@ class Route extends PortRelatedModel implements Keyable
 
     // ---- Define Relationships ----
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Port, $this>
+     * @return BelongsTo<Device, $this>
      */
-    public function port(): BelongsTo
+    public function device(): BelongsTo
     {
-        return $this->belongsTo(Port::class, 'port_id', 'port_id');
+        return $this->belongsTo(Device::class, 'device_id');
     }
 
     public function getCompositeKey(): string

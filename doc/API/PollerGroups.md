@@ -1,10 +1,10 @@
 ###`get_poller_group`
 
-Gets a specific poller group or all if none is specified
+Get one poller group. Without a name, it returns all poller groups.
 
 Route: `/api/v0/poller_group/:poller_group`
 
-- poller_group: optional name or id of the poller group to get
+- poller_group: optional. The name or the id of the poller group.
 
 Output:
 

@@ -3,6 +3,8 @@
 namespace LibreNMS\Tests\Feature\Http;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use App\Models\DevicePerm;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -29,6 +31,7 @@ class UserControllerTest extends TestCase
         Permission::findOrCreate('user.create');
         Permission::findOrCreate('user.update');
         Permission::findOrCreate('user.delete');
+        Permission::findOrCreate('user.manage');
         Permission::findOrCreate('role.update');
 
         Password::defaults(fn () => Password::min(8));
@@ -220,5 +223,47 @@ class UserControllerTest extends TestCase
         $targetUser->refresh();
         $this->assertEquals(0, (int) $targetUser->enabled);
         $this->assertEquals(0, (int) $targetUser->can_modify_passwd);
+    }
+
+    public function testAdminWithManagePermissionCanViewUserPermissionsPage(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $targetUser = User::factory()->create(['enabled' => 1]);
+
+        $admin->givePermissionTo('user.manage');
+
+        $response = $this->actingAs($admin)->get(route('users.permissions.edit', $targetUser));
+
+        $response->assertOk();
+        $response->assertSee('Device Access');
+    }
+
+    public function testAdminWithManagePermissionCanGrantAndRevokeDevicePermission(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $targetUser = User::factory()->create(['enabled' => 1]);
+        $device = Device::factory()->create();
+
+        $admin->givePermissionTo('user.manage');
+
+        $addResponse = $this->actingAs($admin)->post(route('users.permissions.device.attach', $targetUser), [
+            'device_id' => $device->device_id,
+        ]);
+
+        $addResponse->assertRedirect(route('users.permissions.edit', [$targetUser, 'tab' => 'device']));
+        $this->assertDatabaseHas('devices_perms', [
+            'user_id' => $targetUser->user_id,
+            'device_id' => $device->device_id,
+        ]);
+
+        $perm = DevicePerm::query()->where('user_id', $targetUser->user_id)->where('device_id', $device->device_id)->firstOrFail();
+
+        $removeResponse = $this->actingAs($admin)->delete(route('users.permissions.device.detach', [$targetUser, $perm->device_id]));
+
+        $removeResponse->assertRedirect(route('users.permissions.edit', [$targetUser, 'tab' => 'device']));
+        $this->assertDatabaseMissing('devices_perms', [
+            'user_id' => $targetUser->user_id,
+            'device_id' => $device->device_id,
+        ]);
     }
 }

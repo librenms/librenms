@@ -1,0 +1,157 @@
+VERSA-IF-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    generic
+        FROM VERSA-MIB
+;
+
+versa-if MODULE-IDENTITY
+    LAST-UPDATED "201905200000Z"
+    ORGANIZATION "Versa Networks"
+    CONTACT-INFO "
+        2953 Bunker Hill Lane, Suite 210
+        Santa Clara, CA - 95035 (USA)
+        Email: support@versa-networks.com"
+    DESCRIPTION "Enterprise MIB for Versa Networks Interfaces"
+    REVISION "201905200000Z"
+    DESCRIPTION "Initial revision"
+    ::= { generic 4 }
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+IfAddrType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {static(1),dhcp(2)}
+
+IfSubType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {ethernet(1),loopback(2),ae(3),lte(4),wifi(5),tvi(6),p2mp-gre(7),p2mp-esp(8),ipsec(9),paired(10),gre(11),eogre(12),v6gre(13),p2mp-secure(14),p2mp-cleartext(15),p2mp-vxlan(16),pppoe(17),ptvi(18)}
+
+IfBaseType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {ifd(1),ifl(2)}
+
+versaIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VersaIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display Versa interface information"
+    ::= { versa-if 1 }
+
+versaIfEntry OBJECT-TYPE
+    SYNTAX      VersaIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { versaIfVIfIndex }
+        ::= { versaIfTable 1 }
+
+VersaIfEntry ::=
+    SEQUENCE {
+        versaIfVIfIndex Integer32,
+        versaIfVIfName String,
+        versaIfVIfBaseType IfBaseType,
+        versaIfVIfSubType IfSubType,
+        versaIfVIfAddrType IfAddrType,
+        versaIfVIfVrfName String
+    }
+
+versaIfVIfIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface Index"
+    ::= { versaIfEntry 1 }
+
+versaIfVIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (0 .. 255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface Name"
+    ::= { versaIfEntry 2 }
+
+versaIfVIfBaseType OBJECT-TYPE
+    SYNTAX      IfBaseType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface link type IFD/IFL"
+    ::= { versaIfEntry 3 }
+
+versaIfVIfSubType OBJECT-TYPE
+    SYNTAX      IfSubType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface type"
+    ::= { versaIfEntry 4 }
+
+versaIfVIfAddrType OBJECT-TYPE
+    SYNTAX      IfAddrType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface address assignment type"
+    ::= { versaIfEntry 5 }
+
+versaIfVIfVrfName OBJECT-TYPE
+    SYNTAX      String (SIZE (0 .. 64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface VRF name"
+    ::= { versaIfEntry 6 }
+
+versaIfAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VersaIfAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Intrerface address information"
+    ::= { versa-if 2 }
+
+versaIfAddrEntry OBJECT-TYPE
+    SYNTAX      VersaIfAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { versaIfAddrVIndex }
+        ::= { versaIfAddrTable 1 }
+
+VersaIfAddrEntry ::=
+    SEQUENCE {
+        versaIfAddrVIndex Unsigned32,
+        versaIfAddrVIfName String,
+        versaIfAddrVIfAddress String
+    }
+
+versaIfAddrVIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Index"
+    ::= { versaIfAddrEntry 1 }
+
+versaIfAddrVIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (0 .. 255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { versaIfAddrEntry 2 }
+
+versaIfAddrVIfAddress OBJECT-TYPE
+    SYNTAX      String (SIZE (0 .. 64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface address"
+    ::= { versaIfAddrEntry 3 }
+
+END

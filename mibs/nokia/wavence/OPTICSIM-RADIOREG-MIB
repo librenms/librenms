@@ -1,0 +1,198 @@
+-- "CONFIDENTIAL. All rights reserved. Alcatel. This computer program is protected under Copyright.
+-- Recipient is to retain the program in confidence, and is not permitted to copy, use, distribute, modify or
+-- translate the program without authorization. Passing on and copying,use and communication of its
+-- contents is not permitted without written authorization."
+
+OPTICSIM-RADIOREG-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY FROM SNMPv2-SMI
+    tsdim, tsdimBasicMib FROM TSDIM-BASICREG-MIB;
+
+opticsimRadioReg MODULE-IDENTITY
+    LAST-UPDATED "202011250000Z"
+    ORGANIZATION "Alcatel TND"
+    CONTACT-INFO "Alcatel TND"
+    DESCRIPTION
+        "OPTICS-IM RADIO REGISTRATION MODULE"
+
+    REVISION "202011250000Z"
+    DESCRIPTION
+      "Added a new object identifiers for NIM product (radioModelWavence-NIMReg)"
+
+    REVISION "202005270000Z"
+    DESCRIPTION
+      "Removed the object identifiers for MSS-E, MSS-HE and MSS-XE for ANSI market and changed the names for the same of ETSI market, removing the market indication, to be used for both markets (ETSI ad ANSI)."
+
+    REVISION "201903290000Z"
+    DESCRIPTION
+      "Added new object identifiers to identify the specific MSS-E and MSS-HE products"
+
+    REVISION "201802200000Z"
+    DESCRIPTION
+      "Added new object identifiers to identify the specific UBT-SA radio products"
+
+    REVISION "201511130000Z"
+    DESCRIPTION
+    "-SNMPIDL-507, update LAST-UPDATED and REVISION date format adding the 2 digits missing (20) for yers after 1999.
+          Added a REVISION block corresponding to the LAST-UPDATED timestamp.
+    "
+
+    REVISION "201407310000Z"
+    DESCRIPTION
+        "Added new object identifiers to identify the specific MSS-O radio products"
+
+    REVISION "201005130000Z"
+    DESCRIPTION
+        "Added new object identifiers to identify new specific radio products"
+
+    REVISION "200911120000Z"
+    DESCRIPTION
+        "Added new object identifiers to identify new specific radio products"
+
+    REVISION "200904230000Z"
+    DESCRIPTION
+        "Added new object identifier to identify a new specific radio products"
+
+    REVISION "200710110000Z"
+    DESCRIPTION
+        "Added new object identifier to identify the specific radio products"
+
+    REVISION "200211050000Z"
+    DESCRIPTION
+        "Renamed OPTICS-IM RADIO REGISTRATION MODULE"
+
+    REVISION "200110190000Z"
+    DESCRIPTION
+        "Initial Release OPTICS-IM RADIO REGISTRATION MODULE"
+::= { tsdimBasicMib 70 }
+
+-- Registration Tree
+
+opticsimRadioMib OBJECT IDENTIFIER ::= { tsdim 10 }
+opticsimRadioMC  OBJECT IDENTIFIER ::= { opticsimRadioMib 99 }
+opticsimSdhPdhMib OBJECT IDENTIFIER ::= { tsdim 11 }
+opticsimSdhPdhMC OBJECT IDENTIFIER ::= { opticsimSdhPdhMib 99 }
+
+opticsimRadioProducts OBJECT IDENTIFIER ::= { opticsimRadioMib  90 }
+
+    radioModelMPR-E-MSS8Reg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This  objectID  is  to be used as the mib-2 sysObjID to
+                identify the Alcatel 9500MPR-E MSS-8 device."
+        ::= { opticsimRadioProducts  1 }
+
+        radioModelMPR-E-MSS4Reg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel 9500MPR-E MSS-4 device."
+        ::= { opticsimRadioProducts   2 }
+
+        radioModelMPR-E-MSS1Reg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel 9500MPR-E MSS-1 device."
+        ::= { opticsimRadioProducts   3 }
+
+        radioModelMPR-A-MSS8Reg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel 9500MPR-A MSS-8 device."
+        ::= { opticsimRadioProducts   4 }
+
+        radioModelMPR-A-MSS4Reg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel 9500MPR-A MSS-4 device."
+        ::= { opticsimRadioProducts   5 }
+
+        radioModelMPR-A-MSS1Reg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel 9500MPR-A MSS-1 device."
+        ::= { opticsimRadioProducts   6 }
+
+    radioModelAWYReg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel 9500AWY device."
+        ::= { opticsimRadioProducts   7 }
+
+       radioModelMPT-AccessReg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel 9500MPT-Access device."
+        ::= { opticsimRadioProducts   8 }
+
+     radioModelMPT-ALONEReg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel 9500MPT-StandAlone device."
+        ::= { opticsimRadioProducts   9 }
+
+     radioModelMPR-GCReg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel 9500MPT-StandAlone device."
+        ::= { opticsimRadioProducts   10 }
+
+    radioModelMPR-E-MSSOReg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This  objectID  is  to be used as the mib-2 sysObjID to
+                identify the Alcatel 9500MPR-E MSS-O device."
+        ::= { opticsimRadioProducts  11 }
+
+    radioModelMPR-A-MSSOReg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This  objectID  is  to be used as the mib-2 sysObjID to
+                identify the Alcatel 9500MPR-A MSS-O device."
+        ::= { opticsimRadioProducts  12 }
+
+    radioModelUBT-ALONEReg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to identify the Nokia UBT-StandAlone device."
+        ::= { opticsimRadioProducts   13 }
+
+        radioModelWavence-MSSEReg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Nokia Wavence MSS-E device."
+        ::= { opticsimRadioProducts   14 }
+
+        radioModelWavence-MSSHEReg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Nokia Wavence MSS-HE device."
+        ::= { opticsimRadioProducts   15 }
+
+
+        radioModelWavence-MSSXEReg         OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Nokia Wavence MSS-XE device."
+        ::= { opticsimRadioProducts   16 }
+
+        radioModelWavence-NIMReg            OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Nokia Wavence NIM device."
+        ::= { opticsimRadioProducts   17 }
+
+
+END

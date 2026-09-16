@@ -7,12 +7,12 @@ if (empty($os)) {
 }
 
 if ($os instanceof \LibreNMS\OS\Ocnos) {
-    $metric_data = \SnmpQuery::cache()->enumStrings()->walk(['IPI-CMM-CHASSIS-MIB::cmmTransDDMTable', 'IPI-CMM-CHASSIS-MIB::cmmTransType'])->table(3);
+    $metric_data = \SnmpQuery::cache()->enumStrings()->walk(['IPI-CMM-CHASSIS-MIB::cmmTransDDMTable', 'IPI-CMM-CHASSIS-MIB::cmmTransType', 'IPI-CMM-CHASSIS-MIB::cmmTransEEPROMEntry.60'])->table(3);
     $divisor = 1000;
 
     foreach ($metric_data as $cmmStackUnitIndex => $chassis_data) {
         foreach ($chassis_data as $cmmTransIndex => $module_data) {
-            $ifName = $os->guessIfName($cmmTransIndex, $module_data['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'unknown');
+            $ifName = $os->guessIfName($cmmTransIndex, $module_data['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'unknown', $module_data['IPI-CMM-CHASSIS-MIB::cmmTransEEPROMEntry.60'] ?? '');
 
             foreach ($module_data as $cmmTransChannelIndex => $channel_data) {
                 if (isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransVoltage']) && $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransVoltage'] != '-100001') {

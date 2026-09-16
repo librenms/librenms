@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\DynamicConfig;
 
 class SettingsController
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      *
@@ -19,7 +21,7 @@ class SettingsController
      */
     public function index(DynamicConfig $dynamicConfig, $tab = 'alerting', $section = '')
     {
-        Gate::authorize('settings.viewAny');
+        $this->authorize('settings.view');
 
         $data = [
             'active_tab' => $tab,
@@ -40,7 +42,7 @@ class SettingsController
      */
     public function update(DynamicConfig $config, Request $request, $id)
     {
-        Gate::authorize('settings.update');
+        $this->authorize('settings.update');
 
         $value = $request->input('value');
 
@@ -71,7 +73,7 @@ class SettingsController
      */
     public function destroy(DynamicConfig $config, $id)
     {
-        Gate::authorize('settings.update');
+        $this->authorize('settings.update');
 
         if (! $config->isValidSetting($id)) {
             return $this->jsonResponse($id, ':id is not a valid setting', null, 400);
@@ -95,7 +97,7 @@ class SettingsController
      */
     public function listAll(DynamicConfig $config)
     {
-        Gate::authorize('settings.viewAny');
+        $this->authorize('settings.view');
 
         return response()->json($config->all()->filter->isValid());
     }

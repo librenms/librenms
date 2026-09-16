@@ -30,6 +30,7 @@ use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -45,9 +46,9 @@ class Slas implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof SlaDiscovery;
+        return $status->isEnabled() && $connectivity->snmpIsAvailable() && $os instanceof SlaDiscovery;
     }
 
     /**
@@ -65,9 +66,9 @@ class Slas implements Module
         }
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof SlaPolling;
+        return $status->isEnabled() && $connectivity->snmpIsAvailable() && $os instanceof SlaPolling;
     }
 
     /**

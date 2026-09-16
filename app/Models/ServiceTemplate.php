@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
@@ -34,6 +35,7 @@ use Log;
 
 class ServiceTemplate extends BaseModel
 {
+    use HasFactory;
     public $timestamps = false;
     protected $primaryKey = 'id';
     protected $fillable = [
@@ -195,14 +197,14 @@ class ServiceTemplate extends BaseModel
 
     /** @param  Builder<ServiceTemplate>  $query
      *  @return Builder<ServiceTemplate> */
-    public function scopeHasAccess(Builder $query, User $user): Builder
+    protected function scopeHasAccess(Builder $query, User $user): Builder
     {
         return $query;
     }
 
     /** @param  Builder<ServiceTemplate>  $query
      *  @return Builder<ServiceTemplate> */
-    public function scopeIsDisabled(Builder $query): Builder
+    protected function scopeIsDisabled(Builder $query): Builder
     {
         return $query->where('disabled', 1);
     }

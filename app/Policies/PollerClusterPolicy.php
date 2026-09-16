@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Models\PollerCluster;
 use App\Models\User;
 
 class PollerClusterPolicy
@@ -29,7 +28,7 @@ class PollerClusterPolicy
     /**
      * Determine whether the user can view the poller cluster.
      */
-    public function view(User $user, PollerCluster $pollerCluster): bool
+    public function view(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'view');
     }

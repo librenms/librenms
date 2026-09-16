@@ -14,14 +14,12 @@ class CheckRrdStep implements Validation
     const DEFAULT_RRD_STEP = 300;
     const DEFAULT_PING_RRD_STEP = 300;
 
-    private readonly int $ping_rrd_step;
     private readonly int $rrd_step;
 
     private readonly RrdProcess $rrdtool;
 
     public function __construct()
     {
-        $this->ping_rrd_step = (int) LibrenmsConfig::get('ping_rrd_step', self::DEFAULT_PING_RRD_STEP);
         $this->rrd_step = (int) LibrenmsConfig::get('rrd.step', self::DEFAULT_RRD_STEP);
 
         $this->rrdtool = app(RrdProcess::class, ['timeout' => 120]);
@@ -29,7 +27,7 @@ class CheckRrdStep implements Validation
 
     public function enabled(): bool
     {
-        return LibrenmsConfig::get('rrd.step') !== self::DEFAULT_RRD_STEP || LibrenmsConfig::get('ping_rrd_step') !== self::DEFAULT_PING_RRD_STEP;
+        return LibrenmsConfig::get('rrd.step') !== self::DEFAULT_RRD_STEP;
     }
 
     public function validate(): ValidationResult
@@ -43,10 +41,9 @@ class CheckRrdStep implements Validation
             foreach ($rrd_files as $rrd_file) {
                 try {
                     $step = $this->getStep($rrd_file);
-                    $target_step = str_ends_with($rrd_file, '/icmp-perf.rrd') ? $this->ping_rrd_step : $this->rrd_step;
 
-                    if ($step !== $target_step) {
-                        $bad_step_files[] = __('validation.validations.rrd.CheckRrdStep.list_bad_step_item', ['file' => $rrd_file, 'step' => $step, 'target' => $target_step]);
+                    if ($step !== $this->rrd_step) {
+                        $bad_step_files[] = __('validation.validations.rrd.CheckRrdStep.list_bad_step_item', ['file' => $rrd_file, 'step' => $step, 'target' => $this->rrd_step]);
                     }
                 } catch (\Exception $e) {
                     $bad_files[] = $rrd_file . ': ' . $e->getMessage();

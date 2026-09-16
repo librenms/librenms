@@ -118,12 +118,6 @@
                     <input id="notetodevice" type="checkbox" name="notetodevice" @if($note_to_device) checked @endif>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="global_search_ctrlf_focus" class="col-sm-4 control-label">{{ __('Ctrl-F to focus the global search bar') }}</label>
-                <div class="col-sm-4">
-                    <input id="global_search_ctrlf_focus" type="checkbox" name="global_search_ctrlf_focus" @if($global_search_ctrlf_focus) checked @endif>
-                </div>
-            </div>
         </form>
     </x-panel>
 
@@ -208,9 +202,9 @@
     </x-panel>
 
     <x-panel title="{{ __('Device Permissions') }}">
-        @can('update', \App\Models\Device::class)
+        @if(auth()->user()->hasRole('admin'))
             <strong class="blue">{{ __('Global Administrative Access') }}</strong>
-        @elseCan('viewAny', \App\Models\Device::class)
+        @elseif(Gate::allows('viewAll', \App\Models\Device::class))
             <strong class="green">{{ __('Global Viewing Access') }}</strong>
         @else
             @forelse($devices as $device)
@@ -218,7 +212,7 @@
             @empty
                 <strong class="red">{{ __('No access!') }}</strong>
             @endforelse
-        @endcan
+        @endif
     </x-panel>
 </div>
 @endsection
@@ -239,34 +233,6 @@
                     type: 'POST',
                     data: {
                         pref: 'add_schedule_note_to_device',
-                        value: state ? 1 : 0
-                    },
-                    success: function () {
-                        $this.closest('.form-group').addClass('has-success');
-                        setTimeout(function () {
-                            $this.closest('.form-group').removeClass('has-success');
-                        }, 2000);
-                    },
-                    error: function () {
-                        $this.bootstrapSwitch('toggleState', true);
-                        $this.closest('.form-group').addClass('has-error');
-                        setTimeout(function(){
-                            $this.closest('.form-group').removeClass('has-error');
-                        }, 2000);
-                    }
-                });
-            });
-
-        $("[name='global_search_ctrlf_focus']")
-            .bootstrapSwitch('offColor', 'danger')
-            .on('switchChange.bootstrapSwitch', function (e, state) {
-                var $this = $(this);
-                $.ajax({
-                    url: '{{ route('preferences.store') }}',
-                    dataType: 'json',
-                    type: 'POST',
-                    data: {
-                        pref: 'global_search_ctrlf_focus',
                         value: state ? 1 : 0
                     },
                     success: function () {

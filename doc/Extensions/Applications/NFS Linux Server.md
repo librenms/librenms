@@ -1,6 +1,6 @@
 ## Linux NFS Server
 
-Superseded by the [generalized NFS support](NFS.md).
+The [generalized NFS support](NFS.md) replaces this application.
 
 Export the NFS stats from as server.
 

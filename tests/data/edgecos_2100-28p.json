@@ -10031,7 +10031,8 @@
                     "ifStackStatus": "active"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "discovery-protocols": {
         "discovery": {

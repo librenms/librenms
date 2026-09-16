@@ -78,7 +78,7 @@ class SmokepingGenerateCommand extends LnmsCommand
             return 1;
         }
 
-        $devices = Device::isNotDisabled()->orderBy('type')->orderBy('hostname')->get();
+        $devices = Device::isActive()->orderBy('type')->orderBy('hostname')->get();
 
         if (count($devices) < 1) {
             $this->error(__('commands.smokeping:generate.no-devices'));

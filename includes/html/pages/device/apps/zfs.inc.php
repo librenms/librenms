@@ -23,11 +23,15 @@ $version = $app->data['version'] ?? 2;
 sort($pools);
 foreach ($pools as $index => $pool) {
     $pool = htmlspecialchars((string) $pool);
-    $label = $vars['pool'] == $pool
-        ? '<span class="pagemenu-selected">' . $pool . '</span>'
-        : $pool;
 
-    echo generate_link($label, $link_array, ['pool' => $pool]);
+    $label = $pool;
+    $link = generate_link($label, $link_array, ['pool' => $pool]);
+
+    $label = $vars['pool'] == $pool
+        ? '<span class="pagemenu-selected">' . $link . '</span>'
+        : $link;
+
+    echo $link;
 
     if ($index < (count($pools) - 1)) {
         echo ', ';

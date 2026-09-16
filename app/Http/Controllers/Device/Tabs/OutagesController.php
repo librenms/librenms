@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Http\Controllers\Controller;
 use App\Models\Device;
+use App\Models\DeviceOutage;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -35,6 +36,9 @@ class OutagesController extends Controller
 {
     public function __invoke(Device $device, Request $request): View
     {
+        $this->authorize('view', $device);
+        $this->authorize('viewAny', DeviceOutage::class);
+
         $request->validate([
             'to' => 'nullable|int',
             'from' => 'nullable|int',

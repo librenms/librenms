@@ -1,0 +1,553 @@
+TELTONIKA-RUT2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
+	Integer32, enterprises, Counter64,
+	IpAddress, Unsigned32				FROM SNMPv2-SMI
+	DisplayString,
+	PhysAddress					FROM SNMPv2-TC
+	OBJECT-GROUP, NOTIFICATION-GROUP		FROM SNMPv2-CONF;
+
+teltonikaRut2 MODULE-IDENTITY
+	LAST-UPDATED	"202605162001Z"
+	ORGANIZATION	"TELTONIKA"
+	CONTACT-INFO	"TELTONIKA"
+	DESCRIPTION	"The MIB module for TELTONIKA RUT240 routers (RutOS 7.x and newer).
+			 Vendor MIB module name is TELTONIKA-MIB; renamed here to
+			 TELTONIKA-RUT2-MIB to coexist with the legacy flat-OID MIB
+			 shipped for older firmware."
+	REVISION	"202605162001Z"
+	DESCRIPTION	"Vendor revision 202605162001Z, imported for LibreNMS use."
+	::= { enterprises 48690 }
+
+teltonikaSnmpGroups	OBJECT IDENTIFIER ::= { teltonikaRut2 0 }
+device			OBJECT IDENTIFIER ::= { teltonikaRut2 1 }
+mobile			OBJECT IDENTIFIER ::= { teltonikaRut2 2 }
+io			OBJECT IDENTIFIER ::= { teltonikaRut2 6 }
+
+-- Device --
+
+deviceGroup OBJECT-GROUP
+	OBJECTS { rut2Serial,
+		  rut2DeviceName,
+		  rut2ProductCode,
+		  rut2BatchNumber,
+		  rut2HardwareRevision,
+		  rut2FwVersion,
+		  rut2DeviceUptime,
+		  rut2CpuUsage }
+	STATUS current
+	DESCRIPTION "Device SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 1 }
+
+rut2Serial OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Serial number"
+	::= { device 1 }
+
+rut2DeviceName OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device name"
+	::= { device 2 }
+
+rut2ProductCode OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device product code"
+	::= { device 3 }
+
+rut2BatchNumber OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device batch number"
+	::= { device 4 }
+
+rut2HardwareRevision OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device hardware revision"
+	::= { device 5 }
+
+rut2FwVersion OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device firmware version"
+	::= { device 6 }
+
+rut2DeviceUptime OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device uptime in seconds"
+	::= { device 7 }
+
+rut2CpuUsage OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device cpu usage in percents"
+	::= { device 8 }
+
+-- Mobile --
+
+modemGroup OBJECT-GROUP
+	OBJECTS { rut2ModemNum,
+		  rut2MIndex,
+		  rut2MDescr,
+		  rut2MImei,
+		  rut2MModel,
+		  rut2MManufacturer,
+		  rut2MRevision,
+		  rut2MSerial,
+		  rut2MIMSI,
+		  rut2MSimState,
+		  rut2MPinState,
+		  rut2MNetState,
+		  rut2MSignal,
+		  rut2MOperator,
+		  rut2MOperatorNumber,
+		  rut2MConnectionState,
+		  rut2MNetworkType,
+		  rut2MTemperature,
+		  rut2MCellID,
+		  rut2MSINR,
+		  rut2MRSRP,
+		  rut2MRSRQ,
+		  rut2MSent,
+		  rut2MReceived,
+		  rut2MIP,
+		  rut2MSentToday,
+		  rut2MReceivedToday,
+		  rut2MICCID,
+		  rut2MSentCurrentWeek,
+		  rut2MReceivedCurrentWeek,
+		  rut2MSentCurrentMonth,
+		  rut2MReceivedCurrentMonth,
+		  rut2ConnectionUptime }
+	STATUS current
+	DESCRIPTION "Mobile SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 2 }
+
+rut2ModemNum OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of modems present on this system"
+	::= { mobile 1 }
+
+modemTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF ModemEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A list of modem entries"
+	::= { mobile 2 }
+
+modemEntry OBJECT-TYPE
+	SYNTAX		ModemEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry containing information of a particular modem"
+	INDEX		{ rut2MIndex }
+	::= { modemTable 1 }
+
+ModemEntry ::=
+	SEQUENCE {
+	rut2MIndex			Integer32,
+	rut2MDescr			DisplayString,
+	rut2MImei			DisplayString,
+	rut2MModel			DisplayString,
+	rut2MManufacturer		DisplayString,
+	rut2MRevision			DisplayString,
+	rut2MSerial			DisplayString,
+	rut2MIMSI			DisplayString,
+	rut2MSimState			DisplayString,
+	rut2MPinState			DisplayString,
+	rut2MNetState			DisplayString,
+	rut2MSignal			INTEGER,
+	rut2MOperator			DisplayString,
+	rut2MOperatorNumber		DisplayString,
+	rut2MConnectionState		DisplayString,
+	rut2MNetworkType		DisplayString,
+	rut2MTemperature		INTEGER,
+	rut2MCellID			DisplayString,
+	rut2MSINR			DisplayString,
+	rut2MRSRP			DisplayString,
+	rut2MRSRQ			DisplayString,
+	rut2MSent			Counter64,
+	rut2MReceived			Counter64,
+	rut2MIP				DisplayString,
+	rut2MSentToday			Counter64,
+	rut2MReceivedToday		Counter64,
+	rut2MSentCurrentWeek		Counter64,
+	rut2MReceivedCurrentWeek	Counter64,
+	rut2MSentCurrentMonth		Counter64,
+	rut2MReceivedCurrentMonth	Counter64,
+	rut2MICCID			DisplayString
+	}
+
+rut2MIndex OBJECT-TYPE
+	SYNTAX		Integer32 (1..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A unique value, greater than zero, for each modem"
+	::= { modemEntry 1 }
+
+rut2MDescr OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Modem description"
+	::= { modemEntry 2 }
+
+rut2MImei OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Modem IMEI"
+	::= { modemEntry 3 }
+
+rut2MModel OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Modem model"
+	::= { modemEntry 4 }
+
+rut2MManufacturer OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Modem manufacturer"
+	::= { modemEntry 5 }
+
+rut2MRevision OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Modem revision"
+	::= { modemEntry 6 }
+
+rut2MSerial OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Modem serial number"
+	::= { modemEntry 7 }
+
+rut2MIMSI OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"IMSI"
+	::= { modemEntry 8 }
+
+rut2MSimState OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SIM status"
+	::= { modemEntry 9 }
+
+rut2MPinState OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"PIN status"
+	::= { modemEntry 10 }
+
+rut2MNetState OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Mobile network registration status"
+	::= { modemEntry 11 }
+
+rut2MSignal OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Signal level"
+	::= { modemEntry 12 }
+
+rut2MOperator OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Operator currently in use"
+	::= { modemEntry 13 }
+
+rut2MOperatorNumber OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Operator number (MCC+MNC)"
+	::= { modemEntry 14 }
+
+rut2MConnectionState OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Data session connection state"
+	::= { modemEntry 15 }
+
+rut2MNetworkType OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Data session network type"
+	::= { modemEntry 16 }
+
+rut2MTemperature OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Modem temperature (tenths of degrees Celsius)"
+	::= { modemEntry 17 }
+
+rut2MCellID OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Serving cell ID"
+	::= { modemEntry 18 }
+
+rut2MSINR OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"LTE SINR level (dB)"
+	::= { modemEntry 19 }
+
+rut2MRSRP OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"LTE RSRP level (dBm)"
+	::= { modemEntry 20 }
+
+rut2MRSRQ OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"LTE RSRQ level (dB)"
+	::= { modemEntry 21 }
+
+rut2MSent OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Total bytes sent"
+	::= { modemEntry 22 }
+
+rut2MReceived OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Total bytes received"
+	::= { modemEntry 23 }
+
+rut2MIP OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Modem IP address(es)"
+	::= { modemEntry 24 }
+
+rut2MSentToday OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Bytes sent today"
+	::= { modemEntry 25 }
+
+rut2MReceivedToday OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Bytes received today"
+	::= { modemEntry 26 }
+
+rut2MICCID OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SIM ICCID"
+	::= { modemEntry 27 }
+
+rut2MSentCurrentWeek OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Bytes sent current week"
+	::= { modemEntry 28 }
+
+rut2MReceivedCurrentWeek OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Bytes received current week"
+	::= { modemEntry 29 }
+
+rut2MSentCurrentMonth OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Bytes sent current month"
+	::= { modemEntry 30 }
+
+rut2MReceivedCurrentMonth OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Bytes received current month"
+	::= { modemEntry 31 }
+
+rut2ConnectionUptime OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Mobile connection uptime in seconds"
+	::= { mobile 3 }
+
+-- I/O --
+
+ioGroup OBJECT-GROUP
+	OBJECTS { rut2IoCount,
+		  rut2IoIndex,
+		  rut2IoSystemName,
+		  rut2IoName,
+		  rut2IoType,
+		  rut2IoBidirectional,
+		  rut2IoState,
+		  rut2IoInput,
+		  rut2IoInverted,
+		  rut2IoCurrent,
+		  rut2IoPercentage,
+		  rut2IoStateNumeric }
+	STATUS current
+	DESCRIPTION "I/O SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 6 }
+
+rut2IoCount OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Count of I/O"
+	::= { io 1 }
+
+ioTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF IOEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A list of I/O entries"
+	::= { io 2 }
+
+ioEntry OBJECT-TYPE
+	SYNTAX		IOEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry containing information of a particular I/O"
+	INDEX		{ rut2IoIndex }
+	::= { ioTable 1 }
+
+IOEntry ::=
+	SEQUENCE {
+	rut2IoIndex		INTEGER,
+	rut2IoSystemName	DisplayString,
+	rut2IoName		DisplayString,
+	rut2IoType		DisplayString,
+	rut2IoBidirectional	INTEGER,
+	rut2IoState		DisplayString,
+	rut2IoInput		INTEGER,
+	rut2IoInverted		INTEGER,
+	rut2IoCurrent		DisplayString,
+	rut2IoPercentage	DisplayString,
+	rut2IoStateNumeric	INTEGER
+	}
+
+rut2IoIndex OBJECT-TYPE
+	SYNTAX		INTEGER (0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A unique value, greater than zero, for each I/O"
+	::= { ioEntry 1 }
+
+rut2IoSystemName OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The system name of the I/O"
+	::= { ioEntry 2 }
+
+rut2IoName OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The display name of the I/O"
+	::= { ioEntry 3 }
+
+rut2IoType OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A description of I/O type"
+	::= { ioEntry 4 }
+
+rut2IoBidirectional OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Is I/O bidirectional?"
+	::= { ioEntry 5 }
+
+rut2IoState OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"State of I/O"
+	::= { ioEntry 6 }
+
+rut2IoInput OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Is I/O an input?"
+	::= { ioEntry 7 }
+
+rut2IoInverted OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Is value of I/O inverted?"
+	::= { ioEntry 8 }
+
+rut2IoCurrent OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Current amount flowing through ACL"
+	::= { ioEntry 9 }
+
+rut2IoPercentage OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Percentage of ACL"
+	::= { ioEntry 10 }
+
+rut2IoStateNumeric OBJECT-TYPE
+	SYNTAX		INTEGER {na(-1), low(0), high(1)}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Numeric state of I/O"
+	::= { ioEntry 11 }
+
+END

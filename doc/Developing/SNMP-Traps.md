@@ -3,11 +3,11 @@
 You must have a working snmptrapd. See
 [SNMP TRAP HANDLER](../Extensions/SNMP-Trap-Handler.md)
 
-Make sure the MIB is loaded from the trap you are adding. Edit
-`/etc/systemd/system/snmptrapd.service.d/mibs.conf` to add it then
-restart snmptrapd.
+Load the MIB of the new trap. Add it in
+`/etc/systemd/system/snmptrapd.service.d/mibs.conf`. Then restart
+snmptrapd.
 
-`MIBDIRS` option is not recursive, so you need to specify each directory individually.
+The `MIBDIRS` option is not recursive. Give each directory separately.
 
 Create a new class in `LibreNMS\Snmptrap\Handlers` that implements the
 `LibreNMS\Interfaces\SnmptrapHandler` interface. For example:
@@ -61,7 +61,7 @@ class ColdBoot implements SnmptrapHandler
 
 ```
 
-where number on the end means color of the eventlog:
+The value at the end sets the colour in the eventlog:
 
 ```
 Severity::Ok = green
@@ -71,16 +71,16 @@ Severity::Warning = yellow
 Severity::Error = red
 ```
 
-Register the mapping in the `config/snmptraps.php` file. Make sure to
-use the full trap OID and correct class.
+Register the mapping in the `config/snmptraps.php` file. Use the full
+trap OID and the correct class.
 
 ```php
 'SNMPv2-MIB::coldStart' => \LibreNMS\Snmptrap\Handlers\ColdBoot::class,
 ```
 
-The handle function inside your new class will receive a LibreNMS/Snmptrap/Trap
-object containing the parsed trap.  It is common to update the database and create
-event log entries within the handle function.
+The handle function of your new class receives a
+`LibreNMS/Snmptrap/Trap` object with the parsed trap. The handle
+function usually updates the database and creates eventlog entries.
 
 ### Getting information from the Trap
 
@@ -98,8 +98,8 @@ $trap->getTrapOid();  // returns the string you registered your class with
 $trap->getOidData('IF-MIB::ifDescr.114');
 ```
 
-getOidData() requires the full name including any additional index.
-You can use these functions to search the OID keys.
+`getOidData()` needs the full name with the index. These functions
+search the OID keys.
 
 ```php
 $trap->findOid('ifDescr');  // returns the first oid key that contains the string
@@ -108,7 +108,7 @@ $trap->findOids('ifDescr'); // returns all oid keys containing the string
 
 #### Advanced
 
-If the above isn't adequate, you can get the entire trap text:
+If these functions are not enough, read the full trap text:
 
 ```php
 $trap->raw;
@@ -116,11 +116,11 @@ $trap->raw;
 
 ### Tests
 
-Submitting new traps requires them to be fully tested. You can find many examples in the
-`tests/Feature/SnmpTraps/` directory.
+A new trap needs full tests. The `tests/Feature/SnmpTraps/` directory
+holds many examples.
 
-Here is a basic example of a test that trap handler only creates a log message.
-If your trap modifies the database, you should also test that it does so.
+The basic example below tests a trap handler that only creates a log
+message. If your trap changes the database, also test that change.
 
 ```php
 <?php

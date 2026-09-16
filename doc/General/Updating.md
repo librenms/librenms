@@ -1,24 +1,22 @@
 # Updating an Install
 
-By default, LibreNMS is set to automatically update once a day at  00:19 hours.
-If you have disabled this feature then you can perform a manual update.
+By default, LibreNMS updates one time each day at 00:19 hours.
+If you disabled this feature, you can do a manual update.
 
 ## Manual update
 
-If you would like to perform a manual update then you can do this by
-running the following command as the `librenms` user:
+To do a manual update, run this command as the `librenms` user:
 
 ```bash
 ./daily.sh
 ```
 
-This will update the core LibreNMS files and also update the database
-structure if any are available.
+This command updates the core LibreNMS files. It also updates the
+database structure when a new structure is available.
 
 ## Advanced users
 
-If you absolutely must update manually without using `./daily.sh` then
-you can do so by running the following commands:
+If you must update without `./daily.sh`, run these commands:
 
 ```bash
 cd /opt/librenms
@@ -31,14 +29,27 @@ rm bootstrap/cache/*.php
 
 ## Disabling automatic updates
 
-LibreNMS by default performs updates on a daily basis.
-This can be disabled in the WebUI:
+By default, LibreNMS updates each day.
+You can disable the updates in the web interface.
 
 !!! warning
-    You should never remove daily.sh from the cronjob!
-    This does database cleanup and other processes in addition to updating.
+    Do not remove `daily.sh` from the cronjob.
+    This script also does database cleanup and other processes.
 
 !!! setting "system/updates"
     ```bash
     lnms config:set update false
+    ```
+
+## Updating on set days
+
+You can configure LibreNMS to update only on set days. This configuration is an
+array. The array is empty by default.
+
+!!! setting "system/updates"
+    ```bash
+    lnms config:get update_on_days
+    ```
+    ```bash
+    lnms config:set update_on_days.+ "monday"
     ```

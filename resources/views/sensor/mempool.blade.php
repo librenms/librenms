@@ -7,11 +7,11 @@
         <div class="panel-heading">
             <div class="row" style="padding:0px 10px 0px 10px;">
                 <div class="pull-left">
-                    <x-option-bar border="none" name="Health" :options="$metrics" :selected="$metric"></x-option-bar>
+                    <x-option-bar border="none" name="{{ __('Health') }}" :options="$metrics" :selected="$metric"></x-option-bar>
                 </div>
 
                 <div class="pull-left">
-                    <x-option-bar border="none" name="Status" :options="$status_bar" :selected="$status"></x-option-bar>
+                    <x-option-bar border="none" name="{{ __('Status') }}" :options="$status_bar" :selected="$status"></x-option-bar>
                 </div>
 
                 <div class="pull-right">
@@ -24,7 +24,7 @@
                    data-url="{{ route('table.mempools') }}">
                 <thead>
                 <tr>
-                    <th data-column-id="hostname">Device</th>
+                    <th data-column-id="hostname">{{ __('Device') }}</th>
                     <th data-column-id="mempool_descr">{{ $view == 'graphs' ? '' : __('Memory') }}</th>
                     <th data-column-id="graph" data-sortable="false" data-searchable="false"></th>
                     <th data-column-id="mempool_used" data-searchable="false">{{ $view == 'graphs' ? '' : __('Used') }}</th>

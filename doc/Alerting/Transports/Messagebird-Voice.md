@@ -1,12 +1,13 @@
 ## Messagebird Voice
 
-LibreNMS can send messages through Messagebird voice Rest API transport (text to speech).
+LibreNMS sends messages through the Messagebird voice REST API. This
+API converts the text to speech.
 
 | Config | Example |
 | ------ | ------- |
-| Api Key | Api rest key given in the messagebird dashboard |
-| Originator | E.164 formatted originator |
-| Recipient | E.164 formatted recipient for multi recipients comma separated |
-| Language | Select box for options  |
-| Spoken voice | Female or Male  |
-| Repeat | X times the message is repeated  |
+| Api Key | The REST API key from the Messagebird dashboard |
+| Originator | The originator in E.164 format |
+| Recipient | The recipient in E.164 format. Separate several recipients with commas |
+| Language | A select box with the options |
+| Spoken voice | Female or male |
+| Repeat | The number of repeats of the message |

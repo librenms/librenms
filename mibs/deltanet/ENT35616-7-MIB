@@ -1,0 +1,184 @@
+ENT35616-7-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+ent356167 OBJECT IDENTIFIER ::= { enterprises 35616 7 }
+
+chassisTemp OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { ent356167 2 1 }
+
+powerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { ent356167 2 2 }
+
+powerEntry OBJECT-TYPE
+    SYNTAX      PowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    INDEX       { powerIndex }
+    ::= { powerTable 1 }
+
+PowerEntry ::= SEQUENCE {
+    powerIndex  INTEGER,
+    powerExist  INTEGER,
+    powerType   INTEGER,
+    powerStatus INTEGER
+}
+
+powerIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { powerEntry 1 }
+
+powerExist OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { powerEntry 2 }
+
+powerType OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { powerEntry 3 }
+
+powerStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { powerEntry 4 }
+
+fanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { ent356167 2 3 }
+
+fanEntry OBJECT-TYPE
+    SYNTAX      FanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    INDEX       { fanIndex }
+    ::= { fanTable 1 }
+
+FanEntry ::= SEQUENCE {
+    fanIndex  INTEGER,
+    fanStatus INTEGER,
+    fanSpeed  INTEGER
+}
+
+fanIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { fanEntry 1 }
+
+fanStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { fanEntry 2 }
+
+fanSpeed OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { fanEntry 3 }
+
+opticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OpticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { ent356167 3 2 }
+
+opticsEntry OBJECT-TYPE
+    SYNTAX      OpticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    INDEX       { opticsIndex }
+    ::= { opticsTable 1 }
+
+OpticsEntry ::= SEQUENCE {
+    opticsIndex  INTEGER,
+    lineTxDbm    DisplayString,
+    lineRxDbm    DisplayString,
+    lineTemp     DisplayString,
+    clientTxDbm  DisplayString,
+    clientRxDbm  DisplayString,
+    clientTemp   DisplayString
+}
+
+opticsIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { opticsEntry 1 }
+
+lineTxDbm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { opticsEntry 8 }
+
+lineRxDbm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { opticsEntry 9 }
+
+lineTemp OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { opticsEntry 10 }
+
+clientTxDbm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { opticsEntry 18 }
+
+clientRxDbm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { opticsEntry 19 }
+
+clientTemp OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Structural placeholder, not vendor documentation."
+    ::= { opticsEntry 20 }
+
+END

@@ -1,0 +1,267 @@
+-- *------------------------------------------------------------------
+-- * ALTIGA-GLOBAL-REG.my:  Altiga Networks Central Registration MIB.
+-- *
+-- * Altiga Networks was acquired by Cisco Systems on March 29, 2000
+-- *
+-- * Copyright (c) 2002, 2003, 2005 by Cisco Systems, Inc.
+-- * All rights reserved.
+-- *
+-- *------------------------------------------------------------------
+
+ALTIGA-GLOBAL-REG DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+         FROM SNMPv2-SMI;
+
+   altigaGlobalRegModule MODULE-IDENTITY
+      LAST-UPDATED   "200501050000Z"
+      ORGANIZATION   "Cisco Systems, Inc."
+      CONTACT-INFO
+         "Cisco Systems
+          170 W Tasman Drive
+          San Jose, CA  95134
+          USA
+
+          Tel: +1 800 553-NETS
+          E-mail: cs-cvpn3000@cisco.com"
+
+      DESCRIPTION
+         "The Altiga Networks central registration module.
+         
+          Acronyms
+          The following acronyms are used in this document:
+
+
+            ACE:        Access Control Encryption
+
+            BwMgmt:     Bandwidth Management
+
+            CTCP:       Cisco Transmission Control Protocol
+
+            DHCP:       Dynamic Host Configuration Protocol
+
+            DNS:        Domain Name Service
+
+            FTP:        File Transfer Protocol
+
+            FW:         Firewall
+
+            HTTP:       HyperText Transfer Protocol
+
+            ICMP:       Internet Control Message Protocol
+
+            IKE:        Internet Key Exchange
+
+            IP:         Internet Protocol
+
+            LBSSF:      Load Balance Secure Session Failover
+
+            L2TP:       Layer-2 Tunneling Protocol
+
+            MIB:        Management Information Base
+
+            NAT:        Network Address Translation
+
+            NTP:        Network Time Protocol
+
+            PPP:        Point-to-Point Protocol
+
+            PPTP:       Point-to-Point Tunneling Protocol
+
+            SEP:        Scalable Encryption Processor
+
+            SNMP:       Simple Network Management Protocol
+
+            SSH:        Secure Shell Protocol
+
+            SSL:        Secure Sockets Layer
+
+            UDP:        User Datagram Protocol
+         
+            VPN:        Virtual Private Network
+         
+            NAC:        Network Admission Control
+         
+         "
+        REVISION "200501050000Z"
+        DESCRIPTION
+                "Added the new MIB Modules(65 to 67)"
+
+        REVISION "200310200000Z"
+        DESCRIPTION
+                "Added the new MIB Modules(58 to 64)"
+
+        REVISION "200304250000Z"
+        DESCRIPTION
+                "Added the new MIB Modules(54 to 57)"
+
+        REVISION "200207100000Z"
+        DESCRIPTION
+                "Updated with new header"
+
+      ::= { alGlobalRegModule 1 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+-- Altiga's root
+altigaRoot        OBJECT IDENTIFIER ::= { enterprises 3076 }
+--cisco           OBJECT IDENTIFIER ::= { enterprises 9 }
+--ciscoMgmt       OBJECT IDENTIFIER ::= { cisco 9 }
+--ciscoExperiment OBJECT IDENTIFIER ::= { cisco 10 }
+
+-- Altiga's registrations and modules
+altigaReg       OBJECT IDENTIFIER ::= { altigaRoot 1 }
+altigaModules   OBJECT IDENTIFIER ::= { altigaReg 1 }
+
+alGlobalRegModule       OBJECT IDENTIFIER ::= { altigaModules 1 }
+alCapModule             OBJECT IDENTIFIER ::= { altigaModules 2 }
+alMibModule             OBJECT IDENTIFIER ::= { altigaModules 3 }
+alComplModule           OBJECT IDENTIFIER ::= { altigaModules 4 }
+alVersionMibModule      OBJECT IDENTIFIER ::= { altigaModules 6 }
+alAccessMibModule       OBJECT IDENTIFIER ::= { altigaModules 7 }
+alEventMibModule        OBJECT IDENTIFIER ::= { altigaModules 8 }
+alAuthMibModule         OBJECT IDENTIFIER ::= { altigaModules 9 }
+alPptpMibModule         OBJECT IDENTIFIER ::= { altigaModules 10 }
+alPppMibModule          OBJECT IDENTIFIER ::= { altigaModules 11 }
+alHttpMibModule         OBJECT IDENTIFIER ::= { altigaModules 12 }
+alIpMibModule           OBJECT IDENTIFIER ::= { altigaModules 13 }
+alFilterMibModule       OBJECT IDENTIFIER ::= { altigaModules 14 }
+alUserMibModule         OBJECT IDENTIFIER ::= { altigaModules 15 }
+alTelnetMibModule       OBJECT IDENTIFIER ::= { altigaModules 16 }
+alFtpMibModule          OBJECT IDENTIFIER ::= { altigaModules 17 }
+alTftpMibModule         OBJECT IDENTIFIER ::= { altigaModules 18 }
+alSnmpMibModule         OBJECT IDENTIFIER ::= { altigaModules 19 }
+alIpSecMibModule        OBJECT IDENTIFIER ::= { altigaModules 20 }
+alL2tpMibModule         OBJECT IDENTIFIER ::= { altigaModules 21 }
+alSessionMibModule      OBJECT IDENTIFIER ::= { altigaModules 22 }
+alDnsMibModule          OBJECT IDENTIFIER ::= { altigaModules 23 }
+alAddressMibModule      OBJECT IDENTIFIER ::= { altigaModules 24 }
+alDhcpMibModule         OBJECT IDENTIFIER ::= { altigaModules 25 }
+alWatchdogMibModule     OBJECT IDENTIFIER ::= { altigaModules 26 }
+alHardwareMibModule     OBJECT IDENTIFIER ::= { altigaModules 27 }
+alNatMibModule          OBJECT IDENTIFIER ::= { altigaModules 28 }
+alLan2LanMibModule      OBJECT IDENTIFIER ::= { altigaModules 29 } 
+alGeneralMibModule      OBJECT IDENTIFIER ::= { altigaModules 30 }
+alSslMibModule          OBJECT IDENTIFIER ::= { altigaModules 31 }
+alCertMibModule         OBJECT IDENTIFIER ::= { altigaModules 32 }
+alNtpMibModule          OBJECT IDENTIFIER ::= { altigaModules 33 }
+alNetworkListMibModule  OBJECT IDENTIFIER ::= { altigaModules 34 }
+alSepMibModule          OBJECT IDENTIFIER ::= { altigaModules 35 }
+alIkeMibModule          OBJECT IDENTIFIER ::= { altigaModules 36 }
+alSyncMibModule         OBJECT IDENTIFIER ::= { altigaModules 37 }
+alT1E1MibModule         OBJECT IDENTIFIER ::= { altigaModules 38 }
+alMultiLinkMibModule    OBJECT IDENTIFIER ::= { altigaModules 39 }
+alSshMibModule          OBJECT IDENTIFIER ::= { altigaModules 40 }
+alLBSSFMibModule        OBJECT IDENTIFIER ::= { altigaModules 41 }
+alDhcpServerMibModule   OBJECT IDENTIFIER ::= { altigaModules 42 }
+alAutoUpdateMibModule   OBJECT IDENTIFIER ::= { altigaModules 43 }
+alAdminAuthMibModule    OBJECT IDENTIFIER ::= { altigaModules 44 }
+alPPPoEMibModule        OBJECT IDENTIFIER ::= { altigaModules 45 }
+alXmlMibModule          OBJECT IDENTIFIER ::= { altigaModules 46 }
+alCtcpMibModule         OBJECT IDENTIFIER ::= { altigaModules 47 }
+alFwMibModule           OBJECT IDENTIFIER ::= { altigaModules 48 }
+alGroupMatchMibModule   OBJECT IDENTIFIER ::= { altigaModules 49 }
+alACEServerMibModule    OBJECT IDENTIFIER ::= { altigaModules 50 }
+alNatTMibModule         OBJECT IDENTIFIER ::= { altigaModules 51 }
+alBwMgmtMibModule       OBJECT IDENTIFIER ::= { altigaModules 52 }
+alIpSecPreFragMibModule OBJECT IDENTIFIER ::= { altigaModules 53 }
+alFipsMibModule         OBJECT IDENTIFIER ::= { altigaModules 54 }
+alBackupL2LMibModule    OBJECT IDENTIFIER ::= { altigaModules 55 }
+alNotifyMibModule	OBJECT IDENTIFIER ::= { altigaModules 56 }
+alRebootStatusMibModule	OBJECT IDENTIFIER ::= { altigaModules 57 }
+alAuthorizationModule   OBJECT IDENTIFIER ::= { altigaModules 58 }
+alWebPortalMibModule    OBJECT IDENTIFIER ::= { altigaModules 59 }
+alWebEmailMibModule     OBJECT IDENTIFIER ::= { altigaModules 60 }
+alPortForwardMibModule  OBJECT IDENTIFIER ::= { altigaModules 61 }
+alRemoteServerMibModule OBJECT IDENTIFIER ::= { altigaModules 62 }
+alWebvpnAclMibModule    OBJECT IDENTIFIER ::= { altigaModules 63 }
+alNbnsMibModule          OBJECT IDENTIFIER ::= { altigaModules 64 }
+alSecureDesktopMibModule OBJECT IDENTIFIER ::= { altigaModules 65 }
+alSslTunnelClientMibModule OBJECT IDENTIFIER ::= { altigaModules 66 }
+alNacMibModule          OBJECT IDENTIFIER ::= { altigaModules 67 }
+
+
+-- Altiga's company-wide objects and events
+altigaGeneric   OBJECT IDENTIFIER ::= { altigaRoot 2 }
+-- See altiga.mi2
+
+-- Altiga's product-specific objects and events
+altigaProducts  OBJECT IDENTIFIER ::= { altigaRoot 3 }
+
+-- Altiga's Agent profiles
+altigaCaps      OBJECT IDENTIFIER ::= { altigaRoot 4 }
+-- See altiga-cap.mi2
+
+-- Altiga Requirement specifications
+altigaReqs      OBJECT IDENTIFIER ::= { altigaRoot 5 }
+-- We will likely have nothing here
+
+-- Altiga Experiments
+altigaExpr      OBJECT IDENTIFIER ::= { altigaRoot 6 }
+-- We will likely have nothing here
+
+-- Altiga Product Families
+altigaHw        OBJECT IDENTIFIER ::= { altigaReg 2 }
+
+-- VPN Concentrator Product
+altigaVpnHw     OBJECT IDENTIFIER ::= { altigaHw 1 }
+
+-- VPN Concentrator Components
+altigaVpnChassis        OBJECT IDENTIFIER ::= { altigaVpnHw 1 }
+altigaVpnIntf           OBJECT IDENTIFIER ::= { altigaVpnHw 2 }
+altigaVpnEncrypt        OBJECT IDENTIFIER ::= { altigaVpnHw 3 }
+
+-- VPN Concentrator Chassis
+-- Cxx (C10/15/20/30/50/60/80) 30xx
+vpnConcentrator         OBJECT IDENTIFIER ::= { altigaVpnChassis 1 }
+-- C5/3005
+vpnRemote               OBJECT IDENTIFIER ::= { altigaVpnChassis 2 }
+-- 3002
+vpnClient               OBJECT IDENTIFIER ::= { altigaVpnChassis 3 }
+
+
+-- VPN Concentrator Chassis Revisions
+--Concentrators (C10/15/20/30/50/60/80) 30xx
+vpnConcentratorRev1     OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+               "The first revision of Altiga's VPN Concentrator hardware.
+                603e PPC processor. C10/15/20/30/50/60."
+        ::= { vpnConcentrator 1 }
+
+vpnConcentratorRev2     OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+               "The second revision of Altiga's VPN Concentrator hardware.
+                740 PPC processor. C10/15/20/30/50/60."
+        ::= { vpnConcentrator 2 }
+
+--Remotes (a.k.a. Concentrators) 3005
+vpnRemoteRev1   OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+               "The first revision of Altiga's VPN Concentrator (Remote) hardware.
+                8240 PPC processor."
+        ::= { vpnRemote 1 }
+
+
+--Clients (a.k.a. Hardware Client) 3002
+vpnClientRev1   OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+               "The first revision of Altiga's VPN Hardware Client hardware.
+                8260 PPC processor."
+        ::= { vpnClient 1 }
+
+
+-- VPN Concentrator Interface Cards (VOX also)
+-- none
+
+-- VPN Concentrator Encryption Cards
+-- none
+
+
+END

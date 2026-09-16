@@ -23,8 +23,16 @@ discovery:
         sysObjectID: .1.3.6.1.4.1.8072.3.2.10
         sysDescr_regex_except:
             - '/^USG/'
+        snmpget:
+            oid: .1.3.6.1.4.1.54414.1.1.1.0
+            op: '='
+            value: false
     -
         sysDescr_regex: '/^Linux/'
+        snmpget:
+            oid: .1.3.6.1.4.1.54414.1.1.1.0
+            op: '='
+            value: false
 ignore_mount_regexp:
     - '#^/run($|/)#'
     - '#^/dev/shm$#'

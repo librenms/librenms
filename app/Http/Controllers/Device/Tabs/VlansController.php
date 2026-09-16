@@ -28,7 +28,9 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
 use App\Models\PortVlan;
+use App\Models\Vlan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
@@ -36,7 +38,7 @@ class VlansController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return $device->vlans()->exists();
+        return Gate::allows('viewAny', Vlan::class) && $device->vlans()->exists();
     }
 
     public function slug(): string

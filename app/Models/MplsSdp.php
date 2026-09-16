@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class MplsSdp extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $primaryKey = 'sdp_id';
     public $timestamps = false;
     protected $fillable = [

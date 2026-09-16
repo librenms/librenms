@@ -234,16 +234,14 @@ class CiHelper
     }
 
     /**
-     * Runs phpcs --standard=PSR2 against the code base
+     * Runs Pint against the code base
      *
      * @return int the return value from phpcs (0 = success)
      */
     public function checkStyle(): int
     {
         $cs_cmd = [
-            $this->checkPhpExec('php-cs-fixer'),
-            '--config=.php-cs-fixer.php',
-            'fix',
+            $this->checkPhpExec('pint'),
             '-v',
         ];
 

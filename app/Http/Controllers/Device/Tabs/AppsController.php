@@ -26,15 +26,17 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Models\Application;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class AppsController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return $device->applications()->exists();
+        return Gate::allows('viewAny', Application::class) && $device->applications()->exists();
     }
 
     public function slug(): string

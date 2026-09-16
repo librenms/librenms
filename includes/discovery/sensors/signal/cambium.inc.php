@@ -26,6 +26,10 @@ if (strstr((string) $device['sysDescr'], 'Cambium PTP 50650')) {
     $mib = 'WHISP-BOX-MIBV2-MIB';
 }
 
+if (! isset($oid)) {
+    return;
+}
+
 $oids = trim(str_replace('"', '', snmp_get($device, "$oid", '-OsqnU', $mib)));
 d_echo($oids . "\n");
 

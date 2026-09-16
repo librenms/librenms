@@ -1,8 +1,14 @@
+<?php
+
+use Illuminate\Support\Facades\Request;
+use LibreNMS\Util\Time;
+
+?>
 <div style="text-align: center;">
     <form class="form-inline" id="customrange">
         <input type="hidden" id="selfaction" value="<?php echo Request::url(); ?>">
         <div class="form-group">
-            <label for="dtpickerfrom">From</label>
+        <label for="dtpickerfrom"><?= __('From') ?></label>
             <input type="text"
                    class="form-control"
                    id="dtpickerfrom"
@@ -10,7 +16,7 @@
                    data-date-format="YYYY-MM-DD HH:mm">
         </div>
         <div class="form-group">
-            <label for="dtpickerto">To</label>
+        <label for="dtpickerto"><?= __('To') ?></label>
             <input type="text"
                    class="form-control"
                    id="dtpickerto"
@@ -20,14 +26,14 @@
         <input type="submit"
                class="btn btn-default"
                id="submit"
-               value="Update"
+               value="<?= __('Update') ?>"
                onclick="submitCustomRange(this.form);">
     </form>
     <script src="<?php echo asset('js/RrdGraphJS/moment-timezone-with-data.js'); ?>"></script>
     <script type="text/javascript">
         $(function () {
-            var ds_datefrom = new Date(<?php echo \LibreNMS\Util\Time::parseAt($graph_array['from']); ?>*1000);
-            var ds_dateto = new Date(<?php echo \LibreNMS\Util\Time::parseAt($graph_array['to']); ?>*1000);
+            var ds_datefrom = new Date(<?= Time::parseAt($graph_array['from']) ?>*1000);
+            var ds_dateto = new Date(<?= Time::parseAt($graph_array['to']) ?>*1000);
             var ds_tz = '<?php echo session('preferences.timezone'); ?>';
             if (ds_tz) {
                 ds_datefrom = moment.tz(ds_datefrom, ds_tz);

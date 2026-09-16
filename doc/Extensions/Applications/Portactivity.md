@@ -15,7 +15,7 @@
     wget https://github.com/librenms/librenms-agent/raw/master/snmp/portactivity -O /etc/snmp/portactivity
     ```
 
-3. Make the script executable
+3. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/portactivity
@@ -28,9 +28,11 @@
     ```
 
 !!! note "portactivity"
-    Will monitor HTTP, LDAP, and IMAP. The `-p` switch specifies what ports to use. This is a comma separated list.
+    It monitors HTTP, LDAP, and IMAP. The `-p` switch gives the ports in a
+    comma separated list.
     
-    These must be found in '/etc/services' or where ever NSS is set to fetch it from. If not, it will throw an error.
+    These names must be in `/etc/services` or in the source of NSS. Without
+    them, the script gives an error.
     
     If you want to JSON returned by it to be printed in a pretty format use the `-P` flag.
 
@@ -40,4 +42,4 @@
     sudo systemctl restart snmpd
     ```
 
-Please note that for only TCP[46] services are supported.
+Note: only TCP[46] services are supported.

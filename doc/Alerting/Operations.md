@@ -1,36 +1,41 @@
 # Operations
 
-Alert **Operations** let you reuse the same “who to notify and when” behavior across multiple Alert Rules.
+An alert **operation** holds the recipients and the timing of a
+notification. Many alert rules can use the same operation.
 
-Instead of configuring delays, repeats, and transport targets separately on every rule, you create an Operation once, then assign it to any rule.
+Without operations, you configure the delays, the repeats, and the
+transport targets on each rule. With an operation, you configure this
+behaviour one time. Then you assign the operation to any rule.
 
-It is not required to create an operation. Without one, an alert rule can still raise an alert, but it will not send notifications.
+An operation is not necessary. An alert rule without an operation still
+raises an alert. It sends no notification.
 
 ## Quick start
 
-If you are new to alerting, start with this:
+For your first alert, do these steps:
 
 1. Create one operation with one segment.
 2. Set **Steps from** to `1` and **Steps to** to `1`.
 3. Set **Start** to `0` and **Step duration** to `60`.
-4. Add one transport (for example, email).
+4. Add one transport, for example email.
 5. Assign the operation to an alert rule.
 
-This sends one notification immediately when the rule matches.
+The rule then sends one notification immediately at a match.
 
 ## What an Operation is
 
-An Operation is a named set of one or more **segments**.
+An operation is a named set of one or more **segments**.
 
-A segment defines a notification window and its targets. Each segment has:
+A segment defines a notification window and its targets. Each segment
+has these fields:
 
-- **Steps from**: the first step number this segment applies to
-- **Steps to**: the last step number this segment applies to
-  - Leave empty to continue indefinitely.
-- **Start**: delay before this segment starts, in seconds
-- **Step duration**: time between each step, in seconds
+- **Steps from**: the first step number of this segment.
+- **Steps to**: the last step number of this segment.
+  - An empty value continues without a limit.
+- **Start**: the delay before the start of this segment, in seconds.
+- **Step duration**: the time between two steps, in seconds.
 
-In practice, most people start with a single segment.
+Most users start with one segment.
 
 Example:
 
@@ -41,59 +46,76 @@ Example:
 
 ## Transports used by Operations
 
-Each segment contains its own list of notification targets:
+Each segment holds its own list of notification targets:
 
-- **Transports** (Slack, email, Telegram, etc.)
-- **Transport groups** (a reusable group of transports)
+- **Transports**, such as Slack, email, and Telegram.
+- **Transport groups**, that is a reusable group of transports.
 
-This means you can:
+You can therefore:
 
-- Send to one set of transports early (first segment)
-- Send to a wider set later (second segment)
+- Send to one set of transports first, in the first segment.
+- Send to a larger set later, in the second segment.
 
 ## Assigning an operation to a rule
 
-When creating or editing an Alert Rule, choose an **Operation**.
+At the creation or the edit of an alert rule, choose an **operation**.
 
-- If an operation is assigned, notifications follow the operation's segments and transports.
-- If no operation is assigned, the rule can still raise alerts, but no notifications are sent.
+- With an operation, the notifications follow the segments and the
+  transports of that operation.
+- Without an operation, the rule still raises alerts. LibreNMS sends no
+  notification.
 
 ## How operations work in the backend (high level)
 
-At a high level, the backend treats an operation as a reusable notification plan.
+The backend treats an operation as a reusable notification plan.
 
-- An Alert Rule stores `alert_operation_id`, which points to the operation it should use.
-- An operation contains one or more segments.
+- An alert rule stores `alert_operation_id`. This value points to its
+  operation.
+- An operation holds one or more segments.
 - Each segment defines:
-  - a step range (**Steps from** to **Steps to**)
-  - timing (**Start** and **Step duration**)
-  - notification targets (**transports** and/or **transport group** entries)
+  - a step range, from **Steps from** to **Steps to**
+  - the timing, that is **Start** and **Step duration**
+  - the notification targets, that is the **transports**, the
+    **transport group** entries, or both
 
-When an alert is active, notification steps move forward over time. At each step, the backend checks which segment matches that step and sends notifications to that segment's transports and transport groups.
+While an alert is active, the notification steps move forward with
+time. At each step, the backend finds the segment of that step. It then
+sends notifications to the transports and the transport groups of that
+segment.
 
-If no operation is assigned to the rule, the alert can still be raised and tracked, but notifications are not sent.
+Without an operation, LibreNMS still raises and tracks the alert. It
+sends no notification.
 
 ### Simple lifecycle
 
-1. A rule matches, so an alert is raised.
-2. The backend reads the rule's `alert_operation_id`.
-3. If an operation is linked, its segments are loaded.
-4. As time passes, the alert moves through step numbers based on each segment's **Start** and **step duration**.
-5. For each current step, the backend finds the segment whose step range includes that step.
-6. The backend sends notifications to that segment's configured transports and transport groups.
-7. This repeats until the alert is no longer active (for example, recovered or acknowledged).
+1. A rule matches and raises an alert.
+2. The backend reads the `alert_operation_id` of the rule.
+3. If an operation is linked, the backend loads its segments.
+4. With time, the alert moves through the step numbers. The **Start**
+   value and the **Step duration** value of each segment control this
+   movement.
+5. At each current step, the backend finds the segment with that step
+   in its step range.
+6. The backend sends notifications to the transports and the transport
+   groups of that segment.
+7. This cycle repeats until the alert becomes inactive, for example
+   after a recovery or an acknowledgement.
 
 ### Why reuse operations
 
-Operations are reusable by design: update one operation once, and all rules linked to it use the updated behavior.
+Operations are reusable by design. One update to an operation changes
+the behaviour of every rule with a link to it.
 
 ### Safe updates (conceptual)
 
-Changing an operation affects future notifications. Existing alert state may continue according to the current engine cycle before updated behavior is fully reflected.
+A change to an operation applies to the future notifications. An
+existing alert can continue with the old behaviour until the end of the
+current engine cycle.
 
 ## Examples
 
-In the timeline charts below, the **Y-axis** shows time moving downward, and the **X-axis** shows segment lanes from left to right.
+In the timeline charts below, the **Y-axis** shows the time from top to
+bottom. The **X-axis** shows the segment lanes from left to right.
 
 ### Example 1: One immediate notification
 
@@ -111,7 +133,7 @@ sequenceDiagram
 
 ### Example 2: Escalate after initial notifications
 
-Goal: send 5 notifications every 60 seconds to NOC email, then one notification to managers in Slack.
+Goal: send 5 notifications to the NOC email at an interval of 60 seconds. Then send one notification to the managers in Slack.
 
 | name | Steps from | Steps to | Start (s) | Step duration (s) | Transports / groups |
 | --- | --- | --- | --- | --- | --- |
@@ -136,7 +158,7 @@ sequenceDiagram
 
 | name | Steps from | Steps to | Start (s) | Step duration (s) | Transports / groups |
 | --- | --- | --- | --- | --- | --- |
-| Segment 1 | 1 | empty (continues) | 0 | 60 | Email and Slack |
+| Segment 1 | 1 | empty, so it continues | 0 | 60 | Email and Slack |
 
 ```mermaid
 sequenceDiagram
@@ -151,20 +173,23 @@ sequenceDiagram
   end
 ```
 
-This continues sending notifications until the alert is recovered or acknowledged.
+The notifications continue until the alert recovers or until you
+acknowledge it.
 
 ## Troubleshooting
 
-If a rule triggers but no notification is sent, check:
+If a rule triggers but sends no notification, make sure that:
 
-1. The rule has an operation assigned.
+1. The rule has an operation.
 2. The operation has at least one segment.
 3. Each segment has at least one transport or transport group.
-4. The selected transports are configured and working.
+4. The selected transports are configured and work correctly.
 
 ## Managing Operations
 
-Operations are intended to be reusable:
+Operations are reusable:
 
-- Name an operation to describe the policy (for example, “Critical paging escalation”).
-- Update segments/transports once to affect every rule that uses it.
+- Give an operation a name that describes its policy. An example is
+  "Critical paging escalation".
+- One update to the segments or the transports changes every rule with
+  that operation.

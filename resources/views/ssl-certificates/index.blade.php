@@ -102,14 +102,14 @@ $(document).ready(function () {
             "actions": function (column, row) {
                 var html = '<div class="ssl-cert-actions" style="white-space:nowrap">';
                 html += '<a href="{{ url('ssl-certificates') }}/' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-eye fa-fw"></i> {{ __('View') }}</a> ';
-                @can('update', \App\Models\SslCertificate::class)
+                @can('ssl-certificate.update')
                 if (row.disabled) {
                     html += '<button type="button" class="btn btn-xs btn-success" onclick="sslCertEnable(' + row.id + ')"><i class="fa fa-play fa-fw"></i> {{ __('Enable') }}</button> ';
                 } else {
                     html += '<button type="button" class="btn btn-xs btn-warning" onclick="sslCertPause(' + row.id + ')"><i class="fa fa-pause fa-fw"></i> {{ __('Pause') }}</button> ';
                 }
                 @endcan
-                @can('delete', \App\Models\SslCertificate::class)
+                @can('ssl-certificate.delete')
                 html += '<button type="button" class="btn btn-xs btn-danger" onclick="sslCertDelete(' + row.id + ')"><i class="fa fa-trash fa-fw"></i> {{ __('Delete') }}</button>';
                 @endcan
                 html += '</div>';

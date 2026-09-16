@@ -52707,7 +52707,8 @@
                     "ifStackStatus": "active"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "cisco-pw": {
         "discovery": {

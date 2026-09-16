@@ -1,3 +1,6 @@
+<div class="tw:pb-4 tw:-mt-4">
+    <x-filter name="device.ports" :fields="$data['filterFields']"  :initial="$data['filter']" :reload="true"/>
+</div>
 @foreach($data['ports'] as $port)
     <div class="minigraph-div">
         <x-port-link :port="$port">

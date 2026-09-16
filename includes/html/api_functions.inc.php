@@ -48,6 +48,7 @@ use App\Models\ServiceTemplate;
 use App\Models\UserPref;
 use App\Models\Vlan;
 use App\Models\Vrf;
+use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -63,11 +64,14 @@ use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
+use LibreNMS\Syslog\Entry;
+use LibreNMS\Syslog\Processor;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Time;
 
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null): JsonResponse
 {
@@ -300,19 +304,18 @@ function list_locations()
 
 function get_device(Illuminate\Http\Request $request)
 {
-    // return details of a single device
-    $hostname = $request->route('hostname');
+    $device = DeviceCache::get($request->route('hostname'));
 
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-
-    // find device matching the id
-    $device = device_by_id_cache($device_id);
-    if (! $device || ! isset($device['device_id'])) {
-        return api_error(404, "Device $hostname does not exist");
+    if (! $device->exists) {
+        return api_error(404, 'Device ' . $request->route('hostname') . ' does not exist');
     }
 
-    return check_device_permission($device_id, function () use ($device) {
+    return check_device_permission($device->device_id, function () use ($device) {
+        $location = $device->location;
+        $device['location'] = $location?->location;
+        $device['lat'] = $location?->lat;
+        $device['lng'] = $location?->lng;
+
         $host_id = get_vm_parent_id($device);
         if (is_numeric($host_id)) {
             $device = array_merge($device, ['parent_id' => $host_id]);
@@ -435,7 +438,7 @@ function add_device(Illuminate\Http\Request $request)
     try {
         $device = new Device(Arr::only($data, [
             'hostname',
-            'display',
+            'display_template',
             'overwrite_ip',
             'location_id',
             'override_sysLocation',
@@ -474,8 +477,12 @@ function add_device(Illuminate\Http\Request $request)
         }
 
         (new ValidateDeviceAndCreate($device, $force_add, ! empty($data['ping_fallback'])))->execute();
-    } catch (Exception $e) {
+    } catch (\LibreNMS\Exceptions\HostExistsException|\LibreNMS\Exceptions\HostUnreachableException|\LibreNMS\Exceptions\SnmpVersionUnsupportedException $e) {
         return api_error(500, $e->getMessage());
+    } catch (Exception $e) {
+        report($e);
+
+        return api_error(500, 'Failed to add device');
     }
 
     $message = "Device $device->hostname ($device->device_id) has been added successfully";
@@ -1030,60 +1037,45 @@ function trigger_device_discovery(Illuminate\Http\Request $request)
 
 function list_available_health_graphs(Illuminate\Http\Request $request)
 {
-    $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = DeviceCache::get($request->route('hostname'));
 
-    return check_device_permission($device_id, function ($device_id) use ($request) {
+    return check_device_permission($device->device_id, function () use ($request, $device) {
         $input_type = $request->route('type');
-        if ($input_type) {
-            $type = preg_replace('/^device_/', '', $input_type);
-        }
+        $type = $input_type ? preg_replace('/^device_/', '', $input_type) : null;
         $sensor_id = $request->route('sensor_id');
-        $graphs = [];
 
-        if (isset($type)) {
-            if (isset($sensor_id)) {
-                $graphs = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_id` = ?', [$sensor_id]);
-            } else {
-                foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', [$device_id, $type]) as $graph) {
-                    $graphs[] = [
-                        'sensor_id' => $graph['sensor_id'],
-                        'desc' => $graph['sensor_descr'],
-                    ];
+        if ($type === null) {
+            $graphs = $device->sensors()
+                ->where('sensor_deleted', 0)
+                ->distinct()
+                ->pluck('sensor_class')
+                ->map(fn ($sensor_class) => ['desc' => ucfirst((string) $sensor_class), 'name' => 'device_' . $sensor_class])
+                ->all();
+
+            $extraTypes = [
+                'processors' => ['desc' => 'Processors', 'name' => 'device_processor'],
+                'storage' => ['desc' => 'Storage', 'name' => 'device_storage'],
+                'mempools' => ['desc' => 'Memory Pools', 'name' => 'device_mempool'],
+            ];
+            foreach ($extraTypes as $relation => $entry) {
+                if ($device->{$relation}()->count() > 0) {
+                    $graphs[] = $entry;
                 }
             }
-        } else {
-            foreach (dbFetchRows('SELECT `sensor_class` FROM `sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', [$device_id]) as $graph) {
-                $graphs[] = [
-                    'desc' => ucfirst((string) $graph['sensor_class']),
-                    'name' => 'device_' . $graph['sensor_class'],
-                ];
-            }
-            $device = Device::find($device_id);
 
-            if ($device) {
-                if ($device->processors()->count() > 0) {
-                    array_push($graphs, [
-                        'desc' => 'Processors',
-                        'name' => 'device_processor',
-                    ]);
-                }
-
-                if ($device->storage()->count() > 0) {
-                    array_push($graphs, [
-                        'desc' => 'Storage',
-                        'name' => 'device_storage',
-                    ]);
-                }
-
-                if ($device->mempools()->count() > 0) {
-                    array_push($graphs, [
-                        'desc' => 'Memory Pools',
-                        'name' => 'device_mempool',
-                    ]);
-                }
-            }
+            return api_success($graphs, 'graphs');
         }
+
+        [$query, $id_field, $descr_field] = match ($type) {
+            'processor' => [$device->processors(), 'processor_id', 'processor_descr'],
+            'storage' => [$device->storage(), 'storage_id', 'storage_descr'],
+            'mempool' => [$device->mempools(), 'mempool_id', 'mempool_descr'],
+            default => [$device->sensors()->where('sensor_class', $type)->where('sensor_deleted', 0), 'sensor_id', 'sensor_descr'],
+        };
+
+        $graphs = $sensor_id
+            ? $query->where($id_field, $sensor_id)->get()->toArray()
+            : $query->get()->map(fn ($graph) => ['sensor_id' => $graph->{$id_field}, 'desc' => $graph->{$descr_field}])->all();
 
         return api_success($graphs, 'graphs');
     });
@@ -1158,6 +1150,64 @@ function get_device_ports(Illuminate\Http\Request $request): JsonResponse
     }
 
     return api_success($ports, 'ports');
+}
+
+function get_device_wireless_sensors(Illuminate\Http\Request $request): JsonResponse
+{
+    $device = DeviceCache::get($request->route('hostname'));
+    $class = $request->input('class');
+
+    if ($class && ! in_array($class, \LibreNMS\Enum\WirelessSensorType::values(), true)) {
+        return api_error(400, "Invalid wireless sensor class '$class'");
+    }
+
+    $columns = validate_column_list($request->input('columns'), 'wireless_sensors', [
+        'sensor_id',
+        'sensor_deleted',
+        'sensor_class',
+        'device_id',
+        'sensor_index',
+        'sensor_type',
+        'sensor_descr',
+        'sensor_divisor',
+        'sensor_multiplier',
+        'sensor_aggregator',
+        'sensor_current',
+        'sensor_prev',
+        'sensor_limit',
+        'sensor_limit_warn',
+        'sensor_limit_low',
+        'sensor_limit_low_warn',
+        'sensor_alert',
+        'sensor_custom',
+        'entPhysicalIndex',
+        'entPhysicalIndex_measured',
+        'lastupdate',
+        'sensor_oids',
+        'access_point_id',
+        'rrd_type',
+    ]);
+
+    $wireless_sensors = WirelessSensor::query()
+        ->hasAccess(Auth::user())
+        ->where('sensor_deleted', 0)
+        ->where('device_id', $device->device_id)
+        ->when($class, fn ($q) => $q->where('sensor_class', $class))
+        ->select($columns)
+        ->orderBy('sensor_class')
+        ->orderBy('sensor_index')
+        ->orderBy('sensor_descr')
+        ->get();
+
+    if ($wireless_sensors->isEmpty()) {
+        $message = $class
+            ? "No wireless sensors found for class '$class'"
+            : 'No wireless sensors found';
+
+        return api_error(404, $message);
+    }
+
+    return api_success($wireless_sensors, 'wireless_sensors', count: $wireless_sensors->count());
 }
 
 function get_device_ip_addresses(Illuminate\Http\Request $request)
@@ -1239,7 +1289,7 @@ function get_port_info(Illuminate\Http\Request $request)
 
     return check_port_permission($port_id, null, function ($port_id) {
         $with = request()->input('with');
-        $allowed = ['vlans', 'device'];
+        $allowed = ['vlans', 'device', 'statistics'];
         $port = Port::where('port_id', $port_id)
                     ->when(in_array($with, $allowed), fn ($q) => $q->with($with))
                     ->get();
@@ -1650,7 +1700,7 @@ function api_default_transport_targets(): array
  *
  * @param  array<int, array<string, mixed>>  $operations
  */
-function api_assign_rule_alert_operation_from_legacy_api(int $ruleId, array $operations, string $ruleName, ?int $defaultStepSeconds = null): void
+function api_assign_rule_alert_operation_from_legacy_api(int $ruleId, array $operations, string $ruleName, ?int $defaultStepSeconds = null, bool $notificationsSuppressed = false): void
 {
     $rule = \App\Models\AlertRule::find($ruleId);
     if (! $rule) {
@@ -1669,6 +1719,7 @@ function api_assign_rule_alert_operation_from_legacy_api(int $ruleId, array $ope
     $op = \App\Models\AlertOperation::create([
         'name' => $name,
         'default_operation_step_duration_seconds' => $defaultStepSeconds !== null ? max(0, $defaultStepSeconds) : null,
+        'notifications_suppressed' => $notificationsSuppressed,
     ]);
 
     $anyTransports = false;
@@ -1683,7 +1734,6 @@ function api_assign_rule_alert_operation_from_legacy_api(int $ruleId, array $ope
         $to = ($toRaw === '' || $toRaw === null) ? null : max($from, (int) $toRaw);
         $startIn = max(0, (int) ($operation['start_in_seconds'] ?? 0));
         $stepDuration = max(0, (int) ($operation['step_duration_seconds'] ?? 0));
-
         $seg = $op->segments()->create([
             'position' => (int) ($operation['position'] ?? $idx),
             'operation_phase' => $phase,
@@ -1691,7 +1741,6 @@ function api_assign_rule_alert_operation_from_legacy_api(int $ruleId, array $ope
             'escalation_step_to' => $to,
             'start_in_seconds' => $startIn,
             'step_duration_seconds' => $stepDuration,
-            'notifications_suppressed' => false,
         ]);
 
         [$single, $group] = api_parse_transport_targets((array) ($operation['transports'] ?? []));
@@ -1751,7 +1800,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
 
     if (isset($data['builder'])) {
         // accept inline json or json as a string
-        $builder = is_array($data['builder']) ? json_encode($data['builder']) : $data['builder'];
+        $builder = is_array($data['builder']) ? $data['builder'] : json_decode((string) $data['builder'], true);
     } else {
         $builder = $data['rule'] ?? null;
     }
@@ -1793,7 +1842,6 @@ function add_edit_rule(Illuminate\Http\Request $request)
     if (array_key_exists('acknowledgement', $data)) {
         $extra['acknowledgement'] = filter_var($data['acknowledgement'], FILTER_VALIDATE_BOOLEAN);
     }
-    $extra_json = json_encode($extra);
 
     if ($override_query === 'on' || $override_query === true) {
         $query = $adv_query;
@@ -1816,8 +1864,12 @@ function add_edit_rule(Illuminate\Http\Request $request)
 
     // New operation-based API fields
     $operations = $data['operations'] ?? null;
+    $operationNotificationsSuppressed = filter_var(
+        $data['operation_notifications_suppressed'] ?? false,
+        FILTER_VALIDATE_BOOLEAN
+    );
     $defaultOperationStepDuration = array_key_exists('default_operation_step_duration', $data)
-        ? convert_delay((string) $data['default_operation_step_duration'])
+        ? Time::durationToSeconds((string) $data['default_operation_step_duration'])
         : null;
 
     // Backwards compatibility: legacy timing fields are converted into a single problem operation.
@@ -1827,8 +1879,8 @@ function add_edit_rule(Illuminate\Http\Request $request)
         || array_key_exists('mute', $data);
     if (! is_array($operations) && $legacyProvided && ! array_key_exists('alert_operation_id', $data)) {
         $legacyCount = isset($data['count']) ? (int) $data['count'] : -1;
-        $legacyDelaySec = convert_delay((string) ($data['delay'] ?? 0));
-        $legacyIntervalSec = convert_delay((string) ($data['interval'] ?? 0));
+        $legacyDelaySec = Time::durationToSeconds((string) ($data['delay'] ?? 0));
+        $legacyIntervalSec = Time::durationToSeconds((string) ($data['interval'] ?? 0));
         $legacyMute = filter_var($data['mute'] ?? false, FILTER_VALIDATE_BOOLEAN);
         [$defaultSingles, $defaultGroups] = api_default_transport_targets();
         $legacyTransports = array_map(static fn ($id) => (string) $id, $defaultSingles);
@@ -1867,13 +1919,17 @@ function add_edit_rule(Illuminate\Http\Request $request)
         'query' => $query,
         'severity' => $severity,
         'disabled' => $disabled,
-        'extra' => $extra_json,
+        'extra' => $extra,
         'notes' => $notes,
     ];
 
     if (array_key_exists('alert_operation_id', $data)) {
         $v = $data['alert_operation_id'];
         $saveData['alert_operation_id'] = ($v === null || $v === '') ? null : (int) $v;
+    }
+
+    if (array_key_exists('invert_map', $data)) {
+        $saveData['invert_map'] = filter_var($data['invert_map'], FILTER_VALIDATE_BOOLEAN);
     }
 
     if (is_numeric($rule_id)) {
@@ -1907,7 +1963,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
 
     if (! array_key_exists('alert_operation_id', $data) && is_array($operations)) {
         try {
-            api_assign_rule_alert_operation_from_legacy_api((int) $rule_id, $operations, $name, $defaultOperationStepDuration);
+            api_assign_rule_alert_operation_from_legacy_api((int) $rule_id, $operations, $name, $defaultOperationStepDuration, $operationNotificationsSuppressed);
         } catch (\InvalidArgumentException $e) {
             return api_error(400, $e->getMessage());
         } catch (\Throwable) {
@@ -2046,6 +2102,11 @@ function search_oxidized(Illuminate\Http\Request $request)
 function get_oxidized_config(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('device_name');
+    $device = DeviceCache::get($hostname);
+    if (! $device || Gate::denies('configBackupView', $device)) {
+        return api_error(403, 'Insufficient permissions');
+    }
+
     $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $hostname . '?format=json'), true);
     $result = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/fetch/' . $node_info['full_name'] . '?format=json'), true);
     if (! $result) {
@@ -2059,14 +2120,15 @@ function list_oxidized(Illuminate\Http\Request $request)
 {
     $return = [];
     $devices = Device::query()
-            ->with('attribs')
-             ->where('disabled', 0)
-             ->when($request->route('hostname'), fn ($query, $hostname) => $query->where('hostname', $hostname))
-             ->whereNotIn('type', LibrenmsConfig::get('oxidized.ignore_types', []))
-             ->whereNotIn('os', LibrenmsConfig::get('oxidized.ignore_os', []))
-             ->whereAttributeDisabled('override_Oxidized_disable')
-             ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes', 'poller_group'])
-             ->get();
+        ->with('attribs')
+        ->where('disabled', 0)
+        ->hasAccess($request->user())
+        ->when($request->route('hostname'), fn ($query, $hostname) => $query->where('hostname', $hostname))
+        ->whereNotIn('type', LibrenmsConfig::get('oxidized.ignore_types', []))
+        ->whereNotIn('os', LibrenmsConfig::get('oxidized.ignore_os', []))
+        ->whereAttributeDisabled('override_Oxidized_disable')
+        ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes', 'poller_group'])
+        ->get();
 
     /** @var Device $device */
     foreach ($devices as $device) {
@@ -2556,18 +2618,18 @@ function update_device(Illuminate\Http\Request $request)
 function rename_device(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = DeviceCache::get($hostname);
     $new_hostname = $request->route('new_hostname');
-    $new_device = getidbyname($new_hostname);
 
     if (empty($new_hostname)) {
         return api_error(500, 'Missing new hostname');
-    } elseif ($new_device) {
-        return api_error(500, 'Device failed to rename, new hostname already exists');
+    } elseif (! $device->exists) {
+        return api_error(404, 'Existing device not found');
     } else {
-        if (renamehost($device_id, $new_hostname, 'api') == '') {
-            return api_success_noresult(200, 'Device has been renamed');
-        } else {
+        try {
+            $device->hostname = $new_hostname;
+            $device->save();
+        } catch (\Throwable) {
             return api_error(500, 'Device failed to be renamed');
         }
     }
@@ -3436,14 +3498,17 @@ function add_eventlog(Illuminate\Http\Request $request)
     if (! $device || ! isset($device['device_id'])) {
         return api_error(404, $hostname . ' device does not exist');
     }
-    $data = json_decode($request->getContent(), true);
-    if (array_key_exists('text', $data)) {
-        Eventlog::log($data['text'], $device['device_id'], $data['type'] ?? 'API', Severity::from($data['severity'] ?? 2), $data['reference'] ?? null);
 
-        return api_success_noresult(200, 'Eventlog received for ' . $hostname);
-    }
+    return check_device_permission($device['device_id'], function () use ($device, $hostname, $request) {
+        $data = json_decode($request->getContent(), true);
+        if (array_key_exists('text', $data)) {
+            Eventlog::log($data['text'], $device['device_id'], $data['type'] ?? 'API', Severity::from($data['severity'] ?? 2), $data['reference'] ?? null);
 
-    return api_error(400, 'No Eventlog text provided.');
+            return api_success_noresult(200, 'Eventlog received for ' . $hostname);
+        }
+
+        return api_error(400, 'No Eventlog text provided.');
+    });
 }
 
 function list_logs(Illuminate\Http\Request $request, Router $router)
@@ -3628,7 +3693,7 @@ function add_service_for_host(Illuminate\Http\Request $request)
     $service_param = $data['param'] ?: '';
     $service_ignore = $data['ignore'] ? true : false; // Default false
     $service_disable = $data['disable'] ? true : false; // Default false
-    $service_name = $data['name'];
+    $service_name = $data['name'] ?? '';
     $service_id = \LibreNMS\Services::addService($device_id, $service_type, $service_desc, $service_ip, $service_param, (int) $service_ignore, (int) $service_disable, 0, $service_name);
     if ($service_id != false) {
         return api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
@@ -3726,17 +3791,23 @@ function add_location(Illuminate\Http\Request $request)
 
 function edit_location(Illuminate\Http\Request $request)
 {
-    $location = $request->route('location_id_or_name');
-    if (empty($location)) {
+    $location_input = $request->route('location_id_or_name');
+    if (empty($location_input)) {
         return api_error(400, 'No location has been provided to edit');
     }
-    $location_id = ctype_digit($location) ? $location : get_location_id_by_name($location);
-    $data = json_decode($request->getContent(), true);
-    if (empty($location_id)) {
-        return api_error(400, 'Failed to delete location');
+
+    $location = Location::query()
+        ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
+        ->hasAccess($request->user)
+        ->first();
+
+    if ($location === null) {
+        return api_error(400, 'Failed to update location');
     }
-    $result = dbUpdate($data, 'locations', '`id` = ?', [$location_id]);
-    if ($result == 1) {
+
+    $location->fill($request->all());
+
+    if ($location->save()) {
         return api_success_noresult(201, 'Location updated successfully');
     }
 
@@ -3745,39 +3816,41 @@ function edit_location(Illuminate\Http\Request $request)
 
 function get_location(Illuminate\Http\Request $request)
 {
-    $location = $request->route('location_id_or_name');
-    if (empty($location)) {
+    $location_input = $request->route('location_id_or_name');
+    if (empty($location_input)) {
         return api_error(400, 'No location has been provided to get');
     }
-    $data = ctype_digit($location) ? Location::find($location) : Location::where('location', $location)->first();
-    if (empty($data)) {
+    $location = Location::query()
+        ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
+        ->hasAccess($request->user)
+        ->first();
+
+    if ($location === null) {
         return api_error(404, 'Location does not exist');
     }
 
-    return api_success($data, 'get_location');
-}
-
-function get_location_id_by_name($location)
-{
-    return dbFetchCell('SELECT id FROM locations WHERE location = ?', $location);
+    return api_success($location, 'get_location');
 }
 
 function del_location(Illuminate\Http\Request $request)
 {
-    $location = $request->route('location');
-    if (empty($location)) {
+    $location_input = $request->route('location');
+    if (empty($location_input)) {
         return api_error(400, 'No location has been provided to delete');
     }
-    $location_id = ctype_digit($location) ? $location : get_location_id_by_name($location);
-    if (empty($location_id)) {
+
+    $location = Location::query()
+        ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
+        ->hasAccess($request->user)
+        ->first();
+
+    if ($location === null) {
         return api_error(400, "Failed to delete $location (Does not exists)");
     }
-    $data = [
-        'location_id' => 0,
-    ];
-    dbUpdate($data, 'devices', '`location_id` = ?', [$location_id]);
-    $result = \App\Models\Location::where('id', $location_id)->delete();
-    if ($result == 1) {
+
+    Device::where('location_id', $location->id)->update(['location_id' => null]);
+
+    if ($location->delete()) {
         return api_success_noresult(201, "Location $location has been deleted successfully");
     }
 
@@ -3792,8 +3865,8 @@ function maintenance_location(Illuminate\Http\Request $request)
         return api_error(400, 'No information has been provided to set this location into maintenance');
     }
 
-    $loc = $request->route('location');
-    if (! $loc) {
+    $location_input = $request->route('location');
+    if (! $location_input) {
         return api_error(400, 'No location was provided');
     }
 
@@ -3801,9 +3874,13 @@ function maintenance_location(Illuminate\Http\Request $request)
         return api_error(400, 'Duration not provided');
     }
 
-    $location = ctype_digit($loc) ? Location::find($loc) : Location::where('location', $loc)->first();
-    if (empty($location)) {
-        return api_error(404, "Location $loc does not exist");
+    $location = Location::query()
+        ->when(ctype_digit($location_input), fn ($q) => $q->where('id', $location_input), fn ($q) => $q->where('location', $location_input))
+        ->hasAccess($request->user)
+        ->first();
+
+    if ($location === null) {
+        return api_error(404, "Location $location_input does not exist");
     }
 
     $notes = $data['notes'] ?? '';
@@ -3882,12 +3959,13 @@ function search_by_mac(Illuminate\Http\Request $request)
         return api_error(422, $validate->messages());
     }
 
-    $ports = Port::whereHas('fdbEntries', function ($fdbDownlink) use ($macAddress): void {
-        $fdbDownlink->where('mac_address', $macAddress);
-    })
-         ->withCount('fdbEntries')
-         ->orderBy('fdb_entries_count')
-         ->get();
+    $ports = Port::hasAccess(Auth::user())
+        ->whereHas('fdbEntries', function ($fdbDownlink) use ($macAddress): void {
+            $fdbDownlink->where('mac_address', $macAddress);
+        })
+        ->withCount('fdbEntries')
+        ->orderBy('fdb_entries_count')
+        ->get();
 
     if ($ports->count() == 0) {
         return api_error(404, 'mac not found');
@@ -3922,9 +4000,21 @@ function post_syslogsink(Illuminate\Http\Request $request)
     }
 
     $logs = array_is_list($json) ? $json : [$json];
+    $processor = new Processor();
 
     foreach ($logs as $entry) {
-        process_syslog($entry, 1);
+        $entryObject = $processor->parse(new Entry(
+            host: $entry['host'] ?? '',
+            facility: $entry['facility'] ?? '',
+            priority: $entry['priority'] ?? '',
+            level: $entry['level'] ?? '',
+            tag: $entry['tag'] ?? '',
+            timestamp: $entry['timestamp'] ?? '',
+            msg: $entry['msg'] ?? '',
+            program: $entry['program'] ?? '',
+            device_id: $entry['device_id'] ?? null,
+        ));
+        $processor->storeEntry($entryObject);
     }
 
     return api_success_noresult(200, 'Syslog received: ' . count($logs));

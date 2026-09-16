@@ -62,7 +62,7 @@
                     <div class="form-group">
                         <label for="authpass" class="col-sm-3 control-label" v-text="$t('settings.settings.snmp.v3.fields.authpass')"></label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="authpass" :value="item.authpass" @input="updateItem(id, $event.target.id, $event.target.value)">
+                            <SettingPassword :name="'authpass_' + id" :value="item.authpass" :disabled="disabled" @input="updateItem(id, 'authpass', $event)"></SettingPassword>
                         </div>
                     </div>
                 </fieldset>
@@ -81,7 +81,7 @@
                     <div class="form-group">
                         <label for="cryptopass" class="col-sm-3 control-label" v-text="$t('settings.settings.snmp.v3.fields.authpass')"></label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="cryptopass" :value="item.cryptopass"  @input="updateItem(id, $event.target.id, $event.target.value)">
+                            <SettingPassword :name="'cryptopass_' + id" :value="item.cryptopass" :disabled="disabled" @input="updateItem(id, 'cryptopass', $event)"></SettingPassword>
                         </div>
                     </div>
                 </fieldset>
@@ -100,10 +100,12 @@
 
 <script>
 import BaseSetting from "./BaseSetting.vue";
+import SettingPassword from "./SettingPassword.vue";
 
 export default {
         name: "SettingSnmp3auth",
         mixins: [BaseSetting],
+        components: { SettingPassword },
         data() {
             return {
                 localList: this.value,
@@ -161,4 +163,3 @@ export default {
         margin-top: 5px;
     }
 </style>
-

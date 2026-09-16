@@ -1,0 +1,721 @@
+--***************************************************************************
+--  Copyright 2017 Albentia Systems, S.A.
+--    File  : ALBENTIA-AS-MIB.my
+--    Author: Daniel Sierra Solis
+--    Description: Albentia AerDOCSIS device module definition
+--***************************************************************************
+ALBENTIA-AS-MIB    DEFINITIONS ::= BEGIN
+    IMPORTS
+        TEXTUAL-CONVENTION, DisplayString, TruthValue
+            FROM SNMPv2-TC
+        OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        Integer32, TimeTicks, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        albProducts, albGeneric, albModules
+            FROM ALBENTIA-MIB
+        albGps
+            FROM ALBENTIA-COMMON-MIB;
+
+    albDeviceModule    MODULE-IDENTITY
+        LAST-UPDATED    "201704041800Z"
+        ORGANIZATION    "Albentia Systems, S.A."
+        CONTACT-INFO    "ipichel@albentia.com"
+        DESCRIPTION        "SNMP interface module for Albentia wimax equipment"
+        REVISION        "201704041800Z"
+        DESCRIPTION        ""
+        ::=  {  albModules  3  }
+
+    AlbStationMode ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "Station mode"
+        SYNTAX            INTEGER  { nm(0), bs(1), ss(2) }
+
+    AlbSectorStatus ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "Sector status: off or on"
+        SYNTAX            INTEGER  { off(0), on(1) }
+
+    AlbZoneStatus ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "Zone status: started or stopped"
+        SYNTAX            INTEGER  { stopped(0), started(1) }
+
+    AlbFlowDir        ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "Flow direction"
+        SYNTAX            INTEGER  { dl(0), ul(1) }
+
+    AlbQoS ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "QoS for UL services"
+        SYNTAX            INTEGER  { be(0), ugs(1), rtps(2), ertps(3), nrtps(4) }
+
+    AlbEthernetStatus ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "Ethernet Status"
+        SYNTAX            INTEGER  { down(0), up(1) }
+
+    AlbMACStatus ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "MAC Status"
+        SYNTAX            INTEGER  { stopped(0), stopping(1), dfsrunning(2), sarunning(3) , starting(4), started(5) }
+
+    AlbUserStatus ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "User link status"
+        SYNTAX            INTEGER  { reset(0), initialranging(1), capabilities(2), authentication (3),
+                                    registration(4), secondary (5), active(6), disconnecting(7), unlinked(8) }
+
+    AlbUserRadioStatus ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "Radio phy sync status"
+        SYNTAX            INTEGER  { notenabled(0), notsynced(1), connected(2) }
+
+    AlbMngNetType ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "Secondary management channel device configuration regarding data device"
+        SYNTAX            INTEGER  { none(0), unified(1), outofband(2) }
+
+    AlbNetCfgMode ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "CPE Networking configuration mode"
+        SYNTAX            INTEGER  { bridged(0), routed(1), routednat(2), other(3) }
+
+    AlbWanConnType ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION        "WAN networking configuration type"
+        SYNTAX            INTEGER  { dynamic(0), static(1), pppoe(2) }
+
+    AlbFloatValue  ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d-2"
+        STATUS            current
+        DESCRIPTION        "Float value. 2 implied decimal point when rendering the value. For example 1234 be rendered as 12.34"
+        SYNTAX            Integer32
+
+    albAerDOCSISStation    OBJECT IDENTIFIER
+        ::= { albProducts 10 }
+
+    albBasicInfoCommons    OBJECT IDENTIFIER
+        ::= { albAerDOCSISStation 1 }
+
+    albMode                OBJECT-TYPE
+        SYNTAX            AlbStationMode
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION     "Device mode"
+        ::=  { albBasicInfoCommons 1 }
+
+    albFWVersion        OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Firmware version of the system"
+        ::= { albBasicInfoCommons 2 }
+
+    albName            OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION     "Device admin name"
+        ::=  { albBasicInfoCommons 3 }
+
+    albHWAddr            OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Device HW Address"
+        ::= { albBasicInfoCommons 4 }
+
+    albModel            OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION     "Device model"
+        ::=  { albBasicInfoCommons 5 }
+
+    albTemp                OBJECT-TYPE
+        SYNTAX            AlbFloatValue
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Device Temperature (RF) in celsius degrees"
+        ::=  { albBasicInfoCommons 6 }
+
+    albDevUptime        OBJECT-TYPE
+        SYNTAX            TimeTicks
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Device uptime"
+        ::=  { albBasicInfoCommons 7 }
+
+    albEthStatus        OBJECT-TYPE
+        SYNTAX            AlbEthernetStatus
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION     "Ethernet status"
+        ::=  { albBasicInfoCommons 8 }
+
+    albMacStatus        OBJECT-TYPE
+        SYNTAX            AlbMACStatus
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION     "User MAC status"
+        ::=  { albBasicInfoCommons 9 }
+
+    albBasicInfoBS    OBJECT IDENTIFIER
+        ::= { albAerDOCSISStation    2 }
+
+    albUsers        OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Number of users in the system"
+        ::= { albBasicInfoBS 1 }
+
+    albBasicInfoSS    OBJECT IDENTIFIER
+        ::= { albAerDOCSISStation 3 }
+
+    albLinkStatus        OBJECT-TYPE
+        SYNTAX            AlbUserStatus
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION     "User Link status"
+        ::=  { albBasicInfoSS 1 }
+
+    albLinkUptime        OBJECT-TYPE
+        SYNTAX            TimeTicks
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Link uptime"
+        ::=  { albBasicInfoSS 2 }
+
+    albBSIDHWAddr        OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION     "BS HW Address linked to"
+        ::=  { albBasicInfoSS 3 }
+
+    albNumRadios        OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION     "Total number of radios"
+        ::=  { albBasicInfoSS 4 }
+
+    albNumFlows            OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION     "Number of provisioned flows"
+        ::=  { albBasicInfoSS 5 }
+
+    albManaged            OBJECT-TYPE
+        SYNTAX            TruthValue
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Secondary management channel enabled"
+        ::=  { albBasicInfoSS 6 }
+
+    albSMCType            OBJECT-TYPE
+        SYNTAX            AlbMngNetType
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Secondary Management channel and data interface device configuration"
+        ::=  { albBasicInfoSS 7 }
+
+    albNetCfgMode        OBJECT-TYPE
+        SYNTAX            AlbNetCfgMode
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Networking configuration mode"
+        ::=  { albBasicInfoSS 8 }
+
+    albWanConnType        OBJECT-TYPE
+        SYNTAX            AlbWanConnType
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "WAN Connection type"
+        ::=  { albBasicInfoSS 9 }
+
+    albDataIPAddr        OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "WAN IP addr for the cpe"
+        ::=  { albBasicInfoSS 10 }
+
+    albDfltGateway        OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Default gateway for the cpe"
+        ::=  { albBasicInfoSS 11 }
+
+    albLocalIPAddr        OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "LAN IP addr for the cpe"
+        ::=  { albBasicInfoSS 12 }
+
+    albMngIPAddr        OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Mng IP addr for the cpe"
+        ::=  { albBasicInfoSS 13 }
+
+    albWiMAXConf    OBJECT IDENTIFIER
+        ::=  {  albAerDOCSISStation  5  }
+
+    albTables    OBJECT IDENTIFIER
+        ::= { albAerDOCSISStation 10 }
+
+-- SECTORS-TABLE --
+    sectorsTable        OBJECT-TYPE
+        SYNTAX            SEQUENCE  OF  SectorEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION        "Information about the existing sectors in the system"
+        ::= { albTables 1 }
+
+    sectorEntry            OBJECT-TYPE
+        SYNTAX            SectorEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION        "Sector entry for sectors table"
+        INDEX            { sectorColor }
+        ::= { sectorsTable 1 }
+
+    SectorEntry  ::=  SEQUENCE {
+        sectorColor            DisplayString,
+        sectorStatus        AlbSectorStatus,
+        sectorId            Integer32,
+        sectorAlias            DisplayString,
+        sectorTemp            AlbFloatValue,
+        sectorFW            DisplayString,
+        sectorZone            DisplayString
+        }
+
+    sectorColor            OBJECT-TYPE
+        SYNTAX            DisplayString (SIZE (0..64))
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Sector color. Index."
+        ::= { sectorEntry 1 }
+
+    sectorStatus        OBJECT-TYPE
+        SYNTAX            AlbSectorStatus
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Sector status"
+        ::= { sectorEntry 2 }
+
+    sectorId            OBJECT-TYPE
+        SYNTAX            Integer32 (1..65536)
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Sector ID"
+        ::= { sectorEntry 3 }
+
+    sectorAlias            OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Sector alias"
+        ::= { sectorEntry 4 }
+
+    sectorTemp            OBJECT-TYPE
+        SYNTAX            AlbFloatValue
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Temperature of the sector (where available)"
+        ::= { sectorEntry 5 }
+
+    sectorFW            OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Firmware version of the sector (where available)"
+        ::= { sectorEntry 6 }
+
+    sectorZone            OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Zone to which the sector belongs"
+        ::= { sectorEntry 7 }
+
+-- ZONES-TABLE --
+    zonesTable            OBJECT-TYPE
+        SYNTAX            SEQUENCE  OF  ZoneEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION        "Information about the existing zones in the system"
+        ::=  { albTables 2 }
+
+    zoneEntry            OBJECT-TYPE
+        SYNTAX            ZoneEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION        "Zone entry for zones table"
+        INDEX            { zoneId }
+        ::=  { zonesTable 1 }
+
+    ZoneEntry  ::=  SEQUENCE {
+        zoneId            DisplayString,
+        zoneAlias        DisplayString,
+        zoneStatus        AlbZoneStatus,
+        zoneBSID        DisplayString,
+        zoneUptime        TimeTicks
+        }
+
+    zoneId                OBJECT-TYPE
+        SYNTAX            DisplayString (SIZE (0..64))
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Zone ID. Index."
+        ::=  { zoneEntry 1 }
+
+    zoneAlias            OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Alias of the zone"
+        ::=  { zoneEntry 2 }
+
+    zoneStatus            OBJECT-TYPE
+        SYNTAX            AlbZoneStatus
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Zone status"
+        ::=  { zoneEntry 3 }
+
+    zoneBSID            OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Zone BSID"
+        ::=  { zoneEntry 4 }
+
+    zoneUptime            OBJECT-TYPE
+        SYNTAX            TimeTicks
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Zone uptime"
+        ::=  { zoneEntry 5 }
+
+-- RADIO-INFO-TABLE --
+    radioInfoTable        OBJECT-TYPE
+        SYNTAX            SEQUENCE  OF  RadioInfoEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION        "Information about radio settings of the system"
+        ::=  { albTables 5 }
+
+    radioInfoEntry        OBJECT-TYPE
+        SYNTAX            RadioInfoEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION        "Radio entry for radio information table"
+        INDEX            { radioInfoSectorColor }
+        ::=  { radioInfoTable 1 }
+
+    RadioInfoEntry  ::=  SEQUENCE {
+        radioInfoSectorColor    DisplayString,
+        radioInfoZone            DisplayString,
+        radioInfoBw                DisplayString,
+        radioInfoFD                DisplayString,
+        radioInfoCPSize            DisplayString,
+        radioInfoTxPow            Integer32,
+        radioInfoTargetRSSI        Integer32,
+        radioInfoMinDLRate        DisplayString,
+        radioInfoMaxDLRate        DisplayString,
+        radioInfoMinULRate        DisplayString,
+        radioInfoMaxULRate        DisplayString,
+        radioInfoDistance        Integer32,
+        radioInfoFreq            Integer32,
+        radioInfoFreqMode        DisplayString,
+        radioInfoPBIM            DisplayString,
+        radioInfoNoiseReducer    DisplayString
+        }
+
+    radioInfoSectorColor    OBJECT-TYPE
+        SYNTAX            DisplayString (SIZE (0..64))
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Sector color. Index"
+        ::=  { radioInfoEntry 1 }
+
+    radioInfoZone        OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Zone ID"
+        ::=  { radioInfoEntry 2 }
+
+    radioInfoBw            OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Bandwidth (dB)"
+        ::=  { radioInfoEntry 3 }
+
+    radioInfoFD            OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Frame duration (ms)"
+        ::=  { radioInfoEntry 4 }
+
+    radioInfoCPSize        OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Cyclic prefix size"
+        ::=  { radioInfoEntry 5 }
+
+    radioInfoTxPow        OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Transmission power (dBm)"
+        ::=  { radioInfoEntry 6 }
+
+    radioInfoTargetRSSI    OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Target RSSI (dBm)"
+        ::=  { radioInfoEntry 7 }
+
+    radioInfoMinDLRate    OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Min. downlink rate"
+        ::=  { radioInfoEntry 8 }
+
+    radioInfoMaxDLRate    OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Max. downlink rate"
+        ::=  { radioInfoEntry 9 }
+
+    radioInfoMinULRate    OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Min. uplink rate"
+        ::=  { radioInfoEntry 10 }
+
+    radioInfoMaxULRate    OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Max. uplink rate"
+        ::=  { radioInfoEntry 11 }
+
+    radioInfoDistance    OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Distance (m)"
+        ::=  { radioInfoEntry 12 }
+
+    radioInfoFreq        OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "RF transmission frequency (MHz)"
+        ::=  { radioInfoEntry 13 }
+
+    radioInfoFreqMode    OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Frequency scan mode"
+        ::=  { radioInfoEntry 14 }
+
+    radioInfoPBIM        OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "PBIM status"
+        ::=  { radioInfoEntry 15 }
+
+    radioInfoNoiseReducer    OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Noise reducer status"
+        ::=  { radioInfoEntry 16 }
+
+-- SECTOR-STATS-TABLE --
+    sectorStatsTable    OBJECT-TYPE
+        SYNTAX            SEQUENCE  OF  SectorStatsEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION        "System stats per sector"
+        ::=  { albTables 6 }
+
+    sectorStatsEntry    OBJECT-TYPE
+        SYNTAX            SectorStatsEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION        "Sector stats entry for sector stats table"
+        INDEX            { sectorStSectorColor }
+        ::=  { sectorStatsTable 1 }
+
+    SectorStatsEntry  ::=  SEQUENCE {
+        sectorStSectorColor            DisplayString,
+        sectorStNumUsers            Integer32,
+        sectorStDLQoSConflict        TruthValue,
+        sectorStDLQoSNumConflicts    Integer32,
+        sectorStULQoSConflict        TruthValue,
+        sectorStULQoSNumConflicts    Integer32,
+        sectorStDLBytes                Integer32,
+        sectorStDLPckt                Integer32,
+        sectorStULBytes                Integer32,
+        sectorStULPckt                Integer32,
+        sectorStPaddedPckt            Integer32,
+        sectorStPaddedPerc            Integer32,
+        sectorStDiscPckt            Integer32,
+        sectorStDropPckt            Integer32
+        }
+
+    sectorStSectorColor    OBJECT-TYPE
+        SYNTAX            DisplayString (SIZE (0..64))
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Sector color. Index"
+        ::= { sectorStatsEntry 1 }
+
+    sectorStNumUsers     OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Total number of users in the sector"
+        ::= { sectorStatsEntry 2 }
+
+    sectorStDLQoSConflict     OBJECT-TYPE
+        SYNTAX            TruthValue
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Downlink BW exceeded"
+        ::= { sectorStatsEntry 3 }
+
+    sectorStDLQoSNumConflicts    OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Number of times that downlink BW has been exceeded"
+        ::= { sectorStatsEntry 4 }
+
+    sectorStULQoSConflict     OBJECT-TYPE
+        SYNTAX            TruthValue
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Uplink BW exceeded"
+        ::= { sectorStatsEntry 5 }
+
+    sectorStULQoSNumConflicts    OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Number of times that uplink BW has been exceeded"
+        ::= { sectorStatsEntry 6 }
+
+    sectorStDLBytes     OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Aggregated bytes in KB DL"
+        ::= { sectorStatsEntry 7 }
+
+    sectorStDLPckt         OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Aggregated packets in DL"
+        ::= { sectorStatsEntry 8 }
+
+    sectorStULBytes     OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Aggregated bytes -in KB- in UL"
+        ::= { sectorStatsEntry 9 }
+
+    sectorStULPckt         OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Aggregated packets in UL"
+        ::= { sectorStatsEntry 10 }
+
+    sectorStPaddedPckt     OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Aggregated padded packets in transmission"
+        ::= { sectorStatsEntry 11 }
+
+    sectorStPaddedPerc     OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Percentage of padded bytes in transmission"
+        ::= { sectorStatsEntry 12 }
+
+    sectorStDiscPckt     OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Aggregated discarded packets in reception"
+        ::= { sectorStatsEntry 13 }
+
+    sectorStDropPckt     OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Aggregated dropped packets in reception"
+        ::= { sectorStatsEntry 14 }
+
+-- ZONE-STATS-TABLE (minimal subset used by LibreNMS) --
+    zoneStatsTable    OBJECT-TYPE
+        SYNTAX            SEQUENCE  OF  ZoneStatsEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION        "System stats per zone"
+        ::=  { albTables 7 }
+
+    zoneStatsEntry    OBJECT-TYPE
+        SYNTAX            ZoneStatsEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION        "Zone stats entry for zone stats table"
+        INDEX            { zoneStId }
+        ::=  { zoneStatsTable 1 }
+
+    ZoneStatsEntry  ::=  SEQUENCE {
+        zoneStId            DisplayString,
+        zoneStFramDivPerc   AlbFloatValue
+        }
+
+    zoneStId            OBJECT-TYPE
+        SYNTAX            DisplayString (SIZE (0..64))
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Zone ID. Index"
+        ::= { zoneStatsEntry 1 }
+
+    zoneStFramDivPerc    OBJECT-TYPE
+        SYNTAX            AlbFloatValue
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        "Frame division percentage (DL share of TDD frame, scale d-4)"
+        ::= { zoneStatsEntry 15 }
+END

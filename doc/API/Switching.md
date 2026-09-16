@@ -11,7 +11,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/vlans
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/vlans
 ```
 
 Output:
@@ -50,7 +50,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/vlans
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/vlans
 ```
 
 Output:
@@ -84,7 +84,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/links
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/links
 ```
 
 Output:
@@ -127,7 +127,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/links
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/links
 ```
 
 Output:
@@ -168,7 +168,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/links/10
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/links/10
 ```
 
 Output:
@@ -201,7 +201,7 @@ Get a list of all ports FDB.
 
 Route: `/api/v0/resources/fdb/:mac`
 
-- mac is the specific MAC address you would like to query
+- mac is the MAC address of the query
 
 Input:
 
@@ -210,8 +210,8 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/fdb
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/fdb/1aaa2bbb3ccc
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/fdb
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/fdb/1aaa2bbb3ccc
 ```
 
 Output:
@@ -242,7 +242,7 @@ Get a list of all ports FDB with human readable device  and interface names.
 
 Route: `/api/v0/resources/fdb/:mac/detail`
 
-  - mac is the specific MAC address you would like to query
+  - mac is the MAC address of the query
 
 Input:
 
@@ -250,7 +250,7 @@ Input:
 
 Example:
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/fdb/1aaa2bbb3ccc/detail
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/fdb/1aaa2bbb3ccc/detail
 ```
 
 Output:
@@ -290,7 +290,7 @@ Get a list of all ports NAC.
 
 Route: `/api/v0/resources/nac/:mac`
 
-- mac is the specific MAC address you would like to query
+- mac is the MAC address of the query
 
 Input:
 
@@ -299,8 +299,8 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/nac
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/nac/1aaa2bbb3ccc
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/nac
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/nac/1aaa2bbb3ccc
 ```
 
 Output:

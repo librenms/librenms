@@ -10,21 +10,22 @@ It shows you the totals per status and also the uptime per process. That way you
     wget https://github.com/librenms/librenms-agent/raw/master/snmp/supervisord.py -O /etc/snmp/supervisord.py
     ```
 
-    Notice that this will use the default unix socket path. Modify the `unix_socket_path` variable in the script if your path differs from the default.
+    This command uses the default unix socket path. For a different path,
+    change the `unix_socket_path` variable in the script.
 
-2. Make the script executable
+2. Make the script executable.
 
     ```
     chmod +x /etc/snmp/supervisord.py
     ```
 
-3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+3. Edit your `snmpd.conf` file, usually `/etc/snmp/snmpd.conf`, and add:
 
     ```
     extend supervisord /etc/snmp/supervisord.py
     ```
 
-4. Restart snmpd on your host
+4. Restart snmpd on your host.
 
     ```bash
     systemctl restart snmpd

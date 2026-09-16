@@ -1,9 +1,9 @@
 # HV Monitor
 
-HV Monitor provides a generic way to monitor hypervisors. Currently
-CBSD+bhyve on FreeBSD and Libvirt+QEMU on Linux are support.
+HV Monitor is a generic monitor for hypervisors. It supports CBSD with
+bhyve on FreeBSD, and Libvirt with QEMU on Linux.
 
-For more information see
+For more information, read
 HV::Monitor on
 [Github](https://github.com/VVelox/HV-Monitor)
 or [MetaCPAN](https://metacpan.org/dist/HV-Monitor).

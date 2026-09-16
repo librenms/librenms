@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-if (Gate::denies('update', Storage::class)) {
+if (Gate::denies('storage.update')) {
     $response = [
         'status' => 'error',
         'message' => 'You need permission',

@@ -15,7 +15,8 @@ class ApplicationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
+        return $this->hasGlobalPermission($user, 'view', true)
+            || $this->hasGlobalPermission($user, 'viewAll')
             || $this->hasGlobalPermission($user, 'update');
     }
 
@@ -28,7 +29,7 @@ class ApplicationPolicy
             return true;
         }
 
-        return $this->hasGlobalPermission($user, 'view')
+        return $this->hasGlobalPermission($user, 'view', true)
             && Permissions::canAccessDevice($application->device_id, $user);
     }
 

@@ -12,6 +12,8 @@ class ValidateController extends Controller
 {
     public function index(): View
     {
+        $this->authorize('settings.view');
+
         $validationGroups = (new Validator())->getValidationGroups();
 
         $groups = collect($validationGroups)
@@ -30,6 +32,8 @@ class ValidateController extends Controller
 
     public function runValidation(?string $group = null): JsonResponse
     {
+        $this->authorize('settings.view');
+
         $validator = new Validator();
         $validator->validate($group ? [$group] : []);
 
@@ -38,6 +42,8 @@ class ValidateController extends Controller
 
     public function runFixer(Request $request): JsonResponse
     {
+        $this->authorize('settings.update');
+
         $this->validate($request, [
             'fixer' => [
                 'starts_with:LibreNMS\Validations',

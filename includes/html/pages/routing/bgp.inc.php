@@ -5,6 +5,7 @@ use App\Models\Device;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
@@ -285,7 +286,9 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
         $graph_array['width'] = $width;
 
         // Peer Address
-        $peer_device = Device::whereHas('bgppeers', fn ($q) => $q->where('bgpLocalAddr', $peer['bgpPeerIdentifier']))->first();
+        $peer_address = $peer['bgpPeerIdentifier'];
+        $peer_device = Device::whereHas('bgppeers', fn ($q) => $q->where('bgpLocalAddr', $peer_address))->first()
+            ?? Device::findByIp($peer_address);
         $peeraddresslink = '<span class=list-large>' . Url::deviceLink($peer_device, $peer_addr, ['tab' => 'routing', 'proto' => 'bgp']) . '</span>';
 
         // Local Address
@@ -301,20 +304,19 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
         $localaddresslink = '<span class=list-large>' . Url::overlibLink($overlib_link, $local_addr, Url::graphTag($graph_array_zoom)) . '</span>';
 
         if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
-            $last_error = $peer['bgpPeerLastErrorText'];
+            $last_error = e($peer['bgpPeerLastErrorText']);
         } else {
-            $last_error = describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']) . '<br/>' . $peer['bgpPeerLastErrorText'];
+            $last_error = e(Rewrite::bgpErrorCode($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode'])) . '<br/>' . e($peer['bgpPeerLastErrorText']);
         }
 
         echo '<tr class="bgp"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . '>';
 
-        $sep = '';
+        $afi_list = [];
         foreach (dbFetchRows('SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$peer['device_id'], $peer['bgpPeerIdentifier']]) as $afisafi) {
             $afi = $afisafi['afi'];
             $safi = $afisafi['safi'];
             $this_afisafi = $afi . $safi;
-            $peer['afi'] = ($peer['afi'] ?? '') . $sep . $afi . '.' . $safi;
-            $sep = '<br />';
+            $afi_list[] = e($afi . '.' . $safi);
             $peer['afisafi'][$this_afisafi] = 1;
             // Build a list of valid AFI/SAFI for this peer
         }
@@ -324,10 +326,10 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
             <td width=30><b>&#187;</b></td>
             <td width=150>' . $peeraddresslink . '<br />' . Url::deviceLink($peer_device, vars: ['tab' => 'routing', 'proto' => 'bgp']) . "</td>
             <td width=50><b>$peer_type</b></td>
-            <td width=50>" . ($peer['afi'] ?? '') . '</td>
-            <td><strong>AS' . $peer['bgpPeerRemoteAs'] . '</strong><br />' . $peer['astext'] . '</td>
-            <td>' . $peer['bgpPeerDescr'] . "</td>
-            <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "</span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . '</span></strong></td>
+            <td width=50>" . implode('<br />', $afi_list) . '</td>
+            <td><strong>AS' . e($peer['bgpPeerRemoteAs']) . '</strong><br />' . e($peer['astext']) . '</td>
+            <td>' . e($peer['bgpPeerDescr']) . "</td>
+            <td><strong><span style='color: $admin_col;'>" . e($peer['bgpPeerAdminStatus']) . "</span><br /><span style='color: $col;'>" . e($peer['bgpPeerState']) . '</span></strong></td>
             <td>' . $last_error . '</td>
             <td>' . Time::formatInterval($peer['bgpPeerFsmEstablishedTime']) . "<br />
             Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> " . Number::formatSi($peer['bgpPeerInUpdates'], 2, 0, '') . "

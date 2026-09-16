@@ -49,7 +49,7 @@
 
 Wait for it to be rediscovered by LibreNMS.
 
-An optional config file may be specified via -f or placed at
+You can give an optional config file with `-f`. You can also put it at
 `/usr/local/etc/oslv_monitor.json`.
 
 The following keys are used in the JSON config file.
@@ -67,7 +67,9 @@ The following keys are used in the JSON config file.
 The default value varies per backend and if it is needed. 
 
 !!! note "cgroups"
-    While the default for usec to sec conversion should be `1000000`, some settings report the value in nanoseconds, requiring `1000000000`.
+    The default conversion from microseconds to seconds is `1000000`. Some
+    settings report the value in nanoseconds and therefore need
+    `1000000000`.
 
 | Backend  | Time Divider | Default |
 |----------|--------------|---------|
@@ -83,7 +85,7 @@ By Defaults the backends are as below.
 | FreeBSD  | FreeBSD    |
 | Linux    | cgroups    |
 
-#### Default would be like this.
+#### The default is:
 
 ```json
 {
@@ -100,10 +102,10 @@ By Defaults the backends are as below.
 | `oslvm___$name___$stat` | The a specific stat for a specific OSLVMs.                   |
 | `totals_$stat`          | A stat representing a total for all stats across all OSLVMs. |
 
-Something is considered not running if it has been seen. How long
-something is considered to have been seen is controlled by
+An item is not running when LibreNMS saw it earlier. This setting
+controls the period of that memory:
 `apps.oslv_monitor.seen_age`, which is the number of seconds ago it
-would of have to be seen. The default is `604800` which is seven days
+must appear. The default is `604800`, that is seven days
 in seconds.
 
 All time values are in seconds.
@@ -176,7 +178,7 @@ lnms config:set apps.oslv_monitor.workingset_stats false
 lnms config:set apps.oslv_monitor.thp_activity false
 ```
 
-`apps.oslv_monitor.linux_pg_memory_stats` will disable graphs and stat gathering for the
+`apps.oslv_monitor.linux_pg_memory_stats` disables the graphs and the statistics collection of the
 items below.
 
 - `pgactivate`
@@ -193,7 +195,7 @@ items below.
 - `pgsteal_khugepaged`
 - `pgsteal_kswapd`
 
-`apps.oslv_monitor.misc_linux_memory_stats` will disable graphs and stat gathering for the
+`apps.oslv_monitor.misc_linux_memory_stats` disables the graphs and the statistics collection of the
 items below.
 
 - `anon`
@@ -218,20 +220,20 @@ items below.
 - `slab_unreclaimable`
 - `slab`
 
-`apps.oslv_monitor.zswap_size` will disable graphs and stat gathering for the
+`apps.oslv_monitor.zswap_size` disables the graphs and the statistics collection of the
 items below.
 
 - `zswap`
 - `zswapped`
 
-`apps.oslv_monitor.zswap_activity` will disable graphs and stat gathering for the
+`apps.oslv_monitor.zswap_activity` disables the graphs and the statistics collection of the
 items below.
 
 - `zswpin`
 - `zswpout`
 - `zswpwb`
 
-`apps.oslv_monitor.workingset_stats` will disable graphs and stat gathering for the
+`apps.oslv_monitor.workingset_stats` disables the graphs and the statistics collection of the
 items below.
 
 - `workingset_refault_anon`
@@ -242,7 +244,7 @@ items below.
 - `workingset_restore_file`
 - `workingset_nodereclaim`
 
-`apps.oslv_monitor.thp_activity` will disable graphs and stat gathering for the
+`apps.oslv_monitor.thp_activity` disables the graphs and the statistics collection of the
 items below.
 
 - `thp_fault_alloc`

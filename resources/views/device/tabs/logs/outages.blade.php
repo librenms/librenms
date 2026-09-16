@@ -11,10 +11,10 @@
                     <thead>
                     <tr>
                         <th data-column-id="status" data-sortable="false"></th>
-                        <th data-column-id="going_down" data-order="desc">Start</th>
-                        <th data-column-id="up_again">End</th>
-                        <th data-column-id="device_id">Hostname</th>
-                        <th data-column-id="duration" data-sortable="false">Duration</th>
+                        <th data-column-id="going_down" data-order="desc">{{ __('Start') }}</th>
+                        <th data-column-id="up_again">{{ __('End') }}</th>
+                        <th data-column-id="device_id">{{ __('device.attributes.hostname') }}</th>
+                        <th data-column-id="duration" data-sortable="false">{{ __('Duration') }}</th>
                     </tr>
                     </thead>
                 </table>

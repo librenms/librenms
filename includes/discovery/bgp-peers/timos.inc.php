@@ -59,6 +59,7 @@ if ($device['os'] == 'timos') {
                     'vrf_id' => $vrfId,
                     'bgpPeerIdentifier' => $address,
                     'bgpPeerRemoteAs' => $value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'],
+                    'bgpPeerDescr' => $value['TIMETRA-BGP-MIB::tBgpPeerNgDescription'] ?? '',
                     'bgpPeerState' => 'idle',
                     'bgpPeerAdminStatus' => 'stop',
                     'bgpLocalAddr' => '0.0.0.0',

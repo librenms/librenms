@@ -23,6 +23,8 @@ if ($width > '500') {
     $descr_len = (12 + round(($width - 275) / 8));
 }
 
+$unit_text ??= '';
+
 if ($width > '500') {
     $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . " RTT      Loss    SDev   RTT\:SDev                              \l";
 } else {
@@ -64,7 +66,7 @@ foreach (range(1, $pings) as $p) {
     $rrd_options[] = 'CDEF:p' . $i . 'p' . $p . '=pin' . $i . 'p' . $p . ',UN,0,pin' . $i . 'p' . $p . ',IF';
 }
 
-unset($pings_options, $m_options, $sdev_options);
+$pings_options = $m_options = $sdev_options = '';
 
 foreach (range(2, $pings) as $p) {
     $pings_options .= ',p' . $i . 'p' . $p . ',UN,+';

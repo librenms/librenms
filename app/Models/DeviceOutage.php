@@ -33,5 +33,5 @@ class DeviceOutage extends DeviceRelatedModel
     use HasFactory;
 
     public $timestamps = false;
-    protected $fillable = ['going_down', 'up_again'];
+    protected $fillable = ['device_id', 'going_down', 'up_again'];
 }

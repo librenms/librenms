@@ -1,11 +1,27 @@
+import { createPopper } from '@popperjs/core';
+
 // Alpine.js Popup Component
 export default function popup(url = '', options = {}) {
+    // Extract parameters from options
+    const params = options.params || {};
+    delete options.params;
+
+    // Append parameters to URL if any
+    if (Object.keys(params).length > 0) {
+        const urlObj = new URL(url, window.location.origin);
+        Object.entries(params).forEach(([key, value]) => {
+            urlObj.searchParams.append(key, value);
+        });
+        url = urlObj.toString();
+    }
+
     return {
         popupShow: false,
         showTimeout: null,
         hideTimeout: null,
         ignoreNextShownEvent: false,
-        delay: options.delay || 300,
+        showDelay: options.showDelay || 100,
+        hideDelay: options.hideDelay || 300,
         url: url,
         content: '',
         loading: false,
@@ -38,7 +54,7 @@ export default function popup(url = '', options = {}) {
             this.popupElement = document.createElement('div');
             // this.popupElement.className = 'tw:hidden tw:bg-white tw:dark:bg-dark-gray-300 tw:dark:text-white tw:border-2 tw:border-gray-200 tw:dark:border-dark-gray-200 tw:z-50 tw:font-normal tw:leading-normal tw:text-sm tw:text-left tw:no-underline tw:rounded-lg tw:absolute tw:shadow-lg tw:max-w-sm';
             this.popupElement.className = 'tw:hidden';
-            this.popupElement.style.cssText = 'max-width: 95vw; z-index: 9999;';
+            this.popupElement.style.cssText = 'position: fixed; max-width: 95vw; z-index: 9999;';
 
             // Add mouse events to popup
             this.popupElement.addEventListener('mouseenter', () => {
@@ -46,7 +62,7 @@ export default function popup(url = '', options = {}) {
             });
 
             this.popupElement.addEventListener('mouseleave', () => {
-                this.hide(this.delay);
+                this.hide(this.hideDelay);
             });
 
             document.body.appendChild(this.popupElement);
@@ -55,11 +71,11 @@ export default function popup(url = '', options = {}) {
         setupEventListeners() {
             // Mouse events on trigger element
             this.$el.addEventListener('mouseenter', () => {
-                this.show(100);
+                this.show(this.showDelay);
             });
 
             this.$el.addEventListener('mouseleave', () => {
-                this.hide(this.delay);
+                this.hide(this.hideDelay);
             });
 
             // Click away to close
@@ -223,51 +239,24 @@ export default function popup(url = '', options = {}) {
         positionPopup() {
             if (!this.popupElement) return;
 
-            // Use Popper.js if available
-            if (typeof Popper !== 'undefined' && Popper.createPopper) {
-                this.popperInstance = Popper.createPopper(this.$el, this.popupElement, {
-                    placement: 'top',
-                    modifiers: [
-                        {
-                            name: 'offset',
-                            options: { offset: [0, 8] }
-                        },
-                        {
-                            name: 'preventOverflow',
-                            options: { padding: 8 }
-                        },
-                        {
-                            name: 'flip',
-                            options: { fallbackPlacements: ['bottom', 'right', 'left'] }
-                        }
-                    ]
-                });
-            } else {
-                // Fallback manual positioning
-                this.manualPosition();
-            }
-        },
-
-        manualPosition() {
-            const targetRect = this.$el.getBoundingClientRect();
-            const popupRect = this.popupElement.getBoundingClientRect();
-
-            let top = targetRect.top - popupRect.height - 8;
-            let left = targetRect.left + (targetRect.width / 2) - (popupRect.width / 2);
-
-            // Adjust for viewport boundaries
-            if (top < 8) {
-                top = targetRect.bottom + 8;
-            }
-            if (left < 8) {
-                left = 8;
-            }
-            if (left + popupRect.width > window.innerWidth - 8) {
-                left = window.innerWidth - popupRect.width - 8;
-            }
-
-            this.popupElement.style.top = `${top + window.scrollY}px`;
-            this.popupElement.style.left = `${left}px`;
+            this.popperInstance = createPopper(this.$el, this.popupElement, {
+                placement: 'top',
+                strategy: 'fixed',
+                modifiers: [
+                    {
+                        name: 'offset',
+                        options: { offset: [0, 8] }
+                    },
+                    {
+                        name: 'preventOverflow',
+                        options: { padding: 8 }
+                    },
+                    {
+                        name: 'flip',
+                        options: { fallbackPlacements: ['bottom', 'right', 'left'] }
+                    }
+                ]
+            });
         },
 
         // Public methods

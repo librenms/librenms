@@ -31,6 +31,12 @@ use LibreNMS\Util\StringHelpers;
 
 final class StringHelperTest extends TestCase
 {
+    public function testValidUtf8(): void
+    {
+        $this->assertTrue(StringHelpers::isValidUtf8('Øverbyvegen'));
+        $this->assertFalse(StringHelpers::isValidUtf8("\xD8verbyvegen"));
+    }
+
     /**
      * A basic feature test example.
      *
@@ -42,9 +48,11 @@ final class StringHelperTest extends TestCase
         $this->assertEquals('', StringHelpers::inferEncoding(''));
         $this->assertEquals('~null', StringHelpers::inferEncoding('~null'));
         $this->assertEquals('Øverbyvegen', StringHelpers::inferEncoding('Øverbyvegen'));
+        $this->assertEquals("first\nsecond", StringHelpers::inferEncoding("first\xDAsecond"));
 
         $this->assertEquals('Øverbyvegen', StringHelpers::inferEncoding(base64_decode('w5h2ZXJieXZlZ2Vu')));
         $this->assertEquals('Øverbyvegen', StringHelpers::inferEncoding(base64_decode('2HZlcmJ5dmVnZW4=')));
+        $this->assertEquals('教科网IPv4', StringHelpers::inferEncoding(base64_decode('vcy/xs34SVB2NA==')));
 
         config(['app.charset' => 'Shift_JIS']);
         $this->assertEquals('コンサート', StringHelpers::inferEncoding(base64_decode('g1KDk4NUgVuDZw==')));

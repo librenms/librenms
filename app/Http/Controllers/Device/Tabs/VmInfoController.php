@@ -27,14 +27,16 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use App\Models\Vminfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class VmInfoController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return $device->vminfo()->exists();
+        return Gate::allows('viewAny', Vminfo::class) && $device->vminfo()->exists();
     }
 
     public function slug(): string
@@ -54,17 +56,12 @@ class VmInfoController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [
-            'vms' => self::getVms($device),
-        ];
-    }
+        $request->validate(Vminfo::filterValidationRules());
 
-    private static function getVms(Device $device)
-    {
-        return $device->vminfo()
-        ->select('vmwVmDisplayName', 'vmwVmState', 'vmwVmGuestOS', 'vmwVmMemSize', 'vmwVmCpus')
-        ->with('parentDevice')
-        ->orderBy('vmwVmDisplayName')
-        ->get();
+        return [
+            'filterFields' => collect(Vminfo::filterFieldDefinitions())
+                ->filter(fn ($field) => $field['key'] !== 'device_id')->values()->all(),
+            'filter' => $request->array('filter'),
+        ];
     }
 }

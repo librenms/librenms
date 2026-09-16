@@ -1,15 +1,15 @@
 # SNMP Proxy
 
-If you have machines that you want to monitor but are not reachable
-directly, you can use [SNMPD
-Proxy](http://www.net-snmp.org/wiki/index.php/Snmpd_proxy). This will
-use the reachable SNMPD to proxy requests to the unreachable SNMPD.
+Some machines are not directly available for monitoring. For these
+machines, use [SNMPD
+Proxy](http://www.net-snmp.org/wiki/index.php/Snmpd_proxy). A reachable
+SNMPD then forwards the requests to the unreachable SNMPD.
 
 ## Example configuration
 
-We want to poll 'unreachable.example.com' via
+This example polls 'unreachable.example.com' through
 
-'hereweare.example.com'. Use the following config:
+'hereweare.example.com'. Use this configuration.
 
 On 'hereweare.example.com':
 
@@ -31,8 +31,7 @@ On 'unreachable.example.com':
         access MyROGroup "" any noauth exact all none none
 ```
 
-You can now poll community 'private' on
-'unreachable.example.com' via community 'unreachable' on host
-'hereweare.example.com'. Please note that requests on
-'unreachable.example.com' will be coming from
-'hereweare.example.com', not your poller.
+You can now poll the community 'private' on 'unreachable.example.com'
+through the community 'unreachable' on the host 'hereweare.example.com'.
+Note: the requests on 'unreachable.example.com' come from
+'hereweare.example.com', not from your poller.

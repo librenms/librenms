@@ -18,10 +18,10 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/backu
 chmod +x /etc/snmp/backupninja.py
 ```
 
-3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+3. Edit your `snmpd.conf` file, usually `/etc/snmp/snmpd.conf`, and add:
 
 ```bash
 extend backupninja /etc/snmp/backupninja.py
 ```
 
-4. Restart snmpd on your host
+4. Restart snmpd on your host.

@@ -1,0 +1,1562 @@
+--mega-MIB { iso(1) org(3) dod(6) internet(1) private(4)
+--      enterprises(1) mega(13409) }
+
+PROBE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	DisplayString
+		FROM SNMPv2-TC
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Integer32,
+	IpAddress,
+	Unsigned32
+		FROM SNMPv2-SMI;
+
+probe MODULE-IDENTITY
+	LAST-UPDATED "200311181622Z"
+	ORGANIZATION "Megatec"
+	CONTACT-INFO
+		" "
+	DESCRIPTION
+		""
+	::= { enterprises 13409 1 }
+
+
+mega OBJECT IDENTIFIER 	::= { enterprises 13409 }
+
+probeStatus OBJECT IDENTIFIER 	::= { probe 1 }
+
+-- object types
+
+probeStatusTemperature OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS
+		"0.1 degrees Centigrade"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { probeStatus 1 }
+
+
+probeStatusHumidity OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS
+		"percentage"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { probeStatus 2 }
+
+
+probeStatusItem1 OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { probeStatus 3 }
+
+
+probeStatusItem2 OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { probeStatus 4 }
+
+
+probeStatusItem3 OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { probeStatus 5 }
+
+
+probeStatusItem4 OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { probeStatus 6 }
+
+
+probeStatusItem5 OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { probeStatus 7 }
+
+
+probeStatusItem6 OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { probeStatus 8 }
+
+
+probeStatusItem7 OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { probeStatus 9 }
+
+
+probeStatusItem8 OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION ""
+	::= { probeStatus 10 }
+
+
+signalDetectionType OBJECT-TYPE
+	SYNTAX INTEGER {
+			analogInput(1),
+			differentialSignalInputBipolar(2),
+			differentialSignalInputUnipolar(3),
+			contactClosureInput(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { probeSetting 1 }
+
+
+probeSetting OBJECT IDENTIFIER 	::= { probe 2 }
+
+temperatureMax OBJECT-TYPE
+	SYNTAX Integer32 (-10..100)
+	UNITS
+		"0.1 degrees Centigrade"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { probeSetting 2 }
+
+
+temperatureMin OBJECT-TYPE
+	SYNTAX Integer32 (-10..100)
+	UNITS
+		"0.1 degrees Centigrade"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { probeSetting 3 }
+
+
+humidityMax OBJECT-TYPE
+	SYNTAX Integer32 (0..100)
+	UNITS
+		"percentage"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { probeSetting 4 }
+
+
+humidityMin OBJECT-TYPE
+	SYNTAX Integer32 (0..100)
+	UNITS
+		"percentage"
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { probeSetting 5 }
+
+
+analogInput OBJECT IDENTIFIER 	::= { probeSetting 6 }
+
+analogInputGroup1 OBJECT IDENTIFIER 	::= { analogInput 1 }
+
+analogInputGroup1Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup1 1 }
+
+
+analogInputGroup1Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup1 2 }
+
+
+analogInputGroup1Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup1 3 }
+
+
+analogInputGroup1Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup1 4 }
+
+
+analogInputGroup1Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup1 5 }
+
+
+analogInputGroup2 OBJECT IDENTIFIER 	::= { analogInput 2 }
+
+analogInputGroup2Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup2 1 }
+
+
+analogInputGroup2Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup2 2 }
+
+
+analogInputGroup2Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup2 3 }
+
+
+analogInputGroup2Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup2 4 }
+
+
+analogInputGroup2Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup2 5 }
+
+
+analogInputGroup3 OBJECT IDENTIFIER 	::= { analogInput 3 }
+
+analogInputGroup3Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup3 1 }
+
+
+analogInputGroup3Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup3 2 }
+
+
+analogInputGroup3Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup3 3 }
+
+
+analogInputGroup3Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup3 4 }
+
+
+analogInputGroup3Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup3 5 }
+
+
+analogInputGroup4 OBJECT IDENTIFIER 	::= { analogInput 4 }
+
+analogInputGroup4Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup4 1 }
+
+
+analogInputGroup4Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup4 2 }
+
+
+analogInputGroup4Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup4 3 }
+
+
+analogInputGroup4Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup4 4 }
+
+
+analogInputGroup4Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup4 5 }
+
+
+analogInputGroup5 OBJECT IDENTIFIER 	::= { analogInput 5 }
+
+analogInputGroup5Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup5 1 }
+
+
+analogInputGroup5Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup5 2 }
+
+
+analogInputGroup5Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup5 3 }
+
+
+analogInputGroup5Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup5 4 }
+
+
+analogInputGroup5Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup5 5 }
+
+
+analogInputGroup6 OBJECT IDENTIFIER 	::= { analogInput 6 }
+
+analogInputGroup6Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup6 1 }
+
+
+analogInputGroup6Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup6 2 }
+
+
+analogInputGroup6Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup6 3 }
+
+
+analogInputGroup6Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup6 4 }
+
+
+analogInputGroup6Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup6 5 }
+
+
+analogInputGroup7 OBJECT IDENTIFIER 	::= { analogInput 7 }
+
+analogInputGroup7Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup7 1 }
+
+
+analogInputGroup7Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup7 2 }
+
+
+analogInputGroup7Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup7 3 }
+
+
+analogInputGroup7Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup7 4 }
+
+
+analogInputGroup7Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup7 5 }
+
+
+analogInputGroup8 OBJECT IDENTIFIER 	::= { analogInput 8 }
+
+analogInputGroup8Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup8 1 }
+
+
+analogInputGroup8Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup8 2 }
+
+
+analogInputGroup8Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup8 3 }
+
+
+analogInputGroup8Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup8 4 }
+
+
+analogInputGroup8Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { analogInputGroup8 5 }
+
+
+differentialSignalInputBipolar OBJECT IDENTIFIER 	::= { probeSetting 7 }
+
+differentialSignalInputBipolarGroup1 OBJECT IDENTIFIER 	::= { differentialSignalInputBipolar 1 }
+
+differentialSignalInputBipolarGroup1Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup1 1 }
+
+
+differentialSignalInputBipolarGroup1Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup1 2 }
+
+
+differentialSignalInputBipolarGroup1Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup1 3 }
+
+
+differentialSignalInputBipolarGroup1Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup1 4 }
+
+
+differentialSignalInputBipolarGroup1Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup1 5 }
+
+
+differentialSignalInputBipolarGroup2 OBJECT IDENTIFIER 	::= { differentialSignalInputBipolar 2 }
+
+differentialSignalInputBipolarGroup2Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup2 1 }
+
+
+differentialSignalInputBipolarGroup2Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup2 2 }
+
+
+differentialSignalInputBipolarGroup2Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup2 3 }
+
+
+differentialSignalInputBipolarGroup2Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup2 4 }
+
+
+differentialSignalInputBipolarGroup2Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup2 5 }
+
+
+differentialSignalInputBipolarGroup3 OBJECT IDENTIFIER 	::= { differentialSignalInputBipolar 3 }
+
+differentialSignalInputBipolarGroup3Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup3 1 }
+
+
+differentialSignalInputBipolarGroup3Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup3 2 }
+
+
+differentialSignalInputBipolarGroup3Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup3 3 }
+
+
+differentialSignalInputBipolarGroup3Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup3 4 }
+
+
+differentialSignalInputBipolarGroup3Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup3 5 }
+
+
+differentialSignalInputBipolarGroup4 OBJECT IDENTIFIER 	::= { differentialSignalInputBipolar 4 }
+
+differentialSignalInputBipolarGroup4Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup4 1 }
+
+
+differentialSignalInputBipolarGroup4Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup4 2 }
+
+
+differentialSignalInputBipolarGroup4Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup4 3 }
+
+
+differentialSignalInputBipolarGroup4Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup4 4 }
+
+
+differentialSignalInputBipolarGroup4Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputBipolarGroup4 5 }
+
+
+differentialSignalInputUnipolar OBJECT IDENTIFIER 	::= { probeSetting 8 }
+
+differentialSignalInputUnipolarGroup1 OBJECT IDENTIFIER 	::= { differentialSignalInputUnipolar 1 }
+
+differentialSignalInputUnipolarGroup1Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup1 1 }
+
+
+differentialSignalInputUnipolarGroup1Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup1 2 }
+
+
+differentialSignalInputUnipolarGroup1Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup1 3 }
+
+
+differentialSignalInputUnipolarGroup1Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup1 4 }
+
+
+differentialSignalInputUnipolarGroup1Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup1 5 }
+
+
+differentialSignalInputUnipolarGroup2 OBJECT IDENTIFIER 	::= { differentialSignalInputUnipolar 2 }
+
+differentialSignalInputUnipolarGroup2Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup2 1 }
+
+
+differentialSignalInputUnipolarGroup2Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup2 2 }
+
+
+differentialSignalInputUnipolarGroup2Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup2 3 }
+
+
+differentialSignalInputUnipolarGroup2Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup2 4 }
+
+
+differentialSignalInputUnipolarGroup2Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup2 5 }
+
+
+differentialSignalInputUnipolarGroup3 OBJECT IDENTIFIER 	::= { differentialSignalInputUnipolar 3 }
+
+differentialSignalInputUnipolarGroup3Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup3 1 }
+
+
+differentialSignalInputUnipolarGroup3Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup3 2 }
+
+
+differentialSignalInputUnipolarGroup3Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup3 3 }
+
+
+differentialSignalInputUnipolarGroup3Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup3 4 }
+
+
+differentialSignalInputUnipolarGroup3Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup3 5 }
+
+
+differentialSignalInputUnipolarGroup4 OBJECT IDENTIFIER 	::= { differentialSignalInputUnipolar 4 }
+
+differentialSignalInputUnipolarGroup4Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup4 1 }
+
+
+differentialSignalInputUnipolarGroup4Factor OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup4 2 }
+
+
+differentialSignalInputUnipolarGroup4Unit OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup4 3 }
+
+
+differentialSignalInputUnipolarGroup4Max OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup4 4 }
+
+
+differentialSignalInputUnipolarGroup4Min OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { differentialSignalInputUnipolarGroup4 5 }
+
+
+contactClosureInput OBJECT IDENTIFIER 	::= { probeSetting 9 }
+
+contactClosureInputGroup1 OBJECT IDENTIFIER 	::= { contactClosureInput 1 }
+
+contactClosureInputGroup1Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { contactClosureInputGroup1 1 }
+
+
+contactClosureInputGroup2 OBJECT IDENTIFIER 	::= { contactClosureInput 2 }
+
+contactClosureInputGroup2Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { contactClosureInputGroup2 1 }
+
+
+contactClosureInputGroup3 OBJECT IDENTIFIER 	::= { contactClosureInput 3 }
+
+contactClosureInputGroup3Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { contactClosureInputGroup3 1 }
+
+
+contactClosureInputGroup4 OBJECT IDENTIFIER 	::= { contactClosureInput 4 }
+
+contactClosureInputGroup4Caption OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..31))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION ""
+	::= { contactClosureInputGroup4 1 }
+
+
+probeTraps OBJECT IDENTIFIER 	::= { probe 3 }
+
+
+probeTemperatureOver NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 1 }
+
+
+probeTemperatureDown NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 2 }
+
+
+probeTemperatureNormal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 3 }
+
+
+probeHumidityOver NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 4 }
+
+
+probeHumidityDown NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 5 }
+
+
+probeHumidityNormal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 6 }
+
+
+analogInputGroup1Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 7 }
+
+
+analogInputGroup1Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 8 }
+
+
+analogInputGroup1Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 9 }
+
+
+analogInputGroup2Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 10 }
+
+
+analogInputGroup2Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 11 }
+
+
+analogInputGroup2Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 12 }
+
+
+analogInputGroup3Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 13 }
+
+
+analogInputGroup3Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 14 }
+
+
+analogInputGroup3Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 15 }
+
+
+analogInputGroup4Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 16 }
+
+
+analogInputGroup4Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 17 }
+
+
+analogInputGroup4Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 18 }
+
+
+analogInputGroup5Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 19 }
+
+
+analogInputGroup5Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 20 }
+
+
+analogInputGroup5Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 21 }
+
+
+analogInputGroup6Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 22 }
+
+
+analogInputGroup6Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 23 }
+
+
+analogInputGroup6Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 24 }
+
+
+analogInputGroup7Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 25 }
+
+
+analogInputGroup7Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 26 }
+
+
+analogInputGroup7Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 27 }
+
+
+analogInputGroup8Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 28 }
+
+
+analogInputGroup8Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 29 }
+
+
+analogInputGroup8Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 30 }
+
+
+differentialSignalInputBipolarGroup1Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 31 }
+
+
+differentialSignalInputBipolarGroup1Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 32 }
+
+
+differentialSignalInputBipolarGroup1Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 33 }
+
+
+differentialSignalInputBipolarGroup2Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 34 }
+
+
+differentialSignalInputBipolarGroup2Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 35 }
+
+
+differentialSignalInputBipolarGroup2Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 36 }
+
+
+differentialSignalInputBipolarGroup3Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 37 }
+
+
+differentialSignalInputBipolarGroup3Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 38 }
+
+
+differentialSignalInputBipolarGroup3Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 39 }
+
+
+differentialSignalInputBipolarGroup4Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 40 }
+
+
+differentialSignalInputBipolarGroup4Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 41 }
+
+
+differentialSignalInputBipolarGroup4Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 42 }
+
+
+differentialSignalInputUnipolarGroup1Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 43 }
+
+
+differentialSignalInputUnipolarGroup1Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 44 }
+
+
+differentialSignalInputUnipolarGroup1Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 45 }
+
+
+differentialSignalInputUnipolarGroup2Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 46 }
+
+
+differentialSignalInputUnipolarGroup2Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 47 }
+
+
+differentialSignalInputUnipolarGroup2Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 48 }
+
+
+differentialSignalInputUnipolarGroup3Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 49 }
+
+
+differentialSignalInputUnipolarGroup3Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 50 }
+
+
+differentialSignalInputUnipolarGroup3Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 51 }
+
+
+differentialSignalInputUnipolarGroup4Over NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 52 }
+
+
+differentialSignalInputUnipolarGroup4Down NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 53 }
+
+
+differentialSignalInputUnipolarGroup4Normal NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 54 }
+
+
+contactClosureInputGroup1Open NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 55 }
+
+
+contactClosureInputGroup1Close NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 56 }
+
+
+contactClosureInputGroup2Open NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 57 }
+
+
+contactClosureInputGroup2Close NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 58 }
+
+
+contactClosureInputGroup3Open NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 59 }
+
+
+contactClosureInputGroup3Close NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 60 }
+
+
+contactClosureInputGroup4Open NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 61 }
+
+
+contactClosureInputGroup4Close NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION ""
+	::= { probeTraps 62 }
+
+probeMgmt OBJECT IDENTIFIER 	::= { probe 4 }
+
+mconfig OBJECT IDENTIFIER 	::= { probeMgmt 1 }
+
+-- object types
+
+mconfigTrapsReceiversNum OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of managers to send traps to."
+	::= { mconfig 1 }
+
+
+mconfigTrapsReceiversTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF MconfigTrapsReceiversEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A list of managers to send traps to.  The number of
+		entries is given by the value of mconfigNumTrapReceivers"
+	::= { mconfig 2 }
+
+
+mconfigTrapsReceiversEntry OBJECT-TYPE
+	SYNTAX MconfigTrapsReceiversEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The managers to send traps to."
+	INDEX {
+		trapsIndex }
+	::= { mconfigTrapsReceiversTable 1 }
+
+
+MconfigTrapsReceiversEntry ::= SEQUENCE {
+
+	trapsIndex              Unsigned32,
+	trapsReceiverAddr       IpAddress,
+	receiverCommunityString DisplayString,
+	severityLevel           INTEGER,
+	receiverAccept          INTEGER }
+
+
+trapsIndex OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The index to a trap receiver entry."
+	::= { mconfigTrapsReceiversEntry 1 }
+
+
+trapsReceiverAddr OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The IP address of the manager to send a trap to."
+	::= { mconfigTrapsReceiversEntry 2 }
+
+
+receiverCommunityString OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The community name to use in the trap when
+		sent to the manager."
+	::= { mconfigTrapsReceiversEntry 3 }
+
+
+severityLevel OBJECT-TYPE
+	SYNTAX INTEGER {
+			information(1),
+			warning(2),
+			severe(3) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The severity threshold of traps to send to the manager.
+		traps are labeled in severity as informational(1), warning(2),
+		severe(3).  Only traps of equal or greater severity than
+		this value are sent to the manager."
+	::= { mconfigTrapsReceiversEntry 4 }
+
+
+receiverAccept OBJECT-TYPE
+	SYNTAX INTEGER {
+			yes(1),
+			no(2) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"An entry will become active if yes, and will
+		be deleted if no."
+	::= { mconfigTrapsReceiversEntry 5 }
+
+
+conformance OBJECT IDENTIFIER 	::= { probe 5 }
+
+probeStatusGroup OBJECT-GROUP
+	OBJECTS {
+		probeStatusTemperature,
+		probeStatusHumidity,
+		probeStatusItem1,
+		probeStatusItem2,
+		probeStatusItem3,
+		probeStatusItem4,
+		probeStatusItem5,
+		probeStatusItem6,
+		probeStatusItem7,
+		probeStatusItem8 }
+	STATUS current
+	DESCRIPTION ""
+	::= { conformance 1 }
+
+probeSettingGroup OBJECT-GROUP
+	OBJECTS {
+		signalDetectionType,
+		temperatureMax,
+		temperatureMin,
+		humidityMax,
+		humidityMin,
+		analogInputGroup1Caption,
+		analogInputGroup1Factor,
+		analogInputGroup1Unit,
+		analogInputGroup1Max,
+		analogInputGroup1Min,
+		analogInputGroup2Caption,
+		analogInputGroup2Factor,
+		analogInputGroup2Unit,
+		analogInputGroup2Max,
+		analogInputGroup2Min,
+		analogInputGroup3Caption,
+		analogInputGroup3Factor,
+		analogInputGroup3Unit,
+		analogInputGroup3Max,
+		analogInputGroup3Min,
+		analogInputGroup4Caption,
+		analogInputGroup4Factor,
+		analogInputGroup4Unit,
+		analogInputGroup4Max,
+		analogInputGroup4Min,
+		analogInputGroup5Caption,
+		analogInputGroup5Factor,
+		analogInputGroup5Unit,
+		analogInputGroup5Max,
+		analogInputGroup5Min,
+		analogInputGroup6Caption,
+		analogInputGroup6Factor,
+		analogInputGroup6Unit,
+		analogInputGroup6Max,
+		analogInputGroup6Min,
+		analogInputGroup7Caption,
+		analogInputGroup7Factor,
+		analogInputGroup7Unit,
+		analogInputGroup7Max,
+		analogInputGroup7Min,
+		analogInputGroup8Caption,
+		analogInputGroup8Factor,
+		analogInputGroup8Unit,
+		analogInputGroup8Max,
+		analogInputGroup8Min,
+		differentialSignalInputBipolarGroup1Caption,
+		differentialSignalInputBipolarGroup1Factor,
+		differentialSignalInputBipolarGroup1Unit,
+		differentialSignalInputBipolarGroup1Max,
+		differentialSignalInputBipolarGroup1Min,
+		differentialSignalInputBipolarGroup2Caption,
+		differentialSignalInputBipolarGroup2Factor,
+		differentialSignalInputBipolarGroup2Unit,
+		differentialSignalInputBipolarGroup2Max,
+		differentialSignalInputBipolarGroup2Min,
+		differentialSignalInputBipolarGroup3Caption,
+		differentialSignalInputBipolarGroup3Factor,
+		differentialSignalInputBipolarGroup3Unit,
+		differentialSignalInputBipolarGroup3Max,
+		differentialSignalInputBipolarGroup3Min,
+		differentialSignalInputBipolarGroup4Caption,
+		differentialSignalInputBipolarGroup4Factor,
+		differentialSignalInputBipolarGroup4Unit,
+		differentialSignalInputBipolarGroup4Max,
+		differentialSignalInputBipolarGroup4Min,
+		differentialSignalInputUnipolarGroup1Caption,
+		differentialSignalInputUnipolarGroup1Factor,
+		differentialSignalInputUnipolarGroup1Unit,
+		differentialSignalInputUnipolarGroup1Max,
+		differentialSignalInputUnipolarGroup1Min,
+		differentialSignalInputUnipolarGroup2Caption,
+		differentialSignalInputUnipolarGroup2Factor,
+		differentialSignalInputUnipolarGroup2Unit,
+		differentialSignalInputUnipolarGroup2Max,
+		differentialSignalInputUnipolarGroup2Min,
+		differentialSignalInputUnipolarGroup3Caption,
+		differentialSignalInputUnipolarGroup3Factor,
+		differentialSignalInputUnipolarGroup3Unit,
+		differentialSignalInputUnipolarGroup3Max,
+		differentialSignalInputUnipolarGroup3Min,
+		differentialSignalInputUnipolarGroup4Caption,
+		differentialSignalInputUnipolarGroup4Factor,
+		differentialSignalInputUnipolarGroup4Unit,
+		differentialSignalInputUnipolarGroup4Max,
+		differentialSignalInputUnipolarGroup4Min,
+		contactClosureInputGroup1Caption,
+		contactClosureInputGroup2Caption,
+		contactClosureInputGroup3Caption,
+		contactClosureInputGroup4Caption }
+	STATUS current
+	DESCRIPTION ""
+	::= { conformance 2 }
+
+probeTrapsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		analogInputGroup1Over,
+		analogInputGroup1Down,
+		analogInputGroup1Normal,
+		analogInputGroup2Over,
+		analogInputGroup2Down,
+		analogInputGroup2Normal,
+		analogInputGroup3Over,
+		analogInputGroup3Down,
+		analogInputGroup3Normal,
+		analogInputGroup4Over,
+		analogInputGroup4Down,
+		analogInputGroup4Normal,
+		analogInputGroup5Over,
+		analogInputGroup5Down,
+		analogInputGroup5Normal,
+		analogInputGroup6Over,
+		analogInputGroup6Down,
+		analogInputGroup6Normal,
+		analogInputGroup7Over,
+		analogInputGroup7Down,
+		analogInputGroup7Normal,
+		analogInputGroup8Over,
+		analogInputGroup8Down,
+		analogInputGroup8Normal,
+		differentialSignalInputBipolarGroup1Over,
+		differentialSignalInputBipolarGroup1Down,
+		differentialSignalInputBipolarGroup1Normal,
+		differentialSignalInputBipolarGroup2Over,
+		differentialSignalInputBipolarGroup2Down,
+		differentialSignalInputBipolarGroup2Normal,
+		differentialSignalInputBipolarGroup3Over,
+		differentialSignalInputBipolarGroup3Down,
+		differentialSignalInputBipolarGroup3Normal,
+		differentialSignalInputBipolarGroup4Over,
+		differentialSignalInputBipolarGroup4Down,
+		differentialSignalInputBipolarGroup4Normal,
+		differentialSignalInputUnipolarGroup1Over,
+		differentialSignalInputUnipolarGroup1Down,
+		differentialSignalInputUnipolarGroup1Normal,
+		differentialSignalInputUnipolarGroup2Over,
+		differentialSignalInputUnipolarGroup2Down,
+		differentialSignalInputUnipolarGroup2Normal,
+		differentialSignalInputUnipolarGroup3Over,
+		differentialSignalInputUnipolarGroup3Down,
+		differentialSignalInputUnipolarGroup3Normal,
+		differentialSignalInputUnipolarGroup4Over,
+		differentialSignalInputUnipolarGroup4Down,
+		differentialSignalInputUnipolarGroup4Normal,
+		contactClosureInputGroup1Open,
+		contactClosureInputGroup1Close,
+		contactClosureInputGroup2Open,
+		contactClosureInputGroup2Close,
+		contactClosureInputGroup3Open,
+		contactClosureInputGroup3Close,
+		contactClosureInputGroup4Open,
+		contactClosureInputGroup4Close,
+		probeTemperatureOver,
+		probeTemperatureDown,
+		probeTemperatureNormal,
+		probeHumidityOver,
+		probeHumidityDown,
+		probeHumidityNormal }
+	STATUS current
+	DESCRIPTION ""
+	::= { conformance 3 }
+
+mconfigTrapsReceiversGroups OBJECT-GROUP
+	OBJECTS {
+		mconfigTrapsReceiversNum,
+		trapsIndex,
+		trapsReceiverAddr,
+		receiverCommunityString,
+		severityLevel,
+		receiverAccept }
+	STATUS current
+	DESCRIPTION ""
+	::= { conformance 4 }
+
+END

@@ -54,6 +54,11 @@ final class TimeUtilityTest extends TestCase
         $this->assertEquals(time() - 180, Time::parseAt('-3m'), '-3m did not match');
         $this->assertEquals(time() - 7200, Time::parseAt('-2h'), '-2h did not match');
         $this->assertEquals(time() - 172800, Time::parseAt('-2d'), '-2d did not match');
+        $this->assertEquals(time() - 604800, Time::parseAt('-1w'), '-1w did not match');
+        $this->assertEquals(time() - 1209600, Time::parseAt('-2w'), '-2w did not match');
+        $this->assertEquals(time() - 2592000, Time::parseAt('-1mo'), '-1mo did not match');
+        $this->assertEquals(time() - 5184000, Time::parseAt('-2mo'), '-2mo did not match');
+        $this->assertEquals(time() - 90, Time::parseAt('-90s'), '-90s did not match');
         $this->assertEquals(time() - 63115200, Time::parseAt('-2y'), '-2y did not match');
         $this->assertEquals(429929439, Time::parseAt('429929439'));
         $this->assertEquals(212334234, Time::parseAt(212334234));

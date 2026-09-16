@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class MplsTunnelArHop extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
     protected $primaryKey = 'ar_hop_id';
     public $timestamps = false;
     protected $fillable = [

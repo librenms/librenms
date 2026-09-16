@@ -1,0 +1,16 @@
+os: metaview
+text: 'MetaView Server'
+type: appliance
+icon: metaswitch
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir: metaswitch
+discovery:
+    -
+        sysObjectID:
+            - .1.2.826.0.1.1578918.6.508.
+ignore_mount_regexp:
+    - '/^\/disk[0-9\.]+/'
+    - '/^\/export\/.*/'

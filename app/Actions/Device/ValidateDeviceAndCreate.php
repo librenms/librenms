@@ -70,7 +70,7 @@ class ValidateDeviceAndCreate
         if (! $this->force) {
             $this->exceptIfIpExists();
 
-            if (! app(DeviceIsPingable::class)->execute($this->device)->success()) {
+            if (! app(DeviceIsPingable::class)->execute($this->device)->isAlive()) {
                 throw new HostUnreachablePingException($this->device->hostname);
             }
 

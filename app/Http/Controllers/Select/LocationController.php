@@ -27,22 +27,26 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Location;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<Location>
+ */
 class LocationController extends SelectController
 {
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['location'];
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Location::class);
+
         return Location::hasAccess($request->user())
             ->orderBy('location')
             ->select(['id', 'location']);

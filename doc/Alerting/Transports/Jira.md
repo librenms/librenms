@@ -1,30 +1,27 @@
 ## JIRA
 
-You can have LibreNMS create issues on a Jira instance for critical and warning
- alerts using either the Jira REST API or webhooks. 
-Custom fields allow you to add any required fields beyond summary and description
- fields in case mandatory fields are required by your Jira project/issue type 
- configuration. Custom fields are defined in JSON format but ustom fields allow 
- you to add any required fields beyond summary and description fields in case 
- mandatory fields are required by your Jira project/issue type configuration. 
- Custom fields are defined in JSON format. Currently http authentication is used 
- to access Jira and Jira username and password will be stored as cleartext in the 
- LibreNMS database.
+LibreNMS creates issues on a Jira instance for critical alerts and
+warning alerts. It uses the Jira REST API or webhooks. 
+Custom fields add the fields after the summary field and the
+description field. Your Jira project or issue type can need such
+mandatory fields. Give the custom fields in JSON format. LibreNMS uses
+HTTP authentication for Jira. It stores the Jira username and password
+in clear text in the LibreNMS database.
 
 ### REST API
-The config fields that need to set for Jira REST API are: Jira Open URL, Jira username, 
-Jira password, Project key, and issue type.  
+The Jira REST API needs these configuration fields: Jira Open URL, Jira
+username, Jira password, Project key, and Issue type.  
 
-> Note: REST API is that it is only able to open new tickets.
+> Note: the REST API can only open new tickets.
 
 ### Webhooks
-The config fields that need to set for webhooks are: Jira Open URL, Jira Close URL,
- Jira username, Jira password and webhook ID.
+The webhooks need these configuration fields: Jira Open URL, Jira Close
+URL, Jira username, Jira password, and Webhook ID.
 
-> Note: Webhooks allow more control over how alerts are handled in Jira. With webhooks, 
-> recovery messages can be sent to a different URL than alerts. Additionally, a custom 
-> conditional logic can be built using the webhook payload and ID to automatically close 
-> an open ticket if predefined conditions are met.
+> Note: webhooks give more control over the alerts in Jira. A recovery
+> message can go to a different URL than an alert. You can also build
+> your own conditional logic from the webhook payload and ID. This logic
+> closes an open ticket automatically when the conditions match.
 
 
 [Jira Issue Types](https://confluence.atlassian.com/adminjiracloud/issue-types-844500742.html)

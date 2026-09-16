@@ -1,37 +1,38 @@
 ## Sensu
 
-The Sensu transport will POST an
+At each new alert, the Sensu transport sends an
 [Event](https://docs.sensu.io/sensu-go/latest/reference/events/) to the
 [Agent API](https://docs.sensu.io/sensu-go/latest/reference/agent/#create-monitoring-events-using-the-agent-api)
-upon an alert being generated.
+with a POST request.
 
-It will be categorised (ok, warning or critical), and if you configure the
-alert to send recovery notifications, Sensu will also clear the alert
-automatically. No configuration is required - as long as you are running the
-Sensu Agent on your poller with the HTTP socket enabled on tcp/3031, LibreNMS
-will start generating Sensu events as soon as you create the transport.
+The event has a category: ok, warning, or critical. If the alert sends
+recovery notifications, Sensu also clears the alert automatically. No
+configuration is necessary. The Sensu agent must run on your poller
+with the HTTP socket on tcp/3031. LibreNMS then generates Sensu events
+at the creation of the transport.
 
-Acknowledging alerts within LibreNMS is not directly supported, but an
-annotation (`acknowledged`) is set, so a mutator or silence, or even the
-handler could be written to look for it directly in the handler. There is also
-an annotation (`generated-by`) set, to allow you to treat LibreNMS events
-differently from agent events.
+Sensu does not support an acknowledgement from LibreNMS directly. The
+transport sets the annotation `acknowledged`. A mutator, a silence, or
+a handler can read this annotation. The transport also sets the
+annotation `generated-by`. Use it to separate the LibreNMS events from
+the agent events.
 
-The 'shortname' option is a simple way to reduce the length of device names in
-configs. It replaces the last 3 domain components with single letters (e.g.
-websrv08.dc4.eu.corp.example.net gets shortened to websrv08.dc4.eu.cen).
+The 'shortname' option makes the device names in the configurations
+shorter. It replaces the last 3 domain components with single letters.
+For example, `websrv08.dc4.eu.corp.example.net` becomes
+`websrv08.dc4.eu.cen`.
 
 ### Limitations
 
-- Only a single namespace is supported
-- Sensu will reject rules with special characters - the Transport will attempt
-to fix up rule names, but it's best to stick to letters, numbers and spaces
-- The transport only deals in absolutes - it ignores the got worse/got better
-/changed states
-- The agent will buffer alerts, but LibreNMS will not - if your agent is
-offline, alerts will be dropped
-- There is no backchannel between Sensu and LibreNMS - if you make changes in
-Sensu to LibreNMS alerts, they'll be lost on the next event (silences will work)
+- The transport supports only one namespace.
+- Sensu rejects a rule with a special character. The transport tries to
+correct the rule names. Use only letters, numbers, and spaces.
+- The transport uses only absolute states. It ignores the worse,
+better, and changed states.
+- The agent buffers the alerts. LibreNMS does not. If your agent is
+offline, the alerts are lost.
+- There is no back channel between Sensu and LibreNMS. A change to a
+LibreNMS alert in Sensu is lost at the next event. Silences still work.
 
 **Example:**
 

@@ -458,6 +458,8 @@ class MapDataController extends Controller
     // GET Device
     public function getDevices(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Device::class);
+
         // Get all device ids under maintenance (may contain duplicates, but we don't care for this usage)
         $deviceIdsUnderMaintenance = AlertSchedule::isActive()
             ->with([
@@ -627,6 +629,8 @@ class MapDataController extends Controller
     // GET Device Links by device
     public function getDeviceLinks(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Device::class);
+
         // List all links
         $link_list = [];
         $port_assoc_seen = [];
@@ -726,6 +730,8 @@ class MapDataController extends Controller
     // GET Device Links grouped by geographic locations
     public function getGeographicLinks(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Device::class);
+
         // List all links
         $link_list = [];
         foreach (self::geoLinks($request) as $location) {
@@ -760,6 +766,8 @@ class MapDataController extends Controller
     // GET Device services
     public function getServices(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Service::class);
+
         $group_id = $request->device_group;
         $services = Service::hasAccess($request->user())->with('device');
 
