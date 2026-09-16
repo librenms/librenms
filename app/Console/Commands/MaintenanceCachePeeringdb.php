@@ -164,6 +164,8 @@ class MaintenanceCachePeeringdb extends LnmsCommand
 
     /**
      * The exchanges an ASN is present at, or null if there are none to process.
+     *
+     * @return \stdClass[]|null
      */
     private function fetchExchanges(int $asn): ?array
     {
@@ -197,6 +199,8 @@ class MaintenanceCachePeeringdb extends LnmsCommand
 
     /**
      * Every network present at an exchange.
+     *
+     * @return \stdClass[]
      */
     private function fetchPeers(int $ixId): array
     {
