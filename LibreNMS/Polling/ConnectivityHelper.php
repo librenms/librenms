@@ -47,8 +47,14 @@ readonly class ConnectivityHelper
         }
 
         foreach ($this->device->pollingMethods as $method) {
-            if ($method->toConfig()->isEnabled() && $method->affects_availability && ! $method->last_check_successful) {
-                return false;
+            try {
+                if ($method->toConfig()->isEnabled() && $method->affects_availability && ! $method->last_check_successful) {
+                    return false;
+                }
+            } catch (\LibreNMS\Exceptions\SecretDecryptionException) {
+                if ($method->affects_availability) {
+                    return false;
+                }
             }
         }
 
@@ -58,8 +64,14 @@ readonly class ConnectivityHelper
     public function hasAvailability(): bool
     {
         foreach ($this->device->pollingMethods as $method) {
-            if ($method->toConfig()->isEnabled() && $method->affects_availability) {
-                return true;
+            try {
+                if ($method->toConfig()->isEnabled() && $method->affects_availability) {
+                    return true;
+                }
+            } catch (\LibreNMS\Exceptions\SecretDecryptionException) {
+                if ($method->affects_availability) {
+                    return true;
+                }
             }
         }
 
@@ -70,14 +82,30 @@ readonly class ConnectivityHelper
     {
         $method = $this->device->pollingMethod($type);
 
-        return $method && $method->toConfig()->isEnabled();
+        if (! $method) {
+            return false;
+        }
+
+        try {
+            return $method->toConfig()->isEnabled();
+        } catch (\LibreNMS\Exceptions\SecretDecryptionException) {
+            return false;
+        }
     }
 
     public function methodIsAvailable(PollingMethodType $type): bool
     {
         $method = $this->device->pollingMethod($type);
 
-        return $method && $method->toConfig()->isEnabled() && $method->last_check_successful;
+        if (! $method) {
+            return false;
+        }
+
+        try {
+            return $method->toConfig()->isEnabled() && $method->last_check_successful;
+        } catch (\LibreNMS\Exceptions\SecretDecryptionException) {
+            return false;
+        }
     }
 
     public function snmpIsEnabled(): bool

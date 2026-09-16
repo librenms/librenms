@@ -27,6 +27,8 @@
 namespace LibreNMS\Enum;
 
 use LibreNMS\Interfaces\SecretDefinitionInterface;
+use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
+use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
 use LibreNMS\Polling\Secrets\SecretData;
 
 enum SecretType: string
@@ -39,6 +41,9 @@ enum SecretType: string
      */
     public function definition(): SecretDefinitionInterface
     {
-        return app("secret.$this->value");
+        return match ($this) {
+            self::Snmp => app(SnmpSecretDefinition::class),
+            self::Ipmi => app(IpmiSecretDefinition::class),
+        };
     }
 }
