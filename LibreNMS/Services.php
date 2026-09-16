@@ -151,11 +151,9 @@ class Services
 
         // Split performance metrics into an array
         preg_match_all('/\'[^\']*\'\S*|\S+/', $perf, $perf_arr);
-        $perf_arr = $perf_arr[0] ?? [];
-
         $metrics = [];
 
-        foreach ($perf_arr as $string) {
+        foreach ($perf_arr[0] as $string) {
             [$ds, $values] = array_pad(explode('=', trim($string)), 2, '');
 
             $value = $values ? explode(';', trim($values)) : [];
