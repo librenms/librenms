@@ -38,11 +38,11 @@ class SnmpPollingMethodDefinition extends PollingMethodDefinition
                 ->cast('int'),
 
             'timeout' => FieldDefinition::make('timeout', 'number')
-                ->default(fn () => max(1, (int) LibrenmsConfig::get('snmp.timeout', 1)))
-                ->min(1)
+                ->default(fn () => (float) LibrenmsConfig::get('snmp.timeout', 1))
+                ->min(0.1)
                 ->max(60)
-                ->rules(['nullable', 'integer', 'min:1', 'max:60'])
-                ->cast('int'),
+                ->rules(['nullable', 'numeric', 'min:0.1', 'max:60'])
+                ->cast('float'),
 
             'retries' => FieldDefinition::make('retries', 'number')
                 ->default(fn () => (int) LibrenmsConfig::get('snmp.retries', 5))
