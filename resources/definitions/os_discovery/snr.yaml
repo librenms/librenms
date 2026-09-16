@@ -1,8 +1,12 @@
 modules:
     os:
-        hardware:
-            - NAG-MIB::sysHardwareVersion.0
-            - NAG-MIB::sysHardwareVersion.1
+        # Model, firmware and serial come from sysDescr on every SNR family.
+        # S5210X/S5110G (57206 tree) do not expose sysHardwareVersion or
+        # sysSoftwareVersion; the version OIDs below override where present.
+        sysDescr_regex:
+            - '/^SNR-(?<hardware>\S+) Device/'
+            - '/SoftWare Version (?<version>\S+)/'
+            - '/Serial No\.:\s*(?<serial>\S+)/'
         version:
             - NAG-MIB::sysSoftwareVersion.0
             - NAG-MIB::sysSoftwareVersion.1
@@ -17,6 +21,13 @@ modules:
                 used: '.1.3.6.1.4.1.40418.7.100.1.11.7.0'
                 descr: 'Memory'
                 index: 0
+                # S2990X (.7.53, .8.67) and S300X (.7.54) report this branch in
+                # megabytes and duplicate legacy slot 1, so skip it there.
+                skip_values:
+                    -
+                        device: sysObjectID
+                        op: in_array
+                        value: ['.1.3.6.1.4.1.40418.7.53', '.1.3.6.1.4.1.40418.8.67', '.1.3.6.1.4.1.40418.7.54']
             # Legacy table .1.8.1.7/8 slot 1 — populated on S2990X (both 2019
             # and 2023 firmwares) and other older models. Always bytes.
             -

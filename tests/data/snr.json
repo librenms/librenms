@@ -8,7 +8,7 @@
                     "sysDescr": "SNR-S2990X-24FQ Device, Compiled Jan 10 13:47:05 2019",
                     "sysContact": "<private>",
                     "version": "7.5.3.2(R0010.0044)",
-                    "hardware": "1.0.1",
+                    "hardware": "S2990X-24FQ",
                     "features": null,
                     "location": "<private>",
                     "os": "snr",

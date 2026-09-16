@@ -8,12 +8,12 @@
                     "sysDescr": "SNR-S2985G-8T Device, Compiled Aug 17 13:43:32 2021\n SoftWare Version 7.0.3.5(R0241.0465)\n BootRom Version 7.2.40\n HardWare Version 1.1.2\n  Serial No.:SW070911J903001886\n Copyright (C) 2021 NAG LLC\n All rights reserved",
                     "sysContact": "<private>",
                     "version": "7.0.3.5(R0241.0465)",
-                    "hardware": "1.1.2",
+                    "hardware": "S2985G-8T",
                     "features": null,
                     "location": "<private>",
                     "os": "snr",
                     "type": "network",
-                    "serial": null,
+                    "serial": "SW070911J903001886",
                     "icon": "snr.png"
                 }
             ]

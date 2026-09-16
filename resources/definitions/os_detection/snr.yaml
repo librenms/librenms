@@ -4,6 +4,7 @@ type: network
 icon: snr
 group: snr
 mib_dir: snr
+ifname: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
