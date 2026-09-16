@@ -4,26 +4,28 @@
 
 @section('content')
 <div class="container-fluid">
+    <template id="vminfo-filter-template"><x-filter name="vminfo" :fields="$filterFields" :initial="$filter"/></template>
     <x-panel>
-        <template id="vminfo-filter-template"><x-filter name="vminfo" :fields="$filterFields" :initial="$filter"/></template>
-        <div class="table-responsive">
-            <table id="vminfo" class="table table-hover table-condensed table-striped"
-                   data-url="{{ route('table.vminfo') }}">
-                <thead>
-                    <tr>
-                        <th data-column-id="deviceid" data-visible="false">{{ __('Device Id') }}</th>
-                        <th data-column-id="sysname" data-visible="false">{{ __('Sysname') }}</th>
-                        <th data-column-id="vmwVmDisplayName" data-order="asc">{{ __('VM Name') }}</th>
-                        <th data-column-id="hostname">{{ __('Host') }}</th>
-                        <th data-column-id="vmwVmState">{{ __('Power Status') }}</th>
-                        <th data-column-id="vm_type">{{ __('Type') }}</th>
-                        <th data-column-id="vmwVmGuestOS" data-searchable="false">{{ __('Operating System') }}</th>
-                        <th data-column-id="vmwVmMemSize" data-searchable="false">{{ __('Memory') }}</th>
-                        <th data-column-id="vmwVmCpus" data-searchable="false">{{ __('vCPUs') }}</th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
+        <x-slot:table>
+            <div class="table-responsive">
+                <table id="vminfo" class="table table-hover table-condensed table-striped"
+                       data-url="{{ route('table.vminfo') }}">
+                    <thead>
+                        <tr>
+                            <th data-column-id="deviceid" data-visible="false">{{ __('Device Id') }}</th>
+                            <th data-column-id="sysname" data-visible="false">{{ __('Sysname') }}</th>
+                            <th data-column-id="vmwVmDisplayName" data-order="asc">{{ __('VM Name') }}</th>
+                            <th data-column-id="hostname">{{ __('Host') }}</th>
+                            <th data-column-id="vmwVmState">{{ __('Power Status') }}</th>
+                            <th data-column-id="vm_type">{{ __('Type') }}</th>
+                            <th data-column-id="vmwVmGuestOS" data-searchable="false">{{ __('Operating System') }}</th>
+                            <th data-column-id="vmwVmMemSize" data-searchable="false">{{ __('Memory') }}</th>
+                            <th data-column-id="vmwVmCpus" data-searchable="false">{{ __('vCPUs') }}</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </x-slot:table>
     </x-panel>
 </div>
 @endsection
@@ -36,6 +38,7 @@
         ajax: true,
         rowCount: [50, 100, 250, -1],
         templates: {
+            header: "<div id=\"@{{ctx.id}}\" class=\"@{{css.header}}\"><div class=\"actionBar tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2\"><p class=\"@{{css.actions}}\"></p></div></div>",
             search: ""
         },
         post: function () {
@@ -48,9 +51,7 @@
     const $template = $('#vminfo-filter-template');
     if ($template.length) {
         const $content = $($template[0].content.cloneNode(true));
-        const $wrapper = $('<div class="pull-left"></div>');
-        $wrapper.append($content);
-        $(".actionBar").append($wrapper);
+        $(".actionBar").prepend($content);
     }
 
     $(window).on('filter:apply', function (event) {

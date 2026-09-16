@@ -33,6 +33,7 @@
         ajax: true,
         rowCount: [50, 100, 250, -1],
         templates: {
+            header: "<div id=\"@{{ctx.id}}\" class=\"@{{css.header}}\"><div class=\"actionBar tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2\"><p class=\"@{{css.actions}}\"></p></div></div>",
             search: ""
         },
         post: function () {
@@ -46,9 +47,7 @@
     const $template = $('#vminfo-filter-template');
     if ($template.length) {
         const $content = $($template[0].content.cloneNode(true));
-        const $wrapper = $('<div class="pull-left"></div>');
-        $wrapper.append($content);
-        $(".actionBar").append($wrapper);
+        $('.actionBar').prepend($content);
     }
 
     $(window).on('filter:apply', function (event) {
