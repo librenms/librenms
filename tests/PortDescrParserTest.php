@@ -43,13 +43,13 @@ final class PortDescrParserTest extends DBTestCase
 
     public function testIfAliasOverrideFeedsPortParser(): void
     {
-        ->requireSnmpsim();
+        $this->requireSnmpsim();
 
         // Lock testing time
-        ->travelTo(new \DateTime('2022-01-01 00:00:00'));
+        $this->travelTo(new \DateTime('2022-01-01 00:00:00'));
 
         // stub out Eventlog::log and Fping->ping, we don't need to store them for these tests
-        ->stubClasses();
+        $this->stubClasses();
 
         // don't store time series data
         LibrenmsConfig::set('rrd.enable', false);
@@ -59,68 +59,68 @@ final class PortDescrParserTest extends DBTestCase
         LibrenmsConfig::set('port_descr_parser', 'includes/port-descr-parser.inc.php');
 
         // add the test device pointed at the snmpsim data
-         = new Device([
-            'hostname' => ->getSnmpsimIp(),
+        $new_device = new Device([
+            'hostname' => $this->getSnmpsimIp(),
             'snmpver' => 'v2c',
             'transport' => 'udp',
             'community' => 'ios',
-            'port' => ->getSnmpsimPort(),
+            'port' => $this->getSnmpsimPort(),
             'disabled' => 1, // disable to block normal pollers
         ]);
-        (new ValidateDeviceAndCreate(, true))->execute();
-         = ->device_id;
+        (new ValidateDeviceAndCreate($new_device, true))->execute();
+        $device_id = $new_device->device_id;
 
         DeviceCache::flush();
-        DeviceCache::setPrimary();
+        DeviceCache::setPrimary($device_id);
 
         // discover ports (os detection happens in the core module)
-        (new DiscoverDevice(, new ModuleList(['ports' => true])))->handle();
+        (new DiscoverDevice($device_id, new ModuleList(['ports' => true])))->handle();
 
-        /** @var Port  */
-         = Port::query()
-            ->where('device_id', )
+        /** @var Port $port */
+        $port = Port::query()
+            ->where('device_id', $device_id)
             ->where('deleted', 0)
             ->whereNotNull('ifName')
             ->orderBy('ifIndex')
             ->first();
 
-        ->assertNotNull(, 'No port discovered for the simulated device');
+        $this->assertNotNull($port, 'No port discovered for the simulated device');
 
         // override ifAlias for this port, the parser should read this value
-         = 'cust: Acme Corp [1Gbps] {CIRCUIT-123} (note)';
-        Device::find()->setAttrib('ifName:' . ->ifName, );
+        $ifAlias = 'cust: Acme Corp [1Gbps] {CIRCUIT-123} (note)';
+        Device::find($device_id)->setAttrib('ifName:' . $port->ifName, $ifAlias);
         DeviceCache::flush();
-        DeviceCache::setPrimary();
+        DeviceCache::setPrimary($device_id);
 
         // poll ports
-        (new PollDevice(, new ModuleList(['ports' => true])))->handle();
+        (new PollDevice($device_id, new ModuleList(['ports' => true])))->handle();
 
-        ->refresh();
+        $port->refresh();
 
-        ->assertSame('cust', ->port_descr_type);
-        ->assertSame('Acme Corp', ->port_descr_descr);
-        ->assertSame('CIRCUIT-123', ->port_descr_circuit);
-        ->assertSame('1Gbps', ->port_descr_speed);
-        ->assertSame('note', ->port_descr_notes);
+        $this->assertSame('cust', $port->port_descr_type);
+        $this->assertSame('Acme Corp', $port->port_descr_descr);
+        $this->assertSame('CIRCUIT-123', $port->port_descr_circuit);
+        $this->assertSame('1Gbps', $port->port_descr_speed);
+        $this->assertSame('note', $port->port_descr_notes);
 
         DeviceCache::flush();
-        ->travelBack();
+        $this->travelBack();
     }
 
     private function stubClasses(): void
     {
-        ->app->bind(Eventlog::class, function () {
-             = \Mockery::mock(Eventlog::class);
-            ->shouldReceive('_log');
+        $this->app->bind(Eventlog::class, function ($app) {
+            $mock = \Mockery::mock(Eventlog::class);
+            $mock->shouldReceive('_log');
 
-            return ;
+            return $mock;
         });
 
-        ->app->bind(Fping::class, function () {
-             = \Mockery::mock(Fping::class);
-            ->shouldReceive('ping')->andReturn(FpingResponse::artificialUp());
+        $this->app->bind(Fping::class, function ($app) {
+            $mock = \Mockery::mock(Fping::class);
+            $mock->shouldReceive('ping')->andReturn(FpingResponse::artificialUp());
 
-            return ;
+            return $mock;
         });
     }
 }
