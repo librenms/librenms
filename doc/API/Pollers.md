@@ -13,7 +13,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/pollers
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/pollers
 ```
 
 Output (pollers table):
@@ -83,13 +83,13 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/pollers/log
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/pollers/log
 ```
 
 Example with unpolled filter:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/pollers/log?unpolled=1
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/pollers/log?unpolled=1
 ```
 
 Output:

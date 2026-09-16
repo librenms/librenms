@@ -78,10 +78,6 @@
                                 <button
                                         class="btn btn-sm btn-light text-muted copy-btn"
                                         data-clipboard-target="#env-content"
-                                        data-toggle="tooltip"
-                                        data-placement="bottom"
-                                        data-trigger="manual"
-                                        data-title="{{ __('install.finish.copied') }}"
                                 >
                                     <i class="fa-solid fa-clipboard"></i>
                                 </button>
@@ -103,10 +99,6 @@
                                 <button
                                         class="btn btn-sm btn-light text-muted copy-btn"
                                         data-clipboard-target="#config-content"
-                                        data-toggle="tooltip"
-                                        data-placement="bottom"
-                                        data-trigger="manual"
-                                        data-title="{{ __('install.finish.copied') }}"
                                 >
                                     <i class="fa-solid fa-clipboard"></i>
                                 </button>
@@ -196,15 +188,7 @@
 
         var clipboard = new ClipboardJS('.copy-btn');
         clipboard.on('success', function (e) {
-            $(e.trigger).tooltip('show');
-            setTimeout(() => $(e.trigger).tooltip('hide'), 2000);
-
             e.clearSelection();
-        });
-
-        clipboard.on('error', function (e) {
-            $(e.trigger).data('title', '{{ __('install.finish.manual_copy') }}').tooltip('show');
-            setTimeout(() => $(e.trigger).tooltip('hide'), 2000);
         });
     </script>
 @endsection

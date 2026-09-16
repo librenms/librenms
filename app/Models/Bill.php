@@ -38,6 +38,42 @@ class Bill extends BaseModel
     public $timestamps = false;
     protected $primaryKey = 'bill_id';
 
+    protected $fillable = [
+        'bill_name',
+        'bill_type',
+        'bill_cdr',
+        'bill_day',
+        'bill_quota',
+        'bill_custid',
+        'bill_ref',
+        'bill_notes',
+        'dir_95th',
+        'rate_95th_in',
+        'rate_95th_out',
+        'rate_95th',
+        'total_data',
+        'total_data_in',
+        'total_data_out',
+        'rate_average_in',
+        'rate_average_out',
+        'rate_average',
+        'bill_last_calc',
+        'bill_autoadded',
+    ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (Bill $bill): void {
+            $bill->history()->delete();
+            $bill->data()->delete();
+            $bill->portCounters()->delete();
+            $bill->billPorts()->delete();
+            $bill->billPerms()->delete();
+        });
+    }
+
     // ---- Query Scopes ----
 
     protected function scopeHasAccess(Builder $query, User $user): Builder
@@ -72,10 +108,34 @@ class Bill extends BaseModel
     }
 
     /**
+     * @return HasMany<BillPort, $this>
+     */
+    public function billPorts(): HasMany
+    {
+        return $this->hasMany(BillPort::class, 'bill_id', 'bill_id');
+    }
+
+    /**
+     * @return HasMany<BillPerm, $this>
+     */
+    public function billPerms(): HasMany
+    {
+        return $this->hasMany(BillPerm::class, 'bill_id', 'bill_id');
+    }
+
+    /**
      * @return BelongsToMany<Port, $this>
      */
     public function ports(): BelongsToMany
     {
         return $this->belongsToMany(Port::class, 'bill_ports', 'bill_id', 'port_id');
+    }
+
+    /**
+     * @return BelongsToMany<User, $this>
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'bill_perms', 'bill_id', 'user_id');
     }
 }
