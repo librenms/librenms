@@ -249,7 +249,7 @@ bgpPeers:
     - { Field: bgpPeerOutTotalMessages, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: bgpPeerFsmEstablishedTime, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: bgpPeerInUpdateElapsedTime, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '', Default: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [bgpPeer_id], Unique: true, Type: BTREE }
     bgppeers_device_id_context_name_index: { Name: bgppeers_device_id_context_name_index, Columns: [device_id, context_name], Unique: false, Type: BTREE }
@@ -277,7 +277,7 @@ bgpPeers_cbgp:
     - { Field: SuppressedPrefixes_prev, Type: 'bigint unsigned', 'Null': false, Extra: '' }
     - { Field: WithdrawnPrefixes_delta, Type: bigint, 'Null': false, Extra: '' }
     - { Field: WithdrawnPrefixes_prev, Type: 'bigint unsigned', 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '', Default: '' }
   Indexes:
     bgppeers_cbgp_device_id_bgppeeridentifier_afi_safi_unique: { Name: bgppeers_cbgp_device_id_bgppeeridentifier_afi_safi_unique, Columns: [device_id, bgpPeerIdentifier, afi, safi], Unique: true, Type: BTREE }
     bgppeers_cbgp_device_id_bgppeeridentifier_context_name_index: { Name: bgppeers_cbgp_device_id_bgppeeridentifier_context_name_index, Columns: [device_id, bgpPeerIdentifier, context_name], Unique: false, Type: BTREE }
