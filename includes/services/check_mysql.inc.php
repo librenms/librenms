@@ -14,7 +14,7 @@ $check_ds = '{"mysqlqueries":"c","mysql":"c","mysqluptime":"c","mysqlQcache":"c"
 $check_parser = function (string $output, array $metrics = []): array {
     $metrics = [
         'Uptime' => ['value' => 'U', 'uom' => 's', 'full_name' => 'Uptime'],
-        'Queries' => ['value' => 'U', 'uom' => '', 'full_name' => 'Queries', 'alias' => 'Queries_per_second_'],
+        'Queries' => ['value' => 'U', 'uom' => '', 'full_name' => 'Queries', 'alias' => 'Queriespersecondavg'],
         'Questions' => ['value' => 'U', 'uom' => 'c', 'full_name' => 'Questions'],
         'Connections' => ['value' => 'U', 'uom' => 'c', 'full_name' => 'Connections'],
         'Open_files' => ['value' => 'U', 'uom' => 'c', 'full_name' => 'Open_files', 'alias' => 'Opens'],
@@ -33,8 +33,9 @@ $check_parser = function (string $output, array $metrics = []): array {
     $parsed = \LibreNMS\Services::parseStats($output);
     foreach ($metrics as $key => $defaults) {
         $name = $defaults['alias'] ?? $key;
-        if (isset($parsed[$name]['value'])) {
-            $value = $parsed[$name]['value'];
+        $stripped = str_replace('_', '', $key);
+        $value = $parsed[$name]['value'] ?? $parsed[$key]['value'] ?? $parsed[$stripped]['value'] ?? null;
+        if ($value !== null) {
             $metrics[$key]['value'] = $value;
             d_echo('Perf Data - DS: ' . $defaults['full_name'] . ', Value: ' . $value . ', UOM: ' . $defaults['uom'] . "\n");
         }

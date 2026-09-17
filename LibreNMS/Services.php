@@ -130,10 +130,10 @@ class Services
      */
     public static function normalizeDsName(string $ds): string
     {
-        if (preg_match('/(?:.+)?(rta|rtmin|rtmax|pl)$/', $ds, $matches)) {
+        if (preg_match('/^(?:.*:)?(rta|rtmin|rtmax|pl)$/', $ds, $matches)) {
             $normalized_ds = $matches[1];
         } else {
-            $normalized_ds = preg_replace('/[^a-zA-Z0-9_]/', '', str_replace(' ', '_', $ds));
+            $normalized_ds = preg_replace('/[^a-zA-Z0-9_]/', '', $ds);
         }
 
         return substr($normalized_ds, 0, 19);
