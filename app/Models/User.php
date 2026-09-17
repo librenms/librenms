@@ -172,14 +172,6 @@ class User extends Authenticatable
 
     // ---- Define Relationships ----
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ApiToken, $this>
-     */
-    public function apiTokens(): HasMany
-    {
-        return $this->hasMany(ApiToken::class, 'user_id', 'user_id');
-    }
-
-    /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Bill, $this>
      */
     public function bills(): BelongsToMany

@@ -622,7 +622,8 @@ function setCustomMapBackground(id, type, data, network) {
         .css('background-color', '');
 
     const mapBackgroundId = `${id}-bg-geo-map`;
-    const mapBgElem = document.getElementById(mapBackgroundId);
+    const altMapBackgroundId = `custom-map-bg-geo-map-${id.replace('custom-map-', '')}`;
+    const mapBgElem = document.getElementById(mapBackgroundId) || document.getElementById(altMapBackgroundId);
 
     if (type === 'image' && data && data.image_url) {
         let img = new Image();
@@ -643,17 +644,15 @@ function setCustomMapBackground(id, type, data, network) {
         }
     }
 
-    if (type === 'map') {
-        if (mapBgElem) {
-            $(mapBgElem).show();
-        }
+    if (type === 'map' && mapBgElem) {
+        $(mapBgElem).show();
         let config = data || {};
         config['readonly'] = true;
-        init_map(mapBackgroundId, config)
+        init_map(mapBgElem.id, config)
             .setView(L.latLng(data.lat, data.lng), data.zoom);
     } else {
-        destroy_map(mapBackgroundId);
         if (mapBgElem) {
+            destroy_map(mapBgElem.id);
             $(mapBgElem).hide();
             mapBgElem.style.transform = 'none';
         }
@@ -709,7 +708,7 @@ function update_location(id, latlng, callback) {
         data: {lat: latlng.lat, lng: latlng.lng}
     }).done(function () {
         toastr.success('Location updated');
-        typeof callback === 'function' && callback(true);
+        callback?.(true);
     }).fail(function (e) {
         var msg = 'Failed to update location: ' + e.statusText;
         var data = e.responseJSON;
@@ -727,8 +726,7 @@ function update_location(id, latlng, callback) {
         }
 
         toastr.error(msg);
-        typeof callback === 'function' && callback(false);
-
+        callback?.(false);
     });
 }
 
