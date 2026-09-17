@@ -34,6 +34,21 @@ abstract class PollingMethodDefinition implements HasFieldSchema
     }
 
     /**
+     * Discover or validate a candidate polling method for a device.
+     */
+    public function discover(\App\Models\Device $device, \App\Models\DevicePollingMethod $method): \LibreNMS\Polling\Method\Probe\ProbeResult
+    {
+        $testDevice = clone $device;
+        $testDevice->setRelation('pollingMethods', collect([$method]));
+
+        return $this->probe()->check($testDevice);
+    }
+
+    public function enrichDeviceMetadata(\App\Models\Device $device): void
+    {
+    }
+
+    /**
      * @return T
      */
     abstract public function fallbackConfig(\App\Models\Device $device): PollingMethodConfig;

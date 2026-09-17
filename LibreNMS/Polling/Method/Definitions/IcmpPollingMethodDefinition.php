@@ -45,6 +45,13 @@ class IcmpPollingMethodDefinition extends PollingMethodDefinition
         return IcmpConfig::fromPollingMethod($method);
     }
 
+    public function enrichDeviceMetadata(Device $device): void
+    {
+        if ($device->os === 'generic' || empty($device->os)) {
+            $device->os = 'ping';
+        }
+    }
+
     public function icon(): string
     {
         return 'fa-exchange';

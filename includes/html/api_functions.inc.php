@@ -12,7 +12,6 @@
  * the source code distribution for details.
  */
 
-use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\AlertTemplate;
@@ -436,38 +435,41 @@ function add_device(Illuminate\Http\Request $request)
     }
 
     try {
-        $device = new Device(Arr::only($data, [
-            'hostname',
-            'display_template',
-            'overwrite_ip',
-            'location_id',
-            'override_sysLocation',
-            'port',
-            'transport',
-            'poller_group',
-            'port_association_mode',
-        ]));
-
+        $locationId = null;
         if (! empty($data['location'])) {
-            $device->location_id = \App\Models\Location::firstOrCreate(['location' => $data['location']])->id;
+            $locationId = \App\Models\Location::firstOrCreate(['location' => $data['location']])->id;
+        } elseif (! empty($data['location_id'])) {
+            $locationId = (int) $data['location_id'];
         }
 
-        $force_add = ! empty($data['force_add']);
+        $creator = new \App\Actions\Device\LegacyDeviceCreator(
+            hostname: (string) $data['hostname'],
+            display_template: $data['display_template'] ?? null,
+            poller_group: (int) ($data['poller_group'] ?? 0),
+            overwrite_ip: $data['overwrite_ip'] ?? null,
+            location_id: $locationId,
+            override_sysLocation: ! empty($data['override_sysLocation']),
+            sysName: $data['sysName'] ?? null,
+            hardware: $data['hardware'] ?? null,
+            os: $data['os'] ?? null,
+            ping_only: ! empty($data['snmp_disable']) || ! empty($data['ping_only']),
+            snmpver: $data['snmpver'] ?? null,
+            community: $data['community'] ?? null,
+            port: isset($data['port']) ? (int) $data['port'] : null,
+            transport: $data['transport'] ?? null,
+            port_association_mode: $data['port_association_mode'] ?? null,
+            authname: $data['authname'] ?? null,
+            authpass: $data['authpass'] ?? null,
+            authalgo: $data['authalgo'] ?? null,
+            cryptopass: $data['cryptopass'] ?? null,
+            cryptoalgo: $data['cryptoalgo'] ?? null,
+            authlevel: $data['authlevel'] ?? null,
+            force: ! empty($data['force_add']),
+            ping_fallback: ! empty($data['ping_fallback']),
+        );
 
-        if (! empty($data['snmp_disable'])) {
-            $device->os = $data['os'] ?? 'ping';
-            $device->sysName = $data['sysName'] ?? '';
-            $device->hardware = $data['hardware'] ?? '';
-            $device->snmp_disable = 1;
-        } else {
-            $device->snmp_disable = 0;
-        }
-
-        if ($force_add && empty($data['snmp_disable']) && ! $device->hasSnmpInfo()) {
-            return api_error(400, 'SNMP information is required when force adding a device');
-        }
-
-        (new ValidateDeviceAndCreate($device, $force_add, ! empty($data['ping_fallback']), $data))->execute();
+        $device = $creator->getDevice();
+        $creator->createValidator()->execute();
     } catch (\LibreNMS\Exceptions\HostExistsException|\LibreNMS\Exceptions\HostUnreachableException|\LibreNMS\Exceptions\SnmpVersionUnsupportedException $e) {
         return api_error(500, $e->getMessage());
     } catch (Exception $e) {

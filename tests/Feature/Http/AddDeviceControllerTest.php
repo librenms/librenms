@@ -4,7 +4,7 @@ namespace LibreNMS\Tests\Feature\Http;
 
 use App\Models\Device;
 use App\Models\User;
-use LibreNMS\Exceptions\HostUnreachableSnmpException;
+use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
@@ -37,10 +37,10 @@ class AddDeviceControllerTest extends TestCase
         $admin->assignRole('admin');
         $admin->givePermissionTo('device.create');
 
-        // We overload ValidateDeviceAndCreate to throw HostUnreachableSnmpException
+        // We overload ValidateDeviceAndCreate to throw HostUnreachableException
         $mock = \Mockery::mock('overload:App\Actions\Device\ValidateDeviceAndCreate');
 
-        $exception = new HostUnreachableSnmpException('laurens.rtr.ncn.net');
+        $exception = new HostUnreachableException('Could not connect to laurens.rtr.ncn.net');
         $exception->addReason('v2c', 'public');
         $exception->addReason('v3', 'root/noAuthNoPriv');
 
@@ -51,7 +51,6 @@ class AddDeviceControllerTest extends TestCase
         $response = $this->actingAs($admin)->postJson(route('device.add.store'), [
             'hostname' => 'laurens.rtr.ncn.net',
             'poller_group' => 0,
-            'port_assoc_mode' => 'ifIndex',
             'polling_methods' => [
                 'snmp' => [
                     'active' => '1',
@@ -127,7 +126,6 @@ class AddDeviceControllerTest extends TestCase
         $response = $this->actingAs($admin)->postJson(route('device.add.store'), [
             'hostname' => 'laurens.rtr.ncn.net',
             'poller_group' => 0,
-            'port_assoc_mode' => 'ifIndex',
             'polling_methods' => [
                 'snmp' => [
                     'active' => '1',
@@ -215,7 +213,7 @@ class AddDeviceControllerTest extends TestCase
         $admin->givePermissionTo('device.create');
 
         $mock = Mockery::mock('overload:App\Actions\Device\ValidateDeviceAndCreate');
-        $exception = new HostUnreachableSnmpException('json-unreachable.example.com');
+        $exception = new HostUnreachableException('Could not connect to json-unreachable.example.com');
         $exception->addReason('v2c', 'public');
 
         $mock->shouldReceive('execute')
