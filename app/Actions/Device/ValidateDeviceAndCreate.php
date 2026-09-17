@@ -41,6 +41,7 @@ use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use SnmpQuery;
 
 class ValidateDeviceAndCreate
@@ -145,16 +146,18 @@ class ValidateDeviceAndCreate
             ? $this->device->pollingMethods->firstWhere('method_type', PollingMethodType::Snmp)
             : null;
 
-        // If a specific secret or specific secret_data was supplied on the method, test that directly
-        if ($existingSnmpMethod !== null && ($existingSnmpMethod->secret !== null || ! empty(array_filter($existingSnmpMethod->getSecretData())))) {
+        // If a specific secret was supplied on the method, test that directly
+        if ($existingSnmpMethod !== null && $existingSnmpMethod->secret !== null) {
             if (PollingMethodType::Snmp->definition()->probe()->check($this->device)->isSuccess()) {
                 return;
             }
 
-            $secretData = $existingSnmpMethod->getSecretData();
-            $version = $secretData['version'] ?? 'unknown';
-            $target = $existingSnmpMethod->secret?->description ?? ($secretData['community'] ?? ($secretData['authname'] ?? 'custom'));
-            $host_unreachable_exception->addReason($version, (string) $target);
+            $secret = $existingSnmpMethod->secret;
+            $secretData = $secret->toSecretData();
+            if ($secretData instanceof SnmpSecretData) {
+                $target = $secret->description ?: ($secretData->community ?? ($secretData->authname ?? 'custom'));
+                $host_unreachable_exception->addReason($secretData->version, (string) $target);
+            }
         } else {
             // Otherwise, attempt ordered default credentials
             /** @var array<int, int> $defaultSecretIds */
@@ -164,19 +167,17 @@ class ValidateDeviceAndCreate
                 ->get()
                 ->sortBy(fn ($s) => array_search($s->id, $defaultSecretIds));
 
-            $settings = $existingSnmpMethod?->getSettings() ?? [];
+            $settings = $existingSnmpMethod ? ($existingSnmpMethod->settings ?? []) : [];
 
             foreach ($defaultSecrets as $secret) {
                 $secretData = $secret->toSecretData();
                 $snmpMethod = DevicePollingMethod::transient(
-                    PollingMethodType::Snmp,
+                    type: PollingMethodType::Snmp,
                     settings: $settings,
-                    secretData: $secretData->toArray(),
                     device: $this->device,
                     affectsAvailability: true,
+                    secret: $secret,
                 );
-                $snmpMethod->setRelation('secret', $secret);
-                $snmpMethod->secret_id = $secret->id;
 
                 // Set relation temporarily for probe check
                 $this->device->setRelation('pollingMethods', $otherPollingMethods->concat([$snmpMethod]));
@@ -185,7 +186,9 @@ class ValidateDeviceAndCreate
                     return;
                 }
 
-                $host_unreachable_exception->addReason($secretData->version, $secret->description);
+                if ($secretData instanceof SnmpSecretData) {
+                    $host_unreachable_exception->addReason($secretData->version, $secret->description);
+                }
             }
         }
 

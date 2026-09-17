@@ -847,6 +847,9 @@ class Device extends BaseModel
             ->withPivot('method_type');
     }
 
+    /**
+     * @return HasMany<HrDevice, $this>
+     */
     public function hostResources(): HasMany
     {
         return $this->hasMany(HrDevice::class, 'device_id');

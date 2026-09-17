@@ -33,23 +33,21 @@ class IpmiConfig extends PollingMethodConfig
         }
 
         $definition = PollingMethodType::Ipmi->definition();
-        $secretDefinition = $definition->secretDefinition();
-
         $settings = $definition->resolveValues($method->settings ?? []);
-        $resolvedData = $secretDefinition ? $secretDefinition->resolveValues($method->secret->data ?? []) : [];
-        $secretData = \LibreNMS\Polling\Secrets\Data\IpmiSecretData::fromArray($resolvedData);
+        $secretData = $method->secretData();
+        $ipmiSecretData = $secretData instanceof \LibreNMS\Polling\Secrets\Data\IpmiSecretData ? $secretData : new \LibreNMS\Polling\Secrets\Data\IpmiSecretData();
 
         return new static(
             $method->enabled,
             $method->affects_availability,
-            $secretData->username,
-            $secretData->password,
-            $secretData->kgKey,
+            $ipmiSecretData->username,
+            $ipmiSecretData->password,
+            $ipmiSecretData->kgKey,
             ! empty($settings['hostname']) ? $settings['hostname'] : ($method->device->hostname ?? ''),
-            $settings['port'] ?? 623,
+            (int) ($settings['port'] ?? 623),
             (int) ($settings['ciphersuite'] ?? 0),
-            $settings['timeout'] ?? 3,
-            $settings['type'] ?? '',
+            (int) ($settings['timeout'] ?? 3),
+            (string) ($settings['type'] ?? ''),
         );
     }
 }
