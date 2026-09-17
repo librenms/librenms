@@ -30,7 +30,7 @@ final class SnmpPollingMethodDefinition extends PollingMethodDefinition
                     'udp6' => 'UDP6',
                     'tcp6' => 'TCP6',
                 ])
-                ->default('udp')
+                ->default(fn() => LibrenmsConfig::get('snmp.transports.0', 'udp'))
                 ->rules(['nullable', 'string', 'in:udp,tcp,udp6,tcp6']),
 
             'port' => FieldDefinition::make('port', 'number')
