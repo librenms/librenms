@@ -3,11 +3,14 @@
 namespace LibreNMS\Polling\Method\Definitions;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use App\View\FieldSchema\FieldDefinition;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Modules\Core;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
+use SnmpQuery;
 
 /**
  * @extends PollingMethodDefinition<SnmpConfig>
@@ -85,6 +88,78 @@ class SnmpPollingMethodDefinition extends PollingMethodDefinition
         }
 
         return SnmpConfig::fromLegacyDeviceFields($device);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function discover(\App\Models\Device $device, \App\Models\DevicePollingMethod $method): \LibreNMS\Polling\Method\Probe\ProbeResult
+    {
+        $testDevice = clone $device;
+
+        // If a specific secret was supplied on the method, test that directly
+        if ($method->relationLoaded('secret') && $method->secret !== null) {
+            $testDevice->setRelation('pollingMethods', collect([$method]));
+            $result = $this->probe()->check($testDevice);
+            if ($result->isSuccess()) {
+                return $result;
+            }
+
+            $secret = $method->secret;
+            $secretData = $secret->toSecretData();
+            $reasons = [];
+            if ($secretData instanceof \LibreNMS\Polling\Secrets\Data\SnmpSecretData) {
+                $target = $secret->description ?: ($secretData->community ?? ($secretData->authname ?? 'custom'));
+                $reasons[$secretData->version] = (string) $target;
+            }
+
+            return \LibreNMS\Polling\Method\Probe\ProbeResult::failure(
+                array_merge($result->stats(), ['reasons' => $reasons]),
+                $result->errorMessage()
+            );
+        }
+
+        // Otherwise, attempt ordered default credentials
+        /** @var array<int, int> $defaultSecretIds */
+        $defaultSecretIds = (array) LibrenmsConfig::get('snmp.default_credentials', []);
+        $defaultSecrets = \App\Models\Secret::where('secret_type', \LibreNMS\Enum\SecretType::Snmp)
+            ->whereIn('id', $defaultSecretIds)
+            ->get()
+            ->sortBy(fn ($s) => array_search($s->id, $defaultSecretIds));
+
+        $reasons = [];
+        $lastResult = null;
+        foreach ($defaultSecrets as $secret) {
+            $method->setRelation('secret', $secret);
+            $method->secret_id = $secret->id;
+            $testDevice->setRelation('pollingMethods', collect([$method]));
+
+            $result = $this->probe()->check($testDevice);
+            if ($result->isSuccess()) {
+                return $result;
+            }
+
+            $lastResult = $result;
+            $secretData = $secret->toSecretData();
+            if ($secretData instanceof \LibreNMS\Polling\Secrets\Data\SnmpSecretData) {
+                $reasons[$secretData->version] = $secret->description;
+            }
+        }
+
+        return \LibreNMS\Polling\Method\Probe\ProbeResult::failure(
+            array_merge($lastResult ? $lastResult->stats() : [], ['reasons' => $reasons]),
+            $lastResult?->errorMessage()
+        );
+    }
+
+    public function enrichDeviceMetadata(Device $device): void
+    {
+        $sysName = SnmpQuery::device($device)->get('SNMPv2-MIB::sysName.0')->value();
+        if (! empty($sysName)) {
+            $device->sysName = (string) $sysName;
+        }
+
+        $device->os = Core::detectOS($device);
     }
 
     public function defaultAffectsAvailability(): bool

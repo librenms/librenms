@@ -110,7 +110,9 @@ final class AddHostCliTest extends DBTestCase
 
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
-            $this->assertEquals($index + 1, $device->port_association_mode, 'Wrong port association mode ' . $mode);
+            $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
+            $this->assertNotNull($snmpMethod);
+            $this->assertEquals($mode, $snmpMethod->settings['port_association_mode'] ?? null, 'Wrong port association mode ' . $mode);
         }
     }
 

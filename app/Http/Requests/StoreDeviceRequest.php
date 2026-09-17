@@ -7,7 +7,6 @@ use App\Models\PollerGroup;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\PortAssociationMode;
 
 class StoreDeviceRequest extends FormRequest
 {
@@ -29,7 +28,6 @@ class StoreDeviceRequest extends FormRequest
             'port' => ['nullable', 'integer', 'between:1,65535'],
             'transport' => ['nullable', 'string', 'in:udp,udp6,tcp,tcp6'],
             'poller_group' => ['nullable', 'integer', Rule::in(PollerGroup::pluck('id')->prepend(0))],
-            'port_assoc_mode' => ['nullable', 'string', Rule::in(PortAssociationMode::getModes())],
             'force_add' => ['nullable', 'boolean'],
             'ping_fallback' => ['nullable', 'boolean'],
             'polling_methods' => ['required', 'array', 'min:1'],

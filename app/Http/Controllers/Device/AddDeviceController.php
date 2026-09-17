@@ -13,7 +13,6 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostUnreachableException;
 
 class AddDeviceController
@@ -43,8 +42,6 @@ class AddDeviceController
 
         $defaultPollerGroup = LibrenmsConfig::get('default_poller_group', 0);
         $pollerGroups = PollerGroup::orderBy('group_name')->get();
-        $defaultPortAssocMode = LibrenmsConfig::get('default_port_association_mode', 'ifIndex');
-        $portAssocModes = PortAssociationMode::getModes();
 
         $oldActiveMethods = old('active_methods', [PollingMethodType::Icmp->value, PollingMethodType::Snmp->value]);
         $defaultDisplayTemplate = LibrenmsConfig::get('device_display_default', '{{ $hostname }}');
@@ -81,8 +78,6 @@ class AddDeviceController
             'availableMethods' => $availableMethods,
             'default_poller_group' => $defaultPollerGroup,
             'poller_groups' => $pollerGroups,
-            'default_port_association_mode' => $defaultPortAssocMode,
-            'port_association_modes' => $portAssocModes,
             'oldActiveMethods' => $oldActiveMethods,
             'default_display_template' => $defaultDisplayTemplate,
             'add_device_config' => $addDeviceConfig,
@@ -99,21 +94,19 @@ class AddDeviceController
         $device->hostname = $validated['hostname'];
         $device->display_template = $validated['display_template'] ?? null;
         $device->poller_group = $validated['poller_group'] ?? LibrenmsConfig::get('default_poller_group', 0);
-        $device->port_association_mode = $validated['port_assoc_mode']
-            ?? (int) LibrenmsConfig::get('default_port_association_mode', 1);
+
+        if (! empty($validated['sysName'])) {
+            $device->sysName = $validated['sysName'];
+        }
+        if (! empty($validated['os'])) {
+            $device->os = $validated['os'];
+        }
+        if (! empty($validated['hardware'])) {
+            $device->hardware = $validated['hardware'];
+        }
 
         /** @var array<string, array<string, mixed>> $rawMethods */
         $rawMethods = $validated['polling_methods'] ?? [];
-
-        // When SNMP is explicitly disabled / inactive in the submitted payload
-        if (empty($rawMethods['snmp']['active'])) {
-            $device->setAttribute('snmp_disable', true);
-            $device->sysName = $validated['sysName'] ?: '';
-            $device->os = $validated['os'] ?: 'ping';
-            $device->hardware = $validated['hardware'] ?: '';
-        } else {
-            $device->setAttribute('snmp_disable', false);
-        }
 
         // Per-method validate flags: validate if *any* active method requests it.
         // The SNMP method's validate flag doubles as the old force_add inverse.
@@ -121,8 +114,10 @@ class AddDeviceController
             ->filter(fn (array $data): bool => (bool) ($data['active'] ?? false))
             ->every(fn (array $data): bool => empty($data['validate']));
 
+        $pollingMethods = (new \App\Actions\Device\BuildDefaultPollingMethods)->execute($device, ['methods' => $rawMethods]);
+
         try {
-            $validator = new ValidateDeviceAndCreate($device, $forceAdd, false, ['methods' => $rawMethods]);
+            $validator = new ValidateDeviceAndCreate($device, $pollingMethods, $forceAdd);
             $success = $validator->execute();
 
             if (! $success) {

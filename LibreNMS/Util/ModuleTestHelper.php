@@ -268,7 +268,7 @@ class ModuleTestHelper
                 'hostname' => $snmpSimIp,
                 'disabled' => 1, // disable to block normal pollers
             ]);
-            (new ValidateDeviceAndCreate($new_device, true))->execute();
+            (new ValidateDeviceAndCreate($new_device, force: true))->execute();
             $device_id = $new_device->device_id;
 
             $method = DevicePollingMethod::saveForDevice(

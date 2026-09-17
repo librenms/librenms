@@ -29,32 +29,23 @@ namespace App\Actions\Device;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
-use App\Models\Secret;
-use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\PortAssociationMode;
-use LibreNMS\Enum\SecretType;
-use LibreNMS\Exceptions\HostIpExistsException;
-use LibreNMS\Exceptions\HostNameEmptyException;
-use LibreNMS\Exceptions\HostnameExistsException;
-use LibreNMS\Exceptions\HostSysnameExistsException;
-use LibreNMS\Exceptions\HostUnreachablePingException;
-use LibreNMS\Exceptions\HostUnreachableSnmpException;
-use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
-use LibreNMS\Modules\Core;
-use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
-use SnmpQuery;
+use Illuminate\Support\Collection;
 
 class ValidateDeviceAndCreate
 {
     /**
-     * @param  array<string, mixed>  $input
+     * @param  Collection<int, DevicePollingMethod>|null  $pollingMethods
      */
     public function __construct(
         private readonly Device $device,
+        private ?Collection $pollingMethods = null,
         private readonly bool $force = false,
         private readonly bool $ping_fallback = false,
-        private readonly array $input = [],
         private readonly BuildDefaultPollingMethods $builder = new BuildDefaultPollingMethods,
+        private readonly ValidateDeviceUniqueness $uniqueness = new ValidateDeviceUniqueness,
+        private readonly DiscoverDevicePollingMethods $discoverMethods = new DiscoverDevicePollingMethods,
+        private readonly DiscoverDeviceMetadata $discoverMetadata = new DiscoverDeviceMetadata,
+        private readonly PersistDeviceWithPollingMethods $persister = new PersistDeviceWithPollingMethods,
     ) {
     }
 
@@ -62,162 +53,33 @@ class ValidateDeviceAndCreate
      * @return bool
      *
      * @throws \LibreNMS\Exceptions\HostExistsException
-     * @throws HostUnreachablePingException
      * @throws \LibreNMS\Exceptions\HostUnreachableException
-     * @throws SnmpVersionUnsupportedException
+     * @throws \LibreNMS\Exceptions\SnmpVersionUnsupportedException
      */
     public function execute(): bool
     {
-        if (empty($this->device->hostname)) {
-            throw new HostNameEmptyException();
-        }
-
         if ($this->device->exists) {
             return false;
         }
 
-        $this->exceptIfHostnameExists();
+        $this->uniqueness->validateHostname((string) $this->device->hostname);
         $this->fillDefaults();
-        $this->fillDefaultRelations();
+
+        $pollingMethods = $this->pollingMethods ?? $this->builder->execute($this->device);
 
         if (! $this->force) {
-            $this->exceptIfIpExists();
+            $this->uniqueness->validateIp($this->device);
 
-            $icmpMethod = $this->device->pollingMethod(PollingMethodType::Icmp);
-            if ($icmpMethod === null) {
-                $icmpMethod = new DevicePollingMethod([
-                    'method_type' => PollingMethodType::Icmp,
-                    'enabled' => true,
-                    'affects_availability' => false,
-                ]);
-                $icmpMethod->setRelation('device', $this->device);
-            }
-            if (! PollingMethodType::Icmp->definition()->probe()->check($this->device)->isSuccess()) {
-                throw new HostUnreachablePingException($this->device->hostname);
-            }
+            $pollingMethods = $this->discoverMethods->execute(
+                $this->device,
+                $pollingMethods,
+                $this->ping_fallback
+            );
 
-            $this->detectCredentials();
-
-            if (! $this->device->getAttribute('snmp_disable')) {
-                $this->device->sysName = SnmpQuery::device($this->device)->get('SNMPv2-MIB::sysName.0')->value();
-                $this->exceptIfSysNameExists();
-
-                $this->device->os = Core::detectOS($this->device);
-            }
+            $this->discoverMetadata->execute($this->device, $pollingMethods);
         }
 
-        $saved = $this->device->save();
-
-        if ($saved) {
-            if ($this->device->relationLoaded('pollingMethods')) {
-                foreach ($this->device->pollingMethods as $method) {
-                    $method->device_id = $this->device->device_id;
-
-                    // If the method has an associated secret, save it first to get its ID
-                    if ($method->relationLoaded('secret') && $method->secret) {
-                        $secret = $method->secret;
-                        if (! $secret->exists && empty($secret->description)) {
-                            $secret->description = strtoupper((string) $method->method_type->value) . ' ' . $this->device->hostname;
-                        }
-                        $secret->save();
-                        $method->secret_id = $secret->id;
-                    }
-
-                    $method->save();
-                }
-            }
-        }
-
-        return $saved;
-    }
-
-    /**
-     * @throws \LibreNMS\Exceptions\HostUnreachableException
-     * @throws SnmpVersionUnsupportedException
-     */
-    private function detectCredentials(): void
-    {
-        if ($this->device->getAttribute('snmp_disable')) {
-            return;
-        }
-
-        $host_unreachable_exception = new HostUnreachableSnmpException($this->device->hostname);
-
-        // Keep track of other polling methods so we do not overwrite them when setting the relation
-        $otherPollingMethods = collect();
-        if ($this->device->relationLoaded('pollingMethods')) {
-            $otherPollingMethods = $this->device->pollingMethods->filter(fn ($m) => $m->method_type !== PollingMethodType::Snmp);
-        }
-
-        $existingSnmpMethod = $this->device->relationLoaded('pollingMethods')
-            ? $this->device->pollingMethods->firstWhere('method_type', PollingMethodType::Snmp)
-            : null;
-
-        // If a specific secret was supplied on the method, test that directly
-        if ($existingSnmpMethod !== null && $existingSnmpMethod->secret !== null) {
-            if (PollingMethodType::Snmp->definition()->probe()->check($this->device)->isSuccess()) {
-                return;
-            }
-
-            $secret = $existingSnmpMethod->secret;
-            $secretData = $secret->toSecretData();
-            if ($secretData instanceof SnmpSecretData) {
-                $target = $secret->description ?: ($secretData->community ?? ($secretData->authname ?? 'custom'));
-                $host_unreachable_exception->addReason($secretData->version, (string) $target);
-            }
-        } else {
-            // Otherwise, attempt ordered default credentials
-            /** @var array<int, int> $defaultSecretIds */
-            $defaultSecretIds = (array) LibrenmsConfig::get('snmp.default_credentials', []);
-            $defaultSecrets = Secret::where('secret_type', SecretType::Snmp)
-                ->whereIn('id', $defaultSecretIds)
-                ->get()
-                ->sortBy(fn ($s) => array_search($s->id, $defaultSecretIds));
-
-            $settings = $existingSnmpMethod ? ($existingSnmpMethod->settings ?? []) : [];
-
-            foreach ($defaultSecrets as $secret) {
-                $secretData = $secret->toSecretData();
-                $snmpMethod = new DevicePollingMethod([
-                    'method_type' => PollingMethodType::Snmp,
-                    'enabled' => true,
-                    'affects_availability' => true,
-                    'settings' => $settings,
-                    'secret_id' => $secret->id,
-                ]);
-                $snmpMethod->setRelation('device', $this->device);
-                $snmpMethod->setRelation('secret', $secret);
-
-                // Set relation temporarily for probe check
-                $this->device->setRelation('pollingMethods', $otherPollingMethods->concat([$snmpMethod]));
-
-                if (PollingMethodType::Snmp->definition()->probe()->check($this->device)->isSuccess()) {
-                    return;
-                }
-
-                if ($secretData instanceof SnmpSecretData) {
-                    $host_unreachable_exception->addReason($secretData->version, $secret->description);
-                }
-            }
-        }
-
-        if ($this->ping_fallback) {
-            $this->device->setAttribute('snmp_disable', true);
-            $this->device->os = 'ping';
-            $this->device->setRelation('pollingMethods', $otherPollingMethods);
-
-            return;
-        }
-
-        throw $host_unreachable_exception;
-    }
-
-    private function fillDefaultRelations(): void
-    {
-        if (! $this->device->relationLoaded('pollingMethods')) {
-            $pollingMethods = $this->builder->execute($this->device, $this->input);
-            $this->device->setRelation('pollingMethods', $pollingMethods);
-        }
+        return $this->persister->execute($this->device, $pollingMethods);
     }
 
     private function fillDefaults(): void
@@ -226,61 +88,5 @@ class ValidateDeviceAndCreate
         $this->device->os = $this->device->os ?: 'generic';
         $this->device->status_reason = '';
         $this->device->sysName = $this->device->sysName ?: $this->device->hostname;
-        $this->device->port_association_mode = $this->device->port_association_mode ?: LibrenmsConfig::get('default_port_association_mode', 'ifIndex');
-        if (! is_int($this->device->port_association_mode)) {
-            $this->device->port_association_mode = PortAssociationMode::getId($this->device->port_association_mode) ?? 1;
-        }
-    }
-
-    /**
-     * @throws \LibreNMS\Exceptions\HostExistsException
-     */
-    private function exceptIfHostnameExists(): void
-    {
-        if (Device::where('hostname', $this->device->hostname)->exists()) {
-            throw new HostnameExistsException($this->device->hostname);
-        }
-    }
-
-    /**
-     * @throws \LibreNMS\Exceptions\HostExistsException
-     */
-    private function exceptIfIpExists(): void
-    {
-        if ($this->device->overwrite_ip) {
-            $ip = $this->device->overwrite_ip;
-        } elseif (LibrenmsConfig::get('addhost_alwayscheckip')) {
-            $ip = gethostbyname($this->device->hostname);
-        } else {
-            $ip = $this->device->hostname;
-        }
-
-        $existing = Device::findByIp($ip);
-
-        if ($existing) {
-            throw new HostIpExistsException($this->device->hostname, $existing->hostname, $ip);
-        }
-    }
-
-    /**
-     * Check if a device with match hostname or sysname exists in the database.
-     * Throw and error if they do.
-     *
-     * @return void
-     *
-     * @throws \LibreNMS\Exceptions\HostExistsException
-     */
-    private function exceptIfSysNameExists(): void
-    {
-        if (LibrenmsConfig::get('allow_duplicate_sysName')) {
-            return;
-        }
-
-        if (Device::where('sysName', $this->device->sysName)
-            ->when(LibrenmsConfig::get('mydomain'), function ($query, $domain): void {
-                $query->orWhere('sysName', rtrim($this->device->sysName, '.') . '.' . $domain);
-            })->exists()) {
-            throw new HostSysnameExistsException($this->device->hostname, $this->device->sysName);
-        }
     }
 }
