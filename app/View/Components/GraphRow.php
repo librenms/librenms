@@ -23,8 +23,8 @@ class GraphRow extends Component
      * @param  string  $aspect
      * @param  int|string  $columns  Either a number or 'responsive' aka auto columns
      * @param  array  $graphs
-     * @param  Device|int|null  $device
      * @param  Port|int|null  $port
+     * @param  Device|int|null  $device
      */
     public function __construct(
         public string $type = '',
@@ -33,9 +33,10 @@ class GraphRow extends Component
         public string $aspect = 'normal',
         public int|string $columns = 2,
         public array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']],
+        public int $absoluteSize = 0,
         public int|Device|null $device = null,
-        public int|Port|null $port = null)
-    {
+        public int|Port|null $port = null,
+    ) {
         $this->responsive = $columns == 'responsive';
         $this->rowWidth = $this->calculateRowWidth((int) $columns);
         $this->graphColumns = $this->responsive ? ['sm' => 2, 'lg' => 4] : [];

@@ -1,5 +1,4 @@
 @props(['device', 'ports'])
-
 @if($device->ports_total_count)
     <x-device.overview.panel :title="__('Overall Traffic')" icon="fa fa-road">
         <div class="tw:divide-y tw:divide-gray-300 tw:dark:divide-zinc-800">
@@ -21,7 +20,7 @@
             </div>
             <div class="tw:flex tw:flex-wrap tw:gap-x-1 tw:px-2 tw:py-1 tw:bg-neutral-100 tw:dark:bg-dark-gray-200">
                 @foreach($ports as $port)
-                    <x-port-link :port="$port" basic>{{ strtolower($port->getShortLabel()) }}</x-port-link>@if(! $loop->last),@endif
+                    <x-port-link :port="$port">{{ strtolower($port->getShortLabel()) }}</x-port-link>@if(! $loop->last),@endif
                 @endforeach
             </div>
         </div>

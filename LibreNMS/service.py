@@ -39,6 +39,9 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+# how often to re-collect the poller details reported to poller_cluster (6 hours)
+POLLER_DETAILS_REFRESH = 21600
+
 
 class LogOutput(Enum):
     NONE = "none"
@@ -79,6 +82,7 @@ class ServiceConfig(DBConfig):
     single_instance = True
     distributed = False
     group = 0
+    memory_pressure_percent = None
 
     debug = False
     log_level = 20
@@ -127,6 +131,10 @@ class ServiceConfig(DBConfig):
         self.group = ServiceConfig.parse_group(
             config.get("distributed_poller_group", ServiceConfig.group)
         )
+        self.memory_pressure_percent = os.getenv(
+            "DISPATCHER_MEMORY_PRESSURE_PERCENT",
+            ServiceConfig.memory_pressure_percent,
+        )
 
         self.master_timeout = config.get(
             "service_master_timeout", ServiceConfig.master_timeout
@@ -140,7 +148,8 @@ class ServiceConfig(DBConfig):
             "service_poller_workers", ServiceConfig.poller.workers
         )
         self.poller.frequency = config.get(
-            "service_poller_frequency", ServiceConfig.poller.frequency
+            "service_poller_frequency",
+            config.get("rrd").get("step", ServiceConfig.poller.frequency),
         )
         self.discovery.enabled = (
             config.get("service_discovery_enabled", True)
@@ -426,6 +435,7 @@ class Service:
             10, self.systemd_watchdog, "systemd-watchdog"
         )
         self.is_master = False
+        self._poller_details_time = 0
 
     def service_age(self):
         return time.time() - self.start_time
@@ -898,6 +908,16 @@ class Service:
                 )
             )
 
+            try:
+                poller_details = self.get_poller_details_due()
+                if poller_details is not None:
+                    self._db.query(
+                        "UPDATE `poller_cluster` SET `poller_details`=%s WHERE `node_id`=%s",
+                        (poller_details, self.config.node_id),
+                    )
+            except Exception:
+                logger.warning("Could not record poller details", exc_info=True)
+
             # Find our ID
             self._db.query(
                 'SELECT id INTO @parent_poller_id FROM poller_cluster WHERE node_id="{0}"; '.format(
@@ -931,6 +951,14 @@ class Service:
                 "Unable to log performance statistics - is the database still online?",
                 exc_info=True,
             )
+
+    def get_poller_details_due(self):
+        now = time.time()
+        if now - self._poller_details_time > POLLER_DETAILS_REFRESH:
+            self._poller_details_time = now
+            return LibreNMS.get_poller_details_json()
+
+        return None
 
     def systemd_watchdog(self):
         if self.config.health_file:

@@ -44,6 +44,21 @@
 <script type="text/javascript" src="{{ asset('js/vis-data.min.js') }}"></script>
 @endsection
 
+@push('styles')
+<style>
+    div.vis-tooltip {
+        padding: 0 !important;
+        background-color: transparent !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+    div.vis-tooltip .panel {
+        margin-bottom: 0 !important;
+    }
+</style>
+@endpush
+
 @section('scripts')
 <script type="text/javascript">
     var height = $(window).height() - 100;

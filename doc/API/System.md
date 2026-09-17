@@ -11,7 +11,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ping
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ping
 ```
 
 Output:
@@ -35,7 +35,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/system
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/system
 ```
 
 Output:

@@ -47,7 +47,7 @@ class Pushover extends Transport
 {
     public function deliverAlert(array $alert_data): bool
     {
-        $options = $this->parseUserOptions($this->config['options']);
+        $options = $this->parseUserOptions($this->config['options'] ?? '');
 
         $url = 'https://api.pushover.net/1/messages.json';
         $data = [];
