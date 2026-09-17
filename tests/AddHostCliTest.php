@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\PollingMethodType;
@@ -112,7 +113,12 @@ final class AddHostCliTest extends DBTestCase
             $this->assertNotNull($device);
             $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
             $this->assertNotNull($snmpMethod);
-            $this->assertEquals($mode, $snmpMethod->settings['port_association_mode'] ?? null, 'Wrong port association mode ' . $mode);
+
+            if ($mode === LibrenmsConfig::get('default_port_association_mode', 'ifIndex')) {
+                $this->assertArrayNotHasKey('port_association_mode', $snmpMethod->settings, 'Default port association mode not ommitted from settings');
+            } else {
+                $this->assertEquals($mode, $snmpMethod->settings['port_association_mode'] ?? null, 'Wrong port association mode ' . $mode);
+            }
         }
     }
 
@@ -128,7 +134,12 @@ final class AddHostCliTest extends DBTestCase
 
             $device = Device::findByHostname($host);
             $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
-            $this->assertEquals($mode, $snmpMethod->settings['transport'], 'Wrong snmp transport (udp/tcp) ipv4/ipv6');
+
+            if ($mode === LibrenmsConfig::get('snmp.transports.0', 'udp')) {
+                $this->assertArrayNotHasKey('transport', $snmpMethod->settings, 'Default snmp transport not ommitted from settings');
+            } else {
+                $this->assertEquals($mode, $snmpMethod->settings['transport'], 'Wrong snmp transport (udp/tcp) ipv4/ipv6');
+            }
         }
     }
 
