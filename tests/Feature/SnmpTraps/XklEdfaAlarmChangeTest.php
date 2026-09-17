@@ -119,11 +119,11 @@ XKL-MIB::xklEDFAIndex.1 1
 XKL-MIB::xklEDFAInReset.1 no
 XKL-MIB::xklEDFADisabled.1 disabled
 XKL-MIB::xklEDFAMuted.1 no
-XKL-MIB::xklEDFACaseTemperatureAlarm.1 yes
+XKL-MIB::xklEDFACaseTemperatureAlarm.1 no
 XKL-MIB::xklEDFACommonAlarm.1 yes
 XKL-MIB::xklEDFAPumpTemperatureAlarm.1 no
-XKL-MIB::xklEDFALossOfInputAlarm.1 no
-XKL-MIB::xklEDFALossOfOutputAlarm.1 no
+XKL-MIB::xklEDFALossOfInputAlarm.1 yes
+XKL-MIB::xklEDFALossOfOutputAlarm.1 yes
 XKL-MIB::xklEDFAModuleAlarms.1 LOS AOP
 XKL-MIB::xklEDFAName.1 Output EDFA
 TRAP,
