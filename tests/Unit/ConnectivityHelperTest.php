@@ -8,11 +8,9 @@ use App\Models\DevicePollingMethod;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Probe\PollingMethodProbe;
 use LibreNMS\Polling\Method\Probe\ProbeResult;
-use LibreNMS\Polling\PollingMethodFactory;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 use SnmpQuery;
@@ -21,9 +19,6 @@ final class ConnectivityHelperTest extends TestCase
 {
     public function testDeviceStatus(): void
     {
-        $icmpMethod = new DevicePollingMethod();
-        $snmpMethod = new DevicePollingMethod();
-
         $icmpResults = [
             ProbeResult::success(['duplicates' => false]),
             ProbeResult::failure(['duplicates' => false]),
@@ -34,17 +29,6 @@ final class ConnectivityHelperTest extends TestCase
             ProbeResult::success(['duplicates' => false]),
             ProbeResult::failure(['duplicates' => false]),
         ];
-
-        $icmpProbeMock = Mockery::mock(PollingMethodProbe::class);
-        $icmpProbeMock->shouldReceive('check')
-            ->times(8)
-            ->andReturnValues($icmpResults);
-
-        $icmpMock = Mockery::mock(PollingMethodConfig::class);
-        $icmpMock->shouldReceive('isEnabled')
-            ->andReturnUsing(function () use (&$icmpMethod) {
-                return $icmpMethod->enabled;
-            });
 
         $snmpResults = [
             ProbeResult::success(),
@@ -57,41 +41,26 @@ final class ConnectivityHelperTest extends TestCase
             ProbeResult::failure(),
         ];
 
+        $icmpProbeMock = Mockery::mock(PollingMethodProbe::class);
+        $icmpProbeMock->shouldReceive('check')->andReturn(...$icmpResults);
+
         $snmpProbeMock = Mockery::mock(PollingMethodProbe::class);
-        $snmpProbeMock->shouldReceive('check')
-            ->times(8)
-            ->andReturnValues($snmpResults);
-
-        $snmpMock = Mockery::mock(PollingMethodConfig::class);
-        $snmpMock->shouldReceive('isEnabled')
-            ->andReturnUsing(function () use (&$snmpMethod) {
-                return $snmpMethod->enabled;
-            });
-
-        $factoryMock = Mockery::mock(PollingMethodFactory::class);
-        $factoryMock->shouldReceive('make')
-            ->andReturnUsing(fn (DevicePollingMethod $method) => match ($method->method_type) {
-                PollingMethodType::Icmp => $icmpMock,
-                PollingMethodType::Snmp => $snmpMock,
-                default => throw new \UnexpectedValueException('Unexpected polling method type'),
-            });
-        $this->instance(PollingMethodFactory::class, $factoryMock);
+        $snmpProbeMock->shouldReceive('check')->andReturn(...$snmpResults);
 
         $device = new Device();
-        $icmpMethod = new DevicePollingMethod([
-            'method_type' => PollingMethodType::Icmp,
-            'enabled' => true,
-            'affects_availability' => true,
-        ]);
-        $snmpMethod = new DevicePollingMethod([
-            'method_type' => PollingMethodType::Snmp,
-            'enabled' => true,
-            'affects_availability' => true,
-        ]);
+        $icmpMethod = DevicePollingMethod::transient(
+            type: PollingMethodType::Icmp,
+            device: $device,
+            enabled: true,
+            affectsAvailability: true,
+        );
+        $snmpMethod = DevicePollingMethod::transient(
+            type: PollingMethodType::Snmp,
+            device: $device,
+            enabled: true,
+            affectsAvailability: true,
+        );
         $device->setRelation('pollingMethods', collect([$icmpMethod, $snmpMethod]));
-
-        $icmpMethod->setRelation('device', $device);
-        $snmpMethod->setRelation('device', $device);
 
         $this->swap(CheckDeviceAvailability::class, new CheckDeviceAvailabilityMock([
             'icmp' => $icmpProbeMock,

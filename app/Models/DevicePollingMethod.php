@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
-use LibreNMS\Polling\PollingMethodFactory;
 
 #[ObservedBy([DevicePollingMethodObserver::class])]
 class DevicePollingMethod extends Model
@@ -40,6 +39,13 @@ class DevicePollingMethod extends Model
     ];
 
     private ?PollingMethodConfig $configCache = null;
+
+    public function setAttribute($key, $value)
+    {
+        $this->invalidateConfigCache();
+
+        return parent::setAttribute($key, $value);
+    }
 
     /**
      * Save or update a DevicePollingMethod row settings for a device.
@@ -120,9 +126,9 @@ class DevicePollingMethod extends Model
             return $this->configCache;
         }
 
-        $this->loadMissing('secret');
+        $class = $this->method_type->definition()->class();
 
-        return $this->configCache = app(PollingMethodFactory::class)->make($this);
+        return $this->configCache = $class::fromPollingMethod($this);
     }
 
     public function invalidateConfigCache(): void
