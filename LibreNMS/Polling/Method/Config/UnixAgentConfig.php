@@ -5,7 +5,7 @@ namespace LibreNMS\Polling\Method\Config;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
 
-class UnixAgentConfig extends PollingMethodConfig
+final class UnixAgentConfig extends PollingMethodConfig
 {
     public function __construct(
         public bool $enabled,
@@ -21,7 +21,7 @@ class UnixAgentConfig extends PollingMethodConfig
         return true;
     }
 
-    public static function fromPollingMethod(DevicePollingMethod $method): static
+    public static function fromPollingMethod(DevicePollingMethod $method): self
     {
         if ($method->method_type !== PollingMethodType::UnixAgent) {
             throw new \Exception('Invalid polling method type');
@@ -30,7 +30,7 @@ class UnixAgentConfig extends PollingMethodConfig
         $definition = PollingMethodType::UnixAgent->definition();
         $settings = $definition->resolveValues($method->settings ?? []);
 
-        return new static(
+        return new self(
             enabled: $method->enabled ?? true,
             affectsAvailability: $method->affects_availability ?? false,
             port: (int) ($settings['port'] ?? 6556),

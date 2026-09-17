@@ -9,7 +9,7 @@ use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 /**
  * @extends PollingMethodDefinition<UnixAgentConfig>
  */
-class UnixAgentPollingMethodDefinition extends PollingMethodDefinition
+final class UnixAgentPollingMethodDefinition extends PollingMethodDefinition
 {
     /**
      * @inheritDoc

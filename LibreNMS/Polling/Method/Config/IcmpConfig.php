@@ -5,7 +5,7 @@ namespace LibreNMS\Polling\Method\Config;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
 
-class IcmpConfig extends PollingMethodConfig
+final class IcmpConfig extends PollingMethodConfig
 {
     public function __construct(
         public bool $enabled,
@@ -19,13 +19,13 @@ class IcmpConfig extends PollingMethodConfig
         return true;
     }
 
-    public static function fromPollingMethod(DevicePollingMethod $method): static
+    public static function fromPollingMethod(DevicePollingMethod $method): self
     {
         if ($method->method_type !== PollingMethodType::Icmp) {
             throw new \Exception('Invalid polling method type');
         }
 
-        return new static(
+        return new self(
             enabled: $method->enabled ?? true,
             affectsAvailability: $method->affects_availability ?? false,
         );

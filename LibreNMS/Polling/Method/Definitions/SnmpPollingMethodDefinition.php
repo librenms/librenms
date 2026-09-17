@@ -15,7 +15,7 @@ use SnmpQuery;
 /**
  * @extends PollingMethodDefinition<SnmpConfig>
  */
-class SnmpPollingMethodDefinition extends PollingMethodDefinition
+final class SnmpPollingMethodDefinition extends PollingMethodDefinition
 {
     /**
      * @inheritDoc
