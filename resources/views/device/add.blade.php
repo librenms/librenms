@@ -99,7 +99,7 @@
                                     </template>
                                     <template x-if="!showTemplateInput">
                                         <button type="button" @click="showTemplateInput = true"
-                                                class="tw:text-sm tw:font-medium tw:whitespace-nowrap tw:text-blue-600 hover:tw:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:inline-flex tw:items-center tw:gap-1.5 tw:cursor-pointer tw:ml-1">
+                                                class="tw:text-sm tw:font-medium tw:text-blue-600 hover:tw:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:inline-flex tw:items-center tw:gap-1.5 tw:cursor-pointer tw:ml-1">
                                             <i class="fa fa-pencil"></i> {{ __('Edit Template') }}
                                         </button>
                                     </template>
@@ -109,7 +109,7 @@
                             {{-- Computed Display Name Output (Preview) - Natural typography, NOT an input box --}}
                             <div class="tw:flex tw:items-center tw:gap-2 tw:min-h-[36px]">
                                 <i class="fa fa-tag tw:text-gray-400 tw:dark:text-dark-white-400 tw:shrink-0"></i>
-                                <span class="tw:text-base tw:font-bold tw:text-gray-900 tw:dark:text-white tw:tracking-tight tw:break-all tw:leading-normal" x-html="computedDisplayNameHtml"></span>
+                                <span class="tw:text-base tw:font-medium tw:text-gray-900 tw:dark:text-white tw:tracking-tight tw:break-all tw:leading-normal" x-ref="previewEl"></span>
                             </div>
 
                             {{-- Template Input (Hidden by default until user indicates they want to modify it) --}}
@@ -441,6 +441,82 @@
                     this.submitForm(true);
                 },
 
+                computedDisplayName: '',
+                hasPlaceholders: false,
+                previewDebounceTimer: null,
+
+                init() {
+                    this.$watch('hostname', () => this.queuePreview());
+                    this.$watch('sysName', () => this.queuePreview());
+                    this.$watch('display_template', () => this.queuePreview());
+                    this.fetchPreview();
+                },
+
+                queuePreview() {
+                    clearTimeout(this.previewDebounceTimer);
+                    this.previewDebounceTimer = setTimeout(() => this.fetchPreview(), 150);
+                },
+
+                fetchPreview() {
+                    const isIp = (str) => {
+                        if (!str) return false;
+                        return /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(str) || str.includes(':');
+                    };
+
+                    const host = this.hostname?.trim() ?? '';
+                    const sys = this.sysName?.trim() ?? '';
+                    const isHostIp = isIp(host);
+
+                    const values = {
+                        hostname: host || '___PLACEHOLDER_HOSTNAME___',
+                        sysName: sys || '___PLACEHOLDER_SYSNAME___',
+                        sysName_fallback: sys || (host && !isHostIp ? host : '___PLACEHOLDER_SYSNAME_FALLBACK___'),
+                        ip: isHostIp ? host : '___PLACEHOLDER_IP___',
+                    };
+
+                    axios.post('{{ route('ajax.template.preview') }}', {
+                        template: this.activeDisplayTemplate,
+                        variables: values,
+                    }).then(({ data }) => {
+                        this.renderPreview(data?.preview ?? '');
+                    }).catch(() => {
+                        // ignore error
+                    });
+                },
+
+                renderPreview(preview) {
+                    const target = this.$refs.previewEl;
+                    if (!target) return;
+
+                    target.replaceChildren();
+
+                    const placeholderPattern = /___PLACEHOLDER_(HOSTNAME|SYSNAME_FALLBACK|SYSNAME|IP)___/gi;
+                    let hasPlaceholders = false;
+                    let lastIndex = 0;
+                    let match;
+
+                    while ((match = placeholderPattern.exec(preview)) !== null) {
+                        if (match.index > lastIndex) {
+                            target.append(document.createTextNode(preview.slice(lastIndex, match.index)));
+                        }
+
+                        hasPlaceholders = true;
+                        const span = document.createElement('span');
+                        span.className = 'tw:px-1 tw:py-0.5 tw:rounded tw:bg-amber-100/90 tw:dark:bg-amber-900/50 tw:text-amber-800 tw:dark:text-amber-300 tw:border tw:border-dashed tw:border-amber-400 tw:dark:border-amber-600';
+                        span.title = 'Placeholder for unpopulated field';
+                        span.textContent = `<${match[1].toLowerCase()}>`;
+                        target.append(span);
+
+                        lastIndex = placeholderPattern.lastIndex;
+                    }
+
+                    if (lastIndex < preview.length) {
+                        target.append(document.createTextNode(preview.slice(lastIndex)));
+                    }
+
+                    this.hasPlaceholders = hasPlaceholders;
+                },
+
                 get activeDisplayTemplate() {
                     return (this.display_template && this.display_template.trim() !== '')
                         ? this.display_template.trim()
@@ -449,78 +525,6 @@
 
                 get isCustomDisplayTemplate() {
                     return !!(this.display_template && this.display_template.trim() !== '');
-                },
-
-                get displayPreview() {
-                    const isIp = (str) => {
-                        if (!str) return false;
-                        return /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(str) || str.includes(':');
-                    };
-
-                    const host = this.hostname ? this.hostname.trim() : '';
-                    const sys = this.sysName ? this.sysName.trim() : '';
-                    const isHostIp = isIp(host);
-
-                    const values = {};
-                    const placeholders = {};
-
-                    if (host) {
-                        values.hostname = host;
-                    } else {
-                        placeholders.hostname = 'hostname';
-                    }
-
-                    if (sys) {
-                        values.sysName = sys;
-                    } else if (host && !isHostIp) {
-                        values.sysName = host;
-                    } else {
-                        placeholders.sysName = 'sysName';
-                    }
-
-                    if (sys) {
-                        values.sysName_fallback = sys;
-                    } else if (host && !isHostIp) {
-                        values.sysName_fallback = host;
-                    } else {
-                        placeholders.sysName_fallback = 'sysName_fallback';
-                    }
-
-                    if (isHostIp) {
-                        values.ip = host;
-                    } else {
-                        placeholders.ip = 'ip';
-                    }
-
-                    if (this.hardware && this.hardware.trim()) {
-                        values.hardware = this.hardware.trim();
-                    } else {
-                        placeholders.hardware = 'hardware';
-                    }
-
-                    if (this.os && this.os.trim()) {
-                        values.os = this.os.trim();
-                    } else {
-                        placeholders.os = 'os';
-                    }
-
-                    if (window.LibreNMS && window.LibreNMS.SimpleTemplate) {
-                        return window.LibreNMS.SimpleTemplate.parseWithPlaceholders(this.activeDisplayTemplate, values, placeholders);
-                    }
-
-                    return { html: this.activeDisplayTemplate, text: this.activeDisplayTemplate, hasPlaceholders: false };
-                },
-
-                get computedDisplayName() {
-                    return this.displayPreview.text;
-                },
-
-                get computedDisplayNameHtml() {
-                    return this.displayPreview.html;
-                },
-
-                get hasPlaceholders() {
-                    return this.displayPreview.hasPlaceholders;
                 },
 
                 get addableRemaining() {
