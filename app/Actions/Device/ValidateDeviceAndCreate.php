@@ -38,7 +38,7 @@ class ValidateDeviceAndCreate
      */
     public function __construct(
         private readonly Device $device,
-        private ?Collection $pollingMethods = null,
+        private readonly ?Collection $pollingMethods = null,
         private readonly bool $force = false,
         private readonly bool $ping_fallback = false,
         private readonly BuildDefaultPollingMethods $builder = new BuildDefaultPollingMethods,

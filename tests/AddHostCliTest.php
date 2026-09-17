@@ -102,7 +102,7 @@ final class AddHostCliTest extends DBTestCase
     public function testPortAssociationMode(): void
     {
         $modes = ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'];
-        foreach ($modes as $index => $mode) {
+        foreach ($modes as $mode) {
             $host = 'hostName' . $mode;
             $this->artisan('device:add', ['device spec' => $host, '--force' => true, '-p' => $mode, '--v1' => true])
                 ->assertExitCode(0)
