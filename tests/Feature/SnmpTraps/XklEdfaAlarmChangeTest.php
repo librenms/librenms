@@ -39,7 +39,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
 SNMPv2-MIB::snmpTrapOID.0 XKL-MIB::xklEDFAAlarmChange
 XKL-MIB::xklEDFAIndex.1 1
 XKL-MIB::xklEDFAInReset.1 no
-XKL-MIB::xklEDFADisabled.1 enabled
+XKL-MIB::xklEDFADisabled.1 disabled
 XKL-MIB::xklEDFAMuted.1 no
 XKL-MIB::xklEDFACaseTemperatureAlarm.1 no
 XKL-MIB::xklEDFACommonAlarm.1 yes
@@ -65,7 +65,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
 SNMPv2-MIB::snmpTrapOID.0 XKL-MIB::xklEDFAAlarmChange
 XKL-MIB::xklEDFAIndex.1 1
 XKL-MIB::xklEDFAInReset.1 yes
-XKL-MIB::xklEDFADisabled.1 disabled
+XKL-MIB::xklEDFADisabled.1 enabled
 XKL-MIB::xklEDFAMuted.1 no
 XKL-MIB::xklEDFACaseTemperatureAlarm.1 no
 XKL-MIB::xklEDFACommonAlarm.1 yes
@@ -91,8 +91,8 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
 SNMPv2-MIB::snmpTrapOID.0 XKL-MIB::xklEDFAAlarmChange
 XKL-MIB::xklEDFAIndex.1 1
 XKL-MIB::xklEDFAInReset.1 no
-XKL-MIB::xklEDFADisabled.1 disabled
-XKL-MIB::xklEDFAMuted.1 yes
+XKL-MIB::xklEDFADisabled.1 enabled
+XKL-MIB::xklEDFAMuted.1 muted
 XKL-MIB::xklEDFACaseTemperatureAlarm.1 no
 XKL-MIB::xklEDFACommonAlarm.1 yes
 XKL-MIB::xklEDFAPumpTemperatureAlarm.1 no

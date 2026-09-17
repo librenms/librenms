@@ -63,7 +63,7 @@ class XklEdfaAlarmChange implements SnmptrapHandler
         if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFADisabled')) == 'disabled') {
             $message = "$edfaName changed to disabled.";
         }
-        if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFAMuted')) == 'yes') {
+        if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFAMuted')) == 'muted') {
             $message = "$edfaName has become muted.";
         }
 
