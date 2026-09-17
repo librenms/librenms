@@ -14,7 +14,7 @@ use LibreNMS\Polling\Method\Probe\ProbeResult;
 /**
  * @extends PollingMethodDefinition<IcmpConfig>
  */
-class IcmpPollingMethodDefinition extends PollingMethodDefinition
+final class IcmpPollingMethodDefinition extends PollingMethodDefinition
 {
     public function onProbeComplete(Device $device, ProbeResult $result, bool $commit = false): void
     {

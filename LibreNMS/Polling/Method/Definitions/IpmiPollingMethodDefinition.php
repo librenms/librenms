@@ -9,7 +9,7 @@ use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
 /**
  * @extends PollingMethodDefinition<IpmiConfig>
  */
-class IpmiPollingMethodDefinition extends PollingMethodDefinition
+final class IpmiPollingMethodDefinition extends PollingMethodDefinition
 {
     /**
      * @inheritDoc
