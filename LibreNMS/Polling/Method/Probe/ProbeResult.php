@@ -10,12 +10,18 @@ final readonly class ProbeResult
     public function __construct(
         private bool $success,
         private array $stats = [],
+        private ?string $errorMessage = null,
     ) {
     }
 
     public function isSuccess(): bool
     {
         return $this->success;
+    }
+
+    public function errorMessage(): ?string
+    {
+        return $this->errorMessage ?? (is_string($this->stat('error')) ? $this->stat('error') : null);
     }
 
     /**
@@ -47,8 +53,8 @@ final readonly class ProbeResult
     /**
      * @param  array<string, mixed>  $stats
      */
-    public static function failure(array $stats = []): self
+    public static function failure(array $stats = [], ?string $errorMessage = null): self
     {
-        return new self(false, $stats);
+        return new self(false, $stats, $errorMessage);
     }
 }

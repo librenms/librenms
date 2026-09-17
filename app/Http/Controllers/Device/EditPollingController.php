@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Device;
 
 use App\Actions\Device\SetDeviceAvailability;
-use App\Facades\LibrenmsConfig;
 use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\StorePollingMethodRequest;
 use App\Http\Requests\UpdatePollingMethodRequest;
@@ -17,9 +16,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\PortAssociationMode;
 
 class EditPollingController
 {
@@ -101,9 +98,6 @@ class EditPollingController
             'settings' => array_merge(
                 $definition->formDefaults(),
                 $row->settings ?? [],
-                $type === PollingMethodType::Snmp && ! isset($row?->settings['port_association_mode'])
-                    ? ['port_association_mode' => PortAssociationMode::getName($device->port_association_mode) ?? LibrenmsConfig::get('default_port_association_mode', 'ifIndex')]
-                    : []
             ),
             'affects_availability' => $row ? $row->affects_availability : $definition->defaultAffectsAvailability(),
             'secret' => $secret,
@@ -156,16 +150,22 @@ class EditPollingController
                 }
             }
 
-            $transientMethod = DevicePollingMethod::transient(
-                type: $type,
-                settings: $transientSettings,
-                secretData: $transientSecretData,
-                device: $device,
-                affectsAvailability: $definition->defaultAffectsAvailability(),
-                enabled: true,
-            );
+            $transientMethod = new DevicePollingMethod([
+                'method_type' => $type,
+                'settings' => $definition->filterOverrides($transientSettings),
+                'affects_availability' => $definition->defaultAffectsAvailability(),
+                'enabled' => true,
+            ]);
+            $transientMethod->setRelation('device', $device);
+
             if ($transientSecret !== null) {
                 $transientMethod->setRelation('secret', $transientSecret);
+                $transientMethod->secret_id = $transientSecret->id;
+            } elseif (! empty($transientSecretData)) {
+                $transientMethod->setRelation('secret', new Secret([
+                    'secret_type' => $type->value,
+                    'data' => $transientSecretData,
+                ]));
             }
 
             $existingMethods = $device->pollingMethods->reject(fn ($m) => $m->method_type === $type);
@@ -175,14 +175,7 @@ class EditPollingController
             $probeResult = $definition->probe()->check($testDevice);
 
             if (! $probeResult->isSuccess()) {
-                $errorDetails = null;
-                if ($probeResult->stat('response') instanceof SnmpResponse) {
-                    /** @var SnmpResponse $snmpResponse */
-                    $snmpResponse = $probeResult->stat('response');
-                    $errorDetails = $snmpResponse->getErrorMessage() ?: ($snmpResponse->stderr ?: null);
-                } elseif ($probeResult->stat('error')) {
-                    $errorDetails = (string) $probeResult->stat('error');
-                }
+                $errorDetails = $probeResult->errorMessage();
 
                 if ($request->wantsJson()) {
                     return response()->json([
@@ -226,11 +219,6 @@ class EditPollingController
                 ]);
                 $row->secret()->associate($secret)->save();
             }
-        }
-
-        if ($type === PollingMethodType::Snmp && isset($row->settings['port_association_mode'])) {
-            $device->port_association_mode = PortAssociationMode::getId($row->settings['port_association_mode']) ?? 1;
-            $device->saveQuietly();
         }
 
         $row->last_check_successful = isset($probeResult) ? $probeResult->isSuccess() : false;
@@ -304,16 +292,22 @@ class EditPollingController
                 }
             }
 
-            $transientMethod = DevicePollingMethod::transient(
-                type: $type,
-                settings: $transientSettings,
-                secretData: $transientSecretData,
-                device: $device,
-                affectsAvailability: (bool) ($validated['affects_availability'] ?? false),
-                enabled: true,
-            );
+            $transientMethod = new DevicePollingMethod([
+                'method_type' => $type,
+                'settings' => $type->definition()->filterOverrides($transientSettings),
+                'affects_availability' => (bool) ($validated['affects_availability'] ?? false),
+                'enabled' => true,
+            ]);
+            $transientMethod->setRelation('device', $device);
+
             if ($transientSecret !== null) {
                 $transientMethod->setRelation('secret', $transientSecret);
+                $transientMethod->secret_id = $transientSecret->id;
+            } elseif (! empty($transientSecretData)) {
+                $transientMethod->setRelation('secret', new Secret([
+                    'secret_type' => $type->value,
+                    'data' => $transientSecretData,
+                ]));
             }
 
             $existingMethods = $device->pollingMethods->reject(fn ($m) => $m->method_type === $type);
@@ -323,14 +317,7 @@ class EditPollingController
             $probeResult = $type->definition()->probe()->check($testDevice);
 
             if (! $probeResult->isSuccess()) {
-                $errorDetails = null;
-                if ($probeResult->stat('response') instanceof SnmpResponse) {
-                    /** @var SnmpResponse $snmpResponse */
-                    $snmpResponse = $probeResult->stat('response');
-                    $errorDetails = $snmpResponse->getErrorMessage() ?: ($snmpResponse->stderr ?: null);
-                } elseif ($probeResult->stat('error')) {
-                    $errorDetails = (string) $probeResult->stat('error');
-                }
+                $errorDetails = $probeResult->errorMessage();
 
                 if ($request->wantsJson()) {
                     return response()->json([
@@ -400,12 +387,6 @@ class EditPollingController
                     }
                 }
             }
-
-            $pollingMethod->invalidateConfigCache();
-        }
-
-        if ($type === PollingMethodType::Snmp && isset($pollingMethod->settings['port_association_mode'])) {
-            $device->port_association_mode = PortAssociationMode::getId($pollingMethod->settings['port_association_mode']) ?? 1;
         }
 
         $setDeviceAvailability->execute($device, false);

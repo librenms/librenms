@@ -35,13 +35,13 @@ final class PollingMethodProbeTest extends TestCase
     public function testUnixAgentProbeUsesResolvedConfigPortAndTimeout(): void
     {
         $device = new Device(['hostname' => '127.0.0.1']);
-        $unixMethod = DevicePollingMethod::transient(
-            type: PollingMethodType::UnixAgent,
-            settings: ['port' => 6556, 'timeout' => 5],
-            device: $device,
-            affectsAvailability: true,
-            enabled: true,
-        );
+        $unixMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::UnixAgent,
+            'settings' => ['port' => 6556, 'timeout' => 5],
+            'affects_availability' => true,
+            'enabled' => true,
+        ]);
+        $unixMethod->setRelation('device', $device);
         $device->setRelation('pollingMethods', collect([$unixMethod]));
 
         $probe = PollingMethodType::UnixAgent->definition()->probe();
@@ -134,22 +134,22 @@ final class PollingMethodProbeTest extends TestCase
         $device1 = new Device(['hostname' => 'device1.example.com']);
         $device2 = new Device(['hostname' => 'device2.example.com']);
 
-        $method1 = DevicePollingMethod::transient(
-            type: PollingMethodType::Snmp,
-            settings: ['port' => 161, 'transport' => 'udp'],
-            device: $device1,
-            affectsAvailability: true,
-            enabled: true,
-        );
+        $method1 = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
+            'settings' => ['port' => 161, 'transport' => 'udp'],
+            'affects_availability' => true,
+            'enabled' => true,
+        ]);
+        $method1->setRelation('device', $device1);
         $method1->setRelation('secret', $sharedSecret);
 
-        $method2 = DevicePollingMethod::transient(
-            type: PollingMethodType::Snmp,
-            settings: ['port' => 1161, 'transport' => 'tcp'],
-            device: $device2,
-            affectsAvailability: false,
-            enabled: false,
-        );
+        $method2 = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
+            'settings' => ['port' => 1161, 'transport' => 'tcp'],
+            'affects_availability' => false,
+            'enabled' => false,
+        ]);
+        $method2->setRelation('device', $device2);
         $method2->setRelation('secret', $sharedSecret);
 
         $config1 = SnmpConfig::fromPollingMethod($method1);
@@ -173,7 +173,6 @@ final class PollingMethodProbeTest extends TestCase
 
         /** 4. Independent secrets */
         $method2->setRelation('secret', $customSecret);
-        $method2->invalidateConfigCache();
         $config2Updated = SnmpConfig::fromPollingMethod($method2);
 
         $this->assertEquals('v2c', $config1->version);
@@ -194,13 +193,13 @@ final class PollingMethodProbeTest extends TestCase
             SecretDecryptionException::failedToDecrypt('The payload is invalid.')
         );
 
-        $method = DevicePollingMethod::transient(
-            type: PollingMethodType::Snmp,
-            settings: [],
-            device: $device,
-            affectsAvailability: true,
-            enabled: true,
-        );
+        $method = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
+            'settings' => [],
+            'affects_availability' => true,
+            'enabled' => true,
+        ]);
+        $method->setRelation('device', $device);
         $method->setRelation('secret', $badSecret);
         $device->setRelation('pollingMethods', collect([$method]));
 

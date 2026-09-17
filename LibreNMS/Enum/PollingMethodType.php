@@ -31,9 +31,6 @@ enum PollingMethodType: string
 
     public function hasSecret(): bool
     {
-        return match ($this) {
-            self::Ipmi, self::Snmp => true,
-            self::Icmp, self::UnixAgent => false,
-        };
+        return $this->definition()->secretDefinition() !== null;
     }
 }

@@ -4,7 +4,6 @@ namespace App\Actions\Device;
 
 use App\Models\Device;
 use App\Models\Eventlog;
-use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 
 readonly class CheckDeviceAvailability
@@ -26,21 +25,7 @@ readonly class CheckDeviceAvailability
                 $method->last_check_successful = $result->isSuccess();
                 $method->last_checked_at = now();
 
-                if ($method->method_type === PollingMethodType::Icmp) {
-                    if ($result->stat('duplicates')) {
-                        Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $device, 'icmp', Severity::Warning);
-                    }
-
-                    $fpingStatus = $result->stat('fping_status');
-                    if ($commit && $fpingStatus) {
-                        $fpingStatus->saveStats($device);
-                    }
-
-                    $mtuStatus = $result->stat('mtu_status');
-                    if ($result->isSuccess() && $mtuStatus !== null) {
-                        $device->mtu_status = $mtuStatus;
-                    }
-                }
+                $definition->onProbeComplete($device, $result, $commit);
             } catch (\LibreNMS\Exceptions\SecretDecryptionException) {
                 $method->last_check_successful = false;
                 $method->last_checked_at = now();

@@ -47,17 +47,24 @@ class BuildDefaultPollingMethods
                     $secretData = $secretType?->createData($data['secret_data']);
                 }
 
-                $pollingMethod = DevicePollingMethod::transient(
-                    type: $type,
-                    settings: $settings,
-                    secretData: $secretData,
-                    device: $device,
-                    affectsAvailability: $affectsAvailability,
-                    secret: $secret,
-                );
+                $pollingMethod = new DevicePollingMethod([
+                    'method_type' => $type,
+                    'enabled' => true,
+                    'affects_availability' => $affectsAvailability ?? $type->definition()->defaultAffectsAvailability(),
+                    'settings' => $type->definition()->filterOverrides($settings),
+                ]);
+                $pollingMethod->setRelation('device', $device);
 
-                if ($credentialMode === 'new' && $pollingMethod->secret && ! empty($data['description'])) {
-                    $pollingMethod->secret->description = $data['description'];
+                if ($secret !== null) {
+                    $pollingMethod->setRelation('secret', $secret);
+                    $pollingMethod->secret_id = $secret->id;
+                } elseif ($secretData !== null) {
+                    $createdSecret = new Secret([
+                        'secret_type' => $type->value,
+                        'description' => ($credentialMode === 'new' && ! empty($data['description'])) ? $data['description'] : (strtoupper($type->value) . ' ' . $device->hostname),
+                        'data' => $secretData->toArray(),
+                    ]);
+                    $pollingMethod->setRelation('secret', $createdSecret);
                 }
 
                 $pollingMethods->push($pollingMethod);
@@ -67,11 +74,13 @@ class BuildDefaultPollingMethods
         }
 
         // ICMP polling method is always added
-        $pollingMethods->push(DevicePollingMethod::transient(
-            PollingMethodType::Icmp,
-            device: $device,
-            affectsAvailability: false,
-        ));
+        $icmpMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+            'affects_availability' => false,
+        ]);
+        $icmpMethod->setRelation('device', $device);
+        $pollingMethods->push($icmpMethod);
 
         $snmpDisabled = ! empty($input['ping_only']) || ! empty($input['snmp_disable']);
 
@@ -104,13 +113,24 @@ class BuildDefaultPollingMethods
                 );
             }
 
-            $pollingMethods->push(DevicePollingMethod::transient(
-                type: PollingMethodType::Snmp,
-                settings: $settings,
-                secretData: $secretData,
-                device: $device,
-                affectsAvailability: true,
-            ));
+            $snmpMethod = new DevicePollingMethod([
+                'method_type' => PollingMethodType::Snmp,
+                'enabled' => true,
+                'affects_availability' => true,
+                'settings' => PollingMethodType::Snmp->definition()->filterOverrides($settings),
+            ]);
+            $snmpMethod->setRelation('device', $device);
+
+            if ($secretData !== null) {
+                $secret = new Secret([
+                    'secret_type' => SecretType::Snmp->value,
+                    'description' => 'SNMP ' . $device->hostname,
+                    'data' => $secretData->toArray(),
+                ]);
+                $snmpMethod->setRelation('secret', $secret);
+            }
+
+            $pollingMethods->push($snmpMethod);
         }
 
         return $pollingMethods;

@@ -13,11 +13,12 @@ class UnixAgentConfig extends PollingMethodConfig
         public int $port,
         public int $timeout,
     ) {
+        parent::__construct($enabled, $affectsAvailability);
     }
 
-    public function isEnabled(): bool
+    public function isValid(): bool
     {
-        return $this->enabled;
+        return true;
     }
 
     public static function fromPollingMethod(DevicePollingMethod $method): static
@@ -30,10 +31,10 @@ class UnixAgentConfig extends PollingMethodConfig
         $settings = $definition->resolveValues($method->settings ?? []);
 
         return new static(
-            enabled: $method->enabled,
-            affectsAvailability: $method->affects_availability,
-            port: $settings['port'],
-            timeout: $settings['timeout'],
+            enabled: $method->enabled ?? true,
+            affectsAvailability: $method->affects_availability ?? false,
+            port: (int) ($settings['port'] ?? 6556),
+            timeout: (int) ($settings['timeout'] ?? 10),
         );
     }
 }

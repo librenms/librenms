@@ -170,11 +170,11 @@ final class FieldSchemaTest extends TestCase
     public function testIpmiConfigFallsBackToDeviceHostname(): void
     {
         $device = new Device(['hostname' => 'switch.example.com']);
-        $devicePollingMethod = DevicePollingMethod::transient(
-            type: PollingMethodType::Ipmi,
-            settings: [],
-            device: $device,
-        );
+        $devicePollingMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Ipmi,
+            'settings' => [],
+        ]);
+        $devicePollingMethod->setRelation('device', $device);
 
         $config = IpmiConfig::fromPollingMethod($devicePollingMethod);
         $this->assertSame('switch.example.com', $config->hostname);
@@ -182,11 +182,11 @@ final class FieldSchemaTest extends TestCase
         $this->assertSame(3, $config->timeout);
 
         // With explicit hostname override
-        $overrideMethod = DevicePollingMethod::transient(
-            type: PollingMethodType::Ipmi,
-            settings: ['hostname' => 'ipmi.example.com', 'port' => 6230],
-            device: $device,
-        );
+        $overrideMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Ipmi,
+            'settings' => ['hostname' => 'ipmi.example.com', 'port' => 6230],
+        ]);
+        $overrideMethod->setRelation('device', $device);
         $overrideConfig = IpmiConfig::fromPollingMethod($overrideMethod);
         $this->assertSame('ipmi.example.com', $overrideConfig->hostname);
         $this->assertSame(6230, $overrideConfig->port);

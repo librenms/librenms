@@ -83,8 +83,15 @@ class ValidateDeviceAndCreate
         if (! $this->force) {
             $this->exceptIfIpExists();
 
-            $icmpMethod = $this->device->pollingMethod(PollingMethodType::Icmp)
-                ?? DevicePollingMethod::transient(PollingMethodType::Icmp, device: $this->device, affectsAvailability: false);
+            $icmpMethod = $this->device->pollingMethod(PollingMethodType::Icmp);
+            if ($icmpMethod === null) {
+                $icmpMethod = new DevicePollingMethod([
+                    'method_type' => PollingMethodType::Icmp,
+                    'enabled' => true,
+                    'affects_availability' => false,
+                ]);
+                $icmpMethod->setRelation('device', $this->device);
+            }
             if (! PollingMethodType::Icmp->definition()->probe()->check($this->device)->isSuccess()) {
                 throw new HostUnreachablePingException($this->device->hostname);
             }
@@ -171,13 +178,15 @@ class ValidateDeviceAndCreate
 
             foreach ($defaultSecrets as $secret) {
                 $secretData = $secret->toSecretData();
-                $snmpMethod = DevicePollingMethod::transient(
-                    type: PollingMethodType::Snmp,
-                    settings: $settings,
-                    device: $this->device,
-                    affectsAvailability: true,
-                    secret: $secret,
-                );
+                $snmpMethod = new DevicePollingMethod([
+                    'method_type' => PollingMethodType::Snmp,
+                    'enabled' => true,
+                    'affects_availability' => true,
+                    'settings' => $settings,
+                    'secret_id' => $secret->id,
+                ]);
+                $snmpMethod->setRelation('device', $this->device);
+                $snmpMethod->setRelation('secret', $secret);
 
                 // Set relation temporarily for probe check
                 $this->device->setRelation('pollingMethods', $otherPollingMethods->concat([$snmpMethod]));

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\Secret;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -58,7 +59,10 @@ class UpdatePollingMethodRequest extends FormRequest
         if ($isEditingSecret && $type && $type->hasSecret()) {
             $device = $this->route('device');
             /** @var Device|null $deviceModel */
-            $deviceModel = $device instanceof Device ? $device : (is_numeric($device) ? Device::find($device) : null);
+            $deviceModel = $device instanceof Device ? $device : (is_numeric($device) ? DeviceCache::get($device) : null);
+            if ($deviceModel && ! $deviceModel->exists) {
+                $deviceModel = null;
+            }
             $secretId = $this->input('secret_id');
             $targetSecretId = $secretId ? (int) $secretId : $deviceModel?->pollingMethods()->where('method_type', $type->value)->first()?->secret_id;
             $targetSecret = $targetSecretId ? Secret::find($targetSecretId) : null;

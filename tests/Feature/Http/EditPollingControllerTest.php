@@ -80,7 +80,8 @@ class EditPollingControllerTest extends TestCase
         );
 
         $response->assertRedirect();
-        $this->assertEquals(PortAssociationMode::getId('ifName'), $device->fresh()->port_association_mode);
+        $this->assertEquals('ifName', $device->fresh()->pollingMethod(PollingMethodType::Snmp)->settings['port_association_mode']);
+        $this->assertEquals('ifName', $device->fresh()->toSnmpConfig()->portAssociationMode);
     }
 
     public function testStorePollingMethodRejectsDuplicateDefaultSecretDescription(): void

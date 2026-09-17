@@ -14,6 +14,8 @@ abstract class PollingMethodConfig
 
     abstract public static function fromPollingMethod(DevicePollingMethod $method): static;
 
+    abstract public function isValid(): bool;
+
     public function isEnabled(): bool
     {
         return $this->enabled;

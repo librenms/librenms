@@ -26,7 +26,6 @@ use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\PollingMethodAccessor;
@@ -137,17 +136,7 @@ class Device extends BaseModel
 
     public function toSnmpConfig(): SnmpConfig
     {
-        $snmpMethod = $this->pollingMethod(PollingMethodType::Snmp);
-
-        if ($snmpMethod && $snmpMethod->secret) {
-            return SnmpConfig::fromPollingMethod($snmpMethod);
-        }
-
-        if ($this->exists) {
-            Eventlog::log('Missing SNMP polling method or credentials, falling back to legacy device fields.', $this, 'snmp', Severity::Error);
-        }
-
-        return SnmpConfig::fromLegacyDeviceFields($this);
+        return $this->pollingMethodFor()->snmp();
     }
 
     public function ipFamily(): AddressFamily
@@ -173,28 +162,7 @@ class Device extends BaseModel
 
     public function hasSnmpInfo(): bool
     {
-        $snmp = $this->toSnmpConfig();
-
-        if ($snmp->version == 'v3') {
-            if ($snmp->authlevel == 'authNoPriv') {
-                return ! empty($snmp->authname) && ! empty($snmp->authpass);
-            }
-
-            if ($snmp->authlevel == 'authPriv') {
-                return ! empty($snmp->authname)
-                    && ! empty($snmp->authpass)
-                    && ! empty($snmp->cryptoalgo)
-                    && ! empty($snmp->cryptopass);
-            }
-
-            return $snmp->authlevel !== 'noAuthNoPriv'; // reject if not noAuthNoPriv
-        }
-
-        if ($snmp->version == 'v2c' || $snmp->version == 'v1') {
-            return ! empty($snmp->community);
-        }
-
-        return false; // no known snmpver
+        return $this->toSnmpConfig()->isValid();
     }
 
     public function pollingMethodFor(): PollingMethodAccessor
