@@ -29,14 +29,14 @@ namespace LibreNMS\Polling\Method\Config;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
-use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Util\IP;
+use Illuminate\Support\Arr;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 
-class SnmpConfig extends PollingMethodConfig
+final class SnmpConfig extends PollingMethodConfig
 {
     public function __construct(
-        public bool $enabled = true,
-        public bool $affectsAvailability = true,
+        bool $enabled = true,
+        bool $affectsAvailability = true,
 
         // Secrets
         public string $version = 'v2c',
@@ -58,69 +58,29 @@ class SnmpConfig extends PollingMethodConfig
         public int $maxOid = 10,
         public bool $bulk = true,
     ) {
+        parent::__construct($enabled, $affectsAvailability);
     }
 
-    public static function fromDevice(Device $device): static
-    {
-        $method = $device->pollingMethod(PollingMethodType::Snmp);
-        if ($method) {
-            return static::fromModel($method);
-        }
+    private static function fromSettingsAndSecretData(
+        array $settings,
+        SnmpSecretData $secretData,
+        ?string $os = 'generic',
+        bool $enabled = true,
+        bool $affectsAvailability = true,
+    ): self {
+        $os = $os ?: 'generic';
 
-        $os = $device->os ?? 'generic';
-        $timeout = (float) ($device->timeout > 0 ? $device->timeout : LibrenmsConfig::get('snmp.timeout', 1));
-        $retries = (int) (is_numeric($device->retries) ? $device->retries : LibrenmsConfig::get('snmp.retries', 5));
-        $maxRepeaters = (int) ($device->getAttrib('snmp_max_repeaters') ?: LibrenmsConfig::getOsSetting($os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0)));
-        $configuredMaxOid = (int) ($device->getAttrib('snmp_max_oid') ?: LibrenmsConfig::getOsSetting($os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10)));
-        $rawBulk = LibrenmsConfig::getOsSetting($os, 'snmp_bulk', LibrenmsConfig::get('snmp_bulk', true));
+        $timeout = isset($settings['timeout']) && $settings['timeout'] > 0
+            ? (float) $settings['timeout']
+            : (float) LibrenmsConfig::get('snmp.timeout', 1);
 
-        return new static(
-            enabled: ! (bool) ($device->snmp_disable ?? false),
-            affectsAvailability: true,
-            version: (string) ($device->getAttribute('snmpver') ?: ($device->getAttribute('version') ?: 'v2c')),
-            community: $device->getAttribute('community') ?: 'public',
-            authname: $device->getAttribute('authname'),
-            authpass: $device->getAttribute('authpass'),
-            authlevel: $device->getAttribute('authlevel'),
-            authalgo: $device->getAttribute('authalgo'),
-            cryptopass: $device->getAttribute('cryptopass'),
-            cryptoalgo: $device->getAttribute('cryptoalgo'),
-            transport: (string) ($device->transport ?: 'udp'),
-            port: (int) ($device->port ?: 161),
-            context: null,
-            timeout: max(0.1, $timeout),
-            retries: max(0, $retries),
-            maxRepeaters: max(0, $maxRepeaters),
-            maxOid: max(1, $configuredMaxOid),
-            bulk: filter_var($rawBulk, FILTER_VALIDATE_BOOLEAN),
-        );
-    }
+        $retries = isset($settings['retries']) && is_numeric($settings['retries'])
+            ? (int) $settings['retries']
+            : (int) LibrenmsConfig::get('snmp.retries', 5);
 
-    public function isEnabled(): bool
-    {
-        return $this->enabled;
-    }
-
-    public static function fromModel(DevicePollingMethod $method): static
-    {
-        $definition = PollingMethodType::Snmp->definition();
-        $secretDefinition = $definition->secretDefinition();
-
-        $settings = $definition->resolveValues($method->settings ?? []);
-        $resolvedData = $secretDefinition ? $secretDefinition->resolveValues($method->secret?->data ?? []) : [];
-        $secretData = \LibreNMS\Polling\Secrets\Data\SnmpSecretData::fromArray($resolvedData);
-
-        $os = $method->device?->os ?? 'generic';
-
-        $timeout = (float) ($settings['timeout'] > 0 ? $settings['timeout'] : LibrenmsConfig::get('snmp.timeout', 1));
-        $retries = (int) (is_numeric($settings['retries']) ? $settings['retries'] : LibrenmsConfig::get('snmp.retries', 5));
-        $maxRepeaters = (int) ($settings['max_repeaters'] ?: LibrenmsConfig::getOsSetting($os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0)));
-        $configuredMaxOid = (int) ($settings['max_oid'] ?: LibrenmsConfig::getOsSetting($os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10)));
-        $rawBulk = LibrenmsConfig::getOsSetting($os, 'snmp_bulk', LibrenmsConfig::get('snmp_bulk', true));
-
-        return new static(
-            enabled: $method->enabled,
-            affectsAvailability: $method->affects_availability,
+        return new self(
+            enabled: $enabled,
+            affectsAvailability: $affectsAvailability,
             version: $secretData->version,
             community: $secretData->community,
             authname: $secretData->authname,
@@ -129,58 +89,104 @@ class SnmpConfig extends PollingMethodConfig
             authalgo: $secretData->authalgo,
             cryptopass: $secretData->cryptopass,
             cryptoalgo: $secretData->cryptoalgo,
-            transport: $settings['transport'],
-            port: (int) ($settings['port'] ?? 161),
+            transport: $settings['transport'] ?? 'udp',
+            port: (int) ($settings['port'] ?? LibrenmsConfig::get('snmp.port', 161)),
             context: $secretData->context,
             timeout: max(0.1, $timeout),
             retries: max(0, $retries),
-            maxRepeaters: max(0, $maxRepeaters),
-            maxOid: max(1, $configuredMaxOid),
-            bulk: filter_var($rawBulk, FILTER_VALIDATE_BOOLEAN),
+            maxRepeaters: max(0, (int) ($settings['max_repeaters'] ?? LibrenmsConfig::getOsSetting(
+                $os,
+                'snmp.max_repeaters',
+                LibrenmsConfig::get('snmp.max_repeaters', 10)
+            ))),
+            maxOid: max(1, (int) ($settings['max_oid'] ?? LibrenmsConfig::getOsSetting(
+                $os,
+                'snmp_max_oid',
+                LibrenmsConfig::get('snmp.max_oid', 10)
+            ))),
+            bulk: filter_var(
+                $settings['bulk'] ?? $settings['snmp_bulk'] ?? LibrenmsConfig::getOsSetting(
+                    $os,
+                    'snmp_bulk',
+                    LibrenmsConfig::get('snmp_bulk', true)
+                ),
+                FILTER_VALIDATE_BOOLEAN
+            ),
+        );
+    }
+
+    public static function fromPollingMethod(DevicePollingMethod $method): self
+    {
+        return self::fromSettingsAndSecretData(
+            settings: $method->settings ?? [],
+            secretData: SnmpSecretData::fromArray($method->secret->data ?? []),
+            os: $method->device?->os,
+            enabled: $method->enabled,
+            affectsAvailability: $method->affects_availability,
+        );
+    }
+
+    /**
+     * Create from legacy fields.
+     *
+     * @deprecated
+     */
+    public static function fromLegacyDeviceFields(Device $device): self
+    {
+        return self::fromSettingsAndSecretData(
+            settings: [
+                'transport' => $device->transport,
+                'port' => $device->port,
+                'timeout' => $device->timeout,
+                'retries' => $device->retries,
+                'max_repeaters' => $device->getAttrib('snmp_max_repeaters'),
+                'max_oid' => $device->getAttrib('snmp_max_oid'),
+                'bulk' => $device->getAttrib('snmp_bulk'),
+            ],
+            secretData: new SnmpSecretData(
+                version: (string) ($device->getAttribute('snmpver') ?: 'v2c'),
+                community: $device->getAttribute('community'),
+                authlevel: $device->getAttribute('authlevel'),
+                authname: $device->getAttribute('authname'),
+                authpass: $device->getAttribute('authpass'),
+                authalgo: $device->getAttribute('authalgo'),
+                cryptoalgo: $device->getAttribute('cryptoalgo'),
+                cryptopass: $device->getAttribute('cryptopass'),
+            ),
+            os: $device->os,
+            enabled: ! ($device->snmp_disable ?? false),
         );
     }
 
     public static function fromDeviceArray(?array $device): self
     {
-        if (isset($device['ip']) && ! IP::isValid($device['ip'])) {
-            $device['ip'] = @inet_ntop($device['ip']) ?: null;
-        }
-
         $device ??= [];
 
-        if (! empty($device['device_id'])) {
-            $deviceModel = \App\Facades\DeviceCache::get((int) $device['device_id']);
-            if ($deviceModel && $deviceModel->exists && $deviceModel->pollingMethod(PollingMethodType::Snmp)) {
-                return static::fromDevice($deviceModel);
-            }
-        }
-
-        $os = $device['os'] ?? 'generic';
-        $timeout = (float) ((isset($device['timeout']) && $device['timeout'] > 0) ? $device['timeout'] : LibrenmsConfig::get('snmp.timeout', 1));
-        $retries = (int) (isset($device['retries']) && is_numeric($device['retries']) ? $device['retries'] : LibrenmsConfig::get('snmp.retries', 5));
-        $maxRepeaters = (int) (($device['snmp_max_repeaters'] ?? null) ?: LibrenmsConfig::getOsSetting($os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0)));
-        $configuredMaxOid = (int) (($device['snmp_max_oid'] ?? null) ?: LibrenmsConfig::getOsSetting($os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10)));
-        $rawBulk = LibrenmsConfig::getOsSetting($os, 'snmp_bulk', LibrenmsConfig::get('snmp_bulk', true));
-
-        return new static(
-            enabled: ! (bool) ($device['snmp_disable'] ?? false),
-            affectsAvailability: true,
-            version: (string) ($device['snmpver'] ?? $device['version'] ?? 'v2c'),
-            community: $device['community'] ?? 'public',
-            authname: $device['authname'] ?? null,
-            authpass: $device['authpass'] ?? null,
-            authlevel: $device['authlevel'] ?? null,
-            authalgo: $device['authalgo'] ?? null,
-            cryptopass: $device['cryptopass'] ?? null,
-            cryptoalgo: $device['cryptoalgo'] ?? null,
-            transport: (string) ($device['transport'] ?? 'udp'),
-            port: (int) ($device['port'] ?? 161),
-            context: $device['context_name'] ?? null,
-            timeout: max(0.1, $timeout),
-            retries: max(0, $retries),
-            maxRepeaters: max(0, $maxRepeaters),
-            maxOid: max(1, $configuredMaxOid),
-            bulk: filter_var($rawBulk, FILTER_VALIDATE_BOOLEAN),
+        return self::fromSettingsAndSecretData(
+            settings: [
+                'transport' => $device['transport'] ?? null,
+                'port' => $device['port'] ?? null,
+                'timeout' => $device['timeout'] ?? null,
+                'retries' => $device['retries'] ?? null,
+                'max_repeaters' => $device['snmp_max_repeaters'] ?? null,
+                'max_oid' => $device['snmp_max_oid'] ?? null,
+                'bulk' => $device['snmp_bulk'] ?? null,
+            ],
+            secretData: new SnmpSecretData(
+                version: (string) ($device['snmpver'] ?? 'v2c'),
+                community: isset($device['community'])
+                    ? (string) $device['community']
+                    : (Arr::first(Arr::wrap(LibrenmsConfig::get('snmp.community', ['public']))) ?: 'public'),
+                authlevel: $device['authlevel'] ?? null,
+                authname: $device['authname'] ?? null,
+                authpass: $device['authpass'] ?? null,
+                authalgo: $device['authalgo'] ?? null,
+                cryptoalgo: $device['cryptoalgo'] ?? null,
+                cryptopass: $device['cryptopass'] ?? null,
+                context: $device['context_name'] ?? null,
+            ),
+            os: $device['os'] ?? null,
+            enabled: ! ($device['snmp_disable'] ?? false),
         );
     }
 }

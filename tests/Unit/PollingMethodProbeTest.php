@@ -152,8 +152,8 @@ final class PollingMethodProbeTest extends TestCase
         );
         $method2->setRelation('secret', $sharedSecret);
 
-        $config1 = SnmpConfig::fromModel($method1);
-        $config2 = SnmpConfig::fromModel($method2);
+        $config1 = SnmpConfig::fromPollingMethod($method1);
+        $config2 = SnmpConfig::fromPollingMethod($method2);
 
         /** 1. Shared secret between devices */
         $this->assertEquals('shared-community', $config1->community);
@@ -174,7 +174,7 @@ final class PollingMethodProbeTest extends TestCase
         /** 4. Independent secrets */
         $method2->setRelation('secret', $customSecret);
         $method2->invalidateConfigCache();
-        $config2Updated = SnmpConfig::fromModel($method2);
+        $config2Updated = SnmpConfig::fromPollingMethod($method2);
 
         $this->assertEquals('v2c', $config1->version);
         $this->assertEquals('shared-community', $config1->community);
