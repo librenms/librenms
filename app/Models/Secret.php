@@ -27,7 +27,9 @@ class Secret extends BaseModel
 
     public function toSecretData(): \LibreNMS\Polling\Secrets\Data\SnmpSecretData|\LibreNMS\Polling\Secrets\Data\IpmiSecretData
     {
-        return $this->secret_type->createData($this->data);
+        $type = $this->secret_type ?? SecretType::Snmp;
+
+        return $type->createData($this->data ?? []);
     }
 
     /**

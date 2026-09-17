@@ -9,11 +9,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
+use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 
 #[ObservedBy([DevicePollingMethodObserver::class])]
 class DevicePollingMethod extends Model
 {
     /** @use HasFactory<\Database\Factories\DevicePollingMethodFactory> */
+    use HasFactory;
+
     protected $with = [
         'secret',
     ];
@@ -82,15 +86,16 @@ class DevicePollingMethod extends Model
      * Build an unsaved, transient in-memory DevicePollingMethod model.
      *
      * @param  array<string, mixed>  $settings
-     * @param  array<string, mixed>  $secretData
+     * @param  SnmpSecretData|IpmiSecretData|array<string, mixed>|null  $secretData
      */
     public static function transient(
         PollingMethodType $type,
         array $settings = [],
-        array $secretData = [],
+        SnmpSecretData|IpmiSecretData|array|null $secretData = null,
         ?Device $device = null,
         ?bool $affectsAvailability = null,
         bool $enabled = true,
+        ?Secret $secret = null,
     ): self {
         $definition = $type->definition();
         $filteredSettings = $definition->filterOverrides($settings);
@@ -108,16 +113,28 @@ class DevicePollingMethod extends Model
             $method->setRelation('device', $device);
         }
 
-        if ($definition->secretDefinition() !== null && ! empty($secretData)) {
-            $secret = new Secret([
+        if ($secret !== null) {
+            $method->setRelation('secret', $secret);
+            $method->secret_id = $secret->id;
+        } elseif ($definition->secretDefinition() !== null && ! empty($secretData)) {
+            $dataArray = $secretData instanceof SnmpSecretData || $secretData instanceof IpmiSecretData
+                ? $secretData->toArray()
+                : $secretData;
+
+            $createdSecret = new Secret([
                 'secret_type' => $type->value,
                 'description' => $device ? strtoupper($type->value) . ' ' . $device->hostname : '',
-                'data' => $secretData,
+                'data' => $dataArray,
             ]);
-            $method->setRelation('secret', $secret);
+            $method->setRelation('secret', $createdSecret);
         }
 
         return $method;
+    }
+
+    public function secretData(): SnmpSecretData|IpmiSecretData|null
+    {
+        return $this->secret?->toSecretData();
     }
 
     public function toConfig(): PollingMethodConfig

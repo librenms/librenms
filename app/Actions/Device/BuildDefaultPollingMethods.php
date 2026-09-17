@@ -7,6 +7,8 @@ use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretType;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 
 class BuildDefaultPollingMethods
 {
@@ -32,27 +34,30 @@ class BuildDefaultPollingMethods
                 }
 
                 $settings = $data['settings'] ?? [];
-                $secretData = $data['secret_data'] ?? [];
                 $credentialMode = $data['credential_mode'] ?? 'default';
                 $secretId = isset($data['secret_id']) ? (int) $data['secret_id'] : null;
                 $affectsAvailability = isset($data['affects_availability']) ? (bool) $data['affects_availability'] : null;
 
+                $secret = null;
+                $secretData = null;
+                if ($credentialMode === 'existing' && $secretId !== null) {
+                    $secret = Secret::resolveForType($secretId, $type);
+                } elseif (! empty($data['secret_data'])) {
+                    $secretType = SecretType::tryFrom($type->value);
+                    $secretData = $secretType?->createData($data['secret_data']);
+                }
+
                 $pollingMethod = DevicePollingMethod::transient(
                     type: $type,
                     settings: $settings,
-                    secretData: ($credentialMode === 'existing' || empty($secretData)) ? [] : $secretData,
+                    secretData: $secretData,
                     device: $device,
                     affectsAvailability: $affectsAvailability,
+                    secret: $secret,
                 );
 
-                if ($credentialMode === 'existing' && $secretId !== null) {
-                    $secret = Secret::resolveForType($secretId, $type);
-                    $pollingMethod->setRelation('secret', $secret);
-                    $pollingMethod->secret_id = $secret->id;
-                } elseif ($credentialMode === 'new' && ! empty($secretData) && ! empty($data['description'])) {
-                    if ($pollingMethod->secret) {
-                        $pollingMethod->secret->description = $data['description'];
-                    }
+                if ($credentialMode === 'new' && $pollingMethod->secret && ! empty($data['description'])) {
+                    $pollingMethod->secret->description = $data['description'];
                 }
 
                 $pollingMethods->push($pollingMethod);
@@ -85,24 +90,24 @@ class BuildDefaultPollingMethods
             $authalgo = $input['authalgo'] ?? $input['auth-protocol'] ?? $input['auth_protocol'] ?? null;
             $cryptoalgo = $input['cryptoalgo'] ?? $input['privacy-protocol'] ?? $input['privacy_protocol'] ?? null;
 
-            $snmpData = [];
+            $secretData = null;
             if ($snmpver || $community || $auth || $priv || $authname || isset($input['authlevel'])) {
-                $snmpData = [
-                    'version' => $snmpver ?: 'v2c',
-                    'community' => $community,
-                    'authlevel' => $authlevel ?: 'noAuthNoPriv',
-                    'authname' => $authname ?: 'root',
-                    'authpass' => $auth,
-                    'authalgo' => $authalgo ?: 'MD5',
-                    'cryptopass' => $priv,
-                    'cryptoalgo' => $cryptoalgo ?: 'AES',
-                ];
+                $secretData = new SnmpSecretData(
+                    version: $snmpver ?: 'v2c',
+                    community: $community,
+                    authlevel: $authlevel ?: 'noAuthNoPriv',
+                    authname: $authname ?: 'root',
+                    authpass: $auth,
+                    authalgo: $authalgo ?: 'MD5',
+                    cryptoalgo: $cryptoalgo ?: 'AES',
+                    cryptopass: $priv,
+                );
             }
 
             $pollingMethods->push(DevicePollingMethod::transient(
-                PollingMethodType::Snmp,
+                type: PollingMethodType::Snmp,
                 settings: $settings,
-                secretData: $snmpData,
+                secretData: $secretData,
                 device: $device,
                 affectsAvailability: true,
             ));

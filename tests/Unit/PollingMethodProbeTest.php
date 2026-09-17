@@ -189,6 +189,7 @@ final class PollingMethodProbeTest extends TestCase
         $device->device_id = 1;
 
         $badSecret = \Mockery::mock(Secret::class)->makePartial();
+        $badSecret->secret_type = \LibreNMS\Enum\SecretType::Snmp;
         $badSecret->shouldReceive('getAttribute')->with('data')->andThrow(
             SecretDecryptionException::failedToDecrypt('The payload is invalid.')
         );
