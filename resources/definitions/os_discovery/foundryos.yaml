@@ -19,7 +19,6 @@ modules:
             data:
                 -
                     oid:
-                        - FOUNDRY-SN-AGENT-MIB::snAgentTempSensorDescr
                         - FOUNDRY-SN-AGENT-MIB::snChasWarningTemperature
                         - FOUNDRY-SN-AGENT-MIB::snChasShutdownTemperature
         temperature:
@@ -40,11 +39,6 @@ modules:
                     index: 'snChasActualTemperature.{{ $index }}'
                     warn_limit: FOUNDRY-SN-AGENT-MIB::snChasWarningTemperature.0
                     high_limit: FOUNDRY-SN-AGENT-MIB::snChasShutdownTemperature.0
-                    skip_values:
-                        -
-                            oid: FOUNDRY-SN-AGENT-MIB::snAgentTempSensorDescr.1.1
-                            op: 'exists'
-                            value: true
         state:
             data:
                 -
