@@ -15,7 +15,10 @@ use LibreNMS\Polling\PollingMethodFactory;
 class DevicePollingMethod extends Model
 {
     /** @use HasFactory<\Database\Factories\DevicePollingMethodFactory> */
-    use HasFactory;
+    protected $with = [
+        'secret',
+    ];
+
     protected $fillable = [
         'device_id',
         'method_type',
@@ -103,7 +106,6 @@ class DevicePollingMethod extends Model
             $secret = new Secret([
                 'secret_type' => $type->value,
                 'description' => $device ? strtoupper($type->value) . ' ' . $device->hostname : '',
-                'default' => false,
                 'data' => $secretData,
             ]);
             $method->setRelation('secret', $secret);

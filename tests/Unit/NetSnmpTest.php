@@ -361,7 +361,7 @@ class NetSnmpTest extends TestCase
             ],
         );
 
-        $config = SnmpConfig::fromDevice($device);
+        $config = $device->toSnmpConfig();
 
         $this->assertSame('v2c', $config->version);
         $this->assertSame('test-comm', $config->community);
@@ -395,14 +395,14 @@ class NetSnmpTest extends TestCase
         $deviceBulk = $this->makeDeviceWithSnmpConfig(
             deviceAttrs: ['hostname' => 'bulk.device', 'os' => 'ios'],
         );
-        $configBulk = SnmpConfig::fromDevice($deviceBulk);
+        $configBulk = $deviceBulk->toSnmpConfig();
         $this->assertTrue($configBulk->bulk);
 
         \App\Facades\LibrenmsConfig::set('os.airos.snmp_bulk', false);
         $deviceNoBulk = $this->makeDeviceWithSnmpConfig(
             deviceAttrs: ['hostname' => 'nobulk.device', 'os' => 'airos'],
         );
-        $configNoBulk = SnmpConfig::fromDevice($deviceNoBulk);
+        $configNoBulk = $deviceNoBulk->toSnmpConfig();
         $this->assertFalse($configNoBulk->bulk);
     }
 
@@ -412,14 +412,14 @@ class NetSnmpTest extends TestCase
             settings: ['timeout' => 0.5],
         );
 
-        $config = SnmpConfig::fromDevice($device);
+        $config = $device->toSnmpConfig();
         $this->assertSame(0.5, $config->timeout);
 
         // A timeout <= 0 falls back to configured snmp.timeout
         $deviceZero = $this->makeDeviceWithSnmpConfig(
             settings: ['timeout' => 0],
         );
-        $configZero = SnmpConfig::fromDevice($deviceZero);
+        $configZero = $deviceZero->toSnmpConfig();
         $this->assertEquals(\App\Facades\LibrenmsConfig::get('snmp.timeout', 1), $configZero->timeout);
     }
 
@@ -505,7 +505,7 @@ class NetSnmpTest extends TestCase
             'retries' => 2,
         ]);
 
-        $config = SnmpConfig::fromDevice($device);
+        $config = SnmpConfig::fromLegacyDeviceFields($device);
 
         $this->assertTrue($config->enabled);
         $this->assertSame('v2c', $config->version);
@@ -552,5 +552,55 @@ class NetSnmpTest extends TestCase
         $this->assertSame('public', $config->community);
         $this->assertSame('udp', $config->transport);
         $this->assertSame(161, $config->port);
+    }
+
+    public function testDeviceToSnmpConfigFallbackForExistingDeviceLogsEvent(): void
+    {
+        $device = new Device();
+        $device->device_id = 42;
+        $device->exists = true;
+        $device->hostname = 'legacy-fallback.example.com';
+        $device->setRelation('attribs', new Collection);
+        $device->setRelation('pollingMethods', collect([]));
+        $device->setAttribute('snmpver', 'v2c');
+        $device->setAttribute('community', 'fallback-comm');
+
+        $mockEventlog = \Mockery::mock(\App\Models\Eventlog::class);
+        $this->app->instance(\App\Models\Eventlog::class, $mockEventlog);
+
+        $mockEventlog->shouldReceive('_log')
+            ->once()
+            ->with(
+                'Missing SNMP polling method or credentials, falling back to legacy device fields.',
+                $device,
+                'snmp',
+                \LibreNMS\Enum\Severity::Error,
+                null
+            );
+
+        $config = $device->toSnmpConfig();
+
+        $this->assertSame('v2c', $config->version);
+        $this->assertSame('fallback-comm', $config->community);
+    }
+
+    public function testDeviceToSnmpConfigFallbackForTransientDeviceDoesNotLogEvent(): void
+    {
+        $device = new Device();
+        $device->hostname = 'transient.example.com';
+        $device->exists = false;
+        $device->setRelation('attribs', new Collection);
+        $device->setAttribute('snmpver', 'v2c');
+        $device->setAttribute('community', 'transient-comm');
+
+        $mockEventlog = \Mockery::mock(\App\Models\Eventlog::class);
+        $this->app->instance(\App\Models\Eventlog::class, $mockEventlog);
+
+        $mockEventlog->shouldNotReceive('_log');
+
+        $config = $device->toSnmpConfig();
+
+        $this->assertSame('v2c', $config->version);
+        $this->assertSame('transient-comm', $config->community);
     }
 }

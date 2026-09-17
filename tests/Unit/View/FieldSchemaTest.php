@@ -176,7 +176,7 @@ final class FieldSchemaTest extends TestCase
             device: $device,
         );
 
-        $config = IpmiConfig::fromModel($devicePollingMethod);
+        $config = IpmiConfig::fromPollingMethod($devicePollingMethod);
         $this->assertSame('switch.example.com', $config->hostname);
         $this->assertSame(623, $config->port);
         $this->assertSame(3, $config->timeout);
@@ -187,7 +187,7 @@ final class FieldSchemaTest extends TestCase
             settings: ['hostname' => 'ipmi.example.com', 'port' => 6230],
             device: $device,
         );
-        $overrideConfig = IpmiConfig::fromModel($overrideMethod);
+        $overrideConfig = IpmiConfig::fromPollingMethod($overrideMethod);
         $this->assertSame('ipmi.example.com', $overrideConfig->hostname);
         $this->assertSame(6230, $overrideConfig->port);
     }

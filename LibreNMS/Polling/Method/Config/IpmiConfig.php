@@ -26,7 +26,7 @@ class IpmiConfig extends PollingMethodConfig
         return $this->enabled;
     }
 
-    public static function fromModel(DevicePollingMethod $method): static
+    public static function fromPollingMethod(DevicePollingMethod $method): static
     {
         if ($method->method_type !== PollingMethodType::Ipmi) {
             throw new \Exception('Invalid polling method type');

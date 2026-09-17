@@ -12,7 +12,7 @@ abstract class PollingMethodConfig
     ) {
     }
 
-    abstract public static function fromModel(DevicePollingMethod $method): static;
+    abstract public static function fromPollingMethod(DevicePollingMethod $method): static;
 
     public function isEnabled(): bool
     {
