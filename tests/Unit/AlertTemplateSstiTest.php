@@ -12,13 +12,12 @@ class AlertTemplateSstiTest extends TestCase
     {
         $GLOBALS['__test_ssti_flag'] = false;
 
-        $maliciousDisplay = 'Router1 {{ ($GLOBALS["__test_ssti_flag"] = true) ? "malicious" : "" }}';
+        $maliciousDisplay = 'Router1 {{ ($GLOBALS["__test_ssti_flag"] = true) ? "malicious" : "" }} & Switch';
 
         $data = [
             'state' => 1,
             'display' => $maliciousDisplay,
             'name' => 'Test Rule',
-            'title' => 'Alert for device ' . $maliciousDisplay . ' - Test Rule',
             'template' => (new AlertTemplate)->forceFill([
                 'name' => 'Default Alert Template',
                 'title' => '',
@@ -29,7 +28,6 @@ class AlertTemplateSstiTest extends TestCase
                 'state' => 1,
                 'display' => $maliciousDisplay,
                 'name' => 'Test Rule',
-                'title' => 'Alert for device ' . $maliciousDisplay . ' - Test Rule',
             ],
         ];
 
@@ -37,7 +35,7 @@ class AlertTemplateSstiTest extends TestCase
         $renderedTitle = $tpl->getTitle($data);
 
         $this->assertFalse($GLOBALS['__test_ssti_flag'], 'Blade expressions in device display string should not be evaluated');
-        $this->assertEquals('Alert for device ' . e($maliciousDisplay) . ' - Test Rule', $renderedTitle);
+        $this->assertEquals('Alert for device ' . $maliciousDisplay . ' - Test Rule', $renderedTitle);
 
         unset($GLOBALS['__test_ssti_flag']);
     }
@@ -58,7 +56,6 @@ class AlertTemplateSstiTest extends TestCase
                 'state' => 1,
                 'display' => 'my-switch-01',
                 'name' => 'Ping Latency',
-                'title' => 'Fallback Title',
             ],
         ];
 
@@ -78,7 +75,6 @@ class AlertTemplateSstiTest extends TestCase
             'state' => 1,
             'display' => $maliciousDisplay,
             'name' => 'Test Rule',
-            'title' => 'Alert for device ' . $maliciousDisplay . ' - Test Rule',
             'template' => (new AlertTemplate)->forceFill([
                 'name' => 'Default Alert Template',
                 'title' => '',
@@ -89,7 +85,6 @@ class AlertTemplateSstiTest extends TestCase
                 'state' => 1,
                 'display' => $maliciousDisplay,
                 'name' => 'Test Rule',
-                'title' => 'Alert for device ' . $maliciousDisplay . ' - Test Rule',
             ],
         ];
 
@@ -97,8 +92,32 @@ class AlertTemplateSstiTest extends TestCase
         $renderedTitle = $tpl->getTitle($data);
 
         $this->assertFalse($GLOBALS['__test_ssti_flag_directive'], 'Blade directives like @php in device display string should not be evaluated');
-        $this->assertEquals('Alert for device ' . e($maliciousDisplay) . ' - Test Rule', $renderedTitle);
+        $this->assertEquals('Alert for device ' . $maliciousDisplay . ' - Test Rule', $renderedTitle);
 
         unset($GLOBALS['__test_ssti_flag_directive']);
+    }
+
+    public function testCustomTemplateFailureFallsBackToSafeDefaultTitle(): void
+    {
+        $data = [
+            'state' => 1,
+            'display' => 'router & switch',
+            'name' => 'Test Rule',
+            'template' => (new AlertTemplate)->forceFill([
+                'name' => 'Broken Template',
+                'title' => '{{ syntax error unclosed',
+                'template' => '{{ $alert->title }}',
+            ]),
+            'alert' => [
+                'state' => 1,
+                'display' => 'router & switch',
+                'name' => 'Test Rule',
+            ],
+        ];
+
+        $tpl = new Template();
+        $renderedTitle = $tpl->getTitle($data);
+
+        $this->assertEquals('Alert for device router & switch - Test Rule', $renderedTitle);
     }
 }

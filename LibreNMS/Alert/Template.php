@@ -93,22 +93,25 @@ class Template
         $template = $data['template'] ?? null;
         $state = $data['state'] ?? ($data['alert']['state'] ?? null);
         $isRecovered = $state == AlertState::RECOVERED;
-        $defaultTemplate = $isRecovered
-            ? 'Device {{ $alert->display }} recovered from {{ $alert->name ?: $alert->rule }}'
-            : 'Alert for device {{ $alert->display }} - {{ $alert->name }}';
-        $templateTitle = $isRecovered
-            ? ($template->title_rec ?: $defaultTemplate)
-            : ($template->title ?: $defaultTemplate);
 
-        $alert['alert'] = new AlertData($data['alert'] ?? $data);
-        try {
-            $title = Blade::render($templateTitle, $alert);
-        } catch (\Exception) {
+        $alertData = new AlertData($data['alert'] ?? $data);
+
+        $defaultTitle = $isRecovered
+            ? 'Device ' . $alertData->display . ' recovered from ' . ($alertData->name ?: $alertData->rule)
+            : 'Alert for device ' . $alertData->display . ' - ' . $alertData->name;
+
+        $templateTitle = $isRecovered
+            ? ($template->title_rec ?? null)
+            : ($template->title ?? null);
+
+        if (! empty($templateTitle)) {
             try {
-                $title = Blade::render($defaultTemplate, $alert);
+                $title = Blade::render($templateTitle, ['alert' => $alertData]);
             } catch (\Exception) {
-                return (string) ($data['title'] ?? '');
+                $title = $defaultTitle;
             }
+        } else {
+            $title = $defaultTitle;
         }
 
         if ($state == AlertState::ACKNOWLEDGED) {
