@@ -55,7 +55,7 @@ class XklEdfaAlarmChange implements SnmptrapHandler
          */
         $edfaName = $trap->getOidData($trap->findOid('XKL-MIB::xklEDFAName'));
         $moduleName = $trap->getOidData($trap->findOid('XKL-MIB::xklEDFAModuleAlarms'));
-        $message = "$edfaName module alarm: $moduleName";
+        $message = "$edfaName module alarm: $moduleName.";
 
         if ($trap->getOidData($trap->findOid('XKL-MIB::xklEDFAInReset')) == 'yes') {
             $message = "$edfaName reset.";
