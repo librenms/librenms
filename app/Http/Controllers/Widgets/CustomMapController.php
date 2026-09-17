@@ -40,11 +40,6 @@ class CustomMapController extends WidgetController
         'screenshot' => false,
     ];
 
-    public function __construct()
-    {
-        $this->authorizeResource(CustomMap::class, 'map');
-    }
-
     public function getView(Request $request): string|View
     {
         $data = $this->getSettings();

@@ -114,7 +114,7 @@ class Device extends BaseModel
     ];
 
     /**
-     * @return array{inserted: 'datetime', last_discovered: 'datetime', last_polled: 'datetime', last_ping: 'datetime', status: 'boolean'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -122,7 +122,6 @@ class Device extends BaseModel
             'inserted' => 'datetime',
             'last_discovered' => 'datetime',
             'last_polled' => 'datetime',
-            'last_ping' => 'datetime',
             'status' => 'boolean',
             'mtu_status' => 'boolean',
             'ignore' => 'boolean',

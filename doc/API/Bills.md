@@ -142,7 +142,7 @@ Retrieve a graph image associated with a bill.
 NB: this call always returns a png graph, even with the SVG setting.
 The graph does not come from rrdtool.
 
-Route: `/api/v0/bills/:id/graphs/:graph_type
+Route: `/api/v0/bills/:id/graphs/:graph_type`
 
 Example:
 

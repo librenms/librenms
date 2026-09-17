@@ -33,7 +33,6 @@ namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Facades\Rrd;
 use App\Models\AlertLog;
 use App\Models\AlertRule;
 use App\Models\AlertTransport;
@@ -47,9 +46,7 @@ use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
-use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
 
 class RunAlerts
@@ -130,18 +127,15 @@ class RunAlerts
         $obj['status_reason'] = $device->status_reason;
 
         if ((new ConnectivityHelper($device))->icmpIsEnabled()) {
-            try {
-                $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
-                if ($last_ping) {
-                    $obj['ping_timestamp'] = $last_ping->timestamp;
-                    $obj['ping_loss'] = Number::calculatePercent($last_ping->get('xmt') - $last_ping->get('rcv'), $last_ping->get('xmt'));
-                    $obj['ping_min'] = $last_ping->get('min');
-                    $obj['ping_max'] = $last_ping->get('max');
-                    $obj['ping_avg'] = $last_ping->get('avg');
-                    $obj['debug'] = 'unsupported';
-                }
-            } catch (RrdException $e) {
-                Log::error("Error getting last ping for device {$device->hostname}: {$e->getMessage()}");
+            if ($device->stats) {
+                $obj['ping_timestamp'] = $device->stats->ping_last_timestamp;
+                $obj['ping_loss'] = $device->stats->ping_loss_last;
+                $obj['ping_min'] = '';
+                $obj['ping_max'] = '';
+                $obj['ping_avg'] = $device->stats->ping_rtt_last;
+                $obj['debug'] = 'unsupported';
+            } else {
+                Log::info("No last ping stats for device {$device->hostname}");
             }
         }
         $extra = $alert['details'];
@@ -305,10 +299,7 @@ class RunAlerts
     {
         foreach ($this->loadAlerts('alerts.state = ' . AlertState::ACKNOWLEDGED . ' AND alerts.open = ' . AlertState::ACTIVE) as $alert) {
             $rextra = json_decode((string) $alert['extra'], true);
-            if (! isset($rextra['acknowledgement'])) {
-                // backwards compatibility check
-                $rextra['acknowledgement'] = true;
-            }
+            $rextra['acknowledgement'] ??= true;
 
             if ($rextra['acknowledgement']) {
                 // Rule is set to send an acknowledgement alert
@@ -506,15 +497,9 @@ class RunAlerts
             $noacc = false;
             $updet = false;
             $rextra = json_decode((string) $alert['extra'], true);
-            if (! isset($rextra['recovery'])) {
-                // backwards compatibility check
-                $rextra['recovery'] = true;
-            }
+            $rextra['recovery'] ??= true;
 
-            if (! isset($alert['details']['count'])) {
-                // make sure count is set for below code, in legacy code null would get type juggled to 0
-                $alert['details']['count'] = 0;
-            }
+            $alert['details']['count'] ??= 0;
 
             $status_check = DB::table('devices')
                 ->where('device_id', $alert['device_id'])
