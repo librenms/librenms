@@ -1,0 +1,103 @@
+modules:
+    os:
+        hardware: POWER-SYSTEM-MIB::psPs1Sys.0
+        version: POWER-SYSTEM-MIB::psPs1Swv.0
+        serial: POWER-SYSTEM-MIB::psPs1Sn.0
+    sensors:
+        state:
+            data:
+                -
+                    oid: POWER-SYSTEM-MIB::psRecTable
+                    value: POWER-SYSTEM-MIB::psRecEntryStt
+                    num_oid: '.1.3.6.1.4.1.1751.2.71.1.1.7.1.7.{{ $index }}'
+                    index: 'psRecEntryStt.{{ $index }}'
+                    descr: '{{ POWER-SYSTEM-MIB::psRecEntryDes }}'
+                    state_name: psRecEntryStt
+                    states:
+                        - { value: 1, descr: 'ON', generic: 0 }
+                        - { value: 2, descr: 'OFF', generic: 2 }
+                        - { value: 3, descr: 'STANDBY', generic: 1 }
+                        - { value: 4, descr: 'OFF(RFA)', generic: 2 }
+                        - { value: 5, descr: 'VACANT', generic: 1 }
+                -
+                    oid: POWER-SYSTEM-MIB::psRecTable
+                    value: POWER-SYSTEM-MIB::psRecEntryRfa
+                    num_oid: '.1.3.6.1.4.1.1751.2.71.1.1.7.1.14.{{ $index }}'
+                    index: 'psRecEntryRfa.{{ $index }}'
+                    descr: '{{ POWER-SYSTEM-MIB::psRecEntryDes }} Fail'
+                    state_name: psRecEntryRfa
+                    states:
+                        - { value: 0, descr: 'Normal', generic: 0 }
+                        - { value: 1, descr: 'Fail', generic: 2 }
+                -
+                    oid: POWER-SYSTEM-MIB::psRecTable
+                    value: POWER-SYSTEM-MIB::psRecEntryAcf
+                    num_oid: '.1.3.6.1.4.1.1751.2.71.1.1.7.1.15.{{ $index }}'
+                    index: 'psRecEntryAcf.{{ $index }}'
+                    descr: '{{ POWER-SYSTEM-MIB::psRecEntryDes }} AC Fail'
+                    state_name: psRecEntryAcf
+                    states:
+                        - { value: 0, descr: 'Normal', generic: 0 }
+                        - { value: 1, descr: 'AC Fail', generic: 2 }
+                -
+                    oid: POWER-SYSTEM-MIB::psRecTable
+                    value: POWER-SYSTEM-MIB::psRecEntryRcf
+                    num_oid: '.1.3.6.1.4.1.1751.2.71.1.1.7.1.26.{{ $index }}'
+                    index: 'psRecEntryRcf.{{ $index }}'
+                    descr: '{{ POWER-SYSTEM-MIB::psRecEntryDes }} Comms'
+                    state_name: psRecEntryRcf
+                    states:
+                        - { value: 0, descr: 'Normal', generic: 0 }
+                        - { value: 1, descr: 'Comms Fail', generic: 2 }
+
+        voltage:
+            data:
+                -
+                    oid: POWER-SYSTEM-MIB::psDc1Vdc
+                    num_oid: '.1.3.6.1.4.1.1751.2.71.1.1.1.4.0{{ $noindex }}'
+                    index: 'psDc1Vdc.0'
+                    descr: 'System DC Voltage'
+                    divisor: 1000
+                -
+                    oid: POWER-SYSTEM-MIB::psRecTable
+                    value: POWER-SYSTEM-MIB::psRecEntryVdc
+                    num_oid: '.1.3.6.1.4.1.1751.2.71.1.1.7.1.6.{{ $index }}'
+                    index: 'psRecEntryVdc.{{ $index }}'
+                    descr: 'DC Voltage - {{ POWER-SYSTEM-MIB::psRecEntryDes }}'
+                -
+                    oid: POWER-SYSTEM-MIB::psRecTable
+                    value: POWER-SYSTEM-MIB::psRecEntryVac
+                    num_oid: '.1.3.6.1.4.1.1751.2.71.1.1.7.1.29.{{ $index }}'
+                    index: 'psRecEntryVac.{{ $index }}'
+                    descr: 'AC Voltage - {{ POWER-SYSTEM-MIB::psRecEntryDes }}'
+
+        current:
+            data:
+                -
+                    oid: POWER-SYSTEM-MIB::psDc1Adc
+                    num_oid: '.1.3.6.1.4.1.1751.2.71.1.1.1.5.0{{ $noindex }}'
+                    index: 'psDc1Adc.0'
+                    descr: 'System Current'
+                -
+                    oid: POWER-SYSTEM-MIB::psRecTable
+                    value: POWER-SYSTEM-MIB::psRecEntryAdc
+                    num_oid: '.1.3.6.1.4.1.1751.2.71.1.1.7.1.5.{{ $index }}'
+                    index: 'psRecEntryAdc.{{ $index }}'
+                    descr: 'DC Current - {{ POWER-SYSTEM-MIB::psRecEntryDes }}'
+                -
+                    oid: POWER-SYSTEM-MIB::psRecTable
+                    value: POWER-SYSTEM-MIB::psRecEntryAac
+                    num_oid: '.1.3.6.1.4.1.1751.2.71.1.1.7.1.33.{{ $index }}'
+                    index: 'psRecEntryAac.{{ $index }}'
+                    descr: 'AC Current - {{ POWER-SYSTEM-MIB::psRecEntryDes }}'
+                    divisor: 1000
+
+        temperature:
+            data:
+                -
+                    oid: POWER-SYSTEM-MIB::psRecTable
+                    value: POWER-SYSTEM-MIB::psRecEntryTmp
+                    num_oid: '.1.3.6.1.4.1.1751.2.71.1.1.7.1.10.{{ $index }}'
+                    descr: '{{ POWER-SYSTEM-MIB::psRecEntryDes }}'
+                    low_limit: 0
+                    high_limit: 85
