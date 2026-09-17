@@ -57,8 +57,33 @@ final class SnmpConfig extends PollingMethodConfig
         public int $maxRepeaters = 0,
         public int $maxOid = 10,
         public bool $bulk = true,
+        public string $portAssociationMode = 'ifIndex',
     ) {
         parent::__construct($enabled, $affectsAvailability);
+    }
+
+    public function isValid(): bool
+    {
+        if ($this->version === 'v3') {
+            if ($this->authlevel === 'authNoPriv') {
+                return ! empty($this->authname) && ! empty($this->authpass);
+            }
+
+            if ($this->authlevel === 'authPriv') {
+                return ! empty($this->authname)
+                    && ! empty($this->authpass)
+                    && ! empty($this->cryptoalgo)
+                    && ! empty($this->cryptopass);
+            }
+
+            return $this->authlevel === 'noAuthNoPriv';
+        }
+
+        if ($this->version === 'v2c' || $this->version === 'v1') {
+            return ! empty($this->community);
+        }
+
+        return false;
     }
 
     private static function fromSettingsAndSecretData(
@@ -112,6 +137,11 @@ final class SnmpConfig extends PollingMethodConfig
                 ),
                 FILTER_VALIDATE_BOOLEAN
             ),
+            portAssociationMode: $settings['port_association_mode']
+                ?? (isset($settings['port_association_mode_id']) && is_numeric($settings['port_association_mode_id'])
+                    ? \LibreNMS\Enum\PortAssociationMode::getName((int) $settings['port_association_mode_id'])
+                    : null)
+                ?? LibrenmsConfig::get('default_port_association_mode', 'ifIndex'),
         );
     }
 
@@ -144,6 +174,7 @@ final class SnmpConfig extends PollingMethodConfig
                 'max_repeaters' => $device->getAttrib('snmp_max_repeaters'),
                 'max_oid' => $device->getAttrib('snmp_max_oid'),
                 'bulk' => $device->getAttrib('snmp_bulk'),
+                'port_association_mode' => isset($device->port_association_mode) ? \LibreNMS\Enum\PortAssociationMode::getName((int) $device->port_association_mode) : null,
             ],
             secretData: new SnmpSecretData(
                 version: (string) ($device->getAttribute('snmpver') ?: 'v2c'),
@@ -173,6 +204,9 @@ final class SnmpConfig extends PollingMethodConfig
                 'max_repeaters' => $device['snmp_max_repeaters'] ?? null,
                 'max_oid' => $device['snmp_max_oid'] ?? null,
                 'bulk' => $device['snmp_bulk'] ?? null,
+                'port_association_mode' => isset($device['port_association_mode'])
+                    ? (is_numeric($device['port_association_mode']) ? \LibreNMS\Enum\PortAssociationMode::getName((int) $device['port_association_mode']) : $device['port_association_mode'])
+                    : null,
             ],
             secretData: new SnmpSecretData(
                 version: (string) ($device['snmpver'] ?? 'v2c'),

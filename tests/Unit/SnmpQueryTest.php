@@ -4,6 +4,7 @@ namespace LibreNMS\Tests\Unit;
 
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use App\Models\Secret;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
@@ -35,12 +36,18 @@ class SnmpQueryTest extends TestCase
         $device->device_id = 1;
         $device->setRelation('attribs', new Collection);
 
-        $method = DevicePollingMethod::transient(
-            PollingMethodType::Snmp,
-            settings: array_merge(['timeout' => 2, 'retries' => 1], $settings),
-            secretData: array_merge(['version' => 'v2c', 'community' => 'test-community'], $secretData),
-            device: $device,
-        );
+        $secret = new Secret([
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'data' => array_merge(['version' => 'v2c', 'community' => 'test-community'], $secretData),
+        ]);
+        $method = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
+            'enabled' => true,
+            'affects_availability' => true,
+            'settings' => array_merge(['timeout' => 2, 'retries' => 1], $settings),
+        ]);
+        $method->setRelation('device', $device);
+        $method->setRelation('secret', $secret);
         $device->setRelation('pollingMethods', collect([$method]));
 
         return $device;

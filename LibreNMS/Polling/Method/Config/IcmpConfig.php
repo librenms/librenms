@@ -11,11 +11,12 @@ class IcmpConfig extends PollingMethodConfig
         public bool $enabled,
         public bool $affectsAvailability,
     ) {
+        parent::__construct($enabled, $affectsAvailability);
     }
 
-    public function isEnabled(): bool
+    public function isValid(): bool
     {
-        return $this->enabled;
+        return true;
     }
 
     public static function fromPollingMethod(DevicePollingMethod $method): static
@@ -25,8 +26,8 @@ class IcmpConfig extends PollingMethodConfig
         }
 
         return new static(
-            enabled: $method->enabled,
-            affectsAvailability: $method->affects_availability,
+            enabled: $method->enabled ?? true,
+            affectsAvailability: $method->affects_availability ?? false,
         );
     }
 }

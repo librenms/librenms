@@ -33,6 +33,18 @@ class UnixAgentPollingMethodDefinition extends PollingMethodDefinition
         ];
     }
 
+    public function fallbackConfig(\App\Models\Device $device): UnixAgentConfig
+    {
+        $method = new \App\Models\DevicePollingMethod([
+            'method_type' => \LibreNMS\Enum\PollingMethodType::UnixAgent,
+            'enabled' => false,
+            'affects_availability' => $this->defaultAffectsAvailability(),
+        ]);
+        $method->setRelation('device', $device);
+
+        return UnixAgentConfig::fromPollingMethod($method);
+    }
+
     public function defaultAffectsAvailability(): bool
     {
         return false;

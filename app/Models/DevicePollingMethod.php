@@ -42,15 +42,6 @@ class DevicePollingMethod extends Model
         'last_check_successful' => 'boolean',
     ];
 
-    private ?PollingMethodConfig $configCache = null;
-
-    public function setAttribute($key, $value)
-    {
-        $this->invalidateConfigCache();
-
-        return parent::setAttribute($key, $value);
-    }
-
     /**
      * Save or update a DevicePollingMethod row settings for a device.
      *
@@ -77,57 +68,6 @@ class DevicePollingMethod extends Model
         $method->settings = $definition->filterOverrides($settings, $method->settings ?? []);
 
         $method->save();
-        $method->invalidateConfigCache();
-
-        return $method;
-    }
-
-    /**
-     * Build an unsaved, transient in-memory DevicePollingMethod model.
-     *
-     * @param  array<string, mixed>  $settings
-     * @param  SnmpSecretData|IpmiSecretData|array<string, mixed>|null  $secretData
-     */
-    public static function transient(
-        PollingMethodType $type,
-        array $settings = [],
-        SnmpSecretData|IpmiSecretData|array|null $secretData = null,
-        ?Device $device = null,
-        ?bool $affectsAvailability = null,
-        bool $enabled = true,
-        ?Secret $secret = null,
-    ): self {
-        $definition = $type->definition();
-        $filteredSettings = $definition->filterOverrides($settings);
-        $affectsAvail = $affectsAvailability ?? $definition->defaultAffectsAvailability();
-
-        $method = new static([
-            'method_type' => $type,
-            'enabled' => $enabled,
-            'affects_availability' => $affectsAvail,
-            'settings' => $filteredSettings,
-        ]);
-
-        if ($device !== null) {
-            $method->device_id = $device->device_id;
-            $method->setRelation('device', $device);
-        }
-
-        if ($secret !== null) {
-            $method->setRelation('secret', $secret);
-            $method->secret_id = $secret->id;
-        } elseif ($definition->secretDefinition() !== null && ! empty($secretData)) {
-            $dataArray = $secretData instanceof SnmpSecretData || $secretData instanceof IpmiSecretData
-                ? $secretData->toArray()
-                : $secretData;
-
-            $createdSecret = new Secret([
-                'secret_type' => $type->value,
-                'description' => $device ? strtoupper($type->value) . ' ' . $device->hostname : '',
-                'data' => $dataArray,
-            ]);
-            $method->setRelation('secret', $createdSecret);
-        }
 
         return $method;
     }
@@ -139,18 +79,9 @@ class DevicePollingMethod extends Model
 
     public function toConfig(): PollingMethodConfig
     {
-        if ($this->configCache !== null) {
-            return $this->configCache;
-        }
-
         $class = $this->method_type->definition()->class();
 
-        return $this->configCache = $class::fromPollingMethod($this);
-    }
-
-    public function invalidateConfigCache(): void
-    {
-        $this->configCache = null;
+        return $class::fromPollingMethod($this);
     }
 
     /** @return BelongsTo<Device, $this> */

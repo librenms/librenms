@@ -3,7 +3,6 @@
 namespace LibreNMS\Polling\Method;
 
 use App\Models\Device;
-use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
@@ -26,11 +25,15 @@ readonly class PollingMethodAccessor
      */
     private function get(PollingMethodType $type, string $class): PollingMethodConfig
     {
-        $method = $this->device->pollingMethod($type)
-            ?? DevicePollingMethod::transient($type, device: $this->device, enabled: false);
+        $method = $this->device->pollingMethod($type);
+
+        if ($method && (! $type->hasSecret() || $method->secret !== null)) {
+            /** @var T */
+            return $method->toConfig();
+        }
 
         /** @var T */
-        return $method->toConfig();
+        return $type->definition()->fallbackConfig($this->device);
     }
 
     public function snmp(): SnmpConfig

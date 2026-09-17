@@ -39,6 +39,18 @@ class IpmiPollingMethodDefinition extends PollingMethodDefinition
         ];
     }
 
+    public function fallbackConfig(\App\Models\Device $device): IpmiConfig
+    {
+        $method = new \App\Models\DevicePollingMethod([
+            'method_type' => \LibreNMS\Enum\PollingMethodType::Ipmi,
+            'enabled' => false,
+            'affects_availability' => $this->defaultAffectsAvailability(),
+        ]);
+        $method->setRelation('device', $device);
+
+        return IpmiConfig::fromPollingMethod($method);
+    }
+
     public function defaultAffectsAvailability(): bool
     {
         return false;

@@ -15,8 +15,11 @@ class SnmpProbe extends PollingMethodProbe
             || $response->getExitCode() === 2
             || $response->isValid();
 
+        $error = (! $success) ? ($response->getErrorMessage() ?: ($response->stderr ?: null)) : null;
+
         return new ProbeResult($success, [
             'response' => $response,
-        ]);
+            'error' => $error,
+        ], $error);
     }
 }

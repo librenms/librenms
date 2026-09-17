@@ -19,11 +19,12 @@ class IpmiConfig extends PollingMethodConfig
         public int $timeout,
         public string $type,
     ) {
+        parent::__construct($enabled, $affectsAvailability);
     }
 
-    public function isEnabled(): bool
+    public function isValid(): bool
     {
-        return $this->enabled;
+        return ! empty($this->username) && ! empty($this->password);
     }
 
     public static function fromPollingMethod(DevicePollingMethod $method): static
@@ -38,12 +39,12 @@ class IpmiConfig extends PollingMethodConfig
         $ipmiSecretData = $secretData instanceof \LibreNMS\Polling\Secrets\Data\IpmiSecretData ? $secretData : new \LibreNMS\Polling\Secrets\Data\IpmiSecretData();
 
         return new static(
-            $method->enabled,
-            $method->affects_availability,
+            $method->enabled ?? true,
+            $method->affects_availability ?? false,
             $ipmiSecretData->username,
             $ipmiSecretData->password,
             $ipmiSecretData->kgKey,
-            ! empty($settings['hostname']) ? $settings['hostname'] : ($method->device->hostname ?? ''),
+            ! empty($settings['hostname']) ? (string) $settings['hostname'] : ($method->device ? (string) $method->device->hostname : ''),
             (int) ($settings['port'] ?? 623),
             (int) ($settings['ciphersuite'] ?? 0),
             (int) ($settings['timeout'] ?? 3),

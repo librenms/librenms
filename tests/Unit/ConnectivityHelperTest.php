@@ -48,18 +48,20 @@ final class ConnectivityHelperTest extends TestCase
         $snmpProbeMock->shouldReceive('check')->andReturn(...$snmpResults);
 
         $device = new Device();
-        $icmpMethod = DevicePollingMethod::transient(
-            type: PollingMethodType::Icmp,
-            device: $device,
-            enabled: true,
-            affectsAvailability: true,
-        );
-        $snmpMethod = DevicePollingMethod::transient(
-            type: PollingMethodType::Snmp,
-            device: $device,
-            enabled: true,
-            affectsAvailability: true,
-        );
+        $icmpMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+            'affects_availability' => true,
+        ]);
+        $icmpMethod->setRelation('device', $device);
+
+        $snmpMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
+            'enabled' => true,
+            'affects_availability' => true,
+        ]);
+        $snmpMethod->setRelation('device', $device);
+
         $device->setRelation('pollingMethods', collect([$icmpMethod, $snmpMethod]));
 
         $this->swap(CheckDeviceAvailability::class, new CheckDeviceAvailabilityMock([

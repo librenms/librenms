@@ -29,6 +29,15 @@ abstract class PollingMethodDefinition implements HasFieldSchema
         return null;
     }
 
+    public function onProbeComplete(\App\Models\Device $device, \LibreNMS\Polling\Method\Probe\ProbeResult $result, bool $commit = false): void
+    {
+    }
+
+    /**
+     * @return T
+     */
+    abstract public function fallbackConfig(\App\Models\Device $device): PollingMethodConfig;
+
     abstract public function icon(): string;
 
     /**
