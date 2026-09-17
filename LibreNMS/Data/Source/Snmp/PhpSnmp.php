@@ -78,7 +78,7 @@ class PhpSnmp implements SnmpBackendInterface
         $snmp = new \SNMP(
             $this->snmpver($config->version),
             Rewrite::addIpv6Brackets($config->target) . ':' . $config->port,
-            $config->community ?: 'public',
+            $community,
             $config->timeout * 1000000,
             $config->retries,
         );
