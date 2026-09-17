@@ -19,6 +19,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
@@ -48,6 +49,7 @@ class PollDevice implements ShouldQueue
     public function __construct(
         public int $device_id,
         public ModuleList $moduleList,
+        public bool $nodata,
     ) {
     }
 
@@ -90,7 +92,9 @@ class PollDevice implements ShouldQueue
         }
 
         // finalize the device poll
-        $this->device->save();
+        if (! $this->nodata) {
+            $this->device->save();
+        }
 
         Log::info(sprintf("\n>>> Polled %s (%s) in %0.3f seconds <<<",
             $this->device->displayName(),
@@ -127,6 +131,9 @@ class PollDevice implements ShouldQueue
         $datastore = app('Datastore');
 
         foreach ($this->moduleList->modulesWithStatus(ProcessType::Poller, $this->device) as $module => $module_status) {
+            if ($this->nodata) {
+                DB::beginTransaction();
+            }
             $should_poll = false;
             $start_memory = memory_get_usage();
             $module_start = microtime(true);
@@ -155,6 +162,9 @@ class PollDevice implements ShouldQueue
                 // isolate module exceptions so they don't disrupt the polling process
                 Eventlog::log("Error polling $module module: " . class_basename($e) . '. Check log file for more details.', $this->device, 'poller', Severity::Error);
                 report($e);
+            }
+            if ($this->nodata) {
+                DB::rollBack();
             }
 
             if ($should_poll) {
