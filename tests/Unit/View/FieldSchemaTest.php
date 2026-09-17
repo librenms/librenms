@@ -47,7 +47,8 @@ final class FieldSchemaTest extends TestCase
 
     public function testFormDefaultsOnlyIncludesSelectFields(): void
     {
-        $schemaObject = new class implements HasFieldSchema {
+        $schemaObject = new class implements HasFieldSchema
+        {
             use HandlesFieldSchema;
 
             public function fields(): array
@@ -72,7 +73,8 @@ final class FieldSchemaTest extends TestCase
 
     public function testFilterOverridesOmitsEmptyAndDefaultValues(): void
     {
-        $schemaObject = new class implements HasFieldSchema {
+        $schemaObject = new class implements HasFieldSchema
+        {
             use HandlesFieldSchema;
 
             public function fields(): array
@@ -119,7 +121,8 @@ final class FieldSchemaTest extends TestCase
 
     public function testResolveValuesFallsBackToDefaults(): void
     {
-        $schemaObject = new class implements HasFieldSchema {
+        $schemaObject = new class implements HasFieldSchema
+        {
             use HandlesFieldSchema;
 
             public function fields(): array
