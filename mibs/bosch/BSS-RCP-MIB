@@ -1,0 +1,1174 @@
+-- Title: bss-rcp.mib
+--  Version:  9.80.0041
+--  Date:     2022-09-24 18:40:56
+--
+--  Copyright 2022 @ Bosch Sicherheitssysteme Engineering GmbH
+--
+--  Auto-generated file parsed from source code
+--  This MIB defines objects for an SNMP agent and provides the
+--  functionality to configure devices running firmware or software
+--  created by Bosch Sicherheitssysteme Engineering GmbH
+--
+--  If the textual name of an OID ends on "...Table", this indicates
+--  that the following item, whose name ends on "...Entry", can
+--  have zero or more instances. For example:
+--  1.3.6.1.4.1.3967.1.1.1.3              camnameTable
+--  1.3.6.1.4.1.3967.1.1.1.3.1               camnameEntry
+--  1.3.6.1.4.1.3967.1.1.1.3.1.1                camname
+--  To query a camname, extend the OID of the camname by the
+--  instance number, for example:
+--  1.3.6.1.4.1.3967.1.1.1.3.1.1.2              camname
+--  for the camname of the second instance.
+--
+--
+-- List of traps:
+--    relay-output-state
+--    input-pin-state
+--    video-alarm-state
+--    motion-alarm-state
+--    connect-to
+--    disconnect-primitive
+--    viproc-alarm
+--    virtual-alarm-state
+--    power-supply
+--    poe-granted-power
+--    storage-list
+--    temp-sens
+--    eth-link-status
+--    hd-rec-buffer
+--    config-sealing-status
+--    sd-card-life-span-status
+--    login-limiter-message
+--    time-sc-connect-fail-msg
+--
+--
+-- All commands:
+-- 1.3.6.1.4.1.3967.1.1            sys
+-- 1.3.6.1.4.1.3967.1.1.1             identification
+-- 1.3.6.1.4.1.3967.1.1.1.1              unit-name
+-- 1.3.6.1.4.1.3967.1.1.1.2              unit-id
+-- 1.3.6.1.4.1.3967.1.1.1.3              camnameTable
+-- 1.3.6.1.4.1.3967.1.1.1.3.1               camnameEntry
+-- 1.3.6.1.4.1.3967.1.1.1.3.1.1                camname
+-- 1.3.6.1.4.1.3967.1.1.1.4              hardware-version
+-- 1.3.6.1.4.1.3967.1.1.1.5              software-version
+-- 1.3.6.1.4.1.3967.1.1.1.6              serial-number
+-- 1.3.6.1.4.1.3967.1.1.1.7              manufacturer-name
+-- 1.3.6.1.4.1.3967.1.1.2             time
+-- 1.3.6.1.4.1.3967.1.1.2.1              timezone
+-- 1.3.6.1.4.1.3967.1.1.2.2              ntp-server-ip-str
+-- 1.3.6.1.4.1.3967.1.1.2.3              time-sc-connect-fail-msg
+-- 1.3.6.1.4.1.3967.1.1.3             connection
+-- 1.3.6.1.4.1.3967.1.1.3.1              connect-to
+-- 1.3.6.1.4.1.3967.1.1.3.2              disconnect-primitive
+-- 1.3.6.1.4.1.3967.1.1.4             viproc
+-- 1.3.6.1.4.1.3967.1.1.4.1              viprocTable
+-- 1.3.6.1.4.1.3967.1.1.4.1.1               viprocEntry
+-- 1.3.6.1.4.1.3967.1.1.4.1.1.1                viproc-id
+-- 1.3.6.1.4.1.3967.1.1.4.1.1.2                viproc-mode
+-- 1.3.6.1.4.1.3967.1.1.5             aux
+-- 1.3.6.1.4.1.3967.1.1.5.1              oem-device-name
+-- 1.3.6.1.4.1.3967.1.1.5.2              oem-ext-id
+-- 1.3.6.1.4.1.3967.1.1.5.3              defaults
+-- 1.3.6.1.4.1.3967.1.1.5.4              factory-defaults
+-- 1.3.6.1.4.1.3967.1.1.5.5              board-reset
+-- 1.3.6.1.4.1.3967.1.1.5.6              boot-default-app
+-- 1.3.6.1.4.1.3967.1.1.5.7              led-blinking
+-- 1.3.6.1.4.1.3967.1.1.5.9              bsp-dev-errorTable
+-- 1.3.6.1.4.1.3967.1.1.5.9.1               bsp-dev-errorEntry
+-- 1.3.6.1.4.1.3967.1.1.5.9.1.1                bsp-dev-error
+-- 1.3.6.1.4.1.3967.1.1.5.10             livetime-max-temp
+-- 1.3.6.1.4.1.3967.1.1.5.11             livetime-min-temp
+-- 1.3.6.1.4.1.3967.1.1.5.12             livetime-op-minutes
+-- 1.3.6.1.4.1.3967.1.1.5.13             storage-list
+-- 1.3.6.1.4.1.3967.1.1.5.14             hd-rec-buffer
+-- 1.3.6.1.4.1.3967.1.1.5.15             sd-card-life-span-statusTable
+-- 1.3.6.1.4.1.3967.1.1.5.15.1              sd-card-life-span-statusEntry
+-- 1.3.6.1.4.1.3967.1.1.5.15.1.1               sd-card-life-span-status
+-- 1.3.6.1.4.1.3967.1.1.5.16             login-limiter-message
+-- 1.3.6.1.4.1.3967.1.1.6             power-supply
+-- 1.3.6.1.4.1.3967.1.1.7             temperatureTable
+-- 1.3.6.1.4.1.3967.1.1.7.1              temperatureEntry
+-- 1.3.6.1.4.1.3967.1.1.7.1.1               temp-sens
+-- 1.3.6.1.4.1.3967.1.1.8             fan-speedTable
+-- 1.3.6.1.4.1.3967.1.1.8.1              fan-speedEntry
+-- 1.3.6.1.4.1.3967.1.1.8.1.1               fan-speed
+-- 1.3.6.1.4.1.3967.1.1.9             cpu-loadTable
+-- 1.3.6.1.4.1.3967.1.1.9.1              cpu-loadEntry
+-- 1.3.6.1.4.1.3967.1.1.9.1.1               cpu-load-idle
+-- 1.3.6.1.4.1.3967.1.1.9.1.2               cpu-load-coder
+-- 1.3.6.1.4.1.3967.1.1.9.1.3               cpu-load-vca
+-- 1.3.6.1.4.1.3967.1.1.9.1.4               cpu-load
+-- 1.3.6.1.4.1.3967.1.1.10            poe-granted-power
+-- 1.3.6.1.4.1.3967.1.1.11            storage-load
+-- 1.3.6.1.4.1.3967.1.1.12            config-sealing-status
+-- 1.3.6.1.4.1.3967.1.1.13            humidity-valueTable
+-- 1.3.6.1.4.1.3967.1.1.13.1             humidity-valueEntry
+-- 1.3.6.1.4.1.3967.1.1.13.1.1              humidity-value
+-- 1.3.6.1.4.1.3967.1.2            video
+-- 1.3.6.1.4.1.3967.1.2.1             inputTable
+-- 1.3.6.1.4.1.3967.1.2.1.1              inputEntry
+-- 1.3.6.1.4.1.3967.1.2.1.1.1               input-source-val
+-- 1.3.6.1.4.1.3967.1.2.2             encoderTable
+-- 1.3.6.1.4.1.3967.1.2.2.1              encoderEntry
+-- 1.3.6.1.4.1.3967.1.2.2.1.1               video-encoder-status-ext
+-- 1.3.6.1.4.1.3967.1.2.2.1.2               video-encoder-encoded-bytes
+-- 1.3.6.1.4.1.3967.1.3            alarm
+-- 1.3.6.1.4.1.3967.1.3.1             video-alarmTable
+-- 1.3.6.1.4.1.3967.1.3.1.1              video-alarmEntry
+-- 1.3.6.1.4.1.3967.1.3.1.1.1               video-alarm-state
+-- 1.3.6.1.4.1.3967.1.3.2             motion-detectorTable
+-- 1.3.6.1.4.1.3967.1.3.2.1              motion-detectorEntry
+-- 1.3.6.1.4.1.3967.1.3.2.1.1               motion-alarm-state
+-- 1.3.6.1.4.1.3967.1.3.3             viproc-alarmTable
+-- 1.3.6.1.4.1.3967.1.3.3.1              viproc-alarmEntry
+-- 1.3.6.1.4.1.3967.1.3.3.1.1               viproc-alarm
+-- 1.3.6.1.4.1.3967.1.3.4             virtual-alarmTable
+-- 1.3.6.1.4.1.3967.1.3.4.1              virtual-alarmEntry
+-- 1.3.6.1.4.1.3967.1.3.4.1.1               virtual-alarm-state
+-- 1.3.6.1.4.1.3967.1.4            digital-io
+-- 1.3.6.1.4.1.3967.1.4.1             out
+-- 1.3.6.1.4.1.3967.1.4.1.1              relayTable
+-- 1.3.6.1.4.1.3967.1.4.1.1.1               relayEntry
+-- 1.3.6.1.4.1.3967.1.4.1.1.1.1                relay-output-state
+-- 1.3.6.1.4.1.3967.1.4.2             in
+-- 1.3.6.1.4.1.3967.1.4.2.1              input-pin-stateTable
+-- 1.3.6.1.4.1.3967.1.4.2.1.1               input-pin-stateEntry
+-- 1.3.6.1.4.1.3967.1.4.2.1.1.1                input-pin-state
+-- 1.3.6.1.4.1.3967.1.5            network
+-- 1.3.6.1.4.1.3967.1.5.1             interface
+-- 1.3.6.1.4.1.3967.1.5.1.1              mac-address
+-- 1.3.6.1.4.1.3967.1.5.1.2              ip-str
+-- 1.3.6.1.4.1.3967.1.5.1.3              subnet-str
+-- 1.3.6.1.4.1.3967.1.5.1.4              gateway-ip-str
+-- 1.3.6.1.4.1.3967.1.5.1.5              dhcp-val
+-- 1.3.6.1.4.1.3967.1.5.1.6              eth-link
+-- 1.3.6.1.4.1.3967.1.5.1.7              enable-traffic-led
+-- 1.3.6.1.4.1.3967.1.5.1.8              eth-link-statusTable
+-- 1.3.6.1.4.1.3967.1.5.1.8.1               eth-link-statusEntry
+-- 1.3.6.1.4.1.3967.1.5.1.8.1.1                eth-link-status
+-- 1.3.6.1.4.1.3967.1.5.1.9              dns-server-ipTable
+-- 1.3.6.1.4.1.3967.1.5.1.9.1               dns-server-ipEntry
+-- 1.3.6.1.4.1.3967.1.5.1.9.1.1                dns-server-ip
+-- 1.3.6.1.4.1.3967.1.5.1.10             dns-server-ip-stringTable
+-- 1.3.6.1.4.1.3967.1.5.1.10.1              dns-server-ip-stringEntry
+-- 1.3.6.1.4.1.3967.1.5.1.10.1.1               dns-server-ip-string
+-- 1.3.6.1.4.1.3967.1.5.2             snmp-Table
+-- 1.3.6.1.4.1.3967.1.5.2.1              snmp-Entry
+-- 1.3.6.1.4.1.3967.1.5.2.1.1               snmp-traps-host-str
+--
+
+BSS-RCP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, enterprises               FROM SNMPv2-SMI
+    DisplayString                                                      FROM SNMPv2-TC
+    Counter, TimeTicks, Gauge                                          FROM RFC1155-SMI
+    sysUpTime                                                          FROM RFC1213-MIB
+    TRAP-TYPE                                                          FROM RFC-1215;
+
+bss MODULE-IDENTITY
+    LAST-UPDATED "202209241840Z"
+    ORGANIZATION "CORP."
+    CONTACT-INFO " "
+    DESCRIPTION "Bosch"
+    REVISION "202209241840Z"
+    DESCRIPTION "Initial Revision"
+        ::= { enterprises 3967 }
+
+rcp OBJECT IDENTIFIER ::= { bss 1 }
+
+sys OBJECT IDENTIFIER ::= { rcp 1 }
+
+identification OBJECT IDENTIFIER ::= { sys 1 }
+
+unit-name OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: set unit name (max 31 unicode character + null delimiter)
+         READ: read the unit name"
+    ::= { identification 1 }
+
+unit-id OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: set unit ID (max 31 unicode character + null delimiter)
+         READ: read the unit ID"
+    ::= {identification 2}
+
+camnameTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF CamnameEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { identification 3 }
+
+camnameEntry OBJECT-TYPE
+    SYNTAX  CamnameEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { camname }
+    ::= { camnameTable 1 }
+
+camname OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: Deprecated! Use CONF_CAMNAME_LINES instead. (max 31 unicode character + null delimiter)
+         READ: Deprecated! Use CONF_CAMNAME_LINES instead."
+    ::= { camnameEntry 1 }
+
+CamnameEntry ::= SEQUENCE {
+    camname DisplayString
+}
+
+hardware-version OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: read the hardware version"
+    ::= { identification 4 }
+
+software-version OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        " READ: read the software version "
+    ::= { identification 5 }
+
+serial-number OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: returns the serial number of the device. The representation of this serial number is binary octets"
+    ::= { identification 6 }
+
+manufacturer-name OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: returns the manufacturer name"
+    ::= { identification 7 }
+
+
+
+time OBJECT IDENTIFIER ::= { sys 2 }
+
+timezone OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: the timezone in which the unit has to operate (GMT +- nbr of seconds +- nbr of seconds DLS)"
+    ::= { time 1 }
+
+ntp-server-ip-str OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: sets the ntp server ip (as string; xxx.xxx.xxx.xxx or URL) to sync time from
+        READ: reads the time servers ip address (xxx.xxx.xxx.xxx, or URL) used to sync time from"
+    ::= { time 2 }
+
+time-sc-connect-fail-msg OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: neither read nor write access, only message, ##ValueList: 1=connect to server for time sync failed"
+    ::= { time 3 }
+
+
+
+connection OBJECT IDENTIFIER ::= { sys 3 }
+
+connect-to OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: See RCP docu for command CONF_CONNECT_TO"
+    ::= { connection 1 }
+
+disconnect-primitive OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: NOT_SUPPORTED"
+    ::= { connection 2 }
+
+
+viproc OBJECT IDENTIFIER ::= { sys 4 }
+
+viprocTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF ViprocEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { viproc 1 }
+
+viprocEntry OBJECT-TYPE
+    SYNTAX  ViprocEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { viproc-id }
+    ::= { viprocTable 1 }
+
+viproc-id OBJECT-TYPE
+    SYNTAX INTEGER (1..32)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: get the viproc interface id (0:= no viproc), nb: message is sent in host byte order"
+    ::= { viprocEntry 1 }
+
+viproc-mode OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: switches between viproc modes of the video content analysis (VCA). see detailed description ##desc:./doc/CONF_VIPROC_MODE.htm##."
+    ::= { viprocEntry 2 }
+
+ViprocEntry ::= SEQUENCE {
+viproc-id INTEGER,
+viproc-mode INTEGER
+}
+
+
+aux OBJECT IDENTIFIER 
+    ::= { sys 5 }
+
+oem-device-name OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: get the oem device name"
+    ::= { aux 1 }
+
+oem-ext-id OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: DEPRECATED: please use CONF_DEVICE_TYPE_IDS instead. Get the oem extension id"
+    ::= { aux 2 }
+
+defaults OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: sets config to default values except IP, subnet and gateway and resets the device.      ATTENTION: Wait till board has fully rebooted before switching of power, to ensure that defaults are applied completely. Also propagate this to the user, that he has to wait until the reboot is complete.
+         READ: not supported"
+    ::= { aux 3 }
+
+factory-defaults OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: set the configuration to factory defaults and reboot the device. ATTENTION: Wait till board has fully rebooted before switching of power, to ensure that defaults are applied completely. Also propagate this to the user, that he has to wait until the reboot is complete.
+         READ: not supported"
+    ::= { aux 4 }
+
+board-reset OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: reboot the device
+         READ: not supported"
+    ::= { aux 5 }
+
+boot-default-app OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: boot the default application
+         READ: not supported"
+    ::= { aux 6 }
+
+led-blinking OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: 1=power LED will flash for 7 sec
+         READ: NOT_SUPPORTED"
+    ::= { aux 7 }
+
+
+bsp-dev-errorTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Bsp-dev-errorEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { aux 9 }
+
+bsp-dev-errorEntry OBJECT-TYPE
+    SYNTAX  Bsp-dev-errorEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { bsp-dev-error }
+    ::= { bsp-dev-errorTable 1 }
+
+bsp-dev-error OBJECT-TYPE
+    SYNTAX INTEGER (1..128)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: number of bsp devices that encountered an error"
+    ::= { bsp-dev-errorEntry 1 }
+
+Bsp-dev-errorEntry ::= SEQUENCE {
+bsp-dev-error INTEGER
+}
+
+livetime-max-temp OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: read the highest temperature during device livetime in tenths of degrees Celsius"
+    ::= { aux 10 }
+
+livetime-min-temp OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: read the lowest temperature during device livetime in tenths of degrees Celsius"
+    ::= { aux 11 }
+
+livetime-op-minutes OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: read the operation hours counter (total device livetime)"
+    ::= { aux 12 }
+
+storage-list OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: Read the device storage list. ##desc:./doc/CONF_STORAGE_LIST.htm##"
+    ::= { aux 13 }
+
+hd-rec-buffer OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: See RCP docu for command CONF_HD_REC_BUFFER"
+    ::= { aux 14 }
+
+
+sd-card-life-span-statusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Sd-card-life-span-statusEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { aux 15 }
+
+sd-card-life-span-statusEntry OBJECT-TYPE
+    SYNTAX  Sd-card-life-span-statusEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { sd-card-life-span-status }
+    ::= { sd-card-life-span-statusTable 1 }
+
+sd-card-life-span-status OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: See RCP docu for command CONF_SD_CARD_LIFE_SPAN_STATUS"
+    ::= { sd-card-life-span-statusEntry 1 }
+
+Sd-card-life-span-statusEntry ::= SEQUENCE {
+sd-card-life-span-status OCTET STRING
+}
+
+login-limiter-message OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: neither read nor write access, only message, see detailed description ##desc:./doc CONF_LOGIN_LIMITER_MESSAGE.htm##"
+    ::= { aux 16 }
+
+power-supply OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        " "
+    ::= { sys 6 }
+
+
+temperatureTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TemperatureEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { sys 7 }
+
+temperatureEntry OBJECT-TYPE
+    SYNTAX  TemperatureEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { temp-sens }
+    ::= { temperatureTable 1 }
+
+temp-sens OBJECT-TYPE
+    SYNTAX INTEGER(1..128)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: value of the temperature sensor in tenths of degrees Celsius, specified by numdes, in case of negative temperature, the value wraps as 32 bit DWORD and needs to be casted to int"
+    ::= { temperatureEntry 1 }
+
+TemperatureEntry ::= SEQUENCE {
+temp-sens INTEGER
+}
+
+
+fan-speedTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Fan-speedEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { sys 8 }
+
+fan-speedEntry OBJECT-TYPE
+    SYNTAX  Fan-speedEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { fan-speed }
+    ::= { fan-speedTable 1 }
+
+fan-speed OBJECT-TYPE
+    SYNTAX INTEGER(1..128)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        " "
+    ::= { fan-speedEntry 1 }
+
+Fan-speedEntry ::= SEQUENCE {
+fan-speed INTEGER
+}
+
+
+cpu-loadTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Cpu-loadEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { sys 9 }
+
+cpu-loadEntry OBJECT-TYPE
+    SYNTAX  Cpu-loadEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { cpu-load-idle }
+    ::= { cpu-loadTable 1 }
+
+cpu-load-idle OBJECT-TYPE
+    SYNTAX INTEGER(1..128)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: cpu load idle in percent"
+    ::= { cpu-loadEntry 1 }
+
+cpu-load-coder OBJECT-TYPE
+    SYNTAX INTEGER(1..128)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: cpu load coder in percent"
+    ::= { cpu-loadEntry 2 }
+
+cpu-load-vca OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: cpu load vca in percent"
+    ::= { cpu-loadEntry 3 }
+
+cpu-load OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: See RCP docu for command CONF_CPU_LOAD"
+    ::= { cpu-loadEntry 4 }
+
+Cpu-loadEntry ::= SEQUENCE {
+    cpu-load-idle INTEGER,
+    cpu-load-coder INTEGER,
+    cpu-load-vca INTEGER,
+    cpu-load OCTET STRING
+}
+
+poe-granted-power OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: read the current poe power granted by switch / midspan in tenths of Watts"
+    ::= { sys 10 }
+
+storage-load OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: load of local storage in percent"
+    ::= { sys 11 }
+
+config-sealing-status OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: return status of config seal, ##desc:./doc/CONF_CONFIG_SEALING_STATUS.htm##"
+    ::= { sys 12 }
+
+
+humidity-valueTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Humidity-valueEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { sys 13 }
+
+humidity-valueEntry OBJECT-TYPE
+    SYNTAX  Humidity-valueEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { humidity-value }
+    ::= { humidity-valueTable 1 }
+
+humidity-value OBJECT-TYPE
+    SYNTAX INTEGER(1..128)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: value of the humidity sensor specified by numdes (humidity 0 ... 100.00 % maps onto values 0 ... 10000)"
+    ::= { humidity-valueEntry 1 }
+
+Humidity-valueEntry ::= SEQUENCE {
+humidity-value INTEGER
+}
+
+
+
+video OBJECT IDENTIFIER ::= { rcp 2 }
+
+
+inputTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF InputEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { video 1 }
+
+inputEntry OBJECT-TYPE
+    SYNTAX  InputEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { input-source-val }
+    ::= { inputTable 1 }
+
+input-source-val OBJECT-TYPE
+    SYNTAX INTEGER(1..128)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: ##ValueList: 1=camera; 2=vcr; 3=color_plane; 4=auto
+        READ: ##ValueList: 1=camera; 2=vcr; 3=color_plane; 4=auto"
+    ::= { inputEntry 1 }
+
+InputEntry ::= SEQUENCE {
+input-source-val INTEGER
+}
+
+
+encoderTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EncoderEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { video 2 }
+
+encoderEntry OBJECT-TYPE
+    SYNTAX  EncoderEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { video-encoder-status-ext }
+    ::= { encoderTable 1 }
+
+video-encoder-status-ext OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: get encoder status. ##Byte[0:4]: frames per 10 seconds ##Byte[4:4]: KBPS ##Byte[8:4]: grab frames per 10 seconds ##Byte[12:4]:lost frames per 10 seconds (lost frames fps*10 due to overload) ##Byte[16:4]:skipped frames per 10 seconds (skipped frame fps*10 due to configured enc interval in profile or STREAM_PRIORITY)"
+    ::= { encoderEntry 1 }
+
+video-encoder-encoded-bytes OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: Get encoded bytes (32 Bit Counter) since bootup. Only supported for h.264 and Jpeg encoder."
+    ::= { encoderEntry 2 }
+
+EncoderEntry ::= SEQUENCE {
+video-encoder-status-ext OCTET STRING,
+video-encoder-encoded-bytes INTEGER
+}
+
+
+
+alarm OBJECT IDENTIFIER ::= { rcp 3 }
+
+
+video-alarmTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Video-alarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { alarm 1 }
+
+video-alarmEntry OBJECT-TYPE
+    SYNTAX  Video-alarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { video-alarm-state }
+    ::= { video-alarmTable 1 }
+
+video-alarm-state OBJECT-TYPE
+    SYNTAX INTEGER(1..128)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: 0=video alarm is off; 1=video alarm is on (no video signal detected at video input)"
+    ::= { video-alarmEntry 1 }
+
+Video-alarmEntry ::= SEQUENCE {
+video-alarm-state INTEGER
+}
+
+
+motion-detectorTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Motion-detectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { alarm 2 }
+
+motion-detectorEntry OBJECT-TYPE
+    SYNTAX  Motion-detectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { motion-alarm-state }
+    ::= { motion-detectorTable 1 }
+
+motion-alarm-state OBJECT-TYPE
+    SYNTAX INTEGER(1..128)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: 0=motion alarm off; 1=motion alarm on (at least one of the CONF_VIPROC_ALARM alarmbit (except the video loss alarm) is set"
+    ::= { motion-detectorEntry 1 }
+
+Motion-detectorEntry ::= SEQUENCE {
+motion-alarm-state INTEGER
+}
+
+
+viproc-alarmTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Viproc-alarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { alarm 3 }
+
+viproc-alarmEntry OBJECT-TYPE
+    SYNTAX  Viproc-alarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { viproc-alarm }
+    ::= { viproc-alarmTable 1 }
+
+viproc-alarm OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1..256))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: See RCP docu for command CONF_VIPROC_ALARM"
+    ::= { viproc-alarmEntry 1 }
+
+Viproc-alarmEntry ::= SEQUENCE {
+viproc-alarm OCTET STRING
+}
+
+
+virtual-alarmTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Virtual-alarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { alarm 4 }
+
+virtual-alarmEntry OBJECT-TYPE
+    SYNTAX  Virtual-alarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { virtual-alarm-state }
+    ::= { virtual-alarmTable 1 }
+
+virtual-alarm-state OBJECT-TYPE
+    SYNTAX INTEGER(1..128)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: 0=virtual alarm off; 1=virtual alarm on"
+    ::= { virtual-alarmEntry 1 }
+
+Virtual-alarmEntry ::= SEQUENCE {
+virtual-alarm-state INTEGER
+}
+
+
+
+digital-io OBJECT IDENTIFIER ::= { rcp 4 }
+
+
+
+out OBJECT IDENTIFIER ::= { digital-io 1 }
+
+
+relaysTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RelaysEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { out 1 }
+
+relaysEntry OBJECT-TYPE
+    SYNTAX  RelaysEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { relay-output-state }
+    ::= { relaysTable 1 }
+
+relay-output-state OBJECT-TYPE
+    SYNTAX INTEGER(1..128)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: set the logical level of an relay output
+         READ: get the logical level of an relay output"
+    ::= { relaysEntry 1 }
+
+RelaysEntry ::= SEQUENCE {
+relay-output-state INTEGER
+}
+
+
+
+in OBJECT IDENTIFIER ::= { digital-io 2 }
+
+
+input-pin-stateTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Input-pin-stateEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { in 1 }
+
+input-pin-stateEntry OBJECT-TYPE
+    SYNTAX  Input-pin-stateEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { input-pin-state }
+    ::= { input-pin-stateTable 1 }
+
+input-pin-state OBJECT-TYPE 
+    SYNTAX INTEGER(1..128)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: 0=alarm input off; 1= alarm input on"
+    ::= { input-pin-stateEntry 1 }
+
+Input-pin-stateEntry ::= SEQUENCE {
+input-pin-state INTEGER
+}
+
+
+
+network OBJECT IDENTIFIER 
+    ::= { rcp 5 }
+
+interface OBJECT IDENTIFIER 
+    ::= { network 1 }
+
+mac-address OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: read out the systems MAC address.##Num Values: 1=Ethernet; 2=WLAN; 3=Bluetooth"
+    ::= { interface 1 }
+
+ip-str OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: Set the unit's IP address using string notation (xxx.xxx.xxx.xxx)
+         READ: Read the unit's IP address using string notation (xxx.xxx.xxx.xxx)##Num Values 0=Default; 1=Primary IP; 2=Auto IP (read direction)"
+    ::= { interface 2 }
+
+subnet-str OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: set the subnet mask using string notation (xxx.xxx.xxx.xxx)
+         READ: Read the subnet mask using string notation (xxx.xxx.xxx.xxx)##Num Values: 0=Default; 1=Primary IP Subnet; 2=Auto IP Subnet (read direction)"
+    ::= { interface 3 }
+
+gateway-ip-str OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: set the gateway IP using string notation (xxx.xxx.xxx.xxx)
+         READ: read the gateway IP using string notation (xxx.xxx.xxx.xxx)"
+    ::= { interface 4 }
+
+dhcp-val OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: set DHCP mode
+        READ: read DHCP mode ##Valuelist: 0=OFF; 1=ON (On write: Enables DHCP and kicks lease acquisition mechanism); 2=ON No Kick (Write only: enables DHCP mode in config, but does not kick lease acquisition mechanism); 3=ON+APIPA-Fallback"
+    ::= { interface 5 }
+
+eth-link OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: (half duplex=HD, full duplex =FD) 0=auto, 1=10MbitHD, 2=10MbitFD, 3=100MbitHD, 4=100MbitFD, 5=1000MbitFD, 8=10GbitFD
+         READ: (half duplex=HD, full duplex =FD) 0=auto, 1=10MbitHD, 2=10MbitFD, 3=100MbitHD, 4=100MbitFD"
+    ::= { interface 6 }
+
+enable-traffic-led OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: Enables or disables the power LED.
+         READ: power LED: 0=off; 1=on; 2=off 10 minutes after startup"
+    ::= { interface 7 }
+
+
+eth-link-statusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Eth-link-statusEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { interface 8 }
+
+eth-link-statusEntry OBJECT-TYPE
+    SYNTAX  Eth-link-statusEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { eth-link-status }
+    ::= { eth-link-statusTable 1 }
+
+eth-link-status OBJECT-TYPE
+    SYNTAX INTEGER(1..128)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "READ: (half duplex=HD, full duplex =FD) 0=No link, 1=10MbitHD, 2=10MbitFD, 3=100MbitHD, 4=100MbitFD, 5=1000MbitFD, 7=Wlan; 8=10GbitFD"
+    ::= { eth-link-statusEntry 1 }
+
+Eth-link-statusEntry ::= SEQUENCE {
+eth-link-status INTEGER
+}
+
+
+dns-server-ipTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Dns-server-ipEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { interface 9 }
+
+dns-server-ipEntry OBJECT-TYPE
+    SYNTAX  Dns-server-ipEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { dns-server-ip }
+    ::= { dns-server-ipTable 1 }
+
+dns-server-ip OBJECT-TYPE
+    SYNTAX INTEGER(1..128)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: set dns server ip/ipv6
+         READ: Get dns server ip/ipv6##Num Values: 0=Primary DNS; 2=Secondary DNS"
+    ::= { dns-server-ipEntry 1 }
+
+Dns-server-ipEntry ::= SEQUENCE {
+dns-server-ip INTEGER
+}
+
+
+dns-server-ip-stringTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Dns-server-ip-stringEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { interface 10 }
+
+dns-server-ip-stringEntry OBJECT-TYPE
+    SYNTAX  Dns-server-ip-stringEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { dns-server-ip-string }
+    ::= { dns-server-ip-stringTable 1 }
+
+dns-server-ip-string OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..256))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: set dns server ip/ipv6
+         READ: Get dns server ip/ipv6##Num Values: 0=Primary DNS; 2=Secondary DNS"
+    ::= { dns-server-ip-stringEntry 1 }
+
+Dns-server-ip-stringEntry ::= SEQUENCE {
+dns-server-ip-string DisplayString
+}
+
+
+snmp-Table OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Snmp-Entry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    ::= { network 2 }
+
+snmp-Entry OBJECT-TYPE
+    SYNTAX  Snmp-Entry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION 
+        ""
+    INDEX   { snmp-traps-host-str }
+    ::= { snmp-Table 1 }
+
+snmp-traps-host-str OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..256))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "WRITE: not documented
+         READ: not documented"
+    ::= { snmp-Entry 1 }
+
+Snmp-Entry ::= SEQUENCE {
+snmp-traps-host-str DisplayString
+}
+
+
+
+END
+

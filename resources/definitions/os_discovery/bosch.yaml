@@ -1,0 +1,24 @@
+modules:
+    os:
+        hardware: BSS-RCP-MIB::oem-device-name.0
+        serial: BSS-RCP-MIB::serial-number.0
+        version: BSS-RCP-MIB::software-version.0
+    processors:
+        data:
+            -
+                oid: BSS-RCP-MIB::cpu-loadTable
+                value: BSS-RCP-MIB::cpu-load-idle
+                num_oid: '.1.3.6.1.4.1.3967.1.1.9.1.1.{{ $index }}'
+                type: 'bosch'
+                descr: "Processor {{ $index }}"
+                precision: -1
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: BSS-RCP-MIB::temperatureTable
+                    value: BSS-RCP-MIB::temp-sens
+                    num_oid: '.1.3.6.1.4.1.3967.1.1.7.1.1.{{ $index }}'
+                    high_limit: 67.5
+                    descr: "Temp Sensor {{ $index }}"
+                    divisor: 10 
