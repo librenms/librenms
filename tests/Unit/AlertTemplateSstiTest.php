@@ -105,7 +105,7 @@ class AlertTemplateSstiTest extends TestCase
             'name' => 'Test Rule',
             'template' => (new AlertTemplate)->forceFill([
                 'name' => 'Broken Template',
-                'title' => '{{ syntax error unclosed',
+                'title' => '{{ $alert->invalidMethod() }}',
                 'template' => '{{ $alert->title }}',
             ]),
             'alert' => [

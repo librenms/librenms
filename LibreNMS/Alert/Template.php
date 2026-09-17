@@ -96,9 +96,11 @@ class Template
 
         $alertData = new AlertData($data['alert'] ?? $data);
 
+        $display = $alertData['display'];
+        $name = $alertData['name'];
         $defaultTitle = $isRecovered
-            ? 'Device ' . $alertData->display . ' recovered from ' . ($alertData->name ?: $alertData->rule)
-            : 'Alert for device ' . $alertData->display . ' - ' . $alertData->name;
+            ? 'Device ' . $display . ' recovered from ' . ($name ?: $alertData['rule'])
+            : 'Alert for device ' . $display . ' - ' . $name;
 
         $templateTitle = $isRecovered
             ? ($template->title_rec ?? null)
@@ -107,7 +109,7 @@ class Template
         if (! empty($templateTitle)) {
             try {
                 $title = Blade::render($templateTitle, ['alert' => $alertData]);
-            } catch (\Exception) {
+            } catch (\Throwable) {
                 $title = $defaultTitle;
             }
         } else {
