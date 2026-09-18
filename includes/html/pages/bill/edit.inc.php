@@ -93,13 +93,7 @@ if ($bill_data['bill_type'] == 'cdr') {
         <div class="panel-body">
         <div class="form-group">
             <?php
-            //This needs a proper cleanup
-            $ports = dbFetchRows(
-                'SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
-                WHERE B.bill_id = ? AND P.port_id = B.port_id
-                AND D.device_id = P.device_id ORDER BY D.device_id',
-                [$bill_data['bill_id']]
-            );
+            $ports = $bill->ports()->with('device')->orderBy('ports.device_id')->get()->map(fn ($port) => $port->toArray())->all();
 
             if (is_array($ports)) {
                 ?>
@@ -159,6 +153,67 @@ if ($bill_data['bill_type'] == 'cdr') {
         </form>
     </div>
 </div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Billed SAPs</h3>
+    </div>
+    <div class="panel-body">
+        <div class="form-group">
+            <?php
+            $bill_saps = $bill->mplsSaps()->with('device')->orderBy('mpls_saps.device_id')->get();
+
+            if ($bill_saps->isNotEmpty()) {
+                ?>
+            <div class="list-group">
+                <?php   foreach ($bill_saps as $bill_sap) {
+                    $sapdescr = (empty($bill_sap->sapDescription) ? '' : ' - ' . htmlentities($bill_sap->sapDescription)); ?>
+                <div class="list-group-item">
+                    <form action="<?php echo route('bill.sap.detach', [$bill_id, $bill_sap->sap_id]); ?>" class="form-inline" method="post" name="deletesap<?php echo $bill_sap->sap_id ?>" style="display: none;">
+                        <?php echo csrf_field() ?>
+                        <?php echo method_field('DELETE') ?>
+                    </form>
+
+                    <button class="btn btn-danger btn-xs pull-right" onclick="if (confirm('Are you sure you wish to remove this SAP?')) { document.forms['deletesap<?php echo $bill_sap->sap_id ?>'].submit(); }">
+                        <i class="fa fa-minus"></i>
+                        Remove SAP
+                    </button>
+                    SAP <?php echo htmlentities($bill_sap->ifName . ':' . $bill_sap->encap_display) ?> (service <?php echo $bill_sap->svc_oid ?>)<?php echo $sapdescr ?>
+                    on <?php echo \LibreNMS\Util\Url::deviceLink($bill_sap->device); ?>
+                </div>
+                <?php
+                } ?>
+            </div>
+                <?php
+            } else { ?>
+            <div class="alert alert-info">There are no SAPs assigned to this bill</div>
+                <?php
+            } ?>
+        </div>
+
+        <h4>Add SAP</h4>
+
+        <form action="<?php echo route('bill.sap.attach', $bill_id); ?>" method="post" class="form-horizontal" role="form">
+            <?php echo csrf_field() ?>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label" for="sap_device">Device</label>
+                <div class="col-sm-8">
+                    <select class="form-control input-sm" id="sap_device" name="sap_device" onchange="billSapDeviceChanged()"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label" for="sap_id">SAP</label>
+                <div class="col-sm-8">
+                    <select class="form-control input-sm" id="sap_id" name="sap_id"></select>
+                </div>
+            </div>
+            <div class="col-sm-2 col-sm-offset-2">
+                <button type="submit" class="btn btn-primary" name="Submit" value=" Add "><i class="fa fa-plus"></i> Add SAP</button>
+            </div>
+        </form>
+    </div>
+</div>
 <script type="text/javascript">
     const makePortData = function (param) {
         param.device = $('#device').val();
@@ -168,5 +223,15 @@ if ($bill_data['bill_type'] == 'cdr') {
     init_select2('#port_id', 'port', makePortData, 'Select Port');
     function billDeviceChanged() {
         $('#port_id').val(null).trigger('change'); // clear port selection
+    }
+
+    const makeSapData = function (param) {
+        param.device = $('#sap_device').val();
+        return param;
+    }
+    init_select2('#sap_device', 'device', {}, null, 'All Devices (optional filter)');
+    init_select2('#sap_id', 'mpls-sap', makeSapData, null, 'Search SAP by port, service id or description');
+    function billSapDeviceChanged() {
+        $('#sap_id').val(null).trigger('change'); // clear SAP selection
     }
 </script>

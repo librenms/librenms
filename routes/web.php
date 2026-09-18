@@ -140,6 +140,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('bill/{bill}/reset', [BillController::class, 'reset'])->name('bill.reset');
     Route::post('bill/{bill}/ports', [BillController::class, 'attachPort'])->name('bill.port.attach');
     Route::delete('bill/{bill}/ports/{port}', [BillController::class, 'detachPort'])->name('bill.port.detach');
+    Route::post('bill/{bill}/saps', [BillController::class, 'attachSap'])->name('bill.sap.attach');
+    Route::delete('bill/{bill}/saps/{sap}', [BillController::class, 'detachSap'])->name('bill.sap.detach');
     Route::get('locations', [LocationController::class, 'index']);
     Route::resource('ssl-certificates', SslCertificateController::class)->except(['edit']);
     Route::resource('preferences', UserPreferencesController::class)->only('index', 'store', 'update');
@@ -381,6 +383,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('inventory', Select\InventoryController::class)->name('ajax.select.inventory');
             Route::get('syslog', Select\SyslogController::class)->name('ajax.select.syslog');
             Route::get('location', Select\LocationController::class)->name('ajax.select.location');
+            Route::get('mpls-sap', Select\MplsSapController::class)->name('ajax.select.mpls-sap');
             Route::get('munin', Select\MuninPluginController::class)->name('ajax.select.munin');
             Route::get('os', Select\OsController::class)->name('ajax.select.os');
             Route::get('role', Select\RoleController::class)->name('ajax.select.role');

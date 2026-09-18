@@ -119,13 +119,6 @@
         ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where ((devices.disabled = 0 && devices.ignore = 0) = ? AND (`ports`.`ifName` = ? OR `ports`.`ifName` = ?) AND `ports`.`ifInOctets_delta` > ?)", ["1","Ge12","Ge13","42"]]
     ],
     [
-        "%bills.bill_name = \"Neil's Bill\"",
-        {"condition":"AND","rules":[{"id":"bills.bill_name","field":"bills.bill_name","type":"string","input":"text","operator":"equal","value":"Neil's Bill"}],"valid":true},
-        "bills.bill_name = \"Neil's Bill\"",
-        "SELECT * FROM devices,ports,bill_ports,bills WHERE (devices.device_id = ? AND devices.device_id = ports.device_id AND ports.port_id = bill_ports.port_id AND bill_ports.bill_id = bills.bill_id) AND bills.bill_name = \"Neil's Bill\"",
-        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` left join `bill_ports` on `ports`.`port_id` = `bill_ports`.`port_id` left join `bills` on `bill_ports`.`bill_id` = `bills`.`bill_id` where (`bills`.`bill_name` = ?)", ["Neil's Bill"]]
-    ],
-    [
         "%ports.ifOutErrors_rate >= \"100\" || %ports.ifInErrors_rate >= \"100\"",
         {"condition":"OR","rules":[{"id":"ports.ifOutErrors_rate","field":"ports.ifOutErrors_rate","type":"string","input":"text","operator":"greater_or_equal","value":"100"},{"id":"ports.ifInErrors_rate","field":"ports.ifInErrors_rate","type":"string","input":"text","operator":"greater_or_equal","value":"100"}],"valid":true},
         "ports.ifOutErrors_rate >= 100 OR ports.ifInErrors_rate >= 100",

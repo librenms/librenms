@@ -70,10 +70,10 @@ foreach ($rrd_list as $rrd) {
         $descr_out = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_out'] ?? '', $descr_len) . ' Out';
     }
 
-    $rrd_options[] = 'DEF:' . $in . $i . '=' . $rrd['filename'] . ':' . $ds_in . ':AVERAGE';
-    $rrd_options[] = 'DEF:' . $out . $i . '=' . $rrd['filename'] . ':' . $ds_out . ':AVERAGE';
-    $rrd_options[] = 'CDEF:inB' . $i . '=in' . $i . ",$multiplier,*";
-    $rrd_options[] = 'CDEF:outB' . $i . '=out' . $i . ",$multiplier,*";
+    $rrd_options[] = 'DEF:' . $in . $i . '=' . $rrd['filename'] . ':' . ($rrd['ds_in'] ?? $ds_in) . ':AVERAGE';
+    $rrd_options[] = 'DEF:' . $out . $i . '=' . $rrd['filename'] . ':' . ($rrd['ds_out'] ?? $ds_out) . ':AVERAGE';
+    $rrd_options[] = 'CDEF:inB' . $i . '=in' . $i . ',' . ($rrd['multiplier'] ?? $multiplier) . ',*';
+    $rrd_options[] = 'CDEF:outB' . $i . '=out' . $i . ',' . ($rrd['multiplier'] ?? $multiplier) . ',*';
     $rrd_options[] = 'CDEF:outB' . $i . '_neg=outB' . $i . ',' . $stacked['stacked'] . ',*';
     $rrd_options[] = 'CDEF:octets' . $i . '=inB' . $i . ',outB' . $i . ',+';
 
@@ -125,18 +125,20 @@ foreach ($rrd_list as $rrd) {
         $aggr_out .= 'ADDNAN,';
     }
 
-    $aggr_in .= $in . $i;
-    $aggr_out .= $out . $i;
+    // aggregate the unit-normalized (bits) series so entries with different
+    // datasets/multipliers can be mixed
+    $aggr_in .= 'inB' . $i;
+    $aggr_out .= 'outB' . $i;
 
     $i++;
     $iter++;
 }
 
 if (! $noagg) {
-    $rrd_options[] = 'CDEF:aggr' . $in . 'bytes=' . $aggr_in . ',ADDNAN';
-    $rrd_options[] = 'CDEF:aggr' . $out . 'bytes=' . $aggr_out . ',ADDNAN';
-    $rrd_options[] = 'CDEF:aggrinbits=aggrinbytes,' . $multiplier . ',*';
-    $rrd_options[] = 'CDEF:aggroutbits=aggroutbytes,' . $multiplier . ',*';
+    $rrd_options[] = 'CDEF:aggrinbits=' . $aggr_in . ',ADDNAN';
+    $rrd_options[] = 'CDEF:aggroutbits=' . $aggr_out . ',ADDNAN';
+    $rrd_options[] = 'CDEF:aggr' . $in . 'bytes=aggrinbits,8,/';
+    $rrd_options[] = 'CDEF:aggr' . $out . 'bytes=aggroutbits,8,/';
     $rrd_options[] = 'VDEF:totalin=aggrinbytes,TOTAL';
     $rrd_options[] = 'VDEF:totalout=aggroutbytes,TOTAL';
     $rrd_options[] = 'COMMENT:\\n';
