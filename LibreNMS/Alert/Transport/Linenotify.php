@@ -6,6 +6,7 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
@@ -14,7 +15,11 @@ class Linenotify extends Transport
 {
     protected string $name = 'LINE Notify';
 
-    public function deliverAlert(array $alert_data): bool
+    /**
+     * @param  array<string, mixed>|AlertData  $alert_data
+     * @return bool
+     */
+    public function deliverAlert($alert_data): bool
     {
         // TODO possible to attach graph images
         $lineUrl = 'https://notify-api.line.me/api/notify';

@@ -4,7 +4,6 @@
 $init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/../includes/init.php';
 
-use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\RunAlerts;
 use LibreNMS\Alert\Template;
 use LibreNMS\Util\Debug;
@@ -30,17 +29,20 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
         exit(2);
     }
 
-    $obj = $runAlerts->describeAlert($alerts[0]);
+    $alert = $runAlerts->describeAlert($alerts[0]);
+    if (! $alert) {
+        echo "Failed to describe alert.\n";
+        exit(2);
+    }
     if (isset($options['p'])) {
-        $obj['transport'] = $options['p'];
+        $alert->transport = $options['p'];
     }
     $type = new Template;
-    $obj['alert'] = new AlertData($obj);
-    $obj['title'] = $type->getTitle($obj);
-    $obj['msg'] = $type->getBody($obj);
-    unset($obj['template']);
-    unset($obj['alert']);
-    print_r($obj);
+    $alert->title = $type->getTitle($alert);
+    $alert->msg = $type->getBody($alert);
+    $output = $alert->toArray();
+    unset($output['template']);
+    print_r($output);
 } else {
     c_echo('
 Usage:

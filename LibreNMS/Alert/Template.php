@@ -32,22 +32,22 @@ use LibreNMS\Enum\AlertState;
 
 class Template
 {
-    public $template;
+    public ?AlertTemplate $template = null;
 
     /**
      * Get the template details
-     *
-     * @param  array|null  $obj
-     * @return mixed
      */
-    public function getTemplate($obj = null)
+    public function getTemplate(?AlertData $alert = null): ?AlertTemplate
     {
         if ($this->template) {
             // Return the cached template information.
             return $this->template;
         }
-        $this->template = AlertTemplate::whereHas('map', function ($query) use ($obj): void {
-            $query->where('alert_rule_id', '=', $obj['rule_id']);
+
+        $ruleId = $alert?->rule_id;
+
+        $this->template = AlertTemplate::whereHas('map', function ($query) use ($ruleId): void {
+            $query->where('alert_rule_id', '=', $ruleId);
         })->first();
         if (! $this->template) {
             $this->template = AlertTemplate::where('name', '=', 'Default Alert Template')->first();
@@ -56,45 +56,45 @@ class Template
         return $this->template;
     }
 
-    public function getTitle($data)
+    public function getTitle(AlertData $alert): string
     {
-        return $this->bladeTitle($data);
+        return $this->bladeTitle($alert);
     }
 
-    public function getBody($data)
+    public function getBody(AlertData $alert): string
     {
-        return $this->bladeBody($data);
+        return $this->bladeBody($alert);
     }
 
     /**
      * Parse Blade body
-     *
-     * @param  array  $data
-     * @return string
      */
-    public function bladeBody($data)
+    public function bladeBody(AlertData $alert): string
     {
-        $alert['alert'] = new AlertData($data['alert']);
+        $template = $alert->template;
+        $templateBody = $template instanceof AlertTemplate ? $template->template : ($template['template'] ?? null);
+        $templateName = $template instanceof AlertTemplate ? $template->name : ($template['name'] ?? '');
+
+        if (empty($templateBody)) {
+            return Blade::render($this->getDefaultTemplate($templateName, 'No template defined'), ['alert' => $alert]);
+        }
+
         try {
-            return Blade::render($data['template']->template, $alert);
+            return Blade::render((string) $templateBody, ['alert' => $alert]);
         } catch (\Exception $e) {
-            return Blade::render($this->getDefaultTemplate($data['template']->name ?? '', $e->getMessage()), $alert);
+            return Blade::render($this->getDefaultTemplate($templateName, $e->getMessage()), ['alert' => $alert]);
         }
     }
 
     /**
      * Parse Blade title
-     *
-     * @param  array  $data
-     * @return string
      */
-    public function bladeTitle($data)
+    public function bladeTitle(AlertData $alert): string
     {
-        $alert['alert'] = new AlertData($data['alert']);
         try {
-            return Blade::render($data['title'], $alert);
+            return Blade::render((string) $alert->title, ['alert' => $alert]);
         } catch (\Exception) {
-            return $data['title'] ?: Blade::render('Template ' . $data['name'], $alert);
+            return (string) ($alert->title ?: Blade::render('Template ' . $alert->name, ['alert' => $alert]));
         }
     }
 

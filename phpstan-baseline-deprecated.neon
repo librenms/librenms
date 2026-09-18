@@ -2,15 +2,6 @@ parameters:
 	ignoreErrors:
 		-
 			message: '''
-				#^Call to deprecated method displayName\(\) of class App\\Models\\Device\:
-				use display field directly$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: LibreNMS/Alert/AlertData.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchCell\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
