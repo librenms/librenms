@@ -8297,7 +8297,7 @@
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
                     "vrfLocalAs": 65000
                 },
@@ -8320,7 +8320,7 @@
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
                     "vrfLocalAs": 65000
                 },
@@ -8343,7 +8343,7 @@
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
                     "vrfLocalAs": 65000
                 }
@@ -8370,7 +8370,7 @@
                     "bgpPeerOutTotalMessages": 2784457,
                     "bgpPeerFsmEstablishedTime": 3600,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
                     "vrfLocalAs": 65000
                 },
@@ -8393,7 +8393,7 @@
                     "bgpPeerOutTotalMessages": 2784438,
                     "bgpPeerFsmEstablishedTime": 3600,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
                     "vrfLocalAs": 65000
                 },
@@ -8416,7 +8416,7 @@
                     "bgpPeerOutTotalMessages": 2784419,
                     "bgpPeerFsmEstablishedTime": 3600,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
                     "vrfLocalAs": 65000
                 }

@@ -7585,7 +7585,7 @@
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
                     "vrfLocalAs": 65000
                 },
@@ -7608,7 +7608,7 @@
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
                     "vrfLocalAs": 65000
                 }
@@ -7635,7 +7635,7 @@
                     "bgpPeerOutTotalMessages": 5243874,
                     "bgpPeerFsmEstablishedTime": 3600,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
                     "vrfLocalAs": 65000
                 },
@@ -7658,7 +7658,7 @@
                     "bgpPeerOutTotalMessages": 5243447,
                     "bgpPeerFsmEstablishedTime": 3600,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 65000,
                     "vrfLocalAs": 65000
                 }

@@ -3672,22 +3672,22 @@
         "discovery": {
             "ipv6_nd": [
                 {
-                    "mac_address": "b2:8c:95:4e:89:13",
+                    "mac_address": "b28c954e8913",
                     "ipv6_address": "fe80:0000:0000:0000:00e8:7c84:bf24:1705",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "1e:c1:84:79:f5:9a",
+                    "mac_address": "1ec18479f59a",
                     "ipv6_address": "fe80:0000:0000:0000:0c00:50c4:06c4:8e5e",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "56:38:aa:85:f8:b7",
+                    "mac_address": "5638aa85f8b7",
                     "ipv6_address": "fe80:0000:0000:0000:5438:aaff:fe85:f8b7",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "38:1b:9e:86:df:fa",
+                    "mac_address": "381b9e86dffa",
                     "ipv6_address": "fe80:0000:0000:0000:60d8:3290:1f64:549b",
                     "context_name": ""
                 }

@@ -14015,7 +14015,7 @@
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 14224,
                     "vrfLocalAs": 14224
                 },
@@ -14038,7 +14038,7 @@
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 14224,
                     "vrfLocalAs": 14224
                 },
@@ -14061,7 +14061,7 @@
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 14224,
                     "vrfLocalAs": 14224
                 },
@@ -14084,7 +14084,7 @@
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 14224,
                     "vrfLocalAs": 14224
                 },
@@ -14107,7 +14107,7 @@
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 14224,
                     "vrfLocalAs": 14224
                 }
@@ -14134,7 +14134,7 @@
                     "bgpPeerOutTotalMessages": 2564107,
                     "bgpPeerFsmEstablishedTime": 3882948,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 14224,
                     "vrfLocalAs": 14224
                 },
@@ -14157,7 +14157,7 @@
                     "bgpPeerOutTotalMessages": 2565722,
                     "bgpPeerFsmEstablishedTime": 3882914,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 14224,
                     "vrfLocalAs": 14224
                 },
@@ -14180,7 +14180,7 @@
                     "bgpPeerOutTotalMessages": 981332,
                     "bgpPeerFsmEstablishedTime": 1548830,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 14224,
                     "vrfLocalAs": 14224
                 },
@@ -14203,7 +14203,7 @@
                     "bgpPeerOutTotalMessages": 570984,
                     "bgpPeerFsmEstablishedTime": 901232,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 14224,
                     "vrfLocalAs": 14224
                 },
@@ -14226,7 +14226,7 @@
                     "bgpPeerOutTotalMessages": 659625,
                     "bgpPeerFsmEstablishedTime": 1041307,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 14224,
                     "vrfLocalAs": 14224
                 }

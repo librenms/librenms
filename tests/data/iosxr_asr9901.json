@@ -29787,12 +29787,12 @@
         "discovery": {
             "ipv6_nd": [
                 {
-                    "mac_address": "70:6d:15:82:ec:80",
+                    "mac_address": "706d1582ec80",
                     "ipv6_address": "2406:2b00:ffff:0002:0001:0000:0000:0002",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "70:6d:15:82:ec:80",
+                    "mac_address": "706d1582ec80",
                     "ipv6_address": "fe80:0000:0000:0000:726d:15ff:fe82:ec80",
                     "context_name": ""
                 }
