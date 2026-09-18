@@ -1,0 +1,12 @@
+os: teltonika-tsw
+text: Teltonika TSW
+type: network
+icon: teltonika
+
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        snmpget:
+            oid: .1.3.6.1.4.1.48690.1.3.0
+            op: starts
+            value: TSW
