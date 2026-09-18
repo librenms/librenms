@@ -71,5 +71,4 @@ return [
         'snr' => 'Запас SNR',
         'power' => 'Выходная мощность',
     ],
-    'voice_vlan_label' => 'Voice VLAN: :label',
 ];

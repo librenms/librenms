@@ -72,5 +72,4 @@ return [
         'snr' => 'SNR ზღვარი',
         'power' => 'გამომავალი სიმძლავრე',
     ],
-    'voice_vlan_label' => 'Voice VLAN: :label',
 ];

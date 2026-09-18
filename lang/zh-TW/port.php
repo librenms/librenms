@@ -88,5 +88,4 @@ return [
         'snr' => 'SNR 邊際',
         'power' => '輸出功率',
     ],
-    'voice_vlan_label' => 'Voice VLAN: :label',
 ];
