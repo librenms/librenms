@@ -294,7 +294,7 @@ modules:
                     oid: HUAWEI-SITE-MONITOR-MIB::hwSiteDGWorkStatus
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.1.1.9.{{ $index }}'
                     group: Site Summary
-                    descr: "Site Status"
+                    descr: "Site DG Work Status"
                     state_name: hwSiteDGWorkStatus
                     states:
                         - { value: 1, generic: 3, descr: 'idle' }
