@@ -11,9 +11,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\IfOperStatus;
+use LibreNMS\Interfaces\Models\BillableSource;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
@@ -23,7 +25,7 @@ use LibreNMS\Util\Rewrite;
  * @property IfOperStatus|null $ifAdminStatus
  * @property IfOperStatus|null $ifAdminStatus_prev
  */
-class Port extends DeviceRelatedModel
+class Port extends DeviceRelatedModel implements BillableSource
 {
     use HasFactory;
     use Filterable;
@@ -418,11 +420,39 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * @return BelongsToMany<Bill, $this>
+     * @return MorphToMany<Bill, $this, BillCounter>
      */
-    public function bills(): BelongsToMany
+    public function bills(): MorphToMany
     {
-        return $this->belongsToMany(Bill::class, 'bill_ports', 'port_id', 'bill_id');
+        return $this->morphToMany(Bill::class, 'source', 'bill_counters', 'source_id', 'bill_id')
+            ->using(BillCounter::class);
+    }
+
+    // ---- Billing ----
+
+    public function getBillingInOctets(): ?int
+    {
+        return $this->ifInOctets === null ? null : (int) $this->ifInOctets;
+    }
+
+    public function getBillingOutOctets(): ?int
+    {
+        return $this->ifOutOctets === null ? null : (int) $this->ifOutOctets;
+    }
+
+    public function getBillingCounterTime(): ?int
+    {
+        return $this->poll_time ? (int) $this->poll_time : null;
+    }
+
+    public function getBillingSpeed(): ?int
+    {
+        return $this->ifSpeed > 0 ? (int) $this->ifSpeed : null;
+    }
+
+    public function getBillingLabel(): string
+    {
+        return "{$this->ifName} ({$this->ifDescr}) on " . $this->device?->displayName();
     }
 
     /**

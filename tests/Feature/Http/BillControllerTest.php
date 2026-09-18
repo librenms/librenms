@@ -7,9 +7,8 @@ use App\Models\Bill;
 use App\Models\BillData;
 use App\Models\BillHistory;
 use App\Models\BillPerm;
-use App\Models\BillPort;
-use App\Models\BillPortCounter;
 use App\Models\Device;
+use App\Models\MplsSap;
 use App\Models\Port;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -195,24 +194,17 @@ class BillControllerTest extends TestCase
             'bill_peak_in' => 0,
         ]);
 
-        BillPort::query()->insert([
-            'bill_id' => $bill->bill_id,
-            'port_id' => $port->port_id,
-        ]);
-
-        BillPerm::query()->insert([
-            'bill_id' => $bill->bill_id,
-            'user_id' => $admin->user_id,
-        ]);
-
-        BillPortCounter::create([
-            'bill_id' => $bill->bill_id,
-            'port_id' => $port->port_id,
+        $bill->ports()->attach($port->port_id, [
             'timestamp' => now(),
             'in_counter' => 100,
             'in_delta' => 10,
             'out_counter' => 100,
             'out_delta' => 10,
+        ]);
+
+        BillPerm::query()->insert([
+            'bill_id' => $bill->bill_id,
+            'user_id' => $admin->user_id,
         ]);
 
         $response = $this->actingAs($admin)->delete(route('bill.destroy', $bill));
@@ -221,9 +213,40 @@ class BillControllerTest extends TestCase
         $this->assertDatabaseMissing('bills', ['bill_id' => $bill->bill_id]);
         $this->assertDatabaseMissing('bill_data', ['bill_id' => $bill->bill_id]);
         $this->assertDatabaseMissing('bill_history', ['bill_id' => $bill->bill_id]);
-        $this->assertDatabaseMissing('bill_ports', ['bill_id' => $bill->bill_id]);
+        $this->assertDatabaseMissing('bill_counters', ['bill_id' => $bill->bill_id]);
         $this->assertDatabaseMissing('bill_perms', ['bill_id' => $bill->bill_id]);
-        $this->assertDatabaseMissing('bill_port_counters', ['bill_id' => $bill->bill_id]);
+    }
+
+    public function testAdminCanAttachAndDetachSap(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+
+        $sap = MplsSap::factory()->create();
+        $bill = Bill::factory()->create();
+
+        $this->actingAs($admin)->post(route('bill.sap.attach', $bill), ['sap_id' => $sap->sap_id])->assertRedirect();
+        $this->assertDatabaseHas('bill_counters', ['bill_id' => $bill->bill_id, 'source_type' => 'mpls_sap', 'source_id' => $sap->sap_id]);
+        $this->assertTrue($bill->mplsSaps()->where('mpls_saps.sap_id', $sap->sap_id)->exists());
+
+        $this->actingAs($admin)->post(route('bill.sap.attach', $bill), ['sap_id' => 999999])->assertSessionHasErrors('sap_id');
+
+        $this->actingAs($admin)->delete(route('bill.sap.detach', [$bill, $sap]))->assertRedirect();
+        $this->assertDatabaseMissing('bill_counters', ['bill_id' => $bill->bill_id, 'source_id' => $sap->sap_id]);
+    }
+
+    public function testDeletingSourceDetachesItFromBills(): void
+    {
+        $port = Port::factory()->create();
+        $sap = MplsSap::factory()->create();
+        $bill = Bill::factory()->create();
+        $bill->ports()->attach($port->port_id);
+        $bill->mplsSaps()->attach($sap->sap_id);
+
+        $port->delete();
+        $sap->delete();
+
+        $this->assertDatabaseMissing('bill_counters', ['bill_id' => $bill->bill_id]);
     }
 
     public function testUnauthorizedUserCannotDeleteBill(): void
@@ -302,18 +325,19 @@ class BillControllerTest extends TestCase
         ]);
 
         $attachResponse->assertRedirect();
-        $this->assertDatabaseHas('bill_ports', [
+        $this->assertDatabaseHas('bill_counters', [
             'bill_id' => $bill->bill_id,
-            'port_id' => $port->port_id,
+            'source_type' => 'interface',
+            'source_id' => $port->port_id,
         ]);
 
         // Detach
         $detachResponse = $this->actingAs($admin)->delete(route('bill.port.detach', [$bill, $port]));
 
         $detachResponse->assertRedirect();
-        $this->assertDatabaseMissing('bill_ports', [
+        $this->assertDatabaseMissing('bill_counters', [
             'bill_id' => $bill->bill_id,
-            'port_id' => $port->port_id,
+            'source_id' => $port->port_id,
         ]);
     }
 }

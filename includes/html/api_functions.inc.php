@@ -2269,7 +2269,10 @@ function list_bills(Illuminate\Http\Request $request)
         $bill['percent'] = $percent;
         $bill['overuse'] = $overuse;
 
-        $bill['ports'] = dbFetchRows('SELECT `D`.`device_id`,`P`.`port_id`,`P`.`ifName` FROM `bill_ports` AS `B`, `ports` AS `P`, `devices` AS `D` WHERE `B`.`bill_id` = ? AND `P`.`port_id` = `B`.`port_id` AND `D`.`device_id` = `P`.`device_id`', [$bill['bill_id']]);
+        $bill['ports'] = \App\Models\Port::whereHas('bills', fn ($q) => $q->where('bills.bill_id', $bill['bill_id']))
+            ->get(['device_id', 'port_id', 'ifName'])->toArray();
+        $bill['mpls_saps'] = \App\Models\MplsSap::whereHas('bills', fn ($q) => $q->where('bills.bill_id', $bill['bill_id']))
+            ->get(['device_id', 'sap_id', 'svc_oid', 'ifName', 'sapEncapValue', 'sapDescription'])->toArray();
 
         $bills[] = $bill;
     }
@@ -2393,13 +2396,8 @@ function delete_bill(Illuminate\Http\Request $request)
         return api_error(400, 'Could not remove bill with id ' . $bill_id . '. Invalid id');
     }
 
-    $res = \App\Models\Bill::where('bill_id', $bill_id)->delete();
-    if ($res == 1) {
-        \App\Models\BillPort::where('bill_id', $bill_id)->delete();
-        \App\Models\BillData::where('bill_id', $bill_id)->delete();
-        \App\Models\BillHistory::where('bill_id', $bill_id)->delete();
-        \App\Models\BillPerm::where('bill_id', $bill_id)->delete();
-
+    $bill = \App\Models\Bill::find($bill_id);
+    if ($bill && $bill->delete()) {
         return api_success_noresult(200, 'Bill has been removed');
     }
 
@@ -2455,6 +2453,18 @@ function create_edit_bill(Illuminate\Http\Request $request)
                 return api_error(500, 'Port ' . $port_id . ' does not exists');
             }
             $ports_add[] = $port_id;
+        }
+    }
+
+    //check mpls saps
+    $saps_add = null;
+    if (array_key_exists('mpls_saps', $data)) {
+        $saps_add = [];
+        foreach ($data['mpls_saps'] as $sap_id) {
+            if (! \App\Models\MplsSap::where('sap_id', $sap_id)->exists()) {
+                return api_error(500, 'MPLS SAP ' . $sap_id . ' does not exists');
+            }
+            $saps_add[] = $sap_id;
         }
     }
 
@@ -2554,14 +2564,12 @@ function create_edit_bill(Illuminate\Http\Request $request)
         }
     }
 
-    // set previously checked ports
+    // set previously checked ports and saps
     if (is_array($ports_add)) {
-        \App\Models\BillPort::where('bill_id', $bill_id)->delete();
-        if (count($ports_add) > 0) {
-            foreach ($ports_add as $port_id) {
-                dbInsert(['bill_id' => $bill_id, 'port_id' => $port_id, 'bill_port_autoadded' => 0], 'bill_ports');
-            }
-        }
+        \App\Models\Bill::find($bill_id)?->ports()->sync($ports_add);
+    }
+    if (is_array($saps_add)) {
+        \App\Models\Bill::find($bill_id)?->mplsSaps()->sync($saps_add);
     }
 
     return api_success($bill_id, 'bill_id');

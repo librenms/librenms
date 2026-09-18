@@ -63,12 +63,8 @@ if (Gate::allows('view', $bill)) {
     $unix_prev_from = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastfrom')");
     $unix_prev_to = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastto')");
     // Speeds up loading for other included pages by setting it before progessing of mysql data!
-    $ports = dbFetchRows(
-        'SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
-        WHERE B.bill_id = ? AND P.port_id = B.port_id
-        AND D.device_id = P.device_id',
-        [$bill_id]
-    );
+    $ports = $bill->ports()->with('device')->get()->map(fn ($port) => $port->toArray())->all();
+    $bill_saps = $bill->mplsSaps()->with('device')->get();
 
     $vars['view'] ??= 'quick';
 
@@ -91,7 +87,26 @@ if (Gate::allows('view', $bill)) {
         }
 
         echo '</div></div>';
-    }//end print_port_list?>
+    }//end print_port_list
+
+    function print_sap_list($saps)
+    {
+        echo '<div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Billed SAPs</h3>
+            </div>
+            <div class="list-group">';
+
+        foreach ($saps as $sap) {
+            $descr = (empty($sap->sapDescription) ? '' : ' - ' . htmlentities($sap->sapDescription));
+
+            echo '<div class="list-group-item">';
+            echo 'SAP ' . htmlentities($sap->ifName . ':' . $sap->encap_display) . ' (service ' . $sap->svc_oid . ')' . $descr . ' on ' . Url::deviceLink($sap->device);
+            echo '</div>';
+        }
+
+        echo '</div></div>';
+    }//end print_sap_list?>
 
     <h2>Bill: <?php echo htmlentities((string) $bill_data['bill_name']); ?></h2>
 
@@ -157,7 +172,11 @@ if (Gate::allows('view', $bill)) {
 
 <div class="row">
 <div class="col-lg-6 col-lg-push-6">
-        <?php print_port_list($ports) ?>
+        <?php
+        print_port_list($ports);
+        if ($bill_saps->isNotEmpty()) {
+            print_sap_list($bill_saps);
+        } ?>
 </div>
 <div class="col-lg-6 col-lg-pull-6">
 <div class="panel panel-default">

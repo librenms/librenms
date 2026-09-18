@@ -78,8 +78,12 @@ if (isset($_POST['addbill']) && $_POST['addbill'] == 'yes') {
 
     $bill_id = dbInsert($insert, 'bills');
 
-    if (is_numeric($bill_id) && is_numeric($_POST['port_id'])) {
-        dbInsert(['bill_id' => $bill_id, 'port_id' => $_POST['port_id']], 'bill_ports');
+    $new_bill = \App\Models\Bill::find($bill_id);
+    if ($new_bill && is_numeric($_POST['port_id'])) {
+        $new_bill->ports()->attach((int) $_POST['port_id']);
+    }
+    if ($new_bill && ! empty($_POST['sap_id']) && is_numeric($_POST['sap_id'])) {
+        $new_bill->mplsSaps()->attach((int) $_POST['sap_id']);
     }
 
     header('Location: ' . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill_id, 'view' => 'edit']));

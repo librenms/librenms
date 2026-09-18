@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Facades\LibrenmsConfig;
 use App\Http\Requests\UpdateBillRequest;
 use App\Models\Bill;
+use App\Models\MplsSap;
 use App\Models\Port;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -119,6 +120,40 @@ class BillController extends Controller
 
         if ($request->wantsJson()) {
             return response()->json(['status' => 'ok', 'message' => __('Port removed from bill')]);
+        }
+
+        return redirect()->to(Url::generate(['page' => 'bill', 'bill_id' => $bill->bill_id, 'view' => 'edit']));
+    }
+
+    public function attachSap(Request $request, Bill $bill): RedirectResponse|JsonResponse
+    {
+        $this->authorize('update', $bill);
+
+        $validated = $request->validate([
+            'sap_id' => ['required', 'integer', 'exists:mpls_saps,sap_id'],
+        ]);
+
+        $bill->mplsSaps()->syncWithoutDetaching([$validated['sap_id']]);
+
+        toast()->success(__('SAP added to bill'));
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => 'ok', 'message' => __('SAP added to bill')]);
+        }
+
+        return redirect()->to(Url::generate(['page' => 'bill', 'bill_id' => $bill->bill_id, 'view' => 'edit']));
+    }
+
+    public function detachSap(Request $request, Bill $bill, MplsSap $sap): RedirectResponse|JsonResponse
+    {
+        $this->authorize('update', $bill);
+
+        $bill->mplsSaps()->detach($sap->sap_id);
+
+        toast()->success(__('SAP removed from bill'));
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => 'ok', 'message' => __('SAP removed from bill')]);
         }
 
         return redirect()->to(Url::generate(['page' => 'bill', 'bill_id' => $bill->bill_id, 'view' => 'edit']));
