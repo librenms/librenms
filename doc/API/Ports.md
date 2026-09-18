@@ -473,3 +473,55 @@ Output:
     "message": "Port description updated."
 }
 ```
+### `get_port_vlan_info_by_port`
+
+Get all port_vlan info with port_id
+
+Route: `/api/v0/port_vlan_info/port/:port_id`
+
+- portid must be an integer
+
+Input: {port_id}
+
+-
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/port_vlan_info/port/{port_id}
+```
+
+Output:
+
+```json
+{
+  "status": "ok",
+  "message": "",
+  "ports": [
+        {
+          "port_vlan_id": 13297,
+          "device_id": 3,
+          "port_id": 223,
+          "vlan": 102,
+          "baseport": 0,
+          "priority": 0,
+          "state": "unknown",
+          "cost": 0,
+          "untagged": 1,
+          "voice": 1
+        },
+        {
+          "port_vlan_id": 13606,
+          "device_id": 3,
+          "port_id": 223,
+          "vlan": 11,
+          "baseport": 0,
+          "priority": 0,
+          "state": "unknown",
+          "cost": 0,
+          "untagged": 1,
+          "voice": 0
+        }
+    ]
+}
+```
