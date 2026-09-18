@@ -765,8 +765,8 @@ foreach ($ports as $port) {
             // handle functional style parsers
             if (is_callable($port_parser)) {
                 $port_ifAlias = app()->call($port_parser, [
-                    // $ifAlias_override override device ifAlias
-                    'ifAlias' => $ifAlias_override ?? ($this_port['ifAlias'] ?? ''),
+                    'ifAlias' => $this_port['ifAlias'] ?? '',
+                    'ifAlias_override' => $ifAlias_override ?? null,
                     'ifIndex' => $port['ifIndex'] ?? '',
                     'ifName' => $this_port['ifName'] ?? '',
                     'port_id' => $port['port_id'] ?? 0,
