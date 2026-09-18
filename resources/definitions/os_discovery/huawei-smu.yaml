@@ -201,7 +201,7 @@ modules:
                     oid: HUAWEI-SITE-MONITOR-MIB::hwRectDCOutputPower
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.2.2.1.5.{{ $index }}'
                     descr: Rectifier DC Output Power
-                    index: "hwRectDCOutputPower.{{ $index }}""
+                    index: "hwRectDCOutputPower.{{ $index }}"
                     group: Rectifier
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwDcsTotalPower
