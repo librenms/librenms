@@ -41,7 +41,7 @@ class Snmpsim extends Process
         $this->snmprec_dir = base_path('tests/snmpsim');
 
         $cmd = [
-            $this->getVenvPath('bin/snmpsim-command-responder'),
+            $this->getVenvPath('bin/snmpsim-command-responder-lite'),
             "--data-dir={$this->snmprec_dir}",
             "--agent-udpv4-endpoint={$this->ip}:{$this->port}",
             '--log-level=error',
@@ -69,7 +69,7 @@ class Snmpsim extends Process
 
     public function isVenvSetUp(): bool
     {
-        if (! is_executable($this->getVenvPath('bin/snmpsim-command-responder'))) {
+        if (! is_executable($this->getVenvPath('bin/snmpsim-command-responder-lite'))) {
             return false;
         }
 
@@ -96,7 +96,7 @@ class Snmpsim extends Process
                 Log::error($setupProcess->getErrorOutput());
             }
 
-            $installProcess = new Process([$snmpsim_venv_path . '/bin/pip', 'install', 'snmpsim==1.2.1']);
+            $installProcess = new Process([$snmpsim_venv_path . '/bin/pip', 'install', 'snmpsim==1.1.7']);
             $installProcess->setTty($print_output);
             $installProcess->run();
 
