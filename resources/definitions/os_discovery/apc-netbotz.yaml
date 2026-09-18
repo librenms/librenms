@@ -36,7 +36,7 @@ modules:
           value: NetBotz50-MIB::tempSensorErrorStatus
           num_oid: '.1.3.6.1.4.1.52674.500.4.1.1.1.3.{{ $index }}'
           descr: 'Temperature - {{ NetBotz50-MIB::tempSensorLabel }}'
-          index: '{{ $index }}'
+          index: 'tempSensorErrorStatus.{{ $index }}'
           state_name: NetBotz50-MIB::tempSensorErrorStatus
           states:
             - { value: 0, descr: 'normal',   generic: 0,  }
@@ -49,7 +49,7 @@ modules:
           value: NetBotz50-MIB::humiSensorErrorStatus
           num_oid: '.1.3.6.1.4.1.52674.500.4.1.2.1.3.{{ $index }}'
           descr: 'Humidity - {{ NetBotz50-MIB::humiSensorLabel }}'
-          index: '{{ $index }}'
+          index: 'humiSensorErrorStatus.{{ $index }}'
           state_name: NetBotz50-MIB::humiSensorErrorStatus
           states:
             - { value: 0, descr: 'normal',   generic: 0,  }
@@ -62,6 +62,7 @@ modules:
           value: NetBotz50-MIB::netBotzErrorStatus
           num_oid: '.1.3.6.1.4.1.52674.500.100.{{ $index }}'
           descr: Appliance
+          index: 'netBotzErrorStatus.{{ $index }}'
           state_name: NetBotz50-MIB::netBotzErrorStatus
           states:
             - { value: 0, descr: 'normal',   generic: 0,  }
