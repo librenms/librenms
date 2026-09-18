@@ -1,0 +1,83 @@
+modules:
+    os:
+        hardware: APOLLO-MIB::apolloShelfType.s0
+        version: SNMPv2-MIB::sysDescr.0
+        version_regex: '/Software Release\s*:\s*(?<version>\S+\s+Version#\s*:\s*\d+)/'
+    sensors:
+            power:
+                data:
+                    -
+                        oid: APOLLO-MIB::apolloShelfPowerConsumed
+                        num_oid: '.1.3.6.1.4.1.5395.3.7.2.1.8.{{ $index }}'
+                        descr: 'Shelf {{ $index }} Power Consumed'
+                        index: 'apolloShelfPowerConsumed.{{ $index }}'
+                    -
+                        oid: APOLLO-MIB::apolloCardTable
+                        value: APOLLO-MIB::apolloCardPowerConsumed
+                        num_oid: '.1.3.6.1.4.1.5395.3.7.3.1.10.{{ $index }}'
+                        descr: 'Card {{ $APOLLO-MIB::apolloCardDescription }} Power Consumed'
+                        index: 'apolloCardPowerConsumed.{{ $index }}'
+            dbm:
+                data:
+                    -
+                        oid: APOLLO-MIB::apolloTransTable
+                        value: APOLLO-MIB::apolloTrRxPower
+                        num_oid: '.1.3.6.1.4.1.5395.3.7.5.1.5.{{ $index }}'
+                        descr: 'Port {{ $APOLLO-MIB::apolloTrType }} Rx Power'
+                        index: 'APOLLO-MIB::apolloTrRxPower.{{ $index }}'
+                        group: transceiver
+                        entPhysicalIndex: '{{ $index }}'
+                        entPhysicalIndex_measured: ports
+                    -
+                        oid: APOLLO-MIB::apolloTransTable
+                        value: APOLLO-MIB::apolloTrTxPower
+                        num_oid: '.1.3.6.1.4.1.5395.3.7.5.1.6.{{ $index }}'
+                        descr: 'Port {{ $APOLLO-MIB::apolloTrType }} Tx Power'
+                        index: 'apolloTrTxPower.{{ $index }}'
+                        group: transceiver
+                        entPhysicalIndex: '{{ $index }}'
+                        entPhysicalIndex_measured: ports
+            current:
+                data:
+                    -
+                        oid: APOLLO-MIB::apolloTransTable
+                        value: APOLLO-MIB::apolloTrBias
+                        num_oid: '.1.3.6.1.4.1.5395.3.7.5.1.7.{{ $index }}'
+                        descr: 'Port {{ $APOLLO-MIB::apolloTrType }} Laser Bias'
+                        index: 'apolloTrBias.{{ $index }}'
+                        divisor: 1000
+                        group: transceiver
+                        entPhysicalIndex: '{{ $index }}'
+                        entPhysicalIndex_measured: ports
+            state:
+                data:
+                    -
+                        oid: APOLLO-MIB::apolloShelfOperStatus
+                        num_oid: '.1.3.6.1.4.1.5395.3.7.2.1.5.{{ $index }}'
+                        descr: 'Shelf {{ $index }} Operational Status'
+                        index: 'apolloShelfOperStatus.{{ $index }}'
+                        states:
+                            - { value: 1, descr: 'Up', generic: 0 }
+                            - { value: 2, descr: 'Down', generic: 2 }
+                            - { value: 3, descr: 'Unknown', generic: 3 }
+                    -
+                        oid: APOLLO-MIB::apolloShelfFanStatus
+                        num_oid: '.1.3.6.1.4.1.5395.3.7.2.1.9.{{ $index }}'
+                        descr: 'Shelf {{ $index }} Fan Status'
+                        index: 'apolloShelfFanStatus.{{ $index }}'
+                        states:
+                            - { value: 2, descr: 'Down', generic: 2 }
+                            - { value: 3, descr: 'Unsupported', generic: 3 }
+                    -
+                        oid: APOLLO-MIB::apolloCardTable
+                        value: APOLLO-MIB::apolloCardOperStatus
+                        num_oid: '.1.3.6.1.4.1.5395.3.7.3.1.7.{{ $index }}'
+                        descr: 'Card {{ $APOLLO-MIB::apolloCardDescription }} Oper Status'
+                        index: 'apolloCardOperStatus.{{ $index }}'
+                        states:
+                            - { value: 1, descr: 'Unknown', generic: 0 }
+                            - { value: 2, descr: 'Absent', generic: 2 }
+                            - { value: 3, descr: 'Down', generic: 3 }
+                            - { value: 4, descr: 'Up', generic: 4 }
+                            - { value: 5, descr: 'Standby', generic: 5 }
+                            - { value: 6, descr: 'Active', generic: 6 }
