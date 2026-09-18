@@ -12850,17 +12850,17 @@
         "discovery": {
             "ipv6_nd": [
                 {
-                    "mac_address": "0c201622e801",
+                    "mac_address": "0c:20:16:22:e8:01",
                     "ipv6_address": "fe80:0000:0000:0000:0e20:16ff:fe22:e801",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "0c201622e801",
+                    "mac_address": "0c:20:16:22:e8:01",
                     "ipv6_address": "fec0:0000:0000:0000:000a:0000:0000:0004",
                     "context_name": ""
                 },
                 {
-                    "mac_address": "0c2016e8b701",
+                    "mac_address": "0c:20:16:e8:b7:01",
                     "ipv6_address": "fec0:0000:0000:0000:000a:0000:0000:0010",
                     "context_name": ""
                 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Traits\Filterable;
 use App\Observers\DeviceObserver;
@@ -11,7 +12,6 @@ use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -27,8 +27,6 @@ use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
-use LibreNMS\Util\IPv4;
-use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
@@ -154,41 +152,18 @@ class Device extends BaseModel
 
     public static function findByIp(?string $ip): ?Device
     {
-        if (! IP::isValid($ip)) {
+        if ($ip === null) {
             return null;
         }
 
-        $device = static::where('hostname', $ip)->orWhere('ip', inet_pton($ip))->first();
-
-        if ($device) {
-            return $device;
-        }
-
         try {
-            $ipv4 = new IPv4($ip);
-            $port = Ipv4Address::where('ipv4_address', (string) $ipv4)
-                ->with('port', 'port.device')
-                ->firstOrFail()->port;
-            if ($port) {
-                return $port->device;
-            }
-        } catch (InvalidIpException|ModelNotFoundException) {
-            //
-        }
+            $device_id = static::hasIp(IP::parse($ip))->value('device_id');
+            $device = DeviceCache::get($device_id);
 
-        try {
-            $ipv6 = new IPv6($ip);
-            $port = Ipv6Address::where('ipv6_address', $ipv6->uncompressed())
-                ->with(['port', 'port.device'])
-                ->firstOrFail()->port;
-            if ($port) {
-                return $port->device;
-            }
-        } catch (InvalidIpException|ModelNotFoundException) {
-            //
+            return $device->exists ? $device : null;
+        } catch (InvalidIpException) {
+            return null;
         }
-
-        return null;
     }
 
     public function hasSnmpInfo(): bool
@@ -622,7 +597,7 @@ class Device extends BaseModel
         ]);
     }
 
-    public function scopeWhereAttributeDisabled(Builder $query, string $attribute): Builder
+    protected function scopeWhereAttributeDisabled(Builder $query, string $attribute): Builder
     {
         return $query->leftJoin('devices_attribs', function (JoinClause $query) use ($attribute): void {
             $query->on('devices.device_id', 'devices_attribs.device_id')
@@ -641,7 +616,7 @@ class Device extends BaseModel
         ]);
     }
 
-    public function scopeCanPing(Builder $query): Builder
+    protected function scopeCanPing(Builder $query): Builder
     {
         return $this->scopeWhereAttributeDisabled($query->where('disabled', 0), 'override_icmp_disable');
     }
@@ -695,7 +670,7 @@ class Device extends BaseModel
         );
     }
 
-    public function scopeWhereDeviceSpec(Builder $query, ?string $deviceSpec): Builder
+    protected function scopeWhereDeviceSpec(Builder $query, ?string $deviceSpec): Builder
     {
         if (empty($deviceSpec)) {
             return $query;
@@ -714,6 +689,19 @@ class Device extends BaseModel
         }
 
         return $query->where('hostname', $deviceSpec);
+    }
+
+    protected function scopeHasIp(Builder $query, IP $ip): Builder
+    {
+        return $query->where(function (Builder $query) use ($ip): Builder {
+            $family = $ip->getFamily();
+            $ip_string = $ip->uncompressed();
+
+            return $query->where('hostname', $ip_string)
+                ->orWhere('ip', $ip->packed())
+                ->when($family === 'ipv4', fn (Builder $q) => $q->orWhereHas('ipv4', fn (Builder $qi) => $qi->where('ipv4_address', $ip_string)))
+                ->when($family === 'ipv6', fn (Builder $q) => $q->orWhereHas('ipv6', fn (Builder $qi) => $qi->where('ipv6_address', $ip_string)));
+        });
     }
 
     // ---- Define Relationships ----

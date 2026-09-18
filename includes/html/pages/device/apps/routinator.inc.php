@@ -16,11 +16,14 @@ sort($clients);
 if (! empty($clients)) {
     echo ' | RTR clients: ';
     foreach ($clients as $index => $client) {
-        $label = (isset($vars['client']) && $vars['client'] == $client)
-            ? '<span class="pagemenu-selected">' . $client . '</span>'
-            : $client;
+        $label = $client;
+        $link = generate_link($label, $link_array, ['client' => $client]);
 
-        echo generate_link($label, $link_array, ['client' => $client]);
+        $link = (isset($vars['client']) && $vars['client'] == $client)
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+
+        echo $link;
 
         if ($index < (count($clients) - 1)) {
             echo ', ';

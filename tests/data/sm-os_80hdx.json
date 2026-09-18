@@ -2431,7 +2431,7 @@
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 1
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 11,
@@ -2451,7 +2451,7 @@
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 2
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 12,
@@ -2471,7 +2471,7 @@
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 3
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 13,
@@ -2491,7 +2491,7 @@
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 4
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 14,
@@ -2511,7 +2511,7 @@
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 5
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 15,
@@ -2531,7 +2531,7 @@
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 6
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 16,
@@ -2551,7 +2551,7 @@
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 7
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 17,
@@ -2571,7 +2571,7 @@
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 8
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 18,
@@ -2591,7 +2591,7 @@
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 9
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 19,
@@ -2611,7 +2611,7 @@
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "",
                     "entPhysicalMfgDate": "0-0-0,0:0:0.0",
-                    "ifIndex": 10
+                    "ifIndex": null
                 }
             ]
         },
@@ -3363,8 +3363,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 1,
-                    "voice": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -3372,8 +3371,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0,
-                    "voice": 0
+                    "untagged": 0
                 }
             ]
         }
@@ -3854,7 +3852,7 @@
             "transceivers": [
                 {
                     "index": "1",
-                    "entity_physical_index": 10,
+                    "entity_physical_index": 1,
                     "type": null,
                     "vendor": "Cambium Networks",
                     "oui": null,
@@ -3873,7 +3871,7 @@
                 },
                 {
                     "index": "2",
-                    "entity_physical_index": 11,
+                    "entity_physical_index": 2,
                     "type": null,
                     "vendor": "",
                     "oui": null,

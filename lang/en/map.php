@@ -82,7 +82,7 @@ return [
                     'customcolours' => 'Custom Colors',
                     'colour' => 'Color',
                     'colour_lower_pct' => 'Start Percent',
-                    'colour_down' => 'Device Down Color',
+                    'colour_down' => 'Device/Port Down Color',
                     'colour_invalid' => 'Unknown Percent Color',
                     'font_size' => 'Legend Text Size',
                     'steps' => 'Legend Steps',

@@ -125,7 +125,7 @@ class DeviceObserver
             try {
                 $result = File::deleteDirectory($host_dir);
 
-                if (! $result) {
+                if (! $result && File::exists($host_dir)) {
                     Log::debug("Could not delete RRD files for: $device->hostname");
                 }
             } catch (\Exception $e) {

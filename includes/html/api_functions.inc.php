@@ -2143,14 +2143,15 @@ function list_oxidized(Illuminate\Http\Request $request)
 {
     $return = [];
     $devices = Device::query()
-            ->with('attribs')
-             ->where('disabled', 0)
-             ->when($request->route('hostname'), fn ($query, $hostname) => $query->where('hostname', $hostname))
-             ->whereNotIn('type', LibrenmsConfig::get('oxidized.ignore_types', []))
-             ->whereNotIn('os', LibrenmsConfig::get('oxidized.ignore_os', []))
-             ->whereAttributeDisabled('override_Oxidized_disable')
-             ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes', 'poller_group'])
-             ->get();
+        ->with('attribs')
+        ->where('disabled', 0)
+        ->hasAccess($request->user())
+        ->when($request->route('hostname'), fn ($query, $hostname) => $query->where('hostname', $hostname))
+        ->whereNotIn('type', LibrenmsConfig::get('oxidized.ignore_types', []))
+        ->whereNotIn('os', LibrenmsConfig::get('oxidized.ignore_os', []))
+        ->whereAttributeDisabled('override_Oxidized_disable')
+        ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes', 'poller_group'])
+        ->get();
 
     /** @var Device $device */
     foreach ($devices as $device) {

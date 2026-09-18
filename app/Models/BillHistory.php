@@ -35,7 +35,7 @@ class BillHistory extends BillRelatedModel
 
     // ---- Query scopes ----
 
-    public function scopeCurrent(Builder $query): Builder
+    protected function scopeCurrent(Builder $query): Builder
     {
         $now = now();
 
