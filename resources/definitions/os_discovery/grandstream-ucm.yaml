@@ -1,0 +1,117 @@
+modules:
+    mempools:
+        data:
+            -
+                percent_used: GS-UCM63XX-SNMP-MIB::sMemoryUsage
+                type: grandstream-ucm
+                descr: 'System Memory'
+                index: 0
+    os:
+        hardware:
+            - GS-UCM63XX-SNMP-MIB::sProductType.0
+            - GS-UCM63XX-SNMP-MIB::sHardwareVersion.0
+        hardware_template: '{{ GS-UCM63XX-SNMP-MIB::sProductType.0 }} ({{ GS-UCM63XX-SNMP-MIB::sHardwareVersion.0 }})'
+        serial: GS-UCM63XX-SNMP-MIB::sSerialNumber.0
+        version: GS-UCM63XX-SNMP-MIB::sFirmwareVersion.0
+    processors:
+        data:
+            -
+                oid: GS-UCM63XX-SNMP-MIB::sCpuUsage
+                num_oid: '.1.3.6.1.4.1.12581.2.2.8.{{ $index }}'
+                descr: 'System CPU'
+                index: 0
+    sensors:
+        percent:
+            data:
+                -
+                    oid: GS-UCM63XX-SNMP-MIB::sDiskUsage
+                    num_oid: '.1.3.6.1.4.1.12581.2.2.6.{{ $index }}'
+                    descr: 'Disk Usage'
+                    index: disk-usage
+                    warn_limit: 80
+                    high_limit: 90
+                    group: 'System'
+        count:
+            data:
+                -
+                    oid: GS-UCM63XX-SNMP-MIB::concurrentCall
+                    num_oid: '.1.3.6.1.4.1.12581.2.2.9.{{ $index }}'
+                    descr: 'Concurrent Calls'
+                    index: concurrent-calls
+                    rrd_type: GAUGE
+                    group: 'Calls'
+                -
+                    oid: GS-UCM63XX-SNMP-MIB::sTotalCalls
+                    num_oid: '.1.3.6.1.4.1.12581.2.1.1.{{ $index }}'
+                    descr: 'Total Calls'
+                    index: total-calls
+                    rrd_type: COUNTER
+                    group: 'Calls'
+                -
+                    oid: GS-UCM63XX-SNMP-MIB::sInternalCalls
+                    num_oid: '.1.3.6.1.4.1.12581.2.1.2.{{ $index }}'
+                    descr: 'Internal Calls'
+                    index: internal-calls
+                    rrd_type: COUNTER
+                    group: 'Calls'
+                -
+                    oid: GS-UCM63XX-SNMP-MIB::sOutboundCalls
+                    num_oid: '.1.3.6.1.4.1.12581.2.1.3.{{ $index }}'
+                    descr: 'Outbound Calls'
+                    index: outbound-calls
+                    rrd_type: COUNTER
+                    group: 'Calls'
+                -
+                    oid: GS-UCM63XX-SNMP-MIB::sInboundCalls
+                    num_oid: '.1.3.6.1.4.1.12581.2.1.4.{{ $index }}'
+                    descr: 'Inbound Calls'
+                    index: inbound-calls
+                    rrd_type: COUNTER
+                    group: 'Calls'
+                -
+                    oid: GS-UCM63XX-SNMP-MIB::sAnsweredCalls
+                    num_oid: '.1.3.6.1.4.1.12581.2.1.5.{{ $index }}'
+                    descr: 'Answered Calls'
+                    index: answered-calls
+                    rrd_type: COUNTER
+                    group: 'Calls'
+                -
+                    oid: GS-UCM63XX-SNMP-MIB::sFailedCalls
+                    num_oid: '.1.3.6.1.4.1.12581.2.1.6.{{ $index }}'
+                    descr: 'Failed Calls'
+                    index: failed-calls
+                    rrd_type: COUNTER
+                    group: 'Calls'
+                -
+                    oid: GS-UCM63XX-SNMP-MIB::sBusyCalls
+                    num_oid: '.1.3.6.1.4.1.12581.2.1.7.{{ $index }}'
+                    descr: 'Busy Calls'
+                    index: busy-calls
+                    rrd_type: COUNTER
+                    group: 'Calls'
+                -
+                    oid: GS-UCM63XX-SNMP-MIB::sNoAnsweredCalls
+                    num_oid: '.1.3.6.1.4.1.12581.2.1.8.{{ $index }}'
+                    descr: 'Unanswered Calls'
+                    index: unanswered-calls
+                    rrd_type: COUNTER
+                    group: 'Calls'
+        state:
+            data:
+                -
+                    oid: GS-UCM63XX-SNMP-MIB::sTrunksTable
+                    value: GS-UCM63XX-SNMP-MIB::sTrunksStatus
+                    num_oid: '.1.3.6.1.4.1.12581.2.5.1.1.4.{{ $index }}'
+                    descr: GS-UCM63XX-SNMP-MIB::sTrunksName
+                    index: 'trunk-status.{{ $index }}'
+                    state_name: grandstreamUcmTrunkStatus
+                    group: 'Trunks'
+                    states:
+                        - { value: 0, descr: 'Registered', generic: 0 }
+                        - { value: 1, descr: 'Reachable', generic: 0 }
+                        - { value: 2, descr: 'Available', generic: 0 }
+                        - { value: 3, descr: 'Disabled', generic: 1 }
+                        - { value: 4, descr: 'Unmonitored', generic: 1 }
+                        - { value: 5, descr: 'Unregistered', generic: 2 }
+                        - { value: 6, descr: 'Unreachable', generic: 2 }
+                        - { value: 7, descr: 'Unknown', generic: 3 }
