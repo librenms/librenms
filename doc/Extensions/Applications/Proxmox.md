@@ -1,6 +1,5 @@
 # Proxmox
 
-
 ## Install prerequisites
 
 === "Debian/Ubuntu"
@@ -43,3 +42,11 @@
     ```
 
 6. Restart snmpd on your host.
+
+## Virtual Machines
+
+With v2 of the script, LibreNMS shows the guests of the node on the Virtual Machines page. It shows QEMU guests and LXC containers.
+
+The vminfo discovery module reads the guests. LibreNMS enables that module for the proxmox OS. Run the discovery of the device to see the
+
+Install the script on each node of a cluster. Each node reports only its own guests.
