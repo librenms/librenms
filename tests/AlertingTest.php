@@ -78,8 +78,9 @@ final class AlertingTest extends TestCase
         // Known columns map to the registered morph aliases.
         $this->assertSame(['interface', 5], AlertUtil::entityForFault(['device_id' => 1, 'port_id' => 5]));
         $this->assertSame(['sensor', 9], AlertUtil::entityForFault(['device_id' => 1, 'sensor_id' => 9]));
+        $this->assertSame(['bgppeer', 7], AlertUtil::entityForFault(['device_id' => 1, 'bgpPeer_id' => 7]));
         // Unknown *_id columns fall back to the stripped column name.
-        $this->assertSame(['bgpPeer', 7], AlertUtil::entityForFault(['device_id' => 1, 'bgpPeer_id' => 7]));
+        $this->assertSame(['customThing', 3], AlertUtil::entityForFault(['device_id' => 1, 'customThing_id' => 3]));
         // A device-level row (no entity id) resolves to no specific entity.
         $this->assertSame([null, null], AlertUtil::entityForFault(['device_id' => 1, 'ifName' => 'eth0']));
     }
