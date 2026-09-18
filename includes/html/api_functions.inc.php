@@ -1932,6 +1932,10 @@ function add_edit_rule(Illuminate\Http\Request $request)
         $saveData['invert_map'] = filter_var($data['invert_map'], FILTER_VALIDATE_BOOLEAN);
     }
 
+    if (array_key_exists('proc', $data)) {
+        $saveData['proc'] = strip_tags((string) $data['proc']);
+    }
+
     if (is_numeric($rule_id)) {
         $alertRule = \App\Models\AlertRule::find($rule_id);
         if (! $alertRule) {
