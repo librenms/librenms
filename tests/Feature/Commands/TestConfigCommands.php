@@ -140,4 +140,24 @@ final class TestConfigCommands extends InMemoryDbTestCase
             ->expectsOutput(is_string($expected) ? $expected : json_encode($expected, JSON_PRETTY_PRINT))
             ->assertExitCode(0);
     }
+
+    public function testCustomMacroSetting(): void
+    {
+        $this->artisan('config:set', ['setting' => 'alert.macros.rule.my_custom_macro', 'value' => 'ABS(%sensors.sensor_current)'])
+            ->assertExitCode(0);
+
+        $this->assertEquals('ABS(%sensors.sensor_current)', LibrenmsConfig::get('alert.macros.rule.my_custom_macro'));
+        $this->assertEquals('ABS(%sensors.sensor_current)', LibrenmsConfig::get('alert.macros.rule')['my_custom_macro']);
+
+        // Test validation rejects non-string values
+        $this->artisan('config:set', ['setting' => 'alert.macros.rule.my_custom_macro', 'value' => '["invalid"]'])
+            ->assertExitCode(2);
+
+        // Erase custom macro
+        $this->artisan('config:set', ['setting' => 'alert.macros.rule.my_custom_macro'])
+            ->expectsQuestion(trans('commands.config:set.confirm', ['setting' => 'alert.macros.rule.my_custom_macro']), true)
+            ->assertExitCode(0);
+
+        $this->assertNull(LibrenmsConfig::get('alert.macros.rule.my_custom_macro'));
+    }
 }

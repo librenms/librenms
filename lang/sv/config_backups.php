@@ -1,0 +1,32 @@
+<?php
+
+return [
+    'title' => 'Konfig',
+    'backups' => 'Säkerhetskopieringar',
+    'configuration' => 'Konfiguration',
+    'diff' => 'Diff',
+    'show_diff' => 'Visa Diff',
+    'show_config' => 'Visa Config',
+    'default_provider' => 'säkerhetskopieringsleverantören',
+    'select_two_to_compare' => 'Välj två säkerhetskopior att jämföra.',
+    'select_two_hint' => 'Välj två säkerhetskopior från listan för att se skillnaderna mellan dem.',
+    'valid_until' => 'Gäller till kl',
+    'old' => 'Gammal',
+    'new' => 'Nytt',
+    'download' => 'Ladda ner',
+    'copy' => 'Kopiera',
+    'copied' => 'Kopierade!',
+    'load_more' => 'Ladda mer',
+    'loading' => 'Laddar...',
+    'messages' => [
+        'unreachable' => ':provider går inte att nå.',
+        'unreachable_details' => ':provider går inte att nå. Kontrollera den konfigurerade URL-adressen och att :provider körs.',
+        'error' => ':provider returnerade ett fel.',
+        'error_details' => ':provider returnerade ett fel. Kontrollera den konfigurerade API-token.',
+        'backup_not_found' => 'Denna säkerhetskopia kunde inte laddas från :provider.',
+        'no_backups' => 'Det finns inga säkerhetskopior av konfigurationer för den här enheten i :provider ännu.',
+        'device_not_found' => 'Denna enhet kunde inte hittas i :provider. Det matchas av värdnamn eller IP-adress.',
+        'binary_not_supported' => 'Detta är en binär säkerhetskopia och kan inte visas. Se den i :provider istället.',
+        'request_failed' => 'Begäran misslyckades. Försök igen.',
+    ],
+];

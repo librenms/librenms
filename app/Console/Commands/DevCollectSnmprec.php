@@ -287,7 +287,7 @@ class DevCollectSnmprec extends LnmsCommand
     {
         $result = [];
 
-        foreach (explode(PHP_EOL, $snmpData->getRawWithoutBadLines()) as $line) {
+        foreach (explode(PHP_EOL, $snmpData->raw()) as $line) {
             if ($line === '') {
                 continue;
             }

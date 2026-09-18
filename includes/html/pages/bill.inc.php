@@ -15,10 +15,6 @@ if ($bill === null) {
     abort(404);
 }
 
-if (Gate::any(['update', 'delete', 'create'], $bill)) {
-    include 'includes/html/pages/bill/actions.inc.php';
-}
-
 if (Gate::allows('view', $bill)) {
     $bill_data = dbFetchRow('SELECT * FROM bills WHERE bill_id = ?', [$bill_id]);
 

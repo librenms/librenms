@@ -59,16 +59,28 @@ class BillPolicy
     /**
      * Determine whether the user can update the bill.
      */
-    public function update(User $user): bool
+    public function update(User $user, ?Bill $bill = null): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        if ($this->hasGlobalPermission($user, 'viewAll')) {
+            return $this->hasGlobalPermission($user, 'update');
+        }
+
+        // Require global update permission and access to the specific bill when not a global viewer
+        return $this->hasGlobalPermission($user, 'update')
+            && ($bill === null || Permissions::canAccessBill($bill, $user));
     }
 
     /**
      * Determine whether the user can delete the bill.
      */
-    public function delete(User $user): bool
+    public function delete(User $user, ?Bill $bill = null): bool
     {
-        return $this->hasGlobalPermission($user, 'delete');
+        if ($this->hasGlobalPermission($user, 'viewAll')) {
+            return $this->hasGlobalPermission($user, 'delete');
+        }
+
+        // Require global delete permission and access to the specific bill when not a global viewer
+        return $this->hasGlobalPermission($user, 'delete')
+            && ($bill === null || Permissions::canAccessBill($bill, $user));
     }
 }
