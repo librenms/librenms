@@ -205,4 +205,17 @@ final class IpTest extends TestCase
         $this->assertSame('0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1', IP::parse('::1')->toSnmpIndex());
         $this->assertSame('32.1.8.120.0.0.224.0.0.130.0.226.0.136.0.161', IP::parse('2001:0878:0000:e000:0082:00e2:0088:00a1')->toSnmpIndex());
     }
+
+    public function testToSnmpInetAddressIndex(): void
+    {
+        $this->assertSame('1.4.192.0.2.1', IP::toSnmpInetAddressIndex('192.0.2.1'));
+        $this->assertSame('2.16.32.1.13.184.0.0.0.0.0.0.0.0.0.0.0.1', IP::toSnmpInetAddressIndex('2001:db8::1'));
+        $this->assertSame('4.20.254.128.0.0.0.0.0.0.42.153.58.255.254.30.176.127.0.0.15.161', IP::toSnmpInetAddressIndex('fe80::2a99:3aff:fe1e:b07f%4001'));
+    }
+
+    public function testToSnmpInetAddressIndexRejectsInvalidZone(): void
+    {
+        $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
+        IP::toSnmpInetAddressIndex('fe80::1%Ethernet1');
+    }
 }
