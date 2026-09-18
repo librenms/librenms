@@ -153,16 +153,17 @@ class DeviceOverview extends DeviceOverviewHook
 }
 ```
 
-If you need methods of the `User` model, check the type first.
+Check permissions with `can()` or with the `Gate` facade. Both work on an `Authenticatable`. Do not call methods of the `User` model. They tie your plugin to implementation details that might change.
+
 ```php
-use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Facades\Gate;
 
 class DeviceOverview extends DeviceOverviewHook
 {
     public function authorize(Authenticatable $user, Device $device): bool
     {
-        return $user instanceof User && $user->hasAnyRole('admin', 'global-read');
+        return Gate::allows('view', $device);
     }
 }
 ```
