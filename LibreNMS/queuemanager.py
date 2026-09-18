@@ -1,5 +1,6 @@
 import logging
 import os
+import requests
 import threading
 import time
 import traceback
@@ -695,14 +696,49 @@ class PollerQueueManager(QueueManager):
                 else self.config.log_output
             )
 
-            args_list = ["device:poll", device_id]
-            if self.config.debug:
-                args_list.append("-vv")
-            elif self.config.log_output is LibreNMS.LogOutput.NONE:
-                args_list.append("-q")
-            args = tuple(args_list)
+            try_cli = not self.config.apipoll
+            if self.config.apipoll:
+                url = f"http://localhost/ajax/cmd/{device_id}/poll"
+                params = {"colour": 1, "buffer": 1}
+                headers = {"Accept-Encoding": ""}
+                if self.config.debug:
+                    params["verbose"] = 1
+                elif self.config.log_output is LibreNMS.LogOutput.NONE:
+                    params["quiet"] = 1
 
-            exit_code, output = LibreNMS.call_script("lnms", args, output)
+                response = requests.get(url, params=params, headers=headers)
+
+                http_output = response.content.decode().rstrip()
+                if response.ok and "text/plain" in response.headers.get("Content-Type"):
+                    lines = http_output.splitlines()
+                    if len(lines) == 0:
+                        logger.error(
+                            "Device {} didn't receive any HTTP output".format(device_id)
+                        )
+                        try_cli = True
+                    else:
+                        if lines[-1].startswith("exit_status:"):
+                            exit_code = int(lines[-1].split(":")[1])
+                            output = "\n".join(lines[:-1])
+                        else:
+                            logger.error(
+                                "Device {} didn't have an exit code on the last line: {}".format(
+                                    device_id, lines[-1]
+                                )
+                            )
+                            try_cli = True
+                else:
+                    try_cli = True
+
+            if try_cli:
+                args_list = ["device:poll", device_id]
+                if self.config.debug:
+                    args_list.append("-vv")
+                elif self.config.log_output is LibreNMS.LogOutput.NONE:
+                    args_list.append("-q")
+                args = tuple(args_list)
+
+                exit_code, output = LibreNMS.call_script("lnms", args, output)
 
             if exit_code == 0:
                 self.unlock(device_id)
@@ -765,14 +801,49 @@ class DiscoveryQueueManager(TimedQueueManager):
                 else self.config.log_output
             )
 
-            args_list = ["device:discover", device_id]
-            if self.config.debug:
-                args_list.append("-vv")
-            elif self.config.log_output is LibreNMS.LogOutput.NONE:
-                args_list.append("-q")
-            args = tuple(args_list)
+            try_cli = not self.config.apipoll
+            if self.config.apipoll:
+                url = f"http://localhost/ajax/cmd/{device_id}/discover"
+                params = {"colour": 1, "buffer": 1}
+                headers = {"Accept-Encoding": ""}
+                if self.config.debug:
+                    params["verbose"] = 1
+                elif self.config.log_output is LibreNMS.LogOutput.NONE:
+                    params["quiet"] = 1
 
-            exit_code, output = LibreNMS.call_script("lnms", args, output)
+                response = requests.get(url, params=params, headers=headers)
+
+                http_output = response.content.decode().rstrip()
+                if response.ok and "text/plain" in response.headers.get("Content-Type"):
+                    lines = http_output.splitlines()
+                    if len(lines) == 0:
+                        logger.error(
+                            "Device {} didn't receive any HTTP output".format(device_id)
+                        )
+                        try_cli = True
+                    else:
+                        if lines[-1].startswith("exit_status:"):
+                            exit_code = int(lines[-1].split(":")[1])
+                            output = "\n".join(lines[:-1])
+                        else:
+                            logger.error(
+                                "Device {} didn't have an exit code on the last line: {}".format(
+                                    device_id, lines[-1]
+                                )
+                            )
+                            try_cli = True
+                else:
+                    try_cli = True
+
+            if try_cli:
+                args_list = ["device:discover", device_id]
+                if self.config.debug:
+                    args_list.append("-vv")
+                elif self.config.log_output is LibreNMS.LogOutput.NONE:
+                    args_list.append("-q")
+                args = tuple(args_list)
+
+                exit_code, output = LibreNMS.call_script("lnms", args, output)
 
             if exit_code == 0:
                 self.unlock(device_id)
