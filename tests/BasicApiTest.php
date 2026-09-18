@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Tests;
 
+use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\User;
 use App\Models\WirelessSensor;
@@ -286,5 +287,81 @@ final class BasicApiTest extends DBTestCase
         // Query parameter api_token should be rejected on v1
         $this->json('GET', "/api/v1/system?api_token={$token->plainTextToken}")
             ->assertStatus(401);
+    }
+
+    public function testAddRuleStoresProcedureUrl(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+
+        $this->json('POST', '/api/v0/rules', [
+            'devices' => ['-1'],
+            'name' => 'proc rule',
+            'severity' => 'critical',
+            'proc' => 'https://example.org/runbook',
+            'builder' => self::alertRuleBuilder(),
+        ], ['X-Auth-Token' => $token->plainTextToken])->assertStatus(200);
+
+        $this->assertSame(
+            'https://example.org/runbook',
+            AlertRule::query()->where('name', 'proc rule')->value('proc')
+        );
+    }
+
+    public function testEditRuleUpdatesProcedureUrl(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+        $rule = AlertRule::factory()->create(['proc' => 'https://example.org/old']);
+
+        $this->json('PUT', '/api/v0/rules', [
+            'rule_id' => $rule->id,
+            'devices' => ['-1'],
+            'name' => $rule->name,
+            'severity' => 'critical',
+            'proc' => 'https://example.org/new',
+            'builder' => self::alertRuleBuilder(),
+        ], ['X-Auth-Token' => $token->plainTextToken])->assertStatus(200);
+
+        $this->assertSame('https://example.org/new', $rule->fresh()->proc);
+    }
+
+    public function testEditRuleLeavesProcedureUrlAloneWhenOmitted(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+        $rule = AlertRule::factory()->create(['proc' => 'https://example.org/keep']);
+
+        $this->json('PUT', '/api/v0/rules', [
+            'rule_id' => $rule->id,
+            'devices' => ['-1'],
+            'name' => $rule->name,
+            'severity' => 'critical',
+            'builder' => self::alertRuleBuilder(),
+        ], ['X-Auth-Token' => $token->plainTextToken])->assertStatus(200);
+
+        $this->assertSame('https://example.org/keep', $rule->fresh()->proc);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function alertRuleBuilder(): array
+    {
+        return [
+            'condition' => 'AND',
+            'rules' => [[
+                'id' => 'devices.hostname',
+                'field' => 'devices.hostname',
+                'type' => 'string',
+                'input' => 'text',
+                'operator' => 'equal',
+                'value' => 'localhost',
+            ]],
+            'valid' => true,
+        ];
     }
 }
