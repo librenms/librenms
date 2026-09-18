@@ -24,7 +24,7 @@ modules:
         - oid: NetBotz50-MIB::smokeSensorTable
           value: NetBotz50-MIB::smokeSensorValue
           num_oid: '.1.3.6.1.4.1.52674.500.4.2.12.1.2.{{ $index }}'
-          descr: NetBotz50-MIB::smokeSensorLabel
+          descr: 'Smoke - {{ NetBotz50-MIB::smokeSensorLabel }}'
           index: '{{ $index }}'
           high_limit: 1
           state_name: NetBotz50-MIB::smokeSensor
@@ -32,3 +32,42 @@ modules:
             - { value: -1, descr: 'undefined',      generic: 3,  }
             - { value:  0, descr: 'no smoke',       generic: 0,  }
             - { value:  1, descr: 'smoke detected', generic: 2,  }
+        - oid: NetBotz50-MIB::tempSensorTable
+          value: NetBotz50-MIB::tempSensorErrorStatus
+          num_oid: '.1.3.6.1.4.1.52674.500.4.1.1.1.3.{{ $index }}'
+          descr: 'Temperature - {{ NetBotz50-MIB::tempSensorLabel }}'
+          index: 'tempSensorErrorStatus.{{ $index }}'
+          state_name: NetBotz50-MIB::tempSensorErrorStatus
+          states:
+            - { value: 0, descr: 'normal',   generic: 0,  }
+            - { value: 1, descr: 'info',     generic: 0,  }
+            - { value: 2, descr: 'warning',  generic: 1,  }
+            - { value: 3, descr: 'error',    generic: 2,  }
+            - { value: 4, descr: 'critical', generic: 2,  }
+            - { value: 5, descr: 'failure',  generic: 2,  }
+        - oid: NetBotz50-MIB::humiSensorTable
+          value: NetBotz50-MIB::humiSensorErrorStatus
+          num_oid: '.1.3.6.1.4.1.52674.500.4.1.2.1.3.{{ $index }}'
+          descr: 'Humidity - {{ NetBotz50-MIB::humiSensorLabel }}'
+          index: 'humiSensorErrorStatus.{{ $index }}'
+          state_name: NetBotz50-MIB::humiSensorErrorStatus
+          states:
+            - { value: 0, descr: 'normal',   generic: 0,  }
+            - { value: 1, descr: 'info',     generic: 0,  }
+            - { value: 2, descr: 'warning',  generic: 1,  }
+            - { value: 3, descr: 'error',    generic: 2,  }
+            - { value: 4, descr: 'critical', generic: 2,  }
+            - { value: 5, descr: 'failure',  generic: 2,  }
+        - oid: NetBotz50-MIB::netBotzErrorStatus
+          value: NetBotz50-MIB::netBotzErrorStatus
+          num_oid: '.1.3.6.1.4.1.52674.500.100.{{ $index }}'
+          descr: Appliance
+          index: 'netBotzErrorStatus.{{ $index }}'
+          state_name: NetBotz50-MIB::netBotzErrorStatus
+          states:
+            - { value: 0, descr: 'normal',   generic: 0,  }
+            - { value: 1, descr: 'info',     generic: 0,  }
+            - { value: 2, descr: 'warning',  generic: 1,  }
+            - { value: 3, descr: 'error',    generic: 2,  }
+            - { value: 4, descr: 'critical', generic: 2,  }
+            - { value: 5, descr: 'failure',  generic: 2,  }
