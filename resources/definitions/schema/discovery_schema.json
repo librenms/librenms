@@ -47,6 +47,12 @@
                                             "string"
                                         ]
                                     },
+                                    "total_multiplier": {
+                                        "type": [
+                                            "number",
+                                            "string"
+                                        ]
+                                    },
                                     "type": {
                                         "type": "string"
                                     },
