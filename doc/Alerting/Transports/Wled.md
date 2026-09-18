@@ -1,20 +1,21 @@
 ## WLED
 
-This enables setting of WLED presets for alerts.
+This transport sets WLED presets for alerts.
 
-This requires the following information. The hostname/IP of the WLED instance and the IDs
-of the presets you will be using. The ID for the preset will be the number by it's name in
-the WLED web interface.
+The transport needs the hostname or IP address of the WLED instance. It
+also needs the IDs of the presets. The ID of a preset is the number
+next to its name in the WLED web interface.
 
-Leaving warning, critical, or recovery blank, will mean that severity/state is ignored.
+An empty warning, critical, or recovery field ignores that severity or
+state.
 
-Using warning, critical, and recovery together can lead to unpredictable
-results. Similarly best to only use this for very specific alerts/hosts given this
-transport can only communicate limited info.
+The warning, critical, and recovery fields together can give an
+unpredictable result. Use this transport only for specific alerts and
+hosts, because it sends a small amount of information.
 
 **Examples:**
 
-Set the preset on WLED at 10.1.2.3 to 1 for warnings and 3 for recoveries.
+Set the preset on WLED at 10.1.2.3 to 1 for a warning and to 3 for a recovery.
 
 | Config   | Example  |
 |----------|----------|
@@ -23,7 +24,7 @@ Set the preset on WLED at 10.1.2.3 to 1 for warnings and 3 for recoveries.
 | Critical |          |
 | Recovery | 3        |
 
-Set the preset on WLED at 10.1.2.3 to 2 for criticals and 3 for recoveries.
+Set the preset on WLED at 10.1.2.3 to 2 for a critical alert and to 3 for a recovery.
 
 | Config   | Example  |
 |----------|----------|
@@ -32,7 +33,7 @@ Set the preset on WLED at 10.1.2.3 to 2 for criticals and 3 for recoveries.
 | Critical | 2        |
 | Recovery | 3        |
 
-Set the preset on WLED at 10.1.2.3 to 1 for warnings and 2 for criticals.
+Set the preset on WLED at 10.1.2.3 to 1 for a warning and to 2 for a critical alert.
 
 | Config   | Example  |
 |----------|----------|
@@ -41,7 +42,7 @@ Set the preset on WLED at 10.1.2.3 to 1 for warnings and 2 for criticals.
 | Critical | 2        |
 | Recovery |          |
 
-Set the preset on WLED at 10.1.2.3 to 2 for criticals.
+Set the preset on WLED at 10.1.2.3 to 2 for a critical alert.
 
 | Config   | Example  |
 |----------|----------|

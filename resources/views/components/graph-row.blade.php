@@ -13,7 +13,9 @@
                 :port="$port"
                 :device="$device"
                 :legend="$attributes->get('legend', 'no')"
-                :height="$attributes->get('height', 150)"
+                :height="$attributes->get('height')"
+                :columns="$graphColumns"
+                :absolute-size="$absoluteSize"
                 :vars="array_merge($graph, $attributes->get('vars', []))"
                 :img-class="$responsive ? 'tw:w-full tw:h-auto' : null"
         ></x-graph>

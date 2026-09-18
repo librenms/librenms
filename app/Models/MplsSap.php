@@ -54,4 +54,12 @@ class MplsSap extends DeviceRelatedModel implements Keyable
     {
         return $this->belongsTo(MplsService::class, 'svc_id');
     }
+
+    /**
+     * @return BelongsTo<Port, $this>
+     */
+    public function port(): BelongsTo
+    {
+        return $this->belongsTo(Port::class, 'ifName', 'ifName');
+    }
 }

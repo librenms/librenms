@@ -1,6 +1,7 @@
 ## Signal CLI
 
-Use the Signal Messenger for Alerts. Run the Signal CLI with the D-Bus option.
+This transport sends alerts through Signal Messenger. Run the Signal
+CLI with the D-Bus option.
 
 [GitHub Project](https://github.com/AsamK/signal-cli)
 

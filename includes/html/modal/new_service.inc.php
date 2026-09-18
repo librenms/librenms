@@ -148,7 +148,7 @@ $('#create-service').on('show.bs.modal', function (e) {
     if (service_id) {
         $.ajax({
             type: "GET",
-            url: '<?php echo route("service.show", ["service" => ":service"]) ?>'.replace(':service', service_id),
+            url: '<?php echo route('service.show', ['service' => ':service']) ?>'.replace(':service', service_id),
             dataType: "json",
             success: function(output) {
                 $('#stype').val(output['stype']);

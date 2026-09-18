@@ -10,9 +10,9 @@ class Submenu extends Component
     public function __construct(
         public string $title,
         public array $menu,
-        public int $deviceId,
-        public string $currentTab,
-        public string $selected
+        public int $deviceId = 0,
+        public string $currentTab = '',
+        public string $selected = ''
     ) {
     }
 

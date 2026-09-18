@@ -32,11 +32,11 @@ use Log;
 
 class MeasurementManager
 {
-    const FPING_COLOR = "\e[0;35m";
-    const SNMP_COLOR = "\e[0;36m";
-    const DB_COLOR = "\e[1;33m";
-    const DATASTORE_COLOR = "\e[0;32m";
-    const NO_COLOR = "\e[0m";
+    const FPING_COLOR = '%m';
+    const SNMP_COLOR = '%c';
+    const DB_COLOR = '%Y';
+    const DATASTORE_COLOR = '%g';
+    const NO_COLOR = '%n';
 
     /**
      * @var \Illuminate\Support\Collection<string, MeasurementCollection>
@@ -87,7 +87,7 @@ class MeasurementManager
             $this->getCategory('db')->getCountDiff(),
             $this->getCategory('db')->getDurationDiff(),
             $dsStats->implode(' ')
-        ));
+        ), ['color' => true]);
 
         $this->checkpoint();
     }
@@ -160,6 +160,6 @@ class MeasurementManager
             $collection->getTotalCount(),
             $collection->getTotalDuration(),
             $summaries->implode(' ')
-        ));
+        ), ['color' => true]);
     }
 }

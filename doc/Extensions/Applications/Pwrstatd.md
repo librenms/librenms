@@ -11,13 +11,13 @@ https://www.cyberpowersystems.com/products/software/power-panel-personal/
     wget https://github.com/librenms/librenms-agent/raw/master/snmp/pwrstatd.py -O /etc/snmp/pwrstatd.py
     ```
 
-2. Make the script executable
+2. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/pwrstatd.py
     ```
 
-3. Edit your snmpd.conf file and add:
+3. Edit your `snmpd.conf` file and add:
 
     ```bash
     extend pwrstatd /etc/snmp/pwrstatd.py

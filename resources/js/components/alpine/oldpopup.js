@@ -1,3 +1,5 @@
+import { createPopper } from '@popperjs/core';
+
 export default function popup(url = "", options = {}) {
     return {
         popupShow: false,
@@ -12,24 +14,21 @@ export default function popup(url = "", options = {}) {
             this.showTimeout = setTimeout(() => {
                 this.popupShow = true;
 
-                if (this.popperInstance) {
-                    this.popperInstance.destroy();
-                }
+                this.$nextTick(() => {
+                    if (this.popperInstance) {
+                        this.popperInstance.destroy();
+                    }
 
-                if (typeof Popper !== 'undefined') {
-                    this.popperInstance = new Popper(this.$refs.targetRef, this.$refs.popupRef, {
+                    this.popperInstance = createPopper(this.$refs.targetRef, this.$refs.popupRef, {
                         placement: options.placement || 'bottom',
-                        positionFixed: true,
-                        modifiers: {
-                            offset: {
-                                offset: '0, 8'
-                            },
-                            preventOverflow: {
-                                boundariesElement: 'viewport'
-                            }
-                        }
+                        strategy: 'fixed',
+                        modifiers: [
+                            { name: 'offset', options: { offset: [0, 8] } },
+                            { name: 'preventOverflow', options: { rootBoundary: 'viewport', padding: 8 } },
+                            { name: 'flip', options: { rootBoundary: 'viewport', padding: 8 } },
+                        ],
                     });
-                }
+                });
 
                 // close other popups, except this one
                 this.ignoreNextShownEvent = true;

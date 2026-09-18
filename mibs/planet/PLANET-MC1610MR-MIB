@@ -1,0 +1,356 @@
+PLANET-MC1610MR-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Top-level infrastructure of the PLANET enterprise MIB tree
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32  FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                        FROM SNMPv2-TC
+    enterprises                               FROM RFC1155-SMI;
+
+planet MODULE-IDENTITY
+    LAST-UPDATED "202105190000Z"
+    ORGANIZATION "www.planet.com.tw"
+    CONTACT-INFO 
+        "sales@planet.com.tw"
+    DESCRIPTION  
+        "Top-level infrastructure of PLANET enterprise MIB tree"   
+    REVISION     "202105190000Z"
+    DESCRIPTION  
+        "MIB tree re-organized for validation"
+    REVISION     "200811200000Z"
+    DESCRIPTION  
+        "First draft for MC-1610MR"
+    ::= { enterprises 10456}
+
+
+--
+--  PLANET enterprise-specific management objects
+--
+
+mediaConverter              OBJECT IDENTIFIER ::= { planet 2}
+chassis                     OBJECT IDENTIFIER ::= { mediaConverter 625 } 
+
+--
+--  chassis MIBS
+--
+
+chassisIfNumber  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of MC-1610MR interfaces."
+    ::= { chassis 1 }
+  
+chassisIfInfo               OBJECT IDENTIFIER ::= { chassis 2 }
+  
+chassisIfStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ChassisIfStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of MC-1610MR interface entries.  The number of entries is
+        given by the value of ifNumber."
+    ::= { chassisIfInfo 1 }
+
+chassisIfStatusEntry OBJECT-TYPE
+    SYNTAX      ChassisIfStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable to a
+        particular interface."
+    INDEX   { chassisIfStatusIndex }
+    ::= { chassisIfStatusTable 1 }
+
+ChassisIfStatusEntry ::= SEQUENCE
+    {
+        chassisIfStatusIndex      Unsigned32,
+        chassisIfStatusName       OCTET STRING,
+        chassisIfStatusTPStatus   INTEGER,
+        chassisIfStatusTPSpeed    INTEGER,
+        chassisIfStatusTPDuplex   INTEGER,
+        chassisIfStatusFXStatus   INTEGER,
+        chassisIfStatusFXSpeed    INTEGER,
+        chassisIfStatusFXDuplex   INTEGER
+    }
+
+chassisIfStatusIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interface index value"
+    ::= { chassisIfStatusEntry 1 }
+
+chassisIfStatusName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Conveter Name."
+    ::= { chassisIfStatusEntry 2 }
+
+
+chassisIfStatusTPStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                linkDown(0),
+                linkUp(1)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current TP state of the interface."
+    ::= { chassisIfStatusEntry 3 }
+
+chassisIfStatusTPSpeed OBJECT-TYPE
+    SYNTAX  INTEGER {
+                linkDown(0),
+                ifSpeed-10M(1),
+                ifSpeed-100M(2),
+                ifSpeed-1000M(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current TP speed of the interface."
+    ::= { chassisIfStatusEntry 4 }
+
+chassisIfStatusTPDuplex OBJECT-TYPE
+    SYNTAX  INTEGER {
+                linkDown(0),
+                half(1),
+                full(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current TP Duplex of the interface."
+    ::= { chassisIfStatusEntry 5 }
+
+chassisIfStatusFXStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                linkDown(0),
+                linkUp(1)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current FX state of the interface."
+    ::= { chassisIfStatusEntry 6 }
+
+chassisIfStatusFXSpeed OBJECT-TYPE
+    SYNTAX  INTEGER {
+                linkDown(0),
+                ifSpeed-10M(1),
+                ifSpeed-100M(2),
+                ifSpeed-1000M(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current FX speed of the interface."
+    ::= { chassisIfStatusEntry 7 }
+
+chassisIfStatusFXDuplex OBJECT-TYPE
+    SYNTAX  INTEGER {
+                linkDown(0),
+                half(1),
+                full(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current FX Duplex of the interface."
+    ::= { chassisIfStatusEntry 8 }
+
+chassisIfConfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ChassisIfConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of MC-1610MR interface entries.  The number of entries is
+        given by the value of ifNumber."
+    ::= { chassisIfInfo 2 }
+
+chassisIfConfEntry OBJECT-TYPE
+    SYNTAX      ChassisIfConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "An entry containing management information applicable to a
+         particular interface."
+    INDEX   { chassisIfStatusIndex }
+    ::= { chassisIfConfTable 1 }
+  
+ChassisIfConfEntry ::= SEQUENCE
+    {
+        chassisIfConfAdmin          INTEGER,
+        chassisIfConfTPANmode        INTEGER,
+        chassisIfConfTPSpeed        INTEGER,
+        chassisIfConfTPDuplex        INTEGER,
+        chassisIfConfTPFlowControl  INTEGER,
+        chassisIfConfLLCF            INTEGER,
+        chassisIfConfFXDuplex        INTEGER,
+        chassisIfConfFXLLR          INTEGER,
+        chassisIfConfFXANbyPass      INTEGER
+    }
+
+chassisIfConfAdmin OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enable(1),
+                disable(0)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The desired state of the interface.(FST-80X only)"
+    ::= { chassisIfConfEntry 1 }
+
+chassisIfConfTPANmode OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enable(0),
+                disable(1)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TP autonegotiation configuration.(FST-80X only)"
+    ::= { chassisIfConfEntry 2 }
+
+chassisIfConfTPSpeed OBJECT-TYPE
+    SYNTAX  INTEGER {
+                ifSpeed-10M(0),
+                ifSpeed-100M(1),
+                ifSpeed-1000M(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TP Speed configuration.(FST-80X only)"
+    ::= { chassisIfConfEntry 3 }
+
+chassisIfConfTPDuplex OBJECT-TYPE
+    SYNTAX  INTEGER {
+                half(0),
+                full(1)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TP Speed configuration.(FST-80X only)"
+    ::= { chassisIfConfEntry 4 }
+
+chassisIfConfTPFlowControl OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enable(0),
+                disable(1)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TP flow control configuration.(FST-80X only)"
+    ::= { chassisIfConfEntry 5 }
+
+chassisIfConfLLCF OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enable(0),
+                disable(1)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "LLCF configuration.(FST-80X only)"
+    ::= { chassisIfConfEntry 6 }
+
+chassisIfConfFXDuplex OBJECT-TYPE
+    SYNTAX  INTEGER {
+                half(0),
+                full(1)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Fiber duplex configuration.(FST-80X only)"
+    ::= { chassisIfConfEntry 7 }
+
+chassisIfConfFXLLR OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enable(1),
+                disable(0)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "LLR configuration."
+    ::= { chassisIfConfEntry 8 }
+
+chassisIfConfFXANbyPass OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enable(1),
+                disable(0)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Fiber AN by pass configuration.(GST-70X only)"
+    ::= { chassisIfConfEntry 9 }
+
+chassisTemperature  OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "chassis current temperature(C)."
+    ::= { chassis 3 }
+
+chassisPowerStatus  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                off(0),
+                on(1),
+                fail(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "chassis current Power Status."
+    ::= { chassis 4 }
+
+chassisFanStatus  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                off(0),
+                on(1),
+                fail(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "chassis current Fan Status."
+    ::= { chassis 5 }
+
+chassisRedundant  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                disable(0),
+                enable(1)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "chassis Redundant Configuration."
+    ::= { chassis 6 }
+
+chassisSlotLocation  OBJECT-TYPE
+    SYNTAX       OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Slot location description."
+    ::= { chassis 7 }
+  
+END
+
+
+
+

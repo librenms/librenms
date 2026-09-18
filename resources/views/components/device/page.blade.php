@@ -28,12 +28,12 @@
         <div class="pull-right tw:mr-2">
                 @if($overviewGraphs())
                     <div
-                        class="tw:flex tw:flex-row tw:flex-wrap tw:items-end tw:justify-start tw:gap-4 tw:mx-6 tw:px-6 tw:pt-3 tw:pb-5 tw:rounded-2xl">
+                        class="tw:flex tw:flex-row tw:flex-wrap tw:items-end tw:justify-start tw:gap-4 tw:px-6 tw:pt-3 tw:pb-5 tw:rounded-2xl">
                         @foreach($overviewGraphs() as $graph)
                             <div class="tw:flex tw:flex-col tw:items-center tw:text-center tw:shrink-0">
-                                <x-graph-popup :vars="$graph" :type="$graph['type']" :width="$graph['width']" :height="$graph['height']"
+                                <x-graph popup :vars="$graph" :type="$graph['type']" :width="$graph['width']" :height="$graph['height']"
                                     :popup-title="$graph['popup_title']" :device="$device" />
-                                <div class="tw:mt-1 tw:font-semibold tw:text-sm tw:text-gray-700 tw:dark:text-dark-white-300">
+                                <div class="tw:mt-1 tw:font-semibold tw:text-xs tw:text-gray-700 tw:dark:text-dark-white-300">
                                     {{ $graph['popup_title'] }}
                                 </div>
                             </div>

@@ -1,47 +1,43 @@
-LibreNMS is a fork of Observium.  The reason for the fork has nothing to do
-with Observium's [move to community vs. paid versions][1].  It is simply
-that we have different priorities and values to the Observium development
-team.  We decided to fork (reluctantly) because we like using Observium,
-but we want to collaborate on a community-based project with like-minded
-IT professionals.  See [README.md][2] and the references there for more
-information about the kind of community we're trying to promote.
+LibreNMS is a fork of Observium. The [move to community and paid
+versions][1] is not the reason for the fork. The reason is that our
+priorities and values differ from those of the Observium development
+team. We like Observium, but we want a community-based project with
+IT professionals who share our values. For more information about our
+community, read [README.md][2] and the references in that file.
 
-LibreNMS was forked from [the last GPL-licensed version of Observium][3].
+LibreNMS is a fork of [the last GPL-licensed version of Observium][3].
 
-Thanks to one of our users, Dan Brown, who has written a [migration
-script][10], you can easily move your Observium install over to
-LibreNMS. This also takes care of moving from one CPU architecture to
-another. Give it a try :)
+Dan Brown, one of our users, wrote a [migration script][10]. This
+script moves your Observium install to LibreNMS. It also moves the
+install from one CPU architecture to another.
 
-How LibreNMS will be different from Observium:
+LibreNMS differs from Observium in these ways:
 
-- We will have an inclusive community, where it's OK to ask stupid
-  questions, and OK to ask for things that aren't on the roadmap.  If you'd
-  like to see something added, add or comment on the relevant issue in our
-  [Community forum][9].
-- Development decisions will be community-driven.  We want to make software
-  that fulfills its users' needs.
-- There are no plans for a paid version, and we don't anticipate this ever
-  changing.
-- There are no current plans for paid support, but this may be added later
-  if there is sufficient demand.
-- We use git for version control and GitHub for hosting to make it as easy
-  and painless as possible to create forked or private versions.
+- Our community is inclusive. Every question is welcome, and you can ask
+  for features that are not on the roadmap. To request a feature, add or
+  comment on the relevant issue in our [community forum][9].
+- The community drives the development decisions. We want to make
+  software that meets the needs of its users.
+- We have no plans for a paid version. We do not expect this to change.
+- We have no current plans for paid support. We can add paid support
+  later if enough people want it.
+- We use git for version control and GitHub for hosting. Forked and
+  private versions are therefore easy to create.
 
-Reasons why you might want to use Observium instead of LibreNMS:
+Use Observium instead of LibreNMS for these reasons:
 
-- You have a financial investment in Observium and aren't concerned about
-  community contributions.
-- You don't like the [GNU General Public License, version 3][5] or the
-  [philosophy of Free Software/copyleft][6] in general.
+- You have a financial investment in Observium, and community
+  contributions are not important to you.
+- You do not like the [GNU General Public License, version 3][5] or the
+  [philosophy of free software and copyleft][6].
 
-Reasons why you might want to use LibreNMS instead of Observium:
+Use LibreNMS instead of Observium for these reasons:
 
-- You want to work with others on the project, knowing that [your
-  investment of time and effort will not be wasted][7].
-- You want to add and experiment with features that are not a priority for
-  the Observium developers.  See [CONTRIBUTING][8] for more details.
-- You want to make use of the additional features LibreNMS can offer.
+- You want to work with others on the project, and you know that [your
+  investment of time and effort is not wasted][7].
+- You want to add and test features that the Observium developers do not
+  make a priority. For more information, read [CONTRIBUTING][8].
+- You want the additional features of LibreNMS.
 
 [1]: http://postman.memetic.org/pipermail/observium/2013-October/003915.html
 "Observium edition split announcement"

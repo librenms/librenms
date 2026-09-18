@@ -1,10 +1,11 @@
 ## Raspberry Pi GPIO Monitor
 
-SNMP extend script to monitor your IO pins or sensor modules connected to your GPIO header.
+This SNMP extend script monitors the IO pins and the sensor modules on
+your GPIO header.
 
 ### SNMP Extend
 
-1: Make sure you have wiringpi installed on your Raspberry Pi. In Debian-based systems for example you can achieve this by issuing:
+1: Install wiringpi on your Raspberry Pi. On a Debian-based system, run:
 
 ```bash
 sudo apt-get install wiringpi
@@ -30,9 +31,9 @@ sudo apt-get install wiringpi
     chmod +x /etc/snmp/rpigpiomonitor.php
     ```
 
-5: Create or edit your `rpigpiomonitor.ini` file according to your needs.
+5: Create or edit your `rpigpiomonitor.ini` file for your setup.
 
-6: Check your configuration with `rpigpiomonitor.php -validate`
+6: Validate your configuration with `rpigpiomonitor.php -validate`.
 
 7: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
@@ -40,5 +41,6 @@ sudo apt-get install wiringpi
     extend rpigpiomonitor /etc/snmp/rpigpiomonitor.php
     ```
 
-8: Restart snmpd on your Raspberry Pi and, if your Raspberry Pi is already present in LibreNMS, perform a manual rediscover.
+8: Restart snmpd on your Raspberry Pi. If LibreNMS already holds the
+Raspberry Pi, do a manual rediscovery.
 

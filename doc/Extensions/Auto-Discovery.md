@@ -3,14 +3,14 @@
 ## Getting Started
 
 LibreNMS provides the ability to automatically add devices on your
-network, we can do this via a few methods which will be explained
+network. There are several methods, as described
 below and also indicate if they are enabled by default.
 
 All discovery methods run when discovery runs (every 6 hours by
 default and within 5 minutes for new devices).
 
-Please note that you need at least ONE device added before
-auto-discovery will work.
+Note: you need at least ONE device before
+auto discovery works.
 
 The first thing to do though is add the required configuration options.
 
@@ -34,14 +34,14 @@ examples of SNMP v1, v2c and v3 are below:
     }'
     ```
 
-These details will be attempted when adding devices, you can specify
+LibreNMS tries these details at each new device. You can give
 any mixture of these.
 
 ## Allowed Networks
 
 ### Your Networks
 
-To add devices, we need to know what are your subnets so we don't go
+LibreNMS needs your subnets for the new devices. It then does not go
 blindly attempting to add devices not under your control.
 
 !!! setting "discovery/networks"
@@ -53,7 +53,7 @@ blindly attempting to add devices not under your control.
 ### Exclusions
 
 If you have added a network as above but a single device exists within
-it that you can't auto add, then you can exclude this with the following:
+with no automatic add, exclude it with this setting:
 
 !!! setting "discovery/networks"
     ```bash
@@ -64,15 +64,15 @@ it that you can't auto add, then you can exclude this with the following:
 
 ### Discovering devices by IP
 
-By default we don't add devices by IP address, we look for a reverse
+By default, LibreNMS does not add a device by its IP address. It looks for a reverse
 dns name to be found and add with that. If this fails
-and you would like to still add devices automatically then you will
+and you still want the automatic add, you
 need to set `$config['discovery_by_ip'] = true;`
 
 ### Short hostnames
 
 If your devices only return a short hostname such as lax-fa0-dc01 but
-the full name should be lax-fa0-dc01.example.com then you can
+the full name is lax-fa0-dc01.example.com, you can
 set
 
 !!! setting "discovery/general"
@@ -83,7 +83,7 @@ set
 ### Allow Duplicate sysName
 
 By default we require unique sysNames when adding devices (this is
-returned over snmp by your devices). If you would like to allow
+from the SNMP of your devices. To permit
 devices to be added with duplicate sysNames then please set
 
 !!! setting "discovery/discovery_modules"
@@ -94,7 +94,7 @@ devices to be added with duplicate sysNames then please set
 ## Discovery Methods
 
 Below are the methods for auto discovering devices.  Each one can be
-enabled or disabled and may have additional configuration options.
+enabled or disabled. Some have more configuration options.
 
 ### ARP
 
@@ -124,10 +124,12 @@ Enabled by default. Can be disabled with:
 
 This includes FDP, CDP and LLDP support based on the device type.
 
-The LLDP/xDP links with neighbours will always be discovered as soon as the discovery module is enabled.
-However, LibreNMS will only try to add the new devices discovered with LLDP/xDP if `$config['autodiscovery']['xdp'] = true;`.
+LibreNMS always discovers the LLDP and xDP links to the neighbours at
+the start of the discovery module.
+LibreNMS adds the new devices from LLDP and xDP only with
+`$config['autodiscovery']['xdp'] = true;`.
 
-Devices may be excluded from xdp discovery by sysName and sysDescr.
+You can exclude a device from the xDP discovery by sysName and by sysDescr.
 
 !!! setting "discovery/autodiscovery"
     ```bash
@@ -138,7 +140,7 @@ Devices may be excluded from xdp discovery by sysName and sysDescr.
     lnms config:set autodiscovery.xdp_exclude.sysdescr_regexp.+ '/Vendor X/'
     ```
 
-Devices may be excluded from cdp discovery by platform. (CDP only)
+You can exclude a device from the CDP discovery by platform. This filter applies only to CDP.
 
 !!! setting "discovery/autodiscovery"
     ```bash
@@ -182,7 +184,7 @@ Apart from the aforementioned Auto-Discovery options, LibreNMS is also
 able to proactively scan a network for SNMP-enabled devices using the
 configured version/credentials.
 
-SNMP Scan will scan `nets` by default and respects `autodiscovery.nets-exclude`.
+By default, SNMP Scan scans `nets`. It obeys `autodiscovery.nets-exclude`.
 
 To run the SNMP-Scanner you need to execute the `snmp-scan.py` from
 within your LibreNMS installation directory.
@@ -214,7 +216,8 @@ optional arguments:
 
 ### Discovered devices
 
-Newly discovered devices will be added to the `default_poller_group`, this value defaults to 0 if unset.
+LibreNMS adds each new device to the `default_poller_group`. Without
+this setting, the value is 0.
 
 When using distributed polling, this value can be changed locally by setting `default_poller_group`
 

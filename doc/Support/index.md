@@ -1,12 +1,12 @@
 # How to get Help
 
-- Browse through the navigation on the left
-- Search in the upper right
-- Check the [frequently asked questions](FAQ.md)
+- Use the navigation on the left
+- Use the search field in the upper right corner
+- Read the [frequently asked questions](FAQ.md)
 
 # Additional Support
 
-We have a few methods for you to get in touch to ask for help.
+You can ask for help in these places.
 
 - [Community Forum](https://community.librenms.org)
   - [Ask for Help](https://community.librenms.org/c/help)

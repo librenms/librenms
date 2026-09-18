@@ -1,40 +1,67 @@
 ## Time Concepts
 
-Most times in LibreNMS are absolute points in time when data has been collected.  What this means is that midnight UTC is the same as 8pm in the -0400 timezone, and 8am in +0800.  When dealing with these points in time, the preference is:
+Most times in LibreNMS are absolute points in time. They mark the
+collection of data. Midnight UTC is therefore the same moment as 8 pm
+in the -0400 timezone and 8 am in the +0800 timezone. For these points
+in time, use these rules:
 
-- Date objects being manipulated in PHP should use Carbon objects that contain timezone information. When being saved they should use one of the following:
+- A date object in PHP uses a Carbon object with timezone information.
+  Save it in one of these forms:
   - bigint unix epoch values.
-  - timestamp fields, which have provisions on the SQL server side for converting to the appropriate timezone when read.
-- Dates being encoded in the URL should use the unix epoch.
-- Dates being encoded in JSON should use the ISO8601 representation in Zulu/UTC timezone, and the javascript converter to display in the correct timezone.
-- Dates being displayed in HTML pages should be converted to the timezone that the user has selected (browser timezone by default).
-- Dates being parsed from user input should be interpreted using the user's selected timezone, and converted to a JSON/URL encoded format.
+    - timestamp fields. The SQL server converts them to the correct
+    timezone at each read.
+- A date in a URL uses the unix epoch.
+- A date in JSON uses the ISO8601 form in the Zulu (UTC) timezone. The
+  JavaScript converter then shows it in the correct timezone.
+- A date on an HTML page uses the timezone of the user. The default is
+  the browser timezone.
+- A date from user input uses the selected timezone of the user.
+  Convert it to the JSON format or the URL format.
 
-There will be some exceptions to the above, for example scheduled maintenance where the user intends the maintenance window to start at 9pm every night.  When this happens, we should store the timezone along with the time information so we can interpret the time correctly relative to the intended timezone.
+There are exceptions to these rules. One example is a scheduled
+maintenance with a window that starts at 9 pm each night. Store the
+timezone with the time information for such a case. The time is then
+correct for the intended timezone.
 
-Some additional noted on database fields:
-- datetime fields are not normally acceptable because they are not timezone aware. This creates issues near the boundaries of daylight savings as well as assumptions about timezone when parsing.
-- timestamp fields currently have a maximum date in 2106, and can store times with a granularity of microseconds (seconds by default).
-- unix epoch fields have a granulariy of 1 second.
+Notes on the database fields:
+- Do not use datetime fields. They hold no timezone. They cause
+  problems at a daylight saving boundary. They also force an assumption
+  about the timezone at the parse.
+- timestamp fields have a maximum date in 2106. They store times with a
+  granularity of microseconds. The default granularity is seconds.
+- unix epoch fields have a granularity of 1 second.
 
 ## PHP Time Functions
 
-LibreNMS uses the Carbon library for date handling.  The following functions should be used to generate new time objects:
-- `Carbon::now()` - This takes no input arguments and will return the current time.
-- `Carbon::createFromTimestamp()` - This will take an integer representing the unix epoch as input.
-- `Carbon::parse($time_string)` - This will take a string as input.  This will correctly interpret:
+LibreNMS uses the Carbon library for date handling. Use these functions
+to generate a new time object:
+- `Carbon::now()` - it takes no argument and returns the current time.
+- `Carbon::createFromTimestamp()` - it takes an integer unix epoch
+  value.
+- `Carbon::parse($time_string)` - it takes a string. It reads these
+  forms correctly:
   - ISO8601 times with "Z" at the end as UTC times
   - ISO8601 times with a UTC offset (-1200 to +1200) at the end
-  - Datetime fields from the database with no UTC offset (assumes the time is in the PHP timezone)
+    - datetime fields from the database without a UTC offset. It assumes
+    the PHP timezone
 
-The following methods should be used on Carbon objects to convert them to unix epoch timestamps or ISO8601 Zulu time strings:
+Use these methods on a Carbon object. They convert it to a unix epoch
+timestamp or to an ISO8601 Zulu time string:
 - `$object->unix()`
 - `$object->toIso8601ZuluString()`
 
-The following function has been created for formatting dates on web pages, but are considered legacy because a better solution exists using JSON to fetch the data from an AJAX endpoint and then using the javascript formatting functions explained further down this page to format the time. This allows dates to be formatted using the locale of the end user (e.g. dd/mm/yy vs mm/dd/yy):
-- `Time::format()` - Takes both a Carbon object and a format string as inputs, and outputs the time in the user's selected timezone using the format string.
+The function below formats a date on a web page. It is legacy code. A
+better method gets the data from an AJAX endpoint in JSON. The
+JavaScript formatting functions later on this page then format the
+time. The date then uses the locale of the user, for example dd/mm/yy
+or mm/dd/yy:
+- `Time::format()` - it takes a Carbon object and a format string. It
+  returns the time in the selected timezone of the user, in that
+  format.
 
-When using the `Time::format()` function, you should choose from one of the following config options for chooing a date format.  An example of the default output is shown next to each:
+With the `Time::format()` function, use one of these configuration
+options for the date format. An example of the default output follows
+each option:
  - `dateformat.long` - Wed, 04 Feb 2026 09:25:00 +0800
  - `dateformat.compact` - 2026-02-04 09:25:00
  - `dateformat.byminute` - 2026-02-04 09:25
@@ -42,7 +69,8 @@ When using the `Time::format()` function, you should choose from one of the foll
 
 ### Examples
 
-If you have a timestamp field from the database that you want to display on a web page, the following code would be needed:
+To show a timestamp field from the database on a web page, use this
+code:
 ```php
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Time;
@@ -50,7 +78,7 @@ use LibreNMS\Util\Time;
 $output = Time::format($dbtime, LibrenmsConfig::get('dateformat.long'));
 ```
 
-If you have a unix epoch input that you want to display on a web page, the following code would be needed:
+To show a unix epoch input on a web page, use this code:
 ```php
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Time;
@@ -58,14 +86,16 @@ use LibreNMS\Util\Time;
 $output = Time::format(Time::fromTimestamp($epoch), LibrenmsConfig::get('dateformat.compact'));
 ```
 
-If you receive a ISO8601 date as part of data posted from an AJAX query, and want to convert it to a unix epoch to use in a SQL filter, you would do the following:
+An AJAX query can post an ISO8601 date. To convert this date to a unix
+epoch for a SQL filter, use this code:
 ```php
 use LibreNMS\Util\Time;
 
 $epoch = Time::parse($iso8601_date)->unix();
 ```
 
-If you have a timestamp field from the database that you want to send to an AJAX endpoint as ISO8601 time, you would do the following:
+To send a database timestamp field to an AJAX endpoint as an ISO8601
+time, use this code:
 ```php
 $jsontime = $dbtime->toIso8601ZuluString();
 ```
@@ -74,7 +104,8 @@ $jsontime = $dbtime->toIso8601ZuluString();
 
 ### User input
 
-LibreNMS uses the moment-timezone javascript library to parse user input times in Javascript.  To use the library, you will need to include the following in the script section of a laravel page:
+LibreNMS uses the moment-timezone JavaScript library to parse the times
+from user input. Add this line to the script section of a Laravel page:
 ```
 <script src="{{ asset('js/RrdGraphJS/moment-timezone-with-data.js') }}"></script>
 ```

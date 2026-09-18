@@ -2,14 +2,13 @@ hide_toc: true
 
 # Metric storage
 
-By default we ship all metrics to RRD files, either directly or via
-[RRDCached](RRDCached.md). On top of this  you can ship metrics to
-Graphite, InfluxDB (v1 or v2 API), OpenTSDB or Prometheus. At present you can't use
-these backends to display graphs within LibreNMS and will need to use
-something like [Grafana](https://grafana.com/).
+By default, LibreNMS writes all metrics to RRD files. It writes them
+directly or through [RRDCached](RRDCached.md). You can also send the
+metrics to Graphite, InfluxDB (v1 or v2 API), OpenTSDB, or Prometheus.
+LibreNMS cannot draw graphs from these backends. Use a tool such as
+[Grafana](https://grafana.com/) for those graphs.
 
-For further information on configuring LibreNMS to ship data to one of
-the other backends then please see the documentation below.
+For the configuration of another backend, read the documents below.
 
 - [Graphite](metrics/Graphite.md)
 - [InfluxDB](metrics/InfluxDB.md)

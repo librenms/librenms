@@ -2,39 +2,38 @@
 
 ## File location
 
-All transports are located in `LibreNMS\Alert\Transport` and the files
-are named after the Transport name. I.e `Discord.php` for Discord.
+All transports are in `LibreNMS\Alert\Transport`. Each file has the
+name of its transport. An example is `Discord.php` for Discord.
 
 ## Transport structure
 
-The following functions are required for a new transport to pass the unit tests:
+A new transport needs these functions to pass the unit tests:
 
-`deliverAlert()` - This is function called within alerts to invoke the
-transport. Here you should do any post processing of the transport
-config to get it ready for use.
+`deliverAlert()` - the alert code calls this function to start the
+transport. In this function, prepare the transport configuration for
+use.
 
-`contact$Transport()` - This is named after the transport so for
-Discord it would be `contactDiscord()`. This is what actually
-interacts with the 3rd party API, invokes the mail command or whatever
-you want your alert to do.
+`contact$Transport()` - this function has the name of the transport.
+For Discord, the name is `contactDiscord()`. This function connects to
+the third-party API, starts the mail command, or does the action of
+your alert.
 
-`configTemplate()` - This is used to define the form that will accept
-the transport config in the webui and then what data should be
-validated and how. Validation is done using
-[Laravel validation](https://laravel.com/docs/validation)
+`configTemplate()` - this function defines the form for the transport
+configuration in the web interface. It also defines the validation of
+the data. The validation uses [Laravel
+validation](https://laravel.com/docs/validation).
 
 ## Documentation
 
-Please don't forget to create a documentation file `doc/Alerting/Transports/$Transport.md`
-file to include details of your new transport.
+Create a documentation file `doc/Alerting/Transports/$Transport.md`
+with the details of your new transport.
 
-A table should be provided to indicate the form values that we ask for
-and examples. I.e:
+Add a table with the form values and examples. For example:
 
 |Config | Example|
 ------ | -------
 Discord URL | <https://discordapp.com/api/webhooks/4515489001665127664/82-sf4385ysuhfn34u2fhfsdePGLrg8K7cP9wl553Fg6OlZuuxJGaa1d54fe>|
 Options | username=myname|
 
-Please also ensure that you link back to any 3rd party documentation that
-will help users understand how the transport can be used.
+Add a link to each third-party document that explains the use of the
+transport.

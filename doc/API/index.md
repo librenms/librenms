@@ -1,34 +1,47 @@
 ## Versioning
 
-Versioning an API is a minefield which saw us looking at numerous
-options on how to do this.
+The versioning of an API is difficult. We examined many options.
 
-We have currently settled on using versioning within the API end point
-itself `/api/v0`. As the API itself is new and still in active
-development we also decided that v0 would be the best starting point
-to indicate it's in development.
+We put the version into the API endpoint itself: `/api/v0`. The API is
+new and still in active development. We therefore start at v0 to show
+this development state.
 
 ## Tokens
 
-To access any of the token end points you will be required to
-authenticate using a token. Tokens can be created directly from within
-the LibreNMS web interface by going to `/api-access/`.
+Endpoints require authentication using an API access token. You can create and manage tokens
+in the LibreNMS web interface by navigating to **Settings (gear icon) → API Settings → API Access** (or `/api-access/`).
 
-- Click on 'Create API access token'.
-- Select the user you would like to generate the token for.
+To create a token:
+
+- Click **Create API access token**.
 - Enter an optional description.
-- Click Create API Token.
+- Select a token expiration (e.g. Never, 7 days, 30 days, 90 days, 1 year, or a custom number of days).
+- Click **Create**.
+- Copy the generated API token immediately. For security, tokens are stored as SHA-256 hashes and will only be displayed once upon creation or reset.
+
+API tokens are generated in the format `{id}|{secret}` (for example: `1|abc123...`).
+
+## Authentication
+
+API requests are authenticated via HTTP headers.
+
+All API endpoints accept the standard `Authorization: Bearer` header:
+
+- `Authorization: Bearer YOURAPITOKENHERE`
+
+For backwards compatibility, **API v0** (`/api/v0`) also supports:
+
+- `X-Auth-Token: YOURAPITOKENHERE`
 
 ## Endpoints
 
-Whilst this documentation will describe and show examples of the end
-points, we've designed the API so you should be able to traverse
-through it without knowing any of the available API routes.
+This documentation describes each endpoint and gives examples. The API
+also lets you move through it without knowledge of the API routes.
 
-You can do this by first calling `/api/v0`:
+To do this, first call `/api/v0`:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://librenms.org/api/v0
 ```
 
 Output:
@@ -43,28 +56,28 @@ Output:
 
 ## Input
 
-Input to the API is done in three different ways, sometimes a
-combination of two or three of these.
+There are three input methods for the API. A call can use two or three
+of them together.
 
-- Passing parameters via the api route. For example when obtaining a
-  devices details you will pass the hostname of the device in the route: `/api/v0/devices/:hostname`.
-- Passing parameters via the query string. For example you can list
-  all devices on your install but limit the output to devices that are
-  currently down: `/api/v0/devices?type=down`
-- Passing data in via JSON, this will mainly be used when adding or
-  updating information via the API, for instance adding a new device:
+- Parameters in the API route. For example, the details of a device
+  need the hostname in the route: `/api/v0/devices/:hostname`.
+- Parameters in the query string. For example, this call lists all
+  devices on your install but shows only the down devices:
+  `/api/v0/devices?type=down`
+- Data in JSON. This method adds and updates information. For example,
+  it adds a new device:
 
 ```curl
-curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices
+curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://librenms.org/api/v0/devices
 ```
 
 ## Output
 
-Output from the API currently is via two output types:
+The API has two output types:
 
-- JSON: Most API responses will output json. As shown in the example for
-  calling the API endpoint.
-- PNG: This is for when the request is for an image such as a graph for a switch port.
+- JSON: most API responses give JSON, as in the example above.
+- PNG: this type applies to a request for an image, such as a graph of
+  a switch port.
 
 ## Endpoint Categories
 

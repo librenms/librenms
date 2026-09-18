@@ -1,53 +1,51 @@
 ## SnmpQuery
 
-To fetch and manipulate snmp data in LibreNMS, use SnmpQuery.
-Oids can be specified several ways, the preferred way is full textual such
-as IF-MIB::ifIndex. Numeric and short are also supported.
+Use SnmpQuery to get and process SNMP data in LibreNMS. There are
+several formats for an OID. We prefer the full textual form, such as
+`IF-MIB::ifIndex`. The numeric form and the short form are also valid.
 
 ### Actions
-Once an action is reached, the query will be executed and return an
-SnmpResponse holding the returned data. SnmpResponse has many options for
-manipulating and indexing the returned data.
+At an action, the query runs and returns an SnmpResponse with the data.
+SnmpResponse has many options to process and index this data.
 
-There are 4 primary actions you can execute with SnmpQuery.
+SnmpQuery has 4 primary actions:
 
- - get - fetch one or more full oids from the device
- - walk - walk an oid most useful with tables or columns from tables
- - next - get the next oid after the specified oid
- - translate - translate an oid between textual and numeric (returns a string)
+ - get - it gets one or more full OIDs from the device
+ - walk - it walks an OID. It is most useful for a table or a column of a table
+ - next - it gets the OID after the given OID
+ - translate - it converts an OID between the textual form and the numeric form. It returns a string
 
 ### Fetch Options
 
- - numeric - Output all OIDs numerically
- - numericIndex - Output all OIDs numerically
- - abortOnFailure - When walking multiple OIDs, stop if one fails
- - context - Set a context for the snmp query
- - mibDir - Set an additional MIB directory
- - mibs -  Set MIBs to use for this query
- - allowUnordered - Do not error on out of order indexes (allows infinite loops)
- - device - specify a different device to query (SnmpQuery always queries the active device)
+ - numeric - it gives all OIDs in numeric form
+ - numericIndex - it gives all OID indexes in numeric form
+ - abortOnFailure - in a walk of several OIDs, it stops at the first failure
+ - context - it sets a context for the SNMP query
+ - mibDir - it adds a MIB directory
+ - mibs - it sets the MIBs of this query
+ - allowUnordered - it accepts indexes out of order. This option makes an infinite loop possible
+ - device - it selects a different device. By default, SnmpQuery queries the active device
 
 
 ## SnmpResponse
 
 ### value
 
-If the response contained a single value, this will return just the value.
-If there was more than one value, you can specify an oid to fetch from the
-response.
+For a response with one value, this method returns that value. For a
+response with more values, give an OID to select the value.
 
 ##### Examples
- A single value from a single get
+ A single value from a single get:
  
     SnmpQuery::get('SNMPv2-MIB::sysName.0')->value();
     "server"
 
-The first value to match an oid
+The first value that matches an OID:
 
     SnmpQuery::walk('IF-MIB::ifTable')->value('IF-MIB::ifIndex');
     "1"
 
-The value for the oid at the given index
+The value of the OID at the given index:
 
     SnmpQuery::walk('IF-MIB::ifTable')->value('IF-MIB::ifDescr.2');
     "enp7s0"
@@ -55,12 +53,14 @@ The value for the oid at the given index
 
 ### values
 
-Fetch all values in an array keyed by the oid as returned by snmp.
+It returns all values in an array. The key of each value is its OID
+from SNMP.
 
 ##### Examples
 
-Walk a single column from ifTable (You could also fetch all of ifTable, but that would be large)
-Note: tables will use the [] syntax for indexes. Everything else will use dot syntax.
+Walk a single column of ifTable. A walk of the whole ifTable also
+works, but it returns much data. Note: a table uses the `[]` syntax for
+an index. All other objects use the dot syntax.
 
     SnmpQuery::walk('IF-MIB::ifName')->values();
     [
@@ -68,7 +68,7 @@ Note: tables will use the [] syntax for indexes. Everything else will use dot sy
         "IF-MIB::ifName[2]" => "enp7s0",
     ]
 
-Get two oids and show both
+Get two OIDs and show both:
 
     SnmpQuery::get(['SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysDescr.0'])->values();
     [
@@ -147,14 +147,15 @@ Group by 2 (which matches the index count for this table)
 
 ### mapTable
 
-Map an snmp table with callback. Variables passed to the callback will be an
+Map an SNMP table with a callback. The callback receives an
 array of row values followed by each individual index.
 
 This is the best method when you want to return a collection of data that matches the rows in an SNMP table.
 
 ##### Examples
 
-Because this example uses dd() (dump and die), only the first entry will be printed.
+This example uses `dd()`, that is dump and die. It therefore prints
+only the first entry.
 
     SnmpQuery::enumStrings()->walk('IP-MIB::ipAddressTable')->mapTable(function ($data, $ipAddressAddrType, $ipAddressAddr) {
         dd(get_defined_vars());
@@ -225,6 +226,6 @@ and call pluck, we get a nice mapping of ifIndex to ifName
 Functions for checking the results of the SNMP query.
 
  - isValid - check for issues such as aborted SNMP walks (such as network disconnect) and other things.
- - getExitCode - will get the exit code of the snmp process
- - getErrorMessage - will return the stderr output from the process.
+ - getExitCode - it gives the exit code of the SNMP process
+ - getErrorMessage - it gives the stderr output of the process
 

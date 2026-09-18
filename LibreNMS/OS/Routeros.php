@@ -661,6 +661,15 @@ class Routeros extends OS implements
     public function discoverTransceivers(): Collection
     {
         return \SnmpQuery::walk('MIKROTIK-MIB::mtxrOpticalTable')->mapTable(function ($data, $ifIndex) {
+            // RouterOS >= 7.24 lists every SFP cage, including empty ones
+            if (isset($data['MIKROTIK-MIB::mtxrOpticalModulePresent'])) {
+                if (! in_array($data['MIKROTIK-MIB::mtxrOpticalModulePresent'], ['true', '1'], true)) {
+                    return null;
+                }
+            } elseif (isset($data['MIKROTIK-MIB::mtxrOpticalVendorSerial']) && $data['MIKROTIK-MIB::mtxrOpticalVendorSerial'] === '' && empty($data['MIKROTIK-MIB::mtxrOpticalVendorName'])) {
+                return null;
+            }
+
             $wavelength = isset($data['MIKROTIK-MIB::mtxrOpticalWavelength']) && $data['MIKROTIK-MIB::mtxrOpticalWavelength'] != '.00' ? Number::cast($data['MIKROTIK-MIB::mtxrOpticalWavelength']) : null;
 
             return new Transceiver([
@@ -671,7 +680,7 @@ class Routeros extends OS implements
                 'wavelength' => $wavelength == 65535 ? null : $wavelength, // NA value = 65535.00
                 'entity_physical_index' => $ifIndex,
             ]);
-        });
+        })->filter();
     }
 
     public function discoverVlans(): Collection

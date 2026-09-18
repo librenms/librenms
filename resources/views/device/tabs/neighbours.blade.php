@@ -47,6 +47,21 @@
 @elseif($data['selection'] == 'map')
     <div id="netmap"></div>
 
+@push('styles')
+<style>
+    div.vis-tooltip {
+        padding: 0 !important;
+        background-color: transparent !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+    div.vis-tooltip .panel {
+        margin-bottom: 0 !important;
+    }
+</style>
+@endpush
+
 @push('scripts')
 <script>
 var network_nodes = new vis.DataSet({queue: {delay: 100}});

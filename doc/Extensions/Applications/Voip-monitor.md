@@ -1,6 +1,7 @@
 # Voip-monitor
 
-Shell script that reports cpu-load/memory/open-files files stats of Voip Monitor
+This shell script reports the CPU load, the memory, and the open file
+statistics of Voip Monitor.
 
 ## SNMP Extend
 

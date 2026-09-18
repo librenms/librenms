@@ -21,7 +21,7 @@ class UserObserver
         DB::table('bill_perms')->where('user_id', $user->user_id)->delete();
 
         // Remove related user-owned records
-        $user->apiTokens()->delete();
+        $user->tokens()->delete();
         $user->notificationAttribs()->delete();
         $user->preferences()->delete();
         $user->pushSubscriptions()->delete();

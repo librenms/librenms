@@ -1,6 +1,5 @@
 <?php
 
-use Binaryk\LaravelRestify\Http\Middleware\AuthorizeRestify;
 use Binaryk\LaravelRestify\Http\Middleware\DispatchRestifyStartingEvent;
 
 return [
@@ -14,11 +13,11 @@ return [
     'base' => '/api/v1',
 
     'middleware' => [
-        App\Http\Middleware\EnsureApiV1Enabled::class,
         App\Http\Middleware\EnforceJsonApi::class,
+        App\Http\Middleware\FormatJsonApiError::class,
+        App\Http\Middleware\EnsureApiV1Enabled::class,
         'auth:sanctum',
         DispatchRestifyStartingEvent::class,
-        AuthorizeRestify::class,
     ],
 
     'logs' => [

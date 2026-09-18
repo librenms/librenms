@@ -33,13 +33,13 @@ The Wireguard application polls the Wireguard service and scrapes all client sta
     ```
 
 
-3. Make the script executable
+3. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/wireguard.pl
     ```
 
-4. Edit your snmpd.conf file and add:
+4. Edit your `snmpd.conf` file and add:
 
     ```bash
     extend wireguard /etc/snmp/wireguard.pl
@@ -51,7 +51,7 @@ The Wireguard application polls the Wireguard service and scrapes all client sta
 | key                          | default     | description                                                 |
 |------------------------------|-------------|-------------------------------------------------------------|
 | include_pubkey               | 0           | Include the pubkey with the return.                         |
-| use_short_hostname           | 1           | If the hostname should be shortened to just the first part. |
+| use_short_hostname           | 1           | It shortens the hostname to its first part. |
 | public_key_to_arbitrary_name | {}          | A hash of pubkeys to name mappings.                         |
 | pubkey_resolvers             | <see below> | Resolvers to use for the pubkeys.                           |
 

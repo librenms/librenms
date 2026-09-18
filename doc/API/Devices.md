@@ -13,7 +13,7 @@ Input:
 Example:
 
 ```curl
-curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost
+curl -X DELETE -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost
 ```
 
 Output:
@@ -49,7 +49,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost
 ```
 
 Output:
@@ -84,7 +84,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/discover
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/discover
 ```
 
 Output:
@@ -115,7 +115,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/availability
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/availability
 ```
 
 Output:
@@ -160,7 +160,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/outages
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/outages
 ```
 
 Output:
@@ -209,7 +209,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs
 ```
 
 Output:
@@ -250,7 +250,7 @@ Route: `/api/v0/devices/:hostname/health(/:type)(/:sensor_id)`
 - type (optional) is health type / sensor class
 - sensor_id (optional) is the sensor id to retrieve specific information.
 
-`type` may be a sensor class (e.g. `device_voltage`) or one of the special
+`type` is a sensor class, such as `device_voltage`, or one of the special
 classes `device_processor`, `device_storage` and `device_mempool`, which are
 stored in their own tables rather than the `sensors` table. The `device_`
 prefix is optional, so `processor` and `device_processor` are equivalent.
@@ -262,7 +262,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health
 ```
 
 Output:
@@ -288,7 +288,7 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/device_voltage
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/device_voltage
 ```
 
 Output:
@@ -314,7 +314,7 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/device_voltage/1
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/device_voltage/1
 ```
 
 Output:
@@ -356,7 +356,7 @@ Output:
 Example (processor list):
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/processor
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/processor
 ```
 
 Output:
@@ -396,7 +396,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless
 ```
 
 Output:
@@ -421,7 +421,7 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless/device_wireless_ccq
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless/device_wireless_ccq
 ```
 
 Output:
@@ -446,7 +446,7 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless/device_wireless_ccq/1
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless/device_wireless_ccq/1
 ```
 
 Output:
@@ -499,14 +499,14 @@ Input:
 
 - class (optional): filter rows by `sensor_class`. Must be one of the
   wireless sensor types (`clients`, `rssi`, `snr`, `mcs`, `frequency`,
-  `capacity`, `distance`, `quality`, etc.).
+  `capacity`, `distance`, and `quality`).
 - columns (optional): comma-separated list of `wireless_sensors` columns to
   return. Defaults to all columns.
 
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless-sensors
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless-sensors
 ```
 
 Output:
@@ -543,7 +543,7 @@ Output:
 Example filtered by class and selecting a subset of columns:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless-sensors?class=rssi&columns=sensor_id,sensor_index,sensor_descr,sensor_current
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless-sensors?class=rssi&columns=sensor_id,sensor_index,sensor_descr,sensor_current
 ```
 
 Output:
@@ -566,8 +566,8 @@ Output:
 ### `get_health_graph`
 
 Get a particular health class graph for a device, if you provide a
-sensor_id as well then a single sensor graph will be provided. If no
-sensor_id value is provided then you will be sent a stacked sensor graph.
+sensor_id, the call returns a single sensor graph. Without a sensor_id
+value, the call returns a stacked sensor graph.
 
 Route: `/api/v0/devices/:hostname/graphs/health/:type(/:sensor_id)`
 
@@ -582,7 +582,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs/health/device_voltage
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs/health/device_voltage
 ```
 
 Output:
@@ -592,7 +592,7 @@ Output is a stacked graph for the health type provided.
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs/health/device_voltage/1
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs/health/device_voltage/1
 ```
 
 Output:
@@ -602,8 +602,8 @@ Output is the graph of the particular health type sensor provided.
 ### `get_wireless_graph`
 
 Get a particular wireless class graph for a device, if you provide a
-sensor_id as well then a single sensor graph will be provided. If no
-sensor_id value is provided then you will be sent a stacked wireless graph.
+sensor_id, the call returns a single sensor graph. Without a sensor_id
+value, the call returns a stacked wireless graph.
 
 Route: `/api/v0/devices/:hostname/graphs/wireless/:type(/:sensor_id)`
 
@@ -619,7 +619,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs/wireless/device_wireless_ccq
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs/wireless/device_wireless_ccq
 ```
 
 Output:
@@ -629,7 +629,7 @@ Output is a stacked graph for the wireless type provided.
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs/wireless/device_wireless_ccq/1
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs/wireless/device_wireless_ccq/1
 ```
 
 Output:
@@ -649,20 +649,20 @@ Route: `/api/v0/devices/:hostname/:type`
 
 Input:
 
-- from: This is the date you would like the graph to start - See
+- from: the start date of the graph. See
   [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
   for more information.
-- to: This is the date you would like the graph to end - See
+- to: the end date of the graph. See
   [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
   for more information.
 - width: The graph width, defaults to 1075.
 - height: The graph height, defaults to 300.
-- output: Set how the graph should be outputted (base64, display), defaults to display.
+- output: the output format of the graph, `base64` or `display`. The default is `display`.
 
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/device_poller_perf
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/device_poller_perf
 ```
 
 Output:
@@ -681,10 +681,10 @@ Route: `/api/v0/devices/:hostname/services/:service_id/graphs/:datasource`
 
 Input:
 
-- from: This is the date you would like the graph to start - See
+- from: the start date of the graph. See
   [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
   for more information.
-- to: This is the date you would like the graph to end - See
+- to: the end date of the graph. See
   [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
   for more information.
 - width: The graph width, defaults to 1075.
@@ -693,7 +693,7 @@ Input:
   Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/services/35/graphs/loss
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/services/35/graphs/loss
 ```
 
 Output:
@@ -717,7 +717,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ports
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ports
 ```
 
 Output:
@@ -744,7 +744,7 @@ Output:
 Example with VLANs:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ports?with=vlans
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ports?with=vlans
 ```
 
 Output:
@@ -785,7 +785,7 @@ Output:
 }
 ```
 
-> **Note:** Using `with=vlans` on devices with many ports may increase response
+> **Note:** `with=vlans` on a device with many ports can increase the response
 > size and memory usage. Consider using the `columns` parameter to limit
 > returned fields when fetching VLAN data for large devices.
 
@@ -800,7 +800,7 @@ Route: `/api/v0/devices/:hostname/fdb`
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/fdb
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/fdb
 ```
 
 Output:
@@ -831,7 +831,7 @@ Route: `/api/v0/devices/:hostname/nac`
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/nac
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/nac
 ```
 
 Output:
@@ -877,7 +877,7 @@ Route: `/api/v0/devices/:hostname/ip`
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ip
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ip
 ```
 
 Output:
@@ -908,15 +908,10 @@ Route: `/api/v0/devices/:hostname/port_stack`
 
 - hostname can be either the device hostname or id
 
-Input:
-
-- valid_mappings: Filter the result by only showing valid mappings
-  ("0" values not shown).
-
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/port_stack?valid_mappings
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/port_stack
 ```
 
 Output:
@@ -928,15 +923,21 @@ Output:
     "count": 2,
     "mappings": [
         {
-            "device_id": "3742",
-            "port_id_high": "1001000",
-            "port_id_low": "51001",
+            "id": 2795,
+            "device_id": 3742,
+            "high_ifIndex": 17,
+            "high_port_id": 1001000,
+            "low_ifIndex": 18,
+            "low_port_id": 51001,
             "ifStackStatus": "active"
         },
         {
-            "device_id": "3742",
-            "port_id_high": "1001000",
-            "port_id_low": "52001",
+            "id": 2796,
+            "device_id": 3742,
+            "high_ifIndex": 17,
+            "high_port_id": 1001000,
+            "low_ifIndex": 24,
+            "low_port_id": 52001,
             "ifStackStatus": "active"
         }
     ]
@@ -954,7 +955,7 @@ Route: `/api/v0/devices/:hostname/transceivers`
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/transceivers
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/transceivers
 ```
 
 Output:
@@ -1032,7 +1033,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/components
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/components
 ```
 
 Output:
@@ -1089,7 +1090,7 @@ Route: `/api/v0/devices/:hostname/components/:type`
 Example:
 
 ```curl
-curl -X POST -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/components/APITEST
+curl -X POST -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/components/APITEST
 ```
 
 Output:
@@ -1123,7 +1124,7 @@ Route: `/api/v0/devices/:hostname/components`
 In this example we set the label and add a new field: TestField:
 
 ```curl
-curl -X PUT -d '{"4459": {"type": "APITEST","label": "This is a test label","status": 1,"ignore": 0,"disabled": 0,"error": "","TestField": "TestData"}}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/components
+curl -X PUT -d '{"4459": {"type": "APITEST","label": "This is a test label","status": 1,"ignore": 0,"disabled": 0,"error": "","TestField": "TestData"}}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/components
 ```
 
 Output:
@@ -1136,7 +1137,7 @@ Output:
 }
 ```
 
-Just take the JSON array from add_components or edit_components, edit
+Take the JSON array from add_components or edit_components, edit
 as you wish and submit it back to edit components.
 
 ### `delete_components`
@@ -1151,7 +1152,7 @@ Route: `/api/v0/devices/:hostname/components/:component`
 Example:
 
 ```curl
-curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/components/4459
+curl -X DELETE -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/components/4459
 ```
 
 Output:
@@ -1172,8 +1173,8 @@ Route: `/api/v0/devices/:hostname/ports/:ifname`
 - hostname can be either the device hostname or id
 - ifname can be any of the interface names for the device which can be
   obtained using
-  [`get_device_ports`](#get_device_ports). Please ensure that
-  the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.
+  [`get_device_ports`](#get_device_ports). Urlencode the ifName where
+  necessary. For example, `Gi0/1/0` needs urlencoding.
 
 Input:
 
@@ -1182,7 +1183,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ports/eth0
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ports/eth0
 ```
 
 Output:
@@ -1209,31 +1210,30 @@ Route: `/api/v0/devices/:hostname/ports/:ifname/:type`
 - hostname can be either the device hostname or id
 - ifname can be any of the interface names for the device which can be
   obtained using
-  [`get_device_ports`](#get_device_ports). Please ensure that
-  the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need
-  to be urlencoded.
+  [`get_device_ports`](#get_device_ports). Urlencode the ifName where
+  necessary. For example, `Gi0/1/0` needs urlencoding.
 - type is the port type you want the graph for, you can request a list
   of ports for a device with [`get_device_ports`](#get_device_ports).
 
 Input:
 
-- from: This is the date you would like the graph to start - See
+- from: the start date of the graph. See
   [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
   for more information.
-- to: This is the date you would like the graph to end - See
+- to: the end date of the graph. See
   [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
   for more information.
 - width: The graph width, defaults to 1075.
 - height: The graph height, defaults to 300.
-- ifDescr: If this is set to true then we will use ifDescr to lookup
+- ifDescr: with the value true, LibreNMS uses ifDescr for the lookup
   the port instead of ifName. Pass the ifDescr value you want to
-  search as you would ifName.
+  search in the same way as ifName.
 - graph_type: This can be png or svg to force the output as required.
 
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ports/eth0/port_bits
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ports/eth0/port_bits
 ```
 
 Output:
@@ -1253,7 +1253,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/sensors
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/sensors
 ```
 
 Output:
@@ -1326,12 +1326,12 @@ Input:
     - version: Software version of the device (wildcard)
     - hardware: The model of the device (wildcard)
     - features: Software license features (wildcard)
-- query: If searching by, then this will be used as the input.
+- query: the input of the search.
 
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices?order=hostname%20DESC&type=down
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices?order=hostname%20DESC&type=down
 ```
 
 Output:
@@ -1355,7 +1355,7 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices?type=mac&query=00000c9ff013
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices?type=mac&query=00000c9ff013
 ```
 
 Output:
@@ -1389,7 +1389,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/maintenance
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/maintenance
 ```
 
 Output:
@@ -1410,21 +1410,22 @@ Route: `/api/v0/devices/:hostname/maintenance`
 Input (JSON):
 
 - `title`: *optional* -  Some title for the Maintenance  
-  Will be replaced with hostname if omitted
+  Without this field, LibreNMS uses the hostname
 - `behavior`: *optional* - id of maintenance behavior desired
   Defaults to alert.scheduled_maintenance_default_behavior if omitted
 - `notes`: *optional* -  Some description for the Maintenance  
-  Will also be added to device notes if user prefs "Add schedule notes to devices notes" is set
+  LibreNMS also adds it to the device notes when the user preference
+  "Add schedule notes to devices notes" is on
 - `start`: *optional* - start time of Maintenance in full format `Y-m-d H:i:00`  
   eg: 2022-08-01 22:45:00  
-  Current system time `now()` will be used if omitted
+  Without this field, LibreNMS uses the current system time `now()`
 - `duration`: *required* - Duration of Maintenance in format `H:i` / `Hrs:Mins`  
   eg: 02:00
 
 Example with start time:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devices/localhost/maintenance/ \
   --data-raw '
 {
@@ -1448,7 +1449,7 @@ Output:
 Example with no start time:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devices/localhost/maintenance/ \
   --data-raw '
 {
@@ -1471,10 +1472,10 @@ Output:
 
 ### `add_device`
 
-Add a new device.  Most fields are optional. You may omit snmp
+Add a new device. Most fields are optional. You can omit the SNMP
 credentials to attempt each system credential in order. See snmp.version, snmp.community, and snmp.v3
 
-To guarantee device is added, use force_add. This will skip checks 
+For a guaranteed add, use force_add. This option skips the checks 
 for duplicate device and snmp reachability, but not duplicate hostname.
 
 Route: `/api/v0/devices`
@@ -1485,9 +1486,9 @@ Fields:
 
 - hostname (required): device hostname or IP
 - display_template: A string to display as the name of this device, defaults to 
-  hostname (or device_display_default setting). May be a simple
+  hostname, or the device_display_default setting. It is a simple
   template using replacements: {{ $hostname }}, {{ $sysName }},
-  {{ $sysName_fallback }}, {{ $ip }}. This will then generate the display field.
+  {{ $sysName_fallback }}, {{ $ip }}. LibreNMS then generates the display field.
 - snmpver: SNMP version to use, v1, v2c or v3. During checks detection order is v2c,v3,v1
 - port: SNMP port (defaults to port defined in config).
 - transport: SNMP protocol (udp,tcp,udp6,tcp6) Defaults to transport defined in config.
@@ -1524,7 +1525,7 @@ For ICMP only:
 Example:
 
 ```curl
-curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices
+curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices
 ```
 
 Output:
@@ -1547,10 +1548,10 @@ Output:
 ### `list_oxidized`
 
 List devices for use with Oxidized. If you have group support enabled
-then a group will also be returned based on your config.
+the response also holds a group from your configuration.
 
-> LibreNMS will automatically map the OS to the Oxidized model name if
-> they don't match.
+> LibreNMS maps the OS to the Oxidized model name automatically when
+> the two names differ.
 
 Route: `/api/v0/oxidized(/:hostname)`
 
@@ -1561,7 +1562,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/oxidized
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/oxidized
 ```
 
 Output:
@@ -1595,7 +1596,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -X PATCH -d '{"field": "notes", "data": "This server should be kept online"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost
+curl -X PATCH -d '{"field": "notes", "data": "This server should be kept online"}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost
 ```
 
 Output:
@@ -1624,7 +1625,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -X PATCH -d '{"notes": "This port is in a scheduled maintenance with the provider."}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/port/5
+curl -X PATCH -d '{"notes": "This port is in a scheduled maintenance with the provider."}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/port/5
 ```
 
 Output:
@@ -1639,7 +1640,7 @@ Output:
 ```
 
 ```curl
-curl -X PATCH -d '{"field": ["notes","purpose"], "data": ["This server should be kept online", "For serving web traffic"]}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost
+curl -X PATCH -d '{"field": ["notes","purpose"], "data": ["This server should be kept online", "For serving web traffic"]}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost
 ```
 
 Output:
@@ -1668,7 +1669,7 @@ Input:
 Examples:
 
 ```curl
-curl -X PATCH  -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/rename/localhost2
+curl -X PATCH  -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/rename/localhost2
 ```
 
 Output:
@@ -1697,7 +1698,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/groups
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/groups
 ```
 
 Output:
@@ -1727,7 +1728,7 @@ search all oxidized device configs for a string.
 
 Route: `api/v0/oxidized/config/search/:searchstring`
 
-  - searchstring is the specific string you would like to search for.
+  - searchstring is the string of the search.
 
 Input:
 
@@ -1735,7 +1736,7 @@ Input:
 
 Example:
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/oxidized/config/search/vlan10
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/oxidized/config/search/vlan10
 ```
 
 Output:
@@ -1770,7 +1771,7 @@ Input:
 
 Example:
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/oxidized/config/router.corp.com
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/oxidized/config/router.corp.com
 ```
 
 Output:
@@ -1793,7 +1794,7 @@ Input (JSON):
 
 Example:
 ```curl
-curl -X POST -d '{"parent_ids":"15,16,17"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/1/parents
+curl -X POST -d '{"parent_ids":"15,16,17"}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/1/parents
 ```
 
 Output:
@@ -1816,7 +1817,7 @@ Input (JSON):
 
 Example:
 ```curl
-curl -X DELETE -d '{"parent_ids":"15,16,17"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/1/parents
+curl -X DELETE -d '{"parent_ids":"15,16,17"}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/1/parents
 ```
 
 Output:
@@ -1835,7 +1836,7 @@ from `list_devices`.  See that entry point for more detailed information.
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' 'http://foo.example/api/v0/devices?type=device_id&query=34'
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' 'http://foo.example/api/v0/devices?type=device_id&query=34'
 ```
 
 Output:

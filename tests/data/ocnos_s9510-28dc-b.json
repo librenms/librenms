@@ -29354,5 +29354,173 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "2602:fd41:0000:0004:0000:0000:0000:0001",
+                    "ipv6_compressed": "2602:fd41:0:4::1",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": "2602:fd41:0:4::/64",
+                    "ifIndex": 10154
+                },
+                {
+                    "ipv6_address": "2602:fd41:0000:000b:0000:0000:0000:0001",
+                    "ipv6_compressed": "2602:fd41:0:b::1",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": "2602:fd41:0:b::/64",
+                    "ifIndex": 10155
+                },
+                {
+                    "ipv6_address": "2602:fd41:0020:0001:0000:0000:0000:0001",
+                    "ipv6_compressed": "2602:fd41:20:1::1",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": "2602:fd41:20:1::/64",
+                    "ifIndex": 13076
+                },
+                {
+                    "ipv6_address": "2602:fd41:0020:0002:0000:0000:0000:0001",
+                    "ipv6_compressed": "2602:fd41:20:2::1",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": "2602:fd41:20:2::/64",
+                    "ifIndex": 13059
+                },
+                {
+                    "ipv6_address": "2602:fd41:0020:0003:0000:0000:0000:0001",
+                    "ipv6_compressed": "2602:fd41:20:3::1",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": "2602:fd41:20:3::/64",
+                    "ifIndex": 13086
+                },
+                {
+                    "ipv6_address": "2602:fd41:0020:0005:0000:0000:0000:0001",
+                    "ipv6_compressed": "2602:fd41:20:5::1",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": "2602:fd41:20:5::/64",
+                    "ifIndex": 13085
+                },
+                {
+                    "ipv6_address": "2602:fd41:0020:0006:0000:0000:0000:0001",
+                    "ipv6_compressed": "2602:fd41:20:6::1",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": "2602:fd41:20:6::/64",
+                    "ifIndex": 13052
+                },
+                {
+                    "ipv6_address": "2607:9b00:0000:0000:0064:0201:0096:0192",
+                    "ipv6_compressed": "2607:9b00::64:201:96:192",
+                    "ipv6_prefixlen": 128,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 19098
+                },
+                {
+                    "ipv6_address": "2607:9b00:0000:1207:0100:0126:0009:0170",
+                    "ipv6_compressed": "2607:9b00:0:1207:100:126:9:170",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": "2607:9b00:0:1207::/64",
+                    "ifIndex": 100127
+                },
+                {
+                    "ipv6_address": "2607:9b00:0000:1209:0100:0126:0009:0185",
+                    "ipv6_compressed": "2607:9b00:0:1209:100:126:9:185",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": "2607:9b00:0:1209::/64",
+                    "ifIndex": 10017
+                },
+                {
+                    "ipv6_address": "2607:9b00:0000:120b:0100:0126:0009:0201",
+                    "ipv6_compressed": "2607:9b00:0:120b:100:126:9:201",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": "2607:9b00:0:120b::/64",
+                    "ifIndex": 10009
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:5e07:58ff:fe60:18ae",
+                    "ipv6_compressed": "fe80::5e07:58ff:fe60:18ae",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 10154
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:5e07:58ff:fe60:18b0",
+                    "ipv6_compressed": "fe80::5e07:58ff:fe60:18b0",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 10009
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:5e07:58ff:fe60:18b1",
+                    "ipv6_compressed": "fe80::5e07:58ff:fe60:18b1",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 10017
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:5e07:58ff:fe60:18b2",
+                    "ipv6_compressed": "fe80::5e07:58ff:fe60:18b2",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 10021
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:5e07:58ff:fe60:18bc",
+                    "ipv6_compressed": "fe80::5e07:58ff:fe60:18bc",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 10034
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:5e07:58ff:fe60:18cd",
+                    "ipv6_compressed": "fe80::5e07:58ff:fe60:18cd",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 100127
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:5e07:58ff:fe78:b5ad",
+                    "ipv6_compressed": "fe80::5e07:58ff:fe78:b5ad",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 3
+                }
+            ]
+        }
     }
 }

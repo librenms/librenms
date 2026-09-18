@@ -1,24 +1,24 @@
 # Transports
 
-Transports are located within `LibreNMS/Alert/Transport/` and can be
-configured within the WebUI under Alerts -> Alert Transports.
+The transports are in `LibreNMS/Alert/Transport/`. You can configure
+them in the web interface under Alerts -> Alert Transports.
 
-Contacts (email addresses) will be gathered automatically and passed
-to the configured transports. By default the Contacts will be only
-gathered when the alert triggers and will ignore future changes in
-contacts for the incident. If you want contacts to be re-gathered
-before each dispatch, please set:
+LibreNMS collects the contacts, that is the email addresses, and sends
+them to the configured transports. By default, LibreNMS collects the
+contacts at the trigger of the alert. It then ignores each later change
+to the contacts of that incident. To collect the contacts again before
+each dispatch, use this setting:
 
 !!! setting "alerting/general"
     ```bash
     lnms config:set alert.fixed-contacts false
     ```
 
-The contacts will always include the `SysContact` defined in the
-Device's SNMP configuration and also every LibreNMS user that has at
-least `read` permissions on the entity that is to be alerted.
+The contacts always include the `SysContact` from the SNMP
+configuration of the device. They also include each LibreNMS user with
+at least `read` permission on the entity of the alert.
 
-At the moment LibreNMS only supports Port or Device permissions.
+LibreNMS supports port permissions and device permissions only.
 
 ## Using a Proxy
 
@@ -26,4 +26,4 @@ At the moment LibreNMS only supports Port or Device permissions.
 
 ## Using a AMQP based Transport
 
-You need to install an additional php module : `bcmath`
+You must install the additional PHP module `bcmath`.

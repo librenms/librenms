@@ -1,9 +1,9 @@
 # Discovery Support
 
-This document will explain how to use discovery to debug issues or
-manually running to process data.
+This document explains how to use discovery. Use discovery to debug a
+problem or to process data manually.
 
-The basic command to get started is:
+The basic command is:
 
 `lnms device:discover HOSTNAME`
 
@@ -31,49 +31,48 @@ Options:
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 ```
 
-`<device spec>` Use this to specify a device via either id or hostname (including
-wildcard using *). You can also specify odd and even. all will run
-discovery against all devices whilst new will poll only those devices
-that have recently been added or have been selected for rediscovery.
+`<device spec>` selects a device by its id or its hostname. A hostname
+can hold the wildcard `*`. You can also give `odd` or `even`. The value
+`all` runs discovery against all devices. The value `new` polls only
+the new devices and the devices that you selected for rediscovery.
 
-`-v` Enables debugging output so that you can see what is happening during
-a discovery run.
+`-v` enables debug output. This output shows the operation of a
+discovery run.
 
-`-vv` Enables verbose debugging. This includes things like SQL queries and response
-from snmp with sensitive data masked as best as possible.
+`-vv` enables verbose debug output. This output holds SQL queries and
+SNMP responses. LibreNMS masks the sensitive data where it can.
 
-`-vvv` Enables full debugging output with all data in tact.
+`-vvv` enables full debug output with all the data.
 
-`-m` This enables you to specify the module you want to run for discovery.
+`-m` selects the module to run for discovery.
 
 ## Discovery wrapper
 
-We have a `discovery-wrapper.py` script which is based on
-`poller-wrapper.py` by [Job Snijders](https://github.com/job). This
-script is currently the default.
+The `discovery-wrapper.py` script is based on `poller-wrapper.py` by
+[Job Snijders](https://github.com/job). This script is the current
+default.
 
-If you need to debug the output of discovery-wrapper.py then you can
-add `-d` to the end of the command - it is NOT recommended to do this
-in cron.
+To debug the output of `discovery-wrapper.py`, add `-d` to the end of
+the command. Do NOT use this flag in cron.
 
-You also may use `-m` to pass a list of comma-separated modules.
-Please refer to [Command options](#command-options) of `lnms device:discover -h`.
-Example: `/opt/librenms/discovery-wrapper.py 1 -m bgp-peers`
+You can also use `-m` with a comma separated list of modules. For more
+information, read the [command options](#command-options) of
+`lnms device:discover -h`.
+An example is `/opt/librenms/discovery-wrapper.py 1 -m bgp-peers`.
 
-If you want to switch back to `lnms device:discover` (not recommended), then you can replace:
+To go back to `lnms device:discover`, replace this line:
 
 `33  */6   * * *   librenms    /opt/librenms/discovery-wrapper.py 1 >> /dev/null 2>&1`
 
-With:
+With this line. We do not recommend this change:
 
 `33  */6   * * *   librenms    /opt/librenms/lnms device:discover all >> /dev/null 2>&1`
 
 ## Discovery config
 
-These are the default discovery config items. You can globally disable
-a module by setting it to 0. If you just want to disable it for one
-device then you can do this within the WebUI -> Device -> Settings ->
-Modules.
+These are the default discovery configuration items. To disable a
+module globally, set it to 0. To disable a module for one device, use
+the web interface at Device -> Settings -> Modules.
 
 !!! setting "discovery/discovery_modules"
     ```bash
@@ -119,14 +118,15 @@ Modules.
 
 ## OS based Discovery config
 
-You can enable or disable modules for a specific OS by using
-`lnms config:set`. OS based settings have preference
-over global. Device based settings have preference over all others
+To enable or disable a module for one OS, use `lnms config:set`. An OS
+based setting has preference over a global setting. A device based
+setting has preference over all other settings.
 
-Discover performance improvement can be achieved by deactivating all
-modules that are not supported by specific OS.
+Disable the modules that the OS does not support. This change improves
+the discovery performance.
 
-E.g. to deactivate spanning tree but activate discovery-arp module for linux OS
+For example, to disable spanning tree and to enable the discovery-arp
+module for the Linux OS, use these commands:
 
 !!! setting "discovery/discovery_modules"
     ```bash
@@ -136,44 +136,45 @@ E.g. to deactivate spanning tree but activate discovery-arp module for linux OS
 
 ## Discovery modules
 
-`os`: Os detection. This module will pick up the OS of the device.
+`os`: OS detection. This module finds the OS of the device.
 
-`ports`: This module will detect all ports on a device excluding ones
-configured to be ignored by config options.
+`ports`: this module detects all ports on a device. It excludes the
+ports that the configuration options ignore.
 
-`ports-stack`: Same as ports except for stacks.
+`ports-stack`: the same as `ports`, but for stacks.
 
-`xdsl`: Module to collect more metrics for xDSL interfaces.
+`xdsl`: this module collects more metrics for xDSL interfaces.
 
-`entity-physical`: Module to pick up the devices hardware support.
+`entity-physical`: this module finds the hardware support of the device.
 
-`processors`: Processor support for devices.
+`processors`: processor support for devices.
 
-`mempools`: Memory detection support for devices.
+`mempools`: memory detection support for devices.
 
 `cisco-vrf-lite`: VRF-Lite detection and support.
 
-`ipv4-addresses`: IPv4 Address detection
+`ipv4-addresses`: IPv4 address detection.
 
-`ipv6-addresses`: IPv6 Address detection
+`ipv6-addresses`: IPv6 address detection.
 
-`route`: This module will load the routing table of the device. The default route
- limit is 1000 (configurable with `lnms config:set routes.max_number 1000`), with history data.
+`route`: this module loads the routing table of the device, with
+history data. The default route limit is 1000. To change the limit, use
+`lnms config:set routes.max_number 1000`.
 
-`sensors`: Sensor detection such as Temperature, Humidity, Voltages + More
+`sensors`: sensor detection for temperature, humidity, voltage, and more.
 
-`storage`: Storage detection for hard disks
+`storage`: storage detection for hard disks.
 
-`hr-device`: Processor and Memory support via HOST-RESOURCES-MIB.
+`hr-device`: processor and memory support through HOST-RESOURCES-MIB.
 
-`discovery-protocols`: Auto discovery module for xDP, OSPF, OSPFv3 and BGP.
+`discovery-protocols`: auto discovery module for xDP, OSPF, OSPFv3, and BGP.
 
-`arp-table`: Detection of the ARP table for the device.
+`arp-table`: detection of the ARP table of the device.
 
-`fdb-table`: Detection of the Forwarding DataBase table for the
-device, with history data.
+`fdb-table`: detection of the forwarding database table of the device,
+with history data.
 
-`discovery-arp`: Auto discovery via ARP.
+`discovery-arp`: auto discovery through ARP.
 
 `junose-atm-vp`: Juniper ATM support.
 
@@ -181,9 +182,9 @@ device, with history data.
 
 `vlans`: VLAN detection and support.
 
-`mac-accounting`: MAC Address account support.
+`mac-accounting`: MAC address account support.
 
-`cisco-pw`: Pseudowires wires detection and support.
+`cisco-pw`: pseudowire detection and support.
 
 `vrf`: VRF detection and support.
 
@@ -191,17 +192,17 @@ device, with history data.
 
 `slas`: SLA detection and support.
 
-`vminfo`: Detection of vm guests for VMware ESXi, libvert and XCP-NG
+`vminfo`: detection of the VM guests for VMware ESXi, libvirt, and XCP-NG.
 
-`printer-supplies`: Toner levels support.
+`printer-supplies`: toner level support.
 
-`ucd-diskio`: Disk I/O support.
+`ucd-diskio`: disk I/O support.
 
-`services`: *Nix services support.
+`services`: support for *nix services.
 
 ## Running
 
-Here are some examples of running discovery from within your install directory.
+These are examples of discovery in your install directory.
 
 ```bash
 lnms device:discover localhost
@@ -211,9 +212,8 @@ lnms device:discover localhost -m ports
 
 ## Debugging
 
-To provide debugging output you will need to run the discovery process
-with the `-v` flag. You can do this either against all modules, single
-or multiple modules:
+For debug output, run discovery with the `-v` flag. You can run it
+against all modules, one module, or several modules:
 
 All Modules
 
@@ -233,12 +233,12 @@ Multiple Modules
 lnms device:discover localhost -m ports,entity-physical -vv
 ```
 
-Using `-vv` shouldn't output much sensitive information, `-vvv` will so
-it is then advisable to sanitise the output before pasting it
-somewhere as the debug output will contain snmp details amongst other
-items including port descriptions.
+The `-vv` flag gives little sensitive information. The `-vvv` flag
+gives much more. Sanitise the output of `-vvv` before you send it to
+another person. The debug output holds SNMP details, port descriptions,
+and other data.
 
-The output will contain:
+The output holds:
 
 - DB Updates
 - SNMP Response

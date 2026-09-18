@@ -38,7 +38,6 @@ return [
             'programs' => 'Programas',
             'python' => 'Python',
             'rrd' => 'RRD',
-            'rrdcheck' => 'Verificación RRD',
             'scheduler' => 'Programador',
             'system' => 'Sistema',
             'updates' => 'Actualizaciones',

@@ -1,24 +1,22 @@
 # Fast up/down checking
 
-Normally, LibreNMS sends an ICMP ping to the device before polling to
-check if it is up or down. This check is tied to the poller frequency,
-which is normally 5 minutes. This means it may take up to 5 minutes
-to find out if a device is down.
+By default, LibreNMS sends an ICMP ping to a device before the poll.
+This ping tests the up state or the down state. The check uses the
+poller frequency, usually 5 minutes. A down device therefore takes up
+to 5 minutes to appear.
 
-Some users may want to know if devices stop responding to ping more
-quickly than that. LibreNMS offers a `ping.php` script to run ping
-checks as quickly as possible without increasing snmp load on your
-devices by switching to 1 minute polling.
+Some users need a faster report of a device without a ping response.
+The `ping.php` script runs the ping checks as fast as possible. It does
+not increase the SNMP load of 1-minute polling on your devices.
 
 !!! warning
 
-    You likely want to have a device down alert rule to take advantage
-    of Fast Ping checks. You can find one in the [Alert Rules
-    Collection](../Alerting/Rules.md#alert-rules-collection).
+    Fast Ping checks need a device down alert rule. The [Alert Rules
+    Collection](../Alerting/Rules.md#alert-rules-collection) holds one.
 
 ## Setting the ping check to 1 minute
 
-To use the dispatcher service to run the fast pings:
+To run the fast pings with the dispatcher service:
 
 !!! setting "poller/rrdtool"
 
@@ -28,7 +26,7 @@ To use the dispatcher service to run the fast pings:
     systemctl restart librenms.service
     ```
 
-If you are still using CRON:
+With cron:
 
 ```title="/etc/cron.d/librenms"
 *    *    * * *   librenms    /opt/librenms/ping.php >> /dev/null 2>&1
@@ -36,23 +34,23 @@ If you are still using CRON:
 
 !!! note
 
-    If you are using distributed pollers you can restrict a
-    poller to a group by appending `-g` to the cron entry. Alternatively,
-    you should only run `ping.php` on a single node.
+    With distributed pollers, limit a poller to a group. Add `-g` to the
+    cron entry. You can also run `ping.php` on only one node.
 
 ## Device dependencies
 
-The `ping.php` script respects device dependencies, but the main poller
-does not (for technical reasons). However, using this script does not
-disable the icmp check in the poller and a child may be reported as
-down before the parent.
+The `ping.php` script obeys the device dependencies. For technical
+reasons, the main poller does not. This script does not disable the
+ICMP check of the poller. A child device can therefore appear as down
+before its parent.
 
 ## Settings
 
-`ping.php` uses much the same settings as the poller fping with one
-exception: retries is used instead of count.
-`ping.php` does not measure loss and avg response time, only up/down, so
-once a device responds it stops pinging it.
+`ping.php` uses almost the same settings as the poller fping. There is
+one difference: it uses `retries` in place of `count`.
+`ping.php` measures only the up state and the down state. It does not
+measure the loss or the average response time. It stops the ping of a
+device after the first response.
 
 !!! setting "poller/ping"
 

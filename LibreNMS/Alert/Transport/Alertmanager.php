@@ -58,7 +58,7 @@ class Alertmanager extends Transport
             ],
         ]];
 
-        $alertmanager_opts = $this->parseUserOptions($this->config['alertmanager-options']);
+        $alertmanager_opts = $this->parseUserOptions($this->config['alertmanager-options'] ?? '');
         foreach ($alertmanager_opts as $label => $value) {
             if (str_starts_with((string) $label, 'stc_')) {
                 // Static label: strip the stc_ prefix and use the value as-is

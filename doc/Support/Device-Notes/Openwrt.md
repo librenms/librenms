@@ -1,19 +1,21 @@
-To use Wireless Sensors on Openwrt, an agent of sorts is required. The
-purpose of the agent is to execute on the client (Openwrt) side, to ensure
-that the needed Wireless Sensor information is returned for SNMP queries (from LibreNMS).
+Wireless sensors on Openwrt need an agent. The agent runs on the
+Openwrt side. It returns the wireless sensor information for the SNMP
+queries from LibreNMS.
 
 # Installation
 
 ## Openwrt
 
-Two items are required on the Openwrt side - scripts to generate the necessary information (for
-SNMP replies), and an SNMP extend configuration update (to return the information vs. the expected
-query).
+The Openwrt side needs two items. The first item is a set of scripts
+that generate the information for the SNMP replies. The second item is
+an update to the SNMP extend configuration. This update returns the
+information for each query.
 
 1: Install the scripts:
 
-Copy the scripts from librenms-agent repository - preferably inside /etc/librenms on Openwrt (and add this
-directory to /etc/sysupgrade.conf, to survive firmware updates):
+Copy the scripts from the librenms-agent repository into
+`/etc/librenms` on Openwrt. Then add this directory to
+`/etc/sysupgrade.conf`, so that it survives a firmware update:
 ```
 wget -O /etc/librenms/wlClients.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlClients.sh
 wget -O /etc/librenms/wlFrequency.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlFrequency.sh
@@ -26,17 +28,18 @@ chmod +x /etc/librenms/*.sh
 chmod +x /etc/librenms/distro
 ```
 
-The only file that needs to be edited is wlInterfaces.txt, which is a mapping from the wireless interfaces, to
-the desired display name in LibreNMS. For example,
+Only one file needs an edit. The file `wlInterfaces.txt` maps each
+wireless interface to its display name in LibreNMS. For example:
 ```
 wlan0,wl-2.4G
 wlan1,wl-5.0G
 ```
 
-2: Update the Openwrt SNMP configuration, adding extend support for the OS detection and the Wireless Sensor queries:
+2: Update the Openwrt SNMP configuration. Add extend support for the OS detection and the wireless sensor queries:
 
-`vi /etc/config/snmpd`, adding the following entries (assuming the scripts are installed in /etc/librenms, and are executable),
-and update the network interfaces as needed to match the hardware,
+Run `vi /etc/config/snmpd` and add the entries below. These entries
+assume executable scripts in `/etc/librenms`. Change the network
+interfaces to match your hardware.
 
 ```
 config extend
@@ -126,18 +129,20 @@ config extend
         option prog     "/etc/librenms/wlSNR.sh wlan1 max"
 ```
 
-NOTE, any of the scripts above can be tested simply by running the corresponding command.
+NOTE: to test a script above, run its command.
 
-NOTE, to check the output data from any of these extensions, on the LibreNMS machine, run (for example),
+NOTE: to test the output of an extension, run this command on the
+LibreNMS machine:
 
 `snmpwalk -v 2c -c public -Osqnv <openwrt-host> 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."frequency-wlan0"'`
 
-NOTE, on the LibreNMS machine, ensure that snmp-mibs-downloader is installed.
+NOTE: the LibreNMS machine needs `snmp-mibs-downloader`.
 
-NOTE, on the AsuswrtMerlin machine, ensure that distro is installed (i.e. that the OS is correctly detected!).
+NOTE: the Openwrt machine needs `distro`. LibreNMS then detects the OS
+correctly.
 
 3: Restart the snmp service on Openwrt:
 
 `service snmpd restart`
 
-And then wait for discovery and polling on LibreNMS!
+Then wait for the discovery and the polling in LibreNMS.

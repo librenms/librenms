@@ -1,6 +1,6 @@
 ### `get_all_port_security`
 
-Get all port security info by inputting port_id
+Get all the port security information of a port_id.
 
 Route: `/api/v0/port_security`
 
@@ -13,7 +13,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/port_security/
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://librenms.org/api/v0/port_security/
 ```
 
 Output:
@@ -82,7 +82,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/port_security/port/123
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://librenms.org/api/v0/port_security/port/123
 ```
 
 Output:
@@ -151,8 +151,8 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/port_security/device/switch1
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/port_security/device/5
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://librenms.org/api/v0/port_security/device/switch1
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://librenms.org/api/v0/port_security/device/5
 ```
 
 Output:

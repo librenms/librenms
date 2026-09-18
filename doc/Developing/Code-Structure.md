@@ -1,14 +1,13 @@
 # Code structure
 
-This document will try and provide a good overview of how the code is
-structured within LibreNMS. We will go through the main directories
-and provide information on how and when they are used.
-LibreNMS now uses [Laravel](https://laravel.com/docs/) for much of
-it's frontend (webui) and database code. Much of the Laravel
-documentation applies: <https://laravel.com/docs/structure>
+This document gives an overview of the code structure of LibreNMS. It
+describes the main directories and their use. LibreNMS uses
+[Laravel](https://laravel.com/docs/) for much of its web interface code
+and database code. Much of the Laravel documentation therefore applies:
+<https://laravel.com/docs/structure>
 
-Directories from the (filtered) structure tree below are some of the
-directories that will be most interesting during development:
+The filtered structure tree below holds the most important directories
+for development:
 
 ```text
 .
@@ -37,34 +36,34 @@ directories that will be most interesting during development:
 
 ### doc/
 
-This is the location of all the documentation for LibreNMS, this is in
-GitHub markdown format and can be viewed [online](@= config.site_url =@)
+This directory holds all the LibreNMS documentation in GitHub markdown
+format. The documentation is also [online](@= config.site_url =@).
 
 ### app/
 
-Most Laravel and Eloquent classes should be under this directory.
+This directory holds most Laravel classes and Eloquent classes.
 
 ### LibreNMS/
 
-Classes that don't belong to the Laravel application belong in this
-directory, with a directory structure that matches the namespace.  One
-class per file. See [PSR-0](http://www.php-fig.org/psr/psr-0/) for details.
+This directory holds the classes outside the Laravel application. The
+directory structure matches the namespace. Put one class in each file.
+For the details, read [PSR-0](http://www.php-fig.org/psr/psr-0/).
 
 ### html/
 
-All legacy web accessible files are located here. New pages should
-follow the Laravel conventions.
+This directory holds all the legacy web files. A new page must obey the
+Laravel conventions.
 
 ### html/api_v0.php
 
-This is the API routing file which directs users to the correct API
-function based on the API endpoint call.
+This file routes the API. It sends each API endpoint call to the
+correct API function.
 
 ### html/index.php
 
-This is the main file which all links within LibreNMS are parsed
-through. It loads the majority of the relevant includes needed for the
-control panel to function. CSS and JS files are also loaded here.
+All LibreNMS links go through this main file. It loads most of the
+includes of the control panel. It also loads the CSS files and the JS
+files.
 
 ### html/css/
 
@@ -72,7 +71,8 @@ All used CSS files are located here.
 
 ### html/css/custom/
 
-This is a directory you can put custom css files into that won't interfere with auto updates
+Put your own CSS files in this directory. The automatic updates then
+ignore them.
 
 ### html/js/
 
@@ -80,88 +80,83 @@ All used JS files are located here.
 
 ### includes/
 
-This directory is quite big and contains all the files to make the cli
-and polling / discovery to work.  This code is not currently
-accessible from Laravel code (intentionally).
+This large directory holds the files of the command line, the polling,
+and the discovery. The Laravel code cannot reach this code. This limit
+is intentional.
 
 ### includes/discovery/, includes/polling/
 
-All the discovery and polling code. The format is usually quite
-similar between discovery and polling. Both are made up of modules and
-the files within the relevant directories will match that module. So
-for instance if you want to update the os detection for a device, you
-would look in `includes/discovery/os/` for a file named after the
-operating system such as linux:
-`includes/discovery/linux.inc.php`. Within here you would update or
-add support for newer OS'. This is the same for polling as well.
+These directories hold the discovery code and the polling code. The two
+formats are similar. Both use modules. Each file in a directory has the
+name of its module. For example, to update the OS detection of a
+device, open `includes/discovery/os/`. Find the file with the name of
+the operating system, such as `includes/discovery/linux.inc.php`. In
+this file, update the OS support or add a new OS. The polling code
+works in the same way.
 
 ### includes/html/
 
-This is where the majority of the website core files are
-located. These tend to be files that contain functions or often used
-code segments that can be included where needed rather than
-duplicating code.
+This directory holds most of the core website files. These files hold
+functions and common code segments. Other files include them and
+therefore do not duplicate the code.
 
 ### includes/html/forms/
 
-This directory contains all of the files that are dynamically included
-from an ajax call to ajax/form.
+This directory holds the files of the ajax calls to `ajax/form`.
 
 ### includes/html/api_functions.inc.php
 
-All of the functions and calls for the API are located here.
+This file holds all the API functions and calls.
 
 ### includes/html/functions.inc.php
 
-This contains the majority of functions used throughout the standard
-web ui.
+This file holds most of the functions of the standard web interface.
 
 ### includes/html/graphs/
 
-This directory contains global and OS specific graph definitions.
+This directory holds the global graph definitions and the OS specific
+graph definitions.
 
 ### includes/html/reports/
 
-In here is a list of of files that generate PDF reports available to
-the user. These are dynamically called in from `html/pdf.php` based on
-the report the user requests.
+These files generate the PDF reports for the user. `html/pdf.php` calls
+the correct file for the report of the request.
 
 ### includes/html/table/
 
-This directory contains all of the ajax calls when generating the
-table of data. Most have been converted over so if you are planning to
-add a new table of data then you will do so here for all of the back
-end data calls.
+This directory holds the ajax calls of the data tables. Most tables use
+this method. Put the backend data calls of a new data table in this
+directory.
 
 ### includes/html/pages/
 
-This directory contains the URL structure when browsing the Web UI. So
-for example `/devices/` is actually a call to
-`includes/html/pages/devices.inc.php`, `/device/tab=ports/` is
+This directory holds the URL structure of the web interface. For
+example, `/devices/` calls `includes/html/pages/devices.inc.php`. The
+URL `/device/tab=ports/` calls
 `includes/html/pages/device/ports.inc.php`.
 
 ### logs/
 
-Contains the main librenms.log file by default, but can also contain
-your web server's logs, poller logs, and other items.
+This directory holds the main `librenms.log` file. It can also hold
+your web server logs, the poller logs, and other items.
 
 ### mibs/
 
-Here is where all of the mibs are located.  Generally standard mibs
-should be in the root directory and specific vendor mibs should be in
-their own subdirectory.
+This directory holds all the MIBs. Put the standard MIBs in the root
+directory. Put the MIBs of a vendor in their own subdirectory.
 
 ### rrd/
 
-Simple enough, this is where all of the rrd files are created. They
-are stored in directory based on the device hostname.
+LibreNMS creates all the rrd files in this directory. Each device has
+its own directory with the name of its hostname.
 
 ### database/migrations
 
-Contains all the database migrations.  See Laravel docs for additional
-info: <https://laravel.com/docs/migrations>
+This directory holds all the database migrations. For more
+information, read the Laravel documentation:
+<https://laravel.com/docs/migrations>
 
-In general to create a new table you should run:
+To create a new table, run:
 
 ```bash
 php artisan make:model ModelName -m -c -r
