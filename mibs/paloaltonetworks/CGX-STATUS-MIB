@@ -1,0 +1,651 @@
+-- Palo Alto Networks, Inc. SMI for Status MIB Copyright (c) 2017-2022 by
+-- Palo Alto Networks, Inc.
+-- 2022 revision, Aaron Edwards
+
+CGX-STATUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    CgxDegreesC, CgxVolts, cgxMgmt
+        FROM CLOUDGENIX-SMI
+    IANAifType
+        FROM IANAifType-MIB
+    InterfaceIndex
+        FROM IF-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter64, IpAddress, MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    ;
+
+cgxStatusMIB MODULE-IDENTITY
+    LAST-UPDATED  "202202241935Z" -- February 24, 2022
+    ORGANIZATION
+        "Palo Alto Networks, Inc."
+    CONTACT-INFO
+        "Prisma SD-WAN Support
+
+         Palo Alto Networks
+         3000 Tannery Way
+         Santa Clara, CA 95054
+         USA
+
+         Technical Support
+         N. America: +1 408 738 7799
+         EMEA: +31 20 808 4600
+         APAC: +65 3158 5600
+
+         support@paloaltonetworks.com"
+    DESCRIPTION
+        "The MIB that describes Status from Prisma SD-WAN Devices or
+         Components"
+    REVISION      "202202241935Z" -- February 24, 2022
+    DESCRIPTION
+        "24.2.2022 PaloAlto Rebranding and new hardware"
+    ::= { cgxMgmt 2 }
+
+cgxStatusNotifications OBJECT IDENTIFIER ::= { cgxStatusMIB 0 }
+
+cgxStatusObjects OBJECT IDENTIFIER ::= { cgxStatusMIB 1 }
+
+cgxStatusStats OBJECT IDENTIFIER ::= { cgxStatusObjects 1 }
+
+cgxStatusConfig OBJECT IDENTIFIER ::= { cgxStatusObjects 2 }
+
+cgxTunnelObjects OBJECT IDENTIFIER ::= { cgxStatusObjects 3 }
+
+cgxStatusConformance OBJECT IDENTIFIER ::= { cgxStatusMIB 2 }
+
+cgxStatusCompliances OBJECT IDENTIFIER ::= { cgxStatusConformance 1 }
+
+cgxStatusMIBCompliance MODULE-COMPLIANCE
+    STATUS         current
+    DESCRIPTION
+        "Compliance object for the CGX-STATUS-MIB"
+
+    MODULE         CGX-STATUS-MIB
+        MANDATORY-GROUPS
+            { cgxIfSfpTableEntryGroup, cgxTunnelTableEntryGroup }
+    ::= { cgxStatusCompliances 1 }
+
+cgxStatusGroups OBJECT IDENTIFIER ::= { cgxStatusConformance 2 }
+
+cgxTunnelTableEntryGroup OBJECT-GROUP
+    OBJECTS
+        { cgxTunnelId, cgxTunnelType, cgxTunnelEncapsulation,
+        cgxTunnelLocalCircuitName, cgxTunnelLocalCircuitType,
+        cgxTunnelRemoteCircuitName, cgxTunnelRemoteSiteName,
+        cgxTunnelParentInterface, cgxTunnelSrcAddress,
+        cgxTunnelDstAddress, cgxTunnelRemotePublicIpAndPort,
+        cgxTunnelUsable, cgxTunnelActive, cgxTunnelCiphersuite,
+        cgxTunnelPeerVepId, cgxTunnelInByteCounts,
+        cgxTunnelInPacketCounts, cgxTunnelOutByteCounts,
+        cgxTunnelOutPacketCounts, cgxTunnelIndex, cgxTunnelStatus }
+    STATUS        current
+    DESCRIPTION
+        "Group of Tunnel Table Entry Objects"
+    ::= { cgxStatusGroups 1 }
+
+cgxIfSfpTableEntryGroup OBJECT-GROUP
+    OBJECTS
+        { cgxIfSfpTableBitrateNominal, cgxIfSfpTableConnector,
+        cgxIfSfpTableEncoding, cgxIfSfpTableExtendedIdentifier,
+        cgxIfSfpTableIfDescr, cgxIfSfpTableIfIndex, cgxIfSfpTableifType,
+        cgxIfSfpTableLengthCopper, cgxIfSfpTableLengthOM1,
+        cgxIfSfpTableLengthOM2, cgxIfSfpTableLengthOM3,
+        cgxIfSfpTableLengthSmf, cgxIfSfpTableLengthSmfKm,
+        cgxIfSfpTableLowerBitrateMargin, cgxIfSfpTableModuleTemperature,
+        cgxIfSfpTableModuleVoltage, cgxIfSfpTableRateIdentifier,
+        cgxIfSfpTableSfpIdentifier, cgxIfSfpTableTransceiver,
+        cgxIfSfpTableTransceiverData, cgxIfSfpTableUpperBitrateMargin,
+        cgxIfSfpTableVendorDateCode, cgxIfSfpTableVendorName,
+        cgxIfSfpTableVendorOUI, cgxIfSfpTableVendorPartNumber,
+        cgxIfSfpTableVendorRevision, cgxIfSfpTableVendorSerialNumber }
+    STATUS        current
+    DESCRIPTION
+        "Group of Prisma SD-WAN Interface Extended Entry Objects"
+    ::= { cgxStatusGroups 2 }
+
+cgxIfExtensionNumberGroup OBJECT-GROUP
+    OBJECTS
+        { cgxIfSfpNumber }
+    STATUS        current
+    DESCRIPTION
+        "A group containing Prisma SD-WAN Interface Extension Numerical
+         Counters."
+    ::= { cgxStatusGroups 3 }
+
+cgxTunnelMIB OBJECT IDENTIFIER ::= { cgxStatusMIB 10 }
+
+cgxTunnelTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CgxTunnelEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of Prisma SD-WAN Tunnel entries."
+    ::= { cgxTunnelMIB 1 }
+
+cgxTunnelEntry OBJECT-TYPE
+    SYNTAX        CgxTunnelEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing management information applicable to a
+         Prisma SD-WAN Tunnel."
+    INDEX
+        { cgxTunnelIndex }
+    ::= { cgxTunnelTable 1 }
+
+-- DESCRIPTION
+-- 
+-- Type for Prisma SD-WAN Tunnel Entry Objects
+
+CgxTunnelEntry ::= SEQUENCE
+{
+    cgxTunnelIndex                 INTEGER,
+    cgxTunnelId                    DisplayString,
+    cgxTunnelStatus                DisplayString,
+    cgxTunnelType                  DisplayString,
+    cgxTunnelEncapsulation         DisplayString,
+    cgxTunnelLocalCircuitName      DisplayString,
+    cgxTunnelLocalCircuitType      DisplayString,
+    cgxTunnelRemoteCircuitName     DisplayString,
+    cgxTunnelRemoteSiteName        DisplayString,
+    cgxTunnelParentInterface       DisplayString,
+    cgxTunnelSrcAddress            IpAddress,
+    cgxTunnelDstAddress            IpAddress,
+    cgxTunnelRemotePublicIpAndPort DisplayString,
+    cgxTunnelUsable                TruthValue,
+    cgxTunnelActive                TruthValue,
+    cgxTunnelCiphersuite           DisplayString,
+    cgxTunnelPeerVepId             DisplayString,
+    cgxTunnelInByteCounts          Counter64,
+    cgxTunnelInPacketCounts        Counter64,
+    cgxTunnelOutByteCounts         Counter64,
+    cgxTunnelOutPacketCounts       Counter64
+}
+
+
+cgxTunnelIndex OBJECT-TYPE
+    SYNTAX        INTEGER (1..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value, greater than zero, for each tunnel."
+    ::= { cgxTunnelEntry 1 }
+
+cgxTunnelId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Tunnel Unique ID"
+    ::= { cgxTunnelEntry 2 }
+
+cgxTunnelStatus OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Tunnel Status"
+    ::= { cgxTunnelEntry 3 }
+
+cgxTunnelType OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Tunnel Type"
+    ::= { cgxTunnelEntry 4 }
+
+cgxTunnelEncapsulation OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Tunnel Encapsulation"
+    ::= { cgxTunnelEntry 5 }
+
+cgxTunnelLocalCircuitName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Local Circuit Name"
+    ::= { cgxTunnelEntry 6 }
+
+cgxTunnelLocalCircuitType OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Local Circuit Type"
+    ::= { cgxTunnelEntry 7 }
+
+cgxTunnelRemoteCircuitName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Remote Circuit Name"
+    ::= { cgxTunnelEntry 8 }
+
+cgxTunnelRemoteSiteName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Remote Site Name"
+    ::= { cgxTunnelEntry 9 }
+
+cgxTunnelParentInterface OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Parent Interface"
+    ::= { cgxTunnelEntry 10 }
+
+cgxTunnelSrcAddress OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Source IP Address"
+    ::= { cgxTunnelEntry 11 }
+
+cgxTunnelDstAddress OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Destination IP Address"
+    ::= { cgxTunnelEntry 12 }
+
+cgxTunnelRemotePublicIpAndPort OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Remote Public IP and Port"
+    ::= { cgxTunnelEntry 13 }
+
+cgxTunnelUsable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Is Usable"
+    ::= { cgxTunnelEntry 14 }
+
+cgxTunnelActive OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Is Active"
+    ::= { cgxTunnelEntry 15 }
+
+cgxTunnelCiphersuite OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Ciphersuite"
+    ::= { cgxTunnelEntry 16 }
+
+cgxTunnelPeerVepId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Peer VEP ID"
+    ::= { cgxTunnelEntry 17 }
+
+cgxTunnelInByteCounts OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: In Byte (Octet) Counts"
+    ::= { cgxTunnelEntry 18 }
+
+cgxTunnelInPacketCounts OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: In Packet Counts"
+    ::= { cgxTunnelEntry 19 }
+
+cgxTunnelOutByteCounts OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Out Byte (octet) Counts"
+    ::= { cgxTunnelEntry 20 }
+
+cgxTunnelOutPacketCounts OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Tunnel Object: Out Packet Counts"
+    ::= { cgxTunnelEntry 21 }
+
+cgxIfExtensionMIB OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Root Object Identifier for Prisma SD-WAN Interface Extended
+         Data"
+    ::= { cgxStatusMIB 11 }
+
+cgxIfSfpNumber OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This value is expected to exactly match ifNumber from IF-MIB
+         (1.3.6.1.2.1.2.1). These interfaces will be enumerated in the
+         cgxIfSfpEntry table. If the interfaces have extended serial
+         tranciever information, the fields will be populated."
+    ::= { cgxIfExtensionMIB 10 }
+
+cgxIfSfpTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CgxIfSfpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of Prisma SD-WAN Interface Extended Entries."
+    ::= { cgxIfExtensionMIB 11 }
+
+cgxIfSfpEntry OBJECT-TYPE
+    SYNTAX        CgxIfSfpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing management information applicable to a
+         Prisma SD-WAN Interface Extended Entry."
+    INDEX
+        { cgxIfSfpTableIfIndex }
+    ::= { cgxIfSfpTable 1 }
+
+CgxIfSfpEntry ::= SEQUENCE
+{
+    cgxIfSfpTableIfIndex            InterfaceIndex,
+    cgxIfSfpTableIfDescr            DisplayString,
+    cgxIfSfpTableifType             IANAifType,
+    cgxIfSfpTableSfpIdentifier      DisplayString,
+    cgxIfSfpTableExtendedIdentifier DisplayString,
+    cgxIfSfpTableConnector          DisplayString,
+    cgxIfSfpTableTransceiver        DisplayString,
+    cgxIfSfpTableTransceiverData    OCTET STRING,
+    cgxIfSfpTableEncoding           DisplayString,
+    cgxIfSfpTableBitrateNominal     Unsigned32,
+    cgxIfSfpTableRateIdentifier     DisplayString,
+    cgxIfSfpTableLengthSmfKm        Unsigned32,
+    cgxIfSfpTableLengthSmf          Unsigned32,
+    cgxIfSfpTableLengthOM2          Unsigned32,
+    cgxIfSfpTableLengthOM1          Unsigned32,
+    cgxIfSfpTableLengthCopper       Unsigned32,
+    cgxIfSfpTableLengthOM3          Unsigned32,
+    cgxIfSfpTableVendorName         DisplayString,
+    cgxIfSfpTableVendorOUI          DisplayString,
+    cgxIfSfpTableVendorPartNumber   DisplayString,
+    cgxIfSfpTableVendorRevision     DisplayString,
+    cgxIfSfpTableUpperBitrateMargin Unsigned32,
+    cgxIfSfpTableLowerBitrateMargin Unsigned32,
+    cgxIfSfpTableVendorSerialNumber DisplayString,
+    cgxIfSfpTableVendorDateCode     DisplayString,
+    cgxIfSfpTableModuleTemperature  CgxDegreesC,
+    cgxIfSfpTableModuleVoltage      CgxVolts
+}
+
+
+cgxIfSfpTableIfIndex OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This value is expected to exactly match ifIndex from IF-MIB
+         (1.3.6.1.2.1.2.2.1.1) to assist with record correleation"
+    ::= { cgxIfSfpEntry 1 }
+
+cgxIfSfpTableIfDescr OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This value is expected to exactly match ifDescr from IF-MIB
+         (1.3.6.1.2.1.2.2.1.2) to assist with record correleation"
+    ::= { cgxIfSfpEntry 2 }
+
+cgxIfSfpTableifType OBJECT-TYPE
+    SYNTAX        IANAifType
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This value is expected to exactly match ifType from IF-MIB
+         (1.3.6.1.2.1.2.2.1.3) to assist with record correleation"
+    ::= { cgxIfSfpEntry 3 }
+
+cgxIfSfpTableSfpIdentifier OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is a textual representation of the type of serial
+         transceiver returned from the EEPROM. If the interface is not
+         modular or not supported, all subsequent values will return
+         0."
+    ::= { cgxIfSfpEntry 4 }
+
+cgxIfSfpTableExtendedIdentifier OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(8))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Textual representation of the extended identifier of type of
+         serial transceiver"
+    ::= { cgxIfSfpEntry 5 }
+
+cgxIfSfpTableConnector OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Textual representation of code for connector type"
+    ::= { cgxIfSfpEntry 6 }
+
+cgxIfSfpTableTransceiver OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Textual representation of the code for electronic
+         compatibility or optical compatibility from the serial
+         transceiver assembly."
+    ::= { cgxIfSfpEntry 7 }
+
+cgxIfSfpTableTransceiverData OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(8))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Raw code for electronic compatibility or optical compatibility
+         from the serial transceiver assembly. 8 bytes, hexidecimal
+         representation."
+    ::= { cgxIfSfpEntry 8 }
+
+cgxIfSfpTableEncoding OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Textual representation of the Code for serial encoding
+         algorithm"
+    ::= { cgxIfSfpEntry 9 }
+
+cgxIfSfpTableBitrateNominal OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Interface nominal bit rate, units of 100 MBits/sec."
+    ::= { cgxIfSfpEntry 10 }
+
+cgxIfSfpTableRateIdentifier OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Textual reprsentation of Rate ID. Represents type of rate
+         select functionality."
+    ::= { cgxIfSfpEntry 11 }
+
+cgxIfSfpTableLengthSmfKm OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Link length supported for 9/125 micrometer fiber, units of
+         km."
+    ::= { cgxIfSfpEntry 12 }
+
+cgxIfSfpTableLengthSmf OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Link length supported for 9/125 micrometer fiber, units of 100
+         m."
+    ::= { cgxIfSfpEntry 13 }
+
+cgxIfSfpTableLengthOM2 OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Link length supported for 50/125 micrometer OM2 fiber, units
+         of 10 m."
+    ::= { cgxIfSfpEntry 14 }
+
+cgxIfSfpTableLengthOM1 OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Link length supported for 62.5/125 micrometer OM1 fiber, units
+         of 10 m."
+    ::= { cgxIfSfpEntry 15 }
+
+cgxIfSfpTableLengthCopper OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Link length supported for copper and Active Cable, units of
+         meters."
+    ::= { cgxIfSfpEntry 16 }
+
+cgxIfSfpTableLengthOM3 OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Link length supported for 50/125 micrometer fiber, units of 10
+         m."
+    ::= { cgxIfSfpEntry 17 }
+
+cgxIfSfpTableVendorName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Textual representation of SFP vendor name."
+    ::= { cgxIfSfpEntry 18 }
+
+cgxIfSfpTableVendorOUI OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Textual representation of SFP vendor IEEE company ID (OUI)."
+    ::= { cgxIfSfpEntry 19 }
+
+cgxIfSfpTableVendorPartNumber OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Textual representation of Part number provided by SFP
+         vendor."
+    ::= { cgxIfSfpEntry 20 }
+
+cgxIfSfpTableVendorRevision OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Textual representation of revision level for part number
+         provided by vendor."
+    ::= { cgxIfSfpEntry 21 }
+
+cgxIfSfpTableUpperBitrateMargin OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Upper bit rate margin, units of %."
+    ::= { cgxIfSfpEntry 22 }
+
+cgxIfSfpTableLowerBitrateMargin OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Lower bit rate margin, units of %."
+    ::= { cgxIfSfpEntry 23 }
+
+cgxIfSfpTableVendorSerialNumber OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Textual representation of serial number provided by vendor."
+    ::= { cgxIfSfpEntry 24 }
+
+cgxIfSfpTableVendorDateCode OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Textual representation of vendor's manufacturing date code."
+    ::= { cgxIfSfpEntry 25 }
+
+cgxIfSfpTableModuleTemperature OBJECT-TYPE
+    SYNTAX        CgxDegreesC
+    UNITS         "C"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Serial transceiver temperature, reported on the wire as
+         millidegrees Celsius. Converted via textual-convention in
+         CgxDegreesC to degrees Celsius (C)."
+    ::= { cgxIfSfpEntry 26 }
+
+cgxIfSfpTableModuleVoltage OBJECT-TYPE
+    SYNTAX        CgxVolts
+    UNITS         "V"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Serial transceiver voltage, reported on the wire as
+         millivolts. Converted via textual-convention in CgxVolts to
+         Volts (V)."
+    ::= { cgxIfSfpEntry 27 }
+
+END
