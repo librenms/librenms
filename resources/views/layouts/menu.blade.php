@@ -605,8 +605,10 @@
                         <span class="tw:md:hidden tw:2xl:inline-block">{{ __('Alerts') }}</span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ url('alerts') }}"><i class="fa fa-bell fa-fw fa-lg"
-                                                             aria-hidden="true"></i> {{ __('Notifications') }}</a></li>
+                        @can('viewAny', \App\Models\Alert::class)
+                        <li><a href="{{ url('problems') }}"><i class="fa fa-bell fa-fw fa-lg"
+                                                             aria-hidden="true"></i> {{ __('Problems') }}</a></li>
+                        @endcan
                         @can('viewAny', \App\Models\AlertLog::class)
                         <li><a href="{{ url('alert-log') }}"><i class="fa fa-file-text fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert History') }}</a></li>

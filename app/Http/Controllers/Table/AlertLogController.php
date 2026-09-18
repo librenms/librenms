@@ -83,6 +83,18 @@ class AlertLogController extends TableController
             ->with(['device', 'rule'])
             ->hasAccess($request->user());
 
+        $query->whereRaw('(
+            coalesce((select ar.notify_per_entity from alert_rules ar where ar.id = alert_log.rule_id), 0) = 1
+            or alert_log.problem_id is null
+            or alert_log.id = (
+                select min(al2.id) from alert_log al2
+                where al2.device_id = alert_log.device_id
+                  and al2.rule_id = alert_log.rule_id
+                  and al2.state = alert_log.state
+                  and al2.time_logged = alert_log.time_logged
+            )
+        )');
+
         $sort = $request->input('sort');
         if (isset($sort['severity']) || isset($sort['alert_rule'])) {
             $query->leftJoin('alert_rules', 'alert_log.rule_id', '=', 'alert_rules.id');
@@ -102,11 +114,38 @@ class AlertLogController extends TableController
      */
     public function formatItem(Model $model): array
     {
+        $details = is_array($model->details) ? $model->details : [];
+        $entity_count = 1;
+        if ($model->problem_id && $model->rule && ! $model->rule->notify_per_entity) {
+            $siblings = AlertLog::query()
+                ->where('device_id', $model->device_id)
+                ->where('rule_id', $model->rule_id)
+                ->where('state', $model->state->value)
+                ->where('time_logged', $model->time_logged)
+                ->whereNotNull('problem_id')
+                ->get(['id', 'details']);
+            $entity_count = $siblings->count();
+            if ($entity_count > 1) {
+                $rows = [];
+                foreach ($siblings as $sibling) {
+                    foreach ((array) ($sibling->details['rule'] ?? []) as $row) {
+                        $rows[] = $row;
+                    }
+                }
+                $details = ['rule' => $rows] + $details;
+            }
+        }
+
         $fault_detail = view('alerts.fault-detail', [
-            'details' => $this->parser->parse($model->details),
+            'details' => $this->parser->parse($details),
         ])->render();
 
         $status = Html::severityToLabel($model->state->asSeverity(), title: $model->state->name, class: 'alert-status');
+
+        $alert_rule = e($model->rule?->name);
+        if ($entity_count > 1) {
+            $alert_rule .= ' <span class="label label-default">' . $entity_count . '&times;</span>';
+        }
 
         return [
             'id' => $model->id,
@@ -114,7 +153,7 @@ class AlertLogController extends TableController
             'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $model->id . '" data-parent="#alerts"></a>',
             'verbose_details' => "<button type='button' class='btn btn-alert-details verbose-alert-details' style='display:none' aria-label='Details' id='alert-details' data-alert_log_id='$model->id'><i class='fa-solid fa-circle-info'></i></button>",
             'hostname' => '<div class="incident">' . Url::modernDeviceLink($model->device) . '<div id="incident' . $model->id . '" class="collapse">' . $fault_detail . '</div></div>',
-            'alert_rule' => e($model->rule?->name),
+            'alert_rule' => $alert_rule,
             'status' => $status,
             'severity' => $model->rule?->severity,
         ];
