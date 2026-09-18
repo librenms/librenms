@@ -623,6 +623,13 @@ class MapDataController extends Controller
                     $this_children = $next_children;
                 }
             }
+
+            if ($request->boolean('hide_isolated')) {
+                $device_list = array_filter(
+                    $device_list,
+                    fn (array $device): bool => $device['parents']->isNotEmpty() || $device['children']->isNotEmpty()
+                );
+            }
         }
 
         return response()->json($device_list);
