@@ -1,7 +1,7 @@
 modules:
     os:
         hardware:
-          - '.1.3.6.1.4.1.2011.6.3.1.31.0'
+          - HUAWEI-DEVICE-MIB::hwUpgradeVerifyVersion.0
         version:
           - HUAWEI-SITE-MONITOR-MIB::hwMonEquipSoftwareVersion.1
     additional_oids:
@@ -19,69 +19,69 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.5.{{ $index }}'
                     divisor: 10
                     descr: Rectifier Rated Voltage
-                    index: "ratedRectifier-{{ $index }}"
+                    index: "hwRectsRatedVoltage.{{ $index }}"
                     group: Rectifier
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwModifyRectsOutputVoltage
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.6.{{ $index }}'
                     divisor: 10
                     descr: Rectifier Adjusted Voltage
-                    index: "adjustedRectifier-{{ $index }}"
+                    index: "hwModifyRectsOutputVoltage.{{ $index }}"
                     group: Rectifier
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwRectOutputVoltage
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.2.2.1.3.{{ $index }}'
                     divisor: 10
                     descr: Rectifier Output Voltage
-                    index: "rectOutput-{{ $index }}"
+                    index: "hwRectOutputVoltage.{{ $index }}"
                     group: Rectifier
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwRectACVoltage
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.2.2.1.6.{{ $index }}'
                     divisor: 10
                     descr: Rectifier AC Input Voltage
-                    index: "rectAC-{{ $index }}"
+                    index: "hwRectACVoltage.{{ $index }}"
                     group: Rectifier
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwApOrAblVoltage
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.2.1.1.4.{{ $index }}'
-                    descr: "AC Input (L1-Phase)"
-                    index: "acL1-{{ $index }}"
+                    descr: "AC Input (A-Phase)"
+                    index: "hwBpOrAblVoltage.{{ $index }}"
                     group: AC
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBpOrBclVoltage
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.2.1.1.5.{{ $index }}'
-                    descr: "AC Input (L2-Phase)"
-                    index: "acL2-{{ $index }}"
+                    descr: "AC Input (B-Phase)"
+                    index: "hwBpOrBclVoltage.{{ $index }}"
                     group: AC
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwCpOrCalVoltage
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.2.1.1.6.{{ $index }}'
-                    descr: "AC Input (L3-Phase)"
-                    index: "acL3-{{ $index }}"
+                    descr: "AC Input (C-Phase)"
+                    index: "hwCpOrCalVoltage.{{ $index }}"
                     group: AC
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwDcsTotalVoltage
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.1.3.{{ $index }}'
                     descr:  "DC Total Voltage"
-                    index: "dcTotal-{{ $index }}"
+                    index: "hwDcsTotalVoltage.{{ $index }}"
                     group: DC
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwDcOutputVoltage
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.2.1.1.4.{{ $index }}'
                     descr:  "DC Output Voltage"
-                    index: "dcOutput-{{ $index }}"
+                    index: "hwDcOutputVoltage.{{ $index }}"
                     group: DC
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwSetLvdVoltage
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.7.2.1.1.5.{{ $index }}'
                     descr: HUAWEI-SITE-MONITOR-MIB::hwLvdUnitEquipName
-                    index: "lvd-{{ $index }}"
+                    index: "hwSetLvdVoltage.{{ $index }}"
                     group: LVD
                     divisor: 10
         current:
@@ -92,63 +92,63 @@ modules:
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattsTotalCurrent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.1.{{ $index }}'
                     descr: Battery Current
-                    index: "battery-{{ $index }}"
+                    index: "hwBattsTotalCurrent.{{ $index }}"
                     group: Battery
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattStringCurrent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.4.2.1.2.{{ $index }}'
                     descr: Battery String Current
-                    index: "battString-{{ $index }}"
+                    index: "hwBattStringCurrent.{{ $index }}"
                     group: Battery
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwRectsTotalCurrent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.3.{{ $index }}'
                     descr: Rectifier Current
-                    index: "rectifier-{{ $index }}"
+                    index: "hwRectsTotalCurrent.{{ $index }}"
                     group: Rectifier
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwRectOutputCurrent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.2.2.1.2.{{ $index }}'
                     descr: Rectifier Output Current
-                    index: "rectOutput-{{ $index }}"
+                    index: "hwRectOutputCurrent.{{ $index }}"
                     group: Rectifier
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwAphaseCurrent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.2.1.1.7.{{ $index }}'
-                    descr: "AC L1 Current"
-                    index: "acL1-{{ $index }}"
+                    descr: "AC A-Phase Current"
+                    index: "hwAphaseCurrent.{{ $index }}"
                     group: AC
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBphaseCurrent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.2.1.1.8.{{ $index }}'
-                    descr: "AC L2 Current"
-                    index: "acL2-{{ $index }}"
+                    descr: "AC B-Phase Current"
+                    index: "hwBphaseCurrent.{{ $index }}"
                     group: AC
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwCphaseCurrent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.2.1.1.9.{{ $index }}'
-                    descr: "AC L3 Current"
-                    index: "acL3-{{ $index }}"
+                    descr: "AC C-Phase Current"
+                    index: "hwCphaseCurrent.{{ $index }}"
                     group: AC
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwDcsTotalCurrent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.1.4.{{ $index }}'
                     descr: DC Total Current
-                    index: "dcTotal-{{ $index }}"
+                    index: "hwDcsTotalCurrent.{{ $index }}"
                     group: DC
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwDcOutputCurrent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.2.1.1.5.{{ $index }}'
                     descr: DC Output Current
-                    index: "dcOutput-{{ $index }}"
+                    index: "hwDcOutputCurrent.{{ $index }}"
                     group: DC
                     divisor: 10
         temperature:
@@ -159,28 +159,28 @@ modules:
                     oid: HUAWEI-SITE-MONITOR-MIB::hwRectifierTemperature
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.2.2.1.8.{{ $index }}'
                     descr: Rectifier Temperature
-                    index: "rectifier-{{ $index }}"
+                    index: "hwRectifierTemperature.{{ $index }}"
                     group: Rectifier
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattsTemprature
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.5.{{ $index }}'
                     descr: Battery Temperature
-                    index: "battery-{{ $index }}"
+                    index: "hwBattsTemprature.{{ $index }}"
                     group: Battery
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattStringTemprature
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.4.2.1.6.{{ $index }}'
                     descr: Battery String Temperature
-                    index: "battString-{{ $index }}"
+                    index: 'hwBattStringTemprature.{{ $index }}'
                     group: Battery
                     divisor: 10
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwEnvTemperature
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.8.2.1.1.4.{{ $index }}'
                     descr: Environment Temperature
-                    index: "envTemp-{{ $index }}"
+                    index: "hwEnvTemperature.{{ $index }}"
                     group: Environment
                     divisor: 10
         power:
@@ -189,31 +189,31 @@ modules:
                     oid: HUAWEI-SITE-MONITOR-MIB::hwRectsTotalDCPower
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.9.{{ $index }}'
                     descr: Rectifier Total DC Output Power
-                    index: "rectDcTotal-{{ $index }}"
+                    index: "hwRectsTotalDCPower.{{ $index }}"
                     group: Rectifier
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwRectsTotalACInputPower
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.11.{{ $index }}'
                     descr: Rectifier Total AC Input Power
-                    index: "rectAcTotal-{{ $index }}"
+                    index: "hwRectsTotalACInputPower.{{ $index }}"
                     group: Rectifier
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwRectDCOutputPower
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.2.2.1.5.{{ $index }}'
                     descr: Rectifier DC Output Power
-                    index: "rectOutput-{{ $index }}"
+                    index: "hwRectDCOutputPower.{{ $index }}""
                     group: Rectifier
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwDcsTotalPower
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.1.5.{{ $index }}'
                     descr: DC Total Power
-                    index: "dcTotal-{{ $index }}"
+                    index: "hwDcsTotalPower.{{ $index }}"
                     group: DC
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwDcOutputPower
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.2.1.1.6.{{ $index }}'
                     descr: DC Output Power
-                    index: "dcOutput-{{ $index }}"
+                    index: "hwDcOutputPower.{{ $index }}"
                     group: DC
         count:
             options:
@@ -223,55 +223,55 @@ modules:
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattsTotalQuantity
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.1.3.{{ $index }}'
                     descr: "Quantity of Batteries"
-                    index: "battery-{{ $index }}"
+                    index: "hwBattsTotalQuantity.{{ $index }}"
                     group: Battery
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwRectsTotalQuantity
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.4.{{ $index }}'
                     descr: "Quantity of Rectifiers"
-                    index: "rectifier-{{ $index }}"
+                    index: "hwRectsTotalQuantity.{{ $index }}"
                     group: Rectifier
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwDcsTotalQuantity
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.1.6.{{ $index }}'
                     descr: "Quantity of DCs"
-                    index: "dc-{{ $index }}"
+                    index: "hwDcsTotalQuantity.{{ $index }}"
                     group: DC
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwAcsTotalQuantity
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.1.4.{{ $index }}'
                     descr: "Quantity of ACs"
-                    index: "ac-{{ $index }}"
+                    index: "hwAcsTotalQuantity.{{ $index }}"
                     group: AC
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwEnvTempSensorsTotalQuantity
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.8.1.6.{{ $index }}'
                     descr: "Quantity of Temperature Sensors"
-                    index: "envTemp-{{ $index }}"
+                    index: "hwEnvTempSensorsTotalQuantity.{{ $index }}"
                     group: Environment
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattsRemainCapacity
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.9.{{ $index }}'
                     descr: 'Total Battery Remaining Capacity (Ah)'
-                    index: 'batteryRemainAh-{{ $index }}'
+                    index: 'hwBattsRemainCapacity.{{ $index }}'
                     group: Battery
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattsRatedCapacity
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.8.{{ $index }}'
                     descr: 'Total Battery Rated Capacity (Ah)'
-                    index: 'batteryRatedAh-{{ $index }}'
+                    index: 'hwBattsRatedCapacity.{{ $index }}'
                     group: Battery
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwSetBattStdCapacity
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.4.1.1.8.{{ $index }}'
                     descr: 'Battery String Rated Capacity (Ah)'
-                    index: 'battStringRatedAh-{{ $index }}'
+                    index: 'hwSetBattStdCapacity.{{ $index }}'
                     group: Battery
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattStringRemainCapacity
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.4.2.1.4.{{ $index }}'
                     descr: 'Battery String Remaining Capacity (Ah)'
-                    index: 'battStringRemainAh-{{ $index }}'
+                    index: 'hwBattStringRemainCapacity.{{ $index }}'
                     group: Battery
         charge:
             data:
@@ -279,17 +279,27 @@ modules:
                     oid: HUAWEI-SITE-MONITOR-MIB::hwTotalRemainingCapacityPercent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.10.{{ $index }}'
                     descr: 'Remaining battery total capacity'
-                    index: 'battTotal-{{ $index }}'
+                    index: 'hwTotalRemainingCapacityPercent.{{ $index }}'
                     group: Battery
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattStringRemainCapacityPercent
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.4.2.1.3.{{ $index }}'
                     descr: 'Remaining battery string capacity'
-                    index: 'battString-{{ $index }}'
+                    index: 'hwBattStringRemainCapacityPercent.{{ $index }}'
                     divisor: 10
                     group: Battery
         state:
             data:
+                -
+                    oid: HUAWEI-SITE-MONITOR-MIB::hwSiteDGWorkStatus
+                    num_oid: '.1.3.6.1.4.1.2011.6.164.1.1.1.9.{{ $index }}'
+                    group: Site Summary
+                    descr: "Site Status"
+                    state_name: hwSiteDGWorkStatus
+                    states:
+                        - { value: 1, generic: 3, descr: 'idle' }
+                        - { value: 2, generic: 0, descr: 'working' }
+                        - { value: 3, generic: 3, descr: 'unknown' }
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwSiteRunningStatus
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.1.1.10.{{ $index }}'
