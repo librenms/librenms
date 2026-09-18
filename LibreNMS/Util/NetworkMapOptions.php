@@ -111,9 +111,9 @@ class NetworkMapOptions
                     'enabled' => true,
                     'direction' => 'UD',
                     'sortMethod' => 'directed',
-                    'nodeSpacing' => 50,
-                    'treeSpacing' => 50,
-                    'levelSeparation' => 300,
+                    'nodeSpacing' => 150,
+                    'treeSpacing' => 200,
+                    'levelSeparation' => 200,
                 ],
             ],
             'nodes' => [
