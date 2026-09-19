@@ -46,6 +46,7 @@ class AddrController extends Controller
                 'ipv4' => fn ($query) => $query->orderByRaw('INET_ATON(ipv4_address)'),
                 'ipv6' => fn ($query) => $query->orderByRaw('INET6_ATON(ipv6_compressed)'),
             ])
+            ->orderByRaw('LENGTH(ifName) ASC')
             ->orderBy('ifName')
             ->get()
             ->map(function ($port): array {

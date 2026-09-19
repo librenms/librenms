@@ -10,7 +10,7 @@
                     <thead>
                         <tr>
                             <th>{{ __('Status') }}</th>
-                            <th>{{ __('Port') }}</th>
+                            <th>{{ __('Interface') }}</th>
                             <th>{{ __('Address') }}</th>
                             <th>{{ __('Description') }}</th>
                         </tr>
