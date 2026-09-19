@@ -389,8 +389,8 @@ class Url
         return url()->query('graphs', ['type' => $type, ...$args]);
     }
 
-    /**
-     * @param  array  $args
+     /**
+     * @param  array<string, mixed>  $args
      * @return string
      */
     public static function graphTag($args): string
