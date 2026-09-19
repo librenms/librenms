@@ -139,13 +139,6 @@ function c_echo($string, $enabled = true)
     }
 }
 
-function generate_smokeping_file($device, $file = '')
-{
-    $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get((int) $device['device_id']));
-
-    return $smokeping->generateFileName($file);
-}
-
 /**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
  *

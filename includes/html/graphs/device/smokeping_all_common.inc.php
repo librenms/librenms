@@ -29,7 +29,7 @@ if ($width > '500') {
     $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . " RTT      Loss    SDev   RTT\:SDev\l";
 }
 
-foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filename) {
+foreach ($smokeping_files[$direction][$device->hostname] as $source => $filename) {
     if (! LibrenmsConfig::has("graph_colours.$colourset.$iter")) {
         $iter = 0;
     }
@@ -39,7 +39,7 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
 
     $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($source, $descr_len);
 
-    $filename = generate_smokeping_file($device, $filename);
+    $filename = $smokeping->generateFileName($filename);
     $rrd_options[] = "DEF:median$i=" . $filename . ':median:AVERAGE';
     $rrd_options[] = "DEF:loss$i=" . $filename . ':loss:AVERAGE';
     $rrd_options[] = "CDEF:ploss$i=loss$i,$pings,/,100,*";

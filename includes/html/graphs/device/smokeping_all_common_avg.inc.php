@@ -32,7 +32,7 @@ if ($width > '500') {
 
 $dm_list = $sd_list = $ploss_list = '';
 
-foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filename) {
+foreach ($smokeping_files[$direction][$device->hostname] as $source => $filename) {
     if (! LibrenmsConfig::has("graph_colours.$colourset.$iter")) {
         $iter = 0;
     }
@@ -43,7 +43,7 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
     // FIXME: $descr unused? -- PDG 2015-11-14
     $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($source, $descr_len);
 
-    $filename = generate_smokeping_file($device, $filename);
+    $filename = $smokeping->generateFileName($filename);
     $rrd_options[] = "DEF:median$i=" . $filename . ':median:AVERAGE';
     $rrd_options[] = "CDEF:dm$i=median$i,UN,0,median$i,IF";
     $rrd_options[] = "DEF:loss$i=" . $filename . ':loss:AVERAGE';
