@@ -29,7 +29,6 @@
         </div>
     </form>
 
-@push('scripts')
 <script type="text/javascript">
     $('#alert_notes_modal').on('show.bs.modal', function(event) {
         var alert_id = $("#alert_id").val();
@@ -76,4 +75,3 @@
         });
     });
 </script>
-@endpush
