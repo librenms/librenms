@@ -1,7 +1,6 @@
 <?php
 
 use App\Facades\DeviceCache;
-use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use LibreNMS\Util\Url;
 

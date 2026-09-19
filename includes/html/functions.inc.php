@@ -22,8 +22,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\HtmlString;
 use LibreNMS\Enum\ImageFormat;
-use LibreNMS\Util\Clean;
-use LibreNMS\Util\Color;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
