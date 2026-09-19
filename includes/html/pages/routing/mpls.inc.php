@@ -4,6 +4,7 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Port;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Url;
 
 print_optionbar_start();
 
@@ -484,7 +485,7 @@ if ($vars['view'] == 'saps') {
         echo "<tr bgcolor=$bg_colour>
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps']) . '</td>
             <td>' . generate_sap_url($sap, e($sap['svc_oid'])) . '</td>
-            <td>' . generate_port_link($port) . '</td>
+            <td>' . Url::portLink($port) . '</td>
             <td>' . e($sap['sapEncapValue']) . '</td>
             <td>' . e($sap['sapType']) . '</td>
             <td>' . e($sap['sapDescription']) . '</td>
