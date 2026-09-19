@@ -85,7 +85,7 @@ foreach ($pag->items() as $arp) {
         'mac_oui' => $mac->vendor(),
         'ipv4_address' => $arp->ipv4_address,
         'hostname' => Url::deviceLink($arp->device),
-        'interface' => Url::portLink($arp->port, Rewrite::shortenIfName($arp->label)) . ' ' . $error_img,
+        'interface' => Url::portLink($arp->port, e(Rewrite::shortenIfName($arp->label))) . ' ' . $error_img,
         'remote_device' => $arp_name,
         'remote_interface' => $arp_if,
     ];

@@ -80,7 +80,7 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
     $device = DeviceCache::get($eventlog['device_id']);
     if ($eventlog['type'] == 'interface') {
         $port = PortCache::get((int) $eventlog['reference']);
-        $type = '<b>' . Url::portLink($port, Rewrite::shortenIfName(strtolower((string) $port->getLabel()))) . '</b>';
+        $type = '<b>' . Url::portLink($port, e(Rewrite::shortenIfName(strtolower((string) $port->getLabel())))) . '</b>';
     } else {
         $type = $eventlog['type'];
     }
