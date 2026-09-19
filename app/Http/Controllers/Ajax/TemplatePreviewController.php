@@ -1,7 +1,7 @@
 <?php
 
-/**
- * HostUnreachablePingException.php
+/*
+ * TemplatePreviewController.php
  *
  * -Description-
  *
@@ -20,35 +20,31 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2016 Tony Murray
+ * @copyright  2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Exceptions;
+namespace App\Http\Controllers\Ajax;
 
-use LibreNMS\Util\IP;
+use App\Http\Controllers\Controller;
+use App\View\SimpleTemplate;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
-class HostUnreachablePingException extends HostUnreachableException
+class TemplatePreviewController extends Controller
 {
-    /**
-     * @var string
-     */
-    public $hostname;
-    /**
-     * @var string
-     */
-    public $ip;
-
-    public function __construct(string $hostname)
+    public function __invoke(Request $request): JsonResponse
     {
-        $this->hostname = $hostname;
-        $this->ip = gethostbyname($hostname);
-
-        $message = trans('exceptions.host_unreachable.unpingable', [
-            'hostname' => $hostname,
-            'ip' => IP::isValid($this->ip) ? $this->ip : trans('exceptions.host_unreachable.unresolvable'),
+        $validated = $request->validate([
+            'template' => 'nullable|string',
+            'variables' => 'nullable|array',
         ]);
 
-        parent::__construct($message);
+        $template = $validated['template'] ?? '';
+        $variables = $validated['variables'] ?? [];
+
+        return response()->json([
+            'preview' => SimpleTemplate::parse($template, $variables),
+        ]);
     }
 }

@@ -2,10 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
-use App\Models\Device;
 use App\Models\PollerGroup;
 use Exception;
 use Illuminate\Validation\Rule;
@@ -84,34 +82,32 @@ class DeviceAdd extends LnmsCommand
             'poller-group' => ['numeric', Rule::in(PollerGroup::pluck('id')->prepend(0))],
         ]);
 
-        $auth = $this->option('auth-password');
-        $priv = $this->option('privacy-password');
-        $device = new Device([
-            'hostname' => $this->argument('device spec'),
-            'display_template' => $this->option('display-name'),
-            'snmpver' => $this->option('v3') ? 'v3' : ($this->option('v2c') ? 'v2c' : ($this->option('v1') ? 'v1' : '')),
-            'port' => $this->option('port'),
-            'transport' => $this->option('transport'),
-            'poller_group' => $this->option('poller-group'),
-            'port_association_mode' => PortAssociationMode::getId($this->option('port-association-mode')),
-            'community' => $this->option('community'),
-            'authlevel' => ($auth ? 'auth' : 'noAuth') . (($priv && $auth) ? 'Priv' : 'NoPriv'),
-            'authname' => $this->option('security-name'),
-            'authpass' => $this->option('auth-password'),
-            'authalgo' => $this->option('auth-protocol'),
-            'cryptopass' => $this->option('privacy-password'),
-            'cryptoalgo' => $this->option('privacy-protocol'),
-        ]);
+        $creator = new \App\Actions\Device\LegacyDeviceCreator(
+            hostname: (string) $this->argument('device spec'),
+            display_template: $this->option('display-name'),
+            poller_group: (int) $this->option('poller-group'),
+            sysName: $this->option('sysName'),
+            hardware: $this->option('hardware'),
+            os: $this->option('os'),
+            ping_only: (bool) $this->option('ping-only'),
+            snmpver: $this->option('v3') ? 'v3' : ($this->option('v2c') ? 'v2c' : ($this->option('v1') ? 'v1' : null)),
+            community: $this->option('community'),
+            port: $this->option('port') ? (int) $this->option('port') : null,
+            transport: $this->option('transport'),
+            port_association_mode: $this->option('port-association-mode'),
+            authname: $this->option('security-name'),
+            authpass: $this->option('auth-password'),
+            authalgo: $this->option('auth-protocol'),
+            cryptopass: $this->option('privacy-password'),
+            cryptoalgo: $this->option('privacy-protocol'),
+            force: (bool) $this->option('force'),
+            ping_fallback: (bool) $this->option('ping-fallback'),
+        );
 
-        if ($this->option('ping-only')) {
-            $device->snmp_disable = true;
-            $device->os = $this->option('os');
-            $device->hardware = $this->option('hardware');
-            $device->sysName = $this->option('sysName');
-        }
+        $device = $creator->getDevice();
 
         try {
-            $result = (new ValidateDeviceAndCreate($device, $this->option('force'), $this->option('ping-fallback')))->execute();
+            $result = $creator->createValidator()->execute();
 
             if (! $result) {
                 $this->error(trans('commands.device:add.messages.save_failed', ['hostname' => $device->hostname]));

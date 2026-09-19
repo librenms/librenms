@@ -7113,14 +7113,20 @@
             "default": 2,
             "type": "integer"
         },
-        "snmp.community": {
+        "snmp.default_credentials": {
             "group": "poller",
             "section": "snmp",
             "order": 2,
-            "type": "password-array",
-            "default": [
-                "public"
-            ]
+            "type": "array-dynamic",
+            "default": [],
+            "options": {
+                "target": "secret",
+                "placeholder": "Select secret to add..."
+            },
+            "validate": {
+                "value": "array",
+                "value.*": "integer|exists:secrets,id"
+            }
         },
         "snmp.unescape": {
             "type": "boolean"
@@ -7190,42 +7196,6 @@
                 "tcp",
                 "tcp6"
             ]
-        },
-        "snmp.v3": {
-            "group": "poller",
-            "section": "snmp",
-            "order": 3,
-            "type": "snmp3auth",
-            "default": [
-                {
-                    "authalgo": "MD5",
-                    "authlevel": "noAuthNoPriv",
-                    "authname": "root",
-                    "authpass": "",
-                    "cryptoalgo": "AES",
-                    "cryptopass": ""
-                }
-            ],
-            "validate": {
-                "value": "array",
-                "value.*.authalgo": "in:MD5,SHA,SHA-224,SHA-256,SHA-384,SHA-512",
-                "value.*.cryptoalgo": "in:AES,AES-192,AES-256,AES-256-C,DES"
-            }
-        },
-        "snmp.version": {
-            "group": "poller",
-            "section": "snmp",
-            "order": 1,
-            "type": "array",
-            "default": [
-                "v2c",
-                "v3",
-                "v1"
-            ],
-            "validate": {
-                "value": "array",
-                "value.*": "in:v1,v2c,v3"
-            }
         },
         "snmpbulkwalk": {
             "default": "/usr/bin/snmpbulkwalk",

@@ -20,15 +20,7 @@ class SnmpQueryExecuted
      * @param  array<int, string>  $mibs  List of MIBs included
      * @param  string|null  $mibDir  MIB directories used
      */
-    public function __construct(
-        public readonly string $method,
-        public readonly array $oids,
-        public readonly SnmpResponse $response,
-        public readonly array $cliCommand = [],
-        public readonly ?Device $device = null,
-        public readonly string $context = '',
-        public readonly array $mibs = [],
-        public readonly ?string $mibDir = null,
-    ) {
+    public function __construct(public readonly string $method, public readonly array $oids, public readonly SnmpResponse $response, public readonly array $cliCommand = [], public readonly ?Device $device = null, public readonly string $context = '', public readonly array $mibs = [], public readonly ?string $mibDir = null)
+    {
     }
 }

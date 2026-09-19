@@ -27,7 +27,6 @@ class UpdateDeviceMiscRequest extends FormRequest
             'override_device_ssh_port' => 'nullable|integer|between:1,65535',
             'override_device_telnet_port' => 'nullable|integer|between:1,65535',
             'override_device_http_port' => 'nullable|integer|between:1,65535',
-            'override_Unixagent_port' => 'nullable|integer|between:1,65535',
             'override_rrdtool_tune' => 'nullable|boolean',
             'selected_ports' => 'nullable|boolean',
         ];

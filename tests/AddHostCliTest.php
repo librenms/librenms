@@ -26,8 +26,10 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\PollingMethodType;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[TestDox('Add Host CLI')]
@@ -48,9 +50,16 @@ final class AddHostCliTest extends DBTestCase
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
 
-        $this->assertEquals(0, $device->snmp_disable, 'snmp is disabled');
-        $this->assertEquals('community', $device->community, 'Wrong snmp community');
-        $this->assertEquals('v1', $device->snmpver, 'Wrong snmp version');
+        $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
+        $this->assertNotNull($snmpMethod);
+        $secret = $snmpMethod->secret;
+        $this->assertNotNull($secret);
+        $this->assertEquals('community', $secret->data['community']);
+        $this->assertEquals('v1', $secret->data['version']);
+
+        $icmpMethod = $device->pollingMethod(PollingMethodType::Icmp);
+        $this->assertNotNull($icmpMethod);
+        $this->assertTrue($icmpMethod->enabled);
     }
 
     #[TestDox('CLI SNMP v2')]
@@ -63,9 +72,12 @@ final class AddHostCliTest extends DBTestCase
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
 
-        $this->assertEquals(0, $device->snmp_disable, 'snmp is disabled');
-        $this->assertEquals('community', $device->community, 'Wrong snmp community');
-        $this->assertEquals('v2c', $device->snmpver, 'Wrong snmp version');
+        $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
+        $this->assertNotNull($snmpMethod);
+        $secret = $snmpMethod->secret;
+        $this->assertNotNull($secret);
+        $this->assertEquals('community', $secret->data['community']);
+        $this->assertEquals('v2c', $secret->data['version']);
     }
 
     #[TestDox('CLI SNMP v3 user and password')]
@@ -78,18 +90,20 @@ final class AddHostCliTest extends DBTestCase
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
 
-        $this->assertEquals(0, $device->snmp_disable, 'snmp is disabled');
-        $this->assertEquals('authPriv', $device->authlevel, 'Wrong snmp v3 authlevel');
-        $this->assertEquals('SecName', $device->authname, 'Wrong snmp v3 security username');
-        $this->assertEquals('AuthPW', $device->authpass, 'Wrong snmp v3 authentication password');
-        $this->assertEquals('PrivPW', $device->cryptopass, 'Wrong snmp v3 crypto password');
-        $this->assertEquals('v3', $device->snmpver, 'Wrong snmp version');
+        $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
+        $this->assertNotNull($snmpMethod);
+        $secret = $snmpMethod->secret;
+        $this->assertNotNull($secret);
+        $this->assertEquals('v3', $secret->data['version']);
+        $this->assertEquals('SecName', $secret->data['authname']);
+        $this->assertEquals('AuthPW', $secret->data['authpass']);
+        $this->assertEquals('PrivPW', $secret->data['cryptopass']);
     }
 
     public function testPortAssociationMode(): void
     {
         $modes = ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'];
-        foreach ($modes as $index => $mode) {
+        foreach ($modes as $mode) {
             $host = 'hostName' . $mode;
             $this->artisan('device:add', ['device spec' => $host, '--force' => true, '-p' => $mode, '--v1' => true])
                 ->assertExitCode(0)
@@ -97,7 +111,14 @@ final class AddHostCliTest extends DBTestCase
 
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
-            $this->assertEquals($index + 1, $device->port_association_mode, 'Wrong port association mode ' . $mode);
+            $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
+            $this->assertNotNull($snmpMethod);
+
+            if ($mode === LibrenmsConfig::get('default_port_association_mode', 'ifIndex')) {
+                $this->assertArrayNotHasKey('port_association_mode', $snmpMethod->settings, 'Default port association mode not ommitted from settings');
+            } else {
+                $this->assertEquals($mode, $snmpMethod->settings['port_association_mode'] ?? null, 'Wrong port association mode ' . $mode);
+            }
         }
     }
 
@@ -112,9 +133,13 @@ final class AddHostCliTest extends DBTestCase
                 ->execute();
 
             $device = Device::findByHostname($host);
-            $this->assertNotNull($device);
+            $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
 
-            $this->assertEquals($mode, $device->transport, 'Wrong snmp transport (udp/tcp) ipv4/ipv6');
+            if ($mode === LibrenmsConfig::get('snmp.transports.0', 'udp')) {
+                $this->assertArrayNotHasKey('transport', $snmpMethod->settings, 'Default snmp transport not ommitted from settings');
+            } else {
+                $this->assertEquals($mode, $snmpMethod->settings['transport'], 'Wrong snmp transport (udp/tcp) ipv4/ipv6');
+            }
         }
     }
 
@@ -129,9 +154,8 @@ final class AddHostCliTest extends DBTestCase
                 ->execute();
 
             $device = Device::findByHostname($host);
-            $this->assertNotNull($device);
-
-            $this->assertEquals(strtoupper((string) $mode), $device->authalgo, 'Wrong snmp v3 password algorithm');
+            $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
+            $this->assertEquals(strtoupper((string) $mode), $snmpMethod->secret->data['authalgo'], 'Wrong snmp v3 password algorithm');
         }
     }
 
@@ -146,9 +170,8 @@ final class AddHostCliTest extends DBTestCase
                 ->execute();
 
             $device = Device::findByHostname($host);
-            $this->assertNotNull($device);
-
-            $this->assertEquals(strtoupper((string) $mode), $device->cryptoalgo, 'Wrong snmp v3 crypt algorithm');
+            $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
+            $this->assertEquals(strtoupper((string) $mode), $snmpMethod->secret->data['cryptoalgo'], 'Wrong snmp v3 crypt algorithm');
         }
     }
 
@@ -162,10 +185,12 @@ final class AddHostCliTest extends DBTestCase
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
 
-        $this->assertEquals(1, $device->snmp_disable, 'snmp is not disabled');
         $this->assertEquals('hardware', $device->hardware, 'Wrong hardware name');
         $this->assertEquals('nameOfOS', $device->os, 'Wrong os name');
         $this->assertEquals('system', $device->sysName, 'Wrong system name');
+
+        $this->assertNull($device->pollingMethod(PollingMethodType::Snmp));
+        $this->assertNotNull($device->pollingMethod(PollingMethodType::Icmp));
     }
 
     public function testExistingDevice(): void

@@ -2233,13 +2233,9 @@ return [
                 'description' => 'Transport (priority)',
                 'help' => 'Select the enabled transports and put them in the order to try.',
             ],
-            'version' => [
-                'description' => 'Version (priority)',
-                'help' => 'Select the enabled versions and put them in the order to try.',
-            ],
-            'community' => [
-                'description' => 'Communities (priority)',
-                'help' => 'Enter the community strings for v1 and v2c and put them in the order to try',
+            'default_credentials' => [
+                'description' => 'Default Credentials (priority)',
+                'help' => 'Select default SNMP credentials and put them in the order to try during device discovery and addition.',
             ],
             'max_oid' => [
                 'description' => 'Max OIDs',
@@ -2270,25 +2266,6 @@ return [
             'retries' => [
                 'description' => 'Retries',
                 'help' => 'How many times to retry the query',
-            ],
-            'v3' => [
-                'description' => 'SNMP v3 Authentication (priority)',
-                'help' => 'Set up the v3 authentication variables and put them in the order to try',
-                'auth' => 'Auth',
-                'crypto' => 'Crypto',
-                'fields' => [
-                    'authalgo' => 'Algorithm',
-                    'authlevel' => 'Level',
-                    'authname' => 'Username',
-                    'authpass' => 'Password',
-                    'cryptoalgo' => 'Algorithm',
-                    'cryptopass' => 'Password',
-                ],
-                'level' => [
-                    'noAuthNoPriv' => 'No Authentication, No Privacy',
-                    'authNoPriv' => 'Authentication, No Privacy',
-                    'authPriv' => 'Authentication and Privacy',
-                ],
             ],
         ],
         'snmpbulkwalk' => [
