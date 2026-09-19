@@ -65,6 +65,7 @@ class RoutingTabs extends BladeComponent
         }
 
         return array_filter([
+            'addr' => $device->ipv4()->count() + $device->ipv6()->count(),
             'bgp' => $device->bgppeers()->count(),
             'ospf' => $device->ospfInstances()->count(),
             'ospfv3' => $device->ospfv3Instances()->count(),
@@ -84,6 +85,7 @@ class RoutingTabs extends BladeComponent
     public static function getTabLabels(): array
     {
         return [
+            'addr' => 'Addresses',
             'ipsec-tunnels' => __('IPSEC Tunnels'),
             'bgp' => __('BGP'),
             'cef' => __('CEF'),
