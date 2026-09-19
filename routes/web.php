@@ -193,6 +193,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
         Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
         Route::prefix('routing')->name('routing.')->group(function (): void {
+            Route::get('addr', Device\Tabs\Routing\AddrController::class)->name('addr');
             Route::get('bgp', Device\Tabs\Routing\BgpController::class)->name('bgp');
             Route::get('cef', Device\Tabs\Routing\CefController::class)->name('cef');
             Route::get('cisco-otv', Device\Tabs\Routing\CiscoOtvController::class)->name('cisco-otv');
