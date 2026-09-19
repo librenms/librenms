@@ -446,7 +446,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
             $fault_detail .= Url::portLink($port) . ';&nbsp;';
         }
         if ($port->ifDescr != $port->ifAlias) {
-            $fault_detail .= $port->ifAlias . '; ';
+            $fault_detail .= e($port->ifAlias) . '; ';
         }
         $fallback = false;
     }

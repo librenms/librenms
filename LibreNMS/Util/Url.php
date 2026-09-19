@@ -177,7 +177,7 @@ class Url
         }
         $label = Rewrite::normalizeIfName($port->getLabel());
         if (! $text) {
-            $text = $label;
+            $text = htmlentities((string) $label);
         }
 
         $text = e($text);

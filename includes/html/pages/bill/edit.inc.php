@@ -126,7 +126,7 @@ if (is_array($ports)) {
                     </button>
                     <?php echo Url::deviceLink(DeviceCache::get($port['device_id'])); //TODO: Rewrite to Eloquent with device?>
                     <i class="fa fa-random"></i>
-                    <?php echo Url::portLink(PortCache::get($port['port_id']), $port['ifName'] . '' . $portalias); //TODO: Rewrite to Eloquent Port with device?>
+                    <?php echo Url::portLink(PortCache::get($port['port_id']), e($port['ifName'] . '' . $portalias)); //TODO: Rewrite to Eloquent Port with device?>
                 </div>
                 <?php
                 }

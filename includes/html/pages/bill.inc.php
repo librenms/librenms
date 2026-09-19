@@ -92,7 +92,7 @@ if (Gate::allows('view', $bill)) {
             $portalias = (empty($port->ifAlias) ? '' : ' - ' . $port->ifAlias . '');
 
             echo '<div class="list-group-item">';
-            echo Url::portLink($port, $port->ifName . $portalias) . ' on ' . Url::deviceLink(DeviceCache::get($port->device_id));
+            echo Url::portLink($port, e($port->ifName . $portalias)) . ' on ' . Url::deviceLink(DeviceCache::get($port->device_id));
             echo '</div>';
         }
 
