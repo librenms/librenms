@@ -1,11 +1,15 @@
 <?php
 
+use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\Url;
+
 // Don't refresh this page to stop adding multiple ports
 $no_refresh = true;
 
   // This needs more verification. Is it already added? Does it exist?
   // Calculation to extract MB/GB/TB of Kbps/Mbps/Gbps
-$base = \App\Facades\LibrenmsConfig::get('billing.base');
+$base = LibrenmsConfig::get('billing.base');
 
 if ($bill_data['bill_type'] == 'quota') {
     $data = $bill_data['bill_quota'];
@@ -118,7 +122,7 @@ if ($bill_data['bill_type'] == 'cdr') {
                         <i class="fa fa-minus"></i>
                         Remove Interface
                     </button>
-                    <?php echo generate_device_link($port); ?>
+                    <?php echo Url::deviceLink(DeviceCache::get($port['device_id'])); ?>
                     <i class="fa fa-random"></i>
                     <?php echo generate_port_link($port, $port['ifName'] . '' . $portalias); ?>
                 </div>

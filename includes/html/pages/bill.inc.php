@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Bill;
 use Illuminate\Support\Facades\Gate;
@@ -86,7 +87,7 @@ if (Gate::allows('view', $bill)) {
             $portalias = (empty($port['ifAlias']) ? '' : ' - ' . $port['ifAlias'] . '');
 
             echo '<div class="list-group-item">';
-            echo generate_port_link($port, $port['ifName'] . $portalias) . ' on ' . generate_device_link($port);
+            echo generate_port_link($port, $port['ifName'] . $portalias) . ' on ' . Url::deviceLink(DeviceCache::get($port['device_id']));
             echo '</div>';
         }
 
@@ -128,7 +129,7 @@ if (Gate::allows('view', $bill)) {
         $sep = ' | ';
     }
 
-    echo '<div style="font-weight: bold; float: right;"><a href="' . \LibreNMS\Util\Url::generate(['page' => 'bills']) . '/"><i class="fa fa-arrow-left fa-lg icon-theme" aria-hidden="true"></i> Back to Bills</a></div>';
+    echo '<div style="font-weight: bold; float: right;"><a href="' . Url::generate(['page' => 'bills']) . '/"><i class="fa fa-arrow-left fa-lg icon-theme" aria-hidden="true"></i> Back to Bills</a></div>';
 
     print_optionbar_end();
 

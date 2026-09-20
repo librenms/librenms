@@ -21,6 +21,11 @@
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
  */
+
+use App\Facades\DeviceCache;
+use App\Models\Device;
+use LibreNMS\Util\Url;
+
 print_optionbar_start(28);
 ?>
 <form method="post" action="" class="form-inline" role="form">
@@ -73,7 +78,7 @@ $count_query = 'SELECT COUNT(*) FROM ( ';
 $query = 'SELECT packages.name FROM packages,devices ';
 $param = [];
 
-if (Gate::denies('viewAll', \App\Models\Device::class)) {
+if (Gate::denies('viewAll', Device::class)) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
     $where .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
@@ -148,13 +153,13 @@ foreach ($ordered as $name => $entry) {
         }
         if (! in_array($variation['hostname'], $devs)) {
             unset($variation['version']);
-            $devs[] = generate_device_link($variation);
+            $devs[] = Url::deviceLink(DeviceCache::get($variation['device_id']));
         }
     }
     if (count($arch) > 0 && count($vers) > 0) {
         ?>
         <tr>
-            <td><a href="<?php echo \LibreNMS\Util\Url::generate(['page' => 'packages', 'name' => $name]); ?>"><?php echo $name; ?></a></td>
+            <td><a href="<?php echo Url::generate(['page' => 'packages', 'name' => $name]); ?>"><?php echo $name; ?></a></td>
             <td><?php echo implode('<br/>', $vers); ?></td>
             <td><?php echo implode('<br/>', $arch); ?></td>
             <td><?php echo implode('<br/>', $devs); ?></td>

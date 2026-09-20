@@ -15,6 +15,12 @@
  * @author     LibreNMS Contributors
 */
 
+use App\Facades\DeviceCache;
+use App\Models\Device;
+use LibreNMS\Util\Clean;
+use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
+
 $pagetitle[] = 'Services';
 
 require_once 'includes/html/modal/new_service.inc.php';
@@ -116,7 +122,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
 
                 $host_par = [];
                 $perms_sql = null;
-                if (Gate::denies('viewAll', \App\Models\Device::class)) {
+                if (Gate::denies('viewAll', Device::class)) {
                     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
                     $perms_sql .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
                     $host_par = $device_ids;
@@ -129,7 +135,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
                     $device_id = $device['device_id'];
                     $device_hostname = $device['hostname'];
                     $device_sysName = htmlspecialchars((string) $device['sysName']);
-                    $devlink = generate_device_link($device, null, ['tab' => 'services']);
+                    $devlink = Url::deviceLink(DeviceCache::get($device_id), null, ['tab' => 'services']);
                     if ($shift == 1) {
                         array_unshift($sql_param, $device_id);
                         $shift = 0;
@@ -181,12 +187,12 @@ require_once 'includes/html/modal/delete_service.inc.php';
 
                         echo '<tr id="row_' . $service['service_id'] . '">';
                         echo '<td><span data-toggle="tooltip" title="' . $title . '" class="alert-status ' . $label . '"></span></td>';
-                        echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_name'], [])) . '</td>';
-                        echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_type'], [])) . '</td>';
-                        echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_ip'], [])) . '</td>';
-                        echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_message'], [])) . '</td>';
-                        echo '<td>' . nl2br(\LibreNMS\Util\Clean::html($service['service_desc'], [])) . '</td>';
-                        echo '<td>' . (isset($service['service_changed']) ? \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) : 'Waiting for first service check') . '</td>';
+                        echo '<td>' . nl2br(Clean::html($service['service_name'], [])) . '</td>';
+                        echo '<td>' . nl2br(Clean::html($service['service_type'], [])) . '</td>';
+                        echo '<td>' . nl2br(Clean::html($service['service_ip'], [])) . '</td>';
+                        echo '<td>' . nl2br(Clean::html($service['service_message'], [])) . '</td>';
+                        echo '<td>' . nl2br(Clean::html($service['service_desc'], [])) . '</td>';
+                        echo '<td>' . (isset($service['service_changed']) ? Time::formatInterval(time() - $service['service_changed']) : 'Waiting for first service check') . '</td>';
 
                         $service_checked = '';
                         $ico = 'pause';
@@ -211,7 +217,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
                             $service_checked = 'checked';
                         }
                         $service_id = $service['service_id'];
-                        $service_name = \LibreNMS\Util\Clean::html($service['service_name']);
+                        $service_name = Clean::html($service['service_name']);
 
                         echo '<td>' . '<span id="service_status-' . $service_id . '" class="fa fa-fw fa-2x text-' . $color . ' fa-' . $ico . '" data-original-title="" title=""></span></td>';
 

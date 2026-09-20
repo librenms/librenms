@@ -1,16 +1,18 @@
 <?php
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
 
 // FIXME - REWRITE!
 $hostname = $device['hostname'];
 $ifname = $port['ifDescr'];
 $ifIndex = $port['ifIndex'];
-$speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
+    $speed = Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
 
 $ifalias = $port['name'];
 
@@ -131,7 +133,7 @@ if ($vars['subview'] == 'top10') {
         $arp_host = dbFetchRow('SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$ipv4]);
         $arp_host = cleanPort($arp_host);
         if ($arp_host) {
-            $arp_name = generate_device_link($arp_host);
+            $arp_name = Url::deviceLink(DeviceCache::get($arp_host['device_id']));
             $arp_name .= ' ' . generate_port_link($arp_host);
         } else {
             $arp_name = '';
