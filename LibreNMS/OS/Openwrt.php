@@ -48,8 +48,8 @@ class Openwrt extends OS implements
     WirelessUtilizationDiscovery
 {
     // OPENWRT-WIRELESS-MIB openwrtWirelessInterfaceEntry columns, addressed as
-    // <WL_ENTRY>.<column>.<ifIndex>. Wireless data is served by the agent's
-    // pass_persist handler under { openwrtObjects 10 } (.66510.1.10).
+    // <WL_ENTRY>.<column>.<ifIndex>. Wireless data is served by an AgentX
+    // subagent under { openwrtObjects 10 } (.66510.1.10).
     private const WL_ENTRY = '.1.3.6.1.4.1.66510.1.10.3.1';
 
     // openwrtWirelessClientCount scalar: device-wide de-duplicated client count.

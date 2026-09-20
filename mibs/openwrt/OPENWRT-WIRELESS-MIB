@@ -1,10 +1,10 @@
 -- **********************************************************
 -- OPENWRT-WIRELESS-MIB
 --
--- OpenWrt wireless metrics exported by the LibreNMS OpenWrt SNMP agent.
+-- OpenWrt wireless metrics exported by the OpenWrt SNMP metrics agent.
 -- The agent discovers radios/VAPs live (hostapd/iwinfo) at request time and
--- serves this subtree from a single net-snmp pass_persist handler, so no
--- per-interface or per-metric snmpd configuration is required.
+-- serves this subtree as a net-snmp AgentX subagent, so no per-interface or
+-- per-metric snmpd configuration is required.
 --
 -- Registers under OPENWRT-MIB at { openwrtObjects 10 }
 --   -> OID base .1.3.6.1.4.1.66510.1.10
@@ -19,7 +19,7 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,
     Integer32, Unsigned32
         FROM SNMPv2-SMI
-    DisplayString
+    DisplayString, PhysAddress
         FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
@@ -29,7 +29,7 @@ IMPORTS
         FROM OPENWRT-MIB;
 
 openwrtWirelessMIB MODULE-IDENTITY
-    LAST-UPDATED "202608130000Z"
+    LAST-UPDATED "202609150000Z"
     ORGANIZATION "OpenWrt"
     CONTACT-INFO
         "       OpenWrt Project
@@ -37,13 +37,24 @@ openwrtWirelessMIB MODULE-IDENTITY
                 https://github.com/openwrt/openwrt
         "
     DESCRIPTION
-        "MIB module describing OpenWrt wireless metrics (aggregate scalars
-         and a per-interface table) exported by the LibreNMS OpenWrt SNMP
-         agent's pass_persist handler."
-    REVISION "202608130000Z"
+        "MIB module describing OpenWrt wireless metrics (aggregate scalars,
+         a per-interface table, and a per-radio-link table for multi-link
+         interfaces) exported by the OpenWrt SNMP metrics agent's
+         AgentX subagent."
+    REVISION "202609150000Z"
+    DESCRIPTION
+        "Added openwrtWirelessLinkTable: per-radio-link channel, transmit
+         power and channel utilisation for 802.11be Multi-Link Operation
+         (MLO/MLD) interfaces, queried directly over nl80211 rather than
+         through the same path as the single-radio columns below, which
+         cannot represent more than one radio per row."
+    REVISION "202609120000Z"
     DESCRIPTION
         "Initial version: wireless aggregate scalars and per-interface table,
-         including per-interface channel utilisation and transmit power."
+         including per-interface channel utilisation and transmit power.
+         Radio-scoped objects are defined as absent on interfaces that span
+         several radio links, so 802.11be multi-link devices are representable
+         without reporting a misleading single value."
     ::= { openwrtObjects 10 }
 
 -- **********************************************************
@@ -137,9 +148,11 @@ openwrtWlIfaceLabel OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Display label for the wireless interface, normally the SSID. If
-         multiple interfaces share an SSID, the agent appends a band suffix
-         such as 24, 5 or 6 to keep labels unique."
+        "Display label for the wireless interface: its SSID, or the
+         interface name itself if it has none (a monitor interface, or a
+         VAP that is currently down). Not necessarily unique - two VAPs
+         broadcasting the same SSID on different bands get identical
+         labels here; use openwrtWlIfaceIfIndex to tell them apart."
     ::= { openwrtWirelessInterfaceEntry 3 }
 
 openwrtWlIfaceClients OBJECT-TYPE
@@ -161,7 +174,13 @@ openwrtWlIfaceFrequency OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Current channel centre frequency in MHz."
+        "Current channel centre frequency in MHz.
+
+         Absent for an interface that spans several radio links (an
+         802.11be multi-link device), which has no single value for
+         this object; agents report noSuchInstance in that case. See
+         openwrtWirelessLinkTable for that interface's per-link frequency
+         instead."
     ::= { openwrtWirelessInterfaceEntry 5 }
 
 openwrtWlIfaceNoiseFloor OBJECT-TYPE
@@ -170,7 +189,16 @@ openwrtWlIfaceNoiseFloor OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Noise floor for this wireless interface in dBm (typically negative)."
+        "Noise floor for this wireless interface in dBm (typically
+         negative).
+
+         Absent if the driver reports no noise measurement, or for an
+         interface that spans several radio links (an 802.11be multi-link
+         device), which has no single value for this object; agents report
+         noSuchInstance in those cases. Unlike frequency, transmit power
+         and channel utilisation, this has no per-link equivalent in
+         openwrtWirelessLinkTable: nl80211 has no per-link noise attribute,
+         only a device-wide one."
     ::= { openwrtWirelessInterfaceEntry 6 }
 
 openwrtWlIfaceTxRateMin OBJECT-TYPE
@@ -264,7 +292,11 @@ openwrtWlIfaceChannelUtil OBJECT-TYPE
     DESCRIPTION
         "Channel airtime utilisation for this interface's radio, as a
          percentage (0-100). This is the fraction of time the channel is
-         observed busy; 0 if the driver does not report survey data."
+         observed busy. Absent if the driver reports no survey data for
+         the operating channel, or for a multi-link interface, which has no
+         single radio; agents report noSuchInstance in those cases. See
+         openwrtWirelessLinkTable for a multi-link interface's per-link
+         channel utilisation instead."
     ::= { openwrtWirelessInterfaceEntry 16 }
 
 openwrtWlIfaceTxPower OBJECT-TYPE
@@ -273,8 +305,114 @@ openwrtWlIfaceTxPower OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Current transmit power for this wireless interface in dBm."
+        "Current transmit power for this wireless interface in dBm.
+
+         Absent if the driver reports no transmit power, or for an
+         interface that spans several radio links (an 802.11be multi-link
+         device), which has no single value for this object; agents report
+         noSuchInstance in those cases. See openwrtWirelessLinkTable for
+         that interface's per-link transmit power instead."
     ::= { openwrtWirelessInterfaceEntry 17 }
+
+-- **********************************************************
+-- Wireless link table (802.11be Multi-Link Operation)
+-- **********************************************************
+
+openwrtWirelessLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OpenwrtWirelessLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Per-radio-link metrics for wireless interfaces using 802.11be
+         Multi-Link Operation (MLO/MLD), where a single netdev spans
+         several radio links and so has no single channel, transmit power
+         or channel utilisation of its own - see openwrtWlIfaceFrequency
+         and the related objects in openwrtWirelessInterfaceTable, which
+         are defined as absent for such an interface. Each row here is one
+         link of one such interface; several rows share one ifIndex. This
+         table has no rows at all on a device with no multi-link
+         interface, rather than being present but empty."
+    ::= { openwrtWirelessMIB 4 }
+
+openwrtWirelessLinkEntry OBJECT-TYPE
+    SYNTAX      OpenwrtWirelessLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Metrics for one radio link of one multi-link wireless interface."
+    INDEX { openwrtWlLinkIfIndex, openwrtWlLinkId }
+    ::= { openwrtWirelessLinkTable 1 }
+
+OpenwrtWirelessLinkEntry ::= SEQUENCE {
+    openwrtWlLinkIfIndex     InterfaceIndex,
+    openwrtWlLinkId          Integer32,
+    openwrtWlLinkAddress     PhysAddress,
+    openwrtWlLinkFrequency   Unsigned32,
+    openwrtWlLinkTxPower     Integer32,
+    openwrtWlLinkChannelUtil Unsigned32
+}
+
+openwrtWlLinkIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the parent multi-link wireless interface - the same
+         value as openwrtWlIfaceIfIndex for that interface's row in
+         openwrtWirelessInterfaceTable."
+    ::= { openwrtWirelessLinkEntry 1 }
+
+openwrtWlLinkId OBJECT-TYPE
+    SYNTAX      Integer32 (0..15)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The link ID nl80211 assigns this radio link within its MLD
+         (NL80211_ATTR_MLO_LINK_ID), stable for the life of the link."
+    ::= { openwrtWirelessLinkEntry 2 }
+
+openwrtWlLinkAddress OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address this specific link transmits from. Distinct from
+         the MLD address associations use, and from the other links'
+         addresses on the same interface."
+    ::= { openwrtWirelessLinkEntry 3 }
+
+openwrtWlLinkFrequency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "MHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current channel centre frequency in MHz for this link."
+    ::= { openwrtWirelessLinkEntry 4 }
+
+openwrtWlLinkTxPower OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current transmit power for this link in dBm. Absent if the
+         kernel did not report a transmit power for this link; agents
+         report noSuchInstance in that case."
+    ::= { openwrtWirelessLinkEntry 5 }
+
+openwrtWlLinkChannelUtil OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Channel airtime utilisation for this link's radio, as a
+         percentage (0-100), from the same survey data as
+         openwrtWlIfaceChannelUtil. Absent if the driver reports no survey
+         data for this link's operating channel; agents report
+         noSuchInstance in that case."
+    ::= { openwrtWirelessLinkEntry 6 }
 
 -- **********************************************************
 -- Conformance
@@ -318,6 +456,20 @@ openwrtWirelessInterfaceGroup OBJECT-GROUP
         "Per-interface wireless metrics."
     ::= { openwrtWirelessGroups 2 }
 
+openwrtWirelessLinkGroup OBJECT-GROUP
+    OBJECTS {
+        openwrtWlLinkAddress,
+        openwrtWlLinkFrequency,
+        openwrtWlLinkTxPower,
+        openwrtWlLinkChannelUtil
+    }
+    STATUS  current
+    DESCRIPTION
+        "Per-radio-link metrics for 802.11be Multi-Link Operation
+         interfaces. Optional: a device with no multi-link interface has
+         no rows to report and so cannot implement this group."
+    ::= { openwrtWirelessGroups 3 }
+
 openwrtWirelessCompliance MODULE-COMPLIANCE
     STATUS  current
     DESCRIPTION
@@ -327,6 +479,10 @@ openwrtWirelessCompliance MODULE-COMPLIANCE
         openwrtWirelessScalarGroup,
         openwrtWirelessInterfaceGroup
     }
+    GROUP   openwrtWirelessLinkGroup
+    DESCRIPTION
+        "Implemented only by agents that have at least one multi-link
+         (802.11be MLO/MLD) wireless interface to report."
     ::= { openwrtWirelessCompliances 1 }
 
 END

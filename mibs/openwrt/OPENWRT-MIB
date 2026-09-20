@@ -2,7 +2,7 @@
 -- OPENWRT-MIB
 --
 -- Base registration module for OpenWrt metrics exported by the
--- LibreNMS OpenWrt SNMP agent (a single net-snmp pass_persist handler).
+-- OpenWrt SNMP metrics agent (a net-snmp AgentX subagent).
 --
 -- This module only establishes the OpenWrt OID structure. The metrics
 -- themselves live in per-subsystem modules that register beneath
@@ -36,7 +36,7 @@ openwrtMIB MODULE-IDENTITY
         "
     DESCRIPTION
         "Base module describing the OpenWrt OID structure used by the
-         LibreNMS OpenWrt SNMP agent. Per-subsystem metrics register under
+         OpenWrt SNMP metrics agent. Per-subsystem metrics register under
          openwrtObjects (wireless at { openwrtObjects 10 }); conformance
          registers under openwrtConformance."
     REVISION "202608130000Z"
