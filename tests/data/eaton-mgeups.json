@@ -13,7 +13,7 @@
                     "location": "<private>",
                     "os": "eaton-mgeups",
                     "type": "power",
-                    "serial": null,
+                    "serial": "<private>",
                     "icon": "eaton.svg"
                 }
             ]
