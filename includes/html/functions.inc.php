@@ -18,7 +18,6 @@ use App\Models\Device;
 use App\Models\Port;
 use App\Models\Sensor;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\HtmlString;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
@@ -78,17 +77,6 @@ function generate_overlib_content($graph_array, $text)
 
     return $overlib_content;
 }//end generate_overlib_content()
-
-function generate_device_link($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
-{
-    $deviceModel = DeviceCache::get((int) ($device['device_id'] ?? 0));
-
-    if (! $escape_text) {
-        $text = new HtmlString($text);
-    }
-
-    return Url::deviceLink($deviceModel, $text, $vars, $start, $end, $overlib);
-}
 
 function bill_permitted($bill_id)
 {
