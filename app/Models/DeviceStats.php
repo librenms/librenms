@@ -17,8 +17,6 @@ class DeviceStats extends DeviceRelatedModel
         'ping_rtt_last',
         'ping_rtt_prev',
         'ping_rtt_avg',
-        'ping_rttmin_last',
-        'ping_rttmax_last',
         'ping_loss_last',
         'ping_loss_prev',
         'ping_loss_avg',
@@ -35,10 +33,6 @@ class DeviceStats extends DeviceRelatedModel
             $this->ping_rtt_last = $response->avg_latency;
             // Average is calculated as the exponential weighted moving average
             $this->ping_rtt_avg = $this->ping_rtt_avg ? $this->ping_rtt_avg + (($this->ping_rtt_last - $this->ping_rtt_avg) * $avg_factor) : $this->ping_rtt_last;
-
-            // Also update the minimum and maimum latencies (last value only)
-            $this->ping_rttmax_last = $response->max_latency;
-            $this->ping_rttmin_last = $response->min_latency;
         }
 
         // Only update loss if we transmitted a packet

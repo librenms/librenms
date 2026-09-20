@@ -130,8 +130,8 @@ class RunAlerts
             if ($device->stats) {
                 $obj['ping_timestamp'] = $device->stats->ping_last_timestamp;
                 $obj['ping_loss'] = $device->stats->ping_loss_last;
-                $obj['ping_min'] = $device->stats->ping_rttmin_last;
-                $obj['ping_max'] = $device->stats->ping_rttmax_last;
+                $obj['ping_min'] = '';
+                $obj['ping_max'] = '';
                 $obj['ping_avg'] = $device->stats->ping_rtt_last;
                 $obj['debug'] = 'unsupported';
             } else {
