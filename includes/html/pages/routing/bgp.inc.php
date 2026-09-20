@@ -1,7 +1,10 @@
 <?php
 
+use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeer;
 use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Number;
@@ -9,7 +12,7 @@ use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
-if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
+if (Gate::denies('viewAny', BgpPeer::class)) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     $where = '';
@@ -277,8 +280,8 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
         // display overlib graphs
         $graph_array = [];
         $graph_array['type'] = 'bgp_updates';
-        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
-        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
+        $graph_array['to'] = LibrenmsConfig::get('time.now');
+        $graph_array['from'] = LibrenmsConfig::get('time.day');
         $graph_array['height'] = '110';
         $graph_array['width'] = $width;
 
@@ -319,7 +322,7 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
         }
 
         echo '  <td></td>
-            <td width=150>' . $localaddresslink . '<br />' . generate_device_link($peer, null, ['tab' => 'routing', 'proto' => 'bgp']) . '</td>
+            <td width=150>' . $localaddresslink . '<br />' . Url::deviceLink(DeviceCache::get($peer['device_id']), null, ['tab' => 'routing', 'proto' => 'bgp']) . '</td>
             <td width=30><b>&#187;</b></td>
             <td width=150>' . $peeraddresslink . '<br />' . Url::deviceLink($peer_device, vars: ['tab' => 'routing', 'proto' => 'bgp']) . "</td>
             <td width=50><b>$peer_type</b></td>
@@ -368,7 +371,7 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
         if (isset($peer['graph']) && $peer['graph']) {
             $graph_array['height'] = '100';
             $graph_array['width'] = '218';
-            $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+            $graph_array['to'] = LibrenmsConfig::get('time.now');
             echo '<tr></tr><tr class="bgp"><td colspan="9">';
 
             include 'includes/html/print-graphrow.inc.php';

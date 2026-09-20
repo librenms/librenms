@@ -1,7 +1,10 @@
 <?php
 
+use App\Facades\DeviceCache;
 use App\Models\IsisAdjacency;
 use Illuminate\Support\Facades\Gate;
+use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
 
 if (Gate::denies('viewAny', IsisAdjacency::class)) {
     include 'includes/html/error-no-perm.inc.php';
@@ -77,7 +80,7 @@ if (Gate::denies('viewAny', IsisAdjacency::class)) {
           </thead>';
 
     foreach (IsisAdjacency::whereIn('isisISAdjState', $filter)->with('port')->get() as $adj) {
-        $device = device_by_id_cache($adj->device_id);
+        $device = DeviceCache::get($adj->device_id);
         if ($adj->isisISAdjState == 'up') {
             $color = 'green';
         } else {
@@ -88,15 +91,15 @@ if (Gate::denies('viewAny', IsisAdjacency::class)) {
           <tbody>
           <tr>
               <td></td>
-              <td>' . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'isis']) . '</td>
-              <td>' . \LibreNMS\Util\Url::portLink($adj->port) . '</td>
+              <td>' . Url::deviceLink($device, 0, ['tab' => 'routing', 'proto' => 'isis']) . '</td>
+              <td>' . Url::portLink($adj->port) . '</td>
               <td>' . $adj->isisISAdjIPAddrAddress . '</td>
               <td>' . $adj->isisISAdjNeighSysID . '</td>
               <td>' . $adj->isisISAdjAreaAddress . '</td>
               <td>' . $adj->isisISAdjNeighSysType . '</td>
               <td>' . $adj->isisCircAdminState . '</td>
               <td><strong><span style="color: ' . $color . ';">' . $adj->isisISAdjState . '</span></strong></td>
-              <td>' . \LibreNMS\Util\Time::formatInterval($adj->isisISAdjLastUpTime) . '</td>
+              <td>' . Time::formatInterval($adj->isisISAdjLastUpTime) . '</td>
           </tr>
           </tbody>';
     }
