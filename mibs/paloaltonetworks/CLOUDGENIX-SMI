@@ -1,0 +1,90 @@
+-- Palo Alto Networks, Inc. SMI MIB Copyright (c) 2017-2022 by Palo Alto
+-- Networks, Inc.
+-- 2022 revision, Aaron Edwards
+
+CLOUDGENIX-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE,
+    enterprises
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ;
+
+cloudgenix MODULE-IDENTITY
+    LAST-UPDATED  "202202241935Z" -- February 24, 2022
+    ORGANIZATION
+        "Palo Alto Networks, Inc."
+    CONTACT-INFO
+        "Prisma SD-WAN Support
+
+         Palo Alto Networks
+         3000 Tannery Way
+         Santa Clara, CA 95054
+         USA
+
+         Technical Support
+         N. America: +1 408 738 7799
+         EMEA: +31 20 808 4600
+         APAC: +65 3158 5600
+
+         support@paloaltonetworks.com"
+    DESCRIPTION
+        "Structure of Management Information for Prisma SD-WAN"
+    REVISION      "201706191800Z" -- June 19, 2017
+    DESCRIPTION
+        "Inital Revision"
+    ::= { enterprises 50114 }
+
+CgxDegreesC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d-3"
+    STATUS        current
+    DESCRIPTION
+        "Units are reported on the wire in milidegrees Celsius.
+         CgxDegreesC provides a textual-convention to display Degrees
+         Celsius (C)."
+    SYNTAX        Integer32
+
+CgxVolts ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d-3"
+    STATUS        current
+    DESCRIPTION
+        "Units are reported on the wire in milivolts. CgxVolts provides
+         a textual-convention to display as Volts (V)."
+    SYNTAX        Integer32
+
+cgxObjects OBJECT IDENTIFIER ::= { cloudgenix 1 }
+
+cgxConformance OBJECT IDENTIFIER ::= { cloudgenix 2 }
+
+cgxCompliances OBJECT IDENTIFIER ::= { cgxConformance 1 }
+
+cloudgenixCompliance MODULE-COMPLIANCE
+    STATUS         current
+    DESCRIPTION
+        "Compliance statement for entities which implement the Prisma
+         SD-WAN SMI MIB"
+
+    MODULE         CLOUDGENIX-SMI
+    ::= { cgxCompliances 1 }
+
+cgxGroups OBJECT IDENTIFIER ::= { cgxConformance 2 }
+
+cgxMgmt OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Root Object Identifier for Prisma SD-WAN Management-related
+         Objects"
+    ::= { cloudgenix 10 }
+
+cgxProducts OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Root Object Identifier for Prisma SD-WAN Product specific
+         Objects"
+    ::= { cloudgenix 11 }
+
+END

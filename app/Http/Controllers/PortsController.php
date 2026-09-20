@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -104,11 +105,15 @@ class PortsController extends Controller
 
         $purge = $request->input('purge');
         if ($purge === 'all') {
+            Gate::authorize('delete', Port::class);
+
             Port::hasAccess($request->user())->with(['device' => function ($query): void {
                 $query->select('device_id', 'hostname');
             }])->isDeleted()->chunkById(100, function ($ports): void {
                 foreach ($ports as $port) {
-                    $port->delete();
+                    if (Gate::allows('delete', $port)) {
+                        $port->delete();
+                    }
                 }
             });
 
@@ -116,7 +121,9 @@ class PortsController extends Controller
         }
 
         try {
-            Port::hasAccess($request->user())->where('port_id', $purge)->firstOrFail()->delete();
+            $port = Port::hasAccess($request->user())->where('port_id', $purge)->firstOrFail();
+            Gate::authorize('delete', $port);
+            $port->delete();
         } catch (ModelNotFoundException) {
             return response()->json(['message' => 'Port ID ' . ((int) $purge) . ' not found! Could not purge port.'], 422);
         }

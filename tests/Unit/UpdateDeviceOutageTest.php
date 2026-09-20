@@ -106,6 +106,43 @@ final class UpdateDeviceOutageTest extends DBTestCase
         $this->assertCount(0, $device->outages()->get());
     }
 
+    public function testSavingStatusChangeToUpClosesOpenOutage(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        DeviceOutage::factory()->open()->create(['device_id' => $device->device_id]);
+
+        $device->status = 1;
+        $device->save();
+
+        $this->assertNull(
+            $device->outages()->whereNull('up_again')->first(),
+            'Outage must be closed when the device status is saved as up'
+        );
+    }
+
+    public function testSavingStatusChangeToDownOpensOutage(): void
+    {
+        $device = Device::factory()->create(['status' => 1]);
+
+        $device->status = 0;
+        $device->save();
+
+        $this->assertCount(1, $device->outages()->get());
+        $this->assertNull($device->outages()->first()->up_again);
+    }
+
+    public function testSavingWithoutStatusChangeLeavesOutagesAlone(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        DeviceOutage::factory()->open()->create(['device_id' => $device->device_id]);
+
+        $device->sysName = 'unrelated-change';
+        $device->save();
+
+        $this->assertCount(1, $device->outages()->get());
+        $this->assertNull($device->outages()->first()->up_again);
+    }
+
     public function testOpensOutageDuringMaintenanceWhenConsiderMaintenanceDisabled(): void
     {
         LibrenmsConfig::set('graphing.availability_consider_maintenance', false);

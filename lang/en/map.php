@@ -156,6 +156,7 @@ return [
                     'wifi' => 'Wifi',
                 ],
                 'image' => 'Image',
+                'device_os_image' => 'Device OS Image',
                 'image_options' => [
                     'adc' => 'Application Delivery Controller',
                     'firewall' => 'Firewall',

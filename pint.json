@@ -148,6 +148,7 @@
         "resources",
         "routes",
         "tests",
-        "LibreNMS"
+        "LibreNMS",
+        "includes"
     ]
 }
