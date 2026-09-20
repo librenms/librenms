@@ -35,8 +35,8 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
         $obj['transport'] = $options['p'];
     }
     $type = new Template;
-    $obj['alert'] = new AlertData($obj);
     $obj['title'] = $type->getTitle($obj);
+    $obj['alert'] = new AlertData($obj);
     $obj['msg'] = $type->getBody($obj);
     unset($obj['template']);
     unset($obj['alert']);
