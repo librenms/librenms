@@ -175,6 +175,18 @@ class TwoFactorController extends Controller
             throw new AuthenticationException(__('No Two-Factor settings, how did you get here?'));
         }
 
+        // lockout check
+        if (isset($twoFactorSettings['fails']) && $twoFactorSettings['fails'] >= 3) {
+            $lockout_time = LibrenmsConfig::get('twofactor_lock', 0);
+
+            if (! $lockout_time) {
+                auth()->logout();
+                throw new AuthenticationException(__('Too many two-factor failures, please contact administrator.'));
+            } elseif ((time() - ($twoFactorSettings['last'] ?? 0)) < $lockout_time) {
+                throw new AuthenticationException(__('Too many two-factor failures, please wait :time seconds', ['time' => $lockout_time]));
+            }
+        }
+
         if (($server_count = TwoFactor::verifyHOTP($twoFactorSettings['key'], $token, $twoFactorSettings['counter'])) === false) {
             if (isset($twoFactorSettings['fails'])) {
                 $twoFactorSettings['fails']++;

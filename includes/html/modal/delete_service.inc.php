@@ -49,7 +49,7 @@
             var service_id = $("#service_id").val();
             $.ajax({
                 type: 'DELETE',
-                url: '<?php echo route("service.destroy", ["service" => ":service"]) ?>'.replace(':service', service_id),
+                url: '<?php echo route('service.destroy', ['service' => ':service']) ?>'.replace(':service', service_id),
                 dataType: "json",
                 success: function (result) {
                     if (result.status == 0) {

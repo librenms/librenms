@@ -1,12 +1,12 @@
-This document gives the information for the basic detection of a new
-OS.
+# Initial OS Detection and Discovery
 
-### Discovery
+This guide explains how to configure basic OS detection and initial metadata discovery for a device in LibreNMS.
 
-OS discovery selects the OS of a device. Detection normally uses
-sysObjectID or sysDescr. An snmpget of an OID with a value test also
-works. Do not use snmpget, because it makes all OS detections slower,
-not only the new one.
+### OS Detection
+
+OS detection matches the operating system of a newly discovered device. Detection normally uses `sysObjectID` or `sysDescr`.
+
+> **Important**: Avoid using `snmpget` in OS detection. It sends additional SNMP queries that make detection slower for all devices across your network.
 
 First create the new OS file `resources/definitions/os_detection/pulse.yaml`.
 This example works:
@@ -15,7 +15,6 @@ This example works:
 os: pulse
 text: 'Pulse Secure'
 type: firewall
-icon: pulse
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
@@ -24,6 +23,8 @@ discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.12532.
 ```
+
+`icon`: defaults to the OS name (`html/images/os/<os>.svg`). Do not set `icon` if it matches the OS name. Only set `icon` if it differs from the OS name (for example, `icon: cisco` when sharing another vendor's icon).
 
 `over`: a list of the graphs in the device header bar. These are the
 mini graphs at the top right.
@@ -74,37 +75,23 @@ then ignores ifXEntry on these models:
      - cisco2811
 ```
 
-`mib_dir`: it adds one directory for the MIB search. An array is not
-valid. Give only one directory.
+`mib_dir`: the OS name is included in the MIB search path by default (`mibs/<os>`).
+Do not add `mib_dir: <os>`. Only set `mib_dir` if the directory differs from
+the OS name (for example, `mib_dir: juniper`). Give only one directory. An array is not valid.
 
 ```yaml
 mib_dir: juniper
 ```
 
-Disable only the discovery modules and the poller modules that cause a
-problem on a device.
-
-Discovery runs first. Without discovered data, the polling does not
-run.
-
-`discovery_modules`: the list of the discovery modules. Use 1 to enable
-and 0 to disable. `resources/definitions/config_definitions.json` gives
-the default state of each module.
+Do not set modules to `false` in the OS definition. That is what discovery is for.
+Discovery dynamically tests whether the device supports each module. Only use
+`discovery_modules` or `poller_modules` to enable optional modules that are disabled
+globally by default:
 
 ```yaml
 discovery_modules:
      cisco-cef: true
      slas: true
-```
-
-`poller_modules`: the list of the poller modules. Use 1 to enable and 0
-to disable. `resources/definitions/config_definitions.json` gives the
-default state of each module.
-
-```yaml
-poller_modules:
-    cisco-ace-serverfarms: false
-    cisco-ace-loadbalancer: false
 ```
 
 ##### Discovery Logic
@@ -207,10 +194,29 @@ public function discoverOS(\App\Models\Device $device): void
 
 ### MIBs
 
-If the device has MIBs and the detection uses them, add them to the
-repository. Put the MIBs in a vendor directory. For example, the HP
-MIBs are in `mibs/hp`. Give these directories in the YAML detection
-file with `mib_dir`, as above.
+Check thoroughly for existing vendor MIBs first (check vendor websites,
+support downloads, device firmware, or MIB repositories).
+
+If vendor MIBs exist:
+
+- Include vendor MIBs verbatim as provided by the vendor. Do not make any
+  modifications to MIB files.
+- Put the MIBs in a vendor directory (`mibs/<vendor>/`). The OS name is
+  included in the MIB search path by default (`mibs/<os>`). Only set `mib_dir`
+  in the OS detection file if the directory differs from the OS name.
+- Name each file to match the MIB module definition line exactly (for
+  example, `MYVENDOR-SYSTEM-MIB`). Do not add a file extension (such as
+  `.mib` or `.txt`).
+- Do not include standard RFC MIBs in vendor directories.
+- Add only the MIBs that LibreNMS uses. Do not add unused vendor MIBs.
+
+If no MIB exists (check thoroughly):
+
+- If you have detailed SNMP information from the vendor's SNMP specification
+  documentation, you can create a MIB from that documentation.
+- Write standard SMIv2 MIB syntax with valid module headers, imports, object
+  identifiers, and object types.
+- Save the file as `mibs/<vendor>/<MODULE-NAME>` without any file extension.
 
 ### Icon and Logo
 

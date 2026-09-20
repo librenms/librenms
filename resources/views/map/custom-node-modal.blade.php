@@ -68,8 +68,8 @@
                             <div class="form-group row" id="nodeImageRow">
                                 <label for="nodeimage" class="col-sm-3 control-label">{{ __('map.custom.edit.node.image') }}</label>
                                 <div class="col-sm-6">
-                                    <select id="nodeimage" class="form-control input-sm" onchange="nodeSetImage();">
-                                        <option value="" id="deviceiconimage">{{ __('map.custom.edit.node.style_options.device_image') }}</option>
+                                    <select id="nodeimage" class="form-control input-sm" onchange="$('#nodeModal').data('hasCustomImage', $(this).val() !== ''); nodeSetImage();">
+                                        <option value="" id="deviceiconimage">{{ __('map.custom.edit.node.device_os_image') }}</option>
                                         @foreach($images as $imgfile => $imglabel)
                                             <option value="{{$imgfile}}">{{$imglabel}}</option>
                                         @endforeach
@@ -83,14 +83,30 @@
                                 <label for="nodeicon" class="col-sm-3 control-label">{{ __('map.custom.edit.node.icon') }}</label>
                                 <div class="col-sm-6">
                                     <select id="nodeicon" class="form-control input-sm" onchange="nodeSetIcon();">
-                                        <option value="f233">{{ __('map.custom.edit.node.icon_options.server')  }}</option>
-                                        <option value="f390">{{ __('map.custom.edit.node.icon_options.desktop')  }}</option>
+                                        <option value="f6ff">{{ __('map.custom.edit.node.icon_options.network_wired')  }}</option>
+                                        <option value="f4d7">{{ __('map.custom.edit.node.icon_options.router')  }}</option>
+                                        <option value="f796">{{ __('map.custom.edit.node.icon_options.ethernet')  }}</option>
+                                        <option value="f1eb">{{ __('map.custom.edit.node.icon_options.wifi')  }}</option>
+                                        <option value="f519">{{ __('map.custom.edit.node.icon_options.tower')  }}</option>
                                         <option value="f7c0">{{ __('map.custom.edit.node.icon_options.dish')  }}</option>
                                         <option value="f7bf">{{ __('map.custom.edit.node.icon_options.satellite')  }}</option>
-                                        <option value="f1eb">{{ __('map.custom.edit.node.icon_options.wifi')  }}</option>
                                         <option value="f0c2">{{ __('map.custom.edit.node.icon_options.cloud')  }}</option>
                                         <option value="f0ac">{{ __('map.custom.edit.node.icon_options.globe')  }}</option>
-                                        <option value="f519">{{ __('map.custom.edit.node.icon_options.tower')  }}</option>
+                                        <option value="f1ad">{{ __('map.custom.edit.node.icon_options.building')  }}</option>
+                                        <option value="f3ed">{{ __('map.custom.edit.node.icon_options.shield')  }}</option>
+                                        <option value="f023">{{ __('map.custom.edit.node.icon_options.lock')  }}</option>
+                                        <option value="f1e6">{{ __('map.custom.edit.node.icon_options.plug')  }}</option>
+                                        <option value="f011">{{ __('map.custom.edit.node.icon_options.power_off')  }}</option>
+                                        <option value="f240">{{ __('map.custom.edit.node.icon_options.battery')  }}</option>
+                                        <option value="f233">{{ __('map.custom.edit.node.icon_options.server')  }}</option>
+                                        <option value="f1c0">{{ __('map.custom.edit.node.icon_options.database')  }}</option>
+                                        <option value="f0a0">{{ __('map.custom.edit.node.icon_options.hard_drive')  }}</option>
+                                        <option value="f2db">{{ __('map.custom.edit.node.icon_options.microchip')  }}</option>
+                                        <option value="f390">{{ __('map.custom.edit.node.icon_options.desktop')  }}</option>
+                                        <option value="f109">{{ __('map.custom.edit.node.icon_options.laptop')  }}</option>
+                                        <option value="f3fa">{{ __('map.custom.edit.node.icon_options.tablet')  }}</option>
+                                        <option value="f3ce">{{ __('map.custom.edit.node.icon_options.mobile')  }}</option>
+                                        <option value="f02f">{{ __('map.custom.edit.node.icon_options.print')  }}</option>
                                         <option value="f061">{{ __('map.custom.edit.node.icon_options.arrow_right')  }}</option>
                                         <option value="f060">{{ __('map.custom.edit.node.icon_options.arrow_left')  }}</option>
                                         <option value="f062">{{ __('map.custom.edit.node.icon_options.arrow_up')  }}</option>
@@ -187,13 +203,20 @@
             $("#nodeimage").val($("#nodeimage option:eq(1)").val());
         }
         let imgsrc = $("#nodeimage").val();
+        let previewSrc = '';
         // Set the image preview src
         if(! imgsrc) {
-            $("#nodeimagepreview").attr("src", $("#device_image").val());
+            previewSrc = $("#device_image").val();
         } else if (isNaN(imgsrc)) {
-            $("#nodeimagepreview").attr("src", custom_image_base + imgsrc);
+            previewSrc = custom_image_base + imgsrc;
         } else {
-            $("#nodeimagepreview").attr("src", '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", imgsrc));
+            previewSrc = '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", imgsrc);
+        }
+
+        if (previewSrc) {
+            $("#nodeimagepreview").attr("src", previewSrc).show();
+        } else {
+            $("#nodeimagepreview").attr("src", "").hide();
         }
     }
 
@@ -206,6 +229,7 @@
         }
         if(nodestyle == 'image' || nodestyle == 'circularImage') {
             $("#nodeImageRow").show();
+            nodeSetImage();
         } else {
             $("#nodeImageRow").hide();
         }
@@ -224,6 +248,10 @@
         $("#nodeDeviceSearchRow").hide();
         $("#deviceiconimage").show();
         $("#nodeDeviceRow").show();
+        if (! $("#nodeModal").data("hasCustomImage")) {
+            $("#nodeimage").val("");
+        }
+        nodeSetImage();
     }
 
     function nodeDeviceClear() {
@@ -236,10 +264,8 @@
         $("#deviceiconimage").hide();
         $("#nodeDeviceSearchRow").show();
 
-        // Reset device style if we were using the device image
-        if(($("#nodestyle").val() == "image" || $("#nodestyle").val() == "circularImage") && !$("#nodeimage").val()){
-            $("#nodestyle").val(newnodeconf.shape);
-            $("#nodeImageRow").hide();
+        // Update image/style display now that device is cleared
+        if ($("#nodestyle").val() == "image" || $("#nodestyle").val() == "circularImage") {
             nodeSetImage();
         }
     }
@@ -327,7 +353,13 @@
         $("#devicesearch").trigger('change');
 
         $("#device_id").val(nodeconf.device_id || '');
-        if(nodeconf.device_id) {
+        if (!nodeconf.id) {
+            // Default config modal
+            $("#device_name").text("");
+            $("#nodeDeviceRow").hide();
+            $("#deviceiconimage").show();
+            $("#device_image").val("");
+        } else if(nodeconf.device_id) {
             // Nodes is linked to a device
             $("#device_name").text(node_device_map[nodeconf.id].device_name);
             // Hide device selection row
@@ -354,12 +386,19 @@
         $("#nodestyle").val(nodeconf.shape);
 
         // Show or hide the image selection if the shape is an image type
+        var has_custom_image = false;
         if(nodeconf.shape == "image" || nodeconf.shape == "circularImage") {
             $("#nodeImageRow").show();
-            if(nodeconf.image.unselected.indexOf(custom_image_base) == 0) {
-                $("#nodeimage").val(nodeconf.image.unselected.replace(custom_image_base, ""));
-            } else if(nodeconf.image.unselected.indexOf(nodeimage_base) == 0) {
-                $("#nodeimage").val(nodeconf.image.unselected.replace(nodeimage_base, ""));
+            if(nodeconf.image && nodeconf.image.unselected) {
+                if(nodeconf.image.unselected.indexOf(custom_image_base) == 0) {
+                    $("#nodeimage").val(nodeconf.image.unselected.replace(custom_image_base, ""));
+                    has_custom_image = true;
+                } else if(nodeconf.image.unselected.indexOf(nodeimage_base) == 0) {
+                    $("#nodeimage").val(nodeconf.image.unselected.replace(nodeimage_base, ""));
+                    has_custom_image = true;
+                } else {
+                    $("#nodeimage").val("");
+                }
             } else {
                 $("#nodeimage").val("");
             }
@@ -367,6 +406,7 @@
             $("#nodeImageRow").hide();
             $("#nodeimage").val("");
         }
+        $("#nodeModal").data("hasCustomImage", has_custom_image);
         nodeSetImage();
 
         // Show or hide the icon selection if the shape is icon
@@ -421,7 +461,9 @@
         }
         if(newnodeconf.shape == "image" || newnodeconf.shape == "circularImage") {
             let imgsrc = $("#nodeimage").val();
-            if(isNaN(imgsrc)) {
+            if(! imgsrc) {
+                delete newnodeconf.image;
+            } else if(isNaN(imgsrc)) {
                 newnodeconf.image = {unselected: custom_image_base + imgsrc};
             } else {
                 newnodeconf.image = {unselected: '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", imgsrc)};

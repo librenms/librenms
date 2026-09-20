@@ -32,7 +32,7 @@ use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Validation\Rule;
-use LibreNMS\Data\Source\Snmp\NetSnmp;
+use LibreNMS\Data\Source\Snmp\NetSnmpOptions;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\SnmpOidOutput;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -70,7 +70,7 @@ class DebugSnmpwalkController extends Controller
      */
     private function buildCommandLine(Device $device): array
     {
-        return app(NetSnmp::class)->buildCli(
+        return resolve(NetSnmpOptions::class)->buildCli(
             'snmpwalk',
             $device->pollerTarget(),
             ['.'],

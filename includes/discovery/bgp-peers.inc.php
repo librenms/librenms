@@ -8,7 +8,8 @@ use LibreNMS\Util\IP;
 //
 // Load OS specific file
 //
-if (file_exists(base_path("includes/discovery/bgp-peers/{$device['os']}.inc.php"))) {
+$os_specific_bgp_discovery = file_exists(base_path("includes/discovery/bgp-peers/{$device['os']}.inc.php"));
+if ($os_specific_bgp_discovery) {
     include base_path("includes/discovery/bgp-peers/{$device['os']}.inc.php");
 }
 
@@ -180,17 +181,19 @@ foreach ($contexts as $context_name) {
                 }
             }
 
-            $af_query = 'SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=? AND context_name=?';
-            foreach (dbFetchRows($af_query, [$device['device_id'], $peer['ip'], $device['context_name']]) as $entry) {
-                $afi = $entry['afi'];
-                $safi = $entry['safi'];
-                if (! $af_list[$entry['bgpPeerIdentifier']][$afi][$safi]) {
-                    BgpPeerCbgp::where('device_id', $device['device_id'])
-                        ->where('bgpPeerIdentifier', $peer['ip'])
-                        ->where('context_name', $device['context_name'])
-                        ->where('afi', $afi)
-                        ->where('safi', $safi)
-                        ->delete();
+            if (! empty($af_list)) {
+                $af_query = 'SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=? AND context_name=?';
+                foreach (dbFetchRows($af_query, [$device['device_id'], $peer['ip'], $device['context_name']]) as $entry) {
+                    $afi = $entry['afi'];
+                    $safi = $entry['safi'];
+                    if (! isset($af_list[$entry['bgpPeerIdentifier']][$afi][$safi])) {
+                        BgpPeerCbgp::where('device_id', $device['device_id'])
+                            ->where('bgpPeerIdentifier', $peer['ip'])
+                            ->where('context_name', $device['context_name'])
+                            ->where('afi', $afi)
+                            ->where('safi', $safi)
+                            ->delete();
+                    }
                 }
             }
         }
@@ -200,19 +203,21 @@ foreach ($contexts as $context_name) {
         unset($j_peerIndexes);
     }
 
-    // clean up peers
-    $bgpQuery = BgpPeer::where('device_id', $device['device_id'])
-        ->where('context_name', $device['context_name']);
-    $cbgpQuery = BgpPeerCbgp::where('device_id', $device['device_id'])
-        ->where('context_name', $device['context_name']);
-    if (! empty($peerlist)) {
-        $bgpQuery->whereNotIn('bgpPeerIdentifier', array_column($peerlist, 'ip'));
-        $cbgpQuery->whereNotIn('bgpPeerIdentifier', array_column($peerlist, 'ip'));
-    }
-    $deleted = $bgpQuery->delete();
-    $cbgpQuery->delete();
+    // clean up peers, os specific modules track and remove their own
+    if (! $os_specific_bgp_discovery) {
+        $bgpQuery = BgpPeer::where('device_id', $device['device_id'])
+            ->where('context_name', $device['context_name']);
+        $cbgpQuery = BgpPeerCbgp::where('device_id', $device['device_id'])
+            ->where('context_name', $device['context_name']);
+        if (! empty($peerlist)) {
+            $bgpQuery->whereNotIn('bgpPeerIdentifier', array_column($peerlist, 'ip'));
+            $cbgpQuery->whereNotIn('bgpPeerIdentifier', array_column($peerlist, 'ip'));
+        }
+        $deleted = $bgpQuery->delete();
+        $cbgpQuery->delete();
 
-    echo str_repeat('-', $deleted);
+        echo str_repeat('-', $deleted);
+    }
     echo PHP_EOL;
 
     unset(

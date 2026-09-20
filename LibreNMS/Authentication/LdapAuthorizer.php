@@ -80,7 +80,8 @@ class LdapAuthorizer extends AuthorizerBase
         try {
             $connection = $this->getLdapConnection();
 
-            $filter = '(' . LibrenmsConfig::get('auth_ldap_prefix') . $username . ')';
+            $escaped_username = ldap_escape((string) $username, '', LDAP_ESCAPE_FILTER);
+            $filter = '(' . LibrenmsConfig::get('auth_ldap_prefix') . $escaped_username . ')';
             $search = ldap_search($connection, trim(LibrenmsConfig::get('auth_ldap_suffix'), ','), $filter);
             $entries = ldap_get_entries($connection, $search);
             if ($entries['count']) {
@@ -113,15 +114,18 @@ class LdapAuthorizer extends AuthorizerBase
             $group_names = array_keys($groups);
             $ldap_group_filter = '';
             foreach ($group_names as $group_name) {
-                $ldap_group_filter .= '(cn=' . trim((string) $group_name) . ')';
+                $escaped_gn = ldap_escape((string) $group_name, '', LDAP_ESCAPE_FILTER);
+                $ldap_group_filter .= '(cn=' . trim($escaped_gn) . ')';
             }
             if (count($group_names) > 1) {
                 $ldap_group_filter = "(|{$ldap_group_filter})";
             }
             if (LibrenmsConfig::get('auth_ldap_userdn') === true) {
-                $filter = "(&{$ldap_group_filter}(" . trim(LibrenmsConfig::get('auth_ldap_groupmemberattr', 'memberUid')) . '=' . $this->getFullDn($username) . '))';
+                $escaped_member = ldap_escape($this->getFullDn($username), '', LDAP_ESCAPE_FILTER);
+                $filter = "(&{$ldap_group_filter}(" . trim(LibrenmsConfig::get('auth_ldap_groupmemberattr', 'memberUid')) . '=' . $escaped_member . '))';
             } else {
-                $filter = "(&{$ldap_group_filter}(" . trim(LibrenmsConfig::get('auth_ldap_groupmemberattr', 'memberUid')) . '=' . $this->getMembername($username) . '))';
+                $escaped_member = ldap_escape($this->getMembername($username), '', LDAP_ESCAPE_FILTER);
+                $filter = "(&{$ldap_group_filter}(" . trim(LibrenmsConfig::get('auth_ldap_groupmemberattr', 'memberUid')) . '=' . $escaped_member . '))';
             }
             $search = ldap_search($connection, LibrenmsConfig::get('auth_ldap_groupbase'), $filter);
             $entries = ldap_get_entries($connection, $search);
@@ -159,7 +163,8 @@ class LdapAuthorizer extends AuthorizerBase
         try {
             $connection = $this->getLdapConnection();
 
-            $filter = '(' . LibrenmsConfig::get('auth_ldap_prefix') . $username . ')';
+            $escaped_username = ldap_escape((string) $username, '', LDAP_ESCAPE_FILTER);
+            $filter = '(' . LibrenmsConfig::get('auth_ldap_prefix') . $escaped_username . ')';
             $search = ldap_search($connection, trim(LibrenmsConfig::get('auth_ldap_suffix'), ','), $filter);
             $entries = ldap_get_entries($connection, $search);
 
@@ -179,7 +184,8 @@ class LdapAuthorizer extends AuthorizerBase
     {
         $connection = $this->getLdapConnection();
 
-        $filter = '(' . LibrenmsConfig::get('auth_ldap_prefix') . $this->userloginname . ')';
+        $escaped_login = ldap_escape((string) $this->userloginname, '', LDAP_ESCAPE_FILTER);
+        $filter = '(' . LibrenmsConfig::get('auth_ldap_prefix') . $escaped_login . ')';
         if (LibrenmsConfig::get('auth_ldap_userlist_filter') != null) {
             $filter = '(' . LibrenmsConfig::get('auth_ldap_userlist_filter') . ')';
         }
@@ -217,7 +223,8 @@ class LdapAuthorizer extends AuthorizerBase
         if ($type == 'puredn') {
             try {
                 $connection = $this->getLdapConnection();
-                $filter = '(' . LibrenmsConfig::get('auth_ldap_attr.uid') . '=' . $username . ')';
+                $escaped_username = ldap_escape((string) $username, '', LDAP_ESCAPE_FILTER);
+                $filter = '(' . LibrenmsConfig::get('auth_ldap_attr.uid') . '=' . $escaped_username . ')';
                 $search = ldap_search($connection, LibrenmsConfig::get('auth_ldap_groupbase'), $filter);
                 $entries = ldap_get_entries($connection, $search);
 

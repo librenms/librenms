@@ -290,8 +290,8 @@ nav:
       - Fetching SNMP Data: Developing/Using-SnmpQuery.md
       - Creating Documentation: Developing/Creating-Documentation.md
       - Component: Extensions/Component.md
-    - Support for a new OS:
-      - Intro: Developing/Support-New-OS.md
+    - Device OS Support:
+      - Overview: Developing/Support-New-OS.md
       - Initial Detection: Developing/os/Initial-Detection.md
       - Mem/CPU Information: Developing/os/Mem-CPU-Information.md
       - Health Information: Developing/os/Health-Information.md
