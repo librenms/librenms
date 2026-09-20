@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Port;
+use LibreNMS\Util\Url;
 
 $link_array = [
     'page' => 'device',
@@ -122,7 +123,7 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
         '<b>MAC:</b> ' . $mac;
     if (isset($port) && isset($mac) && $mac != '') {
         echo ' (' .
-               generate_device_link(['device_id' => $port->device_id]) .
+               Url::deviceLink($port->device) .
                ', ' .
                generate_port_link([
                    'label' => $port->label,

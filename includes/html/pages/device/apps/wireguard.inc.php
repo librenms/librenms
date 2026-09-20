@@ -4,6 +4,7 @@ use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\Ipv6Address;
 use App\Models\Port;
+use LibreNMS\Util\Url;
 
 $link_array = [
     'page' => 'device',
@@ -135,7 +136,7 @@ if (isset($vars['interface']) &&
     if (isset($peer['hostname'])) {
         $peer_dev = Device::firstWhere(['hostname' => $peer['hostname']]);
         if (isset($peer_dev)) {
-            echo generate_device_link(['device_id' => $peer_dev->device_id], $name) . "<br>\n";
+            echo Url::deviceLink($peer_dev, $name) . "<br>\n";
         } else {
             echo htmlspecialchars($peer['hostname']) . "<br>\n";
         }
@@ -168,7 +169,7 @@ if (isset($vars['interface']) &&
     }
     if (isset($ip_info)) {
         $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
-        echo $peer['endpoint_host'] . '(' . generate_device_link(['device_id' => $port->device_id]) . ', ' .
+        echo $peer['endpoint_host'] . '(' . Url::deviceLink($port->device) . ', ' .
             generate_port_link([
                 'label' => $port->label,
                 'port_id' => $port->port_id,
@@ -198,7 +199,7 @@ if (isset($vars['interface']) &&
             }
             if ($ip_found) {
                 $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
-                $ip_info_string = generate_device_link(['device_id' => $port->device_id], $allowed_ip) . '(' .
+                $ip_info_string = Url::deviceLink($port->device, $allowed_ip) . '(' .
                     generate_port_link([
                         'label' => $port->label,
                         'port_id' => $port->port_id,
@@ -262,7 +263,7 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
                 $peer_dev = Device::firstWhere(['hostname' => $peer['hostname']]);
                 if (isset($peer_dev)) {
                     $name_raw = true;
-                    $name = generate_device_link(['device_id' => $peer_dev->device_id], $name);
+                    $name = Url::deviceLink($peer_dev, $name);
                 }
             }
             $peer['pubkey'] ??= '*hidden*';
@@ -279,7 +280,7 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
                 if (isset($ip_info)) {
                     $endpoint_raw = true;
                     $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
-                    $peer['endpoint_host'] = $peer['endpoint_host'] . '(' . generate_device_link(['device_id' => $port->device_id]) . ', ' .
+                    $peer['endpoint_host'] = $peer['endpoint_host'] . '(' . Url::deviceLink($port->device) . ', ' .
                         generate_port_link([
                             'label' => $port->label,
                             'port_id' => $port->port_id,
@@ -310,7 +311,7 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
                     }
                     if ($ip_found) {
                         $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
-                        $ip_info_string = generate_device_link(['device_id' => $port->device_id], $allowed_ip) . '(' .
+                        $ip_info_string = Url::deviceLink($port->device, $allowed_ip) . '(' .
                             generate_port_link([
                                 'label' => $port->label,
                                 'port_id' => $port->port_id,
