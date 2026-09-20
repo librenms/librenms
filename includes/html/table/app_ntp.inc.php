@@ -1,6 +1,10 @@
 <?php
 
-$component = new LibreNMS\Component();
+use App\Facades\DeviceCache;
+use LibreNMS\Component;
+use LibreNMS\Util\Url;
+
+$component = new Component();
 $options = [];
 $options['filter']['ignore'] = ['=', 0];
 $options['type'] = 'ntp';
@@ -11,8 +15,8 @@ $last = $first + $vars['rowCount']; // Which record do we end on.
 $showAll = $vars['rowCount'] == -1; // Show all devices y/n
 $count = 0;
 // Loop through each device in the component array
-foreach ($components as $devid => $comp) {
-    $device = device_by_id_cache($devid);
+foreach ($components as $device_id => $comp) {
+    $device = DeviceCache::get($device_id);
 
     // Loop through each component
     foreach ($comp as $compid => $array) {
@@ -32,7 +36,7 @@ foreach ($components as $devid => $comp) {
         // Let's process some searching..
         if (($display === true) && ($vars['searchPhrase'] != '')) {
             $searchfound = false;
-            $searchdata = [$device['hostname'], $array['peer'], $array['stratum'], $array['error']];
+            $searchdata = [$device->hostname, $array['peer'], $array['stratum'], $array['error']];
             foreach ($searchdata as $value) {
                 if (strstr((string) $value, (string) $vars['searchPhrase'])) {
                     $searchfound = true;
@@ -50,10 +54,10 @@ foreach ($components as $devid => $comp) {
 
             // If this record is in the range we want.
             if ($showAll || (($count > $first) && ($count <= $last))) {
-                $device_link = generate_device_link($device, null, ['tab' => 'apps', 'app' => 'ntp']);
+                $device_link = Url::deviceLink($device, null, ['tab' => 'apps', 'app' => 'ntp']);
 
                 $graph_array = [];
-                $graph_array['device'] = $device['device_id'];
+                $graph_array['device'] = $device->device_id;
                 $graph_array['width'] = 80;
                 $graph_array['height'] = 20;
 

@@ -12,6 +12,9 @@
  * the source code distribution for details.
  */
 
+use App\Facades\DeviceCache;
+use LibreNMS\Util\Url;
+
 $device_id = $vars['device_id'];
 
 $sql = ' FROM `bgpPeers` AS `B` LEFT JOIN `devices` AS `D` ON `B`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=?';
@@ -52,7 +55,7 @@ $sql = "SELECT * $sql";
 foreach (dbFetchRows($sql, $param) as $routing) {
     $response[] = [
         'routing_id' => $routing['bgpPeer_id'],
-        'hostname' => generate_device_link($routing),
+        'hostname' => Url::deviceLink(DeviceCache::get($routing['device_id'])),
         'bgpPeerIdentifier' => $routing['bgpPeerIdentifier'],
         'bgpPeerRemoteAs' => $routing['bgpPeerRemoteAs'],
         'context_name' => $routing['context_name'],

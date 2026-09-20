@@ -1,5 +1,8 @@
 <?php
 
+use App\Facades\DeviceCache;
+use LibreNMS\Util\Url;
+
 $device_id = $vars['device_id'];
 
 $sql = ' FROM `mempools` AS `M` LEFT JOIN `devices` AS `D` ON `M`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=?';
@@ -42,7 +45,7 @@ foreach (dbFetchRows($sql, $param) as $drive) {
     $perc_warn = round($drive['mempool_perc_warn'], 0);
     $response[] = [
         'mempool_id' => $drive['mempool_id'],
-        'hostname' => generate_device_link($drive),
+        'hostname' => Url::deviceLink(DeviceCache::get($drive['device_id'])),
         'mempool_descr' => $drive['mempool_descr'],
         'mempool_perc' => $perc . '%',
         'mempool_perc_warn' => $perc_warn, ];

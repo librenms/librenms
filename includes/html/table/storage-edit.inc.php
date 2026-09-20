@@ -1,5 +1,9 @@
 <?php
 
+use App\Facades\DeviceCache;
+use LibreNMS\Util\Number;
+use LibreNMS\Util\Url;
+
 $device_id = $vars['device_id'];
 
 $sql = ' FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=?';
@@ -41,10 +45,10 @@ $sql = "SELECT * $sql";
 foreach (dbFetchRows($sql, $param) as $drive) {
     $perc = round($drive['storage_perc']);
     $perc_warn = round($drive['storage_perc_warn']);
-    $size = \LibreNMS\Util\Number::formatBi($drive['storage_size']);
+    $size = Number::formatBi($drive['storage_size']);
     $response[] = [
         'storage_id' => $drive['storage_id'],
-        'hostname' => generate_device_link($drive),
+        'hostname' => Url::deviceLink(DeviceCache::get($drive['device_id'])),
         'storage_descr' => $drive['storage_descr'],
         'storage_perc' => $perc . '%',
         'storage_perc_warn' => $perc_warn,

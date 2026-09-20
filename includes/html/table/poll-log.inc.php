@@ -1,9 +1,12 @@
 <?php
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
 
 $param = [];
 $sql = ' FROM `devices` AS D ';
@@ -66,7 +69,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
         $device['group_name'] = 'General';
     }
     $response[] = [
-        'hostname' => generate_device_link($device, null, ['tab' => 'graphs', 'group' => 'poller']),
+        'hostname' => Url::deviceLink(DeviceCache::get($device['device_id']), null, ['tab' => 'graphs', 'group' => 'poller']),
         'last_polled' => Time::format($device['last_polled'], 'compact'),
         'poller_group' => $device['group_name'],
         'location' => $device['location'],

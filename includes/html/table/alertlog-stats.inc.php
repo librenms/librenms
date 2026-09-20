@@ -14,7 +14,9 @@
  * @author     LibreNMS Contributors
 */
 
+use App\Facades\DeviceCache;
 use App\Models\Alert;
+use LibreNMS\Util\Url;
 
 $where = 1;
 
@@ -72,12 +74,10 @@ $sql = "SELECT COUNT(*), D.device_id, R.name $sql";
 
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alertlog) {
-    $dev = device_by_id_cache($alertlog['device_id']);
-
     $response[] = [
         'id' => $rulei++,
         'count' => $alertlog['COUNT(*)'],
-        'hostname' => '<div class="incident">' . generate_device_link($dev),
+        'hostname' => '<div class="incident">' . Url::deviceLink(DeviceCache::get($alertlog['device_id'])),
         'alert_rule' => $alertlog['name'],
     ];
 }//end foreach
