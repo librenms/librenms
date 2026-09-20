@@ -1,6 +1,8 @@
 <?php
 
-// Eaton MGE UPS - battery runtime remaining (seconds -> minutes, divisor 60)
+// Eaton MGE UPS battery runtime remaining.
+// OID per Eaton MG-SNMP-UPS-MIB (upsmgBatteryRemainingTime, .1.3.6.1.4.1.705.1.5.1);
+// value is in seconds, divided by 60 to report minutes.
 $runtime_oid = '.1.3.6.1.4.1.705.1.5.1.0';
 $runtime = SnmpQuery::get($runtime_oid)->value();
 if (is_numeric($runtime)) {
