@@ -1,3 +1,5 @@
+import { createPopper } from '@popperjs/core';
+
 // Alpine.js Popup Component
 export default function popup(url = '', options = {}) {
     // Extract parameters from options
@@ -237,51 +239,24 @@ export default function popup(url = '', options = {}) {
         positionPopup() {
             if (!this.popupElement) return;
 
-            // Use Popper.js if available
-            if (typeof Popper !== 'undefined' && Popper.createPopper) {
-                this.popperInstance = Popper.createPopper(this.$el, this.popupElement, {
-                    placement: 'top',
-                    modifiers: [
-                        {
-                            name: 'offset',
-                            options: { offset: [0, 8] }
-                        },
-                        {
-                            name: 'preventOverflow',
-                            options: { padding: 8 }
-                        },
-                        {
-                            name: 'flip',
-                            options: { fallbackPlacements: ['bottom', 'right', 'left'] }
-                        }
-                    ]
-                });
-            } else {
-                // Fallback manual positioning
-                this.manualPosition();
-            }
-        },
-
-        manualPosition() {
-            const targetRect = this.$el.getBoundingClientRect();
-            const popupRect = this.popupElement.getBoundingClientRect();
-
-            let top = targetRect.top - popupRect.height - 8;
-            let left = targetRect.left + (targetRect.width / 2) - (popupRect.width / 2);
-
-            // Adjust for viewport boundaries
-            if (top < 8) {
-                top = targetRect.bottom + 8;
-            }
-            if (left < 8) {
-                left = 8;
-            }
-            if (left + popupRect.width > window.innerWidth - 8) {
-                left = window.innerWidth - popupRect.width - 8;
-            }
-
-            this.popupElement.style.top = `${top}px`;
-            this.popupElement.style.left = `${left}px`;
+            this.popperInstance = createPopper(this.$el, this.popupElement, {
+                placement: 'top',
+                strategy: 'fixed',
+                modifiers: [
+                    {
+                        name: 'offset',
+                        options: { offset: [0, 8] }
+                    },
+                    {
+                        name: 'preventOverflow',
+                        options: { padding: 8 }
+                    },
+                    {
+                        name: 'flip',
+                        options: { fallbackPlacements: ['bottom', 'right', 'left'] }
+                    }
+                ]
+            });
         },
 
         // Public methods

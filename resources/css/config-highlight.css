@@ -1,4 +1,5 @@
 .config-highlight {
+    position: relative;
     line-height: 1.5;
     tab-size: 4;
 }
@@ -9,12 +10,42 @@
     white-space: inherit;
 }
 
+.config-highlight.line-numbers {
+    position: relative;
+    counter-reset: linenumber;
+}
+
+.config-highlight.line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
 .config-highlight .line-numbers-rows {
-    border-right-color: #d1d5db;
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em;
+    letter-spacing: -1px;
+    border-right: 1px solid #d1d5db;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.config-highlight .line-numbers-rows > span {
+    display: block;
+    counter-increment: linenumber;
 }
 
 .config-highlight .line-numbers-rows > span::before {
+    content: counter(linenumber);
     color: #9ca3af;
+    display: block;
+    padding-right: 0.8em;
+    text-align: right;
 }
 
 .config-highlight .token.comment {

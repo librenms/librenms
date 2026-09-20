@@ -4,7 +4,7 @@ use App\Facades\DeviceCache;
 use Illuminate\Support\Facades\Gate;
 
 if (isset($_POST['editing'])) {
-    $device=DeviceCache::getPrimary();
+    $device = DeviceCache::getPrimary();
     if (Gate::allows('update', $device)) {
         $ipmi_hostname = $_POST['ipmi_hostname'];
         $ipmi_port = (int) $_POST['ipmi_port'];
@@ -70,7 +70,6 @@ if (isset($update_message)) {
         print_error($update_message);
     }
 }
-
 
 ?>
 

@@ -93,7 +93,7 @@ class AlertRule extends BaseModel
      * @param  Device  $device
      * @return Builder<AlertRule>
      */
-    public function scopeForDevice(Builder $query, Device $device): Builder
+    protected function scopeForDevice(Builder $query, Device $device): Builder
     {
         return $query->where(function (Builder $query) use ($device): void {
             $query->where(function (Builder $query): void {

@@ -9,10 +9,10 @@ if ($service['service_param']) {
 
 $check_cmd = \App\Facades\LibrenmsConfig::get('nagios_plugins') . '/check_load ' . $params;
 
-if (isset($rrd_filename)) {
-    // Check DS is a json array of the graphs that are available
-    $check_ds = '{"load":""}';
+// Check DS is a json array of the graphs that are available
+$check_ds = '{"load":""}';
 
+if (isset($rrd_filename)) {
     // Build the graph data
     $check_graph = [];
     $check_graph['load'][] = ' DEF:DS0=' . $rrd_filename . ':load1:AVERAGE ';

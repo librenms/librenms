@@ -13,7 +13,7 @@ use App\Models\Device;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
@@ -287,7 +287,7 @@ class DevCollectSnmprec extends LnmsCommand
     {
         $result = [];
 
-        foreach (explode(PHP_EOL, $snmpData->getRawWithoutBadLines()) as $line) {
+        foreach (explode(PHP_EOL, $snmpData->raw()) as $line) {
             if ($line === '') {
                 continue;
             }

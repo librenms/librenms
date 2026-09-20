@@ -25,7 +25,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/inventory/localhost?entPhysicalContainedIn=65536
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/inventory/localhost?entPhysicalContainedIn=65536
 ```
 
 Output:
@@ -74,7 +74,7 @@ Route: `/api/v0/inventory/:hostname/all`
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/inventory/localhost/all?entPhysicalContainedIn=65536
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/inventory/localhost/all?entPhysicalContainedIn=65536
 ```
 
 Output:

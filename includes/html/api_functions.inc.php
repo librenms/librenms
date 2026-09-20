@@ -64,6 +64,8 @@ use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
+use LibreNMS\Syslog\Entry;
+use LibreNMS\Syslog\Processor;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -1928,6 +1930,10 @@ function add_edit_rule(Illuminate\Http\Request $request)
 
     if (array_key_exists('invert_map', $data)) {
         $saveData['invert_map'] = filter_var($data['invert_map'], FILTER_VALIDATE_BOOLEAN);
+    }
+
+    if (array_key_exists('proc', $data)) {
+        $saveData['proc'] = strip_tags((string) $data['proc']);
     }
 
     if (is_numeric($rule_id)) {
@@ -3803,7 +3809,7 @@ function edit_location(Illuminate\Http\Request $request)
         return api_error(400, 'Failed to update location');
     }
 
-    $location->fill($request->json());
+    $location->fill($request->all());
 
     if ($location->save()) {
         return api_success_noresult(201, 'Location updated successfully');
@@ -3998,9 +4004,21 @@ function post_syslogsink(Illuminate\Http\Request $request)
     }
 
     $logs = array_is_list($json) ? $json : [$json];
+    $processor = new Processor();
 
     foreach ($logs as $entry) {
-        process_syslog($entry, 1);
+        $entryObject = $processor->parse(new Entry(
+            host: $entry['host'] ?? '',
+            facility: $entry['facility'] ?? '',
+            priority: $entry['priority'] ?? '',
+            level: $entry['level'] ?? '',
+            tag: $entry['tag'] ?? '',
+            timestamp: $entry['timestamp'] ?? '',
+            msg: $entry['msg'] ?? '',
+            program: $entry['program'] ?? '',
+            device_id: $entry['device_id'] ?? null,
+        ));
+        $processor->storeEntry($entryObject);
     }
 
     return api_success_noresult(200, 'Syslog received: ' . count($logs));
