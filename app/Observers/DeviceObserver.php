@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Actions\Device\UpdateDeviceOutage;
 use App\ApiClients\Oxidized;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
@@ -47,6 +48,8 @@ class DeviceObserver
             $polled_by = LibrenmsConfig::get('distributed_poller') ? (' by ' . \config('librenms.node_id')) : '';
 
             Eventlog::log(sprintf('Device status changed to %s from %s check%s.', ucfirst($type), $reason, $polled_by), $device, $type);
+
+            app(UpdateDeviceOutage::class)->execute($device);
         }
 
         // key attribute changes

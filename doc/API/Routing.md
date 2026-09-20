@@ -21,16 +21,16 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?hostname=host.example.com
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?asn=1234
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?remote_asn=1234
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?local_address=1.1.1.1&remote_address=2.2.2.2
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_descr=UPSTREAM
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_state=established
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_adminstate=start
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_family=6
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_state=idle&bgp_descr=CORE&bgp_family=4
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bgp
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bgp?hostname=host.example.com
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bgp?asn=1234
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bgp?remote_asn=1234
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bgp?local_address=1.1.1.1&remote_address=2.2.2.2
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_descr=UPSTREAM
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_state=established
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_adminstate=start
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_family=6
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bgp?bgp_state=idle&bgp_descr=CORE&bgp_family=4
 ```
 
 Output:
@@ -83,7 +83,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/bgp/4
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/bgp/4
 ```
 
 Output:
@@ -130,7 +130,7 @@ Input:
 Example:
 
 ```curl
-curl -v -H 'X-Auth-Token: YOURAPITOKENHERE' --data '{"bgp_descr": "Your description here"}' https://foo.example/api/v0/bgp/4
+curl -v -H 'Authorization: Bearer YOURAPITOKENHERE' --data '{"bgp_descr": "Your description here"}' https://foo.example/api/v0/bgp/4
 ```
 
 Output:
@@ -155,8 +155,8 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/bgp/cbgp
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/bgp/cbgp?hostname=host.example.com
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/routing/bgp/cbgp
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/routing/bgp/cbgp?hostname=host.example.com
 ```
 
 Output:
@@ -209,9 +209,9 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/addresses
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/addresses/ipv4
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/addresses/ipv6
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/addresses
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/addresses/ipv4
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/addresses/ipv6
 ```
 
 Output:
@@ -250,7 +250,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/networks/55/ip
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/networks/55/ip
 ```
 
 Output:
@@ -285,9 +285,9 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/networks
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/networks/ipv4
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/networks/ipv6
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/networks
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/networks/ipv4
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/resources/ip/networks/ipv6
 ```
 
 Output:
@@ -322,7 +322,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/ipsec/data/localhost
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/routing/ipsec/data/localhost
 ```
 
 Output:
@@ -361,8 +361,8 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ospf
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ospf?hostname=host.example.com
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ospf
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ospf?hostname=host.example.com
 ```
 
 Output:
@@ -402,7 +402,7 @@ Route: `/api/v0/ospf_ports`
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ospf_ports
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ospf_ports
 ```
 
 Output:
@@ -460,8 +460,8 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ospfv3
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ospfv3?hostname=host.example.com
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ospfv3
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ospfv3?hostname=host.example.com
 ```
 
 Output:
@@ -507,8 +507,8 @@ Route: `/api/v0/ospfv3_ports`
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ospfv3_ports
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/ospfv3_ports?hostname=host.example.com
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ospfv3_ports
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/ospfv3_ports?hostname=host.example.com
 ```
 
 Output:
@@ -571,9 +571,9 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/vrf
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/vrf?hostname=host.example.com
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/vrf?vrfname=Mgmt-vrf
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/routing/vrf
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/routing/vrf?hostname=host.example.com
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/routing/vrf?vrfname=Mgmt-vrf
 ```
 
 Output:
@@ -609,7 +609,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/vrf/2
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/routing/vrf/2
 ```
 
 Output:
@@ -644,8 +644,8 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/mpls/services
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/mpls/services?hostname=host.example.com
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/routing/mpls/services
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/routing/mpls/services?hostname=host.example.com
 
 ```
 
@@ -696,8 +696,8 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/mpls/saps
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/routing/mpls/saps?hostname=host.example.com
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/routing/mpls/saps
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/routing/mpls/saps?hostname=host.example.com
 ```
 
 Output:

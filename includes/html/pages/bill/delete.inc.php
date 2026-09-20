@@ -1,5 +1,6 @@
-<form name="form1" action="" method="post" class="form-horizontal">
+<form name="form1" action="<?php echo route('bill.destroy', $bill_id); ?>" method="post" class="form-horizontal">
     <?php echo csrf_field() ?>
+    <?php echo method_field('DELETE') ?>
   <script type="text/javascript">
     function showWarning(checked) {
       $('#warning').toggle();
@@ -10,7 +11,6 @@
       }
     }
   </script>
-  <input type="hidden" name="action" value="delete_bill">
   
   <div class="row">
     <div class="col-md-8 col-md-push-2">
