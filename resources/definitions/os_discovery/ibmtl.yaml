@@ -43,7 +43,7 @@ modules:
                     oid: IBM-AUTOMATION-QUERY-MIB::frameconfigTable
                     value: IBM-AUTOMATION-QUERY-MIB::chassis-PS1Status
                     num_oid: '.1.3.6.1.4.1.2.6.257.1.3.2.1.3.{{ $index }}'
-                    index: 'ps1.{{ $index }}'
+                    index: 'chassis-PS1Status.{{ $index }}'
                     descr: 'Frame {{ $index }} PSU 1'
                     state_name: chassis-PS1Status
                     states:
@@ -54,7 +54,7 @@ modules:
                     oid: IBM-AUTOMATION-QUERY-MIB::frameconfigTable
                     value: IBM-AUTOMATION-QUERY-MIB::chassis-PS2Status
                     num_oid: '.1.3.6.1.4.1.2.6.257.1.3.2.1.4.{{ $index }}'
-                    index: 'ps2.{{ $index }}'
+                    index: 'chassis-PS2Status.{{ $index }}'
                     descr: 'Frame {{ $index }} PSU 2'
                     state_name: chassis-PS2Status
                     states:
