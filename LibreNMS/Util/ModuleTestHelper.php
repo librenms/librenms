@@ -272,6 +272,7 @@ class ModuleTestHelper
             $method = new DevicePollingMethod([
                 'method_type' => PollingMethodType::Snmp,
                 'settings' => ['transport' => 'udp', 'port' => $snmpSimPort],
+                'affects_availability' => true,
                 'last_check_successful' => true,
             ]);
             $secret = Secret::firstOrNew([

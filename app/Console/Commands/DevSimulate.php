@@ -112,6 +112,7 @@ class DevSimulate extends LnmsCommand
                 'device_id' => $device->device_id,
                 'method_type' => PollingMethodType::Snmp,
                 'settings' => ['transport' => 'udp', 'port' => $this->snmpsim->port],
+                'affects_availability' => true,
             ]);
             $device->setRelation('pollingMethods', collect([$method]));
         } else {
