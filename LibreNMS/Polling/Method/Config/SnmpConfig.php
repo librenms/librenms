@@ -160,9 +160,7 @@ final class SnmpConfig extends PollingMethodConfig
     }
 
     /**
-     * Create from legacy fields.
-     *
-     * @deprecated
+     * Create from legacy fields. Emergency fallback, do not use.
      */
     public static function fromLegacyDeviceFields(Device $device): self
     {
