@@ -52,7 +52,7 @@ class SelectSecretControllerTest extends TestCase
         $response->assertOk();
         $response->assertJsonStructure(['results' => [['id', 'text']], 'pagination' => ['more']]);
 
-        $results = collect($response->json('results'));
+        $results = $response->collect('results');
         $this->assertTrue($results->contains('id', $snmpSecret->id));
         $this->assertTrue($results->contains('id', $ipmiSecret->id));
     }
@@ -77,7 +77,7 @@ class SelectSecretControllerTest extends TestCase
         $response = $this->actingAs($admin)->getJson(route('ajax.select.secret', ['secret_type' => 'snmp']));
 
         $response->assertOk();
-        $results = collect($response->json('results'));
+        $results = $response->collect('results');
         $this->assertTrue($results->contains('id', $snmpSecret->id));
         $this->assertFalse($results->contains('id', $ipmiSecret->id));
     }
@@ -102,7 +102,7 @@ class SelectSecretControllerTest extends TestCase
         $response = $this->actingAs($admin)->getJson(route('ajax.select.secret', ['type' => 'ipmi']));
 
         $response->assertOk();
-        $results = collect($response->json('results'));
+        $results = $response->collect('results');
         $this->assertTrue($results->contains('id', $ipmiSecret->id));
         $this->assertFalse($results->contains('id', $snmpSecret->id));
     }
@@ -127,7 +127,7 @@ class SelectSecretControllerTest extends TestCase
         $response = $this->actingAs($admin)->getJson(route('ajax.select.secret', ['term' => 'Unique Production Router']));
 
         $response->assertOk();
-        $results = collect($response->json('results'));
+        $results = $response->collect('results');
         $this->assertTrue($results->contains('id', $prodSecret->id));
         $this->assertFalse($results->contains('id', $stageSecret->id));
     }
