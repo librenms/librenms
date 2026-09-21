@@ -85,7 +85,7 @@ class RoutingTabs extends BladeComponent
     public static function getTabLabels(): array
     {
         return [
-            'addr' => 'Addresses',
+            'addr' => __('Addresses'),
             'ipsec-tunnels' => __('IPSEC Tunnels'),
             'bgp' => __('BGP'),
             'cef' => __('CEF'),
