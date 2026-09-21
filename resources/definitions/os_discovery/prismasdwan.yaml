@@ -1,0 +1,13 @@
+modules:
+    os:
+        sysDescr_regex: '/^ion (?<hardware>\S+) \( (?<version>[^\s)]+) \)/'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: CGX-ENV-MIB::cgxEnvTempTable
+                    value: CGX-ENV-MIB::cgxEnvTempReading
+                    num_oid: '.1.3.6.1.4.1.50114.10.3.10.31.1.4.{{ $index }}'
+                    descr: '{{ CGX-ENV-MIB::cgxEnvTempName }}'
+                    index: 'cgxEnvTempReading.{{ $index }}'
+                    divisor: 1000
