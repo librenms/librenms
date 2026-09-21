@@ -251,7 +251,7 @@ class AddDeviceControllerTest extends TestCase
         $capturedForce = null;
         $mock = Mockery::mock('overload:App\Actions\Device\ValidateDeviceAndCreate');
         $mock->shouldReceive('__construct')
-            ->andReturnUsing(function ($device, $force) use (&$capturedForce): void {
+            ->andReturnUsing(function ($device, $methods, $force) use (&$capturedForce): void {
                 $capturedForce = $force;
             });
         $mock->shouldReceive('execute')->once()->andReturn(true);
