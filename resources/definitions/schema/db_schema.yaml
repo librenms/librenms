@@ -2227,6 +2227,8 @@ secrets:
     - { Field: data, Type: text, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    secrets_description_unique: { Name: secrets_description_unique, Columns: [description], Unique: true, Type: BTREE }
+    secrets_secret_type_index: { Name: secrets_secret_type_index, Columns: [secret_type], Unique: false, Type: BTREE }
 sensors:
   Columns:
     - { Field: sensor_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
