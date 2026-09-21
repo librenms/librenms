@@ -384,6 +384,14 @@ class Port extends DeviceRelatedModel
     }
 
     /**
+     * Custom filter for Hostname to also include sysname and displayname.
+     */
+    public function filterDeviceHostname(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyFilterSearch(['device.hostname', 'device.sysName', 'device.display'], $query, $value, $config);
+    }
+
+    /**
      * Custom filter for ifDuplex to handle "unknown" as both 'unknown' and NULL.
      */
     public function filterIfDuplex(Builder $query, mixed $value, array $config): void

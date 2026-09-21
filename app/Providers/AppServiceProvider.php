@@ -3,17 +3,18 @@
 namespace App\Providers;
 
 use App\Facades\LibrenmsConfig;
-use App\Guards\ApiTokenGuard;
 use App\Models\Sensor;
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Sanctum\Sanctum;
 use LibreNMS\Cache\PermissionsCache;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
@@ -53,6 +54,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('sensor-discovery', fn (Application $app) => new \App\Discovery\Sensor($app->make('device-cache')->getPrimary()));
+
+        $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpBackendInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
+        $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
+        $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpQueryInterface::class, \LibreNMS\Data\Source\Snmp\SnmpQuery::class);
     }
 
     /**
@@ -208,7 +213,7 @@ class AppServiceProvider extends ServiceProvider
                 return true;
             }
 
-            if (is_string($value) && preg_match('/^[+-]?\d+[hdmwy]$/', $value)) {
+            if (is_string($value) && preg_match('/^[+-]?\d+(mo|[smhdwy])$/', $value)) {
                 return true;
             }
 
@@ -222,13 +227,23 @@ class AppServiceProvider extends ServiceProvider
 
         Auth::provider('legacy', fn ($app, array $config) => new LegacyUserProvider());
 
-        Auth::provider('token_provider', fn ($app, array $config) => new TokenUserProvider());
+        Sanctum::getAccessTokenFromRequestUsing(function (Request $request) {
+            if ($request->is('api/v0*')) {
+                return $request->header('X-Auth-Token')
+                    ?? $request->bearerToken()
+                    ?? $request->query('api_token')
+                    ?? $request->input('api_token');
+            }
 
-        Auth::extend('token_driver', function ($app, $name, array $config) {
-            $userProvider = $app->make(TokenUserProvider::class);
-            $request = $app->make('request');
+            return $request->bearerToken();
+        });
 
-            return new ApiTokenGuard($userProvider, $request);
+        Sanctum::authenticateAccessTokensUsing(function ($accessToken, $isValid) {
+            if (! $isValid) {
+                return false;
+            }
+
+            return (bool) ($accessToken->tokenable->enabled ?? false);
         });
 
         Gate::define('admin', fn (User $user) => $user->hasRole('admin'));

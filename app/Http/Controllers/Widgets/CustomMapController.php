@@ -55,7 +55,10 @@ class CustomMapController extends WidgetController
         }
         $data['base_url'] = LibrenmsConfig::get('base_url');
         $data['background_config'] = $data['map']->getBackgroundConfig();
+        $data['legend'] = $data['map']->getLegendConfig();
         $data['map_conf'] = $data['map']->options;
+        $data['map_conf']['width'] = $data['map']->width;
+        $data['map_conf']['height'] = $data['map']->height;
 
         $scalex = (float) $request->dimensions['x'] / (float) $data['map']->width;
         $scaley = (float) $request->dimensions['y'] / (float) $data['map']->height;

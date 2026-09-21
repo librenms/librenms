@@ -74,6 +74,7 @@ class StringHelpers
             'sdfsinfo' => 'SDFS info',
             'smart' => 'SMART',
             'ss' => 'Socket Statistics',
+            'syslog-ng' => 'Syslog-NG',
             'ups-apcups' => 'UPS apcups',
             'ups-nut' => 'UPS nut',
             'zfs' => 'ZFS',

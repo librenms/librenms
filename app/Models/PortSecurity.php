@@ -160,4 +160,12 @@ class PortSecurity extends DeviceRelatedModel implements Keyable
     {
         $this->applyFilterSearch(['port.ifName', 'port.ifDescr', 'port.ifAlias'], $query, $value, $config);
     }
+
+    /**
+     * Custom filter for Hostname to also include sysname and displayname.
+     */
+    public function filterDeviceHostname(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyFilterSearch(['device.hostname', 'device.sysName', 'device.display'], $query, $value, $config);
+    }
 }

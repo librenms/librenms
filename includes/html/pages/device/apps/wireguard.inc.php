@@ -27,18 +27,25 @@ ksort($interface_client_map);
 
 print_optionbar_start();
 
-$label =
+$label = 'All Interfaces';
+$link = generate_link($label, $link_array);
+
+$link =
     (! isset($vars['wg_page']) && ! isset($vars['interface']))
-            ? '<span class="pagemenu-selected">All Interfaces</span>'
-            : 'All Interfaces';
-echo generate_link($label, $link_array);
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+echo $link;
+
 if (count($returned_data) > 0) {
     echo ' | ';
-    $label =
+    $label = 'Details';
+    $link = generate_link($label, $link_array, ['wg_page' => 'details']);
+
+    $link =
         $vars['wg_page'] == 'details'
-        ? '<span class="pagemenu-selected">Details</span>'
-        : 'Details';
-    echo generate_link($label, $link_array, ['wg_page' => 'details']);
+        ? '<span class="pagemenu-selected">' . $link . '</span>'
+        : $link;
+    echo $link;
 }
 echo ' | Interfaces: ';
 
@@ -46,30 +53,39 @@ echo ' | Interfaces: ';
 $i = 0;
 foreach ($interface_client_map as $interface => $client_list) {
     $interface = htmlspecialchars((string) $interface);
+    $label = $interface;
+    $link = generate_link($label, $link_array, ['interface' => $interface]);
 
-    $label =
+    $link =
         ($vars['interface'] == $interface && ! isset($vars['wg_page']))
-            ? '<span class="pagemenu-selected">' . $interface . '</span>'
-            : $interface;
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
 
-    echo generate_link($label, $link_array, ['interface' => $interface]);
+    echo $link;
 
     echo '(';
 
-    $label =
-        ($vars['interface'] == $interface && $vars['wg_page'] == 'peer_bw')
-            ? '<span class="pagemenu-selected">' . 'BW' . '</span>'
-            : 'BW';
+    $label = 'BW';
+    $link = generate_link($label, $link_array, ['interface' => $interface, 'wg_page' => 'peer_bw']);
 
-    echo generate_link($label, $link_array, ['interface' => $interface, 'wg_page' => 'peer_bw']);
+    $link =
+        ($vars['interface'] == $interface && $vars['wg_page'] == 'peer_bw')
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+
+    echo $link;
 
     echo ', ';
 
-    $label =
+    $label = 'Last';
+    $link = generate_link($label, $link_array, ['interface' => $interface, 'wg_page' => 'peer_last']);
+
+    $link =
         ($vars['interface'] == $interface && $vars['wg_page'] == 'peer_last')
-            ? '<span class="pagemenu-selected">' . 'Last' . '</span>'
-            : 'Last';
-    echo generate_link($label, $link_array, ['interface' => $interface, 'wg_page' => 'peer_last']);
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+
+    echo $link;
 
     echo ')';
 
@@ -89,11 +105,15 @@ if (isset($vars['interface']) && isset($interface_client_map[$vars['interface']]
     foreach ($interface_client_map[$vars['interface']] as $peer) {
         $peer = htmlspecialchars((string) $peer);
 
-        $label =
+        $label = $peer;
+        $link = generate_link($label, $link_array, ['interface' => $interface, 'client' => $peer]);
+
+        $link =
             $vars['client'] == $peer
-            ? '<span class="pagemenu-selected">' . $peer . '</span>'
-            : $peer;
-        echo generate_link($label, $link_array, ['interface' => $interface, 'client' => $peer]);
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+
+        echo $link;
 
         if ($i < count(array_keys($interface_client_map[$vars['interface']])) - 1) {
             echo ', ';

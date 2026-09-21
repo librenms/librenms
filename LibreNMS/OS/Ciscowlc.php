@@ -35,6 +35,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Cisco;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Mac;
 use SnmpQuery;
 
 class Ciscowlc extends Cisco implements
@@ -87,7 +88,7 @@ class Ciscowlc extends Cisco implements
                     'name' => $apNames[$mac]['AIRESPACE-WIRELESS-MIB::bsnAPName'] ?? '',
                     'radio_number' => $slot,
                     'type' => $value['AIRESPACE-WIRELESS-MIB::bsnAPIfType'] ?? '',
-                    'mac_addr' => $mac,
+                    'mac_addr' => Mac::parse($mac)->readable(),
                     'channel' => $channel,
                     'txpow' => $value['AIRESPACE-WIRELESS-MIB::bsnAPIfPhyTxPowerLevel'] ?? 0,
                     'radioutil' => $value['AIRESPACE-WIRELESS-MIB::bsnAPIfLoadChannelUtilization'] ?? 0,

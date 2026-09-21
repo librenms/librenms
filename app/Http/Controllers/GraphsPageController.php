@@ -173,6 +173,10 @@ class GraphsPageController extends Controller
      */
     private function buildSubtitle(string $type, string $subtype, GraphsPageRequest $request): string
     {
+        if ($request->subtitle) {
+            return $request->subtitle;
+        }
+
         if (LibrenmsConfig::has("graph_types.$type.$subtype.descr")) {
             return ' :: ' . LibrenmsConfig::get("graph_types.$type.$subtype.descr");
         }

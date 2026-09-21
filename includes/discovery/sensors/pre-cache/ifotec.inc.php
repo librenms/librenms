@@ -39,13 +39,8 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
         ];
 
         // .ifoTemperatureTable.ifoTemperatureEntry.<ifoSysProductIndex>
-        $data = snmp_walk($device, 'ifoTemperatureEntry', '-OQn', 'IFOTEC-SMI');
-        foreach (explode(PHP_EOL, (string) $data) as $line) {
-            if (! Str::contains($line, ' = ')) {
-                continue;
-            }
-            [$oid, $value] = explode(' = ', $line);
-
+        $data = SnmpQuery::mibs(['IFOTEC-SMI'])->numeric()->walk('ifoTemperatureEntry')->values();
+        foreach ($data as $oid => $value) {
             $processed = false;
             foreach ($virtual_tables as $vt_name => $vt_regex) {
                 if (preg_match($vt_regex, $oid, $matches)) {

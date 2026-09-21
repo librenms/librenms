@@ -181,16 +181,6 @@ alert_transport_map:
     - { Field: target_type, Type: varchar(16), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-api_tokens:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: token_hash, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: description, Type: varchar(100), 'Null': false, Extra: '' }
-    - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    api_tokens_token_hash_unique: { Name: api_tokens_token_hash_unique, Columns: [token_hash], Unique: true, Type: BTREE }
 applications:
   Columns:
     - { Field: app_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -259,7 +249,7 @@ bgpPeers:
     - { Field: bgpPeerOutTotalMessages, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: bgpPeerFsmEstablishedTime, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: bgpPeerInUpdateElapsedTime, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '', Default: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [bgpPeer_id], Unique: true, Type: BTREE }
     bgppeers_device_id_context_name_index: { Name: bgppeers_device_id_context_name_index, Columns: [device_id, context_name], Unique: false, Type: BTREE }
@@ -287,7 +277,7 @@ bgpPeers_cbgp:
     - { Field: SuppressedPrefixes_prev, Type: 'bigint unsigned', 'Null': false, Extra: '' }
     - { Field: WithdrawnPrefixes_delta, Type: bigint, 'Null': false, Extra: '' }
     - { Field: WithdrawnPrefixes_prev, Type: 'bigint unsigned', 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '', Default: '' }
   Indexes:
     bgppeers_cbgp_device_id_bgppeeridentifier_afi_safi_unique: { Name: bgppeers_cbgp_device_id_bgppeeridentifier_afi_safi_unique, Columns: [device_id, bgpPeerIdentifier, afi, safi], Unique: true, Type: BTREE }
     bgppeers_cbgp_device_id_bgppeeridentifier_context_name_index: { Name: bgppeers_cbgp_device_id_bgppeeridentifier_context_name_index, Columns: [device_id, bgpPeerIdentifier, context_name], Unique: false, Type: BTREE }
@@ -811,9 +801,9 @@ entPhysical:
     - { Field: entPhysicalDescr, Type: text, 'Null': true, Extra: '' }
     - { Field: entPhysicalClass, Type: text, 'Null': true, Extra: '' }
     - { Field: entPhysicalName, Type: text, 'Null': true, Extra: '' }
-    - { Field: entPhysicalHardwareRev, Type: varchar(96), 'Null': true, Extra: '' }
-    - { Field: entPhysicalFirmwareRev, Type: varchar(96), 'Null': true, Extra: '' }
-    - { Field: entPhysicalSoftwareRev, Type: varchar(96), 'Null': true, Extra: '' }
+    - { Field: entPhysicalHardwareRev, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: entPhysicalFirmwareRev, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: entPhysicalSoftwareRev, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: entPhysicalAlias, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: entPhysicalAssetID, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: entPhysicalIsFRU, Type: varchar(8), 'Null': true, Extra: '' }
@@ -1682,6 +1672,7 @@ pollers:
     - { Field: last_polled, Type: datetime, 'Null': false, Extra: '' }
     - { Field: devices, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: time_taken, Type: double, 'Null': false, Extra: '' }
+    - { Field: poller_details, Type: longtext, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     pollers_poller_name_unique: { Name: pollers_poller_name_unique, Columns: [poller_name], Unique: true, Type: BTREE }
@@ -1691,6 +1682,7 @@ poller_cluster:
     - { Field: node_id, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: poller_name, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: poller_version, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: poller_details, Type: longtext, 'Null': true, Extra: '' }
     - { Field: poller_groups, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
     - { Field: last_report, Type: datetime, 'Null': false, Extra: '' }
     - { Field: master, Type: tinyint, 'Null': false, Extra: '' }
