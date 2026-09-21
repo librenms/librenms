@@ -6975,7 +6975,7 @@
             "units": "Seconds"
         },
         "service_billing_calculate_frequency": {
-            "default": 60,
+            "default": 3600,
             "group": "poller",
             "section": "dispatcherservice",
             "order": 17,
