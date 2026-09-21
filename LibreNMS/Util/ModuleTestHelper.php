@@ -32,6 +32,7 @@ use App\Jobs\DiscoverDevice;
 use App\Jobs\PollDevice;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use App\Models\Secret;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -268,21 +269,20 @@ class ModuleTestHelper
                 'hostname' => $snmpSimIp,
                 'disabled' => 1, // disable to block normal pollers
             ]);
-            (new ValidateDeviceAndCreate($new_device, force: true))->execute();
-            $device_id = $new_device->device_id;
-
-            $method = DevicePollingMethod::saveForDevice(
-                $new_device,
-                PollingMethodType::Snmp,
-                settings: ['transport' => 'udp', 'port' => $snmpSimPort],
-            );
-            $secret = \App\Models\Secret::create([
-                'description' => "SNMP for device $new_device->hostname",
+            $method = new DevicePollingMethod([
+                'method_type' => PollingMethodType::Snmp,
+                'settings' => ['transport' => 'udp', 'port' => $snmpSimPort],
+                'last_check_successful' => true,
+            ]);
+            $secret = Secret::create([
+                'description' => 'LibreNMS Test Secret',
                 'secret_type' => PollingMethodType::Snmp->value,
-                'default' => false,
                 'data' => ['version' => 'v2c', 'community' => $this->file_name],
             ]);
-            $method->secret()->associate($secret)->save();
+            $method->setRelation('secret', $secret);
+
+            (new ValidateDeviceAndCreate($new_device, collect([$method])))->execute();
+            $device_id = $new_device->device_id;
 
             $this->qPrint("Added device: $device_id\n");
         } catch (\Exception $e) {

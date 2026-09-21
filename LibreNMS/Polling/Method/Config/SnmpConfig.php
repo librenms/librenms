@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Polling\Method\Config;
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
@@ -194,6 +195,11 @@ final class SnmpConfig extends PollingMethodConfig
     public static function fromDeviceArray(?array $device): self
     {
         $device ??= [];
+        $device_id = $device['device_id'] ?? 0;
+
+        if (DeviceCache::has($device_id)) {
+            return DeviceCache::get($device_id)->toSnmpConfig();
+        }
 
         return self::fromSettingsAndSecretData(
             settings: [
