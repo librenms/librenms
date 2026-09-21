@@ -274,14 +274,15 @@ class ModuleTestHelper
                 'settings' => ['transport' => 'udp', 'port' => $snmpSimPort],
                 'last_check_successful' => true,
             ]);
-            $secret = Secret::create([
+            $secret = Secret::firstOrNew([
                 'description' => 'LibreNMS Test Secret',
                 'secret_type' => PollingMethodType::Snmp->value,
+            ], [
                 'data' => ['version' => 'v2c', 'community' => $this->file_name],
             ]);
             $method->setRelation('secret', $secret);
 
-            (new ValidateDeviceAndCreate($new_device, collect([$method])))->execute();
+            (new ValidateDeviceAndCreate($new_device, collect([$method]), force: true))->execute();
             $device_id = $new_device->device_id;
 
             $this->qPrint("Added device: $device_id\n");
