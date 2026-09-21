@@ -76,6 +76,8 @@ class ValidateDeviceAndCreate
                 $this->ping_fallback
             );
 
+            $this->device->setRelation('pollingMethods', $pollingMethods);
+
             $this->discoverMetadata->execute($this->device, $pollingMethods);
         }
 

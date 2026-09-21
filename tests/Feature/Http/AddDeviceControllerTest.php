@@ -424,14 +424,23 @@ class AddDeviceControllerTest extends TestCase
 
         \App\Facades\LibrenmsConfig::set('snmp.default_credentials', [$secret1->id, $secret2->id]);
 
+        $fpingMock = Mockery::mock(\LibreNMS\Data\Source\Icmp\Fping::class);
+        $statusMock = \LibreNMS\Data\Source\Icmp\FpingResponse::artificialUp();
+        $fpingMock->shouldReceive('ping')->andReturn($statusMock);
+        $this->instance(\LibreNMS\Data\Source\Icmp\Fping::class, $fpingMock);
+
         $triedCommunities = [];
         \SnmpQuery::partialMock()->shouldReceive('device')
             ->andReturnUsing(function ($device) use (&$triedCommunities) {
                 $snmpMethod = $device?->pollingMethods->firstWhere('method_type', \LibreNMS\Enum\PollingMethodType::Snmp);
                 $comm = $snmpMethod?->secret?->data['community'] ?? null;
-                $triedCommunities[] = $comm;
+                if ($comm && ! in_array($comm, $triedCommunities, true)) {
+                    $triedCommunities[] = $comm;
+                }
 
                 $queryMock = Mockery::mock(\LibreNMS\Data\Source\Snmp\SnmpQueryInterface::class);
+                $queryMock->shouldReceive('numeric', 'options', 'mibDir', 'context', 'cache', 'mibs')->andReturnSelf();
+                $queryMock->shouldReceive('walk', 'next')->andReturn(new \LibreNMS\Data\Source\Snmp\SnmpResponse());
                 if ($comm === 'correct-comm') {
                     $queryMock->shouldReceive('get')->andReturn(new \LibreNMS\Data\Source\Snmp\SnmpResponse(['.1.3.6.1.2.1.1.1.0' => 'Test System'], '', 0));
                 } else {
