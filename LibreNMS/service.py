@@ -92,7 +92,7 @@ class ServiceConfig(DBConfig):
     poller = PollerConfig(24, 300)
     services = PollerConfig(8, 300)
     discovery = PollerConfig(16, 21600)
-    billing = PollerConfig(2, 300, 60)
+    billing = PollerConfig(2, 300, 3600)
     ping = PollerConfig(1, 60)
     down_retry = 60
     update_enabled = True
