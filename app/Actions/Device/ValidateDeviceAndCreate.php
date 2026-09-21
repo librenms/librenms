@@ -31,21 +31,21 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
 
-class ValidateDeviceAndCreate
+readonly class ValidateDeviceAndCreate
 {
     /**
      * @param  Collection<int, DevicePollingMethod>|null  $pollingMethods
      */
     public function __construct(
-        private readonly Device $device,
-        private readonly ?Collection $pollingMethods = null,
-        private readonly bool $force = false,
-        private readonly bool $ping_fallback = false,
-        private readonly BuildDefaultPollingMethods $builder = new BuildDefaultPollingMethods,
-        private readonly ValidateDeviceUniqueness $uniqueness = new ValidateDeviceUniqueness,
-        private readonly DiscoverDevicePollingMethods $discoverMethods = new DiscoverDevicePollingMethods,
-        private readonly DiscoverDeviceMetadata $discoverMetadata = new DiscoverDeviceMetadata,
-        private readonly PersistDeviceWithPollingMethods $persister = new PersistDeviceWithPollingMethods,
+        private Device $device,
+        private ?Collection $pollingMethods = null,
+        private bool $force = false,
+        private bool $ping_fallback = false,
+        private BuildDefaultPollingMethods $builder = new BuildDefaultPollingMethods,
+        private ValidateDeviceUniqueness $uniqueness = new ValidateDeviceUniqueness,
+        private DiscoverDevicePollingMethods $discoverMethods = new DiscoverDevicePollingMethods,
+        private DiscoverDeviceMetadata $discoverMetadata = new DiscoverDeviceMetadata,
+        private PersistDeviceWithPollingMethods $persister = new PersistDeviceWithPollingMethods,
     ) {
     }
 
