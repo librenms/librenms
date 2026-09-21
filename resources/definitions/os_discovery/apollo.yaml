@@ -66,6 +66,7 @@ modules:
                         descr: 'Shelf {{ $index }} Fan Status'
                         index: 'apolloShelfFanStatus.{{ $index }}'
                         states:
+                            - { value: 1, descr: 'Up', generic: 0 }
                             - { value: 2, descr: 'Down', generic: 2 }
                             - { value: 3, descr: 'Unsupported', generic: 3 }
                     -
