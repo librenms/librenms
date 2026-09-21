@@ -27,7 +27,7 @@ readonly class PollingMethodAccessor
     {
         $method = $this->device->pollingMethod($type);
 
-        if ($method && (! $type->hasSecret() || $method->secret !== null)) {
+        if ($method) {
             /** @var T */
             return $method->toConfig();
         }

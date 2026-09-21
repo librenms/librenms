@@ -78,13 +78,13 @@ final class SnmpPollingMethodDefinition extends PollingMethodDefinition
     public function fallbackConfig(\App\Models\Device $device): SnmpConfig
     {
         $method = $device->pollingMethod(\LibreNMS\Enum\PollingMethodType::Snmp);
-        if ($method && $method->secret !== null) {
+        if ($method) {
             /** @var SnmpConfig */
             return $method->toConfig();
         }
 
         if ($device->exists) {
-            \App\Models\Eventlog::log('Missing SNMP polling method or credentials, falling back to legacy device fields.', $device, 'snmp', \LibreNMS\Enum\Severity::Error);
+            \App\Models\Eventlog::log('Missing SNMP polling method, falling back to legacy device fields.', $device, 'snmp', \LibreNMS\Enum\Severity::Error);
         }
 
         return SnmpConfig::fromLegacyDeviceFields($device);
