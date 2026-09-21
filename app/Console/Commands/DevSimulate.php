@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Util\Snmpsim;
@@ -97,7 +98,7 @@ class DevSimulate extends LnmsCommand
     private function addDevice($community): void
     {
         $hostname = $this->option('multiple') ? $community : 'snmpsim';
-        $device = Device::firstOrNew(['hostname' => $hostname]);
+        $device = Device::with('pollingMethods')->firstOrNew(['hostname' => $hostname]);
         $device->overwrite_ip = $this->snmpsim->ip;
         $action = $device->exists ? 'updated' : 'added';
 
@@ -105,15 +106,22 @@ class DevSimulate extends LnmsCommand
         $device->status_reason = '';
         $device->save();
 
-        $method = \App\Models\DevicePollingMethod::saveForDevice(
-            $device,
-            PollingMethodType::Snmp,
-            settings: ['transport' => 'udp', 'port' => $this->snmpsim->port],
-        );
-        $secret = \App\Models\Secret::create([
-            'description' => "SNMP for device $device->hostname",
+        $method = $device->pollingMethod(PollingMethodType::Snmp);
+        if ($method === null) {
+            $method = new DevicePollingMethod([
+                'device_id' => $device->device_id,
+                'method_type' => PollingMethodType::Snmp,
+                'settings' => ['transport' => 'udp', 'port' => $this->snmpsim->port],
+            ]);
+            $device->setRelation('pollingMethods', collect([$method]));
+        } else {
+            $device->pollingMethod(PollingMethodType::Icmp)?->delete(); // don't need icmp, cleanup legacy
+        }
+
+        $secret = \App\Models\Secret::firstOrNew([
+            'description' => "snmpsim secret ($device->hostname)",
             'secret_type' => PollingMethodType::Snmp->value,
-            'default' => false,
+        ], [
             'data' => ['version' => 'v2c', 'community' => $community],
         ]);
         $method->secret()->associate($secret)->save();
