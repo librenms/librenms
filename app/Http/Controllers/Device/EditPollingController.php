@@ -214,7 +214,6 @@ class EditPollingController
                 $secret = Secret::create([
                     'secret_type' => $type->value,
                     'description' => $description,
-                    'default' => (bool) ($validated['default'] ?? false),
                     'data' => $request->validatedSecretData(),
                 ]);
                 $row->secret()->associate($secret)->save();
@@ -367,7 +366,6 @@ class EditPollingController
                     $secret = Secret::create([
                         'secret_type' => $type->value,
                         'description' => $description ?: ('Custom ' . strtoupper($type->value) . ' (' . $device->hostname . ')'),
-                        'default' => false,
                         'data' => $secretData ?? ($targetSecret ? $targetSecret->data : []),
                     ]);
                     $pollingMethod->secret()->associate($secret)->save();

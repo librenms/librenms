@@ -38,14 +38,12 @@ class SelectSecretControllerTest extends TestCase
         Secret::create([
             'description' => 'SNMP Secret 1',
             'secret_type' => SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
         Secret::create([
             'description' => 'IPMI Secret 1',
             'secret_type' => SecretType::Ipmi,
-            'default' => false,
             'data' => ['user' => 'admin', 'password' => 'secret'],
         ]);
 
@@ -64,14 +62,12 @@ class SelectSecretControllerTest extends TestCase
         Secret::create([
             'description' => 'SNMP Secret 1',
             'secret_type' => SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
         Secret::create([
             'description' => 'IPMI Secret 1',
             'secret_type' => SecretType::Ipmi,
-            'default' => false,
             'data' => ['user' => 'admin', 'password' => 'secret'],
         ]);
 
@@ -91,14 +87,12 @@ class SelectSecretControllerTest extends TestCase
         Secret::create([
             'description' => 'SNMP Secret 1',
             'secret_type' => SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
         Secret::create([
             'description' => 'IPMI Secret 1',
             'secret_type' => SecretType::Ipmi,
-            'default' => false,
             'data' => ['user' => 'admin', 'password' => 'secret'],
         ]);
 
@@ -118,14 +112,12 @@ class SelectSecretControllerTest extends TestCase
         Secret::create([
             'description' => 'Production Router Secret',
             'secret_type' => SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
         Secret::create([
             'description' => 'Staging Switch Secret',
             'secret_type' => SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 

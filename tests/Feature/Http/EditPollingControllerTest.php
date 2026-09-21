@@ -95,7 +95,6 @@ class EditPollingControllerTest extends TestCase
         \App\Models\Secret::create([
             'description' => 'SNMP test-device.example.com',
             'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -134,7 +133,6 @@ class EditPollingControllerTest extends TestCase
         \App\Models\Secret::create([
             'description' => 'Existing Custom Description',
             'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -172,7 +170,6 @@ class EditPollingControllerTest extends TestCase
         $secret = \App\Models\Secret::create([
             'description' => 'SNMP Secret 123',
             'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -269,7 +266,6 @@ class EditPollingControllerTest extends TestCase
         $secret = \App\Models\Secret::create([
             'description' => 'Original SNMP Secret',
             'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -325,7 +321,6 @@ class EditPollingControllerTest extends TestCase
         $originalSecret = \App\Models\Secret::create([
             'description' => 'Shared SNMP Secret',
             'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -394,7 +389,6 @@ class EditPollingControllerTest extends TestCase
         $originalSecret = \App\Models\Secret::create([
             'description' => 'Shared SNMP Secret',
             'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -457,7 +451,6 @@ class EditPollingControllerTest extends TestCase
         $secret = \App\Models\Secret::create([
             'description' => 'Solo SNMP Secret',
             'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
-            'default' => false,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
