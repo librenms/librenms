@@ -150,6 +150,7 @@ Route::prefix('v0')->group(function (): void {
             Route::post('{hostname}/eventlog', [App\Api\Controllers\LegacyApiController::class, 'add_eventlog'])->name('add_eventlog');
             Route::get('{hostname}/{type}', [App\Api\Controllers\LegacyApiController::class, 'get_graph_generic_by_hostname'])->name('get_graph_generic_by_hostname');
             Route::get('', [App\Api\Controllers\LegacyApiController::class, 'list_devices'])->name('list_devices');
+            Route::get('{hostname}/portvlan', [App\Api\Controllers\LegacyApiController::class, 'get_port_vlan_info'])->name('get_port_vlan_info_by_hostname');
         });
 
         Route::middleware('can:create,App\Models\Device')->group(function (): void {
@@ -200,6 +201,7 @@ Route::prefix('v0')->group(function (): void {
             Route::get('mac/{search}', [App\Api\Controllers\LegacyApiController::class, 'search_by_mac'])->name('search_mac');
             Route::get('', [App\Api\Controllers\LegacyApiController::class, 'get_all_ports'])->name('get_all_ports');
             Route::get('{portid}/description', [App\Api\Controllers\LegacyApiController::class, 'get_port_description'])->name('get_port_description');
+            Route::get('{portid}/portvlan', [App\Api\Controllers\LegacyApiController::class, 'get_port_vlan_info'])->name('get_port_vlan_info_by_port');
         });
         Route::middleware('can:update,App\Models\Port')->group(function (): void {
             Route::patch('transceiver/metric/{metric}', [App\Api\Controllers\LegacyApiController::class, 'update_transceiver_metric_thresholds'])->name('update_transceiver_metric_thresholds');
