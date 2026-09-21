@@ -578,7 +578,7 @@ class NetSnmpTest extends TestCase
         $mockEventlog->shouldReceive('_log')
             ->once()
             ->with(
-                'Missing SNMP polling method or credentials, falling back to legacy device fields.',
+                'Missing SNMP polling method, falling back to legacy device fields.',
                 $device,
                 'snmp',
                 \LibreNMS\Enum\Severity::Error,
