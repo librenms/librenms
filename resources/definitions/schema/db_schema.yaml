@@ -2224,11 +2224,9 @@ secrets:
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: description, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: secret_type, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: default, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: data, Type: text, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    secrets_secret_type_index: { Name: secrets_secret_type_index, Columns: [secret_type], Unique: false, Type: BTREE }
 sensors:
   Columns:
     - { Field: sensor_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
