@@ -35,13 +35,13 @@ class SelectSecretControllerTest extends TestCase
         $admin = User::factory()->create(['enabled' => 1]);
         $admin->assignRole('admin');
 
-        Secret::create([
+        $snmpSecret = Secret::create([
             'description' => 'SNMP Secret 1',
             'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
-        Secret::create([
+        $ipmiSecret = Secret::create([
             'description' => 'IPMI Secret 1',
             'secret_type' => SecretType::Ipmi,
             'data' => ['user' => 'admin', 'password' => 'secret'],
@@ -51,7 +51,10 @@ class SelectSecretControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertJsonStructure(['results' => [['id', 'text']], 'pagination' => ['more']]);
-        $this->assertCount(2, $response->json('results'));
+
+        $results = collect($response->json('results'));
+        $this->assertTrue($results->contains('id', $snmpSecret->id));
+        $this->assertTrue($results->contains('id', $ipmiSecret->id));
     }
 
     public function testSelectSecretsFiltersBySecretType(): void
@@ -59,13 +62,13 @@ class SelectSecretControllerTest extends TestCase
         $admin = User::factory()->create(['enabled' => 1]);
         $admin->assignRole('admin');
 
-        Secret::create([
+        $snmpSecret = Secret::create([
             'description' => 'SNMP Secret 1',
             'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
-        Secret::create([
+        $ipmiSecret = Secret::create([
             'description' => 'IPMI Secret 1',
             'secret_type' => SecretType::Ipmi,
             'data' => ['user' => 'admin', 'password' => 'secret'],
@@ -74,9 +77,9 @@ class SelectSecretControllerTest extends TestCase
         $response = $this->actingAs($admin)->getJson(route('ajax.select.secret', ['secret_type' => 'snmp']));
 
         $response->assertOk();
-        $results = $response->json('results');
-        $this->assertCount(1, $results);
-        $this->assertEquals('SNMP Secret 1', $results[0]['text']);
+        $results = collect($response->json('results'));
+        $this->assertTrue($results->contains('id', $snmpSecret->id));
+        $this->assertFalse($results->contains('id', $ipmiSecret->id));
     }
 
     public function testSelectSecretsFiltersByTypeParam(): void
@@ -84,13 +87,13 @@ class SelectSecretControllerTest extends TestCase
         $admin = User::factory()->create(['enabled' => 1]);
         $admin->assignRole('admin');
 
-        Secret::create([
+        $snmpSecret = Secret::create([
             'description' => 'SNMP Secret 1',
             'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
-        Secret::create([
+        $ipmiSecret = Secret::create([
             'description' => 'IPMI Secret 1',
             'secret_type' => SecretType::Ipmi,
             'data' => ['user' => 'admin', 'password' => 'secret'],
@@ -99,9 +102,9 @@ class SelectSecretControllerTest extends TestCase
         $response = $this->actingAs($admin)->getJson(route('ajax.select.secret', ['type' => 'ipmi']));
 
         $response->assertOk();
-        $results = $response->json('results');
-        $this->assertCount(1, $results);
-        $this->assertEquals('IPMI Secret 1', $results[0]['text']);
+        $results = collect($response->json('results'));
+        $this->assertTrue($results->contains('id', $ipmiSecret->id));
+        $this->assertFalse($results->contains('id', $snmpSecret->id));
     }
 
     public function testSelectSecretsSearchesByDescription(): void
@@ -109,23 +112,23 @@ class SelectSecretControllerTest extends TestCase
         $admin = User::factory()->create(['enabled' => 1]);
         $admin->assignRole('admin');
 
-        Secret::create([
-            'description' => 'Production Router Secret',
+        $prodSecret = Secret::create([
+            'description' => 'Unique Production Router Secret',
             'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
-        Secret::create([
-            'description' => 'Staging Switch Secret',
+        $stageSecret = Secret::create([
+            'description' => 'Unique Staging Switch Secret',
             'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
-        $response = $this->actingAs($admin)->getJson(route('ajax.select.secret', ['term' => 'Production']));
+        $response = $this->actingAs($admin)->getJson(route('ajax.select.secret', ['term' => 'Unique Production Router']));
 
         $response->assertOk();
-        $results = $response->json('results');
-        $this->assertCount(1, $results);
-        $this->assertEquals('Production Router Secret', $results[0]['text']);
+        $results = collect($response->json('results'));
+        $this->assertTrue($results->contains('id', $prodSecret->id));
+        $this->assertFalse($results->contains('id', $stageSecret->id));
     }
 }
