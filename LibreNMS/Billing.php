@@ -83,7 +83,7 @@ class Billing
         return $cur_used / $since * $total;
     }
 
-    public static function getValue($device_id, $id, $inout): int
+    public static function getValue($device_id, $id, $inout): ?int
     {
         $device = DeviceCache::get($device_id);
         $value = SnmpQuery::device($device)->get('IF-MIB::ifHC' . $inout . 'Octets.' . $id)->value();
@@ -92,7 +92,7 @@ class Billing
             $value = SnmpQuery::device($device)->get('IF-MIB::if' . $inout . 'Octets.' . $id)->value();
         }
 
-        return (int) $value;
+        return is_numeric($value) ? (int) $value : null;
     }
 
     public static function getLastPortCounter($port_id, $bill_id): array

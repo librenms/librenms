@@ -66,6 +66,11 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         $in_measurement = Billing::getValue($port->device_id, $port->ifIndex, 'In');
         $out_measurement = Billing::getValue($port->device_id, $port->ifIndex, 'Out');
 
+        if ($in_measurement === null || $out_measurement === null) {
+            Log::error("WATCH out! - Wrong counters. Table 'bill_port_counters' not updated");
+            continue;
+        }
+
         $last_counters = Billing::getLastPortCounter($port->port_id, $bill_id);
         if ($last_counters['state'] == 'ok') {
             $last_in_measurement = $last_counters['in_counter'];
@@ -100,17 +105,12 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         Log::debug('in_measurement: ' . $in_measurement . '  out_measurement: ' . $out_measurement . "\nThe data types are. in_measurement:" . gettype($in_measurement) . ' and out_measurement: ' . gettype($out_measurement));
         Log::debug('IN_delta: ' . $in_delta . ' OUT_delta: ' . $out_delta . "\nLast_IN_delta: " . ($last_in_delta ?? '') . ' last_OUT_delta: ' . ($last_out_delta ?? ''));
 
-        if (is_numeric($in_measurement) && is_numeric($out_measurement)) {
-            Log::debug("Nice, valid counters 'in/out_measurement', lets use them");
-            // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
-            $fields = ['timestamp' => $now, 'in_counter' => (string) set_numeric($in_measurement), 'out_counter' => (string) set_numeric($out_measurement), 'in_delta' => (string) set_numeric($in_delta), 'out_delta' => (string) set_numeric($out_delta)];
-            if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . $port->port_id . "' AND `bill_id`='$bill_id'") == 0) {
-                $fields['bill_id'] = $bill_id;
-                $fields['port_id'] = $port->port_id;
-                dbInsert($fields, 'bill_port_counters');
-            }
-        } else {
-            Log::error("WATCH out! - Wrong counters. Table 'bill_port_counters' not updated");
+        Log::debug("Nice, valid counters 'in/out_measurement', lets use them");
+        $fields = ['timestamp' => $now, 'in_counter' => $in_measurement, 'out_counter' => $out_measurement, 'in_delta' => (string) set_numeric($in_delta), 'out_delta' => (string) set_numeric($out_delta)];
+        if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . $port->port_id . "' AND `bill_id`='$bill_id'") == 0) {
+            $fields['bill_id'] = $bill_id;
+            $fields['port_id'] = $port->port_id;
+            dbInsert($fields, 'bill_port_counters');
         }
         ////////////////////////////////EndCountersValidation&DB-Update
         $delta = ($delta + $in_delta + $out_delta);
