@@ -125,11 +125,9 @@
                     maxVisible: 100000
                 }
             };
-            options.interaction = options.interaction || {};
+            options.interaction = options.interaction || {dragView: true, zoomView: true};
             options.interaction.hover = true;
             options.interaction.tooltipDelay = 100;
-            options.interaction.dragView = true;
-            options.interaction.zoomView = true;
 
             var container = document.getElementById(elementId);
             var network = new vis.Network(container, {nodes: nodes, edges: edges}, options);
