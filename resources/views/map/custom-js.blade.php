@@ -157,40 +157,6 @@
                     lastValidPos = network.getViewPosition();
                     lastValidScale = s;
                 }
-
-                if (network.body && network.body.nodes) {
-                    for (var id in network.body.nodes) {
-                        var n = network.body.nodes[id];
-                        var nodeData = nodes.get(id);
-                        if (!nodeData) continue;
-
-                        var shape = nodeData.shape || nodeData.style || (n.options && n.options.shape);
-
-                        // Draw background container for icon nodes if configured
-                        if (shape === 'icon') {
-                            var bgCol = (nodeData.color && nodeData.color.background) || nodeData.colour_bg_view;
-                            var bdrCol = (nodeData.color && nodeData.color.border) || nodeData.colour_bdr_view;
-                            var bdrWidth = typeof nodeData.borderWidth === 'number' ? nodeData.borderWidth : 0;
-
-                            if (bgCol || (bdrCol && bdrWidth > 0)) {
-                                var iconSize = (nodeData.size || 25) * 1.18;
-                                ctx.save();
-                                ctx.beginPath();
-                                ctx.arc(n.x, n.y, iconSize, 0, 2 * Math.PI, false);
-                                if (bgCol) {
-                                    ctx.fillStyle = bgCol;
-                                    ctx.fill();
-                                }
-                                if (bdrWidth > 0 && bdrCol) {
-                                    ctx.lineWidth = bdrWidth;
-                                    ctx.strokeStyle = bdrCol;
-                                    ctx.stroke();
-                                }
-                                ctx.restore();
-                            }
-                        }
-                    }
-                }
             });
 
             network.on('zoom', function (properties) {
