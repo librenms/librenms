@@ -4,11 +4,15 @@ namespace LibreNMS\Polling\Method\Methods;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
+use App\Models\Secret;
 use App\View\FieldSchema\FieldDefinition;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Modules\Core;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\Probe\ProbeResult;
 use SnmpQuery;
 
 final class SnmpPollingMethod extends PollingMethod
@@ -86,12 +90,12 @@ final class SnmpPollingMethod extends PollingMethod
         return resolve(\LibreNMS\Polling\Method\Probe\SnmpProbe::class);
     }
 
-    public function secretDefinition(): \App\View\FieldSchema\HasFieldSchema
+    public function secretDefinition(): \LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition
     {
         return resolve(\LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition::class);
     }
 
-    public function config(\App\Models\DevicePollingMethod $method): SnmpConfig
+    public function config(DevicePollingMethod $method): SnmpConfig
     {
         return SnmpConfig::fromPollingMethod($method);
     }
@@ -113,7 +117,7 @@ final class SnmpPollingMethod extends PollingMethod
     /**
      * @inheritDoc
      */
-    public function discover(Device $device, \App\Models\DevicePollingMethod $method): \LibreNMS\Polling\Method\Probe\ProbeResult
+    public function discover(Device $device, DevicePollingMethod $method): ProbeResult
     {
         $testDevice = clone $device;
 
@@ -126,14 +130,11 @@ final class SnmpPollingMethod extends PollingMethod
             }
 
             $secret = $method->secret;
-            $secretData = $secret->toSecretData();
-            $reasons = [];
-            if ($secretData instanceof \LibreNMS\Polling\Secrets\Data\SnmpSecretData) {
-                $target = $secret->description ?: ($secretData->community ?? ($secretData->authname ?? 'custom'));
-                $reasons[$secretData->version] = (string) $target;
-            }
+            $secretData = $this->secretDefinition()->createData($secret->data ?? []);
+            $target = $secret->description ?: ($secretData->community ?? ($secretData->authname ?? 'custom'));
+            $reasons = [$secretData->version => (string) $target];
 
-            return \LibreNMS\Polling\Method\Probe\ProbeResult::failure(
+            return ProbeResult::failure(
                 array_merge($result->stats(), ['reasons' => $reasons]),
                 $result->errorMessage()
             );
@@ -142,7 +143,7 @@ final class SnmpPollingMethod extends PollingMethod
         // Otherwise, attempt ordered default credentials
         /** @var array<int, int> $defaultSecretIds */
         $defaultSecretIds = (array) LibrenmsConfig::get('snmp.default_credentials', []);
-        $defaultSecrets = \App\Models\Secret::where('secret_type', \LibreNMS\Enum\SecretType::Snmp)
+        $defaultSecrets = Secret::where('secret_type', SecretType::Snmp)
             ->whereIn('id', $defaultSecretIds)
             ->get()
             ->sortBy(fn ($s) => array_search($s->id, $defaultSecretIds));
@@ -160,13 +161,11 @@ final class SnmpPollingMethod extends PollingMethod
             }
 
             $lastResult = $result;
-            $secretData = $secret->toSecretData();
-            if ($secretData instanceof \LibreNMS\Polling\Secrets\Data\SnmpSecretData) {
-                $reasons[$secretData->version] = $secret->description;
-            }
+            $secretData = $this->secretDefinition()->createData($secret->data ?? []);
+            $reasons[$secretData->version] = $secret->description;
         }
 
-        return \LibreNMS\Polling\Method\Probe\ProbeResult::failure(
+        return ProbeResult::failure(
             array_merge($lastResult ? $lastResult->stats() : [], ['reasons' => $reasons]),
             $lastResult?->errorMessage()
         );

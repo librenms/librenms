@@ -7,7 +7,6 @@ use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\SecretType;
 
 class BuildDefaultPollingMethods
 {
@@ -58,12 +57,8 @@ class BuildDefaultPollingMethods
             if ($credentialMode === 'existing' && $secretId !== null) {
                 $secret = Secret::resolveForType($secretId, $type);
             } elseif (! empty($data['secret_data'])) {
-                $secretType = match ($type) {
-                    PollingMethodType::Snmp => SecretType::Snmp,
-                    PollingMethodType::Ipmi => SecretType::Ipmi,
-                    default => null,
-                };
-                $secretData = $secretType?->createData($data['secret_data']);
+                $secretDefinition = $this->registry->secretDefinition($type);
+                $secretData = $secretDefinition?->createData($data['secret_data']);
             }
 
             $pollingMethodRegistry = $this->registry;

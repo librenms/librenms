@@ -8,8 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
-use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
+use LibreNMS\Polling\Secrets\Data\SecretData;
 
 #[ObservedBy([DevicePollingMethodObserver::class])]
 class DevicePollingMethod extends Model
@@ -41,7 +40,7 @@ class DevicePollingMethod extends Model
         'last_check_successful' => 'boolean',
     ];
 
-    public function secretData(): SnmpSecretData|IpmiSecretData|null
+    public function secretData(): ?SecretData
     {
         return $this->secret?->toSecretData();
     }

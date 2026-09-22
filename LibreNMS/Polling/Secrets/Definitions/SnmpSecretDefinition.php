@@ -28,11 +28,19 @@ namespace LibreNMS\Polling\Secrets\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
 use App\View\FieldSchema\HandlesFieldSchema;
-use App\View\FieldSchema\HasFieldSchema;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 
-class SnmpSecretDefinition implements HasFieldSchema
+class SnmpSecretDefinition implements SecretDefinition
 {
     use HandlesFieldSchema;
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function createData(array $data): SnmpSecretData
+    {
+        return SnmpSecretData::fromArray($data);
+    }
 
     /**
      * @inheritDoc

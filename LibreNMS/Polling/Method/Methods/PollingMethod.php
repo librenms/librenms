@@ -9,6 +9,7 @@ use App\View\FieldSchema\HasFieldSchema;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Probe\PollingMethodProbe;
 use LibreNMS\Polling\Method\Probe\ProbeResult;
+use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 abstract class PollingMethod implements HasFieldSchema
 {
@@ -29,7 +30,7 @@ abstract class PollingMethod implements HasFieldSchema
         return [];
     }
 
-    public function secretDefinition(): ?HasFieldSchema
+    public function secretDefinition(): ?SecretDefinition
     {
         return null;
     }

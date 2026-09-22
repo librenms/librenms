@@ -2,10 +2,10 @@
 
 namespace LibreNMS\Polling\Method;
 
-use App\View\FieldSchema\HasFieldSchema;
 use InvalidArgumentException;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
+use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class PollingMethodRegistry
 {
@@ -71,9 +71,9 @@ class PollingMethodRegistry
     }
 
     /**
-     * Get the secret definition schema for a polling method, if one is defined.
+     * Get the secret definition for a polling method, if one is defined.
      */
-    public function secretDefinition(PollingMethodType $type): ?HasFieldSchema
+    public function secretDefinition(PollingMethodType $type): ?SecretDefinition
     {
         return $this->require($type)->secretDefinition();
     }

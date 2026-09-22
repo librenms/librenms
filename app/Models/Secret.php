@@ -25,11 +25,20 @@ class Secret extends BaseModel
         'data' => EncryptedArray::class,
     ];
 
-    public function toSecretData(): \LibreNMS\Polling\Secrets\Data\SnmpSecretData|\LibreNMS\Polling\Secrets\Data\IpmiSecretData
+    public function definition(?\LibreNMS\Polling\Method\PollingMethodRegistry $registry = null): ?\LibreNMS\Polling\Secrets\Definitions\SecretDefinition
     {
-        $type = $this->secret_type ?? SecretType::Snmp;
+        if (! $this->secret_type) {
+            return null;
+        }
 
-        return $type->createData($this->data ?? []);
+        $type = \LibreNMS\Enum\PollingMethodType::tryFrom($this->secret_type->value);
+
+        return $type ? ($registry ?? resolve(\LibreNMS\Polling\Method\PollingMethodRegistry::class))->secretDefinition($type) : null;
+    }
+
+    public function toSecretData(?\LibreNMS\Polling\Method\PollingMethodRegistry $registry = null): ?\LibreNMS\Polling\Secrets\Data\SecretData
+    {
+        return $this->definition($registry)?->createData($this->data ?? []);
     }
 
     /**

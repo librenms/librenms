@@ -26,33 +26,8 @@
 
 namespace LibreNMS\Enum;
 
-use App\View\FieldSchema\HasFieldSchema;
-use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
-use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
-use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
-use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
-
 enum SecretType: string
 {
     case Snmp = 'snmp';
     case Ipmi = 'ipmi';
-
-    public function definition(): HasFieldSchema
-    {
-        return match ($this) {
-            self::Snmp => app(SnmpSecretDefinition::class),
-            self::Ipmi => app(IpmiSecretDefinition::class),
-        };
-    }
-
-    /**
-     * @param  array<string, mixed>  $data
-     */
-    public function createData(array $data): SnmpSecretData|IpmiSecretData
-    {
-        return match ($this) {
-            self::Snmp => SnmpSecretData::fromArray($data),
-            self::Ipmi => IpmiSecretData::fromArray($data),
-        };
-    }
 }

@@ -28,11 +28,19 @@ namespace LibreNMS\Polling\Secrets\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
 use App\View\FieldSchema\HandlesFieldSchema;
-use App\View\FieldSchema\HasFieldSchema;
+use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
 
-class IpmiSecretDefinition implements HasFieldSchema
+class IpmiSecretDefinition implements SecretDefinition
 {
     use HandlesFieldSchema;
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function createData(array $data): IpmiSecretData
+    {
+        return IpmiSecretData::fromArray($data);
+    }
 
     /**
      * @inheritDoc

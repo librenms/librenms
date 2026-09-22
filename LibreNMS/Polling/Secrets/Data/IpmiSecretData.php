@@ -2,7 +2,7 @@
 
 namespace LibreNMS\Polling\Secrets\Data;
 
-readonly class IpmiSecretData
+readonly class IpmiSecretData implements SecretData
 {
     public function __construct(
         public string $username = '',

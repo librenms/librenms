@@ -2,7 +2,12 @@
 
 namespace LibreNMS\Polling\Method\Methods;
 
+use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use App\View\FieldSchema\FieldDefinition;
+use LibreNMS\Polling\Method\Config\IpmiConfig;
+use LibreNMS\Polling\Method\Probe\IpmiProbe;
+use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
 
 final class IpmiPollingMethod extends PollingMethod
 {
@@ -44,22 +49,22 @@ final class IpmiPollingMethod extends PollingMethod
         ];
     }
 
-    public function probe(): \LibreNMS\Polling\Method\Probe\IpmiProbe
+    public function probe(): IpmiProbe
     {
-        return resolve(\LibreNMS\Polling\Method\Probe\IpmiProbe::class);
+        return resolve(IpmiProbe::class);
     }
 
-    public function secretDefinition(): \App\View\FieldSchema\HasFieldSchema
+    public function secretDefinition(): IpmiSecretDefinition
     {
-        return resolve(\LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition::class);
+        return resolve(IpmiSecretDefinition::class);
     }
 
-    public function config(\App\Models\DevicePollingMethod $method): \LibreNMS\Polling\Method\Config\IpmiConfig
+    public function config(DevicePollingMethod $method): IpmiConfig
     {
-        return \LibreNMS\Polling\Method\Config\IpmiConfig::fromPollingMethod($method);
+        return IpmiConfig::fromPollingMethod($method);
     }
 
-    public function fallbackConfig(\App\Models\Device $device): ?\LibreNMS\Polling\Method\Config\IpmiConfig
+    public function fallbackConfig(Device $device): ?IpmiConfig
     {
         return null;
     }
