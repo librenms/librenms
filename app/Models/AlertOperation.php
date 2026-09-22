@@ -25,10 +25,13 @@ class AlertOperation extends BaseModel
         'notifications_suppressed',
     ];
 
-    protected $casts = [
-        'default_operation_step_duration_seconds' => 'integer',
-        'notifications_suppressed' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'default_operation_step_duration_seconds' => 'integer',
+            'notifications_suppressed' => 'boolean',
+        ];
+    }
 
     /**
      * @return HasMany<AlertOperationSegment, $this>
