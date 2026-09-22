@@ -136,7 +136,7 @@ class Stats
             'ospfv3_links' => $this->selectTotal('ospfv3_ports', ['ospfv3IfType']),
             'arch' => $this->selectTotal('packages', ['arch']),
             'pollers' => $this->selectTotal('pollers'),
-            'port_assoc' => $this->selectTotal('devices', ['port_association_mode']),
+            'port_assoc' => DB::table('device_polling_methods')->where('method_type', 'snmp')->selectRaw('JSON_UNQUOTE(JSON_EXTRACT(settings, "$.port_association_mode")) AS port_association_mode, COUNT(*) AS total')->groupBy('port_association_mode')->get(),
             'port_type' => $this->selectTotal('ports', ['ifType']),
             'port_ifspeed' => DB::table('ports')->select([DB::raw('COUNT(*) AS `total`'), DB::raw('ROUND(`ifSpeed`/1000/1000) as ifSpeed')])->groupBy(['ifSpeed'])->get(),
             'port_vlans' => $this->selectTotal('ports_vlans', ['state']),

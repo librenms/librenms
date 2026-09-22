@@ -13,9 +13,10 @@ $link_array = ['page' => 'device',
 if (Gate::denies('device.update')) {
     print_error('Insufficient Privileges');
 } else {
+    $isSnmpEnabled = $device instanceof \App\Models\Device ? $device->toSnmpConfig()->isEnabled() : \LibreNMS\Polling\Method\Config\SnmpConfig::fromDeviceArray($device)->isEnabled();
     $panes['device'] = 'Device Settings';
     $panes['polling'] = 'Polling';
-    if (! $device['snmp_disable']) {
+    if ($isSnmpEnabled) {
         $panes['ports'] = 'Port Settings';
     }
 
@@ -27,11 +28,11 @@ if (Gate::denies('device.update')) {
         $panes['icon'] = 'Icon';
     }
 
-    if (! $device['snmp_disable']) {
+    if ($isSnmpEnabled) {
         $panes['apps'] = 'Applications';
     }
     $panes['alert-rules'] = 'Alert Rules';
-    if (! $device['snmp_disable']) {
+    if ($isSnmpEnabled) {
         $panes['modules'] = 'Modules';
     }
 
@@ -47,7 +48,7 @@ if (Gate::denies('device.update')) {
         $panes['wireless-sensors'] = 'Wireless Sensors';
     }
 
-    if (! $device['snmp_disable']) {
+    if ($isSnmpEnabled) {
         $panes['storage'] = 'Storage';
         $panes['processors'] = 'Processors';
         $panes['mempools'] = 'Memory';

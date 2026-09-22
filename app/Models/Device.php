@@ -65,7 +65,6 @@ class Device extends BaseModel
         'override_sysLocation',
         'overwrite_ip',
         'poller_group',
-        'port_association_mode',
         'purpose',
         'serial',
         'status',
@@ -111,7 +110,6 @@ class Device extends BaseModel
             'inserted' => 'datetime',
             'last_discovered' => 'datetime',
             'last_polled' => 'datetime',
-            'last_ping' => 'datetime',
             'status' => 'boolean',
             'mtu_status' => 'boolean',
             'ignore' => 'boolean',
@@ -147,7 +145,7 @@ class Device extends BaseModel
 
     public function ipFamily(): AddressFamily
     {
-        return str_ends_with($this->transport ?? '', '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
+        return str_ends_with($this->toSnmpConfig()->transport, '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
     }
 
     public static function findByIp(?string $ip): ?Device

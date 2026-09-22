@@ -142,7 +142,7 @@ class PingCheck implements ShouldQueue
         }
 
         $query = Device::canPing()
-            ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'snmp_disable', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken'])
+            ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken'])
             ->with([
                 'pollingMethods',
                 'parents' => function ($q): void {

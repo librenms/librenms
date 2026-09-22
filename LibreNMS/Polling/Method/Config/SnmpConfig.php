@@ -166,14 +166,14 @@ final class SnmpConfig extends PollingMethodConfig
     {
         return self::fromSettingsAndSecretData(
             settings: [
-                'transport' => $device->transport,
-                'port' => $device->port,
-                'timeout' => $device->timeout,
-                'retries' => $device->retries,
+                'transport' => $device->getAttribute('transport'),
+                'port' => $device->getAttribute('port'),
+                'timeout' => $device->getAttribute('timeout'),
+                'retries' => $device->getAttribute('retries'),
                 'max_repeaters' => $device->getAttrib('snmp_max_repeaters'),
                 'max_oid' => $device->getAttrib('snmp_max_oid'),
                 'bulk' => $device->getAttrib('snmp_bulk'),
-                'port_association_mode' => isset($device->port_association_mode) ? \LibreNMS\Enum\PortAssociationMode::getName((int) $device->port_association_mode) : null,
+                'port_association_mode' => $device->getAttribute('port_association_mode') !== null ? \LibreNMS\Enum\PortAssociationMode::getName((int) $device->getAttribute('port_association_mode')) : null,
             ],
             secretData: new SnmpSecretData(
                 version: (string) ($device->getAttribute('snmpver') ?: 'v2c'),
@@ -186,7 +186,7 @@ final class SnmpConfig extends PollingMethodConfig
                 cryptopass: $device->getAttribute('cryptopass'),
             ),
             os: $device->os,
-            enabled: ! ($device->snmp_disable ?? false),
+            enabled: ! ($device->getAttribute('snmp_disable') ?? false),
         );
     }
 
