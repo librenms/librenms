@@ -46,7 +46,7 @@ class StorePollingMethodRequest extends FormRequest
         $type = $this->pollingType();
 
         if ($type) {
-            $definition = $registry->get($type);
+            $definition = $registry->definition($type);
             if ($definition) {
                 $rules = [
                     ...$rules,
@@ -55,7 +55,7 @@ class StorePollingMethodRequest extends FormRequest
                         ->all(),
                 ];
 
-                $secretDefinition = $definition->secretDefinition();
+                $secretDefinition = $registry->secretDefinition($type);
                 if ($secretDefinition !== null && $this->input('credential_mode', 'existing') === 'new') {
                     $rules = [
                         ...$rules,
@@ -90,8 +90,7 @@ class StorePollingMethodRequest extends FormRequest
 
             /** @var \LibreNMS\Polling\Method\PollingMethodRegistry $registry */
             $registry = $this->container->make(\LibreNMS\Polling\Method\PollingMethodRegistry::class);
-            $definition = $registry->get($type);
-            if ($definition?->hasSecret() && $this->input('credential_mode', 'existing') === 'existing' && ! $this->input('secret_id')) {
+            if ($registry->hasSecret($type) && $this->input('credential_mode', 'existing') === 'existing' && ! $this->input('secret_id')) {
                 $validator->errors()->add('secret_id', __('poller.select_credential'));
             }
         });

@@ -68,7 +68,7 @@ class EditPollingController
         $row = $device->pollingMethods->firstWhere('method_type', $type);
         $secret = $row?->secret;
         $canUnmaskSecrets = Gate::allows('unmask', Secret::class);
-        $secretDef = $definition->secretDefinition();
+        $secretDef = $this->registry->secretDefinition($type);
         $schema = $secretDef?->schema() ?? [];
         $schemaFields = $secretDef ? $secretDef->buildSchemaFields() : [];
         $settingsFields = $definition->buildSchemaFields(dataVar: 'settingsData');
@@ -95,7 +95,7 @@ class EditPollingController
         return [
             'type' => $type->value,
             'label' => __('poller.methods.' . $type->value),
-            'icon' => $definition->icon(),
+            'icon' => $this->registry->icon($type),
             'schema_fields' => $schemaFields,
             'schema_defaults' => $secretDef?->schemaDefaults() ?? [],
             'settings_fields' => $settingsFields,
@@ -104,7 +104,7 @@ class EditPollingController
                 $definition->formDefaults(),
                 $row->settings ?? [],
             ),
-            'affects_availability' => $row ? $row->affects_availability : $definition->defaultAffectsAvailability(),
+            'affects_availability' => $row ? $row->affects_availability : $this->registry->defaultAffectsAvailability($type),
             'secret' => $secret,
             'secret_form_data' => $secret ? collect($schema)->mapWithKeys(fn (array $field, string $key): array => [
                 $key => $canUnmaskSecrets ? (string) data_get($secret->data, $key, '') : '',
@@ -129,13 +129,13 @@ class EditPollingController
         $type = $request->pollingType() ?? PollingMethodType::from($validated['method_type']);
         $definition = $this->registry->require($type);
 
-        if ($definition->secretDefinition() !== null) {
+        if ($this->registry->hasSecret($type)) {
             $this->authorize('create', Secret::class);
         }
 
         $credentialMode = $validated['credential_mode'] ?? 'existing';
         $secretId = isset($validated['secret_id']) ? (int) $validated['secret_id'] : null;
-        if ($definition->secretDefinition() !== null && $credentialMode === 'existing' && ! $secretId) {
+        if ($this->registry->hasSecret($type) && $credentialMode === 'existing' && ! $secretId) {
             throw ValidationException::withMessages([
                 'secret_id' => __('poller.select_credential'),
             ]);
@@ -147,7 +147,7 @@ class EditPollingController
             $transientSettings = $request->validatedSettings();
             $transientSecretData = [];
             $transientSecret = null;
-            if ($definition->secretDefinition() !== null) {
+            if ($this->registry->hasSecret($type)) {
                 if ($credentialMode === 'existing' && $secretId !== null) {
                     $transientSecret = Secret::resolveForType($secretId, $type);
                 } else {
@@ -158,7 +158,7 @@ class EditPollingController
             $transientMethod = new DevicePollingMethod([
                 'method_type' => $type,
                 'settings' => $definition->filterOverrides($transientSettings),
-                'affects_availability' => $definition->defaultAffectsAvailability(),
+                'affects_availability' => $this->registry->defaultAffectsAvailability($type),
                 'enabled' => true,
             ]);
             $transientMethod->setRelation('device', $device);
@@ -177,7 +177,7 @@ class EditPollingController
             $testDevice = clone $device;
             $testDevice->setRelation('pollingMethods', $existingMethods->concat([$transientMethod]));
 
-            $probeResult = $definition->probe()->check($testDevice);
+            $probeResult = $this->registry->probe($type)->check($testDevice);
 
             if (! $probeResult->isSuccess()) {
                 $errorDetails = $probeResult->errorMessage();
@@ -207,10 +207,10 @@ class EditPollingController
             type: $type,
             settings: $request->validatedSettings(),
             enabled: true,
-            affectsAvailability: $definition->defaultAffectsAvailability(),
+            affectsAvailability: $this->registry->defaultAffectsAvailability($type),
         );
 
-        if ($definition->secretDefinition() !== null) {
+        if ($this->registry->hasSecret($type)) {
             if ($credentialMode === 'existing' && $secretId !== null) {
                 $secret = Secret::resolveForType($secretId, $type);
                 $row->secret()->associate($secret)->save();
@@ -263,7 +263,7 @@ class EditPollingController
         $validated = $request->validated();
 
         $secretId = null;
-        if ($definition->hasSecret()) {
+        if ($this->registry->hasSecret($type)) {
             if (array_key_exists('secret_id', $validated)) {
                 $this->authorize('update', Secret::class);
                 $secretId = (int) $validated['secret_id'];
@@ -284,7 +284,7 @@ class EditPollingController
             $transientSettings = $validated['settings'] ?? [];
             $transientSecretData = [];
             $transientSecret = null;
-            if ($definition->hasSecret()) {
+            if ($this->registry->hasSecret($type)) {
                 $isEditingSecret = (bool) $request->input('is_editing_secret', $request->has('secret_data'));
                 $secretData = $request->has('secret_data') ? $request->validatedSecretData() : null;
 
@@ -319,7 +319,7 @@ class EditPollingController
             $testDevice = clone $device;
             $testDevice->setRelation('pollingMethods', $existingMethods->concat([$transientMethod]));
 
-            $probeResult = $definition->probe()->check($testDevice);
+            $probeResult = $this->registry->probe($type)->check($testDevice);
 
             if (! $probeResult->isSuccess()) {
                 $errorDetails = $probeResult->errorMessage();
@@ -355,7 +355,7 @@ class EditPollingController
             definition: $definition,
         );
 
-        if ($definition->hasSecret()) {
+        if ($this->registry->hasSecret($type)) {
             $isEditingSecret = (bool) $request->input('is_editing_secret', $request->has('secret_data'));
             $secretData = $request->has('secret_data') ? $request->validatedSecretData() : null;
             $mode = $validated['secret_update_mode'] ?? 'update';
@@ -431,9 +431,8 @@ class EditPollingController
 
         $type = PollingMethodType::tryFrom($methodType) ?? abort(404);
         $pollingMethod = $device->pollingMethods()->where('method_type', $type->value)->firstOrFail();
-        $definition = $this->registry->get($type);
 
-        if ($definition?->hasSecret()) {
+        if ($this->registry->hasSecret($type)) {
             $this->authorize('delete', Secret::class);
         }
 

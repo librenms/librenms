@@ -4,13 +4,22 @@ namespace LibreNMS\Polling\Method\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
-use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
 
 /**
  * @extends PollingMethodDefinition<IpmiConfig>
  */
 final class IpmiPollingMethodDefinition extends PollingMethodDefinition
 {
+    public function icon(): string
+    {
+        return 'fa-microchip';
+    }
+
+    public function defaultAffectsAvailability(): bool
+    {
+        return false;
+    }
+
     /**
      * @inheritDoc
      */
@@ -37,54 +46,5 @@ final class IpmiPollingMethodDefinition extends PollingMethodDefinition
                 ->rules(['nullable', 'integer', 'min:1'])
                 ->cast('int'),
         ];
-    }
-
-    public function fallbackConfig(\App\Models\Device $device): IpmiConfig
-    {
-        $method = new \App\Models\DevicePollingMethod([
-            'method_type' => \LibreNMS\Enum\PollingMethodType::Ipmi,
-            'enabled' => false,
-            'affects_availability' => $this->defaultAffectsAvailability(),
-        ]);
-        $method->setRelation('device', $device);
-
-        return IpmiConfig::fromPollingMethod($method);
-    }
-
-    public function defaultAffectsAvailability(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function icon(): string
-    {
-        return 'fa-microchip';
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function class(): string
-    {
-        return IpmiConfig::class;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function probe(): \LibreNMS\Polling\Method\Probe\IpmiProbe
-    {
-        return new \LibreNMS\Polling\Method\Probe\IpmiProbe();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function secretDefinition(): IpmiSecretDefinition
-    {
-        return new IpmiSecretDefinition;
     }
 }

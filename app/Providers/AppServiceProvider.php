@@ -57,10 +57,36 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(\LibreNMS\Polling\Method\PollingMethodRegistry::class, function () {
             $registry = new \LibreNMS\Polling\Method\PollingMethodRegistry();
-            $registry->register(\LibreNMS\Enum\PollingMethodType::Snmp, \LibreNMS\Polling\Method\Definitions\SnmpPollingMethodDefinition::class);
-            $registry->register(\LibreNMS\Enum\PollingMethodType::Icmp, \LibreNMS\Polling\Method\Definitions\IcmpPollingMethodDefinition::class);
-            $registry->register(\LibreNMS\Enum\PollingMethodType::Ipmi, \LibreNMS\Polling\Method\Definitions\IpmiPollingMethodDefinition::class);
-            $registry->register(\LibreNMS\Enum\PollingMethodType::UnixAgent, \LibreNMS\Polling\Method\Definitions\UnixAgentPollingMethodDefinition::class);
+
+            $registry->register(
+                type: \LibreNMS\Enum\PollingMethodType::Snmp,
+                configClass: \LibreNMS\Polling\Method\Config\SnmpConfig::class,
+                probeClass: \LibreNMS\Polling\Method\Probe\SnmpProbe::class,
+                definitionClass: \LibreNMS\Polling\Method\Definitions\SnmpPollingMethodDefinition::class,
+                secretDefinitionClass: \LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition::class,
+            );
+
+            $registry->register(
+                type: \LibreNMS\Enum\PollingMethodType::Icmp,
+                configClass: \LibreNMS\Polling\Method\Config\IcmpConfig::class,
+                probeClass: \LibreNMS\Polling\Method\Probe\IcmpProbe::class,
+                definitionClass: \LibreNMS\Polling\Method\Definitions\IcmpPollingMethodDefinition::class,
+            );
+
+            $registry->register(
+                type: \LibreNMS\Enum\PollingMethodType::Ipmi,
+                configClass: \LibreNMS\Polling\Method\Config\IpmiConfig::class,
+                probeClass: \LibreNMS\Polling\Method\Probe\IpmiProbe::class,
+                definitionClass: \LibreNMS\Polling\Method\Definitions\IpmiPollingMethodDefinition::class,
+                secretDefinitionClass: \LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition::class,
+            );
+
+            $registry->register(
+                type: \LibreNMS\Enum\PollingMethodType::UnixAgent,
+                configClass: \LibreNMS\Polling\Method\Config\UnixAgentConfig::class,
+                probeClass: \LibreNMS\Polling\Method\Probe\UnixAgentProbe::class,
+                definitionClass: \LibreNMS\Polling\Method\Definitions\UnixAgentPollingMethodDefinition::class,
+            );
 
             return $registry;
         });

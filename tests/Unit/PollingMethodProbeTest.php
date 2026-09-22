@@ -24,15 +24,15 @@ final class PollingMethodProbeTest extends TestCase
         config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]);
     }
 
-    public function testDefinitionCreatesFreshProbeInstance(): void
+    public function testRegistryCreatesFreshProbeInstance(): void
     {
         /** @var \LibreNMS\Polling\Method\PollingMethodRegistry $registry */
         $registry = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class);
 
-        $this->assertInstanceOf(SnmpProbe::class, $registry->require(PollingMethodType::Snmp)->probe());
-        $this->assertInstanceOf(IcmpProbe::class, $registry->require(PollingMethodType::Icmp)->probe());
-        $this->assertInstanceOf(IpmiProbe::class, $registry->require(PollingMethodType::Ipmi)->probe());
-        $this->assertInstanceOf(UnixAgentProbe::class, $registry->require(PollingMethodType::UnixAgent)->probe());
+        $this->assertInstanceOf(SnmpProbe::class, $registry->probe(PollingMethodType::Snmp));
+        $this->assertInstanceOf(IcmpProbe::class, $registry->probe(PollingMethodType::Icmp));
+        $this->assertInstanceOf(IpmiProbe::class, $registry->probe(PollingMethodType::Ipmi));
+        $this->assertInstanceOf(UnixAgentProbe::class, $registry->probe(PollingMethodType::UnixAgent));
     }
 
     public function testUnixAgentProbeUsesResolvedConfigPortAndTimeout(): void
@@ -47,7 +47,7 @@ final class PollingMethodProbeTest extends TestCase
         $unixMethod->setRelation('device', $device);
         $device->setRelation('pollingMethods', collect([$unixMethod]));
 
-        $probe = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::UnixAgent)->probe();
+        $probe = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->probe(PollingMethodType::UnixAgent);
 
         $result = $probe->check($device);
         $this->assertIsBool($result->isSuccess());

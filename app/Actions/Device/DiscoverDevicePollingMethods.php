@@ -29,7 +29,8 @@ class DiscoverDevicePollingMethods
 
         foreach ($enabledMethods as $method) {
             $definition = $this->registry->require($method->method_type);
-            $result = $definition->discover($device, $method);
+            $probe = $this->registry->probe($method->method_type);
+            $result = $definition->discover($device, $method, $probe);
 
             $method->last_check_successful = $result->isSuccess();
             $method->last_checked_at = now();

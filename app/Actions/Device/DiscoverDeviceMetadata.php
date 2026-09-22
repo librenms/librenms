@@ -28,7 +28,8 @@ class DiscoverDeviceMetadata
         );
 
         foreach ($successfulMethods as $method) {
-            $this->registry->get($method->method_type)?->enrichDeviceMetadata($device);
+            $pollingMethodRegistry = $this->registry;
+            $pollingMethodRegistry->definition($method->method_type)?->enrichDeviceMetadata($device);
         }
 
         $this->uniqueness->validateSysName($device);

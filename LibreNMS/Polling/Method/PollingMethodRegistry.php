@@ -2,25 +2,59 @@
 
 namespace LibreNMS\Polling\Method;
 
+use App\View\FieldSchema\HasFieldSchema;
 use InvalidArgumentException;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Definitions\PollingMethodDefinition;
+use LibreNMS\Polling\Method\Probe\PollingMethodProbe;
 
 class PollingMethodRegistry
 {
     /**
-     * @var array<string, class-string<PollingMethodDefinition>|PollingMethodDefinition>
+     * @var array<string, array{
+     *     configClass: class-string<PollingMethodConfig>,
+     *     probeClass: class-string<PollingMethodProbe>,
+     *     definitionClass: ?class-string<PollingMethodDefinition>,
+     *     secretDefinitionClass: ?class-string<HasFieldSchema>,
+     * }>
      */
     private array $methods = [];
 
     /**
-     * Register a polling method definition.
-     *
-     * @param  class-string<PollingMethodDefinition>|PollingMethodDefinition  $definition
+     * @var array<string, PollingMethodDefinition>
      */
-    public function register(PollingMethodType $type, string|PollingMethodDefinition $definition): self
-    {
-        $this->methods[$type->value] = $definition;
+    private array $resolvedDefinitions = [];
+
+    /**
+     * @var array<string, ?HasFieldSchema>
+     */
+    private array $resolvedSecretDefinitions = [];
+
+    /**
+     * Register a polling method with its class-strings.
+     *
+     * @param  class-string<PollingMethodConfig>  $configClass
+     * @param  class-string<PollingMethodProbe>  $probeClass
+     * @param  class-string<PollingMethodDefinition>|null  $definitionClass
+     * @param  class-string<HasFieldSchema>|null  $secretDefinitionClass
+     */
+    public function register(
+        PollingMethodType $type,
+        string $configClass,
+        string $probeClass,
+        ?string $definitionClass = null,
+        ?string $secretDefinitionClass = null,
+    ): self {
+        $this->methods[$type->value] = [
+            'configClass' => $configClass,
+            'probeClass' => $probeClass,
+            'definitionClass' => $definitionClass,
+            'secretDefinitionClass' => $secretDefinitionClass,
+        ];
+
+        unset($this->resolvedDefinitions[$type->value]);
+        unset($this->resolvedSecretDefinitions[$type->value]);
 
         return $this;
     }
@@ -36,19 +70,20 @@ class PollingMethodRegistry
     /**
      * Get the definition for a polling method.
      */
-    public function get(PollingMethodType $type): ?PollingMethodDefinition
+    public function definition(PollingMethodType $type): ?PollingMethodDefinition
     {
-        $definition = $this->methods[$type->value] ?? null;
-
-        if ($definition === null) {
+        if (! isset($this->methods[$type->value])) {
             return null;
         }
 
-        if (is_string($definition)) {
-            $this->methods[$type->value] = app($definition);
+        if (! isset($this->resolvedDefinitions[$type->value])) {
+            $definitionClass = $this->methods[$type->value]['definitionClass'];
+            $this->resolvedDefinitions[$type->value] = $definitionClass !== null
+                ? app($definitionClass)
+                : new PollingMethodDefinition();
         }
 
-        return $this->methods[$type->value];
+        return $this->resolvedDefinitions[$type->value];
     }
 
     /**
@@ -58,13 +93,76 @@ class PollingMethodRegistry
      */
     public function require(PollingMethodType $type): PollingMethodDefinition
     {
-        $definition = $this->get($type);
+        $definition = $this->definition($type);
 
         if ($definition === null) {
             throw new InvalidArgumentException("Unknown polling method type: {$type->value}");
         }
 
         return $definition;
+    }
+
+    /**
+     * Get the config class for a polling method.
+     *
+     * @return class-string<PollingMethodConfig>
+     */
+    public function configClass(PollingMethodType $type): string
+    {
+        if (! isset($this->methods[$type->value])) {
+            throw new InvalidArgumentException("Unknown polling method type: {$type->value}");
+        }
+
+        return $this->methods[$type->value]['configClass'];
+    }
+
+    /**
+     * Get the probe for a polling method.
+     */
+    public function probe(PollingMethodType $type): PollingMethodProbe
+    {
+        if (! isset($this->methods[$type->value])) {
+            throw new InvalidArgumentException("Unknown polling method type: {$type->value}");
+        }
+
+        $probeClass = $this->methods[$type->value]['probeClass'];
+
+        return app($probeClass);
+    }
+
+    /**
+     * Get the secret definition schema for a polling method, if one is defined.
+     */
+    public function secretDefinition(PollingMethodType $type): ?HasFieldSchema
+    {
+        if (! isset($this->methods[$type->value])) {
+            return null;
+        }
+
+        if (! array_key_exists($type->value, $this->resolvedSecretDefinitions)) {
+            $secretDefinitionClass = $this->methods[$type->value]['secretDefinitionClass'];
+            $this->resolvedSecretDefinitions[$type->value] = $secretDefinitionClass !== null
+                ? app($secretDefinitionClass)
+                : null;
+        }
+
+        return $this->resolvedSecretDefinitions[$type->value];
+    }
+
+    /**
+     * Determine if a polling method requires secrets.
+     */
+    public function hasSecret(PollingMethodType $type): bool
+    {
+        return $this->secretDefinition($type) !== null;
+    }
+
+    /**
+     * Get the default affects availability value for a polling method.
+     */
+    public function defaultAffectsAvailability(PollingMethodType $type): bool
+    {
+        return $this->require($type)->defaultAffectsAvailability();
     }
 
     /**
@@ -78,7 +176,7 @@ class PollingMethodRegistry
         foreach (array_keys($this->methods) as $key) {
             $type = PollingMethodType::tryFrom($key);
             if ($type !== null) {
-                $resolved[$key] = $this->get($type);
+                $resolved[$key] = $this->definition($type);
             }
         }
 

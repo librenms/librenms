@@ -80,7 +80,7 @@ class DevicePollingMethod extends Model
 
     public function toConfig(): PollingMethodConfig
     {
-        $class = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require($this->method_type)->class();
+        $class = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->configClass($this->method_type);
 
         return $class::fromPollingMethod($this);
     }

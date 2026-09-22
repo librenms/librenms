@@ -62,12 +62,13 @@ class BuildDefaultPollingMethods
                 $secretData = $secretType?->createData($data['secret_data']);
             }
 
-            $definition = $this->registry->get($type);
+            $pollingMethodRegistry = $this->registry;
+            $definition = $pollingMethodRegistry->definition($type);
 
             $pollingMethod = new DevicePollingMethod([
                 'method_type' => $type,
                 'enabled' => true,
-                'affects_availability' => $affectsAvailability ?? ($definition?->defaultAffectsAvailability() ?? true),
+                'affects_availability' => $affectsAvailability ?? $this->registry->defaultAffectsAvailability($type),
                 'settings' => $definition ? $definition->filterOverrides($settings) : $settings,
             ]);
             $pollingMethod->setRelation('device', $device);

@@ -19,9 +19,6 @@ readonly class PollingMethodAccessor
     ) {
     }
 
-    /**
-     * Get the resolved configuration for a polling method on this device.
-     */
     public function get(PollingMethodType $type): ?PollingMethodConfig
     {
         $method = $this->device->pollingMethod($type);
@@ -30,9 +27,14 @@ readonly class PollingMethodAccessor
             return $method->toConfig();
         }
 
-        $definition = $this->registry->get($type);
+        $definition = $this->registry->definition($type);
 
-        return $definition?->fallbackConfig($this->device);
+        return $definition?->fallbackConfig(
+            $this->device,
+            $type,
+            $this->registry->configClass($type),
+            $this->registry->defaultAffectsAvailability($type),
+        );
     }
 
     public function snmp(): SnmpConfig

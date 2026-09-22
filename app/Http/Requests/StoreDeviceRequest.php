@@ -59,11 +59,11 @@ class StoreDeviceRequest extends FormRequest
             $rules["polling_methods.{$method}.affects_availability"] = ['nullable', 'boolean'];
             $rules["polling_methods.{$method}.credential_mode"] = ['nullable', 'in:default,existing,new'];
 
-            $definition = $registry->get($type);
+            $definition = $registry->definition($type);
             if (! $definition) {
                 continue;
             }
-            $secretDefinition = $definition->secretDefinition();
+            $secretDefinition = $registry->secretDefinition($type);
             if ($secretDefinition !== null) {
                 $rules["polling_methods.{$method}.secret_id"] = [
                     'required_if:polling_methods.' . $method . '.credential_mode,existing',

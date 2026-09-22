@@ -9,7 +9,6 @@ use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Modules\Core;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
-use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
 use SnmpQuery;
 
 /**
@@ -17,6 +16,16 @@ use SnmpQuery;
  */
 final class SnmpPollingMethodDefinition extends PollingMethodDefinition
 {
+    public function icon(): string
+    {
+        return 'fa-server';
+    }
+
+    public function defaultAffectsAvailability(): bool
+    {
+        return true;
+    }
+
     /**
      * @inheritDoc
      */
@@ -75,8 +84,12 @@ final class SnmpPollingMethodDefinition extends PollingMethodDefinition
         ];
     }
 
-    public function fallbackConfig(\App\Models\Device $device): SnmpConfig
-    {
+    public function fallbackConfig(
+        Device $device,
+        \LibreNMS\Enum\PollingMethodType $type = \LibreNMS\Enum\PollingMethodType::Snmp,
+        string $configClass = SnmpConfig::class,
+        bool $defaultAffectsAvailability = true
+    ): SnmpConfig {
         $method = $device->pollingMethod(\LibreNMS\Enum\PollingMethodType::Snmp);
         if ($method) {
             /** @var SnmpConfig */
@@ -93,14 +106,14 @@ final class SnmpPollingMethodDefinition extends PollingMethodDefinition
     /**
      * @inheritDoc
      */
-    public function discover(\App\Models\Device $device, \App\Models\DevicePollingMethod $method): \LibreNMS\Polling\Method\Probe\ProbeResult
+    public function discover(Device $device, \App\Models\DevicePollingMethod $method, \LibreNMS\Polling\Method\Probe\PollingMethodProbe $probe): \LibreNMS\Polling\Method\Probe\ProbeResult
     {
         $testDevice = clone $device;
 
         // If a specific secret was supplied on the method, test that directly
         if ($method->relationLoaded('secret') && $method->secret !== null) {
             $testDevice->setRelation('pollingMethods', collect([$method]));
-            $result = $this->probe()->check($testDevice);
+            $result = $probe->check($testDevice);
             if ($result->isSuccess()) {
                 return $result;
             }
@@ -134,7 +147,7 @@ final class SnmpPollingMethodDefinition extends PollingMethodDefinition
             $method->secret_id = $secret->id;
             $testDevice->setRelation('pollingMethods', collect([$method]));
 
-            $result = $this->probe()->check($testDevice);
+            $result = $probe->check($testDevice);
             if ($result->isSuccess()) {
                 return $result;
             }
@@ -160,42 +173,5 @@ final class SnmpPollingMethodDefinition extends PollingMethodDefinition
         }
 
         $device->os = Core::detectOS($device);
-    }
-
-    public function defaultAffectsAvailability(): bool
-    {
-        return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function icon(): string
-    {
-        return 'fa-server';
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function class(): string
-    {
-        return SnmpConfig::class;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function probe(): \LibreNMS\Polling\Method\Probe\SnmpProbe
-    {
-        return new \LibreNMS\Polling\Method\Probe\SnmpProbe();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function secretDefinition(): SnmpSecretDefinition
-    {
-        return new SnmpSecretDefinition;
     }
 }

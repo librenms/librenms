@@ -3,12 +3,9 @@
 namespace LibreNMS\Polling\Method\Definitions;
 
 use App\Models\Device;
-use App\Models\DevicePollingMethod;
 use App\Models\Eventlog;
-use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
-use LibreNMS\Polling\Method\Probe\IcmpProbe;
 use LibreNMS\Polling\Method\Probe\ProbeResult;
 
 /**
@@ -16,6 +13,16 @@ use LibreNMS\Polling\Method\Probe\ProbeResult;
  */
 final class IcmpPollingMethodDefinition extends PollingMethodDefinition
 {
+    public function icon(): string
+    {
+        return 'fa-exchange';
+    }
+
+    public function defaultAffectsAvailability(): bool
+    {
+        return true;
+    }
+
     public function onProbeComplete(Device $device, ProbeResult $result, bool $commit = false): void
     {
         if ($result->stat('duplicates')) {
@@ -33,37 +40,10 @@ final class IcmpPollingMethodDefinition extends PollingMethodDefinition
         }
     }
 
-    public function fallbackConfig(Device $device): IcmpConfig
-    {
-        $method = new DevicePollingMethod([
-            'method_type' => PollingMethodType::Icmp,
-            'enabled' => false,
-            'affects_availability' => $this->defaultAffectsAvailability(),
-        ]);
-        $method->setRelation('device', $device);
-
-        return IcmpConfig::fromPollingMethod($method);
-    }
-
     public function enrichDeviceMetadata(Device $device): void
     {
         if ($device->os === 'generic' || empty($device->os)) {
             $device->os = 'ping';
         }
-    }
-
-    public function icon(): string
-    {
-        return 'fa-exchange';
-    }
-
-    public function class(): string
-    {
-        return IcmpConfig::class;
-    }
-
-    public function probe(): IcmpProbe
-    {
-        return new IcmpProbe();
     }
 }

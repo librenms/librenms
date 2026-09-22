@@ -84,7 +84,8 @@ class LegacyDeviceCreator
                 'port_association_mode' => $this->port_association_mode,
             ], fn ($v) => $v !== null);
 
-            $snmpDefinition = $this->registry->get(PollingMethodType::Snmp);
+            $registry = $this->registry;
+            $snmpDefinition = $registry->definition(PollingMethodType::Snmp);
             $snmpMethod = new DevicePollingMethod([
                 'method_type' => PollingMethodType::Snmp,
                 'enabled' => true,

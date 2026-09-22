@@ -11,6 +11,16 @@ use LibreNMS\Polling\Method\Config\UnixAgentConfig;
  */
 final class UnixAgentPollingMethodDefinition extends PollingMethodDefinition
 {
+    public function icon(): string
+    {
+        return 'fa-terminal';
+    }
+
+    public function defaultAffectsAvailability(): bool
+    {
+        return false;
+    }
+
     /**
      * @inheritDoc
      */
@@ -31,54 +41,5 @@ final class UnixAgentPollingMethodDefinition extends PollingMethodDefinition
                 ->rules(['nullable', 'integer', 'min:1', 'max:300'])
                 ->cast('int'),
         ];
-    }
-
-    public function fallbackConfig(\App\Models\Device $device): UnixAgentConfig
-    {
-        $method = new \App\Models\DevicePollingMethod([
-            'method_type' => \LibreNMS\Enum\PollingMethodType::UnixAgent,
-            'enabled' => false,
-            'affects_availability' => $this->defaultAffectsAvailability(),
-        ]);
-        $method->setRelation('device', $device);
-
-        return UnixAgentConfig::fromPollingMethod($method);
-    }
-
-    public function defaultAffectsAvailability(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function icon(): string
-    {
-        return 'fa-terminal';
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function class(): string
-    {
-        return UnixAgentConfig::class;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function probe(): \LibreNMS\Polling\Method\Probe\UnixAgentProbe
-    {
-        return new \LibreNMS\Polling\Method\Probe\UnixAgentProbe();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function secretDefinition(): null
-    {
-        return null;
     }
 }
