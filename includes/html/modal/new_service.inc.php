@@ -14,18 +14,10 @@
 $stype = '';
 $device_id = (int) ($device['device_id'] ?? 0);
 
-    // Build the types list.
-    $dir = \App\Facades\LibrenmsConfig::get('nagios_plugins');
-    if (file_exists($dir) && is_dir($dir)) {
-        $files = scandir($dir);
-        $dir .= DIRECTORY_SEPARATOR;
-        foreach ($files as $file) {
-            if (is_executable($dir . $file) && is_file($dir . $file) && strstr($file, 'check_')) {
-                [,$check_name] = explode('_', $file, 2);
-                $stype .= "<option value='$check_name'>$check_name</option>";
-            }
-        }
-    } ?>
+foreach (\LibreNMS\Services::list() as $check_name) {
+    $stype .= "<option value='$check_name'>$check_name</option>";
+}
+?>
 
 <div class="modal fade bs-example-modal-sm" id="create-service" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
     <div class="modal-dialog">
