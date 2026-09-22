@@ -158,6 +158,14 @@ class PollingMethodRegistry
     }
 
     /**
+     * Get the icon for a polling method.
+     */
+    public function icon(PollingMethodType $type): string
+    {
+        return $this->require($type)->icon();
+    }
+
+    /**
      * Get the default affects availability value for a polling method.
      */
     public function defaultAffectsAvailability(PollingMethodType $type): bool

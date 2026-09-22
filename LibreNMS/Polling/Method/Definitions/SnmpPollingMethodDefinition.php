@@ -11,9 +11,6 @@ use LibreNMS\Modules\Core;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use SnmpQuery;
 
-/**
- * @extends PollingMethodDefinition<SnmpConfig>
- */
 final class SnmpPollingMethodDefinition extends PollingMethodDefinition
 {
     public function icon(): string

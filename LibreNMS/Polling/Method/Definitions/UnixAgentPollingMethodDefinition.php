@@ -4,11 +4,7 @@ namespace LibreNMS\Polling\Method\Definitions;
 
 use App\Facades\LibrenmsConfig;
 use App\View\FieldSchema\FieldDefinition;
-use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 
-/**
- * @extends PollingMethodDefinition<UnixAgentConfig>
- */
 final class UnixAgentPollingMethodDefinition extends PollingMethodDefinition
 {
     public function icon(): string

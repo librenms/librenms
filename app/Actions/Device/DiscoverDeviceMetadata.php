@@ -10,7 +10,7 @@ class DiscoverDeviceMetadata
 {
     public function __construct(
         private readonly \LibreNMS\Polling\Method\PollingMethodRegistry $registry,
-        private readonly ValidateDeviceUniqueness $uniqueness = new ValidateDeviceUniqueness,
+        private readonly ValidateDeviceUniqueness $uniqueness,
     ) {
     }
 

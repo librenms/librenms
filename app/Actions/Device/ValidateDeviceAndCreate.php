@@ -33,6 +33,12 @@ use Illuminate\Support\Collection;
 
 readonly class ValidateDeviceAndCreate
 {
+    private BuildDefaultPollingMethods $builder;
+    private ValidateDeviceUniqueness $uniqueness;
+    private DiscoverDevicePollingMethods $discoverMethods;
+    private DiscoverDeviceMetadata $discoverMetadata;
+    private PersistDeviceWithPollingMethods $persister;
+
     /**
      * @param  Collection<int, DevicePollingMethod>|null  $pollingMethods
      */
@@ -41,12 +47,17 @@ readonly class ValidateDeviceAndCreate
         private ?Collection $pollingMethods = null,
         private bool $force = false,
         private bool $ping_fallback = false,
-        private BuildDefaultPollingMethods $builder = new BuildDefaultPollingMethods,
-        private ValidateDeviceUniqueness $uniqueness = new ValidateDeviceUniqueness,
-        private DiscoverDevicePollingMethods $discoverMethods = new DiscoverDevicePollingMethods,
-        private DiscoverDeviceMetadata $discoverMetadata = new DiscoverDeviceMetadata,
-        private PersistDeviceWithPollingMethods $persister = new PersistDeviceWithPollingMethods,
+        ?BuildDefaultPollingMethods $builder = null,
+        ?ValidateDeviceUniqueness $uniqueness = null,
+        ?DiscoverDevicePollingMethods $discoverMethods = null,
+        ?DiscoverDeviceMetadata $discoverMetadata = null,
+        ?PersistDeviceWithPollingMethods $persister = null,
     ) {
+        $this->builder = $builder ?? resolve(BuildDefaultPollingMethods::class);
+        $this->uniqueness = $uniqueness ?? resolve(ValidateDeviceUniqueness::class);
+        $this->discoverMethods = $discoverMethods ?? resolve(DiscoverDevicePollingMethods::class);
+        $this->discoverMetadata = $discoverMetadata ?? resolve(DiscoverDeviceMetadata::class);
+        $this->persister = $persister ?? resolve(PersistDeviceWithPollingMethods::class);
     }
 
     /**

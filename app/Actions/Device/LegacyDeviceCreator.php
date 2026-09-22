@@ -40,9 +40,8 @@ class LegacyDeviceCreator
         public ?string $authlevel = null,
         public bool $force = false,
         public bool $ping_fallback = false,
-        ?PollingMethodRegistry $registry = null,
     ) {
-        $this->registry = $registry ?? app(PollingMethodRegistry::class);
+        $this->registry = resolve(PollingMethodRegistry::class);
     }
 
     public function getDevice(): Device

@@ -5,12 +5,8 @@ namespace LibreNMS\Polling\Method\Definitions;
 use App\Models\Device;
 use App\Models\Eventlog;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Probe\ProbeResult;
 
-/**
- * @extends PollingMethodDefinition<IcmpConfig>
- */
 final class IcmpPollingMethodDefinition extends PollingMethodDefinition
 {
     public function icon(): string

@@ -61,6 +61,9 @@ readonly class PollingMethodAccessor
         return $this->get(PollingMethodType::UnixAgent);
     }
 
+    /**
+     * @param  array<int, mixed>  $arguments
+     */
     public function __call(string $name, array $arguments): ?PollingMethodConfig
     {
         $type = PollingMethodType::tryFrom(Str::kebab($name));

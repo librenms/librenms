@@ -3,11 +3,7 @@
 namespace LibreNMS\Polling\Method\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
-use LibreNMS\Polling\Method\Config\IpmiConfig;
 
-/**
- * @extends PollingMethodDefinition<IpmiConfig>
- */
 final class IpmiPollingMethodDefinition extends PollingMethodDefinition
 {
     public function icon(): string

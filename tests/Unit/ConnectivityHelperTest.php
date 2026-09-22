@@ -262,7 +262,7 @@ final class ConnectivityHelperTest extends TestCase
             maxOid: 10
         );
 
-        $probe = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Snmp)->probe();
+        $probe = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->probe(PollingMethodType::Snmp);
 
         $this->assertTrue($probe->check($device)->isSuccess());
         $this->assertTrue($probe->check($device)->isSuccess());
