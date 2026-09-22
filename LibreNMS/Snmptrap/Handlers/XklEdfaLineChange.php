@@ -50,7 +50,7 @@ class XklEdfaLineChange implements SnmptrapHandler
         $severity = match ($edfaState) {
             'up' => Severity::Ok,
             'unused' => Severity::Info,
-            'warning' => Severity::Info,
+            'warning' => Severity::Warning,
             'unknown' => Severity::Info,
             default => Severity::Error,
         };
