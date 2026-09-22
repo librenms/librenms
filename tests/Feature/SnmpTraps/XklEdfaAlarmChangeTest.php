@@ -128,7 +128,7 @@ XKL-MIB::xklEDFAModuleAlarms.1 LOS AOP
 XKL-MIB::xklEDFAName.1 Output EDFA
 TRAP,
 
-            'Output EDFA modules alarms: LOS AOP.',
+            'Output EDFA module alarms: LOS AOP.',
             'Failed to handle EDFA module alarms',
             [Severity::Error],
         );
