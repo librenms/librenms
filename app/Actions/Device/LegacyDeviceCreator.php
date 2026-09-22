@@ -14,7 +14,7 @@ use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 class LegacyDeviceCreator
 {
     private ?Device $device = null;
-    private PollingMethodRegistry $registry;
+    private readonly PollingMethodRegistry $registry;
 
     public function __construct(
         public string $hostname,
