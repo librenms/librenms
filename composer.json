@@ -165,6 +165,9 @@
             "@test:unit",
             "@test:lint",
             "@test:types"
+        ],
+        "pre-package-uninstall": [
+            "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
         ]
     },
     "support": {
