@@ -83,6 +83,15 @@ class Billing
         return $cur_used / $since * $total;
     }
 
+    public static function calculateBitrate(int|float $measurement, int|float $last_measurement, int|float $period): float
+    {
+        if ($period <= 0) {
+            return 0.0;
+        }
+
+        return round(($measurement - $last_measurement) * 8 / $period, 2);
+    }
+
     public static function getValue($device_id, $id, $inout): ?int
     {
         $device = DeviceCache::get($device_id);
@@ -93,41 +102,6 @@ class Billing
         }
 
         return is_numeric($value) ? (int) $value : null;
-    }
-
-    public static function getLastPortCounter($port_id, $bill_id): array
-    {
-        $return = [];
-        $row = dbFetchRow('SELECT timestamp, in_counter, in_delta, out_counter, out_delta FROM bill_port_counters WHERE `port_id` = ? AND `bill_id` = ?', [$port_id, $bill_id]);
-        if (! is_null($row)) {
-            $return['timestamp'] = $row['timestamp'];
-            $return['in_counter'] = $row['in_counter'];
-            $return['in_delta'] = $row['in_delta'];
-            $return['out_counter'] = $row['out_counter'];
-            $return['out_delta'] = $row['out_delta'];
-            $return['state'] = 'ok';
-        } else {
-            $return['state'] = 'failed';
-        }
-
-        return $return;
-    }
-
-    public static function getLastMeasurement($bill_id): array
-    {
-        $return = [];
-        $row = dbFetchRow('SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id = ? ORDER BY timestamp DESC LIMIT 1', [$bill_id]);
-        if (! is_null($row)) {
-            $return['delta'] = $row['delta'];
-            $return['in_delta'] = $row['in_delta'];
-            $return['out_delta'] = $row['out_delta'];
-            $return['timestamp'] = $row['timestamp'];
-            $return['state'] = 'ok';
-        } else {
-            $return['state'] = 'failed';
-        }
-
-        return $return;
     }
 
     private static function get95thagg($bill_id, $datefrom, $dateto): float
