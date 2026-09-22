@@ -202,12 +202,6 @@ class Ipmitool
         $cmd = $this->createCommand($commands, $ipmi_type);
         Log::debug('IPMI[%m' . implode(' ', $cmd) . '%n]', ['color' => true]);
 
-        // ipmitool calls setlocale(LC_ALL, "") internally and formats sensor
-        // values with a locale-sensitive printf("%.3f", ...) — on a server
-        // locale that uses a comma decimal separator, this would emit
-        // e.g. "1,310" instead of "1.310", which gets silently mis-parsed
-        // downstream. Force C so the output format is deterministic
-        // regardless of the host's configured locale.
         return Process::command($cmd)->env(['LC_ALL' => 'C'])->run();
     }
 }
