@@ -143,6 +143,8 @@ class PhpRrd implements RrdBackendInterface
     public function list(string $dir, string|array $prefix): array
     {
         if ($this->rrdcached) {
+            $this->rrdcachedSocketConnect();
+
             $cmd = "LIST $dir";
             Log::debug("SRRD[%g$cmd%n]", ['color' => true]);
             fwrite($this->rrdcachedSocket, "$cmd\n");

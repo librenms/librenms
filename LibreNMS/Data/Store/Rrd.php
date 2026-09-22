@@ -32,9 +32,9 @@ use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use File;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Store\Rrd\RrdPath;
 use LibreNMS\Data\Store\Rrd\PhpRrd;
 use LibreNMS\Data\Store\Rrd\RrdBackendInterface;
+use LibreNMS\Data\Store\Rrd\RrdPath;
 use LibreNMS\Data\Store\Rrd\RrdtoolRrd;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\RrdException;
@@ -53,7 +53,6 @@ class Rrd extends BaseDatastore
     private int $updateErrorCount = 0;
 
     private RrdBackendInterface $backend;
-    private string $rrd_dir;
     private string $version;
     private string $rrdcached;
     /** @var string[] */
@@ -190,7 +189,7 @@ class Rrd extends BaseDatastore
         }
 
         $stat = Measurement::start('update');
-        $this->backend->update($filename, $data);
+        $this->backend->update($rrd, $data);
         $this->recordStatistic($stat->end());
     }
 
@@ -200,9 +199,7 @@ class Rrd extends BaseDatastore
     public function tune(string $type, RrdPath $rrd, int $max): bool
     {
         // tune only works on the local filesystem - use the fully qualified path the RRD file
-        if ($this->rrdcached) {
-            $filename = implode('/', [$this->rrd_dir, $filename]);
-        }
+        $filename = $rrd->fullPath();
 
         $fields = [];
         if ($type === 'port') {
@@ -231,16 +228,7 @@ class Rrd extends BaseDatastore
         if (count($fields) > 0) {
             $cmd = [LibrenmsConfig::get('rrdtool', 'rrdtool'), 'tune', $filename];
             foreach ($fields as $field) {
-                array_push($options, '--maximum', $field . ':' . $max);
-            }
-            try {
-                $stat = Measurement::start('other');
-                $this->backend->tune($filename, $options);
-                $this->recordStatistic($stat->end());
-            } catch (RrdException $e) {
-                if (! $e instanceof RrdNotFoundException) {
-                    Log::debug('RRD tune failed: ' . $e->getMessage());
-                }
+                array_push($cmd, '--maximum', $field . ':' . $max);
             }
             Log::debug('[%gRRD ' . implode(' ', $cmd) . '%n]', ['color' => true]);
 
@@ -309,6 +297,32 @@ class Rrd extends BaseDatastore
     public function name(string $hostname, array|string $filename): RrdPath
     {
         return RrdPath::make($hostname, self::filenameString($filename) . '.rrd');
+    }
+
+    /**
+     * Build a command array for rrdtool
+     * Shortens the filename as needed
+     * Determines if --daemon should be used
+     *
+     * @param  string[]  $options  Options for the command possibly including the rrd definition
+     * @return string[] returns a full command array ready to be used by rrdtool
+     *
+     * @throws RrdFileExistsException if rrdtool <1.4.3 and the rrd file exists locally
+     */
+    public static function buildCommand(string $command, string $filename, array $options = []): array
+    {
+        if ($command == 'create') {
+            // <1.4.3 doesn't support -O, so make sure the file doesn't exist
+            if (version_compare(LibrenmsConfig::get('rrdtool_version', '1.4'), '1.4.3', '<')) {
+                if (is_file($filename)) {
+                    throw new RrdFileExistsException();
+                }
+            } else {
+                $options[] = '-O';
+            }
+        }
+
+        return [$command, $filename, ...$options];
     }
 
     /**
@@ -382,8 +396,7 @@ class Rrd extends BaseDatastore
         if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
             $stat = Measurement::start('other');
             try {
-                $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
-                $check_output = $this->backend->last($filename);
+                $check_output = $this->backend->last($rrdpath);
                 $this->recordStatistic($stat->end());
 
                 return ! (str_contains($check_output, $rrdpath) && str_contains($check_output, 'No such file or directory'));
@@ -546,5 +559,13 @@ class Rrd extends BaseDatastore
         if (! File::deleteDirectory($host_dir)) {
             throw new RrdPermissionException("Could not delete RRD files for: $hostname");
         }
+    }
+
+    /**
+     * @param  string|string[]  $filename
+     */
+    private static function filenameString(string|array $filename): string
+    {
+        return is_array($filename) ? implode('-', $filename) : $filename;
     }
 }
