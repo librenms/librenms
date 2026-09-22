@@ -14,7 +14,6 @@
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Bill;
-use App\Models\BillData;
 use App\Models\BillPortCounter;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Billing;
@@ -46,6 +45,8 @@ Log::info("Starting Bill Polling Session ... \n");
 $query = Bill::with([
     'ports' => fn ($q) => $q->whereIn('ifOperStatus', ['up', 'dormant'])
         ->select(['ports.port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifSpeed']),
+    'portCounters',
+    'data' => fn ($q) => $q->latest('timestamp')->limit(1),
 ])->when($options['b'] ?? null, fn ($q, $bill_id) => $q->where('bill_id', $bill_id));
 
 $poller_group = (LibrenmsConfig::get('distributed_poller') && LibrenmsConfig::get('distributed_billing')) ? LibrenmsConfig::get('distributed_poller_group') : null;
@@ -58,6 +59,10 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
     $delta = 0;
     $in_delta = 0;
     $out_delta = 0;
+    $counterUpdates = [];
+    $polledPortCount = 0;
+    $lastCountersByPort = $bill->portCounters->keyBy('port_id');
+
     foreach ($bill->ports as $port) {
         $device = DeviceCache::get($port->device_id);
 
@@ -65,6 +70,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
             continue;
         }
 
+        $polledPortCount++;
         Log::info("  Polling $port->ifName ($port->ifDescr) on $device->hostname");
 
         $in_measurement = Billing::getValue($port->device_id, $port->ifIndex, 'In');
@@ -75,32 +81,24 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
             continue;
         }
 
-        $last_counters = BillPortCounter::where('port_id', $port->port_id)
-            ->where('bill_id', $bill_id)
-            ->first(['timestamp', 'in_counter', 'in_delta', 'out_counter', 'out_delta']);
-
+        $last_counters = $lastCountersByPort->get($port->port_id);
         if ($last_counters !== null) {
-            $last_in_measurement = $last_counters->in_counter;
-            $last_in_delta = $last_counters->in_delta;
-            $last_out_measurement = $last_counters->out_counter;
-            $last_out_delta = $last_counters->out_delta;
-
             $tmp_period = DB::scalar('SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP(?)', [$last_counters->timestamp]);
 
-            if ($port->ifSpeed > 0 && Billing::calculateBitrate($in_measurement, $last_in_measurement, $tmp_period) > $port->ifSpeed) {
-                $in_delta = $last_in_delta;
-            } elseif ($in_measurement >= $last_in_measurement) {
-                $in_delta = ($in_measurement - $last_in_measurement);
+            if ($port->ifSpeed > 0 && Billing::calculateBitrate($in_measurement, $last_counters->in_counter, $tmp_period) > $port->ifSpeed) {
+                $in_delta = $last_counters->in_delta;
+            } elseif ($in_measurement >= $last_counters->in_counter) {
+                $in_delta = ($in_measurement - $last_counters->in_counter);
             } else {
-                $in_delta = $last_in_delta;
+                $in_delta = $last_counters->in_delta;
             }
 
-            if ($port->ifSpeed > 0 && Billing::calculateBitrate($out_measurement, $last_out_measurement, $tmp_period) > $port->ifSpeed) {
-                $out_delta = $last_out_delta;
-            } elseif ($out_measurement >= $last_out_measurement) {
-                $out_delta = ($out_measurement - $last_out_measurement);
+            if ($port->ifSpeed > 0 && Billing::calculateBitrate($out_measurement, $last_counters->out_counter, $tmp_period) > $port->ifSpeed) {
+                $out_delta = $last_counters->out_delta;
+            } elseif ($out_measurement >= $last_counters->out_counter) {
+                $out_delta = ($out_measurement - $last_counters->out_counter);
             } else {
-                $out_delta = $last_out_delta;
+                $out_delta = $last_counters->out_delta;
             }
         } else {
             $in_delta = 0;
@@ -110,28 +108,33 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         //For debugging
         Log::debug("****$now: " . $bill->bill_name . ' Billing DB SNMP counters received.');
         Log::debug('in_measurement: ' . $in_measurement . '  out_measurement: ' . $out_measurement . "\nThe data types are. in_measurement:" . gettype($in_measurement) . ' and out_measurement: ' . gettype($out_measurement));
-        Log::debug('IN_delta: ' . $in_delta . ' OUT_delta: ' . $out_delta . "\nLast_IN_delta: " . ($last_in_delta ?? '') . ' last_OUT_delta: ' . ($last_out_delta ?? ''));
+        Log::debug('IN_delta: ' . $in_delta . ' OUT_delta: ' . $out_delta . "\nLast_IN_delta: " . ($last_counters->in_delta ?? '') . ' last_OUT_delta: ' . ($last_counters->out_delta ?? ''));
 
         Log::debug("Nice, valid counters 'in/out_measurement', lets use them");
-        BillPortCounter::query()->updateOrInsert(
-            ['port_id' => $port->port_id, 'bill_id' => $bill_id],
-            [
-                'timestamp' => $now,
-                'in_counter' => $in_measurement,
-                'out_counter' => $out_measurement,
-                'in_delta' => (int) $in_delta,
-                'out_delta' => (int) $out_delta,
-            ]
-        );
+        $counterUpdates[] = [
+            'port_id' => $port->port_id,
+            'bill_id' => $bill_id,
+            'timestamp' => $now,
+            'in_counter' => $in_measurement,
+            'out_counter' => $out_measurement,
+            'in_delta' => (int) $in_delta,
+            'out_delta' => (int) $out_delta,
+        ];
         ////////////////////////////////EndCountersValidation&DB-Update
         $delta = ($delta + $in_delta + $out_delta);
         $in_delta = ($in_delta + $in_delta);
         $out_delta = ($out_delta + $out_delta);
     }//end foreach
 
-    $last_data = BillData::where('bill_id', $bill_id)
-        ->latest('timestamp')
-        ->first(['timestamp', 'delta', 'in_delta', 'out_delta']);
+    if (! empty($counterUpdates)) {
+        BillPortCounter::upsert(
+            $counterUpdates,
+            ['port_id', 'bill_id'],
+            ['timestamp', 'in_counter', 'out_counter', 'in_delta', 'out_delta']
+        );
+    }
+
+    $last_data = $bill->data->first();
 
     if ($last_data !== null) {
         $prev_delta = $last_data->delta;
@@ -154,30 +157,21 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
 
     if (! empty($period) && $period < 0) {
         Log::debug("BILLING: negative period! id:$bill_id period:$period delta:$delta in_delta:$in_delta out_delta:$out_delta");
-    } else {
-        $port_count = $bill->ports()
-            ->when($poller_group !== null, function ($q) use ($poller_group) {
-                $groups = is_array($poller_group) ? $poller_group : explode(',', (string) $poller_group);
-                $q->whereHas('device', fn ($dq) => $dq->whereIn('poller_group', $groups));
-            })
-            ->count();
-
-        if ($port_count > 0) {
-            // If no ports are part of this bill then don't insert a zero value entry
-            $bill->data()->create([
-                'timestamp' => $now,
-                'period' => $period,
-                'delta' => $delta,
-                'in_delta' => $in_delta,
-                'out_delta' => $out_delta,
-            ]);
-        }
+    } elseif ($polledPortCount > 0) {
+        // If no ports are part of this bill then don't insert a zero value entry
+        $bill->data()->create([
+            'timestamp' => $now,
+            'period' => $period,
+            'delta' => $delta,
+            'in_delta' => $in_delta,
+            'out_delta' => $out_delta,
+        ]);
     }
 }//end CollectData()
 
 $poller_end = microtime(true);
-$poller_run = ($poller_end - $poller_start);
-$poller_time = substr($poller_run, 0, 5);
+$poller_run = $poller_end - $poller_start;
+$poller_time = round($poller_run, 3);
 
 if ($poller_time > 300) {
     Log::warning("BILLING: polling took longer than 5 minutes ($poller_time seconds)!");
