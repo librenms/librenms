@@ -2,11 +2,13 @@
 
 namespace LibreNMS;
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Number;
+use SnmpQuery;
 
 class Billing
 {
@@ -81,15 +83,13 @@ class Billing
         return $cur_used / $since * $total;
     }
 
-    public static function getValue($host, $port, $id, $inout): int
+    public static function getValue($device_id, $id, $inout): int
     {
-        $oid = 'IF-MIB::ifHC' . $inout . 'Octets.' . $id;
-        $device = dbFetchRow('SELECT * from `devices` WHERE `hostname` = ? LIMIT 1', [$host]);
-        $value = snmp_get($device, $oid, '-Oqv');
+        $device = DeviceCache::get($device_id);
+        $value = SnmpQuery::device($device)->get('IF-MIB::ifHC' . $inout . 'Octets.' . $id)->value();
 
         if (! is_numeric($value)) {
-            $oid = 'IF-MIB::if' . $inout . 'Octets.' . $id;
-            $value = snmp_get($device, $oid, '-Oqv');
+            $value = SnmpQuery::device($device)->get('IF-MIB::if' . $inout . 'Octets.' . $id)->value();
         }
 
         return (int) $value;

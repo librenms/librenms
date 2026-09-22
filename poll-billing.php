@@ -12,6 +12,7 @@
  */
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Bill;
 use LibreNMS\Billing;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Util\Debug;
@@ -38,86 +39,83 @@ if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
 $poller_start = microtime(true);
 Log::info("Starting Bill Polling Session ... \n");
 
-$query = \LibreNMS\DB\Eloquent::DB()->table('bills');
+$query = Bill::with([
+    'ports' => fn ($q) => $q->whereIn('ifOperStatus', ['up', 'dormant'])
+        ->select(['ports.port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifSpeed']),
+])->when($options['b'] ?? null, fn ($q, $bill_id) => $q->where('bill_id', $bill_id));
 
-if (isset($options['b'])) {
-    $query->where('bill_id', $options['b']);
-}
+$poller_group = (LibrenmsConfig::get('distributed_poller') && LibrenmsConfig::get('distributed_billing')) ? LibrenmsConfig::get('distributed_poller_group') : null;
 
 foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
     Log::info('Bill : ' . $bill->bill_name);
     $bill_id = $bill->bill_id;
 
-    if (LibrenmsConfig::get('distributed_poller') && LibrenmsConfig::get('distributed_billing')) {
-        $port_list = dbFetchRows('SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND I.ifOperStatus IN ("up", "dormant") AND D.device_id = I.device_id AND D.status=1 AND D.poller_group IN (' . LibrenmsConfig::get('distributed_poller_group') . ')', [$bill_id]);
-    } else {
-        $port_list = dbFetchRows('SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND I.ifOperStatus IN ("up", "dormant") AND D.device_id = I.device_id AND D.status=1', [$bill_id]);
-    }
-
     $now = dbFetchCell('SELECT NOW()');
     $delta = 0;
     $in_delta = 0;
     $out_delta = 0;
-    foreach ($port_list as $port_data) {
-        $port_id = $port_data['port_id'];
-        $host = $port_data['hostname'];
-        $port = $port_data['port'];
+    foreach ($bill->ports as $port) {
+        $device = DeviceCache::get($port->device_id);
 
-        Log::info("  Polling {$port_data['ifName']} ({$port_data['ifDescr']}) on {$port_data['hostname']}");
+        if ($device->disabled || ($poller_group && $device->poller_group != $poller_group)) {
+            continue;
+        }
 
-        $port_data['in_measurement'] = Billing::getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'In');
-        $port_data['out_measurement'] = Billing::getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'Out');
+        Log::info("  Polling $port->ifName ($port->ifDescr) on $device->hostname");
 
-        $last_counters = Billing::getLastPortCounter($port_id, $bill_id);
+        $in_measurement = Billing::getValue($port->device_id, $port->ifIndex, 'In');
+        $out_measurement = Billing::getValue($port->device_id, $port->ifIndex, 'Out');
+
+        $last_counters = Billing::getLastPortCounter($port->port_id, $bill_id);
         if ($last_counters['state'] == 'ok') {
-            $port_data['last_in_measurement'] = $last_counters['in_counter'];
-            $port_data['last_in_delta'] = $last_counters['in_delta'];
-            $port_data['last_out_measurement'] = $last_counters['out_counter'];
-            $port_data['last_out_delta'] = $last_counters['out_delta'];
+            $last_in_measurement = $last_counters['in_counter'];
+            $last_in_delta = $last_counters['in_delta'];
+            $last_out_measurement = $last_counters['out_counter'];
+            $last_out_delta = $last_counters['out_delta'];
 
             $tmp_period = dbFetchCell("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('" . $last_counters['timestamp'] . "')");
 
-            if ($port_data['ifSpeed'] > 0 && (delta_to_bits($port_data['in_measurement'], $tmp_period) - delta_to_bits($port_data['last_in_measurement'], $tmp_period)) > $port_data['ifSpeed']) {
-                $port_data['in_delta'] = $port_data['last_in_delta'];
-            } elseif ($port_data['in_measurement'] >= $port_data['last_in_measurement']) {
-                $port_data['in_delta'] = ($port_data['in_measurement'] - $port_data['last_in_measurement']);
+            if ($port->ifSpeed > 0 && (delta_to_bits($in_measurement, $tmp_period) - delta_to_bits($last_in_measurement, $tmp_period)) > $port->ifSpeed) {
+                $in_delta = $last_in_delta;
+            } elseif ($in_measurement >= $last_in_measurement) {
+                $in_delta = ($in_measurement - $last_in_measurement);
             } else {
-                $port_data['in_delta'] = $port_data['last_in_delta'];
+                $in_delta = $last_in_delta;
             }
 
-            if ($port_data['ifSpeed'] > 0 && (delta_to_bits($port_data['out_measurement'], $tmp_period) - delta_to_bits($port_data['last_out_measurement'], $tmp_period)) > $port_data['ifSpeed']) {
-                $port_data['out_delta'] = $port_data['last_out_delta'];
-            } elseif ($port_data['out_measurement'] >= $port_data['last_out_measurement']) {
-                $port_data['out_delta'] = ($port_data['out_measurement'] - $port_data['last_out_measurement']);
+            if ($port->ifSpeed > 0 && (delta_to_bits($out_measurement, $tmp_period) - delta_to_bits($last_out_measurement, $tmp_period)) > $port->ifSpeed) {
+                $out_delta = $last_out_delta;
+            } elseif ($out_measurement >= $last_out_measurement) {
+                $out_delta = ($out_measurement - $last_out_measurement);
             } else {
-                $port_data['out_delta'] = $port_data['last_out_delta'];
+                $out_delta = $last_out_delta;
             }
         } else {
-            $port_data['in_delta'] = '0';
-            $port_data['out_delta'] = '0';
+            $in_delta = '0';
+            $out_delta = '0';
         }
         //////////////////////////////////CountersValidation$DB-Update
         //For debugging
         Log::debug("****$now: " . $bill->bill_name . ' Billing DB SNMP counters received.');
-        Log::debug('in_measurement: ' . $port_data['in_measurement'] . '  out_measurement: ' . $port_data['out_measurement'] . "\nThe data types are. in_measurement:" . gettype($port_data['in_measurement']) . ' and out_measurement: ' . gettype($port_data['out_measurement']));
-        Log::debug('IN_delta: ' . $port_data['in_delta'] . ' OUT_delta: ' . $port_data['out_delta'] . "\nLast_IN_delta: " . ($port_data['last_in_delta'] ?? '') . ' last_OUT_delta: ' . ($port_data['last_out_delta'] ?? ''));
+        Log::debug('in_measurement: ' . $in_measurement . '  out_measurement: ' . $out_measurement . "\nThe data types are. in_measurement:" . gettype($in_measurement) . ' and out_measurement: ' . gettype($out_measurement));
+        Log::debug('IN_delta: ' . $in_delta . ' OUT_delta: ' . $out_delta . "\nLast_IN_delta: " . ($last_in_delta ?? '') . ' last_OUT_delta: ' . ($last_out_delta ?? ''));
 
-        if (is_numeric($port_data['in_measurement']) && is_numeric($port_data['out_measurement'])) {
+        if (is_numeric($in_measurement) && is_numeric($out_measurement)) {
             Log::debug("Nice, valid counters 'in/out_measurement', lets use them");
             // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
-            $fields = ['timestamp' => $now, 'in_counter' => (string) set_numeric($port_data['in_measurement']), 'out_counter' => (string) set_numeric($port_data['out_measurement']), 'in_delta' => (string) set_numeric($port_data['in_delta']), 'out_delta' => (string) set_numeric($port_data['out_delta'])];
-            if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . $port_id . "' AND `bill_id`='$bill_id'") == 0) {
+            $fields = ['timestamp' => $now, 'in_counter' => (string) set_numeric($in_measurement), 'out_counter' => (string) set_numeric($out_measurement), 'in_delta' => (string) set_numeric($in_delta), 'out_delta' => (string) set_numeric($out_delta)];
+            if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . $port->port_id . "' AND `bill_id`='$bill_id'") == 0) {
                 $fields['bill_id'] = $bill_id;
-                $fields['port_id'] = $port_id;
+                $fields['port_id'] = $port->port_id;
                 dbInsert($fields, 'bill_port_counters');
             }
         } else {
             Log::error("WATCH out! - Wrong counters. Table 'bill_port_counters' not updated");
         }
         ////////////////////////////////EndCountersValidation&DB-Update
-        $delta = ($delta + $port_data['in_delta'] + $port_data['out_delta']);
-        $in_delta = ($in_delta + $port_data['in_delta']);
-        $out_delta = ($out_delta + $port_data['out_delta']);
+        $delta = ($delta + $in_delta + $out_delta);
+        $in_delta = ($in_delta + $in_delta);
+        $out_delta = ($out_delta + $out_delta);
     }//end foreach
 
     $last_data = Billing::getLastMeasurement($bill_id);
