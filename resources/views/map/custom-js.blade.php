@@ -129,6 +129,10 @@
             options.interaction.hover = true;
             options.interaction.tooltipDelay = 100;
 
+            if (! options.interaction.zoomView) {
+                scale = 1;
+            }
+
             var container = document.getElementById(elementId);
             var network = new vis.Network(container, {nodes: nodes, edges: edges}, options);
 
