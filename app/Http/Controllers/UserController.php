@@ -26,6 +26,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use App\Facades\LibrenmsConfig;
 use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\StoreUserRequest;
@@ -41,11 +43,13 @@ use Illuminate\View\View;
 use LibreNMS\Authentication\LegacyAuth;
 use URL;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('deny-demo');
+        return [
+            'deny-demo',
+        ];
     }
 
     /**

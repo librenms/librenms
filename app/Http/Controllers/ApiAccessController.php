@@ -23,6 +23,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -30,11 +32,13 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Laravel\Sanctum\PersonalAccessToken;
 
-class ApiAccessController extends Controller
+class ApiAccessController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('deny-demo');
+        return [
+            'deny-demo',
+        ];
     }
 
     public function index(Request $request): View
