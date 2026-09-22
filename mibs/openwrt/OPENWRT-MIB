@@ -4,9 +4,11 @@
 -- Base registration module for OpenWrt metrics exported by the
 -- OpenWrt SNMP metrics agent (a net-snmp AgentX subagent).
 --
--- This module only establishes the OpenWrt OID structure. The metrics
--- themselves live in per-subsystem modules that register beneath
--- openwrtObjects, for example OPENWRT-WIRELESS-MIB at { openwrtObjects 10 }.
+-- This module establishes the OpenWrt OID structure, defines the device
+-- metadata scalars under openwrtSystem, and the openwrtProducts values an
+-- agent may report as sysObjectID. The metrics themselves live in
+-- per-subsystem modules that register beneath openwrtObjects, for example
+-- OPENWRT-WIRELESS-MIB at { openwrtObjects 10 }.
 --
 -- Enterprise Number: 66510 (OpenWrt, IANA PEN)
 -- OID Base: .1.3.6.1.4.1.66510
@@ -14,20 +16,21 @@
 -- openwrtMIB is rooted directly under OpenWrt's own IANA-assigned enterprise
 -- number, with no intermediate node.
 --
--- Device metadata scalars (e.g. openwrtMIBversion, openwrtOSversion) are
--- reserved for a future revision and are intentionally not defined yet, so
--- that this MIB stays in lockstep with what the agent currently serves.
 -- Temperature/thermal data is exported separately via LM-SENSORS-MIB.
 -- **********************************************************
 
 OPENWRT-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, enterprises
-        FROM SNMPv2-SMI;
+    MODULE-IDENTITY, OBJECT-TYPE, enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF;
 
 openwrtMIB MODULE-IDENTITY
-    LAST-UPDATED "202608130000Z"
+    LAST-UPDATED "202609220000Z"
     ORGANIZATION "OpenWrt"
     CONTACT-INFO
         "       OpenWrt Project
@@ -36,9 +39,17 @@ openwrtMIB MODULE-IDENTITY
         "
     DESCRIPTION
         "Base module describing the OpenWrt OID structure used by the
-         OpenWrt SNMP metrics agent. Per-subsystem metrics register under
-         openwrtObjects (wireless at { openwrtObjects 10 }); conformance
-         registers under openwrtConformance."
+         OpenWrt SNMP metrics agent, the device metadata scalars under
+         openwrtSystem, and the sysObjectID values under openwrtProducts.
+         Per-subsystem metrics register under openwrtObjects (wireless at
+         { openwrtObjects 10 }); conformance registers under
+         openwrtConformance."
+    REVISION "202609220000Z"
+    DESCRIPTION
+        "Added openwrtSystem device metadata scalars (release version,
+         build revision, target and device model) and openwrtProducts, so
+         a manager can identify an OpenWrt device and its release without
+         extend scripts."
     REVISION "202608130000Z"
     DESCRIPTION
         "Initial version: base registration nodes for the OpenWrt subtree."
@@ -50,5 +61,94 @@ openwrtMIB MODULE-IDENTITY
 
 openwrtObjects     OBJECT IDENTIFIER ::= { openwrtMIB 1 }
 openwrtConformance OBJECT IDENTIFIER ::= { openwrtMIB 2 }
+openwrtProducts    OBJECT IDENTIFIER ::= { openwrtMIB 3 }
+
+-- **********************************************************
+-- Products (sysObjectID values)
+-- **********************************************************
+
+-- sysObjectID for a device running OpenWrt, whatever the hardware; the
+-- device model is in openwrtSysModel. snmpd reports this only when
+-- configured to (net-snmp's own default is its generic Linux value).
+openwrtDevice OBJECT IDENTIFIER ::= { openwrtProducts 1 }
+
+-- **********************************************************
+-- Device metadata
+-- **********************************************************
+
+openwrtSystem OBJECT IDENTIFIER ::= { openwrtObjects 1 }
+
+openwrtSysVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OpenWrt release version, for example 24.10.2, or SNAPSHOT for a
+         development build: the VERSION field of /etc/os-release.
+         Not instantiated if the device does not provide it."
+    ::= { openwrtSystem 1 }
+
+openwrtSysRevision OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Source revision the running firmware was built from, for example
+         r28427-6df0e3d02a: the BUILD_ID field of /etc/os-release. This is
+         what tells one SNAPSHOT build from another. Not instantiated if the
+         device does not provide it."
+    ::= { openwrtSystem 2 }
+
+openwrtSysTarget OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OpenWrt target and subtarget the firmware was built for, for
+         example mediatek/filogic: the OPENWRT_BOARD field of
+         /etc/os-release. Not instantiated if the device does not provide
+         it."
+    ::= { openwrtSystem 3 }
+
+openwrtSysModel OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Human-readable device model, for example Linksys WRT1200AC, as
+         OpenWrt determined it at boot (/tmp/sysinfo/model). Not
+         instantiated if the device does not provide it."
+    ::= { openwrtSystem 4 }
+
+-- **********************************************************
+-- Conformance
+-- **********************************************************
+
+openwrtCompliances OBJECT IDENTIFIER ::= { openwrtConformance 1 }
+openwrtGroups      OBJECT IDENTIFIER ::= { openwrtConformance 2 }
+
+openwrtSystemGroup OBJECT-GROUP
+    OBJECTS {
+        openwrtSysVersion,
+        openwrtSysRevision,
+        openwrtSysTarget,
+        openwrtSysModel
+    }
+    STATUS  current
+    DESCRIPTION
+        "OpenWrt device metadata."
+    ::= { openwrtGroups 1 }
+
+openwrtCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "Compliance statement for OpenWrt SNMP agents."
+    MODULE  -- this module
+    GROUP   openwrtSystemGroup
+    DESCRIPTION
+        "Optional: each object in this group is instantiated only when the
+         device provides the underlying value, so an agent may implement
+         any subset of it."
+    ::= { openwrtCompliances 1 }
 
 END

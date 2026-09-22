@@ -47,6 +47,10 @@ class Openwrt extends OS implements
     WirelessSnrDiscovery,
     WirelessUtilizationDiscovery
 {
+    // OPENWRT-MIB openwrtSysVersion.0 and openwrtSysModel.0.
+    private const SYS_VERSION = '.1.3.6.1.4.1.66510.1.1.1.0';
+    private const SYS_MODEL = '.1.3.6.1.4.1.66510.1.1.4.0';
+
     // OPENWRT-WIRELESS-MIB openwrtWirelessInterfaceEntry columns, addressed as
     // <WL_ENTRY>.<column>.<ifIndex>. Wireless data is served by an AgentX
     // subagent under { openwrtObjects 10 } (.66510.1.10).
@@ -67,10 +71,23 @@ class Openwrt extends OS implements
      */
     public function discoverOS(Device $device): void
     {
-        $distro = trim((string) \SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"')->value());
-        $distroParts = preg_split('/\s+/', $distro, 2);
-        $device->version = $distroParts[1] ?? $distro;
-        $device->hardware = \SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"')->value();
+        $sys = \SnmpQuery::numeric()->get([self::SYS_VERSION, self::SYS_MODEL])->values();
+        $version = trim((string) ($sys[self::SYS_VERSION] ?? ''));
+        $hardware = trim((string) ($sys[self::SYS_MODEL] ?? ''));
+
+        // Without an OPENWRT-MIB agent, fall back per value to the distro and
+        // hardware extends from net-snmp's default OpenWrt snmpd config.
+        if ($version === '') {
+            $distro = trim((string) \SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"')->value());
+            $distroParts = preg_split('/\s+/', $distro, 2);
+            $version = $distroParts[1] ?? $distro;
+        }
+        if ($hardware === '') {
+            $hardware = trim((string) \SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"')->value());
+        }
+
+        $device->version = $version ?: null;
+        $device->hardware = $hardware ?: null;
     }
 
     /**

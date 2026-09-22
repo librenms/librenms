@@ -12,8 +12,11 @@ The reference implementation is
 [`snmpd-openwrt-metrics`](https://github.com/openwrt/packages/pull/30547), a
 net-snmp AgentX subagent maintained in `openwrt/packages`.
 
-LibreNMS also reads a `distro` and a `hardware` extend for OS detection,
-independently of whichever agent serves the two subtrees above:
+The OpenWrt release and device model come from `OPENWRT-MIB` scalars under
+`.1.3.6.1.4.1.66510.1.1` when the device serves them, and a device whose
+snmpd reports OpenWrt's own sysObjectID (`.1.3.6.1.4.1.66510.3.1`) is
+recognised without any extra query. Otherwise LibreNMS falls back to a
+`distro` and a `hardware` extend:
 
 ```
 config extend
@@ -27,11 +30,11 @@ config extend
 	option args '/tmp/sysinfo/model'
 ```
 
-To check what a device is exposing, walk the two subtrees from the LibreNMS
-host:
+To check what a device is exposing, walk the OpenWrt and LM-SENSORS
+subtrees from the LibreNMS host:
 
 ```bash
-snmpwalk -v2c -c your_community_string <openwrt-host> .1.3.6.1.4.1.66510.1.10
+snmpwalk -v2c -c your_community_string <openwrt-host> .1.3.6.1.4.1.66510.1
 snmpwalk -v2c -c your_community_string <openwrt-host> .1.3.6.1.4.1.2021.13.16
 ```
 
