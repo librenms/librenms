@@ -81,16 +81,26 @@ final class SnmpPollingMethodDefinition extends PollingMethodDefinition
         ];
     }
 
-    public function fallbackConfig(
-        Device $device,
-        \LibreNMS\Enum\PollingMethodType $type = \LibreNMS\Enum\PollingMethodType::Snmp,
-        string $configClass = SnmpConfig::class,
-        bool $defaultAffectsAvailability = true
-    ): SnmpConfig {
+    public function probe(): \LibreNMS\Polling\Method\Probe\SnmpProbe
+    {
+        return resolve(\LibreNMS\Polling\Method\Probe\SnmpProbe::class);
+    }
+
+    public function secretDefinition(): \App\View\FieldSchema\HasFieldSchema
+    {
+        return resolve(\LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition::class);
+    }
+
+    public function config(\App\Models\DevicePollingMethod $method): SnmpConfig
+    {
+        return SnmpConfig::fromPollingMethod($method);
+    }
+
+    public function fallbackConfig(Device $device): SnmpConfig
+    {
         $method = $device->pollingMethod(\LibreNMS\Enum\PollingMethodType::Snmp);
         if ($method) {
-            /** @var SnmpConfig */
-            return $method->toConfig();
+            return SnmpConfig::fromPollingMethod($method);
         }
 
         if ($device->exists) {
@@ -103,14 +113,14 @@ final class SnmpPollingMethodDefinition extends PollingMethodDefinition
     /**
      * @inheritDoc
      */
-    public function discover(Device $device, \App\Models\DevicePollingMethod $method, \LibreNMS\Polling\Method\Probe\PollingMethodProbe $probe): \LibreNMS\Polling\Method\Probe\ProbeResult
+    public function discover(Device $device, \App\Models\DevicePollingMethod $method): \LibreNMS\Polling\Method\Probe\ProbeResult
     {
         $testDevice = clone $device;
 
         // If a specific secret was supplied on the method, test that directly
         if ($method->relationLoaded('secret') && $method->secret !== null) {
             $testDevice->setRelation('pollingMethods', collect([$method]));
-            $result = $probe->check($testDevice);
+            $result = $this->check($testDevice);
             if ($result->isSuccess()) {
                 return $result;
             }
@@ -144,7 +154,7 @@ final class SnmpPollingMethodDefinition extends PollingMethodDefinition
             $method->secret_id = $secret->id;
             $testDevice->setRelation('pollingMethods', collect([$method]));
 
-            $result = $probe->check($testDevice);
+            $result = $this->check($testDevice);
             if ($result->isSuccess()) {
                 return $result;
             }

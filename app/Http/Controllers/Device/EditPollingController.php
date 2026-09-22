@@ -177,7 +177,7 @@ class EditPollingController
             $testDevice = clone $device;
             $testDevice->setRelation('pollingMethods', $existingMethods->concat([$transientMethod]));
 
-            $probeResult = $this->registry->probe($type)->check($testDevice);
+            $probeResult = $definition->check($testDevice);
 
             if (! $probeResult->isSuccess()) {
                 $errorDetails = $probeResult->errorMessage();
@@ -202,13 +202,15 @@ class EditPollingController
             }
         }
 
-        $row = DevicePollingMethod::saveForDevice(
-            device: $device,
-            type: $type,
-            settings: $request->validatedSettings(),
-            enabled: true,
-            affectsAvailability: $this->registry->defaultAffectsAvailability($type),
-        );
+        /** @var DevicePollingMethod $row */
+        $row = DevicePollingMethod::firstOrNew([
+            'device_id' => $device->device_id,
+            'method_type' => $type,
+        ]);
+        $row->enabled = true;
+        $row->affects_availability = $this->registry->defaultAffectsAvailability($type);
+        $row->settings = $definition->filterOverrides($request->validatedSettings());
+        $row->save();
 
         if ($this->registry->hasSecret($type)) {
             if ($credentialMode === 'existing' && $secretId !== null) {
@@ -319,7 +321,7 @@ class EditPollingController
             $testDevice = clone $device;
             $testDevice->setRelation('pollingMethods', $existingMethods->concat([$transientMethod]));
 
-            $probeResult = $this->registry->probe($type)->check($testDevice);
+            $probeResult = $definition->check($testDevice);
 
             if (! $probeResult->isSuccess()) {
                 $errorDetails = $probeResult->errorMessage();
@@ -346,14 +348,10 @@ class EditPollingController
 
         $pollingMethod->setRelation('device', $device);
 
-        $pollingMethod = DevicePollingMethod::saveForDevice(
-            device: $device,
-            type: $type,
-            settings: $validated['settings'] ?? [],
-            enabled: $enabled,
-            affectsAvailability: (bool) ($validated['affects_availability'] ?? false),
-            definition: $definition,
-        );
+        $pollingMethod->enabled = $enabled;
+        $pollingMethod->affects_availability = (bool) ($validated['affects_availability'] ?? false);
+        $pollingMethod->settings = $definition->filterOverrides($validated['settings'] ?? [], $pollingMethod->settings ?? []);
+        $pollingMethod->save();
 
         if ($this->registry->hasSecret($type)) {
             $isEditingSecret = (bool) $request->input('is_editing_secret', $request->has('secret_data'));

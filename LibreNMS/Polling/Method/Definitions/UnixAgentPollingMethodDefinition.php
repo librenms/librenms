@@ -38,4 +38,19 @@ final class UnixAgentPollingMethodDefinition extends PollingMethodDefinition
                 ->cast('int'),
         ];
     }
+
+    public function probe(): \LibreNMS\Polling\Method\Probe\UnixAgentProbe
+    {
+        return resolve(\LibreNMS\Polling\Method\Probe\UnixAgentProbe::class);
+    }
+
+    public function config(\App\Models\DevicePollingMethod $method): \LibreNMS\Polling\Method\Config\UnixAgentConfig
+    {
+        return \LibreNMS\Polling\Method\Config\UnixAgentConfig::fromPollingMethod($method);
+    }
+
+    public function fallbackConfig(\App\Models\Device $device): ?\LibreNMS\Polling\Method\Config\UnixAgentConfig
+    {
+        return null;
+    }
 }

@@ -3,7 +3,6 @@
 namespace LibreNMS\Polling\Method;
 
 use App\Models\Device;
-use Illuminate\Support\Str;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
@@ -21,20 +20,14 @@ readonly class PollingMethodAccessor
 
     public function get(PollingMethodType $type): ?PollingMethodConfig
     {
+        $definition = $this->registry->require($type);
         $method = $this->device->pollingMethod($type);
 
         if ($method) {
-            return $method->toConfig();
+            return $definition->config($method);
         }
 
-        $definition = $this->registry->definition($type);
-
-        return $definition?->fallbackConfig(
-            $this->device,
-            $type,
-            $this->registry->configClass($type),
-            $this->registry->defaultAffectsAvailability($type),
-        );
+        return $definition->fallbackConfig($this->device);
     }
 
     public function snmp(): SnmpConfig
@@ -49,25 +42,15 @@ readonly class PollingMethodAccessor
         return $this->get(PollingMethodType::Icmp);
     }
 
-    public function ipmi(): IpmiConfig
+    public function ipmi(): ?IpmiConfig
     {
-        /** @var IpmiConfig */
+        /** @var ?IpmiConfig */
         return $this->get(PollingMethodType::Ipmi);
     }
 
-    public function unixAgent(): UnixAgentConfig
+    public function unixAgent(): ?UnixAgentConfig
     {
-        /** @var UnixAgentConfig */
+        /** @var ?UnixAgentConfig */
         return $this->get(PollingMethodType::UnixAgent);
-    }
-
-    /**
-     * @param  array<int, mixed>  $arguments
-     */
-    public function __call(string $name, array $arguments): ?PollingMethodConfig
-    {
-        $type = PollingMethodType::tryFrom(Str::kebab($name));
-
-        return $type ? $this->get($type) : null;
     }
 }

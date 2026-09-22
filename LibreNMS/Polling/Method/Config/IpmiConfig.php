@@ -4,7 +4,6 @@ namespace LibreNMS\Polling\Method\Config;
 
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Polling\Method\Definitions\IpmiPollingMethodDefinition;
 use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
 
 final class IpmiConfig extends PollingMethodConfig
@@ -35,8 +34,7 @@ final class IpmiConfig extends PollingMethodConfig
             throw new \Exception('Invalid polling method type');
         }
 
-        $definition = new IpmiPollingMethodDefinition();
-        $settings = $definition->resolveValues($method->settings ?? []);
+        $settings = $method->settings ?? [];
         $secretData = $method->secretData();
         $ipmiSecretData = $secretData instanceof IpmiSecretData ? $secretData : new IpmiSecretData();
 

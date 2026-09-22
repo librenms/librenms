@@ -43,4 +43,24 @@ final class IpmiPollingMethodDefinition extends PollingMethodDefinition
                 ->cast('int'),
         ];
     }
+
+    public function probe(): \LibreNMS\Polling\Method\Probe\IpmiProbe
+    {
+        return resolve(\LibreNMS\Polling\Method\Probe\IpmiProbe::class);
+    }
+
+    public function secretDefinition(): \App\View\FieldSchema\HasFieldSchema
+    {
+        return resolve(\LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition::class);
+    }
+
+    public function config(\App\Models\DevicePollingMethod $method): \LibreNMS\Polling\Method\Config\IpmiConfig
+    {
+        return \LibreNMS\Polling\Method\Config\IpmiConfig::fromPollingMethod($method);
+    }
+
+    public function fallbackConfig(\App\Models\Device $device): ?\LibreNMS\Polling\Method\Config\IpmiConfig
+    {
+        return null;
+    }
 }

@@ -3,16 +3,13 @@
 namespace LibreNMS\Polling\Method\Probe;
 
 use App\Models\Device;
-use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Util\Rewrite;
 
 class UnixAgentProbe extends PollingMethodProbe
 {
     public function check(Device $device): ProbeResult
     {
-        /** @var UnixAgentConfig|null $config */
-        $config = $device->pollingMethod(PollingMethodType::UnixAgent)?->toConfig();
+        $config = $device->pollingMethodFor()->unixAgent();
         $agent_port = $config ? $config->port : 6556;
         $timeout = $config ? $config->timeout : 10;
         $poller_target = Rewrite::addIpv6Brackets($device->pollerTarget());

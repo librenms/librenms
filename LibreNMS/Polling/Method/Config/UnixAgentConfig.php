@@ -2,9 +2,9 @@
 
 namespace LibreNMS\Polling\Method\Config;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Polling\Method\Definitions\UnixAgentPollingMethodDefinition;
 
 final class UnixAgentConfig extends PollingMethodConfig
 {
@@ -28,14 +28,13 @@ final class UnixAgentConfig extends PollingMethodConfig
             throw new \Exception('Invalid polling method type');
         }
 
-        $definition = new UnixAgentPollingMethodDefinition();
-        $settings = $definition->resolveValues($method->settings ?? []);
+        $settings = $method->settings ?? [];
 
         return new self(
             enabled: $method->enabled ?? true,
             affectsAvailability: $method->affects_availability ?? false,
-            port: (int) ($settings['port'] ?? 6556),
-            timeout: (int) ($settings['timeout'] ?? 10),
+            port: (int) ($settings['port'] ?? LibrenmsConfig::get('unix-agent.port', 6556)),
+            timeout: (int) ($settings['timeout'] ?? LibrenmsConfig::get('unix-agent.connection-timeout', 10)),
         );
     }
 }

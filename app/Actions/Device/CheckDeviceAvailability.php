@@ -21,8 +21,7 @@ readonly class CheckDeviceAvailability
         foreach ($enabledPollingMethods as $method) {
             try {
                 $definition = $this->registry->require($method->method_type);
-                $probe = $this->registry->probe($method->method_type);
-                $result = $probe->check($device);
+                $result = $definition->check($device);
 
                 $method->last_check_successful = $result->isSuccess();
                 $method->last_checked_at = now();

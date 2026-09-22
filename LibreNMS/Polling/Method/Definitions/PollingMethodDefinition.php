@@ -2,12 +2,15 @@
 
 namespace LibreNMS\Polling\Method\Definitions;
 
+use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use App\View\FieldSchema\HandlesFieldSchema;
 use App\View\FieldSchema\HasFieldSchema;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Probe\PollingMethodProbe;
+use LibreNMS\Polling\Method\Probe\ProbeResult;
 
-class PollingMethodDefinition implements HasFieldSchema
+abstract class PollingMethodDefinition implements HasFieldSchema
 {
     use HandlesFieldSchema;
 
@@ -26,41 +29,41 @@ class PollingMethodDefinition implements HasFieldSchema
         return [];
     }
 
-    public function onProbeComplete(\App\Models\Device $device, \LibreNMS\Polling\Method\Probe\ProbeResult $result, bool $commit = false): void
+    public function secretDefinition(): ?HasFieldSchema
     {
+        return null;
+    }
+
+    abstract public function probe(): PollingMethodProbe;
+
+    public function check(Device $device): ProbeResult
+    {
+        return $this->probe()->check($device);
     }
 
     /**
      * Discover or validate a candidate polling method for a device.
      */
-    public function discover(\App\Models\Device $device, \App\Models\DevicePollingMethod $method, PollingMethodProbe $probe): \LibreNMS\Polling\Method\Probe\ProbeResult
+    public function discover(Device $device, DevicePollingMethod $method): ProbeResult
     {
         $testDevice = clone $device;
         $testDevice->setRelation('pollingMethods', collect([$method]));
 
-        return $probe->check($testDevice);
+        return $this->check($testDevice);
     }
 
-    public function enrichDeviceMetadata(\App\Models\Device $device): void
+    public function onProbeComplete(Device $device, ProbeResult $result, bool $commit = false): void
     {
     }
 
-    /**
-     * @param  class-string<PollingMethodConfig>  $configClass
-     */
-    public function fallbackConfig(
-        \App\Models\Device $device,
-        \LibreNMS\Enum\PollingMethodType $type,
-        string $configClass,
-        bool $defaultAffectsAvailability = true
-    ): PollingMethodConfig {
-        $method = new \App\Models\DevicePollingMethod([
-            'method_type' => $type,
-            'enabled' => false,
-            'affects_availability' => $defaultAffectsAvailability,
-        ]);
-        $method->setRelation('device', $device);
+    public function enrichDeviceMetadata(Device $device): void
+    {
+    }
 
-        return $configClass::fromPollingMethod($method);
+    abstract public function config(DevicePollingMethod $method): PollingMethodConfig;
+
+    public function fallbackConfig(Device $device): ?PollingMethodConfig
+    {
+        return null;
     }
 }

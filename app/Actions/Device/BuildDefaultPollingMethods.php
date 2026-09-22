@@ -58,7 +58,11 @@ class BuildDefaultPollingMethods
             if ($credentialMode === 'existing' && $secretId !== null) {
                 $secret = Secret::resolveForType($secretId, $type);
             } elseif (! empty($data['secret_data'])) {
-                $secretType = SecretType::tryFrom($type->value);
+                $secretType = match ($type) {
+                    PollingMethodType::Snmp => SecretType::Snmp,
+                    PollingMethodType::Ipmi => SecretType::Ipmi,
+                    default => null,
+                };
                 $secretData = $secretType?->createData($data['secret_data']);
             }
 

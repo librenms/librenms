@@ -5,56 +5,23 @@ namespace LibreNMS\Polling\Method;
 use App\View\FieldSchema\HasFieldSchema;
 use InvalidArgumentException;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Definitions\PollingMethodDefinition;
-use LibreNMS\Polling\Method\Probe\PollingMethodProbe;
 
 class PollingMethodRegistry
 {
     /**
-     * @var array<string, array{
-     *     configClass: class-string<PollingMethodConfig>,
-     *     probeClass: class-string<PollingMethodProbe>,
-     *     definitionClass: ?class-string<PollingMethodDefinition>,
-     *     secretDefinitionClass: ?class-string<HasFieldSchema>,
-     * }>
+     * @var array<string, class-string<PollingMethodDefinition>>
      */
-    private array $methods = [];
+    private array $definitions = [];
 
     /**
-     * @var array<string, PollingMethodDefinition>
-     */
-    private array $resolvedDefinitions = [];
-
-    /**
-     * @var array<string, ?HasFieldSchema>
-     */
-    private array $resolvedSecretDefinitions = [];
-
-    /**
-     * Register a polling method with its class-strings.
+     * Register a polling method definition class.
      *
-     * @param  class-string<PollingMethodConfig>  $configClass
-     * @param  class-string<PollingMethodProbe>  $probeClass
-     * @param  class-string<PollingMethodDefinition>|null  $definitionClass
-     * @param  class-string<HasFieldSchema>|null  $secretDefinitionClass
+     * @param  class-string<PollingMethodDefinition>  $definitionClass
      */
-    public function register(
-        PollingMethodType $type,
-        string $configClass,
-        string $probeClass,
-        ?string $definitionClass = null,
-        ?string $secretDefinitionClass = null,
-    ): self {
-        $this->methods[$type->value] = [
-            'configClass' => $configClass,
-            'probeClass' => $probeClass,
-            'definitionClass' => $definitionClass,
-            'secretDefinitionClass' => $secretDefinitionClass,
-        ];
-
-        unset($this->resolvedDefinitions[$type->value]);
-        unset($this->resolvedSecretDefinitions[$type->value]);
+    public function register(PollingMethodType $type, string $definitionClass): self
+    {
+        $this->definitions[$type->value] = $definitionClass;
 
         return $this;
     }
@@ -64,26 +31,27 @@ class PollingMethodRegistry
      */
     public function has(PollingMethodType $type): bool
     {
-        return isset($this->methods[$type->value]);
+        return isset($this->definitions[$type->value]);
     }
 
     /**
      * Get the definition for a polling method.
      */
-    public function definition(PollingMethodType $type): ?PollingMethodDefinition
+    public function get(PollingMethodType $type): ?PollingMethodDefinition
     {
-        if (! isset($this->methods[$type->value])) {
+        if (! isset($this->definitions[$type->value])) {
             return null;
         }
 
-        if (! isset($this->resolvedDefinitions[$type->value])) {
-            $definitionClass = $this->methods[$type->value]['definitionClass'];
-            $this->resolvedDefinitions[$type->value] = $definitionClass !== null
-                ? app($definitionClass)
-                : new PollingMethodDefinition();
-        }
+        return resolve($this->definitions[$type->value]);
+    }
 
-        return $this->resolvedDefinitions[$type->value];
+    /**
+     * Get the definition for a polling method (alias of get).
+     */
+    public function definition(PollingMethodType $type): ?PollingMethodDefinition
+    {
+        return $this->get($type);
     }
 
     /**
@@ -93,7 +61,7 @@ class PollingMethodRegistry
      */
     public function require(PollingMethodType $type): PollingMethodDefinition
     {
-        $definition = $this->definition($type);
+        $definition = $this->get($type);
 
         if ($definition === null) {
             throw new InvalidArgumentException("Unknown polling method type: {$type->value}");
@@ -103,50 +71,11 @@ class PollingMethodRegistry
     }
 
     /**
-     * Get the config class for a polling method.
-     *
-     * @return class-string<PollingMethodConfig>
-     */
-    public function configClass(PollingMethodType $type): string
-    {
-        if (! isset($this->methods[$type->value])) {
-            throw new InvalidArgumentException("Unknown polling method type: {$type->value}");
-        }
-
-        return $this->methods[$type->value]['configClass'];
-    }
-
-    /**
-     * Get the probe for a polling method.
-     */
-    public function probe(PollingMethodType $type): PollingMethodProbe
-    {
-        if (! isset($this->methods[$type->value])) {
-            throw new InvalidArgumentException("Unknown polling method type: {$type->value}");
-        }
-
-        $probeClass = $this->methods[$type->value]['probeClass'];
-
-        return app($probeClass);
-    }
-
-    /**
      * Get the secret definition schema for a polling method, if one is defined.
      */
     public function secretDefinition(PollingMethodType $type): ?HasFieldSchema
     {
-        if (! isset($this->methods[$type->value])) {
-            return null;
-        }
-
-        if (! array_key_exists($type->value, $this->resolvedSecretDefinitions)) {
-            $secretDefinitionClass = $this->methods[$type->value]['secretDefinitionClass'];
-            $this->resolvedSecretDefinitions[$type->value] = $secretDefinitionClass !== null
-                ? app($secretDefinitionClass)
-                : null;
-        }
-
-        return $this->resolvedSecretDefinitions[$type->value];
+        return $this->require($type)->secretDefinition();
     }
 
     /**
@@ -181,10 +110,10 @@ class PollingMethodRegistry
     public function all(): array
     {
         $resolved = [];
-        foreach (array_keys($this->methods) as $key) {
+        foreach (array_keys($this->definitions) as $key) {
             $type = PollingMethodType::tryFrom($key);
             if ($type !== null) {
-                $resolved[$key] = $this->definition($type);
+                $resolved[$key] = $this->require($type);
             }
         }
 
@@ -199,7 +128,7 @@ class PollingMethodRegistry
     public function types(): array
     {
         $types = [];
-        foreach (array_keys($this->methods) as $key) {
+        foreach (array_keys($this->definitions) as $key) {
             $type = PollingMethodType::tryFrom($key);
             if ($type !== null) {
                 $types[] = $type;

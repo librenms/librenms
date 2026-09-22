@@ -19,6 +19,21 @@ final class IcmpPollingMethodDefinition extends PollingMethodDefinition
         return true;
     }
 
+    public function probe(): \LibreNMS\Polling\Method\Probe\IcmpProbe
+    {
+        return resolve(\LibreNMS\Polling\Method\Probe\IcmpProbe::class);
+    }
+
+    public function config(\App\Models\DevicePollingMethod $method): \LibreNMS\Polling\Method\Config\IcmpConfig
+    {
+        return \LibreNMS\Polling\Method\Config\IcmpConfig::fromPollingMethod($method);
+    }
+
+    public function fallbackConfig(Device $device): \LibreNMS\Polling\Method\Config\IcmpConfig
+    {
+        return new \LibreNMS\Polling\Method\Config\IcmpConfig(enabled: false, affectsAvailability: true);
+    }
+
     public function onProbeComplete(Device $device, ProbeResult $result, bool $commit = false): void
     {
         if ($result->stat('duplicates')) {
