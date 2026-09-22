@@ -53,8 +53,9 @@ class DevicePollingMethod extends Model
         array $settings = [],
         bool $enabled = true,
         ?bool $affectsAvailability = null,
+        ?\LibreNMS\Polling\Method\Definitions\PollingMethodDefinition $definition = null,
     ): self {
-        $definition = $type->definition();
+        $definition ??= app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require($type);
 
         /** @var self $method */
         $method = static::firstOrNew([
@@ -79,7 +80,7 @@ class DevicePollingMethod extends Model
 
     public function toConfig(): PollingMethodConfig
     {
-        $class = $this->method_type->definition()->class();
+        $class = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require($this->method_type)->class();
 
         return $class::fromPollingMethod($this);
     }

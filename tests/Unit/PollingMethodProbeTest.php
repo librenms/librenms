@@ -26,10 +26,13 @@ final class PollingMethodProbeTest extends TestCase
 
     public function testDefinitionCreatesFreshProbeInstance(): void
     {
-        $this->assertInstanceOf(SnmpProbe::class, PollingMethodType::Snmp->definition()->probe());
-        $this->assertInstanceOf(IcmpProbe::class, PollingMethodType::Icmp->definition()->probe());
-        $this->assertInstanceOf(IpmiProbe::class, PollingMethodType::Ipmi->definition()->probe());
-        $this->assertInstanceOf(UnixAgentProbe::class, PollingMethodType::UnixAgent->definition()->probe());
+        /** @var \LibreNMS\Polling\Method\PollingMethodRegistry $registry */
+        $registry = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class);
+
+        $this->assertInstanceOf(SnmpProbe::class, $registry->require(PollingMethodType::Snmp)->probe());
+        $this->assertInstanceOf(IcmpProbe::class, $registry->require(PollingMethodType::Icmp)->probe());
+        $this->assertInstanceOf(IpmiProbe::class, $registry->require(PollingMethodType::Ipmi)->probe());
+        $this->assertInstanceOf(UnixAgentProbe::class, $registry->require(PollingMethodType::UnixAgent)->probe());
     }
 
     public function testUnixAgentProbeUsesResolvedConfigPortAndTimeout(): void
@@ -44,7 +47,7 @@ final class PollingMethodProbeTest extends TestCase
         $unixMethod->setRelation('device', $device);
         $device->setRelation('pollingMethods', collect([$unixMethod]));
 
-        $probe = PollingMethodType::UnixAgent->definition()->probe();
+        $probe = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::UnixAgent)->probe();
 
         $result = $probe->check($device);
         $this->assertIsBool($result->isSuccess());

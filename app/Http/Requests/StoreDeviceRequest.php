@@ -20,7 +20,7 @@ class StoreDeviceRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules(\LibreNMS\Polling\Method\PollingMethodRegistry $registry): array
     {
         $rules = [
             'hostname' => ['required', 'ip_or_hostname'],
@@ -59,7 +59,10 @@ class StoreDeviceRequest extends FormRequest
             $rules["polling_methods.{$method}.affects_availability"] = ['nullable', 'boolean'];
             $rules["polling_methods.{$method}.credential_mode"] = ['nullable', 'in:default,existing,new'];
 
-            $definition = $type->definition();
+            $definition = $registry->get($type);
+            if (! $definition) {
+                continue;
+            }
             $secretDefinition = $definition->secretDefinition();
             if ($secretDefinition !== null) {
                 $rules["polling_methods.{$method}.secret_id"] = [

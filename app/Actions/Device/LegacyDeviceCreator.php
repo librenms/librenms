@@ -8,11 +8,13 @@ use App\Models\Secret;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 
 class LegacyDeviceCreator
 {
     private ?Device $device = null;
+    private PollingMethodRegistry $registry;
 
     public function __construct(
         public string $hostname,
@@ -38,7 +40,9 @@ class LegacyDeviceCreator
         public ?string $authlevel = null,
         public bool $force = false,
         public bool $ping_fallback = false,
+        ?PollingMethodRegistry $registry = null,
     ) {
+        $this->registry = $registry ?? app(PollingMethodRegistry::class);
     }
 
     public function getDevice(): Device
@@ -80,11 +84,12 @@ class LegacyDeviceCreator
                 'port_association_mode' => $this->port_association_mode,
             ], fn ($v) => $v !== null);
 
+            $snmpDefinition = $this->registry->get(PollingMethodType::Snmp);
             $snmpMethod = new DevicePollingMethod([
                 'method_type' => PollingMethodType::Snmp,
                 'enabled' => true,
                 'affects_availability' => true,
-                'settings' => PollingMethodType::Snmp->definition()->filterOverrides($settings),
+                'settings' => $snmpDefinition ? $snmpDefinition->filterOverrides($settings) : $settings,
             ]);
             $snmpMethod->setRelation('device', $device);
 

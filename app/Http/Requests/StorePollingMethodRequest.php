@@ -21,7 +21,7 @@ class StorePollingMethodRequest extends FormRequest
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules(\LibreNMS\Polling\Method\PollingMethodRegistry $registry): array
     {
         $rules = [
             'method_type' => ['required', Rule::enum(PollingMethodType::class)],
@@ -46,22 +46,24 @@ class StorePollingMethodRequest extends FormRequest
         $type = $this->pollingType();
 
         if ($type) {
-            $definition = $type->definition();
-            $rules = [
-                ...$rules,
-                ...collect($definition->rules())
-                    ->mapWithKeys(fn (array|string $rule, string $key): array => ["settings.$key" => $rule])
-                    ->all(),
-            ];
-
-            $secretDefinition = $definition->secretDefinition();
-            if ($secretDefinition !== null && $this->input('credential_mode', 'existing') === 'new') {
+            $definition = $registry->get($type);
+            if ($definition) {
                 $rules = [
                     ...$rules,
-                    ...collect($secretDefinition->rules())
-                        ->mapWithKeys(fn (array|string $rule, string $key): array => ["secret_data.$key" => $rule])
+                    ...collect($definition->rules())
+                        ->mapWithKeys(fn (array|string $rule, string $key): array => ["settings.$key" => $rule])
                         ->all(),
                 ];
+
+                $secretDefinition = $definition->secretDefinition();
+                if ($secretDefinition !== null && $this->input('credential_mode', 'existing') === 'new') {
+                    $rules = [
+                        ...$rules,
+                        ...collect($secretDefinition->rules())
+                            ->mapWithKeys(fn (array|string $rule, string $key): array => ["secret_data.$key" => $rule])
+                            ->all(),
+                    ];
+                }
             }
         }
 
@@ -86,7 +88,10 @@ class StorePollingMethodRequest extends FormRequest
                 $validator->errors()->add('method_type', __('poller.method_exists'));
             }
 
-            if ($type->hasSecret() && $this->input('credential_mode', 'existing') === 'existing' && ! $this->input('secret_id')) {
+            /** @var \LibreNMS\Polling\Method\PollingMethodRegistry $registry */
+            $registry = $this->container->make(\LibreNMS\Polling\Method\PollingMethodRegistry::class);
+            $definition = $registry->get($type);
+            if ($definition?->hasSecret() && $this->input('credential_mode', 'existing') === 'existing' && ! $this->input('secret_id')) {
                 $validator->errors()->add('secret_id', __('poller.select_credential'));
             }
         });

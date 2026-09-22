@@ -23,7 +23,10 @@ class UpdatePollingMethodRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $type = $this->pollingType();
-        if ($type && $type->hasSecret() && $this->has('secret_data')) {
+        /** @var \LibreNMS\Polling\Method\PollingMethodRegistry $registry */
+        $registry = $this->container->make(\LibreNMS\Polling\Method\PollingMethodRegistry::class);
+        $definition = $type ? $registry->get($type) : null;
+        if ($definition?->hasSecret() && $this->has('secret_data')) {
             $device = $this->route('device');
             if ($device) {
                 $secretId = $this->input('secret_id');
@@ -49,14 +52,15 @@ class UpdatePollingMethodRequest extends FormRequest
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules(\LibreNMS\Polling\Method\PollingMethodRegistry $registry): array
     {
         $type = $this->pollingType();
+        $definition = $type ? $registry->get($type) : null;
         $isEditingSecret = $this->has('is_editing_secret') ? $this->boolean('is_editing_secret') : $this->has('secret_data');
         $secretUpdateMode = $this->input('secret_update_mode', 'update');
 
         $descriptionRules = ['nullable', 'string', 'max:255'];
-        if ($isEditingSecret && $type && $type->hasSecret()) {
+        if ($isEditingSecret && $definition?->hasSecret()) {
             $device = $this->route('device');
             /** @var Device|null $deviceModel */
             $deviceModel = $device instanceof Device ? $device : (is_numeric($device) ? DeviceCache::get($device) : null);
@@ -88,13 +92,10 @@ class UpdatePollingMethodRequest extends FormRequest
             'settings' => ['nullable', 'array'],
         ];
 
-        $type = $this->pollingType();
-
-        if (! $type) {
+        if (! $definition) {
             return $rules;
         }
 
-        $definition = $type->definition();
         $rules = [
             ...$rules,
             ...collect($definition->rules())

@@ -10,6 +10,7 @@ readonly class CheckDeviceAvailability
 {
     public function __construct(
         private SetDeviceAvailability $setDeviceAvailability,
+        private \LibreNMS\Polling\Method\PollingMethodRegistry $registry,
     ) {
     }
 
@@ -19,7 +20,7 @@ readonly class CheckDeviceAvailability
 
         foreach ($enabledPollingMethods as $method) {
             try {
-                $definition = $method->method_type->definition();
+                $definition = $this->registry->require($method->method_type);
                 $result = $definition->probe()->check($device);
 
                 $method->last_check_successful = $result->isSuccess();

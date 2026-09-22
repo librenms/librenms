@@ -3,6 +3,7 @@
 namespace LibreNMS\Polling\Method;
 
 use App\Models\Device;
+use Illuminate\Support\Str;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
@@ -14,45 +15,54 @@ readonly class PollingMethodAccessor
 {
     public function __construct(
         private Device $device,
+        private PollingMethodRegistry $registry,
     ) {
     }
 
     /**
-     * @template T of PollingMethodConfig
-     *
-     * @param  class-string<T>  $class
-     * @return T
+     * Get the resolved configuration for a polling method on this device.
      */
-    private function get(PollingMethodType $type, string $class): PollingMethodConfig
+    public function get(PollingMethodType $type): ?PollingMethodConfig
     {
         $method = $this->device->pollingMethod($type);
 
         if ($method) {
-            /** @var T */
             return $method->toConfig();
         }
 
-        /** @var T */
-        return $type->definition()->fallbackConfig($this->device);
+        $definition = $this->registry->get($type);
+
+        return $definition?->fallbackConfig($this->device);
     }
 
     public function snmp(): SnmpConfig
     {
-        return $this->get(PollingMethodType::Snmp, SnmpConfig::class);
+        /** @var SnmpConfig */
+        return $this->get(PollingMethodType::Snmp);
     }
 
     public function icmp(): IcmpConfig
     {
-        return $this->get(PollingMethodType::Icmp, IcmpConfig::class);
+        /** @var IcmpConfig */
+        return $this->get(PollingMethodType::Icmp);
     }
 
     public function ipmi(): IpmiConfig
     {
-        return $this->get(PollingMethodType::Ipmi, IpmiConfig::class);
+        /** @var IpmiConfig */
+        return $this->get(PollingMethodType::Ipmi);
     }
 
     public function unixAgent(): UnixAgentConfig
     {
-        return $this->get(PollingMethodType::UnixAgent, UnixAgentConfig::class);
+        /** @var UnixAgentConfig */
+        return $this->get(PollingMethodType::UnixAgent);
+    }
+
+    public function __call(string $name, array $arguments): ?PollingMethodConfig
+    {
+        $type = PollingMethodType::tryFrom(Str::kebab($name));
+
+        return $type ? $this->get($type) : null;
     }
 }

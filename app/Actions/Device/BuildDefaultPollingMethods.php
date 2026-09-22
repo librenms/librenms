@@ -11,6 +11,11 @@ use LibreNMS\Enum\SecretType;
 
 class BuildDefaultPollingMethods
 {
+    public function __construct(
+        private readonly \LibreNMS\Polling\Method\PollingMethodRegistry $registry,
+    ) {
+    }
+
     /**
      * Build default polling methods collection for a new device.
      *
@@ -57,11 +62,13 @@ class BuildDefaultPollingMethods
                 $secretData = $secretType?->createData($data['secret_data']);
             }
 
+            $definition = $this->registry->get($type);
+
             $pollingMethod = new DevicePollingMethod([
                 'method_type' => $type,
                 'enabled' => true,
-                'affects_availability' => $affectsAvailability ?? $type->definition()->defaultAffectsAvailability(),
-                'settings' => $type->definition()->filterOverrides($settings),
+                'affects_availability' => $affectsAvailability ?? ($definition?->defaultAffectsAvailability() ?? true),
+                'settings' => $definition ? $definition->filterOverrides($settings) : $settings,
             ]);
             $pollingMethod->setRelation('device', $device);
 

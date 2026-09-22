@@ -19,12 +19,17 @@ class AddDeviceController
 {
     use AuthorizesRequests;
 
+    public function __construct(
+        private \LibreNMS\Polling\Method\PollingMethodRegistry $registry,
+    ) {
+    }
+
     public function index(Request $request): View
     {
         $this->authorize('create', Device::class);
 
-        $availableMethods = collect(PollingMethodType::cases())->map(function (PollingMethodType $type): array {
-            $definition = $type->definition();
+        $availableMethods = collect($this->registry->types())->map(function (PollingMethodType $type): array {
+            $definition = $this->registry->require($type);
             $secretDefinition = $definition->secretDefinition();
             $schemaFields = $secretDefinition ? $secretDefinition->buildSchemaFields(dataVar: "methods['" . $type->value . "'].formData") : [];
 
@@ -114,7 +119,7 @@ class AddDeviceController
             ->filter(fn (array $data): bool => (bool) ($data['active'] ?? false))
             ->every(fn (array $data): bool => empty($data['validate']));
 
-        $pollingMethods = (new \App\Actions\Device\BuildDefaultPollingMethods)->execute($device, ['methods' => $rawMethods]);
+        $pollingMethods = (new \App\Actions\Device\BuildDefaultPollingMethods($this->registry))->execute($device, ['methods' => $rawMethods]);
 
         try {
             $validator = new ValidateDeviceAndCreate($device, $pollingMethods, $forceAdd);

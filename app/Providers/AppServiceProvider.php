@@ -55,6 +55,16 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton('sensor-discovery', fn (Application $app) => new \App\Discovery\Sensor($app->make('device-cache')->getPrimary()));
 
+        $this->app->singleton(\LibreNMS\Polling\Method\PollingMethodRegistry::class, function () {
+            $registry = new \LibreNMS\Polling\Method\PollingMethodRegistry();
+            $registry->register(\LibreNMS\Enum\PollingMethodType::Snmp, \LibreNMS\Polling\Method\Definitions\SnmpPollingMethodDefinition::class);
+            $registry->register(\LibreNMS\Enum\PollingMethodType::Icmp, \LibreNMS\Polling\Method\Definitions\IcmpPollingMethodDefinition::class);
+            $registry->register(\LibreNMS\Enum\PollingMethodType::Ipmi, \LibreNMS\Polling\Method\Definitions\IpmiPollingMethodDefinition::class);
+            $registry->register(\LibreNMS\Enum\PollingMethodType::UnixAgent, \LibreNMS\Polling\Method\Definitions\UnixAgentPollingMethodDefinition::class);
+
+            return $registry;
+        });
+
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpBackendInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpQueryInterface::class, \LibreNMS\Data\Source\Snmp\SnmpQueryBuilder::class);

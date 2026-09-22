@@ -29,6 +29,11 @@ abstract class PollingMethodDefinition implements HasFieldSchema
         return null;
     }
 
+    public function hasSecret(): bool
+    {
+        return $this->secretDefinition() !== null;
+    }
+
     public function onProbeComplete(\App\Models\Device $device, \LibreNMS\Polling\Method\Probe\ProbeResult $result, bool $commit = false): void
     {
     }

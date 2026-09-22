@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 class DiscoverDeviceMetadata
 {
     public function __construct(
+        private readonly \LibreNMS\Polling\Method\PollingMethodRegistry $registry,
         private readonly ValidateDeviceUniqueness $uniqueness = new ValidateDeviceUniqueness,
     ) {
     }
@@ -27,7 +28,7 @@ class DiscoverDeviceMetadata
         );
 
         foreach ($successfulMethods as $method) {
-            $method->method_type->definition()->enrichDeviceMetadata($device);
+            $this->registry->get($method->method_type)?->enrichDeviceMetadata($device);
         }
 
         $this->uniqueness->validateSysName($device);

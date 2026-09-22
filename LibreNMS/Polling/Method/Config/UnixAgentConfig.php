@@ -4,6 +4,7 @@ namespace LibreNMS\Polling\Method\Config;
 
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\Definitions\UnixAgentPollingMethodDefinition;
 
 final class UnixAgentConfig extends PollingMethodConfig
 {
@@ -27,7 +28,7 @@ final class UnixAgentConfig extends PollingMethodConfig
             throw new \Exception('Invalid polling method type');
         }
 
-        $definition = PollingMethodType::UnixAgent->definition();
+        $definition = new UnixAgentPollingMethodDefinition();
         $settings = $definition->resolveValues($method->settings ?? []);
 
         return new self(

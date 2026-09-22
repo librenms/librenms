@@ -10,6 +10,11 @@ use LibreNMS\Exceptions\HostUnreachableException;
 
 class DiscoverDevicePollingMethods
 {
+    public function __construct(
+        private readonly \LibreNMS\Polling\Method\PollingMethodRegistry $registry,
+    ) {
+    }
+
     /**
      * Discover and validate candidate polling methods for a device.
      *
@@ -23,7 +28,7 @@ class DiscoverDevicePollingMethods
         $enabledMethods = $candidateMethods->filter(fn (DevicePollingMethod $m) => $m->enabled);
 
         foreach ($enabledMethods as $method) {
-            $definition = $method->method_type->definition();
+            $definition = $this->registry->require($method->method_type);
             $result = $definition->discover($device, $method);
 
             $method->last_check_successful = $result->isSuccess();

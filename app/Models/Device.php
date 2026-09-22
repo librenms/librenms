@@ -134,9 +134,15 @@ class Device extends BaseModel
         return ($this->overwrite_ip ?: $this->hostname) ?: '';
     }
 
+    public function pollingConfig(PollingMethodType $type): ?\LibreNMS\Polling\Method\Config\PollingMethodConfig
+    {
+        return $this->pollingMethodFor()->get($type);
+    }
+
     public function toSnmpConfig(): SnmpConfig
     {
-        return $this->pollingMethodFor()->snmp();
+        /** @var SnmpConfig */
+        return $this->pollingConfig(PollingMethodType::Snmp);
     }
 
     public function ipFamily(): AddressFamily
@@ -165,9 +171,9 @@ class Device extends BaseModel
         return $this->toSnmpConfig()->isValid();
     }
 
-    public function pollingMethodFor(): PollingMethodAccessor
+    public function pollingMethodFor(?\LibreNMS\Polling\Method\PollingMethodRegistry $registry = null): PollingMethodAccessor
     {
-        return new PollingMethodAccessor($this);
+        return new PollingMethodAccessor($this, $registry ?? app(\LibreNMS\Polling\Method\PollingMethodRegistry::class));
     }
 
     public function pollingMethod(PollingMethodType $method): ?DevicePollingMethod
