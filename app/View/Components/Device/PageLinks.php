@@ -111,10 +111,11 @@ class PageLinks extends Component
         ];
 
         // IPMI
-        if ($device->attribs->firstWhere('attrib_type', 'ipmi_hostname')) {
+        $ipmiHostname = $device->pollingMethodFor()->ipmi()?->hostname;
+        if ($ipmiHostname) {
             $device_links['ipmi'] = [
                 'icon' => 'fa-microchip',
-                'url' => 'https://' . $device->attribs->firstWhere('attrib_type', 'ipmi_hostname')->attrib_value,
+                'url' => 'https://' . $ipmiHostname,
                 'title' => __('IPMI'),
                 'external' => true,
                 'onclick' => 'http_fallback(this); return false;',

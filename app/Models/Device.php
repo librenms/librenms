@@ -619,7 +619,11 @@ class Device extends BaseModel
 
     protected function scopeCanPing(Builder $query): Builder
     {
-        return $this->scopeWhereAttributeDisabled($query->where('disabled', 0), 'override_icmp_disable');
+        return $query->where('devices.disabled', 0)
+            ->whereDoesntHave('pollingMethods', function (Builder $query): void {
+                $query->where('method_type', PollingMethodType::Icmp)
+                    ->where('enabled', false);
+            });
     }
 
     public function scopeHasAccess($query, User $user)
