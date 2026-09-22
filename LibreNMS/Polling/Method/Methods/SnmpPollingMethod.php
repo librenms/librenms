@@ -1,6 +1,6 @@
 <?php
 
-namespace LibreNMS\Polling\Method\Definitions;
+namespace LibreNMS\Polling\Method\Methods;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
@@ -11,7 +11,7 @@ use LibreNMS\Modules\Core;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use SnmpQuery;
 
-final class SnmpPollingMethodDefinition extends PollingMethodDefinition
+final class SnmpPollingMethod extends PollingMethod
 {
     public function icon(): string
     {

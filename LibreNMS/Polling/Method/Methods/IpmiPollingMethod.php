@@ -1,10 +1,10 @@
 <?php
 
-namespace LibreNMS\Polling\Method\Definitions;
+namespace LibreNMS\Polling\Method\Methods;
 
 use App\View\FieldSchema\FieldDefinition;
 
-final class IpmiPollingMethodDefinition extends PollingMethodDefinition
+final class IpmiPollingMethod extends PollingMethod
 {
     public function icon(): string
     {

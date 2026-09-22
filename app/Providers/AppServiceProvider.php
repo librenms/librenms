@@ -60,22 +60,22 @@ class AppServiceProvider extends ServiceProvider
 
             $registry->register(
                 \LibreNMS\Enum\PollingMethodType::Snmp,
-                \LibreNMS\Polling\Method\Definitions\SnmpPollingMethodDefinition::class,
+                \LibreNMS\Polling\Method\Methods\SnmpPollingMethod::class,
             );
 
             $registry->register(
                 \LibreNMS\Enum\PollingMethodType::Icmp,
-                \LibreNMS\Polling\Method\Definitions\IcmpPollingMethodDefinition::class,
+                \LibreNMS\Polling\Method\Methods\IcmpPollingMethod::class,
             );
 
             $registry->register(
                 \LibreNMS\Enum\PollingMethodType::Ipmi,
-                \LibreNMS\Polling\Method\Definitions\IpmiPollingMethodDefinition::class,
+                \LibreNMS\Polling\Method\Methods\IpmiPollingMethod::class,
             );
 
             $registry->register(
                 \LibreNMS\Enum\PollingMethodType::UnixAgent,
-                \LibreNMS\Polling\Method\Definitions\UnixAgentPollingMethodDefinition::class,
+                \LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod::class,
             );
 
             return $registry;

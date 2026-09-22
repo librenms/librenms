@@ -14,10 +14,10 @@ use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
-use LibreNMS\Polling\Method\Definitions\IcmpPollingMethodDefinition;
-use LibreNMS\Polling\Method\Definitions\IpmiPollingMethodDefinition;
-use LibreNMS\Polling\Method\Definitions\SnmpPollingMethodDefinition;
-use LibreNMS\Polling\Method\Definitions\UnixAgentPollingMethodDefinition;
+use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
+use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
+use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Polling\Method\PollingMethodAccessor;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\Probe\IcmpProbe;
@@ -41,23 +41,23 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertTrue($this->registry->has(PollingMethodType::Ipmi));
         $this->assertTrue($this->registry->has(PollingMethodType::UnixAgent));
 
-        $this->assertInstanceOf(SnmpPollingMethodDefinition::class, $this->registry->definition(PollingMethodType::Snmp));
-        $this->assertInstanceOf(IcmpPollingMethodDefinition::class, $this->registry->definition(PollingMethodType::Icmp));
-        $this->assertInstanceOf(IpmiPollingMethodDefinition::class, $this->registry->definition(PollingMethodType::Ipmi));
-        $this->assertInstanceOf(UnixAgentPollingMethodDefinition::class, $this->registry->definition(PollingMethodType::UnixAgent));
+        $this->assertInstanceOf(SnmpPollingMethod::class, $this->registry->get(PollingMethodType::Snmp));
+        $this->assertInstanceOf(IcmpPollingMethod::class, $this->registry->get(PollingMethodType::Icmp));
+        $this->assertInstanceOf(IpmiPollingMethod::class, $this->registry->get(PollingMethodType::Ipmi));
+        $this->assertInstanceOf(UnixAgentPollingMethod::class, $this->registry->get(PollingMethodType::UnixAgent));
     }
 
-    public function testRegistryBehaviorMethodsProvideDefinitionsConfigsProbesAndSecrets(): void
+    public function testRegistryBehaviorMethodsProvideMethodsConfigsProbesAndSecrets(): void
     {
-        // 1. Definition
-        $snmpDef = $this->registry->require(PollingMethodType::Snmp);
-        $icmpDef = $this->registry->require(PollingMethodType::Icmp);
-        $this->assertInstanceOf(SnmpPollingMethodDefinition::class, $snmpDef);
-        $this->assertInstanceOf(IcmpPollingMethodDefinition::class, $icmpDef);
+        // 1. Method instance
+        $snmpMethod = $this->registry->require(PollingMethodType::Snmp);
+        $icmpMethodDef = $this->registry->require(PollingMethodType::Icmp);
+        $this->assertInstanceOf(SnmpPollingMethod::class, $snmpMethod);
+        $this->assertInstanceOf(IcmpPollingMethod::class, $icmpMethodDef);
 
-        // 2. Definition probe and check
-        $this->assertInstanceOf(SnmpProbe::class, $this->registry->definition(PollingMethodType::Snmp)?->probe());
-        $this->assertInstanceOf(IcmpProbe::class, $this->registry->definition(PollingMethodType::Icmp)?->probe());
+        // 2. Method probe and check
+        $this->assertInstanceOf(SnmpProbe::class, $this->registry->get(PollingMethodType::Snmp)?->probe());
+        $this->assertInstanceOf(IcmpProbe::class, $this->registry->get(PollingMethodType::Icmp)?->probe());
 
         // 3. SecretDefinition and hasSecret
         $this->assertTrue($this->registry->hasSecret(PollingMethodType::Snmp));
@@ -68,13 +68,13 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertInstanceOf(HasFieldSchema::class, $this->registry->secretDefinition(PollingMethodType::Snmp));
         $this->assertNull($this->registry->secretDefinition(PollingMethodType::Icmp));
 
-        // 4. Definition config
-        $icmpMethod = new DevicePollingMethod([
+        // 4. Method config
+        $icmpDeviceMethod = new DevicePollingMethod([
             'method_type' => PollingMethodType::Icmp,
             'enabled' => true,
             'affects_availability' => true,
         ]);
-        $this->assertInstanceOf(IcmpConfig::class, $this->registry->definition(PollingMethodType::Icmp)?->config($icmpMethod));
+        $this->assertInstanceOf(IcmpConfig::class, $this->registry->get(PollingMethodType::Icmp)?->config($icmpDeviceMethod));
 
         // 5. Icon
         $this->assertSame('fa-server', $this->registry->icon(PollingMethodType::Snmp));
@@ -89,7 +89,7 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertFalse($this->registry->defaultAffectsAvailability(PollingMethodType::UnixAgent));
     }
 
-    public function testRegistryAllAndTypesReturnRegisteredDefinitions(): void
+    public function testRegistryAllAndTypesReturnRegisteredMethods(): void
     {
         $types = $this->registry->types();
         $this->assertContains(PollingMethodType::Snmp, $types);

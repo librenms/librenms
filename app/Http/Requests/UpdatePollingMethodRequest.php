@@ -54,7 +54,7 @@ class UpdatePollingMethodRequest extends FormRequest
     public function rules(\LibreNMS\Polling\Method\PollingMethodRegistry $registry): array
     {
         $type = $this->pollingType();
-        $definition = $type ? $registry->definition($type) : null;
+        $definition = $type ? $registry->get($type) : null;
         $isEditingSecret = $this->has('is_editing_secret') ? $this->boolean('is_editing_secret') : $this->has('secret_data');
         $secretUpdateMode = $this->input('secret_update_mode', 'update');
 

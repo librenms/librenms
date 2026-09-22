@@ -1,13 +1,13 @@
 <?php
 
-namespace LibreNMS\Polling\Method\Definitions;
+namespace LibreNMS\Polling\Method\Methods;
 
 use App\Models\Device;
 use App\Models\Eventlog;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Polling\Method\Probe\ProbeResult;
 
-final class IcmpPollingMethodDefinition extends PollingMethodDefinition
+final class IcmpPollingMethod extends PollingMethod
 {
     public function icon(): string
     {

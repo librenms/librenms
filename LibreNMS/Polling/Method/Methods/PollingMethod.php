@@ -1,6 +1,6 @@
 <?php
 
-namespace LibreNMS\Polling\Method\Definitions;
+namespace LibreNMS\Polling\Method\Methods;
 
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
@@ -10,7 +10,7 @@ use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Probe\PollingMethodProbe;
 use LibreNMS\Polling\Method\Probe\ProbeResult;
 
-abstract class PollingMethodDefinition implements HasFieldSchema
+abstract class PollingMethod implements HasFieldSchema
 {
     use HandlesFieldSchema;
 

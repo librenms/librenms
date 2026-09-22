@@ -1,11 +1,11 @@
 <?php
 
-namespace LibreNMS\Polling\Method\Definitions;
+namespace LibreNMS\Polling\Method\Methods;
 
 use App\Facades\LibrenmsConfig;
 use App\View\FieldSchema\FieldDefinition;
 
-final class UnixAgentPollingMethodDefinition extends PollingMethodDefinition
+final class UnixAgentPollingMethod extends PollingMethod
 {
     public function icon(): string
     {

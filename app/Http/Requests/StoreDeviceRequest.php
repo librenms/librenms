@@ -59,8 +59,8 @@ class StoreDeviceRequest extends FormRequest
             $rules["polling_methods.{$method}.affects_availability"] = ['nullable', 'boolean'];
             $rules["polling_methods.{$method}.credential_mode"] = ['nullable', 'in:default,existing,new'];
 
-            $definition = $registry->definition($type);
-            if (! $definition) {
+            $pollingMethod = $registry->get($type);
+            if (! $pollingMethod) {
                 continue;
             }
             $secretDefinition = $registry->secretDefinition($type);
@@ -85,7 +85,7 @@ class StoreDeviceRequest extends FormRequest
 
             // Settings validation rules
             $rules["polling_methods.{$method}.settings"] = ['nullable', 'array'];
-            foreach ($definition->rules() as $key => $rule) {
+            foreach ($pollingMethod->rules() as $key => $rule) {
                 $rules["polling_methods.{$method}.settings.{$key}"] = $rule;
             }
         }

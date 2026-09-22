@@ -67,13 +67,13 @@ class BuildDefaultPollingMethods
             }
 
             $pollingMethodRegistry = $this->registry;
-            $definition = $pollingMethodRegistry->definition($type);
+            $pollingMethodDef = $pollingMethodRegistry->get($type);
 
             $pollingMethod = new DevicePollingMethod([
                 'method_type' => $type,
                 'enabled' => true,
                 'affects_availability' => $affectsAvailability ?? $this->registry->defaultAffectsAvailability($type),
-                'settings' => $definition ? $definition->filterOverrides($settings) : $settings,
+                'settings' => $pollingMethodDef ? $pollingMethodDef->filterOverrides($settings) : $settings,
             ]);
             $pollingMethod->setRelation('device', $device);
 

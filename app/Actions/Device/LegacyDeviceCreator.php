@@ -84,12 +84,12 @@ class LegacyDeviceCreator
             ], fn ($v) => $v !== null);
 
             $registry = $this->registry;
-            $snmpDefinition = $registry->definition(PollingMethodType::Snmp);
+            $snmpMethodDef = $registry->get(PollingMethodType::Snmp);
             $snmpMethod = new DevicePollingMethod([
                 'method_type' => PollingMethodType::Snmp,
                 'enabled' => true,
                 'affects_availability' => true,
-                'settings' => $snmpDefinition ? $snmpDefinition->filterOverrides($settings) : $settings,
+                'settings' => $snmpMethodDef ? $snmpMethodDef->filterOverrides($settings) : $settings,
             ]);
             $snmpMethod->setRelation('device', $device);
 

@@ -10,9 +10,9 @@ use App\View\FieldSchema\HandlesFieldSchema;
 use App\View\FieldSchema\HasFieldSchema;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
-use LibreNMS\Polling\Method\Definitions\IpmiPollingMethodDefinition;
-use LibreNMS\Polling\Method\Definitions\SnmpPollingMethodDefinition;
-use LibreNMS\Polling\Method\Definitions\UnixAgentPollingMethodDefinition;
+use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
+use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Tests\TestCase;
 
 final class FieldSchemaTest extends TestCase
@@ -154,17 +154,17 @@ final class FieldSchemaTest extends TestCase
 
     public function testDefinitionsHaveNullableRules(): void
     {
-        $snmpRules = (new SnmpPollingMethodDefinition)->rules();
+        $snmpRules = (new SnmpPollingMethod)->rules();
         foreach ($snmpRules as $field => $rules) {
             $this->assertContains('nullable', (array) $rules, "SNMP field {$field} should be nullable");
         }
 
-        $ipmiRules = (new IpmiPollingMethodDefinition)->rules();
+        $ipmiRules = (new IpmiPollingMethod)->rules();
         foreach ($ipmiRules as $field => $rules) {
             $this->assertContains('nullable', (array) $rules, "IPMI field {$field} should be nullable");
         }
 
-        $unixRules = (new UnixAgentPollingMethodDefinition)->rules();
+        $unixRules = (new UnixAgentPollingMethod)->rules();
         foreach ($unixRules as $field => $rules) {
             $this->assertContains('nullable', (array) $rules, "Unix agent field {$field} should be nullable");
         }
