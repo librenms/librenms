@@ -14,6 +14,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('devices', function (Blueprint $table) {
+            if (Schema::hasIndex('devices', 'devices_last_poll_attempted_index')) {
+                $table->dropIndex('devices_last_poll_attempted_index');
+            }
+
             $columnsToDrop = array_filter([
                 'port',
                 'transport',
