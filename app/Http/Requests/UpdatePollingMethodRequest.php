@@ -102,7 +102,7 @@ class UpdatePollingMethodRequest extends FormRequest
                 ->all(),
         ];
 
-        $secretDefinition = $type ? $registry->secretDefinition($type) : null;
+        $secretDefinition = $definition->secretDefinition();
         if ($secretDefinition !== null && $this->has('secret_data')) {
             $rules = [
                 ...$rules,

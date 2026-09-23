@@ -30,7 +30,7 @@ class AddDeviceController
 
         $availableMethods = collect($this->registry->types())->map(function (PollingMethodType $type): array {
             $definition = $this->registry->require($type);
-            $secretDefinition = $this->registry->secretDefinition($type);
+            $secretDefinition = $definition->secretDefinition();
             $schemaFields = $secretDefinition ? $secretDefinition->buildSchemaFields(dataVar: "methods['" . $type->value . "'].formData") : [];
 
             return [

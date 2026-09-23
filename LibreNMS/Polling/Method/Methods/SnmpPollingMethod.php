@@ -90,9 +90,9 @@ final class SnmpPollingMethod extends PollingMethod
         return resolve(\LibreNMS\Polling\Method\Probe\SnmpProbe::class);
     }
 
-    public function secretDefinition(): \LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition
+    public function secretType(): ?SecretType
     {
-        return resolve(\LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition::class);
+        return SecretType::Snmp;
     }
 
     public function config(DevicePollingMethod $method): SnmpConfig

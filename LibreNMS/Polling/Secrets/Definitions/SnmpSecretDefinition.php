@@ -27,13 +27,10 @@
 namespace LibreNMS\Polling\Secrets\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
-use App\View\FieldSchema\HandlesFieldSchema;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 
-class SnmpSecretDefinition implements SecretDefinition
+class SnmpSecretDefinition extends SecretDefinition
 {
-    use HandlesFieldSchema;
-
     /**
      * @param  array<string, mixed>  $data
      */

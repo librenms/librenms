@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Secrets\Data\SecretData;
 
 #[ObservedBy([DevicePollingMethodObserver::class])]
@@ -40,9 +41,15 @@ class DevicePollingMethod extends Model
         'last_check_successful' => 'boolean',
     ];
 
-    public function secretData(): ?SecretData
+    public function secretData(?PollingMethodRegistry $registry = null): ?SecretData
     {
-        return $this->secret?->toSecretData();
+        if (! $this->secret || ! $this->method_type) {
+            return null;
+        }
+
+        $registry ??= resolve(PollingMethodRegistry::class);
+
+        return $registry->get($this->method_type)?->secretDefinition()?->createData($this->secret->data ?? []);
     }
 
     /** @return BelongsTo<Device, $this> */

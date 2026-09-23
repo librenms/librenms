@@ -6,6 +6,7 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\View\FieldSchema\HandlesFieldSchema;
 use App\View\FieldSchema\HasFieldSchema;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Probe\PollingMethodProbe;
 use LibreNMS\Polling\Method\Probe\ProbeResult;
@@ -30,9 +31,19 @@ abstract class PollingMethod implements HasFieldSchema
         return [];
     }
 
-    public function secretDefinition(): ?SecretDefinition
+    public function secretType(): ?SecretType
     {
         return null;
+    }
+
+    public function hasSecret(): bool
+    {
+        return $this->secretType() !== null;
+    }
+
+    public function secretDefinition(): ?SecretDefinition
+    {
+        return SecretDefinition::for($this->secretType());
     }
 
     abstract public function probe(): PollingMethodProbe;

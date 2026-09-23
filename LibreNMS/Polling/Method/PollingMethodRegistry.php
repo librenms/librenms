@@ -5,7 +5,6 @@ namespace LibreNMS\Polling\Method;
 use InvalidArgumentException;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
-use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class PollingMethodRegistry
 {
@@ -68,22 +67,6 @@ class PollingMethodRegistry
         }
 
         return $method;
-    }
-
-    /**
-     * Get the secret definition for a polling method, if one is defined.
-     */
-    public function secretDefinition(PollingMethodType $type): ?SecretDefinition
-    {
-        return $this->require($type)->secretDefinition();
-    }
-
-    /**
-     * Determine if a polling method requires secrets.
-     */
-    public function hasSecret(PollingMethodType $type): bool
-    {
-        return $this->secretDefinition($type) !== null;
     }
 
     /**

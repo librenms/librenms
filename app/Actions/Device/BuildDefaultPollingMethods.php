@@ -47,6 +47,11 @@ class BuildDefaultPollingMethods
                 continue;
             }
 
+            $method = $this->registry->get($type);
+            if (! $method) {
+                continue;
+            }
+
             $settings = $data['settings'] ?? [];
             $credentialMode = $data['credential_mode'] ?? 'default';
             $secretId = isset($data['secret_id']) ? (int) $data['secret_id'] : null;
@@ -54,21 +59,18 @@ class BuildDefaultPollingMethods
 
             $secret = null;
             $secretData = null;
-            if ($credentialMode === 'existing' && $secretId !== null) {
-                $secret = Secret::resolveForType($secretId, $type);
+            $secretType = $method->secretType();
+            if ($secretType !== null && $credentialMode === 'existing' && $secretId !== null) {
+                $secret = Secret::resolveForType($secretId, $secretType);
             } elseif (! empty($data['secret_data'])) {
-                $secretDefinition = $this->registry->secretDefinition($type);
-                $secretData = $secretDefinition?->createData($data['secret_data']);
+                $secretData = $method->secretDefinition()?->createData($data['secret_data']);
             }
-
-            $pollingMethodRegistry = $this->registry;
-            $pollingMethodDef = $pollingMethodRegistry->get($type);
 
             $pollingMethod = new DevicePollingMethod([
                 'method_type' => $type,
                 'enabled' => true,
                 'affects_availability' => $affectsAvailability ?? $this->registry->defaultAffectsAvailability($type),
-                'settings' => $pollingMethodDef ? $pollingMethodDef->filterOverrides($settings) : $settings,
+                'settings' => $method->filterOverrides($settings),
             ]);
             $pollingMethod->setRelation('device', $device);
 
@@ -77,7 +79,7 @@ class BuildDefaultPollingMethods
                 $pollingMethod->secret_id = $secret->id;
             } elseif ($secretData !== null) {
                 $createdSecret = new Secret([
-                    'secret_type' => $type->value,
+                    'secret_type' => $secretType,
                     'description' => ($credentialMode === 'new' && ! empty($data['description'])) ? $data['description'] : (strtoupper($type->value) . ' ' . $device->hostname),
                     'data' => $secretData->toArray(),
                 ]);

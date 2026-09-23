@@ -27,13 +27,10 @@
 namespace LibreNMS\Polling\Secrets\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
-use App\View\FieldSchema\HandlesFieldSchema;
 use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
 
-class IpmiSecretDefinition implements SecretDefinition
+class IpmiSecretDefinition extends SecretDefinition
 {
-    use HandlesFieldSchema;
-
     /**
      * @param  array<string, mixed>  $data
      */

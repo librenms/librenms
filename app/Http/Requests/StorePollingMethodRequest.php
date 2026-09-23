@@ -55,7 +55,7 @@ class StorePollingMethodRequest extends FormRequest
                         ->all(),
                 ];
 
-                $secretDefinition = $registry->secretDefinition($type);
+                $secretDefinition = $pollingMethod->secretDefinition();
                 if ($secretDefinition !== null && $this->input('credential_mode', 'existing') === 'new') {
                     $rules = [
                         ...$rules,

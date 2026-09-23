@@ -33,17 +33,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
-use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
-use LibreNMS\Polling\Method\PollingMethodRegistry;
+use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class SecretController extends Controller
 {
-    public function __construct(
-        private readonly PollingMethodRegistry $registry,
-    ) {
-    }
-
     public function index(Request $request): View
     {
         Gate::authorize('viewAny', Secret::class);
@@ -59,8 +53,7 @@ class SecretController extends Controller
 
         $type = $request->query('type', 'snmp');
         $secretType = SecretType::tryFrom($type) ?? SecretType::Snmp;
-        $definition = $this->registry->secretDefinition(PollingMethodType::from($secretType->value))
-            ?? abort(404, 'Secret definition not found.');
+        $definition = SecretDefinition::for($secretType) ?? abort(404, 'Secret definition not found.');
         $schema = $definition->schema();
         $data = array_merge($definition->schemaDefaults(), old());
 
@@ -86,8 +79,7 @@ class SecretController extends Controller
             abort(400, 'Invalid secret type.');
         }
 
-        $definition = $this->registry->secretDefinition(PollingMethodType::from($secretType->value))
-            ?? abort(400, 'Invalid secret type.');
+        $definition = SecretDefinition::for($secretType) ?? abort(400, 'Invalid secret type.');
         $rules = $definition->rules();
         $data = $request->validate($rules);
 
@@ -106,8 +98,7 @@ class SecretController extends Controller
     {
         Gate::authorize('update', $secret);
 
-        $definition = $secret->definition($this->registry)
-            ?? abort(404, 'Secret definition not found.');
+        $definition = SecretDefinition::for($secret->secret_type) ?? abort(404, 'Secret definition not found.');
         $schema = $definition->schema();
         $defaults = $definition->schemaDefaults();
         $secretData = Gate::allows('unmask', $secret)
@@ -130,8 +121,7 @@ class SecretController extends Controller
             'description' => ['required', 'string', 'max:255', Rule::unique('secrets', 'description')->ignore($secret->id)],
         ]);
 
-        $definition = $secret->definition($this->registry)
-            ?? abort(404, 'Secret definition not found.');
+        $definition = SecretDefinition::for($secret->secret_type) ?? abort(404, 'Secret definition not found.');
         $data = $request->validate($definition->rules());
 
         if (! Gate::allows('unmask', $secret)) {

@@ -63,7 +63,7 @@ class StoreDeviceRequest extends FormRequest
             if (! $pollingMethod) {
                 continue;
             }
-            $secretDefinition = $registry->secretDefinition($type);
+            $secretDefinition = $pollingMethod->secretDefinition();
             if ($secretDefinition !== null) {
                 $rules["polling_methods.{$method}.secret_id"] = [
                     'required_if:polling_methods.' . $method . '.credential_mode,existing',

@@ -25,28 +25,12 @@ class Secret extends BaseModel
         'data' => EncryptedArray::class,
     ];
 
-    public function definition(?\LibreNMS\Polling\Method\PollingMethodRegistry $registry = null): ?\LibreNMS\Polling\Secrets\Definitions\SecretDefinition
-    {
-        if (! $this->secret_type) {
-            return null;
-        }
-
-        $type = \LibreNMS\Enum\PollingMethodType::tryFrom($this->secret_type->value);
-
-        return $type ? ($registry ?? resolve(\LibreNMS\Polling\Method\PollingMethodRegistry::class))->secretDefinition($type) : null;
-    }
-
-    public function toSecretData(?\LibreNMS\Polling\Method\PollingMethodRegistry $registry = null): ?\LibreNMS\Polling\Secrets\Data\SecretData
-    {
-        return $this->definition($registry)?->createData($this->data ?? []);
-    }
-
     /**
-     * Resolve an existing Secret by ID and verify its type matches the polling method type.
+     * Resolve an existing Secret by ID and verify its type matches the expected secret type.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public static function resolveForType(int $id, \LibreNMS\Enum\PollingMethodType $type, ?User $user = null): self
+    public static function resolveForType(int $id, SecretType $type, ?User $user = null): self
     {
         $query = static::query();
         $user ??= auth()->user();
@@ -56,7 +40,7 @@ class Secret extends BaseModel
 
         $secret = $query->findOrFail($id);
 
-        if ($secret->secret_type->value !== $type->value) {
+        if ($secret->secret_type !== $type) {
             throw \Illuminate\Validation\ValidationException::withMessages([
                 'secret_id' => __('poller.credential_type_mismatch'),
             ]);

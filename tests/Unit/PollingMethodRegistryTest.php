@@ -58,33 +58,49 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertInstanceOf(SnmpProbe::class, $this->registry->get(PollingMethodType::Snmp)?->probe());
         $this->assertInstanceOf(IcmpProbe::class, $this->registry->get(PollingMethodType::Icmp)?->probe());
 
-        // 3. SecretDefinition and hasSecret
-        $this->assertTrue($this->registry->hasSecret(PollingMethodType::Snmp));
-        $this->assertTrue($this->registry->hasSecret(PollingMethodType::Ipmi));
-        $this->assertFalse($this->registry->hasSecret(PollingMethodType::Icmp));
-        $this->assertFalse($this->registry->hasSecret(PollingMethodType::UnixAgent));
-
-        $snmpSecretDef = $this->registry->secretDefinition(PollingMethodType::Snmp);
+        // 3. SecretDefinition, secretType, and hasSecret on PollingMethod instances
+        $this->assertSame(\LibreNMS\Enum\SecretType::Snmp, $snmpMethod->secretType());
+        $this->assertTrue($snmpMethod->hasSecret());
+        $snmpSecretDef = $snmpMethod->secretDefinition();
         $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\SecretDefinition::class, $snmpSecretDef);
-        $this->assertNull($this->registry->secretDefinition(PollingMethodType::Icmp));
-
         $snmpData = $snmpSecretDef->createData(['community' => 'public']);
         $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Data\SnmpSecretData::class, $snmpData);
         $this->assertSame('public', $snmpData->community);
 
-        $ipmiSecretDef = $this->registry->secretDefinition(PollingMethodType::Ipmi);
+        $ipmiMethod = $this->registry->require(PollingMethodType::Ipmi);
+        $this->assertSame(\LibreNMS\Enum\SecretType::Ipmi, $ipmiMethod->secretType());
+        $this->assertTrue($ipmiMethod->hasSecret());
+        $ipmiSecretDef = $ipmiMethod->secretDefinition();
         $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\SecretDefinition::class, $ipmiSecretDef);
         $ipmiData = $ipmiSecretDef->createData(['username' => 'admin', 'password' => 'pass']);
         $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Data\IpmiSecretData::class, $ipmiData);
         $this->assertSame('admin', $ipmiData->username);
 
-        // Secret model definition and toSecretData
-        $secret = new \App\Models\Secret([
+        $this->assertNull($icmpMethodDef->secretType());
+        $this->assertFalse($icmpMethodDef->hasSecret());
+        $this->assertNull($icmpMethodDef->secretDefinition());
+
+        $unixAgentMethod = $this->registry->require(PollingMethodType::UnixAgent);
+        $this->assertNull($unixAgentMethod->secretType());
+        $this->assertFalse($unixAgentMethod->hasSecret());
+        $this->assertNull($unixAgentMethod->secretDefinition());
+
+        // SecretDefinition::for resolution
+        $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition::class, \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for(\LibreNMS\Enum\SecretType::Snmp));
+        $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition::class, \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for('snmp'));
+        $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition::class, \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for(\LibreNMS\Enum\SecretType::Ipmi));
+        $this->assertNull(\LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for('nonexistent'));
+        $this->assertNull(\LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for(null));
+
+        // DevicePollingMethod secretData
+        $snmpDeviceMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
+        ]);
+        $snmpDeviceMethod->setRelation('secret', new \App\Models\Secret([
             'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
             'data' => ['community' => 'public'],
-        ]);
-        $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition::class, $secret->definition($this->registry));
-        $secretData = $secret->toSecretData($this->registry);
+        ]));
+        $secretData = $snmpDeviceMethod->secretData($this->registry);
         $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Data\SnmpSecretData::class, $secretData);
         $this->assertSame('public', $secretData->community);
 
