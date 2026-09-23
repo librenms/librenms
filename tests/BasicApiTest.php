@@ -46,13 +46,42 @@ final class BasicApiTest extends DBTestCase
         $token = $user->createToken('test');
         $device = Device::factory()->create();
 
-        $this->json('GET', '/api/v0/devices', [], ['X-Auth-Token' => $token->plainTextToken])
-            ->assertStatus(200)
-            ->assertJson([
-                'status' => 'ok',
-                'devices' => [$device->toArray()],
-                'count' => 1,
-            ]);
+        $res = $this->json('GET', '/api/v0/devices', [], ['X-Auth-Token' => $token->plainTextToken]);
+        $res->assertStatus(200)
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonPath('count', 1);
+
+        $deviceData = $res->json('devices.0');
+        $this->assertIsArray($deviceData);
+        $this->assertArrayNotHasKey('parents', $deviceData);
+        $this->assertSame($device->hostname, $deviceData['hostname']);
+        $this->assertSame((int) $device->status, (int) $deviceData['status']);
+        $this->assertIsInt($deviceData['status']);
+    }
+
+    public function testListDevicesWithParentsShape(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+
+        $parent1 = Device::factory()->create(['hostname' => 'parent1.example.com']);
+        $parent2 = Device::factory()->create(['hostname' => 'parent2.example.com']);
+        $child = Device::factory()->create(['hostname' => 'child.example.com']);
+
+        $child->parents()->attach([$parent1->device_id, $parent2->device_id]);
+
+        $res = $this->json('GET', '/api/v0/devices?type=hostname&query=child', [], ['X-Auth-Token' => $token->plainTextToken]);
+        $res->assertStatus(200)
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonPath('count', 1);
+
+        $childData = $res->json('devices.0');
+        $this->assertArrayNotHasKey('parents', $childData);
+        $this->assertStringContainsString((string) $parent1->device_id, (string) $childData['dependency_parent_id']);
+        $this->assertStringContainsString((string) $parent2->device_id, (string) $childData['dependency_parent_id']);
+        $this->assertStringContainsString('parent1.example.com', (string) $childData['dependency_parent_hostname']);
+        $this->assertStringContainsString('parent2.example.com', (string) $childData['dependency_parent_hostname']);
     }
 
     public function testDisabledUserTokenCannotAccessApi(): void
@@ -375,6 +404,12 @@ final class BasicApiTest extends DBTestCase
             ->assertJsonPath('devices.0.location', 'Server Room A')
             ->assertJsonPath('devices.0.parent_id', $vmHost->device_id);
 
+        $getDeviceData = $response->json('devices.0');
+        $this->assertIsArray($getDeviceData);
+        $this->assertArrayNotHasKey('parents', $getDeviceData);
+        $this->assertSame((int) $device->status, (int) $getDeviceData['status']);
+        $this->assertIsInt($getDeviceData['status']);
+
         // Get by device_id
         $this->json('GET', "/api/v0/devices/{$device->device_id}", [], ['X-Auth-Token' => $token->plainTextToken])
             ->assertStatus(200)
@@ -486,6 +521,13 @@ final class BasicApiTest extends DBTestCase
         $res->assertStatus(200)
             ->assertJsonPath('status', 'ok');
 
+        $addedDeviceData = $res->json('devices.0');
+        $this->assertIsArray($addedDeviceData);
+        $this->assertArrayNotHasKey('parents', $addedDeviceData);
+        $this->assertSame(1, (int) $addedDeviceData['snmp_disable']);
+        $this->assertSame('ping-host.test.local', $addedDeviceData['hostname']);
+        $this->assertSame('ping', $addedDeviceData['os']);
+
         $this->assertDatabaseHas('devices', ['hostname' => 'ping-host.test.local', 'os' => 'ping', 'snmp_disable' => 1]);
     }
 
@@ -506,6 +548,10 @@ final class BasicApiTest extends DBTestCase
         $res->assertStatus(200)
             ->assertJsonPath('status', 'ok')
             ->assertJsonPath('devices.0.hostname', 'delete-me.domain.local');
+
+        $deletedDeviceData = $res->json('devices.0');
+        $this->assertIsArray($deletedDeviceData);
+        $this->assertArrayNotHasKey('parents', $deletedDeviceData);
 
         $this->assertDatabaseMissing('devices', ['device_id' => $device->device_id]);
     }
