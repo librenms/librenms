@@ -312,7 +312,7 @@ function get_device(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname does not exist");
     }
 
-    if (Gate::denies('view', $device)) {
+    if ($request->user()->cannot('view', $device)) {
         return api_error(403, 'Insufficient permissions to access this device');
     }
 
@@ -390,7 +390,7 @@ function list_devices(Illuminate\Http\Request $request): JsonResponse
 
 function add_device(Illuminate\Http\Request $request)
 {
-    if (Gate::denies('create', Device::class)) {
+    if ($request->user()->cannot('create', Device::class)) {
         return api_error(403, 'Insufficient permissions to create a device');
     }
 
@@ -451,11 +451,15 @@ function add_device(Illuminate\Http\Request $request)
 
         (new ValidateDeviceAndCreate($device, $force_add, ! empty($data['ping_fallback'])))->execute();
     } catch (\LibreNMS\Exceptions\HostExistsException|\LibreNMS\Exceptions\HostUnreachableException|\LibreNMS\Exceptions\SnmpVersionUnsupportedException $e) {
-        return api_error(500, $e->getMessage());
+        return api_error(400, $e->getMessage());
     } catch (Exception $e) {
         report($e);
 
         return api_error(500, 'Failed to add device');
+    }
+
+    if (! $device->exists) {
+        return api_error(400, 'Could not add device');
     }
 
     $message = "Device $device->hostname ($device->device_id) has been added successfully";
@@ -477,7 +481,7 @@ function del_device(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname not found");
     }
 
-    if (Gate::denies('delete', $device)) {
+    if ($request->user()->cannot('delete', $device)) {
         return api_error(403, 'Insufficient permissions to delete this device');
     }
 
@@ -2545,7 +2549,7 @@ function update_device(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname not found");
     }
 
-    if (Gate::denies('update', $device)) {
+    if ($request->user()->cannot('update', $device)) {
         return api_error(403, 'Insufficient permissions to update this device');
     }
 
@@ -3017,7 +3021,7 @@ function get_devices_by_group(Illuminate\Http\Request $request)
         return api_error(404, 'Device group not found');
     }
 
-    if (Gate::denies('view', $device_group)) {
+    if ($request->user()->cannot('view', $device_group)) {
         return api_error(403, 'Insufficient permissions to access this device group');
     }
 

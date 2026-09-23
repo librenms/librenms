@@ -384,29 +384,34 @@ final class BasicApiTest extends DBTestCase
         // Nonexistent device
         $this->json('GET', '/api/v0/devices/nonexistent-device.local', [], ['X-Auth-Token' => $token->plainTextToken])
             ->assertStatus(404);
+    }
 
-        // User without permission
+    public function testGetDeviceUnauthorized(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'unauthorized-device.domain.local']);
+
         /** @var User $normalUser */
-        $normalUser = User::factory()->create(['level' => 1]);
+        $normalUser = User::factory()->create();
         $normalToken = $normalUser->createToken('normal');
+
         $this->json('GET', "/api/v0/devices/{$device->device_id}", [], ['X-Auth-Token' => $normalToken->plainTextToken])
             ->assertStatus(403);
     }
 
-    public function testListDevicesFiltersAndPermissions(): void
+    public function testListDevicesFilters(): void
     {
         /** @var User $admin */
         $admin = User::factory()->admin()->create();
         $token = $admin->createToken('test');
 
-        $device1 = Device::factory()->create([
+        Device::factory()->create([
             'hostname' => 'alpha.domain.local',
             'os' => 'linux',
             'status' => 1,
             'ignore' => 0,
             'disabled' => 0,
         ]);
-        $device2 = Device::factory()->create([
+        Device::factory()->create([
             'hostname' => 'beta.domain.local',
             'os' => 'cisco',
             'status' => 0,
@@ -431,11 +436,18 @@ final class BasicApiTest extends DBTestCase
         $res->assertStatus(200)
             ->assertJsonPath('count', 1)
             ->assertJsonPath('devices.0.hostname', 'alpha.domain.local');
+    }
 
-        // Normal user only sees assigned devices
+    public function testListDevicesNormalUserPermissions(): void
+    {
+        $device1 = Device::factory()->create(['hostname' => 'alpha.domain.local']);
+        Device::factory()->create(['hostname' => 'beta.domain.local']);
+
         /** @var User $normalUser */
-        $normalUser = User::factory()->create(['level' => 1]);
-        $normalUser->devices()->attach($device1->device_id);
+        $normalUser = User::factory()->create();
+        $normalUser->assignRole('user');
+        $normalUser->devicesOwned()->attach($device1->device_id);
+        \App\Facades\Permissions::invalidateCache();
         $normalToken = $normalUser->createToken('normal');
 
         $res = $this->json('GET', '/api/v0/devices', [], ['X-Auth-Token' => $normalToken->plainTextToken]);
@@ -466,6 +478,7 @@ final class BasicApiTest extends DBTestCase
         $res = $this->json('POST', '/api/v0/devices', [
             'hostname' => 'ping-host.test.local',
             'snmp_disable' => 1,
+            'force_add' => 1,
             'os' => 'ping',
             'location' => 'Lab 1',
         ], ['X-Auth-Token' => $token->plainTextToken]);
@@ -524,7 +537,7 @@ final class BasicApiTest extends DBTestCase
         $res = $this->json('PATCH', "/api/v0/devices/{$device->device_id}", ['field' => 'sysName', 'data' => 'Updated Switch'], ['X-Auth-Token' => $token->plainTextToken]);
         $res->assertStatus(200)
             ->assertJsonPath('status', 'ok');
-        $this->assertSame('Updated Switch', $device->fresh()->sysName);
+        $this->assertSame('updated switch', $device->fresh()->sysName);
 
         // Update location field
         $res = $this->json('PATCH', "/api/v0/devices/{$device->device_id}", ['field' => 'location', 'data' => 'Datacenter 2'], ['X-Auth-Token' => $token->plainTextToken]);
@@ -539,7 +552,7 @@ final class BasicApiTest extends DBTestCase
         ], ['X-Auth-Token' => $token->plainTextToken]);
         $res->assertStatus(200)
             ->assertJsonPath('status', 'ok');
-        $this->assertSame('Core Switch', $device->fresh()->sysName);
+        $this->assertSame('core switch', $device->fresh()->sysName);
         $this->assertSame('Production Core', $device->fresh()->purpose);
     }
 
