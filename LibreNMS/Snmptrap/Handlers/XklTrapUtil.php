@@ -33,8 +33,8 @@ class XklTrapUtil
     /**
      * Get the value, applies the unit divsor from MIB, and returns float with units
      *
-     * @param   string  $value
-     * @return  string  $value
+     * @param  string  $value
+     * @return string $value
      */
     public static function removeUnits($value)
     {

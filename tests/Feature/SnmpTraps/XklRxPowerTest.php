@@ -39,7 +39,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
 SNMPv2-MIB::snmpTrapOID.0 XKL-MIB::xklRxPowerOK
 XKL-MIB::xklTransportIndex.1 1
 XKL-MIB::xklTransportDescr.1 Client 0\/0 (N\/A)
-XKL-MIB::xklTransportReceivePower.1 16
+XKL-MIB::xklTransportReceivePower.1 16 1/10 dBm
 TRAP,
 
             'Transciever Wave 0 (N\/A) receive power OK. Current value: 1.6 dBm',
