@@ -108,6 +108,10 @@ final class SnmpPollingMethod extends PollingMethod
             return SnmpConfig::fromPollingMethod($method);
         }
 
+        if ($device->relationLoaded('pollingMethods') && $device->pollingMethods->isNotEmpty()) {
+            return new SnmpConfig(enabled: false);
+        }
+
         if ($device->exists) {
             \App\Models\Eventlog::log('Missing SNMP polling method, falling back to legacy device fields.', $device, 'snmp', \LibreNMS\Enum\Severity::Error);
         }

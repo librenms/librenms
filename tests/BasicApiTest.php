@@ -528,7 +528,9 @@ final class BasicApiTest extends DBTestCase
         $this->assertSame('ping-host.test.local', $addedDeviceData['hostname']);
         $this->assertSame('ping', $addedDeviceData['os']);
 
-        $this->assertDatabaseHas('devices', ['hostname' => 'ping-host.test.local', 'os' => 'ping', 'snmp_disable' => 1]);
+        $this->assertDatabaseHas('devices', ['hostname' => 'ping-host.test.local', 'os' => 'ping']);
+        $this->assertDatabaseMissing('device_polling_methods', ['device_id' => $addedDeviceData['device_id'], 'method_type' => 'snmp']);
+        $this->assertDatabaseHas('device_polling_methods', ['device_id' => $addedDeviceData['device_id'], 'method_type' => 'icmp', 'enabled' => 1]);
     }
 
     public function testDelDevice(): void

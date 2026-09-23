@@ -324,7 +324,7 @@ function list_devices(Illuminate\Http\Request $request): JsonResponse
     $type = $request->input('type');
 
     $devicesQuery = Device::hasAccess($request->user())
-        ->with(['location', 'parents']);
+        ->with(['location', 'parents', 'pollingMethods.secret', 'stats']);
 
     match ($type) {
         'device_id' => $devicesQuery->where('device_id', $query),
