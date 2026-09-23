@@ -88,7 +88,7 @@ class ArtisanCommandController extends Controller
             echo PHP_EOL . 'exit_status:' . $exitCode . PHP_EOL;
 
             // Delete the session
-            $request->session()->flush();
+            $request->session()->cache()->flush();
         });
     }
 
