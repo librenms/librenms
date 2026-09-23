@@ -54,7 +54,7 @@ final class IpmiPollingMethod extends PollingMethod
         return resolve(IpmiProbe::class);
     }
 
-    public function secretType(): ?SecretType
+    public function secretType(): SecretType
     {
         return SecretType::Ipmi;
     }

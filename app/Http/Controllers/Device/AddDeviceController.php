@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class AddDeviceController
 {
@@ -30,13 +31,13 @@ class AddDeviceController
 
         $availableMethods = collect($this->registry->types())->map(function (PollingMethodType $type): array {
             $definition = $this->registry->require($type);
-            $secretDefinition = $definition->secretDefinition();
+            $secretDefinition = SecretDefinition::for($definition->secretType());
             $schemaFields = $secretDefinition ? $secretDefinition->buildSchemaFields(dataVar: "methods['" . $type->value . "'].formData") : [];
 
             return [
                 'type' => $type->value,
                 'label' => __('poller.methods.' . $type->value),
-                'icon' => $this->registry->icon($type),
+                'icon' => $definition->icon(),
                 'schema_fields' => $schemaFields,
                 'schema_defaults' => $secretDefinition?->schemaDefaults() ?? [],
                 'settings_fields' => $definition->buildSchemaFields(dataVar: "methods['" . $type->value . "'].settingsData"),

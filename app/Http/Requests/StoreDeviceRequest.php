@@ -7,6 +7,7 @@ use App\Models\PollerGroup;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class StoreDeviceRequest extends FormRequest
 {
@@ -63,7 +64,7 @@ class StoreDeviceRequest extends FormRequest
             if (! $pollingMethod) {
                 continue;
             }
-            $secretDefinition = $pollingMethod->secretDefinition();
+            $secretDefinition = SecretDefinition::for($pollingMethod->secretType());
             if ($secretDefinition !== null) {
                 $rules["polling_methods.{$method}.secret_id"] = [
                     'required_if:polling_methods.' . $method . '.credential_mode,existing',

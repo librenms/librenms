@@ -46,14 +46,6 @@ class PollingMethodRegistry
     }
 
     /**
-     * Get the polling method instance for a type (alias of get).
-     */
-    public function method(PollingMethodType $type): ?PollingMethod
-    {
-        return $this->get($type);
-    }
-
-    /**
      * Get the polling method instance for a type, or throw an exception if not found.
      *
      * @throws InvalidArgumentException
@@ -67,14 +59,6 @@ class PollingMethodRegistry
         }
 
         return $method;
-    }
-
-    /**
-     * Get the icon for a polling method.
-     */
-    public function icon(PollingMethodType $type): string
-    {
-        return $this->require($type)->icon();
     }
 
     /**

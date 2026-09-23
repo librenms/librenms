@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Secrets\Data\SecretData;
+use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 #[ObservedBy([DevicePollingMethodObserver::class])]
 class DevicePollingMethod extends Model
@@ -48,8 +49,9 @@ class DevicePollingMethod extends Model
         }
 
         $registry ??= resolve(PollingMethodRegistry::class);
+        $secretType = $registry->get($this->method_type)?->secretType();
 
-        return $registry->get($this->method_type)?->secretDefinition()?->createData($this->secret->data ?? []);
+        return SecretDefinition::for($secretType)?->createData($this->secret->data ?? []);
     }
 
     /** @return BelongsTo<Device, $this> */

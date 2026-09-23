@@ -10,7 +10,6 @@ use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Probe\PollingMethodProbe;
 use LibreNMS\Polling\Method\Probe\ProbeResult;
-use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 abstract class PollingMethod implements HasFieldSchema
 {
@@ -39,11 +38,6 @@ abstract class PollingMethod implements HasFieldSchema
     public function hasSecret(): bool
     {
         return $this->secretType() !== null;
-    }
-
-    public function secretDefinition(): ?SecretDefinition
-    {
-        return SecretDefinition::for($this->secretType());
     }
 
     abstract public function probe(): PollingMethodProbe;

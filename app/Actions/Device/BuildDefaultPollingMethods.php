@@ -7,6 +7,7 @@ use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class BuildDefaultPollingMethods
 {
@@ -63,7 +64,7 @@ class BuildDefaultPollingMethods
             if ($secretType !== null && $credentialMode === 'existing' && $secretId !== null) {
                 $secret = Secret::resolveForType($secretId, $secretType);
             } elseif (! empty($data['secret_data'])) {
-                $secretData = $method->secretDefinition()?->createData($data['secret_data']);
+                $secretData = SecretDefinition::for($secretType)?->createData($data['secret_data']);
             }
 
             $pollingMethod = new DevicePollingMethod([

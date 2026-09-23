@@ -13,6 +13,7 @@ use LibreNMS\Enum\SecretType;
 use LibreNMS\Modules\Core;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Probe\ProbeResult;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use SnmpQuery;
 
 final class SnmpPollingMethod extends PollingMethod
@@ -90,7 +91,7 @@ final class SnmpPollingMethod extends PollingMethod
         return resolve(\LibreNMS\Polling\Method\Probe\SnmpProbe::class);
     }
 
-    public function secretType(): ?SecretType
+    public function secretType(): SecretType
     {
         return SecretType::Snmp;
     }
@@ -130,7 +131,7 @@ final class SnmpPollingMethod extends PollingMethod
             }
 
             $secret = $method->secret;
-            $secretData = $this->secretDefinition()->createData($secret->data ?? []);
+            $secretData = SnmpSecretData::fromArray($secret->data ?? []);
             $target = $secret->description ?: ($secretData->community ?? ($secretData->authname ?? 'custom'));
             $reasons = [$secretData->version => (string) $target];
 
@@ -161,7 +162,7 @@ final class SnmpPollingMethod extends PollingMethod
             }
 
             $lastResult = $result;
-            $secretData = $this->secretDefinition()->createData($secret->data ?? []);
+            $secretData = SnmpSecretData::fromArray($secret->data ?? []);
             $reasons[$secretData->version] = $secret->description;
         }
 

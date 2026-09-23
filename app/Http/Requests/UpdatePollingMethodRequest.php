@@ -9,6 +9,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class UpdatePollingMethodRequest extends FormRequest
 {
@@ -25,7 +26,8 @@ class UpdatePollingMethodRequest extends FormRequest
         $type = $this->pollingType();
         /** @var \LibreNMS\Polling\Method\PollingMethodRegistry $registry */
         $registry = $this->container->make(\LibreNMS\Polling\Method\PollingMethodRegistry::class);
-        if ($type && $registry->hasSecret($type) && $this->has('secret_data')) {
+        $method = $type ? $registry->get($type) : null;
+        if ($method?->hasSecret() && $this->has('secret_data')) {
             $device = $this->route('device');
             if ($device) {
                 $secretId = $this->input('secret_id');
@@ -59,7 +61,7 @@ class UpdatePollingMethodRequest extends FormRequest
         $secretUpdateMode = $this->input('secret_update_mode', 'update');
 
         $descriptionRules = ['nullable', 'string', 'max:255'];
-        if ($isEditingSecret && $type && $registry->hasSecret($type)) {
+        if ($isEditingSecret && $definition?->hasSecret()) {
             $device = $this->route('device');
             /** @var Device|null $deviceModel */
             $deviceModel = $device instanceof Device ? $device : (is_numeric($device) ? DeviceCache::get($device) : null);
@@ -102,7 +104,7 @@ class UpdatePollingMethodRequest extends FormRequest
                 ->all(),
         ];
 
-        $secretDefinition = $definition->secretDefinition();
+        $secretDefinition = SecretDefinition::for($definition->secretType());
         if ($secretDefinition !== null && $this->has('secret_data')) {
             $rules = [
                 ...$rules,

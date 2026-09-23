@@ -58,10 +58,10 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertInstanceOf(SnmpProbe::class, $this->registry->get(PollingMethodType::Snmp)?->probe());
         $this->assertInstanceOf(IcmpProbe::class, $this->registry->get(PollingMethodType::Icmp)?->probe());
 
-        // 3. SecretDefinition, secretType, and hasSecret on PollingMethod instances
+        // 3. secretType and hasSecret on PollingMethod instances
         $this->assertSame(\LibreNMS\Enum\SecretType::Snmp, $snmpMethod->secretType());
         $this->assertTrue($snmpMethod->hasSecret());
-        $snmpSecretDef = $snmpMethod->secretDefinition();
+        $snmpSecretDef = \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for($snmpMethod->secretType());
         $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\SecretDefinition::class, $snmpSecretDef);
         $snmpData = $snmpSecretDef->createData(['community' => 'public']);
         $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Data\SnmpSecretData::class, $snmpData);
@@ -70,7 +70,7 @@ final class PollingMethodRegistryTest extends TestCase
         $ipmiMethod = $this->registry->require(PollingMethodType::Ipmi);
         $this->assertSame(\LibreNMS\Enum\SecretType::Ipmi, $ipmiMethod->secretType());
         $this->assertTrue($ipmiMethod->hasSecret());
-        $ipmiSecretDef = $ipmiMethod->secretDefinition();
+        $ipmiSecretDef = \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for($ipmiMethod->secretType());
         $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\SecretDefinition::class, $ipmiSecretDef);
         $ipmiData = $ipmiSecretDef->createData(['username' => 'admin', 'password' => 'pass']);
         $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Data\IpmiSecretData::class, $ipmiData);
@@ -78,12 +78,10 @@ final class PollingMethodRegistryTest extends TestCase
 
         $this->assertNull($icmpMethodDef->secretType());
         $this->assertFalse($icmpMethodDef->hasSecret());
-        $this->assertNull($icmpMethodDef->secretDefinition());
 
         $unixAgentMethod = $this->registry->require(PollingMethodType::UnixAgent);
         $this->assertNull($unixAgentMethod->secretType());
         $this->assertFalse($unixAgentMethod->hasSecret());
-        $this->assertNull($unixAgentMethod->secretDefinition());
 
         // SecretDefinition::for resolution
         $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition::class, \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for(\LibreNMS\Enum\SecretType::Snmp));
@@ -112,13 +110,7 @@ final class PollingMethodRegistryTest extends TestCase
         ]);
         $this->assertInstanceOf(IcmpConfig::class, $this->registry->get(PollingMethodType::Icmp)?->config($icmpDeviceMethod));
 
-        // 5. Icon
-        $this->assertSame('fa-server', $this->registry->icon(PollingMethodType::Snmp));
-        $this->assertSame('fa-exchange', $this->registry->icon(PollingMethodType::Icmp));
-        $this->assertSame('fa-microchip', $this->registry->icon(PollingMethodType::Ipmi));
-        $this->assertSame('fa-terminal', $this->registry->icon(PollingMethodType::UnixAgent));
-
-        // 6. Default affects availability
+        // 5. Default affects availability
         $this->assertTrue($this->registry->defaultAffectsAvailability(PollingMethodType::Snmp));
         $this->assertTrue($this->registry->defaultAffectsAvailability(PollingMethodType::Icmp));
         $this->assertFalse($this->registry->defaultAffectsAvailability(PollingMethodType::Ipmi));

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class EditPollingController
 {
@@ -68,8 +69,8 @@ class EditPollingController
         $row = $device->pollingMethods->firstWhere('method_type', $type);
         $secret = $row?->secret;
         $canUnmaskSecrets = Gate::allows('unmask', Secret::class);
-        $secretDef = $definition->secretDefinition();
         $secretType = $definition->secretType();
+        $secretDef = SecretDefinition::for($secretType);
         $schema = $secretDef?->schema() ?? [];
         $schemaFields = $secretDef ? $secretDef->buildSchemaFields() : [];
         $settingsFields = $definition->buildSchemaFields(dataVar: 'settingsData');
@@ -96,7 +97,7 @@ class EditPollingController
         return [
             'type' => $type->value,
             'label' => __('poller.methods.' . $type->value),
-            'icon' => $this->registry->icon($type),
+            'icon' => $definition->icon(),
             'schema_fields' => $schemaFields,
             'schema_defaults' => $secretDef?->schemaDefaults() ?? [],
             'settings_fields' => $settingsFields,
@@ -252,8 +253,12 @@ class EditPollingController
     /**
      * @throws AuthorizationException|ValidationException
      */
-    public function update(UpdatePollingMethodRequest $request, Device $device, ToastInterface $toast): JsonResponse|RedirectResponse
-    {
+    public function update(
+        UpdatePollingMethodRequest $request,
+        Device $device,
+        ToastInterface $toast,
+        SetDeviceAvailability $setDeviceAvailability
+    ): JsonResponse|RedirectResponse {
         $this->authorize('update', $device);
 
         $type = $request->pollingType();
@@ -434,7 +439,7 @@ class EditPollingController
         $type = PollingMethodType::tryFrom($methodType) ?? abort(404);
         $pollingMethod = $device->pollingMethods()->where('method_type', $type->value)->firstOrFail();
 
-        if ($this->registry->hasSecret($type)) {
+        if ($this->registry->require($type)->hasSecret()) {
             $this->authorize('delete', Secret::class);
         }
 

@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class StorePollingMethodRequest extends FormRequest
 {
@@ -55,7 +56,7 @@ class StorePollingMethodRequest extends FormRequest
                         ->all(),
                 ];
 
-                $secretDefinition = $pollingMethod->secretDefinition();
+                $secretDefinition = SecretDefinition::for($pollingMethod->secretType());
                 if ($secretDefinition !== null && $this->input('credential_mode', 'existing') === 'new') {
                     $rules = [
                         ...$rules,
@@ -90,7 +91,8 @@ class StorePollingMethodRequest extends FormRequest
 
             /** @var \LibreNMS\Polling\Method\PollingMethodRegistry $registry */
             $registry = $this->container->make(\LibreNMS\Polling\Method\PollingMethodRegistry::class);
-            if ($registry->hasSecret($type) && $this->input('credential_mode', 'existing') === 'existing' && ! $this->input('secret_id')) {
+            $method = $registry->get($type);
+            if ($method?->hasSecret() && $this->input('credential_mode', 'existing') === 'existing' && ! $this->input('secret_id')) {
                 $validator->errors()->add('secret_id', __('poller.select_credential'));
             }
         });
