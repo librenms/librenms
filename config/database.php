@@ -69,11 +69,12 @@ return [
             'engine' => null,
             'sslmode' => env('DB_SSLMODE', 'disabled'),
             'options' => extension_loaded('pdo_mysql') ? [
-                (defined('Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT') ? constant('Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT') : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT) => env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', false),
+                // polyfill-php84 omits this constant on PHP 8.3 builds without mysqlnd
+                (defined(Mysql::class . '::ATTR_SSL_VERIFY_SERVER_CERT') ? Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT) => env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', false),
             ] + array_filter([
-                (defined('Pdo\Mysql::ATTR_SSL_CA') ? constant('Pdo\Mysql::ATTR_SSL_CA') : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
-                (defined('Pdo\Mysql::ATTR_SSL_CERT') ? constant('Pdo\Mysql::ATTR_SSL_CERT') : PDO::MYSQL_ATTR_SSL_CERT) => env('MYSQL_ATTR_SSL_CERT'),
-                (defined('Pdo\Mysql::ATTR_SSL_KEY') ? constant('Pdo\Mysql::ATTR_SSL_KEY') : PDO::MYSQL_ATTR_SSL_KEY) => env('MYSQL_ATTR_SSL_KEY'),
+                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                Mysql::ATTR_SSL_CERT => env('MYSQL_ATTR_SSL_CERT'),
+                Mysql::ATTR_SSL_KEY => env('MYSQL_ATTR_SSL_KEY'),
             ]) : [],
         ],
 
@@ -94,11 +95,12 @@ return [
             'engine' => null,
             'sslmode' => env('DB_SSLMODE', 'disabled'),
             'options' => extension_loaded('pdo_mysql') ? [
-                (defined('Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT') ? constant('Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT') : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT) => env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', false),
+                // polyfill-php84 omits this constant on PHP 8.3 builds without mysqlnd
+                (defined(Mysql::class . '::ATTR_SSL_VERIFY_SERVER_CERT') ? Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT) => env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', false),
             ] + array_filter([
-                (defined('Pdo\Mysql::ATTR_SSL_CA') ? constant('Pdo\Mysql::ATTR_SSL_CA') : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
-                (defined('Pdo\Mysql::ATTR_SSL_CERT') ? constant('Pdo\Mysql::ATTR_SSL_CERT') : PDO::MYSQL_ATTR_SSL_CERT) => env('MYSQL_ATTR_SSL_CERT'),
-                (defined('Pdo\Mysql::ATTR_SSL_KEY') ? constant('Pdo\Mysql::ATTR_SSL_KEY') : PDO::MYSQL_ATTR_SSL_KEY) => env('MYSQL_ATTR_SSL_KEY'),
+                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                Mysql::ATTR_SSL_CERT => env('MYSQL_ATTR_SSL_CERT'),
+                Mysql::ATTR_SSL_KEY => env('MYSQL_ATTR_SSL_KEY'),
             ]) : [],
         ],
 
