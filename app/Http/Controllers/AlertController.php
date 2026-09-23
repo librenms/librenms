@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Alert;
-use App\Models\AlertProblem;
+use App\Models\AlertFault;
 use App\Models\Eventlog;
 use Illuminate\Http\Request;
 use LibreNMS\Enum\AlertState;
@@ -12,9 +12,9 @@ use LibreNMS\Enum\Severity;
 
 class AlertController extends Controller
 {
-    public function ack(Request $request, AlertProblem $problem): \Illuminate\Http\JsonResponse
+    public function ack(Request $request, AlertFault $fault): \Illuminate\Http\JsonResponse
     {
-        $alert = Alert::query()->where('rule_id', $problem->rule_id)->where('device_id', $problem->device_id)->first();
+        $alert = Alert::query()->where('rule_id', $fault->rule_id)->where('device_id', $fault->device_id)->first();
         if ($alert) {
             $this->authorize('update', $alert);
         }
@@ -38,7 +38,7 @@ class AlertController extends Controller
 
         if ($newState === null) {
             return response()->json([
-                'message' => 'Problem has not been acknowledged.',
+                'message' => 'Fault has not been acknowledged.',
                 'status' => 'error',
             ]);
         }
@@ -49,9 +49,9 @@ class AlertController extends Controller
         $ack_msg = $request->input('ack_msg');
         $note_suffix = "$timestamp - $state_description ($username) " . $ack_msg;
 
-        $targets = $problem->rule?->notify_per_entity
-            ? collect([$problem])
-            : AlertProblem::query()->where('rule_id', $problem->rule_id)->where('device_id', $problem->device_id)->where('open', 1)->get();
+        $targets = $fault->rule?->notify_per_entity
+            ? collect([$fault])
+            : AlertFault::query()->where('rule_id', $fault->rule_id)->where('device_id', $fault->device_id)->where('open', 1)->get();
 
         $saved = false;
         foreach ($targets as $target) {
@@ -65,18 +65,18 @@ class AlertController extends Controller
         }
 
         if ($saved) {
-            $rule_name = $problem->rule?->name;
+            $rule_name = $fault->rule?->name;
             $act = strtolower($state_description) . 'nowledged';
-            Eventlog::log("$username {$act} alert $rule_name note: $ack_msg", $problem->device_id, 'alert', Severity::Info, $problem->id);
+            Eventlog::log("$username {$act} alert $rule_name note: $ack_msg", $fault->device_id, 'alert', Severity::Info, $fault->id);
 
             return response()->json([
-                'message' => "Problem {$state_description}nowledged.",
+                'message' => "Fault {$state_description}nowledged.",
                 'status' => 'ok',
             ]);
         }
 
         return response()->json([
-            'message' => 'Problem has not been acknowledged.',
+            'message' => 'Fault has not been acknowledged.',
             'status' => 'error',
         ]);
     }

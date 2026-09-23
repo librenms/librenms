@@ -3,7 +3,7 @@
 /**
  * AlertsController.php
  *
- * Controller for the active problems bootgrid table.
+ * Controller for the active faults bootgrid table.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ namespace App\Http\Controllers\Table;
 use App\Http\Parsers\AlertLogDetailParser;
 use App\Models\Alert;
 use App\Models\AlertLog;
-use App\Models\AlertProblem;
+use App\Models\AlertFault;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -38,7 +38,7 @@ use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
 /**
- * @extends TableController<AlertProblem>
+ * @extends TableController<AlertFault>
  */
 class AlertsController extends TableController
 {
@@ -99,7 +99,7 @@ class AlertsController extends TableController
     protected function searchFields(Request $request): array
     {
         return [
-            'alert_problems.timestamp',
+            'alert_faults.timestamp',
             'rule' => ['builder', 'name'],
             'device' => ['hostname', 'sysName'],
         ];
@@ -111,23 +111,23 @@ class AlertsController extends TableController
     protected function filterFields(Request $request): array
     {
         return [
-            'rule_id' => fn (Builder $q, ?int $id) => $id > 0 ? $q->where('alert_problems.rule_id', $id) : null,
-            'alert_id' => fn (Builder $q, ?int $id) => $id > 0 ? $q->where('alert_problems.id', $id) : null,
-            'device_id' => fn (Builder $q, ?int $id) => $id > 0 ? $q->where('alert_problems.device_id', $id) : null,
+            'rule_id' => fn (Builder $q, ?int $id) => $id > 0 ? $q->where('alert_faults.rule_id', $id) : null,
+            'alert_id' => fn (Builder $q, ?int $id) => $id > 0 ? $q->where('alert_faults.id', $id) : null,
+            'device_id' => fn (Builder $q, ?int $id) => $id > 0 ? $q->where('alert_faults.device_id', $id) : null,
 
             'acknowledged' => function (Builder $q, ?string $acknowledged): void {
                 if ($acknowledged !== null) {
                     if ((int) $acknowledged) {
-                        $q->where('alert_problems.state', AlertState::ACKNOWLEDGED);
+                        $q->where('alert_faults.state', AlertState::ACKNOWLEDGED);
                     } else {
-                        $q->where('alert_problems.state', '!=', AlertState::ACKNOWLEDGED);
+                        $q->where('alert_faults.state', '!=', AlertState::ACKNOWLEDGED);
                     }
                 }
             },
 
             'fired' => function (Builder $q, ?string $fired): void {
                 if ($fired) {
-                    $q->where('alert_problems.state', AlertState::ACTIVE);
+                    $q->where('alert_faults.state', AlertState::ACTIVE);
                 }
             },
 
@@ -138,13 +138,13 @@ class AlertsController extends TableController
 
                 $hasParent = fn ($query) => $query
                     ->from('device_relationships')
-                    ->whereColumn('device_relationships.child_device_id', 'alert_problems.device_id');
+                    ->whereColumn('device_relationships.child_device_id', 'alert_faults.device_id');
 
                 $hasUpParent = fn ($query) => $query
                     ->from('device_relationships')
                     ->join('devices as parent_devices', 'parent_devices.device_id', '=',
                         'device_relationships.parent_device_id')
-                    ->whereColumn('device_relationships.child_device_id', 'alert_problems.device_id')
+                    ->whereColumn('device_relationships.child_device_id', 'alert_faults.device_id')
                     ->where('parent_devices.status', '!=', 0);
 
                 if ((int) $unreachable) {
@@ -156,7 +156,7 @@ class AlertsController extends TableController
 
             'state' => function (Builder $q, ?string $state): void {
                 if ($state !== null) {
-                    $q->where('alert_problems.state', (int) $state);
+                    $q->where('alert_faults.state', (int) $state);
                 }
             },
 
@@ -183,7 +183,7 @@ class AlertsController extends TableController
             },
 
             'group' => function ($q, ?int $group): void {
-                /** @var Builder<AlertProblem> $q */
+                /** @var Builder<AlertFault> $q */
                 if ($group) {
                     $q->inDeviceGroup($group);
                 }
@@ -195,41 +195,41 @@ class AlertsController extends TableController
     {
         $this->authorize('viewAny', Alert::class);
 
-        $query = AlertProblem::query()
-            ->select('alert_problems.*')
+        $query = AlertFault::query()
+            ->select('alert_faults.*')
             ->with(['device', 'device.location', 'rule'])
-            ->where('alert_problems.open', 1)
+            ->where('alert_faults.open', 1)
             ->whereHas('device', fn (Builder $q) => $q->where('disabled', 0))
             ->whereHas('rule', fn (Builder $q) => $q->where('disabled', 0))
             ->hasAccess($request->user());
 
         $stateFilter = $request->input('state');
         if ($stateFilter === null || (int) $stateFilter !== AlertState::RECOVERED) {
-            $query->where('alert_problems.state', '!=', AlertState::RECOVERED);
+            $query->where('alert_faults.state', '!=', AlertState::RECOVERED);
         }
 
-        // Per-entity rules show every problem; grouped rules collapse to one row per device+rule.
+        // Per-entity rules show every fault; grouped rules collapse to one row per device+rule.
         $query->whereRaw('(
-            coalesce((select ar.notify_per_entity from alert_rules ar where ar.id = alert_problems.rule_id), 0) = 1
-            or alert_problems.id = (
-                select min(p2.id) from alert_problems p2
-                where p2.device_id = alert_problems.device_id
-                  and p2.rule_id = alert_problems.rule_id
-                  and p2.open = 1
-                  and p2.state != ?
+            coalesce((select ar.notify_per_entity from alert_rules ar where ar.id = alert_faults.rule_id), 0) = 1
+            or alert_faults.id = (
+                select min(f2.id) from alert_faults f2
+                where f2.device_id = alert_faults.device_id
+                  and f2.rule_id = alert_faults.rule_id
+                  and f2.open = 1
+                  and f2.state != ?
             )
         )', [AlertState::RECOVERED]);
 
         $sort = $request->input('sort', []);
         if (isset($sort['severity']) || isset($sort['rule'])) {
-            $query->leftJoin('alert_rules', 'alert_problems.rule_id', '=', 'alert_rules.id');
+            $query->leftJoin('alert_rules', 'alert_faults.rule_id', '=', 'alert_rules.id');
         }
         if (isset($sort['hostname'])) {
-            $query->leftJoin('devices', 'alert_problems.device_id', '=', 'devices.device_id');
+            $query->leftJoin('devices', 'alert_faults.device_id', '=', 'devices.device_id');
         }
         if (isset($sort['location'])) {
             if (! isset($sort['hostname'])) {
-                $query->leftJoin('devices', 'alert_problems.device_id', '=', 'devices.device_id');
+                $query->leftJoin('devices', 'alert_faults.device_id', '=', 'devices.device_id');
             }
             $query->leftJoin('locations', 'devices.location_id', '=', 'locations.id');
         }
@@ -238,7 +238,7 @@ class AlertsController extends TableController
     }
 
     /**
-     * @param  AlertProblem  $model
+     * @param  AlertFault  $model
      * @return array<string, scalar>
      */
     public function formatItem(Model $model): array
@@ -252,7 +252,7 @@ class AlertsController extends TableController
             $ruleName .= ' <span class="label label-default" title="' . $entityCount . ' matching entities grouped into this alert">' . $entityCount . '&times;</span>';
         }
 
-        $alertLogId = AlertLog::query()->where('problem_id', $model->id)->max('id');
+        $alertLogId = AlertLog::query()->where('fault_id', $model->id)->max('id');
 
         return [
             'rule' => '<i title="' . e(json_encode($model->rule?->builder)) . '"><a href="' . Url::generate(['page' => 'alert-rules']) . '">' . $ruleName . '</a></i>',
@@ -270,15 +270,15 @@ class AlertsController extends TableController
         ];
     }
 
-    private function entityCount(AlertProblem $problem): int
+    private function entityCount(AlertFault $fault): int
     {
-        if ($problem->rule?->notify_per_entity) {
+        if ($fault->rule?->notify_per_entity) {
             return 1;
         }
 
-        return AlertProblem::query()
-            ->where('device_id', $problem->device_id)
-            ->where('rule_id', $problem->rule_id)
+        return AlertFault::query()
+            ->where('device_id', $fault->device_id)
+            ->where('rule_id', $fault->rule_id)
             ->where('open', 1)
             ->where('state', '!=', AlertState::RECOVERED)
             ->count();
@@ -287,15 +287,15 @@ class AlertsController extends TableController
     /**
      * @return array<string, mixed>
      */
-    private function problemDetails(AlertProblem $problem): array
+    private function faultDetails(AlertFault $fault): array
     {
-        $details = is_array($problem->details) ? $problem->details : [];
+        $details = is_array($fault->details) ? $fault->details : [];
 
-        if ($problem->rule && ! $problem->rule->notify_per_entity) {
+        if ($fault->rule && ! $fault->rule->notify_per_entity) {
             $rows = [];
-            $siblings = AlertProblem::query()
-                ->where('device_id', $problem->device_id)
-                ->where('rule_id', $problem->rule_id)
+            $siblings = AlertFault::query()
+                ->where('device_id', $fault->device_id)
+                ->where('rule_id', $fault->rule_id)
                 ->where('open', 1)
                 ->where('state', '!=', AlertState::RECOVERED)
                 ->get(['id', 'details']);
@@ -312,9 +312,9 @@ class AlertsController extends TableController
         return $details;
     }
 
-    private function renderFaultDetail(AlertProblem $problem): string
+    private function renderFaultDetail(AlertFault $fault): string
     {
-        $details = $this->problemDetails($problem);
+        $details = $this->faultDetails($fault);
         if (empty($details)) {
             return '';
         }
@@ -324,14 +324,14 @@ class AlertsController extends TableController
         ])->render();
     }
 
-    private function renderHostname(AlertProblem $problem): string
+    private function renderHostname(AlertFault $fault): string
     {
-        $faultDetail = $this->renderFaultDetail($problem);
+        $faultDetail = $this->renderFaultDetail($fault);
         $collapseClass = $this->incidentCollapseClass($faultDetail);
 
         return '<div class="incident">'
-            . Url::modernDeviceLink($problem->device)
-            . '<div id="incident' . $problem->id . '"' . $collapseClass . '>' . $faultDetail . '</div>'
+            . Url::modernDeviceLink($fault->device)
+            . '<div id="incident' . $fault->id . '"' . $collapseClass . '>' . $faultDetail . '</div>'
             . '</div>';
     }
 
@@ -381,7 +381,7 @@ class AlertsController extends TableController
         return $icon;
     }
 
-    private function ackButton(AlertProblem $model, int $state): string
+    private function ackButton(AlertFault $model, int $state): string
     {
         if (! Gate::allows('alert.update')) {
             return '';

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Adds the alert_problems table plus supporting columns on alert_log (problem_id),
- * alert_rules (notify_per_entity) and alerts (open_problem_count), then backfills one
- * open problem per currently active alert.
+ * Adds the alert_faults table plus supporting columns on alert_log (fault_id),
+ * alert_rules (notify_per_entity) and alerts (open_fault_count), then backfills one
+ * open fault per currently active alert.
  */
 
 use Illuminate\Database\Migrations\Migration;
@@ -16,19 +16,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $this->createProblemsTable();
+        $this->createFaultsTable();
         $this->addSupportingColumns();
-        $this->backfillProblems();
+        $this->backfillFaults();
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('alert_problems');
+        Schema::dropIfExists('alert_faults');
 
-        if (Schema::hasColumn('alert_log', 'problem_id')) {
+        if (Schema::hasColumn('alert_log', 'fault_id')) {
             Schema::table('alert_log', function (Blueprint $table) {
-                $table->dropIndex('alert_log_problem_id_index');
-                $table->dropColumn('problem_id');
+                $table->dropIndex('alert_log_fault_id_index');
+                $table->dropColumn('fault_id');
             });
         }
 
@@ -38,20 +38,20 @@ return new class extends Migration
             });
         }
 
-        if (Schema::hasColumn('alerts', 'open_problem_count')) {
+        if (Schema::hasColumn('alerts', 'open_fault_count')) {
             Schema::table('alerts', function (Blueprint $table) {
-                $table->dropColumn('open_problem_count');
+                $table->dropColumn('open_fault_count');
             });
         }
     }
 
-    private function createProblemsTable(): void
+    private function createFaultsTable(): void
     {
-        if (Schema::hasTable('alert_problems')) {
+        if (Schema::hasTable('alert_faults')) {
             return;
         }
 
-        Schema::create('alert_problems', function (Blueprint $table) {
+        Schema::create('alert_faults', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('rule_id');
             $table->unsignedInteger('device_id');
@@ -76,16 +76,16 @@ return new class extends Migration
         });
 
         if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
-            DB::statement('ALTER TABLE `alert_problems` CHANGE `details` `details` longblob NULL ;');
+            DB::statement('ALTER TABLE `alert_faults` CHANGE `details` `details` longblob NULL ;');
         }
     }
 
     private function addSupportingColumns(): void
     {
-        if (! Schema::hasColumn('alert_log', 'problem_id')) {
+        if (! Schema::hasColumn('alert_log', 'fault_id')) {
             Schema::table('alert_log', function (Blueprint $table) {
-                $table->unsignedInteger('problem_id')->nullable()->after('device_id');
-                $table->index('problem_id');
+                $table->unsignedInteger('fault_id')->nullable()->after('device_id');
+                $table->index('fault_id');
             });
         }
 
@@ -95,25 +95,25 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasColumn('alerts', 'open_problem_count')) {
+        if (! Schema::hasColumn('alerts', 'open_fault_count')) {
             Schema::table('alerts', function (Blueprint $table) {
-                $table->unsignedInteger('open_problem_count')->default(0)->after('open');
+                $table->unsignedInteger('open_fault_count')->default(0)->after('open');
             });
         }
     }
 
-    private function backfillProblems(): void
+    private function backfillFaults(): void
     {
         if (! Schema::hasTable('alerts')) {
             return;
         }
 
-        // Active states that should carry an open problem after the upgrade.
+        // Active states that should carry an open fault after the upgrade.
         $activeStates = [AlertState::ACTIVE, AlertState::ACKNOWLEDGED, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED];
 
         foreach (DB::table('alerts')->whereIn('state', $activeStates)->orderBy('id')->get() as $alert) {
-            // Problems only carry ACTIVE/ACKNOWLEDGED/RECOVERED; collapse worse/better/changed to active.
-            $problemState = (int) $alert->state === AlertState::ACKNOWLEDGED ? AlertState::ACKNOWLEDGED : AlertState::ACTIVE;
+            // Faults only carry ACTIVE/ACKNOWLEDGED/RECOVERED; collapse worse/better/changed to active.
+            $faultState = (int) $alert->state === AlertState::ACKNOWLEDGED ? AlertState::ACKNOWLEDGED : AlertState::ACTIVE;
 
             $latestLog = DB::table('alert_log')
                 ->where('rule_id', $alert->rule_id)
@@ -121,13 +121,13 @@ return new class extends Migration
                 ->orderByDesc('id')
                 ->first(['id', 'details', 'time_logged']);
 
-            $problemId = DB::table('alert_problems')->insertGetId([
+            $faultId = DB::table('alert_faults')->insertGetId([
                 'rule_id' => $alert->rule_id,
                 'device_id' => $alert->device_id,
                 'entity_type' => null,
                 'entity_id' => null,
                 'entity_key' => '',
-                'state' => $problemState,
+                'state' => $faultState,
                 'alerted' => (int) ($alert->alerted ?? 0),
                 'open' => 1,
                 'severity' => null,
@@ -140,10 +140,10 @@ return new class extends Migration
             ]);
 
             if ($latestLog !== null) {
-                DB::table('alert_log')->where('id', $latestLog->id)->update(['problem_id' => $problemId]);
+                DB::table('alert_log')->where('id', $latestLog->id)->update(['fault_id' => $faultId]);
             }
 
-            DB::table('alerts')->where('id', $alert->id)->update(['open_problem_count' => 1]);
+            DB::table('alerts')->where('id', $alert->id)->update(['open_fault_count' => 1]);
         }
     }
 };

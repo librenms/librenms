@@ -24,7 +24,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 use App\Models\Alert;
-use App\Models\AlertProblem;
+use App\Models\AlertFault;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
@@ -33,7 +33,7 @@ $alert_id = $vars['alert_id'] ?? null;
 $sub_type = $vars['sub_type'] ?? '';
 $note = isset($vars['note']) ? strip_tags($vars['note']) : '';
 
-if (! is_numeric($alert_id) || ! ($problem = AlertProblem::find($alert_id))) {
+if (! is_numeric($alert_id) || ! ($fault = AlertFault::find($alert_id))) {
     abort(response()->json([
         'status' => 'error',
         'message' => 'Invalid alert id',
@@ -41,7 +41,7 @@ if (! is_numeric($alert_id) || ! ($problem = AlertProblem::find($alert_id))) {
     ]));
 }
 
-$alert = Alert::query()->where('rule_id', $problem->rule_id)->where('device_id', $problem->device_id)->first();
+$alert = Alert::query()->where('rule_id', $fault->rule_id)->where('device_id', $fault->device_id)->first();
 $ability = $sub_type === 'get_note' ? 'view' : 'update';
 if (! $alert || Gate::denies($ability, $alert)) {
     abort(response()->json([
@@ -54,11 +54,11 @@ if (! $alert || Gate::denies($ability, $alert)) {
 if ($sub_type === 'get_note') {
     $status = 'ok';
     $message = 'Alert note retrieved';
-    $note = (string) $problem->note;
+    $note = (string) $fault->note;
 } else {
-    $query = $problem->rule?->notify_per_entity
-        ? AlertProblem::whereKey($problem->id)
-        : AlertProblem::where('rule_id', $problem->rule_id)->where('device_id', $problem->device_id)->where('open', 1);
+    $query = $fault->rule?->notify_per_entity
+        ? AlertFault::whereKey($fault->id)
+        : AlertFault::where('rule_id', $fault->rule_id)->where('device_id', $fault->device_id)->where('open', 1);
 
     if ($query->update(['note' => $note])) {
         $status = 'ok';

@@ -4,7 +4,7 @@ namespace LibreNMS\Tests\Feature;
 
 use App\Models\Alert;
 use App\Models\AlertLog;
-use App\Models\AlertProblem;
+use App\Models\AlertFault;
 use App\Models\AlertRule;
 use App\Models\Device;
 use Illuminate\Support\Carbon;
@@ -137,11 +137,11 @@ class AlertRulesTest extends TestCase
             'state' => AlertState::ACTIVE,
             'open' => 1,
             'alerted' => 0,
-            'open_problem_count' => 1,
+            'open_fault_count' => 1,
             'info' => [],
         ]);
 
-        AlertProblem::create([
+        AlertFault::create([
             'rule_id' => $rule->id,
             'device_id' => $device->device_id,
             'entity_key' => (string) $device->device_id,
@@ -169,7 +169,7 @@ class AlertRulesTest extends TestCase
             ->where('rule_id', $rule->id)
             ->count());
 
-        $problem = AlertProblem::where('device_id', $device->device_id)
+        $problem = AlertFault::where('device_id', $device->device_id)
             ->where('rule_id', $rule->id)
             ->first();
         $this->assertArrayHasKey('contacts', $problem->details);
@@ -221,11 +221,11 @@ class AlertRulesTest extends TestCase
             'state' => AlertState::ACTIVE,
             'open' => 1,
             'alerted' => 0,
-            'open_problem_count' => 1,
+            'open_fault_count' => 1,
             'info' => [],
         ]);
 
-        AlertProblem::create([
+        AlertFault::create([
             'rule_id' => $rule->id,
             'device_id' => $device->device_id,
             'entity_key' => (string) $device->device_id,
@@ -467,12 +467,12 @@ class AlertRulesTest extends TestCase
             'state' => $state,
             'open' => 1,
             'alerted' => 1,
-            'open_problem_count' => 1,
+            'open_fault_count' => 1,
             'info' => [],
             'timestamp' => $initialTimestamp,
         ]);
 
-        AlertProblem::create([
+        AlertFault::create([
             'rule_id' => $rule->id,
             'device_id' => $device->device_id,
             'entity_key' => (string) $device->device_id,
@@ -501,7 +501,7 @@ class AlertRulesTest extends TestCase
             ->where('rule_id', $rule->id)
             ->count());
 
-        $problem = AlertProblem::where('device_id', $device->device_id)
+        $problem = AlertFault::where('device_id', $device->device_id)
             ->where('rule_id', $rule->id)
             ->first();
         $this->assertArrayHasKey('contacts', $problem->details);

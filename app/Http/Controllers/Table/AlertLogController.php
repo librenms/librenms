@@ -85,7 +85,7 @@ class AlertLogController extends TableController
 
         $query->whereRaw('(
             coalesce((select ar.notify_per_entity from alert_rules ar where ar.id = alert_log.rule_id), 0) = 1
-            or alert_log.problem_id is null
+            or alert_log.fault_id is null
             or alert_log.id = (
                 select min(al2.id) from alert_log al2
                 where al2.device_id = alert_log.device_id
@@ -116,13 +116,13 @@ class AlertLogController extends TableController
     {
         $details = is_array($model->details) ? $model->details : [];
         $entity_count = 1;
-        if ($model->problem_id && $model->rule && ! $model->rule->notify_per_entity) {
+        if ($model->fault_id && $model->rule && ! $model->rule->notify_per_entity) {
             $siblings = AlertLog::query()
                 ->where('device_id', $model->device_id)
                 ->where('rule_id', $model->rule_id)
                 ->where('state', $model->state->value)
                 ->where('time_logged', $model->time_logged)
-                ->whereNotNull('problem_id')
+                ->whereNotNull('fault_id')
                 ->get(['id', 'details']);
             $entity_count = $siblings->count();
             if ($entity_count > 1) {

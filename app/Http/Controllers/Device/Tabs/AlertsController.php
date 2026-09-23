@@ -51,7 +51,7 @@ class AlertsController implements DeviceTab
 
     public function name(): string
     {
-        return __('Problems');
+        return __('Faults');
     }
 
     public function data(Device $device, Request $request): array

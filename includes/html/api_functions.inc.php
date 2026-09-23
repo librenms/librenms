@@ -1606,7 +1606,7 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
 {
     $id = $request->route('id');
 
-    $sql = 'SELECT `D`.`hostname`, `A`.*, `R`.`severity`,`R`.`name`,`R`.`proc`,`R`.`notes` FROM `alert_problems` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` ';
+    $sql = 'SELECT `D`.`hostname`, `A`.*, `R`.`severity`,`R`.`name`,`R`.`proc`,`R`.`notes` FROM `alert_faults` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` ';
     $sql .= 'AND `A`.`state` IN ';
     if ($request->has('state')) {
         $param = explode(',', (string) $request->input('state'));
@@ -1640,7 +1640,7 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
 
     if ($request->has('order')) {
         [$sort_column, $sort_order] = explode(' ', (string) $request->input('order'), 2);
-        validate_column_list($sort_column, 'alert_problems');
+        validate_column_list($sort_column, 'alert_faults');
         if (in_array($sort_order, ['asc', 'desc'])) {
             $order = $request->input('order');
         }
@@ -1999,22 +1999,22 @@ function delete_rule(Illuminate\Http\Request $request)
 
 function ack_alert(Illuminate\Http\Request $request)
 {
-    $problem_id = $request->route('id');
+    $fault_id = $request->route('id');
     $data = json_decode($request->getContent(), true);
 
-    if (! is_numeric($problem_id)) {
-        return api_error(400, 'Invalid problem has been provided');
+    if (! is_numeric($fault_id)) {
+        return api_error(400, 'Invalid fault has been provided');
     }
 
-    $problem = dbFetchRow('SELECT `ap`.`rule_id`, `ap`.`device_id`, `r`.`notify_per_entity` FROM `alert_problems` `ap` JOIN `alert_rules` `r` ON `r`.`id` = `ap`.`rule_id` WHERE `ap`.`id` = ?', [$problem_id]);
-    if (empty($problem)) {
+    $fault = dbFetchRow('SELECT `af`.`rule_id`, `af`.`device_id`, `r`.`notify_per_entity` FROM `alert_faults` `af` JOIN `alert_rules` `r` ON `r`.`id` = `af`.`rule_id` WHERE `af`.`id` = ?', [$fault_id]);
+    if (empty($fault)) {
         return api_success_noresult(200, 'No Alert by that ID');
     }
 
-    if (empty($problem['notify_per_entity'])) {
-        $targets = dbFetchRows('SELECT id, note, info FROM alert_problems WHERE device_id = ? AND rule_id = ? AND open = 1', [$problem['device_id'], $problem['rule_id']]);
+    if (empty($fault['notify_per_entity'])) {
+        $targets = dbFetchRows('SELECT id, note, info FROM alert_faults WHERE device_id = ? AND rule_id = ? AND open = 1', [$fault['device_id'], $fault['rule_id']]);
     } else {
-        $targets = dbFetchRows('SELECT id, note, info FROM alert_problems WHERE id = ?', [$problem_id]);
+        $targets = dbFetchRows('SELECT id, note, info FROM alert_faults WHERE id = ?', [$fault_id]);
     }
 
     $updated = false;
@@ -2027,7 +2027,7 @@ function ack_alert(Illuminate\Http\Request $request)
         $note .= date(LibrenmsConfig::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
         $info['until_clear'] = $data['until_clear'];
 
-        if (dbUpdate(['state' => 2, 'note' => $note, 'info' => json_encode($info)], 'alert_problems', '`id` = ? LIMIT 1', [$target['id']])) {
+        if (dbUpdate(['state' => 2, 'note' => $note, 'info' => json_encode($info)], 'alert_faults', '`id` = ? LIMIT 1', [$target['id']])) {
             $updated = true;
         }
     }
@@ -2041,22 +2041,22 @@ function ack_alert(Illuminate\Http\Request $request)
 
 function unmute_alert(Illuminate\Http\Request $request)
 {
-    $problem_id = $request->route('id');
+    $fault_id = $request->route('id');
     $data = json_decode($request->getContent(), true);
 
-    if (! is_numeric($problem_id)) {
-        return api_error(400, 'Invalid problem has been provided');
+    if (! is_numeric($fault_id)) {
+        return api_error(400, 'Invalid fault has been provided');
     }
 
-    $problem = dbFetchRow('SELECT `ap`.`rule_id`, `ap`.`device_id`, `r`.`notify_per_entity` FROM `alert_problems` `ap` JOIN `alert_rules` `r` ON `r`.`id` = `ap`.`rule_id` WHERE `ap`.`id` = ?', [$problem_id]);
-    if (empty($problem)) {
+    $fault = dbFetchRow('SELECT `af`.`rule_id`, `af`.`device_id`, `r`.`notify_per_entity` FROM `alert_faults` `af` JOIN `alert_rules` `r` ON `r`.`id` = `af`.`rule_id` WHERE `af`.`id` = ?', [$fault_id]);
+    if (empty($fault)) {
         return api_success_noresult(200, 'No alert by that ID');
     }
 
-    if (empty($problem['notify_per_entity'])) {
-        $targets = dbFetchRows('SELECT id, note FROM alert_problems WHERE device_id = ? AND rule_id = ? AND open = 1', [$problem['device_id'], $problem['rule_id']]);
+    if (empty($fault['notify_per_entity'])) {
+        $targets = dbFetchRows('SELECT id, note FROM alert_faults WHERE device_id = ? AND rule_id = ? AND open = 1', [$fault['device_id'], $fault['rule_id']]);
     } else {
-        $targets = dbFetchRows('SELECT id, note FROM alert_problems WHERE id = ?', [$problem_id]);
+        $targets = dbFetchRows('SELECT id, note FROM alert_faults WHERE id = ?', [$fault_id]);
     }
 
     $updated = false;
@@ -2067,7 +2067,7 @@ function unmute_alert(Illuminate\Http\Request $request)
         }
         $note .= date(LibrenmsConfig::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
 
-        if (dbUpdate(['state' => 1, 'note' => $note], 'alert_problems', '`id` = ? LIMIT 1', [$target['id']])) {
+        if (dbUpdate(['state' => 1, 'note' => $note], 'alert_faults', '`id` = ? LIMIT 1', [$target['id']])) {
             $updated = true;
         }
     }

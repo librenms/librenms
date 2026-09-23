@@ -35,7 +35,7 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\AlertLog;
-use App\Models\AlertProblem;
+use App\Models\AlertFault;
 use App\Models\AlertRule;
 use App\Models\AlertTransport;
 use App\Models\ApplicationMetric;
@@ -189,8 +189,8 @@ class RunAlerts
                 ->where('device_id', $alert['device_id'])
                 ->where('id', '<', $alert['id']);
 
-            if (! empty($alert['problem_id'])) {
-                $previousLogQuery->where('problem_id', $alert['problem_id']);
+            if (! empty($alert['fault_id'])) {
+                $previousLogQuery->where('fault_id', $alert['fault_id']);
             }
 
             $previousLog = $previousLogQuery->orderByDesc('id')->first();
@@ -292,7 +292,7 @@ class RunAlerts
         $perEntity = (bool) AlertRule::query()->where('id', $alert['rule_id'])->value('notify_per_entity');
 
         $recovering = (int) $alert['state'] === AlertState::RECOVERED;
-        $problems = AlertProblem::query()
+        $faults = AlertFault::query()
             ->where('rule_id', $alert['rule_id'])
             ->where('device_id', $alert['device_id'])
             ->where('open', 1)
@@ -300,28 +300,28 @@ class RunAlerts
             ->orderBy('id')
             ->get();
 
-        // Build the set of notifications to send: one per problem (per-entity) or one aggregate (grouped).
+        // Build the set of notifications to send: one per fault (per-entity) or one aggregate (grouped).
         $units = [];
-        if ($problems->isEmpty()) {
-            $units[] = $alert; // legacy fallback (e.g. data with no problem rows yet)
+        if ($faults->isEmpty()) {
+            $units[] = $alert; // legacy fallback (e.g. data with no fault rows yet)
         } elseif ($perEntity) {
-            foreach ($problems as $problem) {
+            foreach ($faults as $fault) {
                 $unit = $alert;
-                $unit['state'] = (int) $problem->state;
-                $unit['problem_id'] = $problem->id;
-                $unit['details']['rule'] = $problem->details['rule'] ?? [];
-                $unit['details']['contacts'] = $problem->details['contacts'] ?? ($alert['details']['contacts'] ?? []);
-                $latestLogId = AlertLog::query()->where('problem_id', $problem->id)->max('id');
+                $unit['state'] = (int) $fault->state;
+                $unit['fault_id'] = $fault->id;
+                $unit['details']['rule'] = $fault->details['rule'] ?? [];
+                $unit['details']['contacts'] = $fault->details['contacts'] ?? ($alert['details']['contacts'] ?? []);
+                $latestLogId = AlertLog::query()->where('fault_id', $fault->id)->max('id');
                 if ($latestLogId) {
                     $unit['id'] = $latestLogId;
                 }
-                $unit['time_logged'] = (string) ($problem->last_seen ?? $problem->timestamp);
+                $unit['time_logged'] = (string) ($fault->last_seen ?? $fault->timestamp);
                 $units[] = $unit;
             }
         } else {
             $rows = [];
-            foreach ($problems as $problem) {
-                foreach (($problem->details['rule'] ?? []) as $row) {
+            foreach ($faults as $fault) {
+                foreach (($fault->details['rule'] ?? []) as $row) {
                     $rows[] = $row;
                 }
             }
@@ -551,8 +551,8 @@ class RunAlerts
             }
 
             if ((int) $alert['state'] === AlertState::RECOVERED) {
-                // Recovery has been handled (sent or muted): close the recovered problems so they are terminal.
-                AlertProblem::query()
+                // Recovery has been handled (sent or muted): close the recovered faults so they are terminal.
+                AlertFault::query()
                     ->where('rule_id', $alert['rule_id'])
                     ->where('device_id', $alert['device_id'])
                     ->where('open', 1)

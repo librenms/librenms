@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -14,5 +13,22 @@
  * @author     LibreNMS Contributors
 */
 
-// Backwards-compatible alias: the alerts page is now the Faults page.
-require 'includes/html/pages/faults.inc.php';
+$no_refresh = true;
+$page_title = 'Faults';
+?>
+
+<div class="panel panel-default panel-condensed">
+    <div class="panel-heading">
+        <strong>Faults</strong>
+    </div>
+
+    <?php
+    $device['device_id'] = '-1';
+    echo view('alerts.modals.details')->render();
+    echo view('alerts.modals.notes')->render();
+    echo view('alerts.modals.ack')->render();
+    require_once 'includes/html/common/alerts.inc.php';
+    echo implode('', $common_output);
+    unset($device['device_id']);
+    ?>
+</div>
