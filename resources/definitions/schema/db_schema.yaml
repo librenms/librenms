@@ -632,11 +632,6 @@ devices:
     - { Field: cryptopass, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: cryptoalgo, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: snmpver, Type: varchar(4), 'Null': false, Extra: '', Default: v2c }
-    - { Field: port, Type: 'smallint unsigned', 'Null': false, Extra: '', Default: '161' }
-    - { Field: transport, Type: varchar(16), 'Null': false, Extra: '', Default: udp }
-    - { Field: timeout, Type: int, 'Null': true, Extra: '' }
-    - { Field: retries, Type: int, 'Null': true, Extra: '' }
-    - { Field: snmp_disable, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: bgpLocalAs, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: sysObjectID, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: snmpEngineID, Type: varchar(128), 'Null': true, Extra: '' }
@@ -652,14 +647,10 @@ devices:
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: uptime, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: agent_uptime, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: last_polled, Type: timestamp, 'Null': true, Extra: '' }
-    - { Field: last_poll_attempted, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: last_polled_timetaken, Type: 'double unsigned', 'Null': true, Extra: '' }
     - { Field: last_discovered_timetaken, Type: 'double unsigned', 'Null': true, Extra: '' }
     - { Field: last_discovered, Type: timestamp, 'Null': true, Extra: '' }
-    - { Field: last_ping, Type: timestamp, 'Null': true, Extra: '' }
-    - { Field: last_ping_timetaken, Type: 'double unsigned', 'Null': true, Extra: '' }
     - { Field: purpose, Type: text, 'Null': true, Extra: '' }
     - { Field: type, Type: varchar(20), 'Null': false, Extra: '', Default: '' }
     - { Field: serial, Type: text, 'Null': true, Extra: '' }
@@ -667,7 +658,6 @@ devices:
     - { Field: poller_group, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: override_sysLocation, Type: tinyint, 'Null': true, Extra: '', Default: '0' }
     - { Field: notes, Type: text, 'Null': true, Extra: '' }
-    - { Field: port_association_mode, Type: int, 'Null': false, Extra: '', Default: '1' }
     - { Field: max_depth, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: disable_notify, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: ignore_status, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
@@ -676,7 +666,6 @@ devices:
     PRIMARY: { Name: PRIMARY, Columns: [device_id], Unique: true, Type: BTREE }
     devices_display_index: { Name: devices_display_index, Columns: [display], Unique: false, Type: BTREE }
     devices_hostname_sysname_display_index: { Name: devices_hostname_sysname_display_index, Columns: [hostname, sysName, display], Unique: false, Type: BTREE }
-    devices_last_poll_attempted_index: { Name: devices_last_poll_attempted_index, Columns: [last_poll_attempted], Unique: false, Type: BTREE }
     devices_last_polled_index: { Name: devices_last_polled_index, Columns: [last_polled], Unique: false, Type: BTREE }
     devices_os_index: { Name: devices_os_index, Columns: [os], Unique: false, Type: BTREE }
     devices_status_index: { Name: devices_status_index, Columns: [status], Unique: false, Type: BTREE }
