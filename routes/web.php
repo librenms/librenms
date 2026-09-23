@@ -68,6 +68,7 @@ use App\Http\Controllers\Widgets;
 use App\Http\Controllers\WidgetSettingsController;
 use App\Http\Controllers\WirelessSensorController;
 use App\Http\Middleware\AuthenticateGraph;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth as AuthFacade;
 use Illuminate\Support\Facades\Route;
 
