@@ -187,7 +187,10 @@ trait BridgeMib
             SnmpQuery::context("$vlan", 'vlan-')->enumStrings()->get($oids)
                 ->mapTable(function ($data, $base_port) use ($vlan, $vlan_ports) {
                     $port = $vlan_ports->get($base_port);
-                    $port->vlan = $vlan;
+                    // groupBy('vlan') casts a null vlan key to '' (PHP's own null -> ''
+                    // array-key coercion), so restore null here rather than persisting
+                    // that empty string to the nullable int `vlan` column.
+                    $port->vlan = $vlan === '' ? null : $vlan;
                     $port->state = $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown';
                     $port->enable = $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown';
                     $port->designatedRoot = Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? '')->hex();
