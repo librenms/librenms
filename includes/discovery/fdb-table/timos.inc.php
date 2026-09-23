@@ -28,6 +28,7 @@ use App\Facades\PortCache;
 use App\Models\Vlan;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\NokiaEncap;
 
 /*
  * Nokia TiMOS devices use TIMETRA-SERV-MIB::tlsFdbInfoTable for FDB information.
@@ -51,58 +52,6 @@ use LibreNMS\Util\Mac;
  *
  * Nokia SAP identifier format: ServiceID:PortId:EncapValue (e.g., 100:1/1/1:500)
  */
-
-/**
- * Decode TmnxEncapVal to extract VLAN ID(s)
- *
- * @param  int|string  $encapVal  The encoded encapsulation value
- * @return array Array with 'outer' and optionally 'inner' VLAN IDs
- *
- * @see TIMETRA-TC-MIB::TmnxEncapVal
- */
-function decodeNokiaEncapValue($encapVal): array
-{
-    $encapVal = (int) $encapVal;
-
-    // Null encapsulation
-    if ($encapVal == 0) {
-        return ['outer' => 0, 'inner' => null];
-    }
-
-    // Check for QinQ: if upper 16 bits have a value (ignoring special bits)
-    $innerVlan = ($encapVal >> 16) & 0x0FFF;  // Upper 12 bits of upper 16 bits
-    $outerVlan = $encapVal & 0x0FFF;          // Lower 12 bits
-
-    if ($innerVlan > 0) {
-        // QinQ encapsulation
-        return ['outer' => $outerVlan, 'inner' => $innerVlan];
-    }
-
-    // Simple dot1q encapsulation - VLAN is in lower 12 bits
-    return ['outer' => $outerVlan, 'inner' => null];
-}
-
-/**
- * Format TmnxEncapVal for display (Nokia-friendly format)
- *
- * @param  int|string  $encapVal  The encoded encapsulation value
- * @return string Formatted encap value (e.g., "500" or "100.200" for QinQ)
- */
-function formatNokiaEncapValue($encapVal): string
-{
-    $decoded = decodeNokiaEncapValue($encapVal);
-
-    if ($decoded['inner'] !== null) {
-        // QinQ format: outer.inner
-        return $decoded['outer'] . '.' . $decoded['inner'];
-    }
-
-    if ($decoded['outer'] == 4095) {
-        return '*';  // Wildcard
-    }
-
-    return (string) $decoded['outer'];
-}
 
 // Walk only the required FDB columns for best performance
 // Testing showed: 5 columns = 388s, 3 columns = 144s, full table entry = 10+ min
@@ -163,7 +112,7 @@ if (! empty($fdbTable)) {
 
             // Decode the encapsulation value to get VLAN ID(s)
             // TmnxEncapVal is encoded: dot1q uses lower 12 bits, QinQ uses upper/lower 16 bits
-            $decodedEncap = decodeNokiaEncapValue($encapValue);
+            $decodedEncap = NokiaEncap::decode($encapValue);
             $vlanNumber = $decodedEncap['outer'];  // Use outer VLAN for FDB lookup
 
             // Skip if no valid VLAN (null encap or wildcard)
@@ -177,7 +126,7 @@ if (! empty($fdbTable)) {
             $vlan_id = $vlans_dict[$vlanNumber] ?? $vlanNumber;
 
             // Nokia SAP format: ServiceID:Port:EncapValue (formatted for display)
-            $formattedEncap = formatNokiaEncapValue($encapValue);
+            $formattedEncap = NokiaEncap::format($encapValue);
             $sapIdentifier = "$svcId:$portId:$formattedEncap";
 
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
