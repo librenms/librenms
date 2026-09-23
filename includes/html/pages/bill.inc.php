@@ -15,7 +15,6 @@ if ($bill === null) {
     abort(404);
 }
 
-
 if (Gate::allows('view', $bill)) {
     $bill_data = dbFetchRow('SELECT * FROM bills WHERE bill_id = ?', [$bill_id]);
 

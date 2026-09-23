@@ -323,6 +323,7 @@ Input (JSON):
 - invert: it inverts the check of the rule.
 - name: the name of the rule. This field is mandatory.
 - notes: your own notes about this rule
+- proc: Optional. URL of a procedure/runbook for this rule, shown as a link on the alerts page and passed to transports. Must be `http://` or `https://` to be rendered, max 80 characters.
 
 Example:
 
@@ -374,6 +375,7 @@ Input (JSON):
 - invert: it inverts the check of the rule.
 - name: the name of the rule. This field is mandatory.
 - notes: your own notes about this rule
+- proc: Optional. URL of a procedure/runbook for this rule, shown as a link on the alerts page and passed to transports. Must be `http://` or `https://` to be rendered, max 80 characters.
 
 Example:
 

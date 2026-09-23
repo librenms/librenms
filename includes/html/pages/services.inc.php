@@ -41,7 +41,6 @@ require_once 'includes/html/modal/delete_service.inc.php';
                     'critical' => 'Critical',
                 ];
 
-
                 // The menu option - on the left
 
                 $sep = '';
