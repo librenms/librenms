@@ -91,7 +91,7 @@ return [
                 ],
                 'legend_title' => 'Configuración de leyenda',
                 'legend_toggle' => 'Alternar leyenda',
-                'zoom' => 'Panorámica y zoom',
+                'zoom' => 'Zoom',
                 'dragnodes' => 'Mover nodos',
                 'physics' => 'Motor de física',
             ],

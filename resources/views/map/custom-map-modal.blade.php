@@ -118,7 +118,7 @@
             post_options.interaction = {};
         }
 
-        post_options.interaction.zoomView = post_options.interaction.dragView = $("#mapopt-zoom").prop('checked');
+        post_options.interaction.zoomView = $("#mapopt-zoom").prop('checked');
         post_options.interaction.dragNodes = $("#mapopt-dragnodes").prop('checked');
         post_options.physics.enabled = $("#mapopt-physics").prop('checked');
 

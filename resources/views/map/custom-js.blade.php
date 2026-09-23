@@ -125,9 +125,14 @@
                     maxVisible: 100000
                 }
             };
-            options.interaction = options.interaction || {dragView: true, zoomView: true};
+            options.interaction = options.interaction || {zoomView: true};
             options.interaction.hover = true;
             options.interaction.tooltipDelay = 100;
+            options.interaction.dragView = true;
+
+            if (! options.interaction.zoomView) {
+                scale = 1;
+            }
 
             var container = document.getElementById(elementId);
             var network = new vis.Network(container, {nodes: nodes, edges: edges}, options);
@@ -142,8 +147,8 @@
             container._minScale = scale;
             container._maxScale = 12.0;
 
-            var centreY = Math.round(mapHeight / 2);
-            var centreX = Math.round(mapWidth / 2);
+            var centreY = options.interaction.zoomView ? Math.round(mapHeight / 2) : Math.round(container.scrollHeight / 2);
+            var centreX = options.interaction.zoomView ? Math.round(mapWidth / 2) : Math.round(container.scrollWidth / 2);
             network.moveTo({position: {x: centreX, y: centreY}, scale: scale});
 
             var lastValidPos = { x: centreX, y: centreY };
@@ -213,6 +218,7 @@
 
         zoomIn: function (network, container) {
             if (!network) return;
+            if (!network.interactionHandler?.options?.zoomView) return;
             var curScale = network.getScale();
             var maxScale = (container && container._maxScale) ? container._maxScale : 12.0;
             var targetScale = Math.min(curScale * 1.25, maxScale);
@@ -224,6 +230,7 @@
 
         zoomOut: function (network, container) {
             if (!network) return;
+            if (!network.interactionHandler?.options?.zoomView) return;
             var curScale = network.getScale();
             var minScale = (container && container._minScale) ? container._minScale : 0.1;
             var targetScale = Math.max(curScale / 1.25, minScale);
@@ -235,6 +242,7 @@
 
         fitMap: function (network, container) {
             if (!network || !container) return;
+            if (!network.interactionHandler?.options?.zoomView) return;
             var mapWidth = container._mapWidth;
             var mapHeight = container._mapHeight;
             var scale = container._minScale || 1;
@@ -244,6 +252,15 @@
                 position: {x: centreX, y: centreY},
                 scale: scale,
                 animation: { duration: 300, easingFunction: 'easeInOutQuad' }
+            });
+        },
+
+        topLeft: function (network, container) {
+            var centreX = Math.round(container.scrollWidth / 2);
+            var centreY = Math.round(container.scrollHeight / 2);
+            network.moveTo({
+                position: { x: centreX, y: centreY},
+                animation: { duration: 100, easingFunction: 'linear' }
             });
         },
 
@@ -890,21 +907,29 @@
                         menuHeader = "{{ __('Map Navigation') }}";
                     }
 
-                    menuItems.push({
-                        icon: 'fa-solid fa-expand',
-                        label: "{{ __('Fit to Window') }} (F)",
-                        action: function () { custommap.fitMap(self.network, container); }
-                    });
-                    menuItems.push({
-                        icon: 'fa-solid fa-magnifying-glass-plus',
-                        label: "{{ __('Zoom In') }} (+)",
-                        action: function () { custommap.zoomIn(self.network, container); }
-                    });
-                    menuItems.push({
-                        icon: 'fa-solid fa-magnifying-glass-minus',
-                        label: "{{ __('Zoom Out') }} (-)",
-                        action: function () { custommap.zoomOut(self.network, container); }
-                    });
+                    if (netOptions.interaction?.zoomView == undefined ? true : netOptions.interaction.zoomView) {
+                        menuItems.push({
+                            icon: 'fa-solid fa-expand',
+                            label: "{{ __('Fit to Window') }} (F)",
+                            action: function () { custommap.fitMap(self.network, container); }
+                        });
+                        menuItems.push({
+                            icon: 'fa-solid fa-magnifying-glass-plus',
+                            label: "{{ __('Zoom In') }} (+)",
+                            action: function () { custommap.zoomIn(self.network, container); }
+                        });
+                        menuItems.push({
+                            icon: 'fa-solid fa-magnifying-glass-minus',
+                            label: "{{ __('Zoom Out') }} (-)",
+                            action: function () { custommap.zoomOut(self.network, container); }
+                        });
+                    } else {
+                        menuItems.push({
+                            icon: 'fa-solid fa-expand',
+                            label: "{{ __('Navigate to top left') }} (F)",
+                            action: function () { custommap.topLeft(self.network, container); }
+                        });
+                    }
                     if (self.editUrl) {
                         menuItems.push({
                             icon: 'fa-solid fa-pen-to-square',
@@ -956,7 +981,7 @@
                         var networkContainer = document.getElementById(self.elementId);
                         if (e.key === '0' || e.key.toLowerCase() === 'f' || e.key === 'Home') {
                             e.preventDefault();
-                            custommap.fitMap(self.network, networkContainer);
+                            self.network.interactionHandler?.options?.zoomView ? custommap.fitMap(self.network, networkContainer) : custommap.topLeft(self.network, networkContainer);
                         } else if (e.key === '+' || e.key === '=') {
                             e.preventDefault();
                             custommap.zoomIn(self.network, networkContainer);

@@ -91,7 +91,7 @@ return [
                 ],
                 'legend_title' => 'Förklaringsinställningar',
                 'legend_toggle' => 'Visa eller dölj förklaringen',
-                'zoom' => 'Panorera och zooma',
+                'zoom' => 'Zooma',
                 'dragnodes' => 'Flytta noder',
                 'physics' => 'Fysikmotor',
             ],
