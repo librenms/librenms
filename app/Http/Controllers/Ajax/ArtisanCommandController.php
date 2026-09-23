@@ -86,6 +86,9 @@ class ArtisanCommandController extends Controller
             $exitCode = Artisan::call($cmd, $args, $this->getCliStreamOutput());
 
             echo PHP_EOL . 'exit_status:' . $exitCode . PHP_EOL;
+
+            // Delete the session
+            $request->session()->flush();
         });
     }
 
