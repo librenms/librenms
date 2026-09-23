@@ -130,12 +130,12 @@ class Vminfo extends DeviceRelatedModel implements Keyable
         }
     }
 
-    protected function scopeGuessFromDevice(Builder $query, Device $device): Builder
+    public function scopeGuessFromDevice(Builder $query, Device $device): Builder
     {
         $where = [$device->hostname];
 
-        if (LibrenmsConfig::get('mydomain')) {
-            $where[] = $device->hostname . '.' . LibrenmsConfig::get('mydomain');
+        if ($domain = LibrenmsConfig::get('mydomain')) {
+            $where[] = $device->hostname . '.' . $domain;
         }
 
         return $query->whereIn('vmwVmDisplayName', $where);
