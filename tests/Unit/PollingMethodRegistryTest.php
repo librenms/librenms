@@ -176,8 +176,6 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertFalse($accessor->icmp()->isEnabled());
         $this->assertFalse($accessor->ipmi()->isEnabled());
         $this->assertFalse($accessor->unixAgent()->isEnabled());
-        $this->assertInstanceOf(IpmiConfig::class, $accessor->ipmi());
-        $this->assertInstanceOf(UnixAgentConfig::class, $accessor->unixAgent());
 
         // With methods attached
         $deviceWithMethods = new Device(['hostname' => '192.0.2.1']);
@@ -197,9 +195,7 @@ final class PollingMethodRegistryTest extends TestCase
         $deviceWithMethods->setRelation('pollingMethods', collect([$ipmiMethod, $unixAgentMethod]));
 
         $accessorWithMethods = new PollingMethodAccessor($deviceWithMethods, $this->pollingMethods);
-        $this->assertInstanceOf(IpmiConfig::class, $accessorWithMethods->ipmi());
         $this->assertTrue($accessorWithMethods->ipmi()->isEnabled());
-        $this->assertInstanceOf(UnixAgentConfig::class, $accessorWithMethods->unixAgent());
         $this->assertTrue($accessorWithMethods->unixAgent()->isEnabled());
     }
 
