@@ -18,10 +18,6 @@ class DevicePollingMethod extends Model
     /** @use HasFactory<\Database\Factories\DevicePollingMethodFactory> */
     use HasFactory;
 
-    protected $with = [
-        'secret',
-    ];
-
     protected $fillable = [
         'device_id',
         'method_type',
