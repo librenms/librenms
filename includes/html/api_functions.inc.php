@@ -15,6 +15,7 @@
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Http\Resources\Device as DeviceResource;
 use App\Models\AlertTemplate;
 use App\Models\AlertTemplateMap;
 use App\Models\Availability;
@@ -47,7 +48,6 @@ use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
 use App\Models\Vlan;
-use App\Models\Vminfo;
 use App\Models\Vrf;
 use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
@@ -303,27 +303,6 @@ function list_locations()
     return api_success($locations, 'locations');
 }
 
-function format_device_api(Device $device): array
-{
-    $data = $device->getAttributes();
-    $data['ip'] = $device->ip;
-    $data['location'] = $device->location?->location;
-    $data['lat'] = $device->location?->lat;
-    $data['lng'] = $device->location?->lng;
-
-    if ($device->relationLoaded('parents')) {
-        $data['dependency_parent_id'] = $device->parents->pluck('device_id')->implode(',') ?: null;
-        $data['dependency_parent_hostname'] = $device->parents->pluck('hostname')->implode(',') ?: null;
-    }
-
-    $hostId = Vminfo::guessFromDevice($device)->value('device_id');
-    if (is_numeric($hostId)) {
-        $data['parent_id'] = (int) $hostId;
-    }
-
-    return $data;
-}
-
 function get_device(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
@@ -337,7 +316,7 @@ function get_device(Illuminate\Http\Request $request)
         return api_error(403, 'Insufficient permissions to access this device');
     }
 
-    return api_success([format_device_api($device)], 'devices');
+    return api_success([DeviceResource::make($device)->resolve()], 'devices');
 }
 
 function list_devices(Illuminate\Http\Request $request): JsonResponse
@@ -378,9 +357,7 @@ function list_devices(Illuminate\Http\Request $request): JsonResponse
 
     $devices = $devicesQuery->get();
 
-    $deviceList = $devices->map(fn (Device $device): array => format_device_api($device))->all();
-
-    return api_success($deviceList, 'devices');
+    return api_success(DeviceResource::collection($devices)->resolve(), 'devices');
 }
 
 function add_device(Illuminate\Http\Request $request)
@@ -459,7 +436,7 @@ function add_device(Illuminate\Http\Request $request)
 
     $message = "Device $device->hostname ($device->device_id) has been added successfully";
 
-    return api_success([format_device_api($device)], 'devices', $message);
+    return api_success([DeviceResource::make($device)->resolve()], 'devices', $message);
 }
 
 function del_device(Illuminate\Http\Request $request)
@@ -480,7 +457,7 @@ function del_device(Illuminate\Http\Request $request)
         return api_error(403, 'Insufficient permissions to delete this device');
     }
 
-    $deviceData = format_device_api($device);
+    $deviceData = DeviceResource::make($device)->resolve();
 
     if (! $device->delete()) {
         return api_error(500, 'Device deletion failed');
