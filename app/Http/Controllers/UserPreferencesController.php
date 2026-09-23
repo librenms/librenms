@@ -27,7 +27,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
 use App\Facades\LibrenmsConfig;
 use App\Models\Dashboard;
 use App\Models\Device;
