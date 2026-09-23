@@ -33,6 +33,7 @@ use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Session;
 use Monolog\Level;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -80,15 +81,15 @@ class ArtisanCommandController extends Controller
             $this->setLogLevel(Level::Debug);
         }
 
-        // Clear out the session cache file
-        $request->session()->cache()->flush();
-
         return $this->stream(function () use ($cmd, $args): void {
             Event::forget(CommandStarting::class); // prevent normal cli setup and checks
 
             $exitCode = Artisan::call($cmd, $args, $this->getCliStreamOutput());
 
             echo PHP_EOL . 'exit_status:' . $exitCode . PHP_EOL;
+
+            // Delete the session
+            Session::invalidate();
         });
     }
 
