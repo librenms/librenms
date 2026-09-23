@@ -24,9 +24,9 @@ $page_title = 'Problems';
 
     <?php
     $device['device_id'] = '-1';
-    require_once 'includes/html/modal/alert_details.php';
-    require_once 'includes/html/modal/alert_notes.inc.php';
-    require_once 'includes/html/modal/alert_ack.inc.php';
+    echo view('alerts.modals.details')->render();
+    echo view('alerts.modals.notes')->render();
+    echo view('alerts.modals.ack')->render();
     require_once 'includes/html/common/alerts.inc.php';
     echo implode('', $common_output);
     unset($device['device_id']);
