@@ -66,6 +66,7 @@ function snmp_exec(string $cmd, array|string|null $oids, array|string|null $opti
         response: $response,
         options: $queryOptions,
         config: $config,
+        backend: class_basename($snmp),
         device: DeviceCache::get($device['device_id'] ?? DeviceCache::getPrimary()->device_id),
     ));
 

@@ -19,7 +19,8 @@ class SnmpQueryExecuted
      * @param  float  $duration  Query execution duration in seconds
      * @param  SnmpResponse  $response  The SNMP response object
      * @param  SnmpQueryOptions  $options  The options used for this query
-     * @param  SnmpConfig|null  $config  The SNMP connection settings, if available
+     * @param  SnmpConfig  $config  The SNMP connection settings
+     * @param  string  $backend  The name of the SNMP backend used
      * @param  Device|null  $device  The device model, if available
      */
     public function __construct(
@@ -29,7 +30,8 @@ class SnmpQueryExecuted
         public readonly float $duration,
         public readonly SnmpResponse $response,
         public readonly SnmpQueryOptions $options,
-        public readonly ?SnmpConfig $config = null,
+        public readonly SnmpConfig $config,
+        public readonly string $backend,
         public readonly ?Device $device = null,
     ) {
     }

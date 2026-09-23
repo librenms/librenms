@@ -5,7 +5,9 @@ namespace LibreNMS\Tests\Unit\Listeners;
 use App\Events\SnmpQueryExecuted;
 use App\Listeners\PrintSnmpDebugOutput;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Debug;
 
@@ -26,7 +28,10 @@ final class PrintSnmpDebugOutputTest extends TestCase
             method: 'snmpget',
             oids: ['sysDescr.0', 'sysObjectID.0'],
             duration: 0.42,
-            response: $response, options: new \LibreNMS\Data\Source\Snmp\SnmpQueryOptions,
+            response: $response,
+            options: new SnmpQueryOptions,
+            config: new SnmpConfig,
+            backend: 'NetSnmp',
         );
 
         Log::shouldReceive('debug')
@@ -58,9 +63,11 @@ final class PrintSnmpDebugOutputTest extends TestCase
             target: '127.0.0.1',
             method: 'snmpget',
             oids: ['sysDescr.0'],
-            response: $response,
-            options: new \LibreNMS\Data\Source\Snmp\SnmpQueryOptions,
             duration: 0.01524,
+            response: $response,
+            options: new SnmpQueryOptions,
+            config: new SnmpConfig,
+            backend: 'NetSnmp',
         );
 
         Log::shouldReceive('debug')

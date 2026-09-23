@@ -13,6 +13,8 @@ class SnmpMetricListener
      */
     public function handle(SnmpQueryExecuted $event): void
     {
-        app(MeasurementManager::class)->recordSnmp(Measurement::make($event->method, $event->duration));
+        $manager = app(MeasurementManager::class);
+        $manager->recordSnmp(Measurement::make($event->method, $event->duration));
+        $manager->record('snmp_backend', Measurement::make($event->backend, $event->duration));
     }
 }

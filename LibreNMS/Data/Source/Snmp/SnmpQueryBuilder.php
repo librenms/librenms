@@ -380,6 +380,7 @@ class SnmpQueryBuilder implements SnmpQueryInterface
                 response: $response,
                 options: $options,
                 config: $config,
+                backend: class_basename($this->backend),
                 device: $this->device,
             ));
 
