@@ -39,7 +39,7 @@ use LibreNMS\Util\Mib;
 use LibreNMS\Util\Oid;
 use Log;
 
-class SnmpQuery implements SnmpQueryInterface
+class SnmpQueryBuilder implements SnmpQueryInterface
 {
     private Device $device;
     private string $context = '';
