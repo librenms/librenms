@@ -32,7 +32,7 @@ class NokiaEncap
      * Decode TmnxEncapVal to extract VLAN ID(s)
      *
      * @param  int|string  $encapVal  The encoded encapsulation value
-     * @return array Array with 'outer' and optionally 'inner' VLAN IDs
+     * @return array{outer: int, inner: int|null} Outer VLAN, and inner VLAN when QinQ
      *
      * @see TIMETRA-TC-MIB::TmnxEncapVal
      */
