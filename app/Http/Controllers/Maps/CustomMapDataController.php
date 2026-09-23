@@ -33,7 +33,6 @@ use App\Models\CustomMapEdge;
 use App\Models\CustomMapNode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\IfOperStatus;
@@ -78,7 +77,6 @@ class CustomMapDataController extends Controller
             if ($edge->port) {
                 $edges[$edgeid]['device_id'] = $edge->port->device_id;
                 $edges[$edgeid]['port_name'] = $edge->port->device->displayName() . ' - ' . $edge->port->getLabel();
-                $edges[$edgeid]['port_info'] = Blade::render('<x-port-link-map :port="$port" />', ['port' => $edge->port]);
 
                 // Get speed to and from
                 if ($edge->reverse) {
@@ -170,7 +168,6 @@ class CustomMapDataController extends Controller
 
                 $nodes[$nodeid]['device_name'] = $node->device->hostname . '(' . $node->device->sysName . ')';
                 $nodes[$nodeid]['device_image'] = $node->device->icon;
-                $nodes[$nodeid]['device_info'] = Blade::render('<x-device-link-map :device="$device" />', ['device' => $node->device]);
 
                 if ($node->device->disabled) {
                     $this->setNodeDisabledStyle($nodes[$nodeid]);
