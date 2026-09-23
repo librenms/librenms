@@ -80,15 +80,15 @@ class ArtisanCommandController extends Controller
             $this->setLogLevel(Level::Debug);
         }
 
+        // Clear out the session cache file
+        $request->session()->cache()->flush();
+
         return $this->stream(function () use ($cmd, $args): void {
             Event::forget(CommandStarting::class); // prevent normal cli setup and checks
 
             $exitCode = Artisan::call($cmd, $args, $this->getCliStreamOutput());
 
             echo PHP_EOL . 'exit_status:' . $exitCode . PHP_EOL;
-
-            // Delete the session
-            $request->session()->cache()->flush();
         });
     }
 
