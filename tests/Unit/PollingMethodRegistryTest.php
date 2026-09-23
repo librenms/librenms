@@ -25,38 +25,38 @@ use LibreNMS\Tests\TestCase;
 
 final class PollingMethodRegistryTest extends TestCase
 {
-    private PollingMethodRegistry $registry;
+    private PollingMethodRegistry $pollingMethods;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->registry = app(PollingMethodRegistry::class);
+        $this->pollingMethods = app(PollingMethodRegistry::class);
     }
 
     public function testRegistryContainsDefaultPollingMethods(): void
     {
-        $this->assertTrue($this->registry->has(PollingMethodType::Snmp));
-        $this->assertTrue($this->registry->has(PollingMethodType::Icmp));
-        $this->assertTrue($this->registry->has(PollingMethodType::Ipmi));
-        $this->assertTrue($this->registry->has(PollingMethodType::UnixAgent));
+        $this->assertTrue($this->pollingMethods->has(PollingMethodType::Snmp));
+        $this->assertTrue($this->pollingMethods->has(PollingMethodType::Icmp));
+        $this->assertTrue($this->pollingMethods->has(PollingMethodType::Ipmi));
+        $this->assertTrue($this->pollingMethods->has(PollingMethodType::UnixAgent));
 
-        $this->assertInstanceOf(SnmpPollingMethod::class, $this->registry->get(PollingMethodType::Snmp));
-        $this->assertInstanceOf(IcmpPollingMethod::class, $this->registry->get(PollingMethodType::Icmp));
-        $this->assertInstanceOf(IpmiPollingMethod::class, $this->registry->get(PollingMethodType::Ipmi));
-        $this->assertInstanceOf(UnixAgentPollingMethod::class, $this->registry->get(PollingMethodType::UnixAgent));
+        $this->assertInstanceOf(SnmpPollingMethod::class, $this->pollingMethods->get(PollingMethodType::Snmp));
+        $this->assertInstanceOf(IcmpPollingMethod::class, $this->pollingMethods->get(PollingMethodType::Icmp));
+        $this->assertInstanceOf(IpmiPollingMethod::class, $this->pollingMethods->get(PollingMethodType::Ipmi));
+        $this->assertInstanceOf(UnixAgentPollingMethod::class, $this->pollingMethods->get(PollingMethodType::UnixAgent));
     }
 
     public function testRegistryBehaviorMethodsProvideMethodsConfigsProbesAndSecrets(): void
     {
         // 1. Method instance
-        $snmpMethod = $this->registry->require(PollingMethodType::Snmp);
-        $icmpMethodDef = $this->registry->require(PollingMethodType::Icmp);
+        $snmpMethod = $this->pollingMethods->require(PollingMethodType::Snmp);
+        $icmpMethodDef = $this->pollingMethods->require(PollingMethodType::Icmp);
         $this->assertInstanceOf(SnmpPollingMethod::class, $snmpMethod);
         $this->assertInstanceOf(IcmpPollingMethod::class, $icmpMethodDef);
 
         // 2. Method probe and check
-        $this->assertInstanceOf(SnmpProbe::class, $this->registry->get(PollingMethodType::Snmp)?->probe());
-        $this->assertInstanceOf(IcmpProbe::class, $this->registry->get(PollingMethodType::Icmp)?->probe());
+        $this->assertInstanceOf(SnmpProbe::class, $this->pollingMethods->get(PollingMethodType::Snmp)?->probe());
+        $this->assertInstanceOf(IcmpProbe::class, $this->pollingMethods->get(PollingMethodType::Icmp)?->probe());
 
         // 3. secretType and hasSecret on PollingMethod instances
         $this->assertSame(\LibreNMS\Enum\SecretType::Snmp, $snmpMethod->secretType());
@@ -67,7 +67,7 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Data\SnmpSecretData::class, $snmpData);
         $this->assertSame('public', $snmpData->community);
 
-        $ipmiMethod = $this->registry->require(PollingMethodType::Ipmi);
+        $ipmiMethod = $this->pollingMethods->require(PollingMethodType::Ipmi);
         $this->assertSame(\LibreNMS\Enum\SecretType::Ipmi, $ipmiMethod->secretType());
         $this->assertTrue($ipmiMethod->hasSecret());
         $ipmiSecretDef = \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for($ipmiMethod->secretType());
@@ -79,7 +79,7 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertNull($icmpMethodDef->secretType());
         $this->assertFalse($icmpMethodDef->hasSecret());
 
-        $unixAgentMethod = $this->registry->require(PollingMethodType::UnixAgent);
+        $unixAgentMethod = $this->pollingMethods->require(PollingMethodType::UnixAgent);
         $this->assertNull($unixAgentMethod->secretType());
         $this->assertFalse($unixAgentMethod->hasSecret());
 
@@ -98,7 +98,7 @@ final class PollingMethodRegistryTest extends TestCase
             'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
             'data' => ['community' => 'public'],
         ]));
-        $secretData = $snmpDeviceMethod->secretData($this->registry);
+        $secretData = $snmpDeviceMethod->secretData($this->pollingMethods);
         $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Data\SnmpSecretData::class, $secretData);
         $this->assertSame('public', $secretData->community);
 
@@ -108,24 +108,24 @@ final class PollingMethodRegistryTest extends TestCase
             'enabled' => true,
             'affects_availability' => true,
         ]);
-        $this->assertInstanceOf(IcmpConfig::class, $this->registry->get(PollingMethodType::Icmp)?->config($icmpDeviceMethod));
+        $this->assertInstanceOf(IcmpConfig::class, $this->pollingMethods->get(PollingMethodType::Icmp)?->config($icmpDeviceMethod));
 
         // 5. Default affects availability
-        $this->assertTrue($this->registry->defaultAffectsAvailability(PollingMethodType::Snmp));
-        $this->assertTrue($this->registry->defaultAffectsAvailability(PollingMethodType::Icmp));
-        $this->assertFalse($this->registry->defaultAffectsAvailability(PollingMethodType::Ipmi));
-        $this->assertFalse($this->registry->defaultAffectsAvailability(PollingMethodType::UnixAgent));
+        $this->assertTrue($this->pollingMethods->require(PollingMethodType::Snmp)->defaultAffectsAvailability());
+        $this->assertTrue($this->pollingMethods->require(PollingMethodType::Icmp)->defaultAffectsAvailability());
+        $this->assertFalse($this->pollingMethods->require(PollingMethodType::Ipmi)->defaultAffectsAvailability());
+        $this->assertFalse($this->pollingMethods->require(PollingMethodType::UnixAgent)->defaultAffectsAvailability());
     }
 
     public function testRegistryAllAndTypesReturnRegisteredMethods(): void
     {
-        $types = $this->registry->types();
+        $types = $this->pollingMethods->types();
         $this->assertContains(PollingMethodType::Snmp, $types);
         $this->assertContains(PollingMethodType::Icmp, $types);
         $this->assertContains(PollingMethodType::Ipmi, $types);
         $this->assertContains(PollingMethodType::UnixAgent, $types);
 
-        $all = $this->registry->all();
+        $all = $this->pollingMethods->all();
         $this->assertArrayHasKey('snmp', $all);
         $this->assertArrayHasKey('icmp', $all);
         $this->assertArrayHasKey('ipmi', $all);
@@ -165,7 +165,7 @@ final class PollingMethodRegistryTest extends TestCase
         $device = new Device(['hostname' => '192.0.2.1']);
         $device->device_id = 1;
 
-        $accessor = new PollingMethodAccessor($device, $this->registry);
+        $accessor = new PollingMethodAccessor($device, $this->pollingMethods);
         $this->assertInstanceOf(SnmpConfig::class, $accessor->get(PollingMethodType::Snmp));
         $this->assertInstanceOf(IcmpConfig::class, $accessor->get(PollingMethodType::Icmp));
         $this->assertNull($accessor->get(PollingMethodType::Ipmi));
@@ -194,7 +194,7 @@ final class PollingMethodRegistryTest extends TestCase
         $unixAgentMethod->setRelation('device', $deviceWithMethods);
         $deviceWithMethods->setRelation('pollingMethods', collect([$ipmiMethod, $unixAgentMethod]));
 
-        $accessorWithMethods = new PollingMethodAccessor($deviceWithMethods, $this->registry);
+        $accessorWithMethods = new PollingMethodAccessor($deviceWithMethods, $this->pollingMethods);
         $this->assertInstanceOf(IpmiConfig::class, $accessorWithMethods->ipmi());
         $this->assertInstanceOf(UnixAgentConfig::class, $accessorWithMethods->unixAgent());
     }
@@ -202,15 +202,15 @@ final class PollingMethodRegistryTest extends TestCase
     public function testActionClassesAcceptConstructorInjectedRegistry(): void
     {
         $device = new Device(['hostname' => '192.0.2.1']);
-        $builder = new BuildDefaultPollingMethods($this->registry);
+        $builder = new BuildDefaultPollingMethods($this->pollingMethods);
         $methods = $builder->execute($device);
         $this->assertCount(2, $methods);
 
-        $discoverMethods = new DiscoverDevicePollingMethods($this->registry);
+        $discoverMethods = new DiscoverDevicePollingMethods($this->pollingMethods);
         $resultMethods = $discoverMethods->execute($device, collect());
         $this->assertCount(0, $resultMethods);
 
-        $discoverMetadata = new DiscoverDeviceMetadata($this->registry, new ValidateDeviceUniqueness);
+        $discoverMetadata = new DiscoverDeviceMetadata($this->pollingMethods, new ValidateDeviceUniqueness);
         $discoverMetadata->execute($device, collect());
         $this->assertSame('192.0.2.1', $device->hostname);
     }

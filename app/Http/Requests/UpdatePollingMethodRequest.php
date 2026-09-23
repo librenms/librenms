@@ -56,12 +56,12 @@ class UpdatePollingMethodRequest extends FormRequest
     public function rules(\LibreNMS\Polling\Method\PollingMethodRegistry $registry): array
     {
         $type = $this->pollingType();
-        $definition = $type ? $registry->get($type) : null;
+        $method = $type ? $registry->get($type) : null;
         $isEditingSecret = $this->has('is_editing_secret') ? $this->boolean('is_editing_secret') : $this->has('secret_data');
         $secretUpdateMode = $this->input('secret_update_mode', 'update');
 
         $descriptionRules = ['nullable', 'string', 'max:255'];
-        if ($isEditingSecret && $definition?->hasSecret()) {
+        if ($isEditingSecret && $method?->hasSecret()) {
             $device = $this->route('device');
             /** @var Device|null $deviceModel */
             $deviceModel = $device instanceof Device ? $device : (is_numeric($device) ? DeviceCache::get($device) : null);
@@ -93,18 +93,18 @@ class UpdatePollingMethodRequest extends FormRequest
             'settings' => ['nullable', 'array'],
         ];
 
-        if (! $definition) {
+        if (! $method) {
             return $rules;
         }
 
         $rules = [
             ...$rules,
-            ...collect($definition->rules())
+            ...collect($method->rules())
                 ->mapWithKeys(fn (array|string $rule, string $key): array => ["settings.$key" => $rule])
                 ->all(),
         ];
 
-        $secretDefinition = SecretDefinition::for($definition->secretType());
+        $secretDefinition = SecretDefinition::for($method->secretType());
         if ($secretDefinition !== null && $this->has('secret_data')) {
             $rules = [
                 ...$rules,

@@ -76,19 +76,19 @@ return new class extends Migration
             ->where('method_type', 'snmp')
             ->orderBy('id')
             ->chunk(100, function ($pollingMethods) {
-                foreach ($pollingMethods as $method) {
-                    $settings = json_decode($method->settings, true) ?: [];
+                foreach ($pollingMethods as $deviceMethod) {
+                    $settings = json_decode($deviceMethod->settings, true) ?: [];
                     $modeName = $settings['port_association_mode'] ?? 'ifIndex';
                     $modeId = PortAssociationMode::getId($modeName) ?? 1;
 
                     DB::table('devices')
-                        ->where('device_id', $method->device_id)
+                        ->where('device_id', $deviceMethod->device_id)
                         ->update([
                             'port' => $settings['port'] ?? 161,
                             'transport' => $settings['transport'] ?? 'udp',
                             'timeout' => $settings['timeout'] ?? null,
                             'retries' => $settings['retries'] ?? null,
-                            'snmp_disable' => ! $method->enabled,
+                            'snmp_disable' => ! $deviceMethod->enabled,
                             'port_association_mode' => $modeId,
                         ]);
                 }

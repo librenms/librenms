@@ -7,11 +7,12 @@ use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 
-class DiscoverDevicePollingMethods
+readonly class DiscoverDevicePollingMethods
 {
     public function __construct(
-        private readonly \LibreNMS\Polling\Method\PollingMethodRegistry $registry,
+        private PollingMethodRegistry $pollingMethods,
     ) {
     }
 
@@ -27,18 +28,18 @@ class DiscoverDevicePollingMethods
     {
         $enabledMethods = $candidateMethods->filter(fn (DevicePollingMethod $m) => $m->enabled);
 
-        foreach ($enabledMethods as $method) {
-            $definition = $this->registry->require($method->method_type);
-            $result = $definition->discover($device, $method);
+        foreach ($enabledMethods as $deviceMethod) {
+            $method = $this->pollingMethods->require($deviceMethod->method_type);
+            $result = $method->discover($device, $deviceMethod);
 
-            $method->last_check_successful = $result->isSuccess();
-            $method->last_checked_at = now();
+            $deviceMethod->last_check_successful = $result->isSuccess();
+            $deviceMethod->last_checked_at = now();
 
             if (! $result->isSuccess()) {
-                if ($pingFallback && $method->method_type !== PollingMethodType::Icmp) {
-                    $method->enabled = false;
+                if ($pingFallback && $deviceMethod->method_type !== PollingMethodType::Icmp) {
+                    $deviceMethod->enabled = false;
                     $candidateMethods = $candidateMethods->reject(
-                        fn (DevicePollingMethod $m) => $m === $method || $m->method_type === $method->method_type
+                        fn (DevicePollingMethod $m) => $m === $deviceMethod || $m->method_type === $deviceMethod->method_type
                     )->values();
                 } else {
                     $exception = new HostUnreachableException((string) $device->hostname);

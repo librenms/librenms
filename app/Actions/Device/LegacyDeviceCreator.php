@@ -14,7 +14,7 @@ use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 class LegacyDeviceCreator
 {
     private ?Device $device = null;
-    private readonly PollingMethodRegistry $registry;
+    private readonly PollingMethodRegistry $pollingMethods;
 
     public function __construct(
         public string $hostname,
@@ -41,7 +41,7 @@ class LegacyDeviceCreator
         public bool $force = false,
         public bool $ping_fallback = false,
     ) {
-        $this->registry = resolve(PollingMethodRegistry::class);
+        $this->pollingMethods = resolve(PollingMethodRegistry::class);
     }
 
     public function getDevice(): Device
@@ -83,7 +83,7 @@ class LegacyDeviceCreator
                 'port_association_mode' => $this->port_association_mode,
             ], fn ($v) => $v !== null);
 
-            $registry = $this->registry;
+            $registry = $this->pollingMethods;
             $snmpMethodDef = $registry->get(PollingMethodType::Snmp);
             $snmpMethod = new DevicePollingMethod([
                 'method_type' => PollingMethodType::Snmp,

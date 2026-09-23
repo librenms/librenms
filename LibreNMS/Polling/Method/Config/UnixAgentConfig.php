@@ -22,17 +22,17 @@ final class UnixAgentConfig extends PollingMethodConfig
         return true;
     }
 
-    public static function fromPollingMethod(DevicePollingMethod $method): self
+    public static function fromPollingMethod(DevicePollingMethod $deviceMethod): self
     {
-        if ($method->method_type !== PollingMethodType::UnixAgent) {
+        if ($deviceMethod->method_type !== PollingMethodType::UnixAgent) {
             throw new \Exception('Invalid polling method type');
         }
 
-        $settings = $method->settings ?? [];
+        $settings = $deviceMethod->settings ?? [];
 
         return new self(
-            enabled: $method->enabled ?? true,
-            affectsAvailability: $method->affects_availability ?? false,
+            enabled: $deviceMethod->enabled ?? true,
+            affectsAvailability: $deviceMethod->affects_availability ?? false,
             port: (int) ($settings['port'] ?? LibrenmsConfig::get('unix-agent.port', 6556)),
             timeout: (int) ($settings['timeout'] ?? LibrenmsConfig::get('unix-agent.connection-timeout', 10)),
         );

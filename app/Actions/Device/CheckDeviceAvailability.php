@@ -5,12 +5,13 @@ namespace App\Actions\Device;
 use App\Models\Device;
 use App\Models\Eventlog;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 readonly class CheckDeviceAvailability
 {
     public function __construct(
         private SetDeviceAvailability $setDeviceAvailability,
-        private \LibreNMS\Polling\Method\PollingMethodRegistry $registry,
+        private PollingMethodRegistry $pollingMethods,
     ) {
     }
 
@@ -18,19 +19,19 @@ readonly class CheckDeviceAvailability
     {
         $enabledPollingMethods = $device->pollingMethods->filter(fn ($m) => $m->enabled);
 
-        foreach ($enabledPollingMethods as $method) {
+        foreach ($enabledPollingMethods as $deviceMethod) {
             try {
-                $definition = $this->registry->require($method->method_type);
-                $result = $definition->check($device);
+                $method = $this->pollingMethods->require($deviceMethod->method_type);
+                $result = $method->check($device);
 
-                $method->last_check_successful = $result->isSuccess();
-                $method->last_checked_at = now();
+                $deviceMethod->last_check_successful = $result->isSuccess();
+                $deviceMethod->last_checked_at = now();
 
-                $definition->onProbeComplete($device, $result, $commit);
+                $method->onProbeComplete($device, $result, $commit);
             } catch (\LibreNMS\Exceptions\SecretDecryptionException) {
-                $method->last_check_successful = false;
-                $method->last_checked_at = now();
-                Eventlog::log("Failed to decrypt credentials for {$method->method_type->value} polling. Verify that APP_KEY matches the primary installation.", $device, 'auth', Severity::Error);
+                $deviceMethod->last_check_successful = false;
+                $deviceMethod->last_checked_at = now();
+                Eventlog::log("Failed to decrypt credentials for {$deviceMethod->method_type->value} polling. Verify that APP_KEY matches the primary installation.", $device, 'auth', Severity::Error);
             }
         }
 

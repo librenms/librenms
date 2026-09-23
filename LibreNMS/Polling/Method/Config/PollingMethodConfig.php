@@ -12,7 +12,7 @@ abstract class PollingMethodConfig
     ) {
     }
 
-    abstract public static function fromPollingMethod(DevicePollingMethod $method): self;
+    abstract public static function fromPollingMethod(DevicePollingMethod $deviceMethod): self;
 
     abstract public function isValid(): bool;
 

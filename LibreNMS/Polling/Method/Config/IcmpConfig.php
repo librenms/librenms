@@ -19,15 +19,15 @@ final class IcmpConfig extends PollingMethodConfig
         return true;
     }
 
-    public static function fromPollingMethod(DevicePollingMethod $method): self
+    public static function fromPollingMethod(DevicePollingMethod $deviceMethod): self
     {
-        if ($method->method_type !== PollingMethodType::Icmp) {
+        if ($deviceMethod->method_type !== PollingMethodType::Icmp) {
             throw new \Exception('Invalid polling method type');
         }
 
         return new self(
-            enabled: $method->enabled ?? true,
-            affectsAvailability: $method->affects_availability ?? false,
+            enabled: $deviceMethod->enabled ?? true,
+            affectsAvailability: $deviceMethod->affects_availability ?? false,
         );
     }
 }

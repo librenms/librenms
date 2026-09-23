@@ -9,6 +9,7 @@ use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\Probe\PollingMethodProbe;
 use LibreNMS\Polling\Method\Probe\ProbeResult;
 use LibreNMS\Tests\TestCase;
@@ -262,7 +263,7 @@ final class ConnectivityHelperTest extends TestCase
             maxOid: 10
         );
 
-        $probe = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Snmp)->probe();
+        $probe = app(PollingMethodRegistry::class)->require(PollingMethodType::Snmp)->probe();
 
         $this->assertTrue($probe->check($device)->isSuccess());
         $this->assertTrue($probe->check($device)->isSuccess());
@@ -282,14 +283,14 @@ class CheckDeviceAvailabilityMock
         $setDeviceAvailability = app(\App\Actions\Device\SetDeviceAvailability::class);
         $enabledPollingMethods = $device->pollingMethods->filter(fn ($m) => $m->enabled);
 
-        foreach ($enabledPollingMethods as $method) {
-            $typeKey = $method->method_type instanceof PollingMethodType ? $method->method_type->value : (string) $method->method_type;
+        foreach ($enabledPollingMethods as $deviceMethod) {
+            $typeKey = $deviceMethod->method_type instanceof PollingMethodType ? $deviceMethod->method_type->value : (string) $deviceMethod->method_type;
             $probeMock = $this->probeMocks[$typeKey] ?? null;
 
             if ($probeMock) {
                 $result = $probeMock->check($device);
-                $method->last_check_successful = $result->isSuccess();
-                $method->last_checked_at = now();
+                $deviceMethod->last_check_successful = $result->isSuccess();
+                $deviceMethod->last_checked_at = now();
             }
         }
 

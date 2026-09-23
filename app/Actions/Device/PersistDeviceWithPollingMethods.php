@@ -18,21 +18,21 @@ class PersistDeviceWithPollingMethods
             $saved = $device->save();
 
             if ($saved && $pollingMethods !== null) {
-                foreach ($pollingMethods as $method) {
-                    $method->device_id = $device->device_id;
+                foreach ($pollingMethods as $deviceMethod) {
+                    $deviceMethod->device_id = $device->device_id;
 
-                    if ($method->relationLoaded('secret') && $method->secret) {
-                        $secret = $method->secret;
+                    if ($deviceMethod->relationLoaded('secret') && $deviceMethod->secret) {
+                        $secret = $deviceMethod->secret;
                         if (! $secret->exists) {
                             if (empty($secret->description)) {
-                                $secret->description = strtoupper($method->method_type->value) . ' ' . $device->hostname;
+                                $secret->description = strtoupper($deviceMethod->method_type->value) . ' ' . $device->hostname;
                             }
                             $secret->save();
                         }
-                        $method->secret_id = $secret->id;
+                        $deviceMethod->secret_id = $secret->id;
                     }
 
-                    $method->save();
+                    $deviceMethod->save();
                 }
 
                 $device->setRelation('pollingMethods', $pollingMethods);

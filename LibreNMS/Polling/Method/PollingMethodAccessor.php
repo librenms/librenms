@@ -14,20 +14,20 @@ readonly class PollingMethodAccessor
 {
     public function __construct(
         private Device $device,
-        private PollingMethodRegistry $registry,
+        private PollingMethodRegistry $pollingMethods,
     ) {
     }
 
     public function get(PollingMethodType $type): ?PollingMethodConfig
     {
-        $definition = $this->registry->require($type);
-        $method = $this->device->pollingMethod($type);
+        $method = $this->pollingMethods->require($type);
+        $deviceMethod = $this->device->pollingMethod($type);
 
-        if ($method) {
-            return $definition->config($method);
+        if ($deviceMethod) {
+            return $method->config($deviceMethod);
         }
 
-        return $definition->fallbackConfig($this->device);
+        return $method->fallbackConfig($this->device);
     }
 
     public function snmp(): SnmpConfig

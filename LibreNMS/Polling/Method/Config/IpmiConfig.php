@@ -28,22 +28,22 @@ final class IpmiConfig extends PollingMethodConfig
         return ! empty($this->username) && ! empty($this->password);
     }
 
-    public static function fromPollingMethod(DevicePollingMethod $method, ?IpmiSecretData $secretData = null): self
+    public static function fromPollingMethod(DevicePollingMethod $deviceMethod, ?IpmiSecretData $secretData = null): self
     {
-        if ($method->method_type !== PollingMethodType::Ipmi) {
+        if ($deviceMethod->method_type !== PollingMethodType::Ipmi) {
             throw new \Exception('Invalid polling method type');
         }
 
-        $settings = $method->settings ?? [];
-        $secretData ??= $method->secret ? IpmiSecretData::fromArray($method->secret->data ?? []) : new IpmiSecretData();
+        $settings = $deviceMethod->settings ?? [];
+        $secretData ??= $deviceMethod->secret ? IpmiSecretData::fromArray($deviceMethod->secret->data ?? []) : new IpmiSecretData();
 
         return new self(
-            $method->enabled ?? true,
-            $method->affects_availability ?? false,
+            $deviceMethod->enabled ?? true,
+            $deviceMethod->affects_availability ?? false,
             $secretData->username,
             $secretData->password,
             $secretData->kgKey,
-            ! empty($settings['hostname']) ? (string) $settings['hostname'] : ($method->device ? (string) $method->device->hostname : ''),
+            ! empty($settings['hostname']) ? (string) $settings['hostname'] : ($deviceMethod->device ? (string) $deviceMethod->device->hostname : ''),
             (int) ($settings['port'] ?? 623),
             (int) ($settings['ciphersuite'] ?? 0),
             (int) ($settings['timeout'] ?? 3),

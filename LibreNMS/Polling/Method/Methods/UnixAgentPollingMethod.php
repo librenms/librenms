@@ -44,9 +44,9 @@ final class UnixAgentPollingMethod extends PollingMethod
         return resolve(\LibreNMS\Polling\Method\Probe\UnixAgentProbe::class);
     }
 
-    public function config(\App\Models\DevicePollingMethod $method): \LibreNMS\Polling\Method\Config\UnixAgentConfig
+    public function config(\App\Models\DevicePollingMethod $deviceMethod): \LibreNMS\Polling\Method\Config\UnixAgentConfig
     {
-        return \LibreNMS\Polling\Method\Config\UnixAgentConfig::fromPollingMethod($method);
+        return \LibreNMS\Polling\Method\Config\UnixAgentConfig::fromPollingMethod($deviceMethod);
     }
 
     public function fallbackConfig(\App\Models\Device $device): ?\LibreNMS\Polling\Method\Config\UnixAgentConfig

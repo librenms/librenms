@@ -59,9 +59,9 @@ final class IpmiPollingMethod extends PollingMethod
         return SecretType::Ipmi;
     }
 
-    public function config(DevicePollingMethod $method): IpmiConfig
+    public function config(DevicePollingMethod $deviceMethod): IpmiConfig
     {
-        return IpmiConfig::fromPollingMethod($method);
+        return IpmiConfig::fromPollingMethod($deviceMethod);
     }
 
     public function fallbackConfig(Device $device): ?IpmiConfig

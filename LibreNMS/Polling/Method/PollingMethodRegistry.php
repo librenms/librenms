@@ -62,14 +62,6 @@ class PollingMethodRegistry
     }
 
     /**
-     * Get the default affects availability value for a polling method.
-     */
-    public function defaultAffectsAvailability(PollingMethodType $type): bool
-    {
-        return $this->require($type)->defaultAffectsAvailability();
-    }
-
-    /**
      * Get all registered polling methods.
      *
      * @return array<string, PollingMethod>

@@ -96,9 +96,9 @@ final class SnmpPollingMethod extends PollingMethod
         return SecretType::Snmp;
     }
 
-    public function config(DevicePollingMethod $method): SnmpConfig
+    public function config(DevicePollingMethod $deviceMethod): SnmpConfig
     {
-        return SnmpConfig::fromPollingMethod($method);
+        return SnmpConfig::fromPollingMethod($deviceMethod);
     }
 
     public function fallbackConfig(Device $device): SnmpConfig
@@ -118,19 +118,19 @@ final class SnmpPollingMethod extends PollingMethod
     /**
      * @inheritDoc
      */
-    public function discover(Device $device, DevicePollingMethod $method): ProbeResult
+    public function discover(Device $device, DevicePollingMethod $deviceMethod): ProbeResult
     {
         $testDevice = clone $device;
 
         // If a specific secret was supplied on the method, test that directly
-        if ($method->relationLoaded('secret') && $method->secret !== null) {
-            $testDevice->setRelation('pollingMethods', collect([$method]));
+        if ($deviceMethod->relationLoaded('secret') && $deviceMethod->secret !== null) {
+            $testDevice->setRelation('pollingMethods', collect([$deviceMethod]));
             $result = $this->check($testDevice);
             if ($result->isSuccess()) {
                 return $result;
             }
 
-            $secret = $method->secret;
+            $secret = $deviceMethod->secret;
             $secretData = SnmpSecretData::fromArray($secret->data ?? []);
             $target = $secret->description ?: ($secretData->community ?? ($secretData->authname ?? 'custom'));
             $reasons = [$secretData->version => (string) $target];
@@ -152,9 +152,9 @@ final class SnmpPollingMethod extends PollingMethod
         $reasons = [];
         $lastResult = null;
         foreach ($defaultSecrets as $secret) {
-            $method->setRelation('secret', $secret);
-            $method->secret_id = $secret->id;
-            $testDevice->setRelation('pollingMethods', collect([$method]));
+            $deviceMethod->setRelation('secret', $secret);
+            $deviceMethod->secret_id = $secret->id;
+            $testDevice->setRelation('pollingMethods', collect([$deviceMethod]));
 
             $result = $this->check($testDevice);
             if ($result->isSuccess()) {

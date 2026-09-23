@@ -46,8 +46,8 @@ readonly class ConnectivityHelper
             return true;
         }
 
-        foreach ($this->device->pollingMethods as $method) {
-            if ($method->enabled && $method->affects_availability && ! $method->last_check_successful) {
+        foreach ($this->device->pollingMethods as $deviceMethod) {
+            if ($deviceMethod->enabled && $deviceMethod->affects_availability && ! $deviceMethod->last_check_successful) {
                 return false;
             }
         }
@@ -57,8 +57,8 @@ readonly class ConnectivityHelper
 
     public function hasAvailability(): bool
     {
-        foreach ($this->device->pollingMethods as $method) {
-            if ($method->enabled && $method->affects_availability) {
+        foreach ($this->device->pollingMethods as $deviceMethod) {
+            if ($deviceMethod->enabled && $deviceMethod->affects_availability) {
                 return true;
             }
         }

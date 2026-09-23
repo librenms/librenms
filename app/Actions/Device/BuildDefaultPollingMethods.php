@@ -7,12 +7,13 @@ use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class BuildDefaultPollingMethods
 {
     public function __construct(
-        private readonly \LibreNMS\Polling\Method\PollingMethodRegistry $registry,
+        private readonly PollingMethodRegistry $pollingMethods,
     ) {
     }
 
@@ -48,7 +49,7 @@ class BuildDefaultPollingMethods
                 continue;
             }
 
-            $method = $this->registry->get($type);
+            $method = $this->pollingMethods->get($type);
             if (! $method) {
                 continue;
             }
@@ -70,7 +71,7 @@ class BuildDefaultPollingMethods
             $pollingMethod = new DevicePollingMethod([
                 'method_type' => $type,
                 'enabled' => true,
-                'affects_availability' => $affectsAvailability ?? $this->registry->defaultAffectsAvailability($type),
+                'affects_availability' => $affectsAvailability ?? $method->defaultAffectsAvailability(),
                 'settings' => $method->filterOverrides($settings),
             ]);
             $pollingMethod->setRelation('device', $device);

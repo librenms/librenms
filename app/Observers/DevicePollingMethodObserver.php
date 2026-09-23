@@ -6,15 +6,15 @@ use App\Models\DevicePollingMethod;
 
 class DevicePollingMethodObserver
 {
-    public function saved(DevicePollingMethod $method): void
+    public function saved(DevicePollingMethod $deviceMethod): void
     {
-        if (! $method->enabled && $method->device_id) {
-            $device = $method->device;
+        if (! $deviceMethod->enabled && $deviceMethod->device_id) {
+            $device = $deviceMethod->device;
             if (! $device) {
                 return;
             }
 
-            $typeValue = $method->method_type->value;
+            $typeValue = $deviceMethod->method_type->value;
             $reasons = collect(explode(',', (string) $device->status_reason))
                 ->reject(fn ($v) => $v === $typeValue)
                 ->filter()

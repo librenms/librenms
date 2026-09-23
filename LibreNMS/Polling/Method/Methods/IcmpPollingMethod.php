@@ -24,9 +24,9 @@ final class IcmpPollingMethod extends PollingMethod
         return resolve(\LibreNMS\Polling\Method\Probe\IcmpProbe::class);
     }
 
-    public function config(\App\Models\DevicePollingMethod $method): \LibreNMS\Polling\Method\Config\IcmpConfig
+    public function config(\App\Models\DevicePollingMethod $deviceMethod): \LibreNMS\Polling\Method\Config\IcmpConfig
     {
-        return \LibreNMS\Polling\Method\Config\IcmpConfig::fromPollingMethod($method);
+        return \LibreNMS\Polling\Method\Config\IcmpConfig::fromPollingMethod($deviceMethod);
     }
 
     public function fallbackConfig(Device $device): \LibreNMS\Polling\Method\Config\IcmpConfig

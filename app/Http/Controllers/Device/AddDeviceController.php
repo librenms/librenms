@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class AddDeviceController
@@ -21,7 +22,7 @@ class AddDeviceController
     use AuthorizesRequests;
 
     public function __construct(
-        private \LibreNMS\Polling\Method\PollingMethodRegistry $registry,
+        private readonly PollingMethodRegistry $pollingMethods,
     ) {
     }
 
@@ -29,20 +30,20 @@ class AddDeviceController
     {
         $this->authorize('create', Device::class);
 
-        $availableMethods = collect($this->registry->types())->map(function (PollingMethodType $type): array {
-            $definition = $this->registry->require($type);
-            $secretDefinition = SecretDefinition::for($definition->secretType());
+        $availableMethods = collect($this->pollingMethods->types())->map(function (PollingMethodType $type): array {
+            $method = $this->pollingMethods->require($type);
+            $secretDefinition = SecretDefinition::for($method->secretType());
             $schemaFields = $secretDefinition ? $secretDefinition->buildSchemaFields(dataVar: "methods['" . $type->value . "'].formData") : [];
 
             return [
                 'type' => $type->value,
                 'label' => __('poller.methods.' . $type->value),
-                'icon' => $definition->icon(),
+                'icon' => $method->icon(),
                 'schema_fields' => $schemaFields,
                 'schema_defaults' => $secretDefinition?->schemaDefaults() ?? [],
-                'settings_fields' => $definition->buildSchemaFields(dataVar: "methods['" . $type->value . "'].settingsData"),
-                'settings_defaults' => $definition->schemaDefaults(),
-                'settings_form_defaults' => $definition->formDefaults(),
+                'settings_fields' => $method->buildSchemaFields(dataVar: "methods['" . $type->value . "'].settingsData"),
+                'settings_defaults' => $method->schemaDefaults(),
+                'settings_form_defaults' => $method->formDefaults(),
             ];
         })->all();
 
@@ -120,7 +121,7 @@ class AddDeviceController
             ->filter(fn (array $data): bool => (bool) ($data['active'] ?? false))
             ->every(fn (array $data): bool => empty($data['validate']));
 
-        $pollingMethods = (new \App\Actions\Device\BuildDefaultPollingMethods($this->registry))->execute($device, ['methods' => $rawMethods]);
+        $pollingMethods = (new \App\Actions\Device\BuildDefaultPollingMethods($this->pollingMethods))->execute($device, ['methods' => $rawMethods]);
 
         try {
             $validator = new ValidateDeviceAndCreate($device, $pollingMethods, $forceAdd);

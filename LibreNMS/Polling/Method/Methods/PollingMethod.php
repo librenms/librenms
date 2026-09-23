@@ -50,10 +50,10 @@ abstract class PollingMethod implements HasFieldSchema
     /**
      * Discover or validate a candidate polling method for a device.
      */
-    public function discover(Device $device, DevicePollingMethod $method): ProbeResult
+    public function discover(Device $device, DevicePollingMethod $deviceMethod): ProbeResult
     {
         $testDevice = clone $device;
-        $testDevice->setRelation('pollingMethods', collect([$method]));
+        $testDevice->setRelation('pollingMethods', collect([$deviceMethod]));
 
         return $this->check($testDevice);
     }
@@ -66,7 +66,7 @@ abstract class PollingMethod implements HasFieldSchema
     {
     }
 
-    abstract public function config(DevicePollingMethod $method): PollingMethodConfig;
+    abstract public function config(DevicePollingMethod $deviceMethod): PollingMethodConfig;
 
     public function fallbackConfig(Device $device): ?PollingMethodConfig
     {
