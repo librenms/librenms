@@ -29,7 +29,7 @@ class PluginEnable extends LnmsCommand
             if ($plugin !== 'all') {
                 $query->where('plugin_name', 'like', $plugin)
                     ->limit(1)
-                    ->orderBy('version', 'DESC');
+                    ->orderBy('version', 'desc');
             }
 
             $updated = $query->update(['plugin_active' => 1]);
