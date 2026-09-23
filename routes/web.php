@@ -68,7 +68,6 @@ use App\Http\Controllers\Widgets;
 use App\Http\Controllers\WidgetSettingsController;
 use App\Http\Controllers\WirelessSensorController;
 use App\Http\Middleware\AuthenticateGraph;
-use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth as AuthFacade;
 use Illuminate\Support\Facades\Route;
 
@@ -477,8 +476,8 @@ Route::middleware(['auth'])->group(function (): void {
 // routes that don't need authentication
 Route::prefix('ajax')->group(function (): void {
     Route::post('set_timezone', [Ajax\TimezoneController::class, 'set']);
-    Route::get('cmd/{device}/discover', [App\Http\Controllers\Ajax\ArtisanCommandController::class, 'discover'])->withoutMiddleware([StartSession::class])->name('discover_device');
-    Route::get('cmd/{device}/poll', [App\Http\Controllers\Ajax\ArtisanCommandController::class, 'poll'])->withoutMiddleware([StartSession::class])->name('poll_device');
+    Route::get('cmd/{device}/discover', [App\Http\Controllers\Ajax\ArtisanCommandController::class, 'discover'])->middleware([])->name('discover_device');
+    Route::get('cmd/{device}/poll', [App\Http\Controllers\Ajax\ArtisanCommandController::class, 'poll'])->middleware([])->name('poll_device');
 });
 
 // installation routes
