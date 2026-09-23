@@ -237,7 +237,7 @@ class SnmpQueryTest extends TestCase
         \Illuminate\Support\Facades\Event::assertDispatched(\App\Events\SnmpQueryExecuted::class, fn (\App\Events\SnmpQueryExecuted $event) => $event->target === $this->device->pollerTarget()
             && $event->method === 'snmpget'
             && $event->oids === ['sysDescr.0']
-            && is_float($event->duration)
+            && $event->duration >= 0
             && $event->device === $this->device
             && $event->response->command === ['/usr/bin/snmpget', 'sysDescr.0']
             && $event->response->values() === ['sysDescr.0' => 'Linux 6.0']);
