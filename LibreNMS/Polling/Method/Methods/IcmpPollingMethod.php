@@ -2,13 +2,14 @@
 
 namespace LibreNMS\Polling\Method\Methods;
 
+use App\Actions\Device\DeviceMtuTest;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Eventlog;
+use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
-use LibreNMS\Polling\Method\Probe\IcmpProbe;
-use LibreNMS\Polling\Method\Probe\ProbeResult;
+use LibreNMS\Polling\Method\ProbeResult;
 
 final class IcmpPollingMethod extends PollingMethod
 {
@@ -22,9 +23,26 @@ final class IcmpPollingMethod extends PollingMethod
         return true;
     }
 
-    public function probe(): IcmpProbe
+    public function probe(Device $device): ProbeResult
     {
-        return resolve(IcmpProbe::class);
+        $fping = app(Fping::class);
+        $status = $fping->ping($device->pollerTarget(), $device->ipFamily());
+        $hasDuplicates = $status->duplicates > 0;
+
+        if ($hasDuplicates) {
+            $status->ignoreFailure();
+        }
+
+        $mtuStatus = null;
+        if ($status->isAlive()) {
+            $mtuStatus = app(DeviceMtuTest::class)->execute($device);
+        }
+
+        return new ProbeResult($status->isAlive(), [
+            'duplicates' => $hasDuplicates,
+            'fping_status' => $status,
+            'mtu_status' => $mtuStatus,
+        ]);
     }
 
     public function config(DevicePollingMethod $deviceMethod): IcmpConfig

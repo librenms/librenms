@@ -181,7 +181,7 @@ class EditPollingController
             $testDevice = clone $device;
             $testDevice->setRelation('pollingMethods', $existingMethods->concat([$transientMethod]));
 
-            $probeResult = $method->check($testDevice);
+            $probeResult = $method->probe($testDevice);
 
             if (! $probeResult->isSuccess()) {
                 $errorDetails = $probeResult->errorMessage();
@@ -330,7 +330,7 @@ class EditPollingController
             $testDevice = clone $device;
             $testDevice->setRelation('pollingMethods', $existingMethods->concat([$transientMethod]));
 
-            $probeResult = $method->check($testDevice);
+            $probeResult = $method->probe($testDevice);
 
             if (! $probeResult->isSuccess()) {
                 $errorDetails = $probeResult->errorMessage();

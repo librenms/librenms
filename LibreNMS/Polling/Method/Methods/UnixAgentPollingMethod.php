@@ -7,7 +7,8 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\View\FieldSchema\FieldDefinition;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
-use LibreNMS\Polling\Method\Probe\UnixAgentProbe;
+use LibreNMS\Polling\Method\ProbeResult;
+use LibreNMS\Util\Rewrite;
 
 final class UnixAgentPollingMethod extends PollingMethod
 {
@@ -43,9 +44,25 @@ final class UnixAgentPollingMethod extends PollingMethod
         ];
     }
 
-    public function probe(): UnixAgentProbe
+    public function probe(Device $device): ProbeResult
     {
-        return resolve(UnixAgentProbe::class);
+        $config = $device->pollingMethodFor()->unixAgent();
+        $agent_port = $config->port;
+        $timeout = $config->timeout;
+        $poller_target = Rewrite::addIpv6Brackets($device->pollerTarget());
+
+        try {
+            $agent = @fsockopen($poller_target, $agent_port, $errno, $errstr, $timeout);
+            if ($agent) {
+                fclose($agent);
+
+                return ProbeResult::success(['port' => $agent_port, 'timeout' => $timeout]);
+            }
+        } catch (\Throwable) {
+            // return failure
+        }
+
+        return ProbeResult::failure(['port' => $agent_port, 'timeout' => $timeout]);
     }
 
     public function config(DevicePollingMethod $deviceMethod): UnixAgentConfig

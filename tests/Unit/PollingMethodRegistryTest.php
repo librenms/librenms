@@ -19,8 +19,7 @@ use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Polling\Method\PollingMethodAccessor;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
-use LibreNMS\Polling\Method\Probe\IcmpProbe;
-use LibreNMS\Polling\Method\Probe\SnmpProbe;
+use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Tests\TestCase;
 
 final class PollingMethodRegistryTest extends TestCase
@@ -54,9 +53,9 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertInstanceOf(SnmpPollingMethod::class, $snmpMethod);
         $this->assertInstanceOf(IcmpPollingMethod::class, $icmpMethodDef);
 
-        // 2. Method probe and check
-        $this->assertInstanceOf(SnmpProbe::class, $this->pollingMethods->get(PollingMethodType::Snmp)?->probe());
-        $this->assertInstanceOf(IcmpProbe::class, $this->pollingMethods->get(PollingMethodType::Icmp)?->probe());
+        // 2. Method probe
+        $this->assertInstanceOf(ProbeResult::class, $this->pollingMethods->get(PollingMethodType::Snmp)?->probe(new Device()));
+        $this->assertInstanceOf(ProbeResult::class, $this->pollingMethods->get(PollingMethodType::Icmp)?->probe(new Device()));
 
         // 3. secretType and hasSecret on PollingMethod instances
         $this->assertSame(\LibreNMS\Enum\SecretType::Snmp, $snmpMethod->secretType());

@@ -22,7 +22,7 @@ readonly class CheckDeviceAvailability
         foreach ($enabledPollingMethods as $deviceMethod) {
             try {
                 $method = $this->pollingMethods->require($deviceMethod->method_type);
-                $result = $method->check($device);
+                $result = $method->probe($device);
 
                 $deviceMethod->last_check_successful = $result->isSuccess();
                 $deviceMethod->last_checked_at = now();

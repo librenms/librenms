@@ -5,9 +5,10 @@ namespace LibreNMS\Polling\Method\Methods;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\View\FieldSchema\FieldDefinition;
+use LibreNMS\Data\Source\Ipmitool;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
-use LibreNMS\Polling\Method\Probe\IpmiProbe;
+use LibreNMS\Polling\Method\ProbeResult;
 
 final class IpmiPollingMethod extends PollingMethod
 {
@@ -49,9 +50,21 @@ final class IpmiPollingMethod extends PollingMethod
         ];
     }
 
-    public function probe(): IpmiProbe
+    public function probe(Device $device): ProbeResult
     {
-        return resolve(IpmiProbe::class);
+        $ipmi = Ipmitool::init($device);
+
+        if (! $ipmi) {
+            return ProbeResult::failure();
+        }
+
+        try {
+            $ipmi->command(['power', 'status']);
+
+            return ProbeResult::success();
+        } catch (\Throwable) {
+            return ProbeResult::failure();
+        }
     }
 
     public function secretType(): SecretType

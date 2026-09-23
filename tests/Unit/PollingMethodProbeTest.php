@@ -9,11 +9,7 @@ use App\Models\Secret;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\SecretDecryptionException;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
-use LibreNMS\Polling\Method\Probe\IcmpProbe;
-use LibreNMS\Polling\Method\Probe\IpmiProbe;
-use LibreNMS\Polling\Method\Probe\ProbeResult;
-use LibreNMS\Polling\Method\Probe\SnmpProbe;
-use LibreNMS\Polling\Method\Probe\UnixAgentProbe;
+use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Tests\TestCase;
 
 final class PollingMethodProbeTest extends TestCase
@@ -24,15 +20,16 @@ final class PollingMethodProbeTest extends TestCase
         config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]);
     }
 
-    public function testRegistryCreatesFreshProbeInstance(): void
+    public function testPollingMethodsReturnProbeResult(): void
     {
         /** @var \LibreNMS\Polling\Method\PollingMethodRegistry $registry */
         $registry = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class);
+        $device = new Device();
 
-        $this->assertInstanceOf(SnmpProbe::class, $registry->require(PollingMethodType::Snmp)->probe());
-        $this->assertInstanceOf(IcmpProbe::class, $registry->require(PollingMethodType::Icmp)->probe());
-        $this->assertInstanceOf(IpmiProbe::class, $registry->require(PollingMethodType::Ipmi)->probe());
-        $this->assertInstanceOf(UnixAgentProbe::class, $registry->require(PollingMethodType::UnixAgent)->probe());
+        $this->assertInstanceOf(ProbeResult::class, $registry->require(PollingMethodType::Snmp)->probe($device));
+        $this->assertInstanceOf(ProbeResult::class, $registry->require(PollingMethodType::Icmp)->probe($device));
+        $this->assertInstanceOf(ProbeResult::class, $registry->require(PollingMethodType::Ipmi)->probe($device));
+        $this->assertInstanceOf(ProbeResult::class, $registry->require(PollingMethodType::UnixAgent)->probe($device));
     }
 
     public function testUnixAgentProbeUsesResolvedConfigPortAndTimeout(): void
@@ -47,9 +44,9 @@ final class PollingMethodProbeTest extends TestCase
         $unixMethod->setRelation('device', $device);
         $device->setRelation('pollingMethods', collect([$unixMethod]));
 
-        $probe = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::UnixAgent)->probe();
+        $method = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::UnixAgent);
 
-        $result = $probe->check($device);
+        $result = $method->probe($device);
         $this->assertIsBool($result->isSuccess());
         $this->assertEquals(6556, $result->stat('port'));
         $this->assertEquals(5, $result->stat('timeout'));

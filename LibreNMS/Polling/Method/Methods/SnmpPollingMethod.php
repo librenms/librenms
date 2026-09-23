@@ -12,7 +12,7 @@ use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Modules\Core;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
-use LibreNMS\Polling\Method\Probe\ProbeResult;
+use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use SnmpQuery;
 
@@ -86,9 +86,20 @@ final class SnmpPollingMethod extends PollingMethod
         ];
     }
 
-    public function probe(): \LibreNMS\Polling\Method\Probe\SnmpProbe
+    public function probe(Device $device): ProbeResult
     {
-        return resolve(\LibreNMS\Polling\Method\Probe\SnmpProbe::class);
+        $response = SnmpQuery::device($device)->get('SNMPv2-MIB::sysObjectID.0');
+
+        $success = $response->getExitCode() === 0
+            || $response->getExitCode() === 2
+            || $response->isValid();
+
+        $error = (! $success) ? ($response->getErrorMessage() ?: ($response->stderr ?: null)) : null;
+
+        return new ProbeResult($success, [
+            'response' => $response,
+            'error' => $error,
+        ], $error);
     }
 
     public function secretType(): SecretType
@@ -129,7 +140,7 @@ final class SnmpPollingMethod extends PollingMethod
         // If a specific secret was supplied on the method, test that directly
         if ($deviceMethod->relationLoaded('secret') && $deviceMethod->secret !== null) {
             $testDevice->setRelation('pollingMethods', collect([$deviceMethod]));
-            $result = $this->check($testDevice);
+            $result = $this->probe($testDevice);
             if ($result->isSuccess()) {
                 return $result;
             }
@@ -160,7 +171,7 @@ final class SnmpPollingMethod extends PollingMethod
             $deviceMethod->secret_id = $secret->id;
             $testDevice->setRelation('pollingMethods', collect([$deviceMethod]));
 
-            $result = $this->check($testDevice);
+            $result = $this->probe($testDevice);
             if ($result->isSuccess()) {
                 return $result;
             }

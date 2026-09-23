@@ -8,8 +8,7 @@ use App\View\FieldSchema\HandlesFieldSchema;
 use App\View\FieldSchema\HasFieldSchema;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
-use LibreNMS\Polling\Method\Probe\PollingMethodProbe;
-use LibreNMS\Polling\Method\Probe\ProbeResult;
+use LibreNMS\Polling\Method\ProbeResult;
 
 abstract class PollingMethod implements HasFieldSchema
 {
@@ -40,12 +39,7 @@ abstract class PollingMethod implements HasFieldSchema
         return $this->secretType() !== null;
     }
 
-    abstract public function probe(): PollingMethodProbe;
-
-    public function check(Device $device): ProbeResult
-    {
-        return $this->probe()->check($device);
-    }
+    abstract public function probe(Device $device): ProbeResult;
 
     /**
      * Discover or validate a candidate polling method for a device.
@@ -55,7 +49,7 @@ abstract class PollingMethod implements HasFieldSchema
         $testDevice = clone $device;
         $testDevice->setRelation('pollingMethods', collect([$deviceMethod]));
 
-        return $this->check($testDevice);
+        return $this->probe($testDevice);
     }
 
     public function onProbeComplete(Device $device, ProbeResult $result, bool $commit = false): void

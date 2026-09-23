@@ -10,8 +10,7 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
-use LibreNMS\Polling\Method\Probe\PollingMethodProbe;
-use LibreNMS\Polling\Method\Probe\ProbeResult;
+use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 use SnmpQuery;
@@ -42,11 +41,11 @@ final class ConnectivityHelperTest extends TestCase
             ProbeResult::failure(),
         ];
 
-        $icmpProbeMock = Mockery::mock(PollingMethodProbe::class);
-        $icmpProbeMock->shouldReceive('check')->andReturn(...$icmpResults);
+        $icmpMethodMock = Mockery::mock(\LibreNMS\Polling\Method\Methods\PollingMethod::class);
+        $icmpMethodMock->shouldReceive('probe')->andReturn(...$icmpResults);
 
-        $snmpProbeMock = Mockery::mock(PollingMethodProbe::class);
-        $snmpProbeMock->shouldReceive('check')->andReturn(...$snmpResults);
+        $snmpMethodMock = Mockery::mock(\LibreNMS\Polling\Method\Methods\PollingMethod::class);
+        $snmpMethodMock->shouldReceive('probe')->andReturn(...$snmpResults);
 
         $device = new Device();
         $icmpMethod = new DevicePollingMethod([
@@ -66,8 +65,8 @@ final class ConnectivityHelperTest extends TestCase
         $device->setRelation('pollingMethods', collect([$icmpMethod, $snmpMethod]));
 
         $this->swap(CheckDeviceAvailability::class, new CheckDeviceAvailabilityMock([
-            'icmp' => $icmpProbeMock,
-            'snmp' => $snmpProbeMock,
+            'icmp' => $icmpMethodMock,
+            'snmp' => $snmpMethodMock,
         ]));
 
         /** ping and snmp enabled */
@@ -194,15 +193,15 @@ final class ConnectivityHelperTest extends TestCase
         $ipmiMethod = new DevicePollingMethod();
         $unixAgentMethod = new DevicePollingMethod();
 
-        $ipmiProbeMock = Mockery::mock(PollingMethodProbe::class);
-        $ipmiProbeMock->shouldReceive('check')->andReturn(ProbeResult::success(), ProbeResult::failure());
+        $ipmiMethodMock = Mockery::mock(\LibreNMS\Polling\Method\Methods\PollingMethod::class);
+        $ipmiMethodMock->shouldReceive('probe')->andReturn(ProbeResult::success(), ProbeResult::failure());
 
-        $unixAgentProbeMock = Mockery::mock(PollingMethodProbe::class);
-        $unixAgentProbeMock->shouldReceive('check')->andReturn(ProbeResult::success(), ProbeResult::failure());
+        $unixAgentMethodMock = Mockery::mock(\LibreNMS\Polling\Method\Methods\PollingMethod::class);
+        $unixAgentMethodMock->shouldReceive('probe')->andReturn(ProbeResult::success(), ProbeResult::failure());
 
         $this->swap(CheckDeviceAvailability::class, new CheckDeviceAvailabilityMock([
-            'ipmi' => $ipmiProbeMock,
-            'unix-agent' => $unixAgentProbeMock,
+            'ipmi' => $ipmiMethodMock,
+            'unix-agent' => $unixAgentMethodMock,
         ]));
 
         $device = new Device();
@@ -263,18 +262,18 @@ final class ConnectivityHelperTest extends TestCase
             maxOid: 10
         );
 
-        $probe = app(PollingMethodRegistry::class)->require(PollingMethodType::Snmp)->probe();
+        $snmpMethod = app(PollingMethodRegistry::class)->require(PollingMethodType::Snmp);
 
-        $this->assertTrue($probe->check($device)->isSuccess());
-        $this->assertTrue($probe->check($device)->isSuccess());
-        $this->assertTrue($probe->check($device)->isSuccess());
-        $this->assertFalse($probe->check($device)->isSuccess());
+        $this->assertTrue($snmpMethod->probe($device)->isSuccess());
+        $this->assertTrue($snmpMethod->probe($device)->isSuccess());
+        $this->assertTrue($snmpMethod->probe($device)->isSuccess());
+        $this->assertFalse($snmpMethod->probe($device)->isSuccess());
     }
 }
 
 class CheckDeviceAvailabilityMock
 {
-    public function __construct(private array $probeMocks)
+    public function __construct(private array $methodMocks)
     {
     }
 
@@ -285,10 +284,10 @@ class CheckDeviceAvailabilityMock
 
         foreach ($enabledPollingMethods as $deviceMethod) {
             $typeKey = $deviceMethod->method_type instanceof PollingMethodType ? $deviceMethod->method_type->value : (string) $deviceMethod->method_type;
-            $probeMock = $this->probeMocks[$typeKey] ?? null;
+            $methodMock = $this->methodMocks[$typeKey] ?? null;
 
-            if ($probeMock) {
-                $result = $probeMock->check($device);
+            if ($methodMock) {
+                $result = $methodMock->probe($device);
                 $deviceMethod->last_check_successful = $result->isSuccess();
                 $deviceMethod->last_checked_at = now();
             }
