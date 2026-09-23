@@ -30,8 +30,14 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Alert;
 use App\Models\AlertOperationSegment;
 use App\Models\AlertRule;
+use App\Models\BgpPeer;
 use App\Models\DeviceGroup;
+use App\Models\Mempool;
+use App\Models\Processor;
+use App\Models\Sensor;
 use App\Models\User;
+use App\Models\WirelessSensor;
+use Illuminate\Database\Eloquent\Model;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
@@ -97,11 +103,100 @@ class AlertUtil
     }
 
     /**
+     * Stable entity identity for alert rule rows (alert_problems.entity_key / morph resolution).
+     * Ordered: first matching profile wins. Add entries here instead of one-off row checks.
+     *
+     * @return list<array{
+     *     key_prefix: string,
+     *     trigger: string,
+     *     columns: list<string>,
+     *     model?: class-string<Model>|null,
+     *     alias?: string|null,
+     *     id_column?: string|null,
+     *     lookup_columns?: list<string>|null,
+     *     skip_if_model_matches?: class-string<Model>|null,
+     *     entity_only?: bool,
+     * }>
+     */
+    private static function entityIdentityRegistry(): array
+    {
+        return [
+            [
+                'key_prefix' => 'bgppeer',
+                'trigger' => 'bgpPeerIdentifier',
+                'columns' => ['device_id', 'context_name', 'bgpPeerIdentifier'],
+                'model' => BgpPeer::class,
+                'alias' => 'bgppeer',
+                'id_column' => 'bgpPeer_id',
+                'lookup_columns' => ['device_id', 'context_name', 'bgpPeerIdentifier'],
+            ],
+            [
+                'key_prefix' => 'sensor',
+                'trigger' => 'sensor_index',
+                'columns' => ['device_id', 'poller_type', 'sensor_class', 'sensor_type', 'sensor_index'],
+                'model' => Sensor::class,
+                'alias' => 'sensor',
+                'id_column' => 'sensor_id',
+                'lookup_columns' => ['poller_type', 'sensor_class', 'sensor_type', 'sensor_index'],
+                'skip_if_model_matches' => WirelessSensor::class,
+            ],
+            [
+                'key_prefix' => 'wireless_sensor',
+                'trigger' => 'sensor_index',
+                'columns' => ['device_id', 'poller_type', 'sensor_class', 'sensor_type', 'sensor_index'],
+                'model' => WirelessSensor::class,
+                'alias' => null,
+                'id_column' => 'sensor_id',
+                'lookup_columns' => ['poller_type', 'sensor_class', 'sensor_type', 'sensor_index'],
+                'entity_only' => true,
+            ],
+            [
+                'key_prefix' => 'mempool',
+                'trigger' => 'mempool_index',
+                'columns' => ['device_id', 'mempool_type', 'mempool_class', 'mempool_index'],
+                'model' => Mempool::class,
+                'alias' => 'mempool',
+                'id_column' => 'mempool_id',
+                'lookup_columns' => ['mempool_type', 'mempool_class', 'mempool_index'],
+            ],
+            [
+                'key_prefix' => 'processor',
+                'trigger' => 'processor_index',
+                'columns' => ['device_id', 'processor_type', 'processor_index'],
+                'model' => Processor::class,
+                'alias' => 'processor',
+                'id_column' => 'processor_id',
+                'lookup_columns' => ['processor_type', 'processor_index'],
+            ],
+        ];
+    }
+
+    /**
+     * Stable reconciliation key for a rule result row (stored as alert_problems.entity_key).
+     *
+     * @param  array<string, mixed>  $row
+     */
+    public static function faultKeyForRow(array $row): string
+    {
+        $profile = self::matchIdentityProfile($row, forEntityKey: true);
+        if ($profile !== null) {
+            return self::faultKeyFromProfile($row, $profile);
+        }
+
+        return self::generateComparisonKeyForFault($row, self::extractIdFieldsForFault($row));
+    }
+
+    /**
      * @param  array<string, mixed>  $row
      * @return array{0: ?string, 1: ?int}
      */
     public static function entityForFault(array $row): array
     {
+        $profile = self::matchIdentityProfile($row, forEntityKey: false);
+        if ($profile !== null) {
+            return self::entityFromProfile($row, $profile);
+        }
+
         foreach (self::ENTITY_COLUMN_MAP as $column => $alias) {
             if (! empty($row[$column])) {
                 return [$alias, (int) $row[$column]];
@@ -120,6 +215,138 @@ class AlertUtil
         }
 
         return [null, null];
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     * @return array<string, mixed>|null
+     */
+    private static function matchIdentityProfile(array $row, bool $forEntityKey): ?array
+    {
+        foreach (self::entityIdentityRegistry() as $profile) {
+            if (($profile['entity_only'] ?? false) && $forEntityKey) {
+                continue;
+            }
+
+            if (! self::identityTriggerPresent($row, $profile['trigger'])) {
+                continue;
+            }
+
+            if (! $forEntityKey) {
+                $skipModel = $profile['skip_if_model_matches'] ?? null;
+                if ($skipModel !== null && self::lookupEntityPrimaryKey($skipModel, $row, self::lookupColumnsForProfile($profile)) !== null) {
+                    continue;
+                }
+            }
+
+            return $profile;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     * @param  array<string, mixed>  $profile
+     */
+    private static function identityTriggerPresent(array $row, string $trigger): bool
+    {
+        if (! array_key_exists($trigger, $row)) {
+            return false;
+        }
+
+        $value = $row[$trigger];
+
+        return $value !== null && $value !== '';
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     * @param  array<string, mixed>  $profile
+     */
+    private static function faultKeyFromProfile(array $row, array $profile): string
+    {
+        $parts = [(string) $profile['key_prefix']];
+        foreach ($profile['columns'] as $column) {
+            $parts[] = (string) ($row[$column] ?? '');
+        }
+
+        return implode('|', $parts);
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     * @param  array<string, mixed>  $profile
+     * @return array{0: ?string, 1: ?int}
+     */
+    private static function entityFromProfile(array $row, array $profile): array
+    {
+        $alias = $profile['alias'] ?? null;
+        $modelClass = $profile['model'] ?? null;
+        if ($modelClass !== null) {
+            $entityId = self::lookupEntityPrimaryKey($modelClass, $row, self::lookupColumnsForProfile($profile));
+            if ($entityId !== null && $alias !== null) {
+                return [$alias, $entityId];
+            }
+        }
+
+        $idColumn = $profile['id_column'] ?? null;
+        if ($alias !== null && $idColumn !== null && ! empty($row[$idColumn])) {
+            return [$alias, (int) $row[$idColumn]];
+        }
+
+        return [null, null];
+    }
+
+    /**
+     * @param  array<string, mixed>  $profile
+     * @return list<string>
+     */
+    private static function lookupColumnsForProfile(array $profile): array
+    {
+        return $profile['lookup_columns'] ?? $profile['columns'];
+    }
+
+    /**
+     * @param  class-string<Model>  $modelClass
+     * @param  array<string, mixed>  $row
+     * @param  list<string>  $identityColumns
+     */
+    private static function lookupEntityPrimaryKey(string $modelClass, array $row, array $identityColumns): ?int
+    {
+        $deviceId = (int) ($row['device_id'] ?? 0);
+        if ($deviceId <= 0) {
+            return null;
+        }
+
+        try {
+            $query = $modelClass::query()->where('device_id', $deviceId);
+
+            foreach ($identityColumns as $field) {
+                if ($field === 'device_id') {
+                    continue;
+                }
+                if (! array_key_exists($field, $row)) {
+                    continue;
+                }
+                $value = $row[$field];
+                if ($field === 'context_name' && ($value === null || $value === '')) {
+                    $query->where(function ($q): void {
+                        $q->where('context_name', '')->orWhereNull('context_name');
+                    });
+                    continue;
+                }
+                if ($value !== null && $value !== '') {
+                    $query->where($field, $value);
+                }
+            }
+
+            $id = $query->value((new $modelClass)->getKeyName());
+
+            return $id !== null ? (int) $id : null;
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     /**

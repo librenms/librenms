@@ -147,7 +147,7 @@ readonly class AlertRules
                 $faulting[''] = ['type' => null, 'id' => null, 'rows' => $rows];
             } else {
                 foreach ($rows as $row) {
-                    $key = AlertUtil::generateComparisonKeyForFault($row, AlertUtil::extractIdFieldsForFault($row));
+                    $key = AlertUtil::faultKeyForRow($row);
                     if (! isset($faulting[$key])) {
                         [$type, $id] = AlertUtil::entityForFault($row);
                         $faulting[$key] = ['type' => $type, 'id' => $id, 'rows' => []];
@@ -172,6 +172,10 @@ readonly class AlertRules
                 $problem->details = $details;
                 $problem->severity = $rule->severity;
                 $problem->last_seen = $now;
+                if ($info['type'] !== null && $info['id'] !== null) {
+                    $problem->entity_type = $info['type'];
+                    $problem->entity_id = $info['id'];
+                }
                 $problem->save();
                 unset($existing[$key]);
                 Log::info('Status: %bNOCHG%n', ['color' => true]);
@@ -237,7 +241,7 @@ readonly class AlertRules
 
         $alertRow = Alert::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)->first();
         $prevState = $alertRow?->state;
-        $prevCount = $alertRow?->open_problem_count ?? 0;
+        $prevCount = $alertRow !== null ? (int) $alertRow->open_problem_count : 0;
 
         if ($activeCount == 0) {
             $newState = AlertState::RECOVERED;
@@ -277,7 +281,7 @@ readonly class AlertRules
             $alertRow->open = 1;
             $alertRow->alerted = 0;
             $alertRow->open_problem_count = $activeCount;
-            $alertRow->info = '[]';
+            $alertRow->info = [];
             $alertRow->save();
         }
     }
