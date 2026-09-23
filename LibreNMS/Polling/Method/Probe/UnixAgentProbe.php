@@ -10,8 +10,8 @@ class UnixAgentProbe extends PollingMethodProbe
     public function check(Device $device): ProbeResult
     {
         $config = $device->pollingMethodFor()->unixAgent();
-        $agent_port = $config ? $config->port : 6556;
-        $timeout = $config ? $config->timeout : 10;
+        $agent_port = $config->port;
+        $timeout = $config->timeout;
         $poller_target = Rewrite::addIpv6Brackets($device->pollerTarget());
 
         try {

@@ -168,14 +168,16 @@ final class PollingMethodRegistryTest extends TestCase
         $accessor = new PollingMethodAccessor($device, $this->pollingMethods);
         $this->assertInstanceOf(SnmpConfig::class, $accessor->get(PollingMethodType::Snmp));
         $this->assertInstanceOf(IcmpConfig::class, $accessor->get(PollingMethodType::Icmp));
-        $this->assertNull($accessor->get(PollingMethodType::Ipmi));
-        $this->assertNull($accessor->get(PollingMethodType::UnixAgent));
+        $this->assertInstanceOf(IpmiConfig::class, $accessor->get(PollingMethodType::Ipmi));
+        $this->assertInstanceOf(UnixAgentConfig::class, $accessor->get(PollingMethodType::UnixAgent));
 
         // Test dedicated accessor methods
         $this->assertTrue($accessor->snmp()->isEnabled());
         $this->assertFalse($accessor->icmp()->isEnabled());
-        $this->assertNull($accessor->ipmi());
-        $this->assertNull($accessor->unixAgent());
+        $this->assertFalse($accessor->ipmi()->isEnabled());
+        $this->assertFalse($accessor->unixAgent()->isEnabled());
+        $this->assertInstanceOf(IpmiConfig::class, $accessor->ipmi());
+        $this->assertInstanceOf(UnixAgentConfig::class, $accessor->unixAgent());
 
         // With methods attached
         $deviceWithMethods = new Device(['hostname' => '192.0.2.1']);
@@ -196,7 +198,9 @@ final class PollingMethodRegistryTest extends TestCase
 
         $accessorWithMethods = new PollingMethodAccessor($deviceWithMethods, $this->pollingMethods);
         $this->assertInstanceOf(IpmiConfig::class, $accessorWithMethods->ipmi());
+        $this->assertTrue($accessorWithMethods->ipmi()->isEnabled());
         $this->assertInstanceOf(UnixAgentConfig::class, $accessorWithMethods->unixAgent());
+        $this->assertTrue($accessorWithMethods->unixAgent()->isEnabled());
     }
 
     public function testActionClassesAcceptConstructorInjectedRegistry(): void

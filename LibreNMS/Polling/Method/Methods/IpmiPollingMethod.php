@@ -64,8 +64,19 @@ final class IpmiPollingMethod extends PollingMethod
         return IpmiConfig::fromPollingMethod($deviceMethod);
     }
 
-    public function fallbackConfig(Device $device): ?IpmiConfig
+    public function fallbackConfig(Device $device): IpmiConfig
     {
-        return null;
+        return new IpmiConfig(
+            enabled: false,
+            affectsAvailability: false,
+            username: '',
+            password: '',
+            kgKey: '',
+            hostname: (string) $device->hostname,
+            port: 623,
+            cipherSuite: 0,
+            timeout: 3,
+            type: '',
+        );
     }
 }

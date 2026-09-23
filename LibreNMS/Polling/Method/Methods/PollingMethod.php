@@ -68,8 +68,5 @@ abstract class PollingMethod implements HasFieldSchema
 
     abstract public function config(DevicePollingMethod $deviceMethod): PollingMethodConfig;
 
-    public function fallbackConfig(Device $device): ?PollingMethodConfig
-    {
-        return null;
-    }
+    abstract public function fallbackConfig(Device $device): PollingMethodConfig;
 }

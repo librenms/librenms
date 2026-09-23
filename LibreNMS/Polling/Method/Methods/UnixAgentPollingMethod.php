@@ -49,8 +49,13 @@ final class UnixAgentPollingMethod extends PollingMethod
         return \LibreNMS\Polling\Method\Config\UnixAgentConfig::fromPollingMethod($deviceMethod);
     }
 
-    public function fallbackConfig(\App\Models\Device $device): ?\LibreNMS\Polling\Method\Config\UnixAgentConfig
+    public function fallbackConfig(\App\Models\Device $device): \LibreNMS\Polling\Method\Config\UnixAgentConfig
     {
-        return null;
+        return new \LibreNMS\Polling\Method\Config\UnixAgentConfig(
+            enabled: false,
+            affectsAvailability: false,
+            port: (int) LibrenmsConfig::get('unix-agent.port', 6556),
+            timeout: (int) LibrenmsConfig::get('unix-agent.connection-timeout', 10),
+        );
     }
 }

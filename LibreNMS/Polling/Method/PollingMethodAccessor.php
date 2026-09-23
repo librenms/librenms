@@ -42,15 +42,15 @@ readonly class PollingMethodAccessor
         return $this->get(PollingMethodType::Icmp);
     }
 
-    public function ipmi(): ?IpmiConfig
+    public function ipmi(): IpmiConfig
     {
-        /** @var ?IpmiConfig */
+        /** @var IpmiConfig */
         return $this->get(PollingMethodType::Ipmi);
     }
 
-    public function unixAgent(): ?UnixAgentConfig
+    public function unixAgent(): UnixAgentConfig
     {
-        /** @var ?UnixAgentConfig */
+        /** @var UnixAgentConfig */
         return $this->get(PollingMethodType::UnixAgent);
     }
 }
