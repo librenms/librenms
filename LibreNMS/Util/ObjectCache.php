@@ -42,7 +42,6 @@ use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\Vrf;
 use Cache;
-use Illuminate\Support\Collection;
 use LibreNMS\Enum\Sensor as SensorEnum;
 
 class ObjectCache
@@ -51,17 +50,20 @@ class ObjectCache
 
     public static function applications()
     {
-        return Cache::remember('ObjectCache:applications_list:' . auth()->id(), self::$cache_time, function () {
+        // cache plain arrays, then re-hydrate: models must not be serialized into the cache
+        $applications = Cache::remember('ObjectCache:applications_list:' . auth()->id(), self::$cache_time, function () {
             $user = auth()->user(); /** @var \App\Models\User $user */
-            $applications = Application::hasAccess($user)
+
+            return Application::hasAccess($user)
                 ->select(['app_type', 'app_state', 'app_instance'])
                 ->groupBy('app_type', 'app_state', 'app_instance')
-                ->get(); /** @var Collection $applications */
-
-            return $applications
+                ->get()
                 ->sortBy('show_name', SORT_NATURAL | SORT_FLAG_CASE)
-                ->groupBy('app_type');
+                ->values()
+                ->toArray();
         });
+
+        return Application::hydrate($applications)->groupBy('app_type');
     }
 
     public static function routing()
