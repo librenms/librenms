@@ -1,0 +1,28 @@
+os: almalinux
+text: AlmaLinux
+type: server
+group: unix
+icon: almalinux
+ifXmcbc: true
+ifname: true
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+poller_modules:
+    bgp-peers: false
+    ospf: false
+    stp: false
+discovery_modules:
+    applications: true
+    bgp-peers: false
+    stp: false
+    vminfo: true
+processor_stacked: true
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        snmpget:
+            oid: .1.3.6.1.4.1.8072.1.3.2.3.1.1.17.97.108.109.97.108.105.110.117.120.45.114.101.108.101.97.115.101
+            op: starts
+            value: 'ID="almalinux"'
