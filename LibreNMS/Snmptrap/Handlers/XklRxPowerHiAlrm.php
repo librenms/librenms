@@ -45,8 +45,8 @@ class XklRxPowerHiAlrm implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $rxPower = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportReceivePower'));
-        $rxHiAlarm = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportRxPowerHiAlrmThresh'));
+        $rxPower = XklTrapUtil::removeUnits($trap->getOidData($trap->findOid('XKL-MIB::xklTransportReceivePower')));
+        $rxHiAlarm = XklTrapUtil::removeUnits($trap->getOidData($trap->findOid('XKL-MIB::xklTransportRxPowerHiAlrmThresh')));
         $xcvrDescr = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportDescr'));
 
         $message = "Transciever $xcvrDescr is above recieve alarm threshold $rxHiAlarm. Current value: $rxPower";

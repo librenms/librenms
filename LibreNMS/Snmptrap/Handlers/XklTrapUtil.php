@@ -1,9 +1,10 @@
 <?php
-
 /**
- * XklRxPowerOK.php
+ * XklTrapUtil.php
  *
  * -Description-
+ *
+ * Utility class for handling XKL traps
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,33 +22,35 @@
  * @link       http://librenms.org
  *
  * @copyright  2026 Heath Barnhart
- * @author     Heath Barnhart <your email>
+ * @author     Heath Barnhart hbarnhart@kanren.net
  */
 
 namespace LibreNMS\Snmptrap\Handlers;
 
-use App\Models\Device;
-use LibreNMS\Enum\Severity;
-use LibreNMS\Interfaces\SnmptrapHandler;
-use LibreNMS\Snmptrap\Trap;
-
-class XklRxPowerOK implements SnmptrapHandler
+class XklTrapUtil
 {
     /**
-     * Handle snmptrap.
-     * Data is pre-parsed and delivered as a Trap.
+     * Get the value, applies the unit divsor from MIB, and returns float with units
      *
-     * @param  Device  $device
-     * @param  Trap  $trap
-     * @return void
+     * @param string $value
+     * @return string
      */
-    public function handle(Device $device, Trap $trap)
+    public static function removeUnits($value)
     {
-        $xcvrDescr = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportDescr.33'));
-        $rxPower = XklTrapUtil::removeUnits($trap->getOidData($trap->findOid('XKL-MIB::xklTransportReceivePower')));
+        if ($value) {
+            preg_match('/(-?\d+)\s(\d+)\/(\d+)\s(\S*)/', $value, $matches);
+            $base = (int)$matches[1];
+            $numerator = (int)$matches[2];
+            $denominator = (int)$matches[3];
+            $unit = trim($matches[4]);
 
-        $message = "Transciever $xcvrDescr receive power OK. Current value: $rxPower";
+            $multiplier = $numerator / $denominator;
 
-        $trap->log($message, Severity::Ok);
+            $value = ($base * $multiplier) . " $unit";
+        } else {
+            $value = "N/A";
+        }
+
+        return $value;
     }
 }
