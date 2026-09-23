@@ -90,19 +90,19 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertNull(\LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for('nonexistent'));
         $this->assertNull(\LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for(null));
 
-        // DevicePollingMethod secretData
+        // 4. Method config translation from DevicePollingMethod + Secret
         $snmpDeviceMethod = new DevicePollingMethod([
             'method_type' => PollingMethodType::Snmp,
+            'enabled' => true,
+            'affects_availability' => true,
         ]);
         $snmpDeviceMethod->setRelation('secret', new \App\Models\Secret([
             'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
             'data' => ['community' => 'public'],
         ]));
-        $secretData = $snmpDeviceMethod->secretData($this->pollingMethods);
-        $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Data\SnmpSecretData::class, $secretData);
-        $this->assertSame('public', $secretData->community);
+        $snmpConfig = $snmpMethod->config($snmpDeviceMethod);
+        $this->assertSame('public', $snmpConfig->community);
 
-        // 4. Method config
         $icmpDeviceMethod = new DevicePollingMethod([
             'method_type' => PollingMethodType::Icmp,
             'enabled' => true,
