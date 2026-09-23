@@ -57,11 +57,11 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
 SNMPv2-MIB::snmpTrapOID.0 XKL-MIB::xklRxPowerLoWarn
 XKL-MIB::xklTransportIndex.33 33
 XKL-MIB::xklTransportDescr.33 Wave 0 (N/A)
-XKL-MIB::xklTransportReceivePower.33 -135 1/10 dBm
-XKL-MIB::xklTransportRxPowerLoWarnThresh.33 -230 1/10 dBm
+XKL-MIB::xklTransportReceivePower.33 -205 1/10 dBm
+XKL-MIB::xklTransportRxPowerLoWarnThresh.33 -180 1/10 dBm
 TRAP,
 
-            'Transciever Wave 0 (N/A) is below recieve warning threshold -2.3 dBM. Current value: -1.35 dBm',
+            'Transciever Wave 0 (N/A) is below recieve warning threshold -18 dBm. Current value: -20.5 dBm',
             'Failed to handle XklRxPowerLoWarn trap.',
             [Severity::Warning],
         );
@@ -80,7 +80,7 @@ XKL-MIB::xklTransportReceivePower.33 -400 1/10 dBm
 XKL-MIB::xklTransportRxPowerLoAlrmThresh.33 -282 1/10 dBm
 TRAP,
 
-            'Transciever Wave 0 (N/A) is below recieve alarm threshold -2.82 dBm. Current value: -40 dBm',
+            'Transciever Wave 0 (N/A) is below recieve alarm threshold -28.2 dBm. Current value: -40 dBm',
             'Failed to handle XklRxPowerLoAlrm trap.',
             [Severity::Error],
         );
@@ -92,14 +92,14 @@ TRAP,
 {{ hostname }}
 UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:4:53:43.00
-SNMPv2-MIB::snmpTrapOID.0 XKL-MIB::xklRxPowerHiWan
+SNMPv2-MIB::snmpTrapOID.0 XKL-MIB::xklRxPowerHiWarn
 XKL-MIB::xklTransportIndex.33 33
 XKL-MIB::xklTransportDescr.33 Wave 0 (N/A)
 XKL-MIB::xklTransportReceivePower.33 -5 1/10 dBm
-XKL-MIB::xklTransportRxPowerLoAlrmThresh.33 -10 1/10 dBm
+XKL-MIB::xklTransportRxPowerHiWarnThresh.33 -10 1/10 dBm
 TRAP,
 
-            'Transciever Wave 0 (N/A) is below recieve warning threshold -1 dBm. Current value: -.5 dBm',
+            'Transciever Wave 0 (N/A) is above recieve warning threshold -1 dBm. Current value: -0.5 dBm',
             'Failed to handle XklRxPowerHiWarn trap.',
             [Severity::Warning],
         );
@@ -115,7 +115,7 @@ SNMPv2-MIB::snmpTrapOID.0 XKL-MIB::xklRxPowerHiAlrm
 XKL-MIB::xklTransportIndex.33 33"
 XKL-MIB::xklTransportDescr.33 Wave 0 (N/A)
 XKL-MIB::xklTransportReceivePower.33 20 1/10 dBm
-XKL-MIB::xklTransportRxPowerLoAlrmThresh.33 10 1/10 dBm
+XKL-MIB::xklTransportRxPowerHiAlrmThresh.33 10 1/10 dBm
 TRAP,
 
             'Transciever Wave 0 (N/A) is above recieve alarm threshold 1 dBm. Current value: 2 dBm',

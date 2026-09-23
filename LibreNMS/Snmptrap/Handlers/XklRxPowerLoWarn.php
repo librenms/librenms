@@ -46,7 +46,7 @@ class XklRxPowerLoWarn implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $rxPower = XklTrapUtil::removeUnits($trap->getOidData($trap->findOid('XKL-MIB::xklTransportReceivePower')));
-        $rxLoWarn = XklTrapUtil::removeUnits($trap->getOidData($trap->findOid('XKL-MIB::xklTransportRxPowerLoAlrmThresh')));
+        $rxLoWarn = XklTrapUtil::removeUnits($trap->getOidData($trap->findOid('XKL-MIB::xklTransportRxPowerLoWarnThresh')));
         $xcvrDescr = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportDescr'));
 
         $message = "Transciever $xcvrDescr is below recieve warning threshold $rxLoWarn. Current value: $rxPower";

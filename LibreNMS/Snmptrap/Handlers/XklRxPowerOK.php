@@ -43,7 +43,7 @@ class XklRxPowerOK implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $xcvrDescr = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportDescr.33'));
+        $xcvrDescr = $trap->getOidData($trap->findOid('XKL-MIB::xklTransportDescr'));
         $rxPower = XklTrapUtil::removeUnits($trap->getOidData($trap->findOid('XKL-MIB::xklTransportReceivePower')));
 
         $message = "Transciever $xcvrDescr receive power OK. Current value: $rxPower";
