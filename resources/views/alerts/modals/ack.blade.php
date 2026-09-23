@@ -54,7 +54,7 @@
         var ack_until_clear = $("#ack_until_clear").bootstrapSwitch('state');
         $.ajax({
             type: "POST",
-            url: @json(url('alert/__PROBLEM_ID__/ack')).replace('__PROBLEM_ID__', ack_alert_id),
+            url: @json(url('alert/__FAULT_ID__/ack')).replace('__FAULT_ID__', ack_alert_id),
             dataType: "json",
             data: {
                 state: ack_alert_state,

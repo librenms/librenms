@@ -103,7 +103,7 @@ class AlertUtil
     }
 
     /**
-     * Stable entity identity for alert rule rows (alert_problems.entity_key / morph resolution).
+     * Stable entity identity for alert rule rows (alert_faults.entity_key / morph resolution).
      * Ordered: first matching profile wins. Add entries here instead of one-off row checks.
      *
      * @return list<array{
@@ -172,7 +172,7 @@ class AlertUtil
     }
 
     /**
-     * Stable reconciliation key for a rule result row (stored as alert_problems.entity_key).
+     * Stable reconciliation key for a rule result row (stored as alert_faults.entity_key).
      *
      * @param  array<string, mixed>  $row
      */

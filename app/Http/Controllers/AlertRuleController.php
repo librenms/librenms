@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AlertRuleRequest;
 use App\Models\Alert;
-use App\Models\AlertProblem;
+use App\Models\AlertFault;
 use App\Models\AlertRule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -111,10 +111,10 @@ class AlertRuleController extends Controller
         $success = $alertRule->save();
 
         if ($success && $alertRule->disabled) {
-            AlertProblem::where('rule_id', $alertRule->id)->where('open', 1)
+            AlertFault::where('rule_id', $alertRule->id)->where('open', 1)
                 ->update(['open' => 0, 'state' => AlertState::RECOVERED]);
             Alert::where('rule_id', $alertRule->id)
-                ->update(['state' => AlertState::CLEAR, 'open' => 0, 'alerted' => 0, 'open_problem_count' => 0]);
+                ->update(['state' => AlertState::CLEAR, 'open' => 0, 'alerted' => 0, 'open_fault_count' => 0]);
         }
 
         return response()->json(['status' => $success ? 200 : 422], $success ? 200 : 422);

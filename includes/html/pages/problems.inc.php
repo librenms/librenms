@@ -1,34 +1,4 @@
 <?php
-/*
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.  Please see LICENSE.txt at the top level of
- * the source code distribution for details.
- *
- * @package    LibreNMS
- * @subpackage webui
- * @link       https://www.librenms.org
- * @copyright  2017 LibreNMS
- * @author     LibreNMS Contributors
-*/
 
-$no_refresh = true;
-$page_title = 'Problems';
-?>
-
-<div class="panel panel-default panel-condensed">
-    <div class="panel-heading">
-        <strong>Problems</strong>
-    </div>
-
-    <?php
-    $device['device_id'] = '-1';
-    echo view('alerts.modals.details')->render();
-    echo view('alerts.modals.notes')->render();
-    echo view('alerts.modals.ack')->render();
-    require_once 'includes/html/common/alerts.inc.php';
-    echo implode('', $common_output);
-    unset($device['device_id']);
-    ?>
-</div>
+// Backwards-compatible alias: /problems redirects to the Faults page.
+require 'includes/html/pages/faults.inc.php';

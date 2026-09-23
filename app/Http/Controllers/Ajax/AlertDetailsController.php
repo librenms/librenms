@@ -40,14 +40,14 @@ class AlertDetailsController
 
         $details = $alertLog->details['rule'] ?? null;
 
-        if ($alertLog->problem_id && $alertLog->rule && ! $alertLog->rule->notify_per_entity) {
+        if ($alertLog->fault_id && $alertLog->rule && ! $alertLog->rule->notify_per_entity) {
             $rows = [];
             $siblings = AlertLog::query()
                 ->where('device_id', $alertLog->device_id)
                 ->where('rule_id', $alertLog->rule_id)
                 ->where('state', $alertLog->state->value)
                 ->where('time_logged', $alertLog->time_logged)
-                ->whereNotNull('problem_id')
+                ->whereNotNull('fault_id')
                 ->get(['id', 'details']);
             foreach ($siblings as $sibling) {
                 foreach ((array) ($sibling->details['rule'] ?? []) as $row) {

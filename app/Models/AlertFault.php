@@ -1,9 +1,9 @@
 <?php
 
 /**
- * app/Models/AlertProblem.php
+ * app/Models/AlertFault.php
  *
- * Model for access to alert_problems table data. A problem is a per-entity incident
+ * Model for access to alert_faults table data. A fault is a per-entity incident
  * created when an alert rule matches; its state changes are recorded in alert_log.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,10 +46,10 @@ use LibreNMS\Enum\AlertState;
  * @property array<string, mixed> $info
  * @property array<string, mixed> $details
  */
-class AlertProblem extends DeviceRelatedModel
+class AlertFault extends DeviceRelatedModel
 {
     public $timestamps = false;
-    protected $table = 'alert_problems';
+    protected $table = 'alert_faults';
 
     protected $casts = [
         'info' => 'array',
@@ -62,8 +62,8 @@ class AlertProblem extends DeviceRelatedModel
     // ---- Query scopes ----
 
     /**
-     * @param  Builder<AlertProblem>  $query
-     * @return Builder<AlertProblem>
+     * @param  Builder<AlertFault>  $query
+     * @return Builder<AlertFault>
      */
     public function scopeOpen($query): Builder
     {
@@ -71,8 +71,8 @@ class AlertProblem extends DeviceRelatedModel
     }
 
     /**
-     * @param  Builder<AlertProblem>  $query
-     * @return Builder<AlertProblem>
+     * @param  Builder<AlertFault>  $query
+     * @return Builder<AlertFault>
      */
     public function scopeActive($query): Builder
     {
@@ -80,8 +80,8 @@ class AlertProblem extends DeviceRelatedModel
     }
 
     /**
-     * @param  Builder<AlertProblem>  $query
-     * @return Builder<AlertProblem>
+     * @param  Builder<AlertFault>  $query
+     * @return Builder<AlertFault>
      */
     public function scopeAcknowledged($query): Builder
     {
@@ -103,11 +103,11 @@ class AlertProblem extends DeviceRelatedModel
      */
     public function logs(): HasMany
     {
-        return $this->hasMany(AlertLog::class, 'problem_id');
+        return $this->hasMany(AlertLog::class, 'fault_id');
     }
 
     /**
-     * The entity this problem is about (Port, Sensor, Device, ...), resolved via the morph map.
+     * The entity this fault is about (Port, Sensor, Device, ...), resolved via the morph map.
      *
      * @return MorphTo<\Illuminate\Database\Eloquent\Model, $this>
      */

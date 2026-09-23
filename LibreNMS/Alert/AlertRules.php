@@ -35,7 +35,7 @@ namespace LibreNMS\Alert;
 use App\Facades\DeviceCache;
 use App\Models\Alert;
 use App\Models\AlertLog;
-use App\Models\AlertProblem;
+use App\Models\AlertFault;
 use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -73,13 +73,13 @@ readonly class AlertRules
 
         if ($this->device->disable_notify) {
             Log::info('Disable alerting is set, Clearing active alerts and skipping alert rules check');
-            AlertProblem::query()->where('device_id', $this->device->device_id)->where('open', 1)
+            AlertFault::query()->where('device_id', $this->device->device_id)->where('open', 1)
                 ->update(['open' => 0, 'state' => AlertState::RECOVERED]);
             $this->device->alerts()->update([
                 'state' => AlertState::CLEAR,
                 'alerted' => 0,
                 'open' => 0,
-                'open_problem_count' => 0,
+                'open_fault_count' => 0,
             ]);
 
             return false;
@@ -157,44 +157,44 @@ readonly class AlertRules
             }
         }
 
-        /** @var array<string, AlertProblem> $existing */
+        /** @var array<string, AlertFault> $existing */
         $existing = [];
-        foreach (AlertProblem::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)
-            ->where('open', 1)->where('state', '!=', AlertState::RECOVERED)->get() as $problem) {
-            /** @var AlertProblem $problem */
-            $existing[$problem->entity_key] = $problem;
+        foreach (AlertFault::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)
+            ->where('open', 1)->where('state', '!=', AlertState::RECOVERED)->get() as $fault) {
+            /** @var AlertFault $fault */
+            $existing[$fault->entity_key] = $fault;
         }
 
         foreach ($faulting as $key => $info) {
             $details = ['rule' => $info['rows'], 'contacts' => AlertUtil::getContacts($info['rows'])];
             if (isset($existing[$key])) {
-                $problem = $existing[$key];
-                $problem->details = $details;
-                $problem->severity = $rule->severity;
-                $problem->last_seen = $now;
+                $fault = $existing[$key];
+                $fault->details = $details;
+                $fault->severity = $rule->severity;
+                $fault->last_seen = $now;
                 if ($info['type'] !== null && $info['id'] !== null) {
-                    $problem->entity_type = $info['type'];
-                    $problem->entity_id = $info['id'];
+                    $fault->entity_type = $info['type'];
+                    $fault->entity_id = $info['id'];
                 }
-                $problem->save();
+                $fault->save();
                 unset($existing[$key]);
                 Log::info('Status: %bNOCHG%n', ['color' => true]);
             } else {
-                $problem = new AlertProblem;
-                $problem->rule_id = $rule->id;
-                $problem->device_id = $this->device->device_id;
-                $problem->entity_type = $info['type'];
-                $problem->entity_id = $info['id'];
-                $problem->entity_key = (string) $key;
-                $problem->severity = $rule->severity;
-                $problem->details = $details;
-                $this->recordProblemTransition($problem, AlertState::ACTIVE, $now);
+                $fault = new AlertFault;
+                $fault->rule_id = $rule->id;
+                $fault->device_id = $this->device->device_id;
+                $fault->entity_type = $info['type'];
+                $fault->entity_id = $info['id'];
+                $fault->entity_key = (string) $key;
+                $fault->severity = $rule->severity;
+                $fault->details = $details;
+                $this->recordFaultTransition($fault, AlertState::ACTIVE, $now);
                 Log::info(PHP_EOL . 'Status: %rALERT%n', ['color' => true]);
             }
         }
 
-        foreach ($existing as $problem) {
-            $this->recordProblemTransition($problem, AlertState::RECOVERED, $now);
+        foreach ($existing as $fault) {
+            $this->recordFaultTransition($fault, AlertState::RECOVERED, $now);
             Log::info(PHP_EOL . 'Status: %gOK%n', ['color' => true]);
         }
 
@@ -202,27 +202,27 @@ readonly class AlertRules
     }
 
     /**
-     * Persist a problem state change: save the problem row (with its current details) and append the
-     * matching alert_log entry. Set $problem->details before calling.
+     * Persist a fault state change: save the fault row (with its current details) and append the
+     * matching alert_log entry. Set $fault->details before calling.
      */
-    private function recordProblemTransition(AlertProblem $problem, int $state, ?Carbon $now = null): void
+    private function recordFaultTransition(AlertFault $fault, int $state, ?Carbon $now = null): void
     {
         $now ??= Carbon::now();
-        if (! $problem->exists) {
-            $problem->first_seen = $now;
+        if (! $fault->exists) {
+            $fault->first_seen = $now;
         }
-        $problem->state = $state;
-        $problem->open = 1; // recoveries stay open until the dispatcher sends the recovery notification
-        $problem->alerted = 0;
-        $problem->last_seen = $now;
-        $problem->timestamp = $now;
-        $problem->save();
+        $fault->state = $state;
+        $fault->open = 1; // recoveries stay open until the dispatcher sends the recovery notification
+        $fault->alerted = 0;
+        $fault->last_seen = $now;
+        $fault->timestamp = $now;
+        $fault->save();
 
-        $details = is_array($problem->details) ? $problem->details : [];
+        $details = is_array($fault->details) ? $fault->details : [];
         AlertLog::create([
-            'rule_id' => $problem->rule_id,
-            'device_id' => $problem->device_id,
-            'problem_id' => $problem->id,
+            'rule_id' => $fault->rule_id,
+            'device_id' => $fault->device_id,
+            'fault_id' => $fault->id,
             'state' => $state,
             'time_logged' => $now,
             'details' => $details,
@@ -230,18 +230,18 @@ readonly class AlertRules
     }
 
     /**
-     * Update the rule-level alerts row from the current open problem count.
+     * Update the rule-level alerts row from the current open fault count.
      * Worse/better is derived from the count delta (replaces the old fault diffing).
      */
     private function syncAlertState(AlertRule $rule): void
     {
-        $base = AlertProblem::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)->where('open', 1);
+        $base = AlertFault::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)->where('open', 1);
         $activeCount = (clone $base)->where('state', '!=', AlertState::RECOVERED)->count();
         $unackCount = (clone $base)->where('state', AlertState::ACTIVE)->count();
 
         $alertRow = Alert::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)->first();
         $prevState = $alertRow?->state;
-        $prevCount = $alertRow !== null ? (int) $alertRow->open_problem_count : 0;
+        $prevCount = $alertRow !== null ? (int) $alertRow->open_fault_count : 0;
 
         if ($activeCount == 0) {
             $newState = AlertState::RECOVERED;
@@ -263,7 +263,7 @@ readonly class AlertRules
 
         if ($alertRow) {
             $alertRow->state = $newState;
-            $alertRow->open_problem_count = $activeCount;
+            $alertRow->open_fault_count = $activeCount;
             if ($stateChanged) {
                 $alertRow->open = 1;
                 $alertRow->alerted = 0;
@@ -280,7 +280,7 @@ readonly class AlertRules
             $alertRow->rule_id = $rule->id;
             $alertRow->open = 1;
             $alertRow->alerted = 0;
-            $alertRow->open_problem_count = $activeCount;
+            $alertRow->open_fault_count = $activeCount;
             $alertRow->info = [];
             $alertRow->save();
         }

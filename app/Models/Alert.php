@@ -46,7 +46,7 @@ class Alert extends DeviceRelatedModel
         'info',
         'timestamp',
         'note',
-        'open_problem_count',
+        'open_fault_count',
     ];
 
     /**
@@ -118,12 +118,12 @@ class Alert extends DeviceRelatedModel
     }
 
     /**
-     * @return HasMany<AlertProblem, $this>
+     * @return HasMany<AlertFault, $this>
      */
-    public function problems(): HasMany
+    public function faults(): HasMany
     {
-        return $this->hasMany(AlertProblem::class, 'rule_id', 'rule_id')
-            ->where('alert_problems.device_id', $this->device_id);
+        return $this->hasMany(AlertFault::class, 'rule_id', 'rule_id')
+            ->where('alert_faults.device_id', $this->device_id);
     }
 
     /**
