@@ -3,7 +3,11 @@
 namespace LibreNMS\Polling\Method\Methods;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use App\View\FieldSchema\FieldDefinition;
+use LibreNMS\Polling\Method\Config\UnixAgentConfig;
+use LibreNMS\Polling\Method\Probe\UnixAgentProbe;
 
 final class UnixAgentPollingMethod extends PollingMethod
 {
@@ -39,19 +43,19 @@ final class UnixAgentPollingMethod extends PollingMethod
         ];
     }
 
-    public function probe(): \LibreNMS\Polling\Method\Probe\UnixAgentProbe
+    public function probe(): UnixAgentProbe
     {
-        return resolve(\LibreNMS\Polling\Method\Probe\UnixAgentProbe::class);
+        return resolve(UnixAgentProbe::class);
     }
 
-    public function config(\App\Models\DevicePollingMethod $deviceMethod): \LibreNMS\Polling\Method\Config\UnixAgentConfig
+    public function config(DevicePollingMethod $deviceMethod): UnixAgentConfig
     {
-        return \LibreNMS\Polling\Method\Config\UnixAgentConfig::fromPollingMethod($deviceMethod);
+        return UnixAgentConfig::fromPollingMethod($deviceMethod);
     }
 
-    public function fallbackConfig(\App\Models\Device $device): \LibreNMS\Polling\Method\Config\UnixAgentConfig
+    public function fallbackConfig(Device $device): UnixAgentConfig
     {
-        return new \LibreNMS\Polling\Method\Config\UnixAgentConfig(
+        return new UnixAgentConfig(
             enabled: false,
             affectsAvailability: false,
             port: (int) LibrenmsConfig::get('unix-agent.port', 6556),

@@ -3,8 +3,11 @@
 namespace LibreNMS\Polling\Method\Methods;
 
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use App\Models\Eventlog;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Polling\Method\Config\IcmpConfig;
+use LibreNMS\Polling\Method\Probe\IcmpProbe;
 use LibreNMS\Polling\Method\Probe\ProbeResult;
 
 final class IcmpPollingMethod extends PollingMethod
@@ -19,19 +22,19 @@ final class IcmpPollingMethod extends PollingMethod
         return true;
     }
 
-    public function probe(): \LibreNMS\Polling\Method\Probe\IcmpProbe
+    public function probe(): IcmpProbe
     {
-        return resolve(\LibreNMS\Polling\Method\Probe\IcmpProbe::class);
+        return resolve(IcmpProbe::class);
     }
 
-    public function config(\App\Models\DevicePollingMethod $deviceMethod): \LibreNMS\Polling\Method\Config\IcmpConfig
+    public function config(DevicePollingMethod $deviceMethod): IcmpConfig
     {
-        return \LibreNMS\Polling\Method\Config\IcmpConfig::fromPollingMethod($deviceMethod);
+        return IcmpConfig::fromPollingMethod($deviceMethod);
     }
 
-    public function fallbackConfig(Device $device): \LibreNMS\Polling\Method\Config\IcmpConfig
+    public function fallbackConfig(Device $device): IcmpConfig
     {
-        return new \LibreNMS\Polling\Method\Config\IcmpConfig(enabled: false, affectsAvailability: true);
+        return new IcmpConfig(enabled: false, affectsAvailability: true);
     }
 
     public function onProbeComplete(Device $device, ProbeResult $result, bool $commit = false): void
