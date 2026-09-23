@@ -1,8 +1,5 @@
 <?php
 
-use Laravel\Sanctum\Http\Middleware\AuthenticateSession;
-use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
-use Illuminate\Cookie\Middleware\EncryptCookies;
 use Laravel\Sanctum\Sanctum;
 
 return [
@@ -18,12 +15,7 @@ return [
     |
     */
 
-    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
-        '%s%s',
-        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
-        Sanctum::currentApplicationUrlWithPort(),
-        // Sanctum::currentRequestHost(),
-    ))),
+    'stateful' => explode(',', (string) env('SANCTUM_STATEFUL_DOMAINS', '')),
 
     /*
     |--------------------------------------------------------------------------
