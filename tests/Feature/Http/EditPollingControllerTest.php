@@ -6,7 +6,6 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\User;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -42,9 +41,7 @@ class EditPollingControllerTest extends TestCase
         $admin->assignRole('admin');
         $admin->givePermissionTo('device.update');
 
-        $device = Device::factory()->create([
-            'port_association_mode' => PortAssociationMode::getId('ifIndex'),
-        ]);
+        $device = Device::factory()->create();
 
         DevicePollingMethod::factory()->create([
             'device_id' => $device->device_id,
