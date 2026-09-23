@@ -80,6 +80,9 @@ class AlertRule extends BaseModel
         'alert_operation_id',
     ];
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

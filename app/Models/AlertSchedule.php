@@ -67,6 +67,9 @@ class AlertSchedule extends Model
         $this->timezone = config('app.timezone');
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

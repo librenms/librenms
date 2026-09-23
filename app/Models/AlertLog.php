@@ -21,6 +21,9 @@ class AlertLog extends DeviceRelatedModel
         'details',
     ];
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

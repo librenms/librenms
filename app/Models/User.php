@@ -45,7 +45,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * @return array{realname: 'string', descr: 'string', email: 'string', can_modify_passwd: 'integer'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {

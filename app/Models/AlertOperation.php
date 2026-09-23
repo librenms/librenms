@@ -25,6 +25,9 @@ class AlertOperation extends BaseModel
         'notifications_suppressed',
     ];
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
