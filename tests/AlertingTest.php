@@ -73,12 +73,82 @@ final class AlertingTest extends TestCase
         ));
     }
 
+    public function testFaultKeyForRowUsesSensorIdentity(): void
+    {
+        $row = [
+            'device_id' => 1,
+            'sensor_id' => 9,
+            'sensor_class' => 'temperature',
+            'sensor_type' => 'routeros',
+            'sensor_index' => '3',
+        ];
+
+        $this->assertSame(
+            'sensor|1||temperature|routeros|3',
+            AlertUtil::faultKeyForRow($row)
+        );
+        $this->assertSame(
+            AlertUtil::faultKeyForRow($row),
+            AlertUtil::faultKeyForRow(array_merge($row, ['sensor_id' => 99]))
+        );
+    }
+
+    public function testFaultKeyForRowUsesProcessorIdentity(): void
+    {
+        $row = [
+            'device_id' => 1,
+            'processor_id' => 4,
+            'processor_type' => 'hr',
+            'processor_index' => '2',
+        ];
+
+        $this->assertSame(
+            'processor|1|hr|2',
+            AlertUtil::faultKeyForRow($row)
+        );
+        $this->assertSame(
+            AlertUtil::faultKeyForRow($row),
+            AlertUtil::faultKeyForRow(array_merge($row, ['processor_id' => 88]))
+        );
+    }
+
+    public function testFaultKeyForRowUsesBgpPeerIdentity(): void
+    {
+        $row = [
+            'device_id' => 1,
+            'context_name' => '',
+            'bgpPeerIdentifier' => '10.0.0.1',
+            'bgpPeer_id' => 7,
+        ];
+
+        $this->assertSame(
+            'bgppeer|1||10.0.0.1',
+            AlertUtil::faultKeyForRow($row)
+        );
+        $this->assertSame(
+            AlertUtil::faultKeyForRow($row),
+            AlertUtil::faultKeyForRow(array_merge($row, ['bgpPeer_id' => 99]))
+        );
+    }
+
     public function testEntityForFault(): void
     {
         // Known columns map to the registered morph aliases.
         $this->assertSame(['interface', 5], AlertUtil::entityForFault(['device_id' => 1, 'port_id' => 5]));
         $this->assertSame(['sensor', 9], AlertUtil::entityForFault(['device_id' => 1, 'sensor_id' => 9]));
+        $this->assertSame(['processor', 4], AlertUtil::entityForFault([
+            'device_id' => 1,
+            'processor_type' => 'hr',
+            'processor_index' => '2',
+            'processor_id' => 4,
+        ]));
         $this->assertSame(['bgppeer', 7], AlertUtil::entityForFault(['device_id' => 1, 'bgpPeer_id' => 7]));
+        $this->assertSame(['bgppeer', 7], AlertUtil::entityForFault([
+            'device_id' => 1,
+            'context_name' => '',
+            'bgpPeerIdentifier' => '10.0.0.1',
+            'bgpPeer_id' => 7,
+        ]));
         // Unknown *_id columns fall back to the stripped column name.
         $this->assertSame(['customThing', 3], AlertUtil::entityForFault(['device_id' => 1, 'customThing_id' => 3]));
         // A device-level row (no entity id) resolves to no specific entity.

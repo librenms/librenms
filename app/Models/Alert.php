@@ -46,6 +46,7 @@ class Alert extends DeviceRelatedModel
         'info',
         'timestamp',
         'note',
+        'open_problem_count',
     ];
 
     /**

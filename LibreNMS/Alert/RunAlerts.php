@@ -183,28 +183,37 @@ class RunAlerts
             }
         } elseif ($alert['state'] == AlertState::RECOVERED) {
             // Alert is now cleared. Scope to the same problem when notifying per entity.
-            $alert_log = AlertLog::where('state', '!=', AlertState::ACKNOWLEDGED)->where('state', '!=', AlertState::RECOVERED)->where('rule_id', $alert['rule_id'])->where('device_id', $alert['device_id'])->where('id', '<', $alert['id']);
+            $previousLogQuery = AlertLog::query()
+                ->whereNotIn('state', [AlertState::ACKNOWLEDGED, AlertState::RECOVERED])
+                ->where('rule_id', $alert['rule_id'])
+                ->where('device_id', $alert['device_id'])
+                ->where('id', '<', $alert['id']);
+
             if (! empty($alert['problem_id'])) {
-                $alert_log->where('problem_id', $alert['problem_id']);
+                $previousLogQuery->where('problem_id', $alert['problem_id']);
             }
-            $alert_log->orderBy('id', 'desc')->first();
-            if (empty($alert_log?->id)) {
+
+            $previousLog = $previousLogQuery->orderByDesc('id')->first();
+            if ($previousLog === null) {
                 return false;
             }
 
-            $extra = [];
-            if (! empty($alert_log?->details)) {
-                $extra = json_decode(gzuncompress($alert_log?->details), true);
+            $extra = $previousLog->details;
+            $extra['count'] = 0;
+
+            // Reset count to 0 on the current log row so alerts will continue
+            $currentLog = AlertLog::query()->find($alert['id']);
+            if ($currentLog instanceof AlertLog) {
+                $currentDetails = $currentLog->details;
+                $currentDetails['count'] = 0;
+                $currentLog->details = $currentDetails;
+                $currentLog->save();
             }
 
-            // Reset count to 0 so alerts will continue
-            $extra['count'] = 0;
-            $alert_log->details = gzcompress(json_encode($alert_log?->details), 9);
-            $alert_log->save();
-
-            $obj['elapsed'] = Time::formatInterval(strtotime((string) $alert['time_logged']) - strtotime((string) $id['time_logged']), true) ?: 'none';
-            $obj['id'] = $id['id'];
-            foreach ($extra['rule'] as $incident) {
+            $obj['title'] = $template->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']);
+            $obj['elapsed'] = Time::formatInterval(strtotime((string) $alert['time_logged']) - strtotime((string) $previousLog->time_logged), true) ?: 'none';
+            $obj['id'] = $previousLog->id;
+            foreach ($extra['rule'] ?? [] as $incident) {
                 $i++;
                 $obj['faults'][$i] = $incident;
                 $obj['faults'][$i]['string'] = '';
