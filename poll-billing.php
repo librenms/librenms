@@ -66,11 +66,10 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
     foreach ($bill->ports as $port) {
         $device = DeviceCache::get($port->device_id);
 
-        if ($device->disabled || ($poller_group && $device->poller_group != $poller_group)) {
+        if ($device->disabled || ! $device->status || ($poller_group && $device->poller_group != $poller_group)) {
             continue;
         }
 
-        $polledPortCount++;
         Log::info("  Polling $port->ifName ($port->ifDescr) on $device->hostname");
 
         $in_measurement = Billing::getValue($port->device_id, $port->ifIndex, 'In');
@@ -81,34 +80,36 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
             continue;
         }
 
+        $polledPortCount++;
+
         $last_counters = $lastCountersByPort->get($port->port_id);
         if ($last_counters !== null) {
             $tmp_period = DB::scalar('SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP(?)', [$last_counters->timestamp]);
 
             if ($port->ifSpeed > 0 && Billing::calculateBitrate($in_measurement, $last_counters->in_counter, $tmp_period) > $port->ifSpeed) {
-                $in_delta = $last_counters->in_delta;
+                $port_in_delta = $last_counters->in_delta;
             } elseif ($in_measurement >= $last_counters->in_counter) {
-                $in_delta = ($in_measurement - $last_counters->in_counter);
+                $port_in_delta = ($in_measurement - $last_counters->in_counter);
             } else {
-                $in_delta = $last_counters->in_delta;
+                $port_in_delta = $last_counters->in_delta;
             }
 
             if ($port->ifSpeed > 0 && Billing::calculateBitrate($out_measurement, $last_counters->out_counter, $tmp_period) > $port->ifSpeed) {
-                $out_delta = $last_counters->out_delta;
+                $port_out_delta = $last_counters->out_delta;
             } elseif ($out_measurement >= $last_counters->out_counter) {
-                $out_delta = ($out_measurement - $last_counters->out_counter);
+                $port_out_delta = ($out_measurement - $last_counters->out_counter);
             } else {
-                $out_delta = $last_counters->out_delta;
+                $port_out_delta = $last_counters->out_delta;
             }
         } else {
-            $in_delta = 0;
-            $out_delta = 0;
+            $port_in_delta = 0;
+            $port_out_delta = 0;
         }
         //////////////////////////////////CountersValidation$DB-Update
         //For debugging
         Log::debug("****$now: " . $bill->bill_name . ' Billing DB SNMP counters received.');
         Log::debug('in_measurement: ' . $in_measurement . '  out_measurement: ' . $out_measurement . "\nThe data types are. in_measurement:" . gettype($in_measurement) . ' and out_measurement: ' . gettype($out_measurement));
-        Log::debug('IN_delta: ' . $in_delta . ' OUT_delta: ' . $out_delta . "\nLast_IN_delta: " . ($last_counters->in_delta ?? '') . ' last_OUT_delta: ' . ($last_counters->out_delta ?? ''));
+        Log::debug('IN_delta: ' . $port_in_delta . ' OUT_delta: ' . $port_out_delta . "\nLast_IN_delta: " . ($last_counters->in_delta ?? '') . ' last_OUT_delta: ' . ($last_counters->out_delta ?? ''));
 
         Log::debug("Nice, valid counters 'in/out_measurement', lets use them");
         $counterUpdates[] = [
@@ -117,13 +118,13 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
             'timestamp' => $now,
             'in_counter' => $in_measurement,
             'out_counter' => $out_measurement,
-            'in_delta' => (int) $in_delta,
-            'out_delta' => (int) $out_delta,
+            'in_delta' => (int) $port_in_delta,
+            'out_delta' => (int) $port_out_delta,
         ];
         ////////////////////////////////EndCountersValidation&DB-Update
-        $delta = ($delta + $in_delta + $out_delta);
-        $in_delta = ($in_delta + $in_delta);
-        $out_delta = ($out_delta + $out_delta);
+        $delta += $port_in_delta + $port_out_delta;
+        $in_delta += $port_in_delta;
+        $out_delta += $port_out_delta;
     }//end foreach
 
     if (! empty($counterUpdates)) {
