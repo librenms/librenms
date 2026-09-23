@@ -84,6 +84,7 @@ class Stp implements Module
         ModuleModelObserver::done();
 
         $ports = $device->stpPorts;
+        $ports = $os->pollStpPorts($ports);
         ModuleModelObserver::observe(PortStp::class, 'Ports');
         $this->syncModels($device, 'stpPorts', $ports);
         ModuleModelObserver::done();
