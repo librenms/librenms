@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XklTrapUtil.php
  *
@@ -32,23 +33,23 @@ class XklTrapUtil
     /**
      * Get the value, applies the unit divsor from MIB, and returns float with units
      *
-     * @param string $value
-     * @return string
+     * @param   string  $value
+     * @return  string  $value
      */
     public static function removeUnits($value)
     {
         if ($value) {
             preg_match('/(-?\d+)\s(\d+)\/(\d+)\s(\S*)/', $value, $matches);
-            $base = (int)$matches[1];
-            $numerator = (int)$matches[2];
-            $denominator = (int)$matches[3];
+            $base = (int) $matches[1];
+            $numerator = (int) $matches[2];
+            $denominator = (int) $matches[3];
             $unit = trim($matches[4]);
 
             $multiplier = $numerator / $denominator;
 
             $value = ($base * $multiplier) . " $unit";
         } else {
-            $value = "N/A";
+            $value = 'N/A';
         }
 
         return $value;
