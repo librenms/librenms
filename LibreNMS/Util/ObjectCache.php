@@ -51,7 +51,7 @@ class ObjectCache
     public static function applications()
     {
         // cache plain arrays, then re-hydrate: models must not be serialized into the cache
-        $applications = Cache::remember('ObjectCache:applications_list:' . auth()->id(), self::$cache_time, function () {
+        $applications = Cache::remember('ObjectCache:applications_list_v2:' . auth()->id(), self::$cache_time, function () {
             $user = auth()->user(); /** @var \App\Models\User $user */
 
             return Application::hasAccess($user)
