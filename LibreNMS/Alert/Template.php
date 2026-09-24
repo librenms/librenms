@@ -74,7 +74,7 @@ class Template
      */
     public function bladeBody($data)
     {
-        $alert['alert'] = new AlertData($data['alert']);
+        $alert['alert'] = new AlertData($data['alert'] ?? $data);
         try {
             return Blade::render($data['template']->template, $alert);
         } catch (\Exception $e) {
@@ -90,12 +90,43 @@ class Template
      */
     public function bladeTitle($data)
     {
-        $alert['alert'] = new AlertData($data['alert']);
-        try {
-            return Blade::render($data['title'], $alert);
-        } catch (\Exception) {
-            return $data['title'] ?: Blade::render('Template ' . $data['name'], $alert);
+        $template = $data['template'] ?? null;
+        $state = $data['state'] ?? ($data['alert']['state'] ?? null);
+        $isRecovered = $state == AlertState::RECOVERED;
+
+        $alertData = new AlertData($data['alert'] ?? $data);
+
+        $display = $alertData['display'];
+        $name = $alertData['name'];
+        $defaultTitle = $isRecovered
+            ? 'Device ' . $display . ' recovered from ' . ($name ?: $alertData['rule'])
+            : 'Alert for device ' . $display . ' - ' . $name;
+
+        $templateTitle = $isRecovered
+            ? ($template->title_rec ?? null)
+            : ($template->title ?? null);
+
+        if (! empty($templateTitle)) {
+            try {
+                $title = Blade::render($templateTitle, ['alert' => $alertData]);
+            } catch (\Throwable) {
+                $title = $defaultTitle;
+            }
+        } else {
+            $title = $defaultTitle;
         }
+
+        if ($state == AlertState::ACKNOWLEDGED) {
+            $title .= ' Has been acknowledged';
+        } elseif ($state == AlertState::WORSE) {
+            $title .= ' Has worsened';
+        } elseif ($state == AlertState::BETTER) {
+            $title .= ' Has improved';
+        } elseif ($state == AlertState::CHANGED) {
+            $title .= ' changed';
+        }
+
+        return $title;
     }
 
     public function getDefaultTemplate(string $template_name, string $error): string

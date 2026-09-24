@@ -5,7 +5,7 @@ namespace LibreNMS\Tests\Unit;
 use App\Models\Device;
 use Illuminate\Support\Facades\Cache;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
-use LibreNMS\Data\Source\Snmp\SnmpQuery;
+use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
@@ -50,7 +50,7 @@ class SnmpQueryTest extends TestCase
                 && $options->context === '')
             ->andReturn(new SnmpResponse(['sysDescr.0' => 'Linux 6.0']));
 
-        $query = (new SnmpQuery($mockBackend))
+        $query = (new SnmpQueryBuilder($mockBackend))
             ->device($this->device)
             ->numeric();
 
@@ -72,7 +72,7 @@ class SnmpQueryTest extends TestCase
             ->withArgs(fn (string $target, string $oid) => $oid === 'ifType')
             ->andReturn(new SnmpResponse(['ifType.1' => 'ethernetCsmacd']));
 
-        $query = (new SnmpQuery($mockBackend))->device($this->device);
+        $query = (new SnmpQueryBuilder($mockBackend))->device($this->device);
         $response = $query->walk(['ifDescr', 'ifType']);
 
         $this->assertSame(['ifDescr.1' => 'eth0', 'ifType.1' => 'ethernetCsmacd'], $response->values());
@@ -86,7 +86,7 @@ class SnmpQueryTest extends TestCase
             ->withArgs(fn (string $target, array $oids) => $oids === ['sysDescr.0'])
             ->andReturn(new SnmpResponse(['sysObjectID.0' => '.1.3.6.1.4.1']));
 
-        $query = (new SnmpQuery($mockBackend))->device($this->device);
+        $query = (new SnmpQueryBuilder($mockBackend))->device($this->device);
         $response = $query->next('sysDescr.0');
 
         $this->assertSame(['sysObjectID.0' => '.1.3.6.1.4.1'], $response->values());
@@ -115,7 +115,7 @@ class SnmpQueryTest extends TestCase
             ->withArgs(fn (string $target, array $oids) => $oids === ['oid3'])
             ->andReturn(new SnmpResponse(['oid3' => '3']));
 
-        $query = (new SnmpQuery($mockBackend))->device($device);
+        $query = (new SnmpQueryBuilder($mockBackend))->device($device);
         $response = $query->get(['oid1', 'oid2', 'oid3']);
 
         $this->assertSame(['oid1' => '1', 'oid2' => '2', 'oid3' => '3'], $response->values());
@@ -134,7 +134,7 @@ class SnmpQueryTest extends TestCase
         $mockBackend->shouldNotReceive('walk')
             ->withArgs(fn (string $target, string $oid) => $oid === 'secondOid');
 
-        $query = (new SnmpQuery($mockBackend))
+        $query = (new SnmpQueryBuilder($mockBackend))
             ->device($this->device)
             ->abortOnFailure();
 
@@ -153,7 +153,7 @@ class SnmpQueryTest extends TestCase
             ->withArgs(fn (string $target, array $oids) => $oids === ['sysDescr.0'])
             ->andReturn(new SnmpResponse(['sysDescr.0' => 'CachedLinux']));
 
-        $query = (new SnmpQuery($mockBackend))
+        $query = (new SnmpQueryBuilder($mockBackend))
             ->device($this->device)
             ->cache();
 
@@ -173,7 +173,7 @@ class SnmpQueryTest extends TestCase
             ->withArgs(fn (string $oid, SnmpQueryOptions $options) => $oid === 'IF-MIB::ifTable')
             ->andReturn('.1.3.6.1.2.1.2.2');
 
-        $query = (new SnmpQuery($mockBackend, $mockTranslate))
+        $query = (new SnmpQueryBuilder($mockBackend, $mockTranslate))
             ->device($this->device)
             ->numeric();
 
@@ -196,7 +196,7 @@ class SnmpQueryTest extends TestCase
             ->withArgs(fn (string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options) => $options->context === 'vlan-100')
             ->andReturn(new SnmpResponse(['val' => '1']));
 
-        $query = (new SnmpQuery($mockBackend))
+        $query = (new SnmpQueryBuilder($mockBackend))
             ->device($v3Device)
             ->context('100', 'vlan-');
 
@@ -214,7 +214,7 @@ class SnmpQueryTest extends TestCase
                 && $options->tolerateUnorderedIndexes === true)
             ->andReturn(new SnmpResponse(['test' => '1']));
 
-        $query = (new SnmpQuery($mockBackend))
+        $query = (new SnmpQueryBuilder($mockBackend))
             ->device($this->device)
             ->options(['-OQUsb', '-Cc']);
 
@@ -231,13 +231,15 @@ class SnmpQueryTest extends TestCase
             ->once()
             ->andReturn(new SnmpResponse(['sysDescr.0' => 'Linux 6.0'], command: ['/usr/bin/snmpget', 'sysDescr.0']));
 
-        $query = (new SnmpQuery($mockBackend))->device($this->device);
+        $query = (new SnmpQueryBuilder($mockBackend))->device($this->device);
         $query->get('sysDescr.0');
 
-        \Illuminate\Support\Facades\Event::assertDispatched(\App\Events\SnmpQueryExecuted::class, fn (\App\Events\SnmpQueryExecuted $event) => $event->method === 'snmpget'
+        \Illuminate\Support\Facades\Event::assertDispatched(\App\Events\SnmpQueryExecuted::class, fn (\App\Events\SnmpQueryExecuted $event) => $event->target === $this->device->pollerTarget()
+            && $event->method === 'snmpget'
             && $event->oids === ['sysDescr.0']
-            && $event->cliCommand === ['/usr/bin/snmpget', 'sysDescr.0']
+            && $event->duration >= 0
             && $event->device === $this->device
+            && $event->response->command === ['/usr/bin/snmpget', 'sysDescr.0']
             && $event->response->values() === ['sysDescr.0' => 'Linux 6.0']);
     }
 
@@ -253,7 +255,7 @@ class SnmpQueryTest extends TestCase
                     && $options->numericTimeticks === true)
             ->andReturn(new SnmpResponse(['sysDescr.0' => 'Linux']));
 
-        $query = (new SnmpQuery($mockBackend))->device($this->device);
+        $query = (new SnmpQueryBuilder($mockBackend))->device($this->device);
         $query->get('sysDescr.0');
     }
 
@@ -265,7 +267,7 @@ class SnmpQueryTest extends TestCase
             ->withArgs(fn (string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options) => $options->oidFormat === SnmpOidOutput::Suffix)
             ->andReturn(new SnmpResponse(['sysDescr.0' => 'Linux']));
 
-        $query = (new SnmpQuery($mockBackend))->device($this->device)->hideMib();
+        $query = (new SnmpQueryBuilder($mockBackend))->device($this->device)->hideMib();
         $query->get('sysDescr.0');
     }
 
@@ -280,7 +282,7 @@ class SnmpQueryTest extends TestCase
             ->withArgs(fn (string $target, string $oid, SnmpConfig $config, SnmpQueryOptions $options) => $options->allowBulk === false)
             ->andReturn(new SnmpResponse(['laLoadInt' => '1']));
 
-        $query = (new SnmpQuery($mockBackend))->device($this->device);
+        $query = (new SnmpQueryBuilder($mockBackend))->device($this->device);
         $query->walk('UCD-SNMP-MIB::laLoadInt');
     }
 }
