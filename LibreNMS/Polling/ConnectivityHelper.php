@@ -29,6 +29,9 @@ namespace LibreNMS\Polling;
 use App\Models\Device;
 use LibreNMS\Enum\PollingMethodType;
 
+/**
+ * ConnectivityHelper contains some methods to ease integration with legacy code and simplify rebases
+ */
 readonly class ConnectivityHelper
 {
     public function __construct(
