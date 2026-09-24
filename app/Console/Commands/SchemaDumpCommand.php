@@ -32,18 +32,12 @@ class SchemaDumpCommand extends DumpCommand
         $database = $this->option('database');
 
         if ($this->option('snapshots')) {
-            $databases = $database ? [$database] : ['mysql', 'testing', 'testing_persistent'];
+            $databases = $database ? [$database] : ['mysql', 'testing'];
             foreach ($databases as $database) {
                 $this->line("Database: $database");
                 $this->input->setOption('database', $database);
                 $this->input->setOption('verbose', 3);
                 parent::handle($connections, $dispatcher);
-            }
-
-            // in memory db doesn't dump right, copy the sqlite on-disk dump
-            $persistent_dump_file = base_path('/database/schema/testing_persistent-schema.dump');
-            if (in_array('testing_persistent', $databases) && file_exists($persistent_dump_file)) {
-                copy($persistent_dump_file, base_path('/database/schema/testing_memory-schema.dump'));
             }
 
             return 0;

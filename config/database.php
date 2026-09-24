@@ -112,6 +112,8 @@ return [
             'database' => database_path('testing.sqlite'),
             'prefix' => '',
             'foreign_key_constraints' => true,
+            'synchronous' => 'off',
+            'journal_mode' => 'memory',
         ],
     ],
 
