@@ -317,7 +317,7 @@ class Rrd extends BaseDatastore
     {
         $host = self::safeName(trim((string) $host, '[]'));
 
-        return Str::finish($this->rrd_dir, '/') . $host;
+        return Str::finish(LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd'), '/') . $host;
     }
 
     /**
