@@ -51,14 +51,18 @@ final class UnixAgentPollingMethod extends PollingMethod
         $timeout = $config->timeout;
         $poller_target = Rewrite::addIpv6Brackets($device->pollerTarget());
 
-        $agent = @fsockopen($poller_target, $agent_port, $errno, $errstr, $timeout);
-        if ($agent) {
-            fclose($agent);
+        try {
+            $agent = @fsockopen($poller_target, $agent_port, $errno, $errstr, $timeout);
+            if ($agent) {
+                fclose($agent);
 
-            return ProbeResult::success(['port' => $agent_port, 'timeout' => $timeout]);
+                return ProbeResult::success(['port' => $agent_port, 'timeout' => $timeout]);
+            }
+
+            return ProbeResult::failure(['port' => $agent_port, 'timeout' => $timeout], $errstr ?: null);
+        } catch (\ErrorException $e) {
+            return ProbeResult::failure(['port' => $agent_port, 'timeout' => $timeout], $e->getMessage());
         }
-
-        return ProbeResult::failure(['port' => $agent_port, 'timeout' => $timeout], $errstr ?: null);
     }
 
     public function config(DevicePollingMethod $deviceMethod): UnixAgentConfig
