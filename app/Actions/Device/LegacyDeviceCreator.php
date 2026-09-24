@@ -68,10 +68,12 @@ class LegacyDeviceCreator
     {
         $methods = collect();
 
+        $icmpMethodDef = $this->pollingMethods->require(PollingMethodType::Icmp);
         $icmpMethod = new DevicePollingMethod([
             'method_type' => PollingMethodType::Icmp,
             'enabled' => true,
-            'affects_availability' => false,
+            'affects_availability' => $icmpMethodDef->defaultAffectsAvailability(),
+            'settings' => [],
         ]);
         $icmpMethod->setRelation('device', $device);
         $methods->push($icmpMethod);
@@ -83,15 +85,7 @@ class LegacyDeviceCreator
                 'port_association_mode' => $this->port_association_mode,
             ], fn ($v) => $v !== null);
 
-            $registry = $this->pollingMethods;
-            $snmpMethodDef = $registry->get(PollingMethodType::Snmp);
-            $snmpMethod = new DevicePollingMethod([
-                'method_type' => PollingMethodType::Snmp,
-                'enabled' => true,
-                'affects_availability' => true,
-                'settings' => $snmpMethodDef ? $snmpMethodDef->filterOverrides($settings) : $settings,
-            ]);
-            $snmpMethod->setRelation('device', $device);
+            $snmpMethodDef = $this->pollingMethods->require(PollingMethodType::Snmp);
 
             $hasCredentials = $this->snmpver !== null
                 || $this->community !== null
@@ -101,6 +95,7 @@ class LegacyDeviceCreator
                 || ($this->authalgo !== null && $this->authalgo !== 'MD5')
                 || ($this->cryptoalgo !== null && $this->cryptoalgo !== 'AES');
 
+            $secret = null;
             if ($hasCredentials) {
                 $authlevel = $this->authlevel ?: (($this->authpass ? 'auth' : 'noAuth') . (($this->cryptopass && $this->authpass) ? 'Priv' : 'NoPriv'));
                 $secretData = new SnmpSecretData(
@@ -119,6 +114,16 @@ class LegacyDeviceCreator
                     'description' => 'SNMP ' . $device->hostname,
                     'data' => $secretData->toArray(),
                 ]);
+            }
+
+            $snmpMethod = new DevicePollingMethod([
+                'method_type' => PollingMethodType::Snmp,
+                'enabled' => true,
+                'affects_availability' => $snmpMethodDef->defaultAffectsAvailability(),
+                'settings' => $snmpMethodDef->filterOverrides($settings),
+            ]);
+            $snmpMethod->setRelation('device', $device);
+            if ($secret !== null) {
                 $snmpMethod->setRelation('secret', $secret);
             }
 
