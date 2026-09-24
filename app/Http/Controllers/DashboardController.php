@@ -33,19 +33,27 @@ use App\Models\UserPref;
 use App\Models\UserWidget;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
-class DashboardController extends Controller
+class DashboardController extends Controller implements HasMiddleware
 {
     /** @var \Illuminate\Support\Collection<int, \App\Models\Dashboard> */
     private $dashboards;
 
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(Dashboard::class, 'dashboard');
+        return [
+            new Middleware('can:viewAny,' . Dashboard::class, only: ['index']),
+            new Middleware('can:view,dashboard', only: ['show']),
+            new Middleware('can:create,' . Dashboard::class, only: ['create', 'store']),
+            new Middleware('can:update,dashboard', only: ['edit', 'update']),
+            new Middleware('can:delete,dashboard', only: ['destroy']),
+        ];
     }
 
     /**
