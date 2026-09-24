@@ -2,7 +2,6 @@
 
 namespace LibreNMS\Tests\Unit\View;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\View\FieldSchema\FieldDefinition;
@@ -23,20 +22,17 @@ final class FieldSchemaTest extends TestCase
             ->default(161)
             ->cast('int');
         $this->assertSame(161, $fieldWithDefault->getDefault());
-        $this->assertSame(161, $fieldWithDefault->getEffectiveDefault());
         $this->assertSame('161', $fieldWithDefault->getPlaceholder());
 
         $fieldWithCallableDefault = FieldDefinition::make('timeout', 'number')
             ->default(fn (): int => 5)
             ->cast('int');
         $this->assertSame(5, $fieldWithCallableDefault->getDefault());
-        $this->assertSame(5, $fieldWithCallableDefault->getEffectiveDefault());
         $this->assertSame('5', $fieldWithCallableDefault->getPlaceholder());
 
         $fieldWithExplicitPlaceholder = FieldDefinition::make('hostname', 'text')
             ->placeholder('device hostname');
         $this->assertNull($fieldWithExplicitPlaceholder->getDefault());
-        $this->assertNull($fieldWithExplicitPlaceholder->getEffectiveDefault());
         $this->assertSame('device hostname', $fieldWithExplicitPlaceholder->getPlaceholder());
 
         $fieldRules = FieldDefinition::make('retries', 'number')
@@ -117,39 +113,6 @@ final class FieldSchemaTest extends TestCase
         // Partial update preserving existing override
         $partialInput = ['transport' => 'tcp'];
         $this->assertEquals(['transport' => 'tcp', 'port' => 162], $schemaObject->filterOverrides($partialInput, $existing));
-    }
-
-    public function testResolveValuesFallsBackToDefaults(): void
-    {
-        $schemaObject = new class implements HasFieldSchema
-        {
-            use HandlesFieldSchema;
-
-            public function fields(): array
-            {
-                return [
-                    'transport' => FieldDefinition::make('transport', 'select')
-                        ->options(['udp' => 'UDP', 'tcp' => 'TCP'])
-                        ->default('udp'),
-                    'port' => FieldDefinition::make('port', 'number')
-                        ->default(fn () => (int) LibrenmsConfig::get('snmp.port', 161))
-                        ->cast('int'),
-                ];
-            }
-        };
-
-        // Empty input resolves to defaults
-        $resolved = $schemaObject->resolveValues([]);
-        $this->assertEquals(['transport' => 'udp', 'port' => 161], $resolved);
-
-        // Input with override resolves to overridden value
-        $resolvedOverride = $schemaObject->resolveValues(['port' => '162']);
-        $this->assertEquals(['transport' => 'udp', 'port' => 162], $resolvedOverride);
-
-        // Changing global config dynamically changes fallback when no override is set
-        LibrenmsConfig::set('snmp.port', 1161);
-        $resolvedDynamic = $schemaObject->resolveValues([]);
-        $this->assertEquals(['transport' => 'udp', 'port' => 1161], $resolvedDynamic);
     }
 
     public function testDefinitionsHaveNullableRules(): void

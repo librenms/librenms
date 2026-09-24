@@ -123,12 +123,6 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertContains(PollingMethodType::Icmp, $types);
         $this->assertContains(PollingMethodType::Ipmi, $types);
         $this->assertContains(PollingMethodType::UnixAgent, $types);
-
-        $all = $this->pollingMethods->all();
-        $this->assertArrayHasKey('snmp', $all);
-        $this->assertArrayHasKey('icmp', $all);
-        $this->assertArrayHasKey('ipmi', $all);
-        $this->assertArrayHasKey('unix-agent', $all);
     }
 
     public function testDevicePollingConfigReturnsConfigFromMethodOrFallback(): void

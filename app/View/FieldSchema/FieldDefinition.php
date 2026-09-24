@@ -138,14 +138,6 @@ class FieldDefinition
     }
 
     /**
-     * Alias for getDefault() for backwards compatibility.
-     */
-    public function getEffectiveDefault(): mixed
-    {
-        return $this->getDefault();
-    }
-
-    /**
      * Return the placeholder string: explicit placeholder takes priority,
      * then a stringified default value if one is defined.
      */

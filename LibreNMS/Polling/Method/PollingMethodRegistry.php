@@ -62,24 +62,6 @@ class PollingMethodRegistry
     }
 
     /**
-     * Get all registered polling methods.
-     *
-     * @return array<string, PollingMethod>
-     */
-    public function all(): array
-    {
-        $resolved = [];
-        foreach (array_keys($this->methods) as $key) {
-            $type = PollingMethodType::tryFrom($key);
-            if ($type !== null) {
-                $resolved[$key] = $this->require($type);
-            }
-        }
-
-        return $resolved;
-    }
-
-    /**
      * Get all registered polling method types.
      *
      * @return array<PollingMethodType>

@@ -104,34 +104,6 @@ trait HandlesFieldSchema
     }
 
     /**
-     * Resolve field values by combining schema defaults, existing values, and new input values, filtering allowed schema keys and casting values.
-     *
-     * @param  array<string, mixed>  $input
-     * @param  array<string, mixed>  $existing
-     * @return array<string, mixed>
-     */
-    public function resolveValues(array $input, array $existing = []): array
-    {
-        $fields = $this->fields();
-        if (empty($fields)) {
-            return [];
-        }
-
-        $result = [];
-        foreach ($fields as $key => $field) {
-            if (array_key_exists($key, $input) && $input[$key] !== null && $input[$key] !== '') {
-                $result[$key] = $field->castValue($input[$key]);
-            } elseif (array_key_exists($key, $existing) && $existing[$key] !== null && $existing[$key] !== '') {
-                $result[$key] = $field->castValue($existing[$key]);
-            } elseif (($default = $field->getDefault()) !== null) {
-                $result[$key] = $default;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Filter input values for storage, retaining only non-empty values that differ from defaults.
      *
      * @param  array<string, mixed>  $input
