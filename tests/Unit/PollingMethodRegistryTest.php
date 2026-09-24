@@ -62,8 +62,7 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertTrue($snmpMethod->hasSecret());
         $snmpSecretDef = \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for($snmpMethod->secretType());
         $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\SecretDefinition::class, $snmpSecretDef);
-        $snmpData = $snmpSecretDef->createData(['community' => 'public']);
-        $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Data\SnmpSecretData::class, $snmpData);
+        $snmpData = \LibreNMS\Polling\Secrets\Data\SnmpSecretData::fromArray(['community' => 'public']);
         $this->assertSame('public', $snmpData->community);
 
         $ipmiMethod = $this->pollingMethods->require(PollingMethodType::Ipmi);
@@ -71,8 +70,7 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertTrue($ipmiMethod->hasSecret());
         $ipmiSecretDef = \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for($ipmiMethod->secretType());
         $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\SecretDefinition::class, $ipmiSecretDef);
-        $ipmiData = $ipmiSecretDef->createData(['username' => 'admin', 'password' => 'pass']);
-        $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Data\IpmiSecretData::class, $ipmiData);
+        $ipmiData = \LibreNMS\Polling\Secrets\Data\IpmiSecretData::fromArray(['username' => 'admin', 'password' => 'pass']);
         $this->assertSame('admin', $ipmiData->username);
 
         $this->assertNull($icmpMethodDef->secretType());

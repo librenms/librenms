@@ -244,4 +244,59 @@ final class PollingMethodProbeTest extends TestCase
         $config = \LibreNMS\Polling\Method\Config\IpmiConfig::fromPollingMethod($method);
         $this->assertEquals('lanplus', $config->type);
     }
+
+    public function testUnixAgentProbeOnDeadPortReturnsFailureResult(): void
+    {
+        // 192.0.2.1 (TEST-NET-1) or 127.0.0.1 on an unused port with 1s timeout
+        $device = new Device(['hostname' => '127.0.0.1']);
+        $unixMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::UnixAgent,
+            'settings' => ['port' => 1, 'timeout' => 1],
+            'affects_availability' => true,
+            'enabled' => true,
+        ]);
+        $unixMethod->setRelation('device', $device);
+        $device->setRelation('pollingMethods', collect([$unixMethod]));
+
+        $method = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::UnixAgent);
+
+        $result = $method->probe($device);
+        $this->assertFalse($result->isSuccess());
+        $this->assertEquals(1, $result->stat('port'));
+        $this->assertEquals(1, $result->stat('timeout'));
+    }
+
+    public function testSnmpConfigTransportDefaultMatchesConfigTransports(): void
+    {
+        \App\Facades\LibrenmsConfig::set('snmp.transports.0', 'tcp6');
+
+        $device = new Device(['hostname' => 'snmp.example.com']);
+        $method = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
+            'settings' => [],
+            'enabled' => true,
+        ]);
+        $method->setRelation('device', $device);
+
+        $config = SnmpConfig::fromPollingMethod($method);
+        $this->assertEquals('tcp6', $config->transport);
+
+        \App\Facades\LibrenmsConfig::set('snmp.transports.0', 'udp');
+    }
+
+    public function testFilterOverridesPreservesExplicitValuesMatchingDefaults(): void
+    {
+        $method = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Snmp);
+
+        $input = [
+            'transport' => 'udp',
+            'port' => 161,
+            'timeout' => 1,
+        ];
+
+        $overrides = $method->filterOverrides($input);
+        $this->assertEquals('udp', $overrides['transport']);
+        $this->assertEquals(161, $overrides['port']);
+        $this->assertEquals(1.0, $overrides['timeout']);
+    }
 }
