@@ -184,7 +184,7 @@ final class PollingMethodProbeTest extends TestCase
 
     public function testCheckDeviceAvailabilityHandlesSecretDecryptionGracefully(): void
     {
-        $device = new Device(['hostname' => 'corrupt-key.example.com']);
+        $device = new Device(['hostname' => 'corrupt-key.example.com', 'status' => true]);
         $device->device_id = 1;
 
         $badSecret = \Mockery::mock(Secret::class)->makePartial();
@@ -207,8 +207,8 @@ final class PollingMethodProbeTest extends TestCase
 
         $status = $checker->execute($device, false);
 
-        $this->assertFalse($status);
-        $this->assertFalse($method->last_check_successful);
-        $this->assertEquals('snmp', $device->status_reason);
+        $this->assertTrue($status);
+        $this->assertNull($method->last_check_successful);
+        $this->assertNotEquals('snmp', $device->status_reason);
     }
 }

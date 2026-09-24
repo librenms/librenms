@@ -25,7 +25,7 @@ class SetDeviceAvailability
     {
         if ($device->exists || $device->relationLoaded('pollingMethods')) {
             $failedAvailabilityMethods = $device->pollingMethods
-                ->filter(fn ($method) => $method->enabled && $method->affects_availability && ! $method->last_check_successful);
+                ->filter(fn ($method) => $method->enabled && $method->affects_availability && $method->last_check_successful === false);
         } else {
             $failedAvailabilityMethods = new Collection;
         }

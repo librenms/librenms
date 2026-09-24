@@ -47,7 +47,7 @@ readonly class ConnectivityHelper
         }
 
         foreach ($this->device->pollingMethods as $deviceMethod) {
-            if ($deviceMethod->enabled && $deviceMethod->affects_availability && ! $deviceMethod->last_check_successful) {
+            if ($deviceMethod->enabled && $deviceMethod->affects_availability && $deviceMethod->last_check_successful === false) {
                 return false;
             }
         }
