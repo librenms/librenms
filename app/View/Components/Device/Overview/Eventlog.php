@@ -34,7 +34,7 @@ class Eventlog extends Component
                 Severity::Warning => 'label-warning',
                 default => 'label-default',
             },
-            'port' => $entry->type === 'interface' ? $ports->get($entry->reference) : null,
+            'port' => $entry->type === 'interface' ? $ports->get((int) $entry->reference) : null,
         ])->values()->all();
     }
 

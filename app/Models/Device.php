@@ -431,7 +431,7 @@ class Device extends BaseModel
             $deleted = (bool) $this->attribs->get($attrib_index)->delete();
             // only forget the attrib_index after delete, otherwise delete() will fail fatally with:
             // Symfony\\Component\\Debug\Exception\\FatalThrowableError(code: 0):  Call to a member function delete() on null
-            $this->attribs->forget((string) $attrib_index);
+            $this->attribs->forget($attrib_index);
 
             return $deleted;
         }

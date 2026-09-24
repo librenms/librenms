@@ -15,7 +15,7 @@ class AuthLogController
         $this->authorize('auth-log.view');
 
         return view('user.authlog', [
-            'authlog' => AuthLog::orderBy('datetime', 'DESC')->get(),
+            'authlog' => AuthLog::orderBy('datetime', 'desc')->get(),
         ]);
     }
 }

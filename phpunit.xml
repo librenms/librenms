@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
-         backupGlobals="true"
-         bootstrap="tests/bootstrap.php"
-         colors="true"
-         processIsolation="false"
-         stopOnFailure="false"
-         cacheDirectory=".phpunit.cache"
-         backupStaticProperties="false">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" backupGlobals="true" bootstrap="tests/bootstrap.php" colors="true" processIsolation="false" stopOnFailure="false" cacheDirectory=".phpunit.cache" backupStaticProperties="false">
   <testsuites>
     <testsuite name="LibreNMS Test Suite">
       <directory>tests</directory>
@@ -30,6 +22,9 @@
     <env name="DB_CONNECTION" value="testing"/>
     <env name="CONFIG_CACHE_TTL" value="300"/>
     <const name="PHPUNIT_RUNNING" value="true"/>
+    <env name="BROADCAST_CONNECTION" value="null"/>
+    <env name="PULSE_ENABLED" value="false"/>
+    <env name="NIGHTWATCH_ENABLED" value="false"/>
   </php>
   <source>
     <include>
