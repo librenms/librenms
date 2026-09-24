@@ -17,6 +17,10 @@ abstract class SecretDefinition implements HasFieldSchema
      */
     abstract public function createData(array $data): SecretData;
 
+    /**
+     * This resolution is intentionally kept simple to avoid enumerating all secrets here.
+     * More complex systems can be implemented later.
+     */
     public static function for(SecretType|string|null $type): ?static
     {
         if ($type === null) {
