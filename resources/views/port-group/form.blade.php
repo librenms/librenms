@@ -13,3 +13,116 @@
         <span class="help-block">{{ $errors->first('desc') }}</span>
     </div>
 </div>
+
+<div class="form-group @if($errors->has('type')) has-error @endif">
+    <label for="type" class="control-label col-sm-3 col-md-2">{{ __('Type') }}</label>
+    <div class="col-sm-9 col-md-10">
+        <select class="form-control" id="type" name="type" onchange="change_pg_type(this)">
+            <option value="dynamic"
+                    @if(old('type', $port_group->type) == 'dynamic') selected @endif>{{ __('Dynamic') }}</option>
+            <option value="static"
+                    @if(old('type', $port_group->type ?: 'static') == 'static') selected @endif>{{ __('Static') }}</option>
+        </select>
+        <span class="help-block">{{ $errors->first('type') }}</span>
+    </div>
+</div>
+
+<div id="dynamic-pg-form" class="form-group @if($errors->has('rules')) has-error @endif">
+    <label for="pattern" class="control-label col-sm-3 col-md-2 text-nowrap">{{ __('Define Rules') }}</label>
+    <div class="col-sm-9 col-md-10">
+        <div id="builder"></div>
+        <span class="help-block">{{ $errors->first('rules') }}</span>
+    </div>
+</div>
+
+<div id="static-pg-form" class="form-group @if($errors->has('ports')) has-error @endif" style="display: none">
+    <label for="ports" class="control-label col-sm-3 col-md-2 text-nowrap">{{ __('Select Ports') }}</label>
+    <div class="col-sm-9 col-md-10">
+        <select class="form-control" id="ports" name="ports[]" multiple>
+            @foreach($port_group->ports as $port)
+                <option value="{{ $port->port_id }}" selected>{{ $port->getShortLabel() }} - {{ $port->device?->shortDisplayName() }}</option>
+            @endforeach
+        </select>
+        <span class="help-block">{{ $errors->first('ports') }}</span>
+    </div>
+</div>
+
+<script>
+    function change_pg_type(select) {
+        var type = select.options[select.selectedIndex].value;
+        document.getElementById("dynamic-pg-form").style.display = (type === 'dynamic' ? 'block' : 'none');
+        document.getElementById("static-pg-form").style.display = (type === 'dynamic' ? 'none' : 'block');
+    }
+
+    change_pg_type(document.getElementById('type'));
+
+    init_select2('#ports', 'port', {multiple: true});
+
+    var builder = $('#builder').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
+        $("[name$='_filter']").each(function () {
+            $(this).select2({
+                dropdownAutoWidth: true,
+                width: 'auto'
+            });
+        });
+    }).on('ruleToSQL.queryBuilder.filter', function (e, rule) {
+        if (rule.operator === 'regexp') {
+            e.value += ' \'' + rule.value + '\'';
+        }
+    }).queryBuilder({
+        plugins: [
+            'bt-tooltip-errors',
+            'sortable'
+        ],
+
+        filters: {!! $filters !!},
+        operators: [
+            'equal', 'not_equal', 'between', 'not_between', 'begins_with', 'not_begins_with', 'contains', 'not_contains', 'ends_with', 'not_ends_with', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null', 'in', 'not_in',
+            {type: 'less', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'less_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'greater', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'greater_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']},
+            {type: 'not_regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']}
+        ],
+        lang: {
+            operators: {
+                regexp: 'regex',
+                not_regex: 'not regex'
+            }
+        },
+        sqlOperators: {
+            regexp: {op: 'REGEXP'},
+            not_regexp: {op: 'NOT REGEXP'}
+        },
+        sqlRuleOperator: {
+            'REGEXP': function (v) {
+                return {val: v, op: 'regexp'};
+            },
+            'NOT REGEXP': function (v) {
+                return {val: v, op: 'not_regexp'};
+            }
+        }
+    });
+
+    $('.port-group-form').on("submit", function (eventObj) {
+        if ($('#type').val() === 'static') {
+            return true;
+        }
+
+        if (!builder.queryBuilder('validate')) {
+            return false;
+        }
+
+        $('<input type="hidden" name="rules" />')
+            .attr('value', JSON.stringify(builder.queryBuilder('getRules')))
+            .appendTo(this);
+        return true;
+    });
+</script>
+<script>
+    var rules = {!! json_encode(old('rules') ? json_decode(old('rules')) : $port_group->rules) !!};
+    if (rules) {
+        builder.queryBuilder('setRules', rules);
+    }
+</script>

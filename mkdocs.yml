@@ -175,6 +175,7 @@ nav:
     - Billing Module: Extensions/Billing-Module.md
     - Configuration: Support/Configuration.md
     - Dashboards: Extensions/Dashboards.md
+    - Grouping Ports: Extensions/Port-Groups.md
     - Interface Description Parsing: Extensions/Interface-Description-Parsing.md
     - Network Maps:
       - Availability Map: Extensions/Availability-Map.md
