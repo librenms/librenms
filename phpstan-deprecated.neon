@@ -4,7 +4,7 @@ includes:
 
 parameters:
     phpVersion:
-        min: 80300
+        min: 80400
         max: 80599
 
     customRulesetUsed: true
