@@ -68,7 +68,7 @@ class WirelessSensor extends SensorModel implements Keyable
     ];
 
     /**
-     * @return array{sensor_class: 'LibreNMS\Enum\WirelessSensorType', sensor_oids: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
