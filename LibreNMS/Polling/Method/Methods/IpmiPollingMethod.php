@@ -6,7 +6,6 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\View\FieldSchema\FieldDefinition;
 use LibreNMS\Data\Source\Ipmitool;
-use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\IpmiConnectionFailed;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
@@ -63,27 +62,14 @@ final class IpmiPollingMethod extends PollingMethod
         try {
             $ipmi->command(['power', 'status']);
 
-            $stats = [];
-            if ($type = $ipmi->getType()) {
-                $stats['type'] = $type;
-            }
-
-            return ProbeResult::success($stats);
+            return ProbeResult::success();
         } catch (IpmiConnectionFailed $e) {
-            return ProbeResult::failure([], $e->getMessage());
+            return ProbeResult::failure(errorMessage: $e->getMessage());
         }
     }
 
     public function onProbeComplete(Device $device, ProbeResult $result, bool $commit = false): void
     {
-        if ($result->isSuccess() && $type = $result->stat('type')) {
-            $deviceMethod = $device->pollingMethod(PollingMethodType::Ipmi);
-            if ($deviceMethod) {
-                $settings = $deviceMethod->settings ?? [];
-                $settings['type'] = $type;
-                $deviceMethod->settings = $settings;
-            }
-        }
     }
 
     public function secretType(): SecretType
