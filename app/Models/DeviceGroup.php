@@ -62,7 +62,7 @@ class DeviceGroup extends BaseModel
     }
 
     /**
-     * @return array{rules: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
