@@ -8,7 +8,6 @@ use App\Models\Secret;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
-use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class BuildDefaultPollingMethods
 {
@@ -60,12 +59,16 @@ class BuildDefaultPollingMethods
             $affectsAvailability = isset($data['affects_availability']) ? (bool) $data['affects_availability'] : null;
 
             $secret = null;
-            $secretData = null;
             $secretType = $method->secretType();
             if ($secretType !== null && $credentialMode === 'existing' && $secretId !== null) {
                 $secret = Secret::resolveForType($secretId, $secretType);
-            } elseif (! empty($data['secret_data'])) {
-                $secretData = SecretDefinition::for($secretType)?->createData($data['secret_data']);
+            } elseif ($secretType !== null && ! empty($data['secret_data'])) {
+                $desc = ($credentialMode === 'new' && ! empty($data['description'])) ? $data['description'] : (strtoupper($type->value) . ' ' . $device->hostname);
+                $secret = new Secret([
+                    'description' => $desc,
+                    'secret_type' => $secretType,
+                    'data' => $data['secret_data'],
+                ]);
             }
 
             $pollingMethod = new DevicePollingMethod([
@@ -75,17 +78,8 @@ class BuildDefaultPollingMethods
                 'settings' => $method->filterOverrides($settings),
             ]);
             $pollingMethod->setRelation('device', $device);
-
             if ($secret !== null) {
                 $pollingMethod->setRelation('secret', $secret);
-                $pollingMethod->secret_id = $secret->id;
-            } elseif ($secretData !== null) {
-                $createdSecret = new Secret([
-                    'secret_type' => $secretType,
-                    'description' => ($credentialMode === 'new' && ! empty($data['description'])) ? $data['description'] : (strtoupper($type->value) . ' ' . $device->hostname),
-                    'data' => $secretData->toArray(),
-                ]);
-                $pollingMethod->setRelation('secret', $createdSecret);
             }
 
             $pollingMethods->push($pollingMethod);
