@@ -6,16 +6,10 @@ use App\View\FieldSchema\HandlesFieldSchema;
 use App\View\FieldSchema\HasFieldSchema;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\SecretType;
-use LibreNMS\Polling\Secrets\Data\SecretData;
 
 abstract class SecretDefinition implements HasFieldSchema
 {
     use HandlesFieldSchema;
-
-    /**
-     * @param  array<string, mixed>  $data
-     */
-    abstract public function createData(array $data): SecretData;
 
     /**
      * This resolution is intentionally kept simple to avoid enumerating all secrets here.
