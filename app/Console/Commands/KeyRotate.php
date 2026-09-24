@@ -6,6 +6,8 @@ use App\Console\LnmsCommand;
 use Artisan;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use LibreNMS\Util\EnvHelper;
@@ -40,6 +42,7 @@ class KeyRotate extends LnmsCommand
         $this->addArgument('old_key', InputArgument::OPTIONAL);
         $this->addOption('generate-new-key');
         $this->addOption('forgot-key');
+        $this->addOption('no-interaction', description: 'Run the operation without confirmation');
     }
 
     /**
@@ -111,11 +114,12 @@ class KeyRotate extends LnmsCommand
         $this->encrypt = $this->createEncrypter($new, $cipher);
 
         $this->line(trans('commands.key:rotate.backups'));
-        if (! $this->confirm(trans('commands.key:rotate.confirm'))) {
+        if (! $this->option('no-interaction') && ! $this->confirm(trans('commands.key:rotate.confirm'))) {
             return 1;
         }
 
-        $success = $this->rekeyConfigData('validation.encryption.test');
+        $success = $this->rekeyConfigData('validation.encryption.test')
+            && $this->rekeySecrets();
 
         if (! $success) {
             $this->line(trans('commands.key:rotate.old_key', ['key' => $old]));
@@ -141,6 +145,50 @@ class KeyRotate extends LnmsCommand
     private function createEncrypter(string $key, string $cipher): Encrypter
     {
         return new Encrypter(base64_decode(Str::after($key, 'base64:')), $cipher);
+    }
+
+    private function rekeySecrets(): bool
+    {
+        if (! Schema::hasTable('secrets')) {
+            return true;
+        }
+
+        try {
+            DB::transaction(function (): void {
+                $secrets = DB::table('secrets')->whereNotNull('data')->get(['id', 'description', 'data']);
+
+                foreach ($secrets as $secret) {
+                    $raw = $secret->data;
+                    if ($raw === null || $raw === '') {
+                        continue;
+                    }
+
+                    try {
+                        $decrypted = $this->decrypt->decryptString($raw);
+                        $reEncrypted = $this->encrypt->encryptString($decrypted);
+                    } catch (DecryptException) {
+                        try {
+                            $this->encrypt->decryptString($raw);
+                            continue; // already re-keyed with new key
+                        } catch (DecryptException) {
+                            $this->warn("Skipping secret #{$secret->id} ({$secret->description}): unable to decrypt with old or new key.");
+                            continue;
+                        }
+                    }
+
+                    DB::table('secrets')->where('id', $secret->id)->update([
+                        'data' => $reEncrypted,
+                        'updated_at' => now(),
+                    ]);
+                }
+            });
+
+            return true;
+        } catch (\Throwable $e) {
+            $this->warn($e->getMessage());
+
+            return false;
+        }
     }
 
     private function rekeyConfigData(string $key): bool
