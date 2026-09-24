@@ -125,14 +125,11 @@
                     maxVisible: 100000
                 }
             };
-            options.interaction = options.interaction || {zoomView: true};
+            options.interaction = options.interaction || {};
             options.interaction.hover = true;
             options.interaction.tooltipDelay = 100;
             options.interaction.dragView = true;
-
-            if (! options.interaction.zoomView) {
-                scale = 1;
-            }
+            options.interaction.zoomView = true;
 
             var container = document.getElementById(elementId);
             var network = new vis.Network(container, {nodes: nodes, edges: edges}, options);
@@ -147,8 +144,8 @@
             container._minScale = scale;
             container._maxScale = 12.0;
 
-            var centreY = options.interaction.zoomView ? Math.round(mapHeight / 2) : Math.round(container.scrollHeight / 2);
-            var centreX = options.interaction.zoomView ? Math.round(mapWidth / 2) : Math.round(container.scrollWidth / 2);
+            var centreY = Math.round(mapHeight / 2);
+            var centreX = Math.round(mapWidth / 2);
             network.moveTo({position: {x: centreX, y: centreY}, scale: scale});
 
             var lastValidPos = { x: centreX, y: centreY };
@@ -218,7 +215,6 @@
 
         zoomIn: function (network, container) {
             if (!network) return;
-            if (!network.interactionHandler?.options?.zoomView) return;
             var curScale = network.getScale();
             var maxScale = (container && container._maxScale) ? container._maxScale : 12.0;
             var targetScale = Math.min(curScale * 1.25, maxScale);
@@ -230,7 +226,6 @@
 
         zoomOut: function (network, container) {
             if (!network) return;
-            if (!network.interactionHandler?.options?.zoomView) return;
             var curScale = network.getScale();
             var minScale = (container && container._minScale) ? container._minScale : 0.1;
             var targetScale = Math.max(curScale / 1.25, minScale);
@@ -240,9 +235,16 @@
             });
         },
 
+        zoomOriginal: function (network) {
+            if (!network) return;
+            network.moveTo({
+                scale: 1,
+                animation: { duration: 200, easingFunction: 'easeInOutQuad' }
+            });
+        },
+
         fitMap: function (network, container) {
             if (!network || !container) return;
-            if (!network.interactionHandler?.options?.zoomView) return;
             var mapWidth = container._mapWidth;
             var mapHeight = container._mapHeight;
             var scale = container._minScale || 1;
@@ -255,12 +257,25 @@
             });
         },
 
-        topLeft: function (network, container) {
-            var centreX = Math.round(container.scrollWidth / 2);
-            var centreY = Math.round(container.scrollHeight / 2);
+        fitHeight: function (network, container) {
+            if (!network || !container) return;
+            var containerHeight = $(container).height() || $(window).height();
+            var logicalHeight = this.mapLogicalHeight || 800;
+            var scale = (containerHeight / logicalHeight) || 1;
             network.moveTo({
-                position: { x: centreX, y: centreY},
-                animation: { duration: 100, easingFunction: 'linear' }
+                scale: scale,
+                animation: { duration: 200, easingFunction: 'easeInOutQuad' }
+            });
+        },
+
+        fitWidth: function (network, container) {
+            if (!network || !container) return;
+            var containerWidth = $(container).width() || $(window).width();
+            var logicalWidth = this.mapLogicalWidth || 1800;
+            var scale = (containerWidth / logicalWidth) || 1;
+            network.moveTo({
+                scale: scale,
+                animation: { duration: 200, easingFunction: 'easeInOutQuad' }
             });
         },
 
@@ -907,29 +922,36 @@
                         menuHeader = "{{ __('Map Navigation') }}";
                     }
 
-                    if (netOptions.interaction?.zoomView == undefined ? true : netOptions.interaction.zoomView) {
-                        menuItems.push({
-                            icon: 'fa-solid fa-expand',
-                            label: "{{ __('Fit to Window') }} (F)",
-                            action: function () { custommap.fitMap(self.network, container); }
-                        });
-                        menuItems.push({
-                            icon: 'fa-solid fa-magnifying-glass-plus',
-                            label: "{{ __('Zoom In') }} (+)",
-                            action: function () { custommap.zoomIn(self.network, container); }
-                        });
-                        menuItems.push({
-                            icon: 'fa-solid fa-magnifying-glass-minus',
-                            label: "{{ __('Zoom Out') }} (-)",
-                            action: function () { custommap.zoomOut(self.network, container); }
-                        });
-                    } else {
-                        menuItems.push({
-                            icon: 'fa-solid fa-expand',
-                            label: "{{ __('Navigate to top left') }} (F)",
-                            action: function () { custommap.topLeft(self.network, container); }
-                        });
-                    }
+                    menuItems.push({
+                        icon: 'fa-solid fa-expand',
+                        label: "{{ __('Fit to Window') }} (F)",
+                        action: function () { custommap.fitMap(self.network, container); }
+                    });
+                    menuItems.push({
+                        icon: 'fa-solid fa-arrows-left-right',
+                        label: "{{ __('Zoom to Width') }} (W)",
+                        action: function () { custommap.fitWidth(self.network, container); }
+                    });
+                    menuItems.push({
+                        icon: 'fa-solid fa-arrows-up-down',
+                        label: "{{ __('Zoom to Height') }} (H)",
+                        action: function () { custommap.fitHeight(self.network, container); }
+                    });
+                    menuItems.push({
+                        icon: 'fa-solid fa-window-maximize',
+                        label: "{{ __('Original Scale') }} (1)",
+                        action: function () { custommap.zoomOriginal(self.network); }
+                    });
+                    menuItems.push({
+                        icon: 'fa-solid fa-magnifying-glass-plus',
+                        label: "{{ __('Zoom In') }} (+)",
+                        action: function () { custommap.zoomIn(self.network, container); }
+                    });
+                    menuItems.push({
+                        icon: 'fa-solid fa-magnifying-glass-minus',
+                        label: "{{ __('Zoom Out') }} (-)",
+                        action: function () { custommap.zoomOut(self.network, container); }
+                    });
                     if (self.editUrl) {
                         menuItems.push({
                             icon: 'fa-solid fa-pen-to-square',
@@ -981,13 +1003,22 @@
                         var networkContainer = document.getElementById(self.elementId);
                         if (e.key === '0' || e.key.toLowerCase() === 'f' || e.key === 'Home') {
                             e.preventDefault();
-                            self.network.interactionHandler?.options?.zoomView ? custommap.fitMap(self.network, networkContainer) : custommap.topLeft(self.network, networkContainer);
+                            custommap.fitMap(self.network, networkContainer);
+                        } else if (e.key.toLowerCase() === 'h') {
+                            e.preventDefault();
+                            custommap.fitHeight(self.network, networkContainer);
+                        } else if (e.key.toLowerCase() === 'w') {
+                            e.preventDefault();
+                            custommap.fitWidth(self.network, networkContainer);
                         } else if (e.key === '+' || e.key === '=') {
                             e.preventDefault();
                             custommap.zoomIn(self.network, networkContainer);
                         } else if (e.key === '-' || e.key === '_') {
                             e.preventDefault();
                             custommap.zoomOut(self.network, networkContainer);
+                        } else if (e.key === '1' || e.key === '!') {
+                            e.preventDefault();
+                            custommap.zoomOriginal(self.network);
                         } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
                             e.preventDefault();
                             var curPos = self.network.getViewPosition();

@@ -52,12 +52,6 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="mapopt-zoom" class="col-sm-3 control-label">{{ __('map.custom.edit.map.zoom') }}</label>
-                                <div class="col-sm-9">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="mapopt-zoom">
-                                </div>
-                            </div>
-                            <div class="form-group row">
                                 <label for="mapopt-dragnodes" class="col-sm-3 control-label">{{ __('map.custom.edit.map.dragnodes') }}</label>
                                 <div class="col-sm-9">
                                     <input class="form-check-input" type="checkbox" role="switch" id="mapopt-dragnodes">
@@ -118,7 +112,6 @@
             post_options.interaction = {};
         }
 
-        post_options.interaction.zoomView = $("#mapopt-zoom").prop('checked');
         post_options.interaction.dragNodes = $("#mapopt-dragnodes").prop('checked');
         post_options.physics.enabled = $("#mapopt-physics").prop('checked');
 
@@ -193,7 +186,6 @@
 
     function mapSettingsReset() {
         $("#mapreversearrows").bootstrapSwitch('state', Boolean(reverse_arrows));
-        $("#mapopt-zoom").bootstrapSwitch('state', Boolean(map_options.interaction.zoomView));
         $("#mapopt-dragnodes").bootstrapSwitch('state', Boolean(map_options.interaction.dragNodes));
         $("#mapopt-physics").bootstrapSwitch('state', Boolean(map_options.physics.enabled));
         $("#mapname").val(map_name);
