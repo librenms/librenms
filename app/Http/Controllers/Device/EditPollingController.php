@@ -87,11 +87,28 @@ class EditPollingController
                 'usage_count' => $availableSecret->devices_count,
             ],
         ])->all();
-        $secretFormDataById = $secretsForType->mapWithKeys(fn (Secret $availableSecret): array => [
-            (string) $availableSecret->id => (object) collect($schemaFields)->mapWithKeys(fn (array $field): array => [
-                $field['key'] => $canUnmaskSecrets ? (string) data_get($availableSecret->data, $field['key'], '') : '',
-            ])->all(),
-        ])->all();
+        $currentSecretData = [];
+        if ($secret && $canUnmaskSecrets) {
+            try {
+                $currentSecretData = $secret->data ?? [];
+            } catch (\Throwable) { // @phpstan-ignore catch.neverThrown
+                $currentSecretData = [];
+            }
+        }
+
+        $secretFormDataById = $secretsForType->mapWithKeys(function (Secret $availableSecret) use ($schemaFields, $canUnmaskSecrets): array {
+            try {
+                $secretData = $canUnmaskSecrets ? ($availableSecret->data ?? []) : [];
+            } catch (\Throwable) { // @phpstan-ignore catch.neverThrown
+                $secretData = [];
+            }
+
+            return [
+                (string) $availableSecret->id => (object) collect($schemaFields)->mapWithKeys(fn (array $field): array => [
+                    $field['key'] => (string) data_get($secretData, $field['key'], ''),
+                ])->all(),
+            ];
+        })->all();
 
         $settingsDefaults = $method->schemaDefaults();
 
@@ -110,7 +127,7 @@ class EditPollingController
             'affects_availability' => $row ? $row->affects_availability : $method->defaultAffectsAvailability(),
             'secret' => $secret,
             'secret_form_data' => $secret ? collect($schema)->mapWithKeys(fn (array $field, string $key): array => [
-                $key => $canUnmaskSecrets ? (string) data_get($secret->data, $key, '') : '',
+                $key => (string) data_get($currentSecretData, $key, ''),
             ])->all() : null,
             'secret_meta' => $secretMeta,
             'secret_form_data_by_id' => $secretFormDataById,
@@ -232,8 +249,8 @@ class EditPollingController
             }
         }
 
-        $row->last_check_successful = isset($probeResult) ? $probeResult->isSuccess() : false;
-        $row->last_checked_at = now();
+        $row->last_check_successful = isset($probeResult) ? $probeResult->isSuccess() : ($forceSave ? false : null);
+        $row->last_checked_at = (isset($probeResult) || $forceSave) ? now() : null;
         $row->save();
 
         $toast->success(__('poller.method_added'));
@@ -406,8 +423,8 @@ class EditPollingController
         $device->saveQuietly();
 
         if ($enabled) {
-            $deviceMethod->last_check_successful = isset($probeResult) ? $probeResult->isSuccess() : false;
-            $deviceMethod->last_checked_at = now();
+            $deviceMethod->last_check_successful = isset($probeResult) ? $probeResult->isSuccess() : ($forceSave ? false : $deviceMethod->last_check_successful);
+            $deviceMethod->last_checked_at = (isset($probeResult) || $forceSave) ? now() : $deviceMethod->last_checked_at;
             $deviceMethod->save();
         }
 
