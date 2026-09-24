@@ -64,9 +64,7 @@ if (Gate::denies('device.update')) {
 
     $sep = '';
     foreach ($panes as $type => $text) {
-        if (! isset($vars['section'])) {
-            $vars['section'] = $type;
-        }
+        $vars['section'] ??= $type;
         echo $sep;
         if ($vars['section'] == $type) {
             echo "<span class='pagemenu-selected'>";

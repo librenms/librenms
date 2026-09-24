@@ -283,17 +283,15 @@ class Unifi extends OS implements
         $sensors = [];
         foreach ($power_oids as $index => $entry) {
             $radio_name = $vap_radios[$index];
-            if (! isset($sensors[$radio_name])) {
-                $sensors[$radio_name] = new WirelessSensor(
-                    WirelessSensorType::Power,
-                    $this->getDeviceId(),
-                    '.1.3.6.1.4.1.41112.1.6.1.2.1.21.' . $index,
-                    'unifi-tx',
-                    $radio_name,
-                    "Tx Power ($radio_name)",
-                    $entry['unifiVapTxPower']
-                );
-            }
+            $sensors[$radio_name] ??= new WirelessSensor(
+                WirelessSensorType::Power,
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.41112.1.6.1.2.1.21.' . $index,
+                'unifi-tx',
+                $radio_name,
+                "Tx Power ($radio_name)",
+                $entry['unifiVapTxPower']
+            );
         }
 
         return $sensors;

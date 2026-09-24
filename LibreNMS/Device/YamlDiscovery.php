@@ -84,10 +84,7 @@ class YamlDiscovery
                     $count++;
                     $current_data = [];
 
-                    // fall back to the fetched oid if value is not specified.  Useful for non-tabular data.
-                    if (! isset($data['value'])) {
-                        $data['value'] = $data['oid'];
-                    }
+                    $data['value'] ??= $data['oid'];
 
                     // determine numeric oid automatically if not specified
                     if (! isset($data['num_oid'])) {

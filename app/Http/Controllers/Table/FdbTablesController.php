@@ -267,9 +267,7 @@ class FdbTablesController extends TableController
      */
     protected function getMacCount(Port $port): int
     {
-        if (! isset($this->macCountCache[$port->port_id])) {
-            $this->macCountCache[$port->port_id] = $port->fdbEntries()->count();
-        }
+        $this->macCountCache[$port->port_id] ??= $port->fdbEntries()->count();
 
         return $this->macCountCache[$port->port_id];
     }
