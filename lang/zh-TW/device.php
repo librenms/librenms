@@ -67,8 +67,6 @@ return [
         'ignore_device_status' => '忽略裝置狀態',
         'ignore_device_status_title' => '將裝置標記為忽略狀態，它將始終顯示為線上。',
         'save' => '儲存',
-        'size_on_disk' => '磁碟使用大小',
-        'rrd_files' => 'RRD 檔案',
         'last_polled' => '上次輪詢時間',
         'last_discovered' => '上次探索時間',
         'rediscover_error' => '將此裝置設定為重新探索時發生錯誤',
