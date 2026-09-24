@@ -29,7 +29,6 @@ class Bosch extends OS implements OSDiscovery
     {
         parent::discoverOS($device); //yaml
 
-        $device->serial = preg_replace('/(?<zero>0)(?<digit>\d)|(?<blank>\s)|(?<end>\X)/', '\\2', $device->serial);
 
         $device->sysName = rtrim($device->sysName, '.');
 

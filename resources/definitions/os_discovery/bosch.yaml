@@ -1,7 +1,11 @@
 modules:
     os:
-        hardware: BSS-RCP-MIB::oem-device-name.0
+        hardware: 'BSS-RCP-MIB::oem-device-name.0'
+        hardware_replace:
+            - ["/[\r\n\t\"']+/s", '']
+            - ['/00$/', '']
         serial: BSS-RCP-MIB::serial-number.0
+        serial_replace: [['/(?:0(\d))|[\s"\\\\]+|./s', '\1']]
         version: BSS-RCP-MIB::software-version.0
     processors:
         data:
