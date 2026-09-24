@@ -7,6 +7,7 @@ use App\Models\Alert;
 use App\Models\AlertFault;
 use App\Models\Eventlog;
 use Illuminate\Http\Request;
+use LibreNMS\Alert\AlertRules;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\Severity;
 
@@ -65,6 +66,11 @@ class AlertController extends Controller
         }
 
         if ($saved) {
+            $fault->loadMissing('rule');
+            if ($fault->rule) {
+                (new AlertRules($fault->device_id))->syncAlertState($fault->rule);
+            }
+
             $rule_name = $fault->rule?->name;
             $act = strtolower($state_description) . 'nowledged';
             Eventlog::log("$username {$act} alert $rule_name note: $ack_msg", $fault->device_id, 'alert', Severity::Info, $fault->id);
