@@ -153,7 +153,9 @@ class KeyRotate extends LnmsCommand
         }
 
         try {
-            DB::transaction(function (): void {
+            $skipped = 0;
+            $rotated = 0;
+            DB::transaction(function () use (&$skipped, &$rotated): void {
                 $secrets = DB::table('secrets')->whereNotNull('data')->get(['id', 'description', 'data']);
 
                 foreach ($secrets as $secret) {
@@ -170,6 +172,7 @@ class KeyRotate extends LnmsCommand
                             $this->encrypt->decryptString($raw);
                             continue; // already re-keyed with new key
                         } catch (DecryptException) {
+                            $skipped++;
                             $this->warn("Skipping secret #{$secret->id} ({$secret->description}): unable to decrypt with old or new key.");
                             continue;
                         }
@@ -179,8 +182,13 @@ class KeyRotate extends LnmsCommand
                         'data' => $reEncrypted,
                         'updated_at' => now(),
                     ]);
+                    $rotated++;
                 }
             });
+
+            if ($skipped > 0) {
+                $this->warn("Rotated {$rotated} secrets, skipped {$skipped} undecryptable secrets.");
+            }
 
             return true;
         } catch (\Throwable $e) {
