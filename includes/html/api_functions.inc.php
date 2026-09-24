@@ -2033,6 +2033,11 @@ function ack_alert(Illuminate\Http\Request $request)
     }
 
     if ($updated) {
+        $rule = \App\Models\AlertRule::query()->find($fault['rule_id']);
+        if ($rule !== null) {
+            (new \LibreNMS\Alert\AlertRules($fault['device_id']))->syncAlertState($rule);
+        }
+
         return api_success_noresult(200, 'Alert has been acknowledged');
     } else {
         return api_success_noresult(200, 'No Alert by that ID');
@@ -2073,6 +2078,11 @@ function unmute_alert(Illuminate\Http\Request $request)
     }
 
     if ($updated) {
+        $rule = \App\Models\AlertRule::query()->find($fault['rule_id']);
+        if ($rule !== null) {
+            (new \LibreNMS\Alert\AlertRules($fault['device_id']))->syncAlertState($rule);
+        }
+
         return api_success_noresult(200, 'Alert has been unmuted');
     } else {
         return api_success_noresult(200, 'No alert by that ID');

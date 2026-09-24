@@ -233,7 +233,7 @@ readonly class AlertRules
      * Update the rule-level alerts row from the current open fault count.
      * Worse/better is derived from the count delta (replaces the old fault diffing).
      */
-    private function syncAlertState(AlertRule $rule): void
+    public function syncAlertState(AlertRule $rule): void
     {
         $base = AlertFault::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)->where('open', 1);
         $activeCount = (clone $base)->where('state', '!=', AlertState::RECOVERED)->count();
@@ -266,7 +266,10 @@ readonly class AlertRules
             $alertRow->open_fault_count = $activeCount;
             if ($stateChanged) {
                 $alertRow->open = 1;
-                $alertRow->alerted = 0;
+                // Keep alerted when entering acknowledged so runAcks can dedupe via alerted=ACK after notify.
+                if ($newState !== AlertState::ACKNOWLEDGED) {
+                    $alertRow->alerted = 0;
+                }
                 $alertRow->timestamp = Carbon::now();
             }
             if ($newState === AlertState::RECOVERED) {

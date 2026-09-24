@@ -302,10 +302,28 @@ class RunAlerts
 
         // Build the set of notifications to send: one per fault (per-entity) or one aggregate (grouped).
         $units = [];
-        if ($faults->isEmpty()) {
+        if ((int) $alert['state'] === AlertState::ACKNOWLEDGED) {
+            // Acknowledgement alerts are one notification per rule/device (runAcks), not per fault.
+            if ($faults->isNotEmpty()) {
+                $rows = [];
+                foreach ($faults as $fault) {
+                    foreach (($fault->details['rule'] ?? []) as $row) {
+                        $rows[] = $row;
+                    }
+                }
+                $alert['details']['rule'] = $rows;
+                if (LibrenmsConfig::get('alert.fixed-contacts') == false) {
+                    $alert['details']['contacts'] = AlertUtil::getContacts($rows);
+                }
+            }
+            $units[] = $alert;
+        } elseif ($faults->isEmpty()) {
             $units[] = $alert; // legacy fallback (e.g. data with no fault rows yet)
         } elseif ($perEntity) {
             foreach ($faults as $fault) {
+                if ((int) $fault->state === AlertState::ACKNOWLEDGED) {
+                    continue;
+                }
                 $unit = $alert;
                 $unit['state'] = (int) $fault->state;
                 $unit['fault_id'] = $fault->id;
@@ -332,6 +350,10 @@ class RunAlerts
             $units[] = $alert;
         }
 
+        if ($units === []) {
+            return true;
+        }
+
         foreach ($units as $unit) {
             $obj = $this->describeAlert($unit);
             if (is_array($obj)) {
@@ -353,7 +375,11 @@ class RunAlerts
      */
     public function runAcks()
     {
-        foreach ($this->loadAlerts('alerts.state = ' . AlertState::ACKNOWLEDGED . ' AND alerts.open = ' . AlertState::ACTIVE) as $alert) {
+        foreach ($this->loadAlerts('alerts.state = ' . AlertState::ACKNOWLEDGED . ' AND alerts.open = 1') as $alert) {
+            if ((int) $alert['alerted'] === AlertState::ACKNOWLEDGED) {
+                continue;
+            }
+
             $rextra = json_decode((string) $alert['extra'], true);
             if (! isset($rextra['acknowledgement'])) {
                 // backwards compatibility check
@@ -361,10 +387,16 @@ class RunAlerts
             }
 
             if ($rextra['acknowledgement']) {
-                // Rule is set to send an acknowledgement alert
                 $this->issueAlert($alert);
-                dbUpdate(['open' => AlertState::CLEAR], 'alerts', 'rule_id = ? AND device_id = ?', [$alert['rule_id'], $alert['device_id']]);
             }
+
+            \App\Models\Alert::query()
+                ->where('rule_id', $alert['rule_id'])
+                ->where('device_id', $alert['device_id'])
+                ->update([
+                    'open' => 0,
+                    'alerted' => AlertState::ACKNOWLEDGED,
+                ]);
         }
     }
 
@@ -440,6 +472,23 @@ class RunAlerts
             $tolerence_window = LibrenmsConfig::get('alert.tolerance_window');
             $activeState = in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true);
             $dueTransports = [];
+
+            $hasUnacknowledgedFaults = $activeState && AlertFault::query()
+                ->where('rule_id', $alert['rule_id'])
+                ->where('device_id', $alert['device_id'])
+                ->where('open', 1)
+                ->where('state', AlertState::ACTIVE)
+                ->exists();
+
+            // Faults can be ack'd while the aggregate alerts row is still ACTIVE.
+            if ($activeState && ! $hasUnacknowledgedFaults) {
+                $rule = AlertRule::query()->find($alert['rule_id']);
+                if ($rule !== null) {
+                    (new AlertRules($alert['device_id']))->syncAlertState($rule);
+                }
+
+                continue;
+            }
 
             if ($activeState && AlertUtil::ruleHasAlertOperations((int) $alert['rule_id'])) {
                 if (AlertUtil::operationNotificationsSuppressed((int) $alert['rule_id'])) {
