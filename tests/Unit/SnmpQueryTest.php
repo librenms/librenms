@@ -285,4 +285,51 @@ class SnmpQueryTest extends TestCase
         $query = (new SnmpQueryBuilder($mockBackend))->device($this->device);
         $query->walk('UCD-SNMP-MIB::laLoadInt');
     }
+
+    public function testTargetWithoutDevice(): void
+    {
+        \Illuminate\Support\Facades\Event::fake([\App\Events\SnmpQueryExecuted::class]);
+
+        $config = new SnmpConfig(version: 'v2c', community: 'custom-comm');
+
+        $mockBackend = $this->mockBackend();
+        $mockBackend->shouldReceive('get')
+            ->once()
+            ->withArgs(fn (string $target, array $oids, SnmpConfig $cfg, SnmpQueryOptions $options) => $target === '192.168.1.1'
+                && $cfg->community === 'custom-comm'
+                && $oids === ['sysDescr.0'])
+            ->andReturn(new SnmpResponse(['sysDescr.0' => 'Custom Switch']));
+
+        $query = (new SnmpQueryBuilder($mockBackend))
+            ->target('192.168.1.1', $config);
+
+        $response = $query->get('sysDescr.0');
+
+        $this->assertSame(['sysDescr.0' => 'Custom Switch'], $response->values());
+
+        \Illuminate\Support\Facades\Event::assertDispatched(\App\Events\SnmpQueryExecuted::class, fn (\App\Events\SnmpQueryExecuted $event) => $event->target === '192.168.1.1'
+            && $event->config === $config
+            && $event->device === null
+            && $event->method === 'snmpget');
+    }
+
+    public function testTargetWithoutDeviceWalk(): void
+    {
+        $config = new SnmpConfig(version: 'v2c', community: 'custom-comm');
+
+        $mockBackend = $this->mockBackend();
+        $mockBackend->shouldReceive('walk')
+            ->once()
+            ->withArgs(fn (string $target, string $oid, SnmpConfig $cfg, SnmpQueryOptions $options) => $target === '192.168.1.1'
+                && $cfg->community === 'custom-comm'
+                && $oid === 'ifDescr')
+            ->andReturn(new SnmpResponse(['ifDescr.1' => 'eth0']));
+
+        $query = (new SnmpQueryBuilder($mockBackend))
+            ->target('192.168.1.1', $config);
+
+        $response = $query->walk('ifDescr');
+
+        $this->assertSame(['ifDescr.1' => 'eth0'], $response->values());
+    }
 }

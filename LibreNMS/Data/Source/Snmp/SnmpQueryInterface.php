@@ -27,6 +27,7 @@
 namespace LibreNMS\Data\Source\Snmp;
 
 use App\Models\Device;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 
 interface SnmpQueryInterface
 {
@@ -40,6 +41,11 @@ interface SnmpQueryInterface
      * By default the query will use the primary device.
      */
     public function device(Device $device): SnmpQueryInterface;
+
+    /**
+     * Specify a raw target (host) and its SNMP config without a Device.
+     */
+    public function target(string $target, SnmpConfig $config): SnmpQueryInterface;
 
     /**
      * Cache the data for the rest of the runtime (or retrieve from cache if available)

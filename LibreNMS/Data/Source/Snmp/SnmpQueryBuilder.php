@@ -40,7 +40,9 @@ use Log;
 
 class SnmpQueryBuilder implements SnmpQueryInterface
 {
-    private Device $device;
+    private ?Device $device = null;
+    private ?string $target = null;
+    private ?SnmpConfig $config = null;
     private string $context = '';
     private string $v3ContextPrefix = '';
     private SnmpQueryOptions $options;
@@ -70,8 +72,6 @@ class SnmpQueryBuilder implements SnmpQueryInterface
             $this->options = SnmpQueryOptions::quickPrint();
             $this->options->allowUnderscores = true;
         }
-
-        $this->device = DeviceCache::getPrimary();
     }
 
     /**
@@ -89,6 +89,19 @@ class SnmpQueryBuilder implements SnmpQueryInterface
     public function device(Device $device): SnmpQueryInterface
     {
         $this->device = $device;
+        $this->target = null;
+
+        return $this;
+    }
+
+    /**
+     * Specify a raw target (host) and its SNMP config without a Device.
+     */
+    public function target(string $target, SnmpConfig $config): SnmpQueryInterface
+    {
+        $this->target = $target;
+        $this->config = $config;
+        $this->device = null;
 
         return $this;
     }
@@ -250,8 +263,8 @@ class SnmpQueryBuilder implements SnmpQueryInterface
     public function walk($oid): SnmpResponse
     {
         $config = $this->prepareQuery();
-        $target = $this->device->pollerTarget();
-        $os = $this->device->os ?? 'generic';
+        $target = $this->resolveTarget();
+        $os = $this->resolveOs();
         $oids = $this->parseOid($oid);
 
         return $this->runWithAbort(
@@ -306,7 +319,7 @@ class SnmpQueryBuilder implements SnmpQueryInterface
     private function executeChunked(string $command, string $verb, array|string $oid, \Closure $backendCall): SnmpResponse
     {
         $config = $this->prepareQuery();
-        $target = $this->device->pollerTarget();
+        $target = $this->resolveTarget();
         $chunks = $this->limitOids($this->parseOid($oid), $config);
 
         return $this->runWithAbort(
@@ -344,12 +357,12 @@ class SnmpQueryBuilder implements SnmpQueryInterface
     }
 
     /**
-     * Resolve the device's SNMP config and sync mibDirs/context onto the query options.
+     * Resolve the SNMP config and sync mibDirs/context onto the query options.
      * Shared by get/walk/next; translate() only needs prepareMibDirs().
      */
     private function prepareQuery(): SnmpConfig
     {
-        $config = $this->device->toSnmpConfig();
+        $config = $this->config ?? $this->getDevice()->toSnmpConfig();
         $this->prepareMibDirs();
         $this->options->context = $config->version === 'v3' ? $this->v3ContextPrefix . $this->context : $this->context;
 
@@ -358,7 +371,17 @@ class SnmpQueryBuilder implements SnmpQueryInterface
 
     private function prepareMibDirs(): void
     {
-        $this->options->mibDirs = Mib::directories($this->device->os ?? 'generic', $this->options->mibDirs);
+        $this->options->mibDirs = Mib::directories($this->resolveOs(), $this->options->mibDirs);
+    }
+
+    private function resolveTarget(): string
+    {
+        return $this->target ?? $this->getDevice()->pollerTarget();
+    }
+
+    private function resolveOs(): string
+    {
+        return $this->target === null ? ($this->getDevice()->os ?: 'generic') : 'generic';
     }
 
     /**
@@ -392,7 +415,7 @@ class SnmpQueryBuilder implements SnmpQueryInterface
         }
 
         $driver = 'array';
-        $key = $this->getCacheKey($command, $oids);
+        $key = $this->getCacheKey($command, $oids, $target, $config);
 
         if (Debug::isEnabled()) {
             $cache_performance = Cache::driver($driver)->get('SnmpQuery_cache_performance', []);
@@ -436,15 +459,20 @@ class SnmpQueryBuilder implements SnmpQueryInterface
         return is_string($oid) ? explode(' ', $oid) : $oid;
     }
 
+    private function getDevice(): Device
+    {
+        return $this->device ?? DeviceCache::getPrimary();
+    }
+
     /**
      * @param  string[]  $oids
      */
-    private function getCacheKey(string $type, array $oids): string
+    private function getCacheKey(string $type, array $oids, string $target, SnmpConfig $config): string
     {
         return implode('|', [
             $type,
-            $this->device->hostname,
-            $this->device->community,
+            $target,
+            $config->community,
             $this->options->context,
             implode(',', $oids),
             implode(',', [
