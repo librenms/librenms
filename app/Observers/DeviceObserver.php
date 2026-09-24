@@ -196,6 +196,7 @@ class DeviceObserver
         $device->ospfv3Ports()->delete();
         $device->outages()->delete();
         $device->packages()->delete();
+        $device->pollingMethods()->delete();
         $device->portsFdb()->delete();
         $device->portsNac()->delete();
         \DB::table('ports_stack')->where('device_id', $device->device_id)->delete();
