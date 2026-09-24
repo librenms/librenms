@@ -80,6 +80,7 @@ return new class extends Migration
                             'method_type' => 'snmp',
                             'enabled' => ! $device->snmp_disable,
                             'affects_availability' => true,
+                            'last_check_successful' => (bool) $device->status,
                             'secret_id' => $secretId,
                             'settings' => json_encode($settings),
                             'created_at' => now(),
