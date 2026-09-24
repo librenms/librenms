@@ -169,9 +169,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port['graph_type'] = $type;
     }
 
-    if (! isset($port['graph_type'])) {
-        $port['graph_type'] = 'port_bits';
-    }
+    $port['graph_type'] ??= 'port_bits';
 
     $class = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
 
@@ -271,9 +269,7 @@ function generate_ap_link($args, $text = null, $type = null)
         $args['graph_type'] = $type;
     }
 
-    if (! isset($args['graph_type'])) {
-        $args['graph_type'] = 'port_bits';
-    }
+    $args['graph_type'] ??= 'port_bits';
 
     if (! isset($args['hostname'])) {
         $args = array_merge($args, device_by_id_cache($args['device_id']));

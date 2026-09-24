@@ -174,9 +174,7 @@ class GraphParameters implements \Stringable
         // set up scaling scaling
         if ($this->scale_min === null && $this->scale_max === null) {
             $options[] = '--alt-autoscale-max';
-            if ($this->scale_rigid === null) {
-                $this->scale_rigid = true;
-            }
+            $this->scale_rigid ??= true;
         }
         if ($this->scale_min !== null) {
             array_push($options, '-l', $this->scale_min);

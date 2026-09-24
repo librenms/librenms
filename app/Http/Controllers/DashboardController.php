@@ -272,10 +272,8 @@ class DashboardController extends Controller
      */
     private function getAvailableDashboards(User $user): Collection
     {
-        if ($this->dashboards === null) {
-            $this->dashboards = Dashboard::hasAccess($user)->with('user:user_id,username')
-                ->orderBy('dashboard_name')->get()->keyBy('dashboard_id');
-        }
+        $this->dashboards ??= Dashboard::hasAccess($user)->with('user:user_id,username')
+            ->orderBy('dashboard_name')->get()->keyBy('dashboard_id');
 
         return $this->dashboards;
     }

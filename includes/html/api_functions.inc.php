@@ -1849,9 +1849,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
             'transports' => $legacyTransports,
         ]];
 
-        if ($defaultOperationStepDuration === null) {
-            $defaultOperationStepDuration = $legacyIntervalSec;
-        }
+        $defaultOperationStepDuration ??= $legacyIntervalSec;
         if ($legacyMute) {
             // Legacy mute means "never notify", represented by no operations.
             $operations = [];
@@ -3568,9 +3566,7 @@ function validate_column_list(?string $columns, string $table, array $default = 
     }
 
     static $schema;
-    if (is_null($schema)) {
-        $schema = new \LibreNMS\DB\Schema();
-    }
+    $schema ??= new \LibreNMS\DB\Schema();
 
     $column_names = is_array($columns) ? $columns : explode(',', $columns);
     $valid_columns = $schema->getColumns($table);
