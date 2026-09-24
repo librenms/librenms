@@ -227,6 +227,21 @@ final class PollingMethodProbeTest extends TestCase
         $setAvailability = app(\App\Actions\Device\SetDeviceAvailability::class);
         $this->assertTrue($setAvailability->execute($device));
         $this->assertTrue($device->status);
-        $this->assertNull($device->status_reason);
+        $this->assertEquals('', $device->status_reason);
+    }
+
+    public function testIpmiConfigReadsFromPollingMethodSettings(): void
+    {
+        $device = new Device(['hostname' => 'ipmi.example.com']);
+
+        $method = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Ipmi,
+            'settings' => ['type' => 'lanplus'],
+            'enabled' => true,
+        ]);
+        $method->setRelation('device', $device);
+
+        $config = \LibreNMS\Polling\Method\Config\IpmiConfig::fromPollingMethod($method);
+        $this->assertEquals('lanplus', $config->type);
     }
 }
