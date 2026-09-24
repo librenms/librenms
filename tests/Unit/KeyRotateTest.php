@@ -78,7 +78,7 @@ final class KeyRotateTest extends TestCase
         // Run key:rotate command
         $code = Artisan::call('key:rotate', [
             'old_key' => $oldKey,
-            '--force' => true,
+            '--no-interaction' => true,
         ]);
         $output = Artisan::output();
         $this->assertSame(0, $code, "key:rotate failed with output:\n$output");

@@ -42,7 +42,6 @@ class KeyRotate extends LnmsCommand
         $this->addArgument('old_key', InputArgument::OPTIONAL);
         $this->addOption('generate-new-key');
         $this->addOption('forgot-key');
-        $this->addOption('no-interaction', description: 'Run the operation without confirmation');
     }
 
     /**
