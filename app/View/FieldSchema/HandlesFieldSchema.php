@@ -119,26 +119,18 @@ trait HandlesFieldSchema
 
         $result = [];
         foreach ($fields as $key => $field) {
-            $default = $field->getDefault();
-
             if (array_key_exists($key, $input)) {
                 $raw = $input[$key];
                 if ($raw === null || $raw === '') {
                     continue;
                 }
-                $cast = $field->castValue($raw);
-                if ($cast !== $default) {
-                    $result[$key] = $cast;
-                }
+                $result[$key] = $field->castValue($raw);
             } elseif (array_key_exists($key, $existing)) {
                 $raw = $existing[$key];
                 if ($raw === null || $raw === '') {
                     continue;
                 }
-                $cast = $field->castValue($raw);
-                if ($cast !== $default) {
-                    $result[$key] = $cast;
-                }
+                $result[$key] = $field->castValue($raw);
             }
         }
 
