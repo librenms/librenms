@@ -40,7 +40,7 @@ use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
-    /** @var \Illuminate\Support\Collection<int, \App\Models\Dashboard> */
+    /** @var \Illuminate\Support\Collection<int, \App\Models\Dashboard>|null */
     private $dashboards;
 
     public function __construct()
