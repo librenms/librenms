@@ -31,12 +31,14 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Facades\Log;
+use File;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdFileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
+use LibreNMS\Exceptions\RrdPermissionException;
 use LibreNMS\Exceptions\RrdStoreException;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
@@ -302,7 +304,7 @@ class Rrd extends BaseDatastore
     {
         $filename = self::safeName(is_array($extra) ? implode('-', $extra) : $extra);
 
-        return implode('/', [$this->dirFromHost($host), $filename . '.rrd']);
+        return implode('/', [self::dirFromHost($host), $filename . '.rrd']);
     }
 
     /**
@@ -311,7 +313,7 @@ class Rrd extends BaseDatastore
      * @param  string  $host  Host name
      * @return string the name of the rrd directory for $host
      */
-    public function dirFromHost($host): string
+    private static function dirFromHost($host): string
     {
         $host = self::safeName(trim((string) $host, '[]'));
 
@@ -410,7 +412,7 @@ class Rrd extends BaseDatastore
             $output = $this->command('list', '/' . self::safeName($hostname));
             $files = array_filter(explode("\n", trim($output)), fn ($file) => str_starts_with((string) $file, $prefix));
         } else {
-            $files = glob($this->dirFromHost($hostname) . '/' . $prefix . '*.rrd') ?: [];
+            $files = glob(self::dirFromHost($hostname) . '/' . $prefix . '*.rrd') ?: [];
         }
 
         sort($files);
@@ -582,5 +584,66 @@ class Rrd extends BaseDatastore
     private function coalesceStatisticType($type): string
     {
         return ($type == 'update' || $type == 'create') ? $type : 'other';
+    }
+
+    /**
+     * Check that a directory exists
+     */
+    private static function checkDirExists(string $rrdpath): bool
+    {
+        if (LibrenmsConfig::get('rrdcached')) {
+            return true;
+        }
+
+        $rrd_dir = $rrdpath;
+        if (! is_dir($rrd_dir)) {
+            if (mkdir($rrd_dir, 0775, true)) {
+                Log::info("Created directory : $rrd_dir");
+            } else {
+                Log::error("Failed to create rrd directory: $rrd_dir");
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Initialise storage for a device
+     */
+    public function initStorage(Device $device): void
+    {
+        if (LibrenmsConfig::get('rrd.enable', true)) {
+            self::checkDirExists(self::dirFromHost($device->hostname));
+        }
+    }
+
+    /**
+     * Rename storage for a device
+     */
+    public function renameDevice(Device $device, string $oldName, string $newName): bool
+    {
+        $new_rrd_dir = self::dirFromHost($newName);
+
+        if (is_dir($new_rrd_dir)) {
+            Eventlog::log("Renaming of $oldName failed due to existing RRD folder for $newName", $device, 'system', Severity::Error);
+
+            throw new RrdPermissionException("Renaming of $oldName failed due to existing RRD folder for $newName");
+        }
+
+        return rename(self::dirFromHost($oldName), $new_rrd_dir);
+    }
+
+    /**
+     * Delete a device
+     */
+    public function deleteDevice(string $hostname): void
+    {
+        // delete rrd files
+        $host_dir = self::dirFromHost($hostname);
+        if (! File::deleteDirectory($host_dir)) {
+            throw new RrdPermissionException("Could not delete RRD files for: $hostname");
+        }
     }
 }
