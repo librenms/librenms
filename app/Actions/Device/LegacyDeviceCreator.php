@@ -68,11 +68,10 @@ class LegacyDeviceCreator
     {
         $methods = collect();
 
-        $icmpMethodDef = $this->pollingMethods->require(PollingMethodType::Icmp);
         $icmpMethod = new DevicePollingMethod([
             'method_type' => PollingMethodType::Icmp,
             'enabled' => true,
-            'affects_availability' => $icmpMethodDef->defaultAffectsAvailability(),
+            'affects_availability' => $this->ping_only || $this->ping_fallback,
             'settings' => [],
         ]);
         $icmpMethod->setRelation('device', $device);
