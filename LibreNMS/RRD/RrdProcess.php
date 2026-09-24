@@ -15,7 +15,6 @@ class RrdProcess
 {
     const COMMAND_COMPLETE = 'OK u:';
 
-    private readonly string $rrdcached;
     private readonly string $rrd_dir;
     private readonly InputStream $input;
 
@@ -24,7 +23,6 @@ class RrdProcess
 
     public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300, ?Closure $processFactory = null)
     {
-        $this->rrdcached = (string) LibrenmsConfig::get('rrdcached', '');
         $this->rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd'), '/');
         $this->input = new InputStream();
 
@@ -111,11 +109,6 @@ class RrdProcess
     private function runAsync(string $command): void
     {
         $this->start();
-
-        // clean directory path when using rrdcached
-        if ($this->rrdcached) {
-            $command = str_replace($this->rrd_dir, '', $command);
-        }
 
         $this->logger->debug("RRD[%g$command%n]", ['color' => true]);
         $this->process->clearOutput();
