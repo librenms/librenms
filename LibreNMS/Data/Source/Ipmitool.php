@@ -32,6 +32,7 @@ use App\Models\Device;
 use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\IpmiConnectionFailed;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
 
@@ -84,8 +85,17 @@ class Ipmitool
                 $result = $this->runCommand($commands, $ipmi_type);
 
                 if ($result->successful()) {
-                    $this->device->setAttrib('ipmi_type', $ipmi_type);
                     $this->type = $ipmi_type;
+
+                    $method = $this->device->pollingMethod(PollingMethodType::Ipmi);
+                    if ($method) {
+                        $settings = $method->settings ?? [];
+                        $settings['type'] = $ipmi_type;
+                        $method->settings = $settings;
+                        if ($method->exists) {
+                            $method->save();
+                        }
+                    }
 
                     return $result->output();
                 }

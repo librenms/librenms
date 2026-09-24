@@ -7,6 +7,7 @@ use App\Models\DevicePollingMethod;
 use App\View\FieldSchema\FieldDefinition;
 use LibreNMS\Data\Source\Ipmitool;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Exceptions\IpmiConnectionFailed;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\ProbeResult;
 
@@ -62,8 +63,8 @@ final class IpmiPollingMethod extends PollingMethod
             $ipmi->command(['power', 'status']);
 
             return ProbeResult::success();
-        } catch (\Throwable) {
-            return ProbeResult::failure();
+        } catch (IpmiConnectionFailed $e) {
+            return ProbeResult::failure([], $e->getMessage());
         }
     }
 
