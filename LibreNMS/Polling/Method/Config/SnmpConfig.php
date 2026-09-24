@@ -115,7 +115,7 @@ final class SnmpConfig extends PollingMethodConfig
             authalgo: $secretData->authalgo,
             cryptopass: $secretData->cryptopass,
             cryptoalgo: $secretData->cryptoalgo,
-            transport: $settings['transport'] ?? 'udp',
+            transport: $settings['transport'] ?? LibrenmsConfig::get('snmp.transports.0', 'udp'),
             port: (int) ($settings['port'] ?? LibrenmsConfig::get('snmp.port', 161)),
             context: $secretData->context,
             timeout: max(0.1, $timeout),
@@ -154,8 +154,8 @@ final class SnmpConfig extends PollingMethodConfig
             settings: $deviceMethod->settings ?? [],
             secretData: $secretData,
             os: $deviceMethod->device?->os,
-            enabled: $deviceMethod->enabled,
-            affectsAvailability: $deviceMethod->affects_availability,
+            enabled: $deviceMethod->enabled ?? false,
+            affectsAvailability: $deviceMethod->affects_availability ?? false,
         );
     }
 
