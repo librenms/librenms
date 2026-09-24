@@ -202,6 +202,21 @@
 				"Site gateway, default value: 192.168.0.1. Users need to configure the site gateway. "
 			::= { hwSiteSummary 8 }
 		
+		-- 1.3.6.1.4.1.2011.6.164.1.1.1.10
+		hwSiteRunningStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                normal(1),
+                alarm(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "State of the site alarm state. It is an enumeration type: 
+                  If the enumeration value is 1, it indicates that the site is in the normal state;
+                  If the enumeration value is 2, it indicates that the site is in the alarm state."
+            ::= { hwSiteSummary 10 }
+		
 		-- 1.3.6.1.4.1.2011.6.164.1.1.1.9
 		hwSiteDGWorkStatus OBJECT-TYPE
 			SYNTAX INTEGER
@@ -715,11 +730,37 @@
 				If the NMS notifies the SNMP agent that this node is set to 1, it indicates power-on of all rectifier modules;
 				If the NMS notifies the SNMP agent that this node is set to 2, it indicates power-off of all the rectifier modules. "
 			::= { hwRectsGroup 8 }
-
+		
+		-- 1.3.6.1.4.1.2011.6.164.1.3.1.9
+		hwRectsTotalDCPower OBJECT-TYPE
+            SYNTAX Unsigned32 (0..100000000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Total power of the direct current output.
+                Value range: 0 to 100000000,
+                units: W, 
+                and the value is an integer.
+                If the value is 2147483647(0x7FFFFFFF), it indicates that the value is invalid."
+            ::= { hwRectsGroup 9 }
+		
+		-- 1.3.6.1.4.1.2011.6.164.1.3.1.11
+		hwRectsTotalACInputPower OBJECT-TYPE
+            SYNTAX Unsigned32 (0..100000000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Total power of the direct current output. 
+                Value range: 0 to 100000000, 
+                units: W, 
+                and the value is an integer. 
+                If the value is 2147483647(0x7FFFFFFF), it indicates that the value is invalid."
+            ::= { hwRectsGroup 11 }
 		
 		-- 1.3.6.1.4.1.2011.6.164.1.3.2
 		hwRectifier OBJECT IDENTIFIER ::= { hwSiteRectifiers 2 }
-
+		
+		
 		
 --  1.3.6.1.4.1.2011.6.1.5.6
 		-- 1.3.6.1.4.1.2011.6.164.1.3.2.1
@@ -965,17 +1006,25 @@
 		HwRectOperEntry ::=
 			SEQUENCE { 
 				hwRectOperIndex
-					Integer32,
-				hwRectOutputCurrent
-					Unsigned32,
-				hwRectOutputVoltage
-					Unsigned32,
+                    Integer32,
+                hwRectOutputCurrent
+                    Unsigned32,
+                hwRectOutputVoltage
+                    Unsigned32,
+                hwRectDCOutputPower
+                    Unsigned32,
+                hwRectACVoltage
+                    Unsigned32,
+                hwRectRatedEfficiency
+                    Unsigned32,
+                hwRectifierTemperature
+                    Integer32,
 				hwRectTotalOperTime
-					Unsigned32,
-				hwRectOperStatus
-					INTEGER,
-				hwRectOperRowStatus
-					RowStatus
+				    Integer32,
+                hwRectOperStatus
+                    INTEGER,
+                hwRectOperRowStatus
+                    RowStatus
 			 }
 
 		-- 1.3.6.1.4.1.2011.6.164.1.3.2.2.1.1
@@ -1011,7 +1060,58 @@
 				"
 			::= { hwRectOperEntry 3 }
 
+		-- 1.3.6.1.4.1.2011.6.164.1.3.2.2.1.5
+		hwRectDCOutputPower OBJECT-TYPE
+            SYNTAX Unsigned32 (0..30000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "DC output power. 
+                Value range: 0 to 30000, 
+                units: W, 
+                and the value is an integer.(1). 
+                If the value is 2147483647(0x7FFFFFFF), it indicates that the value is invalid."
+            ::= { hwRectOperEntry 5 }
 		
+		-- 1.3.6.1.4.1.2011.6.164.1.3.2.2.1.6
+		hwRectACVoltage OBJECT-TYPE
+            SYNTAX Unsigned32 (0..6000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "AC input voltage. 
+                Value range: 0 to 600, 
+                units: V, 
+                and the value is accurate to one decimal space (.1).
+                If the value is 2147483647(0x7FFFFFFF), it indicates that the value is invalid."
+            ::= { hwRectOperEntry 6 }
+		
+		-- 1.3.6.1.4.1.2011.6.164.1.3.2.2.1.7
+		hwRectRatedEfficiency OBJECT-TYPE
+            SYNTAX Unsigned32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rated Efficiency. 
+                Value range: 0 to 100, 
+                units: %, 
+                and the value is an integer.(1). 
+                If the value is 2147483647(0x7FFFFFFF), it indicates that the value is invalid."
+            ::= { hwRectOperEntry 7 }
+		
+		-- 1.3.6.1.4.1.2011.6.164.1.3.2.2.1.8
+		hwRectifierTemperature OBJECT-TYPE
+            SYNTAX Integer32 (-3000..3000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rectifier Temperature. 
+                Value range: -300 to 300, 
+                units: degC, 
+                and the value is accurate to one decimal space (.1). 
+                If the value is 2147483647(0x7FFFFFFF), it indicates that the value is invalid."
+            ::= { hwRectOperEntry 8 }
+			
 		-- 1.3.6.1.4.1.2011.6.164.1.3.2.2.1.4
 		hwRectTotalOperTime OBJECT-TYPE
 			SYNTAX Unsigned32
@@ -1286,12 +1386,62 @@
 				If the enumeration value is 2, it indicates the current of the battery group is limited. 
 				"
 			::= { hwBattsOperate 4 }
-
+		
+		-- 1.3.6.1.4.1.2011.6.164.1.4.2.5.
+		hwBattsTemprature OBJECT-TYPE
+            SYNTAX Integer32 ( -300..200)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Battery temperature. It is a battery parameter collected in real time. 
+                Value range: -300 to 200, 
+                unit: centigrade (degC), 
+                and the value is an integer .
+                If the value is 2147483647(0x7FFFFFFF), it indicates that battery temperature sensor is not configured."
+            ::= { hwBattsOperate 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.164.1.4.2.8
+		hwBattsRatedCapacity OBJECT-TYPE
+            SYNTAX Unsigned32 (0..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Batteries actual capacity. 
+                It is an analog parameter collected by the battery string in real time.
+                Value range: 0 to 2147483647, 
+                units: Ah, 
+                the value is an integer (1).  
+                If the value is 2147483647(0x7FFFFFFF), it indicates that the value is invalid."
+            ::= { hwBattsOperate 8 }
+		
+		-- 1.3.6.1.4.1.2011.6.164.1.4.2.9
+        hwBattsRemainCapacity OBJECT-TYPE
+            SYNTAX Unsigned32 (0..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Remaining capacity of all of the battery. 
+                It is an analog parameter collected by the battery string in real time. 
+                Value range: 0 to 2147483647, 
+                units: Ah, 
+                and the value is an integer (1).  
+                If the value is 2147483647(0x7FFFFFFF), it indicates that the value is invalid."
+            ::= { hwBattsOperate 9 }
+		
+		-- 1.3.6.1.4.1.2011.6.164.1.4.2.10
+		hwTotalRemainingCapacityPercent OBJECT-TYPE
+            SYNTAX Unsigned32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Total Remaining Capacity Percent. 
+                Value range: 0 to 100, units: %, 
+                and the value is an integer.(1). 
+                If the value is 2147483647(0x7FFFFFFF), it indicates that the value is invalid."
+            ::= { hwBattsOperate 10 }
 		
 		-- 1.3.6.1.4.1.2011.6.164.1.4.3
 		hwBattsTest OBJECT IDENTIFIER ::= { hwSiteBatterys 3 }
-
-		
 		-- 1.3.6.1.4.1.2011.6.164.1.4.3.1
 		hwBattsTestRecordCount OBJECT-TYPE
 			SYNTAX Unsigned32 (0..100)
@@ -1940,7 +2090,6 @@
 			DESCRIPTION
 				"Total current of the AC group. It indicates the real-time statistics of the AC group. Value range: 0 to 1000, unit: A, and the value is accurate to one decimal place (.1)."
 			::= { hwAcDistributionsGroup 3 }
-
 		
 		-- 1.3.6.1.4.1.2011.6.164.1.5.1.4
 		hwAcsTotalQuantity OBJECT-TYPE
@@ -5431,11 +5580,12 @@
 		
 		-- 1.3.6.1.4.1.2011.6.164.3.1.3
 		hwSiteRectifiersGroup OBJECT-GROUP
-			OBJECTS { hwRectSerialNo, hwRectType, hwRectManufacturer, hwRectOutputCurrent, hwRectOutputVoltage, 
+			OBJECTS { hwRectSerialNo, hwRectType, hwRectManufacturer, hwRectOutputCurrent, hwRectOutputVoltage,
+				hwRectDCOutputPower, hwRectACVoltage, hwRectRatedEfficiency, hwRectifierTemperature,
 				hwCtrlRectOnOff, hwRectEquipId, hwRectEquipName, hwRectRatedCurrent, hwRectInputAcType, 
 				hwRectEfficency, hwRectConfigIndex, hwRectConfigRowStatus, hwRectsGroupId, hwRectsGroupName, 
 				hwRectsTotalQuantity, hwRectsRatedVoltage, hwModifyRectsOutputVoltage, hwSetRectsRedundEnable, hwRectManuDate, 
-				hwCtrlRectsAllOnOff, hwRectsTotalCurrent, hwRectOperStatus, hwRectOperIndex, hwRectTotalOperTime, 
+				hwCtrlRectsAllOnOff, hwRectsTotalDCPower, hwRectsTotalACInputPower, hwRectsTotalCurrent, hwRectOperStatus, hwRectOperIndex, hwRectTotalOperTime, 
 				hwRectSoftwareVersion, hwRectOperRowStatus }
 			STATUS current
 			DESCRIPTION 
@@ -5448,7 +5598,8 @@
 			OBJECTS { hwBattStringCurrent, hwBattStringRemainCapacity, hwSetBattInstallTime, hwBattStringEquipId, hwBattStringEquipName, 
 				hwBattStringRemainCapacityPercent, hwBattStringActualCapacity, hwSetBattStdCapacity, hwBattStringTemprature, hwBattsGroupId, 
 				hwBattsGroupName, hwSetBattsHighTempAction, hwSetBattsHighTempVoltLimit, hwSetBattsFloatVoltage, hwSetBattsBoostVoltage, 
-				hwSetBattsCompFactor, hwBattsChargeStatus, hwBattsCurrLimitStatus, hwCtrlBattsTestStartStop, hwBattsTestResultIndex, 
+				hwSetBattsCompFactor, hwBattsChargeStatus, hwBattsCurrLimitStatus, hwBattsTemprature, hwBattsRatedCapacity, hwBattsRemainCapacity, 
+				hwCtrlBattsTestStartStop, hwBattsTestResultIndex, hwTotalRemainingCapacityPercent, 
 				hwBattsTestType, hwBattsTestStartTime, hwBattsTestResult, hwBattsEfficiency, hwBattsDischargeTime, 
 				hwBattsDischargeEndVoltage, hwBattsDischargeAvCurrent, hwBattsDischargeAhValue, hwBattsTestTemprature, hwBattsTestEndCourse, 
 				hwBattsTestResultRowStatus, hwBattStringConfigIndex, hwBattStringConfigRowStatus, hwSetBattsTempUpperLimit, hwSetBattsTempLowerLimit, 
