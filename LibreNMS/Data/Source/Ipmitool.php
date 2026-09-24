@@ -92,9 +92,6 @@ class Ipmitool
                         $settings = $method->settings ?? [];
                         $settings['type'] = $ipmi_type;
                         $method->settings = $settings;
-                        if ($method->exists) {
-                            $method->save();
-                        }
                     }
 
                     return $result->output();
