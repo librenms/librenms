@@ -14,7 +14,9 @@ return new class extends Migration
     {
         DB::transaction(function () {
             $hasAgentUptime = Schema::hasColumn('devices', 'agent_uptime');
-            $unixOses = collect(LibrenmsConfig::get('os', []))->filter(fn ($cfg) => ($cfg['group'] ?? null) === 'unix')->keys()->all();
+            /** @var array<string, array{group?: string}> $allOs */
+            $allOs = (array) LibrenmsConfig::get('os', []);
+            $unixOses = array_keys(array_filter($allOs, fn (array $cfg): bool => ($cfg['group'] ?? null) === 'unix'));
 
             $query = DB::table('devices')
                 ->where(function ($q) use ($hasAgentUptime, $unixOses) {
