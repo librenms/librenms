@@ -560,12 +560,4 @@ class Rrd extends BaseDatastore
             throw new RrdPermissionException("Could not delete RRD files for: $hostname");
         }
     }
-
-    /**
-     * @param  string|string[]  $filename
-     */
-    private static function filenameString(string|array $filename): string
-    {
-        return is_array($filename) ? implode('-', $filename) : $filename;
-    }
 }
