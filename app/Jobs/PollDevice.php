@@ -58,7 +58,6 @@ class PollDevice implements ShouldQueue
     public function handle(): void
     {
         $this->initDevice();
-        $connectivity = new ConnectivityHelper($this->device);
         $this->initRrdDirectory();
         $this->connectivity = new ConnectivityHelper($this->device);
         PollingDevice::dispatch($this->device);
@@ -70,7 +69,7 @@ class PollDevice implements ShouldQueue
         // check and save status
         app(CheckDeviceAvailability::class)->execute($this->device, true);
 
-        $this->pollModules($connectivity);
+        $this->pollModules();
 
         $measurement->end();
 
@@ -114,7 +113,7 @@ class PollDevice implements ShouldQueue
         DevicePolled::dispatch($this->device);
     }
 
-    private function pollModules(ConnectivityHelper $connectivity): void
+    private function pollModules(): void
     {
         // update $device array status
         $this->deviceArray['status'] = $this->device->status;
