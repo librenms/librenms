@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -13,11 +14,14 @@ return new class extends Migration
     {
         DB::transaction(function () {
             $hasAgentUptime = Schema::hasColumn('devices', 'agent_uptime');
+            $unixOses = collect(LibrenmsConfig::get('os', []))->filter(fn ($cfg) => ($cfg['group'] ?? null) === 'unix')->keys()->all();
 
             $query = DB::table('devices')
-                ->where(function ($q) use ($hasAgentUptime) {
-                    $q->where('os_group', '=', 'unix')
-                        ->orWhere('os', '=', 'windows');
+                ->where(function ($q) use ($hasAgentUptime, $unixOses) {
+                    if (! empty($unixOses)) {
+                        $q->whereIn('os', $unixOses);
+                    }
+                    $q->orWhere('os', '=', 'windows');
 
                     if ($hasAgentUptime) {
                         $q->orWhere('agent_uptime', '>', 0);
