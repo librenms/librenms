@@ -38,7 +38,6 @@ use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdFileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
-use LibreNMS\Exceptions\RrdPermissionException;
 use LibreNMS\Exceptions\RrdStoreException;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
@@ -279,7 +278,7 @@ class Rrd extends BaseDatastore
     /**
      * Generates a path based on the hostname (or IP)
      */
-    public function dirFromHost($host): string
+    public function dirFromHost($host): RrdPath
     {
         return RrdPath::make($host);
     }

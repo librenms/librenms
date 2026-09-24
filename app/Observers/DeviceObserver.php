@@ -88,8 +88,8 @@ class DeviceObserver
             $new_name = $device->hostname;
 
             $old_name = $device->getOriginal('hostname');
-            $new_rrd_dir = Rrd::dirFromHost($new_name);
-            $old_rrd_dir = Rrd::dirFromHost($old_name);
+            $new_rrd_dir = Rrd::dirFromHost($new_name)->fullPath();
+            $old_rrd_dir = Rrd::dirFromHost($old_name)->fullPath();
 
             // Fail if another device has the same hostname
             if (Device::where('hostname', $device->hostname)->whereNot('device_id', $device->device_id)->count() > 0) {
@@ -124,7 +124,7 @@ class DeviceObserver
     {
         if (! empty($device->hostname)) {
             // delete rrd files
-            $host_dir = Rrd::dirFromHost($device->hostname);
+            $host_dir = Rrd::dirFromHost($device->hostname)->fullPath();
             try {
                 $result = File::deleteDirectory($host_dir);
 
