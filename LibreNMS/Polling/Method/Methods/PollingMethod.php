@@ -39,6 +39,12 @@ abstract class PollingMethod implements HasFieldSchema
         return $this->secretType() !== null;
     }
 
+    /**
+     * Perform the cheapest reachability check for this polling method.
+     * Must avoid side effects on the target where possible.
+     * Returns a failure rather than throwing for an unreachable target.
+     * Called at most once per method per run by the framework.
+     */
     abstract public function probe(Device $device): ProbeResult;
 
     /**

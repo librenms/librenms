@@ -182,7 +182,7 @@ final class PollingMethodProbeTest extends TestCase
         $this->assertEquals('user1', $config2Updated->authname);
     }
 
-    public function testCheckDeviceAvailabilityHandlesSecretDecryptionGracefully(): void
+    public function testCheckDeviceAvailabilityPropagatesSecretDecryptionException(): void
     {
         $device = new Device(['hostname' => 'corrupt-key.example.com', 'status' => true]);
         $device->device_id = 1;
@@ -205,10 +205,28 @@ final class PollingMethodProbeTest extends TestCase
 
         $checker = app(\App\Actions\Device\CheckDeviceAvailability::class);
 
-        $status = $checker->execute($device, false);
+        $this->expectException(SecretDecryptionException::class);
+        $checker->execute($device, false);
+    }
 
-        $this->assertTrue($status);
-        $this->assertNull($method->last_check_successful);
-        $this->assertNotEquals('snmp', $device->status_reason);
+    public function testNullLastCheckSuccessfulIsUnknownNotFailed(): void
+    {
+        $device = new Device(['hostname' => 'unprobed.example.com', 'status' => true]);
+        $method = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
+            'enabled' => true,
+            'affects_availability' => true,
+            'last_check_successful' => null,
+        ]);
+        $method->setRelation('device', $device);
+        $device->setRelation('pollingMethods', collect([$method]));
+
+        $helper = new \LibreNMS\Polling\ConnectivityHelper($device);
+        $this->assertTrue($helper->isAvailable());
+
+        $setAvailability = app(\App\Actions\Device\SetDeviceAvailability::class);
+        $this->assertTrue($setAvailability->execute($device));
+        $this->assertTrue($device->status);
+        $this->assertNull($device->status_reason);
     }
 }
