@@ -9,9 +9,7 @@ $link_array = [
     'protocol' => 'mpls',
 ];
 
-if (! isset($vars['view'])) {
-    $vars['view'] = 'lsp';
-}
+$vars['view'] ??= 'lsp';
 
 echo '<span style="font-weight: bold;">MPLS</span> &#187; ';
 

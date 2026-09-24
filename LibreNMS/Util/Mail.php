@@ -29,6 +29,8 @@ namespace LibreNMS\Util;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\RrdGraphException;
 use PHPMailer\PHPMailer\PHPMailer;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\ExceptionInterface as MimeException;
 
 class Mail
 {
@@ -40,16 +42,22 @@ class Mail
     public static function parseEmails(string $emails): array
     {
         $result = [];
-        $regex = '/^[\"\']?([^\"\']+)[\"\']?\s{0,}<([^@]+@[^>]+)>$/';
 
-        $emails = preg_split('/[,;]\s{0,}/', $emails);
-        foreach ($emails as $email) {
-            if (preg_match($regex, $email, $out, PREG_OFFSET_CAPTURE)) {
-                $email = $out[2][0];
+        // split on , or ; but not inside a double quoted name
+        foreach (preg_split('/"[^"]*"(*SKIP)(*FAIL)|[,;]/', $emails) as $email) {
+            $email = trim($email);
+            if ($email === '') {
+                continue;
             }
 
-            if (filter_var($email, FILTER_VALIDATE_EMAIL) !== false) {
-                $result[$email] = $out[1][0] ?? LibrenmsConfig::get('email_user');
+            try {
+                $address = Address::create($email);
+            } catch (MimeException) {
+                continue;
+            }
+
+            if (filter_var($address->getAddress(), FILTER_VALIDATE_EMAIL) !== false) {
+                $result[$address->getAddress()] = $address->getName() ?: LibrenmsConfig::get('email_user');
             }
         }
 
