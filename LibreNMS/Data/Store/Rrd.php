@@ -276,14 +276,6 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * Generates a path based on the hostname (or IP)
-     */
-    public function dirFromHost($host): RrdPath
-    {
-        return RrdPath::make($host);
-    }
-
-    /**
      * Generates and pipes a command to rrdtool
      *
      * @internal

@@ -5,11 +5,11 @@ namespace App\Observers;
 use App\Actions\Device\UpdateDeviceOutage;
 use App\ApiClients\Oxidized;
 use App\Facades\LibrenmsConfig;
-use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Eventlog;
 use File;
 use Illuminate\Support\Facades\App;
+use LibreNMS\Data\Store\Rrd\RrdPath;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostRenameException;
 use Log;
@@ -88,8 +88,8 @@ class DeviceObserver
             $new_name = $device->hostname;
 
             $old_name = $device->getOriginal('hostname');
-            $new_rrd_dir = Rrd::dirFromHost($new_name)->fullPath();
-            $old_rrd_dir = Rrd::dirFromHost($old_name)->fullPath();
+            $new_rrd_dir = RrdPath::make($new_name)->fullPath();
+            $old_rrd_dir = RrdPath::make($old_name)->fullPath();
 
             // Fail if another device has the same hostname
             if (Device::where('hostname', $device->hostname)->whereNot('device_id', $device->device_id)->count() > 0) {
@@ -124,7 +124,7 @@ class DeviceObserver
     {
         if (! empty($device->hostname)) {
             // delete rrd files
-            $host_dir = Rrd::dirFromHost($device->hostname)->fullPath();
+            $host_dir = RrdPath::make($device->hostname)->fullPath();
             try {
                 $result = File::deleteDirectory($host_dir);
 

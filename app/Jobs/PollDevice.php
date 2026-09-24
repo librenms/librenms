@@ -20,6 +20,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Data\Store\Rrd\RrdPath;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\OS;
@@ -191,7 +192,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
     private function initRrdDirectory(): void
     {
         if (LibrenmsConfig::get('rrd.enable', true)) {
-            Rrd::checkDirExists(Rrd::dirFromHost($this->device->hostname));
+            Rrd::checkDirExists(RrdPath::make($this->device->hostname));
         }
     }
 
