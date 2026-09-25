@@ -1,11 +1,17 @@
 modules:
+    os:
+        sysDescr_regex:
+            - '/^ZXA10 (?<hardware>C\d+), ZTE ZXA10 Software Version: (?<version>\S+)/'
+            - '/^(?<hardware>C\d+) Version (?<version>\S+) Software/'
     mempools:
         additional_oids:
             oids:
                 - ZTE-AN-CHASSIS-MIB::zxAnCardActualType
+                - ZTE-TITAN-SLOT-MIB::zxTitanSlotName
         data:
             -
                 total: ZTE-AN-CHASSIS-MIB::zxAnCardMemSize
+                total_multiplier: 1048576
                 percent_used: ZTE-AN-CHASSIS-MIB::zxAnCardMemUsage
                 descr: 'Card {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}'
                 skip_values:
@@ -13,6 +19,11 @@ modules:
                         oid: ZTE-AN-CHASSIS-MIB::zxAnCardMemUsage
                         op: '='
                         value: 0
+            -
+                total: ZTE-TITAN-SLOT-MIB::zxTitanSlotMemTotal
+                percent_used: ZTE-TITAN-SLOT-MIB::zxTitanSlotMemUsedPercent
+                descr: 'Card {{ ZTE-TITAN-SLOT-MIB::zxTitanSlotName }}'
+                precision: 1048576
     processors:
         data:
             -
@@ -20,6 +31,16 @@ modules:
                 value: ZTE-AN-CHASSIS-MIB::zxAnCardCpuLoad
                 num_oid: '.1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.{{ $index }}'
                 descr: '{{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }} Processor'
+                skip_values:
+                    -
+                        oid: ZTE-AN-CHASSIS-MIB::zxAnCardMemSize
+                        op: '='
+                        value: 0
+            -
+                oid: ZTE-TITAN-SLOT-MIB::zxTitanSlotPerfTable
+                value: ZTE-TITAN-SLOT-MIB::zxTitanSlotCpuUsedPercent
+                num_oid: '.1.3.6.1.4.1.3902.3.6002.2.1.1.8.{{ $index }}'
+                descr: '{{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType:0-2 }} Processor'
     sensors:
         additional_oids:
             data:
@@ -29,6 +50,33 @@ modules:
                         - ZTE-AN-ENVMON-MIB::zxAnEnvRack
                         - ZTE-AN-ENVMON-MIB::zxAnEnvShelf
                         - ZTE-AN-ENVMON-MIB::zxAnEnvSlot
+                        - IF-MIB::ifName
+        dbm:
+            data:
+                -
+                    oid: ZTE-AN-OPTICAL-MODULE-MIB::zxAnOpticalIfTxPwrCurrValue
+                    divisor: 1000
+                    descr: '{{ IF-MIB::ifName }} TX Power'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    num_oid: '.1.3.6.1.4.1.3902.1082.30.40.2.4.1.3.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: ZTE-AN-OPTICAL-MODULE-MIB::zxAnOpticalIfTxPwrCurrValue
+                            op: '='
+                            value: 2147483647
+                -
+                    oid: ZTE-AN-OPTICAL-MODULE-MIB::zxAnOpticalIfRxPwrCurrValue
+                    divisor: 1000
+                    descr: '{{ IF-MIB::ifName }} RX Power'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    num_oid: '.1.3.6.1.4.1.3902.1082.30.40.2.4.1.2.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: ZTE-AN-OPTICAL-MODULE-MIB::zxAnOpticalIfRxPwrCurrValue
+                            op: '='
+                            value: 2147483647
         temperature:
             data:
                 -
