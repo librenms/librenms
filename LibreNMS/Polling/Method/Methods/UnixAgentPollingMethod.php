@@ -54,8 +54,8 @@ final class UnixAgentPollingMethod extends PollingMethod
     public function probe(Device $device, PollingMethodConfig $config): ProbeResult
     {
         $agentConfig = $config instanceof UnixAgentConfig ? $config : null;
-        $agent_port = $agentConfig ? $agentConfig->port : (int) LibrenmsConfig::get('unix-agent.port', 6556);
-        $timeout = $agentConfig ? $agentConfig->timeout : (int) LibrenmsConfig::get('unix-agent.connection-timeout', 10);
+        $agent_port = $agentConfig->port;
+        $timeout = $agentConfig->timeout;
         $poller_target = Rewrite::addIpv6Brackets($device->pollerTarget());
 
         try {

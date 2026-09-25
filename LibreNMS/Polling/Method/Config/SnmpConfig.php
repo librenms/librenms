@@ -145,8 +145,6 @@ final class SnmpConfig extends PollingMethodConfig
         );
     }
 
-
-
     /**
      * Create from legacy fields. Emergency fallback, do not use.
      */

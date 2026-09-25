@@ -7,11 +7,6 @@ use Illuminate\Support\Collection;
 
 class SetDeviceAvailability
 {
-    public function __construct(
-        private readonly UpdateDeviceOutage $updateDeviceOutage,
-    ) {
-    }
-
     /**
      * Set status and status_reason fields based on availability results.
      * Does not persist to the database unless $commit is true.
