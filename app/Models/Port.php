@@ -65,6 +65,9 @@ class Port extends DeviceRelatedModel implements BillableSource
         'device.hostname',
     ];
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
