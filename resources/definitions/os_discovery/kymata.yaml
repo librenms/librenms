@@ -1,0 +1,71 @@
+modules:
+    os:
+        version: KYMATA-AMP-MIB::hwVersion.0
+        serial: KYMATA-AMP-MIB::serialNumber.0
+        hardware: KYMATA-AMP-MIB::productName.0
+        sysName: KYMATA-AMP-MIB::hostName.0
+    sensors:
+        dbm:
+            data:
+                -
+                    oid: KYMATA-AMP-MIB::rfOut
+                    num_oid: .1.3.6.1.4.1.60429.1.3.12.{{ $index }}
+                    index: 'txLevel.{{ $index }}'
+                    descr: 'Tx Power'
+                    divisor: 100
+        count:
+            data:
+                -
+                    oid: KYMATA-AMP-MIB::packetCounter
+                    num_oid: .1.3.6.1.4.1.60429.1.3.14.{{ $index }}
+                    descr: 'Packets/min'
+                    index: 'packetCounter.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: KYMATA-AMP-MIB::temperature
+                    value: KYMATA-AMP-MIB::temperature
+                    num_oid: .1.3.6.1.4.1.60429.1.3.10.{{ $index }}
+                    index: 'temperature.{{ $index }}'
+                    descr: 'Internal'
+        state:
+            data:
+                -
+                    oid: KYMATA-AMP-MIB::alarmStatus
+                    num_oid: .1.3.6.1.4.1.60429.1.3.1.{{ $index }}
+                    descr: 'Alarm'
+                    index: 'alarmStatus.{{ $index }}'
+                    state_name: Alarm status
+                    states:
+                         - { value: 0, generic: 0, descr: 'No Alarm' }
+                         - { value: 1, generic: 2, descr: 'AP alarm, the devices does not receive beacons or traffic from the AP' }
+                         - { value: 2, generic: 2, descr: 'Low RF Out' }
+                         - { value: 3, generic: 2, descr: 'PCBA RF Board Power Supply Problem' }
+                         - { value: 4, generic: 2, descr: 'Temperature above 75C' }
+                -
+                    oid: KYMATA-AMP-MIB::activityAP
+                    num_oid: .1.3.6.1.4.1.60429.1.3.15.{{ $index }}
+                    descr: 'AP Activity'
+                    index: 'activityAP.{{ $index }}'
+                    state_name: AP Activity
+                    states:
+                         - { value: 0, generic: 2, descr: 'AP Off' }
+                         - { value: 1, generic: 1, descr: 'Beacon' }
+                         - { value: 2, generic: 0, descr: 'Client/Traffic' }
+                -
+                    oid: KYMATA-AMP-MIB::pcbPowerProblem
+                    num_oid: .1.3.6.1.4.1.60429.1.3.16.{{ $index }}
+                    descr: 'PCB Power Problem'
+                    index: 'pcbPowerProblem.{{ $index }}'
+                    state_name: PCB Power
+                    states:
+                         - { value: 0, generic: 0, descr: 'No' }
+                         - { value: 1, generic: 2, descr: 'Yes' }
+        voltage:
+            data:
+                -
+                    oid: KYMATA-AMP-MIB::voltage5V
+                    num_oid: .1.3.6.1.4.1.60429.1.3.11.{{ $index }}
+                    divisor: 1000
+                    descr: 'Voltage'
+                    index: 'voltage5V.{{ $index }}'

@@ -1,0 +1,11 @@
+os: kymata
+type: wireless
+text: 'Kymata'
+icon: kymata
+mib_dir: kymata
+over:
+    - { graph: device_dbm, text: 'Tx Power' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.60429.1
