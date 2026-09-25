@@ -1,0 +1,4444 @@
+APOLLO-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+            Integer32, IpAddress, Counter64
+                FROM SNMPv2-SMI
+            TEXTUAL-CONVENTION, TruthValue, RowStatus , DisplayString, TimeStamp
+                FROM SNMPv2-TC
+            MODULE-COMPLIANCE, OBJECT-GROUP          FROM SNMPv2-CONF
+            InterfaceIndex
+                FROM IF-MIB
+            eciMibs
+                    FROM ECI-SMI
+            InterfaceIndex
+                    FROM IF-MIB 
+            SnmpAdminString
+                    FROM SNMP-FRAMEWORK-MIB
+            etherStatsEntry
+                    FROM RMON-MIB ;
+
+apollo  MODULE-IDENTITY
+        LAST-UPDATED  "1501100930Z"  -- Jan 10, 2015 at 09:30 GMT
+        ORGANIZATION "ECI TELECOM"
+        CONTACT-INFO
+	"ECI Telecom, Ltd.
+	 Postal: 30 Hasivim Street
+	         Petach Tikva 49157, Israel 
+	 Tel: +972-3-9266000
+	 Fax: +972-3-9266370
+	 email: on.support@ecitele.com"
+        DESCRIPTION
+            "The set of MIB modules that describe various features of APOLLO NE"
+        ::= {eciMibs 7  }
+
+--  APOLLO General Variables
+
+--  These parameters apply globally to APOLLO Network Element.
+
+apolloNeTable       OBJECT-TYPE 
+    SYNTAX          OBJECT IDENTIFIER 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+                    "This is a key-less table and contains a single entry"
+    ::= { apollo 1 }
+
+apolloNeName        OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (0..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+                    "A textual description of Apollo Network element"
+    ::= { apolloNeTable 1 }
+
+apolloNeId          OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+                    "This attribute is an unsigned short number [1..65535]
+                     which is configured during NE installation phase typically
+                     via planning tool. A value of 0 indicates that this
+                     attribute is not set in the agent."
+    ::= { apolloNeTable 2 }
+
+apolloNeDescription OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (0..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+                    "A textual description of Apollo Network Element"
+    ::= { apolloNeTable 3 }
+
+apolloNeStatus      OBJECT-TYPE
+    SYNTAX          BITS
+                    {
+                         no-problem(0)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+                    "Apollo NE Status:This value represents the overall status of NE.
+                     A value of 1 represents No Problem. In the current version, this
+                     is the only value that is supported. This may be expanded in future"
+    ::= { apolloNeTable 4 }
+
+apolloNeOperStatus OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                        up(1),
+                        down(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+                    "Apollo NE operational status: This value will always be UP"
+    ::= { apolloNeTable 5 }
+
+apolloShelfTable    OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ApolloShelfEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     
+                    " Information regarding the Shelf attributes"  
+    ::= {apollo 2}
+
+apolloShelfEntry    OBJECT-TYPE
+    SYNTAX          ApolloShelfEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     
+                    "Information regarding Shelf Attributes"
+    INDEX           {apolloShelfIndex}  
+    ::= {apolloShelfTable 1}
+
+ApolloShelfEntry ::=
+    SEQUENCE    
+    {
+        apolloShelfIndex            INTEGER,
+        apolloShelfType             DisplayString (SIZE (0..255)),
+        apolloShelfDescription      DisplayString (SIZE (0..255)),
+        apolloShelfAdminStatus      INTEGER,
+        apolloShelfOperStatus       INTEGER,
+        apolloShelfStatus           BITS,
+        apolloShelfTemp             Integer32 (0..'FFFFFF'h),
+        apolloShelfPowerConsumed    OCTET STRING,
+        apolloShelfFanStatus        INTEGER 
+    }
+
+    apolloShelfIndex        OBJECT-TYPE
+        SYNTAX              INTEGER{
+                            s0(1),
+                            sa(2),
+                            sb(3),
+                            sc(4),
+                            sd(5),
+                            se(6),
+                            sf(7),
+                            sg(8),
+                            sh(9),
+                            si(10),
+                            sj(11),
+                            sk(12),
+                            sl(13)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "This parameter identifies the specific shelf associated with this row. 
+                             Shelf number '0'(0x30) is the main/single shelf.
+                             In a multi-shelf NE, shelves 1,2,3 and fourth are the subtended" 
+        ::= {apolloShelfEntry 1 }        
+    apolloShelfType         OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE (0..255))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "A textual description of specific shelf type associated with this row" 
+        ::= {apolloShelfEntry 2 }        
+    apolloShelfDescription  OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE (0..255))     
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "Apollo shelf description" 
+        ::= {apolloShelfEntry 3 }        
+
+    apolloShelfAdminStatus  OBJECT-TYPE
+        SYNTAX              INTEGER
+                            {
+                                up(1),
+                                down(2)
+                            }   
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "Apollo Shelf Admin Status"
+        ::= {apolloShelfEntry 4 }        
+    apolloShelfOperStatus   OBJECT-TYPE
+        SYNTAX              INTEGER
+                            {
+                                up(1),
+                                down(2),
+                                unknown(3)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "Apollo Shelf Oper Status"
+        ::= {apolloShelfEntry 5 }        
+    apolloShelfStatus       OBJECT-TYPE
+        SYNTAX              BITS
+                            {
+                                no-problem(0),
+                                communication-loss(1),
+                                type-mismatch(2),
+                                temperature-too-high(3),
+                                fan-failure(4),
+                                powering-failure(5),
+                                excessive-power-consumed(6) 
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "Apollo Shelf Status"
+        ::= {apolloShelfEntry 6 }        
+    apolloShelfTemp         OBJECT-TYPE
+        SYNTAX              Integer32 (0..'FFFFFF'h)
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "Apollo Shelf temperature "
+        ::= {apolloShelfEntry 7 }        
+    apolloShelfPowerConsumed OBJECT-TYPE
+        SYNTAX               OCTET STRING
+        MAX-ACCESS           read-only
+        STATUS               current
+        DESCRIPTION
+                            "Apollo Shelf Power Consumed"
+        ::= {apolloShelfEntry 8 }        
+--TO-DO:
+--As mentioned in SRQ, Fan Status could be practically 
+--be a collection of objects, rather than a single one
+--like fan status,fan speed, fan reminder setup,status of 
+--power suppliers in case of single unit.
+    apolloShelfFanStatus    OBJECT-TYPE
+        SYNTAX              INTEGER
+                            {
+                                up(1),
+                                down(2),
+                                unsupported(3)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "Apollo Shelf Fan Status"
+        ::= {apolloShelfEntry 9 }        
+
+apolloCardTable     OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ApolloCardEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     
+                    "This MIB Table carries various attributes for all supported apollo cards"  
+    ::= {apollo 3}
+
+apolloCardEntry     OBJECT-TYPE
+    SYNTAX          ApolloCardEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     
+                    "Entries for all supported apollo cards"  
+    INDEX           {apolloCardShelfIndex, apolloCardIndex}  
+    ::= {apolloCardTable 1}
+
+ApolloCardEntry ::=
+    SEQUENCE    {
+        apolloCardShelfIndex    INTEGER,
+        apolloCardIndex         INTEGER,
+        apolloCardType          DisplayString ( SIZE ( 0.. 255)),
+        apolloCardSlots         DisplayString (SIZE (0.. 255)),
+        apolloCardDescription   DisplayString ( SIZE ( 0.. 255)),
+        apolloCardAdminStatus   INTEGER,
+        apolloCardOperStatus    INTEGER,
+        apolloCardStatus        BITS,
+        apolloCardTemp          OCTET STRING,
+        apolloCardPowerConsumed OCTET STRING (SIZE(4))
+    }
+
+    apolloCardShelfIndex    OBJECT-TYPE
+        SYNTAX              INTEGER
+                            {
+                                s0(1),
+                                sa(2),
+                                sb(3),
+                                sc(4),
+                                sd(5),
+                                se(6),
+                                sf(7),
+                                sg(8),
+                                sh(9),
+                                si(10),
+                                sj(11),
+                                sk(12),
+                                sl(13)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "This parameter identifies the specific shelf associated with this row. 
+                             Shelf number '0'(0x30) is the main/single shelf.
+                             In a multi-shelf NE, shelves 1,2,3 and fourth are the subtended" 
+        ::= {apolloCardEntry 1 }        
+
+    apolloCardIndex    OBJECT-TYPE
+        SYNTAX              INTEGER{
+                            u0(1),
+                            u1(2),
+                            u2(3),
+                            u3(4),
+                            u4(5),
+                            u5(6),
+                            u6(7),
+                            u7(8),
+                            u8(9),
+                            u9(10),
+                            u10(11),
+                            u11(12),
+                            u12(13),
+                            u13(14),
+                            u14(15),
+                            u15(16),
+                            u16(17),
+                            u17(18),
+                            u18(19),
+                            u19(20),
+                            u20(21),
+                            u21(22),
+                            u22(23),
+                            u23(24),
+                            rcpa(25),
+                            rcpb(26),
+                            cem(27),
+                            fan(28),
+                            pfm1(29),
+                            pfm2(30),
+                            ctm-a(31),
+                            ctm-b(32),
+                            rcpa-storage(33),
+                            rcpb-storage(34),
+                            rcpa-np(35),
+                            rcpb-np(36),
+                            rcpa-np-phy(37),
+                            rcpb-np-phy(38),
+                            rcpa-pxf(39),
+                            rcpb-pxf(40),
+                            u24(41),
+			    u25(42),
+			    u26(43),
+			    u27(44),
+			    u28(45),
+			    u29(46),
+			    u30(47),
+			    u31(48),
+			    xTam(49),
+			    xMim-l(50),
+		            xMim-r(51),
+		            xFcm-u(52),
+			    xFcm-m(53),
+			    xFcm-l(54),
+			    xPfm-a1(55),
+			    xPfm-b1(56),
+			    xPfm-a2(57),
+			    xPfm-b2(58),
+			    xPfm-a3(59),
+			    xPfm-b3(60),
+			    xPfm-a4(61),
+			    xPfm-b4(62),
+			    xPfm-a5(63),
+			    xPfm-b5(64),
+			    xPfm-a6(65),
+			    xPfm-b6(66),
+			    xFm1(67),			   
+			    xFm2(68),			   
+			    xFm3(69),			   
+			    xFm4(70),			   
+			    xFm5(71),			   
+			    xFm6(72),			   
+			    xFm7(73),
+			    fcm08-d-l(74),
+			    fcm08-d-u(75),
+			    u0-0(76),
+			    u0-1(77),
+			    u1-0(78),
+			    u1-1(79),
+			    u2-0(80),
+			    u2-1(81),
+			    u3-0(82),
+			    u3-1(83),
+			    u4-0(84),
+			    u4-1(85),
+			    u5-0(86),
+			    u5-1(87),
+			    u6-0(88),
+			    u6-1(89),
+			    u7-0(90),
+			    u7-1(91),
+			    u8-0(92),
+			    u8-1(93),
+			    u9-0(94),
+			    u9-1(95),
+			    u10-0(96),
+			    u10-1(97),
+			    u11-0(98),
+			    u11-1(99),
+			    u12-0(100),
+			    u12-1(101),
+			    u13-0(102),
+			    u13-1(103),
+			    u14-0(104),
+			    u14-1(105),
+			    u15-0(106),
+			    u15-1(107),
+			    u16-0(108),
+			    u16-1(109),
+			    u17-0(110),
+			    u17-1(111),
+			    u18-0(112),
+			    u18-1(113),
+			    u19-0(114),
+			    u19-1(115),
+			    u20-0(116),
+			    u20-1(117),
+			    u21-0(118),
+			    u21-1(119),
+			    u22-0(120),
+			    u22-1(121),
+			    u23-0(122),
+			    u23-1(123)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "This parameter identifies the specific card 
+                            within apolloShelfIndex, associated with this row.)" 
+        ::= {apolloCardEntry 2 }        
+
+    apolloCardType          OBJECT-TYPE 
+        SYNTAX              DisplayString ( SIZE ( 0.. 255))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         
+                            "Apollo card type description"
+        ::= {apolloCardEntry 3}
+    
+    apolloCardSlots         OBJECT-TYPE
+        SYNTAX              DisplayString ( SIZE ( 0.. 255))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION     
+                            "Number of slots occupied by this card"
+        ::= {apolloCardEntry 4}
+
+    apolloCardDescription   OBJECT-TYPE
+        SYNTAX              DisplayString ( SIZE ( 0.. 255))     
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "Apollo card description" 
+        ::= {apolloCardEntry 5 }        
+
+    apolloCardAdminStatus        OBJECT-TYPE
+        SYNTAX      INTEGER{
+                            up(1),
+                            down(2)
+                }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "Apollo card Admin Status"
+        ::= {apolloCardEntry 6 }        
+    apolloCardOperStatus        OBJECT-TYPE
+        SYNTAX      INTEGER{
+                            unknown(1),
+                            absent(2),
+                            down(3),
+                            up(4),
+                            standby(5),
+                            active(6)
+                }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "Apollo Card Oper Status"
+        ::= {apolloCardEntry 7 }        
+
+    apolloCardStatus        OBJECT-TYPE
+        SYNTAX              BITS
+                            {
+                              no-problem(0),
+                              unplugged(1),
+                              communication-loss(2),
+                              type-mismatch(3),
+                              bit-fail(4),
+                              bit-degraded(5),
+                              bit-slightly-degraded(6),
+                              temperature-too-high(7),
+                              power-failure(8),
+                              mf-oof(9),
+                              key-rotation-fail(10),
+                              ctm-a-failure(11),
+                              ctm-b-failure(12),
+                              ctm-mismatch-failure(13)
+                            }   
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "Apollo Card Status"
+        ::= {apolloCardEntry 8 }        
+
+    apolloCardTemp         OBJECT-TYPE
+        SYNTAX              OCTET STRING 
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "Apollo Card Temperature"
+        ::= {apolloCardEntry 9 }        
+
+    apolloCardPowerConsumed        OBJECT-TYPE
+        SYNTAX              OCTET STRING (SIZE (4))     
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                            "Apollo Card Power Consumed in Watts"
+        ::= {apolloCardEntry 10 }        
+
+apolloIfTable       OBJECT-TYPE
+       SYNTAX       SEQUENCE OF ApolloIfEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+                    "Information about the port on which this interface resides"
+    ::= {apollo 4}
+
+apolloIfEntry       OBJECT-TYPE
+       SYNTAX       ApolloIfEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+                    "Information regarding port/interface attributes"
+       INDEX           {apolloIfIndex}
+       ::= {apolloIfTable 1}
+
+ApolloIfEntry ::=
+    SEQUENCE
+    {
+        apolloIfIndex          InterfaceIndex,
+        apolloIfDirection      INTEGER,
+        apolloIfBehavior       INTEGER,
+        apolloIfPmEnabled      INTEGER,
+        apolloIfAlarmSeverity  INTEGER,
+        apolloIfStatus         DisplayString (SIZE (0..255)),
+        apolloIfPgId           DisplayString (SIZE (0..255)),
+        apolloIfPgRole         INTEGER 
+    }
+
+    apolloIfIndex        OBJECT-TYPE
+        SYNTAX           InterfaceIndex
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                    "This is the IfIndex of the Physical and Logical Interfaces on the agent"
+        ::= { apolloIfEntry 1 }
+    apolloIfDirection    OBJECT-TYPE
+        SYNTAX           INTEGER{
+                         direction-none(1),
+                         direction-uni-in(2),
+                         direction-uni-out(3),
+                         direction-bidirection(4),
+                         direction-uni-in-out(5)
+                         }
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                    "Information regarding port direction"
+        ::= {apolloIfEntry 2 }
+    apolloIfBehavior     OBJECT-TYPE
+        SYNTAX           INTEGER{
+                         direction-none(1),
+                         direction-uni-in(2),
+                         direction-uni-out(3),
+                         direction-bidirection(4),
+                         direction-uni-in-out(5)
+                         }
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                    "Information regarding port behaviour"
+        ::= {apolloIfEntry 3 }
+    apolloIfPmEnabled    OBJECT-TYPE
+        SYNTAX           INTEGER{
+                         true(1),
+                         false(2)
+                         }
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                    "This parameter indicates whether PM is enabled or not on the interface"
+        ::= {apolloIfEntry 4 }
+    apolloIfAlarmSeverity   OBJECT-TYPE
+        SYNTAX              INTEGER{
+                            critical(1),
+                            major(2),
+                            minor(3),
+                            warning(4),
+                            nonalarmed(5),
+                            clear(6),
+                            undefined(7)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                    "This parameter indicates the severity of the alarm"
+        ::= {apolloIfEntry 5 }
+    apolloIfStatus       OBJECT-TYPE
+        SYNTAX           DisplayString (SIZE (0..255)) 
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                    "This attribute intends to address generic failures and
+                     failures that are not reflected by technology-specific MIBs.
+                     Bit positions meaning shall be context sensitive (i.e., per ifType)
+
+		     Bit zero is set to indicate 'No Failure' regardless of
+		     the IfType
+
+                     For IfType = OtnOtu following are the alarms and the bit positions 
+                     that will be set (assuming bit positions start from 0)
+                     Trail Trace ID Mismatch(1),Loss Of Frame(2),Signal Degraded (3),
+                     Loss of Multi Frame(4),Backward Defect Indication(5),
+                     Equipment plugged out(6),Installed equipment differs from the configured one(7)
+                     Built-in test: HW failed(8),Built-in test: HW degraded(9),
+                     Built-in test: HW slightly degraded(10),High Temperature(11),
+                     Input power greater than predetermined threshold(12),
+                     Input power lower than predetermined threshold(13),
+                     Output power greater than predetermined threshold(14),
+                     Output power lower than predetermined threshold(15),
+                     Transceiver bias out of range(16),Wavelength mismatch(17),
+                     Loss of Signal(18),LF(19),RF(20),
+                     Broadcast Packets 15M(21),Multicast Packets 15M(22),
+                     Group Address To MAC Ambiguity 15M(23),
+                     IGMP Query At Access 15M(24),Rx Error Octets 15M(25),
+                     Priority 0 Random Drop Octets Alarm 15M(26),
+                     Priority 1 Random Drop Octets Alarm 15M(27),
+                     Priority 2 Random Drop Octets Alarm 15M(28),
+                     Priority 3 Random Drop Octets Alarm 15M(29),
+                     Priority 4 Random Drop Octets Alarm 15M(30),
+                     Priority 5 Random Drop Octets Alarm 15M(31),
+                     Priority 6 Random Drop Octets Alarm 15M(32),
+                     Priority 7 Random Drop Octets Alarm 15M(33),
+                     Tx Utilization Percent 15M(34),OAM Discovery Failed(35),
+                     OAM Remote Link Fault(36),OAM Remote Link Event(37),
+                     OAM Local Link Event(38),Loss of Data(39),
+                     Threshold Crossing Alert: Near End Errored Seconds, 15 minutes(40),
+                     Threshold Crossing Alert: Near End Severely Errored Seconds, 15 minutes(41),
+                     Threshold Crossing Alert: Near End Background Block Errors, 15 minutes(42),
+                     Threshold Crossing Alert: Far End Errored Seconds, 15 minutes(43),
+                     Threshold Crossing Alert: Far End Severely Errored Seconds, 15 minutes(44),
+                     Threshold Crossing Alert: Far End Background Block Errors, 15 minutes(45),
+                     Threshold Crossing Alert: Near end Corrected errors, 15 minutes(46),
+                     Threshold Crossing Alert: Near End Errored seconds, 1 Day(47),
+                     Threshold Crossing Alert: Near End Severely Errored seconds, 1 Day(48),
+                     Threshold Crossing Alert: Near End Background Block Errors, 1 Day(49),
+                     Threshold Crossing Alert: Far End Errored seconds, 1 Day(50),
+                     Threshold Crossing Alert: Far End Severely Errored seconds, 1 Day(51),
+                     Threshold Crossing Alert: Far End Background Block Errors, 1 Day(52),
+                     Threshold Crossing Alert: Near end Corrected errors, 1 Day(53),
+                     Generic AIS(54),Remote Client Signal Failure(55),
+                     Alarm Indication Signal(56),ODU-Lck Signal(57),
+                     Payload Type Mismatch(58),Unavailable Time(59),
+                     ODU Loss of Signal At Client Port(60),
+                     Missing Fiber Connectivity (61),
+                     High Pre Fec BER (62),
+                     Rx Signal Power High (63),
+                     Rx Signal Power Low (64),
+                     Missing Or Invalid License Key (65),
+                     OTUA LOF (66),
+                     OTUA LOMF (67),
+                     OTUA DEG (68),
+                     OTUA BDI (69),
+                     OTUA High Pre-Fec BER (70)
+
+                     For IfType = OtnOdu following are the alarms and the bit positions 
+                     that will be set (assuming bit positions start from 0)
+                     Alarm Indication Signal(1),ODU-Lck Signal(2),Open Connection indication(3),
+                     Trail Trace ID Mismatch(4),Signal Degraded(5),
+                     Backward Defect Indication(6),Payload Type Mismatch(7)
+                     Generic AIS(8),ODU Loss of Signal At Client Port(9),
+                     ODU Msi Mismatch(10),Low Order ODU Msi Mismatch(11),
+                     Threshold Crossing Alert: Near End Errored Seconds, 15 minutes(12),
+                     Threshold Crossing Alert: Near End Severely Errored Seconds, 15 minutes(13),
+                     Threshold Crossing Alert: Near End Background Block Errors, 15 minutes(14),
+                     Threshold Crossing Alert: Far End Errored Seconds, 15 minutes(15),
+                     Threshold Crossing Alert: Far End Severely Errored Seconds, 15 minutes(16),
+                     Threshold Crossing Alert: Far End Background Block Errors, 15 minutes(17),
+                     Threshold Crossing Alert: Near End Errored seconds, 1 Day(18),
+                     Threshold Crossing Alert: Near End Severely Errored seconds, 1 Day(19),
+                     Threshold Crossing Alert: Near End Background Block Errors, 1 Day(20),
+                     Threshold Crossing Alert: Far End Errored seconds, 1 Day(21),
+                     Threshold Crossing Alert: Far End Severely Errored seconds, 1 Day(22),
+                     Threshold Crossing Alert: Far End Background Block Errors, 1 Day(23),
+                     Unavailable Time(24),Threshold Crossing Alert: Test Sequence Errors, 15 minutes(25),
+                     Threshold Crossing Alert: Test Sequence Errors, 1 day(26),
+                     Key Replacement Failed For 5 months due to IV overflow(27)
+                     Key Rotation Failed (28)
+                     Mic Errors 15M (29)
+                     Decryption Errors 15M (30)
+                     Remote Port Failed (31)
+                     DH Group Mismatch (32)
+ 
+                     For IfType = EtherPhy following are the alarms and the bit positions 
+                     that will be set (assuming bit positions start from 0)
+                     Broadcast Packets 15M (1),Multicast Packets 15M (2),
+                     Group Address To MAC Ambiguity 15M (3),IGMP Query At Access 15M (4),
+                     Rx Error Octets 15M (5),Tx Utilization Percent 15M (6),
+                     OAM Local Link Event (7),Auto-Negotiation Failed (8),
+                     Ethernet Link Down (9),OAM Discovery Failed (10),
+                     OAM Lost Link (11),OAM Remote Link Fault (12),
+                     OAM Remote Link Fault (13),LF (14),RF (15),
+                     Priority 0 Random Drop Octets Alarm 15M (16),
+                     Priority 1 Random Drop Octets Alarm 15M (17),
+                     Priority 2 Random Drop Octets Alarm 15M (18),
+                     Priority 3 Random Drop Octets Alarm 15M (19),
+                     Priority 4 Random Drop Octets Alarm 15M (20),
+                     Priority 5 Random Drop Octets Alarm 15M (21),
+                     Priority 6 Random Drop Octets Alarm 15M (22),
+                     Priority 7 Random Drop Octets Alarm 15M (23),
+                     Equipment plugged out(24),
+                     Installed equipment differs from the configured one (25),
+                     Built-in test: HW failed(26),Built-in test: HW degraded(27),
+                     Built-in test: HW slightly degraded(28),High Temperature(29),
+                     Input power greater than predetermined threshold(30),
+                     Input power lower than predetermined threshold(31),
+                     Output power greater than predetermined threshold(32),
+                     Output power lower than predetermined threshold(33),
+                     Transceiver bias out of range(34),
+                     Wavelength mismatch(35),Loss of Signal(36)
+
+                     For IfType = UllInterface following are the alarms and the bit positions 
+                     that will be set (assuming bit positions start from 0)
+                     Equipment plugged out(1),Installed equipment differs from the configured one(2)
+                     Built-in test: HW failed(3),Built-in test: HW degraded(4),
+                     Built-in test: HW slightly degraded(5),High Temperature(6),
+                     Input power greater than predetermined threshold(7),
+                     Input power lower than predetermined threshold(8),
+                     Output power greater than predetermined threshold(9),
+                     Output power lower than predetermined threshold(10),
+                     Transceiver bias out of range(11),Wavelength mismatch(12),
+                     Loss of Signal(13),
+                     Threshold Crossing Alert: Near End Errored Seconds, 15 minutes(14),
+                     Threshold Crossing Alert: Near End Severely Errored Seconds, 15 minutes(15),
+                     Threshold Crossing Alert: Near End Background Block Errors, 15 minutes(16),
+                     Threshold Crossing Alert: Far End Errored Seconds, 15 minutes(17),
+                     Threshold Crossing Alert: Far End Severely Errored Seconds, 15 minutes(18),
+                     Threshold Crossing Alert: Far End Background Block Errors, 15 minutes(19),
+                     Threshold Crossing Alert: Near End Errored seconds, 1 Day(20),
+                     Threshold Crossing Alert: Near End Severely Errored seconds, 1 Day(21),
+                     Threshold Crossing Alert: Near End Background Block Errors, 1 Day(22),
+                     Threshold Crossing Alert: Far End Errored seconds, 1 Day(23),
+                     Threshold Crossing Alert: Far End Severely Errored seconds, 1 Day(24),
+                     Threshold Crossing Alert: Far End Background Block Errors, 1 Day(25),
+                     Unavailable Time(26)
+
+                     For IfType = ETY and ETY-OC following are the alarms and the bit positions(assuming bit positions start from 0)
+                     loss of signal (1),syncloss(2),hiber(3),localFail(4),remoteFail(5),gfpLfd(6),gfpUpim(7),gfpPtim(8),gfpExim(9),GfpCsf(10), EqptBitFail(11), EqptBitDegraded(12), EqptBitSlightlyDegraded(13), WavelengthMismatch(14), EqptMismatch(15), EqptOut(16), LaserBiasFault(17), RxPwrHigh(18), RxPwrLow(19), TxPwrHigh(20), TxPwrLow(21), TempHigh(22), PcsUat(23), PcsNeEs15M(24), PcsNeSes15M(25), PcsNeEs1D(26), PcsNeSes1D(27), PcsBip8Errors15M(28), PcsErroredBlock15M(29) , 
+RxBadFrames15M (30), TxBadFrames15M (31), MissingFiberConnectivity (32), MissingOrInvalidLicenseKey (33), gfpUat (34), gfpNeEs15M (35), gfpNeSes15M (36)
+
+                     For IfType = FC following are the alarms and the bit positions(assuming bit positions start from 0)
+                     loss of signal (1),syncloss(2),hiber(3),localFail(4),remoteFail(5),gfpLfd(6),gfpUpim(7),gfpPtim(8),gfpExim(9),GfpCsf(10)
+
+                     For IfType = OcInterface following are the alarms and the bit positions 
+                     that will be set (assuming bit positions start from 0)
+                     Equipment plugged out(1),Installed equipment differs from the configured one(2)
+                     Built-in test: HW failed(3),Built-in test: HW degraded(4),
+                     Built-in test: HW slightly degraded(5),High Temperature(6),
+                     Input power greater than predetermined threshold(7),
+                     Input power lower than predetermined threshold(8),
+                     Output power greater than predetermined threshold(9),
+                     Output power lower than predetermined threshold(10),
+                     Transceiver bias out of range(11),Wavelength mismatch(12),
+                     Loss of Signal(13),
+                     Loss of Frame(14),
+                     Trail Trace ID mismatch(15)
+                     
+                     Threshold Crossing Alert: Near End Errored Seconds, 15 minutes(16),
+                     Threshold Crossing Alert: Near End Severely Errored Seconds, 15 minutes(17),
+                     Threshold Crossing Alert: Near End Code Violations, 15 minutes(18),
+                     Threshold Crossing Alert: Near End Errored seconds, 1 Day(19),
+                     Threshold Crossing Alert: Near End Severely Errored seconds, 1 Day(20),
+                     Threshold Crossing Alert: Near End Severely Errored Seconds, 1 day(21),
+                     Unavailable Time(22),
+                     Fiber connectivity configuration is missing and it may impact traffic(23),
+                     Low input OSNR(24)
+                     MissingOrInvalidLicenseKey (25)
+
+                     For IfType = FcInterface following are the alarms and the bit positions 
+                     that will be set (assuming bit positions start from 0)
+                     Equipment plugged out(1),Installed equipment differs from the configured one(2)
+                     Built-in test: HW failed(3),Built-in test: HW degraded(4),
+                     Built-in test: HW slightly degraded(5),High Temperature(6),
+                     Input power greater than predetermined threshold(7),
+                     Input power lower than predetermined threshold(8),
+                     Output power greater than predetermined threshold(9),
+                     Output power lower than predetermined threshold(10),
+                     Transceiver bias out of range(11),Wavelength mismatch(12),
+                     Loss of Signal(13),
+                     Loss of synchronization(14),
+                     Excessive Line Code Violations(15),
+                     Local Fault(16),
+                     GFP-T Loss of frame(17),
+                     User Payload Identifier mismatch(18),
+                     Payload Type Identifier mismatch alarm(19),
+                     Extension header mismatch(20),
+                     Client signal fail Far-end indication(21),
+                     Threshold Crossing Alert: Near End Errored Seconds, 15 minutes(22),
+                     Threshold Crossing Alert: Near End Severely Errored Seconds, 15 minutes(23),
+                     Threshold Crossing Alert: Near End Background Block Errors, 15 minutes(24),
+                     Threshold Crossing Alert: Near End Errored seconds, 1 Day(25),
+                     Threshold Crossing Alert: Near End Severely Errored seconds, 1 Day(26),
+                     Threshold Crossing Alert: Near End Severely Errored Seconds, 1 Day(27),
+                     Threshold Crossing Alert: Near End Background Block Errors, 15 Day(28),
+                     Unavailable Time(29),
+                     Threshold Crossing Alert: PCS Near End Errored Seconds, 15 minutes(30),
+                     Threshold Crossing Alert: PCS Near End Severely Errored Seconds, 15 minutes(31),
+                     Threshold Crossing Alert: PCS Near End Background Block Errors, 15 minutes(32),
+                     Threshold Crossing Alert: PCS Near End Errored seconds, 1 Day(33),
+                     Threshold Crossing Alert: PCS Near End Severely Errored seconds, 1 Day(34),
+                     Threshold Crossing Alert: PCS Near End Severely Errored Seconds, 1 Day(35),
+                     Threshold Crossing Alert: PCS Near End Background Block Errors, 15 Day(36),
+                     PCS Unavailable Time(37),
+                     Threshold Crossing Alert: GFP Near End Errored Seconds, 15 minutes(38),
+                     Threshold Crossing Alert: GFP Near End Severely Errored Seconds, 15 minutes(39),
+                     Threshold Crossing Alert: GFP Near End Background Block Errors, 15 minutes(40),
+                     Threshold Crossing Alert: GFP Near End Errored seconds, 1 Day(41),
+                     Threshold Crossing Alert: GFP Near End Severely Errored seconds, 1 Day(42),
+                     Threshold Crossing Alert: GFP Near End Severely Errored Seconds, 1 Day(43),
+                     Threshold Crossing Alert: GFP Near End Background Block Errors, 15 Day(44),
+                     GFP Unavailable Time(45),
+                     Fiber connectivity configuration is missing and it may impact traffic(46),
+                     Low input OSNR(47),
+                     PCS Errored Block (48),
+                     MissingOrInvalidLicenseKey (49)"
+        ::= {apolloIfEntry 6 }
+    apolloIfPgId         OBJECT-TYPE
+        SYNTAX           DisplayString (SIZE (0..255))
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                    "The Protection Group Index (PG ID) in which the
+                     related port/interface is a member.If this attribute
+                     is set to N/A it indicates that the related port/interface
+                     is not a member in any PG."
+        ::={ apolloIfEntry 7 }
+    apolloIfPgRole       OBJECT-TYPE
+        SYNTAX           INTEGER
+                         {
+                            none(1),
+                            active(2),
+                            standby(3)
+                         }
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                    "This attribute reflects, for a port/interface that
+                     is a member in a PG, its current role in the PG"
+        ::= {apolloIfEntry 8 }
+
+apolloTransTable    OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ApolloTransEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     
+                    " Information regarding the Transceiver on a port"  
+    ::= {apollo 5}
+
+apolloTransEntry    OBJECT-TYPE
+    SYNTAX          ApolloTransEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     
+                    "Information regarding Transceiver attributes"
+    INDEX           {apolloTrIfIndex}  
+    ::= {apolloTransTable 1}
+
+ApolloTransEntry ::=
+    SEQUENCE    {
+        apolloTrIfIndex                     InterfaceIndex,
+        apolloTrStatus                      Integer32 (0..'FFFFFF'h),
+        apolloTrType                        DisplayString ( SIZE ( 0..255)),
+        apolloTrActTxState                  INTEGER,
+        apolloTrRxPower                     OCTET STRING (SIZE(4)),
+        apolloTrTxPower                     OCTET STRING (SIZE(4)),
+        apolloTrBias                        OCTET STRING (SIZE(4)),
+        apolloTrOsnrMin                     OCTET STRING (SIZE(4)),
+        apolloTrOsnrMax                     OCTET STRING (SIZE(4)),
+        apolloInputDispersion               Integer32(0..'FFFFFF'h),
+        apolloInputOSNR                     OCTET STRING (SIZE(4)),
+        apolloInputPMD                      OCTET STRING (SIZE(4)),
+        apolloInputNLP                      OCTET STRING (SIZE(4)),
+        apolloOutputDispersion              Integer32(0..'FFFFFF'h),
+        apolloOutputOSNR                    OCTET STRING (SIZE(4)),
+        apolloOutputPMD                     OCTET STRING (SIZE(4)),
+        apolloOutputNLP                     OCTET STRING (SIZE(4)),
+        apolloFrequencySpread               INTEGER,
+        apolloLineCode                      DisplayString ( SIZE (0..255)), 
+        apolloMeasuredOSNR                  OCTET STRING (SIZE(4)),
+        apolloTrTemperature	            OCTET STRING (SIZE(4)),
+        apolloTrSupplyVoltage	            OCTET STRING (SIZE(4)),
+        apolloTrRxPowerLane1                OCTET STRING (SIZE(4)),
+        apolloTrRxPowerLane2                OCTET STRING (SIZE(4)),
+        apolloTrRxPowerLane3                OCTET STRING (SIZE(4)),
+        apolloTrRxPowerLane4                OCTET STRING (SIZE(4)),
+        apolloTrRxPowLaneHighThreshold      OCTET STRING (SIZE(4)),
+        apolloTrRxPowLaneLowThreshold       OCTET STRING (SIZE(4)),
+        apolloTrRxPowLaneHighWarn           OCTET STRING (SIZE(4)),
+        apolloTrRxPowLaneLowWarn            OCTET STRING (SIZE(4)),
+        apolloTrTxPowerLane1                OCTET STRING (SIZE(4)),
+        apolloTrTxPowerLane2                OCTET STRING (SIZE(4)),
+        apolloTrTxPowerLane3                OCTET STRING (SIZE(4)),
+        apolloTrTxPowerLane4                OCTET STRING (SIZE(4)),
+        apolloTrTxPowLaneHighThreshold      OCTET STRING (SIZE(4)),
+        apolloTrTxPowLaneLowThreshold       OCTET STRING (SIZE(4)),
+        apolloTrTxPowLaneHighWarn           OCTET STRING (SIZE(4)),
+        apolloTrTxPowLaneLowWarn            OCTET STRING (SIZE(4)),
+        apolloTrBiasHighThreshold           OCTET STRING (SIZE(4)),
+        apolloTrBiasLowThreshold            OCTET STRING (SIZE(4)),
+        apolloTrBiasHighWarn                OCTET STRING (SIZE(4)),
+        apolloTrBiasLowWarn                 OCTET STRING (SIZE(4)),
+        apolloTrTempHighThreshold           OCTET STRING (SIZE(4)),
+        apolloTrTempLowThreshold            OCTET STRING (SIZE(4)),
+        apolloTrTempHighWarn                OCTET STRING (SIZE(4)),
+        apolloTrTempLowWarn                 OCTET STRING (SIZE(4)),
+        apolloTrVolHighThreshold            OCTET STRING (SIZE(4)),
+        apolloTrVolLowThreshold             OCTET STRING (SIZE(4)),
+        apolloTrVolHighWarn                 OCTET STRING (SIZE(4)),
+        apolloTrVolLowWarn                  OCTET STRING (SIZE(4))
+    }
+
+    apolloTrIfIndex         OBJECT-TYPE
+    SYNTAX                  InterfaceIndex
+    MAX-ACCESS              read-only
+    STATUS                  current 
+    DESCRIPTION             
+                    "This attribute will be the ifIndex of the lowest PIF available
+                    on a port.In case, there are multiple PIF's on the same port,
+                    all entries will report the same values."
+                ::={ apolloTransEntry 1}
+
+    apolloTrStatus          OBJECT-TYPE
+        SYNTAX              Integer32 (0..'FFFFFF'h)
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                    "This is a bit-map which is represented using a 32 bit number where 
+                    each bit represent alarm type as below:
+                    0 represents the least significant bit and 31 represents the most significant
+                    bit.Alarms type listed below are supported as of now.
+                    (0)No Problem,(1)Unplugged,(2)Type Mismatch,(3)Bit Fail,(4)Bit Degraded,
+                    (5)Bit Slightly Degraded,(6)Wavelength Mismatch,(7)Rx Power High,(8)Rx Power Low,
+                    (9)Tx Power High,(10)Tx Power Low,(11)Laser Bias Fault,(12)Laser Temperature High,
+                    (13)Low Osnr,(14)Laser Temperature Low,(15)Laser Bias Low Fault,(16)Rx Power High Warn,
+                    (17)Rx Power Low Warn,(18)Tx Power High Warn,(19)Tx Power Low Warn,(20)Laser Temperature High Warn,
+                    (21)Laser Temperature Low Warn,(22)Tx Bias High Warn,(23)Tx Bias Low Warn,
+                    (24)Supply Voltage High,(25)Supply Voltage Low,(26)Supply Voltage High Warn
+		    (27)Supply Voltage Low Warn"
+                ::= {apolloTransEntry 2 }        
+
+    apolloTrType            OBJECT-TYPE
+        SYNTAX              DisplayString ( SIZE( 0.. 255))     
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                    "The actual type of Transceiver plugged in this port"
+                ::= {apolloTransEntry 3 }        
+    apolloTrActTxState          OBJECT-TYPE
+        SYNTAX              INTEGER{
+                            on(1),
+                            off(2)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                    "The actual laser state (On/OFF) of the Transceiver plugged in this port"
+                ::= {apolloTransEntry 4 }        
+
+    apolloTrRxPower             OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))     
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Actual Rx Power received on the transceiver.Its value is expressed in dBm"
+                ::={ apolloTransEntry 5}
+    apolloTrTxPower             OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))     
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Actual Tx Power transmitted on the transceiver.Its value is expressed in dBm"
+                ::={ apolloTransEntry 6}
+    apolloTrBias                OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))     
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Laser Bias of the transceiver plugged in this port. Its value is expressed in mA"
+                ::={ apolloTransEntry 7}
+    apolloTrOsnrMin             OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))     
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Minimum OSNR value of the Transceiver plugged in this port.
+                     Value will be expressed in db"
+                ::={ apolloTransEntry 8}
+    apolloTrOsnrMax             OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))     
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Maximum OSNR value of the Transceiver plugged in this port.
+                     Value will be expressed in db"
+                ::={ apolloTransEntry 9}
+    apolloInputDispersion       OBJECT-TYPE
+    SYNTAX                      Integer32 (0..'FFFFFF'h)
+    UNITS                       "ps/nm"
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Input Dispersion value of the Transceiver 
+                     plugged in this port"
+                ::={ apolloTransEntry 10}
+    apolloInputOSNR             OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))     
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Input OSNR value of the Transceiver plugged in this port. 
+                     Value will be expressed in db"
+                ::={ apolloTransEntry 11}
+    apolloInputPMD              OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))     
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Input PMD[Polarization Mode Dispersion] value of the 
+                    Transceiver plugged in this port"
+                ::={ apolloTransEntry 12}
+    apolloInputNLP              OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))     
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Input NLP[Non Liner Phenomenon] value of the 
+                    Transceiver plugged in this port"
+                ::={ apolloTransEntry 13}
+    apolloOutputDispersion      OBJECT-TYPE
+    SYNTAX                      Integer32 (0..'FFFFFF'h)
+    UNITS                       "ps/nm"
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Output Dispersion value of the Transceiver plugged in this port "
+                ::={ apolloTransEntry 14}
+    apolloOutputOSNR            OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))     
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Output OSNR value of the Transceiver plugged in this port.
+                     Value will be expressed in db"
+                ::={ apolloTransEntry 15}
+    apolloOutputPMD             OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))     
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Output PMD[Polarization Mode Dispersion] of the Transceiver
+                     plugged in this port"
+                ::={ apolloTransEntry 16}
+    apolloOutputNLP             OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))     
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Output NLP[Non Linear Phenomenon] of the Transceiver
+                     plugged in this port"
+                ::={ apolloTransEntry 17}
+    apolloFrequencySpread       OBJECT-TYPE
+    SYNTAX                      INTEGER {
+                                 invalid(1),
+                                 fiftyGHz-dwdm(2),
+                                 hundredGhz-dwdm(3),
+                                 twentynm-cwdm(4) 
+                                }
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Frequency Spread value of the Transceiver 
+                     plugged in this port"
+                ::={ apolloTransEntry 18}
+    apolloLineCode              OBJECT-TYPE
+    SYNTAX                      DisplayString ( SIZE ( 0.. 255))     
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Line code value of the Transceiver plugged in this port"
+                ::={ apolloTransEntry 19}
+    apolloMeasuredOSNR          OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))     
+    MAX-ACCESS                  read-only
+    STATUS                      current 
+    DESCRIPTION             
+                    "Measured OSNR value of the transceiver plugged in this port"
+                ::={ apolloTransEntry 20}
+    apolloTrTemperature         OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Laser Temperature of the transceiver plugged in this port. Its
+                     value is expressed in Cel"
+		::={ apolloTransEntry 21}
+    apolloTrSupplyVoltage       OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Supply Voltage of the transceiver plugged in this port. Its
+                     value is expressed in Volt"
+                ::={ apolloTransEntry 22}
+    apolloTrRxPowerLane1        OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Rx Power Lane 1. Its value is expressed in dBm"
+                ::={ apolloTransEntry 23}
+    apolloTrRxPowerLane2        OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Rx Power Lane 2. Its value is expressed in dBm"
+                ::={ apolloTransEntry 24}
+    apolloTrRxPowerLane3        OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Rx Power Lane 3. Its value is expressed in dBm"
+                ::={ apolloTransEntry 25}
+    apolloTrRxPowerLane4        OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Rx Power Lane 4. Its value is expressed in dBm"
+                ::={ apolloTransEntry 26}
+    apolloTrRxPowLaneHighThreshold      OBJECT-TYPE
+    SYNTAX                              OCTET STRING (SIZE (4))
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+                    "Rx Power Lane High Threshold. Its value is expressed in dBm"
+                ::={ apolloTransEntry 27}
+    apolloTrRxPowLaneLowThreshold       OBJECT-TYPE
+    SYNTAX                              OCTET STRING (SIZE (4))
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+                    "Rx Power Lane Low Threshold. Its value is expressed in dBm"
+                ::={ apolloTransEntry 28}
+    apolloTrRxPowLaneHighWarn           OBJECT-TYPE
+    SYNTAX                              OCTET STRING (SIZE (4))
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+                    "Rx Power Lane High Warning Threshold. Its value is expressed in dBm"
+                ::={ apolloTransEntry 29}
+    apolloTrRxPowLaneLowWarn            OBJECT-TYPE
+    SYNTAX                              OCTET STRING (SIZE (4))
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+                    "Rx Power Lane Low Warning Threshold. Its value is expressed in dBm"
+                ::={ apolloTransEntry 30}
+    apolloTrTxPowerLane1        OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Tx Power Lane 1. Its value is expressed in dBm"
+                ::={ apolloTransEntry 31}
+    apolloTrTxPowerLane2        OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Tx Power Lane 2. Its value is expressed in dBm"
+                ::={ apolloTransEntry 32}
+    apolloTrTxPowerLane3        OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Tx Power Lane 3. Its value is expressed in dBm"
+                ::={ apolloTransEntry 33}
+    apolloTrTxPowerLane4        OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Tx Power Lane 4. Its value is expressed in dBm"
+                ::={ apolloTransEntry 34}
+    apolloTrTxPowLaneHighThreshold      OBJECT-TYPE
+    SYNTAX                              OCTET STRING (SIZE (4))
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+                    "Tx Power Lane High Threshold. Its value is expressed in dBm"
+                ::={ apolloTransEntry 35}
+    apolloTrTxPowLaneLowThreshold       OBJECT-TYPE
+    SYNTAX                              OCTET STRING (SIZE (4))
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+                    "Tx Power Lane Low Threshold. Its value is expressed in dBm"
+                ::={ apolloTransEntry 36}
+    apolloTrTxPowLaneHighWarn           OBJECT-TYPE
+    SYNTAX                              OCTET STRING (SIZE (4))
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+                    "Tx Power Lane High Warning Threshold. Its value is expressed in dBm"
+                ::={ apolloTransEntry 37}
+    apolloTrTxPowLaneLowWarn            OBJECT-TYPE
+    SYNTAX                              OCTET STRING (SIZE (4))
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+                    "Tx Power Lane Low Warning Threshold. Its value is expressed in dBm"
+                ::={ apolloTransEntry 38}
+    apolloTrBiasHighThreshold   OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Laser Bias High Threshold. Its value is expressed in mA"
+                ::={ apolloTransEntry 39}
+    apolloTrBiasLowThreshold    OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Laser Bias Low Threshold. Its value is expressed in mA"
+                ::={ apolloTransEntry 40}
+    apolloTrBiasHighWarn        OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Laser Bias High Warning Threshold. Its value is expressed in mA"
+                ::={ apolloTransEntry 41}
+    apolloTrBiasLowWarn         OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Laser Bias Low Warning Threshold. Its value is expressed in mA"
+                ::={ apolloTransEntry 42}
+    apolloTrTempHighThreshold   OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Laser Temperature High Threshold. Its value is expressed in Cel"
+                ::={ apolloTransEntry 43}
+    apolloTrTempLowThreshold    OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Laser Temperature Low Threshold. Its value is expressed in Cel"
+                ::={ apolloTransEntry 44}
+    apolloTrTempHighWarn        OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Laser Temperature High Warning Threshold. Its value is expressed in Cel"
+                ::={ apolloTransEntry 45}
+    apolloTrTempLowWarn         OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Laser Temperature Low Warning Threshold. Its value is expressed in Cel"
+                ::={ apolloTransEntry 46}
+    apolloTrVolHighThreshold    OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Supply Voltage High Threshold. Its value is expressed in Volt"
+                ::={ apolloTransEntry 47}
+    apolloTrVolLowThreshold     OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Supply Voltage Low Threshold. Its value is expressed in Volt"
+                ::={ apolloTransEntry 48}
+    apolloTrVolHighWarn         OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Supply Voltage High Warning Threshold. Its value is expressed in Volt"
+                ::={ apolloTransEntry 49}
+    apolloTrVolLowWarn         OBJECT-TYPE
+    SYNTAX                      OCTET STRING (SIZE (4))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                    "Supply Voltage Low Warning Threshold. Its value is expressed in Volt"
+                ::={ apolloTransEntry 50}
+
+
+    -- The Ethernet Statistics Group
+    --
+    -- The ethernet statistics group contains statistics measured by the
+    -- probe for each monitored interface on this device.  These
+    -- statistics take the form of free running counters that start from
+    -- zero when a valid entry is created.
+    --
+    -- This group currently has statistics defined only for
+    -- Ethernet interfaces.  Each apolloEtherStatsEntry contains statistics
+    -- for one Ethernet interface.  The probe must create one
+    -- apolloEtherStats entry for each monitored Ethernet interface
+    -- on the device.
+
+    apolloEtherStatsTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF ApolloEtherStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "A list of Ethernet statistics entries."
+        ::= { apollo 6 }
+
+    apolloEtherStatsEntry OBJECT-TYPE
+        SYNTAX     ApolloEtherStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "A collection of statistics kept for a particular
+            Ethernet interface.  As an example, an instance of the
+            apolloEtherStatsJabbers object might be named apolloEtherStatsJabbers.1"
+        AUGMENTS    { etherStatsEntry }
+        ::= { apolloEtherStatsTable 1 }
+
+    ApolloEtherStatsEntry ::= SEQUENCE {
+        apolloEtherStatsDiscontinuityTime           TimeStamp,
+        apolloEtherStatsUndersizePkts               Counter64,
+        apolloEtherStatsOversizePkts                Counter64,
+        apolloEtherStatsCrcAlignErrors              Counter64,
+        apolloEtherStatsFragments                   Counter64,
+        apolloEtherStatsJabbers                     Counter64,
+        apolloEtherStatsRxPktsGt1518Octets          Counter64,
+        apolloEtherStatsRxPausePkts                 Counter64,
+        apolloEtherStatsRxErroredPkts               Counter64,
+        apolloEtherStatsRxHeaderErroredPkts         Counter64,
+        apolloEtherStatsRxDropVlanPkts              Counter64,
+        apolloEtherStatsLinkDownSecs                Counter64,
+        apolloEtherStatsTxAveRate                   Counter64,
+        apolloEtherStatsTxUtil                      Counter64,
+        apolloEtherStatsTxGoodPkts                  Counter64,
+        apolloEtherStatsTxDropWredPkts              Counter64,
+        apolloEtherStatsTxDropWredOctets            Counter64,
+        apolloEtherStatsTxRatioWred                 Counter64,
+        apolloEtherStatsTxDropVlanPkts              Counter64,
+        apolloEtherStatsTxPriFilterPkts             Counter64,
+        apolloEtherStatsFwdTransitions              Counter64,
+        apolloEtherStatsRxTtl1Pkts                  Counter64,
+        apolloEtherStatsRxMplsFilterPkts            Counter64
+    }
+
+apolloEtherStatsDiscontinuityTime OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUpTime on the most recent occasion at which any one or more of this interface's Ethernet statistics counters suffered a discontinuity."
+    ::= { apolloEtherStatsEntry 1 }
+
+apolloEtherStatsUndersizePkts OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rx Undersize Packets"
+    ::= { apolloEtherStatsEntry 2 }
+
+apolloEtherStatsOversizePkts OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rx Oversize Packets"
+    ::= { apolloEtherStatsEntry 3 }
+
+apolloEtherStatsCrcAlignErrors OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rx CRC Align Error Packets"
+    ::= { apolloEtherStatsEntry 4 }
+
+apolloEtherStatsFragments OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Frames"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rx Fragments Frames"
+    ::= { apolloEtherStatsEntry 5 }
+
+apolloEtherStatsJabbers OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rx Jabber Packets"
+    ::= { apolloEtherStatsEntry 6 }
+
+apolloEtherStatsRxPktsGt1518Octets OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Octets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rx Frames 1519 to Max Frame Size"
+    ::= { apolloEtherStatsEntry 7 }
+
+apolloEtherStatsRxPausePkts OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Frames"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rx Pause Frames"
+    ::= { apolloEtherStatsEntry 8 }
+
+apolloEtherStatsRxErroredPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rx Error Packets"
+    ::= { apolloEtherStatsEntry 9 }
+
+apolloEtherStatsRxHeaderErroredPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rx Header Error Packets"
+    ::= { apolloEtherStatsEntry 10 }
+
+apolloEtherStatsRxDropVlanPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rx VLAN Packets Discards"
+    ::= { apolloEtherStatsEntry 11 }
+
+apolloEtherStatsLinkDownSecs OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Link Down Seconds"
+    ::= { apolloEtherStatsEntry 12 }
+
+apolloEtherStatsTxAveRate OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Mbyte-per-sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tx Octet Average Rate (Mbyte/sec)"
+    ::= { apolloEtherStatsEntry 13 }
+
+apolloEtherStatsTxUtil OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Percent"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tx Utilization (%)"
+    ::= { apolloEtherStatsEntry 14 }
+
+apolloEtherStatsTxGoodPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tx Good Packets"
+    ::= { apolloEtherStatsEntry 15 }
+
+apolloEtherStatsTxDropWredPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tx WRED Drop Packets"
+    ::= { apolloEtherStatsEntry 16 }
+
+apolloEtherStatsTxDropWredOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Octets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tx WRED Drop Octets"
+    ::= { apolloEtherStatsEntry 17 }
+
+apolloEtherStatsTxRatioWred OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "ppm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tx WRED Ratio ppm"
+    ::= { apolloEtherStatsEntry 18 }
+
+apolloEtherStatsTxDropVlanPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Egress C-VLAN Drop Packets"
+    ::= { apolloEtherStatsEntry 19 }
+
+apolloEtherStatsTxPriFilterPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Egress Priority Filtering discards"
+    ::= { apolloEtherStatsEntry 20 }
+
+apolloEtherStatsFwdTransitions OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Port Forward Transitions"
+    ::= { apolloEtherStatsEntry 21 }
+
+apolloEtherStatsRxTtl1Pkts OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rx Dropped due to TTL one Packets"
+    ::= { apolloEtherStatsEntry 22 }
+
+apolloEtherStatsRxMplsFilterPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rx MPLS Filter Packet Discards"
+    ::= { apolloEtherStatsEntry 23 }
+
+-- ApolloEtherStatsEgPerPortCosTable Begins
+
+apolloEtherStatsEgPerPortCosTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ApolloEtherStatsEgPerPortCosEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of Ethernet statistics entries."
+    ::= { apollo 7 }
+
+apolloEtherStatsEgPerPortCosEntry OBJECT-TYPE
+    SYNTAX     ApolloEtherStatsEgPerPortCosEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A collection of egress statistics kept for a particular
+        Ethernet interface.  As an example, an instance of the
+        apolloEtherStatsEgPerPortCosTxPkts object might be named
+        apolloEtherStatsEgPerPortCosTxPkts.1"
+    INDEX { apolloEtherStatsEgPerPortCosIfIndex, apolloEtherStatsEgPerPortCosCosNum }
+    ::= { apolloEtherStatsEgPerPortCosTable 1 }
+
+ApolloEtherStatsEgPerPortCosEntry ::= SEQUENCE {
+    apolloEtherStatsEgPerPortCosIfIndex             Integer32,
+    apolloEtherStatsEgPerPortCosCosNum              Integer32,
+    apolloEtherStatsEgPerPortCosDiscontinuityTime   TimeStamp,
+    apolloEtherStatsEgPerPortCosTxAveRate           Counter64,
+    apolloEtherStatsEgPerPortCosTxUtilization       Counter32,
+    apolloEtherStatsEgPerPortCosTxPkts              Counter64,
+    apolloEtherStatsEgPerPortCosTxOctets            Counter64,
+    apolloEtherStatsEgPerPortCosTxDropWredPkts      Counter64,
+    apolloEtherStatsEgPerPortCosTxDropWredPpm       Counter64
+}
+
+apolloEtherStatsEgPerPortCosIfIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Index to port/interface associated with port"
+    ::= { apolloEtherStatsEgPerPortCosEntry 1 }
+
+apolloEtherStatsEgPerPortCosCosNum OBJECT-TYPE
+    SYNTAX     Integer32 (1..8)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Egress Per Port Cos (1 to 8) for Cos 0 to 7"
+    ::= { apolloEtherStatsEgPerPortCosEntry 2 }
+
+apolloEtherStatsEgPerPortCosDiscontinuityTime OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUpTime on the most recent occasion at which any one or
+         more of this row's counters suffered a discontinuity"
+    ::= { apolloEtherStatsEgPerPortCosEntry 3 }
+
+apolloEtherStatsEgPerPortCosTxAveRate OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tx CoS# Average Octet Rate"
+    ::= { apolloEtherStatsEgPerPortCosEntry 4 }
+
+apolloEtherStatsEgPerPortCosTxUtilization OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tx CoS# Utilization (%)"
+    ::= { apolloEtherStatsEgPerPortCosEntry 5 }
+
+apolloEtherStatsEgPerPortCosTxPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tx CoS#  Pkts"
+    ::= { apolloEtherStatsEgPerPortCosEntry 6 }
+
+apolloEtherStatsEgPerPortCosTxOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tx CoS#  Octets"
+    ::= { apolloEtherStatsEgPerPortCosEntry 7 }
+
+apolloEtherStatsEgPerPortCosTxDropWredPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tx CoS# WRED Drop Packets"
+    ::= { apolloEtherStatsEgPerPortCosEntry 8 }
+
+apolloEtherStatsEgPerPortCosTxDropWredPpm OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tx CoS# WRED Drop (ppm)"
+    ::= { apolloEtherStatsEgPerPortCosEntry 9 }
+
+-- ApolloEtherStatsEgPerPortCosTable Ends
+
+-- ApolloLacpStatsTable Begins
+
+apolloLacpStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ApolloLacpStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of Ethernet statistics entries."
+    ::= { apollo 8 }
+
+apolloLacpStatsEntry OBJECT-TYPE
+    SYNTAX     ApolloLacpStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A collection of LACP statistics kept for a particular
+        Ethernet interface.  As an example, an instance of the
+        apolloLacpStatsPdusRx object might be named apolloLacpStatsPdusRx.1"
+    INDEX { apolloLacpStatsIndex }
+    ::= { apolloLacpStatsTable 1 }
+
+ApolloLacpStatsEntry ::= SEQUENCE {
+    apolloLacpStatsIndex                Integer32,
+    apolloLacpStatsPdusRx               Counter64,
+    apolloLacpStatsMarkerPdusRx         Counter64,
+    apolloLacpStatsMarkerRespPdusRx     Counter64,
+    apolloLacpStatsUnknownRx            Counter64,
+    apolloLacpStatsIllegalRx            Counter64,
+    apolloLacpStatsPdusTx               Counter64,
+    apolloLacpStatsMarkerPdusTx         Counter64,
+    apolloLacpStatsMarkerRespPdusTx     Counter64,
+    apolloLacpStatsDiscontinuityTime    TimeStamp
+}
+
+apolloLacpStatsIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Unique SNMP attribute, that identifies every interface with LACP support.
+         Internally it is interface-index"
+    ::= { apolloLacpStatsEntry 1 }
+
+apolloLacpStatsPdusRx OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of valid LACP PDUs received on this interface"
+    ::= { apolloLacpStatsEntry 2 }
+
+apolloLacpStatsMarkerPdusRx OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of valid Marker PDUs received on this interface"
+    ::= { apolloLacpStatsEntry 3 }
+
+apolloLacpStatsMarkerRespPdusRx OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of valid Marker Response PDUs received on this interface"
+    ::= { apolloLacpStatsEntry 4 }
+
+apolloLacpStatsUnknownRx OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of frames received on this interface that either carry the
+         Slow Protocols EtherType value, but contain an unknown PDU, or are
+         addressed to the Slow Protocols group MAC Address, but do not carry
+         the Slow Protocols EtherType."
+    ::= { apolloLacpStatsEntry 5 }
+
+apolloLacpStatsIllegalRx OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of frames received on this interface that carry the Slow
+         Protocols EtherType value, but contain a badly formed PDU or an
+         illegal value of Protocol Subtype."
+    ::= { apolloLacpStatsEntry 6 }
+
+apolloLacpStatsPdusTx OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of LACP PDUs transmitted on this interface"
+    ::= { apolloLacpStatsEntry 7 }
+
+apolloLacpStatsMarkerPdusTx OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of Marker PDUs transmitted on this interface"
+    ::= { apolloLacpStatsEntry 8 }
+
+apolloLacpStatsMarkerRespPdusTx OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of Marker Response PDUs transmitted on this interface"
+    ::= { apolloLacpStatsEntry 9 }
+
+apolloLacpStatsDiscontinuityTime OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Continuous Counter Discontinuity Time"
+    ::= { apolloLacpStatsEntry 10 }
+
+-- ApolloLacpStatsTable Ends
+
+-- apolloVsiStatsIngPerCosTable Begins
+
+    apolloVsiStatsIngPerCosTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ApolloVsiStatsIngPerCosEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of VSI ingress statistics entries per 
+                  Classes-of-Service(CoS)."
+        ::= {apollo 9}
+    apolloVsiStatsIngPerCosEntry OBJECT-TYPE
+ 	SYNTAX ApolloVsiStatsIngPerCosEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A collection of statistics kept for vsi per cos interface"
+        INDEX {apolloVsiStatsIngPerCosShelf, apolloVsiStatsIngPerCosCard, apolloVsiStatsIngPerCosVsi,
+               apolloVsiStatsIngPerCosIfIndex, apolloVsiStatsIngPerCosCosNum}
+        ::= {apolloVsiStatsIngPerCosTable 1}
+
+        ApolloVsiStatsIngPerCosEntry ::=
+        SEQUENCE    {
+            apolloVsiStatsIngPerCosShelf           	INTEGER,
+            apolloVsiStatsIngPerCosCard		   	INTEGER,
+	    apolloVsiStatsIngPerCosVsi  	   	SnmpAdminString,
+	    apolloVsiStatsIngPerCosIfIndex 	   	InterfaceIndex, 
+	    apolloVsiStatsIngPerCosCosNum 	   	INTEGER,
+	    apolloVsiStatsIngPerCosDiscontinuityTime    TimeStamp,
+	    apolloVsiStatsIngPerCosRxOctets 	   	Counter64,
+            apolloVsiStatsIngPerCosGOctets         	Counter64,
+            apolloVsiStatsIngPerCosConfOctets 	   	Counter64,
+            apolloVsiStatsIngPerCosDropOctets      	Counter64,	
+            apolloVsiStatsIngPerCosExceedOctets    	Counter64,
+            apolloVsiStatsIngPerCosConfRate        	Integer32,
+            apolloVsiStatsIngPerCosUtil 	   	Integer32,	
+            apolloVsiStatsIngPerCosNonConf 	   	Integer32	
+	}
+
+apolloVsiStatsIngPerCosShelf OBJECT-TYPE
+    SYNTAX INTEGER
+           {
+	     s0(1),
+	     sa(2),
+	     sb(3),
+	     sc(4),
+	     sd(5),
+	     se(6),
+	     sf(7),
+	     sg(8),
+	     sh(9),
+	     si(10),
+	     sj(11),
+	     sk(12),
+	     sl(13)
+           }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "32 bit key, An index of the shelf associated with this row.
+         Shelf number '0' (0x30) is the main/single self. In a multi-slef NE,
+         Shelves '1', '2', and fourth are the subtended shelves."
+    ::= {apolloVsiStatsIngPerCosEntry 1 }
+
+apolloVsiStatsIngPerCosCard OBJECT-TYPE
+    SYNTAX INTEGER{
+            u0(1),
+            u1(2),
+	    u2(3),
+	    u3(4),
+	    u4(5),
+	    u5(6),
+	    u6(7),
+	    u7(8),
+	    u8(9),
+	    u9(10),
+	    u10(11),
+	    u11(12),
+	    u12(13),
+	    u13(14),
+	    u14(15),
+	    u15(16),
+	    u16(17),
+	    u17(18),
+	    u18(19),
+	    u19(20),
+	    u20(21),
+	    u21(22),
+	    u22(23),
+	    u23(24),
+	    rcpa(25),
+	    rcpb(26),
+	    cem(27),
+	    fan(28),
+	    pfm1(29),
+	    pfm2(30),
+	    ctm-a(31),
+	    ctm-b(32),
+	    rcpa-storage(33),
+	    rcpb-storage(34),
+	    rcpa-np(35),
+	    rcpb-np(36),
+	    rcpa-np-phy(37),
+	    rcpb-np-phy(38),
+	    rcpa-pxf(39),
+	    rcpb-pxf(40) 
+          } 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "32 bit key, An index of the specific card associated with this row."
+    ::= {apolloVsiStatsIngPerCosEntry 2}
+
+apolloVsiStatsIngPerCosVsi OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Key. Name of the VSI associated with this row"
+    ::= {apolloVsiStatsIngPerCosEntry 3 }
+
+apolloVsiStatsIngPerCosIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Key. ifIndex. The port/interface associated with this row"
+    ::= {apolloVsiStatsIngPerCosEntry 4 }
+
+apolloVsiStatsIngPerCosCosNum OBJECT-TYPE
+    SYNTAX  INTEGER {
+    	    cos0(1),
+            cos1(2),
+            cos2(3),
+            cos3(4),
+            cos4(5),
+            cos5(6),
+            cos6(7),
+            cos7(8)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Key. An index (1 to 8 for CoS 0 to 7) of the CoS associated with this row."
+    ::= {apolloVsiStatsIngPerCosEntry 5 }
+
+apolloVsiStatsIngPerCosDiscontinuityTime OBJECT-TYPE
+    SYNTAX     TimeStamp 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUpTime on the most recent occasion at which any one
+         or more of this row's statistics counters suffered a discontinuity."
+    ::= { apolloVsiStatsIngPerCosEntry 6 }
+
+apolloVsiStatsIngPerCosRxOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Total Number of octets received and accepted by the policer
+        (before marking), including octets of Green, Yellow and Red packets."
+    ::= { apolloVsiStatsIngPerCosEntry 7 }
+
+apolloVsiStatsIngPerCosGOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Total number of octets from received packets (Post Policy) which were 
+         marked as Green or Yellow by the policer.
+         (Aggregation of yellow + green octets"
+    ::= { apolloVsiStatsIngPerCosEntry 8 }
+
+apolloVsiStatsIngPerCosConfOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Total number of octets from received packets (Police Conformed) which 
+         were marked as Green or Yellow by the policer.
+         (Aggregation of yellow + green octets)"
+    ::= { apolloVsiStatsIngPerCosEntry 9 }
+
+apolloVsiStatsIngPerCosDropOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Total number of octets from received packets which were dropped by the policer (Red packets)"
+    ::= { apolloVsiStatsIngPerCosEntry 10 }
+
+apolloVsiStatsIngPerCosExceedOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Total number of octets from received packets which were dropped by the policer (Red packets)"
+    ::= { apolloVsiStatsIngPerCosEntry 11 }
+
+apolloVsiStatsIngPerCosConfRate OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rate of conforming octets.
+         Calculated as 8*(Green Octets + Yellow Octets in the current interval) / Monitored Seconds"
+    ::= { apolloVsiStatsIngPerCosEntry 12 }
+
+apolloVsiStatsIngPerCosUtil OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Utilization of ingress policer (%). Calculated as average flow rate divided by CIR or PIR."
+    ::= { apolloVsiStatsIngPerCosEntry 13 }
+
+apolloVsiStatsIngPerCosNonConf OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Non-conforming octets (%). Calculated as the number of octets marked 
+         as Red by the policer divided by all in octets"
+    ::= { apolloVsiStatsIngPerCosEntry 14 }
+
+-- apolloVsiStatsIngPerCosTable ends
+
+-- apolloEtyIfCur15mPmTable Begins
+        
+apolloEtyIfCur15mPmTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ApolloEtyIfCur15mPmEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A list of current 15m PM counters for ETY interface"
+    ::= {apollo 10}
+
+apolloEtyIfCur15mPmEntry OBJECT-TYPE
+    SYNTAX          ApolloEtyIfCur15mPmEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A collection of 15m ETY interface PM statistics"
+    INDEX {apolloEtyIfIndex}
+    ::= {apolloEtyIfCur15mPmTable 1}
+
+ApolloEtyIfCur15mPmEntry ::=
+    SEQUENCE
+    {
+        apolloEtyIfIndex                            InterfaceIndex,
+        apolloEtyIfCur15mMonitoredSeconds           Integer32, 
+        apolloEtyIfCur15mPmValidity                 INTEGER,  
+        apolloEtyIfCur15mPmOsnrMin                  OCTET STRING (SIZE(4)),  
+        apolloEtyIfCur15mPmOsnrMax                  OCTET STRING (SIZE(4)),   
+        apolloEtyIfCur15mPmRxPwrMin                 OCTET STRING (SIZE(4)),
+        apolloEtyIfCur15mPmRxPwrMax                 OCTET STRING (SIZE(4)),
+        apolloEtyIfCur15mPmTxPwrMin                 OCTET STRING (SIZE(4)),
+        apolloEtyIfCur15mPmTxPwrMax                 OCTET STRING (SIZE(4)),
+        apolloEtyIfCur15mPmES                       Integer32,  
+        apolloEtyIfCur15mPmSES                      Integer32,  
+        apolloEtyIfCur15mPmUAS                      Integer32,  
+        apolloEtyIfCur15mPmGfpES                    Integer32,  
+        apolloEtyIfCur15mPmGfpSES                   Integer32,  
+        apolloEtyIfCur15mPmGfpUAS                   Integer32,  
+        apolloEtyIfCur15mPmGfpDiscards              Counter64,
+        apolloEtyIfCur15mPmCrcRxOctets              Counter64,
+        apolloEtyIfCur15mPmCrcRxGoodOctets          Counter64,
+        apolloEtyIfCur15mPmCrcRxBadOctets           Counter64,
+        apolloEtyIfCur15mPmCrcRxPkts                Counter64,
+        apolloEtyIfCur15mPmCrcRxGoodPkts            Counter64,
+        apolloEtyIfCur15mPmCrcRxBadPkts             Counter64,
+        apolloEtyIfCur15mPmRxBroadcastPkts          Counter64,
+        apolloEtyIfCur15mPmRxMulticastPkts          Counter64,
+        apolloEtyIfCur15mPmRxUnicastPkts            Counter64,
+        apolloEtyIfCur15mPmRxCrcAlignErrors         Counter64,
+        apolloEtyIfCur15mPmRxUndersizePkts          Counter64,
+        apolloEtyIfCur15mPmRxOversizePkts           Counter64,
+        apolloEtyIfCur15mPmRxFragments              Counter64,
+        apolloEtyIfCur15mPmRxPausePkts              Counter64,
+        apolloEtyIfCur15mPmRxPkts64Octets           Counter64,
+        apolloEtyIfCur15mPmRxPkts65to127Octets      Counter64,
+        apolloEtyIfCur15mPmRxPkts128to255Octets     Counter64,
+        apolloEtyIfCur15mPmRxPkts256to511Octets     Counter64,
+        apolloEtyIfCur15mPmRxPkts512to1023Octets    Counter64,
+        apolloEtyIfCur15mPmRxPkts1024to1518Octets   Counter64,
+        apolloEtyIfCur15mPmRxPktsGt1518Octets       Counter64,
+        apolloEtyIfCur15mPmTxOctets                 Counter64,
+        apolloEtyIfCur15mPmTxGoodOctets             Counter64,
+        apolloEtyIfCur15mPmTxBadOctets              Counter64,
+        apolloEtyIfCur15mPmTxPkts                   Counter64,
+        apolloEtyIfCur15mPmTxGoodPkts               Counter64,
+        apolloEtyIfCur15mPmTxBadPkts                Counter64,
+        apolloEtyIfCur15mPmTxBroadcastPkts          Counter64,
+        apolloEtyIfCur15mPmTxMulticastPkts          Counter64,
+        apolloEtyIfCur15mPmTxCrcAlignErrors         Counter64,
+        apolloEtyIfCur15mPmTxUndersizePkts          Counter64,
+        apolloEtyIfCur15mPmTxOversizePkts           Counter64,
+        apolloEtyIfCur15mPmTxFragments              Counter64,
+        apolloEtyIfCur15mPmTxPausePkts              Counter64,
+        apolloEtyIfCur15mPmTxPkts64Octets           Counter64,
+        apolloEtyIfCur15mPmTxPkts65to127Octets      Counter64,
+        apolloEtyIfCur15mPmTxPkts128to255Octets     Counter64,
+        apolloEtyIfCur15mPmTxPkts256to511Octets     Counter64,
+        apolloEtyIfCur15mPmTxPkts512to1023Octets    Counter64,
+        apolloEtyIfCur15mPmTxPkts1024to1518Octets   Counter64,
+        apolloEtyIfCur15mPmTxPktsGt1518Octets       Counter64
+    }
+
+    apolloEtyIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Key. ifIndex. The port/interface associated with this row"
+        ::= {apolloEtyIfCur15mPmEntry 1}
+
+    apolloEtyIfCur15mMonitoredSeconds OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Monitored seconds in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 2}
+
+    apolloEtyIfCur15mPmValidity OBJECT-TYPE
+        SYNTAX          INTEGER
+                        {
+                            true(1),
+                            false(2)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Current 15m interval validity"
+        ::= {apolloEtyIfCur15mPmEntry 3}
+
+    apolloEtyIfCur15mPmOsnrMin OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "OSNR minimum value in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 4}
+
+    apolloEtyIfCur15mPmOsnrMax OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "OSNR maximum value in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 5}
+
+    apolloEtyIfCur15mPmRxPwrMin OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx Power minimum value in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 6}
+
+    apolloEtyIfCur15mPmRxPwrMax OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx Power maximum value in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 7}
+
+    apolloEtyIfCur15mPmTxPwrMin OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx Power minimum value in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 8}
+
+    apolloEtyIfCur15mPmTxPwrMax OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx Power maximum value in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 9}
+
+    apolloEtyIfCur15mPmES OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "PCS error seconds in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 10}
+
+    apolloEtyIfCur15mPmSES OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "PCS severely errored seconds in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 11}
+
+    apolloEtyIfCur15mPmUAS OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "PCS un-available seconds in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 12}
+
+    apolloEtyIfCur15mPmGfpES OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "GFP error seconds in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 13}
+
+    apolloEtyIfCur15mPmGfpSES OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "GFP severely errored seconds in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 14}
+
+    apolloEtyIfCur15mPmGfpUAS OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "GFP un-available seconds in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 15}
+
+    apolloEtyIfCur15mPmGfpDiscards OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "GFP discards 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 16}
+
+    apolloEtyIfCur15mPmCrcRxOctets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx octets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 17}
+
+    apolloEtyIfCur15mPmCrcRxGoodOctets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx good octets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 18}
+
+    apolloEtyIfCur15mPmCrcRxBadOctets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx bad octets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 19}
+
+    apolloEtyIfCur15mPmCrcRxPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 20}
+
+    apolloEtyIfCur15mPmCrcRxGoodPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx good packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 21}
+
+    apolloEtyIfCur15mPmCrcRxBadPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx bad packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 22}
+
+    apolloEtyIfCur15mPmRxBroadcastPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx broadcast packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 23}
+
+    apolloEtyIfCur15mPmRxMulticastPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx multicast packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 24}
+
+    apolloEtyIfCur15mPmRxUnicastPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx unicast packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 25}
+
+    apolloEtyIfCur15mPmRxCrcAlignErrors OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx align errors 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 26}
+
+    apolloEtyIfCur15mPmRxUndersizePkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx undersized packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 27}
+
+    apolloEtyIfCur15mPmRxOversizePkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx oversized packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 28}
+
+    apolloEtyIfCur15mPmRxFragments OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx fragments 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 29}
+
+    apolloEtyIfCur15mPmRxPausePkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx pause packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 30}
+
+    apolloEtyIfCur15mPmRxPkts64Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx packets (size 64 octets) 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 31}
+
+    apolloEtyIfCur15mPmRxPkts65to127Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx packets (size 65-127 octets) 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 32}
+
+    apolloEtyIfCur15mPmRxPkts128to255Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx packets (size 128-255 octets) 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 33}
+
+    apolloEtyIfCur15mPmRxPkts256to511Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx packets (size 256-511 octets) 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 34}
+
+    apolloEtyIfCur15mPmRxPkts512to1023Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx packets (size 512-1023 octets) 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 35}
+
+    apolloEtyIfCur15mPmRxPkts1024to1518Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx packets (size 1024-1518 octets) 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 36}
+
+    apolloEtyIfCur15mPmRxPktsGt1518Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx packets (size greater than 1518 octets) 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 37}
+
+    apolloEtyIfCur15mPmTxOctets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx octets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 38}
+
+    apolloEtyIfCur15mPmTxGoodOctets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx good octets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 39}
+
+    apolloEtyIfCur15mPmTxBadOctets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx bad octets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 40}
+
+    apolloEtyIfCur15mPmTxPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 41}
+
+    apolloEtyIfCur15mPmTxGoodPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx good packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 42}
+
+    apolloEtyIfCur15mPmTxBadPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx bad packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 43}
+
+    apolloEtyIfCur15mPmTxBroadcastPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx broadcast packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 44}
+
+    apolloEtyIfCur15mPmTxMulticastPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx multicast packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 45}
+
+    apolloEtyIfCur15mPmTxCrcAlignErrors OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx align errors 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 46}
+
+    apolloEtyIfCur15mPmTxUndersizePkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx undersized packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 47}
+
+    apolloEtyIfCur15mPmTxOversizePkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx oversized packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 48}
+
+    apolloEtyIfCur15mPmTxFragments OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx fragments 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 49}
+
+    apolloEtyIfCur15mPmTxPausePkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx pause packets 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 50}
+
+    apolloEtyIfCur15mPmTxPkts64Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets (size 64 octets) 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 51}
+
+    apolloEtyIfCur15mPmTxPkts65to127Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets (size 65-127 octets) 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 52}
+
+    apolloEtyIfCur15mPmTxPkts128to255Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets (size 128-255 octets) 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 53}
+
+    apolloEtyIfCur15mPmTxPkts256to511Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets (size 256-511 octets) 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 54}
+
+    apolloEtyIfCur15mPmTxPkts512to1023Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets (size 512-1023 octets) 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 55}
+
+    apolloEtyIfCur15mPmTxPkts1024to1518Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets (size 1024-1518 octets) 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 56}
+
+    apolloEtyIfCur15mPmTxPktsGt1518Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets (size greater than 1518 octets) 64-bit counter in current 15m interval"
+        ::= {apolloEtyIfCur15mPmEntry 57}
+
+-- apolloEtyIfCur15mPmTable Ends
+
+-- apolloEtyIfCurDayPmTable Begins
+
+apolloEtyIfCurDayPmTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ApolloEtyIfCurDayPmEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A list of current day PM counters for ETY interface"
+    ::= {apollo 11}
+
+apolloEtyIfCurDayPmEntry OBJECT-TYPE
+    SYNTAX          ApolloEtyIfCurDayPmEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A collection of day ETY interface PM statistics"
+    INDEX {apolloEtyIfIndex}
+    ::= {apolloEtyIfCurDayPmTable 1}
+
+ApolloEtyIfCurDayPmEntry ::=
+    SEQUENCE
+    {
+        apolloEtyIfCurDayMonitoredSeconds           Integer32,
+        apolloEtyIfCurDayPmValidity                 INTEGER,
+        apolloEtyIfCurDayPmOsnrMin                  OCTET STRING (SIZE(4)),
+        apolloEtyIfCurDayPmOsnrMax                  OCTET STRING (SIZE(4)),
+        apolloEtyIfCurDayPmRxPwrMin                 OCTET STRING (SIZE(4)),
+        apolloEtyIfCurDayPmRxPwrMax                 OCTET STRING (SIZE(4)),
+        apolloEtyIfCurDayPmTxPwrMin                 OCTET STRING (SIZE(4)),
+        apolloEtyIfCurDayPmTxPwrMax                 OCTET STRING (SIZE(4)),
+        apolloEtyIfCurDayPmES                       Integer32,
+        apolloEtyIfCurDayPmSES                      Integer32,
+        apolloEtyIfCurDayPmUAS                      Integer32,
+        apolloEtyIfCurDayPmGfpES                    Integer32,
+        apolloEtyIfCurDayPmGfpSES                   Integer32,
+        apolloEtyIfCurDayPmGfpUAS                   Integer32,
+        apolloEtyIfCurDayPmGfpDiscards              Counter64,
+        apolloEtyIfCurDayPmCrcRxOctets              Counter64,
+        apolloEtyIfCurDayPmCrcRxGoodOctets          Counter64,
+        apolloEtyIfCurDayPmCrcRxBadOctets           Counter64,
+        apolloEtyIfCurDayPmCrcRxPkts                Counter64,
+        apolloEtyIfCurDayPmCrcRxGoodPkts            Counter64,
+        apolloEtyIfCurDayPmCrcRxBadPkts             Counter64,
+        apolloEtyIfCurDayPmRxBroadcastPkts          Counter64,
+        apolloEtyIfCurDayPmRxMulticastPkts          Counter64,
+        apolloEtyIfCurDayPmRxUnicastPkts            Counter64,
+        apolloEtyIfCurDayPmRxCrcAlignErrors         Counter64,
+        apolloEtyIfCurDayPmRxUndersizePkts          Counter64,
+        apolloEtyIfCurDayPmRxOversizePkts           Counter64,
+        apolloEtyIfCurDayPmRxFragments              Counter64,
+        apolloEtyIfCurDayPmRxPausePkts              Counter64,
+        apolloEtyIfCurDayPmRxPkts64Octets           Counter64,
+        apolloEtyIfCurDayPmRxPkts65to127Octets      Counter64,
+        apolloEtyIfCurDayPmRxPkts128to255Octets     Counter64,
+        apolloEtyIfCurDayPmRxPkts256to511Octets     Counter64,
+        apolloEtyIfCurDayPmRxPkts512to1023Octets    Counter64,
+        apolloEtyIfCurDayPmRxPkts1024to1518Octets   Counter64,
+        apolloEtyIfCurDayPmRxPktsGt1518Octets       Counter64,
+        apolloEtyIfCurDayPmTxOctets                 Counter64,
+        apolloEtyIfCurDayPmTxGoodOctets             Counter64,
+        apolloEtyIfCurDayPmTxBadOctets              Counter64,
+        apolloEtyIfCurDayPmTxPkts                   Counter64,
+        apolloEtyIfCurDayPmTxGoodPkts               Counter64,
+        apolloEtyIfCurDayPmTxBadPkts                Counter64,
+        apolloEtyIfCurDayPmTxBroadcastPkts          Counter64,
+        apolloEtyIfCurDayPmTxMulticastPkts          Counter64,
+        apolloEtyIfCurDayPmTxCrcAlignErrors         Counter64,
+        apolloEtyIfCurDayPmTxUndersizePkts          Counter64,
+        apolloEtyIfCurDayPmTxOversizePkts           Counter64,
+        apolloEtyIfCurDayPmTxFragments              Counter64,
+        apolloEtyIfCurDayPmTxPausePkts              Counter64,
+        apolloEtyIfCurDayPmTxPkts64Octets           Counter64,
+        apolloEtyIfCurDayPmTxPkts65to127Octets      Counter64,
+        apolloEtyIfCurDayPmTxPkts128to255Octets     Counter64,
+        apolloEtyIfCurDayPmTxPkts256to511Octets     Counter64,
+        apolloEtyIfCurDayPmTxPkts512to1023Octets    Counter64,
+        apolloEtyIfCurDayPmTxPkts1024to1518Octets   Counter64,
+        apolloEtyIfCurDayPmTxPktsGt1518Octets       Counter64
+    }
+
+    apolloEtyIfCurDayMonitoredSeconds OBJECT-TYPE
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Monitored seconds in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 1}
+
+    apolloEtyIfCurDayPmValidity OBJECT-TYPE
+        SYNTAX          INTEGER
+                        {
+                            true(1),
+                            false(2)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Current day interval validity"         
+        ::= {apolloEtyIfCurDayPmEntry 2}            
+        
+    apolloEtyIfCurDayPmOsnrMin OBJECT-TYPE          
+        SYNTAX          OCTET STRING (SIZE(4))      
+        MAX-ACCESS      read-only                   
+        STATUS          current
+        DESCRIPTION
+            "OSNR minimum value in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 3}
+        
+    apolloEtyIfCurDayPmOsnrMax OBJECT-TYPE          
+        SYNTAX          OCTET STRING (SIZE(4))      
+        MAX-ACCESS      read-only                   
+        STATUS          current
+        DESCRIPTION
+            "OSNR maximum value in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 4}
+    
+    apolloEtyIfCurDayPmRxPwrMin OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx Power minimum value in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 5}
+    
+    apolloEtyIfCurDayPmRxPwrMax OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx Power maximum value in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 6}
+
+    apolloEtyIfCurDayPmTxPwrMin OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx Power minimum value in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 7}
+
+    apolloEtyIfCurDayPmTxPwrMax OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx Power maximum value in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 8}
+
+    apolloEtyIfCurDayPmES OBJECT-TYPE
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "PCS error seconds in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 9}
+        
+    apolloEtyIfCurDayPmSES OBJECT-TYPE 
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only
+        STATUS          current 
+        DESCRIPTION     
+            "PCS severely errored seconds in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 10}
+        
+    apolloEtyIfCurDayPmUAS OBJECT-TYPE 
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only
+        STATUS          current 
+        DESCRIPTION     
+            "PCS un-available seconds in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 11}
+        
+    apolloEtyIfCurDayPmGfpES OBJECT-TYPE
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "GFP error seconds in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 12}
+
+    apolloEtyIfCurDayPmGfpSES OBJECT-TYPE
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "GFP severely errored seconds in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 13}
+
+    apolloEtyIfCurDayPmGfpUAS OBJECT-TYPE
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "GFP un-available seconds in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 14}
+
+    apolloEtyIfCurDayPmGfpDiscards OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "GFP discards 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 15}
+
+    apolloEtyIfCurDayPmCrcRxOctets OBJECT-TYPE 
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Rx octets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 16}
+        
+    apolloEtyIfCurDayPmCrcRxGoodOctets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Rx good octets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 17}
+
+    apolloEtyIfCurDayPmCrcRxBadOctets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx bad octets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 18}
+
+    apolloEtyIfCurDayPmCrcRxPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 19}
+
+    apolloEtyIfCurDayPmCrcRxGoodPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx good packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 20}
+
+    apolloEtyIfCurDayPmCrcRxBadPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx bad packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 21}
+
+    apolloEtyIfCurDayPmRxBroadcastPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Rx broadcast packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 22}
+        
+    apolloEtyIfCurDayPmRxMulticastPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Rx multicast packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 23}
+        
+    apolloEtyIfCurDayPmRxUnicastPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Rx unicast packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 24}
+        
+    apolloEtyIfCurDayPmRxCrcAlignErrors OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Rx align errors 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 25}
+        
+    apolloEtyIfCurDayPmRxUndersizePkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Rx undersized packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 26}
+
+    apolloEtyIfCurDayPmRxOversizePkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx oversized packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 27}
+
+    apolloEtyIfCurDayPmRxFragments OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx fragments 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 28}
+
+    apolloEtyIfCurDayPmRxPausePkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx pause packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 29}
+
+    apolloEtyIfCurDayPmRxPkts64Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx packets (size 64 octets) 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 30}
+
+    apolloEtyIfCurDayPmRxPkts65to127Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Rx packets (size 65-127 octets) 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 31}
+        
+    apolloEtyIfCurDayPmRxPkts128to255Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Rx packets (size 128-255 octets) 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 32}
+        
+    apolloEtyIfCurDayPmRxPkts256to511Octets OBJECT-TYPE 
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Rx packets (size 256-511 octets) 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 33}
+        
+    apolloEtyIfCurDayPmRxPkts512to1023Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Rx packets (size 512-1023 octets) 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 34}
+        
+    apolloEtyIfCurDayPmRxPkts1024to1518Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx packets (size 1024-1518 octets) 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 35}
+
+    apolloEtyIfCurDayPmRxPktsGt1518Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx packets (size greater than 1518 octets) 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 36}
+
+    apolloEtyIfCurDayPmTxOctets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx octets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 37}
+
+    apolloEtyIfCurDayPmTxGoodOctets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx good octets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 38}
+
+    apolloEtyIfCurDayPmTxBadOctets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx bad octets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 39}
+        
+    apolloEtyIfCurDayPmTxPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Tx packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 40}
+        
+    apolloEtyIfCurDayPmTxGoodPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current 
+        DESCRIPTION     
+            "Tx good packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 41}
+        
+    apolloEtyIfCurDayPmTxBadPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Tx bad packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 42}
+    
+    apolloEtyIfCurDayPmTxBroadcastPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx broadcast packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 43}
+
+    apolloEtyIfCurDayPmTxMulticastPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx multicast packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 44}
+
+    apolloEtyIfCurDayPmTxCrcAlignErrors OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx align errors 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 45}
+
+    apolloEtyIfCurDayPmTxUndersizePkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx undersized packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 46}
+
+    apolloEtyIfCurDayPmTxOversizePkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx oversized packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 47}
+
+    apolloEtyIfCurDayPmTxFragments OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx fragments 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 48}
+
+    apolloEtyIfCurDayPmTxPausePkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx pause packets 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 49}
+
+    apolloEtyIfCurDayPmTxPkts64Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets (size 64 octets) 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 50}
+
+    apolloEtyIfCurDayPmTxPkts65to127Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets (size 65-127 octets) 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 51}
+
+    apolloEtyIfCurDayPmTxPkts128to255Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets (size 128-255 octets) 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 52}
+
+    apolloEtyIfCurDayPmTxPkts256to511Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets (size 256-511 octets) 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 53}
+
+    apolloEtyIfCurDayPmTxPkts512to1023Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets (size 512-1023 octets) 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 54}
+
+    apolloEtyIfCurDayPmTxPkts1024to1518Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets (size 1024-1518 octets) 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 55}
+
+    apolloEtyIfCurDayPmTxPktsGt1518Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx packets (size greater than 1518 octets) 64-bit counter in current day interval"
+        ::= {apolloEtyIfCurDayPmEntry 56}
+    
+-- apolloEtyIfCurDayPmTable Ends
+
+-- apolloFcIfCur15mPmTable Begins
+    
+apolloFcIfCur15mPmTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ApolloFcIfCur15mPmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Current 15 minute PM entries for FC interface"
+    ::= { apollo 12 }
+
+apolloFcIfCur15mPmEntry OBJECT-TYPE
+    SYNTAX     ApolloFcIfCur15mPmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A collection of 15 minute FC interface PM statistics.
+         As an example, an instance of the apolloFcIfCur15mPmOsnrMin object
+         might be named apolloFcIfCur15mPmOsnrMin.1"
+    INDEX { apolloFcIfIndex }
+    ::= { apolloFcIfCur15mPmTable 1 }
+
+ApolloFcIfCur15mPmEntry ::= SEQUENCE {
+    apolloFcIfIndex                     InterfaceIndex,
+    apolloFcIfCur15mMonitoredSeconds    Integer32,
+    apolloFcIfCur15mPmValidity          INTEGER,
+    apolloFcIfCur15mPmOsnrMin           OCTET STRING (SIZE(4)),
+    apolloFcIfCur15mPmOsnrMax           OCTET STRING (SIZE(4)),
+    apolloFcIfCur15mPmRxPwrMin          OCTET STRING (SIZE(4)),
+    apolloFcIfCur15mPmRxPwrMax          OCTET STRING (SIZE(4)),
+    apolloFcIfCur15mPmTxPwrMin          OCTET STRING (SIZE(4)),
+    apolloFcIfCur15mPmTxPwrMax          OCTET STRING (SIZE(4)),
+    apolloFcIfCur15mPmES                Integer32,
+    apolloFcIfCur15mPmSES               Integer32,
+    apolloFcIfCur15mPmUAS               Integer32,
+    apolloFcIfCur15mPmRxErrors          Counter64,
+    apolloFcIfCur15mPmGfpES             Integer32,
+    apolloFcIfCur15mPmGfpSES            Integer32,
+    apolloFcIfCur15mPmGfpUAS            Integer32,
+    apolloFcIfCur15mPmGfpErrors         Counter64
+}
+
+apolloFcIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Key. ifIndex. The port/interface associated with this row"
+    ::= { apolloFcIfCur15mPmEntry 1 }
+
+apolloFcIfCur15mMonitoredSeconds OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PM Monitored seconds"
+    ::= { apolloFcIfCur15mPmEntry 2 }
+
+apolloFcIfCur15mPmValidity OBJECT-TYPE
+    SYNTAX      INTEGER{
+                    true(1),
+                    false(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This parameter is a boolean indicating PM validity"
+    ::= { apolloFcIfCur15mPmEntry 3 }
+
+apolloFcIfCur15mPmOsnrMin OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSNR minimum value in current 15 minute interval"
+    ::= { apolloFcIfCur15mPmEntry 4 }   
+    
+apolloFcIfCur15mPmOsnrMax OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "OSNR maximum value in current 15 minute interval"
+    ::= { apolloFcIfCur15mPmEntry 5 }
+        
+apolloFcIfCur15mPmRxPwrMin OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Minimum value of input power in current 15 minute interval"
+    ::= { apolloFcIfCur15mPmEntry 6 }
+        
+apolloFcIfCur15mPmRxPwrMax OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION     
+        "Maximum value of input power in current 15 minute interval"
+    ::= { apolloFcIfCur15mPmEntry 7 }
+    
+apolloFcIfCur15mPmTxPwrMin OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum value of output power in current 15 minute interval"
+    ::= { apolloFcIfCur15mPmEntry 8 }
+    
+apolloFcIfCur15mPmTxPwrMax OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum value of output power in current 15 minute interval"
+    ::= { apolloFcIfCur15mPmEntry 9 }
+
+apolloFcIfCur15mPmES OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Errored Seconds in current 15 minute interval"
+    ::= { apolloFcIfCur15mPmEntry 10 }
+
+apolloFcIfCur15mPmSES OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Severely Errored Seconds in current 15 minute interval"
+    ::= { apolloFcIfCur15mPmEntry 11 }
+
+apolloFcIfCur15mPmUAS OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unavailable Seconds in current 15 minute interval"
+    ::= { apolloFcIfCur15mPmEntry 12 }
+
+apolloFcIfCur15mPmRxErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "64 bit counter that  counts the number of times of entering 
+         to Error state or Line Code Violation"
+    ::= { apolloFcIfCur15mPmEntry 13 }
+    
+apolloFcIfCur15mPmGfpES OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "GFP Errored Seconds in current 15 minute interval"
+    ::= { apolloFcIfCur15mPmEntry 14 }
+    
+apolloFcIfCur15mPmGfpSES OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "GFP Severely Errored Seconds in current 15 minute interval"
+    ::= { apolloFcIfCur15mPmEntry 15 }
+    
+apolloFcIfCur15mPmGfpUAS OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "GFP Unavailable Seconds in current 15 minute interval"
+    ::= { apolloFcIfCur15mPmEntry 16 }
+    
+apolloFcIfCur15mPmGfpErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "GFP 64 bit counter that  counts the number of times of entering
+         to Error state or Line Code Violation"
+    ::= { apolloFcIfCur15mPmEntry 17 }
+    
+-- apolloFcIfCur15mPmTable Ends
+
+-- apolloFcIfCurDayPmTable Begins 
+
+apolloFcIfCurDayPmTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ApolloFcIfCurDayPmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Current day PM entries for FC interface"
+    ::= { apollo 13 }
+
+apolloFcIfCurDayPmEntry OBJECT-TYPE
+    SYNTAX     ApolloFcIfCurDayPmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A collection of day FC interface PM statistics.
+         As an example, an instance of the apolloFcIfCurDayPmOsnrMin object
+         might be named apolloFcIfCurDayPmOsnrMin.1"
+    INDEX { apolloFcIfIndex }
+    ::= { apolloFcIfCurDayPmTable 1 }
+
+ApolloFcIfCurDayPmEntry ::= SEQUENCE {
+    apolloFcIfCurDayMonitoredSeconds    Integer32,
+    apolloFcIfCurDayPmValidity          INTEGER,
+    apolloFcIfCurDayPmOsnrMin           OCTET STRING (SIZE(4)),
+    apolloFcIfCurDayPmOsnrMax           OCTET STRING (SIZE(4)),
+    apolloFcIfCurDayPmRxPwrMin          OCTET STRING (SIZE(4)),
+    apolloFcIfCurDayPmRxPwrMax          OCTET STRING (SIZE(4)),
+    apolloFcIfCurDayPmTxPwrMin          OCTET STRING (SIZE(4)),
+    apolloFcIfCurDayPmTxPwrMax          OCTET STRING (SIZE(4)),
+    apolloFcIfCurDayPmES                Integer32,
+    apolloFcIfCurDayPmSES               Integer32,
+    apolloFcIfCurDayPmUAS               Integer32,
+    apolloFcIfCurDayPmRxErrors          Counter64,
+    apolloFcIfCurDayPmGfpES             Integer32,
+    apolloFcIfCurDayPmGfpSES            Integer32,
+    apolloFcIfCurDayPmGfpUAS            Integer32,
+    apolloFcIfCurDayPmGfpErrors         Counter64
+}
+
+apolloFcIfCurDayMonitoredSeconds OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PM Monitored seconds"
+    ::= { apolloFcIfCurDayPmEntry 1 }
+
+apolloFcIfCurDayPmValidity OBJECT-TYPE
+    SYNTAX      INTEGER{
+                    true(1),
+                    false(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This parameter is a boolean indicating PM validity"
+    ::= { apolloFcIfCurDayPmEntry 2 }
+
+apolloFcIfCurDayPmOsnrMin OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSNR minimum value in current day interval"
+    ::= { apolloFcIfCurDayPmEntry 3 }
+
+apolloFcIfCurDayPmOsnrMax OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSNR maximum value in current day interval"
+    ::= { apolloFcIfCurDayPmEntry 4 }
+    
+apolloFcIfCurDayPmRxPwrMin OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Minimum value of input power in current day interval"
+    ::= { apolloFcIfCurDayPmEntry 5 }
+        
+apolloFcIfCurDayPmRxPwrMax OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION     
+        "Maximum value of input power in current day interval"
+    ::= { apolloFcIfCurDayPmEntry 6 }
+    
+apolloFcIfCurDayPmTxPwrMin OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum value of output power in current day interval"
+    ::= { apolloFcIfCurDayPmEntry 7 }
+    
+apolloFcIfCurDayPmTxPwrMax OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum value of output power in current day interval"
+    ::= { apolloFcIfCurDayPmEntry 8 }
+    
+apolloFcIfCurDayPmES OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Errored Seconds in current day interval"
+    ::= { apolloFcIfCurDayPmEntry 9 }
+
+apolloFcIfCurDayPmSES OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Severely Errored Seconds in current day interval"
+    ::= { apolloFcIfCurDayPmEntry 10 }
+
+apolloFcIfCurDayPmUAS OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unavailable Seconds in current day interval"
+    ::= { apolloFcIfCurDayPmEntry 11 }
+
+apolloFcIfCurDayPmRxErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "64 bit counter that  counts the number of times of entering
+         to Error state or Line Code Violation"
+    ::= { apolloFcIfCurDayPmEntry 12 }
+
+apolloFcIfCurDayPmGfpES OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "GFP Errored Seconds in current day interval"
+    ::= { apolloFcIfCurDayPmEntry 13 }
+
+apolloFcIfCurDayPmGfpSES OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "GFP Severely Errored Seconds in current day interval"
+    ::= { apolloFcIfCurDayPmEntry 14 }
+    
+apolloFcIfCurDayPmGfpUAS OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "GFP Unavailable Seconds in current day interval"
+    ::= { apolloFcIfCurDayPmEntry 15 }
+    
+apolloFcIfCurDayPmGfpErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "GFP 64 bit counter that  counts the number of times of entering
+         to Error state or Line Code Violation"
+    ::= { apolloFcIfCurDayPmEntry 16 }
+    
+-- apolloFcIfCurDayPmTable Ends
+
+-- apolloOptIfOTUkCur15mPmTable Begins
+
+apolloOptIfOTUkCur15mPmTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ApolloOptIfOTUkCur15mPmEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A list of current 15m PM counters for optical OTU interface"
+    ::= {apollo 14}
+
+apolloOptIfOTUkCur15mPmEntry OBJECT-TYPE
+    SYNTAX          ApolloOptIfOTUkCur15mPmEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A collection of 15m optical OTU interface PM statistics"
+    INDEX {apolloOptIfOTUkIndex}
+    ::= {apolloOptIfOTUkCur15mPmTable 1}
+
+ApolloOptIfOTUkCur15mPmEntry ::=
+    SEQUENCE
+    {
+        apolloOptIfOTUkIndex                        InterfaceIndex,
+        apolloOptIfOTUkCur15mMonitoredSeconds       Integer32,
+        apolloOptIfOTUkCur15mPmValidity             INTEGER,
+        apolloOptIfOTUkCur15mPmNCorrections         Counter64,
+        apolloOptIfOTUkCur15mPmNES                  Integer32,
+        apolloOptIfOTUkCur15mPmFES                  Integer32,
+        apolloOptIfOTUkCur15mPmNSES                 Integer32,
+        apolloOptIfOTUkCur15mPmFSES                 Integer32,
+        apolloOptIfOTUkCur15mPmNBBE                 Counter64,
+        apolloOptIfOTUkCur15mPmFBBE                 Counter64,
+        apolloOptIfOTUkCur15mPmNOFS                 Integer32,
+        apolloOptIfOTUkCur15mPmNUAS                 Integer32,
+        apolloOptIfOTUkCur15mPmFUAS                 Integer32,
+        apolloOptIfOTUkCur15mPmOsnrMin              OCTET STRING (SIZE(4)),
+        apolloOptIfOTUkCur15mPmOsnrMax              OCTET STRING (SIZE(4)),
+        apolloOptIfOTUkCur15mPmRxPwrMin             OCTET STRING (SIZE(4)),
+        apolloOptIfOTUkCur15mPmRxPwrMax             OCTET STRING (SIZE(4)),
+        apolloOptIfOTUkCur15mPmTxPwrMin             OCTET STRING (SIZE(4)),
+        apolloOptIfOTUkCur15mPmTxPwrMax             OCTET STRING (SIZE(4)),
+        apolloOptIfOTUkCur15mPmDgdMin               Integer32,
+        apolloOptIfOTUkCur15mPmDgdMax               Integer32,
+        apolloOptIfOTUkCur15mPmCdMin                Integer32,
+        apolloOptIfOTUkCur15mPmCdMax                Integer32,
+        apolloOptIfOTUkCur15mPmPreFecBer            Counter64,
+        apolloOptIfOTUkCur15mPmQFactorMin           Integer32,
+        apolloOptIfOTUkCur15mPmQFactorMax           Integer32,
+        apolloOptIfOTUkCur15mPmQMarginMin           Integer32,
+        apolloOptIfOTUkCur15mPmQMarginMax           Integer32
+    }
+
+    apolloOptIfOTUkIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Key. ifIndex. The port/interface associated with this row"
+        ::= {apolloOptIfOTUkCur15mPmEntry 1}
+
+    apolloOptIfOTUkCur15mMonitoredSeconds OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Monitored seconds in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 2}
+
+    apolloOptIfOTUkCur15mPmValidity OBJECT-TYPE
+        SYNTAX          INTEGER
+                        {
+                            true(1),
+                            false(2)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Current 15m interval validity"
+        ::= {apolloOptIfOTUkCur15mPmEntry 3}
+
+    apolloOptIfOTUkCur15mPmNCorrections OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Corrected errors 64-bit counter in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 4}
+     
+    apolloOptIfOTUkCur15mPmNES OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current 
+        DESCRIPTION     
+            "Near-end error seconds in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 5}
+        
+    apolloOptIfOTUkCur15mPmFES OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only 
+        STATUS          current 
+        DESCRIPTION     
+            "Far-end error seconds in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 6}
+        
+    apolloOptIfOTUkCur15mPmNSES OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION         
+            "Near-end severely errored seconds in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 7}
+        
+    apolloOptIfOTUkCur15mPmFSES OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only 
+        STATUS          current 
+        DESCRIPTION
+            "Far-end severely errored seconds in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 8}
+        
+    apolloOptIfOTUkCur15mPmNBBE OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Near-end background block errors 64-bit counter in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 9}
+
+    apolloOptIfOTUkCur15mPmFBBE OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Far-end background block errors 64-bit counter in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 10}
+
+    apolloOptIfOTUkCur15mPmNOFS OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Near-end out of frame seconds in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 11}
+
+    apolloOptIfOTUkCur15mPmNUAS OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Near-end un-available seconds in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 12}
+
+    apolloOptIfOTUkCur15mPmFUAS OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Far-end un-available seconds in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 13}
+
+    apolloOptIfOTUkCur15mPmOsnrMin OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only                    
+        STATUS          current
+        DESCRIPTION
+            "OSNR minimum value in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 14}
+        
+    apolloOptIfOTUkCur15mPmOsnrMax OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "OSNR maximum value in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 15}
+        
+    apolloOptIfOTUkCur15mPmRxPwrMin OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx Power minimum value in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 16}
+        
+    apolloOptIfOTUkCur15mPmRxPwrMax OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx Power maximum value in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 17}
+        
+    apolloOptIfOTUkCur15mPmTxPwrMin OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only 
+        STATUS          current
+        DESCRIPTION
+            "Tx Power minimum value in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 18}
+
+    apolloOptIfOTUkCur15mPmTxPwrMax OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx Power maximum value in current 15m interval"
+        ::= {apolloOptIfOTUkCur15mPmEntry 19}
+
+     apolloOptIfOTUkCur15mPmDgdMin OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Differential Group Delay Min (1ps Accuracy)"
+        ::= {apolloOptIfOTUkCur15mPmEntry 20}
+
+     apolloOptIfOTUkCur15mPmDgdMax OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Differential Group Delay Max (1ps Accuracy)"
+        ::= {apolloOptIfOTUkCur15mPmEntry 21}
+
+     apolloOptIfOTUkCur15mPmCdMin OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Chromatic Dispersion Min (10ps/nm Accuracy)"
+        ::= {apolloOptIfOTUkCur15mPmEntry 22}
+
+     apolloOptIfOTUkCur15mPmCdMax OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Chromatic Dispersion Max (10ps/nm Accuracy)"
+        ::= {apolloOptIfOTUkCur15mPmEntry 23}
+
+     apolloOptIfOTUkCur15mPmPreFecBer OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Pre-FEC High BER"
+        ::= {apolloOptIfOTUkCur15mPmEntry 24}
+
+     apolloOptIfOTUkCur15mPmQFactorMin OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q-Factor Min. Receiver pre-FEC BER in dB"
+        ::= {apolloOptIfOTUkCur15mPmEntry 25}
+
+     apolloOptIfOTUkCur15mPmQFactorMax OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q-Factor Max. Receiver pre-FEC BER in dB"
+        ::= {apolloOptIfOTUkCur15mPmEntry 26}
+
+     apolloOptIfOTUkCur15mPmQMarginMin OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q-Margin Min"
+        ::= {apolloOptIfOTUkCur15mPmEntry 27}
+
+     apolloOptIfOTUkCur15mPmQMarginMax OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q-Margin Max"
+        ::= {apolloOptIfOTUkCur15mPmEntry 28}
+
+
+
+-- apolloOptIfOTUkCur15mPmTable Ends
+
+-- apolloOptIfOTUkCurDayPmTable Begins
+
+apolloOptIfOTUkCurDayPmTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ApolloOptIfOTUkCurDayPmEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A list of current day PM counters for optical OTU interface"
+    ::= {apollo 15}
+
+apolloOptIfOTUkCurDayPmEntry OBJECT-TYPE
+    SYNTAX          ApolloOptIfOTUkCurDayPmEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A collection of day optical OTU interface PM statistics"
+    INDEX {apolloOptIfOTUkIndex}
+    ::= {apolloOptIfOTUkCurDayPmTable 1}
+
+ApolloOptIfOTUkCurDayPmEntry ::=
+    SEQUENCE
+    {
+        apolloOptIfOTUkCurDayMonitoredSeconds       Integer32,
+        apolloOptIfOTUkCurDayPmValidity             INTEGER,
+        apolloOptIfOTUkCurDayPmNCorrections         Counter64,
+        apolloOptIfOTUkCurDayPmNES                  Integer32,
+        apolloOptIfOTUkCurDayPmFES                  Integer32,
+        apolloOptIfOTUkCurDayPmNSES                 Integer32,
+        apolloOptIfOTUkCurDayPmFSES                 Integer32,
+        apolloOptIfOTUkCurDayPmNBBE                 Counter64,
+        apolloOptIfOTUkCurDayPmFBBE                 Counter64,
+        apolloOptIfOTUkCurDayPmNOFS                 Integer32,
+        apolloOptIfOTUkCurDayPmNUAS                 Integer32,
+        apolloOptIfOTUkCurDayPmFUAS                 Integer32,
+        apolloOptIfOTUkCurDayPmOsnrMin              OCTET STRING (SIZE(4)),
+        apolloOptIfOTUkCurDayPmOsnrMax              OCTET STRING (SIZE(4)),
+        apolloOptIfOTUkCurDayPmRxPwrMin             OCTET STRING (SIZE(4)),
+        apolloOptIfOTUkCurDayPmRxPwrMax             OCTET STRING (SIZE(4)),
+        apolloOptIfOTUkCurDayPmTxPwrMin             OCTET STRING (SIZE(4)),
+        apolloOptIfOTUkCurDayPmTxPwrMax             OCTET STRING (SIZE(4)),
+	apolloOptIfOTUkCurDayPmDgdMin               Integer32,
+        apolloOptIfOTUkCurDayPmDgdMax               Integer32,
+        apolloOptIfOTUkCurDayPmCdMin                Integer32,
+        apolloOptIfOTUkCurDayPmCdMax                Integer32,
+        apolloOptIfOTUkCurDayPmPreFecBer            Counter64,
+        apolloOptIfOTUkCurDayPmQFactorMin           Integer32,
+        apolloOptIfOTUkCurDayPmQFactorMax           Integer32,
+        apolloOptIfOTUkCurDayPmQMarginMin           Integer32,
+        apolloOptIfOTUkCurDayPmQMarginMax           Integer32
+    }
+
+    apolloOptIfOTUkCurDayMonitoredSeconds OBJECT-TYPE
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Monitored seconds in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 1}
+
+    apolloOptIfOTUkCurDayPmValidity OBJECT-TYPE
+        SYNTAX          INTEGER
+                        {
+                            true(1),
+                            false(2)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Current day interval validity"
+        ::= {apolloOptIfOTUkCurDayPmEntry 2}
+
+    apolloOptIfOTUkCurDayPmNCorrections OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Corrected errors 64-bit counter in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 3}
+
+    apolloOptIfOTUkCurDayPmNES OBJECT-TYPE
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Near-end error seconds in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 4}
+     
+    apolloOptIfOTUkCurDayPmFES OBJECT-TYPE
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only 
+        STATUS          current 
+        DESCRIPTION     
+            "Far-end error seconds in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 5}
+        
+    apolloOptIfOTUkCurDayPmNSES OBJECT-TYPE
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION         
+            "Near-end severely errored seconds in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 6}
+        
+    apolloOptIfOTUkCurDayPmFSES OBJECT-TYPE
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only 
+        STATUS          current 
+        DESCRIPTION
+            "Far-end severely errored seconds in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 7}
+        
+    apolloOptIfOTUkCurDayPmNBBE OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Near-end background block errors 64-bit counter in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 8}
+        
+    apolloOptIfOTUkCurDayPmFBBE OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current 
+        DESCRIPTION
+            "Far-end background block errors 64-bit counter in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 9}
+
+    apolloOptIfOTUkCurDayPmNOFS OBJECT-TYPE
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Near-end out of frame seconds in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 10}
+
+    apolloOptIfOTUkCurDayPmNUAS OBJECT-TYPE
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Near-end un-available seconds in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 11}
+
+    apolloOptIfOTUkCurDayPmFUAS OBJECT-TYPE
+        SYNTAX          Integer32 (0..86400)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Far-end un-available seconds in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 12}
+
+    apolloOptIfOTUkCurDayPmOsnrMin OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "OSNR minimum value in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 13}
+
+    apolloOptIfOTUkCurDayPmOsnrMax OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "OSNR maximum value in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 14}
+        
+    apolloOptIfOTUkCurDayPmRxPwrMin OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx Power minimum value in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 15}
+        
+    apolloOptIfOTUkCurDayPmRxPwrMax OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Rx Power maximum value in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 16}
+        
+    apolloOptIfOTUkCurDayPmTxPwrMin OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only 
+        STATUS          current
+        DESCRIPTION
+            "Tx Power minimum value in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 17}
+        
+    apolloOptIfOTUkCurDayPmTxPwrMax OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(4))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Tx Power maximum value in current day interval"
+        ::= {apolloOptIfOTUkCurDayPmEntry 18}
+
+         apolloOptIfOTUkCurDayPmDgdMin OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Differential Group Delay Min (1ps Accuracy)"
+        ::= {apolloOptIfOTUkCurDayPmEntry 19}
+
+     apolloOptIfOTUkCurDayPmDgdMax OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Differential Group Delay Max (1ps Accuracy)"
+        ::= {apolloOptIfOTUkCurDayPmEntry 20}
+
+     apolloOptIfOTUkCurDayPmCdMin OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Chromatic Dispersion Min (10ps/nm Accuracy)"
+        ::= {apolloOptIfOTUkCurDayPmEntry 21}
+
+     apolloOptIfOTUkCurDayPmCdMax OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Chromatic Dispersion Max (10ps/nm Accuracy)"
+        ::= {apolloOptIfOTUkCurDayPmEntry 22}
+     apolloOptIfOTUkCurDayPmPreFecBer OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            ""
+        ::= {apolloOptIfOTUkCurDayPmEntry 23}
+
+     apolloOptIfOTUkCurDayPmQFactorMin OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q-Factor Min. Receiver pre-FEC BER in dB"
+        ::= {apolloOptIfOTUkCurDayPmEntry 24}
+
+     apolloOptIfOTUkCurDayPmQFactorMax OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q-Factor Max. Receiver pre-FEC BER in dB"
+        ::= {apolloOptIfOTUkCurDayPmEntry 25}
+
+     apolloOptIfOTUkCurDayPmQMarginMin OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q-Margin Min"
+        ::= {apolloOptIfOTUkCurDayPmEntry 26}
+     apolloOptIfOTUkCurDayPmQMarginMax OBJECT-TYPE
+        SYNTAX          Integer32 (0..900)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q-Margin Max"
+        ::= {apolloOptIfOTUkCurDayPmEntry 27}
+
+
+-- apolloOptIfOTUkCurDayPmTable Ends
+
+-- apolloOptIfODUkCur15mPmTable Begins
+
+apolloOptIfODUkCur15mPmTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ApolloOptIfODUkCur15mPmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Current day PM entries for ODU interface"
+    ::= { apollo 16 }
+
+apolloOptIfODUkCur15mPmEntry OBJECT-TYPE
+    SYNTAX     ApolloOptIfODUkCur15mPmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A collection of current 15 minute ODU interface PM statistics.
+         As an example, an instance of the apolloOptIfODUkCur15mPmOsnrMin object
+         might be named apolloOptIfODUkCur15mPmMicErrors.1"
+    INDEX { apolloOptIfODUkIndex }
+    ::= { apolloOptIfODUkCur15mPmTable 1 }
+
+ApolloOptIfODUkCur15mPmEntry ::= SEQUENCE {
+    apolloOptIfODUkIndex                     InterfaceIndex,
+    apolloOptIfODUkCur15mMonitoredSeconds    Integer32,
+    apolloOptIfODUkCur15mPmValidity          INTEGER,
+    apolloOptIfODUkCur15mPmMicErrors         Counter64,
+    apolloOptIfODUkCur15mPmNES               Integer32,
+    apolloOptIfODUkCur15mPmFES               Integer32,
+    apolloOptIfODUkCur15mPmNSES              Integer32,
+    apolloOptIfODUkCur15mPmFSES              Integer32,
+    apolloOptIfODUkCur15mPmNBBE              Counter64,
+    apolloOptIfODUkCur15mPmFBBE              Counter64,
+    apolloOptIfODUkCur15mPmNUAS              Integer32,
+    apolloOptIfODUkCur15mPmFUAS              Integer32,
+    apolloOptIfODUkCur15mPmUAS               Integer32,
+    apolloOptIfODUkCur15mPmTSE               Counter64,
+    apolloOptIfODUkCur15mPmTSEOutOfSync      Integer32
+}
+
+apolloOptIfODUkIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Key. ifIndex. The port/interface associated with this row"
+    ::= { apolloOptIfODUkCur15mPmEntry 1 }
+
+apolloOptIfODUkCur15mMonitoredSeconds OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PM Monitored seconds"
+    ::= { apolloOptIfODUkCur15mPmEntry 2 }
+
+apolloOptIfODUkCur15mPmValidity OBJECT-TYPE
+    SYNTAX      INTEGER{
+                    true(1),
+                    false(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This parameter is a boolean indicating PM validity"
+    ::= { apolloOptIfODUkCur15mPmEntry 3 }
+
+apolloOptIfODUkCur15mPmMicErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sum of MIC errors counter in current 15 minute interval"
+    ::= { apolloOptIfODUkCur15mPmEntry 4 }
+
+apolloOptIfODUkCur15mPmNES OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Near End Errored second in current 15 minute interval"
+    ::= { apolloOptIfODUkCur15mPmEntry 5 }
+        
+apolloOptIfODUkCur15mPmFES OBJECT-TYPE 
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Far End Errored second in current 15 minute interval"
+    ::= { apolloOptIfODUkCur15mPmEntry 6 }
+        
+apolloOptIfODUkCur15mPmNSES OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION     
+        "Near End Severely Errored second in current 15 minute interval"
+    ::= { apolloOptIfODUkCur15mPmEntry 7 }
+    
+apolloOptIfODUkCur15mPmFSES OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Far End Severely Errored second in current 15 minute interval"
+    ::= { apolloOptIfODUkCur15mPmEntry 8 }
+    
+apolloOptIfODUkCur15mPmNBBE OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Near End Background Block Errors in current 15 minute interval"
+    ::= { apolloOptIfODUkCur15mPmEntry 9 }
+    
+apolloOptIfODUkCur15mPmFBBE OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Far End Background Block Errors in current 15 minute interval"
+    ::= { apolloOptIfODUkCur15mPmEntry 10 }
+
+apolloOptIfODUkCur15mPmNUAS OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Near End Unavailable Seconds in current 15 minute interval"
+    ::= { apolloOptIfODUkCur15mPmEntry 11 }
+
+apolloOptIfODUkCur15mPmFUAS OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Far End Unavailable Seconds in current 15 minute interval"
+    ::= { apolloOptIfODUkCur15mPmEntry 12 }
+
+apolloOptIfODUkCur15mPmUAS OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unavailable Seconds"
+    ::= { apolloOptIfODUkCur15mPmEntry 13 }
+
+apolloOptIfODUkCur15mPmTSE OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Test Sequence Error"
+    ::= { apolloOptIfODUkCur15mPmEntry 14 }
+
+apolloOptIfODUkCur15mPmTSEOutOfSync  OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time(sec) TSE is out of sync"
+    ::= { apolloOptIfODUkCur15mPmEntry 15 }
+
+
+
+-- apolloOptIfODUkCur15mPmTable Ends
+
+-- apolloOptIfODUkCurDayPmTable Begins
+
+apolloOptIfODUkCurDayPmTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ApolloOptIfODUkCurDayPmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Current day PM entries for ODU interface"
+    ::= { apollo 17 }
+
+apolloOptIfODUkCurDayPmEntry OBJECT-TYPE
+    SYNTAX     ApolloOptIfODUkCurDayPmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION 
+        "A collection of current 15 minute ODU interface PM statistics.
+         As an example, an instance of the apolloOptIfODUkCurDayPmOsnrMin object
+         might be named apolloOptIfODUkCurDayPmMicErrors.1"
+    INDEX { apolloOptIfODUkIndex }
+    ::= { apolloOptIfODUkCurDayPmTable 1 }
+    
+ApolloOptIfODUkCurDayPmEntry ::= SEQUENCE {
+    apolloOptIfODUkCurDayMonitoredSeconds    Integer32,
+    apolloOptIfODUkCurDayPmValidity          INTEGER,
+    apolloOptIfODUkCurDayPmMicErrors         Counter64,
+    apolloOptIfODUkCurDayPmNES               Integer32,
+    apolloOptIfODUkCurDayPmFES               Integer32,
+    apolloOptIfODUkCurDayPmNSES              Integer32,
+    apolloOptIfODUkCurDayPmFSES              Integer32,
+    apolloOptIfODUkCurDayPmNBBE              Counter64,
+    apolloOptIfODUkCurDayPmFBBE              Counter64,
+    apolloOptIfODUkCurDayPmNUAS              Integer32,
+    apolloOptIfODUkCurDayPmFUAS              Integer32,
+    apolloOptIfODUkCurDayPmUAS		     Integer32,
+    apolloOptIfODUkCurDayPmTSE               Counter64,
+    apolloOptIfODUkCurDayPmTSEOutOfSync      Integer32
+}
+
+apolloOptIfODUkCurDayMonitoredSeconds OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PM Monitored seconds"
+    ::= { apolloOptIfODUkCurDayPmEntry 1 }
+    
+apolloOptIfODUkCurDayPmValidity OBJECT-TYPE
+    SYNTAX      INTEGER{
+                    true(1),
+                    false(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This parameter is a boolean indicating PM validity"
+    ::= { apolloOptIfODUkCurDayPmEntry 2 }
+
+apolloOptIfODUkCurDayPmMicErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sum of MIC errors counter in current day"
+    ::= { apolloOptIfODUkCurDayPmEntry 3 }
+
+apolloOptIfODUkCurDayPmNES OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Near End Errored second in current day"
+    ::= { apolloOptIfODUkCurDayPmEntry 4 }
+
+apolloOptIfODUkCurDayPmFES OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Far End Errored second in current day"
+    ::= { apolloOptIfODUkCurDayPmEntry 5 }
+
+apolloOptIfODUkCurDayPmNSES OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Near End Severely Errored second in current day"
+    ::= { apolloOptIfODUkCurDayPmEntry 6 }
+    
+apolloOptIfODUkCurDayPmFSES OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Far End Severely Errored second in current day"
+    ::= { apolloOptIfODUkCurDayPmEntry 7 }
+    
+apolloOptIfODUkCurDayPmNBBE OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Near End Background Block Errors in current day"
+    ::= { apolloOptIfODUkCurDayPmEntry 8 }
+    
+apolloOptIfODUkCurDayPmFBBE OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Far End Background Block Errors in current day"
+    ::= { apolloOptIfODUkCurDayPmEntry 9 }
+    
+apolloOptIfODUkCurDayPmNUAS OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Near End Unavailable Seconds in current day"
+    ::= { apolloOptIfODUkCurDayPmEntry 10 }
+    
+apolloOptIfODUkCurDayPmFUAS OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Far End Unavailable Seconds in current day"
+    ::= { apolloOptIfODUkCurDayPmEntry 11 }
+
+apolloOptIfODUkCurDayPmUAS OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unavailable Seconds"
+    ::= { apolloOptIfODUkCurDayPmEntry 12 }
+
+apolloOptIfODUkCurDayPmTSE OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Test Sequence Error"
+    ::= { apolloOptIfODUkCurDayPmEntry 13 }
+
+apolloOptIfODUkCurDayPmTSEOutOfSync  OBJECT-TYPE
+    SYNTAX      Integer32 (0..900)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time(sec) TSE is out of sync"
+    ::= { apolloOptIfODUkCurDayPmEntry 14 }
+
+-- apolloOptIfODUkCurDayPmTable Ends
+
+-- apolloPhotonicsPortTable Begins
+
+apolloPhotonicsPortTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ApolloPhotonicsPortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+                    "This table lists all the OCHP, OTS, OSC ports for all the photonic cards"
+    ::= {apollo 18}
+
+apolloPhotonicsPortEntry OBJECT-TYPE
+    SYNTAX       ApolloPhotonicsPortEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+                 "Information regarding photonic ports."
+    INDEX        {apolloPhotonicsPortIndex}
+    ::= {apolloPhotonicsPortTable 1}
+
+ApolloPhotonicsPortEntry ::=
+    SEQUENCE
+    {
+        apolloPhotonicsPortIndex            InterfaceIndex,
+        apolloPhotonicsPortName             DisplayString (SIZE (0..255)),
+        apolloPhotonicsPortRxActualPower    OCTET STRING (SIZE(4)),
+        apolloPhotonicsPortTxActualPower    OCTET STRING (SIZE(4)),
+        apolloPhotonicsPortRxMinPower       OCTET STRING (SIZE(4)),
+        apolloPhotonicsPortRxMaxPower       OCTET STRING (SIZE(4)),
+        apolloPhotonicsPortTxMinPower       OCTET STRING (SIZE(4)),
+        apolloPhotonicsPortTxMaxPower       OCTET STRING (SIZE(4))
+    }
+
+    apolloPhotonicsPortIndex    OBJECT-TYPE
+    SYNTAX                      InterfaceIndex
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                                "Index of the photonic port which helps to uniquely identify an entry in apolloPhotonicsPortTable"
+    ::={ apolloPhotonicsPortEntry 1}
+
+    apolloPhotonicsPortName     OBJECT-TYPE
+    SYNTAX                      DisplayString (SIZE (0..255))
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+                                "Description of photonic port - slot/port name"
+    ::={ apolloPhotonicsPortEntry 2}
+
+    apolloPhotonicsPortRxActualPower    OBJECT-TYPE
+    SYNTAX                              OCTET STRING (SIZE(4))
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+                                "Rx Actual Power Value in dBm"
+    ::={ apolloPhotonicsPortEntry 3}
+
+    apolloPhotonicsPortTxActualPower    OBJECT-TYPE
+    SYNTAX                              OCTET STRING (SIZE(4))
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+                                "Tx Actual Power Value in dBm"
+    ::={ apolloPhotonicsPortEntry 4}
+
+    apolloPhotonicsPortRxMinPower       OBJECT-TYPE
+    SYNTAX                              OCTET STRING (SIZE(4))
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+                                "Rx Minimum Power Value in dBm"
+    ::={ apolloPhotonicsPortEntry 5}
+
+    apolloPhotonicsPortRxMaxPower       OBJECT-TYPE
+    SYNTAX                              OCTET STRING (SIZE(4))
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+                                "Rx Maximum Power Value in dBm"
+    ::={ apolloPhotonicsPortEntry 6}
+
+    apolloPhotonicsPortTxMinPower       OBJECT-TYPE
+    SYNTAX                              OCTET STRING (SIZE(4))
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+                                "Tx Minimum Power Value in dBm"
+    ::={ apolloPhotonicsPortEntry 7}
+
+    apolloPhotonicsPortTxMaxPower       OBJECT-TYPE
+    SYNTAX                              OCTET STRING (SIZE(4))
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+                                "Tx Maximum Power Value in dBm"
+    ::={ apolloPhotonicsPortEntry 8}
+
+-- apolloPhotonicsPortTable Ends
+
+END
