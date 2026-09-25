@@ -15,6 +15,7 @@
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Http\Resources\Device as DeviceResource;
 use App\Models\AlertTemplate;
 use App\Models\AlertTemplateMap;
 use App\Models\Availability;
@@ -304,123 +305,67 @@ function list_locations()
 
 function get_device(Illuminate\Http\Request $request)
 {
-    $device = DeviceCache::get($request->route('hostname'));
+    $hostname = $request->route('hostname');
+    $device = DeviceCache::get($hostname);
 
     if (! $device->exists) {
-        return api_error(404, 'Device ' . $request->route('hostname') . ' does not exist');
+        return api_error(404, "Device $hostname does not exist");
     }
 
-    return check_device_permission($device->device_id, function () use ($device) {
-        $location = $device->location;
-        $device['location'] = $location?->location;
-        $device['lat'] = $location?->lat;
-        $device['lng'] = $location?->lng;
+    if ($request->user()->cannot('view', $device)) {
+        return api_error(403, 'Insufficient permissions to access this device');
+    }
 
-        $host_id = get_vm_parent_id($device);
-        if (is_numeric($host_id)) {
-            $device = array_merge($device, ['parent_id' => $host_id]);
-        }
-
-        return api_success([$device], 'devices');
-    });
+    return api_success([DeviceResource::make($device)->resolve()], 'devices');
 }
 
-function list_devices(Illuminate\Http\Request $request)
+function list_devices(Illuminate\Http\Request $request): JsonResponse
 {
-    // This will return a list of devices
+    $query = $request->input('query');
+    $type = $request->input('type');
+
+    $devicesQuery = Device::hasAccess($request->user())
+        ->with(['location', 'parents']);
+
+    match ($type) {
+        'device_id' => $devicesQuery->where('device_id', $query),
+        'active' => $devicesQuery->isActive(),
+        'ignored' => $devicesQuery->isIgnored(),
+        'up' => $devicesQuery->isUp(),
+        'down' => $devicesQuery->isDown(),
+        'disabled' => $devicesQuery->isDisabled(),
+        'location' => $devicesQuery->whereHas('location', fn (Builder $q) => $q->where('location', 'LIKE', "%$query%")),
+        'hostname' => $devicesQuery->where('hostname', 'LIKE', "%$query%"),
+        'display' => $devicesQuery->where('display', 'LIKE', "%$query%"),
+        'os' => $devicesQuery->where('os', $query),
+        'sysName' => $devicesQuery->where('sysName', $query),
+        'location_id' => $devicesQuery->where('location_id', $query),
+        'type' => $devicesQuery->where('type', $query),
+        'mac' => $devicesQuery->whereHas('ports.macs', fn (Builder $q) => $q->where('mac_address', $query)),
+        'ipv4' => $devicesQuery->whereHas('ports.ipv4', fn (Builder $q) => $q->where('ipv4_address', $query)),
+        'ipv6' => $devicesQuery->whereHas('ports.ipv6', fn (Builder $q) => $q->where('ipv6_address', $query)->orWhere('ipv6_compressed', $query)),
+        'serial', 'version', 'hardware', 'features' => $devicesQuery->where($type, 'LIKE', "%$query%"),
+        default => null,
+    };
 
     $order = $request->input('order');
-    $type = $request->input('type');
-    $query = $request->input('query');
-    $param = [];
-
     if (is_string($order) && preg_match('/^([a-z_]+)(?: (desc|asc))?$/i', $order, $matches)) {
-        $order = "d.`$matches[1]` " . ($matches[2] ?? 'ASC');
+        $devicesQuery->orderBy($matches[1], $matches[2] ?? 'ASC');
     } else {
-        $order = 'd.`hostname` ASC';
+        $devicesQuery->orderBy('hostname');
     }
 
-    $select = ' d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname, `location`, `lat`, `lng` ';
-    $join = ' LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` LEFT JOIN `locations` ON `locations`.`id` = `d`.`location_id`';
+    $devices = $devicesQuery->get();
 
-    if ($type == 'all' || empty($type)) {
-        $sql = '1';
-    } elseif ($type == 'device_id') {
-        $sql = '`d`.`device_id` = ?';
-        $param[] = $query;
-    } elseif ($type == 'active') {
-        $sql = "`d`.`ignore`='0' AND `d`.`disabled`='0'";
-    } elseif ($type == 'location') {
-        $sql = '`locations`.`location` LIKE ?';
-        $param[] = "%$query%";
-    } elseif ($type == 'hostname') {
-        $sql = '`d`.`hostname` LIKE ?';
-        $param[] = "%$query%";
-    } elseif ($type == 'ignored') {
-        $sql = "`d`.`ignore`='1' AND `d`.`disabled`='0'";
-    } elseif ($type == 'up') {
-        $sql = "`d`.`status`='1' AND `d`.`ignore`='0' AND `d`.`disabled`='0'";
-    } elseif ($type == 'down') {
-        $sql = "`d`.`status`='0' AND `d`.`ignore`='0' AND `d`.`disabled`='0'";
-    } elseif ($type == 'disabled') {
-        $sql = "`d`.`disabled`='1'";
-    } elseif ($type == 'os') {
-        $sql = '`d`.`os`=?';
-        $param[] = $query;
-    } elseif ($type == 'mac') {
-        $join .= ' LEFT JOIN `ports` AS p ON d.`device_id` = p.`device_id` LEFT JOIN `ipv4_mac` AS m ON p.`port_id` = m.`port_id` ';
-        $sql = 'm.`mac_address`=?';
-        $select .= ',p.* ';
-        $param[] = $query;
-    } elseif ($type == 'ipv4') {
-        $join .= ' LEFT JOIN `ports` AS p ON d.`device_id` = p.`device_id` LEFT JOIN `ipv4_addresses` AS a ON p.`port_id` = a.`port_id` ';
-        $sql = 'a.`ipv4_address`=?';
-        $select .= ',p.* ';
-        $param[] = $query;
-    } elseif ($type == 'ipv6') {
-        $join .= ' LEFT JOIN `ports` AS p ON d.`device_id` = p.`device_id` LEFT JOIN `ipv6_addresses` AS a ON p.`port_id` = a.`port_id` ';
-        $sql = 'a.`ipv6_address`=? OR a.`ipv6_compressed`=?';
-        $select .= ',p.* ';
-        $param = [$query, $query];
-    } elseif ($type == 'sysName') {
-        $sql = '`d`.`sysName`=?';
-        $param[] = $query;
-    } elseif ($type == 'location_id') {
-        $sql = '`d`.`location_id`=?';
-        $param[] = $query;
-    } elseif ($type == 'type') {
-        $sql = '`d`.`type`=?';
-        $param[] = $query;
-    } elseif ($type == 'display') {
-        $sql = '`d`.`display` LIKE ?';
-        $param[] = "%$query%";
-    } elseif (in_array($type, ['serial', 'version', 'hardware', 'features'])) {
-        $sql = "`d`.`$type` LIKE ?";
-        $param[] = "%$query%";
-    } else {
-        $sql = '1';
-    }
-
-    if (Gate::denies('viewAll', Device::class)) {
-        $sql .= ' AND `d`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
-        $param[] = Auth::id();
-    }
-    $devices = [];
-    $dev_query = "SELECT $select FROM `devices` AS d $join WHERE $sql GROUP BY d.`hostname` ORDER BY $order";
-    foreach (dbFetchRows($dev_query, $param) as $device) {
-        $host_id = get_vm_parent_id($device);
-        $device['ip'] = inet6_ntop($device['ip']);
-        if (is_numeric($host_id)) {
-            $device['parent_id'] = $host_id;
-        }
-        $devices[] = $device;
-    }
-
-    return api_success($devices, 'devices');
+    return api_success(DeviceResource::collection($devices)->resolve(), 'devices');
 }
 
 function add_device(Illuminate\Http\Request $request)
 {
+    if ($request->user()->cannot('create', Device::class)) {
+        return api_error(403, 'Insufficient permissions to create a device');
+    }
+
     // This will add a device using the data passed encoded with json
     $data = $request->json()->all();
 
@@ -478,47 +423,47 @@ function add_device(Illuminate\Http\Request $request)
 
         (new ValidateDeviceAndCreate($device, $force_add, ! empty($data['ping_fallback'])))->execute();
     } catch (\LibreNMS\Exceptions\HostExistsException|\LibreNMS\Exceptions\HostUnreachableException|\LibreNMS\Exceptions\SnmpVersionUnsupportedException $e) {
-        return api_error(500, $e->getMessage());
+        return api_error(400, $e->getMessage());
     } catch (Exception $e) {
         report($e);
 
         return api_error(500, 'Failed to add device');
     }
 
+    if (! $device->exists) {
+        return api_error(400, 'Could not add device');
+    }
+
     $message = "Device $device->hostname ($device->device_id) has been added successfully";
 
-    return api_success([$device->attributesToArray()], 'devices', $message);
+    return api_success([DeviceResource::make($device)->resolve()], 'devices', $message);
 }
 
 function del_device(Illuminate\Http\Request $request)
 {
-    // This will add a device using the data passed encoded with json
     $hostname = $request->route('hostname');
 
     if (empty($hostname)) {
         return api_error(400, 'No hostname has been provided to delete');
     }
 
-    // allow deleting by device_id or hostname
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $device = null;
-    if ($device_id) {
-        // save the current details for returning to the client on successful delete
-        $device = device_by_id_cache($device_id);
-    }
+    $device = DeviceCache::get($hostname);
 
-    if (! $device) {
+    if (! $device->exists) {
         return api_error(404, "Device $hostname not found");
     }
 
-    $response = delete_device($device_id);
-    if (empty($response)) {
-        // FIXME: Need to provide better diagnostics out of delete_device
+    if ($request->user()->cannot('delete', $device)) {
+        return api_error(403, 'Insufficient permissions to delete this device');
+    }
+
+    $deviceData = DeviceResource::make($device)->resolve();
+
+    if (! $device->delete()) {
         return api_error(500, 'Device deletion failed');
     }
 
-    // deletion succeeded - include old device details in response
-    return api_success([$device], 'devices', $response);
+    return api_success([$deviceData], 'devices', "Removed device $device->hostname\n");
 }
 
 function maintenance_device(Illuminate\Http\Request $request)
@@ -1904,9 +1849,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
             'transports' => $legacyTransports,
         ]];
 
-        if ($defaultOperationStepDuration === null) {
-            $defaultOperationStepDuration = $legacyIntervalSec;
-        }
+        $defaultOperationStepDuration ??= $legacyIntervalSec;
         if ($legacyMute) {
             // Legacy mute means "never notify", represented by no operations.
             $operations = [];
@@ -2570,53 +2513,67 @@ function create_edit_bill(Illuminate\Http\Request $request)
 function update_device(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    // use hostname as device_id if it's all digits
-    $device = ctype_digit($hostname) ? Device::find($hostname) : Device::findByHostname($hostname);
+    $device = DeviceCache::get($hostname);
 
-    if (is_null($device)) {
+    if (! $device->exists) {
         return api_error(404, "Device $hostname not found");
+    }
+
+    if ($request->user()->cannot('update', $device)) {
+        return api_error(403, 'Insufficient permissions to update this device');
     }
 
     $data = json_decode($request->getContent(), true);
     $bad_fields = ['device_id', 'hostname'];
     if (empty($data['field'])) {
         return api_error(400, 'Device field to patch has not been supplied');
-    } elseif (in_array($data['field'], $bad_fields)) {
+    }
+
+    if (is_string($data['field']) && in_array($data['field'], $bad_fields, true)) {
         return api_error(500, 'Device field is not allowed to be updated');
     }
 
     if (is_array($data['field']) && is_array($data['data'])) {
         foreach ($data['field'] as $tmp_field) {
-            if (in_array($tmp_field, $bad_fields)) {
+            if (in_array($tmp_field, $bad_fields, true)) {
                 return api_error(500, 'Device field is not allowed to be updated');
             }
         }
-        if (count($data['field']) == count($data['data'])) {
+        if (count($data['field']) === count($data['data'])) {
             $update = [];
             for ($x = 0; $x < count($data['field']); $x++) {
                 $field = $data['field'][$x];
                 $field_data = $data['data'][$x];
 
-                if ($field == 'location') {
+                if ($field === 'location') {
                     $field = 'location_id';
-                    $field_data = \App\Models\Location::firstOrCreate(['location' => $field_data])->id;
+                    $field_data = Location::firstOrCreate(['location' => $field_data])->id;
                 }
 
                 $update[$field] = $field_data;
             }
             if ($device->fill($update)->save()) {
                 return api_success_noresult(200, 'Device fields have been updated');
-            } else {
-                return api_error(500, 'Device fields failed to be updated');
             }
-        } else {
-            return api_error(500, 'Device fields failed to be updated as the number of fields (' . count($data['field']) . ') does not match the supplied data (' . count($data['data']) . ')');
+
+            return api_error(500, 'Device fields failed to be updated');
         }
-    } elseif ($device->fill([$data['field'] => $data['data']])->save()) {
-        return api_success_noresult(200, 'Device ' . $data['field'] . ' field has been updated');
-    } else {
-        return api_error(500, 'Device ' . $data['field'] . ' field failed to be updated');
+
+        return api_error(500, 'Device fields failed to be updated as the number of fields (' . count($data['field']) . ') does not match the supplied data (' . count($data['data']) . ')');
     }
+
+    $field = $data['field'];
+    $field_data = $data['data'] ?? null;
+    if ($field === 'location') {
+        $field = 'location_id';
+        $field_data = Location::firstOrCreate(['location' => $field_data])->id;
+    }
+
+    if ($device->fill([$field => $field_data])->save()) {
+        return api_success_noresult(200, 'Device ' . $data['field'] . ' field has been updated');
+    }
+
+    return api_error(500, 'Device ' . $data['field'] . ' field failed to be updated');
 }
 
 function rename_device(Illuminate\Http\Request $request)
@@ -3034,7 +2991,13 @@ function get_devices_by_group(Illuminate\Http\Request $request)
         return api_error(404, 'Device group not found');
     }
 
-    $devices = $device_group->devices()->get($request->input('full') ? ['*'] : ['devices.device_id']);
+    if ($request->user()->cannot('view', $device_group)) {
+        return api_error(403, 'Insufficient permissions to access this device group');
+    }
+
+    $devices = $device_group->devices()
+        ->hasAccess($request->user())
+        ->get($request->input('full') ? ['devices.*'] : ['devices.device_id']);
 
     if ($devices->isEmpty()) {
         return api_error(404, 'No devices found in group ' . $name);
@@ -3603,9 +3566,7 @@ function validate_column_list(?string $columns, string $table, array $default = 
     }
 
     static $schema;
-    if (is_null($schema)) {
-        $schema = new \LibreNMS\DB\Schema();
-    }
+    $schema ??= new \LibreNMS\DB\Schema();
 
     $column_names = is_array($columns) ? $columns : explode(',', $columns);
     $valid_columns = $schema->getColumns($table);

@@ -40,7 +40,7 @@ class Application extends DeviceRelatedModel
     protected $fillable = ['device_id', 'app_type', 'app_instance', 'app_status', 'app_state', 'data', 'deleted_at', 'discovered'];
 
     /**
-     * @return array{data: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
