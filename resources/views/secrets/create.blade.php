@@ -1,23 +1,23 @@
 @extends('layouts.librenmsv1')
 
-@section('title', __('Add Credential'))
+@section('title', __('Add Secret'))
 
 @section('content')
     <div class="container">
         <div class="tw:mb-4">
             <a href="{{ route('secrets.index') }}" class="btn btn-default">
-                <i class="fas fa-arrow-left tw:mr-1"></i> {{ __('Back to Credentials') }}
+                <i class="fas fa-arrow-left tw:mr-1"></i> {{ __('Back to Secrets') }}
             </a>
         </div>
 
         <x-panel>
             <x-slot name="title">
-                <i class="fas fa-plus fa-fw fa-lg" aria-hidden="true"></i> {{ __('Add Credential') }}
+                <i class="fas fa-plus fa-fw fa-lg" aria-hidden="true"></i> {{ __('Add Secret') }}
             </x-slot>
 
             <div class="tw:mb-6">
                 <form method="GET" action="{{ route('secrets.create') }}" class="tw:flex tw:items-center tw:gap-4">
-                    <label for="type_selector" class="tw:font-medium tw:mb-0">{{ __('Select Credential Type:') }}</label>
+                    <label for="type_selector" class="tw:font-medium tw:mb-0">{{ __('Select Secret Type:') }}</label>
                     <select id="type_selector" name="type" class="form-control tw:w-auto" onchange="this.form.submit()">
                         @foreach($types as $type)
                             <option value="{{ $type->value }}" {{ $currentType === $type ? 'selected' : '' }}>

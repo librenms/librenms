@@ -14,6 +14,10 @@
                     {{ $secrets->count() }} {{ Str::plural('secret', $secrets->count()) }} configured
                 </div>
                 <div class="tw:flex tw:items-center tw:gap-2">
+                    <a href="{{ url('/settings/poller/snmp') }}" class="btn btn-default">
+                        <i class="fas fa-cog tw:mr-1"></i>
+                        {{ __('Edit Default Secrets') }}
+                    </a>
                     <a href="{{ route('secrets.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus tw:mr-1"></i>
                         {{ __('Add Secret') }}

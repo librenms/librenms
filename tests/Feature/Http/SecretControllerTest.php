@@ -137,6 +137,10 @@ class SecretControllerTest extends TestCase
         $response->assertViewHas('data', fn (array $data): bool => ($data['version'] ?? null) === 'v2c');
         $response->assertSee('x-data="{ formData:', false);
         $response->assertSee('x-model="formData[\'version\']"', false);
+        $response->assertSee('Add Secret');
+        $response->assertSee('Back to Secrets');
+        $response->assertSee('Select Secret Type:');
+        $response->assertDontSee('Credential');
     }
 
     public function testEditSecretRendersFormWithSecretData(): void
@@ -238,5 +242,7 @@ class SecretControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Cannot delete secret in use');
+        $response->assertSee('Edit Default Secrets');
+        $response->assertSee(url('/settings/poller/snmp'));
     }
 }
