@@ -125,8 +125,8 @@
                                 }
                             })"
                              x-show="activeTab === '{{ $method["type"] }}' && activeMethods.includes('{{ $method["type"] }}')"
-                             style="display: none;"
-                             x-transition>
+                             x-cloak
+                             style="display: none;">
 
                             <div class="tw:flex tw:items-center tw:justify-between tw:mb-6 tw:border-b tw:pb-3 tw:dark:border-dark-gray-400">
                                 <div class="tw:flex tw:items-center tw:gap-3">
@@ -459,7 +459,7 @@
                 },
                 addMethod(type) {
                     if (!this.activeMethods.includes(type)) {
-                        this.activeMethods.push(type);
+                        this.activeMethods = [...this.activeMethods, type];
                         this.activeTab = type;
                     }
                 },
