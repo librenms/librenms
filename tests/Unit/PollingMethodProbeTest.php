@@ -2,7 +2,7 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use App\Casts\EncryptedArray;
+use App\Casts\EncryptedSecret;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
@@ -101,7 +101,7 @@ final class PollingMethodProbeTest extends TestCase
 
     public function testSecretDecryptionExceptionThrownOnInvalidPayload(): void
     {
-        $cast = new EncryptedArray();
+        $cast = new EncryptedSecret();
         $secret = new Secret();
 
         $this->expectException(SecretDecryptionException::class);

@@ -16,4 +16,15 @@ class SecretDecryptionException extends RuntimeException
 
         return new self($message);
     }
+
+    public static function failedToEncrypt(?string $reason = null): self
+    {
+        $message = 'Failed to encrypt secret data.';
+
+        if ($reason) {
+            $message .= " ($reason)";
+        }
+
+        return new self($message);
+    }
 }

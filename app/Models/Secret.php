@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Casts\EncryptedArray;
+use App\Casts\EncryptedSecret;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -22,7 +22,7 @@ class Secret extends BaseModel
 
     public $casts = [
         'secret_type' => SecretType::class,
-        'data' => EncryptedArray::class,
+        'data' => EncryptedSecret::class,
     ];
 
     /**
