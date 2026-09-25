@@ -32,6 +32,7 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use LibreNMS\Util\NetworkMapOptions;
 
 class DeviceDependencyController extends Controller
 {
@@ -48,7 +49,7 @@ class DeviceDependencyController extends Controller
         $data = [
             'page_refresh' => LibrenmsConfig::get('page_refresh', 300),
             'group_id' => $deviceGroup?->id,
-            'options' => LibrenmsConfig::get('network_map_dependencymap_vis_options') ?? LibrenmsConfig::get('network_map_vis_options'),
+            'options' => NetworkMapOptions::dependencyMap(),
             'group_name' => $deviceGroup?->name,
             'highlight_style' => [
                 'color' => [

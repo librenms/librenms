@@ -31,10 +31,13 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use LibreNMS\Util\Validate;
 
 class HealthSensorsController extends WidgetController
 {
     protected string $name = 'health-sensors';
+
+    private const MAX_ENTRIES = 100;
 
     /** @var array<string, mixed> */
     protected $defaults = [
@@ -46,6 +49,8 @@ class HealthSensorsController extends WidgetController
         'rows' => 4,
         'cols' => 3,
         'display_mode' => 'number',
+        'sort_by' => 'descr',
+        'sort_order' => 'asc',
         'sensor_class_regex' => '.*',
         'descr_regex' => '.*',
         'warning' => '',
@@ -87,9 +92,11 @@ class HealthSensorsController extends WidgetController
         $descrBare = trim((string) ($settings['descr_regex'] ?? '.*'));
         $classBare = trim((string) ($settings['sensor_class_regex'] ?? '.*'));
 
-        $userWarning = $settings['warning'] ?? null;
-        $userCritical = $settings['critical'] ?? null;
-        $maxEntries = $this->maxEntries((int) $settings['rows'], (int) $settings['cols']);
+        $userWarning = is_numeric($settings['warning'] ?? null) ? (float) $settings['warning'] : null;
+        $userCritical = is_numeric($settings['critical'] ?? null) ? (float) $settings['critical'] : null;
+        $maxEntries = $this->maxEntries((int) $settings['rows'], (int) $settings['cols'], (string) $settings['display_mode']);
+        $sortColumn = $settings['sort_by'] === 'value' ? 'sensor_current' : 'sensor_descr';
+        $sortOrder = Validate::ascDesc($settings['sort_order'], 'ASC');
 
         try {
             $sensors = Sensor::hasAccess($request->user())
@@ -107,8 +114,9 @@ class HealthSensorsController extends WidgetController
                 })
                 ->when($classBare !== '.*', fn ($q) => $q->whereRaw('sensor_class REGEXP ?', [$classBare]))
                 ->when($descrBare !== '.*', fn ($q) => $q->whereRaw('sensor_descr REGEXP ?', [$descrBare]))
+                ->when($sortColumn === 'sensor_current', fn ($q) => $q->whereNotNull('sensor_current'))
                 ->with('device')
-                ->orderBy('sensor_descr')
+                ->orderBy($sortColumn, $sortOrder)
                 ->limit($maxEntries)
                 ->get()
                 ->map(function (Sensor $sensor) use ($userWarning, $userCritical): array {
@@ -168,8 +176,17 @@ class HealthSensorsController extends WidgetController
         $settings['device_regex'] = trim((string) ($settings['device_regex'] ?? ''));
         $settings['rows'] = isset($settings['rows']) && is_numeric($settings['rows']) ? (int) $settings['rows'] : 4;
         $settings['cols'] = isset($settings['cols']) && is_numeric($settings['cols']) ? (int) $settings['cols'] : 3;
-        $settings['rows'] = max(1, min(48, $settings['rows']));
+        $settings['rows'] = max(1, min(self::MAX_ENTRIES, $settings['rows']));
         $settings['cols'] = max(1, min(12, $settings['cols']));
+
+        $settings['sort_by'] = match ((string) ($settings['sort_by'] ?? 'descr')) {
+            'value' => 'value',
+            default => 'descr',
+        };
+        $settings['sort_order'] = match (strtolower((string) ($settings['sort_order'] ?? 'asc'))) {
+            'desc' => 'desc',
+            default => 'asc',
+        };
 
         $sensorClassRegex = trim((string) ($settings['sensor_class_regex'] ?? ''));
         $settings['sensor_class_regex'] = $sensorClassRegex === '' ? '.*' : $sensorClassRegex;
@@ -190,13 +207,15 @@ class HealthSensorsController extends WidgetController
         return view('widgets.settings.health-sensors', $settings);
     }
 
-    private function maxEntries(int $rows, int $cols): int
+    private function maxEntries(int $rows, int $cols, string $displayMode = 'number'): int
     {
-        $rows = max(1, min(50, $rows));
+        $rows = max(1, min(self::MAX_ENTRIES, $rows));
         $cols = max(1, min(12, $cols));
 
+        $entries = $displayMode === 'table' ? $rows : $rows * $cols;
+
         // safety cap to avoid accidentally rendering huge widgets
-        return max(1, min(48, $rows * $cols));
+        return max(1, min(self::MAX_ENTRIES, $entries));
     }
 
     private function thresholdStatus(?float $value, ?float $lowWarn, ?float $lowCrit, ?float $highWarn, ?float $highCrit): string

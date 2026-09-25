@@ -51,4 +51,27 @@ final class ApiTransportTest extends TestCase
             $request->url() == 'https://librenms.org?text=This%20is%20a%20post%20multi-line%0Aalert.' &&
             $request->body() == "bodytext=This is a post multi-line\nalert.");
     }
+
+    public function testNullOptionalConfigFieldsDoNotThrow(): void
+    {
+        /** @var AlertTransport $transport */
+        $transport = AlertTransport::factory()->api('', 'post', '')->make();
+
+        // Optional textarea fields (options, headers, body) are stored as null when left blank
+        // on transports created before these fields existed, or cleared via the API. See #20418.
+        $config = $transport->transport_config;
+        $config['api-options'] = null;
+        $config['api-headers'] = null;
+        $config['api-body'] = null;
+        $transport->transport_config = $config;
+
+        LaravelHttp::fake([
+            '*' => LaravelHttp::response(),
+        ]);
+
+        $result = $transport->instance()->deliverAlert(['msg' => 'test']);
+
+        $this->assertTrue($result);
+        LaravelHttp::assertSentCount(1);
+    }
 }

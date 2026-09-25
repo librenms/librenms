@@ -65,11 +65,11 @@ class Route extends PortRelatedModel implements Keyable
 
     // ---- Define Relationships ----
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Port, $this>
+     * @return BelongsTo<Device, $this>
      */
-    public function port(): BelongsTo
+    public function device(): BelongsTo
     {
-        return $this->belongsTo(Port::class, 'port_id', 'port_id');
+        return $this->belongsTo(Device::class, 'device_id');
     }
 
     public function getCompositeKey(): string

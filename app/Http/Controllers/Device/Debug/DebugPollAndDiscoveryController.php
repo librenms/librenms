@@ -34,6 +34,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\Rule;
+use LibreNMS\Util\Debug;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DebugPollAndDiscoveryController extends Controller
@@ -49,6 +50,7 @@ class DebugPollAndDiscoveryController extends Controller
             'type' => ['required', Rule::in(['poller', 'discovery'])],
         ]);
 
+        Debug::enableQueryDebug();
         if ($validated['format'] == 'download') {
             $this->enableDownload($validated['type'] . '-' . $device->hostname . '.txt');
         }

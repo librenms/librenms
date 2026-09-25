@@ -77,7 +77,6 @@ return [
             'programs' => 'Programs',
             'python' => 'Python',
             'rrd' => 'RRD',
-            'rrdcheck' => 'RRD Check',
             'scheduler' => 'Scheduler',
             'system' => 'System',
             'updates' => 'Updates',

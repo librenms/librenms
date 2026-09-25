@@ -80,7 +80,7 @@ class Rrd extends BaseDatastore
         $this->rrdcached = LibrenmsConfig::get('rrdcached', false);
         $this->rrd_dir = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
         $this->step = LibrenmsConfig::get('rrd.step', 300);
-        $this->rra = preg_split('/s+/', trim(LibrenmsConfig::get(
+        $this->rra = preg_split('/\s+/', trim(LibrenmsConfig::get(
             'rrd_rra',
             'RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ' .
             ' RRA:MIN:0.5:1:2016 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:1440     RRA:MIN:0.5:288:1440 ' .
@@ -157,25 +157,6 @@ class Rrd extends BaseDatastore
         } catch (RrdException $e) {
             Log::error('RRD Error %r' . $e->getMessage() . '%n', ['color' => true]);
         }
-    }
-
-    /**
-     * @throws RrdException
-     */
-    public function lastUpdate(string $filename): ?TimeSeriesPoint
-    {
-        $output = $this->command('lastupdate', $filename);
-
-        if (preg_match('/((?: \w+)+)\n\n(\d+):((?: [\d.-]+)+)\nOK/', $output, $matches)) {
-            $data = array_combine(
-                explode(' ', ltrim($matches[1])),
-                explode(' ', ltrim($matches[3])),
-            );
-
-            return new TimeSeriesPoint((int) $matches[2], $data);
-        }
-
-        return null;
     }
 
     /**

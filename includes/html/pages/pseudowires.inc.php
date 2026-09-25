@@ -4,9 +4,7 @@ use LibreNMS\Util\Url;
 
 $pagetitle[] = 'Pseudowires';
 
-if (! isset($vars['view'])) {
-    $vars['view'] = 'detail';
-}
+$vars['view'] ??= 'detail';
 
 $link_array = ['page' => 'pseudowires'];
 

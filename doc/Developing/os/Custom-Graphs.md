@@ -1,3 +1,5 @@
+# Custom Device Graphs
+
 First define your graphs in
 `resources/definitions/config_definitions.json`. Your work is then
 available to everyone.

@@ -48,7 +48,7 @@ class Availability extends Component
         $deviceCreated = $this->device->inserted?->timestamp;
         $okThreshold = (float) LibrenmsConfig::get('availablity.threshold_ok', 99.9);
         $warningThreshold = (float) LibrenmsConfig::get('availablity.threshold_warning', 95);
-        $currentDay = $start->copy()->startOfDay();
+        $currentDay = $now->copy()->subDays($days - 1)->startOfDay();
         $dayData = [];
 
         for ($day = 0; $day < $days; $day++) {

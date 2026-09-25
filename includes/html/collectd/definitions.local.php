@@ -45,9 +45,7 @@ function meta_graph_local($host, $plugin, $plugin_instance, $type, $type_instanc
     $sources = [];
 
     $title = "$host/$plugin" . (! is_null($plugin_instance) ? "-$plugin_instance" : '') . "/$type";
-    if (! isset($opts['title'])) {
-        $opts['title'] = $title;
-    }
+    $opts['title'] ??= $title;
     $opts['rrd_opts'] = ['-v', 'Events'];
     /*  $opts['colors'] = array(
             'ham'     => '00e000',

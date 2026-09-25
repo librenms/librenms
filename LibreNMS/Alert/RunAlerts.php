@@ -33,7 +33,6 @@ namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Facades\Rrd;
 use App\Models\AlertLog;
 use App\Models\AlertRule;
 use App\Models\AlertTransport;
@@ -47,9 +46,7 @@ use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
-use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
 
 class RunAlerts
@@ -130,18 +127,15 @@ class RunAlerts
         $obj['status_reason'] = $device->status_reason;
 
         if ((new ConnectivityHelper($device))->icmpIsEnabled()) {
-            try {
-                $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
-                if ($last_ping) {
-                    $obj['ping_timestamp'] = $last_ping->timestamp;
-                    $obj['ping_loss'] = Number::calculatePercent($last_ping->get('xmt') - $last_ping->get('rcv'), $last_ping->get('xmt'));
-                    $obj['ping_min'] = $last_ping->get('min');
-                    $obj['ping_max'] = $last_ping->get('max');
-                    $obj['ping_avg'] = $last_ping->get('avg');
-                    $obj['debug'] = 'unsupported';
-                }
-            } catch (RrdException $e) {
-                Log::error("Error getting last ping for device {$device->hostname}: {$e->getMessage()}");
+            if ($device->stats) {
+                $obj['ping_timestamp'] = $device->stats->ping_last_timestamp;
+                $obj['ping_loss'] = $device->stats->ping_loss_last;
+                $obj['ping_min'] = '';
+                $obj['ping_max'] = '';
+                $obj['ping_avg'] = $device->stats->ping_rtt_last;
+                $obj['debug'] = 'unsupported';
+            } else {
+                Log::info("No last ping stats for device {$device->hostname}");
             }
         }
         $extra = $alert['details'];
@@ -167,17 +161,6 @@ class RunAlerts
         $template = $tpl->getTemplate($obj);
 
         if ($alert['state'] >= AlertState::ACTIVE) {
-            $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . $alert['name'];
-            if ($alert['state'] == AlertState::ACKNOWLEDGED) {
-                $obj['title'] .= ' Has been acknowledged';
-            } elseif ($alert['state'] == AlertState::WORSE) {
-                $obj['title'] .= ' Has worsened';
-            } elseif ($alert['state'] == AlertState::BETTER) {
-                $obj['title'] .= ' Has improved';
-            } elseif ($alert['state'] == AlertState::CHANGED) {
-                $obj['title'] .= ' changed';
-            }
-
             foreach ($extra['rule'] as $incident) {
                 $i++;
                 $obj['faults'][$i] = $incident;
@@ -208,7 +191,6 @@ class RunAlerts
             $extra['count'] = 0;
             dbUpdate(['details' => gzcompress(json_encode($id['details']), 9)], 'alert_log', 'id = ?', [$alert['id']]);
 
-            $obj['title'] = $template->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']);
             $obj['elapsed'] = Time::formatInterval(strtotime((string) $alert['time_logged']) - strtotime((string) $id['time_logged']), true) ?: 'none';
             $obj['id'] = $id['id'];
             foreach ($extra['rule'] as $incident) {
@@ -317,10 +299,7 @@ class RunAlerts
     {
         foreach ($this->loadAlerts('alerts.state = ' . AlertState::ACKNOWLEDGED . ' AND alerts.open = ' . AlertState::ACTIVE) as $alert) {
             $rextra = json_decode((string) $alert['extra'], true);
-            if (! isset($rextra['acknowledgement'])) {
-                // backwards compatibility check
-                $rextra['acknowledgement'] = true;
-            }
+            $rextra['acknowledgement'] ??= true;
 
             if ($rextra['acknowledgement']) {
                 // Rule is set to send an acknowledgement alert
@@ -518,15 +497,9 @@ class RunAlerts
             $noacc = false;
             $updet = false;
             $rextra = json_decode((string) $alert['extra'], true);
-            if (! isset($rextra['recovery'])) {
-                // backwards compatibility check
-                $rextra['recovery'] = true;
-            }
+            $rextra['recovery'] ??= true;
 
-            if (! isset($alert['details']['count'])) {
-                // make sure count is set for below code, in legacy code null would get type juggled to 0
-                $alert['details']['count'] = 0;
-            }
+            $alert['details']['count'] ??= 0;
 
             $status_check = DB::table('devices')
                 ->where('device_id', $alert['device_id'])
@@ -704,9 +677,8 @@ class RunAlerts
                 $transport_title = "Transport {$item['transport_type']}";
                 $obj['transport'] = $item['transport_type'];
                 $obj['transport_name'] = $item['transport_name'];
-                $obj['alert'] = new AlertData($obj);
                 $obj['title'] = $type->getTitle($obj);
-                $obj['alert']['title'] = $obj['title'];
+                $obj['alert'] = new AlertData($obj);
                 $obj['msg'] = $type->getBody($obj);
                 c_echo(" :: $transport_title => ");
                 try {

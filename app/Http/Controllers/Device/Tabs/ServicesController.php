@@ -26,12 +26,12 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Services;
 use LibreNMS\Util\Time;
 
 class ServicesController implements DeviceTab
@@ -80,7 +80,7 @@ class ServicesController implements DeviceTab
                 $graphs = [];
                 if ($view === 'details') {
                     $serviceDs = htmlspecialchars_decode((string) $service->service_ds);
-                    $checkScript = LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower((string) $service->service_type) . '.inc.php';
+                    $checkScript = Services::customCheckPath($service->service_type);
                     if (is_file($checkScript)) {
                         include $checkScript;
                         if (isset($check_ds) && is_string($check_ds)) {

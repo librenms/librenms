@@ -14,9 +14,9 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services?state=2
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services?state=0&type=tcp
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/services
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/services?state=2
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/services?state=0&type=tcp
 ```
 
 Output:
@@ -85,9 +85,9 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services/:hostname
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services/:hostname?state=2
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services/:hostname?state=0&type=tcp
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/services/:hostname
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/services/:hostname?state=2
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/services/:hostname?state=0&type=tcp
 ```
 
 Output:
@@ -139,7 +139,7 @@ Input:
 Example:
 
 ```curl
-curl -X POST -d '{"type":"ping","ip": "192.168.1.10","desc":"test ping","param": "-t 10 -c 5"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services/192.168.1.10
+curl -X POST -d '{"type":"ping","ip": "192.168.1.10","desc":"test ping","param": "-t 10 -c 5"}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/services/192.168.1.10
 ```
 
 Output:
@@ -166,7 +166,7 @@ Input:
 Example:
 
 ```curl
-curl -X PATCH -d '{"service_disabled":"1"}' 'X-Auth-Token:YOUR-API-TOKEN' https://foo.example/api/v0/services/5
+curl -X PATCH -d '{"service_disabled":"1"}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/services/5
 ```
 
 Output:
@@ -194,7 +194,7 @@ Input:
 Example:
 
 ```curl
-curl -X DELETE -H 'X-Auth-Token:YOUR-API-TOKEN' https://foo.example/api/v0/services/35
+curl -X DELETE -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/services/35
 ```
 
 Output:

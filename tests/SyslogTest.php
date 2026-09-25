@@ -29,6 +29,7 @@ namespace LibreNMS\Tests;
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Syslog\Entry;
 use LibreNMS\Syslog\Processor;
 
 final class SyslogTest extends DBTestCase
@@ -61,23 +62,21 @@ final class SyslogTest extends DBTestCase
         $this->processor = new Processor;
     }
 
-    private function fillLine($line)
+    private function createExpected(string $line, array $resultDelta): Entry
     {
-        $entry = [];
-        [$entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']] = explode('||', trim((string) $line));
+        [$host, $facility, $priority, $level, $tag, $timestamp, , $program] = explode('||', trim($line));
 
-        return $entry;
-    }
-
-    private function createData($line, $resultDelta)
-    {
-        $entry = $this->fillLine($line);
-        $data = [];
-        $data['input'] = $entry;
-        unset($entry['msg']); // empty msg
-        $data['result'] = array_merge($entry, $resultDelta, ['device_id' => $this->device_id]);
-
-        return $data;
+        return new Entry(
+            host: $host,
+            facility: $facility,
+            priority: $priority,
+            level: $level,
+            tag: $tag,
+            timestamp: $timestamp,
+            msg: $resultDelta['msg'] ?? '',
+            program: $resultDelta['program'] ?? $program,
+            device_id: $this->device_id,
+        );
     }
 
     /**
@@ -86,11 +85,13 @@ final class SyslogTest extends DBTestCase
      * @param  string  $inputline  The line from the syslog daemon including the ||'s
      * @param  array  $modified  of the modified fields, most likely containging the keys program and msg
      */
-    private function checkSyslog($inputline, $modified)
+    private function checkSyslog(string $inputline, array $modified): void
     {
-        $data = $this->createData($inputline, $modified);
-        $res = $this->processor->process($data['input'], false);
-        $this->assertEquals($data['result'], $res);
+        $expected = $this->createExpected($inputline, $modified);
+        $entry = $this->processor->parseLogLine($inputline);
+        $this->assertNotNull($entry);
+        $res = $this->processor->parse($entry);
+        $this->assertEquals($expected, $res);
     }
 
     public function testCiscoSyslog(): void
