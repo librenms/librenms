@@ -73,7 +73,7 @@ class ServicesTabTest extends TestCase
             ->assertOk()
             ->assertSee('Ping Check')
             ->assertSee('Round Trip Average')
-            ->assertSeeInOrder(['Last Checked', 'Ping Check', '3 days', 'Not yet recorded'])
+            ->assertSeeInOrder(['Last Checked', 'Ping Check', '3 days', 'No check recorded'])
             ->assertSee('colspan="8"', false);
     }
 
@@ -92,7 +92,7 @@ class ServicesTabTest extends TestCase
             ->assertOk()
             ->assertSeeInOrder(['Steady service', 'No status change recorded', '5 minutes'])
             ->assertDontSee('Waiting for first check')
-            ->assertDontSee('Not yet recorded');
+            ->assertDontSee('No check recorded');
     }
 
     public function testGlobalServicesPageShowsRecordedAndUnknownCheckTimes(): void
@@ -133,10 +133,10 @@ class ServicesTabTest extends TestCase
                     '5 minutes',
                     'Unrecorded Check',
                     '3 days',
-                    'Not yet recorded',
+                    'No check recorded',
                     'Waiting Check',
                     'No status change recorded',
-                    'Not yet recorded',
+                    'No check recorded',
                 ])
                 ->assertDontSee('Waiting for first check')
                 ->assertDontSee('years');

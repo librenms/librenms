@@ -131,10 +131,9 @@ device. Examples are procs, inodes, and load.
 The Services list and a device's Services page display **Last Checked**
 and **Last Changed**. Last Checked shows when the most recent check
 completed, including checks that return Warning or Critical. Last Changed
-shows when the service status last changed. A check updates Last Checked
-even when its status stays the same.
+shows when the service status last changed.
 
-Last Checked displays **Not yet recorded** until a check time is recorded.
+Last Checked displays **No check recorded** until a check time is recorded.
 Upgrades do not backfill historical check times, so existing services show
 this text until their next completed check.
 
@@ -142,9 +141,7 @@ Last Changed displays **No status change recorded** when no status change
 time is available, even if the service has already been checked.
 
 The [Services API](../API/Services.md#list_services) exposes these times
-and the configured global Dispatcher check interval. This interval is not
-a measured polling interval or a scheduled next check time; cron schedules
-can differ.
+alongside the existing service information.
 
 ![Service check timing in the Services list](../img/service-check-timing.jpg)
 

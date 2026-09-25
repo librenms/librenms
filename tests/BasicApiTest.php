@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Tests;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\ApiToken;
 use App\Models\Device;
 use App\Models\Service;
@@ -56,43 +55,47 @@ final class BasicApiTest extends DBTestCase
     }
 
     #[DataProvider('serviceListTimingProvider')]
-    public function testListServicesIncludesCheckTiming(bool $deviceOnly, int $frequency): void
+    public function testListServicesIncludesCheckTiming(bool $deviceOnly): void
     {
         /** @var User $user */
         $user = User::factory()->admin()->create();
         $token = ApiToken::generateToken($user);
         $device = Device::factory()->create();
         $checkedAt = 1787468400;
-        $service = Service::factory()->for($device)->create(['service_checked' => $checkedAt]);
+        $service = Service::factory()->for($device)->create([
+            'service_checked' => $checkedAt,
+            'service_name' => 'HTTP availability',
+            'service_type' => 'http',
+            'service_desc' => 'Public web endpoint',
+            'service_status' => 2,
+            'service_message' => 'HTTP CRITICAL',
+        ]);
         $neverChecked = Service::factory()->for($device)->create();
-        $originalFrequency = LibrenmsConfig::get('service_services_frequency');
 
-        try {
-            LibrenmsConfig::set('service_services_frequency', $frequency);
+        $url = $deviceOnly ? "/api/v0/services/{$device->device_id}" : '/api/v0/services';
+        $response = $this->json('GET', $url, [], ['X-Auth-Token' => $token->token_hash])
+            ->assertStatus(200)
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonCount(2, 'services.0');
 
-            $url = $deviceOnly ? "/api/v0/services/{$device->device_id}" : '/api/v0/services';
-            $response = $this->json('GET', $url, [], ['X-Auth-Token' => $token->token_hash])
-                ->assertStatus(200)
-                ->assertJsonPath('status', 'ok')
-                ->assertJsonCount(2, 'services.0');
-
-            $services = array_column($response->json('services.0'), null, 'service_id');
-            $this->assertSame($checkedAt, $services[$service->service_id]['service_checked']);
-            $this->assertSame(0, $services[$neverChecked->service_id]['service_checked']);
-            $this->assertSame($frequency, $services[$service->service_id]['service_check_interval']);
-            $this->assertSame($frequency, $services[$neverChecked->service_id]['service_check_interval']);
-        } finally {
-            LibrenmsConfig::set('service_services_frequency', $originalFrequency);
-        }
+        $services = array_column($response->json('services.0'), null, 'service_id');
+        $result = $services[$service->service_id];
+        $this->assertSame($checkedAt, $result['service_checked']);
+        $this->assertSame(0, $services[$neverChecked->service_id]['service_checked']);
+        $this->assertSame($device->device_id, (int) $result['device_id']);
+        $this->assertSame('HTTP availability', $result['service_name']);
+        $this->assertSame('http', $result['service_type']);
+        $this->assertSame('Public web endpoint', $result['service_desc']);
+        $this->assertSame(2, (int) $result['service_status']);
+        $this->assertSame('HTTP CRITICAL', $result['service_message']);
+        $this->assertArrayNotHasKey('service_check_interval', $result);
     }
 
     public static function serviceListTimingProvider(): array
     {
         return [
-            'all services with default interval' => [false, 300],
-            'device services with default interval' => [true, 300],
-            'all services with custom interval' => [false, 120],
-            'device services with custom interval' => [true, 120],
+            'all services' => [false],
+            'device services' => [true],
         ];
     }
 
