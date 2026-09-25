@@ -35,20 +35,6 @@ use SnmpQuery;
 
 class Xpand extends OS implements WirelessPowerDiscovery, WirelessSnrDiscovery
 {
-    /*
-     * The current firmware exposes a self-describing "measurements" table that is
-     * not covered by any usable MIB, so discovery walks the numeric columns and
-     * selects rows by their name column. The table is indexed by a single
-     * measurement-instance sub-identifier (the last OID element).
-     *
-     *   .2 entity  e.g. /ne/frame-1/slot-4/odu or /ne/frame-1/slot-4/riu
-     *   .3 name    the metric selector (RF INPUT LEVEL, SNR, ...)
-     *   .5 value   already scaled in the reported unit (dBm / dB), no divisor
-     */
-    private const MEAS_ENTITY = '.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.2';
-    private const MEAS_NAME = '.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.3';
-    private const MEAS_VALUE = '.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.5';
-
     private const POWER_MEASUREMENTS = [
         'RF INPUT LEVEL' => 'RX Main',
         'RF INPUT LEVEL SPACE' => 'RX Diversity',
@@ -58,6 +44,9 @@ class Xpand extends OS implements WirelessPowerDiscovery, WirelessSnrDiscovery
     private const SNR_MEASUREMENTS = [
         'SNR' => 'SNR',
     ];
+
+    /** @var array<int|string, array{name: string, entity: string, value: string|null}>|null */
+    private ?array $measurements = null;
 
     /**
      * @return \LibreNMS\Device\WirelessSensor[]
@@ -84,36 +73,53 @@ class Xpand extends OS implements WirelessPowerDiscovery, WirelessSnrDiscovery
      */
     private function discoverMeasurements(WirelessSensorType $type, array $wanted): array
     {
-        $names = SnmpQuery::walk(self::MEAS_NAME)->pluck();
-        if (empty($names)) {
-            return [];
-        }
-
-        $entities = SnmpQuery::walk(self::MEAS_ENTITY)->pluck();
-        $values = SnmpQuery::walk(self::MEAS_VALUE)->pluck();
-
         $sensors = [];
-        foreach ($names as $index => $name) {
-            $label = $wanted[$name] ?? null;
+        foreach ($this->measurements() as $index => $measurement) {
+            $label = $wanted[$measurement['name']] ?? null;
             if ($label === null) {
                 continue;
             }
 
-            $value = $values[$index] ?? null;
-            $current = is_numeric($value) ? (float) $value : null;
-
             $sensors[] = new WirelessSensor(
                 $type,
                 $this->getDeviceId(),
-                self::MEAS_VALUE . '.' . $index,
+                '.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.5.' . $index, // measurement value
                 'xpand',
                 $index,
-                trim($this->entityLabel($entities[$index] ?? '') . ' ' . $label),
-                $current
+                trim($this->entityLabel($measurement['entity']) . ' ' . $label),
+                is_numeric($measurement['value']) ? (float) $measurement['value'] : null
             );
         }
 
         return $sensors;
+    }
+
+    /**
+     * Walk the self-describing measurements table once and cache it. There is no
+     * usable MIB for this firmware, so the numeric columns are read directly and
+     * rows are selected by their name column. Indexed by the measurement-instance
+     * sub-identifier (the last OID element).
+     *
+     * @return array<int|string, array{name: string, entity: string, value: string|null}>
+     */
+    private function measurements(): array
+    {
+        if ($this->measurements === null) {
+            $names = SnmpQuery::walk('.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.3')->pluck();    // measurement name
+            $entities = SnmpQuery::walk('.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.2')->pluck(); // entity path, e.g. /ne/frame-1/slot-4/odu
+            $values = SnmpQuery::walk('.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.5')->pluck();    // value, already scaled (dBm / dB)
+
+            $this->measurements = [];
+            foreach ($names as $index => $name) {
+                $this->measurements[$index] = [
+                    'name' => (string) $name,
+                    'entity' => (string) ($entities[$index] ?? ''),
+                    'value' => isset($values[$index]) ? (string) $values[$index] : null,
+                ];
+            }
+        }
+
+        return $this->measurements;
     }
 
     /**
