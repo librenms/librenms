@@ -6088,6 +6088,18 @@
             "section": "port-descr",
             "order": 31
         },
+        "peeringdb.api_key": {
+            "default": "",
+            "group": "external",
+            "section": "peeringdb",
+            "order": 1,
+            "type": "password",
+            "when": {
+                "setting": "peeringdb.enabled",
+                "operator": "equals",
+                "value": true
+            }
+        },
         "peeringdb.enabled": {
             "default": false,
             "group": "external",

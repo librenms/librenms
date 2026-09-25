@@ -11,6 +11,7 @@
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\StateTranslation;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -282,100 +283,6 @@ function hytera_h2f($number, $nd)
     }
 
     return number_format($floatfinal, $nd, '.', '');
-}
-
-/**
- * Function to generate PeeringDB Cache
- */
-function cache_peeringdb()
-{
-    if (LibrenmsConfig::get('peeringdb.enabled') === true) {
-        $peeringdb_url = 'https://peeringdb.com/api';
-        // We cache for 71 hours
-        $cached = dbFetchCell('SELECT count(*) FROM `pdb_ix` WHERE (UNIX_TIMESTAMP() - timestamp) < 255600');
-        if ($cached == 0) {
-            $rand = random_int(3, 30);
-            echo "No cached PeeringDB data found, sleeping for $rand seconds" . PHP_EOL;
-            sleep($rand);
-            $peer_keep = [];
-            $ix_keep = [];
-            // Exclude Private and reserved ASN ranges
-            // 64512 - 65534 (Private)
-            // 65535 (Well Known)
-            // 4200000000 - 4294967294 (Private)
-            // 4294967295 (Reserved)
-            foreach (dbFetchRows('SELECT `bgpLocalAs` FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 GROUP BY `bgpLocalAs`') as $as) {
-                $asn = $as['bgpLocalAs'];
-                $get = \LibreNMS\Util\Http::client()->get($peeringdb_url . '/net?depth=2&asn=' . $asn);
-                $json_data = $get->body();
-                $data = json_decode($json_data);
-                $ixs = $data->{'data'}[0]->{'netixlan_set'};
-                foreach ($ixs ?? [] as $ix) {
-                    $ixid = $ix->{'ix_id'};
-                    $tmp_ix = dbFetchRow('SELECT * FROM `pdb_ix` WHERE `ix_id` = ? AND asn = ?', [$ixid, $asn]);
-                    if ($tmp_ix) {
-                        $pdb_ix_id = $tmp_ix['pdb_ix_id'];
-                        $update = ['name' => $ix->{'name'}, 'timestamp' => time()];
-                        dbUpdate($update, 'pdb_ix', '`ix_id` = ? AND `asn` = ?', [$ixid, $asn]);
-                    } else {
-                        $insert = [
-                            'ix_id' => $ixid,
-                            'name' => $ix->{'name'},
-                            'asn' => $asn,
-                            'timestamp' => time(),
-                        ];
-                        $pdb_ix_id = dbInsert($insert, 'pdb_ix');
-                    }
-                    $ix_keep[] = $pdb_ix_id;
-                    $get_ix = \LibreNMS\Util\Http::client()->get("$peeringdb_url/netixlan?ix_id=$ixid");
-                    $ix_json = $get_ix->body();
-                    $ix_data = json_decode($ix_json);
-                    $peers = $ix_data->{'data'};
-                    foreach ($peers ?? [] as $peer) {
-                        $peer_name = \LibreNMS\Util\AutonomousSystem::get($peer->{'asn'})->name();
-                        $tmp_peer = dbFetchRow('SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ? AND `ix_id` = ?', [$peer->{'id'}, $ixid]);
-                        if ($tmp_peer) {
-                            $peer_keep[] = $tmp_peer['pdb_ix_peers_id'];
-                            $update = [
-                                'remote_asn' => $peer->{'asn'},
-                                'remote_ipaddr4' => $peer->{'ipaddr4'},
-                                'remote_ipaddr6' => $peer->{'ipaddr6'},
-                                'name' => $peer_name,
-                            ];
-                            dbUpdate($update, 'pdb_ix_peers', '`pdb_ix_peers_id` = ?', [$tmp_peer['pdb_ix_peers_id']]);
-                        } else {
-                            $peer_insert = [
-                                'ix_id' => $ixid,
-                                'peer_id' => $peer->{'id'},
-                                'remote_asn' => $peer->{'asn'},
-                                'remote_ipaddr4' => $peer->{'ipaddr4'},
-                                'remote_ipaddr6' => $peer->{'ipaddr6'},
-                                'name' => $peer_name,
-                                'timestamp' => time(),
-                            ];
-                            $peer_keep[] = dbInsert($peer_insert, 'pdb_ix_peers');
-                        }
-                    }
-                }
-            }
-
-            // cleanup
-            if (empty($peer_keep)) {
-                \App\Models\PeeringdbIxPeer::query()->delete();
-            } else {
-                \App\Models\PeeringdbIxPeer::whereNotIn('pdb_ix_peers_id', $peer_keep)->delete();
-            }
-            if (empty($ix_keep)) {
-                \App\Models\PeeringdbIx::query()->delete();
-            } else {
-                \App\Models\PeeringdbIx::whereNotIn('pdb_ix_id', $ix_keep)->delete();
-            }
-        } else {
-            echo 'Cached PeeringDB data found.....' . PHP_EOL;
-        }
-    } else {
-        echo 'Peering DB integration disabled' . PHP_EOL;
-    }
 }
 
 /**

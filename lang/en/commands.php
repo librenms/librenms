@@ -303,6 +303,9 @@ return [
             'optionValue' => 'Selected :option is invalid. It must be one of: :values',
         ],
     ],
+    'maintenance:cache-peeringdb' => [
+        'description' => 'Cache PeeringDB exchange and peer data for the local ASNs',
+    ],
     'maintenance:cleanup-database' => [
         'description' => 'Database cleanup of orphaned items.',
     ],
