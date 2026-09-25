@@ -9,24 +9,36 @@ class DevicePollingMethodObserver
     public function saved(DevicePollingMethod $deviceMethod): void
     {
         if (! $deviceMethod->enabled && $deviceMethod->device_id) {
-            $device = $deviceMethod->device;
-            if (! $device) {
-                return;
-            }
+            $this->cleanupStatusReason($deviceMethod);
+        }
+    }
 
-            $typeValue = $deviceMethod->method_type->value;
-            $reasons = collect(explode(',', (string) $device->status_reason))
-                ->reject(fn ($v) => $v === $typeValue)
-                ->filter()
-                ->implode(',');
+    public function deleted(DevicePollingMethod $deviceMethod): void
+    {
+        if ($deviceMethod->device_id) {
+            $this->cleanupStatusReason($deviceMethod);
+        }
+    }
 
-            if ($device->status_reason !== $reasons) {
-                $device->status_reason = $reasons;
-                if ($device->status == 0 && empty($reasons)) {
-                    $device->status = 1;
-                }
-                $device->save();
+    private function cleanupStatusReason(DevicePollingMethod $deviceMethod): void
+    {
+        $device = $deviceMethod->device;
+        if (! $device) {
+            return;
+        }
+
+        $typeValue = $deviceMethod->method_type->value;
+        $reasons = collect(explode(',', (string) $device->status_reason))
+            ->reject(fn ($v) => $v === $typeValue)
+            ->filter()
+            ->implode(',');
+
+        if ($device->status_reason !== $reasons) {
+            $device->status_reason = $reasons;
+            if ($device->status == 0 && empty($reasons)) {
+                $device->status = 1;
             }
+            $device->save();
         }
     }
 }
