@@ -13,6 +13,10 @@ if ($os_specific_bgp_discovery) {
     include base_path("includes/discovery/bgp-peers/{$device['os']}.inc.php");
 }
 
+if ($device['os'] === 'vrp') {
+    return;
+}
+
 if (empty($bgpLocalAs)) {
     $bgpLocalAs = \SnmpQuery::get('BGP4-MIB::bgpLocalAs.0')->value();
 }
