@@ -146,9 +146,9 @@ final class SnmpConfig extends PollingMethodConfig
         );
     }
 
-    public static function fromPollingMethod(DevicePollingMethod $deviceMethod, ?SnmpSecretData $secretData = null): self
+    public static function fromPollingMethod(DevicePollingMethod $deviceMethod): self
     {
-        $secretData ??= $deviceMethod->secret ? SnmpSecretData::fromArray($deviceMethod->secret->data ?? []) : new SnmpSecretData();
+        $secretData = $deviceMethod->secret ? SnmpSecretData::fromArray($deviceMethod->secret->data ?? []) : new SnmpSecretData();
 
         return self::fromSettingsAndSecretData(
             settings: $deviceMethod->settings ?? [],

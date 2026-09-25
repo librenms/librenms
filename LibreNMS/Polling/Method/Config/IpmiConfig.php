@@ -28,14 +28,14 @@ final class IpmiConfig extends PollingMethodConfig
         return ! empty($this->username) && ! empty($this->password);
     }
 
-    public static function fromPollingMethod(DevicePollingMethod $deviceMethod, ?IpmiSecretData $secretData = null): self
+    public static function fromPollingMethod(DevicePollingMethod $deviceMethod): self
     {
         if ($deviceMethod->method_type !== PollingMethodType::Ipmi) {
             throw new \Exception('Invalid polling method type');
         }
 
         $settings = $deviceMethod->settings ?? [];
-        $secretData ??= $deviceMethod->secret ? IpmiSecretData::fromArray($deviceMethod->secret->data ?? []) : new IpmiSecretData();
+        $secretData = $deviceMethod->secret ? IpmiSecretData::fromArray($deviceMethod->secret->data ?? []) : new IpmiSecretData();
 
         return new self(
             $deviceMethod->enabled ?? true,
