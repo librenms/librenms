@@ -209,7 +209,7 @@ if ($previous && ! $nototal && ! empty($rrd_list)) {
     $rrd_options[] = 'VDEF:percentile_outX=outbitsX,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
     $rrd_options[] = 'CDEF:dpercentile_outXn=doutbitsX,' . $stacked['stacked'] . ',*';
     $rrd_options[] = 'VDEF:dpercentile_outXperc=dpercentile_outXn,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
-    $rrd_options[] = 'CDEF:dpercentile_outXnd=doutbitsX,doutbitsX,-,dpercentile_outXperc,-1,*,+';
+    $rrd_options[] = 'CDEF:dpercentile_outXnd=doutbitsX,doutbitsX,-,dpercentile_outXperc,' . $stacked['stacked'] . ',*,+';
     $rrd_options[] = 'VDEF:dpercentile_outXpercn=dpercentile_outXnd,FIRST';
     $rrd_options[] = 'VDEF:totinX=inBX,TOTAL';
     $rrd_options[] = 'VDEF:aveinX=inbitsX,AVERAGE';

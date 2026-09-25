@@ -713,7 +713,12 @@ function get_oxidized_nodes_list()
  */
 function generate_stacked_graphs($force_stack = false, $transparency = '88')
 {
-    if (LibrenmsConfig::get('webui.graph_stacked') == true || $force_stack == true) {
+    $user = Auth::user();
+    $user?->loadMissing('preferences');
+    $same_axis = $user ? \App\Models\UserPref::getPref($user, 'traffic_same_axis') : null;
+    $enabled = $same_axis === null ? LibrenmsConfig::get('webui.graph_stacked') : (bool) $same_axis;
+
+    if ($enabled || $force_stack == true) {
         return ['transparency' => $transparency, 'stacked' => '1'];
     } else {
         return ['transparency' => '', 'stacked' => '-1'];

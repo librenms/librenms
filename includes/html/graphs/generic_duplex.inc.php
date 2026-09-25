@@ -23,6 +23,7 @@ $stacked = generate_stacked_graphs();
 $length = 10;
 $percentile ??= false;
 $print_total ??= false;
+$format ??= '';
 
 if (! isset($percentile)) {
     $length += 2;

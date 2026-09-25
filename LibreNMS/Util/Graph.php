@@ -206,6 +206,10 @@ class Graph
                 throw new RrdGraphException('Graph Definition Error', 'Def Error', $width, $height);
             }
 
+            if (generate_stacked_graphs()['stacked'] === '1') {
+                $rrd_options = \LibreNMS\Data\Graphing\TrafficGraphStyle::sameAxis($rrd_options);
+            }
+
             return [...$graph_params->toRrdOptions(), ...$rrd_options];
         } finally {
             if ($previousCwd !== false) {

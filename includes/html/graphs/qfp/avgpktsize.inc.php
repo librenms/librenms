@@ -50,7 +50,7 @@ $rrd_options[] = 'CDEF:out_throughput=out_bits,8,/';
 
 $rrd_options[] = 'CDEF:in_avg=in_throughput,in_packets,/';
 $rrd_options[] = 'CDEF:out_avg_tmp=out_throughput,out_packets,/';
-$rrd_options[] = 'CDEF:out_avg=out_avg_tmp,-1,*';
+$rrd_options[] = 'CDEF:out_avg=out_avg_tmp,' . $stacked['stacked'] . ',*';
 
 $rrd_options[] = 'AREA:in_avg#' . $colour_area_in . $stacked['transparency'] . ':';
 $rrd_options[] = 'COMMENT:Average packet size\\n';
