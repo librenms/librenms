@@ -719,8 +719,10 @@ class EditPollingControllerTest extends TestCase
 
         $freshMethod = $method->fresh();
         $this->assertEquals(['ip_version' => 'ipv6'], $freshMethod->settings);
-        $config = $device->fresh()->pollingConfig(PollingMethodType::Icmp);
+        $config = $device->fresh()->pollingMethodFor()->icmp();
         $this->assertSame('ipv6', $config->ipVersion);
-        $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $config->addressFamily($device));
+        $icmpMethod = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Icmp);
+        $this->assertInstanceOf(\LibreNMS\Polling\Method\Methods\IcmpPollingMethod::class, $icmpMethod);
+        $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($device->fresh(), $config));
     }
 }

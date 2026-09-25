@@ -9,6 +9,8 @@ use App\Models\Secret;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\SecretDecryptionException;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Tests\TestCase;
 
@@ -157,7 +159,7 @@ final class PollingMethodProbeTest extends TestCase
         $method2->setRelation('device', $device2);
         $method2->setRelation('secret', $sharedSecret);
 
-        $snmpMethod = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Snmp);
+        $snmpMethod = new SnmpPollingMethod();
 
         $config1 = $snmpMethod->config($method1);
         $config2 = $snmpMethod->config($method2);
@@ -299,7 +301,7 @@ final class PollingMethodProbeTest extends TestCase
         ]);
         $method->setRelation('device', $device);
 
-        $config = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Ipmi)->config($method);
+        $config = (new IpmiPollingMethod())->config($method);
         $this->assertEquals('lanplus', $config->type);
     }
 
@@ -336,7 +338,7 @@ final class PollingMethodProbeTest extends TestCase
         ]);
         $method->setRelation('device', $device);
 
-        $config = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Snmp)->config($method);
+        $config = (new SnmpPollingMethod())->config($method);
         $this->assertEquals('tcp6', $config->transport);
 
         \App\Facades\LibrenmsConfig::set('snmp.transports.0', 'udp');
@@ -457,7 +459,7 @@ final class PollingMethodProbeTest extends TestCase
                 $config,
                 \Mockery::type(\LibreNMS\Data\Source\Snmp\SnmpQueryOptions::class)
             )
-            ->andReturn(new \LibreNMS\Data\Source\Snmp\RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = OID: SNMPv2-SMI::enterprises.9.1.1', 0));
+            ->andReturn(new \LibreNMS\Data\Source\Snmp\RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = OID: SNMPv2-SMI::enterprises.9.1.1', '', 0));
 
         $method = new \LibreNMS\Polling\Method\Methods\SnmpPollingMethod($mockBackend);
         $result = $method->probe($device, $config);

@@ -278,9 +278,9 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertSame('ipv6', $fromMethodConfig->ipVersion);
         $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($deviceIpv4, $fromMethodConfig));
 
-        // Test Device::pollingConfig()
+        // Test Device::pollingMethodFor()
         $deviceIpv4->setRelation('pollingMethods', collect([$deviceMethod]));
-        $this->assertSame('ipv6', $deviceIpv4->pollingConfig(PollingMethodType::Icmp)->ipVersion);
+        $this->assertSame('ipv6', $deviceIpv4->pollingMethodFor()->icmp()->ipVersion);
         $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($deviceIpv4));
     }
 }
