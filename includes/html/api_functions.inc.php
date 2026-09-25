@@ -3003,6 +3003,10 @@ function get_devices_by_group(Illuminate\Http\Request $request)
         return api_error(404, 'No devices found in group ' . $name);
     }
 
+    if ($request->input('full')) {
+        return api_success(DeviceResource::collection($devices)->resolve(), 'devices');
+    }
+
     return api_success($devices->makeHidden('pivot')->toArray(), 'devices');
 }
 
