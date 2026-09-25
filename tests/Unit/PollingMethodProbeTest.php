@@ -48,9 +48,6 @@ final class PollingMethodProbeTest extends TestCase
             'affects_availability' => true,
             'enabled' => true,
         ]);
-        $unixMethod->setRelation('device', $device);
-        $device->setRelation('pollingMethods', collect([$unixMethod]));
-
         $method = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::UnixAgent);
 
         $result = $method->probe($device, $method->config($unixMethod));
@@ -138,16 +135,12 @@ final class PollingMethodProbeTest extends TestCase
             ],
         ]);
 
-        $device1 = new Device(['hostname' => 'device1.example.com']);
-        $device2 = new Device(['hostname' => 'device2.example.com']);
-
         $method1 = new DevicePollingMethod([
             'method_type' => PollingMethodType::Snmp,
             'settings' => ['port' => 161, 'transport' => 'udp'],
             'affects_availability' => true,
             'enabled' => true,
         ]);
-        $method1->setRelation('device', $device1);
         $method1->setRelation('secret', $sharedSecret);
 
         $method2 = new DevicePollingMethod([
@@ -156,7 +149,6 @@ final class PollingMethodProbeTest extends TestCase
             'affects_availability' => false,
             'enabled' => false,
         ]);
-        $method2->setRelation('device', $device2);
         $method2->setRelation('secret', $sharedSecret);
 
         $snmpMethod = new SnmpPollingMethod();
@@ -292,14 +284,11 @@ final class PollingMethodProbeTest extends TestCase
 
     public function testIpmiConfigReadsFromPollingMethodSettings(): void
     {
-        $device = new Device(['hostname' => 'ipmi.example.com']);
-
         $method = new DevicePollingMethod([
             'method_type' => PollingMethodType::Ipmi,
             'settings' => ['type' => 'lanplus'],
             'enabled' => true,
         ]);
-        $method->setRelation('device', $device);
 
         $config = (new IpmiPollingMethod())->config($method);
         $this->assertEquals('lanplus', $config->type);
@@ -315,8 +304,6 @@ final class PollingMethodProbeTest extends TestCase
             'affects_availability' => true,
             'enabled' => true,
         ]);
-        $unixMethod->setRelation('device', $device);
-        $device->setRelation('pollingMethods', collect([$unixMethod]));
 
         $method = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::UnixAgent);
 
@@ -330,13 +317,11 @@ final class PollingMethodProbeTest extends TestCase
     {
         \App\Facades\LibrenmsConfig::set('snmp.transports.0', 'tcp6');
 
-        $device = new Device(['hostname' => 'snmp.example.com']);
         $method = new DevicePollingMethod([
             'method_type' => PollingMethodType::Snmp,
             'settings' => [],
             'enabled' => true,
         ]);
-        $method->setRelation('device', $device);
 
         $config = (new SnmpPollingMethod())->config($method);
         $this->assertEquals('tcp6', $config->transport);
