@@ -12,6 +12,7 @@ use LibreNMS\Exceptions\IpmiConnectionFailed;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\ProbeResult;
+use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
 
 final class IpmiPollingMethod extends PollingMethod
 {
@@ -55,10 +56,10 @@ final class IpmiPollingMethod extends PollingMethod
 
     /**
      * @param  Device  $device
-     * @param  IpmiConfig|null  $config
+     * @param  IpmiConfig  $config
      * @return ProbeResult
      */
-    public function probe(Device $device, ?PollingMethodConfig $config = null): ProbeResult
+    public function probe(Device $device, PollingMethodConfig $config): ProbeResult
     {
         $ipmiConfig = $config instanceof IpmiConfig ? $config : null;
         $ipmi = Ipmitool::init($device, $ipmiConfig);
@@ -87,14 +88,28 @@ final class IpmiPollingMethod extends PollingMethod
 
     public function config(DevicePollingMethod $deviceMethod): IpmiConfig
     {
-        return IpmiConfig::fromPollingMethod($deviceMethod);
+        $settings = $deviceMethod->settings ?? [];
+        $secretData = $deviceMethod->secret ? IpmiSecretData::fromArray($deviceMethod->secret->data ?? []) : new IpmiSecretData();
+
+        return new IpmiConfig(
+            $deviceMethod->enabled ?? true,
+            $deviceMethod->affects_availability ?? false,
+            $secretData->username,
+            $secretData->password,
+            $secretData->kgKey,
+            ! empty($settings['hostname']) ? (string) $settings['hostname'] : ($deviceMethod->device ? (string) $deviceMethod->device->hostname : ''),
+            (int) ($settings['port'] ?? 623),
+            (int) ($settings['ciphersuite'] ?? 0),
+            (int) ($settings['timeout'] ?? 3),
+            (string) ($settings['type'] ?? ''),
+        );
     }
 
     public function fallbackConfig(Device $device): IpmiConfig
     {
         $method = $device->pollingMethod(PollingMethodType::Ipmi);
         if ($method) {
-            return IpmiConfig::fromPollingMethod($method);
+            return $this->config($method);
         }
 
         return new IpmiConfig(

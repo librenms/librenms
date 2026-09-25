@@ -5,15 +5,16 @@ namespace LibreNMS\Tests\Unit;
 use App\Actions\Device\CheckDeviceAvailability;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
-use LibreNMS\Data\Source\Snmp\SnmpResponse;
+use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Tests\TestCase;
 use Mockery;
-use SnmpQuery;
 
 final class ConnectivityHelperTest extends TestCase
 {
@@ -232,14 +233,16 @@ final class ConnectivityHelperTest extends TestCase
 
     public function testIsSNMPable(): void
     {
-        SnmpQuery::partialMock()->shouldReceive('get')
+        $mockBackend = Mockery::mock(SnmpBackendInterface::class);
+        $mockBackend->shouldReceive('get')
             ->times(4)
             ->andReturn(
-                new SnmpResponse(['SNMPv2-MIB::sysObjectID.0' => '.1'], '', 0),
-                new SnmpResponse(['SNMPv2-MIB::sysObjectID.0' => '.1'], '', 1),
-                new SnmpResponse([], '', 0),
-                new SnmpResponse([], '', 1)
+                new RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = OID: .1', '', 0),
+                new RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = OID: .1', '', 2),
+                new RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = OID: .1', '', 1),
+                new RawSnmpResponse('', 'Timeout', 1)
             );
+        $this->app->instance(SnmpBackendInterface::class, $mockBackend);
 
         $device = new Device;
         $snmpConfig = new SnmpConfig(
@@ -264,10 +267,10 @@ final class ConnectivityHelperTest extends TestCase
 
         $snmpMethod = app(PollingMethodRegistry::class)->require(PollingMethodType::Snmp);
 
-        $this->assertTrue($snmpMethod->probe($device)->isSuccess());
-        $this->assertTrue($snmpMethod->probe($device)->isSuccess());
-        $this->assertTrue($snmpMethod->probe($device)->isSuccess());
-        $this->assertFalse($snmpMethod->probe($device)->isSuccess());
+        $this->assertTrue($snmpMethod->probe($device, $snmpConfig)->isSuccess());
+        $this->assertTrue($snmpMethod->probe($device, $snmpConfig)->isSuccess());
+        $this->assertTrue($snmpMethod->probe($device, $snmpConfig)->isSuccess());
+        $this->assertFalse($snmpMethod->probe($device, $snmpConfig)->isSuccess());
     }
 }
 
@@ -287,7 +290,8 @@ class CheckDeviceAvailabilityMock
             $methodMock = $this->methodMocks[$typeKey] ?? null;
 
             if ($methodMock) {
-                $result = $methodMock->probe($device);
+                $config = Mockery::mock(PollingMethodConfig::class);
+                $result = $methodMock->probe($device, $config);
                 $deviceMethod->last_check_successful = $result->isSuccess();
                 $deviceMethod->last_checked_at = now();
             }

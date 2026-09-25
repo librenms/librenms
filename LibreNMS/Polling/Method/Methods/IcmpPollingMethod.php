@@ -60,15 +60,15 @@ final class IcmpPollingMethod extends PollingMethod
 
     /**
      * @param  Device  $device
-     * @param  IcmpConfig|null  $config
+     * @param  IcmpConfig  $config
      * @return ProbeResult
      *
      * @throws FpingUnparsableLine
      */
-    public function probe(Device $device, ?PollingMethodConfig $config = null): ProbeResult
+    public function probe(Device $device, PollingMethodConfig $config): ProbeResult
     {
         $fping = app(Fping::class);
-        $icmpConfig = $config instanceof IcmpConfig ? $config : $this->fallbackConfig($device);
+        $icmpConfig = $config instanceof IcmpConfig ? $config : null;
         $status = $fping->ping($device->pollerTarget(), $this->resolveAddressFamily($device, $icmpConfig));
         $hasDuplicates = $status->duplicates > 0;
 
@@ -93,14 +93,18 @@ final class IcmpPollingMethod extends PollingMethod
 
     public function config(DevicePollingMethod $deviceMethod): IcmpConfig
     {
-        return IcmpConfig::fromPollingMethod($deviceMethod);
+        return new IcmpConfig(
+            enabled: $deviceMethod->enabled ?? true,
+            affectsAvailability: $deviceMethod->affects_availability ?? false,
+            ipVersion: $deviceMethod->settings['ip_version'] ?? 'default',
+        );
     }
 
     public function fallbackConfig(Device $device): IcmpConfig
     {
         $method = $device->pollingMethod(PollingMethodType::Icmp);
         if ($method) {
-            return IcmpConfig::fromPollingMethod($method);
+            return $this->config($method);
         }
 
         return new IcmpConfig(enabled: false, affectsAvailability: true, ipVersion: 'default');

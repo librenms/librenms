@@ -98,21 +98,20 @@ final class SnmpPollingMethod extends PollingMethod
 
     /**
      * @param  Device  $device
-     * @param  SnmpConfig|null  $config
+     * @param  SnmpConfig  $config
      * @return ProbeResult
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function probe(Device $device, ?PollingMethodConfig $config = null): ProbeResult
+    public function probe(Device $device, PollingMethodConfig $config): ProbeResult
     {
         $backend = $this->backend ?? resolve(SnmpBackendInterface::class);
-        $snmpConfig = $config instanceof SnmpConfig ? $config : $this->fallbackConfig($device);
 
         $response = $backend->get(
             $device->pollerTarget(),
             ['SNMPv2-MIB::sysObjectID.0'],
-            $snmpConfig,
+            $config,
             SnmpQueryOptions::quickPrint()
         );
 
@@ -135,14 +134,24 @@ final class SnmpPollingMethod extends PollingMethod
 
     public function config(DevicePollingMethod $deviceMethod): SnmpConfig
     {
-        return SnmpConfig::fromPollingMethod($deviceMethod);
+        $secretData = $deviceMethod->secret
+            ? SnmpSecretData::fromArray($deviceMethod->secret->data ?? [])
+            : new SnmpSecretData();
+
+        return SnmpConfig::fromSettingsAndSecretData(
+            settings: $deviceMethod->settings ?? [],
+            secretData: $secretData,
+            os: $deviceMethod->device?->os,
+            enabled: $deviceMethod->enabled ?? false,
+            affectsAvailability: $deviceMethod->affects_availability ?? false,
+        );
     }
 
     public function fallbackConfig(Device $device): SnmpConfig
     {
         $method = $device->pollingMethod(\LibreNMS\Enum\PollingMethodType::Snmp);
         if ($method) {
-            return SnmpConfig::fromPollingMethod($method);
+            return $this->config($method);
         }
 
         if ($device->relationLoaded('pollingMethods') && $device->pollingMethods->isNotEmpty()) {

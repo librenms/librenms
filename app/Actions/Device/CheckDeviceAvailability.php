@@ -25,7 +25,7 @@ readonly class CheckDeviceAvailability
             $method = $this->pollingMethods->require($deviceMethod->method_type);
 
             try {
-                $result = $method->probe($device);
+                $result = $method->probe($device, $method->config($deviceMethod));
 
                 $deviceMethod->last_check_successful = $result->isSuccess();
                 $deviceMethod->last_checked_at = now();

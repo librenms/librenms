@@ -29,7 +29,6 @@ namespace LibreNMS\Polling\Method\Config;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use App\Models\DevicePollingMethod;
 use Illuminate\Support\Arr;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 
@@ -87,7 +86,7 @@ final class SnmpConfig extends PollingMethodConfig
         return false;
     }
 
-    private static function fromSettingsAndSecretData(
+    public static function fromSettingsAndSecretData(
         array $settings,
         SnmpSecretData $secretData,
         ?string $os = 'generic',
@@ -146,18 +145,7 @@ final class SnmpConfig extends PollingMethodConfig
         );
     }
 
-    public static function fromPollingMethod(DevicePollingMethod $deviceMethod): self
-    {
-        $secretData = $deviceMethod->secret ? SnmpSecretData::fromArray($deviceMethod->secret->data ?? []) : new SnmpSecretData();
 
-        return self::fromSettingsAndSecretData(
-            settings: $deviceMethod->settings ?? [],
-            secretData: $secretData,
-            os: $deviceMethod->device?->os,
-            enabled: $deviceMethod->enabled ?? false,
-            affectsAvailability: $deviceMethod->affects_availability ?? false,
-        );
-    }
 
     /**
      * Create from legacy fields. Emergency fallback, do not use.

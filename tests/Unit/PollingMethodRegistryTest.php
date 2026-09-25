@@ -54,8 +54,8 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertInstanceOf(IcmpPollingMethod::class, $icmpMethodDef);
 
         // 2. Method probe
-        $this->assertInstanceOf(ProbeResult::class, $this->pollingMethods->get(PollingMethodType::Snmp)?->probe(new Device()));
-        $this->assertInstanceOf(ProbeResult::class, $this->pollingMethods->get(PollingMethodType::Icmp)?->probe(new Device()));
+        $this->assertInstanceOf(ProbeResult::class, $this->pollingMethods->get(PollingMethodType::Snmp)?->probe(new Device(), new SnmpConfig()));
+        $this->assertInstanceOf(ProbeResult::class, $this->pollingMethods->get(PollingMethodType::Icmp)?->probe(new Device(), new IcmpConfig()));
 
         // 3. secretType and hasSecret on PollingMethod instances
         $this->assertSame(\LibreNMS\Enum\SecretType::Snmp, $snmpMethod->secretType());
@@ -268,13 +268,13 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv4, $icmpMethod->resolveAddressFamily($deviceIpv4, $legacyFollowSnmpConfig));
         $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($deviceIpv6, $legacyFollowSnmpConfig));
 
-        // Test fromPollingMethod
+        // Test PollingMethod::config()
         $deviceMethod = new DevicePollingMethod([
             'method_type' => PollingMethodType::Icmp,
             'enabled' => true,
             'settings' => ['ip_version' => 'ipv6'],
         ]);
-        $fromMethodConfig = IcmpConfig::fromPollingMethod($deviceMethod);
+        $fromMethodConfig = $icmpMethod->config($deviceMethod);
         $this->assertSame('ipv6', $fromMethodConfig->ipVersion);
         $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($deviceIpv4, $fromMethodConfig));
 

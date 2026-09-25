@@ -8,7 +8,6 @@ use App\View\FieldSchema\FieldDefinition;
 use App\View\FieldSchema\HandlesFieldSchema;
 use App\View\FieldSchema\HasFieldSchema;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
@@ -142,7 +141,8 @@ final class FieldSchemaTest extends TestCase
         ]);
         $devicePollingMethod->setRelation('device', $device);
 
-        $config = IpmiConfig::fromPollingMethod($devicePollingMethod);
+        $ipmiMethod = new IpmiPollingMethod();
+        $config = $ipmiMethod->config($devicePollingMethod);
         $this->assertSame('switch.example.com', $config->hostname);
         $this->assertSame(623, $config->port);
         $this->assertSame(3, $config->timeout);
@@ -153,7 +153,7 @@ final class FieldSchemaTest extends TestCase
             'settings' => ['hostname' => 'ipmi.example.com', 'port' => 6230],
         ]);
         $overrideMethod->setRelation('device', $device);
-        $overrideConfig = IpmiConfig::fromPollingMethod($overrideMethod);
+        $overrideConfig = $ipmiMethod->config($overrideMethod);
         $this->assertSame('ipmi.example.com', $overrideConfig->hostname);
         $this->assertSame(6230, $overrideConfig->port);
     }

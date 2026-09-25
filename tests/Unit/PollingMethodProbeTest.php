@@ -26,10 +26,15 @@ final class PollingMethodProbeTest extends TestCase
         $registry = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class);
         $device = new Device();
 
-        $this->assertInstanceOf(ProbeResult::class, $registry->require(PollingMethodType::Snmp)->probe($device));
-        $this->assertInstanceOf(ProbeResult::class, $registry->require(PollingMethodType::Icmp)->probe($device));
-        $this->assertInstanceOf(ProbeResult::class, $registry->require(PollingMethodType::Ipmi)->probe($device));
-        $this->assertInstanceOf(ProbeResult::class, $registry->require(PollingMethodType::UnixAgent)->probe($device));
+        $snmp = $registry->require(PollingMethodType::Snmp);
+        $icmp = $registry->require(PollingMethodType::Icmp);
+        $ipmi = $registry->require(PollingMethodType::Ipmi);
+        $unixAgent = $registry->require(PollingMethodType::UnixAgent);
+
+        $this->assertInstanceOf(ProbeResult::class, $snmp->probe($device, $snmp->fallbackConfig($device)));
+        $this->assertInstanceOf(ProbeResult::class, $icmp->probe($device, $icmp->fallbackConfig($device)));
+        $this->assertInstanceOf(ProbeResult::class, $ipmi->probe($device, $ipmi->fallbackConfig($device)));
+        $this->assertInstanceOf(ProbeResult::class, $unixAgent->probe($device, $unixAgent->fallbackConfig($device)));
     }
 
     public function testUnixAgentProbeUsesResolvedConfigPortAndTimeout(): void
@@ -46,7 +51,7 @@ final class PollingMethodProbeTest extends TestCase
 
         $method = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::UnixAgent);
 
-        $result = $method->probe($device);
+        $result = $method->probe($device, $method->config($unixMethod));
         $this->assertIsBool($result->isSuccess());
         $this->assertEquals(6556, $result->stat('port'));
         $this->assertEquals(5, $result->stat('timeout'));
@@ -152,8 +157,10 @@ final class PollingMethodProbeTest extends TestCase
         $method2->setRelation('device', $device2);
         $method2->setRelation('secret', $sharedSecret);
 
-        $config1 = SnmpConfig::fromPollingMethod($method1);
-        $config2 = SnmpConfig::fromPollingMethod($method2);
+        $snmpMethod = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Snmp);
+
+        $config1 = $snmpMethod->config($method1);
+        $config2 = $snmpMethod->config($method2);
 
         /** 1. Shared secret between devices */
         $this->assertEquals('shared-community', $config1->community);
@@ -173,7 +180,7 @@ final class PollingMethodProbeTest extends TestCase
 
         /** 4. Independent secrets */
         $method2->setRelation('secret', $customSecret);
-        $config2Updated = SnmpConfig::fromPollingMethod($method2);
+        $config2Updated = $snmpMethod->config($method2);
 
         $this->assertEquals('v2c', $config1->version);
         $this->assertEquals('shared-community', $config1->community);
@@ -292,7 +299,7 @@ final class PollingMethodProbeTest extends TestCase
         ]);
         $method->setRelation('device', $device);
 
-        $config = \LibreNMS\Polling\Method\Config\IpmiConfig::fromPollingMethod($method);
+        $config = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Ipmi)->config($method);
         $this->assertEquals('lanplus', $config->type);
     }
 
@@ -311,7 +318,7 @@ final class PollingMethodProbeTest extends TestCase
 
         $method = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::UnixAgent);
 
-        $result = $method->probe($device);
+        $result = $method->probe($device, $method->config($unixMethod));
         $this->assertFalse($result->isSuccess());
         $this->assertEquals(1, $result->stat('port'));
         $this->assertEquals(1, $result->stat('timeout'));
@@ -329,7 +336,7 @@ final class PollingMethodProbeTest extends TestCase
         ]);
         $method->setRelation('device', $device);
 
-        $config = SnmpConfig::fromPollingMethod($method);
+        $config = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Snmp)->config($method);
         $this->assertEquals('tcp6', $config->transport);
 
         \App\Facades\LibrenmsConfig::set('snmp.transports.0', 'udp');
@@ -377,25 +384,25 @@ final class PollingMethodProbeTest extends TestCase
 
         // 1. ip_version = 'default' -> passes null
         $mockFping->shouldReceive('ping')->with('192.0.2.1', null)->once()->andReturn(\LibreNMS\Data\Source\Icmp\FpingResponse::artificialUp('192.0.2.1'));
-        $result = $icmpPollingMethod->probe($device);
+        $result = $icmpPollingMethod->probe($device, $icmpPollingMethod->config($icmpMethod));
         $this->assertTrue($result->isSuccess());
 
         // 2. ip_version = 'match_snmp_transport' -> passes AddressFamily::IPv6 (since transport is udp6)
         $icmpMethod->settings = ['ip_version' => 'match_snmp_transport'];
         $mockFping->shouldReceive('ping')->with('192.0.2.1', \LibreNMS\Enum\AddressFamily::IPv6)->once()->andReturn(\LibreNMS\Data\Source\Icmp\FpingResponse::artificialUp('192.0.2.1'));
-        $result = $icmpPollingMethod->probe($device);
+        $result = $icmpPollingMethod->probe($device, $icmpPollingMethod->config($icmpMethod));
         $this->assertTrue($result->isSuccess());
 
         // 3. ip_version = 'ipv4' -> passes AddressFamily::IPv4
         $icmpMethod->settings = ['ip_version' => 'ipv4'];
         $mockFping->shouldReceive('ping')->with('192.0.2.1', \LibreNMS\Enum\AddressFamily::IPv4)->once()->andReturn(\LibreNMS\Data\Source\Icmp\FpingResponse::artificialUp('192.0.2.1'));
-        $result = $icmpPollingMethod->probe($device);
+        $result = $icmpPollingMethod->probe($device, $icmpPollingMethod->config($icmpMethod));
         $this->assertTrue($result->isSuccess());
 
         // 4. ip_version = 'ipv6' -> passes AddressFamily::IPv6
         $icmpMethod->settings = ['ip_version' => 'ipv6'];
         $mockFping->shouldReceive('ping')->with('192.0.2.1', \LibreNMS\Enum\AddressFamily::IPv6)->once()->andReturn(\LibreNMS\Data\Source\Icmp\FpingResponse::artificialUp('192.0.2.1'));
-        $result = $icmpPollingMethod->probe($device);
+        $result = $icmpPollingMethod->probe($device, $icmpPollingMethod->config($icmpMethod));
         $this->assertTrue($result->isSuccess());
     }
 

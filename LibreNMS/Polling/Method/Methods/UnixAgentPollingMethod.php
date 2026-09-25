@@ -48,14 +48,14 @@ final class UnixAgentPollingMethod extends PollingMethod
 
     /**
      * @param  Device  $device
-     * @param  UnixAgentConfig|null  $config
+     * @param  UnixAgentConfig  $config
      * @return ProbeResult
      */
-    public function probe(Device $device, ?PollingMethodConfig $config = null): ProbeResult
+    public function probe(Device $device, PollingMethodConfig $config): ProbeResult
     {
-        $agentConfig = $config instanceof UnixAgentConfig ? $config : $this->fallbackConfig($device);
-        $agent_port = $agentConfig->port;
-        $timeout = $agentConfig->timeout;
+        $agentConfig = $config instanceof UnixAgentConfig ? $config : null;
+        $agent_port = $agentConfig ? $agentConfig->port : (int) LibrenmsConfig::get('unix-agent.port', 6556);
+        $timeout = $agentConfig ? $agentConfig->timeout : (int) LibrenmsConfig::get('unix-agent.connection-timeout', 10);
         $poller_target = Rewrite::addIpv6Brackets($device->pollerTarget());
 
         try {
@@ -74,14 +74,21 @@ final class UnixAgentPollingMethod extends PollingMethod
 
     public function config(DevicePollingMethod $deviceMethod): UnixAgentConfig
     {
-        return UnixAgentConfig::fromPollingMethod($deviceMethod);
+        $settings = $deviceMethod->settings ?? [];
+
+        return new UnixAgentConfig(
+            enabled: $deviceMethod->enabled ?? true,
+            affectsAvailability: $deviceMethod->affects_availability ?? false,
+            port: (int) ($settings['port'] ?? LibrenmsConfig::get('unix-agent.port', 6556)),
+            timeout: (int) ($settings['timeout'] ?? LibrenmsConfig::get('unix-agent.connection-timeout', 10)),
+        );
     }
 
     public function fallbackConfig(Device $device): UnixAgentConfig
     {
         $method = $device->pollingMethod(PollingMethodType::UnixAgent);
         if ($method) {
-            return UnixAgentConfig::fromPollingMethod($method);
+            return $this->config($method);
         }
 
         return new UnixAgentConfig(
