@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Device;
 
+use App\Actions\Device\BuildDefaultPollingMethods;
 use App\Actions\Device\SetDeviceAvailability;
 use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\StorePollingMethodRequest;
@@ -13,11 +14,13 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
+use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class EditPollingController
@@ -26,6 +29,7 @@ class EditPollingController
 
     public function __construct(
         private readonly PollingMethodRegistry $pollingMethods,
+        private readonly BuildDefaultPollingMethods $buildMethods,
     ) {
     }
 
@@ -154,72 +158,26 @@ class EditPollingController
         }
 
         $credentialMode = $validated['credential_mode'] ?? 'existing';
-        $secretId = isset($validated['secret_id']) ? (int) $validated['secret_id'] : null;
+        $secretId = isset($validated['secret_id']) && $validated['secret_id'] !== '' ? (int) $validated['secret_id'] : null;
         if ($method->hasSecret() && $credentialMode === 'existing' && ! $secretId) {
             throw ValidationException::withMessages([
                 'secret_id' => __('poller.select_credential'),
             ]);
         }
 
-        $forceSave = $request->boolean('force_save');
+        $candidate = $this->buildMethods->buildMethod($device, $type, [
+            'settings' => $request->validatedSettings(),
+            'credential_mode' => $credentialMode,
+            'secret_id' => $secretId,
+            'secret_data' => $method->hasSecret() && $credentialMode === 'new' ? $request->validatedSecretData() : null,
+            'description' => $validated['description'] ?? null,
+            'affects_availability' => $method->defaultAffectsAvailability(),
+        ]);
 
-        if (! $forceSave) {
-            $transientSettings = $request->validatedSettings();
-            $transientSecretData = [];
-            $transientSecret = null;
-            if ($method->hasSecret()) {
-                $secretType = $method->secretType();
-                if ($credentialMode === 'existing' && $secretId !== null) {
-                    $transientSecret = Secret::resolveForType($secretId, $secretType);
-                } else {
-                    $transientSecretData = $request->validatedSecretData();
-                }
-            }
-
-            $transientMethod = new DevicePollingMethod([
-                'method_type' => $type,
-                'settings' => $method->filterOverrides($transientSettings),
-                'affects_availability' => $method->defaultAffectsAvailability(),
-                'enabled' => true,
-            ]);
-            $transientMethod->setRelation('device', $device);
-
-            if ($transientSecret !== null) {
-                $transientMethod->setRelation('secret', $transientSecret);
-                $transientMethod->secret_id = $transientSecret->id;
-            } elseif (! empty($transientSecretData)) {
-                $transientMethod->setRelation('secret', new Secret([
-                    'secret_type' => $method->secretType(),
-                    'data' => $transientSecretData,
-                ]));
-            }
-
-            $existingMethods = $device->pollingMethods->reject(fn ($m) => $m->method_type === $type);
-            $testDevice = clone $device;
-            $testDevice->setRelation('pollingMethods', $existingMethods->concat([$transientMethod]));
-
-            $probeResult = $method->probe($testDevice);
-
+        if (! $request->boolean('force_save')) {
+            $probeResult = $method->discover($device, $candidate);
             if (! $probeResult->isSuccess()) {
-                $errorDetails = $probeResult->errorMessage();
-
-                if ($request->wantsJson()) {
-                    return response()->json([
-                        'status' => 'unreachable',
-                        'message' => __('poller.reachability_failed', [
-                            'hostname' => $device->hostname,
-                            'method' => __('poller.methods.' . $type->value),
-                        ]),
-                        'error_details' => $errorDetails,
-                    ], 422);
-                }
-
-                $toast->error(__('poller.reachability_failed', [
-                    'hostname' => $device->hostname,
-                    'method' => __('poller.methods.' . $type->value),
-                ]));
-
-                return redirect()->back();
+                return $this->reachabilityFailedResponse($request, $device, $type, $probeResult, $toast);
             }
         }
 
@@ -229,28 +187,18 @@ class EditPollingController
             'method_type' => $type,
         ]);
         $row->enabled = true;
-        $row->affects_availability = $method->defaultAffectsAvailability();
-        $row->settings = $method->filterOverrides($request->validatedSettings());
-        $row->save();
+        $row->affects_availability = $candidate->affects_availability;
+        $row->settings = $candidate->settings;
 
-        if ($method->hasSecret()) {
-            $secretType = $method->secretType();
-            if ($credentialMode === 'existing' && $secretId !== null) {
-                $secret = Secret::resolveForType($secretId, $secretType);
-                $row->secret()->associate($secret)->save();
-            } else {
-                $description = $validated['description'];
-                $secret = Secret::create([
-                    'secret_type' => $secretType,
-                    'description' => $description,
-                    'data' => $request->validatedSecretData(),
-                ]);
-                $row->secret()->associate($secret)->save();
+        if ($candidate->relationLoaded('secret') && $candidate->secret !== null) {
+            if (! $candidate->secret->exists) {
+                $candidate->secret->save();
             }
+            $row->secret()->associate($candidate->secret);
         }
 
-        $row->last_check_successful = isset($probeResult) ? $probeResult->isSuccess() : ($forceSave ? false : null);
-        $row->last_checked_at = (isset($probeResult) || $forceSave) ? now() : null;
+        $row->last_check_successful = isset($probeResult) ? $probeResult->isSuccess() : ($request->boolean('force_save') ? false : null);
+        $row->last_checked_at = (isset($probeResult) || $request->boolean('force_save')) ? now() : null;
         $row->save();
 
         $toast->success(__('poller.method_added'));
@@ -307,126 +255,43 @@ class EditPollingController
         $forceSave = $request->boolean('force_save');
         $enabled = (bool) ($validated['enabled'] ?? true);
 
+        $candidate = $this->buildMethods->buildMethod($device, $type, [
+            'settings' => $validated['settings'] ?? [],
+            'existing_settings' => $deviceMethod->settings ?? [],
+            'credential_mode' => $secretId !== null && ! $request->input('is_editing_secret', $request->has('secret_data')) ? 'existing' : 'new',
+            'secret_id' => $secretId,
+            'secret_data' => $request->has('secret_data') ? $request->validatedSecretData() : null,
+            'secret' => ($secretId === null && ! $request->has('secret_data')) ? $deviceMethod->secret : null,
+            'description' => $validated['description'] ?? null,
+            'affects_availability' => (bool) ($validated['affects_availability'] ?? false),
+            'enabled' => $enabled,
+        ]);
+
         if ($enabled && ! $forceSave) {
-            $transientSettings = $validated['settings'] ?? [];
-            $transientSecretData = [];
-            $transientSecret = null;
-            if ($method->hasSecret()) {
-                $secretType = $method->secretType();
-                $isEditingSecret = (bool) $request->input('is_editing_secret', $request->has('secret_data'));
-                $secretData = $request->has('secret_data') ? $request->validatedSecretData() : null;
-
-                if ($secretId !== null && ! $isEditingSecret) {
-                    $transientSecret = Secret::resolveForType($secretId, $secretType);
-                } elseif ($secretData !== null) {
-                    $transientSecretData = $secretData;
-                } else {
-                    $transientSecret = $deviceMethod->secret;
-                }
-            }
-
-            $transientMethod = new DevicePollingMethod([
-                'method_type' => $type,
-                'settings' => $method->filterOverrides($transientSettings),
-                'affects_availability' => (bool) ($validated['affects_availability'] ?? false),
-                'enabled' => true,
-            ]);
-            $transientMethod->setRelation('device', $device);
-
-            if ($transientSecret !== null) {
-                $transientMethod->setRelation('secret', $transientSecret);
-                $transientMethod->secret_id = $transientSecret->id;
-            } elseif (! empty($transientSecretData)) {
-                $transientMethod->setRelation('secret', new Secret([
-                    'secret_type' => $method->secretType(),
-                    'data' => $transientSecretData,
-                ]));
-            }
-
-            $existingMethods = $device->pollingMethods->reject(fn ($m) => $m->method_type === $type);
-            $testDevice = clone $device;
-            $testDevice->setRelation('pollingMethods', $existingMethods->concat([$transientMethod]));
-
-            $probeResult = $method->probe($testDevice);
-
+            $probeResult = $method->discover($device, $candidate);
             if (! $probeResult->isSuccess()) {
-                $errorDetails = $probeResult->errorMessage();
-
-                if ($request->wantsJson()) {
-                    return response()->json([
-                        'status' => 'unreachable',
-                        'message' => __('poller.reachability_failed', [
-                            'hostname' => $device->hostname,
-                            'method' => __('poller.methods.' . $type->value),
-                        ]),
-                        'error_details' => $errorDetails,
-                    ], 422);
-                }
-
-                $toast->error(__('poller.reachability_failed', [
-                    'hostname' => $device->hostname,
-                    'method' => __('poller.methods.' . $type->value),
-                ]));
-
-                return redirect()->back();
+                return $this->reachabilityFailedResponse($request, $device, $type, $probeResult, $toast);
             }
         }
 
         $deviceMethod->setRelation('device', $device);
-
         $deviceMethod->enabled = $enabled;
-        $deviceMethod->affects_availability = (bool) ($validated['affects_availability'] ?? false);
-        $deviceMethod->settings = $method->filterOverrides($validated['settings'] ?? [], $deviceMethod->settings ?? []);
-        $deviceMethod->save();
+        $deviceMethod->affects_availability = $candidate->affects_availability;
+        $deviceMethod->settings = $candidate->settings;
 
         if ($method->hasSecret()) {
-            $secretType = $method->secretType();
-            $isEditingSecret = (bool) $request->input('is_editing_secret', $request->has('secret_data'));
-            $secretData = $request->has('secret_data') ? $request->validatedSecretData() : null;
-            $mode = $validated['secret_update_mode'] ?? 'update';
-            $description = $validated['description'] ?? null;
-
-            if ($secretId !== null && ! $isEditingSecret) {
-                $secret = Secret::resolveForType($secretId, $secretType);
-                $deviceMethod->secret()->associate($secret)->save();
-            } elseif ($isEditingSecret || $secretData !== null) {
-                $targetSecret = $secretId !== null ? Secret::resolveForType($secretId, $secretType) : $deviceMethod->secret;
-                $isShared = $targetSecret ? ($targetSecret->devices()->count() > 1) : false;
-                $shouldCreate = ($mode === 'create' && $isShared) || ! $targetSecret;
-
-                if ($shouldCreate) {
-                    $secret = Secret::create([
-                        'secret_type' => $secretType,
-                        'description' => $description ?: ('Custom ' . strtoupper($type->value) . ' (' . $device->hostname . ')'),
-                        'data' => $secretData ?? ($targetSecret ? $targetSecret->data : []),
-                    ]);
-                    $deviceMethod->secret()->associate($secret)->save();
-                } else {
-                    $updateAttributes = [];
-                    if ($secretData !== null) {
-                        $updateAttributes['data'] = $secretData;
-                    }
-                    if ($description !== null && $description !== '') {
-                        $updateAttributes['description'] = $description;
-                    }
-                    if (! empty($updateAttributes) && $targetSecret) {
-                        $targetSecret->update($updateAttributes);
-                    }
-                    if ($targetSecret) {
-                        $deviceMethod->secret()->associate($targetSecret)->save();
-                    }
-                }
-            }
+            $this->syncSecret($request, $device, $type, $deviceMethod, $secretId);
         }
-
-        $setDeviceAvailability->execute($device, false);
-        $device->saveQuietly();
 
         if ($enabled) {
             $deviceMethod->last_check_successful = isset($probeResult) ? $probeResult->isSuccess() : ($forceSave ? false : $deviceMethod->last_check_successful);
             $deviceMethod->last_checked_at = (isset($probeResult) || $forceSave) ? now() : $deviceMethod->last_checked_at;
-            $deviceMethod->save();
         }
+
+        $deviceMethod->save();
+
+        $setDeviceAvailability->execute($device, false);
+        $device->saveQuietly();
 
         $toast->success(__('poller.method_updated'));
 
@@ -476,5 +341,80 @@ class EditPollingController
         }
 
         return redirect()->route('device.edit.polling', ['device' => $device, 'tab' => $type->value]);
+    }
+
+    private function syncSecret(
+        UpdatePollingMethodRequest $request,
+        Device $device,
+        PollingMethodType $type,
+        DevicePollingMethod $deviceMethod,
+        ?int $secretId
+    ): void {
+        $validated = $request->validated();
+        $secretType = $this->pollingMethods->require($type)->secretType();
+        $isEditingSecret = (bool) $request->input('is_editing_secret', $request->has('secret_data'));
+        $secretData = $request->has('secret_data') ? $request->validatedSecretData() : null;
+        $mode = $validated['secret_update_mode'] ?? 'update';
+        $description = $validated['description'] ?? null;
+
+        if ($secretId !== null && ! $isEditingSecret) {
+            $secret = Secret::resolveForType($secretId, $secretType);
+            $deviceMethod->secret()->associate($secret);
+        } elseif ($isEditingSecret || $secretData !== null) {
+            $targetSecret = $secretId !== null ? Secret::resolveForType($secretId, $secretType) : $deviceMethod->secret;
+            $isShared = $targetSecret && $targetSecret->devices()->count() > 1;
+            $shouldCreate = ($mode === 'create' && $isShared) || ! $targetSecret;
+
+            if ($shouldCreate) {
+                $secret = Secret::create([
+                    'secret_type' => $secretType,
+                    'description' => $description ?: ('Custom ' . strtoupper($type->value) . ' (' . $device->hostname . ')'),
+                    'data' => $secretData ?? ($targetSecret ? $targetSecret->data : []),
+                ]);
+                $deviceMethod->secret()->associate($secret);
+            } else {
+                $updateAttributes = [];
+                if ($secretData !== null) {
+                    $updateAttributes['data'] = $secretData;
+                }
+                if ($description !== null && $description !== '') {
+                    $updateAttributes['description'] = $description;
+                }
+                if (! empty($updateAttributes) && $targetSecret) {
+                    $targetSecret->update($updateAttributes);
+                }
+                if ($targetSecret) {
+                    $deviceMethod->secret()->associate($targetSecret);
+                }
+            }
+        }
+    }
+
+    private function reachabilityFailedResponse(
+        Request $request,
+        Device $device,
+        PollingMethodType $type,
+        ProbeResult $probeResult,
+        ToastInterface $toast
+    ): JsonResponse|RedirectResponse {
+        $errorDetails = $probeResult->errorMessage();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'unreachable',
+                'message' => __('poller.reachability_failed', [
+                    'hostname' => $device->hostname,
+                    'method' => __('poller.methods.' . $type->value),
+                ]),
+                'error_details' => $errorDetails,
+            ], 422);
+        }
+
+        $toast->error(__('poller.reachability_failed', [
+            'hostname' => $device->hostname,
+            'method' => __('poller.methods.' . $type->value),
+        ]));
+
+        return redirect()->back();
     }
 }
