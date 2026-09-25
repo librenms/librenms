@@ -1509,7 +1509,7 @@ SNMP v1 or v2c credentials:
 SNMP v3 credentials:
 
 - authlevel: SNMP authlevel (noAuthNoPriv, authNoPriv, authPriv).
-- authname: SNMP Auth username
+- authname: SNMP Auth username (leading and trailing whitespace is automatically trimmed)
 - authpass: SNMP Auth password
 - authalgo: SNMP Auth algorithm (MD5, SHA) (SHA-224, SHA-256, SHA-384, SHA-512 if supported by your server)
 - cryptopass: SNMP Crypto Password
