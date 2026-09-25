@@ -159,16 +159,7 @@ trait HandlesFieldSchema
                 $visibleIfExpression = null;
 
                 if (isset($field['visible_if']) && is_array($field['visible_if'])) {
-                    $visibleIfExpression = collect($field['visible_if'])
-                        ->map(function (mixed $condVal, string $condKey): string {
-                            if (is_array($condVal) && isset($condVal['$in'])) {
-                                return json_encode(array_values($condVal['$in'])) . '.includes(__DATA_VAR__[' . json_encode($condKey) . '])';
-                            }
-
-                            return '__DATA_VAR__[' . json_encode($condKey) . '] === ' . json_encode($condVal);
-                        })->implode(' && ');
-
-                    $visibleIfExpression = str_replace('__DATA_VAR__', $dataVar, $visibleIfExpression);
+                    $visibleIfExpression = FieldDefinition::buildVisibleIfExpressionFromArray($field['visible_if'], $dataVar);
                 }
 
                 return [

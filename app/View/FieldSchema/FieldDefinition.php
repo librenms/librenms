@@ -263,7 +263,21 @@ class FieldDefinition
             return null;
         }
 
-        return collect($this->visibleIf)
+        return static::buildVisibleIfExpressionFromArray($this->visibleIf, $dataVar);
+    }
+
+    /**
+     * Build a JavaScript expression from a visible_if conditions array.
+     *
+     * @param  array<string, mixed>  $conditions
+     */
+    public static function buildVisibleIfExpressionFromArray(array $conditions, string $dataVar = 'formData'): ?string
+    {
+        if (empty($conditions)) {
+            return null;
+        }
+
+        return collect($conditions)
             ->map(function (mixed $condVal, string $condKey) use ($dataVar): string {
                 if (is_array($condVal) && isset($condVal['$in'])) {
                     return json_encode(array_values($condVal['$in'])) . '.includes(' . $dataVar . '[' . json_encode($condKey) . '])';

@@ -71,14 +71,7 @@
 
         if (! $visibleIf && ! empty($config['visible_if'])) {
             $dataVar = $modelPrefix ?: 'formData';
-            $visibleIf = collect($config['visible_if'])
-                ->map(function (mixed $condVal, string $condKey) use ($dataVar): string {
-                    if (is_array($condVal) && isset($condVal['$in'])) {
-                        return json_encode(array_values($condVal['$in'])) . '.includes(' . $dataVar . '[' . json_encode($condKey) . '])';
-                    }
-
-                    return $dataVar . '[' . json_encode($condKey) . '] === ' . json_encode($condVal);
-                })->implode(' && ');
+            $visibleIf = \App\View\FieldSchema\FieldDefinition::buildVisibleIfExpressionFromArray($config['visible_if'], $dataVar);
         }
 
         $normalised[] = [
