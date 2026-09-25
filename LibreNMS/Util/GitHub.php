@@ -263,9 +263,7 @@ GRAPHQL;
             ? $user_count[$user['login']] + 1
             : 1;
 
-        if (! isset($this->profile_links[$user['login']])) {
-            $this->profile_links[$user['login']] = $user['url'];
-        }
+        $this->profile_links[$user['login']] ??= $user['url'];
     }
 
     /**

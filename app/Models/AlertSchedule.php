@@ -60,14 +60,21 @@ class AlertSchedule extends Model
         'Sa' => 6,
         'Su' => 7,
     ];
-    protected $casts = [
-        'behaviour' => MaintenanceBehavior::class,
-    ];
 
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
         $this->timezone = config('app.timezone');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'behaviour' => MaintenanceBehavior::class,
+        ];
     }
 
     // ---- Accessors/Mutators ----

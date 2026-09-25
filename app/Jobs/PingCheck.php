@@ -245,7 +245,7 @@ class PingCheck implements ShouldQueue
                     if ($alert_child) {
                         Log::debug("Deferred device $child_id triggered by $device_id");
 
-                        Action::execute(RunAlertRulesAction::class, device: $this->devices->get($child_id));
+                        Action::execute(RunAlertRulesAction::class, device: $this->devices->firstWhere('device_id', $child_id));
                         $this->deferred->pull($child_id);
                     }
                 }

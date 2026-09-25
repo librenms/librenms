@@ -206,7 +206,7 @@ class DevCollectSnmprec extends LnmsCommand
             }
 
             if (! empty($parsed)) {
-                $snmprecDataByContext[$event->context][] = $parsed;
+                $snmprecDataByContext[$event->options->context][] = $parsed;
             }
         };
 
@@ -256,14 +256,14 @@ class DevCollectSnmprec extends LnmsCommand
      */
     private function requeryOids(Device $device, SnmpQueryExecuted $event, array &$snmprecDataByContext): void
     {
-        $mibOption = ! empty($event->mibs) ? '+' . implode(':', $event->mibs) : 'ALL';
+        $mibOption = ! empty($event->options->mibs) ? '+' . implode(':', $event->options->mibs) : 'ALL';
         $snmpOptions = ['-OUneb', '-Ih', '-m', $mibOption];
 
         foreach ($event->oids as $oid) {
             $query = SnmpQuery::device($device)
                 ->options($snmpOptions)
-                ->context($event->context)
-                ->mibDir($event->mibDir);
+                ->context($event->options->context)
+                ->mibDir(implode(':', $event->options->mibDirs));
 
             $data = match ($event->method) {
                 'snmpget' => $query->get($oid),
@@ -274,7 +274,7 @@ class DevCollectSnmprec extends LnmsCommand
             if ($data->getExitCode() === 0) {
                 $reParsed = $this->convertSnmpToSnmprec($data);
                 if (! empty($reParsed)) {
-                    $snmprecDataByContext[$event->context][] = $reParsed;
+                    $snmprecDataByContext[$event->options->context][] = $reParsed;
                 }
             }
         }
