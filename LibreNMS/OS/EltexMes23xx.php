@@ -46,27 +46,36 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
     }
 
+    protected function useEntLogicalIndexAsIfIndex(): bool
+    {
+        return false;
+    }
+
     public function discoverEntityPhysical(): Collection
     {
         $inventory = $this->discoverBaseEntityPhysical();
 
-        // add in transceivers
+        // add SFPs
         $trans = SnmpQuery::hideMib()->enumStrings()->cache()->walk('ELTEX-MES-PHYSICAL-DESCRIPTION-MIB::eltPhdTransceiverInfoTable')->table(1);
-        $ifIndexToEntIndexMap = array_flip($this->getIfIndexEntPhysicalMap());
+        $switchIndex = $inventory->where('entPhysicalDescr', 'switch processor')->value('entPhysicalIndex'); // containedIn
+        $map = array_flip($this->getIfIndexEntPhysicalMap()); // map ifindex -> entphy index
 
         foreach ($trans as $ifIndex => $data) {
+            $relPos = $inventory->where('entPhysicalIndex', $map[$ifIndex])->value('entPhysicalParentRelPos');
             $inventory->push(new EntPhysical([
-                'entPhysicalIndex' => 1000000 + $ifIndex,
+                'entPhysicalIndex' => $map[$ifIndex],
                 'entPhysicalDescr' => $data['eltPhdTransceiverInfoType'],
                 'entPhysicalClass' => 'sfp-cage',
                 'entPhysicalName' => strtoupper((string) $data['eltPhdTransceiverInfoConnectorType']),
-                'entPhysicalModelName' => $this->normData($data['eltPhdTransceiverInfoPartNumber']),
-                'entPhysicalSerialNum' => $data['eltPhdTransceiverInfoSerialNumber'],
-                'entPhysicalContainedIn' => $ifIndexToEntIndexMap[$ifIndex] ?? 0,
-                'entPhysicalMfgName' => $data['eltPhdTransceiverInfoVendorName'],
-                'entPhysicalHardwareRev' => $this->normData($data['eltPhdTransceiverInfoVendorRev']),
-                'entPhysicalParentRelPos' => 0,
+                'entPhysicalModelName' => $this->normData($data['eltPhdTransceiverInfoPartNumber'] ?? null),
+                'entPhysicalSerialNum' => $data['eltPhdTransceiverInfoSerialNumber'] ?? null,
+                'entPhysicalMfgName' => $this->normData($data['eltPhdTransceiverInfoVendorName'] ?? null),
+                'entPhysicalHardwareRev' => $data['eltPhdTransceiverInfoVendorRev'],
+                'entPhysicalAlias' => $data['eltPhdTransceiverInfoComplianceCode'],
                 'entPhysicalIsFRU' => 'true',
+                'entPhysicalVendorType' => 'zeroDotZero',
+                'entPhysicalContainedIn' => $switchIndex,
+                'entPhysicalParentRelPos' => $relPos,
                 'ifIndex' => $ifIndex,
             ]));
         }
@@ -76,18 +85,21 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
 
     public function discoverTransceivers(): Collection
     {
+        $map = array_flip($this->getIfIndexEntPhysicalMap()); // map ifindex -> entphy index
+
         return SnmpQuery::hideMib()->enumStrings()->cache()->walk('ELTEX-MES-PHYSICAL-DESCRIPTION-MIB::eltPhdTransceiverInfoTable')
             ->mapTable(fn ($data, $ifIndex) => new Transceiver([
                 'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $ifIndex,
                 'connector' => $data['eltPhdTransceiverInfoConnectorType'] ? strtoupper((string) $data['eltPhdTransceiverInfoConnectorType']) : null,
                 'distance' => $data['eltPhdTransceiverInfoTransferDistance'] ?? null,
-                'model' => $data['eltPhdTransceiverInfoPartNumber'] ?? null,
+                'model' => $this->normData($data['eltPhdTransceiverInfoPartNumber'] ?? null),
                 'revision' => $data['eltPhdTransceiverInfoVendorRev'] ?? null,
                 'serial' => $data['eltPhdTransceiverInfoSerialNumber'] ?? null,
-                'vendor' => $data['eltPhdTransceiverInfoVendorName'] ?? null,
+                'vendor' => $this->normData($data['eltPhdTransceiverInfoVendorName'] ?? null),
                 'wavelength' => $data['eltPhdTransceiverInfoWaveLength'] ?? null,
-                'entity_physical_index' => $ifIndex,
+                'type' => $data['eltPhdTransceiverInfoComplianceCode'],
+                'entity_physical_index' => $map[$ifIndex],
             ]));
     }
 
