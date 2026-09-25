@@ -2269,10 +2269,10 @@ function list_bills(Illuminate\Http\Request $request)
         $bill['percent'] = $percent;
         $bill['overuse'] = $overuse;
 
-        $bill['ports'] = \App\Models\Port::whereHas('bills', fn ($q) => $q->where('bills.bill_id', $bill['bill_id']))
-            ->get(['device_id', 'port_id', 'ifName'])->toArray();
-        $bill['mpls_saps'] = \App\Models\MplsSap::whereHas('bills', fn ($q) => $q->where('bills.bill_id', $bill['bill_id']))
-            ->get(['device_id', 'sap_id', 'svc_oid', 'ifName', 'sapEncapValue', 'sapDescription'])->toArray();
+        foreach (\App\Models\Bill::SOURCE_TYPES as $class) {
+            $bill[$class::billingApiKey()] = $class::whereHas('bills', fn ($q) => $q->where('bills.bill_id', $bill['bill_id']))
+                ->get($class::billingApiFields())->toArray();
+        }
 
         $bills[] = $bill;
     }
@@ -2441,30 +2441,17 @@ function create_edit_bill(Illuminate\Http\Request $request)
     if (! $data) {
         return api_error(500, 'Invalid JSON data');
     }
-    //check ports
-    $ports_add = null;
-    if (array_key_exists('ports', $data)) {
-        $ports_add = [];
-        $ports = $data['ports'];
-        foreach ($ports as $port_id) {
-            $result = dbFetchRows('SELECT port_id FROM `ports` WHERE `port_id` = ?  LIMIT 1', [$port_id]);
-            $result = $result[0];
-            if (! is_array($result) || ! array_key_exists('port_id', $result)) {
-                return api_error(500, 'Port ' . $port_id . ' does not exists');
+    // check sources, keyed by the api key of their type (ports, mpls_saps, ...)
+    $sources_add = [];
+    foreach (\App\Models\Bill::SOURCE_TYPES as $class) {
+        if (array_key_exists($class::billingApiKey(), $data)) {
+            $sources_add[$class] = [];
+            foreach ((array) $data[$class::billingApiKey()] as $source_id) {
+                if (! $class::whereKey($source_id)->exists()) {
+                    return api_error(500, $class::billingTypeName() . ' ' . $source_id . ' does not exists');
+                }
+                $sources_add[$class][] = $source_id;
             }
-            $ports_add[] = $port_id;
-        }
-    }
-
-    //check mpls saps
-    $saps_add = null;
-    if (array_key_exists('mpls_saps', $data)) {
-        $saps_add = [];
-        foreach ($data['mpls_saps'] as $sap_id) {
-            if (! \App\Models\MplsSap::where('sap_id', $sap_id)->exists()) {
-                return api_error(500, 'MPLS SAP ' . $sap_id . ' does not exists');
-            }
-            $saps_add[] = $sap_id;
         }
     }
 
@@ -2564,12 +2551,9 @@ function create_edit_bill(Illuminate\Http\Request $request)
         }
     }
 
-    // set previously checked ports and saps
-    if (is_array($ports_add)) {
-        \App\Models\Bill::find($bill_id)?->ports()->sync($ports_add);
-    }
-    if (is_array($saps_add)) {
-        \App\Models\Bill::find($bill_id)?->mplsSaps()->sync($saps_add);
+    // set previously checked sources
+    foreach ($sources_add as $class => $source_ids) {
+        \App\Models\Bill::find($bill_id)?->sources($class)->sync($source_ids);
     }
 
     return api_success($bill_id, 'bill_id');

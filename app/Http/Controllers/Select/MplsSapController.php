@@ -48,11 +48,17 @@ class MplsSapController extends SelectController
     /**
      * Defines search fields will be searched in order
      *
-     * @return array<int, string>
+     * @return array<int|string, string|list<string>> relation name => fields for related models
      */
     protected function searchFields(Request $request): array
     {
-        return ['ifName', 'svc_oid', 'sapDescription'];
+        return [
+            'ifName',
+            'svc_oid',
+            'sapDescription',
+            'service' => ['svcDescription'],
+            'device' => ['hostname', 'sysName', 'display'],
+        ];
     }
 
     /**
@@ -68,7 +74,8 @@ class MplsSapController extends SelectController
                 $query->select(['svc_id', 'svcDescription']);
             }]);
 
-        if ($device_id = $request->input('device')) {
+        // the add bill dialog sends -1 for "No Device"
+        if (($device_id = (int) $request->input('device')) > 0) {
             $query->where('mpls_saps.device_id', $device_id);
         }
 

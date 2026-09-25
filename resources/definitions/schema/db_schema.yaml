@@ -1186,8 +1186,6 @@ mpls_saps:
     - { Field: sapOperStatus, Type: "enum('up','down')", 'Null': true, Extra: '' }
     - { Field: sapLastMgmtChange, Type: bigint, 'Null': true, Extra: '' }
     - { Field: sapLastStatusChange, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: sapIngressOctets, Type: 'bigint unsigned', 'Null': true, Extra: '' }
-    - { Field: sapEgressOctets, Type: 'bigint unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sap_id], Unique: true, Type: BTREE }
     mpls_saps_device_id_index: { Name: mpls_saps_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

@@ -225,14 +225,27 @@ class BillControllerTest extends TestCase
         $sap = MplsSap::factory()->create();
         $bill = Bill::factory()->create();
 
-        $this->actingAs($admin)->post(route('bill.sap.attach', $bill), ['sap_id' => $sap->sap_id])->assertRedirect();
+        $this->actingAs($admin)->post(route('bill.source.attach', $bill), ['source_type' => 'mpls_sap', 'source_id' => $sap->sap_id])->assertRedirect();
         $this->assertDatabaseHas('bill_counters', ['bill_id' => $bill->bill_id, 'source_type' => 'mpls_sap', 'source_id' => $sap->sap_id]);
-        $this->assertTrue($bill->mplsSaps()->where('mpls_saps.sap_id', $sap->sap_id)->exists());
+        $this->assertTrue($bill->sources(MplsSap::class)->where('mpls_saps.sap_id', $sap->sap_id)->exists());
 
-        $this->actingAs($admin)->post(route('bill.sap.attach', $bill), ['sap_id' => 999999])->assertSessionHasErrors('sap_id');
+        $this->actingAs($admin)->post(route('bill.source.attach', $bill), ['source_type' => 'mpls_sap', 'source_id' => 999999])->assertSessionHasErrors('source_id');
 
-        $this->actingAs($admin)->delete(route('bill.sap.detach', [$bill, $sap]))->assertRedirect();
+        $this->actingAs($admin)->delete(route('bill.source.detach', [$bill, 'mpls_sap', $sap->sap_id]))->assertRedirect();
         $this->assertDatabaseMissing('bill_counters', ['bill_id' => $bill->bill_id, 'source_id' => $sap->sap_id]);
+    }
+
+    public function testUnknownSourceTypeIsRejected(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+
+        $device = Device::factory()->create();
+        $bill = Bill::factory()->create();
+
+        $this->actingAs($admin)->post(route('bill.source.attach', $bill), ['source_type' => 'device', 'source_id' => $device->device_id])->assertSessionHasErrors('source_type');
+        $this->actingAs($admin)->delete(route('bill.source.detach', [$bill, 'device', $device->device_id]))->assertNotFound();
+        $this->assertDatabaseMissing('bill_counters', ['bill_id' => $bill->bill_id]);
     }
 
     public function testDeletingSourceDetachesItFromBills(): void
@@ -241,7 +254,7 @@ class BillControllerTest extends TestCase
         $sap = MplsSap::factory()->create();
         $bill = Bill::factory()->create();
         $bill->ports()->attach($port->port_id);
-        $bill->mplsSaps()->attach($sap->sap_id);
+        $bill->sources(MplsSap::class)->attach($sap->sap_id);
 
         $port->delete();
         $sap->delete();
@@ -320,8 +333,9 @@ class BillControllerTest extends TestCase
         $bill = Bill::factory()->create();
 
         // Attach
-        $attachResponse = $this->actingAs($admin)->post(route('bill.port.attach', $bill), [
-            'port_id' => $port->port_id,
+        $attachResponse = $this->actingAs($admin)->post(route('bill.source.attach', $bill), [
+            'source_type' => 'interface',
+            'source_id' => $port->port_id,
         ]);
 
         $attachResponse->assertRedirect();
@@ -332,7 +346,7 @@ class BillControllerTest extends TestCase
         ]);
 
         // Detach
-        $detachResponse = $this->actingAs($admin)->delete(route('bill.port.detach', [$bill, $port]));
+        $detachResponse = $this->actingAs($admin)->delete(route('bill.source.detach', [$bill, 'interface', $port->port_id]));
 
         $detachResponse->assertRedirect();
         $this->assertDatabaseMissing('bill_counters', [

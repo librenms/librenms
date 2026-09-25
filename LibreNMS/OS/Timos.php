@@ -645,13 +645,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
                 ->addDataset('sapIngressDroppedBits', 'COUNTER', 0)
                 ->addDataset('sapEgressDroppedBits', 'COUNTER', 0);
 
-            // cumulative octet counters, kept on the model so billing can use them without polling again
-            $sapIngressOctets = ($value['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? 0) + ($value['sapBaseStatsIngressPchipOfferedHiPrioOctets'] ?? 0);
-            $sapEgressOctets = ($value['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? 0) + ($value['sapBaseStatsEgressQchipForwardedInProfOctets'] ?? 0);
-
             $fields = [
-                'sapIngressBits' => $sapIngressOctets * 8,
-                'sapEgressBits' => $sapEgressOctets * 8,
+                'sapIngressBits' => (($value['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? 0) + ($value['sapBaseStatsIngressPchipOfferedHiPrioOctets'] ?? 0)) * 8,
+                'sapEgressBits' => (($value['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? 0) + ($value['sapBaseStatsEgressQchipForwardedInProfOctets'] ?? 0)) * 8,
                 'sapIngressDroppedBits' => (($value['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? 0) + ($value['sapBaseStatsIngressQchipDroppedHiPrioOctets'] ?? 0)) * 8,
                 'sapEgressDroppedBits' => (($value['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? 0) + ($value['sapBaseStatsEgressQchipDroppedInProfOctets'] ?? 0)) * 8,
             ];
@@ -679,9 +675,6 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
                 'sapOperStatus' => $value['sapOperStatus'],
                 'sapLastMgmtChange' => round($value['sapLastMgmtChange'] / 100),
                 'sapLastStatusChange' => round($value['sapLastStatusChange'] / 100),
-                // some SAPs report the Counter64 maximum for a stat they don't keep, the sum then overflows to float
-                'sapIngressOctets' => is_int($sapIngressOctets) ? $sapIngressOctets : null,
-                'sapEgressOctets' => is_int($sapEgressOctets) ? $sapEgressOctets : null,
             ]);
         })->filter();
     }

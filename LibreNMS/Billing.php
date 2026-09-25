@@ -5,15 +5,15 @@ namespace LibreNMS;
 use App\Facades\LibrenmsConfig;
 use App\Models\Bill;
 use App\Models\BillCounter;
-use App\Models\MplsSap;
-use App\Models\Port;
 use Carbon\Carbon;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Interfaces\Models\BillableSource;
 use LibreNMS\Util\Number;
 
 class Billing
@@ -114,8 +114,7 @@ class Billing
     }
 
     /**
-     * Account the traffic of every source on the bill since the previous run.
-     * Counters are read from the last poll of each source, the device is not queried.
+     * Account the traffic of every source on the bill since the previous run
      */
     public static function pollBill(Bill $bill): void
     {
@@ -124,7 +123,9 @@ class Billing
         $out_delta = 0;
 
         foreach (self::activeSources($bill) as $source) {
-            Log::info('  ' . $source->getBillingLabel());
+            /** @var \App\Models\Device $device loaded by activeSources() */
+            $device = $source->getRelation('device');
+            Log::info('  ' . $source::billingTypeName() . ' ' . $source->getBillingLabel() . ' on ' . $device->displayName());
             [$in, $out] = self::updateCounter($bill, $source, $now);
             $in_delta += $in;
             $out_delta += $out;
@@ -155,29 +156,27 @@ class Billing
     /**
      * Store the current counter sample of a source and return the traffic since the previous sample
      *
-     * @param  Port|MplsSap  $source  loaded through a Bill relation, so the pivot is present
+     * @param  Model&BillableSource  $source  loaded through a Bill relation, so the pivot is present
      * @return array{0: int, 1: int} inbound and outbound octets
      */
-    private static function updateCounter(Bill $bill, Port|MplsSap $source, Carbon $now): array
+    private static function updateCounter(Bill $bill, Model&BillableSource $source, Carbon $now): array
     {
-        $in = $source->getBillingInOctets();
-        $out = $source->getBillingOutOctets();
+        $counters = $source->fetchBillingCounters();
 
-        if ($in === null || $out === null) {
-            Log::error('    No counters available yet, skipping');
+        if ($counters === null) {
+            Log::error('    Could not read the counters, skipping');
 
             return [0, 0];
         }
 
+        [$in, $out] = $counters;
         /** @var BillCounter $last */
         $last = $source->getRelation('pivot');
-        $counter_time = $source->getBillingCounterTime();
-        $time = $counter_time ? Carbon::createFromTimestamp($counter_time) : $now;
         $in_delta = 0;
         $out_delta = 0;
 
         if ($last->in_counter !== null) {
-            $period = max(1, $time->getTimestamp() - $last->timestamp->getTimestamp());
+            $period = max(1, $now->getTimestamp() - $last->timestamp->getTimestamp());
             $in_delta = self::counterDelta($in, $last->in_counter, $last->in_delta, $period, $source->getBillingSpeed());
             $out_delta = self::counterDelta($out, $last->out_counter, $last->out_delta, $period, $source->getBillingSpeed());
         }
@@ -185,7 +184,7 @@ class Billing
         Log::debug("    in: $in (+$in_delta)  out: $out (+$out_delta)");
 
         $source->bills()->updateExistingPivot($bill->bill_id, [
-            'timestamp' => $time,
+            'timestamp' => $now,
             'in_counter' => $in,
             'out_counter' => $out,
             'in_delta' => $in_delta,
@@ -215,31 +214,35 @@ class Billing
     }
 
     /**
-     * Sources of the bill that carry traffic right now: operationally up, on an up device handled by this poller
+     * Sources of the bill that carry traffic right now: active, on an up device handled by this poller
      *
-     * @return Collection<int, Port|MplsSap>
+     * @return Collection<int, Model&BillableSource>
      */
     private static function activeSources(Bill $bill): Collection
     {
         $device = fn (Builder $query) => self::pollerDevices($query)->where('status', 1);
 
-        $ports = $bill->ports()->with('device')
-            ->whereIn('ports.ifOperStatus', ['up', 'dormant'])
-            ->whereHas('device', $device)
-            ->get();
+        /** @var Collection<int, Model&BillableSource> $sources */
+        $sources = new Collection;
+        foreach (Bill::SOURCE_TYPES as $class) {
+            $sources = $sources->concat($bill->sources($class)->with('device')
+                ->where(fn (Builder $query) => $class::filterBillingActive($query))
+                ->whereHas('device', $device)
+                ->get());
+        }
 
-        $saps = $bill->mplsSaps()->with('device')
-            ->where('mpls_saps.sapOperStatus', 'up')
-            ->whereHas('device', $device)
-            ->get();
-
-        return $ports->concat($saps);
+        return $sources;
     }
 
     private static function hasSources(Bill $bill): bool
     {
-        return $bill->ports()->whereHas('device', self::pollerDevices(...))->exists()
-            || $bill->mplsSaps()->whereHas('device', self::pollerDevices(...))->exists();
+        foreach (Bill::SOURCE_TYPES as $class) {
+            if ($bill->sources($class)->whereHas('device', self::pollerDevices(...))->exists()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

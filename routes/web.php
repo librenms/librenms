@@ -138,10 +138,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('customoid', CustomoidController::class)->only(['show', 'store', 'update', 'destroy']);
     Route::resource('bill', BillController::class)->only(['update', 'destroy']);
     Route::post('bill/{bill}/reset', [BillController::class, 'reset'])->name('bill.reset');
-    Route::post('bill/{bill}/ports', [BillController::class, 'attachPort'])->name('bill.port.attach');
-    Route::delete('bill/{bill}/ports/{port}', [BillController::class, 'detachPort'])->name('bill.port.detach');
-    Route::post('bill/{bill}/saps', [BillController::class, 'attachSap'])->name('bill.sap.attach');
-    Route::delete('bill/{bill}/saps/{sap}', [BillController::class, 'detachSap'])->name('bill.sap.detach');
+    Route::post('bill/{bill}/sources', [BillController::class, 'attachSource'])->name('bill.source.attach');
+    Route::delete('bill/{bill}/sources/{type}/{id}', [BillController::class, 'detachSource'])->name('bill.source.detach')->whereNumber('id');
     Route::get('locations', [LocationController::class, 'index']);
     Route::resource('ssl-certificates', SslCertificateController::class)->except(['edit']);
     Route::resource('preferences', UserPreferencesController::class)->only('index', 'store', 'update');

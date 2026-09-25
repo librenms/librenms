@@ -2,20 +2,23 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Billable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use LibreNMS\Interfaces\Models\BillableSource;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\OS\Timos;
+use LibreNMS\Util\Url;
 
 /**
  * @property-read string $encap_display
  */
 class MplsSap extends DeviceRelatedModel implements BillableSource, Keyable
 {
+    use Billable;
     use HasFactory;
     protected $primaryKey = 'sap_id';
     public $timestamps = false;
@@ -33,18 +36,7 @@ class MplsSap extends DeviceRelatedModel implements BillableSource, Keyable
         'sapOperStatus',
         'sapLastMgmtChange',
         'sapLastStatusChange',
-        'sapIngressOctets',
-        'sapEgressOctets',
     ];
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::deleting(function (MplsSap $sap): void {
-            $sap->bills()->detach();
-        });
-    }
 
     // ---- Helper Functions ----
 
@@ -71,20 +63,56 @@ class MplsSap extends DeviceRelatedModel implements BillableSource, Keyable
 
     // ---- Billing ----
 
-    public function getBillingInOctets(): ?int
+    public static function billingTypeName(): string
     {
-        return $this->sapIngressOctets === null ? null : (int) $this->sapIngressOctets;
+        return 'Nokia SAP';
     }
 
-    public function getBillingOutOctets(): ?int
+    public static function billingSelectType(): string
     {
-        return $this->sapEgressOctets === null ? null : (int) $this->sapEgressOctets;
+        return 'mpls-sap';
     }
 
-    public function getBillingCounterTime(): ?int
+    public static function billingApiKey(): string
     {
-        // counters are refreshed by the mpls poller module, the device poll time is the closest we have
-        return $this->device?->last_polled?->getTimestamp();
+        return 'mpls_saps';
+    }
+
+    public static function billingApiFields(): array
+    {
+        return ['device_id', 'sap_id', 'svc_oid', 'ifName', 'sapEncapValue', 'sapDescription'];
+    }
+
+    public static function filterBillingActive(Builder $query): void
+    {
+        $query->where('mpls_saps.sapOperStatus', 'up');
+    }
+
+    public function fetchBillingCounters(): ?array
+    {
+        // the same counters the sap graphs use: ingress offered, egress forwarded
+        $objects = [
+            'in' => ['sapBaseStatsIngressPchipOfferedHiPrioOctets', 'sapBaseStatsIngressPchipOfferedLoPrioOctets'],
+            'out' => ['sapBaseStatsEgressQchipForwardedInProfOctets', 'sapBaseStatsEgressQchipForwardedOutProfOctets'],
+        ];
+        $index = $this->getSapIndex();
+        $oids = array_map(fn ($object) => "TIMETRA-SAP-MIB::$object.$index", array_merge(...array_values($objects)));
+        $response = \SnmpQuery::device($this->device)->get($oids);
+
+        $counters = [];
+        foreach ($objects as $direction => $names) {
+            $counters[$direction] = 0;
+            foreach ($names as $name) {
+                $value = $response->value("TIMETRA-SAP-MIB::$name.$index");
+                if (! is_numeric($value)) {
+                    return null; // a partial sum would be accounted as a traffic spike
+                }
+                // some SAPs report the Counter64 maximum for a stat they don't keep
+                $counters[$direction] += $value === '18446744073709551615' ? 0 : (int) $value;
+            }
+        }
+
+        return [$counters['in'], $counters['out']];
     }
 
     public function getBillingSpeed(): ?int
@@ -94,7 +122,35 @@ class MplsSap extends DeviceRelatedModel implements BillableSource, Keyable
 
     public function getBillingLabel(): string
     {
-        return "SAP {$this->ifName}:{$this->encap_display} (service {$this->svc_oid}) on " . $this->device?->displayName();
+        return "{$this->ifName}:{$this->encap_display} (service {$this->svc_oid})" . ($this->sapDescription ? ' - ' . $this->sapDescription : '');
+    }
+
+    public function getBillingLink(): string
+    {
+        return Url::graphPopup([
+            'device' => $this->device_id,
+            'page' => 'graphs',
+            'type' => 'device_sap',
+            'traffic_id' => $this->getSapIndex(),
+        ], e($this->getBillingLabel()));
+    }
+
+    public function getBillingRrd(): ?array
+    {
+        return [
+            'filename' => \Rrd::name($this->device->hostname, \LibreNMS\Data\Store\Rrd::safeName('sap-' . $this->getSapIndex())),
+            'ds_in' => 'sapIngressBits',
+            'ds_out' => 'sapEgressBits',
+            'multiplier' => 1,
+        ];
+    }
+
+    /**
+     * svc.port.encap index of the sap (snmp tables and rrd name), a wildcard encapsulation is 4095
+     */
+    private function getSapIndex(): string
+    {
+        return $this->svc_oid . '.' . $this->sapPortId . '.' . ($this->sapEncapValue == '*' ? '4095' : $this->sapEncapValue);
     }
 
     // ---- Define Relationships ----
@@ -120,14 +176,5 @@ class MplsSap extends DeviceRelatedModel implements BillableSource, Keyable
     public function port(): BelongsTo
     {
         return $this->belongsTo(Port::class, 'ifName', 'ifName');
-    }
-
-    /**
-     * @return MorphToMany<Bill, $this, BillCounter>
-     */
-    public function bills(): MorphToMany
-    {
-        return $this->morphToMany(Bill::class, 'source', 'bill_counters', 'source_id', 'bill_id')
-            ->using(BillCounter::class);
     }
 }

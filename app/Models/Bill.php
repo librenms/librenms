@@ -27,15 +27,25 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Models\BillableSource;
 
 class Bill extends BaseModel
 {
     use HasFactory;
+
+    /**
+     * Models that can be accounted on a bill, see BillableSource
+     */
+    public const SOURCE_TYPES = [
+        Port::class,
+        MplsSap::class,
+    ];
 
     public $timestamps = false;
     protected $primaryKey = 'bill_id';
@@ -127,34 +137,44 @@ class Bill extends BaseModel
     }
 
     /**
-     * @return MorphToMany<MplsSap, $this, BillCounter>
-     */
-    public function mplsSaps(): MorphToMany
-    {
-        return $this->sources(MplsSap::class);
-    }
-
-    /**
-     * All billable sources of this bill, each with the bill_counters pivot loaded
+     * Sources of one billable type, each with the bill_counters pivot loaded
      *
-     * @return Collection<int, Port|MplsSap>
-     */
-    public function billableSources(): Collection
-    {
-        return $this->ports()->get()->concat($this->mplsSaps()->get());
-    }
-
-    /**
-     * @template TSource of \Illuminate\Database\Eloquent\Model
+     * @template TSource of \Illuminate\Database\Eloquent\Model&BillableSource
      *
      * @param  class-string<TSource>  $class
      * @return MorphToMany<TSource, $this, BillCounter>
      */
-    private function sources(string $class): MorphToMany
+    public function sources(string $class): MorphToMany
     {
         return $this->morphedByMany($class, 'source', 'bill_counters', 'bill_id', 'source_id')
             ->using(BillCounter::class)
             ->withPivot(['autoadded', 'timestamp', 'in_counter', 'in_delta', 'out_counter', 'out_delta']);
+    }
+
+    /**
+     * All sources of this bill, ordered by device
+     *
+     * @return Collection<int, \Illuminate\Database\Eloquent\Model&BillableSource>
+     */
+    public function billableSources(): Collection
+    {
+        /** @var Collection<int, \Illuminate\Database\Eloquent\Model&BillableSource> $sources */
+        $sources = new Collection;
+        foreach (self::SOURCE_TYPES as $class) {
+            $sources = $sources->concat($this->sources($class)->with('device')->get());
+        }
+
+        return $sources->sortBy('device_id')->values();
+    }
+
+    /**
+     * Billable source classes keyed by their morph alias (bill_counters.source_type)
+     *
+     * @return array<string, class-string<\Illuminate\Database\Eloquent\Model&BillableSource>>
+     */
+    public static function sourceTypes(): array
+    {
+        return collect(self::SOURCE_TYPES)->keyBy(fn (string $class) => Relation::getMorphAlias($class))->all();
     }
 
     /**

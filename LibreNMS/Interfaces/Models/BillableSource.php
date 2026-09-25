@@ -4,8 +4,13 @@
  * BillableSource.php
  *
  * A model whose traffic counters can be accounted on a traffic bill.
- * Counters come from the regular poller run for that model, billing never
- * queries the device itself.
+ * Billing reads the counters from the device each time it runs.
+ *
+ * To make a new kind of source billable:
+ *  - implement this interface and use the App\Models\Traits\Billable trait on the model
+ *  - give the model a morph alias in AppServiceProvider::configureMorphAliases()
+ *  - add the model to Bill::SOURCE_TYPES
+ *  - provide an ajax select controller to pick it in the bill forms (see billingSelectType())
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,22 +30,61 @@
 
 namespace LibreNMS\Interfaces\Models;
 
+use App\Models\Device;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+
 interface BillableSource
 {
     /**
-     * Cumulative inbound octet counter as stored by the last poll, null if not polled yet
+     * Name of this kind of source shown in the bill pages, e.g. "Port"
      */
-    public function getBillingInOctets(): ?int;
+    public static function billingTypeName(): string;
 
     /**
-     * Cumulative outbound octet counter as stored by the last poll, null if not polled yet
+     * Type of the ajax select used to pick a source in the bill forms (ajax/select/{type})
      */
-    public function getBillingOutOctets(): ?int;
+    public static function billingSelectType(): string;
 
     /**
-     * Unix timestamp the counters were read at, null if unknown
+     * Key listing these sources in the bills API
      */
-    public function getBillingCounterTime(): ?int;
+    public static function billingApiKey(): string;
+
+    /**
+     * Columns of these sources returned by the bills API
+     *
+     * @return list<string>
+     */
+    public static function billingApiFields(): array;
+
+    /**
+     * Limit a query to sources that carry traffic right now, e.g. operationally up
+     *
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     */
+    public static function filterBillingActive(Builder $query): void;
+
+    /**
+     * @return MorphToMany<\App\Models\Bill, covariant \Illuminate\Database\Eloquent\Model, \App\Models\BillCounter>
+     */
+    public function bills(): MorphToMany;
+
+    /**
+     * Billing only accounts sources on up devices handled by the local poller
+     *
+     * @return BelongsTo<Device, covariant \Illuminate\Database\Eloquent\Model>
+     */
+    public function device(): BelongsTo;
+
+    /**
+     * Read the cumulative inbound and outbound octet counters from the device.
+     * Returns null if either can not be read, so a failed read is never accounted as traffic.
+     *
+     * @return array{0: int, 1: int}|null
+     */
+    public function fetchBillingCounters(): ?array;
 
     /**
      * Link speed in bits per second used to reject impossible counter jumps, null for no limit
@@ -48,7 +92,20 @@ interface BillableSource
     public function getBillingSpeed(): ?int;
 
     /**
-     * Human readable name for log output
+     * Human readable name of the source, without the device
      */
     public function getBillingLabel(): string;
+
+    /**
+     * Html link to the source (with graph popup) for the bill pages
+     */
+    public function getBillingLink(): string;
+
+    /**
+     * Rrd holding the traffic of this source for the bill graphs, null if it has none.
+     * multiplier converts the stored values to bits.
+     *
+     * @return array{filename: string, ds_in: string, ds_out: string, multiplier: int}|null
+     */
+    public function getBillingRrd(): ?array;
 }

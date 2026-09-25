@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Billable;
 use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,12 +12,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Interfaces\Models\BillableSource;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Url;
 use LibreNMS\Util\Rewrite;
 
 /**
@@ -27,6 +28,7 @@ use LibreNMS\Util\Rewrite;
  */
 class Port extends DeviceRelatedModel implements BillableSource
 {
+    use Billable;
     use HasFactory;
     use Filterable;
 
@@ -101,7 +103,6 @@ class Port extends DeviceRelatedModel implements BillableSource
             $port->vlans()->delete();
             $port->links()->delete();
             $port->remoteLinks()->delete();
-            $port->bills()->detach();
 
             // dont have relationships yet
             DB::table('juniAtmVp')->where('port_id', $port->port_id)->delete();
@@ -419,30 +420,47 @@ class Port extends DeviceRelatedModel implements BillableSource
         return $this->hasOne(PortAdsl::class, 'port_id');
     }
 
-    /**
-     * @return MorphToMany<Bill, $this, BillCounter>
-     */
-    public function bills(): MorphToMany
-    {
-        return $this->morphToMany(Bill::class, 'source', 'bill_counters', 'source_id', 'bill_id')
-            ->using(BillCounter::class);
-    }
-
     // ---- Billing ----
 
-    public function getBillingInOctets(): ?int
+    public static function billingTypeName(): string
     {
-        return $this->ifInOctets === null ? null : (int) $this->ifInOctets;
+        return 'Port';
     }
 
-    public function getBillingOutOctets(): ?int
+    public static function billingSelectType(): string
     {
-        return $this->ifOutOctets === null ? null : (int) $this->ifOutOctets;
+        return 'port';
     }
 
-    public function getBillingCounterTime(): ?int
+    public static function billingApiKey(): string
     {
-        return $this->poll_time ? (int) $this->poll_time : null;
+        return 'ports';
+    }
+
+    public static function billingApiFields(): array
+    {
+        return ['device_id', 'port_id', 'ifName'];
+    }
+
+    public static function filterBillingActive(Builder $query): void
+    {
+        $query->whereIn('ports.ifOperStatus', ['up', 'dormant']);
+    }
+
+    public function fetchBillingCounters(): ?array
+    {
+        // prefer the 64 bit counters, fall back to the 32 bit ones on devices without them
+        foreach ([['IF-MIB::ifHCInOctets', 'IF-MIB::ifHCOutOctets'], ['IF-MIB::ifInOctets', 'IF-MIB::ifOutOctets']] as [$in_oid, $out_oid]) {
+            $response = \SnmpQuery::device($this->device)->get(["$in_oid.$this->ifIndex", "$out_oid.$this->ifIndex"]);
+            $in = $response->value("$in_oid.$this->ifIndex");
+            $out = $response->value("$out_oid.$this->ifIndex");
+
+            if (is_numeric($in) && is_numeric($out)) {
+                return [(int) $in, (int) $out];
+            }
+        }
+
+        return null;
     }
 
     public function getBillingSpeed(): ?int
@@ -452,7 +470,22 @@ class Port extends DeviceRelatedModel implements BillableSource
 
     public function getBillingLabel(): string
     {
-        return "{$this->ifName} ({$this->ifDescr}) on " . $this->device?->displayName();
+        return $this->ifName . ($this->ifAlias ? ' - ' . $this->ifAlias : '');
+    }
+
+    public function getBillingLink(): string
+    {
+        return Url::portLink($this, $this->getBillingLabel());
+    }
+
+    public function getBillingRrd(): ?array
+    {
+        return [
+            'filename' => \Rrd::name($this->device->hostname, \Rrd::portName($this->port_id)),
+            'ds_in' => 'INOCTETS',
+            'ds_out' => 'OUTOCTETS',
+            'multiplier' => 8,
+        ];
     }
 
     /**

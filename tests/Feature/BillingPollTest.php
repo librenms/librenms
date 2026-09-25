@@ -3,7 +3,7 @@
 /**
  * BillingPollTest.php
  *
- * Bill polling accounts the counters stored by the port and mpls pollers.
+ * Bill polling reads the counters of every source from the device and accounts the deltas.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,50 +29,50 @@ use App\Models\Device;
 use App\Models\MplsSap;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Arr;
 use LibreNMS\Billing;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Tests\TestCase;
+use SnmpQuery;
 
 class BillingPollTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** @var array<string, string> what the fake devices answer, by oid */
+    private array $snmp = [];
+
     protected function setUp(): void
     {
         parent::setUp();
         LibrenmsConfig::set('distributed_poller', false);
+
+        SnmpQuery::partialMock()->shouldReceive('get')->andReturnUsing(
+            fn ($oids) => new SnmpResponse(Arr::only($this->snmp, Arr::wrap($oids)))
+        );
     }
 
     public function testPortAndSapCountersAreAccounted(): void
     {
-        $device = Device::factory()->create(['status' => 1, 'last_polled' => now()]);
-        $port = Port::factory()->create([
-            'device_id' => $device->device_id,
-            'ifOperStatus' => 'up',
-            'ifSpeed' => 1000000000,
-            'ifInOctets' => 1000,
-            'ifOutOctets' => 2000,
-            'poll_time' => now()->subMinutes(5)->getTimestamp(),
-        ]);
-        $sap = MplsSap::factory()->up()->create([
-            'device_id' => $device->device_id,
-            'sapIngressOctets' => 500,
-            'sapEgressOctets' => 700,
-        ]);
+        $device = Device::factory()->create(['status' => 1]);
+        $port = Port::factory()->create(['device_id' => $device->device_id, 'ifOperStatus' => 'up', 'ifSpeed' => 1000000000]);
+        $sap = MplsSap::factory()->up()->create(['device_id' => $device->device_id]);
 
         $bill = Bill::factory()->create();
         $bill->ports()->attach($port->port_id);
-        $bill->mplsSaps()->attach($sap->sap_id);
+        $bill->sources(MplsSap::class)->attach($sap->sap_id);
 
         // first run only seeds the counters
+        $this->portCounters($port, 1000, 2000);
+        $this->sapCounters($sap, [300, 200], [400, 300]);
         Billing::pollBill($bill);
         $this->assertDatabaseHas('bill_counters', ['bill_id' => $bill->bill_id, 'source_type' => 'interface', 'source_id' => $port->port_id, 'in_counter' => 1000, 'in_delta' => 0]);
-        $this->assertDatabaseHas('bill_counters', ['bill_id' => $bill->bill_id, 'source_type' => 'mpls_sap', 'source_id' => $sap->sap_id, 'in_counter' => 500, 'in_delta' => 0]);
+        $this->assertDatabaseHas('bill_counters', ['bill_id' => $bill->bill_id, 'source_type' => 'mpls_sap', 'source_id' => $sap->sap_id, 'in_counter' => 500, 'out_counter' => 700, 'in_delta' => 0]);
         $this->assertEquals(0, $bill->data()->latest('timestamp')->first()->delta);
 
-        // the pollers stored new samples
-        $port->update(['ifInOctets' => 1100, 'ifOutOctets' => 2300, 'poll_time' => now()->getTimestamp()]);
-        $sap->update(['sapIngressOctets' => 510, 'sapEgressOctets' => 720]);
-
+        $this->travel(5)->minutes();
+        $this->portCounters($port, 1100, 2300);
+        $this->sapCounters($sap, [305, 205], [410, 310]);
         Billing::pollBill($bill);
         $this->assertDatabaseHas('bill_counters', ['source_type' => 'interface', 'source_id' => $port->port_id, 'in_counter' => 1100, 'in_delta' => 100, 'out_delta' => 300]);
         $this->assertDatabaseHas('bill_counters', ['source_type' => 'mpls_sap', 'source_id' => $sap->sap_id, 'in_counter' => 510, 'in_delta' => 10, 'out_delta' => 20]);
@@ -84,42 +84,71 @@ class BillingPollTest extends TestCase
         $this->assertEquals(2, $bill->data()->count());
     }
 
-    public function testCounterWrapRepeatsPreviousDelta(): void
+    public function testPortFallsBackTo32BitCounters(): void
     {
         $device = Device::factory()->create(['status' => 1]);
-        $port = Port::factory()->create([
-            'device_id' => $device->device_id,
-            'ifOperStatus' => 'up',
-            'ifSpeed' => 0,
-            'ifInOctets' => 1000,
-            'ifOutOctets' => 1000,
-            'poll_time' => now()->subMinutes(10)->getTimestamp(),
-        ]);
+        $port = Port::factory()->create(['device_id' => $device->device_id, 'ifOperStatus' => 'up']);
         $bill = Bill::factory()->create();
         $bill->ports()->attach($port->port_id);
 
+        $this->snmp = ["IF-MIB::ifInOctets.$port->ifIndex" => '42', "IF-MIB::ifOutOctets.$port->ifIndex" => '43'];
         Billing::pollBill($bill);
-        $port->update(['ifInOctets' => 1250, 'ifOutOctets' => 1250, 'poll_time' => now()->subMinutes(5)->getTimestamp()]);
+
+        $this->assertDatabaseHas('bill_counters', ['source_id' => $port->port_id, 'in_counter' => 42, 'out_counter' => 43]);
+    }
+
+    public function testCounterWrapRepeatsPreviousDelta(): void
+    {
+        $device = Device::factory()->create(['status' => 1]);
+        $port = Port::factory()->create(['device_id' => $device->device_id, 'ifOperStatus' => 'up', 'ifSpeed' => 0]);
+        $bill = Bill::factory()->create();
+        $bill->ports()->attach($port->port_id);
+
+        $this->portCounters($port, 1000, 1000);
         Billing::pollBill($bill);
-        $port->update(['ifInOctets' => 10, 'ifOutOctets' => 10, 'poll_time' => now()->getTimestamp()]); // wrapped
+        $this->travel(5)->minutes();
+        $this->portCounters($port, 1250, 1250);
+        Billing::pollBill($bill);
+        $this->travel(5)->minutes();
+        $this->portCounters($port, 10, 10); // wrapped
         Billing::pollBill($bill);
 
         $this->assertDatabaseHas('bill_counters', ['source_id' => $port->port_id, 'in_counter' => 10, 'in_delta' => 250, 'out_delta' => 250]);
     }
 
-    public function testDownSourcesAndUnpolledCountersAreSkipped(): void
+    public function testDownAndUnreadableSourcesAreSkipped(): void
     {
         $device = Device::factory()->create(['status' => 1]);
-        $down = Port::factory()->create(['device_id' => $device->device_id, 'ifOperStatus' => 'down', 'ifInOctets' => 5, 'ifOutOctets' => 5]);
-        $fresh = Port::factory()->create(['device_id' => $device->device_id, 'ifOperStatus' => 'up', 'ifInOctets' => null, 'ifOutOctets' => null]);
+        $down = Port::factory()->create(['device_id' => $device->device_id, 'ifOperStatus' => 'down']);
+        $unreadable = Port::factory()->create(['device_id' => $device->device_id, 'ifOperStatus' => 'up']);
+        $partial = MplsSap::factory()->up()->create(['device_id' => $device->device_id]);
         $bill = Bill::factory()->create();
-        $bill->ports()->attach([$down->port_id, $fresh->port_id]);
+        $bill->ports()->attach([$down->port_id, $unreadable->port_id]);
+        $bill->sources(MplsSap::class)->attach($partial->sap_id);
+
+        $this->portCounters($down, 5, 5);
+        $this->sapCounters($partial, [300, 200], [400, 300]);
+        unset($this->snmp[$this->sapOid($partial, 'sapBaseStatsEgressQchipForwardedOutProfOctets')]); // one of the four failed
 
         Billing::pollBill($bill);
 
         $this->assertDatabaseHas('bill_counters', ['source_id' => $down->port_id, 'in_counter' => null]);
-        $this->assertDatabaseHas('bill_counters', ['source_id' => $fresh->port_id, 'in_counter' => null]);
+        $this->assertDatabaseHas('bill_counters', ['source_id' => $unreadable->port_id, 'in_counter' => null]);
+        $this->assertDatabaseHas('bill_counters', ['source_id' => $partial->sap_id, 'in_counter' => null]);
         $this->assertEquals(1, $bill->data()->count()); // the bill has sources, so a (zero) entry is written
+    }
+
+    public function testSapStatNotKeptIsIgnored(): void
+    {
+        $device = Device::factory()->create(['status' => 1]);
+        $sap = MplsSap::factory()->up()->create(['device_id' => $device->device_id]);
+        $bill = Bill::factory()->create();
+        $bill->sources(MplsSap::class)->attach($sap->sap_id);
+
+        $this->sapCounters($sap, ['18446744073709551615', 200], [400, 300]);
+        Billing::pollBill($bill);
+
+        $this->assertDatabaseHas('bill_counters', ['source_id' => $sap->sap_id, 'in_counter' => 200, 'out_counter' => 700]);
     }
 
     public function testBillWithoutSourcesGetsNoData(): void
@@ -129,5 +158,28 @@ class BillingPollTest extends TestCase
         Billing::pollBill($bill);
 
         $this->assertEquals(0, $bill->data()->count());
+    }
+
+    private function portCounters(Port $port, int $in, int $out): void
+    {
+        $this->snmp["IF-MIB::ifHCInOctets.$port->ifIndex"] = (string) $in;
+        $this->snmp["IF-MIB::ifHCOutOctets.$port->ifIndex"] = (string) $out;
+    }
+
+    /**
+     * @param  array{0: int|string, 1: int|string}  $in  offered hi and lo priority octets
+     * @param  array{0: int|string, 1: int|string}  $out  forwarded in and out of profile octets
+     */
+    private function sapCounters(MplsSap $sap, array $in, array $out): void
+    {
+        $this->snmp[$this->sapOid($sap, 'sapBaseStatsIngressPchipOfferedHiPrioOctets')] = (string) $in[0];
+        $this->snmp[$this->sapOid($sap, 'sapBaseStatsIngressPchipOfferedLoPrioOctets')] = (string) $in[1];
+        $this->snmp[$this->sapOid($sap, 'sapBaseStatsEgressQchipForwardedInProfOctets')] = (string) $out[0];
+        $this->snmp[$this->sapOid($sap, 'sapBaseStatsEgressQchipForwardedOutProfOctets')] = (string) $out[1];
+    }
+
+    private function sapOid(MplsSap $sap, string $object): string
+    {
+        return "TIMETRA-SAP-MIB::$object.$sap->svc_oid.$sap->sapPortId.$sap->sapEncapValue";
     }
 }
