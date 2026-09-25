@@ -178,56 +178,68 @@ class PingCheck implements ShouldQueue
             return;
         }
 
-        $waiting_on = [];
-        foreach ($device->parents ?? [] as $parent) {
-            if (! $this->processed->has($parent->device_id)) {
-                $waiting_on[] = $parent->device_id;
+        try {
+            $waiting_on = [];
+            foreach ($device->parents ?? [] as $parent) {
+                if (! $this->processed->has($parent->device_id)) {
+                    $waiting_on[] = $parent->device_id;
+                }
             }
-        }
 
-        // update ICMP polling method state
-        $icmpMethod = $device->pollingMethod(PollingMethodType::Icmp);
-        if ($icmpMethod !== null) {
-            $icmpMethod->last_check_successful = $response->isAlive();
-            $icmpMethod->last_checked_at = now();
-            $icmpMethod->save();
-        }
+            // update ICMP polling method state
+            $icmpMethod = $device->pollingMethod(PollingMethodType::Icmp);
+            if ($icmpMethod !== null) {
+                $icmpMethod->last_check_successful = $response->isAlive();
+                $icmpMethod->last_checked_at = now();
+                $icmpMethod->save();
+            }
 
-        // mark up only if snmp is not down too
-        $changed = app(SetDeviceAvailability::class)->execute($device, true);
+            // mark up only if snmp is not down too
+            $changed = app(SetDeviceAvailability::class)->execute($device, true);
 
-        // save last_ping_timetaken and rrd data
-        $response->saveStats($device);
+            // save last_ping_timetaken and rrd data
+            $response->saveStats($device);
 
-        // mark as processed
-        $this->processed->put($device->device_id, true);
-        Log::debug("Recorded data for $device->hostname");
+            // mark as processed
+            $this->processed->put($device->device_id, true);
+            Log::debug("Recorded data for $device->hostname");
 
-        if ($changed) { // only run alert rules if status changed
-            $type = $device->status ? 'up' : 'down';
-            Log::debug("Device $device->hostname changed status to $type, running alerts");
+            if ($changed) { // only run alert rules if status changed
+                $type = $device->status ? 'up' : 'down';
+                Log::debug("Device $device->hostname changed status to $type, running alerts");
 
-            if (count($waiting_on) === 0) {
-                Action::execute(RunAlertRulesAction::class, device: $device);
-            } else {
-                Log::debug('Alerts Deferred');
+                if (count($waiting_on) === 0) {
+                    Action::execute(RunAlertRulesAction::class, device: $device);
+                } else {
+                    Log::debug('Alerts Deferred');
 
-                $this->deferred->put($device->device_id, $device->parents);
-                foreach ($waiting_on as $parent_id) {
-                    Log::debug("Adding $device->device_id to list waiting for $parent_id");
+                    $this->deferred->put($device->device_id, $device->parents);
+                    foreach ($waiting_on as $parent_id) {
+                        Log::debug("Adding $device->device_id to list waiting for $parent_id");
 
-                    if ($this->waiting_on->has($parent_id)) {
-                        $child_list = $this->waiting_on->get($parent_id);
-                        $child_list->put($device->device_id, true);
-                    } else {
-                        // create a new entry containing this device
-                        $this->waiting_on->put($parent_id, collect([$device->device_id => true]));
+                        if ($this->waiting_on->has($parent_id)) {
+                            $child_list = $this->waiting_on->get($parent_id);
+                            $child_list->put($device->device_id, true);
+                        } else {
+                            // create a new entry containing this device
+                            $this->waiting_on->put($parent_id, collect([$device->device_id => true]));
+                        }
                     }
                 }
             }
-        }
 
-        $this->runDeferredAlerts($device->device_id);
+            $this->runDeferredAlerts($device->device_id);
+        } catch (\Throwable $e) {
+            $this->processed->put($device->device_id, true);
+            $this->runDeferredAlerts($device->device_id);
+
+            if (defined('PHPUNIT_RUNNING')) {
+                throw $e;
+            }
+
+            Log::error("Error handling ping response for {$device->hostname}: " . $e->getMessage());
+            report($e);
+        }
     }
 
     /**

@@ -67,7 +67,20 @@ class PollDevice implements ShouldQueue
         $measurement->manager()->checkpoint(); // don't count previous stats
 
         // check and save status
-        app(CheckDeviceAvailability::class)->execute($this->device, true);
+        try {
+            app(CheckDeviceAvailability::class)->execute($this->device, true);
+        } catch (Throwable $e) {
+            if (defined('PHPUNIT_RUNNING')) {
+                throw $e;
+            }
+
+            Log::error("Error checking device availability for {$this->device->hostname}: {$e->getMessage()}");
+            Eventlog::log('Error checking device availability: ' . class_basename($e) . '. Check log file for more details.', $this->device, 'poller', Severity::Error);
+            $this->device->status = false;
+            $this->device->status_reason = 'error';
+            $this->device->save();
+            report($e);
+        }
 
         $this->pollModules();
 

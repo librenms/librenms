@@ -145,7 +145,11 @@ class Device extends BaseModel
 
     public function ipFamily(): AddressFamily
     {
-        return str_ends_with($this->toSnmpConfig()->transport, '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
+        try {
+            return str_ends_with($this->toSnmpConfig()->transport, '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
+        } catch (\Throwable) {
+            return filter_var($this->pollerTarget(), FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? AddressFamily::IPv6 : AddressFamily::IPv4;
+        }
     }
 
     public static function findByIp(?string $ip): ?Device

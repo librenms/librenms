@@ -105,7 +105,19 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         include_once base_path('includes/snmp.inc.php');
 
         // update availability status
-        app(CheckDeviceAvailability::class)->execute($this->device);
+        try {
+            app(CheckDeviceAvailability::class)->execute($this->device);
+        } catch (Throwable $e) {
+            if (defined('PHPUNIT_RUNNING')) {
+                throw $e;
+            }
+
+            Log::error("Error checking device availability for {$this->device->hostname}: {$e->getMessage()}");
+            Eventlog::log('Error checking device availability: ' . class_basename($e) . '. Check log file for more details.', $this->device, 'discovery', Severity::Error);
+            $this->device->status = false;
+            $this->device->status_reason = 'error';
+            report($e);
+        }
         $connectivity = new ConnectivityHelper($this->device);
         $this->deviceArray['status'] = $this->device->status;
         $this->deviceArray['status_reason'] = $this->device->status_reason;

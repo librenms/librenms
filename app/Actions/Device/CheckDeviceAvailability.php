@@ -3,6 +3,10 @@
 namespace App\Actions\Device;
 
 use App\Models\Device;
+use App\Models\Eventlog;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\SecretDecryptionException;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 readonly class CheckDeviceAvailability
@@ -19,12 +23,23 @@ readonly class CheckDeviceAvailability
 
         foreach ($enabledPollingMethods as $deviceMethod) {
             $method = $this->pollingMethods->require($deviceMethod->method_type);
-            $result = $method->probe($device);
 
-            $deviceMethod->last_check_successful = $result->isSuccess();
-            $deviceMethod->last_checked_at = now();
+            try {
+                $result = $method->probe($device);
 
-            $method->onProbeComplete($device, $result, $commit);
+                $deviceMethod->last_check_successful = $result->isSuccess();
+                $deviceMethod->last_checked_at = now();
+
+                $method->onProbeComplete($device, $result, $commit);
+            } catch (SecretDecryptionException $e) {
+                $deviceMethod->last_check_successful = false;
+                $deviceMethod->last_checked_at = now();
+
+                Log::error("Failed to decrypt credentials for {$deviceMethod->method_type->value} polling on {$device->hostname}: {$e->getMessage()}");
+                if ($device->exists) {
+                    Eventlog::log("Failed to decrypt credentials for {$deviceMethod->method_type->value} polling. Verify that APP_KEY matches the primary installation.", $device, 'auth', Severity::Error);
+                }
+            }
         }
 
         $this->setDeviceAvailability->execute($device, $commit);

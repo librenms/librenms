@@ -182,7 +182,7 @@ final class PollingMethodProbeTest extends TestCase
         $this->assertEquals('user1', $config2Updated->authname);
     }
 
-    public function testCheckDeviceAvailabilityPropagatesSecretDecryptionException(): void
+    public function testCheckDeviceAvailabilityHandlesSecretDecryptionGracefully(): void
     {
         $device = new Device(['hostname' => 'corrupt-key.example.com', 'status' => true]);
         $device->device_id = 1;
@@ -205,8 +205,59 @@ final class PollingMethodProbeTest extends TestCase
 
         $checker = app(\App\Actions\Device\CheckDeviceAvailability::class);
 
-        $this->expectException(SecretDecryptionException::class);
-        $checker->execute($device, false);
+        $status = $checker->execute($device, false);
+
+        $this->assertFalse($status);
+        $this->assertFalse($device->status);
+        $this->assertEquals('snmp', $device->status_reason);
+        $this->assertFalse($method->last_check_successful);
+        $this->assertNotNull($method->last_checked_at);
+    }
+
+    public function testCheckDeviceAvailabilityWithCorruptedSecretAllowsOtherMethodsToProbe(): void
+    {
+        $device = new Device(['hostname' => 'dual-method.example.com', 'status' => true]);
+        $device->device_id = 1;
+
+        $badSecret = \Mockery::mock(Secret::class)->makePartial();
+        $badSecret->secret_type = \LibreNMS\Enum\SecretType::Snmp;
+        $badSecret->shouldReceive('getAttribute')->with('data')->andThrow(
+            SecretDecryptionException::failedToDecrypt('Bad key')
+        );
+
+        $snmpMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
+            'settings' => [],
+            'affects_availability' => false,
+            'enabled' => true,
+        ]);
+        $snmpMethod->setRelation('device', $device);
+        $snmpMethod->setRelation('secret', $badSecret);
+
+        $icmpMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Icmp,
+            'settings' => [],
+            'affects_availability' => true,
+            'enabled' => true,
+        ]);
+        $icmpMethod->setRelation('device', $device);
+
+        $mockFping = \Mockery::mock(\LibreNMS\Data\Source\Icmp\Fping::class);
+        $mockFping->shouldReceive('ping')->andReturn(\LibreNMS\Data\Source\Icmp\FpingResponse::artificialUp('127.0.0.1'));
+        $this->app->instance(\LibreNMS\Data\Source\Icmp\Fping::class, $mockFping);
+
+        $device->setRelation('pollingMethods', collect([$snmpMethod, $icmpMethod]));
+
+        $checker = app(\App\Actions\Device\CheckDeviceAvailability::class);
+        $status = $checker->execute($device, false);
+
+        // SNMP failed due to decryption exception, but didn't abort ICMP check
+        $this->assertFalse($snmpMethod->last_check_successful);
+        $this->assertTrue($icmpMethod->last_check_successful);
+        // Since only ICMP affects availability and succeeded, device status is up
+        $this->assertTrue($status);
+        $this->assertTrue($device->status);
+        $this->assertEquals('', $device->status_reason);
     }
 
     public function testNullLastCheckSuccessfulIsUnknownNotFailed(): void
