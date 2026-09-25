@@ -79,40 +79,30 @@ class EditPollingController
         $schema = $secretDef?->schema() ?? [];
         $schemaFields = $secretDef ? $secretDef->buildSchemaFields() : [];
         $settingsFields = $method->buildSchemaFields(dataVar: 'settingsData');
+
         $secretsForType = $secretType ? Secret::query()
             ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
             ->where('secret_type', $secretType)
             ->withCount('devices')
             ->orderBy('description')
             ->get() : collect();
+
         $secretMeta = $secretsForType->mapWithKeys(fn (Secret $availableSecret): array => [
             (string) $availableSecret->id => [
                 'description' => $availableSecret->description,
                 'usage_count' => $availableSecret->devices_count,
             ],
         ])->all();
-        $currentSecretData = [];
-        if ($secret && $canUnmaskSecrets) {
-            try {
-                $currentSecretData = $secret->data ?? [];
-            } catch (\Throwable) { // @phpstan-ignore catch.neverThrown
-                $currentSecretData = [];
-            }
-        }
 
-        $secretFormDataById = $secretsForType->mapWithKeys(function (Secret $availableSecret) use ($schemaFields, $canUnmaskSecrets): array {
-            try {
-                $secretData = $canUnmaskSecrets ? ($availableSecret->data ?? []) : [];
-            } catch (\Throwable) { // @phpstan-ignore catch.neverThrown
-                $secretData = [];
-            }
-
-            return [
-                (string) $availableSecret->id => (object) collect($schemaFields)->mapWithKeys(fn (array $field): array => [
-                    $field['key'] => (string) data_get($secretData, $field['key'], ''),
-                ])->all(),
-            ];
-        })->all();
+        $schemaFieldKeys = array_column($schemaFields, 'key');
+        $secretFormDataById = $secretsForType->mapWithKeys(
+            fn (Secret $availableSecret): array => [
+                (string) $availableSecret->id => (object) $this->extractFieldValues(
+                    $this->unmaskSecretData($availableSecret, $canUnmaskSecrets),
+                    $schemaFieldKeys
+                ),
+            ]
+        )->all();
 
         $settingsDefaults = $method->schemaDefaults();
 
@@ -130,9 +120,9 @@ class EditPollingController
             ),
             'affects_availability' => $row ? $row->affects_availability : $method->defaultAffectsAvailability(),
             'secret' => $secret,
-            'secret_form_data' => $secret ? collect($schema)->mapWithKeys(fn (array $field, string $key): array => [
-                $key => (string) data_get($currentSecretData, $key, ''),
-            ])->all() : null,
+            'secret_form_data' => $secret
+                ? $this->extractFieldValues($this->unmaskSecretData($secret, $canUnmaskSecrets), array_keys($schema))
+                : null,
             'secret_meta' => $secretMeta,
             'secret_form_data_by_id' => $secretFormDataById,
             'usage_count' => $secret?->devices()->count() ?? 0,
@@ -140,6 +130,34 @@ class EditPollingController
             'enabled' => $row ? $row->enabled : true,
             'last_check_successful' => $row?->last_check_successful,
         ];
+    }
+
+    /**
+     * Returns a secret's decrypted data, or an empty array if it can't/shouldn't be unmasked.
+     *
+     * @return array<string, mixed>
+     */
+    private function unmaskSecretData(?Secret $secret, bool $canUnmask): array
+    {
+        if (! $secret || ! $canUnmask) {
+            return [];
+        }
+
+        return $secret->data ?? [];
+    }
+
+    /**
+     * Pulls the given keys out of a data array as strings, for populating a form.
+     *
+     * @param  array<string, mixed>  $data
+     * @param  array<int, string>  $keys
+     * @return array<string, string>
+     */
+    private function extractFieldValues(array $data, array $keys): array
+    {
+        return collect($keys)->mapWithKeys(fn (string $key): array => [
+            $key => (string) data_get($data, $key, ''),
+        ])->all();
     }
 
     /**
@@ -174,14 +192,16 @@ class EditPollingController
             'affects_availability' => $method->defaultAffectsAvailability(),
         ]);
 
-        if (! $request->boolean('force_save')) {
+        $forceSave = $request->boolean('force_save');
+        $probeResult = null;
+
+        if (! $forceSave) {
             $probeResult = $method->discover($device, $candidate);
             if (! $probeResult->isSuccess()) {
                 return $this->reachabilityFailedResponse($request, $device, $type, $probeResult, $toast);
             }
         }
 
-        /** @var DevicePollingMethod $row */
         $row = DevicePollingMethod::firstOrNew([
             'device_id' => $device->device_id,
             'method_type' => $type,
@@ -197,8 +217,9 @@ class EditPollingController
             $row->secret()->associate($candidate->secret);
         }
 
-        $row->last_check_successful = isset($probeResult) ? $probeResult->isSuccess() : ($request->boolean('force_save') ? false : null);
-        $row->last_checked_at = (isset($probeResult) || $request->boolean('force_save')) ? now() : null;
+        // We only get here via a successful probe or an explicit force_save
+        $row->last_check_successful = $probeResult !== null;
+        $row->last_checked_at = now();
         $row->save();
 
         $toast->success(__('poller.method_added'));
@@ -238,17 +259,18 @@ class EditPollingController
         $validated = $request->validated();
 
         $secretId = null;
-        if ($method->hasSecret()) {
+        $isEditingSecret = (bool) $request->input('is_editing_secret', $request->has('secret_data'));
+
+        if ($method->hasSecret() && (array_key_exists('secret_id', $validated) || $request->has('secret_data'))) {
+            $this->authorize('update', Secret::class);
+
             if (array_key_exists('secret_id', $validated)) {
-                $this->authorize('update', Secret::class);
                 $secretId = (int) $validated['secret_id'];
                 if (! $secretId) {
                     throw ValidationException::withMessages([
                         'secret_id' => __('poller.select_credential'),
                     ]);
                 }
-            } elseif ($request->has('secret_data')) {
-                $this->authorize('update', Secret::class);
             }
         }
 
@@ -258,7 +280,7 @@ class EditPollingController
         $candidate = $this->buildMethods->buildMethod($device, $type, [
             'settings' => $validated['settings'] ?? [],
             'existing_settings' => $deviceMethod->settings ?? [],
-            'credential_mode' => $secretId !== null && ! $request->input('is_editing_secret', $request->has('secret_data')) ? 'existing' : 'new',
+            'credential_mode' => ($secretId !== null && ! $isEditingSecret) ? 'existing' : 'new',
             'secret_id' => $secretId,
             'secret_data' => $request->has('secret_data') ? $request->validatedSecretData() : null,
             'secret' => ($secretId === null && ! $request->has('secret_data')) ? $deviceMethod->secret : null,
@@ -266,6 +288,8 @@ class EditPollingController
             'affects_availability' => (bool) ($validated['affects_availability'] ?? false),
             'enabled' => $enabled,
         ]);
+
+        $probeResult = null;
 
         if ($enabled && ! $forceSave) {
             $probeResult = $method->discover($device, $candidate);
@@ -280,12 +304,13 @@ class EditPollingController
         $deviceMethod->settings = $candidate->settings;
 
         if ($method->hasSecret()) {
-            $this->syncSecret($request, $device, $type, $deviceMethod, $secretId);
+            $this->syncSecret($request, $device, $type, $deviceMethod, $secretId, $isEditingSecret);
         }
 
         if ($enabled) {
-            $deviceMethod->last_check_successful = isset($probeResult) ? $probeResult->isSuccess() : ($forceSave ? false : $deviceMethod->last_check_successful);
-            $deviceMethod->last_checked_at = (isset($probeResult) || $forceSave) ? now() : $deviceMethod->last_checked_at;
+            // A disabled method keeps its last check status untouched.
+            $deviceMethod->last_check_successful = $probeResult !== null;
+            $deviceMethod->last_checked_at = now();
         }
 
         $deviceMethod->save();
@@ -348,11 +373,11 @@ class EditPollingController
         Device $device,
         PollingMethodType $type,
         DevicePollingMethod $deviceMethod,
-        ?int $secretId
+        ?int $secretId,
+        bool $isEditingSecret
     ): void {
         $validated = $request->validated();
         $secretType = $this->pollingMethods->require($type)->secretType();
-        $isEditingSecret = (bool) $request->input('is_editing_secret', $request->has('secret_data'));
         $secretData = $request->has('secret_data') ? $request->validatedSecretData() : null;
         $mode = $validated['secret_update_mode'] ?? 'update';
         $description = $validated['description'] ?? null;
@@ -360,33 +385,42 @@ class EditPollingController
         if ($secretId !== null && ! $isEditingSecret) {
             $secret = Secret::resolveForType($secretId, $secretType);
             $deviceMethod->secret()->associate($secret);
-        } elseif ($isEditingSecret || $secretData !== null) {
-            $targetSecret = $secretId !== null ? Secret::resolveForType($secretId, $secretType) : $deviceMethod->secret;
-            $isShared = $targetSecret && $targetSecret->devices()->count() > 1;
-            $shouldCreate = ($mode === 'create' && $isShared) || ! $targetSecret;
 
-            if ($shouldCreate) {
-                $secret = Secret::create([
-                    'secret_type' => $secretType,
-                    'description' => $description ?: ('Custom ' . strtoupper($type->value) . ' (' . $device->hostname . ')'),
-                    'data' => $secretData ?? ($targetSecret ? $targetSecret->data : []),
-                ]);
-                $deviceMethod->secret()->associate($secret);
-            } else {
-                $updateAttributes = [];
-                if ($secretData !== null) {
-                    $updateAttributes['data'] = $secretData;
-                }
-                if ($description !== null && $description !== '') {
-                    $updateAttributes['description'] = $description;
-                }
-                if (! empty($updateAttributes) && $targetSecret) {
-                    $targetSecret->update($updateAttributes);
-                }
-                if ($targetSecret) {
-                    $deviceMethod->secret()->associate($targetSecret);
-                }
-            }
+            return;
+        }
+
+        if (! $isEditingSecret && $secretData === null) {
+            return;
+        }
+
+        $targetSecret = $secretId !== null ? Secret::resolveForType($secretId, $secretType) : $deviceMethod->secret;
+        $isShared = $targetSecret && $targetSecret->devices()->count() > 1;
+        $shouldCreate = ($mode === 'create' && $isShared) || ! $targetSecret;
+
+        if ($shouldCreate) {
+            $secret = Secret::create([
+                'secret_type' => $secretType,
+                'description' => $description ?: ('Custom ' . strtoupper($type->value) . ' (' . $device->hostname . ')'),
+                'data' => $secretData ?? ($targetSecret ? $targetSecret->data : []),
+            ]);
+            $deviceMethod->secret()->associate($secret);
+
+            return;
+        }
+
+        $updateAttributes = [];
+        if ($secretData !== null) {
+            $updateAttributes['data'] = $secretData;
+        }
+        if ($description !== null && $description !== '') {
+            $updateAttributes['description'] = $description;
+        }
+
+        if ($updateAttributes !== [] && $targetSecret) {
+            $targetSecret->update($updateAttributes);
+        }
+        if ($targetSecret) {
+            $deviceMethod->secret()->associate($targetSecret);
         }
     }
 
@@ -397,23 +431,20 @@ class EditPollingController
         ProbeResult $probeResult,
         ToastInterface $toast
     ): JsonResponse|RedirectResponse {
-        $errorDetails = $probeResult->errorMessage();
+        $message = __('poller.reachability_failed', [
+            'hostname' => $device->hostname,
+            'method' => __('poller.methods.' . $type->value),
+        ]);
 
         if ($request->wantsJson()) {
             return response()->json([
                 'status' => 'unreachable',
-                'message' => __('poller.reachability_failed', [
-                    'hostname' => $device->hostname,
-                    'method' => __('poller.methods.' . $type->value),
-                ]),
-                'error_details' => $errorDetails,
+                'message' => $message,
+                'error_details' => $probeResult->errorMessage(),
             ], 422);
         }
 
-        $toast->error(__('poller.reachability_failed', [
-            'hostname' => $device->hostname,
-            'method' => __('poller.methods.' . $type->value),
-        ]));
+        $toast->error($message);
 
         return redirect()->back();
     }

@@ -9,10 +9,10 @@ use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 
-class BuildDefaultPollingMethods
+readonly class BuildDefaultPollingMethods
 {
     public function __construct(
-        private readonly PollingMethodRegistry $pollingMethods,
+        private PollingMethodRegistry $pollingMethods,
     ) {
     }
 
@@ -28,34 +28,17 @@ class BuildDefaultPollingMethods
             return null;
         }
 
-        $settings = $data['settings'] ?? [];
-        $existingSettings = $data['existing_settings'] ?? [];
-        $credentialMode = $data['credential_mode'] ?? 'default';
-        $secretId = isset($data['secret_id']) && $data['secret_id'] !== '' ? (int) $data['secret_id'] : null;
         $affectsAvailability = isset($data['affects_availability']) ? (bool) $data['affects_availability'] : null;
-
-        $secret = $data['secret'] ?? null;
-        $secretType = $method->secretType();
-        if ($secret === null && $secretType !== null) {
-            if ($credentialMode === 'existing' && $secretId !== null) {
-                $secret = Secret::resolveForType($secretId, $secretType);
-            } elseif (! empty($data['secret_data'])) {
-                $desc = ($credentialMode === 'new' && ! empty($data['description'])) ? $data['description'] : (strtoupper($type->value) . ' ' . $device->hostname);
-                $secret = new Secret([
-                    'description' => $desc,
-                    'secret_type' => $secretType,
-                    'data' => $data['secret_data'],
-                ]);
-            }
-        }
+        $secret = $this->resolveSecret($device, $type, $data, $method->secretType());
 
         $pollingMethod = new DevicePollingMethod([
             'method_type' => $type,
             'enabled' => (bool) ($data['enabled'] ?? true),
             'affects_availability' => $affectsAvailability ?? $method->defaultAffectsAvailability(),
-            'settings' => $method->filterOverrides($settings, $existingSettings),
+            'settings' => $method->filterOverrides($data['settings'] ?? [], $data['existing_settings'] ?? []),
         ]);
         $pollingMethod->setRelation('device', $device);
+
         if ($secret !== null) {
             $pollingMethod->setRelation('secret', $secret);
             if ($secret->exists) {
@@ -64,6 +47,41 @@ class BuildDefaultPollingMethods
         }
 
         return $pollingMethod;
+    }
+
+    /**
+     * Resolve the secret to attach: an explicitly given one, an existing one picked
+     * by ID, a freshly-built one from posted secret data, or none if there's nothing
+     * to attach.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    private function resolveSecret(Device $device, PollingMethodType $type, array $data, mixed $secretType): ?Secret
+    {
+        if (isset($data['secret']) || $secretType === null) {
+            return $data['secret'] ?? null;
+        }
+
+        $credentialMode = $data['credential_mode'] ?? 'default';
+        $secretId = isset($data['secret_id']) && $data['secret_id'] !== '' ? (int) $data['secret_id'] : null;
+
+        if ($credentialMode === 'existing' && $secretId !== null) {
+            return Secret::resolveForType($secretId, $secretType);
+        }
+
+        if (empty($data['secret_data'])) {
+            return null;
+        }
+
+        $description = ($credentialMode === 'new' && ! empty($data['description']))
+            ? $data['description']
+            : strtoupper($type->value) . ' ' . $device->hostname;
+
+        return new Secret([
+            'description' => $description,
+            'secret_type' => $secretType,
+            'data' => $data['secret_data'],
+        ]);
     }
 
     /**
