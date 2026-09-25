@@ -12,7 +12,8 @@
     <div x-show="unreachableDialog" x-cloak style="display: none;"
          class="tw:fixed tw:inset-0 tw:z-100 tw:flex tw:items-center tw:justify-center tw:p-4 tw:bg-black/60 tw:backdrop-blur-xs"
          @click="unreachableDialog = false"
-         @keydown.escape.window="unreachableDialog = false">
+         @keydown.escape.window="unreachableDialog = false"
+         x-effect="if (unreachableDialog) $nextTick(() => $refs.editSettingsBtn?.focus())">
         <div x-show="unreachableDialog"
              x-transition:enter="tw:ease-out tw:duration-300"
              x-transition:enter-start="tw:opacity-0 tw:scale-95"
@@ -42,7 +43,7 @@
             </div>
 
             <div class="tw:mt-6 tw:flex tw:flex-col-reverse tw:sm:flex-row tw:justify-end tw:gap-3">
-                <button type="button" @click="unreachableDialog = false" class="btn btn-default">
+                <button type="button" x-ref="editSettingsBtn" @click="unreachableDialog = false" class="btn btn-default">
                     {{ __('Edit Settings') }}
                 </button>
                 <button type="button" @click="{{ $actionClick }}" class="btn btn-warning">
