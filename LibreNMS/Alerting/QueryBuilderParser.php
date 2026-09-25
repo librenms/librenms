@@ -86,9 +86,7 @@ class QueryBuilderParser implements \JsonSerializable
      */
     public function getTables(): array
     {
-        if (! isset($this->tables)) {
-            $this->tables = $this->findTablesRecursive($this->builder);
-        }
+        $this->tables ??= $this->findTablesRecursive($this->builder);
 
         return $this->tables;
     }

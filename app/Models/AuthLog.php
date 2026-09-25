@@ -37,7 +37,7 @@ class AuthLog extends Model
     protected $table = 'authlog';
 
     /**
-     * @return array{datetime: 'datetime'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {

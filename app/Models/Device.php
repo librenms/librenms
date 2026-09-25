@@ -114,7 +114,7 @@ class Device extends BaseModel
     ];
 
     /**
-     * @return array{inserted: 'datetime', last_discovered: 'datetime', last_polled: 'datetime', last_ping: 'datetime', status: 'boolean'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -523,8 +523,8 @@ class Device extends BaseModel
     public function filterState(Builder $query, mixed $value, array $config): void
     {
         $this->applyMappedFilter($query, $value, $config, fn (Builder $q, $state) => match ($state) {
-            'up' => $q->where('status', 1)->where('disabled', 0)->where('disable_notify', 0),
-            'down' => $q->where('status', 0)->where('disabled', 0)->where('disable_notify', 0),
+            'up' => $q->where('status', 1)->where('disabled', 0),
+            'down' => $q->where('status', 0)->where('disabled', 0),
             default => $q,
         });
     }

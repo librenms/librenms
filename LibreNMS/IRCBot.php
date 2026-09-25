@@ -413,9 +413,7 @@ class IRCBot
                 if ($ex[2] != '*') {
                     $this->tempnick = $ex[2];
                 }
-                if (! isset($this->tempnick)) {
-                    $this->tempnick = $this->nick . random_int(0, 99);
-                }
+                $this->tempnick ??= $this->nick . random_int(0, 99);
                 if ($this->debug) {
                     $this->log('Using temp nick ' . $this->tempnick);
                 }

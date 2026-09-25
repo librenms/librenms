@@ -63,9 +63,7 @@ abstract class BaseModel extends Model
             return $query;
         }
 
-        if (is_null($table)) {
-            $table = $this->getTable();
-        }
+        $table ??= $this->getTable();
 
         return $query->whereIntegerInRaw("$table.device_id", \Permissions::devicesForUser($user));
     }
@@ -79,9 +77,7 @@ abstract class BaseModel extends Model
             return $query;
         }
 
-        if (is_null($table)) {
-            $table = $this->getTable();
-        }
+        $table ??= $this->getTable();
 
         return $query->where(fn ($query) => $query->whereIntegerInRaw("$table.port_id", \Permissions::portsForUser($user))
             ->orWhereIntegerInRaw("$table.device_id", \Permissions::devicesForUser($user)));
@@ -96,9 +92,7 @@ abstract class BaseModel extends Model
             return $query;
         }
 
-        if (is_null($table)) {
-            $table = $this->getTable();
-        }
+        $table ??= $this->getTable();
 
         return $query->whereIntegerInRaw("$table.bill_id", \Permissions::billsForUser($user));
     }

@@ -28,6 +28,7 @@ namespace LibreNMS\Polling\Method\Config;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use LibreNMS\Util\IP;
 
 final readonly class SnmpConfig
 {
@@ -82,6 +83,10 @@ final readonly class SnmpConfig
 
     public static function fromDeviceArray(array $device): self
     {
+        if (isset($device['ip']) && ! IP::isValid($device['ip'])) {
+            $device['ip'] = @inet_ntop($device['ip']) ?: null;
+        }
+
         return self::fromDevice(new Device($device));
     }
 }

@@ -155,9 +155,7 @@ abstract class IP implements \Stringable
      */
     public function getNetwork($cidr = null)
     {
-        if (is_null($cidr)) {
-            $cidr = $this->cidr;
-        }
+        $cidr ??= $this->cidr;
 
         return $this->getNetworkAddress($cidr) . "/$cidr";
     }
