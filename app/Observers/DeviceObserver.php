@@ -10,9 +10,9 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use File;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostRenameException;
-use Log;
 
 class DeviceObserver
 {
@@ -48,6 +48,7 @@ class DeviceObserver
             $polled_by = LibrenmsConfig::get('distributed_poller') ? (' by ' . \config('librenms.node_id')) : '';
 
             Eventlog::log(sprintf('Device status changed to %s from %s check%s.', ucfirst($type), $reason, $polled_by), $device, $type);
+            Log::debug('Device availability updated for ' . $device->hostname . ' to ' . ($device->status ? 'up' : 'down') . ' due to ' . $device->status_reason);
 
             app(UpdateDeviceOutage::class)->execute($device);
         }
