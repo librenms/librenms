@@ -450,20 +450,13 @@ class Port extends DeviceRelatedModel implements BillableSource
         $query->whereIn('ports.ifOperStatus', ['up', 'dormant']);
     }
 
-    public function fetchBillingCounters(): ?array
+    public function getBillingCounters(): ?array
     {
-        // prefer the 64 bit counters, fall back to the 32 bit ones on devices without them
-        foreach ([['IF-MIB::ifHCInOctets', 'IF-MIB::ifHCOutOctets'], ['IF-MIB::ifInOctets', 'IF-MIB::ifOutOctets']] as [$in_oid, $out_oid]) {
-            $response = \SnmpQuery::device($this->device)->get(["$in_oid.$this->ifIndex", "$out_oid.$this->ifIndex"]);
-            $in = $response->value("$in_oid.$this->ifIndex");
-            $out = $response->value("$out_oid.$this->ifIndex");
-
-            if (is_numeric($in) && is_numeric($out)) {
-                return [(int) $in, (int) $out];
-            }
+        if ($this->ifInOctets === null || $this->ifOutOctets === null || ! $this->poll_time) {
+            return null;
         }
 
-        return null;
+        return [(int) $this->ifInOctets, (int) $this->ifOutOctets, (int) $this->poll_time];
     }
 
     public function getBillingSpeed(): ?int

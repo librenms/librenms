@@ -4,7 +4,8 @@
  * BillableSource.php
  *
  * A model whose traffic counters can be accounted on a traffic bill.
- * Billing reads the counters from the device each time it runs.
+ * Counters come from the regular poller run for that model, billing never
+ * queries the device itself.
  *
  * To make a new kind of source billable:
  *  - implement this interface and use the App\Models\Traits\Billable trait on the model
@@ -79,12 +80,12 @@ interface BillableSource
     public function device(): BelongsTo;
 
     /**
-     * Read the cumulative inbound and outbound octet counters from the device.
-     * Returns null if either can not be read, so a failed read is never accounted as traffic.
+     * Cumulative inbound and outbound octet counters as stored by the last poll and the
+     * unix timestamp they were read at. Null if the source has not been polled yet.
      *
-     * @return array{0: int, 1: int}|null
+     * @return array{0: int, 1: int, 2: int}|null
      */
-    public function fetchBillingCounters(): ?array;
+    public function getBillingCounters(): ?array;
 
     /**
      * Link speed in bits per second used to reject impossible counter jumps, null for no limit

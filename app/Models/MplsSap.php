@@ -36,6 +36,8 @@ class MplsSap extends DeviceRelatedModel implements BillableSource, Keyable
         'sapOperStatus',
         'sapLastMgmtChange',
         'sapLastStatusChange',
+        'sapIngressOctets',
+        'sapEgressOctets',
     ];
 
     // ---- Helper Functions ----
@@ -88,31 +90,15 @@ class MplsSap extends DeviceRelatedModel implements BillableSource, Keyable
         $query->where('mpls_saps.sapOperStatus', 'up');
     }
 
-    public function fetchBillingCounters(): ?array
+    public function getBillingCounters(): ?array
     {
-        // the same counters the sap graphs use: ingress offered, egress forwarded
-        $objects = [
-            'in' => ['sapBaseStatsIngressPchipOfferedHiPrioOctets', 'sapBaseStatsIngressPchipOfferedLoPrioOctets'],
-            'out' => ['sapBaseStatsEgressQchipForwardedInProfOctets', 'sapBaseStatsEgressQchipForwardedOutProfOctets'],
-        ];
-        $index = $this->getSapIndex();
-        $oids = array_map(fn ($object) => "TIMETRA-SAP-MIB::$object.$index", array_merge(...array_values($objects)));
-        $response = \SnmpQuery::device($this->device)->get($oids);
-
-        $counters = [];
-        foreach ($objects as $direction => $names) {
-            $counters[$direction] = 0;
-            foreach ($names as $name) {
-                $value = $response->value("TIMETRA-SAP-MIB::$name.$index");
-                if (! is_numeric($value)) {
-                    return null; // a partial sum would be accounted as a traffic spike
-                }
-                // some SAPs report the Counter64 maximum for a stat they don't keep
-                $counters[$direction] += $value === '18446744073709551615' ? 0 : (int) $value;
-            }
+        // counters are refreshed by the mpls poller module, the device poll time is the closest we have
+        $time = $this->device?->last_polled?->getTimestamp();
+        if ($this->sapIngressOctets === null || $this->sapEgressOctets === null || ! $time) {
+            return null;
         }
 
-        return [$counters['in'], $counters['out']];
+        return [(int) $this->sapIngressOctets, (int) $this->sapEgressOctets, $time];
     }
 
     public function getBillingSpeed(): ?int

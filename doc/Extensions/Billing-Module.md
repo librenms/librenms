@@ -23,6 +23,15 @@ To enable and use the billing module, do these steps:
     Go to Settings -> Poller -> Settings
     Then select `Billing Enabled` for each poller.
 
+## How usage is collected
+
+Billing does not query devices itself. Each run accounts the traffic counters
+the pollers stored at their last poll: `ifInOctets`/`ifOutOctets` of billed
+ports (ports poller module) and the SAP counters of billed SAPs (MPLS poller
+module). The poller module of a billed source must be enabled on its device;
+a source that was not polled since the previous billing run adds nothing to
+that run and its traffic is accounted once it is polled again.
+
 ## Adding a bill
 
 To create a new bill, from the LibreNMS menu select Ports -> Traffic Bills and
@@ -40,8 +49,8 @@ same bill; their usage is summed.
 On Nokia SR OS (TiMOS) devices the customer handoff of a service is a SAP
 (Service Access Point: port + encapsulation). A SAP is not an interface in
 the ifTable, so it cannot be billed as a port. Instead a bill can be based
-on individual SAPs. Like ports, billing reads the SAP traffic counters
-(the same ones shown in the SAP graphs) from the device each time it runs.
+on individual SAPs: the traffic counters the MPLS poller module already
+collects for the SAP graphs are accounted on the bill.
 
 Select `Nokia SAP` as the source in the `Add Traffic Bill` dialog or the
 `Add Source` form. The MPLS discovery/poller module must be enabled on the
