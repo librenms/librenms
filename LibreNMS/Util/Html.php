@@ -141,9 +141,7 @@ class Html
     public static function percentageBar($width, $height, $percent, $left_text = '', $right_text = '', $warn = null, $shadow = null, $colors = null)
     {
         $percent = min($percent, 100);
-        if ($colors === null) {
-            $colors = Color::percentage($percent, $warn ?: null);
-        }
+        $colors ??= Color::percentage($percent, $warn ?: null);
         $default = Color::percentage(0);
         $left_text_color = empty($colors['left_text']) ? 'inherit' : '#' . $colors['left_text'];
         $right_text_color = empty($colors['right_text']) ? 'inherit' : '#' . $colors['right_text'];
