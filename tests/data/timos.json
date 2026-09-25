@@ -8488,7 +8488,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 12437249,
-                    "sapLastStatusChange": 36211628
+                    "sapLastStatusChange": 36211628,
+                    "sapIngressOctets": null,
+                    "sapEgressOctets": null
                 },
                 {
                     "svc_oid": 118208002,
@@ -8501,7 +8503,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 13038042,
-                    "sapLastStatusChange": 13038062
+                    "sapLastStatusChange": 13038062,
+                    "sapIngressOctets": null,
+                    "sapEgressOctets": null
                 },
                 {
                     "svc_oid": 118208003,
@@ -8514,7 +8518,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 15315533,
-                    "sapLastStatusChange": 15315561
+                    "sapLastStatusChange": 15315561,
+                    "sapIngressOctets": null,
+                    "sapEgressOctets": null
                 },
                 {
                     "svc_oid": 118208004,
@@ -8527,7 +8533,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 18844769,
-                    "sapLastStatusChange": 18844847
+                    "sapLastStatusChange": 18844847,
+                    "sapIngressOctets": null,
+                    "sapEgressOctets": null
                 },
                 {
                     "svc_oid": 118208010,
@@ -8540,7 +8548,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 27554054,
-                    "sapLastStatusChange": 42286652
+                    "sapLastStatusChange": 42286652,
+                    "sapIngressOctets": null,
+                    "sapEgressOctets": null
                 },
                 {
                     "svc_oid": 118208012,
@@ -8553,7 +8563,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 27554068,
-                    "sapLastStatusChange": 13559111
+                    "sapLastStatusChange": 13559111,
+                    "sapIngressOctets": null,
+                    "sapEgressOctets": null
                 },
                 {
                     "svc_oid": 118208020,
@@ -8566,7 +8578,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 28082922,
-                    "sapLastStatusChange": 28081223
+                    "sapLastStatusChange": 28081223,
+                    "sapIngressOctets": null,
+                    "sapEgressOctets": null
                 }
             ]
         },
@@ -9458,7 +9472,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 12437249,
-                    "sapLastStatusChange": 36211628
+                    "sapLastStatusChange": 36211628,
+                    "sapIngressOctets": 0,
+                    "sapEgressOctets": 0
                 },
                 {
                     "svc_oid": 118208002,
@@ -9471,7 +9487,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 13038042,
-                    "sapLastStatusChange": 13038062
+                    "sapLastStatusChange": 13038062,
+                    "sapIngressOctets": 0,
+                    "sapEgressOctets": 0
                 },
                 {
                     "svc_oid": 118208003,
@@ -9484,7 +9502,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 15315533,
-                    "sapLastStatusChange": 15315561
+                    "sapLastStatusChange": 15315561,
+                    "sapIngressOctets": 0,
+                    "sapEgressOctets": 0
                 },
                 {
                     "svc_oid": 118208004,
@@ -9497,7 +9517,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 18844769,
-                    "sapLastStatusChange": 18844847
+                    "sapLastStatusChange": 18844847,
+                    "sapIngressOctets": 0,
+                    "sapEgressOctets": 0
                 },
                 {
                     "svc_oid": 118208010,
@@ -9510,7 +9532,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 27554054,
-                    "sapLastStatusChange": 42286652
+                    "sapLastStatusChange": 42286652,
+                    "sapIngressOctets": 0,
+                    "sapEgressOctets": 0
                 },
                 {
                     "svc_oid": 118208012,
@@ -9523,7 +9547,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 27554068,
-                    "sapLastStatusChange": 13559111
+                    "sapLastStatusChange": 13559111,
+                    "sapIngressOctets": 0,
+                    "sapEgressOctets": 0
                 },
                 {
                     "svc_oid": 118208020,
@@ -9536,7 +9562,9 @@
                     "sapAdminStatus": "up",
                     "sapOperStatus": "up",
                     "sapLastMgmtChange": 28082922,
-                    "sapLastStatusChange": 28081223
+                    "sapLastStatusChange": 28081223,
+                    "sapIngressOctets": 0,
+                    "sapEgressOctets": 0
                 }
             ]
         }

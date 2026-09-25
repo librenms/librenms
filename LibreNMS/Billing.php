@@ -122,7 +122,8 @@ class Billing
     }
 
     /**
-     * Account the traffic of every source on the bill since the previous run
+     * Account the traffic of every source on the bill since the previous run.
+     * Counters are read from the last poll of each source, the device is not queried.
      */
     public static function pollBill(Bill $bill): void
     {
@@ -140,7 +141,7 @@ class Billing
             }
 
             Log::info('  ' . $source::billingTypeName() . ' ' . $source->getBillingLabel() . ' on ' . $device->display);
-            [$in, $out] = self::updateCounter($bill, $source, $now);
+            [$in, $out] = self::updateCounter($bill, $source);
             $in_delta += $in;
             $out_delta += $out;
         }
@@ -173,24 +174,31 @@ class Billing
      * @param  Model&BillableSource  $source  loaded through a Bill relation, so the pivot is present
      * @return array{0: int, 1: int} inbound and outbound octets
      */
-    private static function updateCounter(Bill $bill, Model&BillableSource $source, Carbon $now): array
+    private static function updateCounter(Bill $bill, Model&BillableSource $source): array
     {
-        $counters = $source->fetchBillingCounters();
+        $counters = $source->getBillingCounters();
 
         if ($counters === null) {
-            Log::error('    Could not read the counters, skipping');
+            Log::error('    No counters available yet, skipping');
 
             return [0, 0];
         }
 
-        [$in, $out] = $counters;
+        [$in, $out, $counter_time] = $counters;
+        $time = Carbon::createFromTimestamp($counter_time, date_default_timezone_get()); // stored as local time, like the other bill timestamps
         /** @var BillCounter $last */
         $last = $source->getRelation('pivot');
         $in_delta = 0;
         $out_delta = 0;
 
         if ($last->in_counter !== null) {
-            $period = max(1, $now->getTimestamp() - $last->timestamp->getTimestamp());
+            if ($time->lte($last->timestamp)) {
+                Log::debug('    Counters not polled since the last run, skipping');
+
+                return [0, 0];
+            }
+
+            $period = $time->getTimestamp() - $last->timestamp->getTimestamp();
             $in_delta = self::counterDelta($in, $last->in_counter, $last->in_delta, $period, $source->getBillingSpeed());
             $out_delta = self::counterDelta($out, $last->out_counter, $last->out_delta, $period, $source->getBillingSpeed());
         }
@@ -198,7 +206,7 @@ class Billing
         Log::debug("    in: $in (+$in_delta)  out: $out (+$out_delta)");
 
         $source->bills()->updateExistingPivot($bill->bill_id, [
-            'timestamp' => $now,
+            'timestamp' => $time,
             'in_counter' => $in,
             'out_counter' => $out,
             'in_delta' => $in_delta,
