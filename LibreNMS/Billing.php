@@ -125,7 +125,7 @@ class Billing
         foreach (self::activeSources($bill) as $source) {
             /** @var \App\Models\Device $device loaded by activeSources() */
             $device = $source->getRelation('device');
-            Log::info('  ' . $source::billingTypeName() . ' ' . $source->getBillingLabel() . ' on ' . $device->displayName());
+            Log::info('  ' . $source::billingTypeName() . ' ' . $source->getBillingLabel() . ' on ' . $device->display);
             [$in, $out] = self::updateCounter($bill, $source, $now);
             $in_delta += $in;
             $out_delta += $out;

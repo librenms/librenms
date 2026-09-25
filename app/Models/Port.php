@@ -17,8 +17,8 @@ use Illuminate\Support\Str;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Interfaces\Models\BillableSource;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\Url;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
 /**
  * @property IfOperStatus|null $ifOperStatus
