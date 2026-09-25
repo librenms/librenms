@@ -1,5 +1,5 @@
-os: xpand
-text: 'XPAND IP'
+os: nera
+text: 'Nera Evolution'
 type: wireless
 over:
     - { graph: device_wireless_power, text: 'Wireless Power' }

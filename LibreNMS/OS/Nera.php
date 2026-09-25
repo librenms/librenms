@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Xpand.php
+ * Nera.php
  *
- * XPAND IP microwave radios (Nera / EVOLUTION, enterprise 2378)
+ * Nera Evolution Series microwave radios (XPAND IP / METRO, enterprise 2378)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
 
-class Xpand extends OS implements WirelessPowerDiscovery, WirelessSnrDiscovery
+class Nera extends OS implements WirelessPowerDiscovery, WirelessSnrDiscovery
 {
     private const POWER_MEASUREMENTS = [
         'RF INPUT LEVEL' => 'RX Main',
@@ -84,7 +84,7 @@ class Xpand extends OS implements WirelessPowerDiscovery, WirelessSnrDiscovery
                 $type,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2378.1.1.2.2.2.2.1.1.5.' . $index, // measurement value
-                'xpand',
+                'nera',
                 $index,
                 trim($this->entityLabel($measurement['entity']) . ' ' . $label),
                 is_numeric($measurement['value']) ? (float) $measurement['value'] : null
