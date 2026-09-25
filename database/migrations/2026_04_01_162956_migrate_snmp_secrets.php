@@ -25,6 +25,19 @@ return new class extends Migration
                 DB::transaction(function () use ($devices) {
                     $deviceIds = $devices->pluck('device_id')->all();
 
+                    // Skip devices that already have an SNMP polling method
+                    $existingDeviceIds = DB::table('device_polling_methods')
+                        ->where('method_type', 'snmp')
+                        ->whereIn('device_id', $deviceIds)
+                        ->pluck('device_id')
+                        ->all();
+
+                    $deviceIds = array_diff($deviceIds, $existingDeviceIds);
+
+                    if (empty($deviceIds)) {
+                        return;
+                    }
+
                     $attribsByDevice = DB::table('devices_attribs')
                         ->whereIn('device_id', $deviceIds)
                         ->whereIn('attrib_type', ['snmp_max_repeaters', 'snmp_max_oid'])
@@ -34,6 +47,10 @@ return new class extends Migration
                     $pollingMethods = [];
 
                     foreach ($devices as $device) {
+                        if (in_array($device->device_id, $existingDeviceIds)) {
+                            continue;
+                        }
+
                         $snmpver = $device->snmpver ?? 'v2c';
                         $data = ['version' => $snmpver];
 
@@ -88,7 +105,9 @@ return new class extends Migration
                         ];
                     }
 
-                    DB::table('device_polling_methods')->insert($pollingMethods);
+                    if (! empty($pollingMethods)) {
+                        DB::table('device_polling_methods')->insert($pollingMethods);
+                    }
                 });
             });
 

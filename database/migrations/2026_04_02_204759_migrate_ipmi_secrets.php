@@ -18,11 +18,18 @@ return new class extends Migration
 
     public function up(): void
     {
-        DB::table('devices')
-            ->orderBy('devices.device_id')
-            ->chunk(100, function ($devices) {
-                DB::transaction(function () use ($devices) {
+        DB::transaction(function () {
+            DB::table('devices')
+                ->orderBy('devices.device_id')
+                ->chunk(100, function ($devices) {
                     $deviceIds = $devices->pluck('device_id')->all();
+
+                    // Skip devices that already have an IPMI polling method
+                    $existingDeviceIds = DB::table('device_polling_methods')
+                        ->where('method_type', 'ipmi')
+                        ->whereIn('device_id', $deviceIds)
+                        ->pluck('device_id')
+                        ->all();
 
                     $attribsByDevice = DB::table('devices_attribs')
                         ->whereIn('device_id', $deviceIds)
@@ -35,6 +42,10 @@ return new class extends Migration
                     $pollingMethods = [];
 
                     foreach ($deviceIds as $deviceId) {
+                        if (in_array($deviceId, $existingDeviceIds)) {
+                            continue;
+                        }
+
                         $attribs = ($attribsByDevice[$deviceId] ?? collect())
                             ->pluck('attrib_value', 'attrib_type');
 
@@ -84,7 +95,7 @@ return new class extends Migration
                         DB::table('device_polling_methods')->insert($pollingMethods);
                     }
                 });
-            });
+        });
 
         $id = 0;
         foreach ($this->secretMeta as $secretId => $meta) {
