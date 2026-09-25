@@ -138,7 +138,7 @@ class InventoryController implements DeviceTab
             }
 
             if ($entState->entStateAlarm && ! in_array($entState->entStateAlarm, ['00', '80'], true)) {
-                $alarms = parse_entity_state_alarm($entState->entStateAlarm);
+                $alarms = $this->parse_entity_state_alarm($entState->entStateAlarm);
             }
         }
 
@@ -261,5 +261,23 @@ class InventoryController implements DeviceTab
         }
 
         return $this->type;
+    }
+
+    private function parse_entity_state_alarm($bits): array  {
+        // not sure if this is correct
+        $data = [
+            0 => ['text' => 'unavailable', 'color' => 'default'],
+            1 => ['text' => 'underRepair', 'color' => 'warning'],
+            2 => ['text' => 'critical', 'color' => 'danger'],
+            3 => ['text' => 'major', 'color' => 'danger'],
+            4 => ['text' => 'minor', 'color' => 'info'],
+            5 => ['text' => 'warning', 'color' => 'warning'],
+            6 => ['text' => 'indeterminate', 'color' => 'default'],
+        ];
+
+        $alarms = str_split(base_convert((string) $bits, 16, 2));
+        $active_alarms = array_filter($alarms);
+
+        return array_intersect_key($data, $active_alarms);
     }
 }
