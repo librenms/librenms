@@ -69,9 +69,12 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                 'ECS4100-52T-MIB' => '.1.3.6.1.4.1.259.10.1.46.1.39.3.2.0',
                 'ECS4110-MIB' => '.1.3.6.1.4.1.259.10.1.39.1.39.3.2.0',
                 'ECS4120-MIB' => '.1.3.6.1.4.1.259.10.1.45.1.39.3.2.0',
+                'ECS4150-MIB' => '.1.3.6.1.4.1.259.10.1.55.1.39.3.2.0',
                 'ECS4210-MIB' => '.1.3.6.1.4.1.259.10.1.42.101.1.39.3.2.0',
                 'ECS4510-MIB' => '.1.3.6.1.4.1.259.10.1.24.1.39.3.2.0',
                 'ECS4610-24F-MIB' => '.1.3.6.1.4.1.259.10.1.5.1.39.3.2.0',
+                'ECS4650-MIB' => '.1.3.6.1.4.1.259.10.1.58.1.39.3.2.0',
+                'ECS5520-MIB' => '.1.3.6.1.4.1.259.10.1.51.1.39.3.2.0',
                 'ES3510MA-MIB' => '.1.3.6.1.4.1.259.8.1.11.1.39.3.2.0',
                 'ES3528MO-MIB' => '.1.3.6.1.4.1.259.6.10.94.1.39.3.2.0',
                 'ES3528MV2-MIB' => '.1.3.6.1.4.1.259.10.1.22.1.39.3.2.0',
@@ -84,9 +87,12 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                 'ECS4100-52T-MIB' => '.1.3.6.1.4.1.259.10.1.46.1.39.3.3.0',
                 'ECS4110-MIB' => '.1.3.6.1.4.1.259.10.1.39.1.39.3.3.0',
                 'ECS4120-MIB' => '.1.3.6.1.4.1.259.10.1.45.1.39.3.3.0',
+                'ECS4150-MIB' => '.1.3.6.1.4.1.259.10.1.55.1.39.3.3.0',
                 'ECS4210-MIB' => '.1.3.6.1.4.1.259.10.1.42.101.1.39.3.3.0',
                 'ECS4510-MIB' => '.1.3.6.1.4.1.259.10.1.24.1.39.3.3.0',
                 'ECS4610-24F-MIB' => '.1.3.6.1.4.1.259.10.1.5.1.39.3.3.0',
+                'ECS4650-MIB' => '.1.3.6.1.4.1.259.10.1.58.1.39.3.3.0',
+                'ECS5520-MIB' => '.1.3.6.1.4.1.259.10.1.51.1.39.3.3.0',
                 'ES3510MA-MIB' => '.1.3.6.1.4.1.259.8.1.11.1.39.3.3.0',
                 'ES3528MO-MIB' => '.1.3.6.1.4.1.259.6.10.94.1.39.3.3.0',
                 'ES3528MV2-MIB' => '.1.3.6.1.4.1.259.10.1.22.1.39.3.3.0',
@@ -127,8 +133,14 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
             $oid = '.1.3.6.1.4.1.259.10.1.39.1.39.2.1.0';
         } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.45.')) { //ECS4120
             $oid = '.1.3.6.1.4.1.259.10.1.45.1.39.2.1.0';
+        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.55.')) { //ECS4150
+            $oid = '.1.3.6.1.4.1.259.10.1.55.1.39.2.1.0';
         } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.42.')) { //ECS4210
             $oid = '.1.3.6.1.4.1.259.10.1.42.101.1.39.2.1.0';
+        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.58.')) { //ECS4650
+            $oid = '.1.3.6.1.4.1.259.10.1.58.1.39.2.1.0';
+        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.51.')) { //ECS5520
+            $oid = '.1.3.6.1.4.1.259.10.1.51.1.39.2.1.0';
         } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.27.')) { //ECS3510
             $oid = '.1.3.6.1.4.1.259.10.1.27.1.39.2.1.0';
         } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.8.1.11.')) { //ES3510MA
@@ -201,8 +213,11 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
             'ECS4100-52T-MIB' => '.1.3.6.1.4.1.259.10.1.46.1.2.11',
             'ECS4110-MIB' => '.1.3.6.1.4.1.259.10.1.39.1.2.11',
             'ECS4120-MIB' => '.1.3.6.1.4.1.259.10.1.45.1.2.11',
+            'ECS4150-MIB' => '.1.3.6.1.4.1.259.10.1.55.1.2.11',
             'ECS4210-MIB' => '.1.3.6.1.4.1.259.10.1.42.101.1.2.11',
             'ECS4510-MIB' => '.1.3.6.1.4.1.259.10.1.24.1.2.11',
+            'ECS4650-MIB' => '.1.3.6.1.4.1.259.10.1.58.1.2.11',
+            'ECS5520-MIB' => '.1.3.6.1.4.1.259.10.1.51.1.2.11',
             'ES3510MA-MIB' => '.1.3.6.1.4.1.259.8.1.11.1.2.11',
             'ES3528MV2-MIB' => '.1.3.6.1.4.1.259.10.1.22.1.2.11',
             default => null,
@@ -346,9 +361,12 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
             'ECS4100-52T-MIB' => '.1.3.6.1.4.1.259.10.1.46.1.1.3.1.8',
             'ECS4110-MIB' => '.1.3.6.1.4.1.259.10.1.39.1.1.3.1.8',
             'ECS4120-MIB' => '.1.3.6.1.4.1.259.10.1.45.1.1.3.1.8',
+            'ECS4150-MIB' => '.1.3.6.1.4.1.259.10.1.55.1.1.3.1.8',
             'ECS4210-MIB' => '.1.3.6.1.4.1.259.10.1.42.101.1.1.3.1.8',
             'ECS4510-MIB' => '.1.3.6.1.4.1.259.10.1.24.1.1.3.1.8',
             'ECS4610-24F-MIB' => '.1.3.6.1.4.1.259.10.1.5.1.1.3.1.8',
+            'ECS4650-MIB' => '.1.3.6.1.4.1.259.10.1.58.1.1.3.1.8',
+            'ECS5520-MIB' => '.1.3.6.1.4.1.259.10.1.51.1.1.3.1.8',
             'ES3510MA-MIB' => '.1.3.6.1.4.1.259.8.1.11.1.1.3.1.8',
             'ES3528MO-MIB' => '.1.3.6.1.4.1.259.6.10.94.1.1.3.1.8',
             'ES3528MV2-MIB' => '.1.3.6.1.4.1.259.10.1.22.1.1.3.1.8',
@@ -395,6 +413,9 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
 
         $switchFanTableOidPrefix = match ($mib) {
             'ECS4120-MIB' => '.1.3.6.1.4.1.259.10.1.45.1.1.9',
+            'ECS4150-MIB' => '.1.3.6.1.4.1.259.10.1.55.1.1.9',
+            'ECS4650-MIB' => '.1.3.6.1.4.1.259.10.1.58.1.1.9',
+            'ECS5520-MIB' => '.1.3.6.1.4.1.259.10.1.51.1.1.9',
             default => null,
         };
 
@@ -453,7 +474,10 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
         $switchThermalTempTableOidPrefix = match ($mib) {
             'ECS4100-52T-MIB' => '.1.3.6.1.4.1.259.10.1.46.1.1.11',
             'ECS4120-MIB' => '.1.3.6.1.4.1.259.10.1.45.1.1.11',
+            'ECS4150-MIB' => '.1.3.6.1.4.1.259.10.1.55.1.1.11',
             'ECS4510-MIB' => '.1.3.6.1.4.1.259.10.1.24.1.1.11',
+            'ECS4650-MIB' => '.1.3.6.1.4.1.259.10.1.58.1.1.11',
+            'ECS5520-MIB' => '.1.3.6.1.4.1.259.10.1.51.1.1.11',
             default => null,
         };
 
@@ -467,7 +491,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                 app('sensor-discovery')->discover(new \App\Models\Sensor([
                     'poller_type' => 'snmp',
                     'sensor_class' => 'temperature',
-                    'sensor_oid' => "$switchThermalTempTableOidPrefix.1.3.$unit.$unit",
+                    'sensor_oid' => "$switchThermalTempTableOidPrefix.1.3.$unit.$index",
                     'sensor_index' => "edgecos-switchThermalTempValue.$unit.$index",
                     'sensor_type' => 'edgecos',
                     'sensor_descr' => "Switch Temperature $unit.$index",
@@ -495,6 +519,9 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
             '.1.3.6.1.4.1.259.10.1.42.' => 'ECS4210-MIB',
             '.1.3.6.1.4.1.259.10.1.27.' => 'ECS3510-MIB',
             '.1.3.6.1.4.1.259.10.1.45.' => 'ECS4120-MIB',
+            '.1.3.6.1.4.1.259.10.1.55.' => 'ECS4150-MIB',
+            '.1.3.6.1.4.1.259.10.1.51.' => 'ECS5520-MIB',
+            '.1.3.6.1.4.1.259.10.1.58.' => 'ECS4650-MIB',
             '.1.3.6.1.4.1.259.8.1.11' => 'ES3510MA-MIB',
             '.1.3.6.1.4.1.259.10.1.43.' => 'ECS2100-MIB',
             '.1.3.6.1.4.1.259.10.1.46.' => 'ECS4100-52T-MIB',

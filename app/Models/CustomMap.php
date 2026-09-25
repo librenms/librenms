@@ -64,7 +64,7 @@ class CustomMap extends BaseModel
     ];
 
     /**
-     * @return array{options: 'array', legend_colours: 'array', newnodeconfig: 'array', newedgeconfig: 'array', background_data: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -91,7 +91,23 @@ class CustomMap extends BaseModel
         return $config;
     }
 
-    public function scopeHasAccess(Builder $query, User $user): Builder
+    /**
+     * Get legend config intended to be passed to javascript
+     */
+    public function getLegendConfig(): array
+    {
+        return [
+            'x' => $this->legend_x,
+            'y' => $this->legend_y,
+            'steps' => $this->legend_steps,
+            'hide_invalid' => (bool) $this->legend_hide_invalid,
+            'hide_overspeed' => (bool) $this->legend_hide_overspeed,
+            'font_size' => $this->legend_font_size,
+            'colours' => $this->legend_colours,
+        ];
+    }
+
+    protected function scopeHasAccess(Builder $query, User $user): Builder
     {
         if (Gate::allows('viewAll', CustomMap::class)) {
             return $query;

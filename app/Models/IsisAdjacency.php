@@ -55,11 +55,11 @@ class IsisAdjacency extends PortRelatedModel implements Keyable
 
     // ---- Define Relationships ----
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Port, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
      */
     public function device(): BelongsTo
     {
-        return $this->belongsTo(Port::class, 'device_id');
+        return $this->belongsTo(Device::class, 'device_id');
     }
 
     public function getCompositeKey(): string

@@ -227,7 +227,7 @@ for any configured and enabled "routeros" device.
 Verify the return of groups by querying the API:
 
 ```
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/oxidized
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/oxidized
 ```
 
 If you need to, you can specify credentials for groups by using the
@@ -250,12 +250,12 @@ hooks:
     type: exec
     events: [node_fail]
     async: true
-    cmd: 'curl -k -s -X POST -d "{\"text\": \"Check for config change failed. Reason: ${OX_ERR_REASON//\"}. Group: ${OX_NODE_GROUP} Timetaken: ${OX_JOB_TIME}\",\"severity\":\"3\",\"type\":\"oxidized\"}" -H "X-Auth-Token: YOURAPITOKENHERE" https://foo.example/api/v0/devices/${OX_NODE_NAME}/eventlog'
+    cmd: 'curl -k -s -X POST -d "{\"text\": \"Check for config change failed. Reason: ${OX_ERR_REASON//\"}. Group: ${OX_NODE_GROUP} Timetaken: ${OX_JOB_TIME}\",\"severity\":\"3\",\"type\":\"oxidized\"}" -H "Authorization: Bearer YOURAPITOKENHERE" https://foo.example/api/v0/devices/${OX_NODE_NAME}/eventlog'
   libre_log_change:
     type: exec
     events: [post_store]
     async: true
-    cmd: 'curl -k -s -X POST -d "{\"text\": \"Config change observed on check. Commit Ref: ${OX_REPO_COMMITREF} Group: ${OX_NODE_GROUP} Timetaken: ${OX_JOB_TIME}\",\"severity\":\"2\",\"type\":\"oxidized\"}" -H "X-Auth-Token: YOURAPITOKENHERE" https://foo.example/api/v0/devices/${OX_NODE_NAME}/eventlog'
+    cmd: 'curl -k -s -X POST -d "{\"text\": \"Config change observed on check. Commit Ref: ${OX_REPO_COMMITREF} Group: ${OX_NODE_GROUP} Timetaken: ${OX_JOB_TIME}\",\"severity\":\"2\",\"type\":\"oxidized\"}" -H "Authorization: Bearer YOURAPITOKENHERE" https://foo.example/api/v0/devices/${OX_NODE_NAME}/eventlog'
 ```
 Note: `/bin/sh` must be bash, or the substitutions fail. [Ruby runs
 commands only with the shell at

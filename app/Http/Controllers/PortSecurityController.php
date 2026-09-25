@@ -6,7 +6,6 @@ use App\Models\PortSecurity;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class PortSecurityController extends Controller
@@ -40,7 +39,7 @@ class PortSecurityController extends Controller
     public static function getFilteredQuery(Request $request, ?int $deviceId = null): Builder
     {
         return PortSecurity::query()
-            ->hasAccess(Auth::user())
+            ->hasAccess($request->user())
             ->with(['device', 'port'])
             ->when($deviceId, fn (Builder $q) => $q->where('port_security.device_id', $deviceId))
             ->when($request->array('filter'), fn (Builder $q, $filters) => $q->applyFilters($filters))

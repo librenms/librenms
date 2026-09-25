@@ -3,6 +3,7 @@
 namespace LibreNMS\Authentication;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Exceptions\InvalidAuthMechanismException;
 use LibreNMS\Interfaces\Authentication\Authorizer;
 
 class LegacyAuth
@@ -52,12 +53,10 @@ class LegacyAuth
      */
     public static function getClass($type = null)
     {
-        if (is_null($type)) {
-            $type = self::getType();
-        }
+        $type ??= self::getType();
 
         if (! isset(self::$configToClassMap[$type])) {
-            throw new \RuntimeException($type . ' not found as auth_mechanism');
+            throw new InvalidAuthMechanismException($type);
         }
 
         return self::$configToClassMap[$type];

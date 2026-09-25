@@ -29,7 +29,6 @@ namespace App\Jobs;
 use App\Action;
 use App\Actions\Alerts\RunAlertRulesAction;
 use App\Actions\Device\SetDeviceAvailability;
-use App\Actions\Device\UpdateDeviceOutage;
 use App\Models\Device;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -187,9 +186,6 @@ class PingCheck implements ShouldQueue
         // mark up only if snmp is not down too
         $changed = app(SetDeviceAvailability::class)->execute($device, ['icmp' => $response->isAlive()]);
         $device->save();
-        if ($changed) {
-            app(UpdateDeviceOutage::class)->execute($device);
-        }
 
         // mark as processed
         $this->processed->put($device->device_id, true);
@@ -249,7 +245,7 @@ class PingCheck implements ShouldQueue
                     if ($alert_child) {
                         Log::debug("Deferred device $child_id triggered by $device_id");
 
-                        Action::execute(RunAlertRulesAction::class, device: $this->devices->get($child_id));
+                        Action::execute(RunAlertRulesAction::class, device: $this->devices->firstWhere('device_id', $child_id));
                         $this->deferred->pull($child_id);
                     }
                 }

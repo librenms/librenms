@@ -202,6 +202,6 @@ class Ipmitool
         $cmd = $this->createCommand($commands, $ipmi_type);
         Log::debug('IPMI[%m' . implode(' ', $cmd) . '%n]', ['color' => true]);
 
-        return Process::command($cmd)->run();
+        return Process::command($cmd)->env(['LC_ALL' => 'C'])->run();
     }
 }

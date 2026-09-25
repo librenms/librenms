@@ -14,11 +14,14 @@ echo generate_link('Totals', $link_array) . ' | Instances: ';
 $sagan_instances = $app->data['instances'] ?? [];
 sort($sagan_instances);
 foreach ($sagan_instances as $index => $sinstance) {
-    $label = $vars['sinstance'] == $sinstance
-        ? '<span class="pagemenu-selected">' . $sinstance . '</span>'
-        : $sinstance;
+    $label = $sinstance;
+    $link = generate_link($label, $link_array, ['sinstance' => $sinstance]);
 
-    echo generate_link($label, $link_array, ['sinstance' => $sinstance]);
+    $link = $vars['sinstance'] == $sinstance
+        ? '<span class="pagemenu-selected">' . $link . '</span>'
+        : $link;
+
+    echo $link;
 
     if ($index < (count($sagan_instances) - 1)) {
         echo ', ';

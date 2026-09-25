@@ -169,9 +169,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port['graph_type'] = $type;
     }
 
-    if (! isset($port['graph_type'])) {
-        $port['graph_type'] = 'port_bits';
-    }
+    $port['graph_type'] ??= 'port_bits';
 
     $class = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
 
@@ -271,9 +269,7 @@ function generate_ap_link($args, $text = null, $type = null)
         $args['graph_type'] = $type;
     }
 
-    if (! isset($args['graph_type'])) {
-        $args['graph_type'] = 'port_bits';
-    }
+    $args['graph_type'] ??= 'port_bits';
 
     if (! isset($args['hostname'])) {
         $args = array_merge($args, device_by_id_cache($args['device_id']));
@@ -615,24 +611,6 @@ function get_ports_from_type($given_types)
     return $ports;
 }
 
-/**
- * @param  $filename
- * @param  $content
- */
-function file_download($filename, $content)
-{
-    $length = strlen((string) $content);
-    header('Content-Description: File Transfer');
-    header('Content-Type: text/plain');
-    header("Content-Disposition: attachment; filename=$filename");
-    header('Content-Transfer-Encoding: binary');
-    header('Content-Length: ' . $length);
-    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-    header('Expires: 0');
-    header('Pragma: public');
-    echo $content;
-}
-
 function get_rules_from_json()
 {
     return json_decode(file_get_contents(resource_path('definitions/alert_rules.json')), true);
@@ -715,13 +693,13 @@ function get_oxidized_nodes_list()
             $formatted_local_time = $object['time'];
         }
         echo '<tr>
-        <td>' . $device->device_id . '</td>
-        <td>' . $object['name'] . '</td>
-        <td>' . $device->sysName . '</td>
-        <td>' . $object['status'] . '</td>
-        <td>' . $formatted_local_time . '</td>
-        <td>' . $object['model'] . '</td>
-        <td>' . $object['group'] . '</td>
+        <td>' . e($device->device_id) . '</td>
+        <td>' . e($object['name']) . '</td>
+        <td>' . e($device->sysName) . '</td>
+        <td>' . e($object['status']) . '</td>
+        <td>' . e($formatted_local_time) . '</td>
+        <td>' . e($object['model']) . '</td>
+        <td>' . e($object['group']) . '</td>
         <td></td>
         </tr>';
     }

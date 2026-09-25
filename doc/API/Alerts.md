@@ -13,7 +13,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alerts/1
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/alerts/1
 ```
 
 Output:
@@ -55,7 +55,7 @@ Input:
 Example:
 
 ```curl
-curl -X PUT -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alerts/1
+curl -X PUT -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/alerts/1
 ```
 
 Output:
@@ -83,7 +83,7 @@ Input:
 Example:
 
 ```curl
-curl -X PUT -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alerts/unmute/1
+curl -X PUT -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/alerts/unmute/1
 ```
 
 Output:
@@ -112,19 +112,19 @@ Input:
 Examples:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alerts?state=1
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/alerts?state=1
 ```
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alerts?severity=critical
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/alerts?severity=critical
 ```
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alerts?order=timestamp%20ASC
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/alerts?order=timestamp%20ASC
 ```
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alerts?alert_rule=49
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/alerts?alert_rule=49
 ```
 
 Output:
@@ -164,7 +164,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/rules/1
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/rules/1
 ```
 
 Output:
@@ -221,7 +221,7 @@ Input:
 Example:
 
 ```curl
-curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/rules/1
+curl -X DELETE -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/rules/1
 ```
 
 Output:
@@ -249,7 +249,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/rules
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/rules
 ```
 
 Output:
@@ -323,11 +323,12 @@ Input (JSON):
 - invert: it inverts the check of the rule.
 - name: the name of the rule. This field is mandatory.
 - notes: your own notes about this rule
+- proc: Optional. URL of a procedure/runbook for this rule, shown as a link on the alerts page and passed to transports. Must be `http://` or `https://` to be rendered, max 80 characters.
 
 Example:
 
 ```curl
-curl -X POST -d '{"devices":[1,2,3], "name":"testrule", "builder":{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"localhost"}],"valid":true}, "severity":"critical", "default_operation_step_duration":"5 m", "alert_operation_id": 12, "notes":"This a note from the API"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/rules
+curl -X POST -d '{"devices":[1,2,3], "name":"testrule", "builder":{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"localhost"}],"valid":true}, "severity":"critical", "default_operation_step_duration":"5 m", "alert_operation_id": 12, "notes":"This a note from the API"}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/rules
 ```
 
 Output:
@@ -374,11 +375,12 @@ Input (JSON):
 - invert: it inverts the check of the rule.
 - name: the name of the rule. This field is mandatory.
 - notes: your own notes about this rule
+- proc: Optional. URL of a procedure/runbook for this rule, shown as a link on the alerts page and passed to transports. Must be `http://` or `https://` to be rendered, max 80 characters.
 
 Example:
 
 ```curl
-curl -X PUT -d '{"rule_id":1,"devices":["-1"], "name":"testrule", "builder":{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"localhost"}],"valid":true}, "severity":"critical", "default_operation_step_duration":"5 m", "alert_operation_id": 12, "notes":"This a note from the API"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/rules
+curl -X PUT -d '{"rule_id":1,"devices":["-1"], "name":"testrule", "builder":{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"localhost"}],"valid":true}, "severity":"critical", "default_operation_step_duration":"5 m", "alert_operation_id": 12, "notes":"This a note from the API"}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/rules
 ```
 
 Output:
@@ -406,7 +408,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alert_templates/1
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/alert_templates/1
 ```
 
 Output:
@@ -440,7 +442,7 @@ Input: None
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alert_templates
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/alert_templates
 ```
 
 Output:
@@ -480,7 +482,7 @@ Input (JSON):
 Example:
 
 ```curl
-curl -X POST -d '{"name":"new alert template","template":"---","title":"CREATED ALERT","title_rec": "ALERT RECOVERED","alert_rules":[]}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alert_templates
+curl -X POST -d '{"name":"new alert template","template":"---","title":"CREATED ALERT","title_rec": "ALERT RECOVERED","alert_rules":[]}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/alert_templates
 ```
 
 Output:
@@ -516,7 +518,7 @@ Input (JSON):
 Example:
 
 ```curl
-curl -X POST -d '{"name":"new alert template","template":"---","template_id":"2","title":"CREATED ALERT","title_rec": "ALERT RECOVERED","alert_rules":[]}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alert_templates
+curl -X POST -d '{"name":"new alert template","template":"---","template_id":"2","title":"CREATED ALERT","title_rec": "ALERT RECOVERED","alert_rules":[]}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/alert_templates
 ```
 
 Output:

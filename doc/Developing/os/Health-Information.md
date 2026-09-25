@@ -1,4 +1,4 @@
-## Sensors
+# Health and Sensor Information
 
 This document describes how to add health and sensor information for
 your new device.
@@ -49,10 +49,11 @@ therefore do not need PHP knowledge.
 > multiplier where necessary.
 
 All the YAML files are in `resources/definitions/os_discovery/$os.yaml`.
-This method is not always possible, because it depends on the quality
-of the vendor MIBs. Only SNMP walks work. You must give a table with a
-clear structure that holds all the data. The example below uses
-netbotz.
+You can use scalar values in the sensors module instead of only tables.
+For SNMP tables, give the table in `oid:` and the column in `value:`.
+For scalar sensors, give the scalar OID in `oid:` and omit `value:`.
+
+The example below shows a table-based sensor for netbotz:
 
 `resources/definitions/os_discovery/netbotz.yaml`
 
@@ -60,19 +61,36 @@ netbotz.
 modules:
     sensors:
         airflow:
-            options:
-                skip_value_lt: 0
             data:
                 -
                     oid: NETBOTZV2-MIB::airFlowSensorTable
                     value: NETBOTZV2-MIB::airFlowSensorValue
+                    skip_value_lt: 0
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.5528.100.4.1.5.1.2.{{ $index }}'
                     descr: '{{ NETBOTZV2-MIB::airFlowSensorLabel }}'
                     index: 'airFlowSensorValue.{{ $index }}'
 ```
 
-Use the format MIB-NAME::OID for every OID reference.
+The example below shows a scalar sensor:
+
+```yaml
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: ACME-SYSTEM-MIB::acmeChassisTemp.0
+                    num_oid: '.1.3.6.1.4.1.99999.3.2.0'
+                    descr: 'Chassis Temperature'
+```
+
+Always prefer textual OIDs over numeric OIDs in discovery files. The
+sensors module only supports textual OIDs for `oid:` and `value:`. Never
+use numeric OIDs for `oid:` or `value:`.
+
+Avoid using `options:` at the class level. Define settings explicitly on each
+sensor entry under `data:`. It is better to be explicit.
 
 `data:` accepts these options:
 
@@ -81,9 +99,14 @@ available:
 
 - `oid` (required): the name of the table for the SNMP walk, with the
   MIB name in front. An example is `NETBOTZV2-MIB::airFlowSensorTable`.
+  Do not use `*Entry` names; use `*Table` instead. For scalar sensors,
+  provide the scalar OID. The sensors module only supports textual OIDs.
 - `value` (optional): the key of the value in the table, with the MIB
   name in front. An example is `NETBOTZV2-MIB::airFlowSensorValue`.
-  Without this option, LibreNMS uses `oid`.
+  If the sensors use an SNMP table, `oid` must be the table, and `value`
+  must be the column in that table. Omit this option if `value` matches
+  `oid` (such as for scalar sensors). Without this option, LibreNMS uses `oid`.
+  The sensors module only supports textual OIDs.
 - `num_oid` (required for pull requests): the numeric OID of `value`.
   Without this option, the discovery process calculates it. A pull
   request still needs this parameter. It usually holds `{{ $index }}`.
@@ -113,9 +136,13 @@ the string to the equivalent OID representation.
   With the value `transceiver`, LibreNMS shows the sensor with the port
   and not with the generic sensors. You must also set
   `entPhysicalIndex` to ifIndex
-- `index` (optional): the unique index value of this sensor. LibreNMS
-  replaces `{{ $index }}` with the numeric index of this row in the SNMP
-  walk table.
+- `index` (optional): the unique index value of this sensor. Omit
+  this key unless auto-generated indexes collide. LibreNMS uses the row
+  index from the SNMP walk automatically. If multiple tables in the same
+  sensor class produce the same index values, add a prefix (for
+  example, `index: 'inlet.{{ $index }}'`). When you use `skip_values` to
+  provide alternative definitions for different models or firmware
+  versions, identical indexes are desired.
 - `skip_values` (optional): an array of the values to skip. Read the
   note below.
 - `skip_value_lt` (optional): the discovery skips a sensor value that
@@ -138,15 +165,8 @@ the string to the equivalent OID representation.
   default type is GAUGE. For more details, read:
   https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
 
-`options:` accepts these values:
-
-- `divisor`: the divisor of the returned `value`.
-- `multiplier`: the multiplier of the returned `value`.
-- `skip_values`: an array of the values to skip. Read the note below.
-- `skip_value_lt`: the discovery skips a sensor value that is less than
-  this value.
-- `skip_value_gt`: the discovery skips a sensor value that is more than
-  this value.
+Avoid using `options:` to set shared values across entries. Set these keys
+directly inside each item under `data:` instead. It is better to be explicit.
 
 A sensor definition can hold several variables. The syntax is
 `{{ MIB-NAME::variable }}`. You can use any OID of the current table
@@ -225,9 +245,18 @@ List: `{{ IP-MIB::ipAddressPrefixOrigin:2.3.1.4 }}`
 
 #### Skipping rows of the returned data
 
-You can filter the returned rows and discover only the valid sensors.
-This filter helps when a device returns all possible sensors or mixes
-sensor types in one table.
+Generally let discovery probe walks to see if the device supports that
+OID. If an OID table is not supported or returns empty, LibreNMS skips
+it automatically.
+
+Use `skip_values` to filter the returned rows and discover only the valid
+sensors. This filter helps when a device returns all possible sensors or
+mixes sensor types in one table.
+
+When you use `skip_values` with the same index, use it to define
+alternative definitions of the exact same sensor (for example, different
+units, multipliers, or state mappings), rather than to support
+different hardware models.
 
 > `skip_values` also compares the items of the OID table to values.
 > LibreNMS uses the index of the sensor to get the value from the OID.

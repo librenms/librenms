@@ -33,19 +33,27 @@ use App\Models\UserPref;
 use App\Models\UserWidget;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
-class DashboardController extends Controller
+class DashboardController extends Controller implements HasMiddleware
 {
-    /** @var \Illuminate\Support\Collection<int, \App\Models\Dashboard> */
+    /** @var \Illuminate\Support\Collection<int, \App\Models\Dashboard>|null */
     private $dashboards;
 
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(Dashboard::class, 'dashboard');
+        return [
+            new Middleware('can:viewAny,' . Dashboard::class, only: ['index']),
+            new Middleware('can:view,dashboard', only: ['show']),
+            new Middleware('can:create,' . Dashboard::class, only: ['create', 'store']),
+            new Middleware('can:update,dashboard', only: ['edit', 'update']),
+            new Middleware('can:delete,dashboard', only: ['destroy']),
+        ];
     }
 
     /**
@@ -109,7 +117,7 @@ class DashboardController extends Controller
             'bare' => 'nullable|in:yes',
         ]);
 
-        $user = Auth::user();
+        $user = $request->user();
 
         // Split dashboards into user owned or shared
         $dashboards = $this->getAvailableDashboards($user);
@@ -219,7 +227,7 @@ class DashboardController extends Controller
 
         $dashboard_copy = $dashboard->replicate()->fill([
             'user_id' => $target_user_id,
-            'dashboard_name' => $dashboard->dashboard_name . '_' . Auth::user()->username,
+            'dashboard_name' => $dashboard->dashboard_name . '_' . $request->user()->username,
         ]);
 
         if ($dashboard_copy->save()) {
@@ -272,10 +280,8 @@ class DashboardController extends Controller
      */
     private function getAvailableDashboards(User $user): Collection
     {
-        if ($this->dashboards === null) {
-            $this->dashboards = Dashboard::hasAccess($user)->with('user:user_id,username')
-                ->orderBy('dashboard_name')->get()->keyBy('dashboard_id');
-        }
+        $this->dashboards ??= Dashboard::hasAccess($user)->with('user:user_id,username')
+            ->orderBy('dashboard_name')->get()->keyBy('dashboard_id');
 
         return $this->dashboards;
     }

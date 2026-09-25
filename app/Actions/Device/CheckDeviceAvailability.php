@@ -13,7 +13,6 @@ readonly class CheckDeviceAvailability
         private DeviceIsPingable $deviceIsPingable,
         private DeviceIsSnmpable $deviceIsSnmpable,
         private DeviceMtuTest $deviceMtuTest,
-        private UpdateDeviceOutage $updateDeviceOutage,
     ) {
     }
 
@@ -32,7 +31,7 @@ readonly class CheckDeviceAvailability
             $results['snmp'] = $this->deviceIsSnmpable->execute($device);
         }
 
-        $changed = $this->setDeviceAvailability->execute($device, $results);
+        $this->setDeviceAvailability->execute($device, $results);
 
         if ($ping_response->isAlive()) {
             $device->mtu_status = $this->deviceMtuTest->execute($device);
@@ -44,10 +43,6 @@ readonly class CheckDeviceAvailability
             }
 
             $device->save();
-
-            if ($changed) {
-                $this->updateDeviceOutage->execute($device);
-            }
         }
 
         return $device->status;

@@ -14,21 +14,21 @@ if ($bill_data['bill_type'] == 'quota') {
     $tmp['tb'] = ($data / $base / $base / $base / $base);
     if ($tmp['tb'] >= 1) {
         $quota = [
-            'type'      => 'tb',
+            'type' => 'tb',
             'select_tb' => ' selected',
-            'data'      => $tmp['tb'],
+            'data' => $tmp['tb'],
         ];
     } elseif (($tmp['gb'] >= 1) and ($tmp['gb'] < $base)) {
         $quota = [
-            'type'      => 'gb',
+            'type' => 'gb',
             'select_gb' => ' selected',
-            'data'      => $tmp['gb'],
+            'data' => $tmp['gb'],
         ];
     } elseif (($tmp['mb'] >= 1) and ($tmp['mb'] < $base)) {
         $quota = [
-            'type'      => 'mb',
+            'type' => 'mb',
             'select_mb' => ' selected',
-            'data'      => $tmp['mb'],
+            'data' => $tmp['mb'],
         ];
     }
 }//end if
@@ -40,21 +40,21 @@ if ($bill_data['bill_type'] == 'cdr') {
     $tmp['gbps'] = ($data / $base / $base / $base);
     if ($tmp['gbps'] >= 1) {
         $cdr = [
-            'type'        => 'gbps',
+            'type' => 'gbps',
             'select_gbps' => ' selected',
-            'data'        => $tmp['gbps'],
+            'data' => $tmp['gbps'],
         ];
     } elseif (($tmp['mbps'] >= 1) and ($tmp['mbps'] < $base)) {
         $cdr = [
-            'type'        => 'mbps',
+            'type' => 'mbps',
             'select_mbps' => ' selected',
-            'data'        => $tmp['mbps'],
+            'data' => $tmp['mbps'],
         ];
     } elseif (($tmp['kbps'] >= 1) and ($tmp['kbps'] < $base)) {
         $cdr = [
-            'type'        => 'kbps',
+            'type' => 'kbps',
             'select_kbps' => ' selected',
-            'data'        => $tmp['kbps'],
+            'data' => $tmp['kbps'],
         ];
     }
 }//end if
@@ -66,9 +66,9 @@ if ($bill_data['bill_type'] == 'cdr') {
             <h3 class="panel-title">Bill Properties</h3>
         </div>
         <div class="panel-body">
-            <form id="edit" name="edit" method="post" action="" class="form-horizontal" role="form">
+            <form id="edit" name="edit" method="post" action="<?php echo route('bill.update', $bill_id); ?>" class="form-horizontal" role="form">
                 <?php echo csrf_field() ?>
-              <input type=hidden name="action" value="update_bill">
+                <?php echo method_field('PUT') ?>
               <script type="text/javascript">
                 function billType() {
                     $('#cdrDiv').toggle();
@@ -109,10 +109,9 @@ if ($bill_data['bill_type'] == 'cdr') {
                     $emptyCheck = true;
                     $portalias = (empty($port['ifAlias']) ? '' : ' - ' . $port['ifAlias'] . ''); ?>
                 <div class="list-group-item">
-                    <form action="" class="form-inline" method="post" name="delete<?php echo $port['port_id'] ?>" style="display: none;">
+                    <form action="<?php echo route('bill.port.detach', [$bill_id, $port['port_id']]); ?>" class="form-inline" method="post" name="delete<?php echo $port['port_id'] ?>" style="display: none;">
                         <?php echo csrf_field() ?>
-                        <input type="hidden" name="action" value="delete_bill_port" />
-                        <input type="hidden" name="port_id" value="<?php echo $port['port_id'] ?>" />
+                        <?php echo method_field('DELETE') ?>
                     </form>
 
                     <button class="btn btn-danger btn-xs pull-right" onclick="if (confirm('Are you sure you wish to remove this port?')) { document.forms['delete<?php echo $port['port_id'] ?>'].submit(); }">
@@ -139,10 +138,8 @@ if ($bill_data['bill_type'] == 'cdr') {
 
         <h4>Add Port</h4>
 
-        <form action="" method="post" class="form-horizontal" role="form">
+        <form action="<?php echo route('bill.port.attach', $bill_id); ?>" method="post" class="form-horizontal" role="form">
             <?php echo csrf_field() ?>
-            <input type="hidden" name="action" value="add_bill_port" />
-            <input type="hidden" name="bill_id" value="<?php echo $bill_id; ?>" />
 
             <div class="form-group">
                 <label class="col-sm-2 control-label" for="device">Device</label>

@@ -36,16 +36,19 @@ use App\Models\UserPref;
 use Auth;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use LibreNMS\Authentication\LegacyAuth;
 use URL;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('deny-demo');
+        return [
+            'deny-demo',
+        ];
     }
 
     /**
@@ -153,7 +156,7 @@ class UserController extends Controller
         if ($request->input('new_password')) {
             $user->setPassword($request->new_password);
             /** @var User $current_user */
-            $current_user = Auth::user();
+            $current_user = $request->user();
             Auth::setUser($user); // make sure new password is loaded, can only logout other sessions for the active user
             Auth::logoutOtherDevices($request->new_password);
 

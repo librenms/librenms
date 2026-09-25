@@ -61,6 +61,9 @@ class Port extends DeviceRelatedModel
         'device.hostname',
     ];
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
@@ -117,7 +120,7 @@ class Port extends DeviceRelatedModel
      *
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         $os = $this->device?->os;
 
@@ -153,7 +156,7 @@ class Port extends DeviceRelatedModel
      */
     public function getShortLabel(?int $length = null): string
     {
-        $name = Rewrite::normalizeIfName($this->ifName ?: $this->ifDescr);
+        $name = Rewrite::normalizeIfName($this->getLabel());
 
         return substr(Rewrite::shortenIfName($name), 0, $length);
     }
@@ -381,6 +384,14 @@ class Port extends DeviceRelatedModel
     public function filterSearch(Builder $query, mixed $value, array $config): void
     {
         $this->applyFilterSearch(['ifName', 'ifAlias', 'ifDescr'], $query, $value, $config);
+    }
+
+    /**
+     * Custom filter for Hostname to also include sysname and displayname.
+     */
+    public function filterDeviceHostname(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyFilterSearch(['device.hostname', 'device.sysName', 'device.display'], $query, $value, $config);
     }
 
     /**

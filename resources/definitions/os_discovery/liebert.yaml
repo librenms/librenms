@@ -1,4 +1,13 @@
 modules:
+    os:
+        hardware:
+            - LIEBERT-GP-AGENT-MIB::lgpAgentDeviceModel.1
+            - UPS-MIB::upsIdentModel.0
+        serial: LIEBERT-GP-AGENT-MIB::lgpAgentDeviceSerialNumber.1
+        version:
+            - LIEBERT-GP-AGENT-MIB::lgpAgentIdentFirmwareVersion.0
+            - UPS-MIB::upsIdentAgentSoftwareVersion.0
+        features: LIEBERT-GP-AGENT-MIB::lgpAgentIdentModel.0
     sensors:
         temperature:
             data:

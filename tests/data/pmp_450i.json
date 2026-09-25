@@ -435,6 +435,81 @@
             "sensors": [
                 {
                     "sensor_deleted": 0,
+                    "sensor_class": "dbm",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.161.19.3.1.14.2.9.0",
+                    "sensor_index": "0",
+                    "sensor_type": "pmp",
+                    "sensor_descr": "AP CBSD SAS Granted EIRP",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 46,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.161.19.3.1.14.2.1.0",
+                    "sensor_index": "0",
+                    "sensor_type": "apCbsdStatus",
+                    "sensor_descr": "AP CBSD SAS Grant Status",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 4,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "apCbsdStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.161.19.3.3.1.260.0",
+                    "sensor_index": "cnMaestroConnectionStatus",
+                    "sensor_type": "cnMaestroConnectionStatus",
+                    "sensor_descr": "cnMaestro Connection Status",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "cnMaestroConnectionStatus"
+                },
+                {
+                    "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.161.19.3.1.3.1.0",
@@ -485,6 +560,108 @@
                 }
             ],
             "state_indexes": [
+                {
+                    "state_name": "apCbsdStatus",
+                    "state_descr": "Unregistered",
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "apCbsdStatus",
+                    "state_descr": "Registering",
+                    "state_value": 1,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "apCbsdStatus",
+                    "state_descr": "Registered",
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "apCbsdStatus",
+                    "state_descr": "Grant",
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "apCbsdStatus",
+                    "state_descr": "Authorized",
+                    "state_value": 4,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "apCbsdStatus",
+                    "state_descr": "Grant Suspended",
+                    "state_value": 5,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "apCbsdStatus",
+                    "state_descr": "Grant Terminate",
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "apCbsdStatus",
+                    "state_descr": "Relinquishing Spectrum",
+                    "state_value": 7,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "apCbsdStatus",
+                    "state_descr": "Relinquished Spectrum",
+                    "state_value": 8,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "apCbsdStatus",
+                    "state_descr": "Deregistering",
+                    "state_value": 9,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "apCbsdStatus",
+                    "state_descr": "Deregistered",
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "apCbsdStatus",
+                    "state_descr": "Unknown",
+                    "state_value": 11,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "cnMaestroConnectionStatus",
+                    "state_descr": "Connected",
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cnMaestroConnectionStatus",
+                    "state_descr": "Disconnected",
+                    "state_value": 1,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cnMaestroConnectionStatus",
+                    "state_descr": "Connecting",
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cnMaestroConnectionStatus",
+                    "state_descr": "Device Approval Pending",
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cnMaestroConnectionStatus",
+                    "state_descr": "Unknown",
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
                 {
                     "state_name": "WHISP-APS-MIB::whispGPSStats",
                     "state_descr": "gpsSynchronized",

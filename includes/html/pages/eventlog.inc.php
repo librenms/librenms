@@ -49,7 +49,7 @@ $pagetitle[] = 'Eventlog';
         '<option value="">All Devices</option>' +
             <?php
             if (isset($device) && $device instanceof Device) {
-                echo "'<option value=$device->device_id>" . $device->displayName() . "</option>' +";
+                echo "'<option value=\"" . (int) $device->device_id . '">' . addcslashes(e($device->display), "'\\") . "</option>' +";
             } ?>
         '</select>' +
         '</div>&nbsp;&nbsp;&nbsp;&nbsp;' +
