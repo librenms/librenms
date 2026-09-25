@@ -78,8 +78,10 @@ if (isset($_POST['addbill']) && $_POST['addbill'] == 'yes') {
 
     $bill_id = dbInsert($insert, 'bills');
 
-    if (is_numeric($bill_id) && is_numeric($_POST['port_id'])) {
-        dbInsert(['bill_id' => $bill_id, 'port_id' => $_POST['port_id']], 'bill_ports');
+    $new_bill = Bill::find($bill_id);
+    $source_class = Bill::sourceTypes()[$_POST['source_type'] ?? ''] ?? null;
+    if ($new_bill && $source_class && ! empty($_POST['source_id']) && $source_class::whereKey($_POST['source_id'])->exists()) {
+        $new_bill->sources($source_class)->attach((int) $_POST['source_id']);
     }
 
     header('Location: ' . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill_id, 'view' => 'edit']));
