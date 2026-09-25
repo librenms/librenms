@@ -50,7 +50,7 @@ class Alert extends DeviceRelatedModel
     ];
 
     /**
-     * @return array{info: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {

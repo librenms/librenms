@@ -37,13 +37,9 @@ $inf = LibreNMS\Util\Rewrite::normalizeIfName($ifname);
 echo "<div style='clear: both;'>";
 
 if ($vars['subview'] == 'top10') {
-    if (! isset($vars['sort'])) {
-        $vars['sort'] = 'in';
-    }
+    $vars['sort'] ??= 'in';
 
-    if (! isset($vars['period'])) {
-        $vars['period'] = '1day';
-    }
+    $vars['period'] ??= '1day';
 
     $from = '-' . $vars['period'];
 

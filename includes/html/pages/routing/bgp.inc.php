@@ -88,10 +88,7 @@ if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
         echo generate_link('Down', $vars, ['state' => 'down']);
     }
 
-    // End BGP Menu
-    if (! isset($vars['view'])) {
-        $vars['view'] = 'details';
-    }
+    $vars['view'] ??= 'details';
 
     echo '<div style="float: right;">';
 
