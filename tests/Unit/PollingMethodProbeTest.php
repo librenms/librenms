@@ -352,4 +352,110 @@ final class PollingMethodProbeTest extends TestCase
         $this->assertEquals(1161, $overrides['port']);
         $this->assertEquals(3, $overrides['retries']);
     }
+
+    public function testIcmpPollingMethodProbePassesConfiguredAddressFamily(): void
+    {
+        $device = new Device(['hostname' => '192.0.2.1']);
+        $snmpMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
+            'enabled' => true,
+            'settings' => ['transport' => 'udp6'],
+        ]);
+
+        $icmpMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+            'settings' => ['ip_version' => 'default'],
+        ]);
+        $icmpMethod->setRelation('device', $device);
+        $device->setRelation('pollingMethods', collect([$snmpMethod, $icmpMethod]));
+
+        $mockFping = \Mockery::mock(\LibreNMS\Data\Source\Icmp\Fping::class);
+        $this->app->instance(\LibreNMS\Data\Source\Icmp\Fping::class, $mockFping);
+
+        $icmpPollingMethod = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Icmp);
+
+        // 1. ip_version = 'default' -> passes null
+        $mockFping->shouldReceive('ping')->with('192.0.2.1', null)->once()->andReturn(\LibreNMS\Data\Source\Icmp\FpingResponse::artificialUp('192.0.2.1'));
+        $result = $icmpPollingMethod->probe($device);
+        $this->assertTrue($result->isSuccess());
+
+        // 2. ip_version = 'match_snmp_transport' -> passes AddressFamily::IPv6 (since transport is udp6)
+        $icmpMethod->settings = ['ip_version' => 'match_snmp_transport'];
+        $mockFping->shouldReceive('ping')->with('192.0.2.1', \LibreNMS\Enum\AddressFamily::IPv6)->once()->andReturn(\LibreNMS\Data\Source\Icmp\FpingResponse::artificialUp('192.0.2.1'));
+        $result = $icmpPollingMethod->probe($device);
+        $this->assertTrue($result->isSuccess());
+
+        // 3. ip_version = 'ipv4' -> passes AddressFamily::IPv4
+        $icmpMethod->settings = ['ip_version' => 'ipv4'];
+        $mockFping->shouldReceive('ping')->with('192.0.2.1', \LibreNMS\Enum\AddressFamily::IPv4)->once()->andReturn(\LibreNMS\Data\Source\Icmp\FpingResponse::artificialUp('192.0.2.1'));
+        $result = $icmpPollingMethod->probe($device);
+        $this->assertTrue($result->isSuccess());
+
+        // 4. ip_version = 'ipv6' -> passes AddressFamily::IPv6
+        $icmpMethod->settings = ['ip_version' => 'ipv6'];
+        $mockFping->shouldReceive('ping')->with('192.0.2.1', \LibreNMS\Enum\AddressFamily::IPv6)->once()->andReturn(\LibreNMS\Data\Source\Icmp\FpingResponse::artificialUp('192.0.2.1'));
+        $result = $icmpPollingMethod->probe($device);
+        $this->assertTrue($result->isSuccess());
+    }
+
+    public function testIcmpPollingMethodDiscoverPreservesSnmpTransportAndDetectsReachabilityFailure(): void
+    {
+        $device = new Device(['hostname' => '192.0.2.1']);
+        $snmpMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
+            'enabled' => true,
+            'settings' => ['transport' => 'udp6'],
+        ]);
+        $device->setRelation('pollingMethods', collect([$snmpMethod]));
+
+        $candidateIcmpMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+            'settings' => ['ip_version' => 'match_snmp_transport'],
+        ]);
+
+        $mockFping = \Mockery::mock(\LibreNMS\Data\Source\Icmp\Fping::class);
+        $this->app->instance(\LibreNMS\Data\Source\Icmp\Fping::class, $mockFping);
+
+        $icmpPollingMethod = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Icmp);
+
+        // When discover is called on candidate ICMP method, it should preserve the SNMP method, see udp6, and ping IPv6
+        $mockFping->shouldReceive('ping')
+            ->with('192.0.2.1', \LibreNMS\Enum\AddressFamily::IPv6)
+            ->once()
+            ->andReturn(\LibreNMS\Data\Source\Icmp\FpingResponse::createError(\LibreNMS\Enum\FpingExitCode::Unreachable, '192.0.2.1'));
+
+        $result = $icmpPollingMethod->discover($device, $candidateIcmpMethod);
+        $this->assertFalse($result->isSuccess());
+        $this->assertNotNull($result->errorMessage());
+    }
+
+    public function testSnmpPollingMethodProbeUsesBackendDirectlyWithExplicitConfig(): void
+    {
+        $device = new Device(['hostname' => 'snmp.test.local']);
+        $config = new SnmpConfig(
+            version: 'v2c',
+            community: 'custom-community',
+            transport: 'udp',
+            port: 1161,
+        );
+
+        $mockBackend = \Mockery::mock(\LibreNMS\Data\Source\Snmp\SnmpBackendInterface::class);
+        $mockBackend->shouldReceive('get')
+            ->once()
+            ->with(
+                'snmp.test.local',
+                ['SNMPv2-MIB::sysObjectID.0'],
+                $config,
+                \Mockery::type(\LibreNMS\Data\Source\Snmp\SnmpQueryOptions::class)
+            )
+            ->andReturn(new \LibreNMS\Data\Source\Snmp\RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = OID: SNMPv2-SMI::enterprises.9.1.1', 0));
+
+        $method = new \LibreNMS\Polling\Method\Methods\SnmpPollingMethod($mockBackend);
+        $result = $method->probe($device, $config);
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertNull($result->errorMessage());
+    }
 }

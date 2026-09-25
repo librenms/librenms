@@ -6,9 +6,14 @@ use App\Actions\Device\DeviceMtuTest;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Eventlog;
+use App\View\FieldSchema\FieldDefinition;
 use LibreNMS\Data\Source\Icmp\Fping;
+use LibreNMS\Enum\AddressFamily;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\FpingUnparsableLine;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
+use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\ProbeResult;
 
 final class IcmpPollingMethod extends PollingMethod
@@ -23,10 +28,48 @@ final class IcmpPollingMethod extends PollingMethod
         return true;
     }
 
-    public function probe(Device $device): ProbeResult
+    /**
+     * @inheritDoc
+     */
+    public function fields(): array
+    {
+        return [
+            'ip_version' => FieldDefinition::make('ip_version', 'select')
+                ->options([
+                    'default' => 'Default',
+                    'match_snmp_transport' => 'Match SNMP Transport',
+                    'ipv4' => 'IPv4 Only',
+                    'ipv6' => 'IPv6 Only',
+                ])
+                ->default('default')
+                ->rules(['nullable', 'string', 'in:default,match_snmp_transport,follow_snmp,ipv4,ipv6']),
+        ];
+    }
+
+    public function resolveAddressFamily(Device $device, ?IcmpConfig $config = null): ?AddressFamily
+    {
+        $config ??= $this->fallbackConfig($device);
+
+        return match ($config->ipVersion) {
+            'ipv4' => AddressFamily::IPv4,
+            'ipv6' => AddressFamily::IPv6,
+            'match_snmp_transport', 'follow_snmp' => $device->ipFamily(),
+            default => null,
+        };
+    }
+
+    /**
+     * @param  Device  $device
+     * @param  IcmpConfig|null  $config
+     * @return ProbeResult
+     *
+     * @throws FpingUnparsableLine
+     */
+    public function probe(Device $device, ?PollingMethodConfig $config = null): ProbeResult
     {
         $fping = app(Fping::class);
-        $status = $fping->ping($device->pollerTarget(), $device->ipFamily());
+        $icmpConfig = $config instanceof IcmpConfig ? $config : $this->fallbackConfig($device);
+        $status = $fping->ping($device->pollerTarget(), $this->resolveAddressFamily($device, $icmpConfig));
         $hasDuplicates = $status->duplicates > 0;
 
         if ($hasDuplicates) {
@@ -38,11 +81,14 @@ final class IcmpPollingMethod extends PollingMethod
             $mtuStatus = app(DeviceMtuTest::class)->execute($device);
         }
 
+        $error = (! $status->isAlive()) ? (string) $status : null;
+
         return new ProbeResult($status->isAlive(), [
             'duplicates' => $hasDuplicates,
             'fping_status' => $status,
             'mtu_status' => $mtuStatus,
-        ]);
+            'error' => $error,
+        ], $error);
     }
 
     public function config(DevicePollingMethod $deviceMethod): IcmpConfig
@@ -52,7 +98,12 @@ final class IcmpPollingMethod extends PollingMethod
 
     public function fallbackConfig(Device $device): IcmpConfig
     {
-        return new IcmpConfig(enabled: false, affectsAvailability: true);
+        $method = $device->pollingMethod(PollingMethodType::Icmp);
+        if ($method) {
+            return IcmpConfig::fromPollingMethod($method);
+        }
+
+        return new IcmpConfig(enabled: false, affectsAvailability: true, ipVersion: 'default');
     }
 
     public function onProbeComplete(Device $device, ProbeResult $result, bool $commit = false): void

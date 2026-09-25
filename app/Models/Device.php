@@ -27,6 +27,7 @@ use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\PollingMethodAccessor;
 use LibreNMS\Util\IP;
@@ -132,7 +133,7 @@ class Device extends BaseModel
         return ($this->overwrite_ip ?: $this->hostname) ?: '';
     }
 
-    public function pollingConfig(PollingMethodType $type): ?\LibreNMS\Polling\Method\Config\PollingMethodConfig
+    public function pollingConfig(PollingMethodType $type): ?PollingMethodConfig
     {
         return $this->pollingMethodFor()->get($type);
     }

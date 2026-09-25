@@ -45,17 +45,14 @@ abstract class PollingMethod implements HasFieldSchema
      * Returns a failure rather than throwing for an unreachable target.
      * Called at most once per method per run by the framework.
      */
-    abstract public function probe(Device $device): ProbeResult;
+    abstract public function probe(Device $device, ?PollingMethodConfig $config = null): ProbeResult;
 
     /**
      * Discover or validate a candidate polling method for a device.
      */
     public function discover(Device $device, DevicePollingMethod $deviceMethod): ProbeResult
     {
-        $testDevice = clone $device;
-        $testDevice->setRelation('pollingMethods', collect([$deviceMethod]));
-
-        return $this->probe($testDevice);
+        return $this->probe($device, $this->config($deviceMethod));
     }
 
     public function onProbeComplete(Device $device, ProbeResult $result, bool $commit = false): void

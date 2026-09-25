@@ -7,6 +7,14 @@ use LibreNMS\Enum\PollingMethodType;
 
 final class IcmpConfig extends PollingMethodConfig
 {
+    public function __construct(
+        bool $enabled = true,
+        bool $affectsAvailability = true,
+        public string $ipVersion = 'default',
+    ) {
+        parent::__construct($enabled, $affectsAvailability);
+    }
+
     public function isValid(): bool
     {
         return true;
@@ -21,6 +29,7 @@ final class IcmpConfig extends PollingMethodConfig
         return new self(
             enabled: $deviceMethod->enabled ?? true,
             affectsAvailability: $deviceMethod->affects_availability ?? false,
+            ipVersion: $deviceMethod->settings['ip_version'] ?? 'default',
         );
     }
 }

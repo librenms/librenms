@@ -49,10 +49,10 @@ class Ipmitool
         $this->type = $this->method->type;
     }
 
-    public static function init(?Device $device = null): ?self
+    public static function init(?Device $device = null, ?IpmiConfig $config = null): ?self
     {
         $device ??= DeviceCache::getPrimary();
-        $ipmi = $device->pollingMethodFor()->ipmi();
+        $ipmi = $config ?? $device->pollingMethodFor()->ipmi();
 
         if (! $ipmi->enabled || ! $ipmi->hostname) {
             return null;

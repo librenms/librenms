@@ -9,6 +9,9 @@ return [
         'unix-agent' => 'Unix Agent',
     ],
     'method_settings' => [
+        'icmp' => [
+            'ip_version' => 'IP Version',
+        ],
         'ipmi' => [
             'hostname' => 'Hostname',
             'port' => 'Port',

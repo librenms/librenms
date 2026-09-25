@@ -8,16 +8,26 @@ use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use App\View\FieldSchema\FieldDefinition;
 use Illuminate\Validation\Rule;
+use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
+use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Modules\Core;
+use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use SnmpQuery;
 
 final class SnmpPollingMethod extends PollingMethod
 {
+    public function __construct(
+        private readonly ?SnmpBackendInterface $backend = null,
+    ) {
+    }
+
     public function icon(): string
     {
         return 'fa-server';
@@ -86,9 +96,25 @@ final class SnmpPollingMethod extends PollingMethod
         ];
     }
 
-    public function probe(Device $device): ProbeResult
+    /**
+     * @param  Device  $device
+     * @param  SnmpConfig|null  $config
+     * @return ProbeResult
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function probe(Device $device, ?PollingMethodConfig $config = null): ProbeResult
     {
-        $response = SnmpQuery::device($device)->get('SNMPv2-MIB::sysObjectID.0');
+        $backend = $this->backend ?? resolve(SnmpBackendInterface::class);
+        $snmpConfig = $config instanceof SnmpConfig ? $config : $this->fallbackConfig($device);
+
+        $response = $backend->get(
+            $device->pollerTarget(),
+            ['SNMPv2-MIB::sysObjectID.0'],
+            $snmpConfig,
+            SnmpQueryOptions::quickPrint()
+        );
 
         $success = $response->getExitCode() === 0
             || $response->getExitCode() === 2
@@ -135,12 +161,9 @@ final class SnmpPollingMethod extends PollingMethod
      */
     public function discover(Device $device, DevicePollingMethod $deviceMethod): ProbeResult
     {
-        $testDevice = clone $device;
-
         // If a specific secret was supplied on the method, test that directly
         if ($deviceMethod->relationLoaded('secret') && $deviceMethod->secret !== null) {
-            $testDevice->setRelation('pollingMethods', collect([$deviceMethod]));
-            $result = $this->probe($testDevice);
+            $result = $this->probe($device, $this->config($deviceMethod));
             if ($result->isSuccess()) {
                 return $result;
             }
@@ -169,9 +192,8 @@ final class SnmpPollingMethod extends PollingMethod
         foreach ($defaultSecrets as $secret) {
             $deviceMethod->setRelation('secret', $secret);
             $deviceMethod->secret_id = $secret->id;
-            $testDevice->setRelation('pollingMethods', collect([$deviceMethod]));
 
-            $result = $this->probe($testDevice);
+            $result = $this->probe($device, $this->config($deviceMethod));
             if ($result->isSuccess()) {
                 return $result;
             }

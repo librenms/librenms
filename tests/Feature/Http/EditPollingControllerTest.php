@@ -689,4 +689,38 @@ class EditPollingControllerTest extends TestCase
         $this->assertInstanceOf(\LibreNMS\Polling\Method\Config\UnixAgentConfig::class, $config);
         $this->assertEquals(6556, $config->port);
     }
+
+    public function testUpdateIcmpSettingsSavesIpVersion(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+
+        $device = Device::factory()->create(['hostname' => 'icmp-device.example.com']);
+        $method = DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+            'affects_availability' => true,
+            'settings' => [],
+        ]);
+
+        $response = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'icmp']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '1',
+                'force_save' => '1',
+                'settings' => [
+                    'ip_version' => 'ipv6',
+                ],
+            ]
+        );
+        $response->assertOk();
+
+        $freshMethod = $method->fresh();
+        $this->assertEquals(['ip_version' => 'ipv6'], $freshMethod->settings);
+        $config = $device->fresh()->pollingConfig(PollingMethodType::Icmp);
+        $this->assertSame('ipv6', $config->ipVersion);
+        $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $config->addressFamily($device));
+    }
 }

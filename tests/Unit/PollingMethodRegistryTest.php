@@ -205,4 +205,82 @@ final class PollingMethodRegistryTest extends TestCase
         $discoverMetadata->execute($device, collect());
         $this->assertSame('192.0.2.1', $device->hostname);
     }
+
+    public function testIcmpPollingMethodFieldsAndDefaults(): void
+    {
+        $icmpMethod = $this->pollingMethods->require(PollingMethodType::Icmp);
+        $fields = $icmpMethod->fields();
+
+        $this->assertArrayHasKey('ip_version', $fields);
+        $this->assertSame('select', $fields['ip_version']->type);
+        $this->assertSame('default', $fields['ip_version']->getDefault());
+        $this->assertEquals([
+            'default' => 'Default',
+            'match_snmp_transport' => 'Match SNMP Transport',
+            'ipv4' => 'IPv4 Only',
+            'ipv6' => 'IPv6 Only',
+        ], $fields['ip_version']->options);
+    }
+
+    public function testIcmpPollingMethodAddressFamilyResolution(): void
+    {
+        /** @var \LibreNMS\Polling\Method\Methods\IcmpPollingMethod $icmpMethod */
+        $icmpMethod = $this->pollingMethods->require(PollingMethodType::Icmp);
+
+        $deviceIpv4 = new Device(['hostname' => '192.0.2.1']);
+        $snmpMethodIpv4 = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
+            'enabled' => true,
+            'settings' => ['transport' => 'udp'],
+        ]);
+        $deviceIpv4->setRelation('pollingMethods', collect([$snmpMethodIpv4]));
+
+        $deviceIpv6 = new Device(['hostname' => '2001:db8::1']);
+        $snmpMethodIpv6 = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
+            'enabled' => true,
+            'settings' => ['transport' => 'udp6'],
+        ]);
+        $deviceIpv6->setRelation('pollingMethods', collect([$snmpMethodIpv6]));
+
+        // Default -> null (no flag)
+        $defaultConfig = new IcmpConfig(ipVersion: 'default');
+        $this->assertNull($icmpMethod->resolveAddressFamily($deviceIpv4, $defaultConfig));
+        $this->assertNull($icmpMethod->resolveAddressFamily($deviceIpv6, $defaultConfig));
+
+        // IPv4 only -> AddressFamily::IPv4
+        $ipv4Config = new IcmpConfig(ipVersion: 'ipv4');
+        $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv4, $icmpMethod->resolveAddressFamily($deviceIpv4, $ipv4Config));
+        $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv4, $icmpMethod->resolveAddressFamily($deviceIpv6, $ipv4Config));
+
+        // IPv6 only -> AddressFamily::IPv6
+        $ipv6Config = new IcmpConfig(ipVersion: 'ipv6');
+        $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($deviceIpv4, $ipv6Config));
+        $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($deviceIpv6, $ipv6Config));
+
+        // Match SNMP Transport -> matches device's SNMP transport family
+        $matchSnmpConfig = new IcmpConfig(ipVersion: 'match_snmp_transport');
+        $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv4, $icmpMethod->resolveAddressFamily($deviceIpv4, $matchSnmpConfig));
+        $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($deviceIpv6, $matchSnmpConfig));
+
+        // Legacy follow_snmp alias also works
+        $legacyFollowSnmpConfig = new IcmpConfig(ipVersion: 'follow_snmp');
+        $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv4, $icmpMethod->resolveAddressFamily($deviceIpv4, $legacyFollowSnmpConfig));
+        $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($deviceIpv6, $legacyFollowSnmpConfig));
+
+        // Test fromPollingMethod
+        $deviceMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+            'settings' => ['ip_version' => 'ipv6'],
+        ]);
+        $fromMethodConfig = IcmpConfig::fromPollingMethod($deviceMethod);
+        $this->assertSame('ipv6', $fromMethodConfig->ipVersion);
+        $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($deviceIpv4, $fromMethodConfig));
+
+        // Test Device::pollingConfig()
+        $deviceIpv4->setRelation('pollingMethods', collect([$deviceMethod]));
+        $this->assertSame('ipv6', $deviceIpv4->pollingConfig(PollingMethodType::Icmp)->ipVersion);
+        $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($deviceIpv4));
+    }
 }

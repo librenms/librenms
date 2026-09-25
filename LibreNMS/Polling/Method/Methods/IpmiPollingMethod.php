@@ -6,9 +6,11 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\View\FieldSchema\FieldDefinition;
 use LibreNMS\Data\Source\Ipmitool;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\IpmiConnectionFailed;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
+use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\ProbeResult;
 
 final class IpmiPollingMethod extends PollingMethod
@@ -51,9 +53,15 @@ final class IpmiPollingMethod extends PollingMethod
         ];
     }
 
-    public function probe(Device $device): ProbeResult
+    /**
+     * @param  Device  $device
+     * @param  IpmiConfig|null  $config
+     * @return ProbeResult
+     */
+    public function probe(Device $device, ?PollingMethodConfig $config = null): ProbeResult
     {
-        $ipmi = Ipmitool::init($device);
+        $ipmiConfig = $config instanceof IpmiConfig ? $config : null;
+        $ipmi = Ipmitool::init($device, $ipmiConfig);
 
         if (! $ipmi) {
             return ProbeResult::failure();
@@ -84,6 +92,11 @@ final class IpmiPollingMethod extends PollingMethod
 
     public function fallbackConfig(Device $device): IpmiConfig
     {
+        $method = $device->pollingMethod(PollingMethodType::Ipmi);
+        if ($method) {
+            return IpmiConfig::fromPollingMethod($method);
+        }
+
         return new IpmiConfig(
             enabled: false,
             affectsAvailability: false,

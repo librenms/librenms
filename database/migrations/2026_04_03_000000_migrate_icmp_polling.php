@@ -36,6 +36,7 @@ return new class extends Migration
                             'affects_availability' => true,
                             'last_check_successful' => (bool) $device->status,
                             'secret_id' => null,
+                            'settings' => json_encode(['ip_version' => 'match_snmp_transport']),
                             'created_at' => now(),
                             'updated_at' => now(),
                         ];

@@ -6,6 +6,8 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\View\FieldSchema\FieldDefinition;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Util\Rewrite;
@@ -44,11 +46,16 @@ final class UnixAgentPollingMethod extends PollingMethod
         ];
     }
 
-    public function probe(Device $device): ProbeResult
+    /**
+     * @param  Device  $device
+     * @param  UnixAgentConfig|null  $config
+     * @return ProbeResult
+     */
+    public function probe(Device $device, ?PollingMethodConfig $config = null): ProbeResult
     {
-        $config = $device->pollingMethodFor()->unixAgent();
-        $agent_port = $config->port;
-        $timeout = $config->timeout;
+        $agentConfig = $config instanceof UnixAgentConfig ? $config : $this->fallbackConfig($device);
+        $agent_port = $agentConfig->port;
+        $timeout = $agentConfig->timeout;
         $poller_target = Rewrite::addIpv6Brackets($device->pollerTarget());
 
         try {
@@ -72,6 +79,11 @@ final class UnixAgentPollingMethod extends PollingMethod
 
     public function fallbackConfig(Device $device): UnixAgentConfig
     {
+        $method = $device->pollingMethod(PollingMethodType::UnixAgent);
+        if ($method) {
+            return UnixAgentConfig::fromPollingMethod($method);
+        }
+
         return new UnixAgentConfig(
             enabled: false,
             affectsAvailability: false,
