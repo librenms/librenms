@@ -175,7 +175,7 @@ Artisan::command('scan
 
 // mark schedule working
 Schedule::call(function (): void {
-    Cache::put('scheduler_working', now(), now()->addMinutes(6));
+    Cache::put('scheduler_working', now()->timestamp, now()->addMinutes(6));
 })->name('schedule operational check')->everyFiveMinutes();
 
 // schedule maintenance, should be after all others

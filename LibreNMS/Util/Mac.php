@@ -140,7 +140,8 @@ class Mac implements \Stringable
         $results = Cache::remember($oui, 21600, fn () => DB::table('vendor_ouis')
             ->where('oui', 'like', "$oui%") // possible matches
             ->orderBy('oui', 'desc') // so we can check longer ones first if we have them
-            ->pluck('vendor', 'oui'));
+            ->pluck('vendor', 'oui')
+            ->all());
 
         if (count($results) == 1) {
             return Arr::first($results);
