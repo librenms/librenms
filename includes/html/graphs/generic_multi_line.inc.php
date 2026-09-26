@@ -22,6 +22,8 @@ $descr_len ??= 12;
 $unitlen ??= 0;
 $units ??= '';
 $unit_text ??= '';
+$multiplier ??= null;
+$divider ??= null;
 $rrd_optionsb = [];
 
 if ($nototal) {
@@ -65,6 +67,18 @@ foreach ($rrd_list ?? [] as $rrd) {
     } else {
         $rrd_options[] = 'DEF:' . $id . "min=$filename:$ds:MIN";
         $rrd_options[] = 'DEF:' . $id . "max=$filename:$ds:MAX";
+    }
+
+    if (is_numeric($multiplier)) {
+        foreach (['', 'min', 'max'] as $suffix) {
+            $rrd_options[] = 'CDEF:' . $id . '_cdef' . $suffix . '=' . $id . $suffix . ',' . $multiplier . ',*';
+        }
+        $id .= '_cdef';
+    } elseif (is_numeric($divider)) {
+        foreach (['', 'min', 'max'] as $suffix) {
+            $rrd_options[] = 'CDEF:' . $id . '_cdef' . $suffix . '=' . $id . $suffix . ',' . $divider . ',/';
+        }
+        $id .= '_cdef';
     }
 
     if (! empty($rrd['invert'])) {
