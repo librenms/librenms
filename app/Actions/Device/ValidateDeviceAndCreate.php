@@ -110,7 +110,9 @@ class ValidateDeviceAndCreate
         $communities = array_unique($communities);
 
         $v3_credentials = LibrenmsConfig::get('snmp.v3');
-        array_unshift($v3_credentials, $this->device->only(['authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo']));
+        if ($this->device->authlevel) {
+            array_unshift($v3_credentials, $this->device->only(['authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo']));
+        }
         $v3_credentials = array_unique($v3_credentials, SORT_REGULAR);
 
         foreach ($snmp_versions as $snmp_version) {
