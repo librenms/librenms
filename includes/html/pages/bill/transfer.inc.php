@@ -104,7 +104,7 @@ function showPercent($per)
 
 <div class="row">
     <div class="col-lg-5 col-lg-push-7">
-        <?php print_port_list($ports) ?>
+        <?php print_source_list($bill) ?>
     </div>
     <div class="col-lg-7 col-lg-pull-5">
         <div class="panel panel-default">

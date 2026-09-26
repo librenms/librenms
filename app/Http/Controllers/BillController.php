@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 use App\Facades\LibrenmsConfig;
 use App\Http\Requests\UpdateBillRequest;
 use App\Models\Bill;
-use App\Models\Port;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
 
@@ -90,35 +91,42 @@ class BillController extends Controller
         return redirect(url('bills'));
     }
 
-    public function attachPort(Request $request, Bill $bill): RedirectResponse|JsonResponse
+    public function attachSource(Request $request, Bill $bill): RedirectResponse|JsonResponse
     {
         $this->authorize('update', $bill);
 
         $validated = $request->validate([
-            'port_id' => ['required', 'integer', 'exists:ports,port_id'],
+            'source_type' => ['required', Rule::in(array_keys(Bill::sourceTypes()))],
+            'source_id' => ['required', 'integer'],
         ]);
 
-        $bill->ports()->syncWithoutDetaching([$validated['port_id']]);
-
-        toast()->success(__('Port added to bill'));
-
-        if ($request->wantsJson()) {
-            return response()->json(['status' => 'ok', 'message' => __('Port added to bill')]);
+        $class = Bill::sourceTypes()[$validated['source_type']];
+        $source = $class::find($validated['source_id']);
+        if (! $source) {
+            throw ValidationException::withMessages(['source_id' => __(':type does not exist', ['type' => $class::billingTypeName()])]);
         }
 
-        return redirect()->to(Url::generate(['page' => 'bill', 'bill_id' => $bill->bill_id, 'view' => 'edit']));
+        $bill->sources($class)->syncWithoutDetaching([$source->getKey()]);
+
+        return $this->sourceResponse($request, $bill, __(':type added to bill', ['type' => $class::billingTypeName()]));
     }
 
-    public function detachPort(Request $request, Bill $bill, Port $port): RedirectResponse|JsonResponse
+    public function detachSource(Request $request, Bill $bill, string $type, int $id): RedirectResponse|JsonResponse
     {
         $this->authorize('update', $bill);
 
-        $bill->ports()->detach($port->port_id);
+        $class = Bill::sourceTypes()[$type] ?? abort(404);
+        $bill->sources($class)->detach($id);
 
-        toast()->success(__('Port removed from bill'));
+        return $this->sourceResponse($request, $bill, __(':type removed from bill', ['type' => $class::billingTypeName()]));
+    }
+
+    private function sourceResponse(Request $request, Bill $bill, string $message): RedirectResponse|JsonResponse
+    {
+        toast()->success($message);
 
         if ($request->wantsJson()) {
-            return response()->json(['status' => 'ok', 'message' => __('Port removed from bill')]);
+            return response()->json(['status' => 'ok', 'message' => $message]);
         }
 
         return redirect()->to(Url::generate(['page' => 'bill', 'bill_id' => $bill->bill_id, 'view' => 'edit']));

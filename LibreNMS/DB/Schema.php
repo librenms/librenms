@@ -42,6 +42,7 @@ class Schema
     ];
 
     private $relationships;
+    private $morph_pivots;
     private $schema;
 
     /**
@@ -269,11 +270,43 @@ class Schema
                 return [$table, $related];
             }, array_keys($schema), $schema), 1, 0);
 
+            foreach ($this->getMorphPivots() as $pivot => $parents) {
+                if (isset($relations[$pivot])) {
+                    $relations[$pivot] = array_merge($relations[$pivot], array_keys($parents));
+                }
+            }
+
             // filter out blacklisted tables
             $this->relationships = array_diff_key($relations, array_flip(self::$relationship_blacklist));
         }
 
         return $this->relationships;
+    }
+
+    /**
+     * Polymorphic pivot tables and how each parent table joins them
+     *
+     * @return array<string, array<string, array{parent_key: string, pivot_key: string, type_column: string, type: string}>> pivot table => parent table => join keys
+     */
+    public function getMorphPivots(): array
+    {
+        if (! isset($this->morph_pivots)) {
+            $this->morph_pivots = [];
+
+            // Polymorphic pivots can not be guessed from column names, so they are read from the Eloquent
+            // relations. The first source type of a pivot is the join path used to reach it from devices.
+            foreach (\App\Models\Bill::SOURCE_TYPES as $class) {
+                $relation = (new $class)->bills();
+                $this->morph_pivots[$relation->getTable()][$relation->getParent()->getTable()] = [
+                    'parent_key' => $relation->getParentKeyName(),
+                    'pivot_key' => $relation->getForeignPivotKeyName(),
+                    'type_column' => $relation->getMorphType(),
+                    'type' => $relation->getMorphClass(),
+                ];
+            }
+        }
+
+        return $this->morph_pivots;
     }
 
     public function getTableFromKey($key)

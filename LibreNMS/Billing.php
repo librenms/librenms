@@ -3,9 +3,17 @@
 namespace LibreNMS;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Bill;
+use App\Models\BillCounter;
+use Carbon\Carbon;
 use DateTime;
 use DateTimeZone;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Interfaces\Models\BillableSource;
 use LibreNMS\Util\Number;
 
 class Billing
@@ -81,55 +89,6 @@ class Billing
         return $cur_used / $since * $total;
     }
 
-    public static function getValue($host, $port, $id, $inout): int
-    {
-        $oid = 'IF-MIB::ifHC' . $inout . 'Octets.' . $id;
-        $device = dbFetchRow('SELECT * from `devices` WHERE `hostname` = ? LIMIT 1', [$host]);
-        $value = snmp_get($device, $oid, '-Oqv');
-
-        if (! is_numeric($value)) {
-            $oid = 'IF-MIB::if' . $inout . 'Octets.' . $id;
-            $value = snmp_get($device, $oid, '-Oqv');
-        }
-
-        return (int) $value;
-    }
-
-    public static function getLastPortCounter($port_id, $bill_id): array
-    {
-        $return = [];
-        $row = dbFetchRow('SELECT timestamp, in_counter, in_delta, out_counter, out_delta FROM bill_port_counters WHERE `port_id` = ? AND `bill_id` = ?', [$port_id, $bill_id]);
-        if (! is_null($row)) {
-            $return['timestamp'] = $row['timestamp'];
-            $return['in_counter'] = $row['in_counter'];
-            $return['in_delta'] = $row['in_delta'];
-            $return['out_counter'] = $row['out_counter'];
-            $return['out_delta'] = $row['out_delta'];
-            $return['state'] = 'ok';
-        } else {
-            $return['state'] = 'failed';
-        }
-
-        return $return;
-    }
-
-    public static function getLastMeasurement($bill_id): array
-    {
-        $return = [];
-        $row = dbFetchRow('SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id = ? ORDER BY timestamp DESC LIMIT 1', [$bill_id]);
-        if (! is_null($row)) {
-            $return['delta'] = $row['delta'];
-            $return['in_delta'] = $row['in_delta'];
-            $return['out_delta'] = $row['out_delta'];
-            $return['timestamp'] = $row['timestamp'];
-            $return['state'] = 'ok';
-        } else {
-            $return['state'] = 'failed';
-        }
-
-        return $return;
-    }
-
     private static function get95thagg($bill_id, $datefrom, $dateto): float
     {
         $sum_data = dbFetchRows('SELECT (SUM(delta) / SUM(period) * 8) as rate, FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300) AS bucket_start FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ? GROUP BY bill_id, bucket_start ORDER BY rate ASC', [$bill_id, $datefrom, $dateto]);
@@ -152,6 +111,150 @@ class Billing
         $measurement_95th = max(0, (int) round(count($sum_data) / 100 * 95) - 2);
 
         return round($sum_data[$measurement_95th]['rate'] ?? 0, 2);
+    }
+
+    /**
+     * Account the traffic of every source on the bill since the previous run
+     */
+    public static function pollBill(Bill $bill): void
+    {
+        $now = Carbon::now();
+        $in_delta = 0;
+        $out_delta = 0;
+
+        foreach (self::activeSources($bill) as $source) {
+            /** @var \App\Models\Device $device loaded by activeSources() */
+            $device = $source->getRelation('device');
+            Log::info('  ' . $source::billingTypeName() . ' ' . $source->getBillingLabel() . ' on ' . $device->display);
+            [$in, $out] = self::updateCounter($bill, $source, $now);
+            $in_delta += $in;
+            $out_delta += $out;
+        }
+
+        if (! self::hasSources($bill)) {
+            return; // don't insert zero value entries for bills without sources
+        }
+
+        $previous = $bill->data()->latest('timestamp')->first();
+        $period = $previous ? $now->getTimestamp() - Carbon::parse($previous->timestamp)->getTimestamp() : 0;
+
+        if ($period < 0) {
+            Log::debug("BILLING: negative period! id:{$bill->bill_id} period:$period in_delta:$in_delta out_delta:$out_delta");
+
+            return;
+        }
+
+        $bill->data()->create([
+            'timestamp' => $now,
+            'period' => $period,
+            'delta' => $in_delta + $out_delta,
+            'in_delta' => $in_delta,
+            'out_delta' => $out_delta,
+        ]);
+    }
+
+    /**
+     * Store the current counter sample of a source and return the traffic since the previous sample
+     *
+     * @param  Model&BillableSource  $source  loaded through a Bill relation, so the pivot is present
+     * @return array{0: int, 1: int} inbound and outbound octets
+     */
+    private static function updateCounter(Bill $bill, Model&BillableSource $source, Carbon $now): array
+    {
+        $counters = $source->fetchBillingCounters();
+
+        if ($counters === null) {
+            Log::error('    Could not read the counters, skipping');
+
+            return [0, 0];
+        }
+
+        [$in, $out] = $counters;
+        /** @var BillCounter $last */
+        $last = $source->getRelation('pivot');
+        $in_delta = 0;
+        $out_delta = 0;
+
+        if ($last->in_counter !== null) {
+            $period = max(1, $now->getTimestamp() - $last->timestamp->getTimestamp());
+            $in_delta = self::counterDelta($in, $last->in_counter, $last->in_delta, $period, $source->getBillingSpeed());
+            $out_delta = self::counterDelta($out, $last->out_counter, $last->out_delta, $period, $source->getBillingSpeed());
+        }
+
+        Log::debug("    in: $in (+$in_delta)  out: $out (+$out_delta)");
+
+        $source->bills()->updateExistingPivot($bill->bill_id, [
+            'timestamp' => $now,
+            'in_counter' => $in,
+            'out_counter' => $out,
+            'in_delta' => $in_delta,
+            'out_delta' => $out_delta,
+        ]);
+
+        return [$in_delta, $out_delta];
+    }
+
+    /**
+     * Octets since the previous sample. A counter wrap or a jump the link speed can't carry
+     * repeats the previous delta, as the port based billing always did.
+     */
+    private static function counterDelta(int $current, int $last, int $last_delta, int $period, ?int $speed): int
+    {
+        if ($current < $last) {
+            return $last_delta;
+        }
+
+        $delta = $current - $last;
+
+        if ($speed !== null && $delta * 8 / $period > $speed) {
+            return $last_delta;
+        }
+
+        return $delta;
+    }
+
+    /**
+     * Sources of the bill that carry traffic right now: active, on an up device handled by this poller
+     *
+     * @return Collection<int, Model&BillableSource>
+     */
+    private static function activeSources(Bill $bill): Collection
+    {
+        $device = fn (Builder $query) => self::pollerDevices($query)->where('status', 1);
+
+        /** @var Collection<int, Model&BillableSource> $sources */
+        $sources = new Collection;
+        foreach (Bill::SOURCE_TYPES as $class) {
+            $sources = $sources->concat($bill->sources($class)->with('device')
+                ->where(fn (Builder $query) => $class::filterBillingActive($query))
+                ->whereHas('device', $device)
+                ->get());
+        }
+
+        return $sources;
+    }
+
+    private static function hasSources(Bill $bill): bool
+    {
+        foreach (Bill::SOURCE_TYPES as $class) {
+            if ($bill->sources($class)->whereHas('device', self::pollerDevices(...))->exists()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * With distributed billing every poller only accounts the devices of its own poller groups
+     */
+    private static function pollerDevices(Builder $query): Builder
+    {
+        if (LibrenmsConfig::get('distributed_poller') && LibrenmsConfig::get('distributed_billing')) {
+            $query->whereIn('poller_group', explode(',', (string) LibrenmsConfig::get('distributed_poller_group')));
+        }
+
+        return $query;
     }
 
     public static function getRates($bill_id, $datefrom, $dateto, $dir_95th): array

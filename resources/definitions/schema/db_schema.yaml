@@ -306,6 +306,20 @@ bills:
     - { Field: bill_autoadded, Type: tinyint, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [bill_id], Unique: true, Type: BTREE }
+bill_counters:
+  Columns:
+    - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: source_type, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: source_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: autoadded, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: timestamp, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
+    - { Field: in_counter, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: in_delta, Type: bigint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: out_counter, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: out_delta, Type: bigint, 'Null': false, Extra: '', Default: '0' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [bill_id, source_type, source_id], Unique: true, Type: BTREE }
+    bill_counters_source_type_source_id_index: { Name: bill_counters_source_type_source_id_index, Columns: [source_type, source_id], Unique: false, Type: BTREE }
 bill_data:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -355,25 +369,6 @@ bill_perms:
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-bill_ports:
-  Columns:
-    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: bill_port_autoadded, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-bill_port_counters:
-  Columns:
-    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: timestamp, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
-    - { Field: in_counter, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: in_delta, Type: bigint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: out_counter, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: out_delta, Type: bigint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [port_id, bill_id], Unique: true, Type: BTREE }
 cache:
   Columns:
     - { Field: key, Type: varchar(255), 'Null': false, Extra: '' }

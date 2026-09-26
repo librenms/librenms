@@ -62,36 +62,44 @@ if (Gate::allows('view', $bill)) {
 
     $unix_prev_from = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastfrom')");
     $unix_prev_to = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastto')");
-    // Speeds up loading for other included pages by setting it before progessing of mysql data!
-    $ports = dbFetchRows(
-        'SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
-        WHERE B.bill_id = ? AND P.port_id = B.port_id
-        AND D.device_id = P.device_id',
-        [$bill_id]
-    );
 
     $vars['view'] ??= 'quick';
 
-    function print_port_list($ports)
+    function print_source_list(Bill $bill, $removable_bill_id = null)
     {
+        $sources = $bill->billableSources();
+
         echo '<div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Billed Ports</h3>
+                <h3 class="panel-title">Billed Sources</h3>
             </div>
-            <div class="list-group">';
+            <div class="panel-body">';
 
-        // Collected Earlier
-        foreach ($ports as $port) {
-            $port = cleanPort($port);
-            $portalias = (empty($port['ifAlias']) ? '' : ' - ' . $port['ifAlias'] . '');
-
-            echo '<div class="list-group-item">';
-            echo generate_port_link($port, $port['ifName'] . $portalias) . ' on ' . generate_device_link($port);
+        if ($sources->isEmpty()) {
+            echo '<div class="alert alert-info" style="margin-bottom: 0;">There are no sources assigned to this bill</div>';
+        } else {
+            echo '<div class="list-group" style="margin-bottom: 0;">';
+            foreach ($sources as $source) {
+                echo '<div class="list-group-item">';
+                if ($removable_bill_id) {
+                    print_source_remove_button(route('bill.source.detach', [$removable_bill_id, $source->getMorphClass(), $source->getKey()]), $source::billingTypeName());
+                }
+                echo '<span class="label label-default">' . e($source::billingTypeName()) . '</span> ';
+                echo $source->getBillingLink() . ' on ' . Url::deviceLink($source->device);
+                echo '</div>';
+            }
             echo '</div>';
         }
 
         echo '</div></div>';
-    }//end print_port_list?>
+    }//end print_source_list
+
+    function print_source_remove_button($action, $type)
+    {
+        echo '<form action="' . $action . '" method="post" class="pull-right" onsubmit="return confirm(\'Are you sure you wish to remove this ' . e($type) . '?\')">'
+            . csrf_field() . method_field('DELETE')
+            . '<button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-minus"></i> Remove</button></form>';
+    }//end print_source_remove_button?>
 
     <h2>Bill: <?php echo htmlentities((string) $bill_data['bill_name']); ?></h2>
 
@@ -157,7 +165,7 @@ if (Gate::allows('view', $bill)) {
 
 <div class="row">
 <div class="col-lg-6 col-lg-push-6">
-        <?php print_port_list($ports) ?>
+        <?php print_source_list($bill) ?>
 </div>
 <div class="col-lg-6 col-lg-pull-6">
 <div class="panel panel-default">
