@@ -3,7 +3,6 @@
 namespace App\Actions\Device;
 
 use App\Models\Device;
-use Carbon\Carbon;
 use LibreNMS\Polling\ConnectivityHelper;
 
 readonly class CheckDeviceAvailability
@@ -24,8 +23,6 @@ readonly class CheckDeviceAvailability
         $results = [];
         if ($connectivity->icmpIsEnabled()) {
             $results['icmp'] = $ping_response->isAlive();
-            $device->last_ping = Carbon::now();
-            $device->last_ping_timetaken = $ping_response->avg_latency ?: $device->last_ping_timetaken;
         }
         if ($connectivity->snmpIsEnabled()) {
             $results['snmp'] = $this->deviceIsSnmpable->execute($device);
