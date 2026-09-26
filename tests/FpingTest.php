@@ -183,4 +183,65 @@ OUT;
         $result = app()->make(Fping::class)->testMtu('192.168.1.3', 1500);
         $this->assertFalse($result);
     }
+
+    public function testPingCommandWithAddressFamilies(): void
+    {
+        LibrenmsConfig::set('fping', 'fping');
+        LibrenmsConfig::set('fping6', '/nonexistent');
+
+        $capturedCommands = [];
+        $this->app->bind(Process::class, function ($app, $params) use (&$capturedCommands) {
+            $capturedCommands[] = $params['command'];
+            $process = \Mockery::mock(Process::class);
+            $process->shouldReceive('getCommandLine', 'run');
+            $process->shouldReceive('getErrorOutput')->andReturn("192.168.1.3 : xmt/rcv/%loss = 3/3/0%, min/avg/max = 0.62/0.71/0.93\n");
+            $process->shouldReceive('getExitCode')->andReturn(0);
+
+            return $process;
+        });
+
+        // Default (null address family) -> no -4 or -6
+        app()->make(Fping::class)->ping('192.168.1.3');
+        $this->assertNotContains('-4', $capturedCommands[0]);
+        $this->assertNotContains('-6', $capturedCommands[0]);
+
+        // IPv4 -> includes -4
+        app()->make(Fping::class)->ping('192.168.1.3', \LibreNMS\Enum\AddressFamily::IPv4);
+        $this->assertContains('-4', $capturedCommands[1]);
+        $this->assertNotContains('-6', $capturedCommands[1]);
+
+        // IPv6 -> includes -6
+        app()->make(Fping::class)->ping('2001:db8::1', \LibreNMS\Enum\AddressFamily::IPv6);
+        $this->assertContains('-6', $capturedCommands[2]);
+        $this->assertNotContains('-4', $capturedCommands[2]);
+    }
+
+    public function testMtuCommandWithAddressFamilies(): void
+    {
+        LibrenmsConfig::set('fping', 'fping');
+        LibrenmsConfig::set('fping6', '/nonexistent');
+
+        $capturedCommands = [];
+        $this->app->bind(Process::class, function ($app, $params) use (&$capturedCommands) {
+            $capturedCommands[] = $params['command'];
+            $process = \Mockery::mock(Process::class);
+            $process->shouldReceive('getCommandLine', 'run', 'disableOutput');
+            $process->shouldReceive('isSuccessful')->andReturn(true);
+
+            return $process;
+        });
+
+        // Default (null address family) -> no -4 or -6
+        app()->make(Fping::class)->testMtu('192.168.1.3', 1500);
+        $this->assertNotContains('-4', $capturedCommands[0]);
+        $this->assertNotContains('-6', $capturedCommands[0]);
+
+        // IPv4 -> includes -4
+        app()->make(Fping::class)->testMtu('192.168.1.3', 1500, \LibreNMS\Enum\AddressFamily::IPv4);
+        $this->assertContains('-4', $capturedCommands[1]);
+
+        // IPv6 -> includes -6
+        app()->make(Fping::class)->testMtu('2001:db8::1', 1500, \LibreNMS\Enum\AddressFamily::IPv6);
+        $this->assertContains('-6', $capturedCommands[2]);
+    }
 }

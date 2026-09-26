@@ -41,7 +41,7 @@ function snmp_exec(string $cmd, array|string|null $oids, array|string|null $opti
     $config = SnmpConfig::fromDeviceArray($device);
 
     $queryOptions = resolve(NetSnmpOptions::class)->parseCli($options);
-    $queryOptions->context = $device['context_name'] ?? $queryOptions->context;
+    $queryOptions->context = $device['context_name'] ?? ($config->context ?: $queryOptions->context);
     $queryOptions->mibs = Mib::parseCliInput($mibs ?? '', $queryOptions->mibs);
     $queryOptions->mibDirs = Mib::directories($os, Mib::parseCliInput($mibdir ?? '', $queryOptions->mibDirs));
     if ($cmd === 'snmpwalk') {

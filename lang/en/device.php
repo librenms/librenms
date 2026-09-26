@@ -37,6 +37,7 @@ return [
     'status_down' => 'Down',
     'device_type' => 'Device Type',
     'alerts_disabled' => 'Alerts Disabled',
+    'no_availability' => 'Warning: No availability sources are enabled for this device. At least one polling method must be enabled and set to affect availability, otherwise the device will ALWAYS show as up',
 
     'edit' => [
         'delete_device' => 'Delete Device',
@@ -51,6 +52,10 @@ return [
         'system_default' => 'System Default',
 
         'overwrite_ip_title' => 'Use this IP instead of resolved one for polling',
+        'no_snmp_title' => 'Without SNMP these details are not discovered, set them here',
+        'sysName' => 'sysName',
+        'hardware' => 'Hardware',
+        'os' => 'OS',
         'overwrite_ip' => 'Overwrite IP (do not use)',
 
         'description' => 'Description',

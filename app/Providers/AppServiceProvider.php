@@ -16,6 +16,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Sanctum\Sanctum;
 use LibreNMS\Cache\PermissionsCache;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\Definitions;
+use LibreNMS\Polling\Method\Methods;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use LibreNMS\Util\Version;
@@ -54,6 +58,13 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('sensor-discovery', fn (Application $app) => new \App\Discovery\Sensor($app->make('device-cache')->getPrimary()));
+
+        $this->app->singleton(PollingMethodRegistry::class, fn () => (new PollingMethodRegistry)
+            ->register(PollingMethodType::Snmp, Methods\SnmpPollingMethod::class, Definitions\SnmpDefinition::class)
+            ->register(PollingMethodType::Icmp, Methods\IcmpPollingMethod::class, Definitions\IcmpDefinition::class)
+            ->register(PollingMethodType::Ipmi, Methods\IpmiPollingMethod::class, Definitions\IpmiDefinition::class)
+            ->register(PollingMethodType::UnixAgent, Methods\UnixAgentPollingMethod::class, Definitions\UnixAgentDefinition::class)
+        );
 
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpBackendInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);

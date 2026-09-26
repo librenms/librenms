@@ -10,9 +10,9 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use File;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostRenameException;
-use Log;
 
 class DeviceObserver
 {
@@ -48,6 +48,7 @@ class DeviceObserver
             $polled_by = LibrenmsConfig::get('distributed_poller') ? (' by ' . \config('librenms.node_id')) : '';
 
             Eventlog::log(sprintf('Device status changed to %s from %s check%s.', ucfirst($type), $reason, $polled_by), $device, $type);
+            Log::debug('Device availability updated for ' . $device->hostname . ' to ' . ($device->status ? 'up' : 'down') . ' due to ' . $device->status_reason);
 
             app(UpdateDeviceOutage::class)->execute($device);
         }
@@ -70,17 +71,6 @@ class DeviceObserver
     {
         if ($device->isDirty(['display_template', 'hostname', 'sysName', 'ip', 'overwrite_ip'])) {
             $device->regenerateDisplayName();
-        }
-
-        if ($device->isDirty('snmp_disable') && $device->snmp_disable) {
-            $reasons = collect(explode(',', (string) $device->status_reason))
-                ->reject(fn ($v) => $v === 'snmp')
-                ->filter()
-                ->implode(',');
-            $device->status_reason = $reasons;
-            if ($device->status == 0 && empty($reasons)) {
-                $device->status = 1;
-            }
         }
 
         // handle device renames
@@ -207,6 +197,7 @@ class DeviceObserver
         $device->ospfv3Ports()->delete();
         $device->outages()->delete();
         $device->packages()->delete();
+        $device->pollingMethods()->delete();
         $device->portsFdb()->delete();
         $device->portsNac()->delete();
         \DB::table('ports_stack')->where('device_id', $device->device_id)->delete();

@@ -632,11 +632,6 @@ devices:
     - { Field: cryptopass, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: cryptoalgo, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: snmpver, Type: varchar(4), 'Null': false, Extra: '', Default: v2c }
-    - { Field: port, Type: 'smallint unsigned', 'Null': false, Extra: '', Default: '161' }
-    - { Field: transport, Type: varchar(16), 'Null': false, Extra: '', Default: udp }
-    - { Field: timeout, Type: int, 'Null': true, Extra: '' }
-    - { Field: retries, Type: int, 'Null': true, Extra: '' }
-    - { Field: snmp_disable, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: bgpLocalAs, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: sysObjectID, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: snmpEngineID, Type: varchar(128), 'Null': true, Extra: '' }
@@ -652,14 +647,10 @@ devices:
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: uptime, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: agent_uptime, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: last_polled, Type: timestamp, 'Null': true, Extra: '' }
-    - { Field: last_poll_attempted, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: last_polled_timetaken, Type: 'double unsigned', 'Null': true, Extra: '' }
     - { Field: last_discovered_timetaken, Type: 'double unsigned', 'Null': true, Extra: '' }
     - { Field: last_discovered, Type: timestamp, 'Null': true, Extra: '' }
-    - { Field: last_ping, Type: timestamp, 'Null': true, Extra: '' }
-    - { Field: last_ping_timetaken, Type: 'double unsigned', 'Null': true, Extra: '' }
     - { Field: purpose, Type: text, 'Null': true, Extra: '' }
     - { Field: type, Type: varchar(20), 'Null': false, Extra: '', Default: '' }
     - { Field: serial, Type: text, 'Null': true, Extra: '' }
@@ -667,7 +658,6 @@ devices:
     - { Field: poller_group, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: override_sysLocation, Type: tinyint, 'Null': true, Extra: '', Default: '0' }
     - { Field: notes, Type: text, 'Null': true, Extra: '' }
-    - { Field: port_association_mode, Type: int, 'Null': false, Extra: '', Default: '1' }
     - { Field: max_depth, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: disable_notify, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: ignore_status, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
@@ -676,7 +666,6 @@ devices:
     PRIMARY: { Name: PRIMARY, Columns: [device_id], Unique: true, Type: BTREE }
     devices_display_index: { Name: devices_display_index, Columns: [display], Unique: false, Type: BTREE }
     devices_hostname_sysname_display_index: { Name: devices_hostname_sysname_display_index, Columns: [hostname, sysName, display], Unique: false, Type: BTREE }
-    devices_last_poll_attempted_index: { Name: devices_last_poll_attempted_index, Columns: [last_poll_attempted], Unique: false, Type: BTREE }
     devices_last_polled_index: { Name: devices_last_polled_index, Columns: [last_polled], Unique: false, Type: BTREE }
     devices_os_index: { Name: devices_os_index, Columns: [os], Unique: false, Type: BTREE }
     devices_status_index: { Name: devices_status_index, Columns: [status], Unique: false, Type: BTREE }
@@ -749,6 +738,26 @@ device_outages:
     device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     device_outages_going_down_index: { Name: device_outages_going_down_index, Columns: [going_down], Unique: false, Type: BTREE }
     device_outages_up_again_index: { Name: device_outages_up_again_index, Columns: [up_again], Unique: false, Type: BTREE }
+device_polling_methods:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: method_type, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: enabled, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
+    - { Field: affects_availability, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: secret_id, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: settings, Type: longtext, 'Null': true, Extra: '' }
+    - { Field: last_checked_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: last_check_successful, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    device_polling_methods_device_id_method_type_unique: { Name: device_polling_methods_device_id_method_type_unique, Columns: [device_id, method_type], Unique: true, Type: BTREE }
+    device_polling_methods_secret_id_foreign: { Name: device_polling_methods_secret_id_foreign, Columns: [secret_id], Unique: false, Type: BTREE }
+  Constraints:
+    device_polling_methods_device_id_foreign: { name: device_polling_methods_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
+    device_polling_methods_secret_id_foreign: { name: device_polling_methods_secret_id_foreign, foreign_key: secret_id, table: secrets, key: id, extra: 'ON DELETE SET NULL' }
 device_relationships:
   Columns:
     - { Field: parent_device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
@@ -2197,6 +2206,18 @@ route:
     - { Field: inetCidrRoutePfxLen, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [route_id], Unique: true, Type: BTREE }
+secrets:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: description, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: secret_type, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: data, Type: text, 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    secrets_description_unique: { Name: secrets_description_unique, Columns: [description], Unique: true, Type: BTREE }
+    secrets_secret_type_index: { Name: secrets_secret_type_index, Columns: [secret_type], Unique: false, Type: BTREE }
 sensors:
   Columns:
     - { Field: sensor_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

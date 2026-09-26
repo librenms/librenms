@@ -191,7 +191,10 @@ class TopDevicesController extends WidgetController
         $settings = $this->getSettings();
 
         /** @var Builder $query */
-        $query = $this->deviceQuery()->orderBy('last_ping_timetaken', $sort)->limit($settings['device_count']);
+        $query = $this->deviceQuery()
+            ->join('device_stats', 'devices.device_id', '=', 'device_stats.device_id')
+            ->orderBy('device_stats.ping_rtt_last', $sort)
+            ->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($device) {
             /** @var Device $device */
