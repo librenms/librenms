@@ -92,11 +92,6 @@ function getidbyname($hostname)
     return DeviceCache::getByHostname($hostname)->device_id;
 }
 
-function get_dev_attrib($device, $attrib_type)
-{
-    return DeviceCache::get((int) $device['device_id'])->getAttrib($attrib_type);
-}
-
 /**
  * Output using console color if possible
  * https://github.com/pear/Console_Color2/blob/master/examples/documentation
