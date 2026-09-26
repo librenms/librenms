@@ -138,12 +138,32 @@ of the user to the hook content.
 For example, `device-overview.blade.php` appears only when the
 device is in a maintenance mode and the current user has the admin role.
 
+Type hint the `$user` argument as `Illuminate\Contracts\Auth\Authenticatable`.
+LibreNMS injects the current user into that type.
+
 ```php
+use Illuminate\Contracts\Auth\Authenticatable;
+
 class DeviceOverview extends DeviceOverviewHook
 {
-    public function authorize(User $user, Device $device): bool
+    public function authorize(Authenticatable $user, Device $device): bool
     {
         return $user->can('admin') && $device->isUnderMaintenance();
+    }
+}
+```
+
+Check permissions with `can()` or with the `Gate` facade. Both work on an `Authenticatable`. Do not call methods of the `User` model. They tie your plugin to implementation details that might change.
+
+```php
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Facades\Gate;
+
+class DeviceOverview extends DeviceOverviewHook
+{
+    public function authorize(Authenticatable $user, Device $device): bool
+    {
+        return Gate::allows('view', $device);
     }
 }
 ```
