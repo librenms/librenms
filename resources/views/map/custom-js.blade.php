@@ -125,9 +125,11 @@
                     maxVisible: 100000
                 }
             };
-            options.interaction = options.interaction || {dragView: true, zoomView: true};
+            options.interaction = options.interaction || {};
             options.interaction.hover = true;
             options.interaction.tooltipDelay = 100;
+            options.interaction.dragView = true;
+            options.interaction.zoomView = true;
 
             var container = document.getElementById(elementId);
             var network = new vis.Network(container, {nodes: nodes, edges: edges}, options);
@@ -233,6 +235,14 @@
             });
         },
 
+        zoomOriginal: function (network) {
+            if (!network) return;
+            network.moveTo({
+                scale: 1,
+                animation: { duration: 200, easingFunction: 'easeInOutQuad' }
+            });
+        },
+
         fitMap: function (network, container) {
             if (!network || !container) return;
             var mapWidth = container._mapWidth;
@@ -244,6 +254,28 @@
                 position: {x: centreX, y: centreY},
                 scale: scale,
                 animation: { duration: 300, easingFunction: 'easeInOutQuad' }
+            });
+        },
+
+        fitHeight: function (network, container) {
+            if (!network || !container) return;
+            var containerHeight = $(container).height() || $(window).height();
+            var logicalHeight = this.mapLogicalHeight || 800;
+            var scale = (containerHeight / logicalHeight) || 1;
+            network.moveTo({
+                scale: scale,
+                animation: { duration: 200, easingFunction: 'easeInOutQuad' }
+            });
+        },
+
+        fitWidth: function (network, container) {
+            if (!network || !container) return;
+            var containerWidth = $(container).width() || $(window).width();
+            var logicalWidth = this.mapLogicalWidth || 1800;
+            var scale = (containerWidth / logicalWidth) || 1;
+            network.moveTo({
+                scale: scale,
+                animation: { duration: 200, easingFunction: 'easeInOutQuad' }
             });
         },
 
@@ -896,6 +928,21 @@
                         action: function () { custommap.fitMap(self.network, container); }
                     });
                     menuItems.push({
+                        icon: 'fa-solid fa-arrows-left-right',
+                        label: "{{ __('Zoom to Width') }} (W)",
+                        action: function () { custommap.fitWidth(self.network, container); }
+                    });
+                    menuItems.push({
+                        icon: 'fa-solid fa-arrows-up-down',
+                        label: "{{ __('Zoom to Height') }} (H)",
+                        action: function () { custommap.fitHeight(self.network, container); }
+                    });
+                    menuItems.push({
+                        icon: 'fa-solid fa-window-maximize',
+                        label: "{{ __('Original Scale') }} (1)",
+                        action: function () { custommap.zoomOriginal(self.network); }
+                    });
+                    menuItems.push({
                         icon: 'fa-solid fa-magnifying-glass-plus',
                         label: "{{ __('Zoom In') }} (+)",
                         action: function () { custommap.zoomIn(self.network, container); }
@@ -957,12 +1004,21 @@
                         if (e.key === '0' || e.key.toLowerCase() === 'f' || e.key === 'Home') {
                             e.preventDefault();
                             custommap.fitMap(self.network, networkContainer);
+                        } else if (e.key.toLowerCase() === 'h') {
+                            e.preventDefault();
+                            custommap.fitHeight(self.network, networkContainer);
+                        } else if (e.key.toLowerCase() === 'w') {
+                            e.preventDefault();
+                            custommap.fitWidth(self.network, networkContainer);
                         } else if (e.key === '+' || e.key === '=') {
                             e.preventDefault();
                             custommap.zoomIn(self.network, networkContainer);
                         } else if (e.key === '-' || e.key === '_') {
                             e.preventDefault();
                             custommap.zoomOut(self.network, networkContainer);
+                        } else if (e.key === '1' || e.key === '!') {
+                            e.preventDefault();
+                            custommap.zoomOriginal(self.network);
                         } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
                             e.preventDefault();
                             var curPos = self.network.getViewPosition();
