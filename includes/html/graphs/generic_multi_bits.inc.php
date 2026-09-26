@@ -63,20 +63,20 @@ if ($i) {
 
     $rrd_options[] = 'CDEF:' . $in . 'octets=' . $in_thing . $pluses;
     $rrd_options[] = 'CDEF:' . $out . 'octets=' . $out_thing . $pluses;
-    $rrd_options[] = 'CDEF:doutoctets=outoctets,' . $stacked['stacked'];
+    $rrd_options[] = 'CDEF:doutoctets=outoctets,' . $stacked['stacked'] . ',*';
     $rrd_options[] = 'CDEF:inbits=inoctets,8,*';
     $rrd_options[] = 'CDEF:outbits=outoctets,8,*';
     $rrd_options[] = 'CDEF:doutbits=doutoctets,8,*';
     $rrd_options[] = 'VDEF:percentile_in=inbits,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
     $rrd_options[] = 'VDEF:percentile_out=outbits,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
-    $rrd_options[] = 'CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'];
+    $rrd_options[] = 'CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',*';
     $rrd_options[] = 'VDEF:dpercentile_outnp=dpercentile_outn,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
-    $rrd_options[] = 'CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,-1,*,+';
+    $rrd_options[] = 'CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+';
     $rrd_options[] = 'VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
 
     if ($graph_params->visible('previous')) {
-        $rrd_options[] = 'CDEF:' . $in . 'octetsX=' . $in_thingX . $pluses;
-        $rrd_options[] = 'CDEF:' . $out . 'octetsX=' . $out_thingX . $pluses;
+        $rrd_options[] = 'CDEF:' . $in . 'octetsX=' . $in_thingX . $plusesX;
+        $rrd_options[] = 'CDEF:' . $out . 'octetsX=' . $out_thingX . $plusesX;
         $rrd_options[] = 'CDEF:doutoctetsX=outoctetsX,' . $stacked['stacked'] . ',*';
         $rrd_options[] = 'CDEF:inbitsX=inoctetsX,8,*';
         $rrd_options[] = 'CDEF:outbitsX=outoctetsX,8,*';
@@ -84,9 +84,9 @@ if ($i) {
         $rrd_options[] = 'VDEF:percentile_inX=inbitsX,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
         $rrd_options[] = 'VDEF:percentile_outX=outbitsX,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
         $rrd_options[] = 'CDEF:dpercentile_outXn=doutbitsX,' . $stacked['stacked'] . ',*';
-        $rrd_options[] = 'VDEF:dpercentile_outX=dpercentile_outXn,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
-        $rrd_options[] = 'CDEF:dpercentile_outXn=doutbitsX,doutbitsX,-,dpercentile_outX,' . $stacked['stacked'] . ',*,+';
-        $rrd_options[] = 'VDEF:dpercentile_outX=dpercentile_outXn,FIRST';
+        $rrd_options[] = 'VDEF:dpercentile_outXperc=dpercentile_outXn,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
+        $rrd_options[] = 'CDEF:dpercentile_outXnd=doutbitsX,doutbitsX,-,dpercentile_outXperc,' . $stacked['stacked'] . ',*,+';
+        $rrd_options[] = 'VDEF:dpercentile_outX=dpercentile_outXnd,FIRST';
     }
 
     if ($legend == 'no' || $legend == '1') {

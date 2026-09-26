@@ -71,6 +71,7 @@ class UserPreferencesController extends Controller implements HasMiddleware
             'can_change_password' => LegacyAuth::get()->canUpdatePasswords($user->username),
             'dashboards' => Dashboard::hasAccess($user)->with('user')->get(),
             'default_dashboard' => UserPref::getPref($user, 'dashboard'),
+            'traffic_same_axis' => UserPref::getPref($user, 'traffic_same_axis') ?? LibrenmsConfig::get('webui.graph_stacked', false),
             'note_to_device' => UserPref::getPref($user, 'add_schedule_note_to_device'),
             'locale' => UserPref::getPref($user, 'locale'),
             'locale_default' => $locales[$default_locale] ?? $default_locale,
@@ -123,6 +124,7 @@ class UserPreferencesController extends Controller implements HasMiddleware
             ],
             'temp_units' => 'required|in:default,f',
             'hide_dashboard_editor' => 'required|integer',
+            'traffic_same_axis' => 'required|boolean',
         ];
 
         $this->validate($request, [

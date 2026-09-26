@@ -109,9 +109,9 @@ if ($i) {
         $rrd_options[] = 'VDEF:percentile_inX=inbitsX,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
         $rrd_options[] = 'VDEF:percentile_outX=outbitsX,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
         $rrd_options[] = 'CDEF:dpercentile_outXn=doutbitsX,' . $stacked['stacked'] . ',*';
-        $rrd_options[] = 'VDEF:dpercentile_outX=dpercentile_outXn,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
-        $rrd_options[] = 'CDEF:dpercentile_outXn=doutbitsX,doutbitsX,-,dpercentile_outX,' . $stacked['stacked'] . ',*,+';
-        $rrd_options[] = 'VDEF:dpercentile_outX=dpercentile_outXn,FIRST';
+        $rrd_options[] = 'VDEF:dpercentile_outXperc=dpercentile_outXn,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
+        $rrd_options[] = 'CDEF:dpercentile_outXnd=doutbitsX,doutbitsX,-,dpercentile_outXperc,' . $stacked['stacked'] . ',*,+';
+        $rrd_options[] = 'VDEF:dpercentile_outX=dpercentile_outXnd,FIRST';
     }
 
     if ($legend == 'no' || $legend == '1') {

@@ -113,6 +113,13 @@
                 </div>
             </div>
             <div class="form-group">
+                <label for="traffic_same_axis" class="col-sm-4 control-label">{{ __('preferences.traffic_same_axis') }}</label>
+                <div class="col-sm-4">
+                    <input id="traffic_same_axis" type="checkbox" name="traffic_same_axis" @if($traffic_same_axis) checked @endif aria-describedby="traffic_same_axis_help">
+                    <p id="traffic_same_axis_help" class="help-block">{{ __('preferences.traffic_same_axis_help') }}</p>
+                </div>
+            </div>
+            <div class="form-group">
                 <label for="notetodevice" class="col-sm-4 control-label">{{ __('Add schedule notes to devices notes') }}</label>
                 <div class="col-sm-4">
                     <input id="notetodevice" type="checkbox" name="notetodevice" @if($note_to_device) checked @endif>
@@ -223,16 +230,16 @@
 
 @section('scripts')
     <script>
-        $("[name='notetodevice']")
-            .bootstrapSwitch('offColor', 'danger')
-            .on('switchChange.bootstrapSwitch', function (e, state) {
+        var $preferenceSwitches = $("[name='notetodevice'], [name='traffic_same_axis']");
+        $preferenceSwitches.bootstrapSwitch('offColor', 'danger');
+        $preferenceSwitches.on('switchChange.bootstrapSwitch', function (e, state) {
                 var $this = $(this);
                 $.ajax({
                     url: '{{ route('preferences.store') }}',
                     dataType: 'json',
                     type: 'POST',
                     data: {
-                        pref: 'add_schedule_note_to_device',
+                        pref: this.name === 'traffic_same_axis' ? 'traffic_same_axis' : 'add_schedule_note_to_device',
                         value: state ? 1 : 0
                     },
                     success: function () {

@@ -1,5 +1,7 @@
 <?php
 
+$stacked = generate_stacked_graphs();
+
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Rewrite;
 
@@ -84,17 +86,18 @@ foreach ($accs as $acc) {
         $rrd_options[] = 'DEF:out' . $this_id . "temp=$this_rrd:" . $prefix . 'OUT:AVERAGE';
         $rrd_options[] = 'CDEF:inB' . $this_id . '=in' . $this_id . ",$multiplier,*";
         $rrd_options[] = 'CDEF:outB' . $this_id . 'temp=out' . $this_id . "temp,$multiplier,*";
-        $rrd_options[] = 'CDEF:outB' . $this_id . '=outB' . $this_id . 'temp,-1,*';
+        $rrd_options[] = 'CDEF:outB' . $this_id . '=outB' . $this_id . 'temp,' . $stacked['stacked'] . ',*';
         $rrd_options[] = 'CDEF:octets' . $this_id . '=inB' . $this_id . ',outB' . $this_id . 'temp,+';
         $rrd_options[] = 'VDEF:totin' . $this_id . '=inB' . $this_id . ',TOTAL';
         $rrd_options[] = 'VDEF:totout' . $this_id . '=outB' . $this_id . 'temp,TOTAL';
         $rrd_options[] = 'VDEF:tot' . $this_id . '=octets' . $this_id . ',TOTAL';
-        $rrd_options[] = 'AREA:inB' . $this_id . '#' . $colour . ':' . $descr . ':STACK';
+        $rrd_options[] = 'AREA:inB' . $this_id . '#' . $colour . $stacked['transparency'] . ':' . $descr . ':STACK';
         if ($rrd_optionsb) {
             $stack = ':STACK';
         }
 
-        $rrd_optionsb[] = 'AREA:outB' . $this_id . '#' . $colour . ":''$stack";
+        $out_colour = $stacked['stacked'] === '1' ? \App\Facades\LibrenmsConfig::get("graph_colours.blues.$iter", $colour) : $colour;
+        $rrd_optionsb[] = 'AREA:outB' . $this_id . '#' . $out_colour . $stacked['transparency'] . ":''$stack";
         $rrd_options[] = 'GPRINT:inB' . $this_id . ":LAST:%6.2lf%s$units";
         $rrd_options[] = 'GPRINT:inB' . $this_id . ":MAX:%6.2lf%s$units";
         $rrd_options[] = 'GPRINT:totin' . $this_id . ":%6.2lf%s$unit";
