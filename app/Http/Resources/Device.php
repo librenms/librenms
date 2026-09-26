@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Secret;
 use App\Models\Vminfo;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -23,6 +24,7 @@ class Device extends JsonResource
         $snmp = $this->polling()->snmp();
         $icmpMethod = $this->pollingMethod(PollingMethodType::Icmp);
         $snmpMethod = $this->pollingMethod(PollingMethodType::Snmp);
+        $canUnmask = (bool) $request->user()?->can('unmask', Secret::class);
 
         $data = [
             'device_id' => $this->device_id,
@@ -30,12 +32,12 @@ class Device extends JsonResource
             'sysName' => $this->sysName,
             'ip' => $this->ip,
             'overwrite_ip' => $this->overwrite_ip,
-            'community' => $snmp->community,
+            'community' => $canUnmask ? $snmp->community : null,
             'authlevel' => $snmp->authlevel,
             'authname' => $snmp->authname,
-            'authpass' => $snmp->authpass,
+            'authpass' => $canUnmask ? $snmp->authpass : null,
             'authalgo' => $snmp->authalgo,
-            'cryptopass' => $snmp->cryptopass,
+            'cryptopass' => $canUnmask ? $snmp->cryptopass : null,
             'cryptoalgo' => $snmp->cryptoalgo,
             'snmpver' => $snmp->version,
             'port' => $snmp->port,
