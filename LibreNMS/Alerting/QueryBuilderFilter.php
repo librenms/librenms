@@ -107,6 +107,18 @@ class QueryBuilderFilter implements \JsonSerializable
                     continue;
                 }
 
+                $field = "$table.$column";
+
+                // devices.ip is varbinary(16) (inet_pton binary) — expose only prefix operators
+                if ($field === 'devices.ip') {
+                    $this->filter[$field] = [
+                        'id' => $field,
+                        'type' => 'string',
+                        'operators' => ['ip_in_prefix', 'ip_not_in_prefix'],
+                    ];
+                    continue;
+                }
+
                 $type = $this->getColumnType($column_type);
 
                 // ignore unsupported types (such as binary and blob)
@@ -114,7 +126,22 @@ class QueryBuilderFilter implements \JsonSerializable
                     continue;
                 }
 
-                $field = "$table.$column";
+                // Override operators for known IP address / network columns
+                $ip_columns = [
+                    'ipv4_address', 'ipv6_address', 'ipv6_compressed',
+                    'ipv4_network', 'ipv6_network', 'ip',
+                ];
+                if (in_array($column, $ip_columns)) {
+                    $this->filter[$field] = [
+                        'id' => $field,
+                        'type' => 'string',
+                        'operators' => [
+                            'equal', 'not_equal', 'contains', 'not_contains',
+                            'begins_with', 'ip_in_prefix', 'ip_not_in_prefix',
+                        ],
+                    ];
+                    continue;
+                }
 
                 if (Str::endsWith($column, ['_perc', '_current', '_usage', '_perc_warn'])) {
                     $this->filter[$field] = [
