@@ -1,13 +1,13 @@
 modules:
+    os:
+        sysDescr_regex: '/Foundry Networks, Inc. (?<hardware>[^,]+), IronWare Version (?<version>\S+)/'
+        serial: FOUNDRY-SN-AGENT-MIB::snChasSerNum.0
     mempools:
         data:
             -
                 total: FOUNDRY-SN-AGENT-MIB::snAgGblDynMemTotal
                 free: FOUNDRY-SN-AGENT-MIB::snAgGblDynMemFree
                 descr: 'Dynamic Memory'
-    os:
-        sysDescr_regex: '/Foundry Networks, Inc. (?<hardware>[^,]+), IronWare Version (?<version>\S+)/'
-        serial: FOUNDRY-SN-AGENT-MIB::snChasSerNum.0
     processors:
         data:
             -
