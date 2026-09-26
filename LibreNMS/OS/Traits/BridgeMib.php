@@ -185,9 +185,8 @@ trait BridgeMib
             }, []);
 
             SnmpQuery::context("$vlan", 'vlan-')->enumStrings()->get($oids)
-                ->mapTable(function ($data, $base_port) use ($vlan, $vlan_ports) {
+                ->mapTable(function ($data, $base_port) use ($vlan_ports) {
                     $port = $vlan_ports->get($base_port);
-                    $port->vlan = $vlan;
                     $port->state = $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown';
                     $port->enable = $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown';
                     $port->designatedRoot = Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? '')->hex();
