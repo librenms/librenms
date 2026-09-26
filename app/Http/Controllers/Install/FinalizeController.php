@@ -45,6 +45,7 @@ class FinalizeController extends InstallationController implements InstallerStep
         }
 
         return view('install.finish', $this->formatData([
+            'app_key' => config('app.key'),
             'can_update' => Git::make()->isAvailable(),
             'success' => '',
             'env' => '',
@@ -94,6 +95,7 @@ class FinalizeController extends InstallationController implements InstallerStep
 
         return response()->json([
             'success' => $success,
+            'app_key' => config('app.key'),
             'env' => $env,
             'config' => $config,
             'messages' => $messages,
@@ -126,6 +128,7 @@ class FinalizeController extends InstallationController implements InstallerStep
         $port = config("database.connections.$connection.port");
 
         return [
+            'APP_KEY' => config('app.key'),
             'NODE_ID' => uniqid(),
             'DB_HOST' => config("database.connections.$connection.host"),
             'DB_PORT' => $port == 3306 ? null : $port, // don't set default port
