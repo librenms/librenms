@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: [master, main]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 permissions:
   contents: read
 
@@ -126,7 +122,7 @@ jobs:
 
     steps:
       - name: Checkout Code (sparse)
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |

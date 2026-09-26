@@ -11,8 +11,11 @@ on:
 jobs:
   auto-format:
     # Only run on forks, never on the main repository
-    if: github.repository != github.event.repository.full_name || github.repository_owner != 'MAIN_REPO_OWNER'
+    if: github.repository_owner != 'librenms'
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
       - name: Check if auto-formatting is enabled
@@ -34,7 +37,7 @@ jobs:
 
       - name: Checkout code
         if: steps.check_enabled.outputs.enabled == 'true'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
