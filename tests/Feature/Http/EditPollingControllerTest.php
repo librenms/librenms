@@ -552,7 +552,83 @@ class EditPollingControllerTest extends TestCase
 
         $response->assertOk();
         $this->assertTrue($method->fresh()->affects_availability);
-        $this->assertFalse($method->fresh()->last_check_successful);
+        $this->assertNull($method->fresh()->last_check_successful);
+    }
+
+    public function testUpdateAvailabilityChangeIsLogged(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+
+        $device = Device::factory()->create(['status' => false, 'status_reason' => 'icmp']);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+            'affects_availability' => true,
+            'last_check_successful' => false,
+        ]);
+
+        $response = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'icmp']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '0',
+                'force_save' => '1',
+                'settings' => [],
+            ]
+        );
+
+        $response->assertOk();
+        $this->assertTrue($device->fresh()->status);
+        $this->assertDatabaseHas('eventlog', [
+            'device_id' => $device->device_id,
+            'message' => 'Device status changed to Up from icmp check.',
+        ]);
+    }
+
+    public function testUpdateCannotRestoreMaskedValuesFromInaccessibleSecret(): void
+    {
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->givePermissionTo(['device.update', 'secret.update']);
+
+        $foreignSecret = \App\Models\Secret::create([
+            'description' => 'Foreign SNMP Secret',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'data' => ['version' => 'v2c', 'community' => 'foreign-community'],
+        ]);
+        DevicePollingMethod::factory()->create([
+            'device_id' => Device::factory()->create()->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $foreignSecret->id,
+        ]);
+
+        $device = Device::factory()->create();
+        $method = DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => null,
+        ]);
+
+        $response = $this->actingAs($user)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'snmp']),
+            [
+                'enabled' => '1',
+                'secret_id' => (string) $foreignSecret->id,
+                'is_editing_secret' => '1',
+                'secret_update_mode' => 'create',
+                'description' => 'Stolen',
+                'secret_data' => [
+                    'version' => 'v2c',
+                    'community' => \App\Models\Secret::MASK,
+                ],
+            ]
+        );
+
+        $response->assertNotFound();
+        $this->assertNull($method->fresh()->secret_id);
+        $this->assertDatabaseMissing('secrets', ['description' => 'Stolen']);
     }
 
     public function testStorePollingMethodUnreachableReturns422(): void
@@ -606,7 +682,7 @@ class EditPollingControllerTest extends TestCase
         $this->assertDatabaseHas('device_polling_methods', [
             'device_id' => $device->device_id,
             'method_type' => 'icmp',
-            'last_check_successful' => 0,
+            'last_check_successful' => null,
         ]);
     }
 
