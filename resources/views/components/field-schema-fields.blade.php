@@ -151,7 +151,7 @@
                 <input type="password"
                        id="{{ $id }}"
                        name="{{ $name }}"
-                       value="********"
+                       value="{{ \App\Models\Secret::MASK }}"
                        class="form-control"
                        readonly>
             @else

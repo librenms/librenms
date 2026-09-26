@@ -23,7 +23,7 @@
                 </a>
                 @endcan
 
-                @if(LibrenmsConfig::get('enable_clear_discovery') && $device->toSnmpConfig()->isEnabled())
+                @if(LibrenmsConfig::get('enable_clear_discovery') && $device->polling()->snmp()->isEnabled())
                     <button type="submit" id="rediscover" data-device_id="{{ $device->device_id }}"
                             class="btn btn-primary" name="rediscover" title="{{ __('device.edit.rediscover_title') }}">
                         <i class="fa fa-retweet"></i> {{ __('device.edit.rediscover') }}

@@ -131,7 +131,7 @@ class SmokepingGenerateCommand extends LnmsCommand
         $smokelist = [];
         foreach ($devices as $device) {
             $smokelist[$device->type][$device->hostname] = [
-                'transport' => $device->pollingMethodFor()->snmp()->transport,
+                'transport' => $device->polling()->snmp()->transport,
                 'displayname' => $device->display,
             ];
         }

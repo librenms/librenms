@@ -14,6 +14,11 @@ class Secret extends BaseModel
     /** @use HasFactory<\Database\Factories\SecretFactory> */
     use HasFactory;
 
+    /**
+     * Placeholder sent to the browser in place of a secret value the user may not see.
+     */
+    public const MASK = '********';
+
     protected $fillable = [
         'description',
         'secret_type',

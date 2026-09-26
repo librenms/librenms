@@ -78,7 +78,7 @@ class EditPollingControllerTest extends TestCase
 
         $response->assertRedirect();
         $this->assertEquals('ifName', $device->fresh()->pollingMethod(PollingMethodType::Snmp)->settings['port_association_mode']);
-        $this->assertEquals('ifName', $device->fresh()->toSnmpConfig()->portAssociationMode);
+        $this->assertEquals('ifName', $device->fresh()->polling()->snmp()->portAssociationMode);
     }
 
     public function testStorePollingMethodRejectsDuplicateDefaultSecretDescription(): void
@@ -642,7 +642,7 @@ class EditPollingControllerTest extends TestCase
 
         $freshMethod = $method->fresh();
         $this->assertEquals([], $freshMethod->settings);
-        $config = $device->fresh()->pollingMethodFor()->unixAgent();
+        $config = $device->fresh()->polling()->unixAgent();
         $this->assertInstanceOf(\LibreNMS\Polling\Method\Config\UnixAgentConfig::class, $config);
         $this->assertEquals(6556, $config->port);
         $this->assertEquals(10, $config->timeout);
@@ -664,7 +664,7 @@ class EditPollingControllerTest extends TestCase
 
         $freshMethod = $method->fresh();
         $this->assertEquals(['port' => 6557], $freshMethod->settings);
-        $config = $device->fresh()->pollingMethodFor()->unixAgent();
+        $config = $device->fresh()->polling()->unixAgent();
         $this->assertInstanceOf(\LibreNMS\Polling\Method\Config\UnixAgentConfig::class, $config);
         $this->assertEquals(6557, $config->port);
 
@@ -685,7 +685,7 @@ class EditPollingControllerTest extends TestCase
 
         $freshMethod = $method->fresh();
         $this->assertEquals([], $freshMethod->settings);
-        $config = $device->fresh()->pollingMethodFor()->unixAgent();
+        $config = $device->fresh()->polling()->unixAgent();
         $this->assertInstanceOf(\LibreNMS\Polling\Method\Config\UnixAgentConfig::class, $config);
         $this->assertEquals(6556, $config->port);
     }
@@ -719,7 +719,7 @@ class EditPollingControllerTest extends TestCase
 
         $freshMethod = $method->fresh();
         $this->assertEquals(['ip_version' => 'ipv6'], $freshMethod->settings);
-        $config = $device->fresh()->pollingMethodFor()->icmp();
+        $config = $device->fresh()->polling()->icmp();
         $this->assertSame('ipv6', $config->ipVersion);
         $icmpMethod = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Icmp);
         $this->assertInstanceOf(\LibreNMS\Polling\Method\Methods\IcmpPollingMethod::class, $icmpMethod);

@@ -45,7 +45,7 @@ final readonly class ProbeResult
 
     public function errorMessage(): ?string
     {
-        return $this->errorMessage ?? (is_string($this->stat('error')) ? $this->stat('error') : null);
+        return $this->errorMessage;
     }
 
     /**

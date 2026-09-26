@@ -22,14 +22,8 @@ class PersistDeviceWithPollingMethods
                     $deviceMethod->device_id = $device->device_id;
 
                     if ($deviceMethod->relationLoaded('secret') && $deviceMethod->secret) {
-                        $secret = $deviceMethod->secret;
-                        if (! $secret->exists) {
-                            if (empty($secret->description)) {
-                                $secret->description = strtoupper($deviceMethod->method_type->value) . ' ' . $device->hostname;
-                            }
-                            $secret->save();
-                        }
-                        $deviceMethod->secret_id = $secret->id;
+                        $deviceMethod->secret->save();
+                        $deviceMethod->secret_id = $deviceMethod->secret->id;
                     }
 
                     $deviceMethod->save();

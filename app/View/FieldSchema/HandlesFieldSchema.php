@@ -29,19 +29,11 @@ namespace App\View\FieldSchema;
 trait HandlesFieldSchema
 {
     /**
-     * Get field definitions for this schema.
-     * Override in implementing classes.
-     *
      * @return array<string, FieldDefinition>
      */
-    public function fields(): array
-    {
-        return [];
-    }
+    abstract public function fields(): array;
 
     /**
-     * UI/form schema derived from fields().
-     *
      * @return array<string, array<string, mixed>>
      */
     public function schema(): array
@@ -54,9 +46,7 @@ trait HandlesFieldSchema
     }
 
     /**
-     * Validation rules derived from fields().
-     *
-     * @return array<string, array<mixed>|string>
+     * @return array<string, mixed>
      */
     public function rules(): array
     {
@@ -69,22 +59,14 @@ trait HandlesFieldSchema
     }
 
     /**
-     * Computed field defaults derived from fields or config.
+     * Default value of each field. Override to source defaults from elsewhere.
      *
      * @return array<string, mixed>
      */
     public function schemaDefaults(): array
     {
-        if (method_exists($this, 'defaultConfig')) {
-            return $this->defaultConfig()->settingsArray();
-        }
-
         return collect($this->fields())
-            ->mapWithKeys(function (FieldDefinition $field, string $key): array {
-                $val = $field->getDefault();
-
-                return [$key => $val];
-            })
+            ->map(fn (FieldDefinition $field): mixed => $field->getDefault())
             ->filter(fn (mixed $v): bool => $v !== null)
             ->all();
     }
@@ -92,37 +74,21 @@ trait HandlesFieldSchema
     /**
      * Initial form values: select fields preselect their default, while text/number fields stay empty.
      *
-     * @return array<string, mixed>
+     * @return array<string, string>
      */
     public function formDefaults(): array
     {
-        if (method_exists($this, 'defaultConfig')) {
-            $defaults = $this->defaultConfig()->settingsArray();
-
-            return collect($this->fields())
-                ->filter(fn (FieldDefinition $field): bool => $field->type === 'select')
-                ->mapWithKeys(function (FieldDefinition $field, string $key) use ($defaults): array {
-                    $val = $defaults[$key] ?? $field->getDefault();
-
-                    return [$key => $val !== null ? (string) $val : null];
-                })
-                ->filter(fn (mixed $v): bool => $v !== null)
-                ->all();
-        }
+        $defaults = $this->schemaDefaults();
 
         return collect($this->fields())
-            ->filter(fn (FieldDefinition $field): bool => $field->type === 'select')
-            ->mapWithKeys(function (FieldDefinition $field, string $key): array {
-                $val = $field->getDefault();
-
-                return [$key => $val !== null ? (string) $val : null];
-            })
-            ->filter(fn (mixed $v): bool => $v !== null)
+            ->filter(fn (FieldDefinition $field, string $key): bool => $field->type === 'select' && isset($defaults[$key]))
+            ->map(fn (FieldDefinition $field, string $key): string => (string) $defaults[$key])
             ->all();
     }
 
     /**
-     * Filter input values for storage, retaining only non-empty values that differ from defaults.
+     * Reduce input to the values that differ from the defaults.
+     * Keys missing from the input keep their existing value; empty values clear it.
      *
      * @param  array<string, mixed>  $input
      * @param  array<string, mixed>  $existing
@@ -130,45 +96,23 @@ trait HandlesFieldSchema
      */
     public function filterOverrides(array $input, array $existing = []): array
     {
-        $fields = $this->fields();
-        if (empty($fields)) {
-            return [];
-        }
-
-        $defaults = method_exists($this, 'defaultConfig')
-            ? $this->defaultConfig()->settingsArray()
-            : [];
-
+        $defaults = $this->schemaDefaults();
         $result = [];
-        foreach ($fields as $key => $field) {
-            $default = array_key_exists($key, $defaults) ? $defaults[$key] : $field->getDefault();
 
-            if (array_key_exists($key, $input)) {
-                $raw = $input[$key];
-                if ($raw === null || $raw === '') {
-                    continue;
-                }
-                $cast = $field->castValue($raw);
-                $isDefault = (is_numeric($cast) && is_numeric($default))
-                    ? (float) $cast === (float) $default
-                    : $cast === $default;
+        foreach ($this->fields() as $key => $field) {
+            $raw = array_key_exists($key, $input) ? $input[$key] : ($existing[$key] ?? null);
+            if ($raw === null || $raw === '') {
+                continue;
+            }
 
-                if (! $isDefault) {
-                    $result[$key] = $cast;
-                }
-            } elseif (array_key_exists($key, $existing)) {
-                $raw = $existing[$key];
-                if ($raw === null || $raw === '') {
-                    continue;
-                }
-                $cast = $field->castValue($raw);
-                $isDefault = (is_numeric($cast) && is_numeric($default))
-                    ? (float) $cast === (float) $default
-                    : $cast === $default;
+            $value = $field->castValue($raw);
+            $default = $defaults[$key] ?? null;
+            $isDefault = (is_numeric($value) && is_numeric($default))
+                ? (float) $value === (float) $default
+                : $value === $default;
 
-                if (! $isDefault) {
-                    $result[$key] = $cast;
-                }
+            if (! $isDefault) {
+                $result[$key] = $value;
             }
         }
 
@@ -176,31 +120,12 @@ trait HandlesFieldSchema
     }
 
     /**
-     * Build UI schema fields derived from fields().
+     * Field data for rendering with the field-schema-fields component.
      *
-     * @param  array<string, array<string, mixed>>|null  $schema
-     * @param  string  $dataVar
      * @return array<int, array<string, mixed>>
      */
-    public function buildSchemaFields(?array $schema = null, string $dataVar = 'formData'): array
+    public function buildSchemaFields(string $dataVar = 'formData'): array
     {
-        if ($schema !== null) {
-            return collect($schema)->map(function (array $field, string $key) use ($dataVar): array {
-                $visibleIfExpression = null;
-
-                if (isset($field['visible_if']) && is_array($field['visible_if'])) {
-                    $visibleIfExpression = FieldDefinition::buildVisibleIfExpressionFromArray($field['visible_if'], $dataVar);
-                }
-
-                return [
-                    ...$field,
-                    'key' => $key,
-                    'field_type' => $field['type'] ?? 'text',
-                    'visible_if_expression' => $visibleIfExpression,
-                ];
-            })->values()->all();
-        }
-
         return collect($this->fields())
             ->map(fn (FieldDefinition $field): array => $field->toSchemaField($dataVar))
             ->values()

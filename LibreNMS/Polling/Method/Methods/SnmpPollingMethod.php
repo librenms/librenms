@@ -5,13 +5,12 @@ namespace LibreNMS\Polling\Method\Methods;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use App\Models\Eventlog;
 use App\Models\Secret;
-use App\View\FieldSchema\FieldDefinition;
-use Illuminate\Validation\Rule;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
-use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Modules\Core;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
@@ -28,78 +27,19 @@ final class SnmpPollingMethod extends PollingMethod
     ) {
     }
 
-    public function icon(): string
-    {
-        return 'fa-server';
-    }
-
-    public function defaultAffectsAvailability(): bool
-    {
-        return true;
-    }
-
     public function defaultConfig(): SnmpConfig
     {
         return SnmpConfig::default();
     }
 
     /**
-     * @inheritDoc
-     */
-    public function fields(): array
-    {
-        return [
-            'transport' => FieldDefinition::make('transport', 'select')
-                ->options([
-                    'udp' => 'UDP',
-                    'tcp' => 'TCP',
-                    'udp6' => 'UDP6',
-                    'tcp6' => 'TCP6',
-                ])
-                ->rules(['nullable', 'string', 'in:udp,tcp,udp6,tcp6']),
-
-            'port' => FieldDefinition::make('port', 'number')
-                ->min(1)
-                ->max(65535)
-                ->rules(['nullable', 'integer', 'min:1', 'max:65535']),
-
-            'timeout' => FieldDefinition::make('timeout', 'number')
-                ->min(0.1)
-                ->max(60)
-                ->rules(['nullable', 'numeric', 'min:0.1', 'max:60'])
-                ->cast('float'),
-
-            'retries' => FieldDefinition::make('retries', 'number')
-                ->min(0)
-                ->max(10)
-                ->rules(['nullable', 'integer', 'min:0', 'max:10']),
-
-            'max_repeaters' => FieldDefinition::make('max_repeaters', 'number')
-                ->min(0)
-                ->max(30)
-                ->rules(['nullable', 'integer', 'min:0', 'max:30']),
-
-            'max_oid' => FieldDefinition::make('max_oid', 'number')
-                ->min(1)
-                ->max(100)
-                ->rules(['nullable', 'integer', 'min:1', 'max:100']),
-
-            'port_association_mode' => FieldDefinition::make('port_association_mode', 'select')
-                ->options(array_combine(PortAssociationMode::getModes(), PortAssociationMode::getModes()))
-                ->rules(['nullable', 'string', Rule::in(PortAssociationMode::getModes())]),
-        ];
-    }
-
-    /**
-     * @param  Device  $device
-     * @param  SnmpConfig  $config
-     * @return ProbeResult
-     *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
     public function probe(Device $device, PollingMethodConfig $config): ProbeResult
     {
+        assert($config instanceof SnmpConfig);
+
         $backend = $this->backend ?? resolve(SnmpBackendInterface::class);
 
         $response = $backend->get(
@@ -113,12 +53,9 @@ final class SnmpPollingMethod extends PollingMethod
             || $response->getExitCode() === 2
             || $response->isValid();
 
-        $error = (! $success) ? ($response->getErrorMessage() ?: ($response->stderr ?: null)) : null;
+        $error = $success ? null : ($response->getErrorMessage() ?: ($response->stderr ?: null));
 
-        return new ProbeResult($success, [
-            'response' => $response,
-            'error' => $error,
-        ], $error);
+        return new ProbeResult($success, ['response' => $response], $error);
     }
 
     public function secretType(): SecretType
@@ -126,34 +63,24 @@ final class SnmpPollingMethod extends PollingMethod
         return SecretType::Snmp;
     }
 
-    public function config(DevicePollingMethod $deviceMethod): SnmpConfig
+    protected function configFromSettings(DevicePollingMethod $deviceMethod): SnmpConfig
     {
-        $secretData = $deviceMethod->secret
-            ? SnmpSecretData::fromArray($deviceMethod->secret->data ?? [])
-            : new SnmpSecretData();
-
         return SnmpConfig::fromSettings(
             settings: $deviceMethod->settings ?? [],
-            secretData: $secretData,
+            secretData: SnmpSecretData::fromArray($deviceMethod->secret->data ?? []),
             os: $deviceMethod->device?->os,
-            enabled: $deviceMethod->enabled ?? false,
-            affectsAvailability: $deviceMethod->affects_availability ?? false,
         );
     }
 
     public function fallbackConfig(Device $device): SnmpConfig
     {
-        $method = $device->pollingMethod(\LibreNMS\Enum\PollingMethodType::Snmp);
-        if ($method) {
-            return $this->config($method);
-        }
-
         if ($device->relationLoaded('pollingMethods') && $device->pollingMethods->isNotEmpty()) {
-            return new SnmpConfig(enabled: false);
+            /** @var SnmpConfig */
+            return parent::fallbackConfig($device);
         }
 
         if ($device->exists) {
-            \App\Models\Eventlog::log('Missing SNMP polling method, falling back to legacy device fields.', $device, 'snmp', \LibreNMS\Enum\Severity::Error);
+            Eventlog::log('Missing SNMP polling method, falling back to legacy device fields.', $device, 'snmp', Severity::Error);
         }
 
         return SnmpConfig::fromLegacyDeviceFields($device);

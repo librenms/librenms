@@ -52,7 +52,7 @@ class Ipmitool
     public static function init(?Device $device = null, ?IpmiConfig $config = null): ?self
     {
         $device ??= DeviceCache::getPrimary();
-        $ipmi = $config ?? $device->pollingMethodFor()->ipmi();
+        $ipmi = $config ?? $device->polling()->ipmi();
 
         if (! $ipmi->enabled || ! $ipmi->hostname) {
             return null;

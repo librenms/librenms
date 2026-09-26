@@ -4,17 +4,14 @@ namespace App\Actions\Device;
 
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
-use App\Models\Secret;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\SecretType;
-use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 
 class LegacyDeviceCreator
 {
     private ?Device $device = null;
-    private readonly PollingMethodRegistry $pollingMethods;
+    private readonly BuildDefaultPollingMethods $builder;
 
     public function __construct(
         public string $hostname,
@@ -41,7 +38,7 @@ class LegacyDeviceCreator
         public bool $force = false,
         public bool $ping_fallback = false,
     ) {
-        $this->pollingMethods = resolve(PollingMethodRegistry::class);
+        $this->builder = resolve(BuildDefaultPollingMethods::class);
     }
 
     public function getDevice(): Device
@@ -66,70 +63,53 @@ class LegacyDeviceCreator
      */
     public function getPollingMethods(Device $device): Collection
     {
-        $methods = collect();
-
-        $icmpMethod = new DevicePollingMethod([
-            'method_type' => PollingMethodType::Icmp,
-            'enabled' => true,
-            'affects_availability' => $this->ping_only || $this->ping_fallback,
-            'settings' => [],
+        $methods = collect([
+            $this->builder->buildMethod($device, PollingMethodType::Icmp, [
+                'affects_availability' => $this->ping_only || $this->ping_fallback,
+            ]),
         ]);
-        $icmpMethod->setRelation('device', $device);
-        $methods->push($icmpMethod);
 
         if (! $this->ping_only) {
-            $settings = array_filter([
-                'port' => $this->port,
-                'transport' => $this->transport,
-                'port_association_mode' => $this->port_association_mode,
-            ], fn ($v) => $v !== null);
-
-            $snmpMethodDef = $this->pollingMethods->require(PollingMethodType::Snmp);
-
-            $hasCredentials = $this->snmpver !== null
-                || $this->community !== null
-                || $this->authpass !== null
-                || $this->cryptopass !== null
-                || ($this->authname !== null && $this->authname !== 'root')
-                || ($this->authalgo !== null && $this->authalgo !== 'MD5')
-                || ($this->cryptoalgo !== null && $this->cryptoalgo !== 'AES');
-
-            $secret = null;
-            if ($hasCredentials) {
-                $authlevel = $this->authlevel ?: (($this->authpass ? 'auth' : 'noAuth') . (($this->cryptopass && $this->authpass) ? 'Priv' : 'NoPriv'));
-                $secretData = new SnmpSecretData(
-                    version: $this->snmpver ?: 'v2c',
-                    community: $this->community,
-                    authlevel: $authlevel,
-                    authname: $this->authname ?: 'root',
-                    authpass: $this->authpass,
-                    authalgo: $this->authalgo ?: 'MD5',
-                    cryptoalgo: $this->cryptoalgo ?: 'AES',
-                    cryptopass: $this->cryptopass,
-                );
-
-                $secret = new Secret([
-                    'secret_type' => SecretType::Snmp->value,
-                    'description' => 'SNMP ' . $device->hostname,
-                    'data' => $secretData->toArray(),
-                ]);
-            }
-
-            $snmpMethod = new DevicePollingMethod([
-                'method_type' => PollingMethodType::Snmp,
-                'enabled' => true,
-                'affects_availability' => $snmpMethodDef->defaultAffectsAvailability(),
-                'settings' => $snmpMethodDef->filterOverrides($settings),
-            ]);
-            $snmpMethod->setRelation('device', $device);
-            if ($secret !== null) {
-                $snmpMethod->setRelation('secret', $secret);
-            }
-
-            $methods->push($snmpMethod);
+            $methods->push($this->builder->buildMethod($device, PollingMethodType::Snmp, [
+                'settings' => array_filter([
+                    'port' => $this->port,
+                    'transport' => $this->transport,
+                    'port_association_mode' => $this->port_association_mode,
+                ], fn ($v) => $v !== null),
+                'secret_data' => $this->snmpSecretData()?->toArray(),
+            ]));
         }
 
         return $methods;
+    }
+
+    /**
+     * Explicit SNMP credentials, or null to try the default credentials.
+     */
+    private function snmpSecretData(): ?SnmpSecretData
+    {
+        $hasCredentials = $this->snmpver !== null
+            || $this->community !== null
+            || $this->authpass !== null
+            || $this->cryptopass !== null
+            || ($this->authname !== null && $this->authname !== 'root')
+            || ($this->authalgo !== null && $this->authalgo !== 'MD5')
+            || ($this->cryptoalgo !== null && $this->cryptoalgo !== 'AES');
+
+        if (! $hasCredentials) {
+            return null;
+        }
+
+        return new SnmpSecretData(
+            version: $this->snmpver ?: 'v2c',
+            community: $this->community,
+            authlevel: $this->authlevel ?: (($this->authpass ? 'auth' : 'noAuth') . (($this->cryptopass && $this->authpass) ? 'Priv' : 'NoPriv')),
+            authname: $this->authname ?: 'root',
+            authpass: $this->authpass,
+            authalgo: $this->authalgo ?: 'MD5',
+            cryptoalgo: $this->cryptoalgo ?: 'AES',
+            cryptopass: $this->cryptopass,
+        );
     }
 
     public function createValidator(): ValidateDeviceAndCreate

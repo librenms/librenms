@@ -37,10 +37,7 @@ readonly class DiscoverDevicePollingMethods
 
             if (! $result->isSuccess()) {
                 if ($pingFallback && $deviceMethod->method_type !== PollingMethodType::Icmp) {
-                    $deviceMethod->enabled = false;
-                    $candidateMethods = $candidateMethods->reject(
-                        fn (DevicePollingMethod $m) => $m === $deviceMethod || $m->method_type === $deviceMethod->method_type
-                    )->values();
+                    $candidateMethods = $candidateMethods->reject(fn (DevicePollingMethod $m) => $m === $deviceMethod)->values();
                 } else {
                     $exception = new HostUnreachableException((string) $device->hostname);
                     /** @var array<string, string> $reasons */

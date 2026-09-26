@@ -6,8 +6,10 @@ use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\PingCheck;
 use App\Models\Device;
+use App\Models\Eventlog;
 use Illuminate\Support\Arr;
 use LibreNMS\Data\Source\Icmp\Fping;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -68,7 +70,7 @@ class DevicePing extends LnmsCommand
         foreach ($devices as $device) {
             $response = $fping->ping($device->pollerTarget(), $icmpMethod->resolveAddressFamily($device));
             if ($response->duplicates > 0 && $device->exists) {
-                \App\Models\Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $device, 'icmp', \LibreNMS\Enum\Severity::Warning);
+                Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $device, 'icmp', Severity::Warning);
                 $response->ignoreFailure();
             }
 

@@ -35,11 +35,6 @@ class StorePollingMethodRequest extends FormRequest
                 'max:255',
                 'unique:secrets,description',
             ],
-            'default' => [
-                Rule::excludeIf($this->input('credential_mode', 'existing') !== 'new'),
-                'nullable',
-                'boolean',
-            ],
             'force_save' => ['nullable', 'boolean'],
             'settings' => ['nullable', 'array'],
         ];
@@ -51,7 +46,7 @@ class StorePollingMethodRequest extends FormRequest
             if ($pollingMethod) {
                 $rules = [
                     ...$rules,
-                    ...collect($pollingMethod->rules())
+                    ...collect($registry->definition($type)->rules())
                         ->mapWithKeys(fn (array|string $rule, string $key): array => ["settings.$key" => $rule])
                         ->all(),
                 ];
@@ -68,9 +63,7 @@ class StorePollingMethodRequest extends FormRequest
             }
         }
 
-        return [
-            ...$rules,
-        ];
+        return $rules;
     }
 
     public function withValidator(Validator $validator): void

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Device;
 
+use App\Actions\Device\BuildDefaultPollingMethods;
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\LibrenmsConfig;
 use App\Http\Interfaces\ToastInterface;
@@ -32,18 +33,20 @@ class AddDeviceController
 
         $availableMethods = collect($this->pollingMethods->types())->map(function (PollingMethodType $type): array {
             $method = $this->pollingMethods->require($type);
+            $definition = $this->pollingMethods->definition($type);
             $secretDefinition = SecretDefinition::for($method->secretType());
             $schemaFields = $secretDefinition ? $secretDefinition->buildSchemaFields(dataVar: "methods['" . $type->value . "'].formData") : [];
 
             return [
                 'type' => $type->value,
                 'label' => __('poller.methods.' . $type->value),
-                'icon' => $method->icon(),
+                'icon' => $definition->icon(),
                 'schema_fields' => $schemaFields,
                 'schema_defaults' => $secretDefinition?->schemaDefaults() ?? [],
-                'settings_fields' => $method->buildSchemaFields(dataVar: "methods['" . $type->value . "'].settingsData"),
-                'settings_defaults' => $method->schemaDefaults(),
-                'settings_form_defaults' => $method->formDefaults(),
+                'settings_fields' => $definition->buildSchemaFields(dataVar: "methods['" . $type->value . "'].settingsData"),
+                'settings_defaults' => $definition->schemaDefaults(),
+                'settings_form_defaults' => $definition->formDefaults(),
+                'default_affects_availability' => $method->defaultConfig()->affectsAvailability,
             ];
         })->all();
 
@@ -68,7 +71,7 @@ class AddDeviceController
 
                 return [$type => [
                     'validate' => old("polling_methods.{$type}.validate") !== null ? (bool) old("polling_methods.{$type}.validate") : true,
-                    'affects_availability' => old("polling_methods.{$type}.affects_availability") !== null ? (bool) old("polling_methods.{$type}.affects_availability") : in_array($type, ['snmp', 'icmp']),
+                    'affects_availability' => old("polling_methods.{$type}.affects_availability") !== null ? (bool) old("polling_methods.{$type}.affects_availability") : $method['default_affects_availability'],
                     'credential_mode' => old("polling_methods.{$type}.credential_mode", 'default'),
                     'secret_id' => old("polling_methods.{$type}.secret_id", ''),
                     'description' => old("polling_methods.{$type}.description", ''),
@@ -91,7 +94,7 @@ class AddDeviceController
         ]);
     }
 
-    public function store(StoreDeviceRequest $request, ToastInterface $toast): JsonResponse
+    public function store(StoreDeviceRequest $request, ToastInterface $toast, BuildDefaultPollingMethods $buildMethods): JsonResponse
     {
         $this->authorize('create', Device::class);
 
@@ -121,7 +124,7 @@ class AddDeviceController
             ->filter(fn (array $data): bool => (bool) ($data['active'] ?? false))
             ->every(fn (array $data): bool => empty($data['validate']));
 
-        $pollingMethods = (new \App\Actions\Device\BuildDefaultPollingMethods($this->pollingMethods))->execute($device, ['methods' => $rawMethods]);
+        $pollingMethods = $buildMethods->execute($device, ['methods' => $rawMethods]);
 
         try {
             $validator = new ValidateDeviceAndCreate($device, $pollingMethods, $forceAdd);

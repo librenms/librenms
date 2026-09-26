@@ -368,7 +368,7 @@ class NetSnmpTest extends TestCase
             ],
         );
 
-        $config = $device->toSnmpConfig();
+        $config = $device->polling()->snmp();
 
         $this->assertSame('v2c', $config->version);
         $this->assertSame('test-comm', $config->community);
@@ -384,14 +384,14 @@ class NetSnmpTest extends TestCase
             secretData: ['community' => 'test-comm'],
         );
 
-        $config1 = $device->toSnmpConfig();
+        $config1 = $device->polling()->snmp();
 
         // Mutate the polling method's secret data
         $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
         $secret = $snmpMethod->secret;
         $secret->data = array_merge($secret->data, ['community' => 'new']);
 
-        $config2 = $device->toSnmpConfig();
+        $config2 = $device->polling()->snmp();
 
         $this->assertSame('test-comm', $config1->community);
         $this->assertSame('new', $config2->community);
@@ -402,14 +402,14 @@ class NetSnmpTest extends TestCase
         $deviceBulk = $this->makeDeviceWithSnmpConfig(
             deviceAttrs: ['hostname' => 'bulk.device', 'os' => 'ios'],
         );
-        $configBulk = $deviceBulk->toSnmpConfig();
+        $configBulk = $deviceBulk->polling()->snmp();
         $this->assertTrue($configBulk->bulk);
 
         \App\Facades\LibrenmsConfig::set('os.airos.snmp_bulk', false);
         $deviceNoBulk = $this->makeDeviceWithSnmpConfig(
             deviceAttrs: ['hostname' => 'nobulk.device', 'os' => 'airos'],
         );
-        $configNoBulk = $deviceNoBulk->toSnmpConfig();
+        $configNoBulk = $deviceNoBulk->polling()->snmp();
         $this->assertFalse($configNoBulk->bulk);
     }
 
@@ -419,14 +419,14 @@ class NetSnmpTest extends TestCase
             settings: ['timeout' => 0.5],
         );
 
-        $config = $device->toSnmpConfig();
+        $config = $device->polling()->snmp();
         $this->assertSame(0.5, $config->timeout);
 
         // A timeout <= 0 falls back to configured snmp.timeout
         $deviceZero = $this->makeDeviceWithSnmpConfig(
             settings: ['timeout' => 0],
         );
-        $configZero = $deviceZero->toSnmpConfig();
+        $configZero = $deviceZero->polling()->snmp();
         $this->assertEquals(\App\Facades\LibrenmsConfig::get('snmp.timeout', 1), $configZero->timeout);
     }
 
@@ -585,7 +585,7 @@ class NetSnmpTest extends TestCase
                 null
             );
 
-        $config = $device->toSnmpConfig();
+        $config = $device->polling()->snmp();
 
         $this->assertSame('v2c', $config->version);
         $this->assertSame('fallback-comm', $config->community);
@@ -605,7 +605,7 @@ class NetSnmpTest extends TestCase
 
         $mockEventlog->shouldNotReceive('_log');
 
-        $config = $device->toSnmpConfig();
+        $config = $device->polling()->snmp();
 
         $this->assertSame('v2c', $config->version);
         $this->assertSame('transient-comm', $config->community);

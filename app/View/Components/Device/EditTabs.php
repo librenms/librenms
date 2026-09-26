@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Facades\Request;
 use Illuminate\View\Component;
+use LibreNMS\Enum\PollingMethodType;
 
 class EditTabs extends Component
 {
@@ -41,7 +42,7 @@ class EditTabs extends Component
         ?string $tab = null,
     ) {
         $this->tab = $tab ?? Request::segment(4, 'edit');
-        $snmpEnabled = $this->device->pollingMethodFor()->snmp()->enabled;
+        $snmpEnabled = $this->device->polling()->isEnabled(PollingMethodType::Snmp);
 
         $this->tabs = [
             'edit' => [

@@ -20,7 +20,7 @@ class Device extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $snmp = $this->toSnmpConfig();
+        $snmp = $this->polling()->snmp();
         $icmpMethod = $this->pollingMethod(PollingMethodType::Icmp);
         $snmpMethod = $this->pollingMethod(PollingMethodType::Snmp);
 

@@ -29,8 +29,7 @@ readonly class DiscoverDeviceMetadata
         );
 
         foreach ($successfulMethods as $deviceMethod) {
-            $pollingMethodRegistry = $this->pollingMethods;
-            $pollingMethodRegistry->get($deviceMethod->method_type)?->enrichDeviceMetadata($device);
+            $this->pollingMethods->require($deviceMethod->method_type)->enrichDeviceMetadata($device);
         }
 
         $this->uniqueness->validateSysName($device);

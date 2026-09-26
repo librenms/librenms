@@ -233,7 +233,7 @@ return [
         'errors' => [
             'none_up' => 'Device was down due to :reason.|All devices were down.',
             'none_actioned' => 'No devices were discovered.',
-            'status_reason_unkown' => 'unknown',
+            'status_reason_unknown' => 'unknown',
         ],
         'actioned' => 'Discovered :count devices in :time',
         'starting' => 'Starting discovery:',
@@ -264,7 +264,7 @@ return [
         'errors' => [
             'none_up' => 'Device was down due to :reason.|All devices were down.',
             'none_actioned' => 'No devices were polled.',
-            'status_reason_unkown' => 'unknown',
+            'status_reason_unknown' => 'unknown',
         ],
         'actioned' => 'Polled :count devices in :time',
         'starting' => 'Starting polling run:',

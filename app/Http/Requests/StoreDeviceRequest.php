@@ -26,18 +26,12 @@ class StoreDeviceRequest extends FormRequest
         $rules = [
             'hostname' => ['required', 'ip_or_hostname'],
             'display_template' => ['nullable', 'string', 'max:128'],
-            'port' => ['nullable', 'integer', 'between:1,65535'],
-            'transport' => ['nullable', 'string', 'in:udp,udp6,tcp,tcp6'],
             'poller_group' => ['nullable', 'integer', Rule::in(PollerGroup::pluck('id')->prepend(0))],
             'force_add' => ['nullable', 'boolean'],
-            'ping_fallback' => ['nullable', 'boolean'],
             'polling_methods' => ['required', 'array', 'min:1'],
             'sysName' => ['nullable', 'string', 'max:255'],
             'hardware' => ['nullable', 'string', 'max:255'],
             'os' => ['nullable', 'string', 'max:255'],
-            'active_tab' => ['nullable', 'string'],
-            'active_methods' => ['nullable', 'array'],
-            'active_methods.*' => ['string'],
         ];
 
         // Loop over the methods provided in the request
@@ -74,7 +68,6 @@ class StoreDeviceRequest extends FormRequest
                 ];
 
                 $rules["polling_methods.{$method}.description"] = ['nullable', 'string', 'max:255', 'unique:secrets,description'];
-                $rules["polling_methods.{$method}.default"] = ['nullable', 'boolean'];
 
                 $credentialMode = $data['credential_mode'] ?? 'default';
                 if ($credentialMode === 'new') {
@@ -86,7 +79,7 @@ class StoreDeviceRequest extends FormRequest
 
             // Settings validation rules
             $rules["polling_methods.{$method}.settings"] = ['nullable', 'array'];
-            foreach ($pollingMethod->rules() as $key => $rule) {
+            foreach ($registry->definition($type)->rules() as $key => $rule) {
                 $rules["polling_methods.{$method}.settings.{$key}"] = $rule;
             }
         }
@@ -101,7 +94,6 @@ class StoreDeviceRequest extends FormRequest
     {
         $this->merge([
             'force_add' => $this->boolean('force_add'),
-            'ping_fallback' => $this->boolean('ping_fallback'),
         ]);
 
         // Merge flags in polling_methods
@@ -118,9 +110,6 @@ class StoreDeviceRequest extends FormRequest
             }
             if (isset($data['affects_availability'])) {
                 $methods[$method]['affects_availability'] = $this->boolean("polling_methods.{$method}.affects_availability");
-            }
-            if (isset($data['default'])) {
-                $methods[$method]['default'] = $this->boolean("polling_methods.{$method}.default");
             }
         }
         $this->merge(['polling_methods' => $methods]);

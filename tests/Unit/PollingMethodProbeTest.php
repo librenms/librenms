@@ -167,8 +167,8 @@ final class PollingMethodProbeTest extends TestCase
         $this->assertEquals('tcp', $config2->transport);
 
         /** 3. Independent enabled & affectsAvailability states */
-        $this->assertTrue($config1->isEnabled());
-        $this->assertFalse($config2->isEnabled());
+        $this->assertTrue($config1->enabled);
+        $this->assertFalse($config2->enabled);
         $this->assertTrue($method1->affects_availability);
         $this->assertFalse($method2->affects_availability);
 
@@ -331,7 +331,7 @@ final class PollingMethodProbeTest extends TestCase
 
     public function testFilterOverridesOmitsMatchingDefaultsAndRetainsOverrides(): void
     {
-        $method = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Snmp);
+        $method = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->definition(PollingMethodType::Snmp);
 
         $input = [
             'transport' => 'udp',

@@ -70,6 +70,7 @@ class EditPollingController
     private function buildMethodData(Device $device, PollingMethodType $type): array
     {
         $method = $this->pollingMethods->require($type);
+        $definition = $this->pollingMethods->definition($type);
         /** @var DevicePollingMethod|null $row */
         $row = $device->pollingMethods->firstWhere('method_type', $type);
         $secret = $row?->secret;
@@ -78,7 +79,6 @@ class EditPollingController
         $secretDef = SecretDefinition::for($secretType);
         $schema = $secretDef?->schema() ?? [];
         $schemaFields = $secretDef ? $secretDef->buildSchemaFields() : [];
-        $settingsFields = $method->buildSchemaFields(dataVar: 'settingsData');
 
         $secretsForType = $secretType ? Secret::query()
             ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
@@ -104,21 +104,19 @@ class EditPollingController
             ]
         )->all();
 
-        $settingsDefaults = $method->schemaDefaults();
-
         return [
             'type' => $type->value,
             'label' => __('poller.methods.' . $type->value),
-            'icon' => $method->icon(),
+            'icon' => $definition->icon(),
             'schema_fields' => $schemaFields,
             'schema_defaults' => $secretDef?->schemaDefaults() ?? [],
-            'settings_fields' => $settingsFields,
-            'settings_defaults' => $settingsDefaults,
+            'settings_fields' => $definition->buildSchemaFields(dataVar: 'settingsData'),
+            'settings_defaults' => $definition->schemaDefaults(),
             'settings' => array_merge(
-                $method->formDefaults(),
+                $definition->formDefaults(),
                 $row->settings ?? [],
             ),
-            'affects_availability' => $row ? $row->affects_availability : $method->defaultAffectsAvailability(),
+            'affects_availability' => $row ? $row->affects_availability : $method->defaultConfig()->affectsAvailability,
             'secret' => $secret,
             'secret_form_data' => $secret
                 ? $this->extractFieldValues($this->unmaskSecretData($secret, $canUnmaskSecrets), array_keys($schema))
@@ -189,7 +187,6 @@ class EditPollingController
             'secret_id' => $secretId,
             'secret_data' => $method->hasSecret() && $credentialMode === 'new' ? $request->validatedSecretData() : null,
             'description' => $validated['description'] ?? null,
-            'affects_availability' => $method->defaultAffectsAvailability(),
         ]);
 
         $forceSave = $request->boolean('force_save');
@@ -217,9 +214,9 @@ class EditPollingController
             $row->secret()->associate($candidate->secret);
         }
 
-        // We only get here via a successful probe or an explicit force_save
-        $row->last_check_successful = $probeResult !== null;
-        $row->last_checked_at = now();
+        // Successful probe, or unchecked when force saved
+        $row->last_check_successful = $probeResult?->isSuccess();
+        $row->last_checked_at = $probeResult ? now() : null;
         $row->save();
 
         $toast->success(__('poller.method_added'));
@@ -254,8 +251,7 @@ class EditPollingController
         }
 
         $method = $this->pollingMethods->require($type);
-        /** @var DevicePollingMethod $deviceMethod */
-        $deviceMethod = $device->pollingMethods()->where('method_type', $type->value)->firstOrFail();
+        $deviceMethod = $device->pollingMethod($type) ?? abort(404);
         $validated = $request->validated();
 
         $secretId = null;
@@ -308,15 +304,14 @@ class EditPollingController
         }
 
         if ($enabled) {
-            // A disabled method keeps its last check status untouched.
-            $deviceMethod->last_check_successful = $probeResult !== null;
-            $deviceMethod->last_checked_at = now();
+            // Successful probe, or unchecked when force saved. A disabled method keeps its last check status.
+            $deviceMethod->last_check_successful = $probeResult?->isSuccess();
+            $deviceMethod->last_checked_at = $probeResult ? now() : null;
         }
 
         $deviceMethod->save();
 
-        $setDeviceAvailability->execute($device, false);
-        $device->saveQuietly();
+        $setDeviceAvailability->execute($device);
 
         $toast->success(__('poller.method_updated'));
 
@@ -345,16 +340,16 @@ class EditPollingController
         $this->authorize('update', $device);
 
         $type = PollingMethodType::tryFrom($methodType) ?? abort(404);
-        $pollingMethod = $device->pollingMethods()->where('method_type', $type->value)->firstOrFail();
+        $pollingMethod = $device->pollingMethod($type) ?? abort(404);
 
         if ($this->pollingMethods->require($type)->hasSecret()) {
             $this->authorize('delete', Secret::class);
         }
 
         $pollingMethod->delete();
+        $device->unsetRelation('pollingMethods');
 
-        $setDeviceAvailability->execute($device, false);
-        $device->saveQuietly();
+        $setDeviceAvailability->execute($device);
 
         $toast->success(__('poller.method_removed'));
 

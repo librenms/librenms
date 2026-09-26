@@ -1,8 +1,10 @@
 <?php
 
+use App\Facades\DeviceCache;
 use App\Models\BgpPeer;
 use App\Models\Sensor;
 use App\Models\WirelessSensor;
+use LibreNMS\Enum\PollingMethodType;
 
 $no_refresh = true;
 
@@ -13,7 +15,7 @@ $link_array = ['page' => 'device',
 if (Gate::denies('device.update')) {
     print_error('Insufficient Privileges');
 } else {
-    $isSnmpEnabled = $device instanceof \App\Models\Device ? $device->toSnmpConfig()->isEnabled() : \LibreNMS\Polling\Method\Config\SnmpConfig::fromDeviceArray($device)->isEnabled();
+    $isSnmpEnabled = DeviceCache::get((int) $device['device_id'])->polling()->isEnabled(PollingMethodType::Snmp);
     $panes['device'] = 'Device Settings';
     $panes['polling'] = 'Polling';
     if ($isSnmpEnabled) {

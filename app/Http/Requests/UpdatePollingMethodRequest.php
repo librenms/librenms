@@ -27,25 +27,25 @@ class UpdatePollingMethodRequest extends FormRequest
         /** @var \LibreNMS\Polling\Method\PollingMethodRegistry $registry */
         $registry = $this->container->make(\LibreNMS\Polling\Method\PollingMethodRegistry::class);
         $method = $type ? $registry->get($type) : null;
-        if ($method?->hasSecret() && $this->has('secret_data')) {
-            $device = $this->route('device');
-            if ($device) {
-                $secretId = $this->input('secret_id');
-                $targetSecret = $secretId ? Secret::find($secretId) : null;
-                $pollingMethod = $device->pollingMethods()->where('method_type', $type->value)->first();
-                $oldData = $targetSecret ? $targetSecret->data : ($pollingMethod?->secret ? $pollingMethod->secret->data : []);
+        $secretData = $this->input('secret_data');
+        $device = $this->route('device');
+        if (! $method?->hasSecret() || ! is_array($secretData) || ! $device instanceof Device) {
+            return;
+        }
 
-                $secretData = $this->input('secret_data');
-                if (is_array($secretData)) {
-                    foreach ($secretData as $key => $val) {
-                        if ($val === '********') {
-                            $secretData[$key] = data_get($oldData, $key, '');
-                        }
-                    }
-                    $this->merge(['secret_data' => $secretData]);
-                }
+        // Only restore masked values from a secret this user is allowed to access
+        $secretId = $this->input('secret_id');
+        $targetSecret = $secretId
+            ? Secret::resolveForType((int) $secretId, $method->secretType(), $this->user())
+            : $device->pollingMethod($type)?->secret;
+        $oldData = $targetSecret->data ?? [];
+
+        foreach ($secretData as $key => $val) {
+            if ($val === Secret::MASK) {
+                $secretData[$key] = data_get($oldData, $key, '');
             }
         }
+        $this->merge(['secret_data' => $secretData]);
     }
 
     /**
@@ -99,7 +99,7 @@ class UpdatePollingMethodRequest extends FormRequest
 
         $rules = [
             ...$rules,
-            ...collect($method->rules())
+            ...collect($registry->definition($type)->rules())
                 ->mapWithKeys(fn (array|string $rule, string $key): array => ["settings.$key" => $rule])
                 ->all(),
         ];

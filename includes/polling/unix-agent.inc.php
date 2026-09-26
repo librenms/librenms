@@ -7,7 +7,7 @@ use LibreNMS\RRD\RrdDefinition;
 if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
     echo \App\Facades\LibrenmsConfig::get('project_name') . ' UNIX Agent: ';
 
-    $agent_port = DeviceCache::getPrimary()->pollingMethodFor()->unixAgent()->port;
+    $agent_port = DeviceCache::getPrimary()->polling()->unixAgent()->port;
 
     $agent_start = microtime(true);
     $agent = null;

@@ -349,7 +349,7 @@ class SnmpQueryBuilder implements SnmpQueryInterface
      */
     private function prepareQuery(): SnmpConfig
     {
-        $config = $this->device->toSnmpConfig();
+        $config = $this->device->polling()->snmp();
         $this->prepareMibDirs();
         $this->options->context = $config->version === 'v3' ? $this->v3ContextPrefix . $this->context : $this->context;
 

@@ -63,30 +63,6 @@ final class SnmpConfig extends PollingMethodConfig
         parent::__construct($enabled, $affectsAvailability);
     }
 
-    public function isValid(): bool
-    {
-        if ($this->version === 'v3') {
-            if ($this->authlevel === 'authNoPriv') {
-                return ! empty($this->authname) && ! empty($this->authpass);
-            }
-
-            if ($this->authlevel === 'authPriv') {
-                return ! empty($this->authname)
-                    && ! empty($this->authpass)
-                    && ! empty($this->cryptoalgo)
-                    && ! empty($this->cryptopass);
-            }
-
-            return $this->authlevel === 'noAuthNoPriv';
-        }
-
-        if ($this->version === 'v2c' || $this->version === 'v1') {
-            return ! empty($this->community);
-        }
-
-        return false;
-    }
-
     public static function default(?string $os = 'generic'): static
     {
         $os = $os ?: 'generic';

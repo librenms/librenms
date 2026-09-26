@@ -42,12 +42,11 @@ readonly class CheckDeviceAvailability
             }
         }
 
-        $this->setDeviceAvailability->execute($device, $commit);
-
         if ($commit) {
             $enabledPollingMethods->each->save();
-            $device->save(); // confirm device is saved
         }
+
+        $this->setDeviceAvailability->execute($device, $commit);
 
         return $device->status;
     }

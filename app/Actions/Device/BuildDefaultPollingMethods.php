@@ -7,6 +7,7 @@ use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 readonly class BuildDefaultPollingMethods
@@ -28,14 +29,13 @@ readonly class BuildDefaultPollingMethods
             return null;
         }
 
-        $affectsAvailability = isset($data['affects_availability']) ? (bool) $data['affects_availability'] : null;
         $secret = $this->resolveSecret($device, $type, $data, $method->secretType());
 
         $pollingMethod = new DevicePollingMethod([
             'method_type' => $type,
             'enabled' => (bool) ($data['enabled'] ?? true),
-            'affects_availability' => $affectsAvailability ?? $method->defaultAffectsAvailability(),
-            'settings' => $method->filterOverrides($data['settings'] ?? [], $data['existing_settings'] ?? []),
+            'affects_availability' => (bool) ($data['affects_availability'] ?? $method->defaultConfig()->affectsAvailability),
+            'settings' => $this->pollingMethods->definition($type)->filterOverrides($data['settings'] ?? [], $data['existing_settings'] ?? []),
         ]);
         $pollingMethod->setRelation('device', $device);
 
@@ -56,7 +56,7 @@ readonly class BuildDefaultPollingMethods
      *
      * @param  array<string, mixed>  $data
      */
-    private function resolveSecret(Device $device, PollingMethodType $type, array $data, mixed $secretType): ?Secret
+    private function resolveSecret(Device $device, PollingMethodType $type, array $data, ?SecretType $secretType): ?Secret
     {
         if (isset($data['secret']) || $secretType === null) {
             return $data['secret'] ?? null;
@@ -95,15 +95,8 @@ readonly class BuildDefaultPollingMethods
         $pollingMethods = collect();
 
         $methodsData = $input['methods'] ?? [
-            'icmp' => [
-                'active' => true,
-                'affects_availability' => true,
-            ],
-            'snmp' => [
-                'active' => true,
-                'affects_availability' => true,
-                'credential_mode' => 'default',
-            ],
+            'icmp' => ['active' => true],
+            'snmp' => ['active' => true],
         ];
 
         foreach ($methodsData as $methodName => $data) {

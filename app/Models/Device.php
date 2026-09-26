@@ -27,9 +27,8 @@ use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
-use LibreNMS\Polling\Method\Config\PollingMethodConfig;
-use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\PollingMethodAccessor;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -133,21 +132,18 @@ class Device extends BaseModel
         return ($this->overwrite_ip ?: $this->hostname) ?: '';
     }
 
-    public function pollingConfig(PollingMethodType $type): ?PollingMethodConfig
+    /**
+     * Polling method configs and status for this device.
+     */
+    public function polling(): PollingMethodAccessor
     {
-        return $this->pollingMethodFor()->get($type);
-    }
-
-    public function toSnmpConfig(): SnmpConfig
-    {
-        /** @var SnmpConfig */
-        return $this->pollingConfig(PollingMethodType::Snmp);
+        return new PollingMethodAccessor($this, app(PollingMethodRegistry::class));
     }
 
     public function ipFamily(): AddressFamily
     {
         try {
-            return str_ends_with($this->toSnmpConfig()->transport, '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
+            return str_ends_with($this->polling()->snmp()->transport, '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
         } catch (\Throwable) {
             return filter_var($this->pollerTarget(), FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? AddressFamily::IPv6 : AddressFamily::IPv4;
         }
@@ -167,16 +163,6 @@ class Device extends BaseModel
         } catch (InvalidIpException) {
             return null;
         }
-    }
-
-    public function hasSnmpInfo(): bool
-    {
-        return $this->toSnmpConfig()->isValid();
-    }
-
-    public function pollingMethodFor(?\LibreNMS\Polling\Method\PollingMethodRegistry $registry = null): PollingMethodAccessor
-    {
-        return new PollingMethodAccessor($this, $registry ?? app(\LibreNMS\Polling\Method\PollingMethodRegistry::class));
     }
 
     public function pollingMethod(PollingMethodType $method): ?DevicePollingMethod
@@ -625,9 +611,9 @@ class Device extends BaseModel
     protected function scopeCanPing(Builder $query): Builder
     {
         return $query->where('devices.disabled', 0)
-            ->whereDoesntHave('pollingMethods', function (Builder $query): void {
+            ->whereHas('pollingMethods', function (Builder $query): void {
                 $query->where('method_type', PollingMethodType::Icmp)
-                    ->where('enabled', false);
+                    ->where('enabled', true);
             });
     }
 

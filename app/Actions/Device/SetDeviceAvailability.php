@@ -3,7 +3,6 @@
 namespace App\Actions\Device;
 
 use App\Models\Device;
-use Illuminate\Support\Collection;
 
 class SetDeviceAvailability
 {
@@ -17,12 +16,7 @@ class SetDeviceAvailability
      */
     public function execute(Device $device, bool $commit = true): bool
     {
-        if ($device->exists || $device->relationLoaded('pollingMethods')) {
-            $failedAvailabilityMethods = $device->pollingMethods
-                ->filter(fn ($method) => $method->enabled && $method->affects_availability && $method->last_check_successful === false);
-        } else {
-            $failedAvailabilityMethods = new Collection;
-        }
+        $failedAvailabilityMethods = $device->polling()->failedAvailabilityChecks();
 
         $device->status = $failedAvailabilityMethods->isEmpty();
         $device->status_reason = $failedAvailabilityMethods->map(fn ($m) => $m->method_type->value)->implode(',');

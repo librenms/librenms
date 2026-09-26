@@ -8,9 +8,11 @@ use App\View\FieldSchema\FieldDefinition;
 use App\View\FieldSchema\HandlesFieldSchema;
 use App\View\FieldSchema\HasFieldSchema;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\Definitions\IcmpDefinition;
+use LibreNMS\Polling\Method\Definitions\IpmiDefinition;
+use LibreNMS\Polling\Method\Definitions\SnmpDefinition;
+use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
 use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
-use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
-use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Tests\TestCase;
 
 final class FieldSchemaTest extends TestCase
@@ -116,17 +118,17 @@ final class FieldSchemaTest extends TestCase
 
     public function testDefinitionsHaveNullableRules(): void
     {
-        $snmpRules = (new SnmpPollingMethod)->rules();
+        $snmpRules = (new SnmpDefinition)->rules();
         foreach ($snmpRules as $field => $rules) {
             $this->assertContains('nullable', (array) $rules, "SNMP field {$field} should be nullable");
         }
 
-        $ipmiRules = (new IpmiPollingMethod)->rules();
+        $ipmiRules = (new IpmiDefinition)->rules();
         foreach ($ipmiRules as $field => $rules) {
             $this->assertContains('nullable', (array) $rules, "IPMI field {$field} should be nullable");
         }
 
-        $unixRules = (new UnixAgentPollingMethod)->rules();
+        $unixRules = (new UnixAgentDefinition)->rules();
         foreach ($unixRules as $field => $rules) {
             $this->assertContains('nullable', (array) $rules, "Unix agent field {$field} should be nullable");
         }
@@ -158,14 +160,14 @@ final class FieldSchemaTest extends TestCase
         $this->assertSame(6230, $overrideConfig->port);
     }
 
-    public function testPollingMethodConfigDefaultsAndSparseSettings(): void
+    public function testPollingMethodConfigDefaultsAndOverrides(): void
     {
         $snmpConfig = \LibreNMS\Polling\Method\Config\SnmpConfig::default();
         $this->assertSame('udp', $snmpConfig->transport);
         $this->assertSame(161, $snmpConfig->port);
         $this->assertSame(1.0, (float) $snmpConfig->timeout);
         $this->assertSame(5, $snmpConfig->retries);
-        $this->assertSame([], $snmpConfig->toSparseSettings());
+        $this->assertSame([], (new SnmpDefinition)->filterOverrides($snmpConfig->settingsArray()));
 
         $customSnmp = \LibreNMS\Polling\Method\Config\SnmpConfig::fromSettings([
             'transport' => 'tcp',
@@ -174,27 +176,27 @@ final class FieldSchemaTest extends TestCase
         ]);
         $this->assertSame('tcp', $customSnmp->transport);
         $this->assertSame(1161, $customSnmp->port);
-        $this->assertEquals(['transport' => 'tcp', 'port' => 1161], $customSnmp->toSparseSettings());
+        $this->assertEquals(['transport' => 'tcp', 'port' => 1161], (new SnmpDefinition)->filterOverrides($customSnmp->settingsArray()));
 
         $unixConfig = \LibreNMS\Polling\Method\Config\UnixAgentConfig::default();
         $this->assertSame(6556, $unixConfig->port);
         $this->assertSame(10, $unixConfig->timeout);
-        $this->assertSame([], $unixConfig->toSparseSettings());
+        $this->assertSame([], (new UnixAgentDefinition)->filterOverrides($unixConfig->settingsArray()));
 
         $customUnix = \LibreNMS\Polling\Method\Config\UnixAgentConfig::fromSettings(['port' => 6557]);
-        $this->assertEquals(['port' => 6557], $customUnix->toSparseSettings());
+        $this->assertEquals(['port' => 6557], (new UnixAgentDefinition)->filterOverrides($customUnix->settingsArray()));
 
         $icmpConfig = \LibreNMS\Polling\Method\Config\IcmpConfig::default();
         $this->assertSame('default', $icmpConfig->ipVersion);
-        $this->assertSame([], $icmpConfig->toSparseSettings());
+        $this->assertSame([], (new IcmpDefinition)->filterOverrides($icmpConfig->settingsArray()));
 
         $customIcmp = \LibreNMS\Polling\Method\Config\IcmpConfig::fromSettings(['ip_version' => 'ipv6']);
-        $this->assertEquals(['ip_version' => 'ipv6'], $customIcmp->toSparseSettings());
+        $this->assertEquals(['ip_version' => 'ipv6'], (new IcmpDefinition)->filterOverrides($customIcmp->settingsArray()));
     }
 
     public function testFilterOverridesUsesConfigDefaults(): void
     {
-        $snmpMethod = new SnmpPollingMethod();
+        $snmpDefinition = new SnmpDefinition();
 
         $input = [
             'transport' => 'udp',
@@ -203,7 +205,7 @@ final class FieldSchemaTest extends TestCase
             'retries' => 3,
         ];
 
-        $overrides = $snmpMethod->filterOverrides($input);
+        $overrides = $snmpDefinition->filterOverrides($input);
         $this->assertEquals(['retries' => 3], $overrides);
     }
 }

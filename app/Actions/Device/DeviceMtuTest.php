@@ -5,7 +5,7 @@ namespace App\Actions\Device;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use LibreNMS\Data\Source\Icmp\Fping;
-use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 
 class DeviceMtuTest
@@ -23,7 +23,7 @@ class DeviceMtuTest
 
     public function execute(Device $device): bool
     {
-        if (! (new ConnectivityHelper($device))->icmpIsEnabled()) {
+        if (! $device->polling()->isEnabled(PollingMethodType::Icmp)) {
             return true;
         }
 

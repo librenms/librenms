@@ -4,23 +4,25 @@ namespace LibreNMS\Polling\Method;
 
 use InvalidArgumentException;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\Definitions\PollingMethodDefinition;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
 
 class PollingMethodRegistry
 {
     /**
-     * @var array<string, class-string<PollingMethod>>
+     * @var array<string, array{method: class-string<PollingMethod>, definition: class-string<PollingMethodDefinition>}>
      */
     private array $methods = [];
 
     /**
-     * Register a polling method class.
+     * Register a polling method and the definition describing its settings.
      *
      * @param  class-string<PollingMethod>  $methodClass
+     * @param  class-string<PollingMethodDefinition>  $definitionClass
      */
-    public function register(PollingMethodType $type, string $methodClass): self
+    public function register(PollingMethodType $type, string $methodClass, string $definitionClass): self
     {
-        $this->methods[$type->value] = $methodClass;
+        $this->methods[$type->value] = ['method' => $methodClass, 'definition' => $definitionClass];
 
         return $this;
     }
@@ -42,7 +44,7 @@ class PollingMethodRegistry
             return null;
         }
 
-        return resolve($this->methods[$type->value]);
+        return resolve($this->methods[$type->value]['method']);
     }
 
     /**
@@ -52,13 +54,21 @@ class PollingMethodRegistry
      */
     public function require(PollingMethodType $type): PollingMethod
     {
-        $method = $this->get($type);
+        return $this->get($type) ?? throw new InvalidArgumentException("Unknown polling method type: {$type->value}");
+    }
 
-        if ($method === null) {
+    /**
+     * Get the settings definition (form fields, rules) for a type.
+     *
+     * @throws InvalidArgumentException
+     */
+    public function definition(PollingMethodType $type): PollingMethodDefinition
+    {
+        if (! isset($this->methods[$type->value])) {
             throw new InvalidArgumentException("Unknown polling method type: {$type->value}");
         }
 
-        return $method;
+        return resolve($this->methods[$type->value]['definition']);
     }
 
     /**
@@ -68,14 +78,6 @@ class PollingMethodRegistry
      */
     public function types(): array
     {
-        $types = [];
-        foreach (array_keys($this->methods) as $key) {
-            $type = PollingMethodType::tryFrom($key);
-            if ($type !== null) {
-                $types[] = $type;
-            }
-        }
-
-        return $types;
+        return array_map(PollingMethodType::from(...), array_keys($this->methods));
     }
 }

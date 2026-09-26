@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Actions\Device\LegacyDeviceCreator;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Models\PollerGroup;
@@ -82,7 +83,7 @@ class DeviceAdd extends LnmsCommand
             'poller-group' => ['numeric', Rule::in(PollerGroup::pluck('id')->prepend(0))],
         ]);
 
-        $creator = new \App\Actions\Device\LegacyDeviceCreator(
+        $creator = new LegacyDeviceCreator(
             hostname: (string) $this->argument('device spec'),
             display_template: $this->option('display-name'),
             poller_group: (int) $this->option('poller-group'),

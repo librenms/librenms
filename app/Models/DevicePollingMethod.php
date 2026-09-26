@@ -26,6 +26,14 @@ class DevicePollingMethod extends Model
         'last_check_successful',
     ];
 
+    /**
+     * Match the database column defaults.
+     */
+    protected $attributes = [
+        'enabled' => true,
+        'affects_availability' => false,
+    ];
+
     protected $casts = [
         'method_type' => PollingMethodType::class,
         'enabled' => 'boolean',

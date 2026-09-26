@@ -30,7 +30,7 @@ use App\Models\Device;
 use LibreNMS\Enum\PollingMethodType;
 
 /**
- * ConnectivityHelper contains some methods to ease integration with legacy code and simplify rebases
+ * Temporary compatibility shim for legacy code. Delegates to Device::polling().
  */
 readonly class ConnectivityHelper
 {
@@ -41,85 +41,51 @@ readonly class ConnectivityHelper
 
     public function isAvailable(): bool
     {
-        if (! $this->device->exists && ! $this->device->relationLoaded('pollingMethods')) {
-            return true;
-        }
-
-        if ($this->device->pollingMethods->isEmpty()) {
-            return true;
-        }
-
-        foreach ($this->device->pollingMethods as $deviceMethod) {
-            if ($deviceMethod->enabled && $deviceMethod->affects_availability && $deviceMethod->last_check_successful === false) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->device->polling()->failedAvailabilityChecks()->isEmpty();
     }
 
     public function hasAvailability(): bool
     {
-        foreach ($this->device->pollingMethods as $deviceMethod) {
-            if ($deviceMethod->enabled && $deviceMethod->affects_availability) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function methodIsEnabled(PollingMethodType $type): bool
-    {
-        $method = $this->device->pollingMethod($type);
-
-        return $method ? $method->enabled : false;
-    }
-
-    public function methodIsAvailable(PollingMethodType $type): bool
-    {
-        $method = $this->device->pollingMethod($type);
-
-        return $method ? ($method->enabled && $method->last_check_successful) : false;
+        return $this->device->polling()->hasAvailabilityCheck();
     }
 
     public function snmpIsEnabled(): bool
     {
-        return $this->methodIsEnabled(PollingMethodType::Snmp);
+        return $this->device->polling()->isEnabled(PollingMethodType::Snmp);
     }
 
     public function snmpIsAvailable(): bool
     {
-        return $this->methodIsAvailable(PollingMethodType::Snmp);
+        return $this->device->polling()->isAvailable(PollingMethodType::Snmp);
     }
 
     public function ipmiIsEnabled(): bool
     {
-        return $this->methodIsEnabled(PollingMethodType::Ipmi);
+        return $this->device->polling()->isEnabled(PollingMethodType::Ipmi);
     }
 
     public function ipmiIsAvailable(): bool
     {
-        return $this->methodIsAvailable(PollingMethodType::Ipmi);
+        return $this->device->polling()->isAvailable(PollingMethodType::Ipmi);
     }
 
     public function icmpIsEnabled(): bool
     {
-        return $this->methodIsEnabled(PollingMethodType::Icmp);
+        return $this->device->polling()->isEnabled(PollingMethodType::Icmp);
     }
 
     public function icmpIsAvailable(): bool
     {
-        return $this->methodIsAvailable(PollingMethodType::Icmp);
+        return $this->device->polling()->isAvailable(PollingMethodType::Icmp);
     }
 
     public function unixAgentIsEnabled(): bool
     {
-        return $this->methodIsEnabled(PollingMethodType::UnixAgent);
+        return $this->device->polling()->isEnabled(PollingMethodType::UnixAgent);
     }
 
     public function unixAgentIsAvailable(): bool
     {
-        return $this->methodIsAvailable(PollingMethodType::UnixAgent);
+        return $this->device->polling()->isAvailable(PollingMethodType::UnixAgent);
     }
 }

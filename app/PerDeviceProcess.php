@@ -119,7 +119,7 @@ class PerDeviceProcess
             if ($this->results->getAttempted() === 1 && $this->current_device_id) {
                 $reason = DeviceCache::get($this->current_device_id)->status_reason;
             } else {
-                $reason = __($translation_prefix . '.errors.status_reason_unkown');
+                $reason = __($translation_prefix . '.errors.status_reason_unknown');
             }
             $output->writeln('<fg=red>' . trans_choice($translation_prefix . '.errors.none_up', $this->results->getAttempted(), ['reason' => $reason]) . '</>');
 

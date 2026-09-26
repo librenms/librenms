@@ -164,7 +164,7 @@ class SecretController extends Controller
     {
         foreach ($schema as $field => $config) {
             if (($config['type'] ?? null) === 'password' && ! empty($data[$field])) {
-                $data[$field] = '********';
+                $data[$field] = Secret::MASK;
             }
         }
 
@@ -181,7 +181,7 @@ class SecretController extends Controller
     {
         foreach ($schema as $field => $config) {
             if (($config['type'] ?? null) === 'password') {
-                if (($newData[$field] ?? null) === '********') {
+                if (($newData[$field] ?? null) === Secret::MASK) {
                     $newData[$field] = $originalData[$field] ?? null;
                 }
             }

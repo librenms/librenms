@@ -42,16 +42,14 @@ interface HasFieldSchema
     public function filterOverrides(array $input, array $existing = []): array;
 
     /**
-     * Build UI schema fields derived from schema().
+     * Build UI schema fields for rendering.
      *
-     * @param  array<string, array<string, mixed>>|null  $schema
-     * @param  string  $dataVar
      * @return array<int, array<string, mixed>>
      */
-    public function buildSchemaFields(?array $schema = null, string $dataVar = 'formData'): array;
+    public function buildSchemaFields(string $dataVar = 'formData'): array;
 
     /**
-     * Validation rules for polling method per-device settings
+     * Validation rules for each field
      *
      * @return array<string, array<mixed>|string>
      */
