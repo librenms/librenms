@@ -235,20 +235,22 @@ class ModuleTestHelper
         LibrenmsConfig::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
 
         // don't allow external DNS queries that could fail
-        try {
-            app()->bind(AutonomousSystem::class, function ($app, $parameters) {
-                $asn = $parameters['asn'] ?? '?';
-                $mock = \Mockery::mock(AutonomousSystem::class);
-                $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(fn (
-                ) => "AS$asn-MOCK-TEXT");
+        app()->bind(AutonomousSystem::class, function ($app, $parameters) {
+            $asn = $parameters['asn'] ?? 0;
 
-                return $mock;
-            });
-        } catch (\ReflectionException) {
-            Log::error('Failed to mock AutonomousSystem');
+            return new class((int) $asn) extends AutonomousSystem
+            {
+                public function __construct(private readonly int $mockAsn)
+                {
+                    parent::__construct($mockAsn);
+                }
 
-            return null;
-        }
+                public function name(): string
+                {
+                    return "AS$this->mockAsn-MOCK-TEXT";
+                }
+            };
+        });
 
         if (! is_file($this->snmprec_file)) {
             throw new FileNotFoundException("$this->snmprec_file does not exist!");
