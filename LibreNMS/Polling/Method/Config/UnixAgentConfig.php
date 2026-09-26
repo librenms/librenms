@@ -7,47 +7,39 @@ use App\Facades\LibrenmsConfig;
 final class UnixAgentConfig extends PollingMethodConfig
 {
     public function __construct(
-        public bool $enabled,
-        public bool $affectsAvailability,
+        bool $enabled,
+        bool $affectsAvailability,
         public int $port,
         public int $timeout,
     ) {
         parent::__construct($enabled, $affectsAvailability);
     }
 
-    public function isValid(): bool
-    {
-        return true;
-    }
-
-    public static function default(): self
+    public static function default(): static
     {
         return new self(
-            enabled: false,
+            enabled: true,
             affectsAvailability: false,
             port: (int) LibrenmsConfig::get('unix-agent.port', 6556),
             timeout: (int) LibrenmsConfig::get('unix-agent.connection-timeout', 10),
         );
     }
 
-    public static function fromSettings(
-        array $settings,
-        bool $enabled = true,
-        bool $affectsAvailability = false,
-    ): self {
-        $default = self::default();
+    public static function fromSettings(array $settings): self
+    {
+        $config = self::default();
 
-        return new self(
-            enabled: $enabled,
-            affectsAvailability: $affectsAvailability,
-            port: isset($settings['port']) && is_numeric($settings['port']) ? (int) $settings['port'] : $default->port,
-            timeout: isset($settings['timeout']) && is_numeric($settings['timeout']) ? (int) $settings['timeout'] : $default->timeout,
-        );
+        if (isset($settings['port']) && is_numeric($settings['port'])) {
+            $config->port = (int) $settings['port'];
+        }
+        if (isset($settings['timeout']) && is_numeric($settings['timeout'])) {
+            $config->timeout = (int) $settings['timeout'];
+        }
+
+        return $config;
     }
 
     /**
-     * Array representation of non-secret settings.
-     *
      * @return array<string, mixed>
      */
     public function settingsArray(): array

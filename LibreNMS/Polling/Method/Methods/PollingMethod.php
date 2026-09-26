@@ -4,31 +4,12 @@ namespace LibreNMS\Polling\Method\Methods;
 
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
-use App\View\FieldSchema\HandlesFieldSchema;
-use App\View\FieldSchema\HasFieldSchema;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\ProbeResult;
 
-abstract class PollingMethod implements HasFieldSchema
+abstract class PollingMethod
 {
-    use HandlesFieldSchema;
-
-    public function icon(): string
-    {
-        return 'fa-server';
-    }
-
-    public function defaultAffectsAvailability(): bool
-    {
-        return true;
-    }
-
-    public function fields(): array
-    {
-        return [];
-    }
-
     public function secretType(): ?SecretType
     {
         return null;
@@ -63,9 +44,33 @@ abstract class PollingMethod implements HasFieldSchema
     {
     }
 
+    /**
+     * Config for a newly added method of this type.
+     */
     abstract public function defaultConfig(): PollingMethodConfig;
 
-    abstract public function config(DevicePollingMethod $deviceMethod): PollingMethodConfig;
+    /**
+     * Build the config for a configured method from its settings and secret.
+     */
+    abstract protected function configFromSettings(DevicePollingMethod $deviceMethod): PollingMethodConfig;
 
-    abstract public function fallbackConfig(Device $device): PollingMethodConfig;
+    public function config(DevicePollingMethod $deviceMethod): PollingMethodConfig
+    {
+        $config = $this->configFromSettings($deviceMethod);
+        $config->enabled = $deviceMethod->enabled;
+        $config->affectsAvailability = $deviceMethod->affects_availability;
+
+        return $config;
+    }
+
+    /**
+     * Config used when the device does not have this method configured.
+     */
+    public function fallbackConfig(Device $device): PollingMethodConfig
+    {
+        $config = $this->defaultConfig();
+        $config->enabled = false;
+
+        return $config;
+    }
 }

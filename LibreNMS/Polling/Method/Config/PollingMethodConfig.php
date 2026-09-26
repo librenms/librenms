@@ -10,13 +10,10 @@ abstract class PollingMethodConfig
     ) {
     }
 
-    abstract public function isValid(): bool;
-
-    public function isEnabled(): bool
-    {
-        return $this->enabled;
-    }
-
+    /**
+     * Settings for a newly added polling method.
+     * This is the single source of default values for the method.
+     */
     abstract public static function default(): static;
 
     /**
@@ -24,28 +21,5 @@ abstract class PollingMethodConfig
      *
      * @return array<string, mixed>
      */
-    public function settingsArray(): array
-    {
-        return [];
-    }
-
-    /**
-     * Diffs current settings against default settings to produce minimal DB storage payload.
-     *
-     * @return array<string, mixed>
-     */
-    public function toSparseSettings(): array
-    {
-        $default = static::default()->settingsArray();
-        $sparse = [];
-
-        foreach ($this->settingsArray() as $key => $value) {
-            $defaultVal = $default[$key] ?? null;
-            if ($value !== $defaultVal && $value !== null && $value !== '') {
-                $sparse[$key] = $value;
-            }
-        }
-
-        return $sparse;
-    }
+    abstract public function settingsArray(): array;
 }

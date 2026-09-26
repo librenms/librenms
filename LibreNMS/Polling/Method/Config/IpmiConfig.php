@@ -7,8 +7,8 @@ use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
 final class IpmiConfig extends PollingMethodConfig
 {
     public function __construct(
-        public bool $enabled,
-        public bool $affectsAvailability,
+        bool $enabled,
+        bool $affectsAvailability,
         public string $username,
         public string $password,
         public string $kgKey,
@@ -21,15 +21,10 @@ final class IpmiConfig extends PollingMethodConfig
         parent::__construct($enabled, $affectsAvailability);
     }
 
-    public function isValid(): bool
-    {
-        return ! empty($this->username) && ! empty($this->password);
-    }
-
-    public static function default(): self
+    public static function default(): static
     {
         return new self(
-            enabled: false,
+            enabled: true,
             affectsAvailability: false,
             username: '',
             password: '',
@@ -46,33 +41,32 @@ final class IpmiConfig extends PollingMethodConfig
         array $settings,
         ?IpmiSecretData $secretData = null,
         ?string $fallbackHostname = null,
-        bool $enabled = true,
-        bool $affectsAvailability = false,
     ): self {
-        $default = self::default();
+        $config = self::default();
         $secretData ??= new IpmiSecretData();
 
-        $hostname = ! empty($settings['hostname'])
-            ? (string) $settings['hostname']
-            : ($fallbackHostname ?: $default->hostname);
+        $config->username = $secretData->username;
+        $config->password = $secretData->password;
+        $config->kgKey = $secretData->kgKey;
+        $config->hostname = ! empty($settings['hostname']) ? (string) $settings['hostname'] : ($fallbackHostname ?: $config->hostname);
 
-        return new self(
-            enabled: $enabled,
-            affectsAvailability: $affectsAvailability,
-            username: $secretData->username,
-            password: $secretData->password,
-            kgKey: $secretData->kgKey,
-            hostname: $hostname,
-            port: isset($settings['port']) && is_numeric($settings['port']) ? (int) $settings['port'] : $default->port,
-            cipherSuite: isset($settings['ciphersuite']) && is_numeric($settings['ciphersuite']) ? (int) $settings['ciphersuite'] : $default->cipherSuite,
-            timeout: isset($settings['timeout']) && is_numeric($settings['timeout']) ? (int) $settings['timeout'] : $default->timeout,
-            type: ! empty($settings['type']) ? (string) $settings['type'] : $default->type,
-        );
+        if (isset($settings['port']) && is_numeric($settings['port'])) {
+            $config->port = (int) $settings['port'];
+        }
+        if (isset($settings['ciphersuite']) && is_numeric($settings['ciphersuite'])) {
+            $config->cipherSuite = (int) $settings['ciphersuite'];
+        }
+        if (isset($settings['timeout']) && is_numeric($settings['timeout'])) {
+            $config->timeout = (int) $settings['timeout'];
+        }
+        if (! empty($settings['type'])) {
+            $config->type = (string) $settings['type'];
+        }
+
+        return $config;
     }
 
     /**
-     * Array representation of non-secret settings.
-     *
      * @return array<string, mixed>
      */
     public function settingsArray(): array

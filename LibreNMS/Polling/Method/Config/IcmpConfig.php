@@ -12,12 +12,7 @@ final class IcmpConfig extends PollingMethodConfig
         parent::__construct($enabled, $affectsAvailability);
     }
 
-    public function isValid(): bool
-    {
-        return true;
-    }
-
-    public static function default(): self
+    public static function default(): static
     {
         return new self(
             enabled: true,
@@ -26,23 +21,18 @@ final class IcmpConfig extends PollingMethodConfig
         );
     }
 
-    public static function fromSettings(
-        array $settings,
-        bool $enabled = true,
-        bool $affectsAvailability = true,
-    ): self {
-        $default = self::default();
+    public static function fromSettings(array $settings): self
+    {
+        $config = self::default();
 
-        return new self(
-            enabled: $enabled,
-            affectsAvailability: $affectsAvailability,
-            ipVersion: ! empty($settings['ip_version']) ? (string) $settings['ip_version'] : $default->ipVersion,
-        );
+        if (! empty($settings['ip_version'])) {
+            $config->ipVersion = (string) $settings['ip_version'];
+        }
+
+        return $config;
     }
 
     /**
-     * Array representation of non-secret settings.
-     *
      * @return array<string, mixed>
      */
     public function settingsArray(): array
