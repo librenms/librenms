@@ -4,7 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use LibreNMS\Enum\PortAssociationMode;
 
 return new class extends Migration
 {
@@ -76,14 +75,14 @@ return new class extends Migration
         });
 
         // Repopulate legacy device fields from device_polling_methods where method_type = 'snmp'
+        $modeIds = ['ifIndex' => 1, 'ifName' => 2, 'ifDescr' => 3, 'ifAlias' => 4];
+
         DB::table('device_polling_methods')
             ->where('method_type', 'snmp')
-            ->orderBy('id')
-            ->chunk(100, function ($pollingMethods) {
+            ->chunkById(100, function ($pollingMethods) use ($modeIds) {
                 foreach ($pollingMethods as $deviceMethod) {
                     $settings = json_decode($deviceMethod->settings, true) ?: [];
-                    $modeName = $settings['port_association_mode'] ?? 'ifIndex';
-                    $modeId = PortAssociationMode::getId($modeName) ?? 1;
+                    $modeId = $modeIds[$settings['port_association_mode'] ?? 'ifIndex'] ?? 1;
 
                     DB::table('devices')
                         ->where('device_id', $deviceMethod->device_id)

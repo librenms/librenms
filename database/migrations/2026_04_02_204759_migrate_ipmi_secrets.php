@@ -18,10 +18,11 @@ return new class extends Migration
 
     public function up(): void
     {
-        DB::transaction(function () {
-            DB::table('devices')
-                ->orderBy('devices.device_id')
-                ->chunk(100, function ($devices) {
+        // Small chunks, each in a short transaction, to avoid holding locks for long
+        DB::table('devices')
+            ->select(['device_id', 'hostname'])
+            ->chunkById(100, function ($devices) {
+                DB::transaction(function () use ($devices) {
                     $deviceIds = $devices->pluck('device_id')->all();
 
                     // Skip devices that already have an IPMI polling method
@@ -74,10 +75,10 @@ return new class extends Migration
 
                         $settings = array_filter([
                             'hostname' => $attribs['ipmi_hostname'] ?? null,
-                            'port' => isset($attribs['ipmi_port']) ? (int) $attribs['ipmi_port'] : 623,
-                            'ciphersuite' => $attribs['ipmi_ciphersuite'] ?? '',
-                            'timeout' => isset($attribs['ipmi_timeout']) ? (int) $attribs['ipmi_timeout'] : 3,
-                        ], fn ($v) => $v !== null);
+                            'port' => isset($attribs['ipmi_port']) ? (int) $attribs['ipmi_port'] : null,
+                            'ciphersuite' => $attribs['ipmi_ciphersuite'] ?? null,
+                            'timeout' => isset($attribs['ipmi_timeout']) ? (int) $attribs['ipmi_timeout'] : null,
+                        ], fn ($v) => $v !== null && $v !== ''); // only values that were set
 
                         $pollingMethods[] = [
                             'device_id' => $deviceId,
@@ -95,7 +96,7 @@ return new class extends Migration
                         DB::table('device_polling_methods')->insert($pollingMethods);
                     }
                 });
-        });
+            }, 'device_id');
 
         $id = 0;
         foreach ($this->secretMeta as $secretId => $meta) {
@@ -107,6 +108,12 @@ return new class extends Migration
                 ]);
             }
         }
+    }
+
+    public function down(): void
+    {
+        DB::table('device_polling_methods')->where('method_type', 'ipmi')->delete();
+        DB::table('secrets')->where('secret_type', 'ipmi')->delete();
     }
 
     /**

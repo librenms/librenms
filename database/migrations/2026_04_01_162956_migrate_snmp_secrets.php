@@ -4,10 +4,11 @@ use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Enum\PortAssociationMode;
 
 return new class extends Migration
 {
+    private const PORT_ASSOCIATION_MODES = [1 => 'ifIndex', 2 => 'ifName', 3 => 'ifDescr', 4 => 'ifAlias'];
+
     /** @var array<string, int> */
     private array $secretMap = [];
 
@@ -19,10 +20,18 @@ return new class extends Migration
 
     public function up(): void
     {
+        // Legacy columns always hold a value, only keep the ones that differ from the global default
+        $defaults = [
+            'port' => (int) \App\Facades\LibrenmsConfig::get('snmp.port', 161),
+            'transport' => \App\Facades\LibrenmsConfig::get('snmp.transports.0', 'udp'),
+            'port_association_mode' => \App\Facades\LibrenmsConfig::get('default_port_association_mode', 'ifIndex'),
+        ];
+
+        // Small chunks, each in a short transaction, to avoid holding locks for long
         DB::table('devices')
-            ->orderBy('device_id')
-            ->chunk(100, function ($devices) {
-                DB::transaction(function () use ($devices) {
+            ->select(['device_id', 'hostname', 'status', 'snmp_disable', 'snmpver', 'community', 'authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo', 'port', 'transport', 'timeout', 'retries', 'port_association_mode'])
+            ->chunkById(100, function ($devices) use ($defaults) {
+                DB::transaction(function () use ($devices, $defaults) {
                     $deviceIds = $devices->pluck('device_id')->all();
 
                     // Skip devices that already have an SNMP polling method
@@ -89,8 +98,8 @@ return new class extends Migration
                             'retries' => $device->retries !== null ? (int) $device->retries : null,
                             'max_repeaters' => isset($attribs['snmp_max_repeaters']) ? (int) $attribs['snmp_max_repeaters'] : null,
                             'max_oid' => isset($attribs['snmp_max_oid']) ? (int) $attribs['snmp_max_oid'] : null,
-                            'port_association_mode' => isset($device->port_association_mode) ? PortAssociationMode::getName((int) $device->port_association_mode) : null,
-                        ], fn ($v) => $v !== null);
+                            'port_association_mode' => self::PORT_ASSOCIATION_MODES[$device->port_association_mode] ?? null,
+                        ], fn ($v, $k) => $v !== null && $v !== ($defaults[$k] ?? null), ARRAY_FILTER_USE_BOTH);
 
                         $pollingMethods[] = [
                             'device_id' => $device->device_id,
@@ -109,7 +118,7 @@ return new class extends Migration
                         DB::table('device_polling_methods')->insert($pollingMethods);
                     }
                 });
-            });
+            }, 'device_id');
 
         // Update descriptions for shared secrets
         $id = 0;
@@ -178,6 +187,13 @@ return new class extends Migration
                 ['config_value' => json_encode($defaultSecretIds)]
             );
         }
+    }
+
+    public function down(): void
+    {
+        DB::table('device_polling_methods')->where('method_type', 'snmp')->delete();
+        DB::table('secrets')->where('secret_type', 'snmp')->delete();
+        DB::table('config')->where('config_name', 'snmp.default_credentials')->delete();
     }
 
     /**
