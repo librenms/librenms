@@ -1,30 +1,6 @@
 @extends('layouts.install')
 
 @section('content')
-    <div class="card mb-3 border-warning">
-        <div class="card-header h6 bg-warning text-dark font-weight-bold">
-            <i class="fa-solid fa-key mr-1"></i>
-            {{ __('install.finish.app_key_title') }}
-        </div>
-        <div class="card-body">
-            <div class="alert alert-warning mb-2">
-                <i class="fa-solid fa-triangle-exclamation mr-1"></i>
-                <strong>{{ __('install.finish.app_key_warning') }}</strong>
-            </div>
-            <p class="card-text text-muted mb-3">
-                {{ __('install.finish.app_key_description') }}
-            </p>
-            <div class="input-group">
-                <input type="text" id="app-key-input" class="form-control text-monospace" value="{{ $app_key }}" readonly>
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary copy-btn" type="button" data-clipboard-target="#app-key-input" title="{{ __('install.finish.copy_key') }}">
-                        <i class="fa-solid fa-clipboard"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="card mb-2">
         <div class="card-header h6">
             {{ __('install.finish.settings') }}
@@ -204,7 +180,6 @@
                 }
 
                 if (result.app_key) {
-                    $('#app-key-input').val(result.app_key);
                     $('#modal-app-key-input').val(result.app_key);
                 }
 
