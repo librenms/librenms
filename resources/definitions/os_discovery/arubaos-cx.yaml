@@ -169,7 +169,7 @@ modules:
                     oid: ARUBAWIRED-VSX-MIB::arubaWiredVsxIslOperState
                     num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.7.2.1.1.{{ $index }}'
                     descr: ISL
-                    index: 'arubaWiredVsxIslOperState.{{ $index }}'
+                    value: ARUBAWIRED-VSX-MIB::arubaWiredVsxIslOperState
                     state_name: arubaWiredVsxIslOperState
                     states:
                         - { value: 1, descr: init, generic: 3 }
