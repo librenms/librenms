@@ -67,7 +67,8 @@ class DeviceDiscover extends LnmsCommand
                 DeviceDiscovered::class,
                 ModuleList::fromUserOverrides($this->option('modules')),
                 $this->option('os'),
-                $this->option('type')
+                $this->option('type'),
+                false
             );
 
             $this->line(__('commands.device:discover.starting'));
