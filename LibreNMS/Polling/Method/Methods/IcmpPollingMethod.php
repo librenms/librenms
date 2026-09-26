@@ -8,15 +8,17 @@ use App\Models\DevicePollingMethod;
 use App\Models\Eventlog;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Enum\AddressFamily;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\ProbeResult;
 
 final class IcmpPollingMethod extends PollingMethod
 {
-    public function defaultConfig(): IcmpConfig
+    public function defaultConfig(?Device $device = null): IcmpConfig
     {
         return IcmpConfig::default();
     }
@@ -28,9 +30,19 @@ final class IcmpPollingMethod extends PollingMethod
         return match ($config->ipVersion) {
             'ipv4' => AddressFamily::IPv4,
             'ipv6' => AddressFamily::IPv6,
-            'match_snmp_transport' => $device->ipFamily(),
+            'match_snmp_transport' => $this->snmpTransportFamily($device),
             default => null,
         };
+    }
+
+    /**
+     * Only the SNMP settings are needed, so avoid decrypting the SNMP secret.
+     */
+    private function snmpTransportFamily(Device $device): AddressFamily
+    {
+        $transport = SnmpConfig::fromSettings($device->pollingMethod(PollingMethodType::Snmp)->settings ?? [])->transport;
+
+        return str_ends_with($transport, '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
     }
 
     /**

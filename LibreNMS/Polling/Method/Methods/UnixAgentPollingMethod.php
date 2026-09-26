@@ -11,7 +11,7 @@ use LibreNMS\Util\Rewrite;
 
 final class UnixAgentPollingMethod extends PollingMethod
 {
-    public function defaultConfig(): UnixAgentConfig
+    public function defaultConfig(?Device $device = null): UnixAgentConfig
     {
         return UnixAgentConfig::default();
     }

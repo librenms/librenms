@@ -3,18 +3,12 @@
 namespace LibreNMS\Polling\Method\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
-use LibreNMS\Polling\Method\Config\IpmiConfig;
 
 final class IpmiDefinition extends PollingMethodDefinition
 {
     public function icon(): string
     {
         return 'fa-microchip';
-    }
-
-    protected function defaultConfig(): IpmiConfig
-    {
-        return IpmiConfig::default();
     }
 
     public function fields(): array

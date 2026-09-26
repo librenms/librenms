@@ -3,18 +3,12 @@
 namespace LibreNMS\Polling\Method\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
-use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 
 final class UnixAgentDefinition extends PollingMethodDefinition
 {
     public function icon(): string
     {
         return 'fa-terminal';
-    }
-
-    protected function defaultConfig(): UnixAgentConfig
-    {
-        return UnixAgentConfig::default();
     }
 
     public function fields(): array

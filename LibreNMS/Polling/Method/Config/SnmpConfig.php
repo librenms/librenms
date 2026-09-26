@@ -114,7 +114,6 @@ final class SnmpConfig extends PollingMethodConfig
         $config->authalgo = $secretData->authalgo;
         $config->cryptopass = $secretData->cryptopass;
         $config->cryptoalgo = $secretData->cryptoalgo;
-        $config->context = $secretData->context;
 
         if (isset($settings['transport']) && $settings['transport'] !== '') {
             $config->transport = (string) $settings['transport'];
@@ -133,6 +132,9 @@ final class SnmpConfig extends PollingMethodConfig
         }
         if (isset($settings['max_oid']) && is_numeric($settings['max_oid'])) {
             $config->maxOid = max(1, (int) $settings['max_oid']);
+        }
+        if (! empty($settings['context'])) {
+            $config->context = (string) $settings['context'];
         }
         if (isset($settings['bulk'])) {
             $config->bulk = filter_var($settings['bulk'], FILTER_VALIDATE_BOOLEAN);
@@ -159,6 +161,7 @@ final class SnmpConfig extends PollingMethodConfig
             'max_repeaters' => $this->maxRepeaters,
             'max_oid' => $this->maxOid,
             'bulk' => $this->bulk,
+            'context' => $this->context,
             'port_association_mode' => $this->portAssociationMode,
         ];
     }
@@ -217,6 +220,7 @@ final class SnmpConfig extends PollingMethodConfig
                 'port_association_mode' => isset($device['port_association_mode'])
                     ? (is_numeric($device['port_association_mode']) ? PortAssociationMode::getName((int) $device['port_association_mode']) : $device['port_association_mode'])
                     : null,
+                'context' => $device['context_name'] ?? null,
             ],
             secretData: new SnmpSecretData(
                 version: (string) ($device['snmpver'] ?? 'v2c'),
@@ -229,7 +233,6 @@ final class SnmpConfig extends PollingMethodConfig
                 authalgo: $device['authalgo'] ?? null,
                 cryptoalgo: $device['cryptoalgo'] ?? null,
                 cryptopass: $device['cryptopass'] ?? null,
-                context: $device['context_name'] ?? null,
             ),
             os: $device['os'] ?? null,
         );

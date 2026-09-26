@@ -3,7 +3,6 @@
 namespace LibreNMS\Polling\Method\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
-use LibreNMS\Polling\Method\Config\IcmpConfig;
 
 final class IcmpDefinition extends PollingMethodDefinition
 {
@@ -12,17 +11,12 @@ final class IcmpDefinition extends PollingMethodDefinition
         return 'fa-exchange';
     }
 
-    protected function defaultConfig(): IcmpConfig
-    {
-        return IcmpConfig::default();
-    }
-
     public function fields(): array
     {
         return [
             'ip_version' => FieldDefinition::make('ip_version', 'select')
                 ->options([
-                    'default' => 'Default',
+                    'default' => 'Auto',
                     'match_snmp_transport' => 'Match SNMP Transport',
                     'ipv4' => 'IPv4 Only',
                     'ipv6' => 'IPv6 Only',

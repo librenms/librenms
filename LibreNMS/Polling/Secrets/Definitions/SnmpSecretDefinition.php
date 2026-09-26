@@ -122,13 +122,6 @@ class SnmpSecretDefinition extends SecretDefinition
                     'authlevel' => 'authPriv',
                 ])
                 ->rules(['required_if:authlevel,authPriv', 'string', 'nullable']),
-
-            'context' => FieldDefinition::make('context', 'text')
-                ->label('Context')
-                ->visibleIf([
-                    'version' => 'v3',
-                ])
-                ->rules(['nullable', 'string']),
         ];
     }
 }

@@ -13,7 +13,6 @@ readonly class SnmpSecretData implements SecretData
         public ?string $authalgo = 'SHA',
         public ?string $cryptoalgo = 'AES',
         public ?string $cryptopass = null,
-        public ?string $context = null,
     ) {
     }
 
@@ -31,7 +30,6 @@ readonly class SnmpSecretData implements SecretData
             authalgo: isset($data['authalgo']) ? (string) $data['authalgo'] : 'SHA',
             cryptoalgo: isset($data['cryptoalgo']) ? (string) $data['cryptoalgo'] : 'AES',
             cryptopass: isset($data['cryptopass']) ? (string) $data['cryptopass'] : null,
-            context: isset($data['context']) ? (string) $data['context'] : null,
         );
     }
 

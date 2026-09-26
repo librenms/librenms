@@ -14,7 +14,7 @@ use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
 
 final class IpmiPollingMethod extends PollingMethod
 {
-    public function defaultConfig(): IpmiConfig
+    public function defaultConfig(?Device $device = null): IpmiConfig
     {
         return IpmiConfig::default();
     }

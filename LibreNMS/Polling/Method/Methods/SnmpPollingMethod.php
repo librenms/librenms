@@ -27,9 +27,9 @@ final class SnmpPollingMethod extends PollingMethod
     ) {
     }
 
-    public function defaultConfig(): SnmpConfig
+    public function defaultConfig(?Device $device = null): SnmpConfig
     {
-        return SnmpConfig::default();
+        return SnmpConfig::default($device?->os);
     }
 
     /**

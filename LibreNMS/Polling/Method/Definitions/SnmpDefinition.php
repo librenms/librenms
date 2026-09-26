@@ -5,18 +5,12 @@ namespace LibreNMS\Polling\Method\Definitions;
 use App\View\FieldSchema\FieldDefinition;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PortAssociationMode;
-use LibreNMS\Polling\Method\Config\SnmpConfig;
 
 final class SnmpDefinition extends PollingMethodDefinition
 {
     public function icon(): string
     {
         return 'fa-server';
-    }
-
-    protected function defaultConfig(): SnmpConfig
-    {
-        return SnmpConfig::default();
     }
 
     public function fields(): array
@@ -56,6 +50,9 @@ final class SnmpDefinition extends PollingMethodDefinition
                 ->min(1)
                 ->max(100)
                 ->rules(['nullable', 'integer', 'min:1', 'max:100']),
+
+            'context' => FieldDefinition::make('context', 'text')
+                ->rules(['nullable', 'string', 'max:255']),
 
             'port_association_mode' => FieldDefinition::make('port_association_mode', 'select')
                 ->options(array_combine(PortAssociationMode::getModes(), PortAssociationMode::getModes()))

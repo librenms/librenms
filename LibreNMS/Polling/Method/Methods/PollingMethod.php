@@ -49,9 +49,9 @@ abstract class PollingMethod
     }
 
     /**
-     * Config for a newly added method of this type.
+     * Config for a newly added method of this type, with defaults for the device if given.
      */
-    abstract public function defaultConfig(): PollingMethodConfig;
+    abstract public function defaultConfig(?Device $device = null): PollingMethodConfig;
 
     /**
      * Build the config for a configured method from its settings and secret.
@@ -72,7 +72,7 @@ abstract class PollingMethod
      */
     public function fallbackConfig(Device $device): PollingMethodConfig
     {
-        $config = $this->defaultConfig();
+        $config = $this->defaultConfig($device);
         $config->enabled = false;
 
         return $config;
