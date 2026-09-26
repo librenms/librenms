@@ -1,0 +1,53 @@
+RSCS-LICENSE DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, enterprises, Unsigned32
+            FROM SNMPv2-SMI
+        DisplayString
+            FROM SNMPv2-TC;
+
+    RSCS        OBJECT IDENTIFIER ::= { enterprises 29577 }
+
+    License  OBJECT IDENTIFIER ::= { RSCS 6 }
+
+    expirationDate OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "License expiration date"
+        ::= { License 1 }
+
+    daysRunning OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Amount of days the license has been active"
+        ::= { License 2 }
+
+    daysRemaining OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Remaining license duration in days"
+        ::= { License 3 }
+
+    licenseStatus OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "License status"
+        ::= { License 4 }
+
+    licenseType OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "License type"
+        ::= { License 5 }
+
+END
