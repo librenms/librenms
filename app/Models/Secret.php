@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use App\Casts\EncryptedSecret;
+use App\Observers\SecretObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\SecretType;
 
+#[ObservedBy([SecretObserver::class])]
 class Secret extends BaseModel
 {
     /** @use HasFactory<\Database\Factories\SecretFactory> */

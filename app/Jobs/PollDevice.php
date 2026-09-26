@@ -40,7 +40,6 @@ class PollDevice implements ShouldQueue
      * @var OS|OS\Generic
      */
     private $os;
-    private ConnectivityHelper $connectivity;
 
     /**
      * @param  int  $device_id
@@ -58,8 +57,8 @@ class PollDevice implements ShouldQueue
     public function handle(): void
     {
         $this->initDevice();
+        $connectivity = new ConnectivityHelper($this->device);
         $this->initRrdDirectory();
-        $this->connectivity = new ConnectivityHelper($this->device);
         PollingDevice::dispatch($this->device);
         $this->os = OS::make($this->deviceArray);
 
@@ -67,22 +66,9 @@ class PollDevice implements ShouldQueue
         $measurement->manager()->checkpoint(); // don't count previous stats
 
         // check and save status
-        try {
-            app(CheckDeviceAvailability::class)->execute($this->device, true);
-        } catch (Throwable $e) {
-            if (defined('PHPUNIT_RUNNING')) {
-                throw $e;
-            }
+        app(CheckDeviceAvailability::class)->execute($this->device, true);
 
-            Log::error("Error checking device availability for {$this->device->hostname}: {$e->getMessage()}");
-            Eventlog::log('Error checking device availability: ' . class_basename($e) . '. Check log file for more details.', $this->device, 'poller', Severity::Error);
-            $this->device->status = false;
-            $this->device->status_reason = 'error';
-            $this->device->save();
-            report($e);
-        }
-
-        $this->pollModules();
+        $this->pollModules($connectivity);
 
         $measurement->end();
 
@@ -92,7 +78,7 @@ class PollDevice implements ShouldQueue
                 $this->recordPerformance($measurement);
             }
 
-            if ($this->connectivity->icmpIsEnabled()) {
+            if ($connectivity->icmpIsEnabled()) {
                 $this->os->enableGraph('ping_perf');
             }
 
@@ -126,7 +112,7 @@ class PollDevice implements ShouldQueue
         DevicePolled::dispatch($this->device);
     }
 
-    private function pollModules(): void
+    private function pollModules(ConnectivityHelper $connectivity): void
     {
         // update $device array status
         $this->deviceArray['status'] = $this->device->status;
@@ -147,7 +133,7 @@ class PollDevice implements ShouldQueue
 
             try {
                 $instance = Module::fromName($module);
-                $should_poll = $instance->shouldPoll($this->os, $module_status, $this->connectivity);
+                $should_poll = $instance->shouldPoll($this->os, $module_status, $connectivity);
 
                 if ($should_poll) {
                     PollingModule::dispatch($this->device, $module);

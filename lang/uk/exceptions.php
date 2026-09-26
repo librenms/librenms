@@ -25,8 +25,6 @@ return [
         'unpingable' => 'Не вдалося отримати відповідь на ping від :hostname (:ip)',
         'unsnmpable' => 'Не вдалося з\'єднатися з :hostname, перевірте налаштування та доступність по протоколу SNMP',
         'unresolvable' => 'Ім\'я не вдалося співставити з IP адресою',
-        'no_reply_community' => 'SNMP :version: Немає відповіді з community :credentials',
-        'no_reply_credentials' => 'SNMP :version: Немає відповіді з реквізитами :credentials',
     ],
     'ldap_missing' => [
         'title' => 'Відсутня підтримка PHP LDAP',

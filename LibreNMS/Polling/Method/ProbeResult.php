@@ -30,11 +30,13 @@ final readonly class ProbeResult
 {
     /**
      * @param  array<string, mixed>  $stats
+     * @param  string[]  $reasons
      */
     public function __construct(
         private bool $success,
         private array $stats = [],
         private ?string $errorMessage = null,
+        private array $reasons = [],
     ) {
     }
 
@@ -46,6 +48,16 @@ final readonly class ProbeResult
     public function errorMessage(): ?string
     {
         return $this->errorMessage;
+    }
+
+    /**
+     * Human-readable reasons for a failure, one per attempt. Defaults to the error message.
+     *
+     * @return string[]
+     */
+    public function reasons(): array
+    {
+        return $this->reasons ?: array_filter([$this->errorMessage]);
     }
 
     /**
@@ -76,9 +88,10 @@ final readonly class ProbeResult
 
     /**
      * @param  array<string, mixed>  $stats
+     * @param  string[]  $reasons
      */
-    public static function failure(array $stats = [], ?string $errorMessage = null): self
+    public static function failure(array $stats = [], ?string $errorMessage = null, array $reasons = []): self
     {
-        return new self(false, $stats, $errorMessage);
+        return new self(false, $stats, $errorMessage, $reasons);
     }
 }

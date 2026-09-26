@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Feature\Http;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
@@ -187,6 +188,33 @@ class SecretControllerTest extends TestCase
         $response->assertRedirect(route('secrets.index'));
         $this->assertDatabaseMissing('secrets', [
             'id' => $secret->id,
+        ]);
+    }
+
+    public function testDestroySecretRemovesItFromDefaultCredentials(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+
+        $keep = Secret::create([
+            'description' => 'Default Keep',
+            'secret_type' => SecretType::Snmp,
+            'data' => ['version' => 'v2c', 'community' => 'keep'],
+        ]);
+        $remove = Secret::create([
+            'description' => 'Default Remove',
+            'secret_type' => SecretType::Snmp,
+            'data' => ['version' => 'v2c', 'community' => 'remove'],
+        ]);
+        LibrenmsConfig::persist('snmp.default_credentials', [$remove->id, $keep->id]);
+
+        $this->actingAs($admin)->delete(route('secrets.destroy', $remove))
+            ->assertRedirect(route('secrets.index'));
+
+        $this->assertSame([$keep->id], LibrenmsConfig::get('snmp.default_credentials'));
+        $this->assertDatabaseHas('config', [
+            'config_name' => 'snmp.default_credentials',
+            'config_value' => json_encode([$keep->id]),
         ]);
     }
 

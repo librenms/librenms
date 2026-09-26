@@ -80,11 +80,4 @@ final class IcmpPollingMethod extends PollingMethod
             $device->mtu_status = $mtuStatus;
         }
     }
-
-    public function enrichDeviceMetadata(Device $device): void
-    {
-        if ($device->os === 'generic' || empty($device->os)) {
-            $device->os = 'ping';
-        }
-    }
 }

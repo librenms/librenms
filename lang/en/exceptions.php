@@ -30,8 +30,7 @@ return [
         'unpingable' => 'Could not ping :hostname (:ip)',
         'unsnmpable' => 'Could not connect to :hostname. Check the SNMP details and SNMP reachability.',
         'unresolvable' => 'Hostname did not resolve to IP',
-        'no_reply_community' => 'SNMP :version: No reply with community :credentials',
-        'no_reply_credentials' => 'SNMP :version: No reply with credentials :credentials',
+        'no_reply_secret' => 'SNMP :version: No reply using credential ":secret"',
     ],
     'ldap_missing' => [
         'title' => 'PHP LDAP support missing',

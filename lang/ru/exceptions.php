@@ -25,8 +25,6 @@ return [
         'unpingable' => 'Не удалось пропинговать :hostname (:ip)',
         'unsnmpable' => 'Не удалось подключиться к :hostname, пожалуйста, проверьте детали snmp и доступность snmp',
         'unresolvable' => 'Имя хоста не разрешилось в IP',
-        'no_reply_community' => 'SNMP :version: Нет ответа с сообществом :credentials',
-        'no_reply_credentials' => 'SNMP :version: Нет ответа с учетными данными :credentials',
     ],
     'ldap_missing' => [
         'title' => 'Отсутствует поддержка PHP LDAP',

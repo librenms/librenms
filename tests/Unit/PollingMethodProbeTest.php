@@ -261,6 +261,29 @@ final class PollingMethodProbeTest extends TestCase
         $this->assertEquals('', $device->status_reason);
     }
 
+    public function testProbeExceptionMarksMethodFailed(): void
+    {
+        $device = new Device(['hostname' => 'broken.example.com']);
+        $icmpMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+            'affects_availability' => true,
+        ]);
+        $icmpMethod->setRelation('device', $device);
+        $device->setRelation('pollingMethods', collect([$icmpMethod]));
+
+        $mockFping = \Mockery::mock(\LibreNMS\Data\Source\Icmp\Fping::class);
+        $mockFping->shouldReceive('ping')->andThrow(new \RuntimeException('fping exploded'));
+        $this->app->instance(\LibreNMS\Data\Source\Icmp\Fping::class, $mockFping);
+
+        $status = app(\App\Actions\Device\CheckDeviceAvailability::class)->execute($device);
+
+        $this->assertFalse($status);
+        $this->assertFalse($icmpMethod->last_check_successful);
+        $this->assertNotNull($icmpMethod->last_checked_at);
+        $this->assertSame('icmp', $device->status_reason);
+    }
+
     public function testNullLastCheckSuccessfulIsUnknownNotFailed(): void
     {
         $device = new Device(['hostname' => 'unprobed.example.com', 'status' => true]);

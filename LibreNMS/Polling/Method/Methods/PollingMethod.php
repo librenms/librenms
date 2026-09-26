@@ -40,6 +40,10 @@ abstract class PollingMethod
     {
     }
 
+    /**
+     * Identify a newly added device (sysName, os, etc.) after this method checked successfully.
+     * Only methods that can query the device for its identity implement this.
+     */
     public function enrichDeviceMetadata(Device $device): void
     {
     }

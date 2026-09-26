@@ -98,15 +98,7 @@ final class SnmpPollingMethod extends PollingMethod
                 return $result;
             }
 
-            $secret = $deviceMethod->secret;
-            $secretData = SnmpSecretData::fromArray($secret->data ?? []);
-            $target = $secret->description ?: ($secretData->community ?? ($secretData->authname ?? 'custom'));
-            $reasons = [$secretData->version => (string) $target];
-
-            return ProbeResult::failure(
-                array_merge($result->stats(), ['reasons' => $reasons]),
-                $result->errorMessage()
-            );
+            return ProbeResult::failure($result->stats(), $result->errorMessage(), [$this->noReplyReason($deviceMethod->secret)]);
         }
 
         // Otherwise, attempt ordered default credentials
@@ -129,14 +121,18 @@ final class SnmpPollingMethod extends PollingMethod
             }
 
             $lastResult = $result;
-            $secretData = SnmpSecretData::fromArray($secret->data ?? []);
-            $reasons[$secretData->version] = $secret->description;
+            $reasons[] = $this->noReplyReason($secret);
         }
 
-        return ProbeResult::failure(
-            array_merge($lastResult ? $lastResult->stats() : [], ['reasons' => $reasons]),
-            $lastResult?->errorMessage()
-        );
+        return ProbeResult::failure($lastResult?->stats() ?? [], $lastResult?->errorMessage(), $reasons);
+    }
+
+    private function noReplyReason(Secret $secret): string
+    {
+        return trans('exceptions.host_unreachable.no_reply_secret', [
+            'version' => SnmpSecretData::fromArray($secret->data ?? [])->version,
+            'secret' => $secret->description,
+        ]);
     }
 
     public function enrichDeviceMetadata(Device $device): void

@@ -40,10 +40,8 @@ readonly class DiscoverDevicePollingMethods
                     $candidateMethods = $candidateMethods->reject(fn (DevicePollingMethod $m) => $m === $deviceMethod)->values();
                 } else {
                     $exception = new HostUnreachableException((string) $device->hostname);
-                    /** @var array<string, string> $reasons */
-                    $reasons = (array) $result->stat('reasons', []);
-                    foreach ($reasons as $version => $reason) {
-                        $exception->addReason((string) $version, (string) $reason);
+                    foreach ($result->reasons() as $reason) {
+                        $exception->addReason($reason);
                     }
 
                     throw $exception;

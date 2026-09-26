@@ -41,8 +41,8 @@ class AddDeviceControllerTest extends TestCase
         $mock = \Mockery::mock('overload:App\Actions\Device\ValidateDeviceAndCreate');
 
         $exception = new HostUnreachableException('Could not connect to laurens.rtr.ncn.net');
-        $exception->addReason('v2c', 'public');
-        $exception->addReason('v3', 'root/noAuthNoPriv');
+        $exception->addReason('SNMP v2c: No reply using credential "public"');
+        $exception->addReason('SNMP v3: No reply using credential "root"');
 
         $mock->shouldReceive('execute')
             ->once()
@@ -69,8 +69,8 @@ class AddDeviceControllerTest extends TestCase
         $errors = $response->json('errors.hostname');
         $this->assertCount(3, $errors);
         $this->assertStringContainsString('Could not connect to laurens.rtr.ncn.net', $errors[0]);
-        $this->assertStringContainsString('SNMP v2c: No reply with community public', $errors[1]);
-        $this->assertStringContainsString('SNMP v3: No reply with credentials root/noAuthNoPriv', $errors[2]);
+        $this->assertSame('SNMP v2c: No reply using credential "public"', $errors[1]);
+        $this->assertSame('SNMP v3: No reply using credential "root"', $errors[2]);
     }
 
     public function testStoreDeviceWithExplicitCredentialsDoesNotAttemptDefaults(): void
@@ -214,7 +214,7 @@ class AddDeviceControllerTest extends TestCase
 
         $mock = Mockery::mock('overload:App\Actions\Device\ValidateDeviceAndCreate');
         $exception = new HostUnreachableException('Could not connect to json-unreachable.example.com');
-        $exception->addReason('v2c', 'public');
+        $exception->addReason('SNMP v2c: No reply using credential "public"');
 
         $mock->shouldReceive('execute')
             ->once()
@@ -238,7 +238,7 @@ class AddDeviceControllerTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonStructure(['status', 'message', 'error_details', 'errors' => ['hostname']]);
         $this->assertEquals('unreachable', $response->json('status'));
-        $this->assertStringContainsString('SNMP v2c: No reply with community public', $response->json('error_details'));
+        $this->assertSame('SNMP v2c: No reply using credential "public"', $response->json('error_details'));
         $this->assertStringContainsString('Could not connect to json-unreachable.example.com', $response->json('errors.hostname.0'));
     }
 

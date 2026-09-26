@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
+use LibreNMS\Enum\PollingMethodType;
 
 readonly class ValidateDeviceAndCreate
 {
@@ -90,6 +91,12 @@ readonly class ValidateDeviceAndCreate
             $this->device->setRelation('pollingMethods', $pollingMethods);
 
             $this->discoverMetadata->execute($this->device, $pollingMethods);
+        }
+
+        // The OS is detected via SNMP, without it the device is ping only
+        $hasSnmp = $pollingMethods->contains(fn (DevicePollingMethod $m) => $m->method_type === PollingMethodType::Snmp && $m->enabled);
+        if (! $hasSnmp && $this->device->os === 'generic') {
+            $this->device->os = 'ping';
         }
 
         return $this->persister->execute($this->device, $pollingMethods);
