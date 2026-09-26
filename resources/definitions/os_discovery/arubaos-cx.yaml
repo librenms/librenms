@@ -176,6 +176,20 @@ modules:
                         - { value: 2, descr: out Sync, generic: 2 }
                         - { value: 3, descr: in Sync, generic: 0 }
                 -
+                    oid: ARUBAWIRED-VSX-MIB::arubaWiredVsxKeepAliveOperState
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.7.2.2.1.{{ $index }}'
+                    descr: KeepAlive
+                    index: 'arubaWiredVsxKeepAliveOperState.{{ $index }}'
+                    state_name: arubaWiredVsxKeepAliveOperState
+                    states:
+                        - { value: 1, descr: init, generic: 3 }
+                        - { value: 2, descr: configured, generic: 3 }
+                        - { value: 3, descr: inSyncEstablished, generic: 0 }
+                        - { value: 4, descr: outofSyncEstablished, generic: 1 }
+                        - { value: 5, descr: initEstablished, generic: 1 }
+                        - { value: 6, descr: failed, generic: 2 }
+                        - { value: 7, descr: stopped, generic: 2 }
+                -
                     oid: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2Topology
                     num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.15.1.1.2.{{ $index }}'
                     descr: 'VSF Topology'
