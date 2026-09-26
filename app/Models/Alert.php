@@ -46,6 +46,7 @@ class Alert extends DeviceRelatedModel
         'info',
         'timestamp',
         'note',
+        'open_fault_count',
     ];
 
     /**
@@ -109,11 +110,20 @@ class Alert extends DeviceRelatedModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\AlertLog, $this>
+     * @return BelongsTo<AlertLog, $this>
      */
     public function latestLog(): BelongsTo
     {
         return $this->belongsTo(AlertLog::class, 'latest_alert_log_id', 'id');
+    }
+
+    /**
+     * @return HasMany<AlertFault, $this>
+     */
+    public function faults(): HasMany
+    {
+        return $this->hasMany(AlertFault::class, 'rule_id', 'rule_id')
+            ->where('alert_faults.device_id', $this->device_id);
     }
 
     /**

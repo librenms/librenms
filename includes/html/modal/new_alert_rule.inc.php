@@ -104,6 +104,12 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                                         <input type='checkbox' name='acknowledgement' id='acknowledgement'>
                                     </div>
                                 </div>
+                                <div class="form-group form-inline">
+                                    <label for='notify_per_entity' class='col-sm-3 col-md-2 control-label' title="Send a separate notification per matching entity (e.g. each port) instead of one grouped notification.">Notify per matching entity </label>
+                                    <div class='col-sm-2' title="Send a separate notification per matching entity (e.g. each port) instead of one grouped notification.">
+                                        <input type='checkbox' name='notify_per_entity' id='notify_per_entity'>
+                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <label for="alert_operation_id" class="col-sm-3 col-md-2 control-label" title="Notification behaviour (escalation, transports). Configure under Alerts → Operations.">Operation </label>
                                     <div class="col-sm-9 col-md-10">
@@ -334,6 +340,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 $("#acknowledgement").bootstrapSwitch('state', <?=$default_acknowledgement_alerts?>);
                 $("#override_query").bootstrapSwitch('state', false);
                 $("#invert_map").bootstrapSwitch('state', <?=$default_invert_map?>);
+                $("#notify_per_entity").bootstrapSwitch('state', false);
                 $(this).find("input[type=text]").val("");
                 $('#adv_query').val('');
                 $('#notes').val('');
@@ -405,6 +412,8 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 }else{
                     $("[name='invert_map']").bootstrapSwitch('state', false);
                 }
+
+                $("[name='notify_per_entity']").bootstrapSwitch('state', rule.notify_per_entity == 1 || rule.notify_per_entity === true);
 
                 $("[name='override_query']").bootstrapSwitch('state', extra.options.override_query);
             }
