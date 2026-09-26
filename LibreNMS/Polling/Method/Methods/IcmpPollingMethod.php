@@ -28,6 +28,11 @@ final class IcmpPollingMethod extends PollingMethod
         return true;
     }
 
+    public function defaultConfig(): IcmpConfig
+    {
+        return IcmpConfig::default();
+    }
+
     /**
      * @inheritDoc
      */
@@ -41,7 +46,6 @@ final class IcmpPollingMethod extends PollingMethod
                     'ipv4' => 'IPv4 Only',
                     'ipv6' => 'IPv6 Only',
                 ])
-                ->default('default')
                 ->rules(['nullable', 'string', 'in:default,match_snmp_transport,follow_snmp,ipv4,ipv6']),
         ];
     }
@@ -93,10 +97,10 @@ final class IcmpPollingMethod extends PollingMethod
 
     public function config(DevicePollingMethod $deviceMethod): IcmpConfig
     {
-        return new IcmpConfig(
+        return IcmpConfig::fromSettings(
+            settings: $deviceMethod->settings ?? [],
             enabled: $deviceMethod->enabled ?? true,
             affectsAvailability: $deviceMethod->affects_availability ?? false,
-            ipVersion: $deviceMethod->settings['ip_version'] ?? 'default',
         );
     }
 
@@ -107,7 +111,7 @@ final class IcmpPollingMethod extends PollingMethod
             return $this->config($method);
         }
 
-        return new IcmpConfig(enabled: false, affectsAvailability: true, ipVersion: 'default');
+        return IcmpConfig::default();
     }
 
     public function onProbeComplete(Device $device, ProbeResult $result, bool $commit = false): void

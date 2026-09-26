@@ -86,22 +86,56 @@ final class SnmpConfig extends PollingMethodConfig
         return false;
     }
 
-    public static function fromSettingsAndSecretData(
+    public static function default(?string $os = 'generic'): self
+    {
+        $os = $os ?: 'generic';
+
+        return new self(
+            enabled: true,
+            affectsAvailability: true,
+            version: 'v2c',
+            community: Arr::first(Arr::wrap(LibrenmsConfig::get('snmp.community', ['public']))) ?: 'public',
+            transport: LibrenmsConfig::get('snmp.transports.0', 'udp'),
+            port: (int) LibrenmsConfig::get('snmp.port', 161),
+            timeout: (float) LibrenmsConfig::get('snmp.timeout', 1),
+            retries: (int) LibrenmsConfig::get('snmp.retries', 5),
+            maxRepeaters: max(0, (int) LibrenmsConfig::getOsSetting(
+                $os,
+                'snmp.max_repeaters',
+                LibrenmsConfig::get('snmp.max_repeaters', 10)
+            )),
+            maxOid: max(1, (int) LibrenmsConfig::getOsSetting(
+                $os,
+                'snmp_max_oid',
+                LibrenmsConfig::get('snmp.max_oid', 10)
+            )),
+            bulk: filter_var(
+                LibrenmsConfig::getOsSetting(
+                    $os,
+                    'snmp_bulk',
+                    LibrenmsConfig::get('snmp_bulk', true)
+                ),
+                FILTER_VALIDATE_BOOLEAN
+            ),
+            portAssociationMode: LibrenmsConfig::get('default_port_association_mode', 'ifIndex'),
+        );
+    }
+
+    public static function fromSettings(
         array $settings,
-        SnmpSecretData $secretData,
+        ?SnmpSecretData $secretData = null,
         ?string $os = 'generic',
         bool $enabled = true,
         bool $affectsAvailability = true,
     ): self {
-        $os = $os ?: 'generic';
+        $default = self::default($os);
+        $secretData ??= new SnmpSecretData();
 
-        $timeout = isset($settings['timeout']) && $settings['timeout'] > 0
-            ? (float) $settings['timeout']
-            : (float) LibrenmsConfig::get('snmp.timeout', 1);
-
-        $retries = isset($settings['retries']) && is_numeric($settings['retries'])
-            ? (int) $settings['retries']
-            : (int) LibrenmsConfig::get('snmp.retries', 5);
+        $portAssoc = $settings['port_association_mode']
+            ?? (isset($settings['port_association_mode_id']) && is_numeric($settings['port_association_mode_id'])
+                ? \LibreNMS\Enum\PortAssociationMode::getName((int) $settings['port_association_mode_id'])
+                : null)
+            ?? $default->portAssociationMode;
 
         return new self(
             enabled: $enabled,
@@ -114,35 +148,53 @@ final class SnmpConfig extends PollingMethodConfig
             authalgo: $secretData->authalgo,
             cryptopass: $secretData->cryptopass,
             cryptoalgo: $secretData->cryptoalgo,
-            transport: $settings['transport'] ?? LibrenmsConfig::get('snmp.transports.0', 'udp'),
-            port: (int) ($settings['port'] ?? LibrenmsConfig::get('snmp.port', 161)),
+            transport: isset($settings['transport']) && $settings['transport'] !== '' ? (string) $settings['transport'] : $default->transport,
+            port: isset($settings['port']) && is_numeric($settings['port']) ? (int) $settings['port'] : $default->port,
             context: $secretData->context,
-            timeout: max(0.1, $timeout),
-            retries: max(0, $retries),
-            maxRepeaters: max(0, (int) ($settings['max_repeaters'] ?? LibrenmsConfig::getOsSetting(
-                $os,
-                'snmp.max_repeaters',
-                LibrenmsConfig::get('snmp.max_repeaters', 10)
-            ))),
-            maxOid: max(1, (int) ($settings['max_oid'] ?? LibrenmsConfig::getOsSetting(
-                $os,
-                'snmp_max_oid',
-                LibrenmsConfig::get('snmp.max_oid', 10)
-            ))),
-            bulk: filter_var(
-                $settings['bulk'] ?? $settings['snmp_bulk'] ?? LibrenmsConfig::getOsSetting(
-                    $os,
-                    'snmp_bulk',
-                    LibrenmsConfig::get('snmp_bulk', true)
-                ),
-                FILTER_VALIDATE_BOOLEAN
-            ),
-            portAssociationMode: $settings['port_association_mode']
-                ?? (isset($settings['port_association_mode_id']) && is_numeric($settings['port_association_mode_id'])
-                    ? \LibreNMS\Enum\PortAssociationMode::getName((int) $settings['port_association_mode_id'])
-                    : null)
-                ?? LibrenmsConfig::get('default_port_association_mode', 'ifIndex'),
+            timeout: isset($settings['timeout']) && is_numeric($settings['timeout']) && $settings['timeout'] > 0 ? max(0.1, (float) $settings['timeout']) : $default->timeout,
+            retries: isset($settings['retries']) && is_numeric($settings['retries']) ? max(0, (int) $settings['retries']) : $default->retries,
+            maxRepeaters: isset($settings['max_repeaters']) && is_numeric($settings['max_repeaters']) ? max(0, (int) $settings['max_repeaters']) : $default->maxRepeaters,
+            maxOid: isset($settings['max_oid']) && is_numeric($settings['max_oid']) ? max(1, (int) $settings['max_oid']) : $default->maxOid,
+            bulk: (isset($settings['bulk']) || isset($settings['snmp_bulk']))
+                ? filter_var($settings['bulk'] ?? $settings['snmp_bulk'], FILTER_VALIDATE_BOOLEAN)
+                : $default->bulk,
+            portAssociationMode: $portAssoc,
         );
+    }
+
+    public static function fromSettingsAndSecretData(
+        array $settings,
+        SnmpSecretData $secretData,
+        ?string $os = 'generic',
+        bool $enabled = true,
+        bool $affectsAvailability = true,
+    ): self {
+        return self::fromSettings(
+            settings: $settings,
+            secretData: $secretData,
+            os: $os,
+            enabled: $enabled,
+            affectsAvailability: $affectsAvailability,
+        );
+    }
+
+    /**
+     * Array representation of non-secret settings.
+     *
+     * @return array<string, mixed>
+     */
+    public function settingsArray(): array
+    {
+        return [
+            'transport' => $this->transport,
+            'port' => $this->port,
+            'timeout' => $this->timeout,
+            'retries' => $this->retries,
+            'max_repeaters' => $this->maxRepeaters,
+            'max_oid' => $this->maxOid,
+            'bulk' => $this->bulk,
+            'port_association_mode' => $this->portAssociationMode,
+        ];
     }
 
     /**

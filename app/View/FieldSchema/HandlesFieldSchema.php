@@ -69,12 +69,16 @@ trait HandlesFieldSchema
     }
 
     /**
-     * Computed field defaults derived from fields().
+     * Computed field defaults derived from fields or config.
      *
      * @return array<string, mixed>
      */
     public function schemaDefaults(): array
     {
+        if (method_exists($this, 'defaultConfig')) {
+            return $this->defaultConfig()->settingsArray();
+        }
+
         return collect($this->fields())
             ->mapWithKeys(function (FieldDefinition $field, string $key): array {
                 $val = $field->getDefault();
@@ -92,6 +96,20 @@ trait HandlesFieldSchema
      */
     public function formDefaults(): array
     {
+        if (method_exists($this, 'defaultConfig')) {
+            $defaults = $this->defaultConfig()->settingsArray();
+
+            return collect($this->fields())
+                ->filter(fn (FieldDefinition $field): bool => $field->type === 'select')
+                ->mapWithKeys(function (FieldDefinition $field, string $key) use ($defaults): array {
+                    $val = $defaults[$key] ?? $field->getDefault();
+
+                    return [$key => $val !== null ? (string) $val : null];
+                })
+                ->filter(fn (mixed $v): bool => $v !== null)
+                ->all();
+        }
+
         return collect($this->fields())
             ->filter(fn (FieldDefinition $field): bool => $field->type === 'select')
             ->mapWithKeys(function (FieldDefinition $field, string $key): array {
@@ -117,9 +135,13 @@ trait HandlesFieldSchema
             return [];
         }
 
+        $defaults = method_exists($this, 'defaultConfig')
+            ? $this->defaultConfig()->settingsArray()
+            : [];
+
         $result = [];
         foreach ($fields as $key => $field) {
-            $default = $field->getDefault();
+            $default = array_key_exists($key, $defaults) ? $defaults[$key] : $field->getDefault();
 
             if (array_key_exists($key, $input)) {
                 $raw = $input[$key];
@@ -127,7 +149,11 @@ trait HandlesFieldSchema
                     continue;
                 }
                 $cast = $field->castValue($raw);
-                if ($cast !== $default) {
+                $isDefault = (is_numeric($cast) && is_numeric($default))
+                    ? (float) $cast === (float) $default
+                    : $cast === $default;
+
+                if (! $isDefault) {
                     $result[$key] = $cast;
                 }
             } elseif (array_key_exists($key, $existing)) {
@@ -136,7 +162,11 @@ trait HandlesFieldSchema
                     continue;
                 }
                 $cast = $field->castValue($raw);
-                if ($cast !== $default) {
+                $isDefault = (is_numeric($cast) && is_numeric($default))
+                    ? (float) $cast === (float) $default
+                    : $cast === $default;
+
+                if (! $isDefault) {
                     $result[$key] = $cast;
                 }
             }

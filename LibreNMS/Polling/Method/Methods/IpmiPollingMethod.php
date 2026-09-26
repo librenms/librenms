@@ -21,9 +21,9 @@ final class IpmiPollingMethod extends PollingMethod
         return 'fa-microchip';
     }
 
-    public function defaultAffectsAvailability(): bool
+    public function defaultConfig(): IpmiConfig
     {
-        return false;
+        return IpmiConfig::default();
     }
 
     /**
@@ -37,20 +37,16 @@ final class IpmiPollingMethod extends PollingMethod
                 ->rules(['nullable', 'string']),
 
             'port' => FieldDefinition::make('port', 'number')
-                ->default(623)
                 ->min(1)
                 ->max(65535)
-                ->rules(['nullable', 'integer', 'min:1', 'max:65535'])
-                ->cast('int'),
+                ->rules(['nullable', 'integer', 'min:1', 'max:65535']),
 
             'ciphersuite' => FieldDefinition::make('ciphersuite', 'text')
                 ->rules(['nullable', 'string']),
 
             'timeout' => FieldDefinition::make('timeout', 'number')
-                ->default(3)
                 ->min(1)
-                ->rules(['nullable', 'integer', 'min:1'])
-                ->cast('int'),
+                ->rules(['nullable', 'integer', 'min:1']),
         ];
     }
 
@@ -88,20 +84,14 @@ final class IpmiPollingMethod extends PollingMethod
 
     public function config(DevicePollingMethod $deviceMethod): IpmiConfig
     {
-        $settings = $deviceMethod->settings ?? [];
         $secretData = $deviceMethod->secret ? IpmiSecretData::fromArray($deviceMethod->secret->data ?? []) : new IpmiSecretData();
 
-        return new IpmiConfig(
-            $deviceMethod->enabled ?? true,
-            $deviceMethod->affects_availability ?? false,
-            $secretData->username,
-            $secretData->password,
-            $secretData->kgKey,
-            ! empty($settings['hostname']) ? (string) $settings['hostname'] : ($deviceMethod->device ? (string) $deviceMethod->device->hostname : ''),
-            (int) ($settings['port'] ?? 623),
-            (int) ($settings['ciphersuite'] ?? 0),
-            (int) ($settings['timeout'] ?? 3),
-            (string) ($settings['type'] ?? ''),
+        return IpmiConfig::fromSettings(
+            settings: $deviceMethod->settings ?? [],
+            secretData: $secretData,
+            fallbackHostname: $deviceMethod->device?->hostname,
+            enabled: $deviceMethod->enabled ?? true,
+            affectsAvailability: $deviceMethod->affects_availability ?? false,
         );
     }
 
@@ -112,17 +102,11 @@ final class IpmiPollingMethod extends PollingMethod
             return $this->config($method);
         }
 
-        return new IpmiConfig(
+        return IpmiConfig::fromSettings(
+            settings: [],
+            fallbackHostname: (string) $device->hostname,
             enabled: false,
             affectsAvailability: false,
-            username: '',
-            password: '',
-            kgKey: '',
-            hostname: (string) $device->hostname,
-            port: 623,
-            cipherSuite: 0,
-            timeout: 3,
-            type: '',
         );
     }
 }

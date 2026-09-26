@@ -2,7 +2,6 @@
 
 namespace LibreNMS\Polling\Method\Methods;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\View\FieldSchema\FieldDefinition;
@@ -19,9 +18,9 @@ final class UnixAgentPollingMethod extends PollingMethod
         return 'fa-terminal';
     }
 
-    public function defaultAffectsAvailability(): bool
+    public function defaultConfig(): UnixAgentConfig
     {
-        return false;
+        return UnixAgentConfig::default();
     }
 
     /**
@@ -31,18 +30,14 @@ final class UnixAgentPollingMethod extends PollingMethod
     {
         return [
             'port' => FieldDefinition::make('port', 'number')
-                ->default(fn () => (int) LibrenmsConfig::get('unix-agent.port', 6556))
                 ->min(1)
                 ->max(65535)
-                ->rules(['nullable', 'integer', 'min:1', 'max:65535'])
-                ->cast('int'),
+                ->rules(['nullable', 'integer', 'min:1', 'max:65535']),
 
             'timeout' => FieldDefinition::make('timeout', 'number')
-                ->default(fn () => (int) LibrenmsConfig::get('unix-agent.connection-timeout', 10))
                 ->min(1)
                 ->max(300)
-                ->rules(['nullable', 'integer', 'min:1', 'max:300'])
-                ->cast('int'),
+                ->rules(['nullable', 'integer', 'min:1', 'max:300']),
         ];
     }
 
@@ -74,13 +69,10 @@ final class UnixAgentPollingMethod extends PollingMethod
 
     public function config(DevicePollingMethod $deviceMethod): UnixAgentConfig
     {
-        $settings = $deviceMethod->settings ?? [];
-
-        return new UnixAgentConfig(
+        return UnixAgentConfig::fromSettings(
+            settings: $deviceMethod->settings ?? [],
             enabled: $deviceMethod->enabled ?? true,
             affectsAvailability: $deviceMethod->affects_availability ?? false,
-            port: (int) ($settings['port'] ?? LibrenmsConfig::get('unix-agent.port', 6556)),
-            timeout: (int) ($settings['timeout'] ?? LibrenmsConfig::get('unix-agent.connection-timeout', 10)),
         );
     }
 
@@ -91,11 +83,6 @@ final class UnixAgentPollingMethod extends PollingMethod
             return $this->config($method);
         }
 
-        return new UnixAgentConfig(
-            enabled: false,
-            affectsAvailability: false,
-            port: (int) LibrenmsConfig::get('unix-agent.port', 6556),
-            timeout: (int) LibrenmsConfig::get('unix-agent.connection-timeout', 10),
-        );
+        return UnixAgentConfig::default();
     }
 }
