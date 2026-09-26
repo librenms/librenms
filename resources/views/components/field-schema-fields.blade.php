@@ -84,6 +84,7 @@
             'max'         => $config['max'] ?? null,
             'placeholder' => $config['placeholder'] ?? null,
             'default'     => $config['default'] ?? null,
+            'default_option' => $config['default_option'] ?? null,
             'required'    => ! empty($config['required']),
         ];
     }
@@ -137,6 +138,9 @@
                     id="{{ $id }}"
                     class="form-control"
                     @if($modelPrefix) x-model="{{ $modelPrefix }}['{{ $key }}']" @endif>
+                @if($field['default_option'] !== null)
+                    <option value="">{{ $field['default_option'] }}</option>
+                @endif
                 @foreach($field['options'] as $optVal => $optLabel)
                     <option value="{{ $optVal }}"
                             @if((string) $value === (string) $optVal || ($value === '' && isset($field['default']) && (string) $field['default'] === (string) $optVal)) selected @endif>

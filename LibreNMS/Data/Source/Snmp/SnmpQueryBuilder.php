@@ -351,7 +351,13 @@ class SnmpQueryBuilder implements SnmpQueryInterface
     {
         $config = $this->device->polling()->snmp();
         $this->prepareMibDirs();
-        $this->options->context = $config->version === 'v3' ? $this->v3ContextPrefix . $this->context : $this->context;
+        if ($this->context === '') {
+            $this->options->context = (string) $config->context; // device default context
+        } elseif ($config->version === 'v3') {
+            $this->options->context = $this->v3ContextPrefix . $this->context;
+        } else {
+            $this->options->context = $this->context;
+        }
 
         return $config;
     }

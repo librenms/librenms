@@ -22,7 +22,6 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Cache\DeviceMaintenanceCache;
-use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\PollingMethodType;
@@ -138,15 +137,6 @@ class Device extends BaseModel
     public function polling(): PollingMethodAccessor
     {
         return new PollingMethodAccessor($this, app(PollingMethodRegistry::class));
-    }
-
-    public function ipFamily(): AddressFamily
-    {
-        try {
-            return str_ends_with($this->polling()->snmp()->transport, '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
-        } catch (\Throwable) {
-            return filter_var($this->pollerTarget(), FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? AddressFamily::IPv6 : AddressFamily::IPv4;
-        }
     }
 
     public static function findByIp(?string $ip): ?Device

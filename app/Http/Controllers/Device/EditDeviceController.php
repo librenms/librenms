@@ -36,6 +36,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Enum\MaintenanceBehavior;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostRenameException;
 
 class EditDeviceController
@@ -84,12 +85,16 @@ class EditDeviceController
             'maintenance' => $isUnderMaintenance,
             'default_maintenance_behavior' => MaintenanceBehavior::from((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'))->value,
             'exclusive_maintenance_id' => $exclusive_schedule_id,
+            'without_snmp' => $device->pollingMethod(PollingMethodType::Snmp) === null,
         ]);
     }
 
     public function update(UpdateDeviceRequest $request, Device $device): RedirectResponse
     {
         $device->fill($request->validated());
+        if ($request->withoutSnmp()) {
+            $device->os = $device->os ?: 'ping';
+        }
 
         $device->parents()->sync($request->input('parent_id', [])); // TODO avoid loops!
 

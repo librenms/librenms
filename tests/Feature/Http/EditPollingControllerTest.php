@@ -99,7 +99,7 @@ class EditPollingControllerTest extends TestCase
             route('device.edit.polling.store', ['device' => $device]),
             [
                 'method_type' => 'snmp',
-                'credential_mode' => 'new',
+                'secret_mode' => 'new',
                 'description' => 'SNMP test-device.example.com',
                 'secret_data' => [
                     'version' => 'v2c',
@@ -137,7 +137,7 @@ class EditPollingControllerTest extends TestCase
             route('device.edit.polling.store', ['device' => $device]),
             [
                 'method_type' => 'snmp',
-                'credential_mode' => 'new',
+                'secret_mode' => 'new',
                 'description' => 'Existing Custom Description',
                 'secret_data' => [
                     'version' => 'v2c',
@@ -281,7 +281,7 @@ class EditPollingControllerTest extends TestCase
                 'affects_availability' => '1',
                 'force_save' => '1',
                 'secret_id' => (string) $secret->id,
-                'is_editing_secret' => '1',
+                'secret_mode' => 'edit',
                 'description' => 'Updated SNMP Secret',
                 'secret_data' => [
                     'version' => 'v2c',
@@ -307,7 +307,7 @@ class EditPollingControllerTest extends TestCase
         $this->assertEquals('supersecret', $secret->fresh()->data['community']);
     }
 
-    public function testUpdateSecretWithCreateModeCreatesNewSecret(): void
+    public function testUpdateWithNewSecretKeepsSharedSecret(): void
     {
         $admin = User::factory()->create(['enabled' => 1]);
         $admin->assignRole('admin');
@@ -344,8 +344,7 @@ class EditPollingControllerTest extends TestCase
                 'affects_availability' => '1',
                 'force_save' => '1',
                 'secret_id' => (string) $originalSecret->id,
-                'is_editing_secret' => '1',
-                'secret_update_mode' => 'create',
+                'secret_mode' => 'new',
                 'description' => 'New Dedicated Secret',
                 'secret_data' => [
                     'version' => 'v2c',
@@ -375,7 +374,7 @@ class EditPollingControllerTest extends TestCase
         $this->assertEquals('brandnew', $newSecret->data['community']);
     }
 
-    public function testUpdateSecretWithCreateModeRejectsDuplicateDescription(): void
+    public function testUpdateWithNewSecretRejectsDuplicateDescription(): void
     {
         $admin = User::factory()->create(['enabled' => 1]);
         $admin->assignRole('admin');
@@ -412,8 +411,7 @@ class EditPollingControllerTest extends TestCase
                 'enabled' => '1',
                 'affects_availability' => '1',
                 'secret_id' => (string) $originalSecret->id,
-                'is_editing_secret' => '1',
-                'secret_update_mode' => 'create',
+                'secret_mode' => 'new',
                 'description' => 'Shared SNMP Secret',
                 'secret_data' => [
                     'version' => 'v2c',
@@ -438,7 +436,7 @@ class EditPollingControllerTest extends TestCase
         $response->assertJsonValidationErrors(['description']);
     }
 
-    public function testUpdateUnsharedSecretWithSameDescriptionUpdatesInPlace(): void
+    public function testEditSecretWithSameDescriptionUpdatesInPlace(): void
     {
         $admin = User::factory()->create(['enabled' => 1]);
         $admin->assignRole('admin');
@@ -466,8 +464,7 @@ class EditPollingControllerTest extends TestCase
                 'affects_availability' => '1',
                 'force_save' => '1',
                 'secret_id' => (string) $secret->id,
-                'is_editing_secret' => '1',
-                'secret_update_mode' => 'create',
+                'secret_mode' => 'edit',
                 'description' => 'Solo SNMP Secret',
                 'secret_data' => [
                     'version' => 'v2c',
@@ -616,8 +613,7 @@ class EditPollingControllerTest extends TestCase
             [
                 'enabled' => '1',
                 'secret_id' => (string) $foreignSecret->id,
-                'is_editing_secret' => '1',
-                'secret_update_mode' => 'create',
+                'secret_mode' => 'new',
                 'description' => 'Stolen',
                 'secret_data' => [
                     'version' => 'v2c',
@@ -800,5 +796,87 @@ class EditPollingControllerTest extends TestCase
         $icmpMethod = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Icmp);
         $this->assertInstanceOf(\LibreNMS\Polling\Method\Methods\IcmpPollingMethod::class, $icmpMethod);
         $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($device->fresh(), $config));
+    }
+
+    public function testUpdateStoresOnlyUserSetSettings(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+
+        $device = Device::factory()->create();
+        $method = DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'settings' => ['transport' => 'tcp', 'max_repeaters' => 20],
+        ]);
+
+        $this->actingAs($admin)->putJson(route('device.edit.polling.update', ['device' => $device, 'methodType' => 'snmp']), [
+            'force_save' => '1',
+            'settings' => ['transport' => '', 'port' => '161', 'max_repeaters' => '', 'context' => 'vrf-a'],
+        ])->assertOk();
+
+        // empty fields (the "Default" option) are not stored, even values matching a default are kept
+        $this->assertSame(['port' => 161, 'context' => 'vrf-a'], $method->fresh()->settings);
+    }
+
+    public function testUpdateWithoutSecretModeKeepsSecret(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+
+        $secret = \App\Models\Secret::create([
+            'description' => 'Kept Secret',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'data' => ['version' => 'v2c', 'community' => 'kept'],
+        ]);
+        $device = Device::factory()->create();
+        $method = DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $secret->id,
+        ]);
+
+        $this->actingAs($admin)->putJson(route('device.edit.polling.update', ['device' => $device, 'methodType' => 'snmp']), [
+            'enabled' => '0',
+        ])->assertOk();
+
+        $this->assertSame($secret->id, $method->fresh()->secret_id);
+        $this->assertFalse($method->fresh()->enabled);
+    }
+
+    public function testSecretPermissionsFollowSecretMode(): void
+    {
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->givePermissionTo('device.update');
+        Permission::findOrCreate('device.viewAll');
+        $user->givePermissionTo('device.viewAll'); // may use any secret
+
+        $secret = \App\Models\Secret::create([
+            'description' => 'Usable Secret',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'data' => ['version' => 'v2c', 'community' => 'usable'],
+        ]);
+        $device = Device::factory()->create();
+        $store = route('device.edit.polling.store', ['device' => $device]);
+
+        // creating a secret needs secret.create
+        $this->actingAs($user)->postJson($store, [
+            'method_type' => 'snmp',
+            'force_save' => '1',
+            'secret_mode' => 'new',
+            'description' => 'Not Allowed',
+            'secret_data' => ['version' => 'v2c', 'community' => 'nope'],
+        ])->assertForbidden();
+
+        // using an existing secret does not
+        $this->actingAs($user)->postJson($store, [
+            'method_type' => 'snmp',
+            'force_save' => '1',
+            'secret_mode' => 'existing',
+            'secret_id' => $secret->id,
+        ])->assertOk();
+
+        $this->assertSame($secret->id, $device->fresh()->pollingMethod(PollingMethodType::Snmp)->secret_id);
+        $this->assertDatabaseMissing('secrets', ['description' => 'Not Allowed']);
     }
 }

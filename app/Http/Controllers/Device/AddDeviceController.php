@@ -43,9 +43,8 @@ class AddDeviceController
                 'icon' => $definition->icon(),
                 'schema_fields' => $schemaFields,
                 'schema_defaults' => $secretDefinition?->schemaDefaults() ?? [],
-                'settings_fields' => $definition->buildSchemaFields(dataVar: "methods['" . $type->value . "'].settingsData"),
-                'settings_defaults' => $definition->schemaDefaults(),
-                'settings_form_defaults' => $definition->formDefaults(),
+                'settings_fields' => $definition->settingsFields($method->defaultConfig(), "methods['" . $type->value . "'].settingsData"),
+                'settings_keys' => array_keys($definition->fields()),
                 'default_affects_availability' => $method->defaultConfig()->affectsAvailability,
             ];
         })->all();
@@ -76,7 +75,7 @@ class AddDeviceController
                     'secret_id' => old("polling_methods.{$type}.secret_id", ''),
                     'description' => old("polling_methods.{$type}.description", ''),
                     'formData' => old("polling_methods.{$type}.secret_data", $method['schema_defaults'] ?? []),
-                    'settingsData' => old("polling_methods.{$type}.settings", $method['settings_form_defaults'] ?? []),
+                    'settingsData' => old("polling_methods.{$type}.settings", array_fill_keys($method['settings_keys'], '')),
                 ]];
             })->all(),
             'all_types' => collect($availableMethods)->map(fn ($m) => ['type' => $m['type'], 'label' => $m['label']])->values()->all(),

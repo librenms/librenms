@@ -6,7 +6,7 @@
 
         @if($configuredMethods->isNotEmpty())
             <div
-                x-data="pollingTabs('{{ request('tab') }}', @js($configuredMethods->pluck('type')->values()), '{{ $defaultTab }}', @js($allMethods->mapWithKeys(fn($m) => [$m['type'] => ['configured' => (bool)$m['configured'], 'enabled' => (bool)$m['enabled'], 'affectsAvailability' => (bool)$m['affects_availability'], 'lastCheckSuccessful' => $m['last_check_successful'], 'credential_mode' => 'existing', 'formData' => $m['schema_defaults'] ?? [], 'settingsData' => $m['settings'] ?? []]])), {{ $errors->any() ? 'true' : 'false' }}, @js($allMethods->map(fn($m) => ['type' => $m['type'], 'label' => $m['label']])->values()))"
+                x-data="pollingTabs('{{ request('tab') }}', @js($configuredMethods->pluck('type')->values()), '{{ $defaultTab }}', @js($allMethods->mapWithKeys(fn($m) => [$m['type'] => ['configured' => (bool)$m['configured'], 'enabled' => (bool)$m['enabled'], 'affectsAvailability' => (bool)$m['affects_availability'], 'lastCheckSuccessful' => $m['last_check_successful'], 'formData' => $m['schema_defaults'] ?? [], 'settingsData' => $m['settings'] ?? []]])), {{ $errors->any() ? 'true' : 'false' }}, @js($allMethods->map(fn($m) => ['type' => $m['type'], 'label' => $m['label']])->values()))"
                 class="tw:flex tw:flex-col tw:md:flex-row tw:gap-6 tw:mt-6"
             >
                 <!-- Left Tabs -->
@@ -174,11 +174,11 @@
                                 @if(!empty($method['schema_fields']))
                                     <div x-show="enabled" class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6">
                                         <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Credentials') }}</h4>
+                                        <input type="hidden" name="secret_mode" :value="secretMode">
 
                                         {{-- Configured credentials section --}}
                                         <div x-show="configured" class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:text-sm tw:bg-white tw:dark:bg-dark-gray-500">
                                             <input type="hidden" name="secret_id" :value="selectedSecretId" :disabled="!configured && credentialMode !== 'existing'">
-                                            <input type="hidden" name="is_editing_secret" :value="isEditingSecret ? '1' : '0'" :disabled="!configured">
 
                                             {{-- Secret picker --}}
                                             <div class="tw:mb-4 form-group" :class="(errors && errors['secret_id']) ? 'has-error' : ''">
@@ -276,11 +276,11 @@
                                                                 </p>
                                                                 <div class="tw:flex tw:flex-col tw:gap-2">
                                                                     <label class="tw:flex tw:items-center tw:cursor-pointer">
-                                                                        <input type="radio" name="secret_update_mode" value="create" x-model="updateMode" :disabled="!showSharedGuard" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
+                                                                        <input type="radio" value="create" x-model="updateMode" :disabled="!showSharedGuard" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
                                                                         <span class="tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Create a new secret for this device only (recommended)') }}</span>
                                                                     </label>
                                                                     <label class="tw:flex tw:items-center tw:cursor-pointer">
-                                                                        <input type="radio" name="secret_update_mode" value="update" x-model="updateMode" :disabled="!showSharedGuard" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
+                                                                        <input type="radio" value="update" x-model="updateMode" :disabled="!showSharedGuard" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
                                                                         <span class="tw:text-gray-700 tw:dark:text-dark-white-200">
                                                                             {{ __('Update the shared secret') }}
                                                                             (<span x-text="otherDevicesCount"></span> {{ __('other device(s) affected') }})
@@ -296,7 +296,6 @@
 
                                         {{-- Unconfigured credentials section --}}
                                         <div x-show="!configured" class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:text-sm tw:bg-white tw:dark:bg-dark-gray-500">
-                                            <input type="hidden" name="credential_mode" :value="credentialMode" :disabled="configured">
                                             <div class="tw:flex tw:flex-wrap tw:gap-6 tw:mb-4">
                                                 <label class="radio-inline">
                                                     <input type="radio" value="existing" x-model="credentialMode">
@@ -343,7 +342,6 @@
                                                         model-prefix="formData"
                                                         description-name="description"
                                                         description-model="description"
-                                                        default-name="default"
                                                         :error-key="'description'"
                                                     />
                                                 </fieldset>
@@ -361,28 +359,6 @@
                                     />
                                 </div>
 
-                                @if($method['type'] === 'snmp')
-                                    <!-- SNMP Disabled Overrides -->
-                                    <div x-show="!enabled" class="tw:bg-gray-50 tw:dark:bg-dark-gray-300 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-xl tw:p-5 tw:mb-6" style="display: none;">
-                                        <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Manual Overrides') }}</h4>
-                                        <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:text-sm tw:bg-white tw:dark:bg-dark-gray-500">
-                                            <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-3 tw:gap-4 tw:max-w-2xl">
-                                                <div>
-                                                    <label class="tw:block tw:text-sm tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-1">{{ __('sysName') }} <span class="tw:text-gray-400 tw:dark:text-dark-white-400 tw:font-normal">({{ __('optional') }})</span></label>
-                                                    <input type="text" name="sysName" class="form-control" value="{{ $device->sysName }}">
-                                                </div>
-                                                <div>
-                                                    <label class="tw:block tw:text-sm tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-1">{{ __('Hardware') }} <span class="tw:text-gray-400 tw:dark:text-dark-white-400 tw:font-normal">({{ __('optional') }})</span></label>
-                                                    <input type="text" name="hardware" class="form-control" value="{{ $device->hardware }}">
-                                                </div>
-                                                <div x-data="{ currentOs: {{ json_encode(['id' => $device->os, 'text' => \App\Facades\LibrenmsConfig::get('os.'.$device->os.'.text')]) }} }" x-init="setTimeout(() => init_select2('#os-select-{{ $device->device_id }}', 'os', {}, currentOs, '{{ __('OS (optional)') }}'), 100)">
-                                                    <label class="tw:block tw:text-sm tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200 tw:mb-1">{{ __('OS') }} <span class="tw:text-gray-400 tw:dark:text-dark-white-400 tw:font-normal">({{ __('optional') }})</span></label>
-                                                    <select name="os" id="os-select-{{ $device->device_id }}" class="form-control"></select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endif
 
                                 <div class="tw:flex tw:items-center tw:justify-between tw:gap-4 tw:mt-6 tw:pt-6 tw:border-t tw:border-gray-200 tw:dark:border-dark-gray-400">
                                     <div class="tw:flex tw:items-center tw:gap-2">
@@ -529,6 +505,11 @@
                 get secretValuesChanged() {
                     return this.secretDataChanged
                         || this.secretDescription !== (this.selectedSecretMeta?.description ?? '');
+                },
+                get secretMode() {
+                    if (!this.configured) { return this.credentialMode; }
+                    if (!this.isEditingSecret) { return 'existing'; }
+                    return this.showSharedGuard && this.updateMode === 'create' ? 'new' : 'edit';
                 },
                 get showSharedGuard() {
                     return this.configured && this.isEditingSecret && this.isSharedSecret && this.secretDataChanged;

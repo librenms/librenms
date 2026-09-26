@@ -16,7 +16,7 @@
     <form x-ref="addForm" method="POST" action="{{ route('device.edit.polling.store', $device) }}"
           x-data="{
               methodType: '{{ old('method_type', '') }}',
-              credentialMode: '{{ old('credential_mode', 'existing') }}',
+              credentialMode: '{{ old('secret_mode', 'existing') }}',
               loading: false,
               errors: {},
               unreachableDialog: false,
@@ -124,11 +124,11 @@
                                 <label class="tw:block tw:font-medium tw:mb-3 tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Credential Mode') }}</label>
                                 <div class="tw:flex tw:gap-6">
                                     <label class="tw:flex tw:items-center tw:cursor-pointer tw:group">
-                                        <input type="radio" name="credential_mode" value="existing" x-model="credentialMode" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
+                                        <input type="radio" name="secret_mode" value="existing" x-model="credentialMode" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
                                         <span class="tw:group-hover:text-[#337ab7] tw:transition-colors tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Use Existing Secret') }}</span>
                                     </label>
                                     <label class="tw:flex tw:items-center tw:cursor-pointer tw:group">
-                                        <input type="radio" name="credential_mode" value="new" x-model="credentialMode" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
+                                        <input type="radio" name="secret_mode" value="new" x-model="credentialMode" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
                                         <span class="tw:group-hover:text-[#337ab7] tw:transition-colors tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Create New Secret') }}</span>
                                     </label>
                                 </div>
@@ -180,7 +180,6 @@
                                         model-prefix="formData"
                                         description-name="description"
                                         description-model="description"
-                                        default-name="default"
                                         :error-key="'description'"
                                     />
                                 </fieldset>

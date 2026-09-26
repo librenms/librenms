@@ -35,7 +35,7 @@ readonly class BuildDefaultPollingMethods
             'method_type' => $type,
             'enabled' => (bool) ($data['enabled'] ?? true),
             'affects_availability' => (bool) ($data['affects_availability'] ?? $method->defaultConfig()->affectsAvailability),
-            'settings' => $this->pollingMethods->definition($type)->filterOverrides($data['settings'] ?? [], $data['existing_settings'] ?? []),
+            'settings' => $this->pollingMethods->definition($type)->filterOverrides($data['settings'] ?? []),
         ]);
         $pollingMethod->setRelation('device', $device);
 
@@ -50,16 +50,15 @@ readonly class BuildDefaultPollingMethods
     }
 
     /**
-     * Resolve the secret to attach: an explicitly given one, an existing one picked
-     * by ID, a freshly-built one from posted secret data, or none if there's nothing
-     * to attach.
+     * Resolve the secret to attach: an existing one picked by ID, a new one from
+     * posted secret data, or none to try the default credentials.
      *
      * @param  array<string, mixed>  $data
      */
     private function resolveSecret(Device $device, PollingMethodType $type, array $data, ?SecretType $secretType): ?Secret
     {
-        if (isset($data['secret']) || $secretType === null) {
-            return $data['secret'] ?? null;
+        if ($secretType === null) {
+            return null;
         }
 
         $credentialMode = $data['credential_mode'] ?? 'default';

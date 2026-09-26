@@ -352,7 +352,7 @@ final class PollingMethodProbeTest extends TestCase
         \App\Facades\LibrenmsConfig::set('snmp.transports.0', 'udp');
     }
 
-    public function testFilterOverridesOmitsMatchingDefaultsAndRetainsOverrides(): void
+    public function testFilterOverridesRetainsUserSetValues(): void
     {
         $method = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->definition(PollingMethodType::Snmp);
 
@@ -363,11 +363,7 @@ final class PollingMethodProbeTest extends TestCase
             'retries' => 3,
         ];
 
-        $overrides = $method->filterOverrides($input);
-        $this->assertArrayNotHasKey('transport', $overrides);
-        $this->assertArrayNotHasKey('timeout', $overrides);
-        $this->assertEquals(1161, $overrides['port']);
-        $this->assertEquals(3, $overrides['retries']);
+        $this->assertEquals($input, $method->filterOverrides($input));
     }
 
     public function testIcmpPollingMethodProbePassesConfiguredAddressFamily(): void

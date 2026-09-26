@@ -212,7 +212,7 @@ final class PollingMethodRegistryTest extends TestCase
         $this->assertSame('select', $fields['ip_version']->type);
         $this->assertSame('default', $fields['ip_version']->getDefault());
         $this->assertEquals([
-            'default' => 'Default',
+            'default' => 'Auto',
             'match_snmp_transport' => 'Match SNMP Transport',
             'ipv4' => 'IPv4 Only',
             'ipv6' => 'IPv6 Only',

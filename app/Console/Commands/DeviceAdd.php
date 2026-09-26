@@ -40,12 +40,9 @@ class DeviceAdd extends LnmsCommand
             'privacy-protocol' => \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms(...),
         ];
 
+        // SNMP settings have no defaults here, only values that are given are stored for the device
         $this->optionDefaults = [
-            'port' => fn () => LibrenmsConfig::get('snmp.port', 161),
-            'transport' => fn () => LibrenmsConfig::get('snmp.transports.0', 'udp'),
             'poller-group' => fn () => LibrenmsConfig::get('default_poller_group'),
-            'port-association-mode' => fn () => LibrenmsConfig::get('default_port_association_mode'),
-
         ];
 
         $this->addArgument('device spec', InputArgument::REQUIRED);
@@ -79,7 +76,9 @@ class DeviceAdd extends LnmsCommand
     public function handle(): int
     {
         $this->validate([
-            'port' => 'numeric|between:1,65535',
+            'port' => 'nullable|numeric|between:1,65535',
+            'transport' => ['nullable', Rule::in($this->optionValues['transport'])],
+            'port-association-mode' => ['nullable', Rule::in(PortAssociationMode::getModes())],
             'poller-group' => ['numeric', Rule::in(PollerGroup::pluck('id')->prepend(0))],
         ]);
 

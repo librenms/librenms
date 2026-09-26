@@ -52,6 +52,10 @@ return [
         'system_default' => 'System Default',
 
         'overwrite_ip_title' => 'Use this IP instead of resolved one for polling',
+        'no_snmp_title' => 'Without SNMP these details are not discovered, set them here',
+        'sysName' => 'sysName',
+        'hardware' => 'Hardware',
+        'os' => 'OS',
         'overwrite_ip' => 'Overwrite IP (do not use)',
 
         'description' => 'Description',

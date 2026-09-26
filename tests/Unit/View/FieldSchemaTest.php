@@ -2,17 +2,18 @@
 
 namespace LibreNMS\Tests\Unit\View;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\View\FieldSchema\FieldDefinition;
-use App\View\FieldSchema\HandlesFieldSchema;
-use App\View\FieldSchema\HasFieldSchema;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Polling\Method\Definitions\IcmpDefinition;
+use LibreNMS\Polling\Method\Config\IpmiConfig;
+use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Definitions\IpmiDefinition;
 use LibreNMS\Polling\Method\Definitions\SnmpDefinition;
 use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
 use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Tests\TestCase;
 
 final class FieldSchemaTest extends TestCase
@@ -42,78 +43,47 @@ final class FieldSchemaTest extends TestCase
         $this->assertSame(['nullable', 'integer', 'min:1', 'max:10'], $fieldRules->getRules());
     }
 
-    public function testFormDefaultsOnlyIncludesSelectFields(): void
+    public function testFilterOverridesKeepsOnlyUserSetValues(): void
     {
-        $schemaObject = new class implements HasFieldSchema
-        {
-            use HandlesFieldSchema;
+        $definition = new SnmpDefinition();
 
-            public function fields(): array
-            {
-                return [
-                    'transport' => FieldDefinition::make('transport', 'select')
-                        ->options(['udp' => 'UDP', 'tcp' => 'TCP'])
-                        ->default('udp'),
-                    'port' => FieldDefinition::make('port', 'number')
-                        ->default(161)
-                        ->cast('int'),
-                    'hostname' => FieldDefinition::make('hostname', 'text'),
-                ];
-            }
-        };
-
-        $formDefaults = $schemaObject->formDefaults();
-        $this->assertEquals(['transport' => 'udp'], $formDefaults);
-        $this->assertArrayNotHasKey('port', $formDefaults);
-        $this->assertArrayNotHasKey('hostname', $formDefaults);
+        // empty means default, set values are kept even when they match the default
+        $this->assertSame(
+            ['transport' => 'udp', 'port' => 1161],
+            $definition->filterOverrides(['transport' => 'udp', 'port' => '1161', 'timeout' => '', 'retries' => null, 'unknown' => 'x'])
+        );
+        $this->assertSame([], $definition->filterOverrides([]));
     }
 
-    public function testFilterOverridesOmitsEmptyAndDefaultValues(): void
+    public function testSettingsFieldsShowDefaults(): void
     {
-        $schemaObject = new class implements HasFieldSchema
-        {
-            use HandlesFieldSchema;
+        $fields = collect((new SnmpDefinition)->settingsFields(new SnmpConfig(transport: 'tcp', port: 1161, maxRepeaters: 7)))->keyBy('key');
 
-            public function fields(): array
-            {
-                return [
-                    'transport' => FieldDefinition::make('transport', 'select')
-                        ->options(['udp' => 'UDP', 'tcp' => 'TCP'])
-                        ->default('udp'),
-                    'port' => FieldDefinition::make('port', 'number')
-                        ->default(161)
-                        ->cast('int'),
-                    'timeout' => FieldDefinition::make('timeout', 'number')
-                        ->default(3)
-                        ->cast('int'),
-                ];
-            }
-        };
+        // selects get an empty "Default" option instead of preselecting a value
+        $this->assertSame('Default (TCP)', $fields['transport']['default_option']);
+        $this->assertArrayNotHasKey('default', $fields['transport']);
 
-        // All defaults / empty strings
-        $input = [
-            'transport' => 'udp',
-            'port' => '',
-            'timeout' => 3,
-        ];
-        $this->assertSame([], $schemaObject->filterOverrides($input));
+        // other fields show the default as a placeholder
+        $this->assertSame('1161', $fields['port']['placeholder']);
+        $this->assertSame('7', $fields['max_repeaters']['placeholder']);
+        $this->assertArrayNotHasKey('placeholder', $fields['context']);
 
-        // Custom override
-        $inputWithOverride = [
-            'transport' => 'tcp',
-            'port' => '162',
-            'timeout' => '',
-        ];
-        $this->assertEquals(['transport' => 'tcp', 'port' => 162], $schemaObject->filterOverrides($inputWithOverride));
+        // explicit placeholders are kept
+        $ipmiFields = collect((new IpmiDefinition)->settingsFields(IpmiConfig::default()))->keyBy('key');
+        $this->assertSame("Default: device's hostname", $ipmiFields['hostname']['placeholder']);
+    }
 
-        // Clearing an existing override with empty string
-        $existing = ['port' => 162];
-        $clearingInput = ['port' => ''];
-        $this->assertSame([], $schemaObject->filterOverrides($clearingInput, $existing));
+    public function testSnmpDefaultsFollowDeviceOs(): void
+    {
+        LibrenmsConfig::set('os.test-os.snmp.max_repeaters', 3);
+        $method = new SnmpPollingMethod();
 
-        // Partial update preserving existing override
-        $partialInput = ['transport' => 'tcp'];
-        $this->assertEquals(['transport' => 'tcp', 'port' => 162], $schemaObject->filterOverrides($partialInput, $existing));
+        $this->assertSame(3, $method->defaultConfig(new Device(['os' => 'test-os']))->maxRepeaters);
+
+        // nothing stored, so the OS default is used rather than pinned
+        $deviceMethod = new DevicePollingMethod(['method_type' => PollingMethodType::Snmp, 'settings' => []]);
+        $deviceMethod->setRelation('device', new Device(['os' => 'test-os']));
+        $this->assertSame(3, $method->config($deviceMethod)->maxRepeaters);
     }
 
     public function testDefinitionsHaveNullableRules(): void
@@ -160,52 +130,25 @@ final class FieldSchemaTest extends TestCase
         $this->assertSame(6230, $overrideConfig->port);
     }
 
-    public function testPollingMethodConfigDefaultsAndOverrides(): void
+    public function testPollingMethodConfigDefaults(): void
     {
-        $snmpConfig = \LibreNMS\Polling\Method\Config\SnmpConfig::default();
+        $snmpConfig = SnmpConfig::default();
         $this->assertSame('udp', $snmpConfig->transport);
         $this->assertSame(161, $snmpConfig->port);
         $this->assertSame(1.0, (float) $snmpConfig->timeout);
         $this->assertSame(5, $snmpConfig->retries);
-        $this->assertSame([], (new SnmpDefinition)->filterOverrides($snmpConfig->settingsArray()));
 
-        $customSnmp = \LibreNMS\Polling\Method\Config\SnmpConfig::fromSettings([
-            'transport' => 'tcp',
-            'port' => 1161,
-            'timeout' => 1,
-        ]);
+        $customSnmp = SnmpConfig::fromSettings(['transport' => 'tcp', 'port' => 1161, 'context' => 'vrf-a']);
         $this->assertSame('tcp', $customSnmp->transport);
         $this->assertSame(1161, $customSnmp->port);
-        $this->assertEquals(['transport' => 'tcp', 'port' => 1161], (new SnmpDefinition)->filterOverrides($customSnmp->settingsArray()));
+        $this->assertSame('vrf-a', $customSnmp->context);
 
         $unixConfig = \LibreNMS\Polling\Method\Config\UnixAgentConfig::default();
         $this->assertSame(6556, $unixConfig->port);
         $this->assertSame(10, $unixConfig->timeout);
-        $this->assertSame([], (new UnixAgentDefinition)->filterOverrides($unixConfig->settingsArray()));
+        $this->assertSame(6557, \LibreNMS\Polling\Method\Config\UnixAgentConfig::fromSettings(['port' => 6557])->port);
 
-        $customUnix = \LibreNMS\Polling\Method\Config\UnixAgentConfig::fromSettings(['port' => 6557]);
-        $this->assertEquals(['port' => 6557], (new UnixAgentDefinition)->filterOverrides($customUnix->settingsArray()));
-
-        $icmpConfig = \LibreNMS\Polling\Method\Config\IcmpConfig::default();
-        $this->assertSame('default', $icmpConfig->ipVersion);
-        $this->assertSame([], (new IcmpDefinition)->filterOverrides($icmpConfig->settingsArray()));
-
-        $customIcmp = \LibreNMS\Polling\Method\Config\IcmpConfig::fromSettings(['ip_version' => 'ipv6']);
-        $this->assertEquals(['ip_version' => 'ipv6'], (new IcmpDefinition)->filterOverrides($customIcmp->settingsArray()));
-    }
-
-    public function testFilterOverridesUsesConfigDefaults(): void
-    {
-        $snmpDefinition = new SnmpDefinition();
-
-        $input = [
-            'transport' => 'udp',
-            'port' => 161,
-            'timeout' => 1,
-            'retries' => 3,
-        ];
-
-        $overrides = $snmpDefinition->filterOverrides($input);
-        $this->assertEquals(['retries' => 3], $overrides);
+        $this->assertSame('default', \LibreNMS\Polling\Method\Config\IcmpConfig::default()->ipVersion);
+        $this->assertSame('ipv6', \LibreNMS\Polling\Method\Config\IcmpConfig::fromSettings(['ip_version' => 'ipv6'])->ipVersion);
     }
 }

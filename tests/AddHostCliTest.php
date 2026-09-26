@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Tests;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\PollingMethodType;
@@ -114,11 +113,8 @@ final class AddHostCliTest extends DBTestCase
             $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
             $this->assertNotNull($snmpMethod);
 
-            if ($mode === LibrenmsConfig::get('default_port_association_mode', 'ifIndex')) {
-                $this->assertArrayNotHasKey('port_association_mode', $snmpMethod->settings, 'Default port association mode not ommitted from settings');
-            } else {
-                $this->assertEquals($mode, $snmpMethod->settings['port_association_mode'] ?? null, 'Wrong port association mode ' . $mode);
-            }
+            // explicitly set values are stored, even when they match the default
+            $this->assertEquals($mode, $snmpMethod->settings['port_association_mode'] ?? null, 'Wrong port association mode ' . $mode);
         }
     }
 
@@ -135,12 +131,15 @@ final class AddHostCliTest extends DBTestCase
             $device = Device::findByHostname($host);
             $snmpMethod = $device->pollingMethod(PollingMethodType::Snmp);
 
-            if ($mode === LibrenmsConfig::get('snmp.transports.0', 'udp')) {
-                $this->assertArrayNotHasKey('transport', $snmpMethod->settings, 'Default snmp transport not ommitted from settings');
-            } else {
-                $this->assertEquals($mode, $snmpMethod->settings['transport'], 'Wrong snmp transport (udp/tcp) ipv4/ipv6');
-            }
+            $this->assertEquals($mode, $snmpMethod->settings['transport'], 'Wrong snmp transport (udp/tcp) ipv4/ipv6');
         }
+
+        // not given, so left to the default
+        $this->artisan('device:add', ['device spec' => 'hostNameDefault', '--force' => true, '--v1' => true])
+            ->assertExitCode(0)
+            ->execute();
+        $snmpMethod = Device::findByHostname('hostNameDefault')->pollingMethod(PollingMethodType::Snmp);
+        $this->assertArrayNotHasKey('transport', $snmpMethod->settings ?? []);
     }
 
     #[TestDox('SNMP v3 auth protocol')]
