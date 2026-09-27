@@ -1,4 +1,12 @@
 modules:
+  os:
+    version:
+      - OPENWRT-MIB::openwrtSysVersion.0
+      - 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"'
+    version_regex: '/^(?:[A-Za-z]\S*\s+)?(?<version>\S.*)$/'
+    hardware:
+      - OPENWRT-MIB::openwrtSysModel.0
+      - 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"'
   sensors:
     fanspeed:
       data:
