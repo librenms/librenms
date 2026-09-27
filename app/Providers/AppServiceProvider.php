@@ -79,6 +79,29 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SnmpBackendInterface::class, NetSnmp::class);
         $this->app->bind(SnmpTranslatorInterface::class, NetSnmp::class);
         $this->app->bind(SnmpQueryInterface::class, SnmpQueryBuilder::class);
+
+        $this->app->bind(\LibreNMS\RRD\Backend\RrdBackendInterface::class, function (Application $app) {
+            if (LibrenmsConfig::get('rrdcached', false)) {
+                try {
+                    return $app->make(\LibreNMS\RRD\Backend\Rrdcached::class);
+                } catch (\Exception) {
+                    // Fallthrough required for unit tests.  Rrdtool class supports cached through RrdProcess
+                    return $app->make(\LibreNMS\RRD\Backend\Rrdtool::class);
+                }
+            } elseif (class_exists('\RRDGraph')) {
+                return $app->make(\LibreNMS\RRD\Backend\PhpRrd::class);
+            }
+
+            return $app->make(\LibreNMS\RRD\Backend\Rrdtool::class);
+        });
+
+        $this->app->bind(\LibreNMS\RRD\Graph\RrdGraphInterface::class, function (Application $app) {
+            if (class_exists('\RRDGraph')) {
+                return $app->make(\LibreNMS\RRD\Graph\PhpRrdGraph::class);
+            }
+
+            return $app->make(\LibreNMS\RRD\Graph\RrdtoolGraph::class);
+        });
     }
 
     /**
