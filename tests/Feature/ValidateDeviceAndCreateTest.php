@@ -29,6 +29,9 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
     #[DataProvider('osProvider')]
     public function testOsWithoutSnmpIsPing(array $methods, ?string $os, string $expected): void
     {
+        $secret = Secret::factory()->create(['secret_type' => SecretType::Snmp]);
+        LibrenmsConfig::set('snmp.default_credentials', [$secret->id]); // used by forced snmp
+
         $device = new Device(['hostname' => 'os-test.example.com', 'os' => $os]);
         $pollingMethods = app(BuildDefaultPollingMethods::class)->execute($device, ['methods' => $methods]);
 

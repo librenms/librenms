@@ -26,10 +26,13 @@
 
 namespace LibreNMS\Tests\Feature;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\Secret;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\DBTestCase;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretType;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[TestDox('Add Host CLI')]
@@ -195,6 +198,10 @@ final class AddHostCliTest extends DBTestCase
 
     public function testExistingDevice(): void
     {
+        // without credentials, a forced add uses the default credentials
+        $secret = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'public']]);
+        LibrenmsConfig::set('snmp.default_credentials', [$secret->id]);
+
         $this->artisan('device:add', ['device spec' => 'existing', '--force' => true])
             ->assertExitCode(0)
             ->execute();
