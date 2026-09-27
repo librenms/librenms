@@ -17,6 +17,7 @@ return [
             'port' => 'Port',
             'ciphersuite' => 'Cipher Suite',
             'timeout' => 'Timeout',
+            'type' => 'Interface',
         ],
         'snmp' => [
             'transport' => 'SNMP transport',
@@ -25,11 +26,13 @@ return [
             'timeout' => 'SNMP timeout',
             'max_repeaters' => 'SNMP max repeaters',
             'max_oid' => 'SNMP max OID',
+            'bulk' => 'SNMP bulk requests',
             'context' => 'SNMP context',
             'port_association_mode' => 'Port Association Mode',
         ],
         'unix-agent' => [
             'port' => 'Unix Agent Port',
+            'timeout' => 'Unix Agent Timeout',
         ],
     ],
     'method_added' => 'Polling method added.',
