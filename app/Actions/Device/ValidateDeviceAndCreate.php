@@ -31,6 +31,7 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 readonly class ValidateDeviceAndCreate
 {
@@ -39,6 +40,7 @@ readonly class ValidateDeviceAndCreate
     private DiscoverDevicePollingMethods $discoverMethods;
     private DiscoverDeviceMetadata $discoverMetadata;
     private PersistDeviceWithPollingMethods $persister;
+    private PollingMethodRegistry $registry;
 
     /**
      * @param  Collection<int, DevicePollingMethod>|null  $pollingMethods
@@ -55,12 +57,14 @@ readonly class ValidateDeviceAndCreate
         ?DiscoverDevicePollingMethods $discoverMethods = null,
         ?DiscoverDeviceMetadata $discoverMetadata = null,
         ?PersistDeviceWithPollingMethods $persister = null,
+        ?PollingMethodRegistry $registry = null,
     ) {
         $this->builder = $builder ?? resolve(BuildDefaultPollingMethods::class);
         $this->uniqueness = $uniqueness ?? resolve(ValidateDeviceUniqueness::class);
         $this->discoverMethods = $discoverMethods ?? resolve(DiscoverDevicePollingMethods::class);
         $this->discoverMetadata = $discoverMetadata ?? resolve(DiscoverDeviceMetadata::class);
         $this->persister = $persister ?? resolve(PersistDeviceWithPollingMethods::class);
+        $this->registry = $registry ?? resolve(PollingMethodRegistry::class);
     }
 
     /**
@@ -99,7 +103,7 @@ readonly class ValidateDeviceAndCreate
 
         // methods that were not checked have not found credentials
         foreach ($pollingMethods as $deviceMethod) {
-            $deviceMethod->method_type->method()->assignDefaultSecret($deviceMethod);
+            $this->registry->get($deviceMethod->method_type)->assignDefaultSecret($deviceMethod);
         }
 
         // The OS is detected via SNMP, without it the device is ping only

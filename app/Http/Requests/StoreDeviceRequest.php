@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretMode;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 class StoreDeviceRequest extends FormRequest
 {
@@ -21,7 +22,7 @@ class StoreDeviceRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules(PollingMethodRegistry $pollingMethods): array
     {
         $rules = [
             'hostname' => ['required', 'ip_or_hostname'],
@@ -54,7 +55,8 @@ class StoreDeviceRequest extends FormRequest
             $rules["polling_methods.{$method}.affects_availability"] = ['nullable', 'boolean'];
             $rules["polling_methods.{$method}.secret_mode"] = ['nullable', Rule::enum(SecretMode::class)->only([SecretMode::Default, SecretMode::Existing, SecretMode::New])];
 
-            $secretDefinition = $type->method()->secretType()?->definition();
+            $pollingMethod = $pollingMethods->get($type);
+            $secretDefinition = $pollingMethod->secretType()?->definition();
             if ($secretDefinition !== null) {
                 $rules["polling_methods.{$method}.secret_id"] = [
                     'required_if:polling_methods.' . $method . '.secret_mode,existing',
@@ -73,7 +75,7 @@ class StoreDeviceRequest extends FormRequest
 
             // Settings validation rules
             $rules["polling_methods.{$method}.settings"] = ['nullable', 'array'];
-            foreach ($type->definition()->rules() as $key => $rule) {
+            foreach ($pollingMethod->definition()->rules() as $key => $rule) {
                 $rules["polling_methods.{$method}.settings.{$key}"] = $rule;
             }
         }

@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretMode;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 /**
  * Add (POST, method_type input) or update (PUT, methodType route) a device's polling method.
@@ -38,7 +39,7 @@ class SavePollingMethodRequest extends FormRequest
     /**
      * @return array<string, mixed>
      */
-    public function rules(): array
+    public function rules(PollingMethodRegistry $pollingMethods): array
     {
         $rules = [
             'method_type' => [Rule::requiredIf($this->isCreating()), Rule::enum(PollingMethodType::class)],
@@ -53,11 +54,12 @@ class SavePollingMethodRequest extends FormRequest
             return $rules;
         }
 
-        foreach ($type->definition()->rules() as $key => $rule) {
+        $method = $pollingMethods->get($type);
+        foreach ($method->definition()->rules() as $key => $rule) {
             $rules["settings.$key"] = $rule;
         }
 
-        $secretDefinition = $type->method()->secretType()?->definition();
+        $secretDefinition = $method->secretType()?->definition();
         if ($secretDefinition === null) {
             return $rules;
         }
@@ -100,9 +102,14 @@ class SavePollingMethodRequest extends FormRequest
     {
         $secretData = $this->input('secret_data');
         $secretId = $this->input('secret_id');
-        $secretType = $this->pollingType()?->method()->secretType();
+        $type = $this->pollingType();
 
-        if (! is_array($secretData) || ! $secretId || $secretType === null) {
+        if (! is_array($secretData) || ! $secretId || $type === null) {
+            return;
+        }
+
+        $secretType = $this->container->make(PollingMethodRegistry::class)->get($type)->secretType();
+        if ($secretType === null) {
             return;
         }
 

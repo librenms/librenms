@@ -20,18 +20,24 @@ use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 class AddDeviceController
 {
     use AuthorizesRequests;
+
+    public function __construct(
+        private readonly PollingMethodRegistry $pollingMethods,
+    ) {
+    }
 
     public function index(Request $request): View
     {
         $this->authorize('create', Device::class);
 
         $availableMethods = collect(PollingMethodType::cases())->map(function (PollingMethodType $type): array {
-            $method = $type->method();
-            $definition = $type->definition();
+            $method = $this->pollingMethods->get($type);
+            $definition = $method->definition();
             $secretDefinition = $method->secretType()?->definition();
 
             return [

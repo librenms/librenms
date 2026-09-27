@@ -7,6 +7,7 @@ use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
+use LibreNMS\Polling\Method\Definitions\PollingMethodDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
 
 abstract class PollingMethod
@@ -59,6 +60,11 @@ abstract class PollingMethod
     }
 
     /**
+     * The settings of this method: form fields, validation rules and casts.
+     */
+    abstract public function definition(): PollingMethodDefinition;
+
+    /**
      * Config for a newly added method of this type, with defaults for the device if given.
      */
     abstract public function defaultConfig(?Device $device = null): PollingMethodConfig;
@@ -69,11 +75,11 @@ abstract class PollingMethod
     public function config(DevicePollingMethod $deviceMethod): PollingMethodConfig
     {
         $config = $this->defaultConfig($deviceMethod->device)
-            ->fill($deviceMethod->method_type->definition()->filterOverrides($deviceMethod->settings ?? []));
+            ->fill($this->definition()->filterOverrides($deviceMethod->settings ?? []));
 
         $secretType = $this->secretType();
         if ($secretType !== null) {
-            $config->fill(get_object_vars($secretType->data($deviceMethod->secret->data ?? [])));
+            $config->fill(get_object_vars($secretType->definition()->data($deviceMethod->secret->data ?? [])));
         }
 
         $config->enabled = $deviceMethod->enabled;

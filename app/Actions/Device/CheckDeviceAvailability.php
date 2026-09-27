@@ -7,12 +7,14 @@ use App\Models\Eventlog;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\SecretDecryptionException;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use Throwable;
 
 readonly class CheckDeviceAvailability
 {
     public function __construct(
         private SetDeviceAvailability $setDeviceAvailability,
+        private PollingMethodRegistry $pollingMethods,
     ) {
     }
 
@@ -21,7 +23,7 @@ readonly class CheckDeviceAvailability
         $enabledPollingMethods = $device->pollingMethods->filter(fn ($m) => $m->enabled);
 
         foreach ($enabledPollingMethods as $deviceMethod) {
-            $method = $deviceMethod->method_type->method();
+            $method = $this->pollingMethods->get($deviceMethod->method_type);
 
             try {
                 $result = $method->probe($device, $method->config($deviceMethod));

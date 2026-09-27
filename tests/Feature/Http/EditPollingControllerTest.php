@@ -6,6 +6,7 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\User;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -794,7 +795,7 @@ class EditPollingControllerTest extends TestCase
         $this->assertEquals(['ip_version' => 'ipv6'], $freshMethod->settings);
         $config = $device->fresh()->polling()->icmp();
         $this->assertSame('ipv6', $config->ipVersion);
-        $icmpMethod = PollingMethodType::Icmp->method();
+        $icmpMethod = app(PollingMethodRegistry::class)->get(PollingMethodType::Icmp);
         $this->assertInstanceOf(\LibreNMS\Polling\Method\Methods\IcmpPollingMethod::class, $icmpMethod);
         $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($device->fresh(), $config));
     }

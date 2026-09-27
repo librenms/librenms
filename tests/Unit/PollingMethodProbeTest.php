@@ -11,6 +11,7 @@ use LibreNMS\Exceptions\SecretDecryptionException;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Tests\TestCase;
 
@@ -26,10 +27,10 @@ final class PollingMethodProbeTest extends TestCase
     {
         $device = new Device();
 
-        $snmp = PollingMethodType::Snmp->method();
-        $icmp = PollingMethodType::Icmp->method();
-        $ipmi = PollingMethodType::Ipmi->method();
-        $unixAgent = PollingMethodType::UnixAgent->method();
+        $snmp = app(PollingMethodRegistry::class)->get(PollingMethodType::Snmp);
+        $icmp = app(PollingMethodRegistry::class)->get(PollingMethodType::Icmp);
+        $ipmi = app(PollingMethodRegistry::class)->get(PollingMethodType::Ipmi);
+        $unixAgent = app(PollingMethodRegistry::class)->get(PollingMethodType::UnixAgent);
 
         $this->assertFalse($snmp->probe($device, $snmp->fallbackConfig($device))->isSuccess());
         $this->assertFalse($icmp->probe($device, $icmp->fallbackConfig($device))->isSuccess());
@@ -46,7 +47,7 @@ final class PollingMethodProbeTest extends TestCase
             'affects_availability' => true,
             'enabled' => true,
         ]);
-        $method = PollingMethodType::UnixAgent->method();
+        $method = app(PollingMethodRegistry::class)->get(PollingMethodType::UnixAgent);
 
         $result = $method->probe($device, $method->config($unixMethod));
         $this->assertIsBool($result->isSuccess());
@@ -322,7 +323,7 @@ final class PollingMethodProbeTest extends TestCase
             'enabled' => true,
         ]);
 
-        $method = PollingMethodType::UnixAgent->method();
+        $method = app(PollingMethodRegistry::class)->get(PollingMethodType::UnixAgent);
 
         $result = $method->probe($device, $method->config($unixMethod));
         $this->assertFalse($result->isSuccess());
@@ -348,7 +349,7 @@ final class PollingMethodProbeTest extends TestCase
 
     public function testFilterOverridesRetainsUserSetValues(): void
     {
-        $method = PollingMethodType::Snmp->definition();
+        $method = app(PollingMethodRegistry::class)->get(PollingMethodType::Snmp)->definition();
 
         $input = [
             'transport' => 'udp',
@@ -380,7 +381,7 @@ final class PollingMethodProbeTest extends TestCase
         $mockFping = \Mockery::mock(\LibreNMS\Data\Source\Icmp\Fping::class);
         $this->app->instance(\LibreNMS\Data\Source\Icmp\Fping::class, $mockFping);
 
-        $icmpPollingMethod = PollingMethodType::Icmp->method();
+        $icmpPollingMethod = app(PollingMethodRegistry::class)->get(PollingMethodType::Icmp);
 
         // 1. ip_version = 'default' -> passes null
         $mockFping->shouldReceive('ping')->with('192.0.2.1', null)->once()->andReturn(\LibreNMS\Data\Source\Icmp\FpingResponse::artificialUp('192.0.2.1'));
@@ -425,7 +426,7 @@ final class PollingMethodProbeTest extends TestCase
         $mockFping = \Mockery::mock(\LibreNMS\Data\Source\Icmp\Fping::class);
         $this->app->instance(\LibreNMS\Data\Source\Icmp\Fping::class, $mockFping);
 
-        $icmpPollingMethod = PollingMethodType::Icmp->method();
+        $icmpPollingMethod = app(PollingMethodRegistry::class)->get(PollingMethodType::Icmp);
 
         // When discover is called on candidate ICMP method, it should preserve the SNMP method, see udp6, and ping IPv6
         $mockFping->shouldReceive('ping')
