@@ -33,9 +33,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Data\Graphing\GraphImage;
 use LibreNMS\Data\Graphing\GraphParameters;
-use LibreNMS\Data\Store\Rrd\RrdPath;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Exceptions\RrdGraphException;
+use LibreNMS\RRD\RrdPath;
 use Rrd;
 
 class Graph

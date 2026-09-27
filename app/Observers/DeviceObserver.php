@@ -9,9 +9,9 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use File;
 use Illuminate\Support\Facades\App;
-use LibreNMS\Data\Store\Rrd\RrdPath;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostRenameException;
+use LibreNMS\RRD\RrdPath;
 use Log;
 
 class DeviceObserver

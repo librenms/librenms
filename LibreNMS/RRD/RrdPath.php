@@ -24,7 +24,7 @@
  * @author     Steven Wilton <swilton@fluentit.au>
  */
 
-namespace LibreNMS\Data\Store\Rrd;
+namespace LibreNMS\RRD;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
