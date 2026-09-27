@@ -3,25 +3,12 @@
 namespace LibreNMS\Tests\Feature\Http\Ajax;
 
 use App\Models\User;
-use LibreNMS\Tests\TestCase;
-use PHPUnit\Framework\Attributes\PreserveGlobalState;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Tests\DBTestCase;
 
-#[RunTestsInSeparateProcesses]
-#[PreserveGlobalState(false)]
-class TemplatePreviewControllerTest extends TestCase
+final class TemplatePreviewControllerTest extends DBTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->dbSetUp();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->dbTearDown();
-        parent::tearDown();
-    }
+    use DatabaseTransactions;
 
     public function testUnauthenticatedUserCannotPreviewTemplate(): void
     {

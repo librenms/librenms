@@ -7,22 +7,20 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
-use LibreNMS\Tests\TestCase;
-use PHPUnit\Framework\Attributes\PreserveGlobalState;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use LibreNMS\Tests\DBTestCase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-#[RunTestsInSeparateProcesses]
-#[PreserveGlobalState(false)]
-class SecretControllerTest extends TestCase
+final class SecretControllerTest extends DBTestCase
 {
+    use DatabaseTransactions;
+
     protected function setUp(): void
     {
         parent::setUp();
-        $this->dbSetUp();
 
         Role::findOrCreate('admin');
         Permission::findOrCreate('secret.create');
@@ -31,16 +29,9 @@ class SecretControllerTest extends TestCase
         Permission::findOrCreate('secret.delete');
     }
 
-    protected function tearDown(): void
-    {
-        $this->dbTearDown();
-        parent::tearDown();
-    }
-
     public function testStoreSecretSucceedsWithUniqueDescription(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $response = $this->actingAs($admin)->post(route('secrets.store'), [
             'description' => 'Unique SNMP Secret',
@@ -57,8 +48,7 @@ class SecretControllerTest extends TestCase
 
     public function testStoreSecretFailsWithDuplicateDescription(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         Secret::create([
             'description' => 'Existing Secret',
@@ -78,8 +68,7 @@ class SecretControllerTest extends TestCase
 
     public function testUpdateSecretAllowsSameDescription(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $secret = Secret::create([
             'description' => 'Existing Secret',
@@ -102,8 +91,7 @@ class SecretControllerTest extends TestCase
 
     public function testUpdateSecretFailsWithDuplicateDescription(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         Secret::create([
             'description' => 'First Secret',
@@ -128,8 +116,7 @@ class SecretControllerTest extends TestCase
 
     public function testCreateSecretRendersFormWithDefaults(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $response = $this->actingAs($admin)->get(route('secrets.create', ['type' => 'snmp']));
 
@@ -146,8 +133,7 @@ class SecretControllerTest extends TestCase
 
     public function testEditSecretRendersFormWithSecretData(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $secret = Secret::create([
             'description' => 'Test SNMP v3 Secret',
@@ -174,8 +160,7 @@ class SecretControllerTest extends TestCase
 
     public function testDestroySecretSucceedsWhenNotInUse(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $secret = Secret::create([
             'description' => 'Unused Secret',
@@ -193,8 +178,7 @@ class SecretControllerTest extends TestCase
 
     public function testDestroySecretRemovesItFromDefaultCredentials(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $keep = Secret::create([
             'description' => 'Default Keep',
@@ -220,8 +204,7 @@ class SecretControllerTest extends TestCase
 
     public function testDestroySecretFailsWhenInUse(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create();
         $secret = Secret::create([
@@ -248,8 +231,7 @@ class SecretControllerTest extends TestCase
 
     public function testIndexShowsDisabledDeleteButtonWhenSecretInUse(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create();
         $secret = Secret::create([

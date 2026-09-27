@@ -1,13 +1,16 @@
 <?php
 
-namespace LibreNMS\Tests\Unit;
+namespace LibreNMS\Tests\Feature;
 
 use App\Actions\Device\LegacyDeviceCreator;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Tests\TestCase;
+use LibreNMS\Tests\DBTestCase;
 
-class LegacyDeviceCreatorTest extends TestCase
+final class LegacyDeviceCreatorTest extends DBTestCase
 {
+    use DatabaseTransactions;
+
     public function testCreatesDeviceAndPollingMethodsForV2c(): void
     {
         $creator = new LegacyDeviceCreator(
@@ -75,6 +78,16 @@ class LegacyDeviceCreatorTest extends TestCase
         $this->assertEquals('privPassword123', $secret->data['cryptopass']);
         $this->assertEquals('AES-256-CFB', $secret->data['cryptoalgo']);
         $this->assertEquals('authPriv', $secret->data['authlevel']);
+    }
+
+    public function testWithoutCredentialsTheDefaultsAreUsed(): void
+    {
+        // the device:add option defaults are not credentials
+        $creator = new LegacyDeviceCreator(hostname: 'defaults.example.com', authname: 'root', authalgo: 'MD5', cryptoalgo: 'AES');
+
+        $snmpMethod = $creator->getPollingMethods($creator->getDevice())->firstWhere('method_type', PollingMethodType::Snmp);
+        $this->assertNotNull($snmpMethod);
+        $this->assertNull($snmpMethod->secret);
     }
 
     public function testPingOnlyOmitsSnmpMethod(): void
