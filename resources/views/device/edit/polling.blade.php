@@ -445,6 +445,8 @@
             };
         }
 
+        let secretRequests = {}; // secret id => pending request
+
         function pollingMethodForm(config) {
             return {
                 type: config.type,
@@ -531,19 +533,21 @@
                         || this.secretValuesChanged
                         || this.settingsChanged();
                 },
-                async loadSecret(id) {
-                    if (!id || this.secrets[id]) {
-                        return this.secrets[id] || null;
+                loadSecret(id) {
+                    if (!id) {
+                        return Promise.resolve(null);
                     }
-                    const response = await fetch(this.secretUrl.replace('__ID__', id), {
+                    // share the request, the select fires several change events
+                    secretRequests[id] ??= fetch(this.secretUrl.replace('__ID__', id), {
                         headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'}
+                    }).then(response => response.ok ? response.json() : null);
+
+                    return secretRequests[id].then(secret => {
+                        if (secret) {
+                            this.secrets = { ...this.secrets, [id]: secret };
+                        }
+                        return secret;
                     });
-                    if (!response.ok) {
-                        return null;
-                    }
-                    const secret = await response.json();
-                    this.secrets = { ...this.secrets, [id]: secret };
-                    return secret;
                 },
                 secretFormData(secret) {
                     const data = secret?.data || {};
@@ -613,6 +617,7 @@
                             this.selectedSecretId = this.currentSecretId;
                             this.newSecretDescription = data.method.default_secret_description ?? this.newSecretDescription;
                             this.secrets = {}; // saved secrets may have changed
+                            secretRequests = {};
                             await this.onSecretChange();
                             this.settingsData = { ...(data.method.settings ?? {}) };
                             this.initialSettingsData = { ...(data.method.settings ?? {}) };

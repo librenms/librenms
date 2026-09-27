@@ -53,6 +53,7 @@ final class PollingMethodRegistryTest extends TestCase
             $config = $this->pollingMethods->get($type)->defaultConfig();
             foreach (array_keys($this->pollingMethods->get($type)->definition()->fields()) as $key) {
                 $this->assertTrue(property_exists($config, Str::camel($key)), "{$type->value} config has no property for setting $key");
+                $this->assertTrue(trans()->has("poller.method_settings.{$type->value}.$key"), "{$type->value} setting $key has no label");
             }
         }
     }
