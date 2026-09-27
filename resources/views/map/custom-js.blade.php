@@ -260,9 +260,12 @@
         fitHeight: function (network, container) {
             if (!network || !container) return;
             var containerHeight = $(container).height() || $(window).height();
-            var logicalHeight = this.mapLogicalHeight || 800;
+            var logicalHeight = container._mapHeight;
             var scale = (containerHeight / logicalHeight) || 1;
+            var newPosition = network.view.getViewPosition();
+            newPosition.y = Math.round(logicalHeight / 2);
             network.moveTo({
+                position: newPosition,
                 scale: scale,
                 animation: { duration: 200, easingFunction: 'easeInOutQuad' }
             });
@@ -271,9 +274,12 @@
         fitWidth: function (network, container) {
             if (!network || !container) return;
             var containerWidth = $(container).width() || $(window).width();
-            var logicalWidth = this.mapLogicalWidth || 1800;
+            var logicalWidth = container._mapWidth;
             var scale = (containerWidth / logicalWidth) || 1;
+            var newPosition = network.view.getViewPosition();
+            newPosition.x = Math.round(logicalWidth / 2);
             network.moveTo({
+                position: newPosition,
                 scale: scale,
                 animation: { duration: 200, easingFunction: 'easeInOutQuad' }
             });
