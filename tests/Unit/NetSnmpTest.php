@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
@@ -552,6 +553,8 @@ class NetSnmpTest extends TestCase
 
     public function testSnmpConfigFromNullDeviceArray(): void
     {
+        LibrenmsConfig::set('snmp.community', ['public']);
+
         $config = SnmpConfig::fromDeviceArray(null);
 
         $this->assertTrue($config->enabled);
