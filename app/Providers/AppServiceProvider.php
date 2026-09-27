@@ -58,6 +58,14 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpBackendInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface::class, \LibreNMS\Data\Source\Snmp\NetSnmp::class);
         $this->app->bind(\LibreNMS\Data\Source\Snmp\SnmpQueryInterface::class, \LibreNMS\Data\Source\Snmp\SnmpQueryBuilder::class);
+
+        $this->app->bind(\LibreNMS\RRD\Backend\RrdBackendInterface::class, function (Application $app) {
+            if (class_exists('\RRDGraph')) {
+                return $app->make(\LibreNMS\RRD\Backend\PhpRrd::class);
+            }
+
+            return $app->make(\LibreNMS\RRD\Backend\Rrdtool::class);
+        });
     }
 
     /**
