@@ -26,9 +26,6 @@
 
 namespace LibreNMS\Enum;
 
-use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
-use LibreNMS\Polling\Secrets\Data\SecretData;
-use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
 use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
@@ -46,17 +43,6 @@ enum SecretType: string
         return match ($this) {
             self::Snmp => new SnmpSecretDefinition,
             self::Ipmi => new IpmiSecretDefinition,
-        };
-    }
-
-    /**
-     * @param  array<string, mixed>  $data  decrypted secret data
-     */
-    public function data(array $data): SecretData
-    {
-        return match ($this) {
-            self::Snmp => SnmpSecretData::fromArray($data),
-            self::Ipmi => IpmiSecretData::fromArray($data),
         };
     }
 }

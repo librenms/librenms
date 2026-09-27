@@ -17,6 +17,7 @@ use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Modules\Core;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\Definitions\SnmpDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use Psr\Container\ContainerExceptionInterface;
@@ -28,6 +29,11 @@ final class SnmpPollingMethod extends PollingMethod
     public function __construct(
         private readonly ?SnmpBackendInterface $backend = null,
     ) {
+    }
+
+    public function definition(): SnmpDefinition
+    {
+        return new SnmpDefinition;
     }
 
     public function defaultConfig(?Device $device = null): SnmpConfig
