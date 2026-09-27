@@ -28,12 +28,14 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\ConfigBackup\ConfigBackupManager;
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\ConfigBackupProvider;
+use LibreNMS\Interfaces\RefreshableConfigBackupProvider;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class ConfigController extends Controller implements DeviceTab
@@ -45,7 +47,7 @@ class ConfigController extends Controller implements DeviceTab
 
     public function visible(Device $device): bool
     {
-        return Gate::allows('show-config', $device) && $this->manager->handles($device);
+        return Gate::allows('configBackupView', $device) && $this->manager->handles($device);
     }
 
     public function slug(): string
@@ -60,92 +62,68 @@ class ConfigController extends Controller implements DeviceTab
 
     public function name(): string
     {
-        return __('Config');
+        return __('config_backups.title');
     }
 
     /**
-     * @return array{error: ?string, error_message: ?string, provider: ?string, latest: ?array{id: string, date: ?int, until: ?int, type: string, content: ?string}, backups: list<array{id: string, date: ?int, until: ?int, type: string, content: ?string}>, total: int, totalPages: int}
+     * @return array{error: ?string, error_message: ?string, urls: array{backups: string, backup: string, diff: string, refresh: string}, messages: array<string, string>, hostname: string, os: string, config_highlighting: ?string, can_refresh: bool}
      */
     public function data(Device $device, Request $request): array
     {
+        $provider = $this->manager->providerFor($device);
+        $providerName = $provider?->name();
+        $defaultProvider = __('config_backups.default_provider');
+
+        $urls = [
+            'backups' => route('device.config.backups', $device->device_id),
+            'backup' => route('device.config.backup', $device->device_id),
+            'diff' => route('device.config.diff', $device->device_id),
+            'refresh' => route('device.config.refresh', $device->device_id),
+        ];
+
+        $messages = [
+            'unreachable' => __('config_backups.messages.unreachable', ['provider' => $providerName ?? $defaultProvider]),
+            'error' => __('config_backups.messages.error', ['provider' => $providerName ?? $defaultProvider]),
+            'backup_not_found' => __('config_backups.messages.backup_not_found', ['provider' => $providerName ?? $defaultProvider]),
+            'binary_not_supported' => __('config_backups.messages.binary_not_supported', ['provider' => $providerName ?? $defaultProvider]),
+            'request_failed' => __('config_backups.messages.request_failed'),
+        ];
+
         $empty = [
             'error' => null,
             'error_message' => null,
-            'provider' => null,
-            'latest' => null,
-            'backups' => [],
-            'total' => 0,
-            'totalPages' => 0,
+            'urls' => $urls,
+            'messages' => $messages,
+            'hostname' => $device->hostname,
+            'os' => $device->os,
+            'config_highlighting' => LibrenmsConfig::getOsSetting($device->os, 'config_highlighting'),
+            'can_refresh' => $provider instanceof RefreshableConfigBackupProvider && Gate::allows('configBackupRefresh', $device),
         ];
 
-        $provider = $this->manager->providerFor($device);
         if ($provider === null) {
             $error = ConfigBackupProvider::ERROR_DEVICE_NOT_FOUND;
 
             return array_merge($empty, ['error' => $error, 'error_message' => $this->errorMessage($error, null)]);
         }
 
-        $empty['provider'] = $provider->name();
-
-        $list = $provider->backups($device);
-        if ($list === null) {
-            $error = $provider->lastError() ?? ConfigBackupProvider::ERROR_UNREACHABLE;
-
-            return array_merge($empty, ['error' => $error, 'error_message' => $this->errorMessage($error, $provider->name())]);
-        }
-
-        if (empty($list['backups'])) {
-            $error = ConfigBackupProvider::ERROR_NO_BACKUPS;
-
-            return array_merge($empty, ['error' => $error, 'error_message' => $this->errorMessage($error, $provider->name())]);
-        }
-
-        $latest = $provider->latest($device) ?? $list['backups'][0];
-
-        return array_merge($empty, [
-            'latest' => $latest,
-            'backups' => $list['backups'],
-            'total' => $list['total'],
-            'totalPages' => $list['totalPages'],
-        ]);
+        return $empty;
     }
 
     private function errorMessage(string $error, ?string $provider): string
     {
-        $provider ??= __('the backup provider');
+        $provider ??= __('config_backups.default_provider');
 
         return match ($error) {
-            ConfigBackupProvider::ERROR_UNREACHABLE => __(':provider is not reachable. Check the configured URL and that :provider is running.', ['provider' => $provider]),
-            ConfigBackupProvider::ERROR_API => __(':provider returned an error. Check the configured API token.', ['provider' => $provider]),
-            ConfigBackupProvider::ERROR_NO_BACKUPS => __('No configuration backups exist for this device in :provider yet.', ['provider' => $provider]),
-            default => __('This device could not be found in :provider. It is matched by hostname or IP address.', ['provider' => $provider]),
+            ConfigBackupProvider::ERROR_UNREACHABLE => __('config_backups.messages.unreachable_details', ['provider' => $provider]),
+            ConfigBackupProvider::ERROR_API => __('config_backups.messages.error_details', ['provider' => $provider]),
+            ConfigBackupProvider::ERROR_NO_BACKUPS => __('config_backups.messages.no_backups', ['provider' => $provider]),
+            default => __('config_backups.messages.device_not_found', ['provider' => $provider]),
         };
     }
 
     public function backups(Device $device, Request $request): JsonResponse
     {
-        Gate::authorize('show-config', $device);
-
-        $validated = $request->validate([
-            'page' => 'required|integer|min:0',
-        ]);
-
-        $provider = $this->manager->providerFor($device);
-        if ($provider === null) {
-            return $this->errorResponse(ConfigBackupProvider::ERROR_DEVICE_NOT_FOUND);
-        }
-
-        $list = $provider->backups($device, (int) $validated['page']);
-        if ($list === null) {
-            return $this->errorResponse($provider->lastError() ?? ConfigBackupProvider::ERROR_UNREACHABLE);
-        }
-
-        return response()->json($list);
-    }
-
-    public function backup(Device $device, string $backup, Request $request): JsonResponse
-    {
-        Gate::authorize('show-config', $device);
+        Gate::authorize('configBackupView', $device);
 
         $validated = $request->validate([
             'page' => 'nullable|integer|min:0',
@@ -154,6 +132,39 @@ class ConfigController extends Controller implements DeviceTab
         $provider = $this->manager->providerFor($device);
         if ($provider === null) {
             return $this->errorResponse(ConfigBackupProvider::ERROR_DEVICE_NOT_FOUND);
+        }
+
+        $list = $provider->backups($device, (int) ($validated['page'] ?? 0));
+        if ($list === null) {
+            return $this->errorResponse($provider->lastError() ?? ConfigBackupProvider::ERROR_UNREACHABLE);
+        }
+
+        return response()->json($list);
+    }
+
+    public function backup(Device $device, Request $request): JsonResponse
+    {
+        Gate::authorize('configBackupView', $device);
+
+        $validated = $request->validate([
+            'backup' => ['nullable', 'string', 'max:191', 'regex:/^[A-Za-z0-9._\\|-]+$/'],
+            'page' => ['nullable', 'integer', 'min:0'],
+        ]);
+
+        $provider = $this->manager->providerFor($device);
+        if ($provider === null) {
+            return $this->errorResponse(ConfigBackupProvider::ERROR_DEVICE_NOT_FOUND);
+        }
+
+        $backup = $validated['backup'] ?? null;
+
+        if ($backup === null) {
+            $latest = $provider->latest($device);
+            if ($latest === null) {
+                return $this->errorResponse($provider->lastError() ?? ConfigBackupProvider::ERROR_NO_BACKUPS);
+            }
+
+            return response()->json($latest);
         }
 
         $content = $provider->content($device, $backup, (int) ($validated['page'] ?? 0));
@@ -169,7 +180,7 @@ class ConfigController extends Controller implements DeviceTab
 
     public function diff(Device $device, Request $request): JsonResponse
     {
-        Gate::authorize('show-config', $device);
+        Gate::authorize('configBackupView', $device);
 
         $validated = $request->validate([
             'orig' => 'required|string|max:191',
@@ -187,6 +198,25 @@ class ConfigController extends Controller implements DeviceTab
         }
 
         return response()->json(['groups' => $groups]);
+    }
+
+    public function refresh(Device $device, Request $request): JsonResponse
+    {
+        Gate::authorize('configBackupRefresh', $device);
+
+        $provider = $this->manager->providerFor($device);
+        if (! $provider instanceof RefreshableConfigBackupProvider) {
+            return response()->json(['status' => 'error', 'message' => __('config_backups.refresh_unavailable')], 422);
+        }
+
+        $queued = $provider->refresh($device, $request->user()->username ?? 'LibreNMS GUI');
+
+        return response()->json([
+            'status' => $queued ? 'ok' : 'error',
+            'message' => $queued
+                ? __('config_backups.messages.refresh_queued', ['provider' => $provider->name()])
+                : __('config_backups.messages.refresh_failed', ['provider' => $provider->name()]),
+        ], $queued ? 200 : 502);
     }
 
     private function errorResponse(string $error): JsonResponse

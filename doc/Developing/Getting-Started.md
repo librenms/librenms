@@ -1,16 +1,14 @@
 # Get ready to contribute to LibreNMS
 
-This document is intended to help you get your local environment set
-up to contribute code to the LibreNMS project.
+This document helps you to set up your local environment for
+contributions to the LibreNMS project.
 
 ## Setting up a development environment
 
-When starting to develop, it may be tempting to just make changes on
-your production server, but that will make things harder for you.
-Taking a little time to set up somewhere to work on code changes can
-really help.
+Do not make changes on your production server. A separate environment
+for your code changes makes the work easier.
 
-Possible options:
+These options are available:
 
 - A Linux computer, VM, or container
 - Another directory on your LibreNMS server
@@ -18,12 +16,13 @@ Possible options:
 
 ### Set up your development git clone
 
-1. Follow the [documentation on using git](Using-Git.md)
+1. Obey the [documentation on using git](Using-Git.md)
 
 1. Install development dependencies `./scripts/composer_wrapper.php install`
 
-1. Set variables in `.env`, including database settings.  Which could be
-   a local or remote MySQL server including your production DB.
+1. Set the variables in `.env`. These variables include the database
+   settings. The MySQL server is local or remote. It can be your
+   production database.
 
     ```dotenv
     APP_ENV=local
@@ -37,15 +36,15 @@ Possible options:
 
 ### Automated testing
 
-LibreNMS uses continuous integration to test code changes to help
-reduce bugs.  This also helps guarantee the changes you contribute
-won't be broken in the future. You can find out more in our [Validating Code Documentation](Validating-Code.md)
+LibreNMS uses continuous integration to test the code changes. These
+tests reduce the number of bugs. They also keep your contribution
+correct in the future. For more information, read the [Validating Code
+documentation](Validating-Code.md).
 
 The default database connection for automated testing is `testing`.
 
-To override the database parameters for unit tests, configure your
-`.env` file accordingly. The defaults (from `config/database.php`)
-are:
+To override the database parameters of the unit tests, edit your `.env`
+file. These are the defaults from `config/database.php`:
 
 ```dotenv
 DB_TEST_DRIVER="mysql"   # PDO driver
@@ -59,9 +58,9 @@ DB_TEST_SOCKET=""        # unix socket path
 
 ### Polling debug output
 
-You can see detailed info by running your polling code in debug
-mode by adding a `-vv` which tries to hide sensitive data `-vvv`
-is full debug output.
+To see detailed information, run your polling code in debug mode. The
+flag `-vv` hides most of the sensitive data. The flag `-vvv` gives the
+full debug output.
 
 ```bash
 lnms device:discover -vv HOSTNAME
@@ -70,9 +69,9 @@ lnms device:poll -vv HOSTNAME
 
 ### Inspecting variables
 
-Sometimes you want to find out what a variable contains (such as the
-data return from an snmpwalk). You can dump one or more variables and
-halt execution with the dd() function.
+The `dd()` function shows the content of a variable, such as the data
+from an snmpwalk. It dumps one or more variables and then stops the
+execution.
 
 ```php
 dd($variable1, $variable2);
@@ -80,16 +79,14 @@ dd($variable1, $variable2);
 
 ### Inspecting web pages
 
-Installing the development dependencies and setting APP_DEBUG enables
-the [Laravel Debugbar](https://github.com/barryvdh/laravel-debugbar)
-This will allow you to inspect page generation and errors right in
-your web browser.
+The development dependencies and `APP_DEBUG` enable the [Laravel
+Debugbar](https://github.com/barryvdh/laravel-debugbar). You can then
+examine the page generation and the errors in your web browser.
 
 ### Better code completion in IDEs and editors
 
-You can generate some files to improve code completion. (These file
-are not updated automatically, so you may need to re-run these command
-periodically)
+These commands generate files for better code completion. The files do
+not update automatically. Run the commands again from time to time.
 
 ```bash
 ./lnms ide-helper:generate
@@ -98,11 +95,11 @@ periodically)
 
 ### Emulating devices
 
-You can capture and emulate devices using
-[Snmpsim](https://github.com/etingof/snmpsim).  LibreNMS has a set of
-scripts to make it easier to work with snmprec files.
-[LibreNMS Snmpsim helpers](https://github.com/librenms/librenms-snmpsim)
+[Snmpsim](https://github.com/etingof/snmpsim) captures and emulates
+devices. LibreNMS has scripts for the snmprec files. See the [LibreNMS
+Snmpsim helpers](https://github.com/librenms/librenms-snmpsim).
 
 ### Laravel documentation
 
-You can find a lot of how LibreNMS works by following the [Laravel Documentation](https://laravel.com/docs/)
+The [Laravel documentation](https://laravel.com/docs/) explains much of
+the operation of LibreNMS.

@@ -10,13 +10,13 @@ The systemd application polls systemd and scrapes systemd units' load, activatio
     wget https://github.com/librenms/librenms-agent/raw/master/snmp/systemd.py -O /etc/snmp/systemd.py
     ```
 
-2. Make the script executable
+2. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/systemd.py
     ```
 
-3. Edit your snmpd.conf file and add:
+3. Edit your `snmpd.conf` file and add:
 
     ```bash
     extend systemd /etc/snmp/systemd.py

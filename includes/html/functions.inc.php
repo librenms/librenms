@@ -26,7 +26,7 @@ use LibreNMS\Util\Url;
 
 function toner2colour($descr, $percent)
 {
-    $colour = \LibreNMS\Util\Color::percentage(100 - $percent, null);
+    $colour = LibreNMS\Util\Color::percentage(100 - $percent, null);
 
     if (str_ends_with((string) $descr, 'C') || stripos((string) $descr, 'cyan') !== false) {
         $colour['left'] = '55D6D3';
@@ -96,7 +96,7 @@ function bill_permitted($bill_id)
         return true;
     }
 
-    return \Permissions::canAccessBill($bill_id, Auth::id());
+    return Permissions::canAccessBill($bill_id, Auth::id());
 }
 
 function port_permitted($port_id, $device_id = null)
@@ -113,7 +113,7 @@ function port_permitted($port_id, $device_id = null)
         return true;
     }
 
-    return \Permissions::canAccessPort($port_id, Auth::id());
+    return Permissions::canAccessPort($port_id, Auth::id());
 }
 
 function device_permitted($device_id)
@@ -122,7 +122,7 @@ function device_permitted($device_id)
         return true;
     }
 
-    return \Permissions::canAccessDevice($device_id, Auth::id());
+    return Permissions::canAccessDevice($device_id, Auth::id());
 }
 
 function alert_layout($severity)
@@ -169,9 +169,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port['graph_type'] = $type;
     }
 
-    if (! isset($port['graph_type'])) {
-        $port['graph_type'] = 'port_bits';
-    }
+    $port['graph_type'] ??= 'port_bits';
 
     $class = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
 
@@ -183,8 +181,8 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port = cleanPort($port);
     }
 
-    $content = '<div class="overlib-text">' . ($port['hostname'] ?? '') . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
-    $content .= addslashes(\LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
+    $content = '<div class="overlib-text">' . ($port['hostname'] ?? '') . ' - ' . Rewrite::normalizeIfName(addslashes(LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
+    $content .= addslashes(LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
 
     $content .= "<div style=\'width: 850px\'>";
     $graph_array['type'] = $port['graph_type'];
@@ -232,15 +230,6 @@ function generate_sap_url($sap, $vars = [])
     return Url::graphPopup(['device' => $sap['device_id'], 'page' => 'graphs', 'type' => 'device_sap', 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps', 'traffic_id' => $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $sap['sapEncapValue']], $vars);
 }//end generate_sap_url()
 
-function generate_port_image($args)
-{
-    if (! $args['bg']) {
-        $args['bg'] = 'FFFFFF00';
-    }
-
-    return "<img src='graph.php?type=" . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . "'>";
-}//end generate_port_image()
-
 /**
  * Create image to output text instead of a graph.
  *
@@ -250,13 +239,8 @@ function generate_port_image($args)
 function graph_error($text, $short = null, $color = [128, 0, 0])
 {
     header('Content-Type: ' . ImageFormat::forGraph()->contentType());
-    echo \LibreNMS\Util\Graph::error($text, $short, 300, null, $color);
+    echo LibreNMS\Util\Graph::error($text, $short, 300, null, $color);
 }
-
-function print_port_thumbnail($args)
-{
-    echo generate_port_link($args, generate_port_image($args));
-}//end print_port_thumbnail()
 
 function print_optionbar_start($height = 0, $width = 0, $marginbottom = 5)
 {
@@ -285,9 +269,7 @@ function generate_ap_link($args, $text = null, $type = null)
         $args['graph_type'] = $type;
     }
 
-    if (! isset($args['graph_type'])) {
-        $args['graph_type'] = 'port_bits';
-    }
+    $args['graph_type'] ??= 'port_bits';
 
     if (! isset($args['hostname'])) {
         $args = array_merge($args, device_by_id_cache($args['device_id']));
@@ -295,7 +277,7 @@ function generate_ap_link($args, $text = null, $type = null)
 
     $content = '<div class=list-large>' . $args['text'] . ' - ' . Rewrite::normalizeIfName($args['label']) . '</div>';
     if ($args['ifAlias']) {
-        $content .= \LibreNMS\Util\Clean::html($args['ifAlias'], []) . '<br />';
+        $content .= LibreNMS\Util\Clean::html($args['ifAlias'], []) . '<br />';
     }
 
     $content .= "<div style=\'width: 850px\'>";
@@ -629,24 +611,6 @@ function get_ports_from_type($given_types)
     return $ports;
 }
 
-/**
- * @param  $filename
- * @param  $content
- */
-function file_download($filename, $content)
-{
-    $length = strlen((string) $content);
-    header('Content-Description: File Transfer');
-    header('Content-Type: text/plain');
-    header("Content-Disposition: attachment; filename=$filename");
-    header('Content-Transfer-Encoding: binary');
-    header('Content-Length: ' . $length);
-    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-    header('Expires: 0');
-    header('Pragma: public');
-    echo $content;
-}
-
 function get_rules_from_json()
 {
     return json_decode(file_get_contents(resource_path('definitions/alert_rules.json')), true);
@@ -729,13 +693,13 @@ function get_oxidized_nodes_list()
             $formatted_local_time = $object['time'];
         }
         echo '<tr>
-        <td>' . $device->device_id . '</td>
-        <td>' . $object['name'] . '</td>
-        <td>' . $device->sysName . '</td>
-        <td>' . $object['status'] . '</td>
-        <td>' . $formatted_local_time . '</td>
-        <td>' . $object['model'] . '</td>
-        <td>' . $object['group'] . '</td>
+        <td>' . e($device->device_id) . '</td>
+        <td>' . e($object['name']) . '</td>
+        <td>' . e($device->sysName) . '</td>
+        <td>' . e($object['status']) . '</td>
+        <td>' . e($formatted_local_time) . '</td>
+        <td>' . e($object['model']) . '</td>
+        <td>' . e($object['group']) . '</td>
         <td></td>
         </tr>';
     }

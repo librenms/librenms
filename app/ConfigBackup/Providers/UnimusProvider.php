@@ -28,8 +28,9 @@ namespace App\ConfigBackup\Providers;
 use App\ApiClients\Unimus;
 use App\Models\Device;
 use LibreNMS\Interfaces\ConfigBackupProvider;
+use LibreNMS\Interfaces\RefreshableConfigBackupProvider;
 
-class UnimusProvider implements ConfigBackupProvider
+class UnimusProvider implements ConfigBackupProvider, RefreshableConfigBackupProvider
 {
     private ?string $lastError = null;
 
@@ -141,6 +142,16 @@ class UnimusProvider implements ConfigBackupProvider
     public function lastError(): ?string
     {
         return $this->lastError;
+    }
+
+    public function refresh(Device $device, string $requestedBy): bool
+    {
+        $unimusDeviceId = $this->resolveDeviceId($device);
+        if ($unimusDeviceId === null) {
+            return false;
+        }
+
+        return $this->api->backupDevice($unimusDeviceId);
     }
 
     private function resolveDeviceId(Device $device): ?int

@@ -61,6 +61,7 @@
             "type": "string"
         },
         "config_highlighting": {
+            "description": "Configuration highlighting Prism.js grammar name override. Guesses based on os name by default.",
             "type": "string"
         },
         "poller_modules": {

@@ -1,13 +1,14 @@
 # Command line tools
 
-Here's a brief list of command line tools, some might be missing.
-If you think something is missing, feel free to ask us or send a pull request :-)
+This is a short list of the command line tools. The list can be incomplete.
+If a tool is not in the list, ask us about it or send a pull request.
 
 # purge-ports.php
 
-This script provides CLI access to the "delete port" function of the WebUI.
-This might come in handy when trying to clean up old ports after large changes
-within the network or when hacking on the poller/discovery functions.
+This script gives command line access to the "delete port" function of the
+web interface. Use it to clean up old ports after a large network change.
+It is also useful during work on the poller functions or the discovery
+functions.
 
 ```
 LibreNMS Port purge tool
@@ -18,18 +19,16 @@ LibreNMS Port purge tool
 
 # Querying port IDs from the database
 
-One simple way to obtain port IDs is by querying the SQL database.
+A query against the SQL database is one way to get port IDs.
 
-If you wanted to query all deleted ports from the database, you could to
-this with the following query:
+This query returns all deleted ports from the database:
 
 ```bash
 echo 'SELECT port_id, hostname, ifDescr FROM ports, devices WHERE devices.device_id = ports.device_id AND deleted = 1' | mysql -h your_DB_server -u your_DB_user -p --skip-column-names your_DB_name
 ```
 
-When you are sure that the list of ports is correct and you want to
-delete all of them, you can write the list into a file and call
-purge-ports.php with that file as input:
+If the list of ports is correct, write the list into a file. Then run
+`purge-ports.php` with that file as the input:
 
 ```
 echo 'SELECT port_id FROM ports, devices WHERE devices.device_id = ports.device_id AND deleted = 1' | mysql -h your_DB_server -u your_DB_user -p --skip-column-names your_DB_name > ports_to_delete

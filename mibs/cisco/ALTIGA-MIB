@@ -1,0 +1,344 @@
+-- *------------------------------------------------------------------
+-- * ALTIGA-MIB.my:  Altiga Generic MIB.
+-- *
+-- * Altiga Networks was acquired by Cisco Systems on March 29, 2000
+-- *
+-- * Copyright (c) 2002, 2003, 2004 by Cisco Systems, Inc.
+-- * All rights reserved.
+-- *
+-- *------------------------------------------------------------------
+ 
+ALTIGA-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY
+         FROM SNMPv2-SMI
+      altigaGeneric, alMibModule
+         FROM ALTIGA-GLOBAL-REG;
+
+   altigaMibModule MODULE-IDENTITY
+      LAST-UPDATED   "200412300000Z"
+      ORGANIZATION   "Cisco Systems, Inc."
+      CONTACT-INFO
+         "Cisco Systems
+          170 W Tasman Drive
+          San Jose, CA  95134
+          USA
+
+          Tel: +1 800 553-NETS
+          E-mail: cs-cvpn3000@cisco.com"
+
+      DESCRIPTION
+         "The Altiga Generic MIB models counters and objects that are
+          of management interest.
+         
+          Acronyms
+          The following acronyms are used in this document:
+
+            MIB:        Management Information Base
+
+            OID:        Object Identifier
+         
+         "
+         
+
+        REVISION "200412300000Z"
+        DESCRIPTION
+                 "Added the new MIB OIDs(60 to 62)."
+
+        REVISION "200310200000Z"
+        DESCRIPTION
+                 "Added the new MIB OIDs(53 to 59)."
+
+        REVISION "200304100000Z"
+        DESCRIPTION
+                 "Added the new MIB OIDs(49 to 52)."
+
+        REVISION "200210110000Z"
+        DESCRIPTION
+                "Updated with new header."
+
+      ::= { alMibModule 1 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+altigaMib OBJECT IDENTIFIER ::= { altigaGeneric 1 }
+
+-- Conformance Area, these are used elsewhere
+altigaConfs    OBJECT IDENTIFIER ::= { altigaMib 1 }
+altigaGroups   OBJECT IDENTIFIER ::= { altigaConfs 1 }
+altigaCompl    OBJECT IDENTIFIER ::= { altigaConfs 2 }
+
+-- Subtree for Statistics, config and events
+altigaStats    OBJECT IDENTIFIER ::= { altigaMib 2 }
+altigaConfig   OBJECT IDENTIFIER ::= { altigaMib 3 }
+altigaEvents   OBJECT IDENTIFIER ::= { altigaMib 4 }
+
+--
+-- Here each subsystem will have a branch. There should be a branch
+-- under each category (Stats, Config and Events), even if there
+-- are no plans to further define the branch. Each branch should
+-- have the same OID.
+--
+
+-- Groups 
+alVersionGroup         OBJECT IDENTIFIER ::= { altigaGroups 1 }
+alAccessGroup          OBJECT IDENTIFIER ::= { altigaGroups 2 }
+alPptpGroup            OBJECT IDENTIFIER ::= { altigaGroups 3 }
+alEventGroup           OBJECT IDENTIFIER ::= { altigaGroups 4 }
+alAuthGroup            OBJECT IDENTIFIER ::= { altigaGroups 5 }
+alPppGroup             OBJECT IDENTIFIER ::= { altigaGroups 6 }
+alHttpGroup            OBJECT IDENTIFIER ::= { altigaGroups 7 }
+alIpGroup              OBJECT IDENTIFIER ::= { altigaGroups 8 }
+alFilterGroup          OBJECT IDENTIFIER ::= { altigaGroups 9 }
+alUserGroup            OBJECT IDENTIFIER ::= { altigaGroups 10 }
+alTelnetGroup          OBJECT IDENTIFIER ::= { altigaGroups 11 }
+alFtpGroup             OBJECT IDENTIFIER ::= { altigaGroups 12 }
+alTftpGroup            OBJECT IDENTIFIER ::= { altigaGroups 13 }
+alSnmpGroup            OBJECT IDENTIFIER ::= { altigaGroups 14 }
+alIpSecGroup           OBJECT IDENTIFIER ::= { altigaGroups 15 }
+alL2tpGroup            OBJECT IDENTIFIER ::= { altigaGroups 16 }
+alSessionGroup         OBJECT IDENTIFIER ::= { altigaGroups 17 }
+alDnsGroup             OBJECT IDENTIFIER ::= { altigaGroups 18 }
+alAddressGroup         OBJECT IDENTIFIER ::= { altigaGroups 19 }
+alDhcpGroup            OBJECT IDENTIFIER ::= { altigaGroups 20 }
+alWatchdogGroup        OBJECT IDENTIFIER ::= { altigaGroups 21 }
+alHardwareGroup        OBJECT IDENTIFIER ::= { altigaGroups 22 }
+alNatGroup             OBJECT IDENTIFIER ::= { altigaGroups 23 }
+alLan2LanGroup         OBJECT IDENTIFIER ::= { altigaGroups 24 }
+alGeneralGroup         OBJECT IDENTIFIER ::= { altigaGroups 25 }
+alSslGroup             OBJECT IDENTIFIER ::= { altigaGroups 26 }
+alCertGroup            OBJECT IDENTIFIER ::= { altigaGroups 27 }
+alNtpGroup             OBJECT IDENTIFIER ::= { altigaGroups 28 }
+alNetworkListGroup     OBJECT IDENTIFIER ::= { altigaGroups 29 }
+alSepGroup             OBJECT IDENTIFIER ::= { altigaGroups 30 }
+alIkeGroup             OBJECT IDENTIFIER ::= { altigaGroups 31 }
+alSyncGroup            OBJECT IDENTIFIER ::= { altigaGroups 32 }
+alT1E1Group            OBJECT IDENTIFIER ::= { altigaGroups 33 }
+alMultiLinkGroup       OBJECT IDENTIFIER ::= { altigaGroups 34 }
+alSshGroup             OBJECT IDENTIFIER ::= { altigaGroups 35 }
+alLBSSFGroup           OBJECT IDENTIFIER ::= { altigaGroups 36 }
+alDhcpServerGroup      OBJECT IDENTIFIER ::= { altigaGroups 37 }
+alAutoUpdateGroup      OBJECT IDENTIFIER ::= { altigaGroups 38 }
+alAdminAuthGroup       OBJECT IDENTIFIER ::= { altigaGroups 39 }
+alPPPoEGroup           OBJECT IDENTIFIER ::= { altigaGroups 40 }
+alXmlGroup             OBJECT IDENTIFIER ::= { altigaGroups 41 }
+alCtcpGroup            OBJECT IDENTIFIER ::= { altigaGroups 42 }
+alFwGroup              OBJECT IDENTIFIER ::= { altigaGroups 43 }
+alGroupMatchGroup      OBJECT IDENTIFIER ::= { altigaGroups 44 }
+alACEServerGroup       OBJECT IDENTIFIER ::= { altigaGroups 45 }
+alNatTGroup            OBJECT IDENTIFIER ::= { altigaGroups 46 }
+alBwMgmtGroup          OBJECT IDENTIFIER ::= { altigaGroups 47 }
+alIpSecPreFragGroup    OBJECT IDENTIFIER ::= { altigaGroups 48 }
+alFipsGroup            OBJECT IDENTIFIER ::= { altigaGroups 49 }
+alBackupL2LGroup       OBJECT IDENTIFIER ::= { altigaGroups 50 }
+alNotifyGroup          OBJECT IDENTIFIER ::= { altigaGroups 51 }
+alRebootStatusGroup    OBJECT IDENTIFIER ::= { altigaGroups 52 }
+alAuthorizationGroup   OBJECT IDENTIFIER ::= { altigaGroups 53 }
+alWebPortalGroup       OBJECT IDENTIFIER ::= { altigaGroups 54 }
+alWebEmailGroup        OBJECT IDENTIFIER ::= { altigaGroups 55 }
+alPortForwardGroup     OBJECT IDENTIFIER ::= { altigaGroups 56 }
+alRemoteServerGroup    OBJECT IDENTIFIER ::= { altigaGroups 57 }
+alWebvpnAclGroup       OBJECT IDENTIFIER ::= { altigaGroups 58 }
+alNbnsGroup            OBJECT IDENTIFIER ::= { altigaGroups 59 }
+alSecureDesktopGroup   OBJECT IDENTIFIER ::= { altigaGroups 60 }
+alSslTunnelClientGroup OBJECT IDENTIFIER ::= { altigaGroups 61 }
+alNacGroup             OBJECT IDENTIFIER ::= { altigaGroups 62 }
+
+
+-- Statistics
+alStatsVersion         OBJECT IDENTIFIER ::= { altigaStats 1 }
+alStatsAccess          OBJECT IDENTIFIER ::= { altigaStats 2 }
+alStatsPptp            OBJECT IDENTIFIER ::= { altigaStats 3 }
+alStatsEvent           OBJECT IDENTIFIER ::= { altigaStats 4 }
+alStatsAuth            OBJECT IDENTIFIER ::= { altigaStats 5 }
+alStatsPpp             OBJECT IDENTIFIER ::= { altigaStats 6 }
+alStatsHttp            OBJECT IDENTIFIER ::= { altigaStats 7 }
+alStatsIp              OBJECT IDENTIFIER ::= { altigaStats 8 }
+alStatsFilter          OBJECT IDENTIFIER ::= { altigaStats 9 }
+alStatsUser            OBJECT IDENTIFIER ::= { altigaStats 10 }
+alStatsTelnet          OBJECT IDENTIFIER ::= { altigaStats 11 }
+alStatsFtp             OBJECT IDENTIFIER ::= { altigaStats 12 }
+alStatsTftp            OBJECT IDENTIFIER ::= { altigaStats 13 }
+alStatsSnmp            OBJECT IDENTIFIER ::= { altigaStats 14 }
+alStatsIpSec           OBJECT IDENTIFIER ::= { altigaStats 15 }
+alStatsL2tp            OBJECT IDENTIFIER ::= { altigaStats 16 }
+alStatsSession         OBJECT IDENTIFIER ::= { altigaStats 17 }
+alStatsDns             OBJECT IDENTIFIER ::= { altigaStats 18 }
+alStatsAddress         OBJECT IDENTIFIER ::= { altigaStats 19 }
+alStatsDhcp            OBJECT IDENTIFIER ::= { altigaStats 20 }
+alStatsWatching        OBJECT IDENTIFIER ::= { altigaStats 21 }
+alStatsHardware        OBJECT IDENTIFIER ::= { altigaStats 22 }
+alStatsNat             OBJECT IDENTIFIER ::= { altigaStats 23 }
+alStatsLan2Lan         OBJECT IDENTIFIER ::= { altigaStats 24 }
+alStatsGeneral         OBJECT IDENTIFIER ::= { altigaStats 25 }
+alStatsSsl             OBJECT IDENTIFIER ::= { altigaStats 26 }
+alStatsCert            OBJECT IDENTIFIER ::= { altigaStats 27 }
+alStatsNtp             OBJECT IDENTIFIER ::= { altigaStats 28 }
+alStatsNetworkList     OBJECT IDENTIFIER ::= { altigaStats 29 }
+alStatsSep             OBJECT IDENTIFIER ::= { altigaStats 30 }
+alStatsIke             OBJECT IDENTIFIER ::= { altigaStats 31 }
+alStatsSync            OBJECT IDENTIFIER ::= { altigaStats 32 }
+alStatsT1E1            OBJECT IDENTIFIER ::= { altigaStats 33 }
+alStatsMultiLink       OBJECT IDENTIFIER ::= { altigaStats 34 }
+alStatsSsh             OBJECT IDENTIFIER ::= { altigaStats 35 }
+alStatsLBSSF           OBJECT IDENTIFIER ::= { altigaStats 36 }
+alStatsDhcpServer      OBJECT IDENTIFIER ::= { altigaStats 37 }
+alStatsAutoUpdate      OBJECT IDENTIFIER ::= { altigaStats 38 }
+alAdminAuthStats       OBJECT IDENTIFIER ::= { altigaStats 39 }
+alStatsPPPoE           OBJECT IDENTIFIER ::= { altigaStats 40 }
+alXmlStats             OBJECT IDENTIFIER ::= { altigaStats 41 }
+alCtcpStats            OBJECT IDENTIFIER ::= { altigaStats 42 }
+alFwStats              OBJECT IDENTIFIER ::= { altigaStats 43 }
+alStatsGroupMatch      OBJECT IDENTIFIER ::= { altigaStats 44 }
+alACEServerStats       OBJECT IDENTIFIER ::= { altigaStats 45 }
+alNatTStats            OBJECT IDENTIFIER ::= { altigaStats 46 }
+alStatsBwMgmt          OBJECT IDENTIFIER ::= { altigaStats 47 }
+alIpSecPreFragStats    OBJECT IDENTIFIER ::= { altigaStats 48 }
+alStatsFips            OBJECT IDENTIFIER ::= { altigaStats 49 }
+alStatsBackupL2L       OBJECT IDENTIFIER ::= { altigaStats 50 }
+alStatsNotify          OBJECT IDENTIFIER ::= { altigaStats 51 }
+alStatsRebootStatus    OBJECT IDENTIFIER ::= { altigaStats 52 }
+alStatsAuthorization   OBJECT IDENTIFIER ::= { altigaStats 53 }
+alStatsWebPortal       OBJECT IDENTIFIER ::= { altigaStats 54 }
+alStatsWebEmail        OBJECT IDENTIFIER ::= { altigaStats 55 }
+alStatsPortForward     OBJECT IDENTIFIER ::= { altigaStats 56 }
+alStatsRemoteServer    OBJECT IDENTIFIER ::= { altigaStats 57 }
+alStatsWebvpnAcl       OBJECT IDENTIFIER ::= { altigaStats 58 }
+alStatsNbns            OBJECT IDENTIFIER ::= { altigaStats 59 }
+alStatsSecureDesktop   OBJECT IDENTIFIER ::= { altigaStats 60 }
+alStatsSslTunnelClient OBJECT IDENTIFIER ::= { altigaStats 61 }
+alStatsNac             OBJECT IDENTIFIER ::= { altigaStats 62 }
+
+
+-- Configuration
+alCfgVersion         OBJECT IDENTIFIER ::= { altigaConfig 1 }
+alCfgAccess          OBJECT IDENTIFIER ::= { altigaConfig 2 }
+alCfgPptp            OBJECT IDENTIFIER ::= { altigaConfig 3 }
+alCfgEvent           OBJECT IDENTIFIER ::= { altigaConfig 4 }
+alCfgAuth            OBJECT IDENTIFIER ::= { altigaConfig 5 }
+alCfgPpp             OBJECT IDENTIFIER ::= { altigaConfig 6 }
+alCfgHttp            OBJECT IDENTIFIER ::= { altigaConfig 7 }
+alCfgIp              OBJECT IDENTIFIER ::= { altigaConfig 8 }
+alCfgFilter          OBJECT IDENTIFIER ::= { altigaConfig 9 }
+alCfgUser            OBJECT IDENTIFIER ::= { altigaConfig 10 }
+alCfgTelnet          OBJECT IDENTIFIER ::= { altigaConfig 11 }
+alCfgFtp             OBJECT IDENTIFIER ::= { altigaConfig 12 }
+alCfgTftp            OBJECT IDENTIFIER ::= { altigaConfig 13 }
+alCfgSnmp            OBJECT IDENTIFIER ::= { altigaConfig 14 }
+alCfgIpSec           OBJECT IDENTIFIER ::= { altigaConfig 15 }
+alCfgL2tp            OBJECT IDENTIFIER ::= { altigaConfig 16 }
+alCfgSession         OBJECT IDENTIFIER ::= { altigaConfig 17 }
+alCfgDns             OBJECT IDENTIFIER ::= { altigaConfig 18 }
+alCfgAddress         OBJECT IDENTIFIER ::= { altigaConfig 19 }
+alCfgDhcp            OBJECT IDENTIFIER ::= { altigaConfig 20 }
+alCfgWatchdog        OBJECT IDENTIFIER ::= { altigaConfig 21 }
+alCfgHardware        OBJECT IDENTIFIER ::= { altigaConfig 22 }
+alCfgNat             OBJECT IDENTIFIER ::= { altigaConfig 23 }
+alCfgLan2Lan         OBJECT IDENTIFIER ::= { altigaConfig 24 }
+alCfgGeneral         OBJECT IDENTIFIER ::= { altigaConfig 25 }
+alCfgSsl             OBJECT IDENTIFIER ::= { altigaConfig 26 }
+alCfgCert            OBJECT IDENTIFIER ::= { altigaConfig 27 }
+alCfgNtp             OBJECT IDENTIFIER ::= { altigaConfig 28 }
+alCfgNetworkList     OBJECT IDENTIFIER ::= { altigaConfig 29 }
+alCfgSep             OBJECT IDENTIFIER ::= { altigaConfig 30 }
+alCfgIke             OBJECT IDENTIFIER ::= { altigaConfig 31 }
+alCfgSync            OBJECT IDENTIFIER ::= { altigaConfig 32 }
+alCfgT1E1            OBJECT IDENTIFIER ::= { altigaConfig 33 }
+alCfgMultiLink       OBJECT IDENTIFIER ::= { altigaConfig 34 }
+alCfgSsh             OBJECT IDENTIFIER ::= { altigaConfig 35 }
+alCfgLBSSF           OBJECT IDENTIFIER ::= { altigaConfig 36 }
+alCfgDhcpServer      OBJECT IDENTIFIER ::= { altigaConfig 37 }
+alCfgAutoUpdate      OBJECT IDENTIFIER ::= { altigaConfig 38 }
+alCfgAdminAuth       OBJECT IDENTIFIER ::= { altigaConfig 39 }
+alCfgPPPoE           OBJECT IDENTIFIER ::= { altigaConfig 40 }
+alCfgXml             OBJECT IDENTIFIER ::= { altigaConfig 41 }
+alCfgCtcp            OBJECT IDENTIFIER ::= { altigaConfig 42 }
+alCfgFw              OBJECT IDENTIFIER ::= { altigaConfig 43 }
+alCfgGroupMatch      OBJECT IDENTIFIER ::= { altigaConfig 44 }
+alCfgACE             OBJECT IDENTIFIER ::= { altigaConfig 45 }
+alCfgNatT            OBJECT IDENTIFIER ::= { altigaConfig 46 }
+alCfgBwMgmt          OBJECT IDENTIFIER ::= { altigaConfig 47 }
+alCfgIpSecPreFrag    OBJECT IDENTIFIER ::= { altigaConfig 48 }
+alCfgFips            OBJECT IDENTIFIER ::= { altigaConfig 49 }
+alCfgBackupL2L       OBJECT IDENTIFIER ::= { altigaConfig 50 }
+alCfgNotify          OBJECT IDENTIFIER ::= { altigaConfig 51 }
+alCfgRebootStatus    OBJECT IDENTIFIER ::= { altigaConfig 52 }
+alCfgAuthorization   OBJECT IDENTIFIER ::= { altigaConfig 53 }
+alCfgWebPortal       OBJECT IDENTIFIER ::= { altigaConfig 54 }
+alCfgWebEmail        OBJECT IDENTIFIER ::= { altigaConfig 55 }
+alCfgPortForward     OBJECT IDENTIFIER ::= { altigaConfig 56 }
+alCfgRemoteServer    OBJECT IDENTIFIER ::= { altigaConfig 57 }
+alCfgWebvpnAcl       OBJECT IDENTIFIER ::= { altigaConfig 58 }
+alCfgNbns            OBJECT IDENTIFIER ::= { altigaConfig 59 }
+alCfgSecureDesktop   OBJECT IDENTIFIER ::= { altigaConfig 60 }
+alCfgSslTunnelClient OBJECT IDENTIFIER ::= { altigaConfig 61 }
+alCfgNac             OBJECT IDENTIFIER ::= { altigaConfig 62 }
+
+-- Events
+alEventsVersion        OBJECT IDENTIFIER ::= { altigaEvents 1 }
+alEventsAccess         OBJECT IDENTIFIER ::= { altigaEvents 2 }
+alEventsPptp           OBJECT IDENTIFIER ::= { altigaEvents 3 }
+alEventsEvent          OBJECT IDENTIFIER ::= { altigaEvents 4 }
+alEventsAuth           OBJECT IDENTIFIER ::= { altigaEvents 5 }
+alEventsPpp            OBJECT IDENTIFIER ::= { altigaEvents 6 }
+alEventsHttp           OBJECT IDENTIFIER ::= { altigaEvents 7 }
+alEventsIp             OBJECT IDENTIFIER ::= { altigaEvents 8 }
+alEventsFilter         OBJECT IDENTIFIER ::= { altigaEvents 9 }
+alEventsUser           OBJECT IDENTIFIER ::= { altigaEvents 10 }
+alEventsTelnet         OBJECT IDENTIFIER ::= { altigaEvents 11 }
+alEventsFtp            OBJECT IDENTIFIER ::= { altigaEvents 12 }
+alEventsTftp           OBJECT IDENTIFIER ::= { altigaEvents 13 }
+alEventsSnmp           OBJECT IDENTIFIER ::= { altigaEvents 14 }
+alEventsIpSec          OBJECT IDENTIFIER ::= { altigaEvents 15 }
+alEventsL2tp           OBJECT IDENTIFIER ::= { altigaEvents 16 }
+alEventsSession        OBJECT IDENTIFIER ::= { altigaEvents 17 }
+alEventsDns            OBJECT IDENTIFIER ::= { altigaEvents 18 }
+alEventsAddress        OBJECT IDENTIFIER ::= { altigaEvents 19 }
+alEventsDhcp           OBJECT IDENTIFIER ::= { altigaEvents 20 }
+alEventsWatchdog       OBJECT IDENTIFIER ::= { altigaEvents 21 }
+alEventsHardware       OBJECT IDENTIFIER ::= { altigaEvents 22 }
+alEventsNat            OBJECT IDENTIFIER ::= { altigaEvents 23 }
+alEventsLan2Lan        OBJECT IDENTIFIER ::= { altigaEvents 24 }
+alEventsGeneral        OBJECT IDENTIFIER ::= { altigaEvents 25 }
+alEventsSsl            OBJECT IDENTIFIER ::= { altigaEvents 26 }
+alEventsCert           OBJECT IDENTIFIER ::= { altigaEvents 27 }
+alEventsNtp            OBJECT IDENTIFIER ::= { altigaEvents 28 }
+alEventsNetworkList    OBJECT IDENTIFIER ::= { altigaEvents 29 }
+alEventsSep            OBJECT IDENTIFIER ::= { altigaEvents 30 }
+alEventsIke            OBJECT IDENTIFIER ::= { altigaEvents 31 }
+alEventsSync           OBJECT IDENTIFIER ::= { altigaEvents 32 }
+alEventsT1E1           OBJECT IDENTIFIER ::= { altigaEvents 33 }
+alEventsMultiLink      OBJECT IDENTIFIER ::= { altigaEvents 34 }
+alEventsSsh            OBJECT IDENTIFIER ::= { altigaEvents 35 }
+alEventsLBSSF          OBJECT IDENTIFIER ::= { altigaEvents 36 }
+alEventsAutoUpdate     OBJECT IDENTIFIER ::= { altigaEvents 38 }
+alEventsAdminAuth      OBJECT IDENTIFIER ::= { altigaEvents 39 }
+alEventsPPPoE          OBJECT IDENTIFIER ::= { altigaEvents 40 }
+alEventXml             OBJECT IDENTIFIER ::= { altigaEvents 41 }
+alEventCtcp            OBJECT IDENTIFIER ::= { altigaEvents 42 }
+alEventFw              OBJECT IDENTIFIER ::= { altigaEvents 43 }
+alEventGroupMatch      OBJECT IDENTIFIER ::= { altigaEvents 44 }
+alEventACE             OBJECT IDENTIFIER ::= { altigaEvents 45 }
+alEventNatT            OBJECT IDENTIFIER ::= { altigaEvents 46 }
+alEventBwMgmt          OBJECT IDENTIFIER ::= { altigaEvents 47 }
+alEventIpSecPreFrag    OBJECT IDENTIFIER ::= { altigaEvents 48 }
+alEventFips            OBJECT IDENTIFIER ::= { altigaEvents 49 }
+alEventBackupL2L       OBJECT IDENTIFIER ::= { altigaEvents 50 }
+alEventsNotify         OBJECT IDENTIFIER ::= { altigaEvents 51 }
+alEventsRebootStatus   OBJECT IDENTIFIER ::= { altigaEvents 52 }
+alEventAuthorization   OBJECT IDENTIFIER ::= { altigaEvents 53 }
+alEventWebPortal       OBJECT IDENTIFIER ::= { altigaEvents 54 }
+alEventWebEmail        OBJECT IDENTIFIER ::= { altigaEvents 55 }
+alEventPortForward     OBJECT IDENTIFIER ::= { altigaEvents 56 }
+alEventRemoteServer    OBJECT IDENTIFIER ::= { altigaEvents 57 }
+alEventWebvpnAcl       OBJECT IDENTIFIER ::= { altigaEvents 58 }
+alEventNbns            OBJECT IDENTIFIER ::= { altigaEvents 59 }
+alEventSecureDesktop   OBJECT IDENTIFIER ::= { altigaEvents 60 }
+alEventSslTunnelClient OBJECT IDENTIFIER ::= { altigaEvents 61 }
+alEventNac             OBJECT IDENTIFIER ::= { altigaEvents 62 }
+
+
+END

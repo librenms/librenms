@@ -344,12 +344,9 @@ class Number
             $used_percent = static::calculatePercent($used, $total, $precision);
         }
 
-        // fill available if it is missing
-        if ($available === null) {
-            $available = $used_is_null
-                ? $total * (1 - ($used_percent / 100))
-                : $total - $used;
-        }
+        $available ??= $used_is_null
+            ? $total * (1 - ($used_percent / 100))
+            : $total - $used;
 
         // return nicely formatted values
         return [

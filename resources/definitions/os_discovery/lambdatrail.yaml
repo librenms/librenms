@@ -53,6 +53,25 @@ modules:
                     value: LAMBDATRAIL-MIB::systemTemperature
                     num_oid: '.1.3.6.1.4.1.35616.2.1.1.1.{{ $index }}'
                     descr: Chassis Temp
+                #Third hardware variant
+                -
+                    oid: ENT35616-7-MIB::opticsTable
+                    value: ENT35616-7-MIB::lineTemp
+                    num_oid: '.1.3.6.1.4.1.35616.7.3.2.1.10.{{ $index }}'
+                    descr: Line {{ $index }} Temp
+                    index: 'line_temp.{{ $index }}'
+                -
+                    oid: ENT35616-7-MIB::opticsTable
+                    value: ENT35616-7-MIB::clientTemp
+                    num_oid: '.1.3.6.1.4.1.35616.7.3.2.1.20.{{ $index }}'
+                    descr: Client {{ $index }} Temp
+                    index: 'client_temp.{{ $index }}'
+                -
+                    oid: ENT35616-7-MIB::chassisTemp
+                    value: ENT35616-7-MIB::chassisTemp
+                    num_oid: '.1.3.6.1.4.1.35616.7.2.1.{{ $index }}'
+                    descr: Chassis Temp
+                    divisor: 100
         dbm:
             data:
                 #LT2-S Variant
@@ -200,6 +219,35 @@ modules:
                             oid: LAMBDATRAIL-MIB::portLineRxPower
                             op: '='
                             value: -1
+                #Third hardware variant
+                -
+                    oid: ENT35616-7-MIB::opticsTable
+                    value: ENT35616-7-MIB::lineTxDbm
+                    num_oid: '.1.3.6.1.4.1.35616.7.3.2.1.8.{{ $index }}'
+                    index: 'lineTxDbm.{{ $index }}'
+                    descr: Line {{ $index }} Tx
+                    group: 'Line {{ $index }}'
+                -
+                    oid: ENT35616-7-MIB::opticsTable
+                    value: ENT35616-7-MIB::lineRxDbm
+                    num_oid: '.1.3.6.1.4.1.35616.7.3.2.1.9.{{ $index }}'
+                    index: 'lineRxDbm.{{ $index }}'
+                    descr: Line {{ $index }} Rx
+                    group: 'Line {{ $index }}'
+                -
+                    oid: ENT35616-7-MIB::opticsTable
+                    value: ENT35616-7-MIB::clientTxDbm
+                    num_oid: '.1.3.6.1.4.1.35616.7.3.2.1.18.{{ $index }}'
+                    index: 'clientTxDbm.{{ $index }}'
+                    descr: Client {{ $index }} Tx
+                    group: 'Client {{ $index }}'
+                -
+                    oid: ENT35616-7-MIB::opticsTable
+                    value: ENT35616-7-MIB::clientRxDbm
+                    num_oid: '.1.3.6.1.4.1.35616.7.3.2.1.19.{{ $index }}'
+                    index: 'clientRxDbm.{{ $index }}'
+                    descr: Client {{ $index }} Rx
+                    group: 'Client {{ $index }}'
         state:
             data:
                 -
@@ -289,6 +337,29 @@ modules:
                         - { descr: notplugged, value: 1, generic: 0 }
                         - { descr: Off, value: 2, generic: 0 }
                         - { descr: On, value: 3, generic: 0 }
+                #Third hardware variant
+                -
+                    oid: ENT35616-7-MIB::powerTable
+                    value: ENT35616-7-MIB::powerStatus
+                    num_oid: '.1.3.6.1.4.1.35616.7.2.2.1.4.{{ $index }}'
+                    descr: 'Powersupply {{ $index }} State'
+                    index: 'power_status.{{ $index }}'
+                    group: Powersupply
+                    state_name: power_status
+                    states:
+                        - { descr: On, value: 1, generic: 0 }
+                        - { descr: Off, value: 0, generic: 3 }
+                -
+                    oid: ENT35616-7-MIB::fanTable
+                    value: ENT35616-7-MIB::fanStatus
+                    num_oid: '.1.3.6.1.4.1.35616.7.2.3.1.2.{{ $index }}'
+                    descr: 'Fan {{ $index }} State'
+                    index: 'fan_status.{{ $index }}'
+                    group: Fan
+                    state_name: fan_status
+                    states:
+                        - { descr: On, value: 1, generic: 0 }
+                        - { descr: Off, value: 0, generic: 3 }
         fanspeed:
             data:
                 -
@@ -296,3 +367,9 @@ modules:
                     value: Lambdatrail2s-MIB::lt2sPowerFanRPM
                     num_oid: '.1.3.6.1.4.1.35616.5.2.5.{{ $index }}'
                     descr: 'Fan Speed'
+                #Third hardware variant
+                -
+                    oid: ENT35616-7-MIB::fanTable
+                    value: ENT35616-7-MIB::fanSpeed
+                    num_oid: '.1.3.6.1.4.1.35616.7.2.3.1.3.{{ $index }}'
+                    descr: 'Fan {{ $index }} Speed'

@@ -184,13 +184,6 @@ if ($options['f'] === 'handle_notifiable') {
                     2
                 );
                 exit(1);
-            } elseif ($options['r'] === 'python3-deps') {
-                Notifications::create($error_title,
-                    'Python 3 dependencies are missing. You need to install them via pip3 install -r requirements.txt or system packages to continue to receive updates.  If you do not install Python 3 and required packages, LibreNMS will continue to function but stop receiving bug fixes and updates.',
-                    'daily.sh',
-                    2
-                );
-                exit(1);
             }
         }
 
@@ -260,7 +253,7 @@ if ($options['f'] === 'purgeusers') {
         if ($purge > 0) {
             $users = \App\Models\AuthLog::where('datetime', '>=', \Carbon\Carbon::now()->subDays($purge))
                 ->distinct()->pluck('user')
-                ->merge(\App\Models\User::has('apiTokens')->pluck('username')) // don't purge users with api tokens
+                ->merge(\App\Models\User::has('tokens')->pluck('username')) // don't purge users with api tokens
                 ->unique();
 
             if (\App\Models\User::thisAuth()->whereNotIn('username', $users)->delete()) {

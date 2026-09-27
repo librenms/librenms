@@ -104,6 +104,7 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
                     'device_id' => $device['device_id'],
                     'vrf_id' => $vrfId,
                     'bgpPeerIdentifier' => $address,
+                    'context_name' => '',
                     'bgpPeerRemoteAs' => $value['hwBgpPeerRemoteAs'] ?? '',
                     'bgpPeerState' => $value['hwBgpPeerState'] ?? '',
                     'bgpPeerAdminStatus' => $value['hwBgpPeerAdminStatus'] ?? '',

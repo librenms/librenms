@@ -29,6 +29,8 @@ namespace App\Http\Controllers\Maps;
 
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\DevicePopupController;
+use App\Http\Controllers\PortPopupController;
 use App\Models\AlertSchedule;
 use App\Models\Device;
 use App\Models\Link;
@@ -501,7 +503,7 @@ class MapDataController extends Controller
                 'last_polled' => $device->last_polled,
                 'disabled' => $device->disabled,
                 'no_alerts' => $device->disable_notify,
-                'url' => $request->url_type == 'links' ? \Blade::render('<x-device-link-map :device="$device" />', ['device' => $device]) : route('device', ['device' => $device->device_id]),
+                'url' => $request->url_type == 'links' ? app(DevicePopupController::class)($request, $device)->render() : route('device', ['device' => $device->device_id]),
                 'style' => self::deviceStyle($device, $request->highlight_node),
                 'lat' => $device->location ? $device->location->lat : null,
                 'lng' => $device->location ? $device->location->lng : null,
@@ -524,7 +526,7 @@ class MapDataController extends Controller
                     $parent_only_ids = $parent_only_ids->filter(fn (int $parent_id, int $k) => ! $child_ids->has($parent_id));
                 }
 
-                // All parents are peers becuase they are also children
+                // All parents are peers because they are also children
                 if (! $parent_only_ids->count()) {
                     $parent_peer_devices->put($device->device_id, $device->device_id);
                 }
@@ -620,6 +622,13 @@ class MapDataController extends Controller
                     }
                     $this_children = $next_children;
                 }
+            }
+
+            if ($request->boolean('hide_isolated')) {
+                $device_list = array_filter(
+                    $device_list,
+                    fn (array $device): bool => $device['parents']->isNotEmpty() || $device['children']->isNotEmpty()
+                );
             }
         }
 
@@ -717,7 +726,7 @@ class MapDataController extends Controller
                         'ldev' => $port->device_id,
                         'rdev' => $remote_port->device_id,
                         'ifnames' => $port->ifName . ' <> ' . $remote_port->ifName,
-                        'url' => \Blade::render('<x-port-link-map :port="$port" />', ['port' => $port]),
+                        'url' => app(PortPopupController::class)($request, $port)->render(),
                         'style' => $link_style,
                     ];
                 }
@@ -793,7 +802,7 @@ class MapDataController extends Controller
                 'icon' => $service->device->icon,
                 'icontitle' => $service->device->icon ? str_replace(['.svg', '.png'], '', basename((string) $service->device->icon)) : $service->device->os,
                 'device_name' => $service->device->shortDisplayName(),
-                'url' => \Blade::render('<x-device-link-map :device="$device" />', ['device' => $service->device]),
+                'url' => app(DevicePopupController::class)($request, $service->device)->render(),
                 'updowntime' => $updowntime,
                 'compact' => LibrenmsConfig::get('webui.availability_map_compact'),
                 'box_size' => LibrenmsConfig::get('webui.availability_map_box_size'),

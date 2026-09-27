@@ -9,6 +9,8 @@ parameters:
         min: 80200
         max: 80499
 
+    parseModelCastsMethod: true
+
     paths:
         - app
         - bootstrap
@@ -34,6 +36,8 @@ parameters:
     checkInternalClassCaseSensitivity: true
 
     checkModelProperties: true
+    checkAuthCallsWhenInRequestScope: true
+    checkModelMethodVisibility: true
     noUnnecessaryEnumerableToArrayCalls: true
 
     ignoreErrors:
