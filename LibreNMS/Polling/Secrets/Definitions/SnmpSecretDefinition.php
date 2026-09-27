@@ -27,9 +27,15 @@
 namespace LibreNMS\Polling\Secrets\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 
 class SnmpSecretDefinition extends SecretDefinition
 {
+    public function data(array $data): SnmpSecretData
+    {
+        return SnmpSecretData::fromArray($data);
+    }
+
     /**
      * @inheritDoc
      */
