@@ -8,10 +8,15 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Secret;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Data\Source\Icmp\Fping;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
+use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Tests\DBTestCase;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ValidateDeviceAndCreateTest extends DBTestCase
@@ -29,6 +34,34 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
 
         $this->assertTrue((new ValidateDeviceAndCreate($device, $pollingMethods, force: true))->execute());
         $this->assertSame($expected, $device->fresh()->os);
+    }
+
+    public function testDefaultCredentialsAreTriedInOrderAndTheWorkingOneIsKept(): void
+    {
+        $wrong = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'wrong']]);
+        $correct = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'correct']]);
+        LibrenmsConfig::set('snmp.default_credentials', [$wrong->id, $correct->id]);
+
+        $fping = Mockery::mock(Fping::class);
+        $fping->shouldReceive('ping')->andReturn(FpingResponse::artificialUp());
+        $this->app->instance(Fping::class, $fping);
+
+        $tried = [];
+        $backend = Mockery::mock(SnmpBackendInterface::class);
+        $backend->shouldReceive('get')->andReturnUsing(function ($target, $oids, $config) use (&$tried) {
+            $tried[] = $config->community;
+
+            return $config->community === 'correct'
+                ? new RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = OID: SNMPv2-SMI::enterprises.9.1.1', '', 0)
+                : new RawSnmpResponse('', 'Timeout', 1);
+        });
+        $this->app->instance(SnmpBackendInterface::class, $backend);
+
+        $device = new Device(['hostname' => 'detect.example.com']);
+
+        $this->assertTrue((new ValidateDeviceAndCreate($device))->execute());
+        $this->assertSame(['wrong', 'correct'], array_values(array_unique($tried)));
+        $this->assertSame($correct->id, $device->pollingMethod(PollingMethodType::Snmp)?->secret_id);
     }
 
     public function testForcedSnmpWithoutCredentialsUsesFirstDefaultCredential(): void
