@@ -4,36 +4,27 @@ namespace LibreNMS\Tests\Feature\Http;
 
 use App\Models\Secret;
 use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\SecretType;
-use LibreNMS\Tests\TestCase;
-use PHPUnit\Framework\Attributes\PreserveGlobalState;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use LibreNMS\Tests\DBTestCase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-#[RunTestsInSeparateProcesses]
-#[PreserveGlobalState(false)]
-class SelectSecretControllerTest extends TestCase
+final class SelectSecretControllerTest extends DBTestCase
 {
+    use DatabaseTransactions;
+
     protected function setUp(): void
     {
         parent::setUp();
-        $this->dbSetUp();
 
         Role::findOrCreate('admin');
         Permission::findOrCreate('secret.view');
     }
 
-    protected function tearDown(): void
-    {
-        $this->dbTearDown();
-        parent::tearDown();
-    }
-
     public function testSelectSecretsReturnsPaginatedResults(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $snmpSecret = Secret::create([
             'description' => 'SNMP Secret 1',
@@ -59,8 +50,7 @@ class SelectSecretControllerTest extends TestCase
 
     public function testSelectSecretsFiltersBySecretType(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $snmpSecret = Secret::create([
             'description' => 'SNMP Secret 1',
@@ -84,8 +74,7 @@ class SelectSecretControllerTest extends TestCase
 
     public function testSelectSecretsFiltersByTypeParam(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $snmpSecret = Secret::create([
             'description' => 'SNMP Secret 1',
@@ -109,8 +98,7 @@ class SelectSecretControllerTest extends TestCase
 
     public function testSelectSecretsSearchesByDescription(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $prodSecret = Secret::create([
             'description' => 'Unique Production Router Secret',

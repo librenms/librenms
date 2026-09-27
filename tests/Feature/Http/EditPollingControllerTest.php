@@ -4,23 +4,27 @@ namespace LibreNMS\Tests\Feature\Http;
 
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use App\Models\Secret;
 use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretType;
+use LibreNMS\Polling\Method\Config\UnixAgentConfig;
+use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
-use LibreNMS\Tests\TestCase;
-use PHPUnit\Framework\Attributes\PreserveGlobalState;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
+use LibreNMS\Tests\DBTestCase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-#[RunTestsInSeparateProcesses]
-#[PreserveGlobalState(false)]
-class EditPollingControllerTest extends TestCase
+final class EditPollingControllerTest extends DBTestCase
 {
+    use DatabaseTransactions;
+
     protected function setUp(): void
     {
         parent::setUp();
-        $this->dbSetUp();
 
         Role::findOrCreate('admin');
         Permission::findOrCreate('device.update');
@@ -31,17 +35,9 @@ class EditPollingControllerTest extends TestCase
         Permission::findOrCreate('secret.unmask');
     }
 
-    protected function tearDown(): void
-    {
-        $this->dbTearDown();
-        parent::tearDown();
-    }
-
     public function testUpdateSnmpPollingMethodUpdatesPortAssociationMode(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create();
 
@@ -85,15 +81,14 @@ class EditPollingControllerTest extends TestCase
 
     public function testStorePollingMethodRejectsDuplicateDefaultSecretDescription(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create(['hostname' => 'test-device.example.com']);
 
         // Pre-create a secret that has the exact default description
-        \App\Models\Secret::create([
+        Secret::create([
             'description' => 'SNMP test-device.example.com',
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -124,14 +119,13 @@ class EditPollingControllerTest extends TestCase
 
     public function testStorePollingMethodRejectsDuplicateCustomSecretDescription(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create(['hostname' => 'test-device2.example.com']);
 
-        \App\Models\Secret::create([
+        Secret::create([
             'description' => 'Existing Custom Description',
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -162,13 +156,11 @@ class EditPollingControllerTest extends TestCase
 
     public function testIndexRendersPollingViewWithoutSecretData(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
-        $secret = \App\Models\Secret::create([
+        $secret = Secret::create([
             'description' => 'SNMP Secret 123',
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -201,9 +193,7 @@ class EditPollingControllerTest extends TestCase
 
     public function testUpdateReturnsJsonResponseWhenRequested(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create();
         DevicePollingMethod::factory()->create([
@@ -233,9 +223,7 @@ class EditPollingControllerTest extends TestCase
 
     public function testDestroyReturnsJsonResponseWhenRequested(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create();
         DevicePollingMethod::factory()->create([
@@ -257,14 +245,11 @@ class EditPollingControllerTest extends TestCase
 
     public function testUpdateSecretDataPersistsToDatabase(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
-        $admin->givePermissionTo('secret.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
-        $secret = \App\Models\Secret::create([
+        $secret = Secret::create([
             'description' => 'Original SNMP Secret',
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -311,15 +296,11 @@ class EditPollingControllerTest extends TestCase
 
     public function testUpdateWithNewSecretKeepsSharedSecret(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
-        $admin->givePermissionTo('secret.create');
-        $admin->givePermissionTo('secret.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
-        $originalSecret = \App\Models\Secret::create([
+        $originalSecret = Secret::create([
             'description' => 'Shared SNMP Secret',
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -371,22 +352,18 @@ class EditPollingControllerTest extends TestCase
         $this->assertEquals('public', $originalSecret->fresh()->data['community']);
         $newSecretId = $pollingMethod->fresh()->secret_id;
         $this->assertNotEquals($originalSecret->id, $newSecretId);
-        $newSecret = \App\Models\Secret::find($newSecretId);
+        $newSecret = Secret::find($newSecretId);
         $this->assertEquals('New Dedicated Secret', $newSecret->description);
         $this->assertEquals('brandnew', $newSecret->data['community']);
     }
 
     public function testUpdateWithNewSecretRejectsDuplicateDescription(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
-        $admin->givePermissionTo('secret.create');
-        $admin->givePermissionTo('secret.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
-        $originalSecret = \App\Models\Secret::create([
+        $originalSecret = Secret::create([
             'description' => 'Shared SNMP Secret',
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -440,14 +417,11 @@ class EditPollingControllerTest extends TestCase
 
     public function testEditSecretWithSameDescriptionUpdatesInPlace(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
-        $admin->givePermissionTo('secret.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
-        $secret = \App\Models\Secret::create([
+        $secret = Secret::create([
             'description' => 'Solo SNMP Secret',
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'public'],
         ]);
 
@@ -495,9 +469,7 @@ class EditPollingControllerTest extends TestCase
 
     public function testUpdatePollingMethodUnreachableReturns422WithDetails(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create(['hostname' => 'unreachable-device.invalid']);
         DevicePollingMethod::factory()->create([
@@ -527,9 +499,7 @@ class EditPollingControllerTest extends TestCase
 
     public function testUpdatePollingMethodForceSaveBypassesUnreachable(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create(['hostname' => 'unreachable-device.invalid']);
         $method = DevicePollingMethod::factory()->create([
@@ -556,9 +526,7 @@ class EditPollingControllerTest extends TestCase
 
     public function testUpdateAvailabilityChangeIsLogged(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create(['status' => false, 'status_reason' => 'icmp']);
         DevicePollingMethod::factory()->create([
@@ -592,9 +560,9 @@ class EditPollingControllerTest extends TestCase
         $user = User::factory()->create(['enabled' => 1]);
         $user->givePermissionTo(['device.update', 'secret.update']);
 
-        $foreignSecret = \App\Models\Secret::create([
+        $foreignSecret = Secret::create([
             'description' => 'Foreign SNMP Secret',
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'foreign-community'],
         ]);
         DevicePollingMethod::factory()->create([
@@ -619,7 +587,7 @@ class EditPollingControllerTest extends TestCase
                 'description' => 'Stolen',
                 'secret_data' => [
                     'version' => 'v2c',
-                    'community' => \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::MASK,
+                    'community' => SecretDefinition::MASK,
                 ],
             ]
         );
@@ -631,9 +599,7 @@ class EditPollingControllerTest extends TestCase
 
     public function testStorePollingMethodUnreachableReturns422(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create(['hostname' => 'unreachable-device2.invalid']);
 
@@ -661,9 +627,7 @@ class EditPollingControllerTest extends TestCase
 
     public function testStorePollingMethodForceSaveBypassesUnreachable(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create(['hostname' => 'unreachable-device3.invalid']);
 
@@ -686,9 +650,7 @@ class EditPollingControllerTest extends TestCase
 
     public function testUpdatePollingMethodSettingsOnlyStoresOverridesAndFallsBackToDefaults(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create();
 
@@ -717,7 +679,7 @@ class EditPollingControllerTest extends TestCase
         $freshMethod = $method->fresh();
         $this->assertEquals([], $freshMethod->settings);
         $config = $device->fresh()->polling()->unixAgent();
-        $this->assertInstanceOf(\LibreNMS\Polling\Method\Config\UnixAgentConfig::class, $config);
+        $this->assertInstanceOf(UnixAgentConfig::class, $config);
         $this->assertEquals(6556, $config->port);
         $this->assertEquals(10, $config->timeout);
 
@@ -739,7 +701,7 @@ class EditPollingControllerTest extends TestCase
         $freshMethod = $method->fresh();
         $this->assertEquals(['port' => 6557], $freshMethod->settings);
         $config = $device->fresh()->polling()->unixAgent();
-        $this->assertInstanceOf(\LibreNMS\Polling\Method\Config\UnixAgentConfig::class, $config);
+        $this->assertInstanceOf(UnixAgentConfig::class, $config);
         $this->assertEquals(6557, $config->port);
 
         // 3. Clear the override by submitting empty port
@@ -760,14 +722,13 @@ class EditPollingControllerTest extends TestCase
         $freshMethod = $method->fresh();
         $this->assertEquals([], $freshMethod->settings);
         $config = $device->fresh()->polling()->unixAgent();
-        $this->assertInstanceOf(\LibreNMS\Polling\Method\Config\UnixAgentConfig::class, $config);
+        $this->assertInstanceOf(UnixAgentConfig::class, $config);
         $this->assertEquals(6556, $config->port);
     }
 
     public function testUpdateIcmpSettingsSavesIpVersion(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create(['hostname' => 'icmp-device.example.com']);
         $method = DevicePollingMethod::factory()->create([
@@ -796,14 +757,13 @@ class EditPollingControllerTest extends TestCase
         $config = $device->fresh()->polling()->icmp();
         $this->assertSame('ipv6', $config->ipVersion);
         $icmpMethod = app(PollingMethodRegistry::class)->get(PollingMethodType::Icmp);
-        $this->assertInstanceOf(\LibreNMS\Polling\Method\Methods\IcmpPollingMethod::class, $icmpMethod);
-        $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($device->fresh(), $config));
+        $this->assertInstanceOf(IcmpPollingMethod::class, $icmpMethod);
+        $this->assertSame(AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($device->fresh(), $config));
     }
 
     public function testUpdateStoresOnlyUserSetSettings(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $device = Device::factory()->create();
         $method = DevicePollingMethod::factory()->create([
@@ -823,12 +783,11 @@ class EditPollingControllerTest extends TestCase
 
     public function testUpdateWithoutSecretModeKeepsSecret(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
-        $secret = \App\Models\Secret::create([
+        $secret = Secret::create([
             'description' => 'Kept Secret',
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'kept'],
         ]);
         $device = Device::factory()->create();
@@ -853,9 +812,9 @@ class EditPollingControllerTest extends TestCase
         Permission::findOrCreate('device.viewAll');
         $user->givePermissionTo('device.viewAll'); // may use any secret
 
-        $secret = \App\Models\Secret::create([
+        $secret = Secret::create([
             'description' => 'Usable Secret',
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'usable'],
         ]);
         $device = Device::factory()->create();
@@ -884,9 +843,7 @@ class EditPollingControllerTest extends TestCase
 
     public function testTabParameterIsNotInjectedIntoScript(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
         $device = Device::factory()->create();
         DevicePollingMethod::factory()->create(['device_id' => $device->device_id, 'method_type' => PollingMethodType::Icmp, 'enabled' => true]);
 
@@ -899,9 +856,9 @@ class EditPollingControllerTest extends TestCase
     public function testSecretDataIsLoadedMaskedWithoutUnmask(): void
     {
         $device = Device::factory()->create();
-        $secret = \App\Models\Secret::create([
+        $secret = Secret::create([
             'description' => 'unmask-test',
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'topsecret'],
         ]);
         DevicePollingMethod::factory()->create([
@@ -919,7 +876,7 @@ class EditPollingControllerTest extends TestCase
             ->assertJsonPath('description', 'unmask-test')
             ->assertJsonPath('usage_count', 1)
             ->assertJsonPath('data.version', 'v2c')
-            ->assertJsonPath('data.community', \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::MASK);
+            ->assertJsonPath('data.community', SecretDefinition::MASK);
 
         $user->givePermissionTo('secret.unmask');
         $this->actingAs($user)->getJson(route('secrets.show', $secret))
@@ -929,9 +886,9 @@ class EditPollingControllerTest extends TestCase
 
     public function testSecretDataIsNotLoadedWithoutAccess(): void
     {
-        $secret = \App\Models\Secret::create([
+        $secret = Secret::create([
             'description' => 'other-device-secret',
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'topsecret'],
         ]);
         DevicePollingMethod::factory()->create([
@@ -947,8 +904,7 @@ class EditPollingControllerTest extends TestCase
 
     public function testSaveResponseDoesNotContainSecretData(): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
         $device = Device::factory()->create();
 
         $content = $this->actingAs($admin)->postJson(route('device.edit.polling.store', ['device' => $device]), [
@@ -967,14 +923,12 @@ class EditPollingControllerTest extends TestCase
     public function testDefaultSecretDescriptionOnEditPageIsUnique(): void
     {
         $device = Device::factory()->create(['hostname' => 'probe.example.com']);
-        \App\Models\Secret::create([
+        Secret::create([
             'description' => 'SNMP probe.example.com',
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'secret_type' => SecretType::Snmp,
             'data' => ['version' => 'v2c', 'community' => 'x'],
         ]);
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
-        $admin->givePermissionTo('device.update');
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
 
         $content = $this->actingAs($admin)->get(route('device.edit.polling', $device))->assertOk()->getContent();
 
