@@ -11,6 +11,7 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
@@ -29,19 +30,25 @@ class Processors implements Module
     }
 
     /**
+     * @param  OS  $os
+     * @param  ModuleStatus  $status
+     * @param  ConnectivityHelper  $connectivity
      * @inheritDoc
      */
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabledAndDeviceUp($os->getDevice()) && $connectivity->snmpIsAvailable();
     }
 
     /**
+     * @param  OS  $os
+     * @param  ModuleStatus  $status
+     * @param  ConnectivityHelper  $connectivity
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabledAndDeviceUp($os->getDevice()) && $connectivity->snmpIsAvailable();
     }
 
     /**
