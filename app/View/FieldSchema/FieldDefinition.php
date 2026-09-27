@@ -26,6 +26,8 @@
 
 namespace App\View\FieldSchema;
 
+use Illuminate\Validation\Rule;
+
 class FieldDefinition
 {
     /**
@@ -153,7 +155,9 @@ class FieldDefinition
     }
 
     /**
-     * @return array<int, string>|string|null
+     * Explicit rules, or rules generated from the type, min, max and options.
+     *
+     * @return array<int, mixed>|string|null
      */
     public function getRules(): array|string|null
     {
@@ -163,7 +167,7 @@ class FieldDefinition
 
         $generated = ['nullable'];
         if ($this->type === 'number') {
-            $generated[] = 'integer';
+            $generated[] = in_array($this->cast, ['float', 'double'], true) ? 'numeric' : 'integer';
             if ($this->min !== null) {
                 $generated[] = 'min:' . $this->min;
             }
@@ -171,12 +175,17 @@ class FieldDefinition
                 $generated[] = 'max:' . $this->max;
             }
         } elseif ($this->type === 'select' && ! empty($this->options)) {
-            $generated[] = 'in:' . implode(',', array_keys($this->options));
+            $generated[] = Rule::in(array_keys($this->options));
+        } elseif (in_array($this->type, ['text', 'password'], true)) {
+            $generated[] = 'string';
         }
 
         return $generated;
     }
 
+    /**
+     * Cast a value to the type of this field, null if it can't be.
+     */
     public function castValue(mixed $value): mixed
     {
         if ($value === null) {
@@ -196,7 +205,7 @@ class FieldDefinition
         return match ($targetType) {
             'int', 'integer' => (int) $value,
             'float', 'double' => (float) $value,
-            'bool', 'boolean' => (bool) $value,
+            'bool', 'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
             'string' => (string) $value,
             'array' => (array) $value,
             default => $value,

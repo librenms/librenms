@@ -2,6 +2,12 @@
 
 namespace LibreNMS\Polling\Method\Config;
 
+use Illuminate\Support\Str;
+
+/**
+ * Typed settings for a polling method.
+ * Setting keys are snake_case versions of the property names (max_oid => maxOid).
+ */
 abstract class PollingMethodConfig
 {
     public function __construct(
@@ -17,9 +23,29 @@ abstract class PollingMethodConfig
     abstract public static function default(): static;
 
     /**
-     * Array representation of non-secret settings.
+     * Set properties from settings or secret data, values must already be cast to the property type.
      *
-     * @return array<string, mixed>
+     * @param  array<string, mixed>  $values
      */
-    abstract public function settingsArray(): array;
+    public function fill(array $values): static
+    {
+        foreach ($values as $key => $value) {
+            $property = Str::camel($key);
+            if (property_exists($this, $property)) {
+                $this->$property = $value;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the value of a setting by its key.
+     */
+    public function setting(string $key): mixed
+    {
+        $property = Str::camel($key);
+
+        return property_exists($this, $property) ? $this->$property : null;
+    }
 }

@@ -192,6 +192,7 @@ groups:
         - sensor.update
 
     secret:
+        - secret.viewAll
         - secret.view
         - secret.create
         - secret.update

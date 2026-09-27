@@ -265,23 +265,23 @@
                                                     <div class="tw:flex tw:flex-wrap tw:gap-4 tw:mb-4">
                                                         <label class="radio-inline">
                                                             <input type="radio"
-                                                                   name="polling_methods[{{ $method['type'] }}][credential_mode]"
+                                                                   name="polling_methods[{{ $method['type'] }}][secret_mode]"
                                                                    value="default"
-                                                                   x-model="methods['{{ $method['type'] }}'].credential_mode">
+                                                                   x-model="methods['{{ $method['type'] }}'].secret_mode">
                                                             {{ __('Attempt Defaults') }}
                                                         </label>
                                                         <label class="radio-inline">
                                                             <input type="radio"
-                                                                   name="polling_methods[{{ $method['type'] }}][credential_mode]"
+                                                                   name="polling_methods[{{ $method['type'] }}][secret_mode]"
                                                                    value="existing"
-                                                                   x-model="methods['{{ $method['type'] }}'].credential_mode">
+                                                                   x-model="methods['{{ $method['type'] }}'].secret_mode">
                                                             {{ __('Use Existing Secret') }}
                                                         </label>
                                                         <label class="radio-inline">
                                                             <input type="radio"
-                                                                   name="polling_methods[{{ $method['type'] }}][credential_mode]"
+                                                                   name="polling_methods[{{ $method['type'] }}][secret_mode]"
                                                                    value="new"
-                                                                   x-model="methods['{{ $method['type'] }}'].credential_mode">
+                                                                   x-model="methods['{{ $method['type'] }}'].secret_mode">
                                                             {{ __('Create New Secret') }}
                                                         </label>
                                                     </div>
@@ -294,14 +294,14 @@
                                                         type="secret"
                                                         :data="['secret_type' => $method['type']]"
                                                         :placeholder="__('Select an existing secret...')"
-                                                        x-show="methods['{{ $method['type'] }}'].credential_mode === 'existing'"
+                                                        x-show="methods['{{ $method['type'] }}'].secret_mode === 'existing'"
                                                         x-cloak
                                                         x-model="methods['{{ $method['type'] }}'].secret_id"
                                                         class="tw:max-w-md"
                                                     />
 
                                                     {{-- New secret form --}}
-                                                    <template x-if="methods['{{ $method['type'] }}'].credential_mode === 'new'">
+                                                    <template x-if="methods['{{ $method['type'] }}'].secret_mode === 'new'">
                                                         <x-device.polling.new-secret-fields
                                                             :method="$method"
                                                             :name-prefix="'polling_methods[' . $method['type'] . '][secret_data]'"
@@ -553,13 +553,13 @@
                             active: 1,
                             validate: m.validate ? 1 : 0,
                             affects_availability: m.affects_availability ? 1 : 0,
-                            credential_mode: m.credential_mode,
+                            secret_mode: m.secret_mode,
                             settings: m.settingsData || {},
                         };
 
-                        if (m.credential_mode === 'existing') {
+                        if (m.secret_mode === 'existing') {
                             methodPayload.secret_id = m.secret_id;
-                        } else if (m.credential_mode === 'new') {
+                        } else if (m.secret_mode === 'new') {
                             methodPayload.description = m.description;
                             methodPayload.secret_data = m.formData || {};
                         }

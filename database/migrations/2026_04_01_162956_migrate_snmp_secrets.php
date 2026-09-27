@@ -49,7 +49,7 @@ return new class extends Migration
 
                     $attribsByDevice = DB::table('devices_attribs')
                         ->whereIn('device_id', $deviceIds)
-                        ->whereIn('attrib_type', ['snmp_max_repeaters', 'snmp_max_oid'])
+                        ->whereIn('attrib_type', ['snmp_max_repeaters', 'snmp_max_oid', 'snmp_bulk'])
                         ->get()
                         ->groupBy('device_id');
 
@@ -98,6 +98,7 @@ return new class extends Migration
                             'retries' => $device->retries !== null ? (int) $device->retries : null,
                             'max_repeaters' => isset($attribs['snmp_max_repeaters']) ? (int) $attribs['snmp_max_repeaters'] : null,
                             'max_oid' => isset($attribs['snmp_max_oid']) ? (int) $attribs['snmp_max_oid'] : null,
+                            'bulk' => isset($attribs['snmp_bulk']) ? filter_var($attribs['snmp_bulk'], FILTER_VALIDATE_BOOLEAN) : null,
                             'port_association_mode' => self::PORT_ASSOCIATION_MODES[$device->port_association_mode] ?? null,
                         ], fn ($v, $k) => $v !== null && $v !== ($defaults[$k] ?? null), ARRAY_FILTER_USE_BOTH);
 

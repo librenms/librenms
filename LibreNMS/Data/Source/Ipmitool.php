@@ -159,8 +159,8 @@ class Ipmitool
                 array_push($cmd, '-y', $this->method->kgKey);
             }
 
-            if ($this->method->cipherSuite) {
-                array_push($cmd, '-C', $this->method->cipherSuite);
+            if ($this->method->ciphersuite) {
+                array_push($cmd, '-C', $this->method->ciphersuite);
             }
 
             if ($this->method->timeout) {

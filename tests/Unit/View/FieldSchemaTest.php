@@ -138,7 +138,7 @@ final class FieldSchemaTest extends TestCase
         $this->assertSame(1.0, (float) $snmpConfig->timeout);
         $this->assertSame(5, $snmpConfig->retries);
 
-        $customSnmp = SnmpConfig::fromSettings(['transport' => 'tcp', 'port' => 1161, 'context' => 'vrf-a']);
+        $customSnmp = SnmpConfig::default()->fill(['transport' => 'tcp', 'port' => 1161, 'context' => 'vrf-a']);
         $this->assertSame('tcp', $customSnmp->transport);
         $this->assertSame(1161, $customSnmp->port);
         $this->assertSame('vrf-a', $customSnmp->context);
@@ -146,9 +146,9 @@ final class FieldSchemaTest extends TestCase
         $unixConfig = \LibreNMS\Polling\Method\Config\UnixAgentConfig::default();
         $this->assertSame(6556, $unixConfig->port);
         $this->assertSame(10, $unixConfig->timeout);
-        $this->assertSame(6557, \LibreNMS\Polling\Method\Config\UnixAgentConfig::fromSettings(['port' => 6557])->port);
+        $this->assertSame(6557, \LibreNMS\Polling\Method\Config\UnixAgentConfig::default()->fill(['port' => 6557])->port);
 
         $this->assertSame('default', \LibreNMS\Polling\Method\Config\IcmpConfig::default()->ipVersion);
-        $this->assertSame('ipv6', \LibreNMS\Polling\Method\Config\IcmpConfig::fromSettings(['ip_version' => 'ipv6'])->ipVersion);
+        $this->assertSame('ipv6', \LibreNMS\Polling\Method\Config\IcmpConfig::default()->fill(['ip_version' => 'ipv6'])->ipVersion);
     }
 }
