@@ -11,6 +11,9 @@ use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Definitions\IpmiDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
 
+/**
+ * @extends PollingMethod<IpmiConfig>
+ */
 final class IpmiPollingMethod extends PollingMethod
 {
     public function definition(): IpmiDefinition

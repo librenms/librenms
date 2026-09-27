@@ -3,6 +3,7 @@
 namespace LibreNMS\Polling\Method;
 
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
@@ -14,6 +15,9 @@ use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
  */
 class PollingMethodRegistry
 {
+    /**
+     * @return PollingMethod<PollingMethodConfig>
+     */
     public function get(PollingMethodType $type): PollingMethod
     {
         return resolve(match ($type) {
