@@ -526,7 +526,7 @@ class MapDataController extends Controller
                     $parent_only_ids = $parent_only_ids->filter(fn (int $parent_id, int $k) => ! $child_ids->has($parent_id));
                 }
 
-                // All parents are peers becuase they are also children
+                // All parents are peers because they are also children
                 if (! $parent_only_ids->count()) {
                     $parent_peer_devices->put($device->device_id, $device->device_id);
                 }
@@ -622,6 +622,13 @@ class MapDataController extends Controller
                     }
                     $this_children = $next_children;
                 }
+            }
+
+            if ($request->boolean('hide_isolated')) {
+                $device_list = array_filter(
+                    $device_list,
+                    fn (array $device): bool => $device['parents']->isNotEmpty() || $device['children']->isNotEmpty()
+                );
             }
         }
 

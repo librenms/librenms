@@ -362,16 +362,12 @@ function _rrd_info($file)
                 // DS definition
                 $p = strpos($key, ']');
                 $ds = substr($key, 3, $p - 3);
-                if (! isset($info['DS'])) {
-                    $info['DS'] = [];
-                }
+                $info['DS'] ??= [];
 
                 $ds_key = substr($key, $p + 2);
 
                 if (! str_contains($ds_key, '[')) {
-                    if (! isset($info['DS']["$ds"])) {
-                        $info['DS']["$ds"] = [];
-                    }
+                    $info['DS']["$ds"] ??= [];
 
                     $info['DS']["$ds"]["$ds_key"] = rrd_strip_quotes($value);
                 }
@@ -379,16 +375,12 @@ function _rrd_info($file)
                 // RRD definition
                 $p = strpos($key, ']');
                 $rra = substr($key, 4, $p - 4);
-                if (! isset($info['RRA'])) {
-                    $info['RRA'] = [];
-                }
+                $info['RRA'] ??= [];
 
                 $rra_key = substr($key, $p + 2);
 
                 if (! str_contains($rra_key, '[')) {
-                    if (! isset($info['RRA']["$rra"])) {
-                        $info['RRA']["$rra"] = [];
-                    }
+                    $info['RRA']["$rra"] ??= [];
 
                     $info['RRA']["$rra"]["$rra_key"] = rrd_strip_quotes($value);
                 }
@@ -442,9 +434,7 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
         }
     }
 
-    if (! isset($opts['rrd_opts'])) {
-        $opts['rrd_opts'] = [];
-    }
+    $opts['rrd_opts'] ??= [];
 
     if (isset($opts['logarithmic']) && $opts['logarithmic']) {
         array_unshift($opts['rrd_opts'], '-o');
@@ -615,9 +605,7 @@ function collectd_draw_generic($timespan, $host, $plugin, $type, $pinst = null, 
         }
     }
 
-    if (is_null($timespan_def)) {
-        $timespan_def = reset($timespans);
-    }
+    $timespan_def ??= reset($timespans);
 
     if (! isset($GraphDefs[$type])) {
         return false;
@@ -696,17 +684,11 @@ function collectd_draw_meta_stack(&$opts, &$sources)
         }
     }
 
-    if (! isset($opts['title'])) {
-        $opts['title'] = 'Unknown title';
-    }
+    $opts['title'] ??= 'Unknown title';
 
-    if (! isset($opts['rrd_opts'])) {
-        $opts['rrd_opts'] = [];
-    }
+    $opts['rrd_opts'] ??= [];
 
-    if (! isset($opts['colors'])) {
-        $opts['colors'] = [];
-    }
+    $opts['colors'] ??= [];
 
     if (isset($opts['logarithmic']) && $opts['logarithmic']) {
         array_unshift($opts['rrd_opts'], '-o');
@@ -833,17 +815,11 @@ function collectd_draw_meta_line(&$opts, &$sources)
         }
     }
 
-    if (! isset($opts['title'])) {
-        $opts['title'] = 'Unknown title';
-    }
+    $opts['title'] ??= 'Unknown title';
 
-    if (! isset($opts['rrd_opts'])) {
-        $opts['rrd_opts'] = [];
-    }
+    $opts['rrd_opts'] ??= [];
 
-    if (! isset($opts['colors'])) {
-        $opts['colors'] = [];
-    }
+    $opts['colors'] ??= [];
 
     if (isset($opts['logarithmic']) && $opts['logarithmic']) {
         array_unshift($opts['rrd_opts'], '-o');

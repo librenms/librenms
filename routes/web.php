@@ -239,7 +239,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
         Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
         Route::get('customlist', [CustomMapListController::class, 'index'])->name('maps.custom.list');
-        Route::get('devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
+        Route::get('devicedependency', [DeviceDependencyController::class, 'dependencyMap'])->name('maps.devicedependency');
         Route::post('getdevices', [Maps\MapDataController::class, 'getDevices'])->name('maps.getdevices');
         Route::post('getdevicelinks', [Maps\MapDataController::class, 'getDeviceLinks'])->name('maps.getdevicelinks');
         Route::post('getgeolinks', [Maps\MapDataController::class, 'getGeographicLinks'])->name('maps.getgeolinks');
@@ -250,7 +250,6 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('nodeimage/{image}', [CustomMapNodeImageController::class, 'show'])->name('maps.nodeimage.show');
         Route::post('nodeimage/{image}', [CustomMapNodeImageController::class, 'update'])->name('maps.nodeimage.update');
     });
-    Route::get('maps/devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
 
     // dashboard
     Route::resource('dashboard', DashboardController::class)->except(['create', 'edit']);

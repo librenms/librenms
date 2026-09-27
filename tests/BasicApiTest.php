@@ -28,7 +28,10 @@ namespace LibreNMS\Tests;
 
 use App\Models\AlertRule;
 use App\Models\Device;
+use App\Models\DeviceGroup;
+use App\Models\Location;
 use App\Models\User;
+use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
@@ -43,13 +46,42 @@ final class BasicApiTest extends DBTestCase
         $token = $user->createToken('test');
         $device = Device::factory()->create();
 
-        $this->json('GET', '/api/v0/devices', [], ['X-Auth-Token' => $token->plainTextToken])
-            ->assertStatus(200)
-            ->assertJson([
-                'status' => 'ok',
-                'devices' => [$device->toArray()],
-                'count' => 1,
-            ]);
+        $res = $this->json('GET', '/api/v0/devices', [], ['X-Auth-Token' => $token->plainTextToken]);
+        $res->assertStatus(200)
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonPath('count', 1);
+
+        $deviceData = $res->json('devices.0');
+        $this->assertIsArray($deviceData);
+        $this->assertArrayNotHasKey('parents', $deviceData);
+        $this->assertSame($device->hostname, $deviceData['hostname']);
+        $this->assertSame((int) $device->status, (int) $deviceData['status']);
+        $this->assertIsInt($deviceData['status']);
+    }
+
+    public function testListDevicesWithParentsShape(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+
+        $parent1 = Device::factory()->create(['hostname' => 'parent1.example.com']);
+        $parent2 = Device::factory()->create(['hostname' => 'parent2.example.com']);
+        $child = Device::factory()->create(['hostname' => 'child.example.com']);
+
+        $child->parents()->attach([$parent1->device_id, $parent2->device_id]);
+
+        $res = $this->json('GET', '/api/v0/devices?type=hostname&query=child', [], ['X-Auth-Token' => $token->plainTextToken]);
+        $res->assertStatus(200)
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonPath('count', 1);
+
+        $childData = $res->json('devices.0');
+        $this->assertArrayNotHasKey('parents', $childData);
+        $this->assertStringContainsString((string) $parent1->device_id, (string) $childData['dependency_parent_id']);
+        $this->assertStringContainsString((string) $parent2->device_id, (string) $childData['dependency_parent_id']);
+        $this->assertStringContainsString('parent1.example.com', (string) $childData['dependency_parent_hostname']);
+        $this->assertStringContainsString('parent2.example.com', (string) $childData['dependency_parent_hostname']);
     }
 
     public function testDisabledUserTokenCannotAccessApi(): void
@@ -344,6 +376,264 @@ final class BasicApiTest extends DBTestCase
         ], ['X-Auth-Token' => $token->plainTextToken])->assertStatus(200);
 
         $this->assertSame('https://example.org/keep', $rule->fresh()->proc);
+    }
+
+    public function testGetDevice(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->admin()->create();
+        $token = $admin->createToken('test');
+
+        $location = Location::factory()->create(['location' => 'Server Room A', 'lat' => 10.5, 'lng' => 20.5]);
+        $device = Device::factory()->create([
+            'hostname' => 'test-device-1.domain.local',
+            'location_id' => $location->id,
+        ]);
+        $vmHost = Device::factory()->create(['hostname' => 'esxi-host.domain.local']);
+        Vminfo::factory()->create([
+            'device_id' => $vmHost->device_id,
+            'vmwVmDisplayName' => $device->hostname,
+        ]);
+
+        // Get by hostname
+        $response = $this->json('GET', "/api/v0/devices/{$device->hostname}", [], ['X-Auth-Token' => $token->plainTextToken]);
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonPath('count', 1)
+            ->assertJsonPath('devices.0.hostname', $device->hostname)
+            ->assertJsonPath('devices.0.location', 'Server Room A')
+            ->assertJsonPath('devices.0.parent_id', $vmHost->device_id);
+
+        $getDeviceData = $response->json('devices.0');
+        $this->assertIsArray($getDeviceData);
+        $this->assertArrayNotHasKey('parents', $getDeviceData);
+        $this->assertSame((int) $device->status, (int) $getDeviceData['status']);
+        $this->assertIsInt($getDeviceData['status']);
+
+        // Get by device_id
+        $this->json('GET', "/api/v0/devices/{$device->device_id}", [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(200)
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonPath('devices.0.device_id', $device->device_id);
+
+        // Nonexistent device
+        $this->json('GET', '/api/v0/devices/nonexistent-device.local', [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(404);
+    }
+
+    public function testGetDeviceUnauthorized(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'unauthorized-device.domain.local']);
+
+        /** @var User $normalUser */
+        $normalUser = User::factory()->create();
+        $normalToken = $normalUser->createToken('normal');
+
+        $this->json('GET', "/api/v0/devices/{$device->device_id}", [], ['X-Auth-Token' => $normalToken->plainTextToken])
+            ->assertStatus(403);
+    }
+
+    public function testListDevicesFilters(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->admin()->create();
+        $token = $admin->createToken('test');
+
+        Device::factory()->create([
+            'hostname' => 'alpha.domain.local',
+            'os' => 'linux',
+            'status' => 1,
+            'ignore' => 0,
+            'disabled' => 0,
+        ]);
+        Device::factory()->create([
+            'hostname' => 'beta.domain.local',
+            'os' => 'cisco',
+            'status' => 0,
+            'ignore' => 0,
+            'disabled' => 1,
+        ]);
+
+        // Filter by os
+        $res = $this->json('GET', '/api/v0/devices?type=os&query=linux', [], ['X-Auth-Token' => $token->plainTextToken]);
+        $res->assertStatus(200)
+            ->assertJsonPath('count', 1)
+            ->assertJsonPath('devices.0.hostname', 'alpha.domain.local');
+
+        // Filter by disabled
+        $res = $this->json('GET', '/api/v0/devices?type=disabled', [], ['X-Auth-Token' => $token->plainTextToken]);
+        $res->assertStatus(200)
+            ->assertJsonPath('count', 1)
+            ->assertJsonPath('devices.0.hostname', 'beta.domain.local');
+
+        // Filter by up
+        $res = $this->json('GET', '/api/v0/devices?type=up', [], ['X-Auth-Token' => $token->plainTextToken]);
+        $res->assertStatus(200)
+            ->assertJsonPath('count', 1)
+            ->assertJsonPath('devices.0.hostname', 'alpha.domain.local');
+    }
+
+    public function testListDevicesNormalUserPermissions(): void
+    {
+        $device1 = Device::factory()->create(['hostname' => 'alpha.domain.local']);
+        Device::factory()->create(['hostname' => 'beta.domain.local']);
+
+        /** @var User $normalUser */
+        $normalUser = User::factory()->create();
+        $normalUser->assignRole('user');
+        $normalUser->devicesOwned()->attach($device1->device_id);
+        \App\Facades\Permissions::invalidateCache();
+        $normalToken = $normalUser->createToken('normal');
+
+        $res = $this->json('GET', '/api/v0/devices', [], ['X-Auth-Token' => $normalToken->plainTextToken]);
+        $res->assertStatus(200)
+            ->assertJsonPath('count', 1)
+            ->assertJsonPath('devices.0.hostname', 'alpha.domain.local');
+    }
+
+    public function testAddDeviceValidationAndCreation(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->admin()->create();
+        $token = $admin->createToken('test');
+
+        // Empty body
+        $this->json('POST', '/api/v0/devices', [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(400);
+
+        // Missing hostname
+        $this->json('POST', '/api/v0/devices', ['snmp_disable' => 1], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(400);
+
+        // Invalid hostname
+        $this->json('POST', '/api/v0/devices', ['hostname' => 'invalid hostname!'], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(400);
+
+        // Successful ping device creation
+        $res = $this->json('POST', '/api/v0/devices', [
+            'hostname' => 'ping-host.test.local',
+            'snmp_disable' => 1,
+            'force_add' => 1,
+            'os' => 'ping',
+            'location' => 'Lab 1',
+        ], ['X-Auth-Token' => $token->plainTextToken]);
+
+        $res->assertStatus(200)
+            ->assertJsonPath('status', 'ok');
+
+        $addedDeviceData = $res->json('devices.0');
+        $this->assertIsArray($addedDeviceData);
+        $this->assertArrayNotHasKey('parents', $addedDeviceData);
+        $this->assertSame(1, (int) $addedDeviceData['snmp_disable']);
+        $this->assertSame('ping-host.test.local', $addedDeviceData['hostname']);
+        $this->assertSame('ping', $addedDeviceData['os']);
+
+        $this->assertDatabaseHas('devices', ['hostname' => 'ping-host.test.local', 'os' => 'ping', 'snmp_disable' => 1]);
+    }
+
+    public function testDelDevice(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->admin()->create();
+        $token = $admin->createToken('test');
+
+        $device = Device::factory()->create(['hostname' => 'delete-me.domain.local']);
+
+        // Nonexistent
+        $this->json('DELETE', '/api/v0/devices/unknown.local', [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(404);
+
+        // Delete by hostname
+        $res = $this->json('DELETE', "/api/v0/devices/{$device->hostname}", [], ['X-Auth-Token' => $token->plainTextToken]);
+        $res->assertStatus(200)
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonPath('devices.0.hostname', 'delete-me.domain.local');
+
+        $deletedDeviceData = $res->json('devices.0');
+        $this->assertIsArray($deletedDeviceData);
+        $this->assertArrayNotHasKey('parents', $deletedDeviceData);
+
+        $this->assertDatabaseMissing('devices', ['device_id' => $device->device_id]);
+    }
+
+    public function testUpdateDevice(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->admin()->create();
+        $token = $admin->createToken('test');
+
+        $device = Device::factory()->create([
+            'hostname' => 'update-target.domain.local',
+            'sysName' => 'Original Name',
+        ]);
+
+        // Nonexistent
+        $this->json('PATCH', '/api/v0/devices/unknown.local', ['field' => 'sysName', 'data' => 'New'], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(404);
+
+        // Missing field
+        $this->json('PATCH', "/api/v0/devices/{$device->device_id}", [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(400);
+
+        // Disallowed field
+        $this->json('PATCH', "/api/v0/devices/{$device->device_id}", ['field' => 'hostname', 'data' => 'new.local'], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(500);
+
+        // Single field update
+        $res = $this->json('PATCH', "/api/v0/devices/{$device->device_id}", ['field' => 'sysName', 'data' => 'Updated Switch'], ['X-Auth-Token' => $token->plainTextToken]);
+        $res->assertStatus(200)
+            ->assertJsonPath('status', 'ok');
+        $this->assertSame('updated switch', $device->fresh()->sysName);
+
+        // Update location field
+        $res = $this->json('PATCH', "/api/v0/devices/{$device->device_id}", ['field' => 'location', 'data' => 'Datacenter 2'], ['X-Auth-Token' => $token->plainTextToken]);
+        $res->assertStatus(200)
+            ->assertJsonPath('status', 'ok');
+        $this->assertSame('Datacenter 2', $device->fresh()->location->location);
+
+        // Multi field update
+        $res = $this->json('PATCH', "/api/v0/devices/{$device->device_id}", [
+            'field' => ['sysName', 'purpose'],
+            'data' => ['Core Switch', 'Production Core'],
+        ], ['X-Auth-Token' => $token->plainTextToken]);
+        $res->assertStatus(200)
+            ->assertJsonPath('status', 'ok');
+        $this->assertSame('core switch', $device->fresh()->sysName);
+        $this->assertSame('Production Core', $device->fresh()->purpose);
+    }
+
+    public function testGetDevicesByGroup(): void
+    {
+        /** @var User $admin */
+        $admin = User::factory()->admin()->create();
+        $token = $admin->createToken('test');
+
+        $group = DeviceGroup::factory()->create(['name' => 'Edge Routers']);
+        $device = Device::factory()->create(['hostname' => 'edge1.domain.local']);
+
+        // Group not found
+        $this->json('GET', '/api/v0/devicegroups/NonexistentGroup', [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(404);
+
+        // Empty group
+        $this->json('GET', "/api/v0/devicegroups/{$group->name}", [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertStatus(404);
+
+        // Attach device to group
+        $group->devices()->attach($device);
+
+        // Get devices by group name
+        $res = $this->json('GET', "/api/v0/devicegroups/{$group->name}", [], ['X-Auth-Token' => $token->plainTextToken]);
+        $res->assertStatus(200)
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonPath('count', 1)
+            ->assertJsonPath('devices.0.device_id', $device->device_id);
+
+        // Get devices by group ID with full=1
+        $resFull = $this->json('GET', "/api/v0/devicegroups/{$group->id}?full=1", [], ['X-Auth-Token' => $token->plainTextToken]);
+        $resFull->assertStatus(200)
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonPath('devices.0.hostname', 'edge1.domain.local');
     }
 
     /**

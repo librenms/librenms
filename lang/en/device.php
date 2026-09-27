@@ -80,8 +80,6 @@ return [
 
         'save' => 'Save',
 
-        'size_on_disk' => 'Size on Disk',
-        'rrd_files' => 'RRD files',
         'last_polled' => 'Last polled',
         'last_discovered' => 'Last discovered',
 
