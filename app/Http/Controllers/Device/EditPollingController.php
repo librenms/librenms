@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Device;
 
+use App\Actions\Device\ResolvePollingMethodSecret;
 use App\Actions\Device\SetDeviceAvailability;
 use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\SavePollingMethodRequest;
@@ -14,20 +15,16 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Polling\Method\Methods\PollingMethod;
-use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
-use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class EditPollingController
 {
     use AuthorizesRequests;
 
     public function __construct(
-        private readonly PollingMethodRegistry $pollingMethods,
+        private readonly ResolvePollingMethodSecret $resolveSecret,
     ) {
     }
 
@@ -40,7 +37,7 @@ class EditPollingController
 
         $device->load('pollingMethods.secret');
 
-        $allMethods = collect($this->pollingMethods->types())->map(
+        $allMethods = collect(PollingMethodType::cases())->map(
             fn (PollingMethodType $type): array => $this->buildMethodData($device, $type)
         );
 
@@ -54,109 +51,45 @@ class EditPollingController
             'configuredMethods' => $configuredMethods,
             'unconfiguredMethods' => $allMethods->filter(fn (array $m): bool => ! $m['configured'])->values(),
             'defaultTab' => $defaultTab,
-            'requestedTab' => PollingMethodType::tryFrom((string) request('tab'))?->value ?? '',
+            'requestedTab' => PollingMethodType::tryFrom((string) request('tab'))->value ?? '',
             'availableSecrets' => Secret::query()
                 ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
                 ->orderBy('description')
-                ->get()
+                ->get(['id', 'description', 'secret_type'])
                 ->groupBy(fn (Secret $s): string => $s->secret_type->value),
         ]);
     }
 
     /**
+     * Form data for a method. Secret values are not included, the form loads them when needed.
+     *
      * @return array<string, mixed>
      */
     private function buildMethodData(Device $device, PollingMethodType $type): array
     {
-        $method = $this->pollingMethods->require($type);
-        $definition = $this->pollingMethods->definition($type);
+        $method = $type->method();
+        $definition = $type->definition();
+        $defaults = $method->defaultConfig($device);
         /** @var DevicePollingMethod|null $row */
         $row = $device->pollingMethods->firstWhere('method_type', $type);
-        $secret = $row?->secret;
-        $canUnmaskSecrets = Gate::allows('unmask', Secret::class);
         $secretType = $method->secretType();
-        $secretDef = SecretDefinition::for($secretType);
-        $schema = $secretDef?->schema() ?? [];
-        $schemaFields = $secretDef ? $secretDef->buildSchemaFields() : [];
-
-        $secretsForType = $secretType ? Secret::query()
-            ->when(auth()->user(), fn ($q, $user) => $q->hasAccess($user))
-            ->where('secret_type', $secretType)
-            ->withCount('devices')
-            ->orderBy('description')
-            ->get() : collect();
-
-        $secretMeta = $secretsForType->mapWithKeys(fn (Secret $availableSecret): array => [
-            (string) $availableSecret->id => [
-                'description' => $availableSecret->description,
-                'usage_count' => $availableSecret->devices_count,
-            ],
-        ])->all();
-
-        $schemaFieldKeys = array_column($schemaFields, 'key');
-        $sensitiveKeys = array_column(array_filter($schemaFields, fn (array $f): bool => ($f['field_type'] ?? $f['type'] ?? '') === 'password'), 'key');
-        $secretFormDataById = $secretsForType->mapWithKeys(
-            fn (Secret $availableSecret): array => [
-                (string) $availableSecret->id => (object) $this->extractFieldValues(
-                    $this->unmaskSecretData($availableSecret, $canUnmaskSecrets, $sensitiveKeys),
-                    $schemaFieldKeys
-                ),
-            ]
-        )->all();
+        $secretDefinition = $secretType?->definition();
 
         return [
             'type' => $type->value,
-            'label' => __('poller.methods.' . $type->value),
+            'label' => $type->label(),
             'icon' => $definition->icon(),
-            'schema_fields' => $schemaFields,
-            'schema_defaults' => $secretDef?->schemaDefaults() ?? [],
-            'settings_fields' => $definition->settingsFields($method->defaultConfig($device)),
+            'schema_fields' => $secretDefinition?->buildSchemaFields() ?? [],
+            'schema_defaults' => $secretDefinition?->schemaDefaults() ?? [],
+            'settings_fields' => $definition->settingsFields($defaults),
             'settings' => [...array_fill_keys(array_keys($definition->fields()), ''), ...$row->settings ?? []],
-            'affects_availability' => $row ? $row->affects_availability : $method->defaultConfig($device)->affectsAvailability,
-            'secret' => $secret,
-            'default_secret_description' => $secretType ? Secret::uniqueDescription(strtoupper($type->value) . ' ' . $device->hostname) : null,
-            'secret_form_data' => $secret
-                ? $this->extractFieldValues($this->unmaskSecretData($secret, $canUnmaskSecrets, $sensitiveKeys), array_keys($schema))
-                : null,
-            'secret_meta' => $secretMeta,
-            'secret_form_data_by_id' => $secretFormDataById,
-            'usage_count' => $secret?->devices()->count() ?? 0,
+            'affects_availability' => $row ? $row->affects_availability : $defaults->affectsAvailability,
+            'secret' => $row?->secret ? ['id' => $row->secret->id, 'description' => $row->secret->description] : null,
+            'default_secret_description' => $secretType ? Secret::defaultDescription($type, $device->hostname) : null,
             'configured' => $row !== null,
             'enabled' => $row ? $row->enabled : true,
             'last_check_successful' => $row?->last_check_successful,
         ];
-    }
-
-    /**
-     * Returns a secret's decrypted data. Without permission to unmask, the sensitive keys are omitted
-     * (the form shows a mask and the server restores them) but other fields stay visible.
-     *
-     * @param  array<int, string>  $sensitiveKeys
-     * @return array<string, mixed>
-     */
-    private function unmaskSecretData(?Secret $secret, bool $canUnmask, array $sensitiveKeys = []): array
-    {
-        if (! $secret) {
-            return [];
-        }
-
-        $data = $secret->data ?? [];
-
-        return $canUnmask ? $data : array_diff_key($data, array_flip($sensitiveKeys));
-    }
-
-    /**
-     * Pulls the given keys out of a data array as strings, for populating a form.
-     *
-     * @param  array<string, mixed>  $data
-     * @param  array<int, string>  $keys
-     * @return array<string, string>
-     */
-    private function extractFieldValues(array $data, array $keys): array
-    {
-        return collect($keys)->mapWithKeys(fn (string $key): array => [
-            $key => (string) data_get($data, $key, ''),
-        ])->all();
     }
 
     /**
@@ -169,7 +102,7 @@ class EditPollingController
         $type = $request->pollingType();
         $deviceMethod = new DevicePollingMethod([
             'method_type' => $type,
-            'affects_availability' => $this->pollingMethods->require($type)->defaultConfig($device)->affectsAvailability,
+            'affects_availability' => $type->method()->defaultConfig($device)->affectsAvailability,
         ]);
 
         return $this->save($request, $device, $deviceMethod, __('poller.method_added'), $toast, $setDeviceAvailability);
@@ -206,12 +139,10 @@ class EditPollingController
         $toast->success(__('poller.method_removed'));
 
         if (request()->wantsJson()) {
-            $secretType = $this->pollingMethods->require($type)->secretType();
-
             return response()->json([
                 'status' => 'ok',
                 'message' => __('poller.method_removed'),
-                'default_secret_description' => $secretType ? Secret::uniqueDescription(strtoupper($type->value) . ' ' . $device->hostname) : null,
+                'default_secret_description' => $type->method()->secretType() ? Secret::defaultDescription($type, $device->hostname) : null,
             ]);
         }
 
@@ -232,7 +163,7 @@ class EditPollingController
         SetDeviceAvailability $setDeviceAvailability,
     ): JsonResponse|RedirectResponse {
         $type = $deviceMethod->method_type;
-        $method = $this->pollingMethods->require($type);
+        $method = $type->method();
 
         if ($request->has('enabled')) {
             $deviceMethod->enabled = $request->boolean('enabled');
@@ -241,10 +172,15 @@ class EditPollingController
             $deviceMethod->affects_availability = $request->boolean('affects_availability');
         }
         if ($request->has('settings')) {
-            $deviceMethod->settings = $this->pollingMethods->definition($type)->filterOverrides($request->validated('settings', []));
+            $deviceMethod->settings = $type->definition()->filterOverrides($request->validated('settings', []));
         }
 
-        $secret = $this->resolveSecret($request, $method);
+        $secret = $this->resolveSecret->execute($device, $type, $request->validated());
+        if ($secret !== null && ! $secret->exists) {
+            $this->authorize('create', Secret::class);
+        } elseif ($secret?->isDirty()) {
+            $this->authorize('update', $secret);
+        }
         if ($secret !== null) {
             $deviceMethod->setRelation('secret', $secret);
         }
@@ -287,41 +223,6 @@ class EditPollingController
         return redirect()->route('device.edit.polling', ['device' => $device, 'tab' => $type->value]);
     }
 
-    /**
-     * The secret selected by the request, unsaved when new or edited. Null keeps the current secret.
-     *
-     * @throws AuthorizationException
-     */
-    private function resolveSecret(SavePollingMethodRequest $request, PollingMethod $method): ?Secret
-    {
-        $secretType = $method->secretType();
-        $mode = $secretType ? $request->secretMode() : null;
-
-        if ($mode === 'new') {
-            $this->authorize('create', Secret::class);
-
-            return new Secret([
-                'secret_type' => $secretType,
-                'description' => $request->validated('description'),
-                'data' => $request->validated('secret_data', []),
-            ]);
-        }
-
-        if ($mode === 'existing' || $mode === 'edit') {
-            $secret = Secret::resolveForType((int) $request->validated('secret_id'), $secretType);
-
-            if ($mode === 'edit') {
-                $this->authorize('update', $secret);
-                $secret->data = $request->validated('secret_data', []);
-                $secret->description = $request->validated('description') ?: $secret->description;
-            }
-
-            return $secret;
-        }
-
-        return null;
-    }
-
     private function reachabilityFailedResponse(
         Request $request,
         Device $device,
@@ -331,7 +232,7 @@ class EditPollingController
     ): JsonResponse|RedirectResponse {
         $message = __('poller.reachability_failed', [
             'hostname' => $device->hostname,
-            'method' => __('poller.methods.' . $type->value),
+            'method' => $type->label(),
         ]);
 
         if ($request->wantsJson()) {

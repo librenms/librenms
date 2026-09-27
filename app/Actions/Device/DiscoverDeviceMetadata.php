@@ -5,12 +5,10 @@ namespace App\Actions\Device;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
-use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 readonly class DiscoverDeviceMetadata
 {
     public function __construct(
-        private PollingMethodRegistry $pollingMethods,
         private ValidateDeviceUniqueness $uniqueness,
     ) {
     }
@@ -29,7 +27,7 @@ readonly class DiscoverDeviceMetadata
         );
 
         foreach ($successfulMethods as $deviceMethod) {
-            $this->pollingMethods->require($deviceMethod->method_type)->enrichDeviceMetadata($device);
+            $deviceMethod->method_type->method()->enrichDeviceMetadata($device);
         }
 
         $this->uniqueness->validateSysName($device);

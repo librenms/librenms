@@ -7,10 +7,13 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Eventlog;
 use App\Models\Secret;
+use Illuminate\Support\Collection;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Modules\Core;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
@@ -63,15 +66,6 @@ final class SnmpPollingMethod extends PollingMethod
         return SecretType::Snmp;
     }
 
-    protected function configFromSettings(DevicePollingMethod $deviceMethod): SnmpConfig
-    {
-        return SnmpConfig::fromSettings(
-            settings: $deviceMethod->settings ?? [],
-            secretData: SnmpSecretData::fromArray($deviceMethod->secret->data ?? []),
-            os: $deviceMethod->device?->os,
-        );
-    }
-
     public function fallbackConfig(Device $device): SnmpConfig
     {
         if ($device->relationLoaded('pollingMethods') && $device->pollingMethods->isNotEmpty()) {
@@ -102,12 +96,7 @@ final class SnmpPollingMethod extends PollingMethod
         }
 
         // Otherwise, attempt ordered default credentials
-        /** @var array<int, int> $defaultSecretIds */
-        $defaultSecretIds = (array) LibrenmsConfig::get('snmp.default_credentials', []);
-        $defaultSecrets = Secret::where('secret_type', SecretType::Snmp)
-            ->whereIn('id', $defaultSecretIds)
-            ->get()
-            ->sortBy(fn ($s) => array_search($s->id, $defaultSecretIds));
+        $defaultSecrets = $this->defaultSecrets();
 
         $reasons = [];
         $lastResult = null;
@@ -125,6 +114,36 @@ final class SnmpPollingMethod extends PollingMethod
         }
 
         return ProbeResult::failure($lastResult?->stats() ?? [], $lastResult?->errorMessage(), $reasons);
+    }
+
+    /**
+     * Without credentials, use the first default credential.
+     */
+    public function assignDefaultSecret(DevicePollingMethod $deviceMethod): void
+    {
+        if ($deviceMethod->secret !== null) {
+            return;
+        }
+
+        $secret = $this->defaultSecrets()->first() ?? throw new MissingSecretException(PollingMethodType::Snmp);
+        $deviceMethod->secret()->associate($secret);
+    }
+
+    /**
+     * The default credentials in the order they should be tried.
+     *
+     * @return Collection<int, Secret>
+     */
+    private function defaultSecrets(): Collection
+    {
+        /** @var array<int, int> $defaultSecretIds */
+        $defaultSecretIds = (array) LibrenmsConfig::get('snmp.default_credentials', []);
+
+        return Secret::where('secret_type', SecretType::Snmp)
+            ->whereIn('id', $defaultSecretIds)
+            ->get()
+            ->sortBy(fn (Secret $secret) => array_search($secret->id, $defaultSecretIds))
+            ->values();
     }
 
     private function noReplyReason(Secret $secret): string

@@ -24,29 +24,4 @@ final class UnixAgentConfig extends PollingMethodConfig
             timeout: (int) LibrenmsConfig::get('unix-agent.connection-timeout', 10),
         );
     }
-
-    public static function fromSettings(array $settings): self
-    {
-        $config = self::default();
-
-        if (isset($settings['port']) && is_numeric($settings['port'])) {
-            $config->port = (int) $settings['port'];
-        }
-        if (isset($settings['timeout']) && is_numeric($settings['timeout'])) {
-            $config->timeout = (int) $settings['timeout'];
-        }
-
-        return $config;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function settingsArray(): array
-    {
-        return [
-            'port' => $this->port,
-            'timeout' => $this->timeout,
-        ];
-    }
 }

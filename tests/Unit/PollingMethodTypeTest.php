@@ -8,7 +8,10 @@ use App\Actions\Device\DiscoverDevicePollingMethods;
 use App\Actions\Device\ValidateDeviceUniqueness;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use App\Models\Secret;
+use Illuminate\Support\Str;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
@@ -18,84 +21,110 @@ use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Polling\Method\PollingMethodAccessor;
-use LibreNMS\Polling\Method\PollingMethodRegistry;
-use LibreNMS\Polling\Method\ProbeResult;
+use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
+use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
+use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
 use LibreNMS\Tests\TestCase;
 
-final class PollingMethodRegistryTest extends TestCase
+final class PollingMethodTypeTest extends TestCase
 {
-    private PollingMethodRegistry $pollingMethods;
-
-    protected function setUp(): void
+    public function testTypesProvideMethods(): void
     {
-        parent::setUp();
-        $this->pollingMethods = app(PollingMethodRegistry::class);
+        $this->assertInstanceOf(SnmpPollingMethod::class, PollingMethodType::Snmp->method());
+        $this->assertInstanceOf(IcmpPollingMethod::class, PollingMethodType::Icmp->method());
+        $this->assertInstanceOf(IpmiPollingMethod::class, PollingMethodType::Ipmi->method());
+        $this->assertInstanceOf(UnixAgentPollingMethod::class, PollingMethodType::UnixAgent->method());
     }
 
-    public function testRegistryContainsDefaultPollingMethods(): void
+    /**
+     * Settings are filled into the config by name, so every field needs a matching config property.
+     */
+    public function testDefinitionFieldsMatchConfigProperties(): void
     {
-        $this->assertTrue($this->pollingMethods->has(PollingMethodType::Snmp));
-        $this->assertTrue($this->pollingMethods->has(PollingMethodType::Icmp));
-        $this->assertTrue($this->pollingMethods->has(PollingMethodType::Ipmi));
-        $this->assertTrue($this->pollingMethods->has(PollingMethodType::UnixAgent));
-
-        $this->assertInstanceOf(SnmpPollingMethod::class, $this->pollingMethods->get(PollingMethodType::Snmp));
-        $this->assertInstanceOf(IcmpPollingMethod::class, $this->pollingMethods->get(PollingMethodType::Icmp));
-        $this->assertInstanceOf(IpmiPollingMethod::class, $this->pollingMethods->get(PollingMethodType::Ipmi));
-        $this->assertInstanceOf(UnixAgentPollingMethod::class, $this->pollingMethods->get(PollingMethodType::UnixAgent));
+        foreach (PollingMethodType::cases() as $type) {
+            $config = $type->method()->defaultConfig();
+            foreach (array_keys($type->definition()->fields()) as $key) {
+                $this->assertTrue(property_exists($config, Str::camel($key)), "{$type->value} config has no property for setting $key");
+            }
+        }
     }
 
-    public function testRegistryBehaviorMethodsProvideMethodsConfigsProbesAndSecrets(): void
+    public function testSettingsAreCastAndFilledIntoConfig(): void
     {
-        // 1. Method instance
-        $snmpMethod = $this->pollingMethods->require(PollingMethodType::Snmp);
-        $icmpMethodDef = $this->pollingMethods->require(PollingMethodType::Icmp);
-        $this->assertInstanceOf(SnmpPollingMethod::class, $snmpMethod);
-        $this->assertInstanceOf(IcmpPollingMethod::class, $icmpMethodDef);
+        $deviceMethod = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Snmp,
+            'settings' => ['transport' => 'tcp', 'port' => '1161', 'timeout' => '2.5', 'max_oid' => '0', 'bulk' => '0', 'context' => ''],
+        ]);
+        $deviceMethod->setRelation('device', new Device(['hostname' => 'example.com']));
+        $deviceMethod->setRelation('secret', null);
 
-        // 2. Method probe
-        $this->assertInstanceOf(ProbeResult::class, $this->pollingMethods->get(PollingMethodType::Snmp)?->probe(new Device(), new SnmpConfig()));
-        $this->assertInstanceOf(ProbeResult::class, $this->pollingMethods->get(PollingMethodType::Icmp)?->probe(new Device(), new IcmpConfig()));
+        $config = PollingMethodType::Snmp->method()->config($deviceMethod);
+        $this->assertInstanceOf(SnmpConfig::class, $config);
+        $this->assertSame('tcp', $config->transport);
+        $this->assertSame(1161, $config->port);
+        $this->assertSame(2.5, $config->timeout);
+        $this->assertSame(SnmpConfig::default()->maxOid, $config->maxOid); // out of range, default
+        $this->assertFalse($config->bulk);
+        $this->assertNull($config->context);
+    }
 
-        // 3. secretType and hasSecret on PollingMethod instances
-        $this->assertSame(\LibreNMS\Enum\SecretType::Snmp, $snmpMethod->secretType());
+    public function testIpmiDetectedTypeIsASetting(): void
+    {
+        $settings = PollingMethodType::Ipmi->definition()->filterOverrides(['ciphersuite' => '3', 'type' => 'lanplus', 'unknown' => 'x']);
+        $this->assertSame(['ciphersuite' => 3, 'type' => 'lanplus'], $settings);
+
+        $deviceMethod = new DevicePollingMethod(['method_type' => PollingMethodType::Ipmi, 'settings' => $settings]);
+        $deviceMethod->setRelation('device', new Device(['hostname' => 'bmc.example.com']));
+        $deviceMethod->setRelation('secret', null);
+
+        $config = PollingMethodType::Ipmi->method()->config($deviceMethod);
+        $this->assertInstanceOf(IpmiConfig::class, $config);
+        $this->assertSame('lanplus', $config->type);
+        $this->assertSame(3, $config->ciphersuite);
+        $this->assertSame('bmc.example.com', $config->hostname);
+    }
+
+    public function testMethodsProvideConfigsProbesAndSecrets(): void
+    {
+        $snmpMethod = PollingMethodType::Snmp->method();
+        $icmpMethod = PollingMethodType::Icmp->method();
+
+        $this->assertFalse($snmpMethod->probe(new Device(), new SnmpConfig())->isSuccess());
+        $this->assertFalse($icmpMethod->probe(new Device(), new IcmpConfig())->isSuccess());
+
+        $this->assertSame(SecretType::Snmp, $snmpMethod->secretType());
         $this->assertTrue($snmpMethod->hasSecret());
-        $snmpSecretDef = \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for($snmpMethod->secretType());
-        $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\SecretDefinition::class, $snmpSecretDef);
-        $snmpData = \LibreNMS\Polling\Secrets\Data\SnmpSecretData::fromArray(['community' => 'public']);
+        $this->assertInstanceOf(SnmpSecretDefinition::class, SecretType::Snmp->definition());
+        $snmpData = SecretType::Snmp->data(['community' => 'public']);
+        $this->assertInstanceOf(SnmpSecretData::class, $snmpData);
         $this->assertSame('public', $snmpData->community);
 
-        $ipmiMethod = $this->pollingMethods->require(PollingMethodType::Ipmi);
-        $this->assertSame(\LibreNMS\Enum\SecretType::Ipmi, $ipmiMethod->secretType());
+        $ipmiMethod = PollingMethodType::Ipmi->method();
+        $this->assertSame(SecretType::Ipmi, $ipmiMethod->secretType());
         $this->assertTrue($ipmiMethod->hasSecret());
-        $ipmiSecretDef = \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for($ipmiMethod->secretType());
-        $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\SecretDefinition::class, $ipmiSecretDef);
-        $ipmiData = \LibreNMS\Polling\Secrets\Data\IpmiSecretData::fromArray(['username' => 'admin', 'password' => 'pass']);
+        $this->assertInstanceOf(IpmiSecretDefinition::class, SecretType::Ipmi->definition());
+        $ipmiData = SecretType::Ipmi->data(['username' => 'admin', 'password' => 'pass']);
+        $this->assertInstanceOf(IpmiSecretData::class, $ipmiData);
         $this->assertSame('admin', $ipmiData->username);
 
-        $this->assertNull($icmpMethodDef->secretType());
-        $this->assertFalse($icmpMethodDef->hasSecret());
+        $this->assertNull($icmpMethod->secretType());
+        $this->assertFalse($icmpMethod->hasSecret());
+        $this->assertNull(PollingMethodType::UnixAgent->method()->secretType());
+        $this->assertFalse(PollingMethodType::UnixAgent->method()->hasSecret());
 
-        $unixAgentMethod = $this->pollingMethods->require(PollingMethodType::UnixAgent);
-        $this->assertNull($unixAgentMethod->secretType());
-        $this->assertFalse($unixAgentMethod->hasSecret());
-
-        // SecretDefinition::for resolution
-        $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition::class, \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for(\LibreNMS\Enum\SecretType::Snmp));
-        $this->assertInstanceOf(\LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition::class, \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for(\LibreNMS\Enum\SecretType::Ipmi));
-        $this->assertNull(\LibreNMS\Polling\Secrets\Definitions\SecretDefinition::for(null));
-
-        // 4. Method config translation from DevicePollingMethod + Secret
+        // Method config from DevicePollingMethod + Secret
         $snmpDeviceMethod = new DevicePollingMethod([
             'method_type' => PollingMethodType::Snmp,
             'enabled' => true,
             'affects_availability' => true,
         ]);
-        $snmpDeviceMethod->setRelation('secret', new \App\Models\Secret([
-            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+        $snmpDeviceMethod->setRelation('secret', new Secret([
+            'secret_type' => SecretType::Snmp,
             'data' => ['community' => 'public'],
         ]));
         $snmpConfig = $snmpMethod->config($snmpDeviceMethod);
+        $this->assertInstanceOf(SnmpConfig::class, $snmpConfig);
         $this->assertSame('public', $snmpConfig->community);
 
         $icmpDeviceMethod = new DevicePollingMethod([
@@ -103,22 +132,13 @@ final class PollingMethodRegistryTest extends TestCase
             'enabled' => true,
             'affects_availability' => true,
         ]);
-        $this->assertInstanceOf(IcmpConfig::class, $this->pollingMethods->get(PollingMethodType::Icmp)?->config($icmpDeviceMethod));
+        $this->assertInstanceOf(IcmpConfig::class, $icmpMethod->config($icmpDeviceMethod));
 
-        // 5. Default affects availability
-        $this->assertTrue($this->pollingMethods->require(PollingMethodType::Snmp)->defaultConfig()->affectsAvailability);
-        $this->assertTrue($this->pollingMethods->require(PollingMethodType::Icmp)->defaultConfig()->affectsAvailability);
-        $this->assertFalse($this->pollingMethods->require(PollingMethodType::Ipmi)->defaultConfig()->affectsAvailability);
-        $this->assertFalse($this->pollingMethods->require(PollingMethodType::UnixAgent)->defaultConfig()->affectsAvailability);
-    }
-
-    public function testRegistryAllAndTypesReturnRegisteredMethods(): void
-    {
-        $types = $this->pollingMethods->types();
-        $this->assertContains(PollingMethodType::Snmp, $types);
-        $this->assertContains(PollingMethodType::Icmp, $types);
-        $this->assertContains(PollingMethodType::Ipmi, $types);
-        $this->assertContains(PollingMethodType::UnixAgent, $types);
+        // Default affects availability
+        $this->assertTrue(PollingMethodType::Snmp->method()->defaultConfig()->affectsAvailability);
+        $this->assertTrue(PollingMethodType::Icmp->method()->defaultConfig()->affectsAvailability);
+        $this->assertFalse(PollingMethodType::Ipmi->method()->defaultConfig()->affectsAvailability);
+        $this->assertFalse(PollingMethodType::UnixAgent->method()->defaultConfig()->affectsAvailability);
     }
 
     public function testDevicePollingConfigReturnsConfigFromMethodOrFallback(): void
@@ -154,7 +174,7 @@ final class PollingMethodRegistryTest extends TestCase
         $device = new Device(['hostname' => '192.0.2.1']);
         $device->device_id = 1;
 
-        $accessor = new PollingMethodAccessor($device, $this->pollingMethods);
+        $accessor = new PollingMethodAccessor($device);
         $this->assertInstanceOf(SnmpConfig::class, $accessor->get(PollingMethodType::Snmp));
         $this->assertInstanceOf(IcmpConfig::class, $accessor->get(PollingMethodType::Icmp));
         $this->assertInstanceOf(IpmiConfig::class, $accessor->get(PollingMethodType::Ipmi));
@@ -183,30 +203,28 @@ final class PollingMethodRegistryTest extends TestCase
         $unixAgentMethod->setRelation('device', $deviceWithMethods);
         $deviceWithMethods->setRelation('pollingMethods', collect([$ipmiMethod, $unixAgentMethod]));
 
-        $accessorWithMethods = new PollingMethodAccessor($deviceWithMethods, $this->pollingMethods);
+        $accessorWithMethods = new PollingMethodAccessor($deviceWithMethods);
         $this->assertTrue($accessorWithMethods->ipmi()->enabled);
         $this->assertTrue($accessorWithMethods->unixAgent()->enabled);
     }
 
-    public function testActionClassesAcceptConstructorInjectedRegistry(): void
+    public function testActionClasses(): void
     {
         $device = new Device(['hostname' => '192.0.2.1']);
-        $builder = new BuildDefaultPollingMethods($this->pollingMethods);
-        $methods = $builder->execute($device);
+        $methods = app(BuildDefaultPollingMethods::class)->execute($device);
         $this->assertCount(2, $methods);
 
-        $discoverMethods = new DiscoverDevicePollingMethods($this->pollingMethods);
-        $resultMethods = $discoverMethods->execute($device, collect());
+        $resultMethods = (new DiscoverDevicePollingMethods)->execute($device, collect());
         $this->assertCount(0, $resultMethods);
 
-        $discoverMetadata = new DiscoverDeviceMetadata($this->pollingMethods, new ValidateDeviceUniqueness);
+        $discoverMetadata = new DiscoverDeviceMetadata(new ValidateDeviceUniqueness);
         $discoverMetadata->execute($device, collect());
         $this->assertSame('192.0.2.1', $device->hostname);
     }
 
     public function testIcmpPollingMethodFieldsAndDefaults(): void
     {
-        $fields = $this->pollingMethods->definition(PollingMethodType::Icmp)->fields();
+        $fields = PollingMethodType::Icmp->definition()->fields();
 
         $this->assertArrayHasKey('ip_version', $fields);
         $this->assertSame('select', $fields['ip_version']->type);
@@ -222,7 +240,7 @@ final class PollingMethodRegistryTest extends TestCase
     public function testIcmpPollingMethodAddressFamilyResolution(): void
     {
         /** @var \LibreNMS\Polling\Method\Methods\IcmpPollingMethod $icmpMethod */
-        $icmpMethod = $this->pollingMethods->require(PollingMethodType::Icmp);
+        $icmpMethod = PollingMethodType::Icmp->method();
 
         $deviceIpv4 = new Device(['hostname' => '192.0.2.1']);
         $snmpMethodIpv4 = new DevicePollingMethod([
@@ -267,6 +285,7 @@ final class PollingMethodRegistryTest extends TestCase
             'settings' => ['ip_version' => 'ipv6'],
         ]);
         $fromMethodConfig = $icmpMethod->config($deviceMethod);
+        $this->assertInstanceOf(IcmpConfig::class, $fromMethodConfig);
         $this->assertSame('ipv6', $fromMethodConfig->ipVersion);
         $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($deviceIpv4, $fromMethodConfig));
 

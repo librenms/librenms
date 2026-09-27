@@ -20,25 +20,4 @@ final class IcmpConfig extends PollingMethodConfig
             ipVersion: 'default',
         );
     }
-
-    public static function fromSettings(array $settings): self
-    {
-        $config = self::default();
-
-        if (! empty($settings['ip_version'])) {
-            $config->ipVersion = (string) $settings['ip_version'];
-        }
-
-        return $config;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function settingsArray(): array
-    {
-        return [
-            'ip_version' => $this->ipVersion,
-        ];
-    }
 }

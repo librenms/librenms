@@ -36,10 +36,6 @@ use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Geocoder;
 use LibreNMS\Util\Git;
-use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Polling\Method\Definitions;
-use LibreNMS\Polling\Method\Methods;
-use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use LibreNMS\Util\Version;
@@ -83,13 +79,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SnmpBackendInterface::class, NetSnmp::class);
         $this->app->bind(SnmpTranslatorInterface::class, NetSnmp::class);
         $this->app->bind(SnmpQueryInterface::class, SnmpQueryBuilder::class);
-
-        $this->app->singleton(PollingMethodRegistry::class, fn () => (new PollingMethodRegistry)
-            ->register(PollingMethodType::Snmp, Methods\SnmpPollingMethod::class, Definitions\SnmpDefinition::class)
-            ->register(PollingMethodType::Icmp, Methods\IcmpPollingMethod::class, Definitions\IcmpDefinition::class)
-            ->register(PollingMethodType::Ipmi, Methods\IpmiPollingMethod::class, Definitions\IpmiDefinition::class)
-            ->register(PollingMethodType::UnixAgent, Methods\UnixAgentPollingMethod::class, Definitions\UnixAgentDefinition::class)
-        );
     }
 
     /**

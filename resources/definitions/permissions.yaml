@@ -175,6 +175,7 @@ groups:
         - routing.update
 
     secret:
+        - secret.viewAll
         - secret.view
         - secret.create
         - secret.update

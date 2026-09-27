@@ -16,13 +16,12 @@ readonly class PollingMethodAccessor
 {
     public function __construct(
         private Device $device,
-        private PollingMethodRegistry $pollingMethods,
     ) {
     }
 
     public function get(PollingMethodType $type): PollingMethodConfig
     {
-        $method = $this->pollingMethods->require($type);
+        $method = $type->method();
         $deviceMethod = $this->device->pollingMethod($type);
 
         return $deviceMethod ? $method->config($deviceMethod) : $method->fallbackConfig($this->device);

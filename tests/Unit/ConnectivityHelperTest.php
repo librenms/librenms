@@ -11,7 +11,6 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
-use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Tests\TestCase;
 use Mockery;
@@ -265,7 +264,7 @@ final class ConnectivityHelperTest extends TestCase
             maxOid: 10
         );
 
-        $snmpMethod = app(PollingMethodRegistry::class)->require(PollingMethodType::Snmp);
+        $snmpMethod = PollingMethodType::Snmp->method();
 
         $this->assertTrue($snmpMethod->probe($device, $snmpConfig)->isSuccess());
         $this->assertTrue($snmpMethod->probe($device, $snmpConfig)->isSuccess());

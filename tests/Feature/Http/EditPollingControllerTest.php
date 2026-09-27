@@ -27,6 +27,7 @@ class EditPollingControllerTest extends TestCase
         Permission::findOrCreate('secret.update');
         Permission::findOrCreate('secret.view');
         Permission::findOrCreate('secret.delete');
+        Permission::findOrCreate('secret.unmask');
     }
 
     protected function tearDown(): void
@@ -158,7 +159,7 @@ class EditPollingControllerTest extends TestCase
         $response->assertSessionHasErrors(['description']);
     }
 
-    public function testIndexRendersPollingViewWithPreservedSecretKeys(): void
+    public function testIndexRendersPollingViewWithoutSecretData(): void
     {
         $admin = User::factory()->create(['enabled' => 1]);
         $admin->assignRole('admin');
@@ -190,11 +191,11 @@ class EditPollingControllerTest extends TestCase
         $response->assertSee('SNMP Secret 123');
         $response->assertViewHas('allMethods', function ($allMethods) use ($secret) {
             $snmp = $allMethods->firstWhere('type', 'snmp');
-            $this->assertArrayHasKey((string) $secret->id, $snmp['secret_meta']);
-            $this->assertArrayHasKey((string) $secret->id, $snmp['secret_form_data_by_id']);
+            $this->assertSame(['id' => $secret->id, 'description' => 'SNMP Secret 123'], $snmp['secret']);
 
             return true;
         });
+        $response->assertDontSee('"community"', false); // secret data is loaded on demand
     }
 
     public function testUpdateReturnsJsonResponseWhenRequested(): void
@@ -617,7 +618,7 @@ class EditPollingControllerTest extends TestCase
                 'description' => 'Stolen',
                 'secret_data' => [
                     'version' => 'v2c',
-                    'community' => \App\Models\Secret::MASK,
+                    'community' => \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::MASK,
                 ],
             ]
         );
@@ -793,7 +794,7 @@ class EditPollingControllerTest extends TestCase
         $this->assertEquals(['ip_version' => 'ipv6'], $freshMethod->settings);
         $config = $device->fresh()->polling()->icmp();
         $this->assertSame('ipv6', $config->ipVersion);
-        $icmpMethod = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Icmp);
+        $icmpMethod = PollingMethodType::Icmp->method();
         $this->assertInstanceOf(\LibreNMS\Polling\Method\Methods\IcmpPollingMethod::class, $icmpMethod);
         $this->assertSame(\LibreNMS\Enum\AddressFamily::IPv6, $icmpMethod->resolveAddressFamily($device->fresh(), $config));
     }
@@ -894,7 +895,7 @@ class EditPollingControllerTest extends TestCase
         $this->assertStringNotContainsString('alert(1)', $response->getContent());
     }
 
-    public function testUserWithoutUnmaskStillSeesNonSensitiveSecretFields(): void
+    public function testSecretDataIsLoadedMaskedWithoutUnmask(): void
     {
         $device = Device::factory()->create();
         $secret = \App\Models\Secret::create([
@@ -910,11 +911,56 @@ class EditPollingControllerTest extends TestCase
         ]);
         $user = User::factory()->create(['enabled' => 1]);
         $user->givePermissionTo(['device.update', 'secret.view', 'secret.update']);
+        \DB::table('devices_perms')->insert(['user_id' => $user->user_id, 'device_id' => $device->device_id]);
 
-        $content = $this->actingAs($user)->get(route('device.edit.polling', $device))->assertOk()->getContent();
+        $this->actingAs($user)->getJson(route('secrets.show', $secret))
+            ->assertOk()
+            ->assertJsonPath('description', 'unmask-test')
+            ->assertJsonPath('usage_count', 1)
+            ->assertJsonPath('data.version', 'v2c')
+            ->assertJsonPath('data.community', \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::MASK);
 
+        $user->givePermissionTo('secret.unmask');
+        $this->actingAs($user)->getJson(route('secrets.show', $secret))
+            ->assertOk()
+            ->assertJsonPath('data.community', 'topsecret');
+    }
+
+    public function testSecretDataIsNotLoadedWithoutAccess(): void
+    {
+        $secret = \App\Models\Secret::create([
+            'description' => 'other-device-secret',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'data' => ['version' => 'v2c', 'community' => 'topsecret'],
+        ]);
+        DevicePollingMethod::factory()->create([
+            'device_id' => Device::factory()->create()->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $secret->id,
+        ]);
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->givePermissionTo(['device.update', 'secret.unmask']);
+
+        $this->actingAs($user)->getJson(route('secrets.show', $secret))->assertNotFound();
+    }
+
+    public function testSaveResponseDoesNotContainSecretData(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $device = Device::factory()->create();
+
+        $content = $this->actingAs($admin)->postJson(route('device.edit.polling.store', ['device' => $device]), [
+            'method_type' => 'snmp',
+            'enabled' => 1,
+            'force_save' => 1,
+            'secret_mode' => 'new',
+            'description' => 'new-secret',
+            'secret_data' => ['version' => 'v2c', 'community' => 'topsecret'],
+        ])->assertOk()->getContent();
+
+        $this->assertStringContainsString('new-secret', $content);
         $this->assertStringNotContainsString('topsecret', $content);
-        $this->assertStringContainsString('\u0022version\u0022:\u0022v2c\u0022', $content);
     }
 
     public function testDefaultSecretDescriptionOnEditPageIsUnique(): void

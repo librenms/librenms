@@ -188,11 +188,6 @@ class Stats
     }
 
     /**
-     * @param  Builder|string  $table
-     * @param  array  $groups
-     * @return Collection
-     */
-    /**
      * The SNMP version is stored in the encrypted secret, so it can't be grouped in SQL.
      */
     private function selectSnmpVersions(): Collection
@@ -219,6 +214,11 @@ class Stats
             ->values();
     }
 
+    /**
+     * @param  Builder|string  $table
+     * @param  array  $groups
+     * @return Collection
+     */
     private function selectTotal($table, array $groups = []): Collection
     {
         $query = $table instanceof Builder ? $table : DB::table($table);
