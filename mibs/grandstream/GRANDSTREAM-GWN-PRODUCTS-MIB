@@ -104,7 +104,7 @@ gwnDeviceUptime OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION "Device Uptime."
-    ::= { gwnSystemInfo 7 }
+    ::= { gwnSystemInfo 7 }	
 
 -- 1.3.6.1.4.1.42397.1.3.1.8
 gwnSnmpUptime OBJECT-TYPE
@@ -114,4 +114,14 @@ gwnSnmpUptime OBJECT-TYPE
     DESCRIPTION "Snmpd Uptime."
     ::= { gwnSystemInfo 8 }
 
+-- 1.3.6.1.4.1.42397.1.3.1.9
+gwnDeviceSn OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Device SN."
+    ::= { gwnSystemInfo 9 }
+
 END
+
+
