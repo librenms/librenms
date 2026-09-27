@@ -16,6 +16,9 @@ use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Definitions\IcmpDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
 
+/**
+ * @extends PollingMethod<IcmpConfig>
+ */
 final class IcmpPollingMethod extends PollingMethod
 {
     public function definition(): IcmpDefinition

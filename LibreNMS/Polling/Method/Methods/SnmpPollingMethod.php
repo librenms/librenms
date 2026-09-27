@@ -24,6 +24,9 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SnmpQuery;
 
+/**
+ * @extends PollingMethod<SnmpConfig>
+ */
 final class SnmpPollingMethod extends PollingMethod
 {
     public function __construct(
@@ -75,7 +78,6 @@ final class SnmpPollingMethod extends PollingMethod
     public function fallbackConfig(Device $device): SnmpConfig
     {
         if ($device->relationLoaded('pollingMethods') && $device->pollingMethods->isNotEmpty()) {
-            /** @var SnmpConfig */
             return parent::fallbackConfig($device);
         }
 

@@ -10,6 +10,9 @@ use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Definitions\PollingMethodDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
 
+/**
+ * @template-covariant TConfig of PollingMethodConfig
+ */
 abstract class PollingMethod
 {
     public function secretType(): ?SecretType
@@ -66,11 +69,15 @@ abstract class PollingMethod
 
     /**
      * Config for a newly added method of this type, with defaults for the device if given.
+     *
+     * @return TConfig
      */
     abstract public function defaultConfig(?Device $device = null): PollingMethodConfig;
 
     /**
      * Build the config for a configured method from its settings and secret.
+     *
+     * @return TConfig
      */
     public function config(DevicePollingMethod $deviceMethod): PollingMethodConfig
     {
@@ -90,6 +97,8 @@ abstract class PollingMethod
 
     /**
      * Config used when the device does not have this method configured.
+     *
+     * @return TConfig
      */
     public function fallbackConfig(Device $device): PollingMethodConfig
     {

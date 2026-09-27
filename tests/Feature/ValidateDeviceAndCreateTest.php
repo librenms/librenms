@@ -75,6 +75,9 @@ final class ValidateDeviceAndCreateTest extends DBTestCase
         $this->assertSame($default->id, $snmp?->secret_id);
     }
 
+    /**
+     * @return array<string, array{array<string, array<string, mixed>>, ?string, string}>
+     */
     public static function osProvider(): array
     {
         return [

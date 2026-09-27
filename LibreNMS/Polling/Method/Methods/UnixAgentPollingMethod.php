@@ -9,6 +9,9 @@ use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Util\Rewrite;
 
+/**
+ * @extends PollingMethod<UnixAgentConfig>
+ */
 final class UnixAgentPollingMethod extends PollingMethod
 {
     public function definition(): UnixAgentDefinition
