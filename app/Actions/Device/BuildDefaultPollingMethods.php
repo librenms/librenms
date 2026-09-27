@@ -6,10 +6,12 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 readonly class BuildDefaultPollingMethods
 {
     public function __construct(
+        private PollingMethodRegistry $pollingMethods,
         private ResolvePollingMethodSecret $resolveSecret,
     ) {
     }
@@ -21,11 +23,12 @@ readonly class BuildDefaultPollingMethods
      */
     public function buildMethod(Device $device, PollingMethodType $type, array $data = []): DevicePollingMethod
     {
+        $method = $this->pollingMethods->get($type);
         $pollingMethod = new DevicePollingMethod([
             'method_type' => $type,
             'enabled' => (bool) ($data['enabled'] ?? true),
-            'affects_availability' => (bool) ($data['affects_availability'] ?? $type->method()->defaultConfig()->affectsAvailability),
-            'settings' => $type->definition()->filterOverrides($data['settings'] ?? []),
+            'affects_availability' => (bool) ($data['affects_availability'] ?? $method->defaultConfig()->affectsAvailability),
+            'settings' => $method->definition()->filterOverrides($data['settings'] ?? []),
         ]);
         $pollingMethod->setRelation('device', $device);
 

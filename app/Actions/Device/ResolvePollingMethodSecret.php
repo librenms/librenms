@@ -7,9 +7,15 @@ use App\Models\Secret;
 use Illuminate\Validation\ValidationException;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretMode;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 
-class ResolvePollingMethodSecret
+readonly class ResolvePollingMethodSecret
 {
+    public function __construct(
+        private PollingMethodRegistry $pollingMethods,
+    ) {
+    }
+
     /**
      * The secret selected by polling method form input. New and edited secrets are not saved.
      * Returns null when no secret was selected.
@@ -20,7 +26,7 @@ class ResolvePollingMethodSecret
      */
     public function execute(Device $device, PollingMethodType $type, array $input): ?Secret
     {
-        $secretType = $type->method()->secretType();
+        $secretType = $this->pollingMethods->get($type)->secretType();
         if ($secretType === null) {
             return null;
         }

@@ -30,8 +30,8 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Arr;
-use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Polling\Method\Definitions\SnmpDefinition;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 
 final class SnmpConfig extends PollingMethodConfig
@@ -176,7 +176,7 @@ final class SnmpConfig extends PollingMethodConfig
     private static function fromLegacy(array $settings, SnmpSecretData $secretData, ?string $os, bool $enabled): self
     {
         $config = self::default($os)
-            ->fill(PollingMethodType::Snmp->definition()->filterOverrides($settings))
+            ->fill((new SnmpDefinition)->filterOverrides($settings))
             ->fill(get_object_vars($secretData));
         $config->enabled = $enabled;
 

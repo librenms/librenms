@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
 
 class EditPollingController
@@ -24,6 +25,7 @@ class EditPollingController
     use AuthorizesRequests;
 
     public function __construct(
+        private readonly PollingMethodRegistry $pollingMethods,
         private readonly ResolvePollingMethodSecret $resolveSecret,
     ) {
     }
@@ -67,8 +69,8 @@ class EditPollingController
      */
     private function buildMethodData(Device $device, PollingMethodType $type): array
     {
-        $method = $type->method();
-        $definition = $type->definition();
+        $method = $this->pollingMethods->get($type);
+        $definition = $method->definition();
         $defaults = $method->defaultConfig($device);
         /** @var DevicePollingMethod|null $row */
         $row = $device->pollingMethods->firstWhere('method_type', $type);
@@ -102,7 +104,7 @@ class EditPollingController
         $type = $request->pollingType();
         $deviceMethod = new DevicePollingMethod([
             'method_type' => $type,
-            'affects_availability' => $type->method()->defaultConfig($device)->affectsAvailability,
+            'affects_availability' => $this->pollingMethods->get($type)->defaultConfig($device)->affectsAvailability,
         ]);
 
         return $this->save($request, $device, $deviceMethod, __('poller.method_added'), $toast, $setDeviceAvailability);
@@ -142,7 +144,7 @@ class EditPollingController
             return response()->json([
                 'status' => 'ok',
                 'message' => __('poller.method_removed'),
-                'default_secret_description' => $type->method()->secretType() ? Secret::defaultDescription($type, $device->hostname) : null,
+                'default_secret_description' => $this->pollingMethods->get($type)->secretType() ? Secret::defaultDescription($type, $device->hostname) : null,
             ]);
         }
 
@@ -163,7 +165,7 @@ class EditPollingController
         SetDeviceAvailability $setDeviceAvailability,
     ): JsonResponse|RedirectResponse {
         $type = $deviceMethod->method_type;
-        $method = $type->method();
+        $method = $this->pollingMethods->get($type);
 
         if ($request->has('enabled')) {
             $deviceMethod->enabled = $request->boolean('enabled');
@@ -172,7 +174,7 @@ class EditPollingController
             $deviceMethod->affects_availability = $request->boolean('affects_availability');
         }
         if ($request->has('settings')) {
-            $deviceMethod->settings = $type->definition()->filterOverrides($request->validated('settings', []));
+            $deviceMethod->settings = $method->definition()->filterOverrides($request->validated('settings', []));
         }
 
         $secret = $this->resolveSecret->execute($device, $type, $request->validated());

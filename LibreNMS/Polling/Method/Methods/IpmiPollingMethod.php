@@ -8,10 +8,16 @@ use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\IpmiConnectionFailed;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
+use LibreNMS\Polling\Method\Definitions\IpmiDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
 
 final class IpmiPollingMethod extends PollingMethod
 {
+    public function definition(): IpmiDefinition
+    {
+        return new IpmiDefinition;
+    }
+
     public function defaultConfig(?Device $device = null): IpmiConfig
     {
         return IpmiConfig::default($device->hostname ?? '');

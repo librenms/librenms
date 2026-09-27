@@ -13,10 +13,16 @@ use LibreNMS\Exceptions\FpingUnparsableLine;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\Definitions\IcmpDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
 
 final class IcmpPollingMethod extends PollingMethod
 {
+    public function definition(): IcmpDefinition
+    {
+        return new IcmpDefinition;
+    }
+
     public function defaultConfig(?Device $device = null): IcmpConfig
     {
         return IcmpConfig::default();
