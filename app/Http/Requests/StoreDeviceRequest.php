@@ -7,7 +7,7 @@ use App\Models\PollerGroup;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
+use LibreNMS\Enum\SecretMode;
 
 class StoreDeviceRequest extends FormRequest
 {
@@ -21,7 +21,7 @@ class StoreDeviceRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(\LibreNMS\Polling\Method\PollingMethodRegistry $registry): array
+    public function rules(): array
     {
         $rules = [
             'hostname' => ['required', 'ip_or_hostname'],
@@ -52,25 +52,19 @@ class StoreDeviceRequest extends FormRequest
             $rules["polling_methods.{$method}.active"] = ['nullable', 'boolean'];
             $rules["polling_methods.{$method}.validate"] = ['nullable', 'boolean'];
             $rules["polling_methods.{$method}.affects_availability"] = ['nullable', 'boolean'];
-            $rules["polling_methods.{$method}.credential_mode"] = ['nullable', 'in:default,existing,new'];
+            $rules["polling_methods.{$method}.secret_mode"] = ['nullable', Rule::enum(SecretMode::class)->only([SecretMode::Default, SecretMode::Existing, SecretMode::New])];
 
-            $pollingMethod = $registry->get($type);
-            if (! $pollingMethod) {
-                continue;
-            }
-            $secretDefinition = SecretDefinition::for($pollingMethod->secretType());
+            $secretDefinition = $type->method()->secretType()?->definition();
             if ($secretDefinition !== null) {
                 $rules["polling_methods.{$method}.secret_id"] = [
-                    'required_if:polling_methods.' . $method . '.credential_mode,existing',
+                    'required_if:polling_methods.' . $method . '.secret_mode,existing',
                     'nullable',
                     'integer',
                     'exists:secrets,id',
                 ];
 
-                $rules["polling_methods.{$method}.description"] = ['nullable', 'string', 'max:255', 'unique:secrets,description'];
-
-                $credentialMode = $data['credential_mode'] ?? 'default';
-                if ($credentialMode === 'new') {
+                if (($data['secret_mode'] ?? null) === SecretMode::New->value) {
+                    $rules["polling_methods.{$method}.description"] = ['nullable', 'string', 'max:255', 'unique:secrets,description'];
                     foreach ($secretDefinition->rules() as $key => $rule) {
                         $rules["polling_methods.{$method}.secret_data.{$key}"] = $rule;
                     }
@@ -79,7 +73,7 @@ class StoreDeviceRequest extends FormRequest
 
             // Settings validation rules
             $rules["polling_methods.{$method}.settings"] = ['nullable', 'array'];
-            foreach ($registry->definition($type)->rules() as $key => $rule) {
+            foreach ($type->definition()->rules() as $key => $rule) {
                 $rules["polling_methods.{$method}.settings.{$key}"] = $rule;
             }
         }

@@ -16,13 +16,11 @@ final class UnixAgentDefinition extends PollingMethodDefinition
         return [
             'port' => FieldDefinition::make('port', 'number')
                 ->min(1)
-                ->max(65535)
-                ->rules(['nullable', 'integer', 'min:1', 'max:65535']),
+                ->max(65535),
 
             'timeout' => FieldDefinition::make('timeout', 'number')
                 ->min(1)
-                ->max(300)
-                ->rules(['nullable', 'integer', 'min:1', 'max:300']),
+                ->max(300),
         ];
     }
 }

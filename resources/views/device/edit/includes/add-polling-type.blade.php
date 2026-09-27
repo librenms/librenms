@@ -16,7 +16,7 @@
     <form x-ref="addForm" method="POST" action="{{ route('device.edit.polling.store', $device) }}"
           x-data="addPollingTypeForm(@js([
               'methodType' => old('method_type', ''),
-              'credentialMode' => old('secret_mode', 'existing'),
+              'secretMode' => old('secret_mode', 'existing'),
               'redirectUrl' => route('device.edit.polling', ['device' => $device]),
               'labels' => [
                   'unreachable' => __('poller.reachability_check_failed'),
@@ -77,25 +77,25 @@
                         <h4 class="tw:font-semibold tw:text-sm tw:uppercase tw:tracking-wider tw:mb-4 tw:text-gray-500 tw:dark:text-dark-white-300">{{ __('Credentials') }}</h4>
 
                         <div class="tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:p-5 tw:rounded-lg tw:text-sm tw:bg-white tw:dark:bg-dark-gray-500">
-                            <input type="hidden" name="secret_mode" :value="credentialMode" :disabled="methodType !== '{{ $method['type'] }}'">
+                            <input type="hidden" name="secret_mode" :value="secretMode" :disabled="methodType !== '{{ $method['type'] }}'">
                             {{-- Credential mode picker --}}
                             <div class="tw:mb-5">
                                 <label class="tw:block tw:font-medium tw:mb-3 tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Credential Mode') }}</label>
                                 <div class="tw:flex tw:gap-6">
                                     <label class="tw:flex tw:items-center tw:cursor-pointer tw:group">
-                                        <input type="radio" name="credential_mode_{{ $method['type'] }}" value="existing" x-model="credentialMode" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
+                                        <input type="radio" name="secret_mode_{{ $method['type'] }}" value="existing" x-model="secretMode" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
                                         <span class="tw:group-hover:text-[#337ab7] tw:transition-colors tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Use Existing Secret') }}</span>
                                     </label>
                                     <label class="tw:flex tw:items-center tw:cursor-pointer tw:group">
-                                        <input type="radio" name="credential_mode_{{ $method['type'] }}" value="new" x-model="credentialMode" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
+                                        <input type="radio" name="secret_mode_{{ $method['type'] }}" value="new" x-model="secretMode" class="tw:w-4 tw:h-4 tw:text-[#337ab7] tw:border-gray-300 tw:focus:ring-[#337ab7] tw:mr-2">
                                         <span class="tw:group-hover:text-[#337ab7] tw:transition-colors tw:text-gray-700 tw:dark:text-dark-white-200">{{ __('Create New Secret') }}</span>
                                     </label>
                                 </div>
                             </div>
 
                             {{-- Existing secret picker --}}
-                            <div x-show="credentialMode === 'existing'" style="display: none;" x-transition class="tw:mb-0" :class="(errors && errors['secret_id']) ? 'has-error' : ''">
-                                <fieldset :disabled="methodType !== '{{ $method['type'] }}' || credentialMode !== 'existing'" class="tw:border-0 tw:p-0 tw:m-0">
+                            <div x-show="secretMode === 'existing'" style="display: none;" x-transition class="tw:mb-0" :class="(errors && errors['secret_id']) ? 'has-error' : ''">
+                                <fieldset :disabled="methodType !== '{{ $method['type'] }}' || secretMode !== 'existing'" class="tw:border-0 tw:p-0 tw:m-0">
                                     <x-select2
                                         :id="'secret-select-add-' . $method['type']"
                                         name="secret_id"
@@ -124,15 +124,15 @@
                                     <p class="tw:text-sm tw:text-amber-600 tw:dark:text-amber-400 tw:mt-2">
                                         <i class="fa fa-exclamation-triangle tw:mr-1"></i>
                                         {{ __('No existing secrets found for this type.') }}
-                                        <a href="#" x-on:click.prevent="credentialMode = 'new'" class="tw:underline tw:font-medium">{{ __('Create one instead.') }}</a>
+                                        <a href="#" x-on:click.prevent="secretMode = 'new'" class="tw:underline tw:font-medium">{{ __('Create one instead.') }}</a>
                                     </p>
                                 @endif
                             </div>
 
                             {{-- New secret form --}}
-                            <div x-show="credentialMode === 'new'" style="display: none;" x-transition
+                            <div x-show="secretMode === 'new'" style="display: none;" x-transition
                                  x-data="{ description: @js(old('description', $method['default_secret_description'])), formData: @js($method['schema_defaults'] ?? []) }">
-                                <fieldset :disabled="methodType !== '{{ $method['type'] }}' || credentialMode !== 'new'" class="tw:border-0 tw:p-0 tw:m-0">
+                                <fieldset :disabled="methodType !== '{{ $method['type'] }}' || secretMode !== 'new'" class="tw:border-0 tw:p-0 tw:m-0">
                                     <x-device.polling.new-secret-fields
                                         :method="$method"
                                         name-prefix="secret_data"
@@ -179,7 +179,7 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('addPollingTypeForm', (config) => ({
                 methodType: config.methodType,
-                credentialMode: config.credentialMode,
+                secretMode: config.secretMode,
                 loading: false,
                 errors: {},
                 unreachableDialog: false,

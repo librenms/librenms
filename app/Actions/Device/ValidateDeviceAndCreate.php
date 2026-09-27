@@ -42,12 +42,14 @@ readonly class ValidateDeviceAndCreate
 
     /**
      * @param  Collection<int, DevicePollingMethod>|null  $pollingMethods
+     * @param  PollingMethodType[]  $uncheckedMethods  methods to save without checking, force skips all checks
      */
     public function __construct(
         private Device $device,
         private ?Collection $pollingMethods = null,
         private bool $force = false,
         private bool $ping_fallback = false,
+        private array $uncheckedMethods = [],
         ?BuildDefaultPollingMethods $builder = null,
         ?ValidateDeviceUniqueness $uniqueness = null,
         ?DiscoverDevicePollingMethods $discoverMethods = null,
@@ -67,6 +69,7 @@ readonly class ValidateDeviceAndCreate
      * @throws \LibreNMS\Exceptions\HostExistsException
      * @throws \LibreNMS\Exceptions\HostUnreachableException
      * @throws \LibreNMS\Exceptions\SnmpVersionUnsupportedException
+     * @throws \LibreNMS\Exceptions\MissingSecretException
      */
     public function execute(): bool
     {
@@ -82,15 +85,21 @@ readonly class ValidateDeviceAndCreate
         if (! $this->force) {
             $this->uniqueness->validateIp($this->device);
 
-            $pollingMethods = $this->discoverMethods->execute(
-                $this->device,
-                $pollingMethods,
-                $this->ping_fallback
+            [$unchecked, $toCheck] = $pollingMethods->partition(
+                fn (DevicePollingMethod $m): bool => in_array($m->method_type, $this->uncheckedMethods, true)
             );
+            $pollingMethods = $this->discoverMethods->execute($this->device, $toCheck, $this->ping_fallback)
+                ->concat($unchecked)
+                ->values();
 
             $this->device->setRelation('pollingMethods', $pollingMethods);
 
             $this->discoverMetadata->execute($this->device, $pollingMethods);
+        }
+
+        // methods that were not checked have not found credentials
+        foreach ($pollingMethods as $deviceMethod) {
+            $deviceMethod->method_type->method()->assignDefaultSecret($deviceMethod);
         }
 
         // The OS is detected via SNMP, without it the device is ping only

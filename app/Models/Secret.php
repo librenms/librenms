@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Gate;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 
 #[ObservedBy([SecretObserver::class])]
@@ -17,14 +18,16 @@ class Secret extends BaseModel
     /** @use HasFactory<\Database\Factories\SecretFactory> */
     use HasFactory;
 
-    /**
-     * Placeholder sent to the browser in place of a secret value the user may not see.
-     */
-    public const MASK = '********';
-
     protected $fillable = [
         'description',
         'secret_type',
+        'data',
+    ];
+
+    /**
+     * Never serialize decrypted secret data.
+     */
+    protected $hidden = [
         'data',
     ];
 
@@ -58,10 +61,11 @@ class Secret extends BaseModel
     }
 
     /**
-     * A description based on $base that no existing secret uses.
+     * A unique description for a new secret for a device's polling method.
      */
-    public static function uniqueDescription(string $base): string
+    public static function defaultDescription(PollingMethodType $type, string $hostname): string
     {
+        $base = strtoupper($type->value) . ' ' . $hostname;
         $description = $base;
         for ($i = 2; static::where('description', $description)->exists(); $i++) {
             $description = "$base ($i)";

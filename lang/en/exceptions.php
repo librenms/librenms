@@ -22,6 +22,7 @@ return [
         'sysname_exists' => 'Already have device :hostname due to duplicate sysName: :sysname',
     ],
     'host_name_empty' => 'Hostname is empty',
+    'missing_secret' => 'Credentials are required to add a device with :method without checking it, and there are no default credentials.',
     'invalid_auth_mechanism' => [
         'title' => 'Invalid authentication mechanism',
         'message' => 'No valid authentication mechanism is configured. Please check the auth_mechanism setting.',

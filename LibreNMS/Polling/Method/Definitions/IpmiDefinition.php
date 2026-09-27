@@ -15,20 +15,27 @@ final class IpmiDefinition extends PollingMethodDefinition
     {
         return [
             'hostname' => FieldDefinition::make('hostname', 'text')
-                ->placeholder('Default: device\'s hostname')
-                ->rules(['nullable', 'string']),
+                ->placeholder('Default: device\'s hostname'),
 
             'port' => FieldDefinition::make('port', 'number')
                 ->min(1)
-                ->max(65535)
-                ->rules(['nullable', 'integer', 'min:1', 'max:65535']),
+                ->max(65535),
 
-            'ciphersuite' => FieldDefinition::make('ciphersuite', 'text')
-                ->rules(['nullable', 'string']),
+            'ciphersuite' => FieldDefinition::make('ciphersuite', 'number')
+                ->min(0)
+                ->max(255),
 
             'timeout' => FieldDefinition::make('timeout', 'number')
-                ->min(1)
-                ->rules(['nullable', 'integer', 'min:1']),
+                ->min(1),
+
+            'type' => FieldDefinition::make('type', 'select')
+                ->options([
+                    'lanplus' => 'lanplus',
+                    'lan' => 'lan',
+                    'imb' => 'imb',
+                    'open' => 'open',
+                ])
+                ->placeholder('Auto-detect'),
         ];
     }
 }

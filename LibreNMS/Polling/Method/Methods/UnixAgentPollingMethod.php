@@ -3,7 +3,6 @@
 namespace LibreNMS\Polling\Method\Methods;
 
 use App\Models\Device;
-use App\Models\DevicePollingMethod;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\ProbeResult;
@@ -35,10 +34,5 @@ final class UnixAgentPollingMethod extends PollingMethod
         } catch (\ErrorException $e) {
             return ProbeResult::failure($stats, $e->getMessage());
         }
-    }
-
-    protected function configFromSettings(DevicePollingMethod $deviceMethod): UnixAgentConfig
-    {
-        return UnixAgentConfig::fromSettings($deviceMethod->settings ?? []);
     }
 }

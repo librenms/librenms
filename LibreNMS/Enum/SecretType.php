@@ -26,8 +26,37 @@
 
 namespace LibreNMS\Enum;
 
+use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
+use LibreNMS\Polling\Secrets\Data\SecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
+use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
+use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
+use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
+
 enum SecretType: string
 {
     case Snmp = 'snmp';
     case Ipmi = 'ipmi';
+
+    /**
+     * The fields (form, validation rules) of this secret type.
+     */
+    public function definition(): SecretDefinition
+    {
+        return match ($this) {
+            self::Snmp => new SnmpSecretDefinition,
+            self::Ipmi => new IpmiSecretDefinition,
+        };
+    }
+
+    /**
+     * @param  array<string, mixed>  $data  decrypted secret data
+     */
+    public function data(array $data): SecretData
+    {
+        return match ($this) {
+            self::Snmp => SnmpSecretData::fromArray($data),
+            self::Ipmi => IpmiSecretData::fromArray($data),
+        };
+    }
 }

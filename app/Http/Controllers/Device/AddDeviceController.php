@@ -8,7 +8,9 @@ use App\Facades\LibrenmsConfig;
 use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\StoreDeviceRequest;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use App\Models\PollerGroup;
+use App\Models\Secret;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -16,34 +18,27 @@ use Illuminate\Http\Request;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
-use LibreNMS\Polling\Method\PollingMethodRegistry;
-use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class AddDeviceController
 {
     use AuthorizesRequests;
 
-    public function __construct(
-        private readonly PollingMethodRegistry $pollingMethods,
-    ) {
-    }
-
     public function index(Request $request): View
     {
         $this->authorize('create', Device::class);
 
-        $availableMethods = collect($this->pollingMethods->types())->map(function (PollingMethodType $type): array {
-            $method = $this->pollingMethods->require($type);
-            $definition = $this->pollingMethods->definition($type);
-            $secretDefinition = SecretDefinition::for($method->secretType());
-            $schemaFields = $secretDefinition ? $secretDefinition->buildSchemaFields(dataVar: "methods['" . $type->value . "'].formData") : [];
+        $availableMethods = collect(PollingMethodType::cases())->map(function (PollingMethodType $type): array {
+            $method = $type->method();
+            $definition = $type->definition();
+            $secretDefinition = $method->secretType()?->definition();
 
             return [
                 'type' => $type->value,
-                'label' => __('poller.methods.' . $type->value),
+                'label' => $type->label(),
                 'icon' => $definition->icon(),
-                'schema_fields' => $schemaFields,
+                'schema_fields' => $secretDefinition?->buildSchemaFields(dataVar: "methods['" . $type->value . "'].formData") ?? [],
                 'schema_defaults' => $secretDefinition?->schemaDefaults() ?? [],
                 'settings_fields' => $definition->settingsFields($method->defaultConfig(), "methods['" . $type->value . "'].settingsData"),
                 'settings_keys' => array_keys($definition->fields()),
@@ -73,7 +68,7 @@ class AddDeviceController
                 return [$type => [
                     'validate' => old("polling_methods.{$type}.validate") !== null ? (bool) old("polling_methods.{$type}.validate") : true,
                     'affects_availability' => old("polling_methods.{$type}.affects_availability") !== null ? (bool) old("polling_methods.{$type}.affects_availability") : $method['default_affects_availability'],
-                    'credential_mode' => old("polling_methods.{$type}.credential_mode", 'default'),
+                    'secret_mode' => old("polling_methods.{$type}.secret_mode", 'default'),
                     'secret_id' => old("polling_methods.{$type}.secret_id", ''),
                     'description' => old("polling_methods.{$type}.description", ''),
                     'formData' => old("polling_methods.{$type}.secret_data", $method['schema_defaults'] ?? []),
@@ -119,12 +114,6 @@ class AddDeviceController
         /** @var array<string, array<string, mixed>> $rawMethods */
         $rawMethods = $validated['polling_methods'] ?? [];
 
-        // Per-method validate flags: validate if *any* active method requests it.
-        // The SNMP method's validate flag doubles as the old force_add inverse.
-        $forceAdd = $request->boolean('force_add') || collect($rawMethods)
-            ->filter(fn (array $data): bool => (bool) ($data['active'] ?? false))
-            ->every(fn (array $data): bool => empty($data['validate']));
-
         $pollingMethods = $buildMethods->execute($device, ['methods' => $rawMethods]);
 
         if ($pollingMethods->isEmpty()) {
@@ -134,8 +123,19 @@ class AddDeviceController
             ], 422);
         }
 
+        if ($pollingMethods->contains(fn (DevicePollingMethod $m): bool => $m->secret?->exists === false)) {
+            $this->authorize('create', Secret::class);
+        }
+
+        // Methods with validation unchecked are saved without checking them
+        $uncheckedMethods = $pollingMethods
+            ->filter(fn (DevicePollingMethod $m): bool => empty($rawMethods[$m->method_type->value]['validate']))
+            ->pluck('method_type')
+            ->all();
+        $forceAdd = $request->boolean('force_add') || count($uncheckedMethods) === $pollingMethods->count();
+
         try {
-            $validator = new ValidateDeviceAndCreate($device, $pollingMethods, $forceAdd);
+            $validator = new ValidateDeviceAndCreate($device, $pollingMethods, $forceAdd, false, $uncheckedMethods);
             $success = $validator->execute();
 
             if (! $success) {
@@ -154,7 +154,7 @@ class AddDeviceController
                 'error_details' => ! empty($reasons) ? implode("\n", $reasons) : null,
                 'errors' => ['hostname' => $errors],
             ], 422);
-        } catch (HostExistsException|SnmpVersionUnsupportedException $e) {
+        } catch (HostExistsException|SnmpVersionUnsupportedException|MissingSecretException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
                 'errors' => ['hostname' => [$e->getMessage()]],

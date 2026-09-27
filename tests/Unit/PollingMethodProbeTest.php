@@ -24,19 +24,17 @@ final class PollingMethodProbeTest extends TestCase
 
     public function testPollingMethodsReturnProbeResult(): void
     {
-        /** @var \LibreNMS\Polling\Method\PollingMethodRegistry $registry */
-        $registry = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class);
         $device = new Device();
 
-        $snmp = $registry->require(PollingMethodType::Snmp);
-        $icmp = $registry->require(PollingMethodType::Icmp);
-        $ipmi = $registry->require(PollingMethodType::Ipmi);
-        $unixAgent = $registry->require(PollingMethodType::UnixAgent);
+        $snmp = PollingMethodType::Snmp->method();
+        $icmp = PollingMethodType::Icmp->method();
+        $ipmi = PollingMethodType::Ipmi->method();
+        $unixAgent = PollingMethodType::UnixAgent->method();
 
-        $this->assertInstanceOf(ProbeResult::class, $snmp->probe($device, $snmp->fallbackConfig($device)));
-        $this->assertInstanceOf(ProbeResult::class, $icmp->probe($device, $icmp->fallbackConfig($device)));
-        $this->assertInstanceOf(ProbeResult::class, $ipmi->probe($device, $ipmi->fallbackConfig($device)));
-        $this->assertInstanceOf(ProbeResult::class, $unixAgent->probe($device, $unixAgent->fallbackConfig($device)));
+        $this->assertFalse($snmp->probe($device, $snmp->fallbackConfig($device))->isSuccess());
+        $this->assertFalse($icmp->probe($device, $icmp->fallbackConfig($device))->isSuccess());
+        $this->assertFalse($ipmi->probe($device, $ipmi->fallbackConfig($device))->isSuccess());
+        $this->assertFalse($unixAgent->probe($device, $unixAgent->fallbackConfig($device))->isSuccess());
     }
 
     public function testUnixAgentProbeUsesResolvedConfigPortAndTimeout(): void
@@ -48,7 +46,7 @@ final class PollingMethodProbeTest extends TestCase
             'affects_availability' => true,
             'enabled' => true,
         ]);
-        $method = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::UnixAgent);
+        $method = PollingMethodType::UnixAgent->method();
 
         $result = $method->probe($device, $method->config($unixMethod));
         $this->assertIsBool($result->isSuccess());
@@ -58,35 +56,31 @@ final class PollingMethodProbeTest extends TestCase
 
     public function testDisablingPollingMethodTrimsStatusReasonAndUpdatesDeviceStatus(): void
     {
-        $device = \Mockery::mock(Device::class)->makePartial();
-        $device->status = false;
-        $device->status_reason = 'icmp,snmp';
-        $device->shouldReceive('save')->andReturn(true);
-
-        $method = new DevicePollingMethod([
+        $device = new Device(['status' => false, 'status_reason' => 'icmp,snmp']);
+        $snmp = new DevicePollingMethod([
             'method_type' => PollingMethodType::Snmp,
             'enabled' => false,
-            'device_id' => 1,
+            'affects_availability' => true,
+            'last_check_successful' => false,
         ]);
-        $method->setRelation('device', $device);
+        $icmp = new DevicePollingMethod([
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+            'affects_availability' => true,
+            'last_check_successful' => false,
+        ]);
+        $device->setRelation('pollingMethods', collect([$snmp, $icmp]));
+        $setAvailability = app(\App\Actions\Device\SetDeviceAvailability::class);
 
-        $observer = new \App\Observers\DevicePollingMethodObserver();
-        $observer->saved($method);
-
+        $setAvailability->execute($device, commit: false);
         $this->assertEquals('icmp', $device->status_reason);
-        $this->assertEquals(0, $device->status);
+        $this->assertFalse($device->status);
 
         // Disable ICMP as well
-        $icmpMethod = new DevicePollingMethod([
-            'method_type' => PollingMethodType::Icmp,
-            'enabled' => false,
-            'device_id' => 1,
-        ]);
-        $icmpMethod->setRelation('device', $device);
-        $observer->saved($icmpMethod);
-
+        $icmp->enabled = false;
+        $setAvailability->execute($device, commit: false);
         $this->assertEquals('', $device->status_reason);
-        $this->assertEquals(1, $device->status);
+        $this->assertTrue($device->status);
     }
 
     public function testProbeResultStoresAndRetrievesStats(): void
@@ -300,7 +294,7 @@ final class PollingMethodProbeTest extends TestCase
         $this->assertTrue($helper->isAvailable());
 
         $setAvailability = app(\App\Actions\Device\SetDeviceAvailability::class);
-        $this->assertTrue($setAvailability->execute($device));
+        $this->assertTrue($setAvailability->execute($device, commit: false));
         $this->assertTrue($device->status);
         $this->assertEquals('', $device->status_reason);
     }
@@ -328,7 +322,7 @@ final class PollingMethodProbeTest extends TestCase
             'enabled' => true,
         ]);
 
-        $method = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::UnixAgent);
+        $method = PollingMethodType::UnixAgent->method();
 
         $result = $method->probe($device, $method->config($unixMethod));
         $this->assertFalse($result->isSuccess());
@@ -354,7 +348,7 @@ final class PollingMethodProbeTest extends TestCase
 
     public function testFilterOverridesRetainsUserSetValues(): void
     {
-        $method = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->definition(PollingMethodType::Snmp);
+        $method = PollingMethodType::Snmp->definition();
 
         $input = [
             'transport' => 'udp',
@@ -386,7 +380,7 @@ final class PollingMethodProbeTest extends TestCase
         $mockFping = \Mockery::mock(\LibreNMS\Data\Source\Icmp\Fping::class);
         $this->app->instance(\LibreNMS\Data\Source\Icmp\Fping::class, $mockFping);
 
-        $icmpPollingMethod = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Icmp);
+        $icmpPollingMethod = PollingMethodType::Icmp->method();
 
         // 1. ip_version = 'default' -> passes null
         $mockFping->shouldReceive('ping')->with('192.0.2.1', null)->once()->andReturn(\LibreNMS\Data\Source\Icmp\FpingResponse::artificialUp('192.0.2.1'));
@@ -431,7 +425,7 @@ final class PollingMethodProbeTest extends TestCase
         $mockFping = \Mockery::mock(\LibreNMS\Data\Source\Icmp\Fping::class);
         $this->app->instance(\LibreNMS\Data\Source\Icmp\Fping::class, $mockFping);
 
-        $icmpPollingMethod = app(\LibreNMS\Polling\Method\PollingMethodRegistry::class)->require(PollingMethodType::Icmp);
+        $icmpPollingMethod = PollingMethodType::Icmp->method();
 
         // When discover is called on candidate ICMP method, it should preserve the SNMP method, see udp6, and ping IPv6
         $mockFping->shouldReceive('ping')

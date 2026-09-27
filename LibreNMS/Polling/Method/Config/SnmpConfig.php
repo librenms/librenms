@@ -30,6 +30,7 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Arr;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 
@@ -98,80 +99,12 @@ final class SnmpConfig extends PollingMethodConfig
         );
     }
 
-    public static function fromSettings(
-        array $settings,
-        ?SnmpSecretData $secretData = null,
-        ?string $os = 'generic',
-    ): self {
-        $config = self::default($os);
-        $secretData ??= new SnmpSecretData();
-
-        $config->version = $secretData->version;
-        $config->community = $secretData->community;
-        $config->authname = $secretData->authname;
-        $config->authpass = $secretData->authpass;
-        $config->authlevel = $secretData->authlevel;
-        $config->authalgo = $secretData->authalgo;
-        $config->cryptopass = $secretData->cryptopass;
-        $config->cryptoalgo = $secretData->cryptoalgo;
-
-        if (isset($settings['transport']) && $settings['transport'] !== '') {
-            $config->transport = (string) $settings['transport'];
-        }
-        if (isset($settings['port']) && is_numeric($settings['port'])) {
-            $config->port = (int) $settings['port'];
-        }
-        if (isset($settings['timeout']) && is_numeric($settings['timeout']) && $settings['timeout'] > 0) {
-            $config->timeout = max(0.1, (float) $settings['timeout']);
-        }
-        if (isset($settings['retries']) && is_numeric($settings['retries'])) {
-            $config->retries = max(0, (int) $settings['retries']);
-        }
-        if (isset($settings['max_repeaters']) && is_numeric($settings['max_repeaters'])) {
-            $config->maxRepeaters = max(0, (int) $settings['max_repeaters']);
-        }
-        if (isset($settings['max_oid']) && is_numeric($settings['max_oid'])) {
-            $config->maxOid = max(1, (int) $settings['max_oid']);
-        }
-        if (! empty($settings['context'])) {
-            $config->context = (string) $settings['context'];
-        }
-        if (isset($settings['bulk'])) {
-            $config->bulk = filter_var($settings['bulk'], FILTER_VALIDATE_BOOLEAN);
-        }
-        if (! empty($settings['port_association_mode'])) {
-            $config->portAssociationMode = (string) $settings['port_association_mode'];
-        }
-
-        return $config;
-    }
-
-    /**
-     * Array representation of non-secret settings.
-     *
-     * @return array<string, mixed>
-     */
-    public function settingsArray(): array
-    {
-        return [
-            'transport' => $this->transport,
-            'port' => $this->port,
-            'timeout' => $this->timeout,
-            'retries' => $this->retries,
-            'max_repeaters' => $this->maxRepeaters,
-            'max_oid' => $this->maxOid,
-            'bulk' => $this->bulk,
-            'context' => $this->context,
-            'port_association_mode' => $this->portAssociationMode,
-        ];
-    }
-
     /**
      * Create from legacy fields. Emergency fallback, do not use.
      */
     public static function fromLegacyDeviceFields(Device $device): self
     {
-        $config = self::fromSettings(
+        return self::fromLegacy(
             settings: [
                 'transport' => $device->getAttribute('transport'),
                 'port' => $device->getAttribute('port'),
@@ -193,10 +126,8 @@ final class SnmpConfig extends PollingMethodConfig
                 cryptopass: $device->getAttribute('cryptopass'),
             ),
             os: $device->os,
+            enabled: ! ($device->getAttribute('snmp_disable') ?? false),
         );
-        $config->enabled = ! ($device->getAttribute('snmp_disable') ?? false);
-
-        return $config;
     }
 
     public static function fromDeviceArray(?array $device): self
@@ -208,7 +139,7 @@ final class SnmpConfig extends PollingMethodConfig
             return DeviceCache::get($device_id)->polling()->snmp();
         }
 
-        $config = self::fromSettings(
+        return self::fromLegacy(
             settings: [
                 'transport' => $device['transport'] ?? null,
                 'port' => $device['port'] ?? null,
@@ -235,8 +166,19 @@ final class SnmpConfig extends PollingMethodConfig
                 cryptopass: $device['cryptopass'] ?? null,
             ),
             os: $device['os'] ?? null,
+            enabled: ! ($device['snmp_disable'] ?? false),
         );
-        $config->enabled = ! ($device['snmp_disable'] ?? false);
+    }
+
+    /**
+     * @param  array<string, mixed>  $settings  uncast settings
+     */
+    private static function fromLegacy(array $settings, SnmpSecretData $secretData, ?string $os, bool $enabled): self
+    {
+        $config = self::default($os)
+            ->fill(PollingMethodType::Snmp->definition()->filterOverrides($settings))
+            ->fill(get_object_vars($secretData));
+        $config->enabled = $enabled;
 
         return $config;
     }

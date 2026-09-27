@@ -90,30 +90,15 @@
                                 configured: {{ $method['configured'] ? 'true' : 'false' }},
                                 enabled: {{ $method['enabled'] ? 'true' : 'false' }},
                                 affectsAvailability: {{ $method['affects_availability'] ? 'true' : 'false' }},
-                                currentSecretId: '{{ (string) ($method['secret']?->id ?? '') }}',
-                                selectedSecretId: '{{ (string) ($method['secret']?->id ?? '') }}',
-                                secretDescription: @js($method['secret']?->description ?? ''),
+                                currentSecretId: '{{ (string) ($method['secret']['id'] ?? '') }}',
+                                secretDescription: @js($method['secret']['description'] ?? ''),
                                 newSecretDescription: @js(old('description', $method['default_secret_description'])),
-                                secretMeta: @js((object) array_replace(
-                                    $method['secret_meta'] ?? [],
-                                    $method['secret']
-                                        ? [(string) $method['secret']->id => [
-                                            'description' => $method['secret']->description,
-                                            'usage_count' => $method['usage_count'] ?? 0,
-                                        ]]
-                                        : []
-                                )),
-                                secretFormDataById: @js((object) array_replace(
-                                    $method['secret_form_data_by_id'] ?? [],
-                                    $method['secret']
-                                        ? [(string) $method['secret']->id => (object) ($method['secret_form_data'] ?? $method['schema_defaults'] ?? [])]
-                                        : []
-                                )),
                                 secretFieldLabels: @js((object) collect($method['schema_fields'] ?? [])->mapWithKeys(fn (array $f) => [$f['key'] => $f['label'] ?? $f['key']])),
-                                formData: @js((object) ($method['secret_form_data'] ?? $method['schema_defaults'] ?? [])),
+                                formData: @js((object) ($method['schema_defaults'] ?? [])),
                                 settingsData: @js((object) ($method['settings'] ?? [])),
                                 updateUrl: '{{ route('device.edit.polling.update', ['device' => $device, 'methodType' => $method['type']]) }}',
                                 storeUrl: '{{ route('device.edit.polling.store', ['device' => $device]) }}',
+                                secretUrl: '{{ route('secrets.show', ['secret' => '__ID__']) }}',
                                 destroyUrl: '{{ route('device.edit.polling.destroy', ['device' => $device, 'methodType' => $method['type']]) }}',
                                 labels: {
                                     saveFailed: @js(__('Failed to save settings')),
@@ -189,7 +174,7 @@
                                                         :id="'secret-select-' . $method['type']"
                                                         type="secret"
                                                         :data="['secret_type' => $method['type']]"
-                                                        :selected="$method['secret'] ? ['id' => (string) $method['secret']->id, 'text' => $method['secret']->description] : null"
+                                                        :selected="$method['secret'] ? ['id' => (string) $method['secret']['id'], 'text' => $method['secret']['description']] : null"
                                                         :placeholder="$method['secret'] ? __('Select Secret') : __('No secret - default credentials')"
                                                         :allow-clear="false"
                                                         x-model="selectedSecretId"
@@ -199,7 +184,7 @@
                                                     >
                                                         <option value="" {{ $method['secret'] ? '' : 'selected' }}></option>
                                                         @foreach(($availableSecrets[$method['type']] ?? collect()) as $secret)
-                                                            <option value="{{ (string) $secret->id }}" {{ (string) ($method['secret']?->id ?? '') === (string) $secret->id ? 'selected' : '' }}>
+                                                            <option value="{{ (string) $secret->id }}" {{ (string) ($method['secret']['id'] ?? '') === (string) $secret->id ? 'selected' : '' }}>
                                                                 {{ $secret->description }}
                                                             </option>
                                                         @endforeach
@@ -233,7 +218,7 @@
 
                                                 <div x-show="showSecretInfo" x-cloak style="display: none;"
                                                      class="tw:mt-3 tw:bg-gray-50 tw:dark:bg-dark-gray-400 tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:rounded-lg tw:p-3 tw:text-sm">
-                                                    <div class="tw:font-semibold tw:text-gray-800 tw:dark:text-dark-white-100" x-text="selectedSecretMeta?.description ?? '{{ __('Unknown secret') }}'"></div>
+                                                    <div class="tw:font-semibold tw:text-gray-800 tw:dark:text-dark-white-100" x-text="selectedSecret?.description ?? '{{ __('Unknown secret') }}'"></div>
                                                     <div class="tw:text-gray-500 tw:dark:text-dark-white-300 tw:mt-1">
                                                         <template x-if="isSharedSecret">
                                                             <span>{{ __('Shared — used by') }} <span x-text="otherDevicesCount"></span> {{ __('other device(s).') }}</span>
@@ -242,8 +227,8 @@
                                                             <span>{{ __('Only used by this device.') }}</span>
                                                         </template>
                                                     </div>
-                                                    <div class="tw:text-gray-500 tw:dark:text-dark-white-300 tw:mt-1" x-show="Object.keys(secretFormDataById[selectedSecretId] || {}).length">
-                                                        {{ __('Fields set') }}: <span x-text="Object.keys(secretFormDataById[selectedSecretId] || {}).map(k => secretFieldLabels[k] || k).join(', ')"></span>
+                                                    <div class="tw:text-gray-500 tw:dark:text-dark-white-300 tw:mt-1" x-show="fieldsSet.length">
+                                                        {{ __('Fields set') }}: <span x-text="fieldsSet.map(k => secretFieldLabels[k] || k).join(', ')"></span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -254,7 +239,7 @@
                                                     <div class="form-group tw:max-w-md" :class="(errors && errors['description']) ? 'has-error' : ''">
                                                         <label class="control-label">{{ __('Secret Description') }}</label>
                                                         <input type="text" name="description" x-model="secretDescription" class="form-control" :disabled="!configured || !isEditingSecret">
-                                                        <p class="tw:text-amber-600 tw:dark:text-amber-400 tw:text-xs tw:mt-1.5" x-show="showSharedGuard && updateMode === 'create' && secretDescription === (selectedSecretMeta?.description ?? '')">
+                                                        <p class="tw:text-amber-600 tw:dark:text-amber-400 tw:text-xs tw:mt-1.5" x-show="showSharedGuard && updateMode === 'create' && secretDescription === (selectedSecret?.description ?? '')">
                                                             <i class="fa fa-info-circle tw:mr-1"></i> {{ __('Please update the description so it does not match the existing secret.') }}
                                                         </p>
                                                         <template x-if="errors && errors['description']">
@@ -275,7 +260,7 @@
                                                             <i class="fa fa-exclamation-triangle tw:text-red-600 tw:dark:text-red-500 tw:mt-1 tw:mr-3"></i>
                                                             <div>
                                                                 <p class="tw:text-sm tw:font-medium tw:text-red-800 tw:dark:text-red-400 tw:mb-2">
-                                                                    <span x-text="selectedSecretMeta?.description"></span>
+                                                                    <span x-text="selectedSecret?.description"></span>
                                                                     {{ __('is shared with other devices. Choose how to apply your changes:') }}
                                                                 </p>
                                                                 <div class="tw:flex tw:flex-col tw:gap-2">
@@ -472,13 +457,13 @@
                 credentialMode: 'existing',
                 loading: false,
                 currentSecretId: config.currentSecretId || '',
-                selectedSecretId: config.selectedSecretId || '',
+                selectedSecretId: config.currentSecretId || '',
                 showSecretInfo: false,
                 isEditingSecret: false,
                 secretDescription: config.secretDescription || '',
                 newSecretDescription: config.newSecretDescription || '',
-                secretMeta: config.secretMeta || {},
-                secretFormDataById: config.secretFormDataById || {},
+                secrets: {}, // id => {description, usage_count, data}, loaded when selected
+                secretUrl: config.secretUrl,
                 secretFieldLabels: config.secretFieldLabels || {},
                 formData: config.formData || {},
                 settingsData: config.settingsData || {},
@@ -493,11 +478,15 @@
                 unreachableMessage: '',
                 unreachableDetails: '',
 
-                get selectedSecretMeta() {
-                    return this.secretMeta[this.selectedSecretId] || null;
+                get selectedSecret() {
+                    return this.secrets[this.selectedSecretId] || null;
+                },
+                get fieldsSet() {
+                    const data = this.selectedSecret?.data || {};
+                    return Object.keys(data).filter(k => data[k] !== null && data[k] !== '');
                 },
                 get otherDevicesCount() {
-                    const total = this.selectedSecretMeta?.usage_count ?? 0;
+                    const total = this.selectedSecret?.usage_count ?? 0;
                     const isCurrent = this.configured && (String(this.selectedSecretId) === String(this.currentSecretId));
                     return isCurrent ? Math.max(0, total - 1) : total;
                 },
@@ -505,12 +494,13 @@
                     return this.otherDevicesCount > 0;
                 },
                 get secretDataChanged() {
-                    if (!this.selectedSecretId) { return false; }
-                    return JSON.stringify(this.formData) !== JSON.stringify(this.secretFormDataById[this.selectedSecretId] || {});
+                    if (!this.selectedSecret) { return false; }
+                    return JSON.stringify(this.formData) !== JSON.stringify(this.secretFormData(this.selectedSecret));
                 },
                 get secretValuesChanged() {
+                    if (!this.selectedSecret) { return false; }
                     return this.secretDataChanged
-                        || this.secretDescription !== (this.selectedSecretMeta?.description ?? '');
+                        || this.secretDescription !== this.selectedSecret.description;
                 },
                 get secretMode() {
                     if (!this.configured) { return this.credentialMode; }
@@ -541,9 +531,28 @@
                         || this.secretValuesChanged
                         || this.settingsChanged();
                 },
-                onSecretChange() {
-                    this.formData = { ...(this.secretFormDataById[this.selectedSecretId] || {}) };
-                    this.secretDescription = this.selectedSecretMeta?.description ?? '';
+                async loadSecret(id) {
+                    if (!id || this.secrets[id]) {
+                        return this.secrets[id] || null;
+                    }
+                    const response = await fetch(this.secretUrl.replace('__ID__', id), {
+                        headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'}
+                    });
+                    if (!response.ok) {
+                        return null;
+                    }
+                    const secret = await response.json();
+                    this.secrets = { ...this.secrets, [id]: secret };
+                    return secret;
+                },
+                secretFormData(secret) {
+                    const data = secret?.data || {};
+                    return Object.fromEntries(Object.keys(this.secretFieldLabels).map(k => [k, data[k] === null || data[k] === undefined ? '' : String(data[k])]));
+                },
+                async onSecretChange() {
+                    const secret = await this.loadSecret(this.selectedSecretId);
+                    this.formData = this.secretFormData(secret);
+                    this.secretDescription = secret?.description ?? '';
                     this.showSecretInfo = false;
                     this.updateMode = this.showSharedGuard ? 'create' : 'update';
                 },
@@ -601,12 +610,10 @@
                             this.initialAffectsAvailability = data.method.affects_availability;
                             this.affectsAvailability = data.method.affects_availability;
                             this.currentSecretId = String(data.method.secret?.id ?? '');
-                            this.selectedSecretId = String(data.method.secret?.id ?? '');
-                            this.secretDescription = data.method.secret?.description ?? '';
+                            this.selectedSecretId = this.currentSecretId;
                             this.newSecretDescription = data.method.default_secret_description ?? this.newSecretDescription;
-                            this.secretMeta = data.method.secret_meta ?? {};
-                            this.secretFormDataById = data.method.secret_form_data_by_id ?? {};
-                            this.formData = { ...(data.method.secret_form_data ?? {}) };
+                            this.secrets = {}; // saved secrets may have changed
+                            await this.onSecretChange();
                             this.settingsData = { ...(data.method.settings ?? {}) };
                             this.initialSettingsData = { ...(data.method.settings ?? {}) };
 
@@ -672,6 +679,9 @@
                     }
                 },
                 init() {
+                    if (this.currentSecretId) {
+                        this.onSecretChange();
+                    }
                     this.setDirty(this.type, this.isDirty);
                     this.$watch('isDirty', (val) => {
                         this.setDirty(this.type, val);
