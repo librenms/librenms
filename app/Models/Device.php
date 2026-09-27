@@ -27,7 +27,6 @@ use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Polling\Method\PollingMethodAccessor;
-use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -136,7 +135,7 @@ class Device extends BaseModel
      */
     public function polling(): PollingMethodAccessor
     {
-        return new PollingMethodAccessor($this, app(PollingMethodRegistry::class));
+        return new PollingMethodAccessor($this);
     }
 
     public static function findByIp(?string $ip): ?Device

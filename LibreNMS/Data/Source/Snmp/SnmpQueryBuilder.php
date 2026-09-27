@@ -398,7 +398,7 @@ class SnmpQueryBuilder implements SnmpQueryInterface
         }
 
         $driver = 'array';
-        $key = $this->getCacheKey($command, $oids);
+        $key = $this->getCacheKey($command, $oids, $target, $config);
 
         if (Debug::isEnabled()) {
             $cache_performance = Cache::driver($driver)->get('SnmpQuery_cache_performance', []);
@@ -445,12 +445,12 @@ class SnmpQueryBuilder implements SnmpQueryInterface
     /**
      * @param  string[]  $oids
      */
-    private function getCacheKey(string $type, array $oids): string
+    private function getCacheKey(string $type, array $oids, string $target, SnmpConfig $config): string
     {
         return implode('|', [
             $type,
-            $this->device->hostname,
-            $this->device->community,
+            $target,
+            $config->community,
             $this->options->context,
             implode(',', $oids),
             implode(',', [

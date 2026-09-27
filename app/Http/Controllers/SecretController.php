@@ -29,12 +29,12 @@ namespace App\Http\Controllers;
 use App\Http\Interfaces\ToastInterface;
 use App\Models\Secret;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\SecretType;
-use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 
 class SecretController extends Controller
 {
@@ -53,7 +53,7 @@ class SecretController extends Controller
 
         $type = $request->query('type', 'snmp');
         $secretType = SecretType::tryFrom($type) ?? SecretType::Snmp;
-        $definition = SecretDefinition::for($secretType) ?? abort(404, 'Secret definition not found.');
+        $definition = $secretType->definition();
         $schema = $definition->schema();
         $data = array_merge($definition->schemaDefaults(), old());
 
@@ -79,9 +79,7 @@ class SecretController extends Controller
             abort(400, 'Invalid secret type.');
         }
 
-        $definition = SecretDefinition::for($secretType) ?? abort(400, 'Invalid secret type.');
-        $rules = $definition->rules();
-        $data = $request->validate($rules);
+        $data = $request->validate($secretType->definition()->rules());
 
         Secret::create([
             'description' => $validated['description'],
@@ -94,21 +92,32 @@ class SecretController extends Controller
         return redirect()->route('secrets.index');
     }
 
+    /**
+     * Secret details for forms, loaded when a secret is selected.
+     */
+    public function show(Request $request, Secret $secret): JsonResponse
+    {
+        abort_unless(Secret::hasAccess($request->user())->whereKey($secret->id)->exists(), 404);
+
+        return response()->json([
+            'id' => $secret->id,
+            'description' => $secret->description,
+            'secret_type' => $secret->secret_type->value,
+            'usage_count' => $secret->devices()->count(),
+            'data' => (object) $this->secretData($secret),
+        ]);
+    }
+
     public function edit(Secret $secret): View
     {
         Gate::authorize('update', $secret);
 
-        $definition = SecretDefinition::for($secret->secret_type) ?? abort(404, 'Secret definition not found.');
-        $schema = $definition->schema();
-        $defaults = $definition->schemaDefaults();
-        $secretData = Gate::allows('unmask', $secret)
-            ? $secret->data
-            : $this->maskPasswordFields($secret->data, $schema);
-        $data = array_merge($defaults, $secretData, old());
+        $definition = $secret->secret_type->definition();
+        $data = array_merge($definition->schemaDefaults(), $this->secretData($secret), old());
 
         return view('secrets.edit', [
             'secret' => $secret,
-            'schema' => $schema,
+            'schema' => $definition->schema(),
             'data' => $data,
         ]);
     }
@@ -121,12 +130,9 @@ class SecretController extends Controller
             'description' => ['required', 'string', 'max:255', Rule::unique('secrets', 'description')->ignore($secret->id)],
         ]);
 
-        $definition = SecretDefinition::for($secret->secret_type) ?? abort(404, 'Secret definition not found.');
+        $definition = $secret->secret_type->definition();
+        $request->merge($definition->unmask($request->all(), $secret->data)); // masked means unchanged
         $data = $request->validate($definition->rules());
-
-        if (! Gate::allows('unmask', $secret)) {
-            $data = $this->restoreMaskedFields($data, $secret->data, $definition->schema());
-        }
 
         $secret->update([
             'description' => $validated['description'],
@@ -156,37 +162,12 @@ class SecretController extends Controller
     }
 
     /**
-     * @param  array<string, mixed>  $data
-     * @param  array<string, array<string, mixed>>  $schema
+     * The secret's data, with sensitive values masked if the user may not see them.
+     *
      * @return array<string, mixed>
      */
-    private function maskPasswordFields(array $data, array $schema): array
+    private function secretData(Secret $secret): array
     {
-        foreach ($schema as $field => $config) {
-            if (($config['type'] ?? null) === 'password' && ! empty($data[$field])) {
-                $data[$field] = Secret::MASK;
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param  array<string, mixed>  $newData
-     * @param  array<string, mixed>  $originalData
-     * @param  array<string, array<string, mixed>>  $schema
-     * @return array<string, mixed>
-     */
-    private function restoreMaskedFields(array $newData, array $originalData, array $schema): array
-    {
-        foreach ($schema as $field => $config) {
-            if (($config['type'] ?? null) === 'password') {
-                if (($newData[$field] ?? null) === Secret::MASK) {
-                    $newData[$field] = $originalData[$field] ?? null;
-                }
-            }
-        }
-
-        return $newData;
+        return Gate::allows('unmask', $secret) ? $secret->data : $secret->secret_type->definition()->mask($secret->data);
     }
 }

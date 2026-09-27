@@ -169,7 +169,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('bill', [UserPermissionsController::class, 'attachBill'])->name('bill.attach');
         Route::delete('bill/{bill}', [UserPermissionsController::class, 'detachBill'])->name('bill.detach')->whereNumber('bill');
     });
-    Route::resource('secrets', SecretController::class)->except(['show']);
+    Route::resource('secrets', SecretController::class);
     Route::get('about', [AboutController::class, 'index'])->name('about');
     Route::delete('reporting', [AboutController::class, 'clearReportingData'])->name('reporting.clear');
     Route::get('authlog', [AuthLogController::class, 'index'])->name('auth-log');

@@ -4,16 +4,13 @@ namespace App\Actions\Device;
 
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
-use App\Models\Secret;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\SecretType;
-use LibreNMS\Polling\Method\PollingMethodRegistry;
 
 readonly class BuildDefaultPollingMethods
 {
     public function __construct(
-        private PollingMethodRegistry $pollingMethods,
+        private ResolvePollingMethodSecret $resolveSecret,
     ) {
     }
 
@@ -22,23 +19,17 @@ readonly class BuildDefaultPollingMethods
      *
      * @param  array<string, mixed>  $data
      */
-    public function buildMethod(Device $device, PollingMethodType $type, array $data = []): ?DevicePollingMethod
+    public function buildMethod(Device $device, PollingMethodType $type, array $data = []): DevicePollingMethod
     {
-        $method = $this->pollingMethods->get($type);
-        if (! $method) {
-            return null;
-        }
-
-        $secret = $this->resolveSecret($device, $type, $data, $method->secretType());
-
         $pollingMethod = new DevicePollingMethod([
             'method_type' => $type,
             'enabled' => (bool) ($data['enabled'] ?? true),
-            'affects_availability' => (bool) ($data['affects_availability'] ?? $method->defaultConfig()->affectsAvailability),
-            'settings' => $this->pollingMethods->definition($type)->filterOverrides($data['settings'] ?? []),
+            'affects_availability' => (bool) ($data['affects_availability'] ?? $type->method()->defaultConfig()->affectsAvailability),
+            'settings' => $type->definition()->filterOverrides($data['settings'] ?? []),
         ]);
         $pollingMethod->setRelation('device', $device);
 
+        $secret = $this->resolveSecret->execute($device, $type, $data);
         if ($secret !== null) {
             $pollingMethod->setRelation('secret', $secret);
             if ($secret->exists) {
@@ -47,40 +38,6 @@ readonly class BuildDefaultPollingMethods
         }
 
         return $pollingMethod;
-    }
-
-    /**
-     * Resolve the secret to attach: an existing one picked by ID, a new one from
-     * posted secret data, or none to try the default credentials.
-     *
-     * @param  array<string, mixed>  $data
-     */
-    private function resolveSecret(Device $device, PollingMethodType $type, array $data, ?SecretType $secretType): ?Secret
-    {
-        if ($secretType === null) {
-            return null;
-        }
-
-        $credentialMode = $data['credential_mode'] ?? 'default';
-        $secretId = isset($data['secret_id']) && $data['secret_id'] !== '' ? (int) $data['secret_id'] : null;
-
-        if ($credentialMode === 'existing' && $secretId !== null) {
-            return Secret::resolveForType($secretId, $secretType);
-        }
-
-        if (empty($data['secret_data'])) {
-            return null;
-        }
-
-        $description = ($credentialMode === 'new' && ! empty($data['description']))
-            ? $data['description']
-            : Secret::uniqueDescription(strtoupper($type->value) . ' ' . $device->hostname);
-
-        return new Secret([
-            'description' => $description,
-            'secret_type' => $secretType,
-            'data' => $data['secret_data'],
-        ]);
     }
 
     /**
@@ -104,13 +61,8 @@ readonly class BuildDefaultPollingMethods
             }
 
             $type = PollingMethodType::tryFrom($methodName);
-            if (! $type) {
-                continue;
-            }
-
-            $pollingMethod = $this->buildMethod($device, $type, $data);
-            if ($pollingMethod !== null) {
-                $pollingMethods->push($pollingMethod);
+            if ($type !== null) {
+                $pollingMethods->push($this->buildMethod($device, $type, $data));
             }
         }
 

@@ -4,7 +4,6 @@ namespace LibreNMS\Polling\Method\Methods;
 
 use App\Actions\Device\DeviceMtuTest;
 use App\Models\Device;
-use App\Models\DevicePollingMethod;
 use App\Models\Eventlog;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Enum\AddressFamily;
@@ -36,11 +35,11 @@ final class IcmpPollingMethod extends PollingMethod
     }
 
     /**
-     * Only the SNMP settings are needed, so avoid decrypting the SNMP secret.
+     * Only the SNMP transport is needed, so avoid decrypting the SNMP secret.
      */
     private function snmpTransportFamily(Device $device): AddressFamily
     {
-        $transport = SnmpConfig::fromSettings($device->pollingMethod(PollingMethodType::Snmp)->settings ?? [])->transport;
+        $transport = $device->pollingMethod(PollingMethodType::Snmp)?->settings['transport'] ?? SnmpConfig::default()->transport;
 
         return str_ends_with($transport, '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
     }
@@ -71,14 +70,9 @@ final class IcmpPollingMethod extends PollingMethod
         ], $status->isAlive() ? null : (string) $status);
     }
 
-    protected function configFromSettings(DevicePollingMethod $deviceMethod): IcmpConfig
-    {
-        return IcmpConfig::fromSettings($deviceMethod->settings ?? []);
-    }
-
     public function onProbeComplete(Device $device, ProbeResult $result, bool $commit = false): void
     {
-        if ($result->stat('duplicates')) {
+        if ($result->stat('duplicates') && $device->exists) {
             Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $device, 'icmp', Severity::Warning);
         }
 

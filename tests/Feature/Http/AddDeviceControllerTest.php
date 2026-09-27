@@ -4,6 +4,7 @@ namespace LibreNMS\Tests\Feature\Http;
 
 use App\Models\Device;
 use App\Models\User;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Tests\TestCase;
 use Mockery;
@@ -55,7 +56,7 @@ class AddDeviceControllerTest extends TestCase
                 'snmp' => [
                     'active' => '1',
                     'validate' => '1',
-                    'credential_mode' => 'default',
+                    'secret_mode' => 'default',
                     'settings' => [
                         'transport' => 'udp',
                     ],
@@ -124,7 +125,7 @@ class AddDeviceControllerTest extends TestCase
                 'snmp' => [
                     'active' => '1',
                     'validate' => '1',
-                    'credential_mode' => 'existing',
+                    'secret_mode' => 'existing',
                     'secret_id' => $secret->id,
                     'settings' => [
                         'transport' => 'udp',
@@ -157,7 +158,7 @@ class AddDeviceControllerTest extends TestCase
                 'snmp' => [
                     'active' => '1',
                     'validate' => '0',
-                    'credential_mode' => 'default',
+                    'secret_mode' => 'default',
                     'settings' => [
                         'transport' => 'udp',
                         'port_association_mode' => 'ifName',
@@ -187,7 +188,7 @@ class AddDeviceControllerTest extends TestCase
                 'snmp' => [
                     'active' => '1',
                     'validate' => '0',
-                    'credential_mode' => 'default',
+                    'secret_mode' => 'default',
                     'settings' => [
                         'transport' => 'udp',
                     ],
@@ -221,7 +222,7 @@ class AddDeviceControllerTest extends TestCase
                 'snmp' => [
                     'active' => '1',
                     'validate' => '1',
-                    'credential_mode' => 'default',
+                    'secret_mode' => 'default',
                     'settings' => [
                         'transport' => 'udp',
                     ],
@@ -258,7 +259,7 @@ class AddDeviceControllerTest extends TestCase
                 'snmp' => [
                     'active' => '1',
                     'validate' => '1',
-                    'credential_mode' => 'default',
+                    'secret_mode' => 'default',
                     'settings' => [
                         'transport' => 'udp',
                     ],
@@ -268,6 +269,52 @@ class AddDeviceControllerTest extends TestCase
 
         $response->assertOk();
         $this->assertTrue($capturedForce);
+    }
+
+    public function testStoreDeviceOnlyChecksMethodsWithValidateChecked(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+
+        $captured = [];
+        $mock = Mockery::mock('overload:App\Actions\Device\ValidateDeviceAndCreate');
+        $mock->shouldReceive('__construct')
+            ->andReturnUsing(function ($device, $methods, $force, $pingFallback, $uncheckedMethods) use (&$captured): void {
+                $captured = [$force, $uncheckedMethods];
+            });
+        $mock->shouldReceive('execute')->once()->andReturn(true);
+
+        $this->actingAs($admin)->postJson(route('device.add.store'), [
+            'hostname' => 'partial-check.example.com',
+            'polling_methods' => [
+                'icmp' => ['active' => '1', 'validate' => '1'],
+                'snmp' => ['active' => '1', 'validate' => '0', 'secret_mode' => 'default'],
+            ],
+        ])->assertOk();
+
+        $this->assertSame([false, [PollingMethodType::Snmp]], $captured);
+    }
+
+    public function testStoreDeviceWithNewSecretRequiresSecretCreatePermission(): void
+    {
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->givePermissionTo('device.create');
+
+        $this->actingAs($user)->postJson(route('device.add.store'), [
+            'hostname' => 'no-secret-create.example.com',
+            'polling_methods' => [
+                'snmp' => [
+                    'active' => '1',
+                    'validate' => '0',
+                    'secret_mode' => 'new',
+                    'description' => 'Not Allowed',
+                    'secret_data' => ['version' => 'v2c', 'community' => 'public'],
+                ],
+            ],
+        ])->assertForbidden();
+
+        $this->assertDatabaseMissing('secrets', ['description' => 'Not Allowed']);
+        $this->assertDatabaseMissing('devices', ['hostname' => 'no-secret-create.example.com']);
     }
 
     public function testStoreDeviceWithoutPollingMethodsReturnsCustomErrorMessage(): void
@@ -328,7 +375,7 @@ class AddDeviceControllerTest extends TestCase
                 'snmp' => [
                     'active' => '1',
                     'validate' => '0',
-                    'credential_mode' => 'default',
+                    'secret_mode' => 'default',
                     'settings' => [
                         'transport' => 'udp',
                     ],
@@ -355,7 +402,7 @@ class AddDeviceControllerTest extends TestCase
                 'snmp' => [
                     'active' => '1',
                     'validate' => '0',
-                    'credential_mode' => 'default',
+                    'secret_mode' => 'default',
                     'settings' => [
                         'transport' => 'udp',
                     ],
@@ -383,7 +430,7 @@ class AddDeviceControllerTest extends TestCase
                 'snmp' => [
                     'active' => '1',
                     'validate' => '0',
-                    'credential_mode' => 'default',
+                    'secret_mode' => 'default',
                     'settings' => [
                         'transport' => 'udp',
                         'port' => '',
@@ -501,7 +548,7 @@ class AddDeviceControllerTest extends TestCase
             'hostname' => '127.0.0.10',
             'poller_group' => 0,
             'polling_methods' => ['snmp' => [
-                'active' => 1, 'validate' => 0, 'credential_mode' => 'new', 'description' => '',
+                'active' => 1, 'validate' => 0, 'secret_mode' => 'new', 'description' => '',
                 'secret_data' => ['version' => 'v2c', 'community' => 'y'],
             ]],
         ])->assertOk();

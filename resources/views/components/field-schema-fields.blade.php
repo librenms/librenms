@@ -155,7 +155,7 @@
                 <input type="password"
                        id="{{ $id }}"
                        name="{{ $name }}"
-                       value="{{ \App\Models\Secret::MASK }}"
+                       value="{{ \LibreNMS\Polling\Secrets\Definitions\SecretDefinition::MASK }}"
                        class="form-control"
                        readonly>
             @else

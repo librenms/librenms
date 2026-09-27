@@ -5,6 +5,7 @@ namespace LibreNMS\Polling\Method\Methods;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Exceptions\MissingSecretException;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\ProbeResult;
 
@@ -49,6 +50,15 @@ abstract class PollingMethod
     }
 
     /**
+     * Attach a secret to a method that has none and will be saved without a check.
+     *
+     * @throws MissingSecretException
+     */
+    public function assignDefaultSecret(DevicePollingMethod $deviceMethod): void
+    {
+    }
+
+    /**
      * Config for a newly added method of this type, with defaults for the device if given.
      */
     abstract public function defaultConfig(?Device $device = null): PollingMethodConfig;
@@ -56,11 +66,16 @@ abstract class PollingMethod
     /**
      * Build the config for a configured method from its settings and secret.
      */
-    abstract protected function configFromSettings(DevicePollingMethod $deviceMethod): PollingMethodConfig;
-
     public function config(DevicePollingMethod $deviceMethod): PollingMethodConfig
     {
-        $config = $this->configFromSettings($deviceMethod);
+        $config = $this->defaultConfig($deviceMethod->device)
+            ->fill($deviceMethod->method_type->definition()->filterOverrides($deviceMethod->settings ?? []));
+
+        $secretType = $this->secretType();
+        if ($secretType !== null) {
+            $config->fill(get_object_vars($secretType->data($deviceMethod->secret->data ?? [])));
+        }
+
         $config->enabled = $deviceMethod->enabled;
         $config->affectsAvailability = $deviceMethod->affects_availability;
 

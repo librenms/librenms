@@ -3,13 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
-use App\Facades\LibrenmsConfig;
 use App\Jobs\PingCheck;
 use App\Models\Device;
-use App\Models\Eventlog;
 use Illuminate\Support\Arr;
-use LibreNMS\Data\Source\Icmp\Fping;
-use LibreNMS\Enum\Severity;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -35,7 +32,7 @@ class DevicePing extends LnmsCommand
      *
      * @return int
      */
-    public function handle(Fping $fping, IcmpPollingMethod $icmpMethod): int
+    public function handle(IcmpPollingMethod $icmpMethod): int
     {
         $spec = $this->argument('device spec');
 
@@ -64,16 +61,14 @@ class DevicePing extends LnmsCommand
             $devices = [new Device(['hostname' => $spec])];
         }
 
-        LibrenmsConfig::set('icmp_check', true); // ignore icmp disabled, this is an explicit user action
-
         /** @var Device $device */
         foreach ($devices as $device) {
-            $response = $fping->ping($device->pollerTarget(), $icmpMethod->resolveAddressFamily($device));
-            if ($response->duplicates > 0 && $device->exists) {
-                Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $device, 'icmp', Severity::Warning);
-                $response->ignoreFailure();
-            }
+            // ping even if icmp is disabled, this is an explicit user action
+            $result = $icmpMethod->probe($device, $device->polling()->icmp());
+            $icmpMethod->onProbeComplete($device, $result);
 
+            /** @var FpingResponse $response */
+            $response = $result->stat('fping_status');
             $this->line($device->displayName() . ' : ' . ($response->wasSkipped() ? 'skipped' : $response));
         }
 
