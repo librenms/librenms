@@ -151,7 +151,7 @@ final class AddHostCliTest extends DBTestCase
         $modes = \LibreNMS\SNMPCapabilities::supportedAuthAlgorithms();
         foreach ($modes as $mode) {
             $host = 'hostName' . $mode;
-            $this->artisan('device:add', ['device spec' => $host, '--force' => true, '-a' => $mode, '--v3' => true])
+            $this->artisan('device:add', ['device spec' => $host, '--force' => true, '-u' => 'SecName', '-a' => $mode, '--v3' => true])
                 ->assertExitCode(0)
                 ->execute();
 
@@ -167,7 +167,7 @@ final class AddHostCliTest extends DBTestCase
         $modes = \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms();
         foreach ($modes as $mode) {
             $host = 'hostName' . $mode;
-            $this->artisan('device:add', ['device spec' => $host, '--force' => true, '-x' => $mode, '--v3' => true])
+            $this->artisan('device:add', ['device spec' => $host, '--force' => true, '-u' => 'SecName', '-x' => $mode, '--v3' => true])
                 ->assertExitCode(0)
                 ->execute();
 
