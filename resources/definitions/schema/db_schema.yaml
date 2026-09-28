@@ -381,6 +381,7 @@ cache:
     - { Field: expiration, Type: int, 'Null': false, Extra: '' }
   Indexes:
     cache_key_unique: { Name: cache_key_unique, Columns: [key], Unique: true, Type: BTREE }
+    cache_expiration_index: { Name: cache_expiration_index, Columns: [expiration], Unique: false, Type: BTREE }
 cache_locks:
   Columns:
     - { Field: key, Type: varchar(255), 'Null': false, Extra: '' }
@@ -388,6 +389,7 @@ cache_locks:
     - { Field: expiration, Type: int, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [key], Unique: true, Type: BTREE }
+    cache_locks_expiration_index: { Name: cache_locks_expiration_index, Columns: [expiration], Unique: false, Type: BTREE }
 callback:
   Columns:
     - { Field: callback_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

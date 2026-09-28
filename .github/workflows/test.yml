@@ -37,16 +37,16 @@ jobs:
           -
             name: PHP 8.5
             php-version: 8.5
-            database: mariadb:11.7
+            database: mariadb:lts
           -
             name: Other
             php-version: 8.5
-            database: mariadb:11.7
+            database: mariadb:lts
             arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
           -
             name: Other
             php-version: 8.4
-            database: mysql:8.0
+            database: mysql:8
             arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
 
     services:
