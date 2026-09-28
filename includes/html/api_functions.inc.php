@@ -398,7 +398,7 @@ function add_device(Illuminate\Http\Request $request)
             hardware: $data['hardware'] ?? null,
             os: $data['os'] ?? null,
             ping_only: ! empty($data['snmp_disable']) || ! empty($data['ping_only']),
-            snmpver: $data['snmpver'] ?? null,
+            snmpver: $data['snmpver'] ?? $data['version'] ?? null,
             community: $data['community'] ?? null,
             port: isset($data['port']) ? (int) $data['port'] : null,
             transport: $data['transport'] ?? null,
