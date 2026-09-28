@@ -67,9 +67,9 @@ class Fping
      * Run fping against a hostname/ip in count mode and collect stats.
      *
      * @param  string  $host  hostname or ip
-     * @param  AddressFamily  $address_family  ipv4 or ipv6
+     * @param  AddressFamily|null  $address_family  ipv4 or ipv6
      */
-    public function ping(string $host, AddressFamily $address_family = AddressFamily::IPv4): FpingResponse
+    public function ping(string $host, ?AddressFamily $address_family = null): FpingResponse
     {
         $measure = Measurement::start('ping');
 
@@ -165,9 +165,9 @@ class Fping
      *
      * @param  string  $host  hostname or ip
      * @param  int  $size  packet size in bytes (headers included)
-     * @param  AddressFamily  $address_family  ipv4 or ipv6
+     * @param  AddressFamily|null  $address_family  ipv4 or ipv6
      */
-    public function testMtu(string $host, int $size, AddressFamily $address_family = AddressFamily::IPv4): bool
+    public function testMtu(string $host, int $size, ?AddressFamily $address_family = null): bool
     {
         $bytes = $size > 28 ? $size - 28 : $size;
 
