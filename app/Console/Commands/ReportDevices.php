@@ -200,10 +200,10 @@ class ReportDevices extends LnmsCommand
         if ($output == 'csv') {
             $out = fopen('php://output', 'w');
             if (! $this->option('no-header')) {
-                fputcsv($out, $headers);
+                fputcsv($out, $headers, escape: '\\');
             }
             foreach ($rows as $row) {
-                fputcsv($out, $row);
+                fputcsv($out, $row, escape: '\\');
             }
             fclose($out);
 

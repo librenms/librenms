@@ -66,13 +66,13 @@ class Scalance extends OS implements MempoolsDiscovery, ProcessorDiscovery
             return new Collection();
         }
 
-        return collect()->push((new Mempool([
+        return collect()->push(new Mempool([
             'mempool_index' => 0,
             'mempool_type' => 'scalance',
             'mempool_class' => 'system',
             'mempool_descr' => 'Memory',
             'mempool_perc_oid' => $perc_oid,
             'mempool_perc_warn' => $mempool_data[$warn_oid],
-        ]))->fillUsage(null, null, null, $mempool_data[$perc_oid]));
+        ])->fillUsage(null, null, null, $mempool_data[$perc_oid]));
     }
 }

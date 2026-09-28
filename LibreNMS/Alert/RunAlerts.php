@@ -126,7 +126,7 @@ class RunAlerts
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
 
-        if ((new ConnectivityHelper($device))->icmpIsEnabled()) {
+        if (new ConnectivityHelper($device)->icmpIsEnabled()) {
             if ($device->stats) {
                 $obj['ping_timestamp'] = $device->stats->ping_last_timestamp;
                 $obj['ping_loss'] = $device->stats->ping_loss_last;

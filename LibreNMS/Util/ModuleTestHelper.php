@@ -272,7 +272,7 @@ class ModuleTestHelper
                 'port' => $snmpSimPort,
                 'disabled' => 1, // disable to block normal pollers
             ]);
-            (new ValidateDeviceAndCreate($new_device, true))->execute();
+            new ValidateDeviceAndCreate($new_device, true)->execute();
             $device_id = $new_device->device_id;
 
             $this->qPrint("Added device: $device_id\n");
@@ -301,7 +301,7 @@ class ModuleTestHelper
         ob_start();
         Log::setDefaultDriver('stdout');
 
-        (new DiscoverDevice($device_id, $this->modules))->handle();
+        new DiscoverDevice($device_id, $this->modules)->handle();
 
         $this->discovery_output = ob_get_contents();
         if ($this->quiet) {
@@ -333,7 +333,7 @@ class ModuleTestHelper
         ob_start();
         Log::setDefaultDriver('stdout');
 
-        (new PollDevice($device_id, $this->modules))->handle();
+        new PollDevice($device_id, $this->modules)->handle();
 
         $this->poller_output = ob_get_contents();
         if ($this->quiet) {

@@ -43,7 +43,7 @@ final class PrintSnmpDebugOutputTest extends TestCase
             ->with("sysDescr.0 = Linux 6.1\nsysObjectID.0 = 1.3.6.1.4.1.8072.3.2.10\n");
 
         try {
-            (new PrintSnmpDebugOutput())->handle($event);
+            new PrintSnmpDebugOutput()->handle($event);
         } finally {
             Debug::set(false);
             Debug::setVerbose(false);
@@ -79,7 +79,7 @@ final class PrintSnmpDebugOutputTest extends TestCase
             ->with("sysDescr.0 = Linux 6.1\n");
 
         try {
-            (new PrintSnmpDebugOutput())->handle($event);
+            new PrintSnmpDebugOutput()->handle($event);
         } finally {
             Debug::set(false);
             Debug::setVerbose(false);

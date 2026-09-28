@@ -28,7 +28,7 @@ final class SnmpMetricListenerTest extends TestCase
             backend: 'NetSnmp',
         );
 
-        (new SnmpMetricListener())->handle($event);
+        new SnmpMetricListener()->handle($event);
 
         $this->assertSame($initialCount + 1, $manager->getCategory('snmp')->getTotalCount());
         $this->assertEqualsWithDelta($initialDuration + 0.123, $manager->getCategory('snmp')->getTotalDuration(), 0.0001);
@@ -51,7 +51,7 @@ final class SnmpMetricListenerTest extends TestCase
             backend: 'PhpExtension',
         );
 
-        (new SnmpMetricListener())->handle($event);
+        new SnmpMetricListener()->handle($event);
 
         $this->assertSame($initialCount + 1, $manager->getCategory('snmp_backend')->getTotalCount());
         $this->assertEqualsWithDelta($initialDuration + 0.045, $manager->getCategory('snmp_backend')->getTotalDuration(), 0.0001);

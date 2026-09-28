@@ -37,9 +37,9 @@ trait CompletesConfigArgument
     public function completeArgument($name, $value, $previous)
     {
         if ($name == 'setting') {
-            return (new DynamicConfig())->all()->keys()->filter(fn ($setting) => Str::startsWith($setting, $value))->all();
+            return new DynamicConfig()->all()->keys()->filter(fn ($setting) => Str::startsWith($setting, $value))->all();
         } elseif ($name == 'value') {
-            $config = (new DynamicConfig())->get($previous);
+            $config = new DynamicConfig()->get($previous);
 
             switch ($config->getType()) {
                 case 'select-dynamic':
@@ -77,7 +77,7 @@ trait CompletesConfigArgument
             }
 
             // make "http" request
-            $results = (new InternalHttpRequest())
+            $results = new InternalHttpRequest()
                 ->actingAs($admin)
                 ->json('GET', route("ajax.select.$target"), $data)->json('results');
 

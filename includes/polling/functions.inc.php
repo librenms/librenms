@@ -143,7 +143,7 @@ function record_sensor_data($device, $all_sensors)
             if (is_callable($sensor['user_func'])) {
                 $sensor_value = $sensor['user_func']($sensor_value);
             } else {
-                $sensor_value = (new UserFuncHelper($sensor_value, $sensor['new_value'], $sensor))->{$sensor['user_func']}();
+                $sensor_value = new UserFuncHelper($sensor_value, $sensor['new_value'], $sensor)->{$sensor['user_func']}();
             }
         }
 

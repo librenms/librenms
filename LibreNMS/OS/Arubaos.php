@@ -107,7 +107,7 @@ class Arubaos extends OS implements
         // If AP count is less than twice the default critical threshold,
         // then set the critical threshold to roughly half the current AP count.
         if ($apCount < $low_limit_const * 2) {
-            $low_limit = round($apCount / 2, 0, PHP_ROUND_HALF_DOWN);
+            $low_limit = round($apCount / 2, 0, \RoundingMode::HalfTowardsZero);
         }
         // If AP count is less than the default warning hreshold,
         // then don't bother setting thresholds.
