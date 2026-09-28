@@ -26,7 +26,8 @@ class Submenu extends Component
         if (isset($parsed_url['query']) && $parsed_url['path'] === $this->selected) {
             parse_str($parsed_url['query'], $vars);
             $request = request();
-            return array_all($vars, fn($value, $key) => !($request->input($key) !== $value));
+
+            return array_all($vars, fn ($value, $key) => ! ($request->input($key) !== $value));
         }
 
         return $url === $this->selected;
