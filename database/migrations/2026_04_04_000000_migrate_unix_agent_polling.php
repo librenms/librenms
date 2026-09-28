@@ -33,10 +33,11 @@ return new class extends Migration
                         ->pluck('device_id')
                         ->all();
 
-                    $deviceSettings = DB::table('devices_attribs')
+                    $attribsByDevice = DB::table('devices_attribs')
                         ->whereIn('device_id', $deviceIds)
-                        ->where('attrib_type', 'poll_unix-agent')
-                        ->pluck('attrib_value', 'device_id');
+                        ->whereIn('attrib_type', ['poll_unix-agent', 'override_Unixagent_port'])
+                        ->get()
+                        ->groupBy('device_id');
 
                     $pollingMethods = [];
                     foreach ($devices as $device) {
@@ -44,9 +45,14 @@ return new class extends Migration
                             continue;
                         }
 
-                        if (! $this->moduleEnabled($device->os, $deviceSettings[$device->device_id] ?? null)) {
+                        $attribs = ($attribsByDevice[$device->device_id] ?? collect())->pluck('attrib_value', 'attrib_type');
+
+                        if (! $this->moduleEnabled($device->os, $attribs['poll_unix-agent'] ?? null)) {
                             continue;
                         }
+
+                        // legacy polling used the port override when it was not empty
+                        $port = (int) ($attribs['override_Unixagent_port'] ?? 0);
 
                         $pollingMethods[] = [
                             'device_id' => $device->device_id,
@@ -55,7 +61,7 @@ return new class extends Migration
                             'affects_availability' => false,
                             'last_check_successful' => ($device->agent_uptime ?? 0) > 0 ? true : null,
                             'secret_id' => null,
-                            'settings' => null,
+                            'settings' => $port > 0 ? json_encode(['port' => $port]) : null,
                             'created_at' => now(),
                             'updated_at' => now(),
                         ];
