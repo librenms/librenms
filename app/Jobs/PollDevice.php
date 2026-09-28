@@ -25,7 +25,6 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\RRD\RrdPath;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
@@ -191,8 +190,15 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
 
     private function initRrdDirectory(): void
     {
-        if (LibrenmsConfig::get('rrd.enable', true)) {
-            Rrd::checkDirExists(RrdPath::make($this->device->hostname));
+        $host_rrd = Rrd::dirFromHost($this->device->hostname);
+        if (LibrenmsConfig::get('rrd.enable', true) && ! is_dir($host_rrd)) {
+            try {
+                mkdir($host_rrd);
+                Log::info("Created directory : $host_rrd");
+            } catch (\ErrorException $e) {
+                Eventlog::log("Failed to create rrd directory: $host_rrd", $this->device);
+                Log::error($e);
+            }
         }
     }
 
