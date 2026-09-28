@@ -35,7 +35,7 @@ final readonly class RrdPath implements \Stringable
 
     private function __construct(string $hostname, string $filename)
     {
-        $this->relativePath = Rrd::safeName(trim($hostname, '[]')) . ($filename ? DIRECTORY_SEPARATOR . $filename : '');
+        $this->relativePath = Rrd::safeName(trim($hostname, '[]')) . ($filename ? DIRECTORY_SEPARATOR . Rrd::safeName($filename) : '');
     }
 
     /**
