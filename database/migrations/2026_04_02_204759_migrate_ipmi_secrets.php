@@ -76,7 +76,7 @@ return new class extends Migration
                         $settings = array_filter([
                             'hostname' => $attribs['ipmi_hostname'] ?? null,
                             'port' => isset($attribs['ipmi_port']) ? (int) $attribs['ipmi_port'] : null,
-                            'ciphersuite' => $attribs['ipmi_ciphersuite'] ?? null,
+                            'ciphersuite' => isset($attribs['ipmi_ciphersuite']) && $attribs['ipmi_ciphersuite'] !== '' ? (int) $attribs['ipmi_ciphersuite'] : null,
                             'timeout' => isset($attribs['ipmi_timeout']) ? (int) $attribs['ipmi_timeout'] : null,
                         ], fn ($v) => $v !== null && $v !== ''); // only values that were set
 

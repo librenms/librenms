@@ -3,7 +3,8 @@
 namespace LibreNMS\Tests\Unit\Polling;
 
 use LibreNMS\Enum\SecretType;
-use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
+use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 use LibreNMS\Polling\Secrets\Definitions\SnmpSecretDefinition;
 use LibreNMS\Tests\TestCase;
@@ -38,11 +39,11 @@ final class SecretDefinitionTest extends TestCase
 
     public function testDataFillsDefaults(): void
     {
-        $snmp = (new SnmpSecretDefinition)->data(['community' => 'public']);
+        $snmp = SnmpSecretData::fromArray(['community' => 'public']);
         $this->assertSame('v2c', $snmp->version);
         $this->assertSame('public', $snmp->community);
 
-        $ipmi = (new IpmiSecretDefinition)->data(['username' => 'admin']);
+        $ipmi = IpmiSecretData::fromArray(['username' => 'admin']);
         $this->assertSame('admin', $ipmi->username);
         $this->assertSame('', $ipmi->password);
     }

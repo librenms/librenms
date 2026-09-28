@@ -94,10 +94,10 @@ return new class extends Migration
                         $settings = array_filter([
                             'port' => $device->port !== null ? (int) $device->port : null,
                             'transport' => $device->transport,
-                            'timeout' => $device->timeout !== null ? (int) $device->timeout : null,
-                            'retries' => $device->retries !== null ? (int) $device->retries : null,
-                            'max_repeaters' => isset($attribs['snmp_max_repeaters']) ? (int) $attribs['snmp_max_repeaters'] : null,
-                            'max_oid' => isset($attribs['snmp_max_oid']) ? (int) $attribs['snmp_max_oid'] : null,
+                            'timeout' => $device->timeout > 0 ? (int) $device->timeout : null,
+                            'retries' => is_numeric($device->retries) ? max(0, (int) $device->retries) : null,
+                            'max_repeaters' => empty($attribs['snmp_max_repeaters']) ? null : max(0, (int) $attribs['snmp_max_repeaters']),
+                            'max_oid' => empty($attribs['snmp_max_oid']) ? null : max(1, (int) $attribs['snmp_max_oid']),
                             'bulk' => isset($attribs['snmp_bulk']) ? filter_var($attribs['snmp_bulk'], FILTER_VALIDATE_BOOLEAN) : null,
                             'port_association_mode' => self::PORT_ASSOCIATION_MODES[$device->port_association_mode] ?? null,
                         ], fn ($v, $k) => $v !== null && $v !== ($defaults[$k] ?? null), ARRAY_FILTER_USE_BOTH);

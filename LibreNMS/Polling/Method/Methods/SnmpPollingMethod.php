@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Polling\Method\Methods;
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
@@ -11,6 +12,7 @@ use Illuminate\Support\Collection;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\MissingSecretException;
@@ -39,9 +41,45 @@ final class SnmpPollingMethod extends PollingMethod
         return new SnmpDefinition;
     }
 
-    public function defaultConfig(?Device $device = null): SnmpConfig
+    public function defaultAffectsAvailability(): bool
     {
-        return SnmpConfig::default($device?->os);
+        return true;
+    }
+
+    /**
+     * @return array{transport: string, port: int, timeout: int|float, retries: int, max_repeaters: int, max_oid: int, bulk: bool, context: ?string, port_association_mode: string}
+     */
+    public function defaults(?Device $device = null): array
+    {
+        $os = $device?->os ?: 'generic';
+
+        return [
+            'transport' => LibrenmsConfig::get('snmp.transports.0', 'udp'),
+            'port' => (int) LibrenmsConfig::get('snmp.port', 161),
+            'timeout' => (float) LibrenmsConfig::get('snmp.timeout', 1),
+            'retries' => (int) LibrenmsConfig::get('snmp.retries', 5),
+            'max_repeaters' => max(0, (int) LibrenmsConfig::getOsSetting($os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', 0))),
+            'max_oid' => max(1, (int) LibrenmsConfig::getOsSetting($os, 'snmp_max_oid', LibrenmsConfig::get('snmp.max_oid', 10))),
+            'bulk' => filter_var(LibrenmsConfig::getOsSetting($os, 'snmp_bulk', LibrenmsConfig::get('snmp_bulk', true)), FILTER_VALIDATE_BOOLEAN),
+            'context' => null,
+            'port_association_mode' => LibrenmsConfig::get('default_port_association_mode', 'ifIndex'),
+        ];
+    }
+
+    public function config(Device $device, ?DevicePollingMethod $deviceMethod = null): SnmpConfig
+    {
+        if ($deviceMethod === null && ! ($device->relationLoaded('pollingMethods') && $device->pollingMethods->isNotEmpty())) {
+            if ($device->exists) {
+                Eventlog::log('Missing SNMP polling method, falling back to legacy device fields.', $device, 'snmp', Severity::Error);
+            }
+
+            return $this->legacyConfig($device);
+        }
+
+        return SnmpConfig::make(
+            ($deviceMethod->settings ?? []) + $this->defaults($device),
+            SnmpSecretData::fromArray($deviceMethod->secret->data ?? []),
+        );
     }
 
     /**
@@ -75,19 +113,6 @@ final class SnmpPollingMethod extends PollingMethod
         return SecretType::Snmp;
     }
 
-    public function fallbackConfig(Device $device): SnmpConfig
-    {
-        if ($device->relationLoaded('pollingMethods') && $device->pollingMethods->isNotEmpty()) {
-            return parent::fallbackConfig($device);
-        }
-
-        if ($device->exists) {
-            Eventlog::log('Missing SNMP polling method, falling back to legacy device fields.', $device, 'snmp', Severity::Error);
-        }
-
-        return SnmpConfig::fromLegacyDeviceFields($device);
-    }
-
     /**
      * @inheritDoc
      */
@@ -95,7 +120,7 @@ final class SnmpPollingMethod extends PollingMethod
     {
         // If a specific secret was supplied on the method, test that directly
         if ($deviceMethod->relationLoaded('secret') && $deviceMethod->secret !== null) {
-            $result = $this->probe($device, $this->config($deviceMethod));
+            $result = $this->probe($device, $this->config($device, $deviceMethod));
             if ($result->isSuccess()) {
                 return $result;
             }
@@ -112,7 +137,7 @@ final class SnmpPollingMethod extends PollingMethod
             $deviceMethod->setRelation('secret', $secret);
             $deviceMethod->secret_id = $secret->id;
 
-            $result = $this->probe($device, $this->config($deviceMethod));
+            $result = $this->probe($device, $this->config($device, $deviceMethod));
             if ($result->isSuccess()) {
                 return $result;
             }
@@ -170,5 +195,84 @@ final class SnmpPollingMethod extends PollingMethod
         }
 
         $device->os = Core::detectOS($device);
+    }
+
+    /**
+     * Create from legacy device fields. Emergency fallback, do not use.
+     */
+    private function legacyConfig(Device $device): SnmpConfig
+    {
+        return $this->legacy(
+            settings: [
+                'transport' => $device->getAttribute('transport'),
+                'port' => $device->getAttribute('port'),
+                'timeout' => $device->getAttribute('timeout'),
+                'retries' => $device->getAttribute('retries'),
+                'max_repeaters' => $device->getAttrib('snmp_max_repeaters') ?: null, // legacy treated 0 as unset
+                'max_oid' => $device->getAttrib('snmp_max_oid') ?: null,
+                'bulk' => $device->getAttrib('snmp_bulk'),
+                'port_association_mode' => $device->getAttribute('port_association_mode') !== null ? PortAssociationMode::getName((int) $device->getAttribute('port_association_mode')) : null,
+            ],
+            secretData: new SnmpSecretData(
+                version: (string) ($device->getAttribute('snmpver') ?: 'v2c'),
+                community: $device->getAttribute('community'),
+                authlevel: $device->getAttribute('authlevel'),
+                authname: $device->getAttribute('authname'),
+                authpass: $device->getAttribute('authpass'),
+                authalgo: $device->getAttribute('authalgo'),
+                cryptoalgo: $device->getAttribute('cryptoalgo'),
+                cryptopass: $device->getAttribute('cryptopass'),
+            ),
+            device: $device,
+        );
+    }
+
+    /**
+     * Config for a legacy device array.
+     *
+     * @param  array<string, mixed>|null  $device
+     */
+    public function configFromDeviceArray(?array $device): SnmpConfig
+    {
+        $device ??= [];
+        $device_id = $device['device_id'] ?? 0;
+
+        if (DeviceCache::has($device_id)) {
+            return DeviceCache::get($device_id)->polling()->snmp();
+        }
+
+        return $this->legacy(
+            settings: [
+                'transport' => $device['transport'] ?? null,
+                'port' => $device['port'] ?? null,
+                'timeout' => $device['timeout'] ?? null,
+                'retries' => $device['retries'] ?? null,
+                'max_repeaters' => ($device['snmp_max_repeaters'] ?? null) ?: null, // legacy treated 0 as unset
+                'max_oid' => ($device['snmp_max_oid'] ?? null) ?: null,
+                'bulk' => $device['snmp_bulk'] ?? null,
+                'port_association_mode' => isset($device['port_association_mode'])
+                    ? (is_numeric($device['port_association_mode']) ? PortAssociationMode::getName((int) $device['port_association_mode']) : $device['port_association_mode'])
+                    : null,
+            ],
+            secretData: new SnmpSecretData(
+                version: (string) ($device['snmpver'] ?? 'v2c'),
+                community: isset($device['community']) ? (string) $device['community'] : null,
+                authlevel: $device['authlevel'] ?? null,
+                authname: $device['authname'] ?? null,
+                authpass: $device['authpass'] ?? null,
+                authalgo: $device['authalgo'] ?? null,
+                cryptoalgo: $device['cryptoalgo'] ?? null,
+                cryptopass: $device['cryptopass'] ?? null,
+            ),
+            device: new Device(['os' => $device['os'] ?? null]),
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $settings  uncast settings
+     */
+    private function legacy(array $settings, SnmpSecretData $secretData, Device $device): SnmpConfig
+    {
+        return SnmpConfig::make($this->definition()->filterOverrides($settings) + $this->defaults($device), $secretData);
     }
 }

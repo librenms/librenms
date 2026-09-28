@@ -2,22 +2,10 @@
 
 namespace LibreNMS\Polling\Method\Config;
 
-final class IcmpConfig extends PollingMethodConfig
+final readonly class IcmpConfig extends PollingMethodConfig
 {
     public function __construct(
-        bool $enabled = true,
-        bool $affectsAvailability = true,
-        public string $ipVersion = 'default',
+        public string $ipVersion,
     ) {
-        parent::__construct($enabled, $affectsAvailability);
-    }
-
-    public static function default(): static
-    {
-        return new self(
-            enabled: true,
-            affectsAvailability: true,
-            ipVersion: 'default',
-        );
     }
 }

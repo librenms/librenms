@@ -57,6 +57,19 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
         $this->assertSame(['version' => 'v2c', 'community' => 'public'], $this->secretData($defaultIds[0]));
     }
 
+    public function testLegacyUnsetSnmpValuesUseTheDefaults(): void
+    {
+        $this->migrateLegacyDevices([
+            ['device_id' => 1, 'hostname' => 'a', 'snmpver' => 'v2c', 'community' => 'shared', 'timeout' => 0, 'retries' => 0],
+        ], [
+            ['device_id' => 1, 'attrib_type' => 'snmp_max_oid', 'attrib_value' => '0'],
+            ['device_id' => 1, 'attrib_type' => 'snmp_max_repeaters', 'attrib_value' => '0'],
+        ]);
+
+        // legacy polling ignored a timeout <= 0 and empty max oid/repeaters, but 0 retries is valid
+        $this->assertSame(['retries' => 0], json_decode($this->pollingMethod(1, 'snmp')->settings, true));
+    }
+
     public function testIcmpAndIpmiSettingsAreMigrated(): void
     {
         LibrenmsConfig::set('icmp_check', true);
@@ -68,6 +81,7 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
             ['device_id' => 2, 'attrib_type' => 'override_icmp_disable', 'attrib_value' => 'true'],
             ['device_id' => 2, 'attrib_type' => 'ipmi_hostname', 'attrib_value' => 'bmc.example.com'],
             ['device_id' => 2, 'attrib_type' => 'ipmi_port', 'attrib_value' => '6230'],
+            ['device_id' => 2, 'attrib_type' => 'ipmi_ciphersuite', 'attrib_value' => '3'],
             ['device_id' => 2, 'attrib_type' => 'ipmi_username', 'attrib_value' => 'admin'],
             ['device_id' => 2, 'attrib_type' => 'ipmi_password', 'attrib_value' => 'secret'],
         ]);
@@ -78,7 +92,7 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
 
         $this->assertNull($this->pollingMethod(1, 'ipmi'));
         $ipmi = $this->pollingMethod(2, 'ipmi');
-        $this->assertSame(['hostname' => 'bmc.example.com', 'port' => 6230], json_decode($ipmi->settings, true));
+        $this->assertSame(['hostname' => 'bmc.example.com', 'port' => 6230, 'ciphersuite' => 3], json_decode($ipmi->settings, true));
         $this->assertSame(['username' => 'admin', 'password' => 'secret', 'kg_key' => null], $this->secretData($ipmi->secret_id));
     }
 

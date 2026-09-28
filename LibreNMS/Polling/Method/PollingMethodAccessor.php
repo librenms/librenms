@@ -22,10 +22,7 @@ readonly class PollingMethodAccessor
 
     public function get(PollingMethodType $type): PollingMethodConfig
     {
-        $method = $this->pollingMethods->get($type);
-        $deviceMethod = $this->device->pollingMethod($type);
-
-        return $deviceMethod ? $method->config($deviceMethod) : $method->fallbackConfig($this->device);
+        return $this->pollingMethods->get($type)->config($this->device, $this->device->pollingMethod($type));
     }
 
     public function snmp(): SnmpConfig

@@ -6,6 +6,7 @@ use App\Models\Secret;
 use App\Models\Vminfo;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
 
 /**
@@ -41,7 +42,7 @@ class Device extends JsonResource
             'transport' => $snmp->transport,
             'timeout' => $snmp->timeout,
             'retries' => $snmp->retries,
-            'snmp_disable' => (int) ! $snmp->enabled,
+            'snmp_disable' => (int) ! $this->polling()->isEnabled(PollingMethodType::Snmp),
             'bgpLocalAs' => $this->bgpLocalAs,
             'sysObjectID' => $this->sysObjectID,
             'sysDescr' => $this->sysDescr,
