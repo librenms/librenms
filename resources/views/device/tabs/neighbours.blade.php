@@ -106,7 +106,7 @@ $('#netmap').height(height + 'px');
 
 // create a network
 var container = document.getElementById('netmap');
-var options = {!! $data['visoptions'] !!};
+var options = {{ Js::from($data['visoptions']) }};
 var data = {
     nodes: network_nodes,
     edges: network_edges,

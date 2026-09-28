@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c9eec07b9ffd8ab9eb474d259796bb19",
+    "content-hash": "a6b5fd900bef156eaca8bbcfc28acfa9",
     "packages": [
         {
             "name": "acmephp/ssl",
@@ -11366,20 +11366,19 @@
         },
         {
             "name": "larastan/larastan",
-            "version": "v3.10.0",
+            "version": "v3.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/larastan/larastan.git",
-                "reference": "2970f83398154178a739609c244577267c7ee8eb"
+                "reference": "ab26fdf90d84877061388109e1e251f67ca3ff7a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/larastan/larastan/zipball/2970f83398154178a739609c244577267c7ee8eb",
-                "reference": "2970f83398154178a739609c244577267c7ee8eb",
+                "url": "https://api.github.com/repos/larastan/larastan/zipball/ab26fdf90d84877061388109e1e251f67ca3ff7a",
+                "reference": "ab26fdf90d84877061388109e1e251f67ca3ff7a",
                 "shasum": ""
             },
             "require": {
-                "ext-json": "*",
                 "iamcal/sql-parser": "^0.7.0",
                 "illuminate/console": "^11.44.2 || ^12.4.1 || ^13",
                 "illuminate/container": "^11.44.2 || ^12.4.1 || ^13",
@@ -11389,7 +11388,7 @@
                 "illuminate/pipeline": "^11.44.2 || ^12.4.1 || ^13",
                 "illuminate/support": "^11.44.2 || ^12.4.1 || ^13",
                 "php": "^8.2",
-                "phpstan/phpstan": "^2.2.0"
+                "phpstan/phpstan": "^2.2.2"
             },
             "require-dev": {
                 "doctrine/coding-standard": "^14",
@@ -11399,7 +11398,7 @@
                 "orchestra/canvas": "^v9.2.2 || ^10.0.1 || ^11",
                 "orchestra/testbench-core": "^9.12.0 || ^10.1 || ^11",
                 "phpstan/phpstan-deprecation-rules": "^2.0.1",
-                "phpunit/phpunit": "^10.5.35 || ^11.5.15 || ^12.5.8 || ^13.1.8"
+                "phpunit/phpunit": "^10.5.35 || ^11.5.15 || ^12.5.8 || ^13.3.0"
             },
             "suggest": {
                 "orchestra/testbench": "Using Larastan for analysing a package needs Testbench",
@@ -11444,7 +11443,7 @@
             ],
             "support": {
                 "issues": "https://github.com/larastan/larastan/issues",
-                "source": "https://github.com/larastan/larastan/tree/v3.10.0"
+                "source": "https://github.com/larastan/larastan/tree/v3.12.0"
             },
             "funding": [
                 {
@@ -11452,7 +11451,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-05-28T08:00:58+00:00"
+            "time": "2026-09-10T09:06:54+00:00"
         },
         {
             "name": "laravel/boost",
@@ -13119,16 +13118,16 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.5.9",
+            "version": "2.6.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "858b1fb95d94f658b54c01080bf7b6ae97274536"
+                "reference": "6ff008471683591224951526247b7a2b86980ba9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/858b1fb95d94f658b54c01080bf7b6ae97274536",
-                "reference": "858b1fb95d94f658b54c01080bf7b6ae97274536",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/6ff008471683591224951526247b7a2b86980ba9",
+                "reference": "6ff008471683591224951526247b7a2b86980ba9",
                 "shasum": ""
             },
             "require": {
@@ -13167,7 +13166,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/2.5.9"
+                "source": "https://github.com/rectorphp/rector/tree/2.6.4"
             },
             "funding": [
                 {
@@ -13175,7 +13174,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-30T22:10:00+00:00"
+            "time": "2026-08-27T09:20:34+00:00"
         },
         {
             "name": "sebastian/cli-parser",

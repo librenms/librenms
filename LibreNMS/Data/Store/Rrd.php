@@ -160,25 +160,6 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * @throws RrdException
-     */
-    public function lastUpdate(string $filename): ?TimeSeriesPoint
-    {
-        $output = $this->command('lastupdate', $filename);
-
-        if (preg_match('/((?: \w+)+)\n\n(\d+):((?: [\d.-]+)+)\nOK/', $output, $matches)) {
-            $data = array_combine(
-                explode(' ', ltrim($matches[1])),
-                explode(' ', ltrim($matches[3])),
-            );
-
-            return new TimeSeriesPoint((int) $matches[2], $data);
-        }
-
-        return null;
-    }
-
-    /**
      * Updates an rrd database at $filename using $options
      * Where $options is an array, each entry which is not a number is replaced with "U"
      *

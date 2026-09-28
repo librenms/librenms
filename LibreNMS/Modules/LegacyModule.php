@@ -200,10 +200,7 @@ class LegacyModule implements Module
     {
         static $def;
 
-        if ($def === null) {
-            // only load the yaml once, then keep it in memory
-            $def = Yaml::parse(file_get_contents(base_path('/tests/module_tables.yaml')));
-        }
+        $def ??= Yaml::parse(file_get_contents(base_path('/tests/module_tables.yaml')));
 
         return $def[$this->name] ?? [];
     }
