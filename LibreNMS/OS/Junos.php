@@ -74,9 +74,64 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
             preg_match('/^junos-evo.*?(\d+\.\d+.*)$/', $data[1]['hrSWInstalledName'], $parsedVersion);
         }
 
-        $device->hardware = $data[0]['jnxBoxDescr'] ?? (isset($parsed['hardware']) ? 'Juniper ' . strtoupper($parsed['hardware']) : null);
+        $boxDescr = $data[0]['jnxBoxDescr'] ?? null;
+        $isVirtualChassis = isset($data[0]['jnxVirtualChassisMemberSWVersion'])
+            || str_contains(strtolower((string) $boxDescr), 'virtual chassis');
+        // a standalone switch may answer jnxVirtualChassisMemberSWVersion, so membership itself is
+        // taken from the role column, which only a Virtual Chassis member populates
+        $members = $isVirtualChassis ? array_filter(
+            SnmpQuery::hideMib()->enumStrings()->walk('JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberTable')->table(1),
+            fn ($member) => isset($member['jnxVirtualChassisMemberRole'])
+        ) : [];
+
+        $device->hardware = $this->parseHardware($boxDescr, $parsed['hardware'] ?? null, $members);
+        $device->features = $this->parseVirtualChassis($boxDescr, $members);
         $device->serial = $data[0]['jnxBoxSerialNo'] ?? null;
         $device->version = $data[0]['jnxVirtualChassisMemberSWVersion'] ?? $parsedVersion[1] ?? $parsed['version'] ?? null;
+    }
+
+    /**
+     * The model, preferring the most specific source available. jnxBoxDescr is a free text
+     * description of the chassis, so on a Virtual Chassis it describes the stack, not a model.
+     *
+     * @param  array<int|string, array<string, string>>  $members
+     */
+    private function parseHardware(?string $boxDescr, ?string $sysDescrHardware, array $members): ?string
+    {
+        // Juniper brackets the model when the chassis part number differs, JNP10003 [MX10003]
+        foreach ([$boxDescr, $this->getDevice()->sysDescr] as $descr) {
+            if ($descr !== null && preg_match('/\[([^\]]+)]/', $descr, $matches)) {
+                return $matches[1];
+            }
+        }
+
+        if ($sysDescrHardware !== null) {
+            return strtoupper($sysDescrHardware);
+        }
+
+        foreach ($members as $member) {
+            if (($member['jnxVirtualChassisMemberRole'] ?? null) == 'master' && ! empty($member['jnxVirtualChassisMemberModel'])) {
+                return strtoupper($member['jnxVirtualChassisMemberModel']);
+            }
+        }
+
+        return $boxDescr;
+    }
+
+    /**
+     * @param  array<int|string, array<string, string>>  $members
+     */
+    private function parseVirtualChassis(?string $boxDescr, array $members): ?string
+    {
+        if (count($members) > 1) {
+            return 'Virtual Chassis of ' . count($members) . ' members';
+        }
+
+        if ($members || str_contains(strtolower((string) $boxDescr), 'virtual chassis')) {
+            return 'Virtual Chassis';
+        }
+
+        return null;
     }
 
     public function pollOS(DataStorageInterface $datastore): void
