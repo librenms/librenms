@@ -71,7 +71,6 @@ class EditPollingController
     {
         $method = $this->pollingMethods->get($type);
         $definition = $method->definition();
-        $defaults = $method->defaultConfig($device);
         /** @var DevicePollingMethod|null $row */
         $row = $device->pollingMethods->firstWhere('method_type', $type);
         $secretType = $method->secretType();
@@ -83,9 +82,9 @@ class EditPollingController
             'icon' => $definition->icon(),
             'schema_fields' => $secretDefinition?->buildSchemaFields() ?? [],
             'schema_defaults' => $secretDefinition?->schemaDefaults() ?? [],
-            'settings_fields' => $definition->settingsFields($defaults),
+            'settings_fields' => $definition->settingsFields($method->defaults($device)),
             'settings' => [...array_fill_keys(array_keys($definition->fields()), ''), ...$row->settings ?? []],
-            'affects_availability' => $row ? $row->affects_availability : $defaults->affectsAvailability,
+            'affects_availability' => $row ? $row->affects_availability : $method->defaultAffectsAvailability(),
             'secret' => $row?->secret ? ['id' => $row->secret->id, 'description' => $row->secret->description] : null,
             'default_secret_description' => $secretType ? Secret::defaultDescription($type, $device->hostname) : null,
             'configured' => $row !== null,
@@ -104,7 +103,7 @@ class EditPollingController
         $type = $request->pollingType();
         $deviceMethod = new DevicePollingMethod([
             'method_type' => $type,
-            'affects_availability' => $this->pollingMethods->get($type)->defaultConfig($device)->affectsAvailability,
+            'affects_availability' => $this->pollingMethods->get($type)->defaultAffectsAvailability(),
         ]);
 
         return $this->save($request, $device, $deviceMethod, __('poller.method_added'), $toast, $setDeviceAvailability);

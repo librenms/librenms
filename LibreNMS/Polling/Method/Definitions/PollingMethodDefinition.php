@@ -5,12 +5,10 @@ namespace LibreNMS\Polling\Method\Definitions;
 use App\View\FieldSchema\FieldDefinition;
 use App\View\FieldSchema\HandlesFieldSchema;
 use App\View\FieldSchema\HasFieldSchema;
-use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 
 /**
  * The settings of a polling method: form fields, validation rules and how values are cast.
- * Each field key must match a property of the method's config (max_oid => maxOid).
- * Only values the user sets are stored, empty fields fall back to the config defaults at runtime.
+ * Only values the user sets are stored (already cast), empty fields fall back to the defaults at runtime.
  */
 abstract class PollingMethodDefinition implements HasFieldSchema
 {
@@ -21,14 +19,15 @@ abstract class PollingMethodDefinition implements HasFieldSchema
     /**
      * Form fields that show the given defaults for fields left empty.
      *
+     * @param  array<string, mixed>  $defaults  the polling method's default settings
      * @return array<int, array<string, mixed>>
      */
-    public function settingsFields(PollingMethodConfig $defaults, string $dataVar = 'settingsData'): array
+    public function settingsFields(array $defaults, string $dataVar = 'settingsData'): array
     {
         return collect($this->fields())->map(function (FieldDefinition $field, string $key) use ($defaults, $dataVar): array {
             $schemaField = $field->toSchemaField($dataVar);
             unset($schemaField['default']); // empty means default, never preselect it
-            $default = $defaults->setting($key);
+            $default = $defaults[$key] ?? null;
 
             if ($field->type === 'select') {
                 if ($field->placeholder !== null) {

@@ -3,10 +3,10 @@
 namespace LibreNMS\Tests\Unit\Polling;
 
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Polling\Method\Config\IpmiConfig;
-use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Definitions\IpmiDefinition;
 use LibreNMS\Polling\Method\Definitions\SnmpDefinition;
+use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Tests\TestCase;
 
@@ -47,7 +47,7 @@ final class PollingMethodDefinitionTest extends TestCase
 
     public function testSettingsFieldsShowDefaults(): void
     {
-        $fields = collect((new SnmpDefinition)->settingsFields(new SnmpConfig(transport: 'tcp', port: 1161, maxRepeaters: 7)))->keyBy('key');
+        $fields = collect((new SnmpDefinition)->settingsFields(['transport' => 'tcp', 'port' => 1161, 'max_repeaters' => 7] + (new SnmpPollingMethod)->defaults()))->keyBy('key');
 
         // selects get an empty "Default" option instead of preselecting a value
         $this->assertSame('Default (TCP)', $fields['transport']['default_option']);
@@ -60,7 +60,7 @@ final class PollingMethodDefinitionTest extends TestCase
         $this->assertArrayNotHasKey('placeholder', $fields['context']);
 
         // explicit placeholders are kept
-        $ipmiFields = collect((new IpmiDefinition)->settingsFields(IpmiConfig::default()))->keyBy('key');
+        $ipmiFields = collect((new IpmiDefinition)->settingsFields((new IpmiPollingMethod)->defaults()))->keyBy('key');
         $this->assertSame("Default: device's hostname", $ipmiFields['hostname']['placeholder']);
         $this->assertSame('Auto-detect', $ipmiFields['type']['default_option']);
     }

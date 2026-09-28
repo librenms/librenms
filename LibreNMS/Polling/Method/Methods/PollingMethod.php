@@ -20,11 +20,6 @@ abstract class PollingMethod
         return null;
     }
 
-    public function hasSecret(): bool
-    {
-        return $this->secretType() !== null;
-    }
-
     /**
      * Perform the cheapest reachability check for this polling method.
      * Must avoid side effects on the target where possible.
@@ -38,7 +33,7 @@ abstract class PollingMethod
      */
     public function discover(Device $device, DevicePollingMethod $deviceMethod): ProbeResult
     {
-        return $this->probe($device, $this->config($deviceMethod));
+        return $this->probe($device, $this->config($device, $deviceMethod));
     }
 
     public function onProbeComplete(Device $device, ProbeResult $result, bool $commit = false): void
@@ -68,43 +63,21 @@ abstract class PollingMethod
     abstract public function definition(): PollingMethodDefinition;
 
     /**
-     * Config for a newly added method of this type, with defaults for the device if given.
-     *
-     * @return TConfig
+     * Whether a newly added method of this type affects device availability.
      */
-    abstract public function defaultConfig(?Device $device = null): PollingMethodConfig;
+    abstract public function defaultAffectsAvailability(): bool;
 
     /**
-     * Build the config for a configured method from its settings and secret.
+     * The value of each setting when it is not set, keyed like the definition fields.
      *
-     * @return TConfig
+     * @return array<string, mixed>
      */
-    public function config(DevicePollingMethod $deviceMethod): PollingMethodConfig
-    {
-        $config = $this->defaultConfig($deviceMethod->device)
-            ->fill($this->definition()->filterOverrides($deviceMethod->settings ?? []));
-
-        $secretType = $this->secretType();
-        if ($secretType !== null) {
-            $config->fill(get_object_vars($secretType->definition()->data($deviceMethod->secret->data ?? [])));
-        }
-
-        $config->enabled = $deviceMethod->enabled;
-        $config->affectsAvailability = $deviceMethod->affects_availability;
-
-        return $config;
-    }
+    abstract public function defaults(?Device $device = null): array;
 
     /**
-     * Config used when the device does not have this method configured.
+     * The config for the device from its stored method, or the defaults if the device does not have this method.
      *
      * @return TConfig
      */
-    public function fallbackConfig(Device $device): PollingMethodConfig
-    {
-        $config = $this->defaultConfig($device);
-        $config->enabled = false;
-
-        return $config;
-    }
+    abstract public function config(Device $device, ?DevicePollingMethod $deviceMethod = null): PollingMethodConfig;
 }

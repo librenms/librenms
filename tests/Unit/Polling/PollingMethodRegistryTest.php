@@ -2,7 +2,6 @@
 
 namespace LibreNMS\Tests\Unit\Polling;
 
-use Illuminate\Support\Str;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
@@ -25,16 +24,17 @@ final class PollingMethodRegistryTest extends TestCase
     }
 
     /**
-     * Settings are filled into the config by name, so every field needs a matching config property and a label.
+     * Configs fall back to the default settings, so every field needs a default and a label.
      */
-    public function testEverySettingHasAConfigPropertyAndLabel(): void
+    public function testEverySettingHasADefaultAndLabel(): void
     {
         foreach (PollingMethodType::cases() as $type) {
             $method = (new PollingMethodRegistry)->get($type);
-            $config = $method->defaultConfig();
+            $fields = array_keys($method->definition()->fields());
 
-            foreach (array_keys($method->definition()->fields()) as $key) {
-                $this->assertTrue(property_exists($config, Str::camel($key)), "{$type->value} config has no property for setting $key");
+            $this->assertEqualsCanonicalizing($fields, array_keys($method->defaults()), "{$type->value} default settings do not match its fields");
+
+            foreach ($fields as $key) {
                 $this->assertTrue(trans()->has("poller.method_settings.{$type->value}.$key"), "{$type->value} setting $key has no label");
             }
         }
@@ -54,9 +54,9 @@ final class PollingMethodRegistryTest extends TestCase
     {
         $registry = new PollingMethodRegistry;
 
-        $this->assertTrue($registry->get(PollingMethodType::Icmp)->defaultConfig()->affectsAvailability);
-        $this->assertFalse($registry->get(PollingMethodType::Ipmi)->defaultConfig()->affectsAvailability);
-        $this->assertTrue($registry->get(PollingMethodType::Snmp)->defaultConfig()->affectsAvailability);
-        $this->assertFalse($registry->get(PollingMethodType::UnixAgent)->defaultConfig()->affectsAvailability);
+        $this->assertTrue($registry->get(PollingMethodType::Icmp)->defaultAffectsAvailability());
+        $this->assertFalse($registry->get(PollingMethodType::Ipmi)->defaultAffectsAvailability());
+        $this->assertTrue($registry->get(PollingMethodType::Snmp)->defaultAffectsAvailability());
+        $this->assertFalse($registry->get(PollingMethodType::UnixAgent)->defaultAffectsAvailability());
     }
 }

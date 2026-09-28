@@ -5,7 +5,6 @@ namespace LibreNMS\Polling\Secrets\Definitions;
 use App\View\FieldSchema\FieldDefinition;
 use App\View\FieldSchema\HandlesFieldSchema;
 use App\View\FieldSchema\HasFieldSchema;
-use LibreNMS\Polling\Secrets\Data\SecretData;
 
 abstract class SecretDefinition implements HasFieldSchema
 {
@@ -15,13 +14,6 @@ abstract class SecretDefinition implements HasFieldSchema
      * Placeholder sent to the browser in place of a secret value the user may not see.
      */
     public const MASK = '********';
-
-    /**
-     * Typed secret data from the decrypted secret.
-     *
-     * @param  array<string, mixed>  $data
-     */
-    abstract public function data(array $data): SecretData;
 
     /**
      * Initial values for a new secret.

@@ -24,7 +24,7 @@ final class SnmpMetricListenerTest extends TestCase
             duration: 0.123,
             response: new SnmpResponse(['sysDescr.0' => 'Linux']),
             options: new SnmpQueryOptions,
-            config: new \LibreNMS\Polling\Method\Config\SnmpConfig,
+            config: \LibreNMS\Polling\Method\Config\SnmpConfig::make((new \LibreNMS\Polling\Method\Methods\SnmpPollingMethod)->defaults(), new \LibreNMS\Polling\Secrets\Data\SnmpSecretData),
             backend: 'NetSnmp',
         );
 
@@ -47,7 +47,7 @@ final class SnmpMetricListenerTest extends TestCase
             duration: 0.045,
             response: new SnmpResponse(['sysDescr.0' => 'Linux']),
             options: new SnmpQueryOptions,
-            config: new \LibreNMS\Polling\Method\Config\SnmpConfig,
+            config: \LibreNMS\Polling\Method\Config\SnmpConfig::make((new \LibreNMS\Polling\Method\Methods\SnmpPollingMethod)->defaults(), new \LibreNMS\Polling\Secrets\Data\SnmpSecretData),
             backend: 'PhpExtension',
         );
 
