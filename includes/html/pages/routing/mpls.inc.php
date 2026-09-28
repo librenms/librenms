@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\OS\Timos;
 use LibreNMS\Util\Number;
 
 print_optionbar_start();
@@ -478,9 +479,9 @@ if ($vars['view'] == 'saps') {
 
         echo "<tr bgcolor=$bg_colour>
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps']) . '</td>
-            <td>' . generate_sap_url($sap, e($sap['svc_oid'])) . '</td>
+            <td>' . e($sap['svc_oid']) . '</td>
             <td>' . generate_port_link($port) . '</td>
-            <td>' . e($sap['sapEncapValue']) . '</td>
+            <td>' . generate_sap_url($sap, e(Timos::decodeEncapVal((int) $sap['sapEncapValue']))) . '</td>
             <td>' . e($sap['sapType']) . '</td>
             <td>' . e($sap['sapDescription']) . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . e($sap['sapAdminStatus']) . '</td>

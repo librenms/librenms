@@ -120,6 +120,7 @@ class AppServiceProvider extends ServiceProvider
             'device' => \App\Models\Device::class,
             'device_group' => \App\Models\DeviceGroup::class,
             'location' => \App\Models\Location::class,
+            'mpls_sap' => \App\Models\MplsSap::class,
         ], $sensor_types));
     }
 

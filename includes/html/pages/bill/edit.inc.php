@@ -86,87 +86,25 @@ if ($bill_data['bill_type'] == 'cdr') {
     </div>
 </div>
 <div class="col-lg-6 col-md-12">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Billed Ports</h3>
-        </div>
-        <div class="panel-body">
-        <div class="form-group">
-            <?php
-            //This needs a proper cleanup
-            $ports = dbFetchRows(
-                'SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
-                WHERE B.bill_id = ? AND P.port_id = B.port_id
-                AND D.device_id = P.device_id ORDER BY D.device_id',
-                [$bill_data['bill_id']]
-            );
+<?php print_source_list($bill, $bill_id) ?>
 
-            if (is_array($ports)) {
-                ?>
-            <div class="list-group">
-                <?php   foreach ($ports as $port) {
-                    $port = cleanPort($port);
-                    $emptyCheck = true;
-                    $portalias = (empty($port['ifAlias']) ? '' : ' - ' . $port['ifAlias'] . ''); ?>
-                <div class="list-group-item">
-                    <form action="<?php echo route('bill.port.detach', [$bill_id, $port['port_id']]); ?>" class="form-inline" method="post" name="delete<?php echo $port['port_id'] ?>" style="display: none;">
-                        <?php echo csrf_field() ?>
-                        <?php echo method_field('DELETE') ?>
-                    </form>
-
-                    <button class="btn btn-danger btn-xs pull-right" onclick="if (confirm('Are you sure you wish to remove this port?')) { document.forms['delete<?php echo $port['port_id'] ?>'].submit(); }">
-                        <i class="fa fa-minus"></i>
-                        Remove Interface
-                    </button>
-                    <?php echo generate_device_link($port); ?>
-                    <i class="fa fa-random"></i>
-                    <?php echo generate_port_link($port, $port['ifName'] . '' . $portalias); ?>
-                </div>
-                <?php
-                }
-                if (empty($emptyCheck)) { ?>
-                <div class="alert alert-info">There are no ports assigned to this bill</alert>
-                <?php                   } ?>
-
-            </div>
-
-                <?php
-            }
-            $port_device_id = -1;
-            ?>
-        </div>
-
-        <h4>Add Port</h4>
-
-        <form action="<?php echo route('bill.port.attach', $bill_id); ?>" method="post" class="form-horizontal" role="form">
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Add Source</h3>
+    </div>
+    <div class="panel-body">
+        <form action="<?php echo route('bill.source.attach', $bill_id); ?>" method="post" class="form-horizontal" role="form">
             <?php echo csrf_field() ?>
-
-            <div class="form-group">
-                <label class="col-sm-2 control-label" for="device">Device</label>
-                <div class="col-sm-8">
-                    <select class="form-control input-sm" id="device" name="device" onchange="billDeviceChanged()"></select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-2 control-label" for="port_id">Port</label>
-                <div class="col-sm-8">
-                    <select class="form-control input-sm" id="port_id" name="port_id"></select>
-                </div>
-            </div>
+            <?php
+            $picker_label_cols = 2;
+            $picker_config = '{}';
+            include 'includes/html/pages/bill/source-picker.inc.php';
+            ?>
             <div class="col-sm-2 col-sm-offset-2">
-                <button type="submit" class="btn btn-primary" name="Submit" value=" Add "><i class="fa fa-plus"></i> Add Port</button>
+                <button type="submit" class="btn btn-primary" name="Submit" value=" Add "><i class="fa fa-plus"></i> Add Source</button>
             </div>
         </form>
     </div>
 </div>
-<script type="text/javascript">
-    const makePortData = function (param) {
-        param.device = $('#device').val();
-        return param;
-    }
-    init_select2('#device', 'device', {}, 'Select Device');
-    init_select2('#port_id', 'port', makePortData, 'Select Port');
-    function billDeviceChanged() {
-        $('#port_id').val(null).trigger('change'); // clear port selection
-    }
-</script>
+</div>
+</div>
