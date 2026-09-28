@@ -115,6 +115,11 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
             }
         }
 
+        // a sysDescr set to something other than the JUNOS string may still lead with the model
+        if (preg_match('/^Juniper ([A-Za-z]+\d\S*)/', (string) $this->getDevice()->sysDescr, $matches)) {
+            return strtoupper($matches[1]);
+        }
+
         return $boxDescr;
     }
 
