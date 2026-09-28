@@ -24,6 +24,12 @@
     'methodType' => '',
 
     /**
+     * Prefix for input IDs, change it when the same fields are rendered twice on a page.
+     * E.g. "new_secret" → id="new_secret_snmp_community"
+     */
+    'idPrefix' => 'secret',
+
+    /**
      * When true, password fields check the 'unmask' gate for Secret before
      * showing the toggle button. When false the button is always shown.
      */
@@ -97,7 +103,7 @@
         : $key;
 
     // Build a unique DOM id for password toggle
-    $inputId = fn(string $key): string => implode('_', array_filter(['secret', $methodType, $key]));
+    $inputId = fn(string $key): string => implode('_', array_filter([$idPrefix, $methodType, $key]));
 
     // Resolve current value for plain POST fields
     $currentValue = function(string $key) use ($data, $namePrefix): string {
@@ -126,7 +132,7 @@
     <div class="form-group {{ ($hasErrors && ($errors->has($dotErrorKey) || $errors->has($errorKey) || $errors->has($key))) ? 'has-error' : '' }}"
          :class="(typeof errors !== 'undefined' && errors && (errors['{{ $dotErrorKey }}'] || errors['{{ $errorKey }}'] || errors['{{ $key }}'])) ? 'has-error' : ''"
          @if($field['visible_if']) x-show="{{ $field['visible_if'] }}" x-cloak @endif
-         id="group-{{ $key }}">
+         id="group-{{ $id }}">
 
         <label for="{{ $id }}" class="control-label">
             {{ __($field['label']) }}

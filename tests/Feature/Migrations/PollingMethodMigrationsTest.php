@@ -18,7 +18,7 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
 
         $this->migrateLegacyDevices([
             ['device_id' => 1, 'hostname' => 'a', 'snmpver' => 'v2c', 'community' => 'shared', 'port' => 161, 'transport' => 'udp'],
-            ['device_id' => 2, 'hostname' => 'b', 'snmpver' => 'v2c', 'community' => 'shared', 'port' => 1161, 'transport' => 'tcp', 'snmp_disable' => 1],
+            ['device_id' => 2, 'hostname' => 'b', 'snmpver' => 'v2c', 'community' => 'shared', 'port' => 1161, 'transport' => 'tcp'],
             ['device_id' => 3, 'hostname' => 'c', 'snmpver' => 'v3', 'authlevel' => 'authPriv', 'authname' => 'user', 'authpass' => 'authpass', 'authalgo' => 'SHA', 'cryptopass' => 'cryptpass', 'cryptoalgo' => 'AES'],
         ], [
             ['device_id' => 1, 'attrib_type' => 'snmp_max_oid', 'attrib_value' => '20'],
@@ -33,7 +33,6 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
         $this->assertSame(['max_oid' => 20, 'bulk' => false], json_decode($a->settings, true));
         $this->assertSame(['port' => 1161, 'transport' => 'tcp'], json_decode($b->settings, true));
         $this->assertEquals(1, $a->enabled);
-        $this->assertEquals(0, $b->enabled);
 
         // identical credentials share a secret
         $this->assertSame($a->secret_id, $b->secret_id);
@@ -55,6 +54,25 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
         $defaultIds = json_decode(DB::table('config')->where('config_name', 'snmp.default_credentials')->value('config_value'), true);
         $this->assertCount(1, $defaultIds);
         $this->assertSame(['version' => 'v2c', 'community' => 'public'], $this->secretData($defaultIds[0]));
+        $this->assertSame('Default SNMP v2c #1', $this->secret($defaultIds[0])->description); // descriptions are not encrypted
+    }
+
+    public function testPingOnlyDevicesGetNoSnmpMethod(): void
+    {
+        $this->migrateLegacyDevices([
+            ['device_id' => 1, 'hostname' => 'ping-only', 'snmpver' => 'v2c', 'community' => 'old-community', 'snmp_disable' => 1],
+        ]);
+
+        $this->assertNull($this->pollingMethod(1, 'snmp'));
+        $this->assertNotNull($this->pollingMethod(1, 'icmp'));
+        $this->assertFalse(DB::table('secrets')->where('description', 'SNMP for device ping-only')->exists());
+
+        // rolling back the removed device fields keeps it ping only
+        $this->artisan('migrate:rollback', [
+            '--database' => $this->connection,
+            '--path' => 'database/migrations/2026_09_22_150000_remove_obsolete_device_fields.php',
+        ]);
+        $this->assertEquals(1, DB::table('devices')->where('device_id', 1)->value('snmp_disable'));
     }
 
     public function testLegacyUnsetSnmpValuesUseTheDefaults(): void

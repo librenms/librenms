@@ -54,6 +54,11 @@ return new class extends Migration
             }
         });
 
+        // Devices without an SNMP method are ping only
+        DB::table('devices')
+            ->whereNotIn('device_id', DB::table('device_polling_methods')->where('method_type', 'snmp')->select('device_id'))
+            ->update(['snmp_disable' => 1]);
+
         // Repopulate legacy device fields from device_polling_methods where method_type = 'snmp'
         $modeIds = ['ifIndex' => 1, 'ifName' => 2, 'ifDescr' => 3, 'ifAlias' => 4];
 
