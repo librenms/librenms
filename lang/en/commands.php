@@ -6,6 +6,7 @@ return [
         'db_auth' => 'Failed to connect to the database. Check the credentials: :error',
         'no_devices' => 'No devices match the given device specification',
         'no_new_devices' => 'No new devices',
+        'unknown_reason' => 'unknown reason',
     ],
     'api:token-create' => [
         'description' => 'Create a new API token for a user',
@@ -231,7 +232,7 @@ return [
             'type' => 'Discover devices only with specified type',
         ],
         'errors' => [
-            'none_up' => 'Device was down, unable to discover.|All devices were down, unable to discover.',
+            'none_up' => 'Device was down (:reason), unable to discover.|All devices were down, unable to discover.',
             'none_actioned' => 'No devices were discovered.',
         ],
         'actioned' => 'Discovered :count devices in :time',
@@ -261,7 +262,7 @@ return [
             'type' => 'Poll devices only with specified type',
         ],
         'errors' => [
-            'none_up' => 'Device was down, unable to poll.|All devices were down, unable to poll.',
+            'none_up' => 'Device was down (:reason), unable to poll.|All devices were down, unable to poll.',
             'none_actioned' => 'No devices were polled.',
         ],
         'actioned' => 'Polled :count devices in :time',
