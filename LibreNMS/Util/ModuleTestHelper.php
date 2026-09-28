@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 
@@ -277,13 +278,7 @@ class ModuleTestHelper
                 'affects_availability' => true,
                 'last_check_successful' => true,
             ]);
-            $secret = Secret::firstOrNew([
-                'description' => 'LibreNMS Test Secret',
-                'secret_type' => PollingMethodType::Snmp->value,
-            ], [
-                'data' => ['version' => 'v2c', 'community' => $this->file_name],
-            ]);
-            $method->setRelation('secret', $secret);
+            $method->setRelation('secret', $this->snmpSecret());
 
             (new ValidateDeviceAndCreate($new_device, collect([$method]), force: true))->execute();
             $device_id = $new_device->device_id;
@@ -374,6 +369,20 @@ class ModuleTestHelper
         }
 
         return $data;
+    }
+
+    /**
+     * The test secret, its community selects the snmprec file served by snmpsim.
+     * Shared by all runs, so update it for the current file.
+     */
+    private function snmpSecret(): Secret
+    {
+        return Secret::updateOrCreate([
+            'description' => 'LibreNMS Test Secret',
+            'secret_type' => SecretType::Snmp,
+        ], [
+            'data' => ['version' => 'v2c', 'community' => $this->file_name],
+        ]);
     }
 
     /**
