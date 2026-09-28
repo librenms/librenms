@@ -46,9 +46,9 @@ class AddDeviceController
                 'icon' => $definition->icon(),
                 'schema_fields' => $secretDefinition?->buildSchemaFields(dataVar: "methods['" . $type->value . "'].formData") ?? [],
                 'schema_defaults' => $secretDefinition?->schemaDefaults() ?? [],
-                'settings_fields' => $definition->settingsFields($method->defaultConfig(), "methods['" . $type->value . "'].settingsData"),
+                'settings_fields' => $definition->settingsFields($method->defaults(), "methods['" . $type->value . "'].settingsData"),
                 'settings_keys' => array_keys($definition->fields()),
-                'default_affects_availability' => $method->defaultConfig()->affectsAvailability,
+                'default_affects_availability' => $method->defaultAffectsAvailability(),
             ];
         })->all();
 

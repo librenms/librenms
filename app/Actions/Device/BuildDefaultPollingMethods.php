@@ -27,7 +27,7 @@ readonly class BuildDefaultPollingMethods
         $pollingMethod = new DevicePollingMethod([
             'method_type' => $type,
             'enabled' => (bool) ($data['enabled'] ?? true),
-            'affects_availability' => (bool) ($data['affects_availability'] ?? $method->defaultConfig()->affectsAvailability),
+            'affects_availability' => (bool) ($data['affects_availability'] ?? $method->defaultAffectsAvailability()),
             'settings' => $method->definition()->filterOverrides($data['settings'] ?? []),
         ]);
         $pollingMethod->setRelation('device', $device);

@@ -27,15 +27,9 @@
 namespace LibreNMS\Polling\Secrets\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
-use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
 
 class IpmiSecretDefinition extends SecretDefinition
 {
-    public function data(array $data): IpmiSecretData
-    {
-        return IpmiSecretData::fromArray($data);
-    }
-
     /**
      * @inheritDoc
      */

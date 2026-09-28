@@ -2,7 +2,9 @@
 
 namespace LibreNMS\Polling\Method\Methods;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
@@ -19,9 +21,30 @@ final class UnixAgentPollingMethod extends PollingMethod
         return new UnixAgentDefinition;
     }
 
-    public function defaultConfig(?Device $device = null): UnixAgentConfig
+    public function defaultAffectsAvailability(): bool
     {
-        return UnixAgentConfig::default();
+        return false;
+    }
+
+    /**
+     * @return array{port: int, timeout: int}
+     */
+    public function defaults(?Device $device = null): array
+    {
+        return [
+            'port' => (int) LibrenmsConfig::get('unix-agent.port', 6556),
+            'timeout' => (int) LibrenmsConfig::get('unix-agent.connection-timeout', 10),
+        ];
+    }
+
+    public function config(Device $device, ?DevicePollingMethod $deviceMethod = null): UnixAgentConfig
+    {
+        $settings = ($deviceMethod->settings ?? []) + $this->defaults($device);
+
+        return new UnixAgentConfig(
+            port: $settings['port'],
+            timeout: $settings['timeout'],
+        );
     }
 
     public function probe(Device $device, PollingMethodConfig $config): ProbeResult
