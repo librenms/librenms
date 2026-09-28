@@ -65,7 +65,7 @@ class Ipmitool
     {
         $device ??= DeviceCache::getPrimary();
 
-        if (! (new ConnectivityHelper($device))->ipmiIsEnabled()) {
+        if (! new ConnectivityHelper($device)->ipmiIsEnabled()) {
             return null;
         }
 

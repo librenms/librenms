@@ -30,4 +30,4 @@ if (empty($os) || ! $os instanceof OS) {
     $os = OS::make($device);
 }
 
-(new \LibreNMS\Modules\Wireless())->discover($os);
+new \LibreNMS\Modules\Wireless()->discover($os);

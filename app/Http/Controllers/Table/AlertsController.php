@@ -46,7 +46,7 @@ class AlertsController extends TableController
     protected array $default_sort = ['timestamp' => 'desc'];
 
     /** Maps the min_severity filter's UI values to alert_rules.severity comparisons. */
-    private const SEVERITY_MAP = [
+    private const array SEVERITY_MAP = [
         'ok' => 1,
         'warning' => 2,
         'critical' => 3,

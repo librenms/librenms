@@ -31,7 +31,7 @@ use Symfony\Component\Process\Process;
 
 class FileCategorizer extends Categorizer
 {
-    private const TESTS_REGEX = '#^tests/(snmpsim|data)/(([0-9a-z\-]+)(_[0-9a-z\-]+)?)(_[0-9a-z\-]+)?\.(json|snmprec)$#';
+    private const string TESTS_REGEX = '#^tests/(snmpsim|data)/(([0-9a-z\-]+)(_[0-9a-z\-]+)?)(_[0-9a-z\-]+)?\.(json|snmprec)$#';
 
     public function __construct($items = [])
     {

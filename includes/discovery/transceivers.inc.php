@@ -30,4 +30,4 @@ if (! isset($os) || ! $os instanceof OS) {
     $os = OS::make($device);
 }
 
-(new \LibreNMS\Modules\Transceivers())->discover($os);
+new \LibreNMS\Modules\Transceivers()->discover($os);

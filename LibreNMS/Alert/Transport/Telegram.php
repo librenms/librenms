@@ -33,7 +33,7 @@ use LibreNMS\Util\Http;
 
 class Telegram extends Transport
 {
-    private  const BASE_URL = 'https://api.telegram.org/bot';
+    private  const string BASE_URL = 'https://api.telegram.org/bot';
 
     private $message = [];
 

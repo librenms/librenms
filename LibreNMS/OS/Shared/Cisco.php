@@ -190,7 +190,7 @@ class Cisco extends OS implements
                 $descr = ucwords((isset($entPhysicalName[$entPhysicalIndex]) ? "{$entPhysicalName[$entPhysicalIndex]} - " : '') . $entry['cempMemPoolName']);
                 $descr = trim(str_replace(['Cisco ', 'Network Processing Engine'], '', $descr), ' -');
 
-                $mempools->push((new Mempool([
+                $mempools->push(new Mempool([
                     'mempool_index' => $index,
                     'entPhysicalIndex' => $entPhysicalIndex,
                     'mempool_type' => 'cemp',
@@ -202,7 +202,7 @@ class Cisco extends OS implements
                     'mempool_perc_warn' => 90,
                     'mempool_largestfree' => $entry['cempMemPoolHCLargestFree'] ?? $entry['cempMemPoolLargestFree'] ?? null,
                     'mempool_lowestfree' => $entry['cempMemPoolHCLowestFree'] ?? $entry['cempMemPoolLowestFree'] ?? null,
-                ]))->fillUsage($entry['cempMemPoolHCUsed'] ?? $entry['cempMemPoolUsed'], null, $entry['cempMemPoolHCFree'] ?? $entry['cempMemPoolFree']));
+                ])->fillUsage($entry['cempMemPoolHCUsed'] ?? $entry['cempMemPoolUsed'], null, $entry['cempMemPoolHCFree'] ?? $entry['cempMemPoolFree']));
             }
         }
 
@@ -213,7 +213,7 @@ class Cisco extends OS implements
         $cmp = snmpwalk_cache_oid($this->getDeviceArray(), 'ciscoMemoryPool', [], 'CISCO-MEMORY-POOL-MIB');
         foreach (Arr::wrap($cmp) as $index => $entry) {
             if (is_numeric($entry['ciscoMemoryPoolUsed']) && is_numeric($index)) {
-                $mempools->push((new Mempool([
+                $mempools->push(new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'cmp',
                     'mempool_class' => 'system',
@@ -223,7 +223,7 @@ class Cisco extends OS implements
                     'mempool_free_oid' => ".1.3.6.1.4.1.9.9.48.1.1.1.6.$index",
                     'mempool_perc_warn' => 90,
                     'mempool_largestfree' => $entry['ciscoMemoryPoolLargestFree'] ?? null,
-                ]))->fillUsage($entry['ciscoMemoryPoolUsed'], null, $entry['ciscoMemoryPoolFree']));
+                ])->fillUsage($entry['ciscoMemoryPoolUsed'], null, $entry['ciscoMemoryPoolFree']));
             }
         }
 
@@ -239,7 +239,7 @@ class Cisco extends OS implements
             if (isset($entry['cpmCPUMemoryFree']) && is_numeric($entry['cpmCPUMemoryFree'])) {
                 $cpu = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex'] ?? 'none'] ?? "Processor $index";
 
-                $mempools->push((new Mempool([
+                $mempools->push(new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'cpm',
                     'mempool_class' => 'system',
@@ -249,7 +249,7 @@ class Cisco extends OS implements
                     'mempool_free_oid' => empty($entry['cpmCPUMemoryHCFree']) ? ".1.3.6.1.4.1.9.9.109.1.1.1.1.13.$index" : ".1.3.6.1.4.1.9.9.109.1.1.1.1.19.$index",
                     'mempool_perc_warn' => 90,
                     'mempool_lowestfree' => $entry['cpmCPUMemoryHCLowest'] ?? $entry['cpmCPUMemoryLowest'] ?? null,
-                ]))->fillUsage(
+                ])->fillUsage(
                     empty($entry['cpmCPUMemoryHCUsed']) ? $entry['cpmCPUMemoryUsed'] : $entry['cpmCPUMemoryHCUsed'],
                     null,
                     empty($entry['cpmCPUMemoryHCFree']) ? $entry['cpmCPUMemoryFree'] : $entry['cpmCPUMemoryHCFree']
@@ -502,14 +502,14 @@ class Cisco extends OS implements
                 }
                 $descr .= ':';
 
-                return (new Storage([
+                return new Storage([
                     'type' => 'cisco-flash',
                     'storage_descr' => $descr,
                     'storage_index' => $index,
                     'storage_type' => 'FlashMemory',
                     'storage_free_oid' => $free_oid,
                     'storage_units' => 1,
-                ]))->fillUsage(total: $size, free: $free);
+                ])->fillUsage(total: $size, free: $free);
             });
     }
 

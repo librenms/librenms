@@ -29,4 +29,4 @@ use LibreNMS\OS;
 if (! $os instanceof OS) {
     $os = OS::make($device);
 }
-(new \LibreNMS\Modules\Isis())->discover($os);
+new \LibreNMS\Modules\Isis()->discover($os);

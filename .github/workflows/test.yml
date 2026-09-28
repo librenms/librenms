@@ -18,12 +18,12 @@ concurrency:
 jobs:
   test:
     name: ${{ matrix.name }} ${{ matrix.arguments }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         php-version:
-          - 8.4
+          - 8.5
         arguments:
           - --os a
           - --os b,c,d
@@ -35,18 +35,18 @@ jobs:
           - --os u,v,w,x,y,z,0,1,2,3,4,5,6,7,8,9
         include:
           -
-            name: PHP 8.4
-            php-version: 8.4
-            database: mariadb:11.7
+            name: PHP 8.5
+            php-version: 8.5
+            database: mariadb:lts
           -
             name: Other
-            php-version: 8.4
-            database: mariadb:11.7
+            php-version: 8.5
+            database: mariadb:lts
             arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
           -
             name: Other
-            php-version: 8.2
-            database: mysql:8.0
+            php-version: 8.4
+            database: mysql:8
             arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
 
     services:

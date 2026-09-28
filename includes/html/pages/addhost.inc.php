@@ -74,7 +74,7 @@ if (! empty($_POST['hostname'])) {
                 $new_device->port_association_mode = PortAssociationMode::getId($_POST['port_assoc_mode']);
 
                 $force_add = (isset($_POST['force_add']) && $_POST['force_add'] == 'on');
-                $result = (new ValidateDeviceAndCreate($new_device, $force_add))->execute();
+                $result = new ValidateDeviceAndCreate($new_device, $force_add)->execute();
 
                 if ($result) {
                     $link = \LibreNMS\Util\Url::deviceUrl($new_device->device_id);

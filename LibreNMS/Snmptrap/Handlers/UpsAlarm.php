@@ -32,7 +32,7 @@ class UpsAlarm
     /**
      * UPS-MIB upsWellKnownAlarms (RFC 1628), keyed by their OBJECT-IDENTITY index.
      */
-    private const ALARMS = [
+    private const array ALARMS = [
         1 => ['upsAlarmBatteryBad', 'One or more batteries have been determined to require replacement.', Severity::Error],
         2 => ['upsAlarmOnBattery', 'The UPS is drawing power from the batteries.', Severity::Warning],
         3 => ['upsAlarmLowBattery', 'The remaining battery run-time is less than or equal to the configured low battery time.', Severity::Error],

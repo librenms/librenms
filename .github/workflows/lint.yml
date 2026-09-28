@@ -46,7 +46,7 @@ jobs:
 
   phpstan:
     name: PHP Static Analysis
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
     steps:
@@ -105,7 +105,7 @@ jobs:
 
   rector:
     name: Rector (dry-run)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6

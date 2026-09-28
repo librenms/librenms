@@ -34,9 +34,9 @@ use LibreNMS\Interfaces\RefreshableConfigBackupProvider;
 class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupProvider
 {
     /** Backup id used for the single current config when versioning is disabled. */
-    private const CONFIG_ID = 'current';
+    private const string CONFIG_ID = 'current';
 
-    private const PER_PAGE = 100;
+    private const int PER_PAGE = 100;
 
     private ?string $lastError = null;
 
