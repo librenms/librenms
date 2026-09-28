@@ -5,8 +5,10 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use App\Models\Secret;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Util\Snmpsim;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -111,17 +113,17 @@ class DevSimulate extends LnmsCommand
             $method = new DevicePollingMethod([
                 'device_id' => $device->device_id,
                 'method_type' => PollingMethodType::Snmp,
-                'settings' => ['transport' => 'udp', 'port' => $this->snmpsim->port],
                 'affects_availability' => true,
             ]);
             $device->setRelation('pollingMethods', collect([$method]));
         } else {
             $device->pollingMethod(PollingMethodType::Icmp)?->delete(); // don't need icmp, cleanup legacy
         }
+        $method->settings = [...$method->settings ?? [], 'transport' => 'udp', 'port' => $this->snmpsim->port];
 
-        $secret = \App\Models\Secret::firstOrNew([
+        $secret = Secret::updateOrCreate([
             'description' => "snmpsim secret ($device->hostname)",
-            'secret_type' => PollingMethodType::Snmp->value,
+            'secret_type' => SecretType::Snmp,
         ], [
             'data' => ['version' => 'v2c', 'community' => $community],
         ]);
