@@ -48,15 +48,7 @@ if (! empty($resrcData)) {
             foreach ($memberData as $resrcId => $entry) {
                 if (isset($entry['tmnxNatIsaMemberResrcName'], $entry['tmnxNatIsaMemberResrcVal'])) {
                     $name = $entry['tmnxNatIsaMemberResrcName'];
-
-                    // Only create sensors for allowed resource types
-                    $matched = false;
-                    foreach ($allowedResources as $allowed) {
-                        if (stripos($name, $allowed) !== false) {
-                            $matched = true;
-                            break;
-                        }
-                    }
+                    $matched = array_any($allowedResources, fn($allowed) => stripos($name, $allowed) !== false);
                     if (! $matched) {
                         continue;
                     }

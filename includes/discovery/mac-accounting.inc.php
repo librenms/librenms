@@ -6,4 +6,4 @@ if (! $os instanceof OS) {
     $os = OS::make($device);
 }
 
-(new \LibreNMS\Modules\MacAccounting())->discover($os);
+new \LibreNMS\Modules\MacAccounting()->discover($os);

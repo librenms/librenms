@@ -18,7 +18,7 @@ class DeviceIsPingable
 
     public function execute(Device $device): FpingResponse
     {
-        if (! (new ConnectivityHelper($device))->icmpIsEnabled()) {
+        if (! new ConnectivityHelper($device)->icmpIsEnabled()) {
             return FpingResponse::artificialUp($device->pollerTarget());
         }
 

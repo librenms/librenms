@@ -32,15 +32,15 @@ Artisan::command('device:rename
     {new hostname : ' . __('The new hostname or IP') . '}
 ', function (): void {
     /** @var Illuminate\Console\Command $this */
-    (new Process([
+    new Process([
         base_path('renamehost.php'),
         $this->argument('old hostname'),
         $this->argument('new hostname'),
-    ]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
+    ])->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Rename a device, this can be used to change the hostname or IP of a device'));
 
 Artisan::command('update', function (): void {
-    (new Process([base_path('daily.sh')]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
+    new Process([base_path('daily.sh')])->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Update LibreNMS and run maintenance routines'));
 
 Artisan::command('poller:ping
@@ -58,7 +58,7 @@ Artisan::command('poller:alerts', function (): void {
         }
     }
 
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
+    new Process($command)->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Check for any pending alerts and deliver them via defined transports'));
 
 Artisan::command('poller:billing
@@ -77,7 +77,7 @@ Artisan::command('poller:billing
             $command[] = '-v';
         }
     }
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
+    new Process($command)->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Collect billing data'));
 
 Artisan::command('poller:services
@@ -100,7 +100,7 @@ Artisan::command('poller:services
             $command[] = '-v';
         }
     }
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
+    new Process($command)->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Update LibreNMS and run maintenance routines'));
 
 Artisan::command('poller:billing-calculate
@@ -112,7 +112,7 @@ Artisan::command('poller:billing-calculate
         $command[] = '-r';
     }
 
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
+    new Process($command)->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Run billing calculations'));
 
 Artisan::command('scan
@@ -159,7 +159,7 @@ Artisan::command('scan
 
     $command = array_merge($command, $this->argument('network'));
 
-    $scan_process = (new Process($command))
+    $scan_process = new Process($command)
         ->setTimeout(null)
         ->setIdleTimeout(null)
         ->setTty(Process::isTtySupported() && ! $this->option('quiet'));

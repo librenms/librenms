@@ -29,4 +29,4 @@ use LibreNMS\OS;
 if (! $os instanceof OS) {
     $os = OS::make($device);
 }
-(new \LibreNMS\Modules\ArpTable())->discover($os);
+new \LibreNMS\Modules\ArpTable()->discover($os);

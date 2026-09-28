@@ -19,7 +19,7 @@ class DeviceMtuTest
 
     public function execute(Device $device): bool
     {
-        if (! (new ConnectivityHelper($device))->icmpIsEnabled()) {
+        if (! new ConnectivityHelper($device)->icmpIsEnabled()) {
             return true;
         }
 

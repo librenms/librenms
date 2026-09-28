@@ -21,4 +21,4 @@ if (! $os instanceof OS) {
     $os = OS::make($device);
 }
 
-(new \LibreNMS\Modules\Stp())->discover($os);
+new \LibreNMS\Modules\Stp()->discover($os);

@@ -473,10 +473,10 @@ class ConfigRepository
         }
 
         if (! $this->has('rrdtool_version')) {
-            $this->persistDefault('rrdtool_version', (new Version($this))->rrdtool());
+            $this->persistDefault('rrdtool_version', new Version($this)->rrdtool());
         }
         if (! $this->has('snmp.unescape')) {
-            $this->persistDefault('snmp.unescape', version_compare((new Version($this))->netSnmp(), '5.8.0', '<'));
+            $this->persistDefault('snmp.unescape', version_compare(new Version($this)->netSnmp(), '5.8.0', '<'));
         }
         if (! $this->has('reporting.usage')) {
             $this->persistDefault('reporting.usage', (bool) Callback::get('enabled'));

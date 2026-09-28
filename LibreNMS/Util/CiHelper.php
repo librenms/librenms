@@ -457,7 +457,7 @@ class CiHelper
         $this->flags['full'] = empty($changed_files); // don't disable full if already set
         $files = $changed_files ? explode(' ', $changed_files) : [];
 
-        $this->changed = (new FileCategorizer($files))->categorize();
+        $this->changed = new FileCategorizer($files)->categorize();
         $this->parseChangedFiles();
     }
 

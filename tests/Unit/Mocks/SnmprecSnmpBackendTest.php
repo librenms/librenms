@@ -41,8 +41,8 @@ final class SnmprecSnmpBackendTest extends TestCase
 {
     use SnmpsimHelpers;
 
-    private const FIXTURE = 'snmpquerymock_regression';
-    private const BASE_OID = '1.3.6.1.2.1.2.2.1.2';
+    private const string FIXTURE = 'snmpquerymock_regression';
+    private const string BASE_OID = '1.3.6.1.2.1.2.2.1.2';
 
     private function makeBackend(): SnmprecSnmpBackend
     {
