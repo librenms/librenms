@@ -577,6 +577,14 @@ class NetSnmpTest extends TestCase
         $this->assertSame(2, $config->retries);
     }
 
+    public function testLegacyOidLimitUsesTheSnmpPollingMethod(): void
+    {
+        \App\Facades\LibrenmsConfig::set('snmp.max_oid', 5);
+        \App\Facades\DeviceCache::fake($this->makeDeviceWithSnmpConfig(settings: ['max_oid' => 20]));
+
+        $this->assertSame(20, get_device_oid_limit(['device_id' => 1, 'os' => 'generic']));
+    }
+
     public function testLegacySnmpExecUsesTheContextFromTheDeviceArray(): void
     {
         $device = $this->makeDeviceWithSnmpConfig(settings: ['context' => 'vrf-default']);
