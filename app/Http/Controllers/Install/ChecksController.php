@@ -82,7 +82,8 @@ class ChecksController extends InstallationController implements InstallerStep
         if (! $this->checkPhpVersion()) {
             return false;
         }
-        return array_all(self::MODULES, fn($module) => extension_loaded($module));
+
+        return array_all(self::MODULES, fn ($module) => extension_loaded($module));
     }
 
     public function enabled(): bool

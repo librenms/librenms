@@ -198,7 +198,8 @@ class AppServiceProvider extends ServiceProvider
             if (! is_array($value)) {
                 return false;
             }
-            return array_all($value, fn($_, $key) => !(is_string($key) && strlen(trim($key)) == 0));
+
+            return array_all($value, fn ($_, $key) => ! (is_string($key) && strlen(trim($key)) == 0));
         });
 
         Validator::extend('date_or_relative', function ($attribute, $value, $parameters, $validator) {

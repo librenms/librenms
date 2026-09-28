@@ -184,7 +184,7 @@ abstract class IP implements \Stringable
      */
     public function inNetworks($networks)
     {
-        return array_any((array) $networks, fn($network) => $this->inNetwork($network));
+        return array_any((array) $networks, fn ($network) => $this->inNetwork($network));
     }
 
     /**
