@@ -95,7 +95,7 @@ if (! function_exists('preg_match_any')) {
      */
     function preg_match_any($subject, $regexes)
     {
-        return array_any((array) $regexes, fn($regex) => preg_match($regex, $subject));
+        return array_any((array) $regexes, fn ($regex) => preg_match($regex, $subject));
     }
 }
 

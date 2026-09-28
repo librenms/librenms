@@ -48,7 +48,7 @@ if (! empty($resrcData)) {
             foreach ($memberData as $resrcId => $entry) {
                 if (isset($entry['tmnxNatIsaMemberResrcName'], $entry['tmnxNatIsaMemberResrcVal'])) {
                     $name = $entry['tmnxNatIsaMemberResrcName'];
-                    $matched = array_any($allowedResources, fn($allowed) => stripos($name, $allowed) !== false);
+                    $matched = array_any($allowedResources, fn ($allowed) => stripos($name, $allowed) !== false);
                     if (! $matched) {
                         continue;
                     }
