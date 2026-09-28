@@ -64,9 +64,7 @@ class LegacyDeviceCreator
     public function getPollingMethods(Device $device): Collection
     {
         $methods = collect([
-            $this->builder->buildMethod($device, PollingMethodType::Icmp, [
-                'affects_availability' => $this->ping_only || $this->ping_fallback,
-            ]),
+            $this->builder->buildMethod($device, PollingMethodType::Icmp),
         ]);
 
         if (! $this->ping_only) {
@@ -84,12 +82,11 @@ class LegacyDeviceCreator
     }
 
     /**
-     * Explicit SNMP credentials, or null to try the default credentials.
+     * Explicit SNMP credentials, only a version to try the default credentials for that version, or null to try all default credentials.
      */
     private function snmpSecretData(): ?SnmpSecretData
     {
-        $hasCredentials = $this->snmpver !== null
-            || $this->community !== null
+        $hasCredentials = $this->community !== null
             || $this->authpass !== null
             || $this->cryptopass !== null
             || ($this->authname !== null && $this->authname !== 'root')
@@ -97,7 +94,7 @@ class LegacyDeviceCreator
             || ($this->cryptoalgo !== null && $this->cryptoalgo !== 'AES');
 
         if (! $hasCredentials) {
-            return null;
+            return $this->snmpver ? new SnmpSecretData(version: $this->snmpver) : null;
         }
 
         return new SnmpSecretData(

@@ -34,6 +34,14 @@ readonly class SnmpSecretData implements SecretData
     }
 
     /**
+     * A secret with only a version has no credentials, the default credentials for that version are tried instead.
+     */
+    public function hasCredentials(): bool
+    {
+        return $this->version === 'v3' ? ! empty($this->authname) : ! empty($this->community);
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toArray(): array
