@@ -134,6 +134,24 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
         $this->assertSame([2, 3], DB::table('device_polling_methods')->where('method_type', 'unix-agent')->orderBy('device_id')->pluck('device_id')->all());
     }
 
+    public function testUnixAgentPortOverrideIsMigrated(): void
+    {
+        LibrenmsConfig::set('poller_modules.unix-agent', true);
+
+        $this->migrateLegacyDevices([
+            ['device_id' => 1, 'hostname' => 'custom-port', 'os' => 'linux'],
+            ['device_id' => 2, 'hostname' => 'default-port', 'os' => 'linux'],
+            ['device_id' => 3, 'hostname' => 'empty-port', 'os' => 'linux'],
+        ], [
+            ['device_id' => 1, 'attrib_type' => 'override_Unixagent_port', 'attrib_value' => '6557'],
+            ['device_id' => 3, 'attrib_type' => 'override_Unixagent_port', 'attrib_value' => ''],
+        ]);
+
+        $this->assertSame(['port' => 6557], json_decode($this->pollingMethod(1, 'unix-agent')->settings, true));
+        $this->assertNull($this->pollingMethod(2, 'unix-agent')->settings);
+        $this->assertNull($this->pollingMethod(3, 'unix-agent')->settings); // legacy ignored an empty override
+    }
+
     /**
      * Roll back to before the polling method migrations, add devices with legacy fields, then migrate.
      *
