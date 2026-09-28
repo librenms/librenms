@@ -19,6 +19,7 @@ use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -74,7 +75,7 @@ final class PollingMethodProbeTest extends TestCase
     public function testSnmpProbesTheDeviceWithTheGivenConfig(): void
     {
         $device = new Device(['hostname' => 'snmp.test.local']);
-        $config = new SnmpConfig(community: 'custom-community', port: 1161);
+        $config = SnmpConfig::make(['port' => 1161] + (new SnmpPollingMethod)->defaults(), new SnmpSecretData(community: 'custom-community'));
 
         $backend = Mockery::mock(SnmpBackendInterface::class);
         $backend->shouldReceive('get')
@@ -93,7 +94,7 @@ final class PollingMethodProbeTest extends TestCase
         $backend = Mockery::mock(SnmpBackendInterface::class);
         $backend->shouldReceive('get')->once()->andReturn(new RawSnmpResponse('', 'Timeout: No Response from snmp.test.local', 1));
 
-        $result = (new SnmpPollingMethod($backend))->probe(new Device(['hostname' => 'snmp.test.local']), new SnmpConfig);
+        $result = (new SnmpPollingMethod($backend))->probe(new Device(['hostname' => 'snmp.test.local']), SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpSecretData));
 
         $this->assertFalse($result->isSuccess());
         $this->assertNotEmpty($result->errorMessage());
@@ -101,7 +102,7 @@ final class PollingMethodProbeTest extends TestCase
 
     public function testUnixAgentProbeUsesConfiguredPortAndTimeout(): void
     {
-        $config = UnixAgentConfig::default()->fill(['port' => 1, 'timeout' => 1]); // nothing listens on port 1
+        $config = new UnixAgentConfig(port: 1, timeout: 1); // nothing listens on port 1
 
         $result = (new UnixAgentPollingMethod)->probe(new Device(['hostname' => '127.0.0.1']), $config);
 

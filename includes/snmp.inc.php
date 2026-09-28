@@ -23,7 +23,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Data\Source\Snmp\NetSnmpOptions;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Exceptions\SnmpException;
-use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Util\Mib;
 use LibreNMS\Util\StringHelpers;
 
@@ -38,7 +38,7 @@ function snmp_exec(string $cmd, array|string|null $oids, array|string|null $opti
     $os = $device['os'] ?? 'generic';
     $oids = Arr::wrap($oids);
 
-    $config = SnmpConfig::fromDeviceArray($device);
+    $config = resolve(SnmpPollingMethod::class)->configFromDeviceArray($device);
 
     $queryOptions = resolve(NetSnmpOptions::class)->parseCli($options);
     $queryOptions->context = $device['context_name'] ?? ($config->context ?: $queryOptions->context);

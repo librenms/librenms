@@ -33,6 +33,8 @@ use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\SnmpOidOutput;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use LibreNMS\Tests\Mocks\SnmprecSnmpBackend;
 use LibreNMS\Tests\SnmpsimHelpers;
 use LibreNMS\Tests\TestCase;
@@ -51,7 +53,7 @@ final class SnmprecSnmpBackendTest extends TestCase
 
     private function makeConfig(): SnmpConfig
     {
-        return new SnmpConfig(community: self::FIXTURE);
+        return SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpSecretData(community: self::FIXTURE));
     }
 
     private function makeNumericOptions(): SnmpQueryOptions
@@ -119,11 +121,15 @@ final class SnmprecSnmpBackendTest extends TestCase
         $real = resolve(SnmpBackendInterface::class);
 
         $target = $this->getSnmpsimIp() ?? '127.0.0.1';
-        $config = new SnmpConfig(
-            community: self::FIXTURE,
-            port: $this->getSnmpsimPort(),
-            timeout: 3,
-            retries: 0,
+        $config = SnmpConfig::make(
+            [
+                'port' => $this->getSnmpsimPort(),
+                'timeout' => 3,
+                'retries' => 0,
+            ] + (new SnmpPollingMethod)->defaults(),
+            new SnmpSecretData(
+                community: self::FIXTURE,
+            ),
         );
         $options = $this->makeNumericOptions();
 

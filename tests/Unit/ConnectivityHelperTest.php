@@ -9,10 +9,12 @@ use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\Method\Config\PollingMethodConfig;
+use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 
@@ -245,24 +247,26 @@ final class ConnectivityHelperTest extends TestCase
         $this->app->instance(SnmpBackendInterface::class, $mockBackend);
 
         $device = new Device;
-        $snmpConfig = new SnmpConfig(
-            enabled: true,
-            affectsAvailability: true,
-            version: 'v2c',
-            community: 'public',
-            authname: null,
-            authpass: null,
-            authlevel: 'noAuthNoPriv',
-            authalgo: 'SHA',
-            cryptopass: null,
-            cryptoalgo: 'AES',
-            transport: 'udp',
-            port: 161,
-            context: null,
-            timeout: 3,
-            retries: 1,
-            maxRepeaters: 0,
-            maxOid: 10
+        $snmpConfig = SnmpConfig::make(
+            [
+                'transport' => 'udp',
+                'port' => 161,
+                'context' => null,
+                'timeout' => 3,
+                'retries' => 1,
+                'max_repeaters' => 0,
+                'max_oid' => 10,
+            ] + (new SnmpPollingMethod)->defaults(),
+            new SnmpSecretData(
+                version: 'v2c',
+                community: 'public',
+                authname: null,
+                authpass: null,
+                authlevel: 'noAuthNoPriv',
+                authalgo: 'SHA',
+                cryptopass: null,
+                cryptoalgo: 'AES',
+            ),
         );
 
         $snmpMethod = app(PollingMethodRegistry::class)->get(PollingMethodType::Snmp);
@@ -290,7 +294,7 @@ class CheckDeviceAvailabilityMock
             $methodMock = $this->methodMocks[$typeKey] ?? null;
 
             if ($methodMock) {
-                $config = Mockery::mock(PollingMethodConfig::class);
+                $config = new IcmpConfig(ipVersion: 'default');
                 $result = $methodMock->probe($device, $config);
                 $deviceMethod->last_check_successful = $result->isSuccess();
                 $deviceMethod->last_checked_at = now();

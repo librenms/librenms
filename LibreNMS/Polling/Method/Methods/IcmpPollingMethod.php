@@ -4,6 +4,7 @@ namespace LibreNMS\Polling\Method\Methods;
 
 use App\Actions\Device\DeviceMtuTest;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use App\Models\Eventlog;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Enum\AddressFamily;
@@ -12,7 +13,6 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
-use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Definitions\IcmpDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
 
@@ -26,9 +26,28 @@ final class IcmpPollingMethod extends PollingMethod
         return new IcmpDefinition;
     }
 
-    public function defaultConfig(?Device $device = null): IcmpConfig
+    public function defaultAffectsAvailability(): bool
     {
-        return IcmpConfig::default();
+        return true;
+    }
+
+    /**
+     * @return array{ip_version: string}
+     */
+    public function defaults(?Device $device = null): array
+    {
+        return [
+            'ip_version' => 'default',
+        ];
+    }
+
+    public function config(Device $device, ?DevicePollingMethod $deviceMethod = null): IcmpConfig
+    {
+        $settings = ($deviceMethod->settings ?? []) + $this->defaults($device);
+
+        return new IcmpConfig(
+            ipVersion: $settings['ip_version'],
+        );
     }
 
     public function resolveAddressFamily(Device $device, ?IcmpConfig $config = null): ?AddressFamily
@@ -48,7 +67,7 @@ final class IcmpPollingMethod extends PollingMethod
      */
     private function snmpTransportFamily(Device $device): AddressFamily
     {
-        $transport = $device->pollingMethod(PollingMethodType::Snmp)?->settings['transport'] ?? SnmpConfig::default()->transport;
+        $transport = $device->pollingMethod(PollingMethodType::Snmp)?->settings['transport'] ?? (new SnmpPollingMethod)->defaults()['transport'];
 
         return str_ends_with($transport, '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
     }
