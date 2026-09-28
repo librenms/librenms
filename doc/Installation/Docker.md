@@ -25,3 +25,9 @@ cd docker-master/examples/compose
 sudo docker compose -f compose.yml up -d
 ```
 5. Open the web interface at `http://localhost:8000` to complete the configuration. Use the correct IP address or name instead of `localhost`.
+
+# Easypanel
+
+[Easypanel](https://easypanel.io) is a self-hosted Docker deployment platform, and LibreNMS has a one-click deployment template there:
+
+[![Deploy on Easypanel](https://easypanel.io/img/deploy-on-easypanel-40.svg)](https://easypanel.io/templates/librenms)
