@@ -138,7 +138,7 @@ class InventoryController implements DeviceTab
             }
 
             if ($entState->entStateAlarm && ! in_array($entState->entStateAlarm, ['00', '80'], true)) {
-                $alarms = $this->parse_entity_state_alarm($entState->entStateAlarm);
+                $alarms = $this->parseEntityStateAlarm($entState->entStateAlarm);
             }
         }
 
@@ -263,7 +263,7 @@ class InventoryController implements DeviceTab
         return $this->type;
     }
 
-    private function parse_entity_state_alarm($bits): array  {
+    private function parseEntityStateAlarm($bits): array  {
         // not sure if this is correct
         $data = [
             0 => ['text' => 'unavailable', 'color' => 'default'],
