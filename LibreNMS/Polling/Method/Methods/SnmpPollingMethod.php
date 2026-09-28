@@ -68,7 +68,7 @@ final class SnmpPollingMethod extends PollingMethod
 
     public function config(Device $device, ?DevicePollingMethod $deviceMethod = null): SnmpConfig
     {
-        if ($deviceMethod === null && ! ($device->relationLoaded('pollingMethods') && $device->pollingMethods->isNotEmpty())) {
+        if ($deviceMethod === null && $device->pollingMethods->isEmpty()) {
             if ($device->exists) {
                 Eventlog::log('Missing SNMP polling method, falling back to legacy device fields.', $device, 'snmp', Severity::Error);
             }
@@ -119,7 +119,7 @@ final class SnmpPollingMethod extends PollingMethod
     public function discover(Device $device, DevicePollingMethod $deviceMethod): ProbeResult
     {
         // If a specific secret was supplied on the method, test that directly
-        if ($deviceMethod->relationLoaded('secret') && $deviceMethod->secret !== null) {
+        if ($deviceMethod->secret !== null) {
             $result = $this->probe($device, $this->config($device, $deviceMethod));
             if ($result->isSuccess()) {
                 return $result;
