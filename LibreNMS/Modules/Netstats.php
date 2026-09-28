@@ -205,7 +205,7 @@ class Netstats implements Module
         foreach ($this->types as $type => $interface) {
             if ($os instanceof $interface) {
                 Log::info("$type ");
-                $method = (new \ReflectionClass($interface))->getMethods()[0]->getName();
+                $method = new \ReflectionClass($interface)->getMethods()[0]->getName();
                 $data = $os->$method($this->oids[$type]);
 
                 // we have data, update it

@@ -156,7 +156,7 @@ if (isset($vars['process'])) {
     ];
 
     echo '<pre>';
-    (new \Symfony\Component\Process\Process($command))->run(function ($type, $buffer): void {
+    new \Symfony\Component\Process\Process($command)->run(function ($type, $buffer): void {
         echo htmlspecialchars((string) $buffer);
     });
     echo '</pre>';

@@ -74,12 +74,12 @@ class Dlinkap extends OS implements MempoolsDiscovery, ProcessorDiscovery
             return new Collection();
         }
 
-        return collect()->push((new Mempool([
+        return collect()->push(new Mempool([
             'mempool_index' => 0,
             'mempool_type' => 'dlinkap',
             'mempool_class' => 'system',
             'mempool_descr' => 'Memory',
             'mempool_perc_oid' => $oid,
-        ]))->fillUsage(null, null, null, $memory));
+        ])->fillUsage(null, null, null, $memory));
     }
 }

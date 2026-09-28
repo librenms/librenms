@@ -95,13 +95,7 @@ if (! function_exists('preg_match_any')) {
      */
     function preg_match_any($subject, $regexes)
     {
-        foreach ((array) $regexes as $regex) {
-            if (preg_match($regex, $subject)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any((array) $regexes, fn($regex) => preg_match($regex, $subject));
     }
 }
 

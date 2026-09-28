@@ -78,7 +78,7 @@ class DatabaseController extends InstallationController implements InstallerStep
 
             // validate Database
             $validator = new Validator();
-            (new Database())->validateSystem($validator);
+            new Database()->validateSystem($validator);
             $results = $validator->getResults('database');
 
             foreach ($results as $result) {

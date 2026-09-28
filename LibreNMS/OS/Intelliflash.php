@@ -17,7 +17,7 @@ class Intelliflash extends OS implements StorageDiscovery, StoragePolling
             $size = ($data['TEGILE-MIB::poolSizeHigh'] << 32) + $data['TEGILE-MIB::poolSizeLow'];
             $used = ($data['TEGILE-MIB::poolUsedSizeHigh'] << 32) + $data['TEGILE-MIB::poolUsedSizeLow'];
 
-            return (new Storage([
+            return new Storage([
                 'type' => 'intelliflash-pl',
                 'storage_index' => $poolIndex,
                 'storage_type' => $data['TEGILE-MIB::poolState'],
@@ -25,14 +25,14 @@ class Intelliflash extends OS implements StorageDiscovery, StoragePolling
                 'storage_size' => $size,
                 'storage_used' => $used,
                 'storage_units' => 1,
-            ]))->fillUsage($used, $size);
+            ])->fillUsage($used, $size);
         });
 
         $projects = SnmpQuery::walk('TEGILE-MIB::projectTable')->mapTable(function ($data, $poolIndex, $projectIndex) {
             $used = ($data['TEGILE-MIB::projectDataSizeHigh'] << 32) + $data['TEGILE-MIB::projectDataSizeLow'];
             $free = ($data['TEGILE-MIB::projectFreeSizeHigh'] << 32) + $data['TEGILE-MIB::projectFreeSizeLow'];
 
-            return (new Storage([
+            return new Storage([
                 'type' => 'intelliflash-pr',
                 'storage_index' => "$poolIndex.$projectIndex",
                 'storage_type' => $data['TEGILE-MIB::projectCompressionEnabled'],
@@ -40,7 +40,7 @@ class Intelliflash extends OS implements StorageDiscovery, StoragePolling
                 'storage_used' => $used,
                 'storage_free' => $free,
                 'storage_units' => 1,
-            ]))->fillUsage($used, free: $free);
+            ])->fillUsage($used, free: $free);
         });
 
         return $pools->merge($projects);

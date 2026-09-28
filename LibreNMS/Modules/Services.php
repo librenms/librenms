@@ -68,7 +68,7 @@ class Services implements Module
         $device = $os->getDeviceArray();
 
         if (LibrenmsConfig::get('discover_services_templates')) {
-            (new ServiceTemplateController())->applyDeviceAll($device['device_id']);
+            new ServiceTemplateController()->applyDeviceAll($device['device_id']);
         }
 
         if (! LibrenmsConfig::get('discover_services')) {
