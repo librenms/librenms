@@ -30,6 +30,7 @@
     <x-field-schema-fields
         :fields="$method['schema_fields']"
         :method-type="$method['type']"
+        id-prefix="new_secret"
         :name-prefix="$namePrefix"
         :model-prefix="$modelPrefix"
         :grid="true" />

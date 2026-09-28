@@ -6,6 +6,7 @@
 
 @php
     $actionLabel = $actionLabel ?? __('Save Anyway');
+    $titleId = 'unreachable-title-' . \Illuminate\Support\Str::random(8); // rendered once per polling method
 @endphp
 
 <template x-teleport="body">
@@ -23,14 +24,14 @@
              x-transition:leave-end="tw:opacity-0 tw:scale-95"
              @click.stop
              class="tw:w-full tw:max-w-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-gray-200 tw:dark:border-dark-gray-300 tw:rounded-xl tw:shadow-2xl tw:p-6"
-             role="dialog" aria-modal="true" aria-labelledby="modal-title">
+             role="dialog" aria-modal="true" aria-labelledby="{{ $titleId }}">
 
             <div class="tw:flex tw:items-start tw:gap-4">
                 <div class="tw:shrink-0 tw:flex tw:items-center tw:justify-center tw:h-12 tw:w-12 tw:rounded-full tw:bg-amber-100 tw:dark:bg-amber-900/50">
                     <i class="fa fa-exclamation-triangle tw:text-amber-600 tw:dark:text-amber-400 tw:text-xl"></i>
                 </div>
                 <div class="tw:grow">
-                    <h3 class="tw:text-lg tw:font-semibold tw:text-gray-900 tw:dark:text-dark-white-100 tw:m-0" id="modal-title">
+                    <h3 class="tw:text-lg tw:font-semibold tw:text-gray-900 tw:dark:text-dark-white-100 tw:m-0" id="{{ $titleId }}">
                         {{ __('poller.reachability_check_failed') }}
                     </h3>
                     <div class="tw:mt-2">

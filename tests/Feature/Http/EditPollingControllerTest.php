@@ -191,6 +191,31 @@ final class EditPollingControllerTest extends DBTestCase
         $response->assertDontSee('"community"', false); // secret data is loaded on demand
     }
 
+    public function testIndexRendersEachSecretOptionAndIdOnce(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $secret = Secret::create([
+            'description' => 'SNMP Secret 456',
+            'secret_type' => SecretType::Snmp,
+            'data' => ['version' => 'v2c', 'community' => 'public'],
+        ]);
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $secret->id,
+        ]);
+
+        $html = $this->actingAs($admin)->get(route('device.edit.polling', ['device' => $device]))->assertOk()->getContent();
+
+        // the edit and new secret forms are both on the page
+        preg_match_all('/\sid="([^"]+)"/', $html, $ids);
+        $this->assertSame([], array_keys(array_filter(array_count_values($ids[1]), fn (int $count): bool => $count > 1)), 'duplicate element ids');
+
+        // the selected secret is rendered as a selected option, select2 must not add it again
+        $this->assertStringNotContainsString('"text":"SNMP Secret 456"', $html);
+    }
+
     public function testUpdateReturnsJsonResponseWhenRequested(): void
     {
         $admin = User::factory()->admin()->create(['enabled' => 1]);

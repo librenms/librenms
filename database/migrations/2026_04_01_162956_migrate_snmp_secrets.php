@@ -60,6 +60,11 @@ return new class extends Migration
                             continue;
                         }
 
+                        // Ping only devices get no SNMP method, credentials are entered again if SNMP is added later
+                        if ($device->snmp_disable) {
+                            continue;
+                        }
+
                         $snmpver = $device->snmpver ?? 'v2c';
                         $data = ['version' => $snmpver];
 
@@ -105,7 +110,7 @@ return new class extends Migration
                         $pollingMethods[] = [
                             'device_id' => $device->device_id,
                             'method_type' => 'snmp',
-                            'enabled' => ! $device->snmp_disable,
+                            'enabled' => true,
                             'affects_availability' => true,
                             'last_check_successful' => (bool) $device->status,
                             'secret_id' => $secretId,
@@ -151,7 +156,7 @@ return new class extends Migration
                         'cryptopass' => $v3['cryptopass'] ?? null,
                         'cryptoalgo' => $v3['cryptoalgo'] ?? 'AES',
                     ];
-                    $secretId = $this->getOrCreateSecret($v3Data, 'Default SNMP v3 (' . ($v3Data['authname'] ?: 'root') . ')');
+                    $secretId = $this->getOrCreateSecret($v3Data, $this->defaultDescription('v3', $defaultSecretIds));
                     if ($secretId !== null) {
                         $defaultSecretIds[] = $secretId;
                     }
@@ -165,7 +170,7 @@ return new class extends Migration
                         'version' => $version,
                         'community' => $community,
                     ];
-                    $secretId = $this->getOrCreateSecret($v2Data, "Default SNMP $version ($community)");
+                    $secretId = $this->getOrCreateSecret($v2Data, $this->defaultDescription($version, $defaultSecretIds));
                     if ($secretId !== null) {
                         $defaultSecretIds[] = $secretId;
                     }
@@ -175,7 +180,7 @@ return new class extends Migration
 
         if (empty($defaultSecretIds)) {
             $v2Data = ['version' => 'v2c', 'community' => 'public'];
-            $secretId = $this->getOrCreateSecret($v2Data, 'Default SNMP v2c (public)');
+            $secretId = $this->getOrCreateSecret($v2Data, $this->defaultDescription('v2c', $defaultSecretIds));
             if ($secretId !== null) {
                 $defaultSecretIds[] = $secretId;
             }
@@ -200,6 +205,16 @@ return new class extends Migration
     /**
      * @param  array<string, mixed>  $data
      */
+    /**
+     * Descriptions are not encrypted, so never include the credentials. Numbered in the order they are tried.
+     *
+     * @param  int[]  $defaultSecretIds
+     */
+    private function defaultDescription(string $version, array $defaultSecretIds): string
+    {
+        return "Default SNMP $version #" . (count($defaultSecretIds) + 1);
+    }
+
     private function getOrCreateSecret(array $data, string $desc, string $type = 'snmp'): ?int
     {
         $hash = hash('sha256', serialize($data));
