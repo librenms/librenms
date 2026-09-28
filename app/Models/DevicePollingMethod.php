@@ -3,11 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\PollingMethodType;
 
-class DevicePollingMethod extends Model
+class DevicePollingMethod extends DeviceRelatedModel
 {
     /** @use HasFactory<\Database\Factories\DevicePollingMethodFactory> */
     use HasFactory;
@@ -39,12 +38,6 @@ class DevicePollingMethod extends Model
         'last_checked_at' => 'datetime',
         'last_check_successful' => 'boolean',
     ];
-
-    /** @return BelongsTo<Device, $this> */
-    public function device(): BelongsTo
-    {
-        return $this->belongsTo(Device::class);
-    }
 
     /** @return BelongsTo<Secret, $this> */
     public function secret(): BelongsTo
