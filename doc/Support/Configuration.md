@@ -300,21 +300,19 @@ polling](1-Minute-Polling.md).
     (count: 3), and each packet has a delay of 3 seconds. fping
     therefore needs more than 6 seconds to return a result.
 
-LibreNMS uses an fping ICMP check to decide whether a device is up. You
-can disable this check globally or for one device. **Do not disable the
-ICMP check without full knowledge of the result. With many devices
-down, the poller waits for the SNMP timeouts. The poller can then take
-more than 5 minutes.**
+LibreNMS uses an fping ICMP check to decide whether a device is up.
+ICMP is a polling method of each device. New devices get ICMP by
+default. To change it for one device, go to Device -> Edit -> Polling
+-> ICMP:
 
-To disable the fping ICMP check globally:
+- **Enabled**: turn the ICMP check on or off.
+- **Affects availability**: when off, LibreNMS still pings the device
+  and graphs the response, but a failed ping does not mark the device
+  down.
+- **IP Version**: the address family to ping.
 
-!!! setting "poller/ping"
-    ```bash
-    lnms config:set icmp_check false
-    ```
-
-To disable the check for one device, go to
-Device -> Edit -> Misc -> Disable ICMP Test and set it to On.
+To stop pinging a device, click **Remove ICMP**. To add ICMP back, use
+**Add Polling Type**.
 
 #### SNMP
 

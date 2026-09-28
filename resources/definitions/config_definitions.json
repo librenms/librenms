@@ -1669,11 +1669,6 @@
             "type": "float",
             "validate": {
                 "value": "numeric|between:0.000001,0.9"
-            },
-            "when": {
-                "setting": "icmp_check",
-                "operator": "equals",
-                "value": true
             }
         },
         "device_traffic_descr": {
@@ -2538,12 +2533,7 @@
             "group": "poller",
             "section": "ping",
             "order": 2,
-            "type": "text",
-            "when": {
-                "setting": "icmp_check",
-                "operator": "equals",
-                "value": true
-            }
+            "type": "text"
         },
         "fping_options.interval": {
             "default": 500,
@@ -2551,12 +2541,7 @@
             "group": "poller",
             "section": "ping",
             "order": 3,
-            "type": "text",
-            "when": {
-                "setting": "icmp_check",
-                "operator": "equals",
-                "value": true
-            }
+            "type": "text"
         },
         "fping_options.timeout": {
             "default": 500,
@@ -2564,12 +2549,7 @@
             "group": "poller",
             "section": "ping",
             "order": 4,
-            "type": "text",
-            "when": {
-                "setting": "icmp_check",
-                "operator": "equals",
-                "value": true
-            }
+            "type": "text"
         },
         "front_page": {
             "default": "default",
@@ -4821,13 +4801,6 @@
                     "starts_with:http://,https://,tcp://"
                 ]
             }
-        },
-        "icmp_check": {
-            "default": true,
-            "group": "poller",
-            "section": "ping",
-            "order": 1,
-            "type": "boolean"
         },
         "ignore_bsd_os_drives": {
             "group": "discovery",
