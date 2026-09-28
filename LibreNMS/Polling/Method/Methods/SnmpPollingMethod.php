@@ -118,8 +118,8 @@ final class SnmpPollingMethod extends PollingMethod
      */
     public function discover(Device $device, DevicePollingMethod $deviceMethod): ProbeResult
     {
-        // If a specific secret was supplied on the method, test that directly
-        if ($deviceMethod->secret !== null) {
+        // If specific credentials were supplied on the method, test them directly
+        if ($this->hasCredentials($deviceMethod)) {
             $result = $this->probe($device, $this->config($device, $deviceMethod));
             if ($result->isSuccess()) {
                 return $result;
@@ -128,12 +128,10 @@ final class SnmpPollingMethod extends PollingMethod
             return ProbeResult::failure($result->stats(), $result->errorMessage(), [$this->noReplyReason($deviceMethod->secret)]);
         }
 
-        // Otherwise, attempt ordered default credentials
-        $defaultSecrets = $this->defaultSecrets();
-
+        // Otherwise, attempt the default credentials in order
         $reasons = [];
         $lastResult = null;
-        foreach ($defaultSecrets as $secret) {
+        foreach ($this->defaultSecretsFor($deviceMethod) as $secret) {
             $deviceMethod->setRelation('secret', $secret);
             $deviceMethod->secret_id = $secret->id;
 
@@ -154,20 +152,37 @@ final class SnmpPollingMethod extends PollingMethod
      */
     public function assignDefaultSecret(DevicePollingMethod $deviceMethod): void
     {
-        if ($deviceMethod->secret !== null) {
+        if ($this->hasCredentials($deviceMethod)) {
             return;
         }
 
-        $secret = $this->defaultSecrets()->first() ?? throw new MissingSecretException(PollingMethodType::Snmp);
+        $secret = $this->defaultSecretsFor($deviceMethod)->first() ?? throw new MissingSecretException(PollingMethodType::Snmp);
         $deviceMethod->secret()->associate($secret);
     }
 
+    private function hasCredentials(DevicePollingMethod $deviceMethod): bool
+    {
+        return $deviceMethod->secret !== null && SnmpSecretData::fromArray($deviceMethod->secret->data ?? [])->hasCredentials();
+    }
+
     /**
-     * The default credentials in the order they should be tried.
+     * All default credentials, or only those for the version when the secret has just a version.
      *
      * @return Collection<int, Secret>
      */
-    private function defaultSecrets(): Collection
+    private function defaultSecretsFor(DevicePollingMethod $deviceMethod): Collection
+    {
+        $version = $deviceMethod->secret ? SnmpSecretData::fromArray($deviceMethod->secret->data ?? [])->version : null;
+
+        return $this->defaultSecrets($version);
+    }
+
+    /**
+     * The default credentials in the order they should be tried, optionally only those for one SNMP version.
+     *
+     * @return Collection<int, Secret>
+     */
+    private function defaultSecrets(?string $version = null): Collection
     {
         /** @var array<int, int> $defaultSecretIds */
         $defaultSecretIds = (array) LibrenmsConfig::get('snmp.default_credentials', []);
@@ -176,6 +191,9 @@ final class SnmpPollingMethod extends PollingMethod
             ->whereIn('id', $defaultSecretIds)
             ->get()
             ->sortBy(fn (Secret $secret) => array_search($secret->id, $defaultSecretIds))
+            ->when($version !== null, fn (Collection $secrets) => $secrets->filter(
+                fn (Secret $secret): bool => SnmpSecretData::fromArray($secret->data ?? [])->version === $version
+            ))
             ->values();
     }
 
