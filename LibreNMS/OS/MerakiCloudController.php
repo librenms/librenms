@@ -195,15 +195,13 @@ class MerakiCloudController extends OS implements
      */
     private function devTable(): array
     {
-        if ($this->devices === null) {
-            // Walk only the needed columns. The Meraki cloud endpoint throttles
-            // large walks, and a full devTable walk returns ragged/partial rows.
-            $this->devices = SnmpQuery::cache()->numericIndex()->walk([
-                'MERAKI-CLOUD-CONTROLLER-MIB::devName',
-                'MERAKI-CLOUD-CONTROLLER-MIB::devStatus',
-                'MERAKI-CLOUD-CONTROLLER-MIB::devClientCount',
-            ])->valuesByIndex();
-        }
+        // Walk only the needed columns. The Meraki cloud endpoint throttles
+        // large walks, and a full devTable walk returns ragged/partial rows.
+        $this->devices ??= SnmpQuery::cache()->numericIndex()->walk([
+            'MERAKI-CLOUD-CONTROLLER-MIB::devName',
+            'MERAKI-CLOUD-CONTROLLER-MIB::devStatus',
+            'MERAKI-CLOUD-CONTROLLER-MIB::devClientCount',
+        ])->valuesByIndex();
 
         return $this->devices;
     }
