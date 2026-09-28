@@ -26,19 +26,25 @@ final class PollingMethodConfigTest extends TestCase
         config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]); // secret data is encrypted
     }
 
-    public function testDefaults(): void
+    public function testUnsetSettingsUseTheConfiguredDefaults(): void
     {
+        LibrenmsConfig::set('snmp.transports', ['tcp', 'udp']);
+        LibrenmsConfig::set('snmp.port', 1161);
+        LibrenmsConfig::set('snmp.timeout', 2.5);
+        LibrenmsConfig::set('snmp.retries', 3);
+        LibrenmsConfig::set('unix-agent.port', 6557);
+        LibrenmsConfig::set('unix-agent.connection-timeout', 7);
         $device = new Device(['hostname' => 'example.com']);
 
-        $snmp = (new SnmpPollingMethod)->config($device, $this->deviceMethod(PollingMethodType::Snmp, device: $device));
-        $this->assertSame('udp', $snmp->transport);
-        $this->assertSame(161, $snmp->port);
-        $this->assertSame(1.0, (float) $snmp->timeout);
-        $this->assertSame(5, $snmp->retries);
+        $snmp = $this->config(new SnmpPollingMethod, $this->deviceMethod(PollingMethodType::Snmp, device: $device));
+        $this->assertSame('tcp', $snmp->transport);
+        $this->assertSame(1161, $snmp->port);
+        $this->assertSame(2.5, $snmp->timeout);
+        $this->assertSame(3, $snmp->retries);
 
         $unixAgent = (new UnixAgentPollingMethod)->config($device);
-        $this->assertSame(6556, $unixAgent->port);
-        $this->assertSame(10, $unixAgent->timeout);
+        $this->assertSame(6557, $unixAgent->port);
+        $this->assertSame(7, $unixAgent->timeout);
 
         $this->assertSame('default', (new IcmpPollingMethod)->config($device)->ipVersion);
     }
