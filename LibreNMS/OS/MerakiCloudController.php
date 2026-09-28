@@ -30,9 +30,6 @@ class MerakiCloudController extends OS implements
     WirelessClientsDiscovery,
     WirelessClientsPolling
 {
-    private const DEV_STATUS_OID = '.1.3.6.1.4.1.29671.1.1.4.1.3.';
-    private const DEV_CLIENT_COUNT_OID = '.1.3.6.1.4.1.29671.1.1.4.1.5.';
-
     /** @var array<string, array<string, mixed>>|null */
     private ?array $devices = null;
 
@@ -53,7 +50,7 @@ class MerakiCloudController extends OS implements
                 continue;
             }
 
-            $oid = self::DEV_CLIENT_COUNT_OID . $index;
+            $oid = '.1.3.6.1.4.1.29671.1.1.4.1.5.' . $index;
             $oids[] = $oid;
             $total += (int) $clients;
 
@@ -101,7 +98,7 @@ class MerakiCloudController extends OS implements
                 continue;
             }
 
-            $oids[] = self::DEV_STATUS_OID . $index;
+            $oids[] = '.1.3.6.1.4.1.29671.1.1.4.1.3.' . $index;
             $online += $this->isOnline($status) ? 1 : 0;
         }
 
