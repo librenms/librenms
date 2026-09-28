@@ -1335,10 +1335,6 @@ return [
             'description' => 'HTTPS-proxy',
             'help' => 'Ställ in detta som en reserv om miljövariabeln https_proxy inte är tillgänglig.',
         ],
-        'icmp_check' => [
-            'description' => 'ICMP-kontroll',
-            'help' => 'Aktivera ICMP-kontroll för alla enheter globalt, detta kommer att pinga enheter för att kontrollera om de är uppe eller nere. Om du inaktiverar detta kan det leda till att omröstningen inte slutförs i tid.',
-        ],
         'ignore_mount' => [
             'description' => 'Monteringspunkter som ska ignoreras',
             'help' => 'Övervaka inte skivanvändningen av dessa monteringspunkter',
