@@ -71,6 +71,9 @@ final class YamlDiscoveryTest extends TestCase
         $field->calculateValue(['oidtest' => 'MIB::oid'], ['2.3' => ['MIB::oid' => '43%']], '2.3', 0);
         $this->assertSame(43, $field->value);
 
+        $field->calculateValue(['oidtest' => 'MIB::oid', 'oidtest_multiplier' => 1048576], ['2.3' => ['MIB::oid' => '512']], '2.3', 0);
+        $this->assertSame(536870912, $field->value);
+
         $field->calculateValue(['oidtest' => 'missing'], ['2.3' => ['MIB::oid' => '41']], '2.3', 0);
         $this->assertNull($field->value);
 
