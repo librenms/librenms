@@ -146,11 +146,11 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
                 echo str_repeat('.', $affected);
                 $vrp_bgp_peer_count += $affected;
             }
-            if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', [$device['device_id'], $value['hwBgpPeerRemoteAddr'], $value['afi'], $value['safi']]) < 1) {
+            if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', [$device['device_id'], $address, $value['afi'], $value['safi']]) < 1) {
                 if ($vrfName != '') {
                     $device['context_name'] = $vrfName;
                 }
-                add_cbgp_peer($device, ['ip' => $value['hwBgpPeerRemoteAddr']], $value['afi'], $value['safi']);
+                add_cbgp_peer($device, ['ip' => $address], $value['afi'], $value['safi']);
                 unset($device['context_name']);
             } else {
                 //nothing to update
