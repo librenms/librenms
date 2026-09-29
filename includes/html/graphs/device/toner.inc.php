@@ -47,18 +47,17 @@ foreach (PrinterSupply::whereBelongsTo($device)->get() as $toner) {
                 $colour['left'] = 'FF0000';
                 unset($iter);
                 break;
-        }//end switch
-    }//end if
-
+        } //end switch
+    } //end if
 
     $descr = Rrd::safeDescr(substr(str_pad($toner->supply_descr, 16), 0, 16));
     $rrd_filename = Rrd::name($device->hostname, ['toner', $toner->supply_type, $toner->supply_index]);
 
-    $rrd_options[] = "DEF:toner" . $toner->supply_id . "=$rrd_filename:toner:AVERAGE";
-    $rrd_options[] = "LINE2:toner" . $toner->supply_id . "#" . $colour['left'] . ':' . $descr;
-    $rrd_options[] = "GPRINT:toner" . $toner->supply_id . ":LAST:%5.0lf%%";
-    $rrd_options[] = "GPRINT:toner" . $toner->supply_id . ":MIN:%5.0lf%%";
-    $rrd_options[] = "GPRINT:toner" . $toner->supply_id . ":MAX:%5.0lf%%\l";
+    $rrd_options[] = 'DEF:toner' . $toner->supply_id . '=' . $rrd_filename . ':toner:AVERAGE';
+    $rrd_options[] = 'LINE2:toner' . $toner->supply_id . '#' . $colour['left'] . ':' . $descr;
+    $rrd_options[] = 'GPRINT:toner' . $toner->supply_id . ':LAST:%5.0lf%%';
+    $rrd_options[] = 'GPRINT:toner' . $toner->supply_id . ':MIN:%5.0lf%%';
+    $rrd_options[] = 'GPRINT:toner' . $toner->supply_id . ":MAX:%5.0lf%%\l";
 
     $iter++;
 }//end foreach
