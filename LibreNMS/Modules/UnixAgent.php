@@ -48,6 +48,25 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
+/**
+ * Parsed agent output, keyed by section name.
+ * Sections with a dash are nested (<<<munin-cpu>>> is ['munin']['cpu']) and known applications are copied to 'app'.
+ *
+ * @phpstan-type AgentData array{
+ *     app?: array<string, string|array<mixed>>,
+ *     dmi?: array<string, string>,
+ *     munin?: array<string, string>,
+ *     hddtemp?: string,
+ *     drbd?: string,
+ *     ps?: string,
+ *     'ps:sep(9)'?: string,
+ *     rpm?: string,
+ *     dpkg?: string,
+ *     pacman?: string,
+ *     ...<string, string|array<string, string>>
+ * }
+ * @phpstan-type ProcessData array{pid: string, user: string, vsz: int|string, rss: string, cputime: string, command: string}
+ */
 class UnixAgent implements Module
 {
     /**
@@ -70,8 +89,10 @@ class UnixAgent implements Module
         'gpsd',
     ];
 
+    private const CACHE_KEY = 'agent_data';
+
     /**
-     * @inheritDoc
+     * @return string[]
      */
     public function dependencies(): array
     {
@@ -110,7 +131,7 @@ class UnixAgent implements Module
         $agent_time = round((microtime(true) - $start) * 1000);
 
         if (empty($raw)) {
-            Cache::driver('array')->put('agent_data', null);
+            Cache::driver('array')->put(self::CACHE_KEY, []);
 
             return;
         }
@@ -130,11 +151,27 @@ class UnixAgent implements Module
         $this->pollMunin($os, $datastore, (array) ($agent_data['munin'] ?? []));
         $this->pollHddtemp($os, $datastore, (string) ($agent_data['hddtemp'] ?? ''));
         $this->pollProcesses($device, $agent_data);
-        $this->discoverApplications($device, $agent_data);
+
+        $apps = $this->discoverApplications($device, $agent_data);
+        if (! empty($apps)) {
+            $agent_data['app'] = $apps;
+        }
+
         $this->updateHardwareFromDmi($device, (array) ($agent_data['dmi'] ?? []));
 
         // store results for the applications module
-        Cache::driver('array')->put('agent_data', $agent_data);
+        Cache::driver('array')->put(self::CACHE_KEY, $agent_data);
+    }
+
+    /**
+     * Get the agent data parsed during this poll.
+     * Empty if the unix-agent module did not run or the agent did not respond.
+     *
+     * @return AgentData
+     */
+    public static function getData(): array
+    {
+        return Cache::driver('array')->get(self::CACHE_KEY, []);
     }
 
     /**
@@ -163,7 +200,7 @@ class UnixAgent implements Module
     }
 
     /**
-     * @inheritDoc
+     * @return array<string, mixed>|null
      */
     public function dump(Device $device, string $type): ?array
     {
@@ -210,6 +247,8 @@ class UnixAgent implements Module
      * Split the raw agent output into sections.
      * Sections with a dash are nested: <<<munin-cpu>>> becomes $data['munin']['cpu']
      * Known applications are also placed under $data['app']
+     *
+     * @return AgentData
      */
     private function parse(string $raw): array
     {
@@ -242,6 +281,9 @@ class UnixAgent implements Module
         return $agent_data;
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function parseKeyValue(string $data): array
     {
         $result = [];
@@ -256,6 +298,9 @@ class UnixAgent implements Module
         return $result;
     }
 
+    /**
+     * @param  AgentData  $agent_data
+     */
     private function pollPackages(Device $device, array $agent_data): void
     {
         $managers = [
@@ -269,7 +314,7 @@ class UnixAgent implements Module
                     'version' => $version,
                     'build' => $build,
                     'size' => $size,
-                    'status' => 1,
+                    'status' => true,
                 ]);
             },
             'dpkg' => function (string $line): Package {
@@ -282,7 +327,7 @@ class UnixAgent implements Module
                     'version' => $version,
                     'build' => '',
                     'size' => Number::cast($size) * 1024,
-                    'status' => 1,
+                    'status' => true,
                 ]);
             },
             'pacman' => function (string $line): Package {
@@ -295,7 +340,7 @@ class UnixAgent implements Module
                     'version' => $version,
                     'build' => '',
                     'size' => (int) Number::toBytes($size),
-                    'status' => 1,
+                    'status' => true,
                 ]);
             },
         ];
@@ -309,7 +354,7 @@ class UnixAgent implements Module
 
             // mark all existing packages as removed, then flag the ones still installed
             $packages = $device->packages->each(function (Package $package): void {
-                $package->status = 0;
+                $package->status = false;
             })->keyBy->getCompositeKey();
 
             foreach (explode("\n", $agent_data[$key]) as $line) {
@@ -327,8 +372,8 @@ class UnixAgent implements Module
                 }
             }
 
-            $device->packages()->saveMany($packages->where('status', 1));
-            $packages->where('status', 0)->each->delete();
+            $device->packages()->saveMany($packages->where('status', true));
+            $packages->where('status', false)->each->delete();
 
             return; // only one package manager per device
         }
@@ -487,6 +532,9 @@ class UnixAgent implements Module
         }
     }
 
+    /**
+     * @param  AgentData  $agent_data
+     */
     private function pollProcesses(Device $device, array $agent_data): void
     {
         if (! empty($agent_data['ps'])) {
@@ -507,6 +555,8 @@ class UnixAgent implements Module
 
     /**
      * format: (user,vsz,rss,cputime,pid) command
+     *
+     * @return Collection<int, ProcessData>
      */
     private function parseUnixProcesses(string $data): Collection
     {
@@ -531,6 +581,8 @@ class UnixAgent implements Module
 
     /**
      * format: (user,VirtualSize,WorkingSetSize,0,ProcessId,PageFileUsage,UserModeTime,KernelModeTime,HandleCount,ThreadCount[,uptime])\tname
+     *
+     * @return Collection<int, ProcessData>
      */
     private function parseWindowsProcesses(string $data): Collection
     {
@@ -566,31 +618,44 @@ class UnixAgent implements Module
         return $processes;
     }
 
-    private function discoverApplications(Device $device, array &$agent_data): void
+    /**
+     * Enable applications found in the agent data.
+     * memcached and drbd are expanded into per-instance data for their application pollers.
+     *
+     * @param  AgentData  $agent_data
+     * @return array<string, string|array<mixed>>
+     */
+    private function discoverApplications(Device $device, array $agent_data): array
     {
-        foreach (array_keys($agent_data['app'] ?? []) as $app_type) {
+        $apps = $agent_data['app'] ?? [];
+
+        foreach (array_keys($apps) as $app_type) {
             if (in_array($app_type, self::AGENT_APPS)) {
                 $this->enableApplication($device, $app_type);
             }
         }
 
-        if (! empty($agent_data['app']['memcached'])) {
-            $agent_data['app']['memcached'] = json_decode((string) $agent_data['app']['memcached'], true) ?: [];
-            foreach (array_keys($agent_data['app']['memcached']) as $instance) {
-                $this->enableApplication($device, 'memcached', $instance);
+        if (! empty($apps['memcached']) && is_string($apps['memcached'])) {
+            $memcached = json_decode($apps['memcached'], true);
+            $apps['memcached'] = is_array($memcached) ? $memcached : [];
+            foreach (array_keys($apps['memcached']) as $instance) {
+                $this->enableApplication($device, 'memcached', (string) $instance);
             }
         }
 
         if (! empty($agent_data['drbd'])) {
-            $agent_data['app']['drbd'] = [];
+            $drbd = [];
             foreach (explode("\n", $agent_data['drbd']) as $line) {
                 [$drbd_dev, $drbd_data] = array_pad(explode(':', $line, 2), 2, '');
                 if (str_starts_with($drbd_dev, 'drbd')) {
-                    $agent_data['app']['drbd'][$drbd_dev] = $drbd_data;
+                    $drbd[$drbd_dev] = $drbd_data;
                     $this->enableApplication($device, 'drbd', $drbd_dev);
                 }
             }
+            $apps['drbd'] = $drbd;
         }
+
+        return $apps;
     }
 
     /**
