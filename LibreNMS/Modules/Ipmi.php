@@ -50,9 +50,6 @@ class Ipmi implements Module
         return [];
     }
 
-    /**
-     * Runs even when IPMI is not configured so stale IPMI sensors get removed
-     */
     public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
         return $status->isEnabled() && $connectivity->ipmiIsAvailable();
@@ -72,8 +69,14 @@ class Ipmi implements Module
             $index = 0;
 
             foreach ($sensor_values as [$descr, $current, $unit, $state, $low_nonrecoverable, $low_limit, $low_warn, $high_warn, $high_limit]) {
+                if ($current == 'na' || ! LibrenmsConfig::has("ipmi_unit.$unit")) {
+                    continue;
+                }
+
+                // units mapped to an empty class (discrete) still consume an index to keep existing sensor_index stable
+                $sensor_index = $index++;
                 $sensor_class = LibrenmsConfig::get("ipmi_unit.$unit");
-                if ($current == 'na' || empty($sensor_class)) {
+                if (empty($sensor_class)) {
                     continue;
                 }
 
@@ -82,7 +85,7 @@ class Ipmi implements Module
                     'poller_type' => 'ipmi',
                     'sensor_class' => $sensor_class,
                     'sensor_oid' => $descr,
-                    'sensor_index' => $index++,
+                    'sensor_index' => $sensor_index,
                     'sensor_type' => 'ipmi',
                     'sensor_descr' => $descr,
                     'sensor_limit' => $high_limit == 'na' ? null : (float) $high_limit,
