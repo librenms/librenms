@@ -42,7 +42,7 @@ function poll_sensor($device, $class)
 
     foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ?', [$class, $device['device_id']]) as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
-            // Agent sensors are polled in the unix-agent module
+            // Agent sensors are polled in the unix-agent
         } elseif ($sensor['poller_type'] == 'ipmi') {
             $misc_sensors[] = $sensor;
         } else {
