@@ -79,8 +79,18 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
 
         $bgpPeers[$vrfInstance][$address] = $value;
         $bgpPeers[$vrfInstance][$address]['vrf_id'] = $map_vrf['byName'][$vrfInstance]['vrf_id'] ?? null;
-        $bgpPeers[$vrfInstance][$address]['afi'] = $oid[1];
-        $bgpPeers[$vrfInstance][$address]['safi'] = $oid[2];
+        $afi = $oid[1];
+        $safi = $oid[2];
+        // HUAWEI-BGP-VPN-MIB labels AFI 25 as "vpls" and defines no label for SAFI 70,
+        // so an EVPN session is reported as vpls/70. Normalise it to the IANA names,
+        // matching what "display bgp all summary" calls it (Address Family:Evpn).
+        if ($afi === 'vpls' && $safi === '70') {
+            $afi = 'l2vpn';
+            $safi = 'evpn';
+        }
+
+        $bgpPeers[$vrfInstance][$address]['afi'] = $afi;
+        $bgpPeers[$vrfInstance][$address]['safi'] = $safi;
         $bgpPeers[$vrfInstance][$address]['typePeer'] = $oid[3];
         if (array_key_exists('0.' . $oid[3] . '.' . $oid_address, $bgpPeersDesc)) {
             // We may have a description
