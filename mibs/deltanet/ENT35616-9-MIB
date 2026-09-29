@@ -1,4 +1,4 @@
-ENT35616-7-MIB DEFINITIONS ::= BEGIN
+ENT35616-9-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     enterprises, OBJECT-TYPE
@@ -6,21 +6,21 @@ IMPORTS
     DisplayString
         FROM SNMPv2-TC;
 
-ent356167 OBJECT IDENTIFIER ::= { enterprises 35616 7 }
+ent356169 OBJECT IDENTIFIER ::= { enterprises 35616 9 }
 
 chassisTemp OBJECT-TYPE
     SYNTAX      INTEGER
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "Structural placeholder, not vendor documentation."
-    ::= { ent356167 2 1 }
+    ::= { ent356169 2 1 }
 
 powerTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF PowerEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "Structural placeholder, not vendor documentation."
-    ::= { ent356167 2 2 }
+    ::= { ent356169 2 2 }
 
 powerEntry OBJECT-TYPE
     SYNTAX      PowerEntry
@@ -70,7 +70,7 @@ fanTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "Structural placeholder, not vendor documentation."
-    ::= { ent356167 2 3 }
+    ::= { ent356169 2 3 }
 
 fanEntry OBJECT-TYPE
     SYNTAX      FanEntry
@@ -112,7 +112,7 @@ opticsTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "Structural placeholder, not vendor documentation."
-    ::= { ent356167 3 2 }
+    ::= { ent356169 3 2 }
 
 opticsEntry OBJECT-TYPE
     SYNTAX      OpticsEntry
