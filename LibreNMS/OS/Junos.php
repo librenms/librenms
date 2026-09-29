@@ -148,7 +148,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         $nodeNames = SnmpQuery::hideMib()
             ->walk('JUNIPER-SRX5000-SPU-MONITORING-MIB::jnxJsSPUMonitoringNodeDescr')
             ->values();
-        $nodes = array_unique(array_map('strtolower', array_filter($nodeNames, fn ($name) => preg_match('/^node\d+$/i', $name))));
+        $nodes = array_unique(array_map(strtolower(...), array_filter($nodeNames, fn ($name) => preg_match('/^node\d+$/i', $name))));
 
         if (count($nodes) > 1) {
             return 'Chassis Cluster (' . count($nodes) . ' nodes)';
