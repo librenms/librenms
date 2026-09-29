@@ -2,7 +2,6 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\Rrd;
-use App\Models\PrinterSupply;
 use LibreNMS\Util\Color;
 
 require 'includes/html/graphs/common.inc.php';
@@ -13,7 +12,7 @@ $graph_params->scale_min = 0;
 $iter = '1';
 $rrd_options[] = 'COMMENT:Toner level            Cur     Min      Max\\n';
 foreach ($device->printerSupplies as $toner) {
-    $colour = Color::toner($toner['supply_descr'], 100 - $toner->supply_current);
+    $colour = Color::toner($toner->supply_descr, 100 - $toner->supply_current);
 
     if ($colour['left'] == null) {
         // FIXME generic colour function
