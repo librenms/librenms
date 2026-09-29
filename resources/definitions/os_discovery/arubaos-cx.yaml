@@ -128,6 +128,42 @@ modules:
         state:
             data:
                 -
+                    oid: ARUBAWIRED-MODULE-MIB::arubaWiredModuleTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.11.6.1.1.6.{{ $index }}'
+                    descr: 'Module {{ ARUBAWIRED-MODULE-MIB::arubaWiredModuleName }}'
+                    value: ARUBAWIRED-MODULE-MIB::arubaWiredModuleState
+                    group: Line Cards
+                    index: 'lineCardStatus.{{ $index }}'
+                    state_name: arubaWiredModuleState
+                    skip_values:
+                        -
+                            oid: ARUBAWIRED-MODULE-MIB::arubaWiredModuleType
+                            op: '!='
+                            value: line_card
+                    states:
+                        - { value: 1, descr: ready,          graph: 1, generic: 0 }
+                        - { value: 2, descr: empty,          graph: 0, generic: 3 }
+                        - { value: 3, descr: down,           graph: 0, generic: 2 }
+                        - { value: 4, descr: failed,         graph: 0, generic: 2 }
+                        - { value: 5, descr: diagnostic,     graph: 0, generic: 1 }
+                        - { value: 6, descr: initializing,   graph: 0, generic: 1 }
+                        - { value: 7, descr: deinitializing, graph: 0, generic: 1 }
+                        - { value: 8, descr: updating,       graph: 0, generic: 1 }
+                        - { value: 9, descr: present,        graph: 0, generic: 1 }
+                        - { value: 10, descr: failover,      graph: 0, generic: 1 }
+                -
+                    oid: ARUBAWIRED-FAN-MIB::arubaWiredFanTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.11.5.1.1.10.{{ $index }}'
+                    descr: 'Fan {{ ARUBAWIRED-FAN-MIB::arubaWiredFanName }}'
+                    value: ARUBAWIRED-FAN-MIB::arubaWiredFanStateEnum
+                    state_name: arubaWiredFanStateEnum
+                    states:
+                        - { value: 1, descr: Unknown,       generic: 3 }
+                        - { value: 2, descr: Empty,         generic: 0 }
+                        - { value: 3, descr: Uninitialized, generic: 3 }
+                        - { value: 4, descr: OK,            generic: 0 }
+                        - { value: 5, descr: Fault,         generic: 2 }
+                -
                     oid: ENTITY-SENSOR-MIB::entPhySensorTable
                     num_oid: '.1.3.6.1.2.1.99.1.1.1.5.{{ $index }}'
                     descr: '{{ ENTITY-MIB::entPhysicalName }}'
