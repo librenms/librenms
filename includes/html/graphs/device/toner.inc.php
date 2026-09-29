@@ -12,7 +12,7 @@ $graph_params->scale_min = 0;
 
 $iter = '1';
 $rrd_options[] = 'COMMENT:Toner level            Cur     Min      Max\\n';
-foreach (PrinterSupply::whereBelongsTo($device)->get() as $toner) {
+foreach ($device->printerSupplies as $toner) {
     $colour = Color::toner($toner['supply_descr'], 100 - $toner->supply_current);
 
     if ($colour['left'] == null) {
