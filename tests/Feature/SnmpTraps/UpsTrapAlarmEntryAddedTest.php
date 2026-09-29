@@ -46,7 +46,7 @@ SNMPv2-SMI::snmpModules.18.1.3.0 10.0.0.1
 SNMPv2-SMI::snmpModules.18.1.4.0 public
 SNMPv2-MIB::snmpTrapEnterprise.0 SNMPv2-SMI::mib-2.33.2
 TRAP,
-            'upsAlarmCommunicationsLost: A problem has been encountered in the communications between the agent and the UPS.',
+            'A problem has been encountered in the communications between the agent and the UPS.',
             'Could not handle testUpsTrapAlarmEntryAddedUntranslated trap',
             [Severity::Error],
         );
@@ -67,7 +67,7 @@ SNMPv2-MIB::snmpTrapOID.0 UPS-MIB::upsTrapAlarmEntryAdded
 UPS-MIB::upsAlarmId.0 2
 UPS-MIB::upsAlarmDescr.0 UPS-MIB::upsAlarmOnBattery
 TRAP,
-            'upsAlarmOnBattery: The UPS is drawing power from the batteries.',
+            'The UPS is drawing power from the batteries.',
             'Could not handle testUpsTrapAlarmEntryAddedTranslated trap',
             [Severity::Warning],
         );

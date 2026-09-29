@@ -63,7 +63,7 @@ class UpsAlarm
     {
         [$name, $description] = $this->lookup($trap);
 
-        return $description === null ? $name : "$name: $description";
+        return $description ?? $name;
     }
 
     protected function getSeverity(Trap $trap): Severity
