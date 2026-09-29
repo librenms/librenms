@@ -2,7 +2,7 @@
 
 use LibreNMS\Modules\UnixAgent;
 
-$agent_data = UnixAgent::getData();
+$agent_data = UnixAgent::getData($device['device_id']);
 \DeviceCache::getPrimary()->applications->each(function ($app) use ($device, $agent_data): void {
     echo 'Application: ' . $app->app_type . ', app_id=' . $app->app_id;
 

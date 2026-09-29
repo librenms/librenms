@@ -89,7 +89,7 @@ class UnixAgent implements Module
         'gpsd',
     ];
 
-    private const CACHE_KEY = 'agent_data';
+    private const CACHE_KEY = 'unix_agent_data.';
 
     /**
      * @return string[]
@@ -131,7 +131,7 @@ class UnixAgent implements Module
         $agent_time = round((microtime(true) - $start) * 1000);
 
         if (empty($raw)) {
-            Cache::driver('array')->put(self::CACHE_KEY, []);
+            Cache::driver('array')->put(self::CACHE_KEY . $device->device_id, []);
 
             return;
         }
@@ -160,18 +160,18 @@ class UnixAgent implements Module
         $this->updateHardwareFromDmi($device, (array) ($agent_data['dmi'] ?? []));
 
         // store results for the applications module
-        Cache::driver('array')->put(self::CACHE_KEY, $agent_data);
+        Cache::driver('array')->put(self::CACHE_KEY . $device->device_id, $agent_data);
     }
 
     /**
-     * Get the agent data parsed during this poll.
+     * Get the agent data parsed while polling the given device.
      * Empty if the unix-agent module did not run or the agent did not respond.
      *
      * @return AgentData
      */
-    public static function getData(): array
+    public static function getData(int $device_id): array
     {
-        return Cache::driver('array')->get(self::CACHE_KEY, []);
+        return Cache::driver('array')->get(self::CACHE_KEY . $device_id, []);
     }
 
     /**
@@ -406,7 +406,7 @@ class UnixAgent implements Module
             }
 
             $plugin = $device->muninPlugins()->firstOrCreate(['mplug_type' => $plugin_type], [
-                'mplug_category' => strtolower($graph['category'] ?? 'general'),
+                'mplug_category' => strtolower($graph['category'] ?? '') ?: 'general',
                 'mplug_title' => $graph['title'] ?? null,
                 'mplug_vlabel' => $graph['vlabel'] ?? null,
                 'mplug_args' => $graph['args'] ?? null,
@@ -415,7 +415,7 @@ class UnixAgent implements Module
 
             $data_sources = [];
             foreach ($values as $name => $data) {
-                $type = $data['type'] ?? 'GAUGE';
+                $type = ($data['type'] ?? '') ?: 'GAUGE';
 
                 $datastore->put($os->getDeviceArray(), 'munin-plugins', [
                     'plugin' => $plugin_type,
@@ -429,14 +429,14 @@ class UnixAgent implements Module
                     'mplug_id' => $plugin->mplug_id,
                     'ds_name' => $name,
                     'ds_type' => $type,
-                    'ds_label' => $data['label'] ?? $name,
+                    'ds_label' => ($data['label'] ?? '') ?: $name,
                     'ds_cdef' => $data['cdef'] ?? '',
-                    'ds_draw' => $data['draw'] ?? 'LINE1.5',
+                    'ds_draw' => ($data['draw'] ?? '') ?: 'LINE1.5',
                     'ds_info' => $data['info'] ?? '',
                     'ds_extinfo' => $data['extinfo'] ?? '',
                     'ds_min' => $data['min'] ?? '',
                     'ds_max' => $data['max'] ?? '',
-                    'ds_graph' => $data['graph'] ?? 'yes',
+                    'ds_graph' => ($data['graph'] ?? '') ?: 'yes',
                     'ds_negative' => $data['negative'] ?? '',
                     'ds_warning' => $data['warning'] ?? '',
                     'ds_critical' => $data['critical'] ?? '',
@@ -457,6 +457,11 @@ class UnixAgent implements Module
      */
     private function pollHddtemp(OS $os, DataStorageInterface $datastore, string $hddtemp): void
     {
+        $hddtemp = trim($hddtemp, '|');
+        if ($hddtemp === '') {
+            return; // hddtemp not installed or not responding, leave existing sensors alone
+        }
+
         $device = $os->getDevice();
 
         // capture current values before sync overwrites them
@@ -465,34 +470,42 @@ class UnixAgent implements Module
             ->where('poller_type', 'agent')
             ->pluck('sensor_current', 'sensor_index');
 
+        $temperatures = [];
         $sensor_discovery = new \App\Discovery\Sensor($device);
-        foreach (explode('||', trim($hddtemp, '|')) as $index => $disk) {
+        foreach (explode('||', $hddtemp) as $index => $disk) {
             [$block_device, $descr, $temperature] = array_pad(explode('|', $disk, 4), 3, '');
             $temperature = trim(str_replace('C', '', $temperature));
+            $sensor_index = $index + 1;
 
-            if (! is_numeric($temperature)) {
-                continue;
-            }
-
-            $sensor_discovery->discover(new Sensor([
+            $sensor = new Sensor([
                 'poller_type' => 'agent',
                 'sensor_class' => 'temperature',
                 'device_id' => $device->device_id,
                 'sensor_oid' => '',
-                'sensor_index' => $index + 1,
+                'sensor_index' => $sensor_index,
                 'sensor_type' => 'hddtemp',
                 'sensor_descr' => "$block_device: $descr",
                 'sensor_divisor' => 1,
                 'sensor_multiplier' => 1,
-                'sensor_current' => (float) $temperature,
                 'rrd_type' => 'GAUGE',
-            ]));
+            ]);
+
+            if (is_numeric($temperature)) {
+                $temperatures[$sensor_index] = (float) $temperature;
+                $sensor->sensor_current = (float) $temperature;
+            } elseif (! $previous->has($sensor_index)) {
+                continue; // no temperature (SLP, NA, ERR), only keep sensors that already exist
+            }
+
+            $sensor_discovery->discover($sensor);
         }
 
         $sensors = $sensor_discovery->sync(sensor_class: 'temperature', poller_type: 'agent');
 
         foreach ($sensors as $sensor) {
-            $this->updateSensor($os, $datastore, $sensor, $previous->get($sensor->sensor_index));
+            if (isset($temperatures[$sensor->sensor_index])) {
+                $this->updateSensor($os, $datastore, $sensor, $previous->get($sensor->sensor_index));
+            }
         }
     }
 
