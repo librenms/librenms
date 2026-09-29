@@ -265,7 +265,7 @@ class PrinterSupplies implements Module
                     'supply_capacity_oid' => $capacity_oid,
                     'supply_index' => $last_index,
                     'supply_type' => $data['prtMarkerSuppliesType'] ?? 'markerSupply',
-                    'supply_descr' => $descr,
+                    'supply_descr' => StringHelpers::inferEncoding($descr),
                     'supply_capacity' => $capacity,
                     'supply_current' => $current,
                 ]));
@@ -321,7 +321,7 @@ class PrinterSupplies implements Module
                 'supply_capacity_oid' => ".1.3.6.1.2.1.43.8.2.1.9.$index",
                 'supply_index' => $last_index,
                 'supply_type' => 'input',
-                'supply_descr' => $data['prtInputName'],
+                'supply_descr' => StringHelpers::inferEncoding($data['prtInputName']),
                 'supply_capacity' => $capacity,
                 'supply_current' => $current,
             ]));
