@@ -9,7 +9,7 @@
                     "sysContact": "<private>",
                     "version": "23.2R2-S1.3",
                     "hardware": "SRX5800",
-                    "features": null,
+                    "features": "Chassis Cluster (2 nodes)",
                     "location": "<private>",
                     "os": "junos",
                     "type": "network",

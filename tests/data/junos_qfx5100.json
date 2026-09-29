@@ -9,7 +9,7 @@
                     "sysContact": "<private>",
                     "version": "14.1X53-D40.8",
                     "hardware": "QFX5100-48S-6Q",
-                    "features": "Virtual Chassis",
+                    "features": null,
                     "location": "<private>",
                     "os": "junos",
                     "type": "network",

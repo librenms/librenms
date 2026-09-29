@@ -8997,7 +8997,7 @@
                     "sysContact": "<private>",
                     "version": "12.1X46-D35.1",
                     "hardware": "SRX3600",
-                    "features": null,
+                    "features": "Chassis Cluster (2 nodes)",
                     "location": "<private>",
                     "os": "junos",
                     "type": "network",

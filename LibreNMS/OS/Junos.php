@@ -77,15 +77,15 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         $boxDescr = $data[0]['jnxBoxDescr'] ?? null;
         $isVirtualChassis = isset($data[0]['jnxVirtualChassisMemberSWVersion'])
             || str_contains(strtolower((string) $boxDescr), 'virtual chassis');
-        // a standalone switch may answer jnxVirtualChassisMemberSWVersion, so membership itself is
-        // taken from the role column, which only a Virtual Chassis member populates
+        // Standalone switches may report one master member, so one row does not establish a Virtual Chassis.
         $members = $isVirtualChassis ? array_filter(
             SnmpQuery::hideMib()->enumStrings()->walk('JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberTable')->table(1),
             fn ($member) => isset($member['jnxVirtualChassisMemberRole'])
         ) : [];
 
         $device->hardware = $this->parseHardware($boxDescr, $parsed['hardware'] ?? null, $members);
-        $device->features = $this->parseVirtualChassis($boxDescr, $members);
+        $device->features = $this->parseVirtualChassis($boxDescr, $members)
+            ?? $this->parseChassisCluster($boxDescr, $device->sysDescr);
         $device->serial = $data[0]['jnxBoxSerialNo'] ?? null;
         $device->version = $data[0]['jnxVirtualChassisMemberSWVersion'] ?? $parsedVersion[1] ?? $parsed['version'] ?? null;
     }
@@ -132,11 +132,29 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
             return 'Virtual Chassis of ' . count($members) . ' members';
         }
 
-        if ($members || str_contains(strtolower((string) $boxDescr), 'virtual chassis')) {
+        if (str_contains(strtolower((string) $boxDescr), 'virtual chassis')) {
             return 'Virtual Chassis';
         }
 
         return null;
+    }
+
+    private function parseChassisCluster(?string $boxDescr, string $sysDescr): ?string
+    {
+        if (! preg_match('/\bsrx\d/i', $sysDescr)) {
+            return null;
+        }
+
+        $nodeNames = SnmpQuery::hideMib()
+            ->walk('JUNIPER-SRX5000-SPU-MONITORING-MIB::jnxJsSPUMonitoringNodeDescr')
+            ->values();
+        $nodes = array_unique(array_map('strtolower', array_filter($nodeNames, fn ($name) => preg_match('/^node\d+$/i', $name))));
+
+        if (count($nodes) > 1) {
+            return 'Chassis Cluster (' . count($nodes) . ' nodes)';
+        }
+
+        return preg_match('/^node[01]\b/i', (string) $boxDescr) ? 'Chassis Cluster' : null;
     }
 
     public function pollOS(DataStorageInterface $datastore): void
