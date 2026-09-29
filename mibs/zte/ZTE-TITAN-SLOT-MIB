@@ -1,0 +1,85 @@
+ZTE-TITAN-SLOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+zteTitanSlotMib MODULE-IDENTITY
+    LAST-UPDATED "202608210000Z"
+    ORGANIZATION "Community / Unofficial"
+    CONTACT-INFO "Contributed to LibreNMS. Reverse engineered from a live
+                   snmpwalk against a ZXA10 C620 (Titan/T1020 platform);
+                   not derived from, and not a copy of, any ZTE-published
+                   MIB."
+    DESCRIPTION
+        "Unofficial MIB module covering the per-slot CPU/memory
+         performance data observed at .1.3.6.1.4.1.3902.3.6002.2.1.1 on
+         the ZXA10 C6xx (Titan) platform (e.g. C620). Data is present
+         only for slots that carry a CPU (main/service processing
+         boards); fabric/power-only slots do not appear here at all.
+         Unlike ZTE-AN-CHASSIS-MIB::zxAnCardTable on this same platform,
+         zxTitanSlotCpuUsedPercent/MemUsedPercent are plain 0-100
+         percentages and zxTitanSlotMemTotal is a real value, so no
+         scaling workaround is required.
+
+         The branch does not follow the usual SMI Table/Entry
+         convention: columns hang directly off
+         .1.3.6.1.4.1.3902.3.6002.2.1.1.<column>, each with a 4-part
+         per-slot instance suffix (observed as rack.shelf.slot.0), so it
+         is modelled here as a plain object group rather than a formal
+         SEQUENCE OF table. Only the columns actually needed for
+         CPU/memory monitoring are declared; several other columns
+         exist in the real data (uptime counters, peak values, a
+         'failed to obtain' status field, ...) but their exact
+         semantics were not confirmed and are intentionally omitted."
+    ::= { zte39020306002 9999 }
+
+zte3902           OBJECT IDENTIFIER ::= { enterprises 3902 }
+zte390203         OBJECT IDENTIFIER ::= { zte3902 3 }
+zte39020306002    OBJECT IDENTIFIER ::= { zte390203 6002 }
+zxTitanSlot       OBJECT IDENTIFIER ::= { zte39020306002 2 }
+zxTitanSlotGroup  OBJECT IDENTIFIER ::= { zxTitanSlot 1 }
+zxTitanSlotPerfTable OBJECT IDENTIFIER ::= { zxTitanSlotGroup 1 }
+
+zxTitanSlotType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "CPU chip type of this slot, e.g. 'T1020'. Column 3,
+                 instance suffix is the per-slot index (e.g. 1.1.1.0)."
+    ::= { zxTitanSlotPerfTable 3 }
+
+zxTitanSlotMemTotal OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total memory of this slot, in megabytes. Column 5."
+    ::= { zxTitanSlotPerfTable 5 }
+
+zxTitanSlotMemUsedPercent OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Memory usage of this slot, in percent. Column 6."
+    ::= { zxTitanSlotPerfTable 6 }
+
+zxTitanSlotCpuUsedPercent OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "CPU usage of this slot, in percent. Column 8."
+    ::= { zxTitanSlotPerfTable 8 }
+
+zxTitanSlotName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Board/slot identifier, e.g. 'PFU-1/1/0'. Column 13."
+    ::= { zxTitanSlotPerfTable 13 }
+
+END
