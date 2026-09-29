@@ -203,9 +203,6 @@ return new class extends Migration
     }
 
     /**
-     * @param  array<string, mixed>  $data
-     */
-    /**
      * Descriptions are not encrypted, so never include the credentials. Numbered in the order they are tried.
      *
      * @param  int[]  $defaultSecretIds
@@ -215,6 +212,9 @@ return new class extends Migration
         return "Default SNMP $version #" . (count($defaultSecretIds) + 1);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     private function getOrCreateSecret(array $data, string $desc, string $type = 'snmp'): ?int
     {
         $hash = hash('sha256', serialize($data));

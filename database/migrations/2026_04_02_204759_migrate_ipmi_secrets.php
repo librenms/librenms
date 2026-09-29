@@ -78,7 +78,7 @@ return new class extends Migration
                             'port' => isset($attribs['ipmi_port']) ? (int) $attribs['ipmi_port'] : null,
                             'ciphersuite' => isset($attribs['ipmi_ciphersuite']) && $attribs['ipmi_ciphersuite'] !== '' ? (int) $attribs['ipmi_ciphersuite'] : null,
                             'timeout' => isset($attribs['ipmi_timeout']) ? (int) $attribs['ipmi_timeout'] : null,
-                        ], fn ($v) => $v !== null && $v !== ''); // only values that were set
+                        ], fn ($v) => $v !== null); // only values that were set
 
                         $pollingMethods[] = [
                             'device_id' => $deviceId,
