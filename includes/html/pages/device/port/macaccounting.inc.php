@@ -12,7 +12,7 @@ use LibreNMS\Util\Url;
 $hostname = $device['hostname'];
 $ifname = $port['ifDescr'];
 $ifIndex = $port['ifIndex'];
-    $speed = Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
+$speed = Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
 
 $ifalias = $port['name'];
 
@@ -204,6 +204,6 @@ if ($vars['subview'] == 'top10') {
             }
             echo '</div>';
             $i++;
-        }//end if
-    }//end foreach
+        } //end if
+    } //end foreach
 }//end if
