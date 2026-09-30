@@ -37,3 +37,39 @@ Add `./lnms dev:check` to your `.git/hooks/pre-commit`:
 
     echo "/opt/librenms/lnms dev:check" >> /opt/librenms/.git/hooks/pre-commit
     chmod +x /opt/librenms/.git/hooks/pre-commit
+
+#### Code Formatting
+
+LibreNMS uses Laravel Pint to format PHP code.
+
+To test the code format:
+
+```bash
+composer test:lint
+```
+
+To automatically format the code:
+
+```bash
+composer lint
+```
+
+You can also run Pint directly:
+
+```bash
+./vendor/bin/pint
+```
+
+#### Automatic Formatting in Forks
+
+You can enable automatic code formatting in your GitHub fork:
+
+1. Open your fork repository in GitHub.
+2. Go to **Settings** > **Secrets and variables** > **Actions** > **Variables**.
+3. Click **New repository variable**.
+4. Set the name to `ENABLE_AUTO_FORMAT`.
+5. Set the value to `true`.
+6. Click **Add variable**.
+
+When you push commits to your fork, a GitHub action formats your code and commits the changes.
+
