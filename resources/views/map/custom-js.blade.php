@@ -675,7 +675,7 @@
                 var containerHeight = $container.height() || $(window).height();
                 var logicalWidth = this.mapLogicalWidth || 1800;
                 var logicalHeight = this.mapLogicalHeight || 800;
-                return [Math.min(containerWidth / logicalWidth, 1) || 1, Math.min(containerHeight / logicalHeight, 1) || 1];
+                return [(containerWidth / logicalWidth) || 1, (containerHeight / logicalHeight) || 1];
             }
 
             calculateScale() {
@@ -932,6 +932,7 @@
                         label: "{{ __('Fit to Window') }} (F)",
                         action: function () { custommap.fitMap(self.network, container); }
                     });
+                    // Show fill to screen if the smaller fit screen scale is over 10% smaller
                     if (fillScale > (fitScale * 1.1)) {
                         menuItems.push({
                             icon: 'fa-solid fa-arrows-up-down-left-right',
@@ -939,7 +940,8 @@
                             action: function () { custommap.fillScreen(self, container); }
                         });
                     }
-                    if (1 > (fillScale * 1.1)) {
+                    // Show original scale if both scales are more than 10% bigger or smaller than original
+                    if ((fillScale > 1.1 || fillScale < 1.1) && (fitScale > 1.1 || fitScale < 1.1)) {
                         menuItems.push({
                             icon: 'fa-solid fa-window-maximize',
                             label: "{{ __('Original Scale') }} (1)",
