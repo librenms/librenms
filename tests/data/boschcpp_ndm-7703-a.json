@@ -465,7 +465,7 @@
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.3967.1.1.9.1.1.1",
                     "processor_index": "1",
-                    "processor_type": "bosch",
+                    "processor_type": "boschcpp",
                     "processor_usage": 84,
                     "processor_descr": "Processor 1",
                     "processor_precision": -1,
@@ -598,6 +598,13 @@
                     "context_name": "",
                     "ipv4_network": "192.168.0.0/16",
                     "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "192.168.190.76",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "192.168.0.0/16",
+                    "ifIndex": 2
                 }
             ]
         }
@@ -615,8 +622,26 @@
                     "ifIndex": 2
                 },
                 {
+                    "ipv6_address": "fd18:9401:1165:0000:0000:0000:0000:0001",
+                    "ipv6_compressed": "fd18:9401:1165::1",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "fd18:9401:1165::/64",
+                    "ifIndex": 2
+                },
+                {
                     "ipv6_address": "fe80:0000:0000:0000:0207:5fff:fec6:f610",
                     "ipv6_compressed": "fe80::207:5fff:fec6:f610",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 2
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:a618:94ff:fe01:1165",
+                    "ipv6_compressed": "fe80::a618:94ff:fe01:1165",
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
@@ -641,7 +666,7 @@
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 49.2,
-                    "sensor_limit": 67.5,
+                    "sensor_limit": 69.2,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 39.2,
                     "sensor_limit_low_warn": null,
