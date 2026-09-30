@@ -2,7 +2,6 @@ os: armis
 text: 'Armis'
 group: unix
 type: server
-icon: armis
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
