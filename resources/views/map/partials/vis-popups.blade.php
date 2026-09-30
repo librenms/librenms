@@ -1,4 +1,5 @@
 {{-- Lazy loaded hover popups for vis.js maps. Usage: visPopups.attach(network, {ports: true}) after creating the network --}}
+@once
 <style>
     .vis-tooltip { display: none !important; }
     #vis-map-popup .panel { margin-bottom: 0; border: none; background: transparent; box-shadow: none; }
@@ -8,6 +9,8 @@
     var visPopups = {
         enabled: @json((bool) \App\Facades\LibrenmsConfig::get('web_mouseover', true)),
         baseUrl: @json(url('/')),
+        cacheTtl: 60000,
+        cache: {},
         showTimeout: null,
         hideTimeout: null,
 
@@ -31,11 +34,21 @@
 
             visPopups.showTimeout = setTimeout(function () {
                 const popup = visPopups.popupEl();
-                popup.innerHTML = '<div class="tw:p-4"><i class="fa-solid fa-circle-notch fa-spin"></i></div>';
                 popup.classList.remove('tw:hidden');
+
+                const url = visPopups.baseUrl.replace(/\/$/, '') + path;
+                const cached = visPopups.cache[url];
+                if (cached && Date.now() - cached.time < visPopups.cacheTtl) {
+                    popup.innerHTML = cached.html;
+                    visPopups.position(popup, x, y);
+                    return;
+                }
+
+                popup.innerHTML = '<div class="tw:p-4"><i class="fa-solid fa-circle-notch fa-spin"></i></div>';
                 visPopups.position(popup, x, y);
 
-                $.get(visPopups.baseUrl + path, function (html) {
+                $.get(url, function (html) {
+                    visPopups.cache[url] = {html: html, time: Date.now()};
                     popup.innerHTML = html;
                     visPopups.position(popup, x, y);
                 }).fail(function () {
@@ -70,6 +83,7 @@
 
         /**
          * options.ports: edge ids are "<port_id>.<remote_port_id>", show the port popup on hover
+         * options.deviceQuery / options.portQuery: query string appended to the popup request
          */
         attach: function (network, options = {}) {
             if (!visPopups.enabled) {
@@ -87,7 +101,7 @@
 
             network.on('hoverNode', function (params) {
                 const pos = network.getPosition(params.node);
-                visPopups.show('/device/' + params.node + '/popup', ...canvasPoint(pos));
+                visPopups.show('/device/' + params.node + '/popup' + (options.deviceQuery || ''), ...canvasPoint(pos));
             });
             network.on('blurNode', () => visPopups.hide(200));
 
@@ -96,7 +110,7 @@
                     const edge = network.body.edges[params.edge];
                     const portId = String(params.edge).split('.')[0];
                     const pos = edge ? {x: (edge.from.x + edge.to.x) / 2, y: (edge.from.y + edge.to.y) / 2} : network.getViewPosition();
-                    visPopups.show('/port/' + portId + '/popup?from=-1d', ...canvasPoint(pos));
+                    visPopups.show('/port/' + portId + '/popup' + (options.portQuery ?? '?from=-1d'), ...canvasPoint(pos));
                 });
                 network.on('blurEdge', () => visPopups.hide(200));
             }
@@ -107,3 +121,4 @@
         },
     };
 </script>
+@endonce
