@@ -34,6 +34,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\Number;
 use SnmpQuery;
 
 class Openwrt extends OS implements
@@ -56,19 +57,22 @@ class Openwrt extends OS implements
                     '.1.3.6.1.4.1.66510.1.10.3.1.4.' . $ifIndex,
                     'openwrt',
                     (string) $ifIndex,
-                    $this->wirelessLabel($row, $ifIndex)
+                    $this->wirelessLabel($row, $ifIndex),
+                    Number::extract($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceClients'])
                 );
             }
         }
 
-        if (count($sensors) > 1 && SnmpQuery::get('OPENWRT-WIRELESS-MIB::openwrtWirelessClientCount.0')->value() !== '') {
+        $total = count($sensors) > 1 ? SnmpQuery::get('OPENWRT-WIRELESS-MIB::openwrtWirelessClientCount.0')->value() : '';
+        if ($total !== '') {
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.66510.1.10.2.0',
                 'openwrt',
                 'total',
-                'Total clients'
+                'Total clients',
+                Number::extract($total)
             );
         }
 
@@ -86,7 +90,8 @@ class Openwrt extends OS implements
                     '.1.3.6.1.4.1.66510.1.10.3.1.5.' . $ifIndex,
                     'openwrt',
                     (string) $ifIndex,
-                    $this->wirelessLabel($row, $ifIndex)
+                    $this->wirelessLabel($row, $ifIndex),
+                    Number::extract($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceFrequency'])
                 );
             }
         }
@@ -105,7 +110,8 @@ class Openwrt extends OS implements
                     '.1.3.6.1.4.1.66510.1.10.3.1.6.' . $ifIndex,
                     'openwrt',
                     (string) $ifIndex,
-                    $this->wirelessLabel($row, $ifIndex)
+                    $this->wirelessLabel($row, $ifIndex),
+                    Number::extract($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceNoiseFloor'])
                 );
             }
         }
@@ -133,8 +139,8 @@ class Openwrt extends OS implements
                         $subtype,
                         "$subtype-$ifIndex-$stat",
                         $this->wirelessLabel($row, $ifIndex) . " $stat",
-                        null,
-                        1000000 // the agent reports Mbit/s, LibreNMS stores bps
+                        Number::extract($row[$column]) * 1000000, // the agent reports Mbit/s, LibreNMS stores bps
+                        1000000
                     );
                 }
             }
@@ -159,7 +165,8 @@ class Openwrt extends OS implements
                         $oid . '.' . $ifIndex,
                         'openwrt',
                         "openwrt-$ifIndex-$stat",
-                        $this->wirelessLabel($row, $ifIndex) . " $stat"
+                        $this->wirelessLabel($row, $ifIndex) . " $stat",
+                        Number::extract($row[$column])
                     );
                 }
             }
@@ -179,7 +186,8 @@ class Openwrt extends OS implements
                     '.1.3.6.1.4.1.66510.1.10.3.1.16.' . $ifIndex,
                     'openwrt',
                     (string) $ifIndex,
-                    $this->wirelessLabel($row, $ifIndex)
+                    $this->wirelessLabel($row, $ifIndex),
+                    Number::extract($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceChannelUtil'])
                 );
             }
         }
@@ -198,7 +206,8 @@ class Openwrt extends OS implements
                     '.1.3.6.1.4.1.66510.1.10.3.1.17.' . $ifIndex,
                     'openwrt',
                     (string) $ifIndex,
-                    $this->wirelessLabel($row, $ifIndex)
+                    $this->wirelessLabel($row, $ifIndex),
+                    Number::extract($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceTxPower'])
                 );
             }
         }
