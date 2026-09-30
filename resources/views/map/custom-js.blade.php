@@ -257,27 +257,19 @@
             });
         },
 
-        fitHeight: function (network, container) {
-            if (!network || !container) return;
-            var containerHeight = $(container).height() || $(window).height();
-            var logicalHeight = container._mapHeight;
-            var scale = (containerHeight / logicalHeight) || 1;
-            var newPosition = network.view.getViewPosition();
-            newPosition.y = Math.round(logicalHeight / 2);
-            network.moveTo({
-                position: newPosition,
-                scale: scale,
-                animation: { duration: 200, easingFunction: 'easeInOutQuad' }
-            });
-        },
-
-        fitWidth: function (network, container) {
-            if (!network || !container) return;
-            var containerWidth = $(container).width() || $(window).width();
-            var logicalWidth = container._mapWidth;
-            var scale = (containerWidth / logicalWidth) || 1;
-            var newPosition = network.view.getViewPosition();
-            newPosition.x = Math.round(logicalWidth / 2);
+        fillScreen: function (mapobj, container) {
+            if (!mapobj.network || !container) return;
+            const network = mapobj.network;
+            const scales = mapobj.calculateScales();
+            const scale = Math.max(...scales);
+            const newPosition = network.view.getViewPosition();
+            if (scales[0] > scales[1]) {
+                // Map width has bigger zoom, center x axis
+                newPosition.x = Math.round(container._mapWidth / 2);
+            } else {
+                // Map height has bigger zoom, center y axis
+                newPosition.y = Math.round(container._mapHeight / 2);
+            }
             network.moveTo({
                 position: newPosition,
                 scale: scale,
@@ -677,13 +669,17 @@
                 this.refresh();
             }
 
-            calculateScale() {
+            calculateScales() {
                 var $container = $('#' + this.containerId);
                 var containerWidth = $container.width() || $(window).width();
                 var containerHeight = $container.height() || $(window).height();
                 var logicalWidth = this.mapLogicalWidth || 1800;
                 var logicalHeight = this.mapLogicalHeight || 800;
-                return Math.min(containerWidth / logicalWidth, containerHeight / logicalHeight) || 1;
+                return [Math.min(containerWidth / logicalWidth, 1) || 1, Math.min(containerHeight / logicalHeight, 1) || 1];
+            }
+
+            calculateScale() {
+                return Math.min(...this.calculateScales());
             }
 
             refresh() {
@@ -928,26 +924,28 @@
                         menuHeader = "{{ __('Map Navigation') }}";
                     }
 
+                    const scales = self.calculateScales();
+                    const fitScale = Math.min(...scales);
+                    const fillScale = Math.max(...scales);
                     menuItems.push({
                         icon: 'fa-solid fa-expand',
                         label: "{{ __('Fit to Window') }} (F)",
                         action: function () { custommap.fitMap(self.network, container); }
                     });
-                    menuItems.push({
-                        icon: 'fa-solid fa-arrows-left-right',
-                        label: "{{ __('Zoom to Width') }} (W)",
-                        action: function () { custommap.fitWidth(self.network, container); }
-                    });
-                    menuItems.push({
-                        icon: 'fa-solid fa-arrows-up-down',
-                        label: "{{ __('Zoom to Height') }} (H)",
-                        action: function () { custommap.fitHeight(self.network, container); }
-                    });
-                    menuItems.push({
-                        icon: 'fa-solid fa-window-maximize',
-                        label: "{{ __('Original Scale') }} (1)",
-                        action: function () { custommap.zoomOriginal(self.network); }
-                    });
+                    if (fillScale > (fitScale * 1.1)) {
+                        menuItems.push({
+                            icon: 'fa-solid fa-arrows-up-down-left-right',
+                            label: "{{ __('Fill Window') }} (L)",
+                            action: function () { custommap.fillScreen(self, container); }
+                        });
+                    }
+                    if (1 > (fillScale * 1.1)) {
+                        menuItems.push({
+                            icon: 'fa-solid fa-window-maximize',
+                            label: "{{ __('Original Scale') }} (1)",
+                            action: function () { custommap.zoomOriginal(self.network); }
+                        });
+                    }
                     menuItems.push({
                         icon: 'fa-solid fa-magnifying-glass-plus',
                         label: "{{ __('Zoom In') }} (+)",
@@ -1010,12 +1008,9 @@
                         if (e.key === '0' || e.key.toLowerCase() === 'f' || e.key === 'Home') {
                             e.preventDefault();
                             custommap.fitMap(self.network, networkContainer);
-                        } else if (e.key.toLowerCase() === 'h') {
+                        } else if (e.key.toLowerCase() === 'l') {
                             e.preventDefault();
-                            custommap.fitHeight(self.network, networkContainer);
-                        } else if (e.key.toLowerCase() === 'w') {
-                            e.preventDefault();
-                            custommap.fitWidth(self.network, networkContainer);
+                            custommap.fillScreen(self, networkContainer);
                         } else if (e.key === '+' || e.key === '=') {
                             e.preventDefault();
                             custommap.zoomIn(self.network, networkContainer);
