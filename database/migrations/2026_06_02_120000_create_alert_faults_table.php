@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Adds the alert_faults table plus supporting columns on alert_log (fault_id),
- * alert_rules (notify_per_entity), then backfills one open fault per currently active alert.
- * Previous active fault count for worse/better lives in alerts.info.open_fault_count (not a column).
+ * Adds alert_faults, alert_log.fault_id, alert_rules.notify_per_entity and max_entities,
+ * then backfills one open fault per currently active alert.
+ * Worse/better previous count lives in alerts.info.open_fault_count (not a column).
  */
 
 use Illuminate\Database\Migrations\Migration;
@@ -16,41 +16,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $this->createFaultsTable();
-        $this->addSupportingColumns();
-        $this->backfillFaults();
-    }
-
-    public function down(): void
-    {
-        Schema::dropIfExists('alert_faults');
-
-        if (Schema::hasColumn('alert_log', 'fault_id')) {
-            Schema::table('alert_log', function (Blueprint $table) {
-                $table->dropIndex('alert_log_fault_id_index');
-                $table->dropColumn('fault_id');
-            });
-        }
-
-        if (Schema::hasColumn('alert_rules', 'max_entities')) {
-            Schema::table('alert_rules', function (Blueprint $table) {
-                $table->dropColumn('max_entities');
-            });
-        }
-
-        if (Schema::hasColumn('alert_rules', 'notify_per_entity')) {
-            Schema::table('alert_rules', function (Blueprint $table) {
-                $table->dropColumn('notify_per_entity');
-            });
-        }
-    }
-
-    private function createFaultsTable(): void
-    {
-        if (Schema::hasTable('alert_faults')) {
-            return;
-        }
-
         Schema::create('alert_faults', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('rule_id');
@@ -78,41 +43,20 @@ return new class extends Migration
         if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
             DB::statement('ALTER TABLE `alert_faults` CHANGE `details` `details` longblob NULL ;');
         }
-    }
 
-    private function addSupportingColumns(): void
-    {
-        if (! Schema::hasColumn('alert_log', 'fault_id')) {
-            Schema::table('alert_log', function (Blueprint $table) {
-                $table->unsignedInteger('fault_id')->nullable()->after('device_id');
-                $table->index('fault_id');
-            });
-        }
+        Schema::table('alert_log', function (Blueprint $table) {
+            $table->unsignedInteger('fault_id')->nullable()->after('device_id');
+            $table->index('fault_id');
+        });
 
-        if (! Schema::hasColumn('alert_rules', 'notify_per_entity')) {
-            Schema::table('alert_rules', function (Blueprint $table) {
-                $table->boolean('notify_per_entity')->default(false)->after('invert_map');
-            });
-        }
+        Schema::table('alert_rules', function (Blueprint $table) {
+            $table->boolean('notify_per_entity')->default(false)->after('invert_map');
+            $table->unsignedInteger('max_entities')->nullable()->after('notify_per_entity');
+        });
 
-        if (! Schema::hasColumn('alert_rules', 'max_entities')) {
-            Schema::table('alert_rules', function (Blueprint $table) {
-                $table->unsignedInteger('max_entities')->nullable()->after('notify_per_entity');
-            });
-        }
-    }
-
-    private function backfillFaults(): void
-    {
-        if (! Schema::hasTable('alerts')) {
-            return;
-        }
-
-        // Active states that should carry an open fault after the upgrade.
         $activeStates = [AlertState::ACTIVE, AlertState::ACKNOWLEDGED, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED];
 
         foreach (DB::table('alerts')->whereIn('state', $activeStates)->orderBy('id')->get() as $alert) {
-            // Faults only carry ACTIVE/ACKNOWLEDGED/RECOVERED; collapse worse/better/changed to active.
             $faultState = (int) $alert->state === AlertState::ACKNOWLEDGED ? AlertState::ACKNOWLEDGED : AlertState::ACTIVE;
 
             $latestLog = DB::table('alert_log')
@@ -150,5 +94,19 @@ return new class extends Migration
             $info['open_fault_count'] = 1;
             DB::table('alerts')->where('id', $alert->id)->update(['info' => json_encode($info)]);
         }
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('alert_faults');
+
+        Schema::table('alert_log', function (Blueprint $table) {
+            $table->dropIndex('alert_log_fault_id_index');
+            $table->dropColumn('fault_id');
+        });
+
+        Schema::table('alert_rules', function (Blueprint $table) {
+            $table->dropColumn(['max_entities', 'notify_per_entity']);
+        });
     }
 };

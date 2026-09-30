@@ -43,6 +43,30 @@ alert_device_map:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_device_map_rule_id_device_id_unique: { Name: alert_device_map_rule_id_device_id_unique, Columns: [rule_id, device_id], Unique: true, Type: BTREE }
+alert_faults:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: rule_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: entity_type, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: entity_id, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: entity_key, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: state, Type: int, 'Null': false, Extra: '', Default: '1' }
+    - { Field: alerted, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: open, Type: int, 'Null': false, Extra: '', Default: '1' }
+    - { Field: severity, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: note, Type: text, 'Null': true, Extra: '' }
+    - { Field: info, Type: text, 'Null': true, Extra: '' }
+    - { Field: details, Type: longblob, 'Null': true, Extra: '' }
+    - { Field: first_seen, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: last_seen, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: timestamp, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    alert_faults_device_id_open_index: { Name: alert_faults_device_id_open_index, Columns: [device_id, open], Unique: false, Type: BTREE }
+    alert_faults_entity_type_entity_id_index: { Name: alert_faults_entity_type_entity_id_index, Columns: [entity_type, entity_id], Unique: false, Type: BTREE }
+    alert_faults_rule_id_device_id_entity_key_index: { Name: alert_faults_rule_id_device_id_entity_key_index, Columns: [rule_id, device_id, entity_key], Unique: false, Type: BTREE }
+    alert_faults_state_index: { Name: alert_faults_state_index, Columns: [state], Unique: false, Type: BTREE }
 alert_group_map:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -64,12 +88,14 @@ alert_log:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: rule_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: fault_id, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: state, Type: int, 'Null': false, Extra: '' }
     - { Field: details, Type: longblob, 'Null': true, Extra: '' }
     - { Field: time_logged, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_log_device_id_rule_id_time_logged_index: { Name: alert_log_device_id_rule_id_time_logged_index, Columns: [device_id, rule_id, time_logged], Unique: false, Type: BTREE }
+    alert_log_fault_id_index: { Name: alert_log_fault_id_index, Columns: [fault_id], Unique: false, Type: BTREE }
     alert_log_rule_id_device_id_state_index: { Name: alert_log_rule_id_device_id_state_index, Columns: [rule_id, device_id, state], Unique: false, Type: BTREE }
     alert_log_time_logged_index: { Name: alert_log_time_logged_index, Columns: [time_logged], Unique: false, Type: BTREE }
 alert_operations:
@@ -113,6 +139,8 @@ alert_rules:
     - { Field: builder, Type: text, 'Null': false, Extra: '' }
     - { Field: proc, Type: varchar(80), 'Null': true, Extra: '' }
     - { Field: invert_map, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: notify_per_entity, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: max_entities, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: notes, Type: text, 'Null': true, Extra: '' }
     - { Field: alert_operation_id, Type: 'int unsigned', 'Null': true, Extra: '' }
   Indexes:
