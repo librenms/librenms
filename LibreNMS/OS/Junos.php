@@ -57,13 +57,13 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
     public function discoverOS(Device $device): void
     {
-        $data = snmp_get_multi($this->getDeviceArray(), [
+        $data = SnmpQuery::hideMib()->get([
             'JUNIPER-MIB::jnxBoxDescr.0',
             'JUNIPER-MIB::jnxBoxSerialNo.0',
             'JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberSWVersion.0',
             'HOST-RESOURCES-MIB::hrSWInstalledName.1',
             'HOST-RESOURCES-MIB::hrSWInstalledName.2',
-        ], '-OQUs');
+        ])->table(1);
 
         preg_match('/Juniper Networks, Inc. (?<hardware>\S+) .* kernel JUNOS (?<version>[^, ]+)[, ]/', $device->sysDescr, $parsed);
         if (isset($data[2]['hrSWInstalledName'])) {
