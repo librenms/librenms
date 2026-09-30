@@ -46,7 +46,6 @@ class Alert extends DeviceRelatedModel
         'info',
         'timestamp',
         'note',
-        'open_fault_count',
     ];
 
     /**

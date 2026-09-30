@@ -113,8 +113,16 @@ class AlertRuleController extends Controller
         if ($success && $alertRule->disabled) {
             AlertFault::where('rule_id', $alertRule->id)->where('open', 1)
                 ->update(['open' => 0, 'state' => AlertState::RECOVERED]);
-            Alert::where('rule_id', $alertRule->id)
-                ->update(['state' => AlertState::CLEAR, 'open' => 0, 'alerted' => 0, 'open_fault_count' => 0]);
+            Alert::where('rule_id', $alertRule->id)->get()->each(function (Alert $alert): void {
+                $info = is_array($alert->info) ? $alert->info : [];
+                unset($info['open_fault_count']);
+                $alert->info = $info;
+                $alert->update([
+                    'state' => AlertState::CLEAR,
+                    'open' => 0,
+                    'alerted' => 0,
+                ]);
+            });
         }
 
         return response()->json(['status' => $success ? 200 : 422], $success ? 200 : 422);

@@ -75,12 +75,16 @@ readonly class AlertRules
             Log::info('Disable alerting is set, Clearing active alerts and skipping alert rules check');
             AlertFault::query()->where('device_id', $this->device->device_id)->where('open', 1)
                 ->update(['open' => 0, 'state' => AlertState::RECOVERED]);
-            $this->device->alerts()->update([
-                'state' => AlertState::CLEAR,
-                'alerted' => 0,
-                'open' => 0,
-                'open_fault_count' => 0,
-            ]);
+            foreach ($this->device->alerts as $alert) {
+                $info = is_array($alert->info) ? $alert->info : [];
+                unset($info['open_fault_count']);
+                $alert->info = $info;
+                $alert->update([
+                    'state' => AlertState::CLEAR,
+                    'alerted' => 0,
+                    'open' => 0,
+                ]);
+            }
 
             return false;
         }
@@ -241,7 +245,8 @@ readonly class AlertRules
 
         $alertRow = Alert::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)->first();
         $prevState = $alertRow?->state;
-        $prevCount = $alertRow !== null ? (int) $alertRow->open_fault_count : 0;
+        $info = is_array($alertRow?->info) ? $alertRow->info : [];
+        $prevCount = (int) ($info['open_fault_count'] ?? 0);
 
         if ($activeCount == 0) {
             $newState = AlertState::RECOVERED;
@@ -263,7 +268,8 @@ readonly class AlertRules
 
         if ($alertRow) {
             $alertRow->state = $newState;
-            $alertRow->open_fault_count = $activeCount;
+            $info['open_fault_count'] = $activeCount;
+            $alertRow->info = $info;
             if ($stateChanged) {
                 $alertRow->open = 1;
                 // Keep alerted when entering acknowledged so runAcks can dedupe via alerted=ACK after notify.
@@ -283,8 +289,7 @@ readonly class AlertRules
             $alertRow->rule_id = $rule->id;
             $alertRow->open = 1;
             $alertRow->alerted = 0;
-            $alertRow->open_fault_count = $activeCount;
-            $alertRow->info = [];
+            $alertRow->info = ['open_fault_count' => $activeCount];
             $alertRow->save();
         }
     }

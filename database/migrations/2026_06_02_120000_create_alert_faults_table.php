@@ -2,8 +2,8 @@
 
 /**
  * Adds the alert_faults table plus supporting columns on alert_log (fault_id),
- * alert_rules (notify_per_entity) and alerts (open_fault_count), then backfills one
- * open fault per currently active alert.
+ * alert_rules (notify_per_entity), then backfills one open fault per currently active alert.
+ * Previous active fault count for worse/better lives in alerts.info.open_fault_count (not a column).
  */
 
 use Illuminate\Database\Migrations\Migration;
@@ -35,12 +35,6 @@ return new class extends Migration
         if (Schema::hasColumn('alert_rules', 'notify_per_entity')) {
             Schema::table('alert_rules', function (Blueprint $table) {
                 $table->dropColumn('notify_per_entity');
-            });
-        }
-
-        if (Schema::hasColumn('alerts', 'open_fault_count')) {
-            Schema::table('alerts', function (Blueprint $table) {
-                $table->dropColumn('open_fault_count');
             });
         }
     }
@@ -94,12 +88,6 @@ return new class extends Migration
                 $table->boolean('notify_per_entity')->default(false)->after('invert_map');
             });
         }
-
-        if (! Schema::hasColumn('alerts', 'open_fault_count')) {
-            Schema::table('alerts', function (Blueprint $table) {
-                $table->unsignedInteger('open_fault_count')->default(0)->after('open');
-            });
-        }
     }
 
     private function backfillFaults(): void
@@ -143,7 +131,12 @@ return new class extends Migration
                 DB::table('alert_log')->where('id', $latestLog->id)->update(['fault_id' => $faultId]);
             }
 
-            DB::table('alerts')->where('id', $alert->id)->update(['open_fault_count' => 1]);
+            $info = json_decode($alert->info ?? '', true);
+            if (! is_array($info)) {
+                $info = [];
+            }
+            $info['open_fault_count'] = 1;
+            DB::table('alerts')->where('id', $alert->id)->update(['info' => json_encode($info)]);
         }
     }
 };
