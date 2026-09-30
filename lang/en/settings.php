@@ -838,6 +838,10 @@ return [
                 'description' => 'Route',
             ],
 
+            'ipmi' => [
+                'description' => 'IPMI',
+            ],
+
             'sensors' => [
                 'description' => 'Sensors',
             ],
