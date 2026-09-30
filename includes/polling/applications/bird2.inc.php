@@ -195,5 +195,10 @@ foreach ($protocolsData as $protocol) {
 
 echo PHP_EOL;
 
-// Clean up any bgpPeers that arent on the list for this device
-BgpPeer::where('device_id', $device['device_id'])->whereNotIn('bgpPeer_id', $bgpPeerIds)->delete();
+// Clean up any bgpPeers that arent on the list for this device. Only do this when
+// at least one peer was processed: ending up with an empty list means the output
+// could not be read this time round, and dropping every peer on a transient read
+// failure loses the whole BGP history for the device.
+if (! empty($bgpPeerIds)) {
+    BgpPeer::where('device_id', $device['device_id'])->whereNotIn('bgpPeer_id', $bgpPeerIds)->delete();
+}
