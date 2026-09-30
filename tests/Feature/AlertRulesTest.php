@@ -137,8 +137,7 @@ class AlertRulesTest extends TestCase
             'state' => AlertState::ACTIVE,
             'open' => 1,
             'alerted' => 0,
-            'open_fault_count' => 1,
-            'info' => [],
+            'info' => ['open_fault_count' => 1],
         ]);
 
         AlertFault::create([
@@ -221,8 +220,7 @@ class AlertRulesTest extends TestCase
             'state' => AlertState::ACTIVE,
             'open' => 1,
             'alerted' => AlertState::ACTIVE,
-            'open_fault_count' => 1,
-            'info' => [],
+            'info' => ['open_fault_count' => 1],
         ]);
 
         AlertFault::create([
@@ -257,8 +255,7 @@ class AlertRulesTest extends TestCase
             'state' => AlertState::ACTIVE,
             'open' => 1,
             'alerted' => 0,
-            'open_fault_count' => 1,
-            'info' => [],
+            'info' => ['open_fault_count' => 1],
         ]);
 
         AlertFault::create([
@@ -503,8 +500,7 @@ class AlertRulesTest extends TestCase
             'state' => $state,
             'open' => 1,
             'alerted' => 1,
-            'open_fault_count' => 1,
-            'info' => [],
+            'info' => ['open_fault_count' => 1],
             'timestamp' => $initialTimestamp,
         ]);
 
