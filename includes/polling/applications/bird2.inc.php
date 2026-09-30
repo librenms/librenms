@@ -152,7 +152,7 @@ foreach ($protocolsData as $protocol) {
 
     $bgpPeer->device_id = $device['device_id'];
     $bgpPeer->astext = \LibreNMS\Util\AutonomousSystem::get($protocol['neighbor_as'])->name();
-    $bgpPeer->bgpPeerIdentifier = $protocol['neighbor_id'] ?? '0.0.0.0';
+    $bgpPeer->bgpPeerIdentifier = $protocol['neighbor_address'];
     $bgpPeer->bgpPeerRemoteAs = $protocol['neighbor_as'];
     $bgpPeer->bgpPeerState = strtolower((string) $protocol['bgp_state']);
     $bgpPeer->bgpPeerAdminStatus = str_replace('up', 'start', strtolower((string) $protocol['protocol_state']));
