@@ -2,7 +2,7 @@ os: boschcpp
 text: 'Bosch IP Camera'
 type: camera
 icon: bosch
-group: Bosch
+group: bosch
 mib_dir: bosch
 over:
     - { graph: device_bits, text: 'Device Traffic' }
