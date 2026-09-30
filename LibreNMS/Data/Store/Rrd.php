@@ -30,8 +30,6 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
-use File;
-use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdFileExistsException;
@@ -43,7 +41,6 @@ use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
 use Log;
-use Symfony\Component\Process\Process;
 
 class Rrd extends BaseDatastore
 {
