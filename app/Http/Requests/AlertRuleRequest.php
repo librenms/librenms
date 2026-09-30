@@ -62,6 +62,7 @@ class AlertRuleRequest extends FormRequest
             'acknowledgement' => ['sometimes', 'boolean'],
             'invert_map' => ['sometimes', 'boolean'],
             'notify_per_entity' => ['sometimes', 'boolean'],
+            'max_entities' => ['sometimes', 'nullable', 'integer', 'min:1'],
 
             'maps' => ['sometimes', 'array'],
             'maps.*' => ['string'],

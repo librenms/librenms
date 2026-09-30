@@ -1882,6 +1882,11 @@ function add_edit_rule(Illuminate\Http\Request $request)
         $saveData['notify_per_entity'] = filter_var($data['notify_per_entity'], FILTER_VALIDATE_BOOLEAN);
     }
 
+    if (array_key_exists('max_entities', $data)) {
+        $maxEntities = $data['max_entities'];
+        $saveData['max_entities'] = ($maxEntities === null || $maxEntities === '') ? null : max(1, (int) $maxEntities);
+    }
+
     if (is_numeric($rule_id)) {
         $alertRule = \App\Models\AlertRule::find($rule_id);
         if (! $alertRule) {
@@ -1939,6 +1944,22 @@ function delete_rule(Illuminate\Http\Request $request)
     return api_error(400, 'Invalid rule id has been provided');
 }
 
+/**
+ * @return list<array<string, mixed>>
+ */
+function api_alert_fault_action_targets(int $fault_id, int $device_id, int $rule_id): array
+{
+    $rule = \App\Models\AlertRule::query()->find($rule_id);
+    if ($rule !== null && \LibreNMS\Alert\AlertUtil::shouldNotifyPerEntity(
+        $rule,
+        \LibreNMS\Alert\AlertUtil::openEntityCountForRuleDevice($rule_id, $device_id)
+    )) {
+        return dbFetchRows('SELECT id, note, info FROM alert_faults WHERE id = ?', [$fault_id]);
+    }
+
+    return dbFetchRows('SELECT id, note, info FROM alert_faults WHERE device_id = ? AND rule_id = ? AND open = 1', [$device_id, $rule_id]);
+}
+
 function ack_alert(Illuminate\Http\Request $request)
 {
     $fault_id = $request->route('id');
@@ -1948,16 +1969,12 @@ function ack_alert(Illuminate\Http\Request $request)
         return api_error(400, 'Invalid fault has been provided');
     }
 
-    $fault = dbFetchRow('SELECT `af`.`rule_id`, `af`.`device_id`, `r`.`notify_per_entity` FROM `alert_faults` `af` JOIN `alert_rules` `r` ON `r`.`id` = `af`.`rule_id` WHERE `af`.`id` = ?', [$fault_id]);
+    $fault = dbFetchRow('SELECT `af`.`rule_id`, `af`.`device_id` FROM `alert_faults` `af` WHERE `af`.`id` = ?', [$fault_id]);
     if (empty($fault)) {
         return api_success_noresult(200, 'No Alert by that ID');
     }
 
-    if (empty($fault['notify_per_entity'])) {
-        $targets = dbFetchRows('SELECT id, note, info FROM alert_faults WHERE device_id = ? AND rule_id = ? AND open = 1', [$fault['device_id'], $fault['rule_id']]);
-    } else {
-        $targets = dbFetchRows('SELECT id, note, info FROM alert_faults WHERE id = ?', [$fault_id]);
-    }
+    $targets = api_alert_fault_action_targets((int) $fault_id, (int) $fault['device_id'], (int) $fault['rule_id']);
 
     $updated = false;
     foreach ($targets as $target) {
@@ -1995,16 +2012,12 @@ function unmute_alert(Illuminate\Http\Request $request)
         return api_error(400, 'Invalid fault has been provided');
     }
 
-    $fault = dbFetchRow('SELECT `af`.`rule_id`, `af`.`device_id`, `r`.`notify_per_entity` FROM `alert_faults` `af` JOIN `alert_rules` `r` ON `r`.`id` = `af`.`rule_id` WHERE `af`.`id` = ?', [$fault_id]);
+    $fault = dbFetchRow('SELECT `af`.`rule_id`, `af`.`device_id` FROM `alert_faults` `af` WHERE `af`.`id` = ?', [$fault_id]);
     if (empty($fault)) {
         return api_success_noresult(200, 'No alert by that ID');
     }
 
-    if (empty($fault['notify_per_entity'])) {
-        $targets = dbFetchRows('SELECT id, note FROM alert_faults WHERE device_id = ? AND rule_id = ? AND open = 1', [$fault['device_id'], $fault['rule_id']]);
-    } else {
-        $targets = dbFetchRows('SELECT id, note FROM alert_faults WHERE id = ?', [$fault_id]);
-    }
+    $targets = api_alert_fault_action_targets((int) $fault_id, (int) $fault['device_id'], (int) $fault['rule_id']);
 
     $updated = false;
     foreach ($targets as $target) {

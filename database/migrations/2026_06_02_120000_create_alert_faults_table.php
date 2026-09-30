@@ -32,6 +32,12 @@ return new class extends Migration
             });
         }
 
+        if (Schema::hasColumn('alert_rules', 'max_entities')) {
+            Schema::table('alert_rules', function (Blueprint $table) {
+                $table->dropColumn('max_entities');
+            });
+        }
+
         if (Schema::hasColumn('alert_rules', 'notify_per_entity')) {
             Schema::table('alert_rules', function (Blueprint $table) {
                 $table->dropColumn('notify_per_entity');
@@ -86,6 +92,12 @@ return new class extends Migration
         if (! Schema::hasColumn('alert_rules', 'notify_per_entity')) {
             Schema::table('alert_rules', function (Blueprint $table) {
                 $table->boolean('notify_per_entity')->default(false)->after('invert_map');
+            });
+        }
+
+        if (! Schema::hasColumn('alert_rules', 'max_entities')) {
+            Schema::table('alert_rules', function (Blueprint $table) {
+                $table->unsignedInteger('max_entities')->nullable()->after('notify_per_entity');
             });
         }
     }

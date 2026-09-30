@@ -26,7 +26,11 @@
 
 namespace LibreNMS\Tests\Unit;
 
+<<<<<<< HEAD:tests/Unit/AlertingTest.php
 use LibreNMS\Tests\TestCase;
+=======
+use App\Models\AlertRule;
+>>>>>>> 03b294405f (Added ability to set max fault entities):tests/AlertingTest.php
 use LibreNMS\Alert\AlertUtil;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -154,6 +158,18 @@ final class AlertingTest extends TestCase
         $this->assertSame(['customThing', 3], AlertUtil::entityForFault(['device_id' => 1, 'customThing_id' => 3]));
         // A device-level row (no entity id) resolves to no specific entity.
         $this->assertSame([null, null], AlertUtil::entityForFault(['device_id' => 1, 'ifName' => 'eth0']));
+    }
+
+    public function testShouldNotifyPerEntityRespectsMaxEntities(): void
+    {
+        $rule = new AlertRule([
+            'notify_per_entity' => true,
+            'max_entities' => 10,
+        ]);
+
+        $this->assertTrue(AlertUtil::shouldNotifyPerEntity($rule, 10));
+        $this->assertFalse(AlertUtil::shouldNotifyPerEntity($rule, 11));
+        $this->assertFalse(AlertUtil::shouldNotifyPerEntity(new AlertRule(['notify_per_entity' => false, 'max_entities' => 10]), 5));
     }
 
     public function testTransports(): void

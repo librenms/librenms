@@ -26,6 +26,7 @@
 use App\Models\Alert;
 use App\Models\AlertFault;
 use Illuminate\Support\Facades\Gate;
+use LibreNMS\Alert\AlertUtil;
 
 header('Content-type: application/json');
 
@@ -56,7 +57,11 @@ if ($sub_type === 'get_note') {
     $message = 'Alert note retrieved';
     $note = (string) $fault->note;
 } else {
-    $query = $fault->rule?->notify_per_entity
+    $rule = $fault->rule;
+    $openCount = $rule !== null
+        ? AlertUtil::openEntityCountForRuleDevice($rule->id, (int) $fault->device_id)
+        : 1;
+    $query = ($rule !== null && AlertUtil::shouldNotifyPerEntity($rule, $openCount))
         ? AlertFault::whereKey($fault->id)
         : AlertFault::where('rule_id', $fault->rule_id)->where('device_id', $fault->device_id)->where('open', 1);
 

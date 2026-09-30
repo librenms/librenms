@@ -7,6 +7,7 @@ use App\Models\AlertLog;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
@@ -96,8 +97,19 @@ class AlertLogController extends TableController
             ->with(['device', 'rule'])
             ->hasAccess($request->user());
 
+        $defaultMax = AlertUtil::defaultMaxEntities();
         $query->whereRaw('(
-            coalesce((select ar.notify_per_entity from alert_rules ar where ar.id = alert_log.rule_id), 0) = 1
+            (
+                coalesce((select ar.notify_per_entity from alert_rules ar where ar.id = alert_log.rule_id), 0) = 1
+                and (
+                    select count(*) from alert_log al_c
+                    where al_c.device_id = alert_log.device_id
+                      and al_c.rule_id = alert_log.rule_id
+                      and al_c.state = alert_log.state
+                      and al_c.time_logged = alert_log.time_logged
+                      and al_c.fault_id is not null
+                ) <= coalesce((select ar.max_entities from alert_rules ar where ar.id = alert_log.rule_id), ?)
+            )
             or alert_log.fault_id is null
             or alert_log.id = (
                 select min(al2.id) from alert_log al2
@@ -106,7 +118,7 @@ class AlertLogController extends TableController
                   and al2.state = alert_log.state
                   and al2.time_logged = alert_log.time_logged
             )
-        )');
+        )', [$defaultMax]);
 
         $sort = $request->input('sort');
         if (isset($sort['severity']) || isset($sort['alert_rule'])) {
@@ -129,7 +141,17 @@ class AlertLogController extends TableController
     {
         $details = is_array($model->details) ? $model->details : [];
         $entity_count = 1;
-        if ($model->fault_id && $model->rule && ! $model->rule->notify_per_entity) {
+        $batchCount = 1;
+        if ($model->fault_id) {
+            $batchCount = AlertLog::query()
+                ->where('device_id', $model->device_id)
+                ->where('rule_id', $model->rule_id)
+                ->where('state', $model->state->value)
+                ->where('time_logged', $model->time_logged)
+                ->whereNotNull('fault_id')
+                ->count();
+        }
+        if ($model->fault_id && $model->rule && AlertUtil::shouldGroupFaultDetails($model->rule, $batchCount)) {
             $siblings = AlertLog::query()
                 ->where('device_id', $model->device_id)
                 ->where('rule_id', $model->rule_id)

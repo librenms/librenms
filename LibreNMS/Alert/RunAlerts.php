@@ -283,7 +283,7 @@ class RunAlerts
      */
     public function issueAlert($alert, ?array $transportOverride = null)
     {
-        $perEntity = (bool) AlertRule::query()->where('id', $alert['rule_id'])->value('notify_per_entity');
+        $rule = AlertRule::query()->find($alert['rule_id']);
 
         $recovering = (int) $alert['state'] === AlertState::RECOVERED;
         $faults = AlertFault::query()
@@ -293,6 +293,8 @@ class RunAlerts
             ->where('state', $recovering ? '=' : '!=', AlertState::RECOVERED)
             ->orderBy('id')
             ->get();
+
+        $perEntity = $rule !== null && AlertUtil::shouldNotifyPerEntity($rule, $faults->count());
 
         // Build the set of notifications to send: one per fault (per-entity) or one aggregate (grouped).
         $units = [];
