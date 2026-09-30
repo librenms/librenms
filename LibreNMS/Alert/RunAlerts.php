@@ -686,6 +686,7 @@ class RunAlerts
                     $tmp = $instance->deliverAlert($obj);
                     $this->alertLog($tmp, $obj, $obj['transport']);
                 } catch (AlertTransportDeliveryException $e) {
+                    Log::warning("Alert transport '{$obj['transport']}' delivery failed for device {$obj['device_id']}: {$e->getMessage()}", ['exception' => $e]);
                     $this->alertLog($e->getMessage(), $obj, $obj['transport']);
                 } catch (\Exception $e) {
                     $this->alertLog($e, $obj, $obj['transport']);
