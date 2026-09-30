@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Ajax;
 
 use App\Models\AlertLog;
+use LibreNMS\Alert\AlertUtil;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 
@@ -38,8 +39,33 @@ class AlertDetailsController
     {
         $this->authorize('view', $alertLog);
 
+        $details = $alertLog->details['rule'] ?? null;
+
+        $siblings = collect();
+        if ($alertLog->fault_id) {
+            $siblings = AlertLog::query()
+                ->where('device_id', $alertLog->device_id)
+                ->where('rule_id', $alertLog->rule_id)
+                ->where('state', $alertLog->state->value)
+                ->where('time_logged', $alertLog->time_logged)
+                ->whereNotNull('fault_id')
+                ->get(['id', 'details']);
+        }
+
+        if ($alertLog->fault_id && $alertLog->rule && AlertUtil::shouldGroupFaultDetails($alertLog->rule, $siblings->count())) {
+            $rows = [];
+            foreach ($siblings as $sibling) {
+                foreach ((array) ($sibling->details['rule'] ?? []) as $row) {
+                    $rows[] = $row;
+                }
+            }
+            if (! empty($rows)) {
+                $details = $rows;
+            }
+        }
+
         return response()->json([
-            'details' => $alertLog->details['rule'] ?? 'No Details found',
+            'details' => $details ?: 'No Details found',
         ]);
     }
 }
