@@ -95,6 +95,24 @@ class AlertRulesTest extends TestCase
             'rule_id' => $rule->id,
             'state' => AlertState::ACTIVE,
         ]);
+
+        // The alert_log entry must be linked to the fault it was raised for. Guards against
+        // fault_id being silently dropped by mass-assignment protection (missing from $fillable).
+        $fault = AlertFault::query()
+            ->where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->first();
+        $this->assertNotNull($fault, 'A fault should be created for the triggered alert');
+
+        $log = AlertLog::query()
+            ->where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('state', AlertState::ACTIVE)
+            ->latest('id')
+            ->first();
+        $this->assertNotNull($log, 'An alert_log entry should be created for the triggered alert');
+        $this->assertNotNull($log->fault_id, 'alert_log.fault_id should be populated');
+        $this->assertSame($fault->id, $log->fault_id, 'alert_log should be linked to the fault via fault_id');
     }
 
     public function testRunRulesUpdatesExistingAlert(): void
@@ -239,6 +257,139 @@ class AlertRulesTest extends TestCase
             'device_id' => $device->device_id,
             'rule_id' => $rule->id,
             'state' => AlertState::ACKNOWLEDGED,
+        ]);
+    }
+
+    public function testSyncAlertStateLogsWorseTransitionWhenRequested(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        // Rule was already alerting on a single fault.
+        Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'info' => ['open_fault_count' => 1],
+        ]);
+
+        // Two open faults now exist -> escalation (worse) versus the recorded count of 1.
+        foreach (['a', 'b'] as $i => $key) {
+            AlertFault::create([
+                'rule_id' => $rule->id,
+                'device_id' => $device->device_id,
+                'entity_key' => 'entity|' . $key,
+                'state' => AlertState::ACTIVE,
+                'open' => 1,
+                'alerted' => 0,
+                'details' => ['rule' => [['id' => $i + 1, 'entity' => $key]]],
+            ]);
+        }
+
+        (new AlertRules($device))->syncAlertState($rule, logStateChange: true);
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::WORSE,
+        ]);
+
+        $log = AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('state', AlertState::WORSE)
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($log, 'A rule-level worse alert_log entry should be created');
+        $this->assertNull($log->fault_id, 'Rule-level history entries are not tied to a single fault');
+        $this->assertCount(2, $log->details['rule'] ?? [], 'Worse entry should snapshot all open fault rows');
+    }
+
+    public function testSyncAlertStateDoesNotLogWorseTransitionByDefault(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'info' => ['open_fault_count' => 1],
+        ]);
+
+        foreach (['a', 'b'] as $key) {
+            AlertFault::create([
+                'rule_id' => $rule->id,
+                'device_id' => $device->device_id,
+                'entity_key' => 'entity|' . $key,
+                'state' => AlertState::ACTIVE,
+                'open' => 1,
+                'alerted' => 0,
+                'details' => ['rule' => [['entity' => $key]]],
+            ]);
+        }
+
+        // Default (no flag): the dispatch/API recompute path must not create history rows.
+        (new AlertRules($device))->syncAlertState($rule);
+
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::WORSE,
+        ]);
+
+        $this->assertEquals(0, AlertLog::where('device_id', $device->device_id)
+            ->where('rule_id', $rule->id)
+            ->where('state', AlertState::WORSE)
+            ->count(), 'No rule-level worse entry should be logged without the flag');
+    }
+
+    public function testSyncAlertStateRetainsAlertedOnRecoverySoRecoveryNotifies(): void
+    {
+        $device = Device::factory()->create(['status' => 0]);
+        $rule = AlertRule::factory()->create([
+            'query' => 'SELECT * FROM devices WHERE device_id = ? AND status = 0',
+        ]);
+
+        // Rule had an active, already-notified alert (dispatcher advanced alerted to ACTIVE).
+        Alert::create([
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::ACTIVE,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+            'info' => ['open_fault_count' => 1],
+        ]);
+
+        // The only fault has recovered (still open, pending the recovery notification).
+        AlertFault::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'entity_key' => (string) $device->device_id,
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+            'alerted' => 0,
+            'details' => ['rule' => []],
+        ]);
+
+        (new AlertRules($device))->syncAlertState($rule);
+
+        // RECOVERED shares value 0 with the "reset alerted" sentinel. alerted must be left at its
+        // previous (active) value so the dispatcher sees alerted != state and sends the recovery;
+        // zeroing it would make runAlerts skip the recovery notification.
+        $this->assertDatabaseHas('alerts', [
+            'device_id' => $device->device_id,
+            'rule_id' => $rule->id,
+            'state' => AlertState::RECOVERED,
+            'alerted' => AlertState::ACTIVE,
         ]);
     }
 

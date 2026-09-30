@@ -35,32 +35,47 @@ class AlertDetailsController
 {
     use AuthorizesRequests;
 
+    /** Max entity rows returned for the on-demand detail view to bound memory. */
+    private const DETAIL_ROW_LIMIT = 1000;
+
     public function __invoke(AlertLog $alertLog): JsonResponse
     {
         $this->authorize('view', $alertLog);
 
         $details = $alertLog->details['rule'] ?? null;
 
-        $siblings = collect();
-        if ($alertLog->fault_id) {
-            $siblings = AlertLog::query()
+        if ($alertLog->fault_id && $alertLog->rule) {
+            // Count siblings without loading/decompressing every details blob first.
+            $sibling_query = fn () => AlertLog::query()
                 ->where('device_id', $alertLog->device_id)
                 ->where('rule_id', $alertLog->rule_id)
                 ->where('state', $alertLog->state->value)
                 ->where('time_logged', $alertLog->time_logged)
-                ->whereNotNull('fault_id')
-                ->get(['id', 'details']);
-        }
+                ->whereNotNull('fault_id');
 
-        if ($alertLog->fault_id && $alertLog->rule && AlertUtil::shouldGroupFaultDetails($alertLog->rule, $siblings->count())) {
-            $rows = [];
-            foreach ($siblings as $sibling) {
-                foreach ((array) ($sibling->details['rule'] ?? []) as $row) {
-                    $rows[] = $row;
+            $sibling_count = $sibling_query()->count();
+
+            if ($sibling_count > 1 && AlertUtil::shouldGroupFaultDetails($alertLog->rule, $sibling_count)) {
+                // Load detail blobs chunked to bound memory, capped for display safety.
+                $rows = [];
+                $sibling_query()
+                    ->orderBy('id')
+                    ->select(['id', 'details'])
+                    ->chunk(200, function ($chunk) use (&$rows): bool {
+                        foreach ($chunk as $sibling) {
+                            foreach ((array) ($sibling->details['rule'] ?? []) as $row) {
+                                $rows[] = $row;
+                                if (count($rows) >= self::DETAIL_ROW_LIMIT) {
+                                    return false;
+                                }
+                            }
+                        }
+
+                        return true;
+                    });
+                if (! empty($rows)) {
+                    $details = $rows;
                 }
-            }
-            if (! empty($rows)) {
-                $details = $rows;
             }
         }
 

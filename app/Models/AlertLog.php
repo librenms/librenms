@@ -17,7 +17,9 @@ class AlertLog extends DeviceRelatedModel
     protected $fillable = [
         'device_id',
         'rule_id',
+        'fault_id',
         'state',
+        'time_logged',
         'details',
     ];
 

@@ -7,6 +7,7 @@ use App\Models\AlertLog;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Time;
@@ -18,6 +19,9 @@ use LibreNMS\Util\Url;
 class AlertLogController extends TableController
 {
     protected array $default_sort = ['time_logged' => 'asc'];
+
+    /** Max entity rows rendered in the (collapsed) inline detail cell to bound memory. */
+    private const INLINE_DETAIL_ROW_LIMIT = 100;
 
     public function __construct(
         private readonly AlertLogDetailParser $parser
@@ -92,33 +96,32 @@ class AlertLogController extends TableController
     {
         $this->authorize('viewAny', AlertLog::class);
 
+        $defaultMax = AlertUtil::defaultMaxEntities();
+
+        // Compute the per-group aggregates (representative row id + fault count) once in a
+        // single grouped derived table instead of running correlated subqueries per row.
+        $groups = DB::table('alert_log')
+            ->selectRaw('device_id, rule_id, state, time_logged, min(id) as min_id, sum(case when fault_id is not null then 1 else 0 end) as fault_count')
+            ->groupBy('device_id', 'rule_id', 'state', 'time_logged');
+
         $query = AlertLog::query()
             ->select('alert_log.*')
             ->with(['device', 'rule'])
-            ->hasAccess($request->user());
-
-        $defaultMax = AlertUtil::defaultMaxEntities();
-        $query->whereRaw('(
-            (
-                coalesce((select ar.notify_per_entity from alert_rules ar where ar.id = alert_log.rule_id), 0) = 1
-                and (
-                    select count(*) from alert_log al_c
-                    where al_c.device_id = alert_log.device_id
-                      and al_c.rule_id = alert_log.rule_id
-                      and al_c.state = alert_log.state
-                      and al_c.time_logged = alert_log.time_logged
-                      and al_c.fault_id is not null
-                ) <= coalesce((select ar.max_entities from alert_rules ar where ar.id = alert_log.rule_id), ?)
-            )
-            or alert_log.fault_id is null
-            or alert_log.id = (
-                select min(al2.id) from alert_log al2
-                where al2.device_id = alert_log.device_id
-                  and al2.rule_id = alert_log.rule_id
-                  and al2.state = alert_log.state
-                  and al2.time_logged = alert_log.time_logged
-            )
-        )', [$defaultMax]);
+            ->hasAccess($request->user())
+            ->joinSub($groups, 'alert_log_groups', function ($join): void {
+                $join->on('alert_log_groups.device_id', '=', 'alert_log.device_id')
+                    ->on('alert_log_groups.rule_id', '=', 'alert_log.rule_id')
+                    ->on('alert_log_groups.state', '=', 'alert_log.state')
+                    ->on('alert_log_groups.time_logged', '=', 'alert_log.time_logged');
+            })
+            ->whereRaw('(
+                alert_log.fault_id is null
+                or alert_log.id = alert_log_groups.min_id
+                or (
+                    coalesce((select ar.notify_per_entity from alert_rules ar where ar.id = alert_log.rule_id), 0) = 1
+                    and alert_log_groups.fault_count <= coalesce((select ar.max_entities from alert_rules ar where ar.id = alert_log.rule_id), ?)
+                )
+            )', [$defaultMax]);
 
         $sort = $request->input('sort');
         if (isset($sort['severity']) || isset($sort['alert_rule'])) {
@@ -141,27 +144,48 @@ class AlertLogController extends TableController
     {
         $details = is_array($model->details) ? $model->details : [];
         $entity_count = 1;
-        $siblings = collect();
-        if ($model->fault_id) {
-            $siblings = AlertLog::query()
+
+        if ($model->fault_id && $model->rule) {
+            // Count siblings without loading/decompressing their details blobs.
+            $sibling_query = fn () => AlertLog::query()
                 ->where('device_id', $model->device_id)
                 ->where('rule_id', $model->rule_id)
                 ->where('state', $model->state->value)
                 ->where('time_logged', $model->time_logged)
-                ->whereNotNull('fault_id')
-                ->get(['id', 'details']);
-        }
-        if ($model->fault_id && $model->rule && AlertUtil::shouldGroupFaultDetails($model->rule, $siblings->count())) {
-            $entity_count = $siblings->count();
-            if ($entity_count > 1) {
+                ->whereNotNull('fault_id');
+
+            $sibling_count = $sibling_query()->count();
+
+            if ($sibling_count > 1 && AlertUtil::shouldGroupFaultDetails($model->rule, $sibling_count)) {
+                $entity_count = $sibling_count;
+
+                // Only now (when grouping) load the detail blobs, chunked and stopping once
+                // we have enough rows to fill the inline display cap.
                 $rows = [];
-                foreach ($siblings as $sibling) {
-                    foreach ((array) ($sibling->details['rule'] ?? []) as $row) {
-                        $rows[] = $row;
-                    }
-                }
+                $sibling_query()
+                    ->orderBy('id')
+                    ->select(['id', 'details'])
+                    ->chunk(200, function ($chunk) use (&$rows): bool {
+                        foreach ($chunk as $sibling) {
+                            foreach ((array) ($sibling->details['rule'] ?? []) as $row) {
+                                $rows[] = $row;
+                                if (count($rows) >= self::INLINE_DETAIL_ROW_LIMIT) {
+                                    return false; // stop loading, we have enough to display
+                                }
+                            }
+                        }
+
+                        return true;
+                    });
                 $details = ['rule' => $rows] + $details;
             }
+        }
+
+        // Bound the rows handed to the parser so a single very large alert cannot exhaust
+        // memory while rendering the collapsed inline detail. The full entity count is still
+        // shown in the label, and complete details remain available via the details endpoint.
+        if (isset($details['rule']) && is_array($details['rule']) && count($details['rule']) > self::INLINE_DETAIL_ROW_LIMIT) {
+            $details['rule'] = array_slice($details['rule'], 0, self::INLINE_DETAIL_ROW_LIMIT);
         }
 
         $fault_detail = view('alerts.fault-detail', [

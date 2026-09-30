@@ -202,7 +202,7 @@ readonly class AlertRules
             Log::info(PHP_EOL . 'Status: %gOK%n', ['color' => true]);
         }
 
-        $this->syncAlertState($rule);
+        $this->syncAlertState($rule, logStateChange: true);
     }
 
     /**
@@ -236,8 +236,11 @@ readonly class AlertRules
     /**
      * Update the rule-level alerts row from the current open fault count.
      * Worse/better is derived from the count delta (replaces the old fault diffing).
+     *
+     * @param  bool  $logStateChange  when true, append a rule-level alert_log entry for
+     *                                worse/better/changed escalation transitions (poll path only)
      */
-    public function syncAlertState(AlertRule $rule): void
+    public function syncAlertState(AlertRule $rule, bool $logStateChange = false): void
     {
         $base = AlertFault::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)->where('open', 1);
         $activeCount = (clone $base)->where('state', '!=', AlertState::RECOVERED)->count();
@@ -272,8 +275,13 @@ readonly class AlertRules
             $alertRow->info = $info;
             if ($stateChanged) {
                 $alertRow->open = 1;
-                // Keep alerted when entering acknowledged so runAcks can dedupe via alerted=ACK after notify.
-                if ($newState !== AlertState::ACKNOWLEDGED) {
+                // Reset alerted so the dispatcher re-notifies on escalation. Two exceptions:
+                //  - ACKNOWLEDGED: runAcks dedupes via alerted=ACK after notifying.
+                //  - RECOVERED: it shares value 0 with the reset, so zeroing alerted would make
+                //    runAlerts see alerted == state and skip the recovery notification. Leaving it
+                //    at the previous (active) value lets the recovery fire once, then runAlerts
+                //    sets alerted = RECOVERED itself.
+                if ($newState !== AlertState::ACKNOWLEDGED && $newState !== AlertState::RECOVERED) {
                     $alertRow->alerted = 0;
                 }
                 $alertRow->timestamp = Carbon::now();
@@ -292,5 +300,42 @@ readonly class AlertRules
             $alertRow->info = ['open_fault_count' => $activeCount];
             $alertRow->save();
         }
+
+        // Individual fault add/recover events are already logged per-entity. When requested
+        // (poll path), also record the rule-level escalation transition so the history shows
+        // worse/better/changed as distinct entries.
+        if ($logStateChange && $stateChanged
+            && in_array($newState, [AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true)) {
+            $this->logRuleStateChange($rule, $newState);
+        }
+    }
+
+    /**
+     * Append a rule-level alert_log entry (not tied to a single fault) capturing the current set
+     * of open faults for the rule/device at the moment of an escalation transition.
+     */
+    private function logRuleStateChange(AlertRule $rule, int $state): void
+    {
+        $rows = [];
+        foreach (AlertFault::query()
+            ->where('rule_id', $rule->id)
+            ->where('device_id', $this->device->device_id)
+            ->where('open', 1)
+            ->where('state', '!=', AlertState::RECOVERED)
+            ->orderBy('id')
+            ->get(['details']) as $fault) {
+            foreach ((array) ($fault->details['rule'] ?? []) as $row) {
+                $rows[] = $row;
+            }
+        }
+
+        AlertLog::create([
+            'rule_id' => $rule->id,
+            'device_id' => $this->device->device_id,
+            'fault_id' => null,
+            'state' => $state,
+            'time_logged' => Carbon::now(),
+            'details' => ['rule' => $rows, 'contacts' => AlertUtil::getContacts($rows)],
+        ]);
     }
 }
