@@ -249,7 +249,6 @@ class AlertUtil
 
     /**
      * @param  array<string, mixed>  $row
-     * @param  array<string, mixed>  $profile
      */
     private static function identityTriggerPresent(array $row, string $trigger): bool
     {
@@ -771,7 +770,7 @@ class AlertUtil
 
     public static function defaultMaxEntities(): int
     {
-        return max(1, (int) LibrenmsConfig::get('alert_rule.default_max_entities', 10));
+        return max(1, (int) LibrenmsConfig::get('alert_rule.default_max_entities', 20));
     }
 
     public static function maxEntitiesForRule(AlertRule $rule): int

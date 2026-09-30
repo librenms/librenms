@@ -41,19 +41,8 @@ class AlertDetailsController
 
         $details = $alertLog->details['rule'] ?? null;
 
-        $batchCount = 1;
+        $siblings = collect();
         if ($alertLog->fault_id) {
-            $batchCount = AlertLog::query()
-                ->where('device_id', $alertLog->device_id)
-                ->where('rule_id', $alertLog->rule_id)
-                ->where('state', $alertLog->state->value)
-                ->where('time_logged', $alertLog->time_logged)
-                ->whereNotNull('fault_id')
-                ->count();
-        }
-
-        if ($alertLog->fault_id && $alertLog->rule && AlertUtil::shouldGroupFaultDetails($alertLog->rule, $batchCount)) {
-            $rows = [];
             $siblings = AlertLog::query()
                 ->where('device_id', $alertLog->device_id)
                 ->where('rule_id', $alertLog->rule_id)
@@ -61,6 +50,10 @@ class AlertDetailsController
                 ->where('time_logged', $alertLog->time_logged)
                 ->whereNotNull('fault_id')
                 ->get(['id', 'details']);
+        }
+
+        if ($alertLog->fault_id && $alertLog->rule && AlertUtil::shouldGroupFaultDetails($alertLog->rule, $siblings->count())) {
+            $rows = [];
             foreach ($siblings as $sibling) {
                 foreach ((array) ($sibling->details['rule'] ?? []) as $row) {
                     $rows[] = $row;

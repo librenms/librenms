@@ -141,17 +141,8 @@ class AlertLogController extends TableController
     {
         $details = is_array($model->details) ? $model->details : [];
         $entity_count = 1;
-        $batchCount = 1;
+        $siblings = collect();
         if ($model->fault_id) {
-            $batchCount = AlertLog::query()
-                ->where('device_id', $model->device_id)
-                ->where('rule_id', $model->rule_id)
-                ->where('state', $model->state->value)
-                ->where('time_logged', $model->time_logged)
-                ->whereNotNull('fault_id')
-                ->count();
-        }
-        if ($model->fault_id && $model->rule && AlertUtil::shouldGroupFaultDetails($model->rule, $batchCount)) {
             $siblings = AlertLog::query()
                 ->where('device_id', $model->device_id)
                 ->where('rule_id', $model->rule_id)
@@ -159,6 +150,8 @@ class AlertLogController extends TableController
                 ->where('time_logged', $model->time_logged)
                 ->whereNotNull('fault_id')
                 ->get(['id', 'details']);
+        }
+        if ($model->fault_id && $model->rule && AlertUtil::shouldGroupFaultDetails($model->rule, $siblings->count())) {
             $entity_count = $siblings->count();
             if ($entity_count > 1) {
                 $rows = [];
