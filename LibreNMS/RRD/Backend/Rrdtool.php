@@ -50,7 +50,7 @@ class Rrdtool implements RrdBackendInterface
      * Close rrdtool process.
      * This should be done before exiting
      */
-    public function terminate(): void
+    public function _destruct(): void
     {
         $this->rrd?->stop();
     }

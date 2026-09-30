@@ -38,6 +38,7 @@ use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\Exceptions\RrdStoreException;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\RRD\RrdPath;
+use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Rewrite;
 use Log;
 use Symfony\Component\Process\Process;
@@ -47,6 +48,7 @@ class Rrd extends BaseDatastore
     private bool $disabled = false;
     private int $updateErrorCount = 0;
 
+    private ?RrdProcess $rrd = null;
     private RrdBackendInterface $backend;
     private string $version;
     private string $rrdcached;
@@ -88,13 +90,18 @@ class Rrd extends BaseDatastore
         $this->backend = resolve(RrdBackendInterface::class);
     }
 
+    private function startRrd(): void
+    {
+        $this->rrd ??= app(RrdProcess::class, ['timeout' => 600]);
+    }
+
     /**
      * Close rrdtool process.
      * This should be done before exiting
      */
     public function terminate(): void
     {
-        $this->backend->terminate();
+        $this->rrd?->stop();
     }
 
     /**
@@ -193,8 +200,7 @@ class Rrd extends BaseDatastore
      */
     public function tune(string $type, RrdPath $rrd, int $max): bool
     {
-        // tune only works on the local filesystem - use the fully qualified path the RRD file
-        $filename = $rrd->fullPath();
+        $this->startRrd();
 
         $fields = [];
         if ($type === 'port') {
@@ -221,18 +227,19 @@ class Rrd extends BaseDatastore
             ];
         }
         if (count($fields) > 0) {
-            $cmd = [LibrenmsConfig::get('rrdtool', 'rrdtool'), 'tune', $filename];
+            $command = ['tune', $rrd];
             foreach ($fields as $field) {
-                array_push($cmd, '--maximum', $field . ':' . $max);
+                array_push($command, '--maximum', $field . ':' . $max);
             }
-            Log::debug('[%gRRD ' . implode(' ', $cmd) . '%n]', ['color' => true]);
 
+            $ret = true;
             $stat = Measurement::start('other');
-            $process = app()->make(Process::class, ['command' => $cmd]);
-            $process->disableOutput();
-            $process->run();
-
-            $ret = $process->isSuccessful();
+            try {
+                $this->rrd->run(implode(' ', $command));
+            } catch (RrdException $e) {
+                Log::debug('RRD tune failed: ' . $e->getMessage());
+                $ret = false;
+            }
 
             $this->recordStatistic($stat->end());
         } else {

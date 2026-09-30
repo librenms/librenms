@@ -31,12 +31,6 @@ use LibreNMS\Exceptions\RrdException;
 interface RrdBackendInterface
 {
     /**
-     * Clean up
-     * This should be done before exiting
-     */
-    public function terminate(): void;
-
-    /**
      * Create a rrd database at $filename using the supplied arguments
      *
      * @param  string[]  $def

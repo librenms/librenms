@@ -55,7 +55,7 @@ class PhpRrd implements RrdBackendInterface
     /**
      * Close rrdcachedSocket
      */
-    public function terminate(): void
+    public function _destruct(): void
     {
         if ($this->rrdcachedSocket) {
             fclose($this->rrdcachedSocket);
