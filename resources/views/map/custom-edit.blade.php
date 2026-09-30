@@ -11,6 +11,13 @@
 @include('map.custom-legend-modal')
 @include('map.custom-map-list-modal')
 
+<div id="custom-map-context-menu"
+     class="tw:hidden tw:fixed tw:z-50 tw:min-w-48 tw:bg-white tw:dark:bg-dark-gray-400 tw:text-slate-800 tw:dark:text-dark-white-100 tw:border tw:border-gray-200 tw:dark:border-dark-gray-100 tw:rounded-lg tw:shadow-xl tw:py-1 tw:text-sm
+">
+  <div id="context-menu-header" class="tw:px-3 tw:py-1.5 tw:font-bold tw:border-b tw:border-gray-100 tw:dark:border-dark-gray-300 tw:text-xs tw:text-slate-500 tw:dark:text-dark-white-300 tw:truncate"></div>
+  <div id="context-menu-items" class="tw:flex tw:flex-col"></div>
+</div>
+
 <div class="container-fluid">
   <div class="row" id="control-row">
     <div class="col-md-5">
@@ -410,6 +417,126 @@
                 $("#map-renderButton").show();
             }
         });
+
+        network.on('oncontext', function (params) {
+            if (params.event.shiftKey) return;
+            params.event.preventDefault();
+
+            // Make sure the add node / add edge modes are not active
+            network.disableEditMode();
+            network.enableEditMode();
+
+            var domX = params.event.clientX;
+            var domY = params.event.clientY;
+            var nodeId = network.getNodeAt(params.pointer.DOM);
+            var edgeId = network.getEdgeAt(params.pointer.DOM);
+
+            var menuItems = [];
+            var menuHeader = '';
+
+            var recenter = false;
+            if (nodeId) {
+                var label;
+                if(nodeId.endsWith("_mid")) {
+                    menuHeader = "{{ __('Edge') }}";
+                    label = "{{ __('Edit Edge') }}";
+                    recenter = nodeId;
+                } else if (nodeId.startsWith("legend_")) {
+                    menuHeader = "{{ __('Legend') }}";
+                    label = "{{ __('Edit Legend') }}";
+                } else {
+                    menuHeader = "{{ __('Node') }}";
+                    label = "{{ __('Edit Node') }}";
+                }
+                const node = network_nodes.get(nodeId);
+                menuItems.push({
+                    icon: 'fa-solid fa-pen',
+                    label: label,
+                    action: function () { checkEditNode(node); }
+                });
+            } else if (edgeId) {
+                const edge = network_edges.get(edgeId);
+                menuHeader = "{{ __('Edge') }}";
+                menuItems.push({
+                    icon: 'fa-solid fa-pen',
+                    label: "{{ __('Edit Edge') }}",
+                    action: function () { editExistingEdge(edge, null); }
+                });
+                recenter = edgeId;
+            } else {
+                menuHeader = "{{ __('Map') }}";
+                menuItems.push({
+                    icon: 'fa-solid fa-circle-plus',
+                    label: "{{ __('Add Node') }}",
+                    action: function () { network.addNodeMode(); }
+                });
+                menuItems.push({
+                    icon: 'fa-solid fa-circle-arrow-right',
+                    label: "{{ __('Add Edge') }}",
+                    action: function () { network.addEdgeMode(); }
+                });
+                menuItems.push({ divider: true });
+                menuItems.push({
+                    icon: 'fa-solid fa-pen',
+                    label: "{{ __('map.custom.edit.map.edit') }}",
+                    action: function () { editMapSettings(); }
+                });
+                menuItems.push({
+                    icon: 'fa-solid fa-image',
+                    label: "{{ __('map.custom.edit.bg.title') }}",
+                    action: function () { editMapBackground(); }
+                });
+                menuItems.push({
+                    icon: 'fa-solid fa-network-wired',
+                    label: "{{ __('map.custom.edit.node.edit_defaults') }}",
+                    action: function () { nodeEdit(newnodeconf); }
+                });
+                menuItems.push({
+                    icon: 'fa-solid fa-arrows-left-right-to-line',
+                    label: "{{ __('map.custom.edit.edge.edit_defaults') }}",
+                    action: function () { edgeEditDefaults(); }
+                });
+                menuItems.push({
+                    icon: 'fa-solid fa-bars',
+                    label: "{{ __('map.custom.edit.map.legend_toggle') }}",
+                    action: function () { toggleLegend(); }
+                });
+                if($("#map-renderButton").is(":visible")) {
+                    menuItems.push({
+                        icon: 'fa-solid fa-brush',
+                        label: "{{ __('map.custom.edit.map.rerender') }}",
+                        action: function () { CreateNetwork(); }
+                    });
+                }
+                if($("#map-saveDataButton").is(":visible")) {
+                    menuItems.push({
+                        icon: 'fa-solid fa-floppy-disk',
+                        label: "{{ __('map.custom.edit.map.save') }}",
+                        action: function () { saveMapData(); }
+                    });
+                }
+            }
+
+            if (recenter) {
+                const edgedata = getEdgeData(recenter);
+                menuItems.push({
+                    icon: 'fa-solid fa-arrows-to-circle',
+                    label: "{{ __('Recenter Edge') }}",
+                    action: function () {
+                        const pos = network.getPositions([edgedata.edge1.from, edgedata.edge2.from]);
+                        const mid_pos = getMidPos(edgedata.id, edgedata.edge1.from, edgedata.edge2.from);
+
+                        edgedata.mid.x = mid_pos.x;
+                        edgedata.mid.y = mid_pos.y;
+                        network_nodes.update([edgedata.mid]);
+                        $("#map-renderButton").show();
+                    }
+                });
+            }
+
+            showContextMenu(menuHeader, menuItems, domX, domY);
+        });
+
         $("#map-renderButton").hide();
     }
 
@@ -704,24 +831,22 @@
         return default_val;
     }
 
+    function getEdgeData (edgeId) {
+        const edgeinfo = edgeId.split("_");
+
+        const mid = network_nodes.get(edgeinfo[0] + "_mid");
+        const edge1 = network_edges.get(edgeinfo[0] + "_from");
+        const edge2 = network_edges.get(edgeinfo[0] + "_to");
+
+        return {id: edgeinfo[0], mid: mid, edge1: edge1, edge2: edge2}
+    }
+
     function editExistingEdge (edge, callback) {
         if(callback) {
             callback(null);
         }
-        var edgeinfo = edge.id.split("_");
 
-        if(edgeinfo[1] == "to") {
-            edge1 = network_edges.get(edgeinfo[0] + "_from");
-            edge2 = network_edges.get(edge.id);
-        } else {
-            edge1 = network_edges.get(edge.id);
-            edge2 = network_edges.get(edgeinfo[0] + "_to");
-        }
-        var mid = network_nodes.get(edgeinfo[0] + "_mid");
-
-        var edgedata = {id: edgeinfo[0], mid: mid, edge1: edge1, edge2: edge2}
-
-        edgeEdit(edgedata);
+        edgeEdit(getEdgeData(edge.id));
     }
 
     function deleteEdge(edgeid) {
@@ -873,6 +998,52 @@
         }
     }
 
+    function showContextMenu(header, items, x, y) {
+        var $menu = $('#custom-map-context-menu');
+        var $header = $('#context-menu-header');
+        var $items = $('#context-menu-items');
+
+        if (header) {
+            $header.text(header).show();
+        } else {
+            $header.hide();
+        }
+
+        $items.empty();
+        items.forEach(function (item) {
+            if (item.divider) {
+                $items.append('<div class="tw:border-t tw:border-gray-100 tw:dark:border-dark-gray-300 tw:my-1"></div>');
+                return;
+            }
+            var $btn = $('<button type="button" class="tw:w-full tw:text-left tw:px-3 tw:py-1.5 tw:hover:bg-blue-50 tw:dark:hover:bg-dark-gray-300 tw:flex tw:items-center tw:gap-2 tw:text-slate-700 tw:dark:text-dark-white-200 tw:transition-colors"></button>');
+            if (item.icon) {
+                $btn.append($('<i class="' + item.icon + ' tw:w-4 tw:text-center tw:text-slate-400 tw:dark:text-dark-white-400"></i>'));
+            }
+            $btn.append($('<span></span>').text(item.label));
+            $btn.on('click', function () {
+                closeContextMenu();
+                if (item.action) item.action();
+            });
+            $items.append($btn);
+        });
+
+        $menu.show().removeClass('tw:hidden');
+
+        var menuW = $menu.outerWidth() || 200;
+        var menuH = $menu.outerHeight() || 200;
+        var winW = $(window).width();
+        var winH = $(window).height();
+
+        if (x + menuW > winW - 10) x = winW - menuW - 10;
+        if (y + menuH > winH - 10) y = winH - menuH - 10;
+
+        $menu.css({ left: x + 'px', top: y + 'px' });
+    }
+
+    function closeContextMenu () {
+        $('#custom-map-context-menu').hide().addClass('tw:hidden');
+    }
+
     function observeEditMode() {
         const targetNode = document.getElementsByClassName("vis-manipulation")[0];
 
@@ -897,6 +1068,16 @@
 
         // watch for addNode/editNode
         observeEditMode();
+
+        // bind event to close context menu
+        if (!$(document).data('custommap-context-bound')) {
+            $(document).data('custommap-context-bound', true)
+                .on('click', function (e) {
+                    if (!$(e.target).closest('#custom-map-context-menu').length) {
+                        closeContextMenu();
+                    }
+                });
+        }
    });
 </script>
 @endsection
