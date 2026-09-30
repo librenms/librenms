@@ -1,6 +1,7 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+
 $device = DeviceCache::getPrimary();
 // Load our list of available applications
 $applications = [];
