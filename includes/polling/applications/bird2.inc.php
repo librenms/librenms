@@ -21,10 +21,10 @@ $protocolsData = [];
 
 // Remove headers
 $birdOutput = trim(explode('Name       Proto      Table      State  Since         Info', (string) $birdOutput, 2)[1]);
-$protocolSegments = explode("\n\n", $birdOutput);
-
-// Remove the first title
-unset($protocolSegments[0]);
+// Each protocol block starts at column 0 and its detail lines are indented, so
+// split on that instead of on blank lines: the SNMP layer strips blank lines out
+// of multi-line values, which left this with a single unusable segment.
+$protocolSegments = preg_split('/\n(?=\S)/', $birdOutput);
 
 foreach ($protocolSegments as $protocolSegment) {
     // Deal with the title first
@@ -173,7 +173,7 @@ foreach ($protocolsData as $protocol) {
 
     $bgpPeer->bgpLocalAddr = $protocol['source_address'] ?? '0.0.0.0';
     $bgpPeer->bgpPeerRemoteAddr = $protocol['neighbor_address'];
-    $bgpPeer->bgpPeerDescr = $protocol['description'] ?: $protocol['name'];
+    $bgpPeer->bgpPeerDescr = ($protocol['description'] ?? '') ?: $protocol['name'];
     $bgpPeer->bgpPeerInUpdates = intval($protocol['route_change_stats']['import_updates']['accepted'] ?? 0);
     $bgpPeer->bgpPeerOutUpdates = intval($protocol['route_change_stats']['export_updates']['accepted'] ?? 0);
     $bgpPeer->bgpPeerInTotalMessages = intval($protocol['route_change_stats']['import_updates']['received'] ?? 0);
