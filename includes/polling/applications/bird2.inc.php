@@ -157,18 +157,23 @@ foreach ($protocolsData as $protocol) {
     $bgpPeer->bgpPeerState = strtolower((string) $protocol['bgp_state']);
     $bgpPeer->bgpPeerAdminStatus = str_replace('up', 'start', strtolower((string) $protocol['protocol_state']));
 
-    if (isset($protocolData['last_error'])) {
+    if (isset($protocol['last_error'])) {
         // Find the subcode if its there and set it
         foreach (trans('bgp.error_subcodes') as $mainCode => $subCodes) {
             foreach ($subCodes as $subCode => $message) {
-                if ($message == $protocolData['last_error']) {
+                if ($message == $protocol['last_error']) {
                     $bgpPeer->bgpPeerLastErrorCode = $mainCode;
                     $bgpPeer->bgpPeerLastErrorSubCode = $subCode;
                 }
             }
         }
 
-        $bgpPeer->bgpPeerLastErrorText = $protocol['neighbor_id'] ?? '0.0.0.0';
+        $bgpPeer->bgpPeerLastErrorText = $protocol['last_error'];
+    } else {
+        // birdc only reports Last error while one applies, so clear a stale one
+        $bgpPeer->bgpPeerLastErrorCode = 0;
+        $bgpPeer->bgpPeerLastErrorSubCode = 0;
+        $bgpPeer->bgpPeerLastErrorText = '';
     }
 
     $bgpPeer->bgpLocalAddr = $protocol['source_address'] ?? '0.0.0.0';
