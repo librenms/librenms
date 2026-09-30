@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Ajax;
 
 use App\Models\AlertLog;
+use LibreNMS\Alert\AlertUtil;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 
@@ -40,7 +41,18 @@ class AlertDetailsController
 
         $details = $alertLog->details['rule'] ?? null;
 
-        if ($alertLog->fault_id && $alertLog->rule && ! $alertLog->rule->notify_per_entity) {
+        $batchCount = 1;
+        if ($alertLog->fault_id) {
+            $batchCount = AlertLog::query()
+                ->where('device_id', $alertLog->device_id)
+                ->where('rule_id', $alertLog->rule_id)
+                ->where('state', $alertLog->state->value)
+                ->where('time_logged', $alertLog->time_logged)
+                ->whereNotNull('fault_id')
+                ->count();
+        }
+
+        if ($alertLog->fault_id && $alertLog->rule && AlertUtil::shouldGroupFaultDetails($alertLog->rule, $batchCount)) {
             $rows = [];
             $siblings = AlertLog::query()
                 ->where('device_id', $alertLog->device_id)

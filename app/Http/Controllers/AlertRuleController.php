@@ -69,6 +69,7 @@ class AlertRuleController extends Controller
             'adv_query' => $alertRule->query,
             'invert_map' => $alertRule->invert_map,
             'notify_per_entity' => $alertRule->notify_per_entity,
+            'max_entities' => $alertRule->max_entities,
         ]);
     }
 
@@ -180,6 +181,7 @@ class AlertRuleController extends Controller
             'notes',
             'invert_map',
             'notify_per_entity',
+            'max_entities',
         ]));
         $alertRule->disabled ??= false;
         $alertRule->builder = json_decode((string) $request->validated('builder_json', '[]'), true);

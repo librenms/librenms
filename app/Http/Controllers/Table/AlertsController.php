@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
@@ -208,9 +209,14 @@ class AlertsController extends TableController
             $query->where('alert_faults.state', '!=', AlertState::RECOVERED);
         }
 
-        // Per-entity rules show every fault; grouped rules collapse to one row per device+rule.
+        // Per-entity rules show every fault until the entity ceiling; then collapse like grouped rules.
+        $openCountSql = AlertUtil::sqlOpenFaultCountForRow();
+        $defaultMax = AlertUtil::defaultMaxEntities();
         $query->whereRaw('(
-            coalesce((select ar.notify_per_entity from alert_rules ar where ar.id = alert_faults.rule_id), 0) = 1
+            (
+                coalesce((select ar.notify_per_entity from alert_rules ar where ar.id = alert_faults.rule_id), 0) = 1
+                and ' . $openCountSql . ' <= coalesce((select ar.max_entities from alert_rules ar where ar.id = alert_faults.rule_id), ?)
+            )
             or alert_faults.id = (
                 select min(f2.id) from alert_faults f2
                 where f2.device_id = alert_faults.device_id
@@ -218,7 +224,7 @@ class AlertsController extends TableController
                   and f2.open = 1
                   and f2.state != ?
             )
-        )', [AlertState::RECOVERED]);
+        )', [$defaultMax, AlertState::RECOVERED]);
 
         $sort = $request->input('sort', []);
         if (isset($sort['severity']) || isset($sort['rule'])) {
@@ -272,16 +278,12 @@ class AlertsController extends TableController
 
     private function entityCount(AlertFault $fault): int
     {
-        if ($fault->rule?->notify_per_entity) {
+        $count = AlertUtil::openEntityCountForRuleDevice((int) $fault->rule_id, (int) $fault->device_id);
+        if ($fault->rule && AlertUtil::shouldNotifyPerEntity($fault->rule, $count)) {
             return 1;
         }
 
-        return AlertFault::query()
-            ->where('device_id', $fault->device_id)
-            ->where('rule_id', $fault->rule_id)
-            ->where('open', 1)
-            ->where('state', '!=', AlertState::RECOVERED)
-            ->count();
+        return $count;
     }
 
     /**
@@ -291,7 +293,8 @@ class AlertsController extends TableController
     {
         $details = is_array($fault->details) ? $fault->details : [];
 
-        if ($fault->rule && ! $fault->rule->notify_per_entity) {
+        $openCount = AlertUtil::openEntityCountForRuleDevice((int) $fault->rule_id, (int) $fault->device_id);
+        if ($fault->rule && AlertUtil::shouldGroupFaultDetails($fault->rule, $openCount)) {
             $rows = [];
             $siblings = AlertFault::query()
                 ->where('device_id', $fault->device_id)

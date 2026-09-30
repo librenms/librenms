@@ -426,6 +426,14 @@
             "section": "rules",
             "order": 8
         },
+        "alert_rule.default_max_entities": {
+            "default": 20,
+            "units": "count",
+            "group": "alerting",
+            "section": "rules",
+            "order": 3,
+            "type": "integer"
+        },
         "discovery_on_reboot": {
             "default": false,
             "type": "boolean",

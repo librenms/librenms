@@ -28,6 +28,7 @@ namespace LibreNMS\Alert;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Alert;
+use App\Models\AlertFault;
 use App\Models\AlertOperationSegment;
 use App\Models\AlertRule;
 use App\Models\BgpPeer;
@@ -43,6 +44,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Enum\AlertRuleOperationPhase;
+use LibreNMS\Enum\AlertState;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class AlertUtil
@@ -765,5 +767,56 @@ class AlertUtil
         }
 
         return $rule;
+    }
+
+    public static function defaultMaxEntities(): int
+    {
+        return max(1, (int) LibrenmsConfig::get('alert_rule.default_max_entities', 10));
+    }
+
+    public static function maxEntitiesForRule(AlertRule $rule): int
+    {
+        if ($rule->max_entities !== null) {
+            return max(1, (int) $rule->max_entities);
+        }
+
+        return self::defaultMaxEntities();
+    }
+
+    public static function openEntityCountForRuleDevice(int $ruleId, int $deviceId): int
+    {
+        return AlertFault::query()
+            ->where('rule_id', $ruleId)
+            ->where('device_id', $deviceId)
+            ->where('open', 1)
+            ->where('state', '!=', AlertState::RECOVERED)
+            ->count();
+    }
+
+    /**
+     * Per-entity notify is only effective while open entity count is within the rule limit.
+     */
+    public static function shouldNotifyPerEntity(AlertRule $rule, int $openEntityCount): bool
+    {
+        if (! $rule->notify_per_entity) {
+            return false;
+        }
+
+        return $openEntityCount <= self::maxEntitiesForRule($rule);
+    }
+
+    public static function shouldGroupFaultDetails(AlertRule $rule, int $entityCount): bool
+    {
+        return ! self::shouldNotifyPerEntity($rule, $entityCount);
+    }
+
+    /**
+     * SQL fragment: count of open, non-recovered faults for the same rule+device as {@see $faultsAlias}.
+     */
+    public static function sqlOpenFaultCountForRow(string $faultsAlias = 'alert_faults'): string
+    {
+        return '(select count(*) from alert_faults f_count where f_count.device_id = ' . $faultsAlias . '.device_id'
+            . ' and f_count.rule_id = ' . $faultsAlias . '.rule_id and f_count.open = 1 and f_count.state != '
+            . AlertState::RECOVERED . ')';
     }
 }

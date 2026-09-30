@@ -46,6 +46,7 @@ use LibreNMS\Enum\AlertState;
  * @property array<string, mixed>|null $builder
  * @property bool|int $invert_map
  * @property bool|int $notify_per_entity
+ * @property int|null $max_entities
  * @property int|null $alert_operation_id
  * @property AlertOperation|null $alertOperation
  */
@@ -80,6 +81,7 @@ class AlertRule extends BaseModel
         'builder',
         'invert_map',
         'notify_per_entity',
+        'max_entities',
         'alert_operation_id',
     ];
 
@@ -93,6 +95,7 @@ class AlertRule extends BaseModel
             'extra' => 'array',
             'alert_operation_id' => 'integer',
             'notify_per_entity' => 'boolean',
+            'max_entities' => 'integer',
         ];
     }
 
