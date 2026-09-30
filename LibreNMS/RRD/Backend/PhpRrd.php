@@ -29,27 +29,17 @@ namespace LibreNMS\RRD\Backend;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdGraphException;
-use LibreNMS\Util\Debug;
 use Log;
 
 class PhpRrd implements RrdBackendInterface
 {
-    /** @var resource|null */
-    private $rrdcachedSocket = null;
+    private ?RrdcachedSocketCmd $rrdcachedSocket = null;
     private readonly string $rrdcached;
 
     public function __construct()
     {
         // Create a RrdtoolRrd to fall through to
         $this->rrdcached = LibrenmsConfig::get('rrdcached', '');
-
-        putenv('LC_ALL=C'); // force english/standard output
-        if ($this->rrdcached) {
-            putenv('RRDCACHED_ADDRESS=' . $this->rrdcached);
-        }
-        if (session('preferences.timezone')) {
-            putenv('TZ=' . session('preferences.timezone'));
-        }
     }
 
     /**
@@ -57,34 +47,14 @@ class PhpRrd implements RrdBackendInterface
      */
     public function _destruct(): void
     {
-        if ($this->rrdcachedSocket) {
-            fclose($this->rrdcachedSocket);
-        }
     }
 
-    private function rrdcachedSocketConnect(): void
+    private function socketCmd(): RrdcachedSocketCmd
     {
         // Only connect once
-        if ($this->rrdcachedSocket) {
-            return;
-        }
+        $this->rrdcachedSocket ??= new RrdcachedSocketCmd();
 
-        if (! $this->rrdcached) {
-            throw new \Exception('SocketRrd only works with rrdcached');
-        }
-
-        if (str_starts_with($this->rrdcached, 'unix:/')) {
-            $this->rrdcachedSocket = stream_socket_client(str_replace('unix:/', 'unix:///', $this->rrdcached), $errno, $errstr, 30);
-        } else {
-            $this->rrdcachedSocket = stream_socket_client('tcp://' . $this->rrdcached, $errno, $errstr, 30);
-        }
-
-        if (! $this->rrdcachedSocket) {
-            throw new \Exception('Error connecting to rrdcached: ' . $errstr);
-        }
-
-        // 60 second timeout per command
-        stream_set_timeout($this->rrdcachedSocket, 60, 0);
+        return $this->rrdcachedSocket;
     }
 
     /**
@@ -96,6 +66,10 @@ class PhpRrd implements RrdBackendInterface
      */
     public function create(string $filename, array $data): void
     {
+        if ($this->rrdcached) {
+            $data = ['-d', $this->rrdcached, ...$data];
+        }
+
         Log::debug('PHPRRD[%gcreate ' . implode(' ', $data) . '%n]', ['color' => true]);
         if (! rrd_create($filename, $data)) {
             Log::warning('Error creating RRD file: ' . rrd_error());
@@ -109,11 +83,15 @@ class PhpRrd implements RrdBackendInterface
      */
     public function update(string $filename, array $data): void
     {
-        $data = 'N:' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data));
-        Log::debug("PHPRRD[%gupdate $filename $data%n]", ['color' => true]);
+        $data = ['N:' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data))];
+        if ($this->rrdcached) {
+            $data = ['-d', $this->rrdcached, ...$data];
+        }
+
+        Log::debug("PHPRRD[%gupdate $filename " . implode(' ', $data) . '%n]', ['color' => true]);
 
         // The \RRDUpdater class does not use rrdcached, so we need to use the function
-        if (! rrd_update($filename, [$data])) {
+        if (! rrd_update($filename, $data)) {
             throw RrdException::parse(rrd_error());
         }
     }
@@ -122,9 +100,7 @@ class PhpRrd implements RrdBackendInterface
     {
         if ($this->rrdcached) {
             // PHP-RRD does not support this command - use a direct connection to rrdcached
-            $this->rrdcachedSocketConnect();
-
-            return $this->socketCmd("LAST $filename");
+            return $this->socketCmd()->last($filename);
         }
 
         Log::debug("PHPRRD[%glast $filename%n]", ['color' => true]);
@@ -143,25 +119,7 @@ class PhpRrd implements RrdBackendInterface
     public function list(string $dir, string|array $prefix): array
     {
         if ($this->rrdcached) {
-            $this->rrdcachedSocketConnect();
-
-            $cmd = "LIST $dir";
-            Log::debug("SRRD[%g$cmd%n]", ['color' => true]);
-            fwrite($this->rrdcachedSocket, "$cmd\n");
-            $line = fgets($this->rrdcachedSocket);
-
-            if (! preg_match('/(-?\d+) (.+)/', $line, $matches)) {
-                throw new \Exception("Error reading data from rrdcached: $line");
-            }
-
-            if ((int) $matches[1] < 0 || $matches[2] != 'RRDs') {
-                throw RrdException::parse($matches[2]);
-            }
-
-            $ret = [];
-            for ($i = 0; $i < (int) $matches[1]; $i++) {
-                $ret[] = trim(fgets($this->rrdcachedSocket));
-            }
+            $ret = $this->socketCmd()->list($dir);
         } else {
             // No cached - it's just a single level file list, so we can use scandir
             $ret = array_diff(scandir($dir), ['.', '..']);
@@ -175,6 +133,8 @@ class PhpRrd implements RrdBackendInterface
      */
     public function graph(array $options): string
     {
+        $savedEnv = $this->saveEnv();
+
         Log::debug('PHPRRD[%graph ' . implode(' ', $options) . '%n]', ['color' => true]);
         $rrd = new \RRDGraph('-');
         $rrd->setOptions($options);
@@ -182,29 +142,46 @@ class PhpRrd implements RrdBackendInterface
             $data = $rrd->saveVerbose();
         } catch (\Exception $e) {
             throw new RrdGraphException($e->getMessage());
+        } finally {
+            $this->restoreEnv($savedEnv);
         }
 
         return $data['image'];
     }
 
-    private function socketCmd(string $cmd, bool $ignoreErrors = false): string
+    /**
+     * @param  string[]  $savedEnv
+     */
+    private function restoreEnv($savedEnv): void
     {
-        Log::debug("SRRD[%g$cmd%n]", ['color' => true]);
-        fwrite($this->rrdcachedSocket, "$cmd\n");
-        $line = fgets($this->rrdcachedSocket);
+        foreach ($savedEnv as $key => $value) {
+            if ($value) {
+                putenv("$key=$value"); // Restore environment variable
+            } else {
+                putenv($key); // Remove environment variable
+            }
+        }
+    }
 
-        if (! preg_match('/(-?\d+) (.+)/', $line, $matches)) {
-            throw new \Exception("Error reading data from rrdcached: $line");
+    /**
+     * @return string[]
+     */
+    private function saveEnv(): array
+    {
+        $ret = [
+            'LC_ALL' => getenv('LC_ALL'),
+            'TZ' => ('TZ'),
+            'RRDCACHED_ADDRESS' => ('RRDCACHED_ADDRESS'),
+        ];
+
+        putenv('LC_ALL=C'); // force english/standard output
+        if ($this->rrdcached) {
+            putenv('RRDCACHED_ADDRESS=' . $this->rrdcached);
+        }
+        if (session('preferences.timezone')) {
+            putenv('TZ=' . session('preferences.timezone'));
         }
 
-        if ((int) $matches[1] < 0 && ! $ignoreErrors) {
-            throw RrdException::parse($matches[2]);
-        }
-
-        if (Debug::isVerbose() && $matches[2]) {
-            Log::debug('rrdcached Output: ' . $matches[2]);
-        }
-
-        return $matches[2];
+        return $ret;
     }
 }

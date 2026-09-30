@@ -86,7 +86,7 @@ class Rrd extends BaseDatastore
             ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
             ' RRA:LAST:0.5:1:2016 '
         )));
-        $this->version = LibrenmsConfig::get('rrdtool_version', '1.4');
+        $this->version = LibrenmsConfig::get('rrdtool_version', '0');
         $this->backend = resolve(RrdBackendInterface::class);
     }
 
@@ -237,7 +237,9 @@ class Rrd extends BaseDatastore
             try {
                 $this->rrd->run(implode(' ', $command));
             } catch (RrdException $e) {
-                Log::debug('RRD tune failed: ' . $e->getMessage());
+                if (! $e instanceof RrdNotFoundException) {
+                    Log::debug('RRD tune failed: ' . $e->getMessage());
+                }
                 $ret = false;
             }
 
@@ -315,7 +317,7 @@ class Rrd extends BaseDatastore
     {
         if ($command == 'create') {
             // <1.4.3 doesn't support -O, so make sure the file doesn't exist
-            if (version_compare(LibrenmsConfig::get('rrdtool_version', '1.4'), '1.4.3', '<')) {
+            if (version_compare(LibrenmsConfig::get('rrdtool_version', '0'), '1.4.3', '<')) {
                 if (is_file($filename)) {
                     throw new RrdFileExistsException();
                 }

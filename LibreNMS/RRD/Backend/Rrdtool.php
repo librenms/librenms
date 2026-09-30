@@ -35,15 +35,11 @@ use Log;
 
 class Rrdtool implements RrdBackendInterface
 {
-    private ?RrdProcess $rrd = null;
+    private readonly RrdProcess $rrd;
 
     public function __construct()
     {
-    }
-
-    private function init(int $timeout = 600): void
-    {
-        $this->rrd ??= app(RrdProcess::class, ['timeout' => $timeout]);
+        $this->rrd = app(RrdProcess::class, ['timeout' => 1200]);
     }
 
     /**
@@ -52,7 +48,7 @@ class Rrdtool implements RrdBackendInterface
      */
     public function _destruct(): void
     {
-        $this->rrd?->stop();
+        $this->rrd->stop();
     }
 
     /**
@@ -89,7 +85,6 @@ class Rrdtool implements RrdBackendInterface
         $cmd = Rrd::buildCommand($command, $filename, $options);
         $commandLine = implode(' ', $cmd);
 
-        $this->init();
         $output = $this->rrd->run($commandLine);
 
         if (Debug::isVerbose() && $output) {
@@ -122,10 +117,7 @@ class Rrdtool implements RrdBackendInterface
     {
         try {
             $command = Rrd::buildCommand('graph', '-', $options);
-
-            $this->init(300);
             $image = $this->rrd->run('"' . implode('" "', $command) . '"');
-            $this->rrd->stop();
 
             return $image;
         } catch (RrdException $e) {
