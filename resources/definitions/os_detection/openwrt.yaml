@@ -2,7 +2,6 @@ os: openwrt
 text: OpenWrt
 type: network
 icon: openwrt
-mib_dir: openwrt
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

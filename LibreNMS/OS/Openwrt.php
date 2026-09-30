@@ -45,27 +45,31 @@ class Openwrt extends OS implements
     WirelessSnrDiscovery,
     WirelessUtilizationDiscovery
 {
-    private const STATS = ['min' => 'Min', 'avg' => 'Avg', 'max' => 'Max'];
-
-    /** @var array<string, string>|null ifIndex => label */
-    private ?array $labels = null;
-
     public function discoverWirelessClients()
     {
-        $sensors = $this->ifaceSensors(WirelessSensorType::Clients, 'openwrtWlIfaceClients');
-
-        if (count($sensors) > 1) {
-            $total = SnmpQuery::numeric()->get('OPENWRT-WIRELESS-MIB::openwrtWirelessClientCount.0')->values();
-            if ($total) {
+        $sensors = [];
+        foreach ($this->wirelessTable() as $ifIndex => $row) {
+            if (isset($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceClients'])) {
                 $sensors[] = new WirelessSensor(
                     WirelessSensorType::Clients,
                     $this->getDeviceId(),
-                    array_key_first($total),
+                    '.1.3.6.1.4.1.66510.1.10.3.1.4.' . $ifIndex,
                     'openwrt',
-                    'total',
-                    'Total clients'
+                    (string) $ifIndex,
+                    $this->wirelessLabel($row, $ifIndex)
                 );
             }
+        }
+
+        if (count($sensors) > 1 && SnmpQuery::get('OPENWRT-WIRELESS-MIB::openwrtWirelessClientCount.0')->value() !== '') {
+            $sensors[] = new WirelessSensor(
+                WirelessSensorType::Clients,
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.66510.1.10.2.0',
+                'openwrt',
+                'total',
+                'Total clients'
+            );
         }
 
         return $sensors;
@@ -73,21 +77,66 @@ class Openwrt extends OS implements
 
     public function discoverWirelessFrequency()
     {
-        return $this->ifaceSensors(WirelessSensorType::Frequency, 'openwrtWlIfaceFrequency');
+        $sensors = [];
+        foreach ($this->wirelessTable() as $ifIndex => $row) {
+            if (isset($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceFrequency'])) {
+                $sensors[] = new WirelessSensor(
+                    WirelessSensorType::Frequency,
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.66510.1.10.3.1.5.' . $ifIndex,
+                    'openwrt',
+                    (string) $ifIndex,
+                    $this->wirelessLabel($row, $ifIndex)
+                );
+            }
+        }
+
+        return $sensors;
     }
 
     public function discoverWirelessNoiseFloor()
     {
-        return $this->ifaceSensors(WirelessSensorType::NoiseFloor, 'openwrtWlIfaceNoiseFloor');
+        $sensors = [];
+        foreach ($this->wirelessTable() as $ifIndex => $row) {
+            if (isset($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceNoiseFloor'])) {
+                $sensors[] = new WirelessSensor(
+                    WirelessSensorType::NoiseFloor,
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.66510.1.10.3.1.6.' . $ifIndex,
+                    'openwrt',
+                    (string) $ifIndex,
+                    $this->wirelessLabel($row, $ifIndex)
+                );
+            }
+        }
+
+        return $sensors;
     }
 
     public function discoverWirelessRate()
     {
         $sensors = [];
-        foreach (['tx' => 'Tx', 'rx' => 'Rx'] as $dir => $column) {
-            foreach (self::STATS as $stat => $suffix) {
-                // the agent reports Mbit/s, LibreNMS stores bps
-                array_push($sensors, ...$this->ifaceSensors(WirelessSensorType::Rate, "openwrtWlIface{$column}Rate$suffix", "openwrt-$dir", $stat, 1000000));
+        foreach ([
+            ['OPENWRT-WIRELESS-MIB::openwrtWlIfaceTxRateMin', '.1.3.6.1.4.1.66510.1.10.3.1.7', 'openwrt-tx', 'min'],
+            ['OPENWRT-WIRELESS-MIB::openwrtWlIfaceTxRateAvg', '.1.3.6.1.4.1.66510.1.10.3.1.8', 'openwrt-tx', 'avg'],
+            ['OPENWRT-WIRELESS-MIB::openwrtWlIfaceTxRateMax', '.1.3.6.1.4.1.66510.1.10.3.1.9', 'openwrt-tx', 'max'],
+            ['OPENWRT-WIRELESS-MIB::openwrtWlIfaceRxRateMin', '.1.3.6.1.4.1.66510.1.10.3.1.10', 'openwrt-rx', 'min'],
+            ['OPENWRT-WIRELESS-MIB::openwrtWlIfaceRxRateAvg', '.1.3.6.1.4.1.66510.1.10.3.1.11', 'openwrt-rx', 'avg'],
+            ['OPENWRT-WIRELESS-MIB::openwrtWlIfaceRxRateMax', '.1.3.6.1.4.1.66510.1.10.3.1.12', 'openwrt-rx', 'max'],
+        ] as [$column, $oid, $subtype, $stat]) {
+            foreach ($this->wirelessTable() as $ifIndex => $row) {
+                if (isset($row[$column])) {
+                    $sensors[] = new WirelessSensor(
+                        WirelessSensorType::Rate,
+                        $this->getDeviceId(),
+                        $oid . '.' . $ifIndex,
+                        $subtype,
+                        "$subtype-$ifIndex-$stat",
+                        $this->wirelessLabel($row, $ifIndex) . " $stat",
+                        null,
+                        1000000 // the agent reports Mbit/s, LibreNMS stores bps
+                    );
+                }
             }
         }
 
@@ -97,8 +146,23 @@ class Openwrt extends OS implements
     public function discoverWirelessSnr()
     {
         $sensors = [];
-        foreach (self::STATS as $stat => $suffix) {
-            array_push($sensors, ...$this->ifaceSensors(WirelessSensorType::Snr, "openwrtWlIfaceSnr$suffix", 'openwrt', $stat));
+        foreach ([
+            ['OPENWRT-WIRELESS-MIB::openwrtWlIfaceSnrMin', '.1.3.6.1.4.1.66510.1.10.3.1.13', 'min'],
+            ['OPENWRT-WIRELESS-MIB::openwrtWlIfaceSnrAvg', '.1.3.6.1.4.1.66510.1.10.3.1.14', 'avg'],
+            ['OPENWRT-WIRELESS-MIB::openwrtWlIfaceSnrMax', '.1.3.6.1.4.1.66510.1.10.3.1.15', 'max'],
+        ] as [$column, $oid, $stat]) {
+            foreach ($this->wirelessTable() as $ifIndex => $row) {
+                if (isset($row[$column])) {
+                    $sensors[] = new WirelessSensor(
+                        WirelessSensorType::Snr,
+                        $this->getDeviceId(),
+                        $oid . '.' . $ifIndex,
+                        'openwrt',
+                        "openwrt-$ifIndex-$stat",
+                        $this->wirelessLabel($row, $ifIndex) . " $stat"
+                    );
+                }
+            }
         }
 
         return $sensors;
@@ -106,39 +170,52 @@ class Openwrt extends OS implements
 
     public function discoverWirelessUtilization()
     {
-        return $this->ifaceSensors(WirelessSensorType::Utilization, 'openwrtWlIfaceChannelUtil');
+        $sensors = [];
+        foreach ($this->wirelessTable() as $ifIndex => $row) {
+            if (isset($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceChannelUtil'])) {
+                $sensors[] = new WirelessSensor(
+                    WirelessSensorType::Utilization,
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.66510.1.10.3.1.16.' . $ifIndex,
+                    'openwrt',
+                    (string) $ifIndex,
+                    $this->wirelessLabel($row, $ifIndex)
+                );
+            }
+        }
+
+        return $sensors;
     }
 
     public function discoverWirelessPower()
     {
-        return $this->ifaceSensors(WirelessSensorType::Power, 'openwrtWlIfaceTxPower');
-    }
-
-    /**
-     * One sensor per wireless interface that reports the given column.
-     *
-     * @return WirelessSensor[]
-     */
-    private function ifaceSensors(WirelessSensorType $type, string $column, string $subtype = 'openwrt', ?string $stat = null, int $multiplier = 1): array
-    {
-        $this->labels ??= SnmpQuery::walk('OPENWRT-WIRELESS-MIB::openwrtWlIfaceLabel')->pluck();
-
         $sensors = [];
-        foreach (SnmpQuery::numeric()->walk("OPENWRT-WIRELESS-MIB::$column")->groupByIndex() as $ifIndex => $values) {
-            $name = trim($this->labels[$ifIndex] ?? '') ?: (string) $ifIndex;
-
-            $sensors[] = new WirelessSensor(
-                $type,
-                $this->getDeviceId(),
-                array_key_first($values),
-                $subtype,
-                $stat === null ? (string) $ifIndex : "$subtype-$ifIndex-$stat",
-                $stat === null ? $name : "$name $stat",
-                null,
-                $multiplier
-            );
+        foreach ($this->wirelessTable() as $ifIndex => $row) {
+            if (isset($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceTxPower'])) {
+                $sensors[] = new WirelessSensor(
+                    WirelessSensorType::Power,
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.66510.1.10.3.1.17.' . $ifIndex,
+                    'openwrt',
+                    (string) $ifIndex,
+                    $this->wirelessLabel($row, $ifIndex)
+                );
+            }
         }
 
         return $sensors;
+    }
+
+    /**
+     * @return array<int|string, array<string, mixed>>
+     */
+    private function wirelessTable(): array
+    {
+        return SnmpQuery::cache()->walk('OPENWRT-WIRELESS-MIB::openwrtWirelessInterfaceTable')->table(1);
+    }
+
+    private function wirelessLabel(array $row, int|string $ifIndex): string
+    {
+        return trim((string) ($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceLabel'] ?? '')) ?: (string) $ifIndex;
     }
 }
