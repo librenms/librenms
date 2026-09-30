@@ -1,0 +1,1207 @@
+# The CMS700 MIB defines every branch as its own scalar (e.g. CMS700::TRMSsens1..N)
+# served without a .0 instance, so each sensor is listed explicitly.
+# oid is the MIB root node so one walk fetches the value, branch name and phase
+# for every entry; num_oid uses {{ $noindex }} because there is no instance index.
+# Branches with an empty branch name are not wired up and are skipped.
+modules:
+    sensors:
+        current:
+            data:
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens1
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.1{{ $noindex }}'
+                    index: 'TRMSsens.1'
+                    descr: 'TRMSsens_1 {{ CMS700::BranchNamesens1 }} (L{{ CMS700::Phasesens1 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens1, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens2
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.2{{ $noindex }}'
+                    index: 'TRMSsens.2'
+                    descr: 'TRMSsens_2 {{ CMS700::BranchNamesens2 }} (L{{ CMS700::Phasesens2 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens2, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens3
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.3{{ $noindex }}'
+                    index: 'TRMSsens.3'
+                    descr: 'TRMSsens_3 {{ CMS700::BranchNamesens3 }} (L{{ CMS700::Phasesens3 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens3, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens4
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.4{{ $noindex }}'
+                    index: 'TRMSsens.4'
+                    descr: 'TRMSsens_4 {{ CMS700::BranchNamesens4 }} (L{{ CMS700::Phasesens4 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens4, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens5
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.5{{ $noindex }}'
+                    index: 'TRMSsens.5'
+                    descr: 'TRMSsens_5 {{ CMS700::BranchNamesens5 }} (L{{ CMS700::Phasesens5 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens5, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens6
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.6{{ $noindex }}'
+                    index: 'TRMSsens.6'
+                    descr: 'TRMSsens_6 {{ CMS700::BranchNamesens6 }} (L{{ CMS700::Phasesens6 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens6, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens7
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.7{{ $noindex }}'
+                    index: 'TRMSsens.7'
+                    descr: 'TRMSsens_7 {{ CMS700::BranchNamesens7 }} (L{{ CMS700::Phasesens7 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens7, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens8
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.8{{ $noindex }}'
+                    index: 'TRMSsens.8'
+                    descr: 'TRMSsens_8 {{ CMS700::BranchNamesens8 }} (L{{ CMS700::Phasesens8 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens8, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens9
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.9{{ $noindex }}'
+                    index: 'TRMSsens.9'
+                    descr: 'TRMSsens_9 {{ CMS700::BranchNamesens9 }} (L{{ CMS700::Phasesens9 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens9, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens10
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.10{{ $noindex }}'
+                    index: 'TRMSsens.10'
+                    descr: 'TRMSsens_10 {{ CMS700::BranchNamesens10 }} (L{{ CMS700::Phasesens10 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens10, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens11
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.11{{ $noindex }}'
+                    index: 'TRMSsens.11'
+                    descr: 'TRMSsens_11 {{ CMS700::BranchNamesens11 }} (L{{ CMS700::Phasesens11 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens11, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens12
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.12{{ $noindex }}'
+                    index: 'TRMSsens.12'
+                    descr: 'TRMSsens_12 {{ CMS700::BranchNamesens12 }} (L{{ CMS700::Phasesens12 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens12, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens13
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.13{{ $noindex }}'
+                    index: 'TRMSsens.13'
+                    descr: 'TRMSsens_13 {{ CMS700::BranchNamesens13 }} (L{{ CMS700::Phasesens13 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens13, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens14
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.14{{ $noindex }}'
+                    index: 'TRMSsens.14'
+                    descr: 'TRMSsens_14 {{ CMS700::BranchNamesens14 }} (L{{ CMS700::Phasesens14 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens14, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens15
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.15{{ $noindex }}'
+                    index: 'TRMSsens.15'
+                    descr: 'TRMSsens_15 {{ CMS700::BranchNamesens15 }} (L{{ CMS700::Phasesens15 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens15, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens16
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.16{{ $noindex }}'
+                    index: 'TRMSsens.16'
+                    descr: 'TRMSsens_16 {{ CMS700::BranchNamesens16 }} (L{{ CMS700::Phasesens16 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens16, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens17
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.17{{ $noindex }}'
+                    index: 'TRMSsens.17'
+                    descr: 'TRMSsens_17 {{ CMS700::BranchNamesens17 }} (L{{ CMS700::Phasesens17 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens17, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens18
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.18{{ $noindex }}'
+                    index: 'TRMSsens.18'
+                    descr: 'TRMSsens_18 {{ CMS700::BranchNamesens18 }} (L{{ CMS700::Phasesens18 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens18, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens19
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.19{{ $noindex }}'
+                    index: 'TRMSsens.19'
+                    descr: 'TRMSsens_19 {{ CMS700::BranchNamesens19 }} (L{{ CMS700::Phasesens19 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens19, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens20
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.20{{ $noindex }}'
+                    index: 'TRMSsens.20'
+                    descr: 'TRMSsens_20 {{ CMS700::BranchNamesens20 }} (L{{ CMS700::Phasesens20 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens20, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens21
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.21{{ $noindex }}'
+                    index: 'TRMSsens.21'
+                    descr: 'TRMSsens_21 {{ CMS700::BranchNamesens21 }} (L{{ CMS700::Phasesens21 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens21, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens22
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.22{{ $noindex }}'
+                    index: 'TRMSsens.22'
+                    descr: 'TRMSsens_22 {{ CMS700::BranchNamesens22 }} (L{{ CMS700::Phasesens22 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens22, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens23
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.23{{ $noindex }}'
+                    index: 'TRMSsens.23'
+                    descr: 'TRMSsens_23 {{ CMS700::BranchNamesens23 }} (L{{ CMS700::Phasesens23 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens23, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens24
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.24{{ $noindex }}'
+                    index: 'TRMSsens.24'
+                    descr: 'TRMSsens_24 {{ CMS700::BranchNamesens24 }} (L{{ CMS700::Phasesens24 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens24, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens25
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.25{{ $noindex }}'
+                    index: 'TRMSsens.25'
+                    descr: 'TRMSsens_25 {{ CMS700::BranchNamesens25 }} (L{{ CMS700::Phasesens25 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens25, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens26
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.26{{ $noindex }}'
+                    index: 'TRMSsens.26'
+                    descr: 'TRMSsens_26 {{ CMS700::BranchNamesens26 }} (L{{ CMS700::Phasesens26 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens26, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens27
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.27{{ $noindex }}'
+                    index: 'TRMSsens.27'
+                    descr: 'TRMSsens_27 {{ CMS700::BranchNamesens27 }} (L{{ CMS700::Phasesens27 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens27, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens28
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.28{{ $noindex }}'
+                    index: 'TRMSsens.28'
+                    descr: 'TRMSsens_28 {{ CMS700::BranchNamesens28 }} (L{{ CMS700::Phasesens28 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens28, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens29
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.29{{ $noindex }}'
+                    index: 'TRMSsens.29'
+                    descr: 'TRMSsens_29 {{ CMS700::BranchNamesens29 }} (L{{ CMS700::Phasesens29 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens29, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens30
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.30{{ $noindex }}'
+                    index: 'TRMSsens.30'
+                    descr: 'TRMSsens_30 {{ CMS700::BranchNamesens30 }} (L{{ CMS700::Phasesens30 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens30, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens31
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.31{{ $noindex }}'
+                    index: 'TRMSsens.31'
+                    descr: 'TRMSsens_31 {{ CMS700::BranchNamesens31 }} (L{{ CMS700::Phasesens31 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens31, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens32
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.32{{ $noindex }}'
+                    index: 'TRMSsens.32'
+                    descr: 'TRMSsens_32 {{ CMS700::BranchNamesens32 }} (L{{ CMS700::Phasesens32 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens32, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens33
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.33{{ $noindex }}'
+                    index: 'TRMSsens.33'
+                    descr: 'TRMSsens_33 {{ CMS700::BranchNamesens33 }} (L{{ CMS700::Phasesens33 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens33, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens34
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.34{{ $noindex }}'
+                    index: 'TRMSsens.34'
+                    descr: 'TRMSsens_34 {{ CMS700::BranchNamesens34 }} (L{{ CMS700::Phasesens34 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens34, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens35
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.35{{ $noindex }}'
+                    index: 'TRMSsens.35'
+                    descr: 'TRMSsens_35 {{ CMS700::BranchNamesens35 }} (L{{ CMS700::Phasesens35 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens35, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens36
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.36{{ $noindex }}'
+                    index: 'TRMSsens.36'
+                    descr: 'TRMSsens_36 {{ CMS700::BranchNamesens36 }} (L{{ CMS700::Phasesens36 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens36, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens37
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.37{{ $noindex }}'
+                    index: 'TRMSsens.37'
+                    descr: 'TRMSsens_37 {{ CMS700::BranchNamesens37 }} (L{{ CMS700::Phasesens37 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens37, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens38
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.38{{ $noindex }}'
+                    index: 'TRMSsens.38'
+                    descr: 'TRMSsens_38 {{ CMS700::BranchNamesens38 }} (L{{ CMS700::Phasesens38 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens38, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens39
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.39{{ $noindex }}'
+                    index: 'TRMSsens.39'
+                    descr: 'TRMSsens_39 {{ CMS700::BranchNamesens39 }} (L{{ CMS700::Phasesens39 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens39, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens40
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.40{{ $noindex }}'
+                    index: 'TRMSsens.40'
+                    descr: 'TRMSsens_40 {{ CMS700::BranchNamesens40 }} (L{{ CMS700::Phasesens40 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens40, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens41
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.41{{ $noindex }}'
+                    index: 'TRMSsens.41'
+                    descr: 'TRMSsens_41 {{ CMS700::BranchNamesens41 }} (L{{ CMS700::Phasesens41 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens41, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens42
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.42{{ $noindex }}'
+                    index: 'TRMSsens.42'
+                    descr: 'TRMSsens_42 {{ CMS700::BranchNamesens42 }} (L{{ CMS700::Phasesens42 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens42, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens43
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.43{{ $noindex }}'
+                    index: 'TRMSsens.43'
+                    descr: 'TRMSsens_43 {{ CMS700::BranchNamesens43 }} (L{{ CMS700::Phasesens43 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens43, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens44
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.44{{ $noindex }}'
+                    index: 'TRMSsens.44'
+                    descr: 'TRMSsens_44 {{ CMS700::BranchNamesens44 }} (L{{ CMS700::Phasesens44 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens44, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens45
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.45{{ $noindex }}'
+                    index: 'TRMSsens.45'
+                    descr: 'TRMSsens_45 {{ CMS700::BranchNamesens45 }} (L{{ CMS700::Phasesens45 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens45, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens46
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.46{{ $noindex }}'
+                    index: 'TRMSsens.46'
+                    descr: 'TRMSsens_46 {{ CMS700::BranchNamesens46 }} (L{{ CMS700::Phasesens46 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens46, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens47
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.47{{ $noindex }}'
+                    index: 'TRMSsens.47'
+                    descr: 'TRMSsens_47 {{ CMS700::BranchNamesens47 }} (L{{ CMS700::Phasesens47 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens47, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens48
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.48{{ $noindex }}'
+                    index: 'TRMSsens.48'
+                    descr: 'TRMSsens_48 {{ CMS700::BranchNamesens48 }} (L{{ CMS700::Phasesens48 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens48, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens49
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.49{{ $noindex }}'
+                    index: 'TRMSsens.49'
+                    descr: 'TRMSsens_49 {{ CMS700::BranchNamesens49 }} (L{{ CMS700::Phasesens49 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens49, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens50
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.50{{ $noindex }}'
+                    index: 'TRMSsens.50'
+                    descr: 'TRMSsens_50 {{ CMS700::BranchNamesens50 }} (L{{ CMS700::Phasesens50 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens50, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens51
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.51{{ $noindex }}'
+                    index: 'TRMSsens.51'
+                    descr: 'TRMSsens_51 {{ CMS700::BranchNamesens51 }} (L{{ CMS700::Phasesens51 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens51, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens52
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.52{{ $noindex }}'
+                    index: 'TRMSsens.52'
+                    descr: 'TRMSsens_52 {{ CMS700::BranchNamesens52 }} (L{{ CMS700::Phasesens52 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens52, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens53
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.53{{ $noindex }}'
+                    index: 'TRMSsens.53'
+                    descr: 'TRMSsens_53 {{ CMS700::BranchNamesens53 }} (L{{ CMS700::Phasesens53 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens53, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens54
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.54{{ $noindex }}'
+                    index: 'TRMSsens.54'
+                    descr: 'TRMSsens_54 {{ CMS700::BranchNamesens54 }} (L{{ CMS700::Phasesens54 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens54, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens55
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.55{{ $noindex }}'
+                    index: 'TRMSsens.55'
+                    descr: 'TRMSsens_55 {{ CMS700::BranchNamesens55 }} (L{{ CMS700::Phasesens55 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens55, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens56
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.56{{ $noindex }}'
+                    index: 'TRMSsens.56'
+                    descr: 'TRMSsens_56 {{ CMS700::BranchNamesens56 }} (L{{ CMS700::Phasesens56 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens56, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens57
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.57{{ $noindex }}'
+                    index: 'TRMSsens.57'
+                    descr: 'TRMSsens_57 {{ CMS700::BranchNamesens57 }} (L{{ CMS700::Phasesens57 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens57, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens58
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.58{{ $noindex }}'
+                    index: 'TRMSsens.58'
+                    descr: 'TRMSsens_58 {{ CMS700::BranchNamesens58 }} (L{{ CMS700::Phasesens58 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens58, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens59
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.59{{ $noindex }}'
+                    index: 'TRMSsens.59'
+                    descr: 'TRMSsens_59 {{ CMS700::BranchNamesens59 }} (L{{ CMS700::Phasesens59 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens59, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens60
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.60{{ $noindex }}'
+                    index: 'TRMSsens.60'
+                    descr: 'TRMSsens_60 {{ CMS700::BranchNamesens60 }} (L{{ CMS700::Phasesens60 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens60, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens61
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.61{{ $noindex }}'
+                    index: 'TRMSsens.61'
+                    descr: 'TRMSsens_61 {{ CMS700::BranchNamesens61 }} (L{{ CMS700::Phasesens61 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens61, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens62
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.62{{ $noindex }}'
+                    index: 'TRMSsens.62'
+                    descr: 'TRMSsens_62 {{ CMS700::BranchNamesens62 }} (L{{ CMS700::Phasesens62 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens62, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens63
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.63{{ $noindex }}'
+                    index: 'TRMSsens.63'
+                    descr: 'TRMSsens_63 {{ CMS700::BranchNamesens63 }} (L{{ CMS700::Phasesens63 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens63, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens64
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.64{{ $noindex }}'
+                    index: 'TRMSsens.64'
+                    descr: 'TRMSsens_64 {{ CMS700::BranchNamesens64 }} (L{{ CMS700::Phasesens64 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens64, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens65
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.65{{ $noindex }}'
+                    index: 'TRMSsens.65'
+                    descr: 'TRMSsens_65 {{ CMS700::BranchNamesens65 }} (L{{ CMS700::Phasesens65 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens65, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens66
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.66{{ $noindex }}'
+                    index: 'TRMSsens.66'
+                    descr: 'TRMSsens_66 {{ CMS700::BranchNamesens66 }} (L{{ CMS700::Phasesens66 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens66, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens67
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.67{{ $noindex }}'
+                    index: 'TRMSsens.67'
+                    descr: 'TRMSsens_67 {{ CMS700::BranchNamesens67 }} (L{{ CMS700::Phasesens67 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens67, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens68
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.68{{ $noindex }}'
+                    index: 'TRMSsens.68'
+                    descr: 'TRMSsens_68 {{ CMS700::BranchNamesens68 }} (L{{ CMS700::Phasesens68 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens68, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens69
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.69{{ $noindex }}'
+                    index: 'TRMSsens.69'
+                    descr: 'TRMSsens_69 {{ CMS700::BranchNamesens69 }} (L{{ CMS700::Phasesens69 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens69, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens70
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.70{{ $noindex }}'
+                    index: 'TRMSsens.70'
+                    descr: 'TRMSsens_70 {{ CMS700::BranchNamesens70 }} (L{{ CMS700::Phasesens70 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens70, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens71
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.71{{ $noindex }}'
+                    index: 'TRMSsens.71'
+                    descr: 'TRMSsens_71 {{ CMS700::BranchNamesens71 }} (L{{ CMS700::Phasesens71 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens71, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens72
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.72{{ $noindex }}'
+                    index: 'TRMSsens.72'
+                    descr: 'TRMSsens_72 {{ CMS700::BranchNamesens72 }} (L{{ CMS700::Phasesens72 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens72, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens73
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.73{{ $noindex }}'
+                    index: 'TRMSsens.73'
+                    descr: 'TRMSsens_73 {{ CMS700::BranchNamesens73 }} (L{{ CMS700::Phasesens73 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens73, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens74
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.74{{ $noindex }}'
+                    index: 'TRMSsens.74'
+                    descr: 'TRMSsens_74 {{ CMS700::BranchNamesens74 }} (L{{ CMS700::Phasesens74 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens74, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens75
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.75{{ $noindex }}'
+                    index: 'TRMSsens.75'
+                    descr: 'TRMSsens_75 {{ CMS700::BranchNamesens75 }} (L{{ CMS700::Phasesens75 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens75, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens76
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.76{{ $noindex }}'
+                    index: 'TRMSsens.76'
+                    descr: 'TRMSsens_76 {{ CMS700::BranchNamesens76 }} (L{{ CMS700::Phasesens76 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens76, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens77
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.77{{ $noindex }}'
+                    index: 'TRMSsens.77'
+                    descr: 'TRMSsens_77 {{ CMS700::BranchNamesens77 }} (L{{ CMS700::Phasesens77 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens77, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens78
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.78{{ $noindex }}'
+                    index: 'TRMSsens.78'
+                    descr: 'TRMSsens_78 {{ CMS700::BranchNamesens78 }} (L{{ CMS700::Phasesens78 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens78, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens79
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.79{{ $noindex }}'
+                    index: 'TRMSsens.79'
+                    descr: 'TRMSsens_79 {{ CMS700::BranchNamesens79 }} (L{{ CMS700::Phasesens79 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens79, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens80
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.80{{ $noindex }}'
+                    index: 'TRMSsens.80'
+                    descr: 'TRMSsens_80 {{ CMS700::BranchNamesens80 }} (L{{ CMS700::Phasesens80 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens80, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens81
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.81{{ $noindex }}'
+                    index: 'TRMSsens.81'
+                    descr: 'TRMSsens_81 {{ CMS700::BranchNamesens81 }} (L{{ CMS700::Phasesens81 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens81, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens82
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.82{{ $noindex }}'
+                    index: 'TRMSsens.82'
+                    descr: 'TRMSsens_82 {{ CMS700::BranchNamesens82 }} (L{{ CMS700::Phasesens82 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens82, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens83
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.83{{ $noindex }}'
+                    index: 'TRMSsens.83'
+                    descr: 'TRMSsens_83 {{ CMS700::BranchNamesens83 }} (L{{ CMS700::Phasesens83 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens83, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens84
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.84{{ $noindex }}'
+                    index: 'TRMSsens.84'
+                    descr: 'TRMSsens_84 {{ CMS700::BranchNamesens84 }} (L{{ CMS700::Phasesens84 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens84, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens85
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.85{{ $noindex }}'
+                    index: 'TRMSsens.85'
+                    descr: 'TRMSsens_85 {{ CMS700::BranchNamesens85 }} (L{{ CMS700::Phasesens85 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens85, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens86
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.86{{ $noindex }}'
+                    index: 'TRMSsens.86'
+                    descr: 'TRMSsens_86 {{ CMS700::BranchNamesens86 }} (L{{ CMS700::Phasesens86 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens86, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens87
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.87{{ $noindex }}'
+                    index: 'TRMSsens.87'
+                    descr: 'TRMSsens_87 {{ CMS700::BranchNamesens87 }} (L{{ CMS700::Phasesens87 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens87, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens88
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.88{{ $noindex }}'
+                    index: 'TRMSsens.88'
+                    descr: 'TRMSsens_88 {{ CMS700::BranchNamesens88 }} (L{{ CMS700::Phasesens88 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens88, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens89
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.89{{ $noindex }}'
+                    index: 'TRMSsens.89'
+                    descr: 'TRMSsens_89 {{ CMS700::BranchNamesens89 }} (L{{ CMS700::Phasesens89 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens89, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens90
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.90{{ $noindex }}'
+                    index: 'TRMSsens.90'
+                    descr: 'TRMSsens_90 {{ CMS700::BranchNamesens90 }} (L{{ CMS700::Phasesens90 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens90, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens91
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.91{{ $noindex }}'
+                    index: 'TRMSsens.91'
+                    descr: 'TRMSsens_91 {{ CMS700::BranchNamesens91 }} (L{{ CMS700::Phasesens91 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens91, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens92
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.92{{ $noindex }}'
+                    index: 'TRMSsens.92'
+                    descr: 'TRMSsens_92 {{ CMS700::BranchNamesens92 }} (L{{ CMS700::Phasesens92 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens92, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens93
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.93{{ $noindex }}'
+                    index: 'TRMSsens.93'
+                    descr: 'TRMSsens_93 {{ CMS700::BranchNamesens93 }} (L{{ CMS700::Phasesens93 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens93, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens94
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.94{{ $noindex }}'
+                    index: 'TRMSsens.94'
+                    descr: 'TRMSsens_94 {{ CMS700::BranchNamesens94 }} (L{{ CMS700::Phasesens94 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens94, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens95
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.95{{ $noindex }}'
+                    index: 'TRMSsens.95'
+                    descr: 'TRMSsens_95 {{ CMS700::BranchNamesens95 }} (L{{ CMS700::Phasesens95 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens95, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens96
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.96{{ $noindex }}'
+                    index: 'TRMSsens.96'
+                    descr: 'TRMSsens_96 {{ CMS700::BranchNamesens96 }} (L{{ CMS700::Phasesens96 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens96, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens97
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.97{{ $noindex }}'
+                    index: 'TRMSsens.97'
+                    descr: 'TRMSsens_97 {{ CMS700::BranchNamesens97 }} (L{{ CMS700::Phasesens97 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens97, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens98
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.98{{ $noindex }}'
+                    index: 'TRMSsens.98'
+                    descr: 'TRMSsens_98 {{ CMS700::BranchNamesens98 }} (L{{ CMS700::Phasesens98 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens98, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens99
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.99{{ $noindex }}'
+                    index: 'TRMSsens.99'
+                    descr: 'TRMSsens_99 {{ CMS700::BranchNamesens99 }} (L{{ CMS700::Phasesens99 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens99, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens100
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.100{{ $noindex }}'
+                    index: 'TRMSsens.100'
+                    descr: 'TRMSsens_100 {{ CMS700::BranchNamesens100 }} (L{{ CMS700::Phasesens100 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens100, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens101
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.101{{ $noindex }}'
+                    index: 'TRMSsens.101'
+                    descr: 'TRMSsens_101 {{ CMS700::BranchNamesens101 }} (L{{ CMS700::Phasesens101 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens101, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens102
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.102{{ $noindex }}'
+                    index: 'TRMSsens.102'
+                    descr: 'TRMSsens_102 {{ CMS700::BranchNamesens102 }} (L{{ CMS700::Phasesens102 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens102, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens103
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.103{{ $noindex }}'
+                    index: 'TRMSsens.103'
+                    descr: 'TRMSsens_103 {{ CMS700::BranchNamesens103 }} (L{{ CMS700::Phasesens103 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens103, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens104
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.104{{ $noindex }}'
+                    index: 'TRMSsens.104'
+                    descr: 'TRMSsens_104 {{ CMS700::BranchNamesens104 }} (L{{ CMS700::Phasesens104 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens104, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens105
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.105{{ $noindex }}'
+                    index: 'TRMSsens.105'
+                    descr: 'TRMSsens_105 {{ CMS700::BranchNamesens105 }} (L{{ CMS700::Phasesens105 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens105, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens106
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.106{{ $noindex }}'
+                    index: 'TRMSsens.106'
+                    descr: 'TRMSsens_106 {{ CMS700::BranchNamesens106 }} (L{{ CMS700::Phasesens106 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens106, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens107
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.107{{ $noindex }}'
+                    index: 'TRMSsens.107'
+                    descr: 'TRMSsens_107 {{ CMS700::BranchNamesens107 }} (L{{ CMS700::Phasesens107 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens107, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens108
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.108{{ $noindex }}'
+                    index: 'TRMSsens.108'
+                    descr: 'TRMSsens_108 {{ CMS700::BranchNamesens108 }} (L{{ CMS700::Phasesens108 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens108, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens109
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.109{{ $noindex }}'
+                    index: 'TRMSsens.109'
+                    descr: 'TRMSsens_109 {{ CMS700::BranchNamesens109 }} (L{{ CMS700::Phasesens109 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens109, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens110
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.110{{ $noindex }}'
+                    index: 'TRMSsens.110'
+                    descr: 'TRMSsens_110 {{ CMS700::BranchNamesens110 }} (L{{ CMS700::Phasesens110 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens110, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens111
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.111{{ $noindex }}'
+                    index: 'TRMSsens.111'
+                    descr: 'TRMSsens_111 {{ CMS700::BranchNamesens111 }} (L{{ CMS700::Phasesens111 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens111, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens112
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.112{{ $noindex }}'
+                    index: 'TRMSsens.112'
+                    descr: 'TRMSsens_112 {{ CMS700::BranchNamesens112 }} (L{{ CMS700::Phasesens112 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens112, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens113
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.113{{ $noindex }}'
+                    index: 'TRMSsens.113'
+                    descr: 'TRMSsens_113 {{ CMS700::BranchNamesens113 }} (L{{ CMS700::Phasesens113 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens113, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens114
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.114{{ $noindex }}'
+                    index: 'TRMSsens.114'
+                    descr: 'TRMSsens_114 {{ CMS700::BranchNamesens114 }} (L{{ CMS700::Phasesens114 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens114, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens115
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.115{{ $noindex }}'
+                    index: 'TRMSsens.115'
+                    descr: 'TRMSsens_115 {{ CMS700::BranchNamesens115 }} (L{{ CMS700::Phasesens115 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens115, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens116
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.116{{ $noindex }}'
+                    index: 'TRMSsens.116'
+                    descr: 'TRMSsens_116 {{ CMS700::BranchNamesens116 }} (L{{ CMS700::Phasesens116 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens116, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens117
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.117{{ $noindex }}'
+                    index: 'TRMSsens.117'
+                    descr: 'TRMSsens_117 {{ CMS700::BranchNamesens117 }} (L{{ CMS700::Phasesens117 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens117, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens118
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.118{{ $noindex }}'
+                    index: 'TRMSsens.118'
+                    descr: 'TRMSsens_118 {{ CMS700::BranchNamesens118 }} (L{{ CMS700::Phasesens118 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens118, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens119
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.119{{ $noindex }}'
+                    index: 'TRMSsens.119'
+                    descr: 'TRMSsens_119 {{ CMS700::BranchNamesens119 }} (L{{ CMS700::Phasesens119 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens119, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens120
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.120{{ $noindex }}'
+                    index: 'TRMSsens.120'
+                    descr: 'TRMSsens_120 {{ CMS700::BranchNamesens120 }} (L{{ CMS700::Phasesens120 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens120, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens121
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.121{{ $noindex }}'
+                    index: 'TRMSsens.121'
+                    descr: 'TRMSsens_121 {{ CMS700::BranchNamesens121 }} (L{{ CMS700::Phasesens121 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens121, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens122
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.122{{ $noindex }}'
+                    index: 'TRMSsens.122'
+                    descr: 'TRMSsens_122 {{ CMS700::BranchNamesens122 }} (L{{ CMS700::Phasesens122 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens122, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens123
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.123{{ $noindex }}'
+                    index: 'TRMSsens.123'
+                    descr: 'TRMSsens_123 {{ CMS700::BranchNamesens123 }} (L{{ CMS700::Phasesens123 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens123, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens124
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.124{{ $noindex }}'
+                    index: 'TRMSsens.124'
+                    descr: 'TRMSsens_124 {{ CMS700::BranchNamesens124 }} (L{{ CMS700::Phasesens124 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens124, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens125
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.125{{ $noindex }}'
+                    index: 'TRMSsens.125'
+                    descr: 'TRMSsens_125 {{ CMS700::BranchNamesens125 }} (L{{ CMS700::Phasesens125 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens125, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens126
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.126{{ $noindex }}'
+                    index: 'TRMSsens.126'
+                    descr: 'TRMSsens_126 {{ CMS700::BranchNamesens126 }} (L{{ CMS700::Phasesens126 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens126, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens127
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.127{{ $noindex }}'
+                    index: 'TRMSsens.127'
+                    descr: 'TRMSsens_127 {{ CMS700::BranchNamesens127 }} (L{{ CMS700::Phasesens127 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens127, op: '==', value: '' }
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::TRMSsens128
+                    num_oid: '.1.3.6.1.4.1.51055.1.1.128{{ $noindex }}'
+                    index: 'TRMSsens.128'
+                    descr: 'TRMSsens_128 {{ CMS700::BranchNamesens128 }} (L{{ CMS700::Phasesens128 }})'
+                    divisor: 100
+                    skip_values:
+                        - { oid: CMS700::BranchNamesens128, op: '==', value: '' }
+        voltage:
+            data:
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::uL1
+                    num_oid: '.1.3.6.1.4.1.51055.1.29.1{{ $noindex }}'
+                    index: 'uL.1'
+                    descr: 'Phase Voltage L1'
+                    divisor: 100
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::uL2
+                    num_oid: '.1.3.6.1.4.1.51055.1.29.2{{ $noindex }}'
+                    index: 'uL.2'
+                    descr: 'Phase Voltage L2'
+                    divisor: 100
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::uL3
+                    num_oid: '.1.3.6.1.4.1.51055.1.29.3{{ $noindex }}'
+                    index: 'uL.3'
+                    descr: 'Phase Voltage L3'
+                    divisor: 100
+        percent:
+            data:
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::thdUL1
+                    num_oid: '.1.3.6.1.4.1.51055.1.43.1{{ $noindex }}'
+                    index: 'thdUL.1'
+                    descr: 'Voltage THD L1'
+                    divisor: 100
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::thdUL2
+                    num_oid: '.1.3.6.1.4.1.51055.1.43.2{{ $noindex }}'
+                    index: 'thdUL.2'
+                    descr: 'Voltage THD L2'
+                    divisor: 100
+                -
+                    oid: CMS700::cms700
+                    value: CMS700::thdUL3
+                    num_oid: '.1.3.6.1.4.1.51055.1.43.3{{ $noindex }}'
+                    index: 'thdUL.3'
+                    descr: 'Voltage THD L3'
+                    divisor: 100
