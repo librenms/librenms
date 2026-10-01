@@ -443,12 +443,16 @@ class Rewrite
      * Take a BGP error code and subcode to return a string representation of it
      * https://www.iana.org/assignments/bgp-parameters/bgp-parameters.xhtml#bgp-parameters-3
      */
-    public static function bgpErrorCode(int|string $code, int|string $subcode): string
+    public static function bgpErrorCode(int|string|null $code, int|string|null $subcode): string
     {
         $codeKey = "bgp.error_codes.$code";
-        $subcodeKey = "bgp.error_subcodes.$code.$subcode";
-
         $codeMessage = __($codeKey);
+
+        if ($subcode === null || $subcode === '') {
+            return $codeMessage !== $codeKey ? $codeMessage : 'Unknown';
+        }
+
+        $subcodeKey = "bgp.error_subcodes.$code.$subcode";
         $subcodeMessage = __($subcodeKey);
 
         if ($subcodeMessage !== $subcodeKey) {
