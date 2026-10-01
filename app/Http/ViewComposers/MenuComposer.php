@@ -286,18 +286,19 @@ class MenuComposer
         $vars['routing_menu'] = $routing_menu;
 
         // Alert menu
-        $alert_status = AlertRule::select('severity')
+        $alert_counts = AlertRule::selectRaw('severity, COUNT(*) as count')
             ->isActive()
             ->hasAccess($user)
             ->leftJoin('devices', 'alerts.device_id', '=', 'devices.device_id')
             ->where('devices.disabled', '=', '0')
             ->where('devices.ignore', '=', '0')
             ->groupBy('severity')
-            ->pluck('severity');
+            ->pluck('count', 'severity');
+        $vars['alert_count'] = $alert_counts->sum();
 
-        if ($alert_status->contains('critical')) {
+        if ($alert_counts->has('critical')) {
             $vars['alert_menu_class'] = 'danger';
-        } elseif ($alert_status->contains('warning')) {
+        } elseif ($alert_counts->has('warning')) {
             $vars['alert_menu_class'] = 'warning';
         } else {
             $vars['alert_menu_class'] = 'success';
@@ -315,10 +316,6 @@ class MenuComposer
 
         // Poller Settings
         $vars['poller_clusters'] = \App\Models\PollerCluster::exists();
-
-        // Search bar
-        $vars['typeahead_limit'] = LibrenmsConfig::get('webui.global_search_result_limit');
-        $vars['global_search_ctrlf_focus'] = UserPref::getPref(Auth::user(), 'global_search_ctrlf_focus');
 
         // Plugins
         $vars['has_v1_plugins'] = Plugins::count() != 0;

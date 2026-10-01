@@ -9,7 +9,11 @@ $temps = trim((string) snmp_walk($device, $temps_oid, '-Osqn'));
 foreach (explode("\n", $temps) as $temp) {
     $temp = trim($temp);
     if ($temp) {
-        [$oid, $descr] = explode(' ', $temp, 2);
+        $parts = explode(' ', $temp, 2);
+        if (count($parts) < 2) {
+            continue;
+        }
+        [$oid, $descr] = $parts;
         if ($descr != '') {
             $split_oid = explode('.', $oid);
             $current_id = $split_oid[count($split_oid) - 1];

@@ -5,3 +5,26 @@ modules:
             - SKYLONE-MIB::productVersion
             - SKYLONE-MIB::productBuild
         version_template: '{{ SKYLONE-MIB::productVersion }} - {{ SKYLONE-MIB::productBuild }}'
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - SKYLONE-MIB::exmName
+                        - SKYLONE-MIB::mulName
+        bitrate:
+            data:
+                -
+                    oid: SKYLONE-MIB::mulBitrate
+                    num_oid: '.1.3.6.1.4.1.51009.11.2.1.6.{{ $index }}'
+                    index: 'mulBitrate.{{ $index }}'
+                    descr: '{{ $SKYLONE-MIB::mulName }}'
+                    group: 'mul'
+                    multiplier: 10
+                -
+                    oid: SKYLONE-MIB::exmBitrate
+                    num_oid: '.1.3.6.1.4.1.51009.10.2.1.7.{{ $index }}'
+                    index: 'exmBitrate.{{ $index }}'
+                    descr: '{{ $SKYLONE-MIB::exmName }}'
+                    group: 'exm'
+                    multiplier: 10

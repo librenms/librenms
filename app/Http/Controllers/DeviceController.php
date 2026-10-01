@@ -29,8 +29,6 @@ class DeviceController
             abort(404);
         }
 
-        $this->authorize('view', $device);
-
         DeviceCache::setPrimary($device_id);
 
         $current_tab = str_replace('tab=', '', $current_tab) ?: 'overview';
@@ -81,10 +79,8 @@ class DeviceController
 
         extract($data); // set preloaded data into variables
         include "includes/html/pages/device/$tab.inc.php";
-        $output = ob_get_clean();
-        ob_end_clean();
 
-        return $output;
+        return ob_get_clean();
     }
 
     public function rediscover(Device $device): JsonResponse
