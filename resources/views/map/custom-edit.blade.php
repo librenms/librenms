@@ -1183,7 +1183,7 @@
 
     document.addEventListener('alpine:init', () => {
         Alpine.data('customEditData', () => ({
-            showHelp: true,
+            showHelp: false,
 
             toggleHelp() {
                 this.showHelp = !this.showHelp;
