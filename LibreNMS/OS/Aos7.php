@@ -167,10 +167,10 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
 
             $ip = '0.0.0.0';
 
-            if ($hexIp = $this->decodeHexIp($ipRaw)) {
-                $ip = $hexIp;
-            } elseif (filter_var($ipRaw, FILTER_VALIDATE_IP)) {
+            if (filter_var($ipRaw, FILTER_VALIDATE_IP)) {
                 $ip = $ipRaw;
+            } elseif ($hexIp = $this->decodeHexIp($ipRaw)) {
+                $ip = $hexIp;
             } elseif (is_numeric($ipRaw) && $ipRaw > 0) {
                 $ip = long2ip((int) $ipRaw) ?: $ip;
             }
