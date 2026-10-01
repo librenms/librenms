@@ -54,7 +54,6 @@ $ajax_form = match ($_POST['type'] ?? '') {
     'search-oxidized-config' => 'includes/html/forms/search-oxidized-config.inc.php',
     'show-alert-transport' => 'includes/html/forms/show-alert-transport.inc.php',
     'show-transport-group' => 'includes/html/forms/show-transport-group.inc.php',
-    'storage-update' => 'includes/html/forms/storage-update.inc.php',
     'transport-groups' => 'includes/html/forms/transport-groups.inc.php',
     'update-ifalias' => 'includes/html/forms/update-ifalias.inc.php',
     'update-ifspeed' => 'includes/html/forms/update-ifspeed.inc.php',
