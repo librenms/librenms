@@ -70,6 +70,9 @@ final class AvailabilityMapControllerTest extends TestCase
         return (new ReflectionClass($controller))->getMethod($method)->invokeArgs($controller, $args);
     }
 
+    /**
+     * @return array<string, int>
+     */
     private function constant(string $name): array
     {
         return (new ReflectionClass(AvailabilityMapController::class))->getConstant($name);
