@@ -5,6 +5,7 @@ namespace App\View\Components;
 use App\Models\Port;
 use Illuminate\Support\Arr;
 use Illuminate\View\Component;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
@@ -71,11 +72,11 @@ class PortLink extends Component
 
     private function status(): string
     {
-        if ($this->port->ifAdminStatus == 'down') {
+        if ($this->port->ifAdminStatus == IfOperStatus::Down) {
             return 'disabled';
         }
 
-        return $this->port->ifAdminStatus == 'up' && $this->port->ifOperStatus != 'up'
+        return $this->port->ifAdminStatus == IfOperStatus::Up && $this->port->ifOperStatus != IfOperStatus::Up
             ? 'down'
             : 'up';
     }

@@ -28,41 +28,53 @@ namespace LibreNMS\Cache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Bill;
 use App\Models\Device;
+use App\Models\DeviceGroup;
 use App\Models\Port;
+use App\Models\PortGroup;
 use App\Models\User;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PermissionsCache
 {
-    private $devicePermissions;
-    private $portPermissions;
-    private $billPermissions;
-    private $deviceGroupMap;
+    /** @var array<int, Collection<object{user_id: int, device_id: int}>> */
+    private array $devicePermissions = [];
+
+    /** @var array<int, Collection<int>> */
+    private array $deviceGroupMap = [];
+
+    /** @var array<int, Collection<int>> */
+    private array $portGroupPermissions = [];
+
+    /** @var Collection<object{user_id: int, port_id: int}>|null */
+    private ?Collection $portPermissions = null;
+
+    /** @var Collection<object{user_id: int, bill_id: int}>|null */
+    private ?Collection $billPermissions = null;
 
     /**
      * Check if a device can be accessed by user (non-global read/admin)
      * If no user is given, use the logged in user
-     *
-     * @param  Device|int  $device
-     * @param  User|int  $user
-     * @return bool
      */
-    public function canAccessDevice($device, $user = null)
+    public function canAccessDevice(Device|int $device, User|int|null $user = null): bool
     {
         return $this->getDevicePermissions($user)
             ->contains('device_id', $this->getDeviceId($device));
     }
 
+    public function canAccessDeviceGroup(DeviceGroup|int $deviceGroup, User|int|null $user = null): bool
+    {
+        return $this->deviceGroupsForUser($user)
+            ->contains(is_int($deviceGroup) ? $deviceGroup : $deviceGroup->id);
+    }
+
     /**
      * Check if a access can be accessed by user (non-global read/admin)
      * If no user is given, use the logged in user
-     *
-     * @param  Port|int  $port
-     * @param  User|int  $user
-     * @return bool
      */
-    public function canAccessPort($port, $user = null)
+    public function canAccessPort(Port|int $port, User|int|null $user = null): bool
     {
         return $this->getPortPermissions()
             ->where('user_id', $this->getUserId($user))
@@ -71,14 +83,20 @@ class PermissionsCache
     }
 
     /**
+     * Check if a port group can be accessed by user (non-global read/admin)
+     * If no user is given, use the logged in user
+     */
+    public function canAccessPortGroup(PortGroup|int $portGroup, User|int|null $user = null): bool
+    {
+        return $this->portGroupsForUser($user)
+            ->contains(is_int($portGroup) ? $portGroup : $portGroup->id);
+    }
+
+    /**
      * Check if a bill can be accessed by user (non-global read/admin)
      * If no user is given, use the logged in user
-     *
-     * @param  Bill|int  $bill
-     * @param  User|int  $user
-     * @return bool
      */
-    public function canAccessBill($bill, $user = null)
+    public function canAccessBill(Bill|int $bill, User|int|null $user = null): bool
     {
         return $this->getBillPermissions()
             ->where('user_id', $this->getUserId($user))
@@ -87,27 +105,11 @@ class PermissionsCache
     }
 
     /**
-     * Get the user_id of users that have been granted access to device
-     *
-     * @param  Device|int  $device
-     * @return \Illuminate\Support\Collection
-     */
-    /*
-        public function usersForDevice($device)
-        {
-            return $this->getDevicePermissions()
-                ->where('device_id', $this->getDeviceId($device))
-                ->pluck('user_id');
-        }
-    */
-
-    /**
      * Get the user_id of users that have been granted access to port
      *
-     * @param  Port|int  $port
-     * @return \Illuminate\Support\Collection
+     * @return Collection<int>
      */
-    public function usersForPort($port)
+    public function usersForPort(Port|int $port): Collection
     {
         return $this->getPortPermissions()
             ->where('port_id', $this->getPortId($port))
@@ -117,10 +119,9 @@ class PermissionsCache
     /**
      * Get the user_id of users that have been granted access to bill
      *
-     * @param  Bill|int  $bill
-     * @return \Illuminate\Support\Collection
+     * @return Collection<int>
      */
-    public function usersForBill($bill)
+    public function usersForBill(Bill|int $bill): Collection
     {
         return $this->getBillPermissions()
             ->where('bill_id', $this->getBillId($bill))
@@ -130,10 +131,9 @@ class PermissionsCache
     /**
      * Get a list of device_id of all devices the user can access
      *
-     * @param  User|int  $user
-     * @return \Illuminate\Support\Collection
+     * @return Collection<int>
      */
-    public function devicesForUser($user = null)
+    public function devicesForUser(User|int|null $user = null): Collection
     {
         return $this->getDevicePermissions($user)
             ->pluck('device_id');
@@ -142,10 +142,9 @@ class PermissionsCache
     /**
      * Get a list of port_id of all ports the user can access directly
      *
-     * @param  User|int  $user
-     * @return \Illuminate\Support\Collection
+     * @return Collection<int>
      */
-    public function portsForUser($user = null)
+    public function portsForUser(User|int|null $user = null): Collection
     {
         return $this->getPortPermissions()
             ->where('user_id', $this->getUserId($user))
@@ -155,10 +154,9 @@ class PermissionsCache
     /**
      * Get a list of bill_id of all bills the user can access directly
      *
-     * @param  User|int  $user
-     * @return \Illuminate\Support\Collection
+     * @return Collection<int>
      */
-    public function billsForUser($user = null)
+    public function billsForUser(User|int|null $user = null): Collection
     {
         return $this->getBillPermissions()
             ->where('user_id', $this->getUserId($user))
@@ -168,41 +166,57 @@ class PermissionsCache
     /**
      * Get the ids of all device groups the user can access
      *
-     * @param  User|int  $user
-     * @return \Illuminate\Support\Collection
+     * @return Collection<int>
      */
-    public function deviceGroupsForUser($user = null)
+    public function deviceGroupsForUser(User|int|null $user = null): Collection
     {
         $user_id = $this->getUserId($user);
 
-        // if we don't have a map for this user yet, populate it.
-        if (! isset($this->deviceGroupMap[$user_id])) {
-            $this->deviceGroupMap[$user_id] = DB::table('device_group_device')
-                ->whereIntegerInRaw('device_id', $this->devicesForUser($user))
-                ->distinct('device_group_id')
-                ->pluck('device_group_id');
-        }
+        $this->deviceGroupMap[$user_id] ??= DB::table('device_group_device')
+            ->whereIntegerInRaw('device_id', $this->devicesForUser($user))
+            ->distinct('device_group_id')
+            ->pluck('device_group_id');
 
         return $this->deviceGroupMap[$user_id];
     }
 
     /**
-     * Get the cached data for device permissions.  Use helpers instead.
+     * Get the ids of all port groups the user can access
      *
-     * @param  User|int  $user
-     * @return \Illuminate\Support\Collection
+     * @return Collection<int>
      */
-    public function getDevicePermissions($user = null)
+    public function portGroupsForUser(User|int|null $user = null): Collection
     {
         $user_id = $this->getUserId($user);
 
-        if (! isset($this->devicePermissions[$user_id])) {
-            $this->devicePermissions[$user_id] = DB::table('devices_perms')
-                ->select(['user_id', 'device_id'])
-                ->where('user_id', $user_id)
-                ->union($this->getDeviceGroupPermissionsQuery()->where('user_id', $user_id))
-                ->get();
-        }
+        $this->portGroupPermissions[$user_id] ??= DB::table('port_groups')
+            ->leftJoin('port_group_port', 'port_groups.id', '=', 'port_group_port.port_group_id')
+            ->leftJoin('ports', 'ports.port_id', '=', 'port_group_port.port_id')
+            ->where(function ($query) use ($user): void {
+                $query->whereNull('port_group_port.port_group_id')
+                    ->orWhereIntegerInRaw('port_group_port.port_id', $this->portsForUser($user))
+                    ->orWhereIntegerInRaw('ports.device_id', $this->devicesForUser($user));
+            })
+            ->distinct('port_groups.id')
+            ->pluck('port_groups.id');
+
+        return $this->portGroupPermissions[$user_id];
+    }
+
+    /**
+     * Get the cached data for device permissions.  Use helpers instead.
+     *
+     * @return Collection<object{user_id: int, device_id: int}>
+     */
+    public function getDevicePermissions(User|int|null $user = null): Collection
+    {
+        $user_id = $this->getUserId($user);
+
+        $this->devicePermissions[$user_id] ??= DB::table('devices_perms')
+            ->select(['user_id', 'device_id'])
+            ->where('user_id', $user_id)
+            ->union($this->getDeviceGroupPermissionsQuery()->where('user_id', $user_id))
+            ->get();
 
         return $this->devicePermissions[$user_id];
     }
@@ -210,15 +224,13 @@ class PermissionsCache
     /**
      * Get the cached data for port permissions.  Use helpers instead.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection<object{user_id: int, port_id: int}>
      */
-    public function getPortPermissions()
+    public function getPortPermissions(): Collection
     {
-        if (is_null($this->portPermissions)) {
-            $this->portPermissions = DB::table('ports_perms')
-                ->select(['user_id', 'port_id'])
-                ->get();
-        }
+        $this->portPermissions ??= DB::table('ports_perms')
+            ->select(['user_id', 'port_id'])
+            ->get();
 
         return $this->portPermissions;
     }
@@ -226,64 +238,53 @@ class PermissionsCache
     /**
      * Get the cached data for bill permissions.  Use helpers instead.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection<object{user_id: int, bill_id: int}>
      */
-    public function getBillPermissions()
+    public function getBillPermissions(): Collection
     {
-        if (is_null($this->billPermissions)) {
-            $this->billPermissions = DB::table('bill_perms')
-                ->select(['user_id', 'bill_id'])->get();
-        }
+        $this->billPermissions ??= DB::table('bill_perms')
+            ->select(['user_id', 'bill_id'])->get();
 
         return $this->billPermissions;
     }
 
-    /**
-     * @param  mixed  $user
-     * @return int|null
-     */
-    private function getUserId($user)
+    public function invalidateCache(): void
+    {
+        $this->devicePermissions = [];
+        $this->deviceGroupMap = [];
+        $this->portGroupPermissions = [];
+        $this->portPermissions = null;
+        $this->billPermissions = null;
+    }
+
+    private function getUserId(User|int|null $user): ?int
     {
         return $user instanceof User ? $user->user_id : (is_numeric($user) ? (int) $user : Auth::id());
     }
 
-    /**
-     * @param  mixed  $device
-     * @return int
-     */
-    private function getDeviceId($device)
+    private function getDeviceId(Device|int|null $device): int
     {
         return $device instanceof Device ? $device->device_id : (is_numeric($device) ? (int) $device : 0);
     }
 
-    /**
-     * @param  mixed  $port
-     * @return int
-     */
-    private function getPortId($port)
+    private function getPortId(Port|int|null $port): int
     {
         return $port instanceof Port ? $port->port_id : (is_numeric($port) ? (int) $port : 0);
     }
 
-    /**
-     * @param  mixed  $bill
-     * @return int
-     */
-    private function getBillId($bill)
+    private function getBillId(Bill|int|null $bill): int
     {
         return $bill instanceof Bill ? $bill->bill_id : (is_numeric($bill) ? (int) $bill : 0);
     }
 
-    /**
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public function getDeviceGroupPermissionsQuery()
+    private function getDeviceGroupPermissionsQuery(): Builder
     {
         return DB::table('devices_group_perms')
-        ->select('devices_group_perms.user_id', 'device_group_device.device_id')
-        ->join('device_group_device', 'device_group_device.device_group_id', '=', 'devices_group_perms.device_group_id')
-        ->when(! LibrenmsConfig::get('permission.device_group.allow_dynamic'), fn ($query) => $query
-            ->join('device_groups', 'device_groups.id', '=', 'devices_group_perms.device_group_id')
-            ->where('device_groups.type', 'static'));
+            ->select('devices_group_perms.user_id', 'device_group_device.device_id')
+            ->join('device_group_device', 'device_group_device.device_group_id', '=',
+                'devices_group_perms.device_group_id')
+            ->when(! LibrenmsConfig::get('permission.device_group.allow_dynamic'), fn ($query) => $query
+                ->join('device_groups', 'device_groups.id', '=', 'devices_group_perms.device_group_id')
+                ->where('device_groups.type', 'static'));
     }
 }

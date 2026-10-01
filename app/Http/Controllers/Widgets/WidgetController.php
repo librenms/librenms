@@ -122,6 +122,9 @@ abstract class WidgetController extends Controller
         if (is_null($this->settings)) {
             $id = \Request::input('id');
             $widget = UserWidget::find($id);
+            if (isset($widget) && isset($widget->dashboard) && ! \Auth::user()->can('view', $widget->dashboard)) {
+                abort(403, 'Unauthorized access to widget');
+            }
             $this->defaults['refresh'] ??= 60;
             $this->settings = array_replace($this->defaults, $widget ? (array) $widget->settings : []);
             $this->settings['id'] = $id;

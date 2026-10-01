@@ -31,6 +31,7 @@ use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Number;
 
 class GlobeController extends WidgetController
@@ -73,13 +74,13 @@ class GlobeController extends WidgetController
                 $count = $location->devices->count();
                 [$devices_down, $devices_up] = $location->devices->partition(fn ($device) => $device->disabled == 0 && $device->ignore == 0 && $device->status == 0);
                 $up = $devices_up->count();
-                $down_items = $devices_down->map(fn ($device) => $device->displayName() . ' DOWN');
+                $down_items = $devices_down->map(fn ($device) => htmlentities((string) $device->displayName()) . ' DOWN');
             } elseif ($data['markers'] == 'ports') {
                 foreach ($location->devices as $device) {
-                    [$ports_down, $ports_up] = $device->ports->partition(fn ($port) => $port->ifOperStatus != 'up' && $port->ifAdminStatus == 'up');
+                    [$ports_down, $ports_up] = $device->ports->partition(fn ($port) => $port->ifOperStatus != IfOperStatus::Up && $port->ifAdminStatus == IfOperStatus::Up);
                     $count += $device->ports->count();
                     $up += $ports_up->count();
-                    $down_items = $ports_down->map(fn ($port) => $device->displayName() . '/' . $port->getShortLabel() . ' DOWN');
+                    $down_items = $ports_down->map(fn ($port) => htmlentities((string) $device->displayName()) . '/' . htmlentities((string) $port->getShortLabel()) . ' DOWN');
                 }
             }
 
@@ -90,7 +91,7 @@ class GlobeController extends WidgetController
                 $locations->push([
                     $location->lat,
                     $location->lng,
-                    $location->location,
+                    htmlentities((string) $location->location),
                     Number::calculatePercent($count - $up, $count), // percent down
                     $count,
                     $down_items->implode(',<br/> '),
@@ -98,7 +99,7 @@ class GlobeController extends WidgetController
             }
         }
 
-        $data['locations'] = $locations->toJson();
+        $data['locations'] = $locations->values()->all();
 
         return view('widgets.globe', $data);
     }

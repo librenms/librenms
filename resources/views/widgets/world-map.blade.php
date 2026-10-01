@@ -8,6 +8,7 @@
         const disabled_alerts = {{ Js::from($disabled_alerts) }};
         const map_config = {{ Js::from($map_config) }};
         const group_radius = {{ (int) $group_radius }};
+        const auto_scale = {{ (int) $auto_scale }};
 
         function populate_map_markers(map_id, group_radius = 10, status = [0,1], device_group = 0) {
             $.ajax({
@@ -43,6 +44,7 @@
                     });
 
                     var map = get_map(map_id);
+                    var isFirstLoad = ! map.markerCluster;
                     if (! map.markerCluster) {
                         map.markerCluster = L.markerClusterGroup({
                             maxClusterRadius: group_radius,
@@ -71,6 +73,13 @@
 
                     map.markerCluster.clearLayers();
                     map.markerCluster.addLayers(markers);
+
+                    if (auto_scale && isFirstLoad && markers.length > 0) {
+                        map.fitBounds(map.markerCluster.getBounds(), {
+                            padding: [30, 30],
+                            maxZoom: 12
+                        });
+                    }
                 },
                 error: function(error){
                     toastr.error(error.statusText);

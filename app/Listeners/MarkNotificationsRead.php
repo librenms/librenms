@@ -37,7 +37,7 @@ class MarkNotificationsRead
                 'user_id' => $user->user_id,
                 'key' => 'read',
                 'value' => 1,
-            ])->toArray());
+            ])->all());
 
         \Log::info('Marked all notifications as read for user ' . $user->username);
     }

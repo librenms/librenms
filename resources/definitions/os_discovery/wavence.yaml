@@ -1,0 +1,37 @@
+modules:
+    os:
+        sysDescr_regex: '/(?<version>.*)/'
+        hardware: TSDIM-SNMPNE-MIB::tsdimNeInstallationType.0
+        features: TSDIM-SNMPNE-MIB::tsdimSdhNeLabel.0
+
+    sensors:
+        dbm:
+            data:
+                -
+                    oid: OPTICSIM-RADIO-TRS-COMMON-MIB::opticsIMRadioAnalogueMeasuresTable
+                    value: OPTICSIM-RADIO-TRS-COMMON-MIB::analogueMeasuresLocalTxPower
+                    num_oid: '.1.3.6.1.4.1.637.54.1.10.1.1.4.1.2.{{ $index }}'
+                    divisor: 10
+                    descr: 'UBT Radio Local Tx Power'
+                    index: 'analogueMeasuresLocalTxPower.{{ $index }}'
+                -
+                    oid: OPTICSIM-RADIO-TRS-COMMON-MIB::opticsIMRadioAnalogueMeasuresTable
+                    value: OPTICSIM-RADIO-TRS-COMMON-MIB::analogueMeasuresLocalRxMainPower
+                    num_oid: '.1.3.6.1.4.1.637.54.1.10.1.1.4.1.3.{{ $index }}'
+                    divisor: 10
+                    descr: 'UBT Radio Local Rx Main Power'
+                    index: 'analogueMeasuresLocalRxMainPower.{{ $index }}'
+                -
+                    oid: OPTICSIM-RADIO-TRS-COMMON-MIB::opticsIMRadioAnalogueMeasuresTable
+                    value: OPTICSIM-RADIO-TRS-COMMON-MIB::analogueMeasuresRemoteTxPower
+                    num_oid: '.1.3.6.1.4.1.637.54.1.10.1.1.4.1.6.{{ $index }}'
+                    divisor: 10
+                    descr: 'UBT Radio Remote Tx Power'
+                    index: 'analogueMeasuresRemoteTxPower.{{ $index }}'
+                -
+                    oid: OPTICSIM-RADIO-TRS-COMMON-MIB::opticsIMRadioAnalogueMeasuresTable
+                    value: OPTICSIM-RADIO-TRS-COMMON-MIB::analogueMeasuresRemoteRxMainPower
+                    num_oid: '.1.3.6.1.4.1.637.54.1.10.1.1.4.1.7.{{ $index }}'
+                    divisor: 10
+                    descr: 'UBT Radio Remote Rx Main Power'
+                    index: 'analogueMeasuresRemoteRxMainPower.{{ $index }}'

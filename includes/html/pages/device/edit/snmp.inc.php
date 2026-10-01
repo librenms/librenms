@@ -63,7 +63,6 @@ if (isset($_POST['editing'])) {
             // update devices_attribs table
 
             // note:
-            // set_dev_attrib and del_dev_attrib *only* return (bool)
             // setAttrib() returns true if it was set and false if it was not (e.g. it didn't change)
             // forgetAttrib() returns true if it was deleted and false if it was not (e.g. it didn't exist)
             // Symfony throws FatalThrowableError on error
@@ -88,7 +87,7 @@ if (isset($_POST['editing'])) {
                     $form_value_is_numeric = true;
                 }
 
-                $get_devices_attrib = get_dev_attrib($device, $devices_attrib);
+                $get_devices_attrib = $device->getAttrib($devices_attrib);
 
                 $set_devices_attrib = false; // testing $set_devices_attrib === false is not a true indicator of a failure
 
@@ -324,7 +323,7 @@ echo "        </select>
     <div class='col-sm-4'>
     <select id='authalgo' name='authalgo' class='form-control'>";
 foreach (\LibreNMS\SNMPCapabilities::authAlgorithms() as $algo => $enabled) {
-    echo "<option value='$algo' " . (strcasecmp((string) $device->authalgo,(string) $algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
+    echo "<option value='$algo' " . (strcasecmp((string) $device->authalgo, (string) $algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
 }
 echo '</select>';
 
@@ -346,7 +345,7 @@ echo "
     <select id='cryptoalgo' name='cryptoalgo' class='form-control'>";
 
 foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled) {
-    echo "<option value='$algo' " . (strcasecmp((string) $device->cryptoalgo,(string) $algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
+    echo "<option value='$algo' " . (strcasecmp((string) $device->cryptoalgo, (string) $algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
 }
 echo '</select>
     ';
@@ -386,6 +385,19 @@ if (LibrenmsConfig::get('distributed_poller') === true) {
         </div>
         ';
 }//end if
+
+if ($device->snmpEngineID) {
+
+?>
+<div class="form-group">
+    <label for="snmpEngineID" class="col-sm-2 control-label">SNMP Engine ID</label>
+    <div class="col-sm-6 tw:mt-2">
+        <?php echo htmlspecialchars((string) $device->snmpEngineID); ?>
+    </div>
+</div>
+
+<?php
+}
 ?>
 
 <div class="form-group">
@@ -426,7 +438,7 @@ function disableSnmp(e) {
     }
 }
 
-var current_os = <?php echo json_encode(['id' => $device->os, 'text' => LibrenmsConfig::get("os.{$device->os}.text")], JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS) ?>;
+var current_os = <?php echo json_encode(['id' => $device->os, 'text' => LibrenmsConfig::get("os.{$device->os}.text")], JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS) ?>;
 init_select2('#os', 'os', {}, current_os, 'OS (optional)');
 
 $("[name='snmp']").bootstrapSwitch('offColor','danger');

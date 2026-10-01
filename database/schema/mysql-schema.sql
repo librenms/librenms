@@ -2316,7 +2316,7 @@ CREATE TABLE `processes` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
   `pid` int(11) NOT NULL,
-  `vsz` int(11) NOT NULL,
+  `vsz` bigint(11) NOT NULL,
   `rss` int(11) NOT NULL,
   `cputime` varchar(14) NOT NULL,
   `user` varchar(50) NOT NULL,

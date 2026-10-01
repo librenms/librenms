@@ -1,0 +1,865 @@
+--
+-- RADIO-BRIDGE-MH-TG-MIB.mib
+-- Wednesday, February 15, 2023 at 14:07:00
+--
+
+    RADIO-BRIDGE-MH-TG-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            InterfaceIndex            
+                FROM IF-MIB            
+            radioBridgeRoot            
+                FROM RADIO-BRIDGE-MIB            
+            OBJECT-GROUP            
+                FROM SNMPv2-CONF            
+            TimeTicks, Gauge32, Counter64, OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI            
+            DisplayString, TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC;
+    
+    
+        -- 1.3.6.1.4.1.31926.35
+        rbTgMIB MODULE-IDENTITY 
+            LAST-UPDATED "202302121900Z"		-- February 12, 2023 at 19:00 GMT
+            ORGANIZATION 
+                "Siklu Communication LTD."
+            CONTACT-INFO 
+                "Support: https://siklu.com/contact/"
+            DESCRIPTION 
+                "The MIB module for managing Siklu Multihaul TG products.
+                Copyright 2023 by Siklu Communication Ltd. All rights reserved."
+            REVISION "202302151405Z"		-- February 15, 2023 at 14:05 GMT
+            DESCRIPTION 
+                "The original version of this MIB"
+            ::= { radioBridgeRoot 35 }
+
+        
+    
+--
+-- Textual conventions
+--
+    
+        RbTgAdminStatus ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The desired state of the interface.
+                Can be either enabled/up or disabled/down."
+            SYNTAX INTEGER
+                {
+                asUp(1),
+                asDown(2)
+                }
+
+        RbTgRadioNodeAssignedName ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "255a"
+            STATUS current
+            DESCRIPTION 
+                "Multihaul TG Node ID/Assigned Name (AN). The name identifies the Multihaul TG node (DN or CN) across RF link.
+                The AN must be unique across the entire Multihaul TG network."
+            SYNTAX OCTET STRING (SIZE (1..8))
+
+        RbTgRadioSectorIndex ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "d"
+            STATUS current
+            DESCRIPTION 
+                "Index of a radio sector."
+            SYNTAX Gauge32 (1..4)
+
+        RbTgRadioNodeLocalRole ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Whether the local node initiated the RF link or responded to the RF link request."
+            SYNTAX INTEGER
+                {
+                rnlrInitiator(1),
+                rnlrResponder(2)
+                }
+
+        RbTgRadioMcs ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "d"
+            STATUS current
+            DESCRIPTION 
+                "Modulation Coding Scheme index (MCS)."
+            SYNTAX Gauge32 (0..12)
+
+        RbTgRadioTxPowerIndex ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "d"
+            STATUS current
+            DESCRIPTION 
+                "Transmit power index (relative).
+                1. For MCS 9 and lower the limit is 31.
+                2. For MCS 10 and higher the index limit is 25."
+            SYNTAX Gauge32 (6..31)
+
+        RbTgRadioRfLinkSpeed ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "d"
+            STATUS current
+            DESCRIPTION 
+                "Over-the-air (OTA) rate."
+            SYNTAX Gauge32 (0..3800)
+
+        RbTgRadioBeamIndex ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "d"
+            STATUS current
+            DESCRIPTION 
+                "Tx/Rx beam index."
+            SYNTAX Gauge32 (0..119)
+
+        RbTgRadioBeamAngle ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "d"
+            STATUS current
+            DESCRIPTION 
+                "Beam direction for azimuth or elevation."
+            SYNTAX INTEGER (-180..180)
+
+        RbTgRadioActiveTilesCount ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "d"
+            STATUS current
+            DESCRIPTION 
+                "Count of active RF tiles."
+            SYNTAX Gauge32 (1..8)
+
+        RbTgRadioGolayIndex ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Index of the radio Golay code sequence.
+                Must be specified in TG node defaults and/or for each sector.
+                Could be overridden in RF link.
+                Based on TG radio definitions."
+            SYNTAX INTEGER
+                {
+                rgiUnspecified(0),
+                rgiVal1(1),
+                rgiVal2(2)
+                }
+
+        RbTgRadioDnResponderNodeType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Whether the TG unit is a distribution node (DN) or a client node (CN)."
+            SYNTAX INTEGER
+                {
+                rdrntDn(1),
+                rdrntCn(2)
+                }
+
+        RbTgRadioDnControlSuperframe ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Time slot at which the local node exchanges control information with the remote node.
+                Only valid for DN to DN RF links. For DN to CN RF links must be set to unspecified."
+            SYNTAX INTEGER
+                {
+                rdcs0(0),
+                rdcs1(1),
+                rdcsUnspecified(10)
+                }
+
+        RbTgRadioDnSectorBitmap ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "b"
+            STATUS current
+            DESCRIPTION 
+                "A bit map representation of the local or remote RF sectors list.
+                For example: sector 1 and 2 will be represented as 0x3."
+            SYNTAX Gauge32 (1..15)
+
+        RbTgRadioDnLinkState ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Possible states of RF link ignition.
+                Possible options are:
+                1. The RF link is connected.
+                2. The RF link admin status is down.
+                3. The local sectors of the RF link are down.
+                4. Waiting for the incoming RF link.
+                5. Waiting in queue.
+                6. Waiting for next polarity period. In this state DN to DN RF links will wait
+                   while sector polarity will math current ignition polarity.
+                7. Link ignition in progress."
+            SYNTAX INTEGER
+                {
+                rdlsConnected(1),
+                rdlsLinkAdminDown(2),
+                rdlsSectorAdminDown(3),
+                rdlsWaitingUpstreamConnection(4),
+                rdlsWaitingInQueue(5),
+                rdlsWaitingPolarityPeriod(6),
+                rdlsIgnition(7)
+                }
+
+    
+--
+-- Node definitions
+--
+    
+        -- 1.3.6.1.4.1.31926.35.1
+        rbTgMIBObjects OBJECT IDENTIFIER ::= { rbTgMIB 1 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1
+        rbTgRadioCommon OBJECT IDENTIFIER ::= { rbTgMIBObjects 1 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.1
+        rbTgRcNodeConfig OBJECT IDENTIFIER ::= { rbTgRadioCommon 1 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.2
+        rbTgRcSectorsConfig OBJECT IDENTIFIER ::= { rbTgRadioCommon 2 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3
+        rbTgRcLinks OBJECT IDENTIFIER ::= { rbTgRadioCommon 3 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1
+        rbTgRcLinksActiveTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF RbTgRcLinksActiveEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A list of all connected RF links and their parameters (initiated and responded) indexed by ifIndex."
+            ::= { rbTgRcLinks 1 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1
+        rbTgRcLinksActiveEntry OBJECT-TYPE
+            SYNTAX RbTgRcLinksActiveEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry containing management information applicable to a particular RF link."
+            INDEX { rbTgRcLinksActiveIfIndex }
+            ::= { rbTgRcLinksActiveTable 1 }
+
+        
+        RbTgRcLinksActiveEntry ::=
+            SEQUENCE { 
+                rbTgRcLinksActiveIfIndex
+                    InterfaceIndex,
+                rbTgRcLinksActiveRemoteName
+                    RbTgRadioNodeAssignedName,
+                rbTgRcLinksActiveActualRemoteSector
+                    RbTgRadioSectorIndex,
+                rbTgRcLinksActiveActualLocalSector
+                    RbTgRadioSectorIndex,
+                rbTgRcLinksActiveLocalRole
+                    RbTgRadioNodeLocalRole,
+                rbTgRcLinksActiveLinkUptime
+                    TimeTicks,
+                rbTgRcLinksActiveRssi
+                    INTEGER,
+                rbTgRcLinksActiveSnr
+                    DisplayString,
+                rbTgRcLinksActiveMcsRx
+                    RbTgRadioMcs,
+                rbTgRcLinksActiveMcsTx
+                    RbTgRadioMcs,
+                rbTgRcLinksActiveRxPer
+                    DisplayString,
+                rbTgRcLinksActiveTxPer
+                    DisplayString,
+                rbTgRcLinksActiveTxPowerIndex
+                    RbTgRadioTxPowerIndex,
+                rbTgRcLinksActiveSpeedRx
+                    RbTgRadioRfLinkSpeed,
+                rbTgRcLinksActiveSpeedTx
+                    RbTgRadioRfLinkSpeed,
+                rbTgRcLinksActiveBeamIndexRx
+                    RbTgRadioBeamIndex,
+                rbTgRcLinksActiveBeamAzimuthRx
+                    RbTgRadioBeamAngle,
+                rbTgRcLinksActiveBeamElevationRx
+                    RbTgRadioBeamAngle,
+                rbTgRcLinksActiveActiveTileCountRx
+                    RbTgRadioActiveTilesCount,
+                rbTgRcLinksActiveBeamIndexTx
+                    RbTgRadioBeamIndex,
+                rbTgRcLinksActiveBeamAzimuthTx
+                    RbTgRadioBeamAngle,
+                rbTgRcLinksActiveBeamElevationTx
+                    RbTgRadioBeamAngle,
+                rbTgRcLinksActiveActiveTileCountTx
+                    RbTgRadioActiveTilesCount,
+                rbTgRcLinksActiveCounterRxOk
+                    Counter64,
+                rbTgRcLinksActiveCounterTxOk
+                    Counter64,
+                rbTgRcLinksActiveCounterRxFail
+                    Counter64,
+                rbTgRcLinksActiveCounterTxFail
+                    Counter64,
+                rbTgRcLinksActiveCounterRxHcsFail
+                    Counter64,
+                rbTgRcLinksActiveCounterTxFailures
+                    Counter64,
+                rbTgRcLinksActiveCounterRxFailures
+                    Counter64,
+                rbTgRcLinksActiveCounterRxDropBufSize
+                    Counter64,
+                rbTgRcLinksActiveCounterRxDropEncryptionFail
+                    Counter64,
+                rbTgRcLinksActiveCounterRxDropRaMismatch
+                    Counter64,
+                rbTgRcLinksActiveCounterRxDropUnexpected
+                    Counter64
+             }
+
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.1
+        rbTgRcLinksActiveIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The ifIndex value that identifies the RF link."
+            ::= { rbTgRcLinksActiveEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.2
+        rbTgRcLinksActiveRemoteName OBJECT-TYPE
+            SYNTAX RbTgRadioNodeAssignedName
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The network Assigned Name/ID (AN) of the remote unit to which an RF link is defined."
+            ::= { rbTgRcLinksActiveEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.3
+        rbTgRcLinksActiveActualRemoteSector OBJECT-TYPE
+            SYNTAX RbTgRadioSectorIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The remote sector index that the RF link is associated to (in the remote unit)."
+            ::= { rbTgRcLinksActiveEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.4
+        rbTgRcLinksActiveActualLocalSector OBJECT-TYPE
+            SYNTAX RbTgRadioSectorIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The local sector index that the RF link is associated from."
+            ::= { rbTgRcLinksActiveEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.5
+        rbTgRcLinksActiveLocalRole OBJECT-TYPE
+            SYNTAX RbTgRadioNodeLocalRole
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Describes whether the local unit initiated the RF link or responded to it."
+            ::= { rbTgRcLinksActiveEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.6
+        rbTgRcLinksActiveLinkUptime OBJECT-TYPE
+            SYNTAX TimeTicks
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of sysUpTime at the time the RF link was changed state to UP."
+            ::= { rbTgRcLinksActiveEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.7
+        rbTgRcLinksActiveRssi OBJECT-TYPE
+            SYNTAX INTEGER (-200..0)
+            UNITS "dBm"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received signal strength indicator. Range: -200dBm to 0dBm, resolution of 1dBm."
+            ::= { rbTgRcLinksActiveEntry 7 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.8
+        rbTgRcLinksActiveSnr OBJECT-TYPE
+            SYNTAX DisplayString
+            UNITS "dB"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Signal-to-Noise Ratio. Range: -50dB to +100dB, resolution of 0.1dB."
+            ::= { rbTgRcLinksActiveEntry 8 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.9
+        rbTgRcLinksActiveMcsRx OBJECT-TYPE
+            SYNTAX RbTgRadioMcs
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current Modulation Coding Scheme index of RX."
+            ::= { rbTgRcLinksActiveEntry 9 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.10
+        rbTgRcLinksActiveMcsTx OBJECT-TYPE
+            SYNTAX RbTgRadioMcs
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current Modulation Coding Scheme index of TX."
+            ::= { rbTgRcLinksActiveEntry 10 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.11
+        rbTgRcLinksActiveRxPer OBJECT-TYPE
+            SYNTAX DisplayString
+            UNITS "Percentage"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current Packet Error Rate (PER) of RX, in percentage. 2 fraction-digits accuracy."
+            ::= { rbTgRcLinksActiveEntry 11 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.12
+        rbTgRcLinksActiveTxPer OBJECT-TYPE
+            SYNTAX DisplayString
+            UNITS "Percentage"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current Packet Error Rate (PER) of TX, in percentage. 2 fraction-digits accuracy."
+            ::= { rbTgRcLinksActiveEntry 12 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.13
+        rbTgRcLinksActiveTxPowerIndex OBJECT-TYPE
+            SYNTAX RbTgRadioTxPowerIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current Transmit Power Index (relative)."
+            ::= { rbTgRcLinksActiveEntry 13 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.14
+        rbTgRcLinksActiveSpeedRx OBJECT-TYPE
+            SYNTAX RbTgRadioRfLinkSpeed
+            UNITS "Mbps"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current over-the-air (OTA) rate of RX."
+            ::= { rbTgRcLinksActiveEntry 14 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.15
+        rbTgRcLinksActiveSpeedTx OBJECT-TYPE
+            SYNTAX RbTgRadioRfLinkSpeed
+            UNITS "Mbps"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current over-the-air (OTA) rate of TX."
+            ::= { rbTgRcLinksActiveEntry 15 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.16
+        rbTgRcLinksActiveBeamIndexRx OBJECT-TYPE
+            SYNTAX RbTgRadioBeamIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current index of active RX beam."
+            ::= { rbTgRcLinksActiveEntry 16 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.17
+        rbTgRcLinksActiveBeamAzimuthRx OBJECT-TYPE
+            SYNTAX RbTgRadioBeamAngle
+            UNITS "Degrees"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current azimuth direction of active RX beam."
+            ::= { rbTgRcLinksActiveEntry 17 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.18
+        rbTgRcLinksActiveBeamElevationRx OBJECT-TYPE
+            SYNTAX RbTgRadioBeamAngle
+            UNITS "Degrees"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current elevation direction of active RX beam."
+            ::= { rbTgRcLinksActiveEntry 18 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.19
+        rbTgRcLinksActiveActiveTileCountRx OBJECT-TYPE
+            SYNTAX RbTgRadioActiveTilesCount
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current count of active RF tiles for RX beam."
+            ::= { rbTgRcLinksActiveEntry 19 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.20
+        rbTgRcLinksActiveBeamIndexTx OBJECT-TYPE
+            SYNTAX RbTgRadioBeamIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current index of active TX beam."
+            ::= { rbTgRcLinksActiveEntry 20 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.21
+        rbTgRcLinksActiveBeamAzimuthTx OBJECT-TYPE
+            SYNTAX RbTgRadioBeamAngle
+            UNITS "Degrees"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current azimuth direction of active TX beam."
+            ::= { rbTgRcLinksActiveEntry 21 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.22
+        rbTgRcLinksActiveBeamElevationTx OBJECT-TYPE
+            SYNTAX RbTgRadioBeamAngle
+            UNITS "Degrees"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current elevation direction of active TX beam."
+            ::= { rbTgRcLinksActiveEntry 22 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.23
+        rbTgRcLinksActiveActiveTileCountTx OBJECT-TYPE
+            SYNTAX RbTgRadioActiveTilesCount
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Current count of active RF tiles for TX beam."
+            ::= { rbTgRcLinksActiveEntry 23 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.24
+        rbTgRcLinksActiveCounterRxOk OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of successfully received frames/MPDUs."
+            ::= { rbTgRcLinksActiveEntry 24 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.25
+        rbTgRcLinksActiveCounterTxOk OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of successfully transmitted frames/MPDUs."
+            ::= { rbTgRcLinksActiveEntry 25 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.26
+        rbTgRcLinksActiveCounterRxFail OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of CRC failed frames received (Once CRC fail, cannot trust RA as well)."
+            ::= { rbTgRcLinksActiveEntry 26 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.27
+        rbTgRcLinksActiveCounterTxFail OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of transmission failures."
+            ::= { rbTgRcLinksActiveEntry 27 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.28
+        rbTgRcLinksActiveCounterRxHcsFail OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of received frames with HCS failed PLCP header."
+            ::= { rbTgRcLinksActiveEntry 28 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.29
+        rbTgRcLinksActiveCounterTxFailures OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Total number of TX packets dropped due to lifetime expiry."
+            ::= { rbTgRcLinksActiveEntry 29 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.30
+        rbTgRcLinksActiveCounterRxFailures OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Total number of RX packets failures."
+            ::= { rbTgRcLinksActiveEntry 30 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.31
+        rbTgRcLinksActiveCounterRxDropBufSize OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Total RX Discard count due to Buffer overflow."
+            ::= { rbTgRcLinksActiveEntry 31 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.32
+        rbTgRcLinksActiveCounterRxDropEncryptionFail OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Total RX Discard count due to Encryption failure."
+            ::= { rbTgRcLinksActiveEntry 32 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.33
+        rbTgRcLinksActiveCounterRxDropRaMismatch OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Total RX Discard count due to RA mismatch."
+            ::= { rbTgRcLinksActiveEntry 33 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.1.3.1.1.34
+        rbTgRcLinksActiveCounterRxDropUnexpected OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Total RX Discard count due to other unexpected reasons or PER emulator."
+            ::= { rbTgRcLinksActiveEntry 34 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2
+        rbTgRadioDn OBJECT IDENTIFIER ::= { rbTgMIBObjects 2 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2.1
+        rbTgRdNodeConfig OBJECT IDENTIFIER ::= { rbTgRadioDn 1 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2.2
+        rbTgRdSectorsConfig OBJECT IDENTIFIER ::= { rbTgRadioDn 2 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2.3
+        rbTgRdLinks OBJECT IDENTIFIER ::= { rbTgRadioDn 3 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2.3.1
+        rbTgRdLinksConfiguredTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF RbTgRdLinksConfiguredEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A list of all RF links that the Data Node will try to initiate indexed by ifIndex."
+            ::= { rbTgRdLinks 1 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2.3.1.1
+        rbTgRdLinksConfiguredEntry OBJECT-TYPE
+            SYNTAX RbTgRdLinksConfiguredEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry containing management information applicable to a particular RF link."
+            INDEX { rbTgRdLinksConfiguredIfIndex }
+            ::= { rbTgRdLinksConfiguredTable 1 }
+
+        
+        RbTgRdLinksConfiguredEntry ::=
+            SEQUENCE { 
+                rbTgRdLinksConfiguredIfIndex
+                    InterfaceIndex,
+                rbTgRdLinksConfiguredRemoteName
+                    RbTgRadioNodeAssignedName,
+                rbTgRdLinksConfiguredResponderNodeType
+                    RbTgRadioDnResponderNodeType,
+                rbTgRdLinksConfiguredControlSuperframe
+                    RbTgRadioDnControlSuperframe,
+                rbTgRdLinksConfiguredAdminStatus
+                    RbTgAdminStatus,
+                rbTgRdLinksConfiguredLocalSectorBitmap
+                    RbTgRadioDnSectorBitmap,
+                rbTgRdLinksConfiguredRemoteSectorBitmap
+                    RbTgRadioDnSectorBitmap,
+                rbTgRdLinksConfiguredLinkState
+                    RbTgRadioDnLinkState,
+                rbTgRdLinksConfiguredTxGolayIndex
+                    RbTgRadioGolayIndex,
+                rbTgRdLinksConfiguredRxGolayIndex
+                    RbTgRadioGolayIndex
+             }
+
+        -- 1.3.6.1.4.1.31926.35.1.2.3.1.1.1
+        rbTgRdLinksConfiguredIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The ifIndex value that identifies the RF link."
+            ::= { rbTgRdLinksConfiguredEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2.3.1.1.2
+        rbTgRdLinksConfiguredRemoteName OBJECT-TYPE
+            SYNTAX RbTgRadioNodeAssignedName
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The network Assigned Name/ID (AN) of the remote unit to which an RF link is defined."
+            ::= { rbTgRdLinksConfiguredEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2.3.1.1.3
+        rbTgRdLinksConfiguredResponderNodeType OBJECT-TYPE
+            SYNTAX RbTgRadioDnResponderNodeType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The requested Node type of the remote Node. The RF link will be rejected if the
+                remote Node is already configured to a different type by another active RF link.
+                To avoid rejected, the rules are:
+                1. Any RF link to a base unit must set the value to rrntDn.
+                2. Any RF link to a terminal unit must set the value to rrntCn."
+            ::= { rbTgRdLinksConfiguredEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2.3.1.1.4
+        rbTgRdLinksConfiguredControlSuperframe OBJECT-TYPE
+            SYNTAX RbTgRadioDnControlSuperframe
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Time slot at which the local node exchanges control information with the remote node.
+                If responder-node-type = Client Node (CN): must be set to unspecified.
+                If responder-node-type = Distribution Node (DN): can be either 0 or 1,
+                but different between remote DNs on the same local sector (can be maximum 2 DN to DN
+                links per RF sector)."
+            ::= { rbTgRdLinksConfiguredEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2.3.1.1.5
+        rbTgRdLinksConfiguredAdminStatus OBJECT-TYPE
+            SYNTAX RbTgAdminStatus
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Defines whether to initiate the link (and keep it up) or
+                drop it (in case it was already established)."
+            ::= { rbTgRdLinksConfiguredEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2.3.1.1.6
+        rbTgRdLinksConfiguredLocalSectorBitmap OBJECT-TYPE
+            SYNTAX RbTgRadioDnSectorBitmap
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A bit map representation of the local RF sectors list.
+                For example: local sector 1 and local sector 2 will result in 0x3."
+            ::= { rbTgRdLinksConfiguredEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2.3.1.1.7
+        rbTgRdLinksConfiguredRemoteSectorBitmap OBJECT-TYPE
+            SYNTAX RbTgRadioDnSectorBitmap
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A bit map representation of the remote RF sectors list.
+                For example: remote sector 1 and remote sector 2 will result in 0x3."
+            ::= { rbTgRdLinksConfiguredEntry 7 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2.3.1.1.8
+        rbTgRdLinksConfiguredLinkState OBJECT-TYPE
+            SYNTAX RbTgRadioDnLinkState
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Possible states of RF link ignition."
+            ::= { rbTgRdLinksConfiguredEntry 8 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2.3.1.1.9
+        rbTgRdLinksConfiguredTxGolayIndex OBJECT-TYPE
+            SYNTAX RbTgRadioGolayIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Tx Golay index of Golay code sequence."
+            ::= { rbTgRdLinksConfiguredEntry 9 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.1.2.3.1.1.10
+        rbTgRdLinksConfiguredRxGolayIndex OBJECT-TYPE
+            SYNTAX RbTgRadioGolayIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rx Golay index of Golay code sequence."
+            ::= { rbTgRdLinksConfiguredEntry 10 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.2
+        rbTgGroups OBJECT IDENTIFIER ::= { rbTgMIB 2 }
+
+        
+        -- 1.3.6.1.4.1.31926.35.2.1
+        rbTgGeneralGroup OBJECT-GROUP
+            OBJECTS { rbTgRcLinksActiveSpeedRx, rbTgRcLinksActiveSpeedTx, rbTgRcLinksActiveSnr, rbTgRcLinksActiveMcsRx, rbTgRcLinksActiveMcsTx, 
+                rbTgRcLinksActiveTxPer, rbTgRcLinksActiveRxPer, rbTgRcLinksActiveTxPowerIndex, rbTgRcLinksActiveBeamAzimuthTx, rbTgRcLinksActiveBeamElevationTx, 
+                rbTgRcLinksActiveActiveTileCountTx, rbTgRcLinksActiveBeamIndexRx, rbTgRcLinksActiveBeamAzimuthRx, rbTgRcLinksActiveBeamElevationRx, rbTgRcLinksActiveActiveTileCountRx, 
+                rbTgRcLinksActiveBeamIndexTx, rbTgRcLinksActiveCounterRxOk, rbTgRcLinksActiveCounterTxOk, rbTgRcLinksActiveCounterTxFail, rbTgRcLinksActiveCounterRxFail, 
+                rbTgRcLinksActiveCounterRxHcsFail, rbTgRcLinksActiveCounterTxFailures, rbTgRcLinksActiveCounterRxFailures, rbTgRcLinksActiveCounterRxDropBufSize, rbTgRcLinksActiveCounterRxDropEncryptionFail, 
+                rbTgRcLinksActiveCounterRxDropRaMismatch, rbTgRcLinksActiveCounterRxDropUnexpected, rbTgRdLinksConfiguredIfIndex, rbTgRcLinksActiveActualRemoteSector, rbTgRcLinksActiveActualLocalSector, 
+                rbTgRcLinksActiveLocalRole, rbTgRcLinksActiveLinkUptime, rbTgRdLinksConfiguredResponderNodeType, rbTgRdLinksConfiguredControlSuperframe, rbTgRdLinksConfiguredAdminStatus, 
+                rbTgRdLinksConfiguredLocalSectorBitmap, rbTgRdLinksConfiguredRemoteSectorBitmap, rbTgRdLinksConfiguredLinkState, rbTgRdLinksConfiguredTxGolayIndex, rbTgRdLinksConfiguredRxGolayIndex, 
+                rbTgRcLinksActiveRssi, rbTgRcLinksActiveIfIndex, rbTgRcLinksActiveRemoteName, rbTgRdLinksConfiguredRemoteName }
+            STATUS current
+            DESCRIPTION 
+                "The collection of objects used to represent the general entity information."
+            ::= { rbTgGroups 1 }
+
+        
+    
+    END
+
+--
+-- RADIO-BRIDGE-MH-TG-MIB.mib
+--

@@ -29,6 +29,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
@@ -69,8 +70,8 @@ OLD-CISCO-INTERFACES-MIB::locIfReason.$port->ifIndex \"down\"\n",
         );
 
         $port = $port->fresh(); // refresh from database
-        $this->assertEquals($port->ifAdminStatus, 'down');
-        $this->assertEquals($port->ifOperStatus, 'down');
+        $this->assertEquals(IfOperStatus::Down, $port->ifAdminStatus);
+        $this->assertEquals(IfOperStatus::Down, $port->ifOperStatus);
     }
 
     public function testLinkUp(): void
@@ -105,7 +106,7 @@ OLD-CISCO-INTERFACES-MIB::locIfReason.$port->ifIndex \"up\"\n",
         );
 
         $port = $port->fresh(); // refresh from database
-        $this->assertEquals($port->ifAdminStatus, 'up');
-        $this->assertEquals($port->ifOperStatus, 'up');
+        $this->assertEquals(IfOperStatus::Up, $port->ifAdminStatus);
+        $this->assertEquals(IfOperStatus::Up, $port->ifOperStatus);
     }
 }

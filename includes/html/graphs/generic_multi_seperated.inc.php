@@ -29,10 +29,12 @@ $out_thing = '';
 $in_thingX = '';
 $out_thingX = '';
 $plus = '';
+$plusX = '';
 $pluses = '';
 $plusesX = '';
 $rrddescr_len = 14; // length of the padded rrd_descr in legend
 $seperator = '';
+$seperatorX = '';
 $descr = '';
 $descr_out = '';
 
@@ -48,7 +50,7 @@ if ($width > '1500') {
 
 $stacked = generate_stacked_graphs();
 
-$units_descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($units_descr ?? '', $rrddescr_len + 5);
+$units_descr = LibreNMS\Data\Store\Rrd::fixedSafeDescr($units_descr ?? '', $rrddescr_len + 5);
 
 if ($format == 'octets' || $format == 'bytes') {
     $units = 'Bps';
@@ -147,8 +149,8 @@ foreach ($rrd_list ?? [] as $rrd) {
     }
 
     if (! $nodetails) {
-        $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $rrddescr_len) . '  In';
-        $descr_out = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('', $rrddescr_len) . ' Out';
+        $descr = LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $rrddescr_len) . '  In';
+        $descr_out = LibreNMS\Data\Store\Rrd::fixedSafeDescr('', $rrddescr_len) . ' Out';
     }
 
     $rrd_options[] = 'AREA:inbits' . $i . '#' . $colour_in . $stacked['transparency'] . ":$descr$stack";
@@ -194,7 +196,7 @@ foreach ($rrd_list ?? [] as $rrd) {
     $iter++;
 }
 
-if ($previous) {
+if ($previous && ! $nototal && ! empty($rrd_list)) {
     $rrd_options[] = 'CDEF:inBX=' . $in_thingX . $plusesX;
     $rrd_options[] = 'CDEF:outBX=' . $out_thingX . $plusesX;
     $rrd_options[] = 'CDEF:octetsX=inBX,outBX,+';
@@ -216,7 +218,7 @@ if ($previous) {
     $rrd_options[] = 'VDEF:totX=octetsX,TOTAL';
 }
 
-if ($previous) {
+if ($previous && ! $nototal && ! empty($rrd_list)) {
     $rrd_options[] = 'AREA:in' . $format . 'X#99999999' . $stacked['transparency'] . ':';
     $rrd_optionsb[] = 'AREA:dout' . $format . 'X#99999999' . $transparency . ':';
     $rrd_options[] = 'LINE1.25:in' . $format . 'X#666666:';
@@ -246,7 +248,7 @@ if (! $nototal && ! empty($rrd_list)) {
 
     $rrd_options[] = 'COMMENT: \\n';
 
-    $rrd_options[] = 'HRULE:999999999999999#FFFFFF:' . \LibreNMS\Data\Store\Rrd::fixedSafeDescr('Total', $rrddescr_len) . '  In';
+    $rrd_options[] = 'HRULE:999999999999999#FFFFFF:' . LibreNMS\Data\Store\Rrd::fixedSafeDescr('Total', $rrddescr_len) . '  In';
     $rrd_options[] = 'GPRINT:inbits:LAST:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:inbits:AVERAGE:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:inbits:MAX:%6.' . $float_precision . "lf%s$units";
@@ -259,7 +261,7 @@ if (! $nototal && ! empty($rrd_list)) {
     }
     $rrd_options[] = 'COMMENT:\\n';
 
-    $rrd_options[] = 'HRULE:999999999999990#FFFFFF:' . \LibreNMS\Data\Store\Rrd::fixedSafeDescr('', $rrddescr_len) . ' Out';
+    $rrd_options[] = 'HRULE:999999999999990#FFFFFF:' . LibreNMS\Data\Store\Rrd::fixedSafeDescr('', $rrddescr_len) . ' Out';
     $rrd_options[] = 'GPRINT:outbits:LAST:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:outbits:AVERAGE:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:outbits:MAX:%6.' . $float_precision . "lf%s$units";
@@ -272,7 +274,7 @@ if (! $nototal && ! empty($rrd_list)) {
     }
     $rrd_options[] = 'COMMENT:\\n';
 
-    $rrd_options[] = 'HRULE:999999999999990#FFFFFF:' . \LibreNMS\Data\Store\Rrd::fixedSafeDescr('', $rrddescr_len) . ' Agg';
+    $rrd_options[] = 'HRULE:999999999999990#FFFFFF:' . LibreNMS\Data\Store\Rrd::fixedSafeDescr('', $rrddescr_len) . ' Agg';
     $rrd_options[] = 'GPRINT:bits:LAST:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:bits:AVERAGE:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:bits:MAX:%6.' . $float_precision . "lf%s$units";

@@ -1,7 +1,9 @@
 <?php
 
 use App\Facades\DeviceCache;
+use App\Facades\PortCache;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
 /*
  * LibreNMS
@@ -19,9 +21,7 @@ use LibreNMS\Util\Rewrite;
  * @author     LibreNMS Contributors
 */
 
-$hostname = DeviceCache::get((int) $entry['device_id'])->hostname;
-
-unset($icon);
+$device = DeviceCache::get((int) $entry['device_id']);
 
 $severity_colour = eventlog_severity($entry['severity']);
 $icon = '<span class="alert-status ' . $severity_colour . '"></span>';
@@ -30,14 +30,13 @@ echo '<tr>';
 echo '<td>' . $icon . '</td>';
 echo '<td style="vertical-align: middle;">' . $entry['datetime'] . '</td>';
 
-if (! isset($vars['device'])) {
-    $dev = device_by_id_cache($entry['device_id']);
-    echo '<td style="vertical-align: middle;">' . generate_device_link($dev, shorthost($dev['hostname'])) . '</td>';
+if ($device->exists) {
+    echo '<td style="vertical-align: middle;">' . Url::deviceLink($device, $device->shortDisplayName()) . '</td>';
 }
 
 if ($entry['type'] == 'interface') {
-    $this_if = cleanPort(get_port_by_id($entry['reference']));
-    $entry['link'] = '<b>' . generate_port_link($this_if, Rewrite::shortenIfName(strtolower((string) $this_if['label']))) . '</b>';
+    $port = PortCache::get($entry['reference']);
+    $entry['link'] = '<b>' . Url::portLink($port, Rewrite::shortenIfName(strtolower((string) $port->getLabel()))) . '</b>';
 } else {
     $entry['link'] = 'System';
 }

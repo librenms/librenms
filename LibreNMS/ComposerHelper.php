@@ -98,8 +98,12 @@ class ComposerHelper
 
     public static function getPlugins(): array
     {
-        $plugins = is_file('composer.plugins.json') ?
-            json_decode(file_get_contents('composer.plugins.json'), true) : [];
+        // Not cwd-relative: also reached from the web UI, where cwd is the
+        // document root. Not base_path(): this class runs as a composer script.
+        $file = realpath(__DIR__ . '/..') . '/composer.plugins.json';
+
+        $plugins = is_file($file) && is_readable($file) ?
+            json_decode((string) file_get_contents($file), true) : [];
 
         return $plugins['require'] ?? [];
     }
@@ -183,7 +187,7 @@ class ComposerHelper
             $cli[] = "$key=$value";
         }
         $cli[] = PHP_BINARY;
-        $cli[] = realpath(__DIR__ . '/../../scripts/composer_wrapper.php');
+        $cli[] = realpath(__DIR__ . '/../scripts/composer_wrapper.php');
         foreach ($command as $word) {
             $cli[] = escapeshellarg($word);
         }

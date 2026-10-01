@@ -8,7 +8,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Util\Time;
 
 class AlertRuleController extends Controller
 {
@@ -17,13 +16,14 @@ class AlertRuleController extends Controller
      */
     public function store(AlertRuleRequest $request): JsonResponse
     {
+        $this->authorize('create', AlertRule::class);
+
         try {
             $alertRule = new AlertRule;
             $this->fillAlertRule($alertRule, $request);
             $alertRule->save();
 
             $this->syncMaps($request->input('maps', []), $alertRule);
-            $this->syncTransports($request->input('transports', []), $alertRule);
 
             return response()->json([
                 'status' => 'ok',
@@ -42,18 +42,22 @@ class AlertRuleController extends Controller
      */
     public function show(AlertRule $alertRule): JsonResponse
     {
+        $this->authorize('view', $alertRule);
+
         $alertRule->load([
             'devices:device_id,hostname,sysName',
             'groups:id,name',
             'locations:id,location',
-            'transportSingles:alert_transports.transport_id,transport_type,transport_name',
-            'transportGroups:alert_transport_groups.transport_group_id,transport_group_name',
+            'alertOperation:id,name,default_operation_step_duration_seconds',
         ]);
 
         return response()->json([
             'extra' => $alertRule->extra,
             'maps' => $this->formatDeviceMaps($alertRule),
-            'transports' => $this->formatTransports($alertRule),
+            'alert_operation_id' => $alertRule->alert_operation_id,
+            'alert_operation_name' => $alertRule->alertOperation?->name,
+            'operations' => $alertRule->toOperationsApiArray(),
+            'default_operation_step_duration_seconds' => $alertRule->alertOperation?->default_operation_step_duration_seconds,
             'name' => $alertRule->name,
             'proc' => $alertRule->proc,
             'notes' => $alertRule->notes,
@@ -69,6 +73,8 @@ class AlertRuleController extends Controller
      */
     public function update(AlertRuleRequest $request, AlertRule $alertRule): JsonResponse
     {
+        $this->authorize('update', $alertRule);
+
         try {
             $this->fillAlertRule($alertRule, $request);
 
@@ -80,7 +86,6 @@ class AlertRuleController extends Controller
             }
 
             $this->syncMaps($request->input('maps', []), $alertRule);
-            $this->syncTransports($request->input('transports', []), $alertRule);
 
             return response()->json([
                 'status' => 'ok',
@@ -96,6 +101,8 @@ class AlertRuleController extends Controller
 
     public function toggle(Request $request, AlertRule $alertRule): JsonResponse
     {
+        $this->authorize('update', $alertRule);
+
         $alertRule->disabled = ! $request->boolean('state', $alertRule->disabled);
         $success = $alertRule->save();
         url('graphs', ['id' => 42, 'type' => 'sensor_']);
@@ -108,6 +115,8 @@ class AlertRuleController extends Controller
      */
     public function destroy(AlertRule $alertRule): JsonResponse
     {
+        $this->authorize('delete', $alertRule);
+
         $success = $alertRule->delete();
 
         return response()->json(['status' => $success ? 200 : 422], $success ? 200 : 422);
@@ -144,27 +153,6 @@ class AlertRuleController extends Controller
         return $maps;
     }
 
-    private function formatTransports(AlertRule $alertRule): array
-    {
-        $transports = [];
-
-        foreach ($alertRule->transportSingles as $transport) {
-            $transports[] = [
-                'id' => $transport->transport_id,
-                'text' => ucfirst((string) $transport->transport_type) . ': ' . $transport->transport_name,
-            ];
-        }
-
-        foreach ($alertRule->transportGroups as $group) {
-            $transports[] = [
-                'id' => 'g' . $group->transport_group_id,
-                'text' => 'Group: ' . $group->transport_group_name,
-            ];
-        }
-
-        return $transports;
-    }
-
     private function fillAlertRule(AlertRule $alertRule, AlertRuleRequest $request): void
     {
         $alertRule->fill($request->safe([
@@ -189,19 +177,17 @@ class AlertRuleController extends Controller
             }
         }
 
-        // extra json
         $extra = $request->safe([
-            'mute',
-            'count',
             'invert',
             'acknowledgement',
             'recovery',
+            'mute',
         ]);
-        $extra['count'] ??= '-1';
         $extra['options'] = ['override_query' => $overrideQuery];
-        $extra['delay'] = Time::durationToSeconds($request->validated('delay') ?? '');
-        $extra['interval'] = Time::durationToSeconds($request->validated('interval') ?? '');
         $alertRule->extra = array_merge($alertRule->extra ?? [], $extra);
+
+        $opId = $request->input('alert_operation_id');
+        $alertRule->alert_operation_id = ($opId === null || $opId === '') ? null : (int) $opId;
     }
 
     private function syncMaps(array $maps, AlertRule $alertRule): void
@@ -221,21 +207,5 @@ class AlertRuleController extends Controller
         $alertRule->devices()->sync($deviceIds);
         $alertRule->groups()->sync($groupIds);
         $alertRule->locations()->sync($locationIds);
-    }
-
-    private function syncTransports(array $transports, AlertRule $alertRule): void
-    {
-        $transportIds = [];
-        $transportGroupIds = [];
-        foreach ($transports as $transport) {
-            if (Str::startsWith($transport, 'g')) {
-                $transportGroupIds[] = (int) substr((string) $transport, 1);
-            } else {
-                $transportIds[] = (int) $transport;
-            }
-        }
-
-        $alertRule->transportSingles()->syncWithPivotValues($transportIds, ['target_type' => 'single']);
-        $alertRule->transportGroups()->syncWithPivotValues($transportGroupIds, ['target_type' => 'group']);
     }
 }

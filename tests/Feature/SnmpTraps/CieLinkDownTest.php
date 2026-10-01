@@ -27,6 +27,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -66,7 +67,7 @@ IF-MIB::ifType.$port->ifIndex ethernetCsmacd",
         );
 
         $port = $port->fresh();
-        $this->assertEquals('up', $port->ifAdminStatus);
-        $this->assertEquals('down', $port->ifOperStatus);
+        $this->assertEquals(IfOperStatus::Up, $port->ifAdminStatus);
+        $this->assertEquals(IfOperStatus::Down, $port->ifOperStatus);
     }
 }

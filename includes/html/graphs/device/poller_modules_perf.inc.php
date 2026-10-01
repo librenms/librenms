@@ -29,7 +29,7 @@ require 'includes/html/graphs/common.inc.php';
 
 foreach ($modules as $module => $module_status) {
     $rrd_filename = Rrd::name($device->hostname, ['poller-perf', $module]);
-    if ($attribs['poll_' . $module] || ($module_status && ! isset($attribs['poll_' . $module])) ||
+    if ((isset($attribs['poll_' . $module]) && $attribs['poll_' . $module]) || ($module_status && ! isset($attribs['poll_' . $module])) ||
         (LibrenmsConfig::getOsSetting($device->os, 'poller_modules.' . $module) && ! isset($attribs['poll_' . $module]))) {
         if (Rrd::checkRrdExists($rrd_filename)) {
             $ds['ds'] = 'poller';

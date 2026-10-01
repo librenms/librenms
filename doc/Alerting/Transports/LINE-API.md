@@ -2,34 +2,34 @@
 
 [LINE Messaging API Docs](https://developers.line.biz/en/docs/messaging-api/overview/)
 
-Here is the step for setup a LINE bot and using it in LibreNMS.
+These are the steps to set up a LINE bot for LibreNMS.
 
-1. Use your real LINE account register in [developer protal](https://developers.line.biz/).
+1. Register your real LINE account in the [developer portal](https://developers.line.biz/).
 
-1. Add a new channel, choose `Messaging API` and continue fill up the forms, note that `Channel name` cannot edit later.
+1. Add a new channel and choose `Messaging API`. Then complete the forms. You cannot change `Channel name` later.
 
-1. Go to "Messaging API" tab of your channel, here listing some important value.
+1. Open the "Messaging API" tab of your channel. This tab holds some important values.
 
-	- `Bot basic ID` and `QR code` is your LINE bot's ID and QR code.
-	- `Channel access token (long-lived)`, will use it in LibreNMS, keep it safe.
+	- `Bot basic ID` and `QR code` are the ID and the QR code of your LINE bot.
+	- `Channel access token (long-lived)` goes into LibreNMS. Keep it secret.
 
-1. Use your real Line account add your LINE bot as a friend.
+1. Add your LINE bot as a friend from your real LINE account.
 
-1. Recipient ID can be `groupID`, `userID` or `roomID`, it will be used in LibreNMS to send message to a group or a user. Use the following NodeJS program and `ngrok` for temporally https webhook to listen it.
+1. The recipient ID is a `groupID`, a `userID`, or a `roomID`. LibreNMS uses this ID to send a message to a group or a user. To find it, use the NodeJS program below with `ngrok` as a temporary HTTPS webhook.
 
 	[LINE-bot-RecipientFetcher](https://github.com/j796160836/LINE-bot-RecipientFetcher)
 
-1. Run the program and using `ngrok` expose port to public
+1. Run the program. Then make the port public with `ngrok`.
 
 	```
 	$ node index.js
 	$ ngrok http 3000
 	```
 
-1. Go to "Messaging API" tab of your channel, fill up Webhook URL to `https://<your ngrok domain>/webhook`
+1. Open the "Messaging API" tab of your channel. Set the Webhook URL to `https://<your ngrok domain>/webhook`.
 
 
-1. If you want to let LINE bot send message to a yourself, use your real account to send a message to your LINE bot. Program will print out the `userID` in console.
+1. To send a message to yourself, send a message to your LINE bot from your real account. The program then prints the `userID` in the console.
 
 	sample value:  
 	
@@ -37,12 +37,13 @@ Here is the step for setup a LINE bot and using it in LibreNMS.
 	{"type":"user","userId":"U527xxxxxxxxxxxxxxxxxxxxxxxxxc0ee"}
 	```
 	
-1. If you want to let LINE bot send message to a group, do the following steps.
+1. To send a message to a group, do these steps.
 
-	- Add your LINE bot into group
-	- Use your real account to send a message to group
+	- Add your LINE bot to the group.
+	- Send a message to the group from your real account.
 	
-	Program will print out the `groupID` in console, it will be Recipient ID, keep it safe.
+	The program then prints the `groupID` in the console. This value is
+	the recipient ID. Keep it secret.
 
 	sample value:
 

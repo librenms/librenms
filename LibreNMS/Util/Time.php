@@ -89,17 +89,19 @@ class Time
             return $time < 0 ? time() + $time : intval($time);
         }
 
-        if (preg_match('/^[+-]\d+[hdmy]$/', $time)) {
+        if (preg_match('/^([+-])(\d+)(mo|[smhdwy])$/', $time, $matches)) {
             $units = [
+                's' => 1,
                 'm' => 60,
                 'h' => 3600,
                 'd' => 86400,
+                'w' => 604800,
+                'mo' => 2592000,
                 'y' => 31557600,
             ];
-            $value = Number::cast(substr($time, 1, -1));
-            $unit = substr($time, -1);
+            $value = Number::cast($matches[2]);
 
-            $offset = ($time[0] == '-' ? -1 : 1) * $units[$unit] * $value;
+            $offset = ($matches[1] == '-' ? -1 : 1) * $units[$matches[3]] * $value;
 
             return time() + $offset;
         }
@@ -151,29 +153,37 @@ class Time
 
     /**
      * Take a date and return the number of days from now
+     * Returns 0 if $date cannot be parsed (matches parseAt()'s existing
+     * invalid-input fallback) instead of letting Carbon's
+     * InvalidFormatException abort the caller (see GH #20555 - a malformed
+     * APC UPS date OID was aborting the whole sensors discovery module).
      */
     public static function dateToMinutes(string|int $date): int
     {
         $carbon = new Carbon();
 
-        return (int) $carbon->diffInMinutes($date);
+        try {
+            return (int) $carbon->diffInMinutes($date);
+        } catch (InvalidFormatException) {
+            return 0;
+        }
     }
 
     public static function durationToSeconds(string $duration): int
     {
-        if (preg_match('/(\d+)([mhd]?)/', $duration, $matches)) {
-            $multipliers = [
-                'm' => 60,
-                'h' => 3600,
-                'd' => 86400,
-            ];
-
-            $multiplier = $multipliers[$matches[2]] ?? 1;
-
-            return $matches[1] * $multiplier;
+        if (! preg_match('/(\d+)([mhd]?)/', $duration, $matches)) {
+            return $duration === '' ? 0 : 300;
         }
 
-        return $duration === '' ? 0 : 300;
+        $multipliers = [
+            'm' => 60,
+            'h' => 3600,
+            'd' => 86400,
+        ];
+
+        $multiplier = $multipliers[$matches[2]] ?? 1;
+
+        return $matches[1] * $multiplier;
     }
 
     /**
@@ -217,8 +227,8 @@ class Time
         }
 
         $format = match ($format) {
-            'long', 'compact', 'byminute', 'time' => LibrenmsConfig::get("dateformat.$format"),
-            default => throw new \Exception('Format needs to be one of log, compact, byminute or time'),
+            'long', 'compact', 'byminute', 'time', 'date' => LibrenmsConfig::get("dateformat.$format"),
+            default => throw new \Exception('Format needs to be one of log, compact, byminute, date or time'),
         };
 
         $timezone = session('preferences.timezone');
@@ -227,5 +237,30 @@ class Time
         }
 
         return $input->format($format);
+    }
+
+    public static function now(): Carbon
+    {
+        return Carbon::now(session('preferences.timezone'));
+    }
+
+    public static function toRelativeOffset(int $seconds): string
+    {
+        $timeUnits = [
+            'y' => 31536000,
+            'mo' => 2678400, // 31 days, matching LibreNMS's month period (see legacyTimeSpecToSecs)
+            'w' => 604800,
+            'd' => 86400,
+            'h' => 3600,
+            'm' => 60,
+        ];
+
+        foreach ($timeUnits as $unit => $size) {
+            if ($seconds >= $size && $seconds % $size === 0) {
+                return '-' . ($seconds / $size) . $unit;
+            }
+        }
+
+        return '-' . $seconds . 's';
     }
 }
