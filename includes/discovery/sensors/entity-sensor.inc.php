@@ -132,13 +132,7 @@ if (! empty($entity_oids)) {
                 default => [1, 1],
             };
 
-            // Aviat WTM 4000 on AOS 6.x reports the scale twice: entPhySensorScale carries
-            // the real magnitude (milli) and entPhySensorPrecision is ALSO set to 3.
-            // Applying both makes every reading 1000x too small - a 53.7 V DC input is
-            // recorded as 0.0537 V, which silently disables every threshold on the device.
-            // entPhySensorUnitsDisplay ("mV"/"mA"/"mC") confirms the scale alone is correct.
-            // Older WTM firmware reports scale=units with precision=3, where precision IS
-            // the real scale and must still be applied - so key off the scale, not the OS.
+            // Aviat AOS 6.x sets both entPhySensorScale and entPhySensorPrecision for the same scale
             $aviat_double_scaled = $device['os'] === 'aviat-wtm' && $entry['entPhySensorScale'] !== 'units';
 
             if (is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > 0 && ! $aviat_double_scaled) {
@@ -182,7 +176,7 @@ if (! empty($entity_oids)) {
                 $valid_sensor = false;
             }
 
-            // RFC 3433 underflow/overflow sentinels - both ends, or they wreck autoscaling
+            // RFC 3433 underflow/overflow values
             if ($entry['entPhySensorValue'] == '-1000000000' || $entry['entPhySensorValue'] == '1000000000') {
                 $valid_sensor = false;
             }

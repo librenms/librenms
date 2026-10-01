@@ -46,19 +46,10 @@ class AviatWtm extends OS implements
     WirelessSnrDiscovery,
     WirelessPowerDiscovery
 {
-    /**
-     * Discover OS version, hardware and serial.
-     *
-     * The yaml baseline reads these from fixed entPhysicalIndex 2, which holds the
-     * chassis on WTM 4000. That works for hardware and serial, but the software
-     * revision is only populated on a different entity (index 4 on AOS 6.2), so
-     * version came back empty. Entity indexes are also renumbered by the radio
-     * across reboots and module changes, so rather than hardcode another index we
-     * take the first non-empty entPhysicalSoftwareRev in the table.
-     */
+    // version is not always on entPhysicalIndex 2, fall back to the first non-empty entPhysicalSoftwareRev
     public function discoverOS(Device $device): void
     {
-        parent::discoverOS($device); // yaml baseline: hardware, serial
+        parent::discoverOS($device);
 
         if (empty($device->version)) {
             $versions = SnmpQuery::hideMib()->walk('ENTITY-MIB::entPhysicalSoftwareRev')->table(1);
