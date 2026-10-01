@@ -391,11 +391,13 @@ if ($out_phaseNum == '3') {
 // BATTERY Voltage
 // Set divisor and limit ranges 1 phase UPS systems
 if ($in_phaseNum == '1') {
-	//Old oid
-    //$battery_voltage1_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.2.0';
-	//New oid
-    $battery_voltage1_oid = '.1.3.6.1.2.1.33.1.2.5.0';
+    $battery_voltage1_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.2.0';
     $battery_voltage1 = SnmpQuery::get($battery_voltage1_oid)->value();
+    if (! is_numeric($battery_voltage1)) {
+        // newer firmware only serves the battery voltage in UPS-MIB
+        $battery_voltage1_oid = '.1.3.6.1.2.1.33.1.2.5.0';
+        $battery_voltage1 = SnmpQuery::get($battery_voltage1_oid)->value();
+    }
     $limit = $bat_1phase_limit;
     $warnlimit = $bat_1phase_warnlimit;
     $lowlimit = $bat_1phase_lowlimit;
