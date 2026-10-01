@@ -44,7 +44,7 @@ modules:
                     group: transceiver
                     skip_values:
                         -
-                            oid: ALCATEL-IND1-PORT-MIB::ddmTemperature
+                            oid: ALCATEL-IND1-PORT-MIB::ddmSupplyVoltage
                             op: '='
                             value: 0
 
@@ -88,9 +88,13 @@ modules:
                     group: transceiver
                     skip_values:
                         -
-                            oid: ALCATEL-IND1-PORT-MIB::ddmTxBiasCurrent
+                            oid: ALCATEL-IND1-PORT-MIB::ddmSupplyVoltage
                             op: '='
                             value: 0
+                        -
+                            oid: ALCATEL-IND1-PORT-MIB::ddmTxOutputPower
+                            op: '<='
+                            value: -200000
 
         dbm:
             data:
@@ -110,13 +114,13 @@ modules:
                     group: transceiver
                     skip_values:
                         -
-                            oid: ALCATEL-IND1-PORT-MIB::ddmRxOpticalPower
-                            op: '<='
-                            value: -20000
-                        -
-                            oid: ALCATEL-IND1-PORT-MIB::ddmTxBiasCurrent
+                            oid: ALCATEL-IND1-PORT-MIB::ddmSupplyVoltage
                             op: '='
                             value: 0
+                        -
+                            oid: ALCATEL-IND1-PORT-MIB::ddmTxOutputPower
+                            op: '<='
+                            value: -200000
                 -
                     oid: ALCATEL-IND1-PORT-MIB::ddmInfoEntry
                     value: ALCATEL-IND1-PORT-MIB::ddmTxOutputPower
@@ -133,13 +137,13 @@ modules:
                     group: transceiver
                     skip_values:
                         -
-                            oid: ALCATEL-IND1-PORT-MIB::ddmTxOutputPower
-                            op: '<='
-                            value: -20000
-                        -
-                            oid: ALCATEL-IND1-PORT-MIB::ddmTxBiasCurrent
+                            oid: ALCATEL-IND1-PORT-MIB::ddmSupplyVoltage
                             op: '='
                             value: 0
+                        -
+                            oid: ALCATEL-IND1-PORT-MIB::ddmTxOutputPower
+                            op: '<='
+                            value: -200000
 
         state:
             data:
