@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\LibrenmsConfig;
+use App\Http\Controllers\PortSecurityController;
 use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
@@ -39,6 +40,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
@@ -54,7 +56,7 @@ class PortsController implements DeviceTab
 
     public function visible(Device $device): bool
     {
-        return $device->ports()->exists();
+        return Gate::allows('viewAny', Port::class) && $device->ports()->exists();
     }
 
     public function slug(): string
@@ -82,6 +84,7 @@ class PortsController implements DeviceTab
             'from' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
             'to' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
             ...Port::filterValidationRules(),
+            ...PortSecurity::filterValidationRules(),
         ]);
 
         $this->loadSettings($request);
@@ -99,7 +102,9 @@ class PortsController implements DeviceTab
         return array_merge([
             'tab' => $tab,
             'details' => $this->detail,
-            'filterFields' => $this->filterFields($device->device_id),
+            'filterFields' => $tab === 'portsecurity'
+                ? PortSecurity::filterFieldDefinitions($device->device_id)
+                : $this->filterFields($device->device_id),
             'submenu' => [
                 $this->getTabs($device),
                 __('Graphs') => $this->getGraphLinks(),
@@ -147,7 +152,7 @@ class PortsController implements DeviceTab
 
         if ($this->detail) {
             $data['neighbor_ports'] = Port::with('device')
-                ->hasAccess(Auth::user())
+                ->hasAccess($request->user())
                 ->whereIn('port_id', $data['neighbors']->map(fn ($a) => array_keys($a))->flatten())
                 ->get()->keyBy('port_id');
         }
@@ -283,7 +288,12 @@ class PortsController implements DeviceTab
 
     private function portSecurityData(Device $device): array
     {
-        return [];
+        return [
+            'portSecurity' => PortSecurityController::paginateForDevice(
+                $device->device_id,
+                $this->settings['perPage']
+            ),
+        ];
     }
 
     private function getTabs(Device $device): array
@@ -468,6 +478,7 @@ class PortsController implements DeviceTab
                 'key' => 'search',
                 'label' => __('Description'),
                 'type' => 'text',
+                'search' => true,
             ],
             [
                 'key' => 'state',

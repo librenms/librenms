@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <title>Albentia</title>
+  <rect x="35"  y="35"  width="56" height="56" fill="#4969A2"/>
+  <rect x="105" y="15"  width="76" height="76" fill="#849FCC"/>
+  <rect x="15"  y="105" width="76" height="76" fill="#0C4E8A"/>
+  <rect x="105" y="105" width="56" height="56" fill="#4969A2"/>
+</svg>

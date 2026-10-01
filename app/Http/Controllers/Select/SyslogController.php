@@ -59,6 +59,8 @@ class SyslogController extends SelectController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Syslog::class);
+
         $query = Syslog::hasAccess($request->user())
             ->select($request->input('field'))->distinct();
 

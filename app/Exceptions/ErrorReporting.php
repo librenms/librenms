@@ -29,6 +29,7 @@ namespace App\Exceptions;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
@@ -79,7 +80,7 @@ class ErrorReporting
         return true;
     }
 
-    public function render(Throwable $exception, Request $request): ?Response
+    public function render(Throwable $exception, Request $request): Response|JsonResponse|null
     {
         // try to upgrade generic exceptions to more specific ones
         if (! config('app.debug')) {

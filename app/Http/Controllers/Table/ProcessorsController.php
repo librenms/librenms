@@ -46,6 +46,8 @@ class ProcessorsController extends TableController
 
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Processor::class);
+
         return Processor::query()
             ->hasAccess($request->user())
             ->when($request->input('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'processors.device_id'))
@@ -74,7 +76,7 @@ class ProcessorsController extends TableController
         ];
 
         $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $model->device]);
-        $descr = $model->processor_descr;
+        $descr = htmlspecialchars((string) $model->processor_descr);
         $mini_graph = Url::graphPopup($graph_array);
         $bar = Html::percentageBar(400, 10, $perc, $perc . '%', (100 - $perc) . '%', $model->processor_perc_warn);
         $usage = Url::graphPopup($graph_array, $bar);

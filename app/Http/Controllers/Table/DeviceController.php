@@ -53,6 +53,7 @@ class DeviceController extends TableController
     {
         return [
             'format' => 'nullable|in:list_basic,list_detail',
+            ...Device::filterValidationRules(),
             'os' => 'nullable|string',
             'version' => 'nullable|string',
             'hardware' => 'nullable|string',
@@ -85,8 +86,9 @@ class DeviceController extends TableController
             'status' => 'status',
             'icon' => 'icon',
             'hostname' => 'hostname',
+            'display' => 'display',
             'hardware' => 'hardware',
-            'os' => 'os',
+            'os' => ['os', 'version', 'display'],
             'uptime' => \DB::raw('IF(`status` = 1, `uptime`, `last_polled` - NOW())'),
             'location' => 'location',
             'device_id' => 'device_id',
@@ -98,9 +100,12 @@ class DeviceController extends TableController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Device::class);
+
         /** @var Builder $query */
         $query = Device::hasAccess($request->user())
             ->with(['location', 'groups'])
+            ->applyFilters($request->array('filter'))
             ->withCount(['ports', 'sensors', 'wirelessSensors']);
 
         // if searching or sorting the location field, join the locations table
@@ -141,9 +146,7 @@ class DeviceController extends TableController
 
     private function isDetailed()
     {
-        if (is_null($this->detailed)) {
-            $this->detailed = \Request::input('format', 'list_detail') == 'list_detail';
-        }
+        $this->detailed ??= \Request::input('format', 'list_detail') == 'list_detail';
 
         return $this->detailed;
     }
@@ -273,7 +276,7 @@ class DeviceController extends TableController
             ],
         ];
 
-        if (Gate::allows('update', Device::class)) {
+        if (Gate::allows('device.update')) {
             $actions[0][] = [
                 'title' => 'Edit device',
                 'href' => Url::deviceUrl($device, ['tab' => 'edit']),

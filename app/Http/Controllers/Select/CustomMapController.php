@@ -42,6 +42,8 @@ class CustomMapController extends SelectController
 
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', CustomMap::class);
+
         return CustomMap::query()->hasAccess($request->user())
             ->select('custom_map_id', 'name')
             ->orderBy('name');

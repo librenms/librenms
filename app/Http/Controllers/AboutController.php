@@ -27,6 +27,7 @@
 namespace App\Http\Controllers;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\AlertLog;
 use App\Models\Application;
 use App\Models\Callback;
 use App\Models\Device;
@@ -48,14 +49,12 @@ use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\Sla;
 use App\Models\Storage;
-use App\Models\Syslog;
 use App\Models\Vlan;
 use App\Models\Vrf;
 use App\Models\WirelessSensor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
-use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Util\Http;
 use LibreNMS\Util\Version;
 
@@ -81,7 +80,7 @@ class AboutController extends Controller
             'version_laravel' => App::version(),
             'version_python' => $version->python(),
             'version_webserver' => $request->server('SERVER_SOFTWARE'),
-            'version_rrdtool' => Rrd::version(),
+            'version_rrdtool' => $version->rrdtool(),
             'version_netsnmp' => $version->netSnmp(),
 
             'stat_apps' => Application::count(),
@@ -103,7 +102,7 @@ class AboutController extends Controller
             'stat_services' => Service::count(),
             'stat_slas' => Sla::count(),
             'stat_storage' => Storage::count(),
-            'stat_syslog' => Syslog::count(),
+            'stat_alertlogs' => AlertLog::count(),
             'stat_toner' => PrinterSupply::count(),
             'stat_vlans' => Vlan::count(),
             'stat_vrf' => Vrf::count(),

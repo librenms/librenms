@@ -43,6 +43,8 @@ class AlertScheduleController extends TableController
 
     protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
+        $this->authorize('viewAny', AlertSchedule::class);
+
         return AlertSchedule::query();
     }
 

@@ -40,13 +40,17 @@ final class SlackTest extends TestCase
     {
         Http::fake();
 
-        $slack = new Transport\Slack(new AlertTransport);
+        $slack = new Transport\Slack(new AlertTransport([
+            'transport_config' => [
+                'slack-url' => 'https://slack.com/some/webhook',
+            ],
+        ]));
 
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make();
         $slack->deliverAlert(AlertData::testData($mock_device));
 
-        Http::assertSent(fn (Request $request) => $request->url() == '' &&
+        Http::assertSent(fn (Request $request) => $request->url() == 'https://slack.com/some/webhook' &&
         $request->method() == 'POST' &&
         $request->hasHeader('Content-Type', 'application/json') &&
         $request->data() == [

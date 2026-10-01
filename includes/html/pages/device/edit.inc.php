@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\BgpPeer;
-use App\Models\Device;
 use App\Models\Sensor;
 use App\Models\WirelessSensor;
 
@@ -11,7 +10,7 @@ $link_array = ['page' => 'device',
     'device' => $device['device_id'],
     'tab' => 'edit', ];
 
-if (Gate::denies('update', Device::class)) {
+if (Gate::denies('device.update')) {
     print_error('Insufficient Privileges');
 } else {
     $panes['device'] = 'Device Settings';
@@ -65,9 +64,7 @@ if (Gate::denies('update', Device::class)) {
 
     $sep = '';
     foreach ($panes as $type => $text) {
-        if (! isset($vars['section'])) {
-            $vars['section'] = $type;
-        }
+        $vars['section'] ??= $type;
         echo $sep;
         if ($vars['section'] == $type) {
             echo "<span class='pagemenu-selected'>";

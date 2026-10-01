@@ -74,6 +74,8 @@ class InventoryController extends TableController
 
     protected function baseQuery($request): Builder|\Illuminate\Database\Query\Builder
     {
+        $this->authorize('viewAny', EntPhysical::class);
+
         $query = EntPhysical::hasAccess($request->user())
             ->with('device')
             ->select(['entPhysical_id', 'device_id', 'entPhysicalDescr', 'entPhysicalName', 'entPhysicalModelName', 'entPhysicalSerialNum']);

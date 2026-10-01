@@ -30,7 +30,6 @@ if (Gate::none(['create', 'update', 'view', 'delete'], AlertSchedule::class)) {
 $sub_type = $_POST['sub_type'];
 
 if ($sub_type == 'new-maintenance') {
-    Gate::authorize('create', AlertSchedule::class);
     // Defaults
     $status = 'error';
     $update = 0;
@@ -39,6 +38,9 @@ if ($sub_type == 'new-maintenance') {
     $schedule_id = $_POST['schedule_id'] ?? 0;
     if ($schedule_id > 0) {
         $update = 1;
+        Gate::authorize('update', AlertSchedule::class);
+    } else {
+        Gate::authorize('create', AlertSchedule::class);
     }
 
     $title = $_POST['title'];
@@ -200,8 +202,8 @@ if ($sub_type == 'new-maintenance') {
         'schedule_id' => $alert_schedule->schedule_id ?? null,
     ];
 } elseif ($sub_type == 'parse-maintenance') {
-    Gate::authorize('view', AlertSchedule::class);
     $alert_schedule = AlertSchedule::findOrFail($_POST['schedule_id']);
+    Gate::authorize('view', $alert_schedule);
     $items = [];
 
     foreach (dbFetchRows('SELECT `alert_schedulable_type`, `alert_schedulable_id` FROM `alert_schedulables` WHERE `schedule_id`=?', [$alert_schedule->schedule_id]) as $target) {
@@ -225,8 +227,8 @@ if ($sub_type == 'new-maintenance') {
     $response['recurring_day'] = $alert_schedule->getOriginal('recurring_day');
     $response['targets'] = $items;
 } elseif ($sub_type == 'end-maintenance') {
-    Gate::authorize('update', AlertSchedule::class);
     $alert_schedule = AlertSchedule::findOrFail($_POST['schedule_id'] ?? 0);
+    Gate::authorize('update', $alert_schedule);
     $alert_schedule->end = date('Y-m-d H:i:s');
     $alert_schedule->save();
     $response = [
@@ -234,9 +236,10 @@ if ($sub_type == 'new-maintenance') {
         'message' => 'Maintenance has been ended',
     ];
 } elseif ($sub_type == 'del-maintenance') {
-    Gate::authorize('delete', AlertSchedule::class);
-    $schedule_id = $_POST['del_schedule_id'];
-    AlertSchedule::where('schedule_id', $schedule_id)->delete();
+    $schedule_id = $_POST['del_schedule_id'] ?? 0;
+    $alert_schedule = AlertSchedule::findOrFail($schedule_id);
+    Gate::authorize('delete', $alert_schedule);
+    $alert_schedule->delete();
     AlertSchedulable::where('schedule_id', $schedule_id)->delete();
     $status = 'ok';
     $message = 'Maintenance schedule has been removed';

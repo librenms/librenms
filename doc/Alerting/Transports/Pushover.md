@@ -1,23 +1,22 @@
 ## Pushover
 
-If you want to change the default [notification
-sound](https://pushover.net/api#sounds) for all notifications then you
-can add the following in Pushover Options:
+To change the default [notification
+sound](https://pushover.net/api#sounds) for all notifications, add this
+line to Pushover Options:
 
 `sound=falling`
 
-You also have the possibility to change sound per severity:
+You can also set a sound for each severity. `sound_ok` applies to a
+recovery notification:
 `sound_critical=falling`
 `sound_warning=siren`
 `sound_ok=magic`
 
-Enabling Pushover support is fairly easy, there are only two required parameters.
-
-Firstly you need to create a new Application (called LibreNMS, for
-example) in your account on the Pushover website ([https://pushover.net/apps](https://pushover.net/apps)).
-
-Now copy your API Key and obtain your User Key from the newly created
-Application and setup the transport.
+Pushover support needs only two parameters. First, create a new
+application in your account on the [Pushover
+website](https://pushover.net/apps). You can give it the name LibreNMS.
+Then get the API key of the new application and your user key or group
+key. Then configure the transport.
 
 [Pushover Docs](https://pushover.net/api)
 
@@ -26,5 +25,5 @@ Application and setup the transport.
 | Config | Example |
 | ------ | ------- |
 | Api Key | APPLICATIONAPIKEYGOESHERE |
-| User Key | USERKEYGOESHERE |
+| User/Group Key | USERORGROUPKEYGOESHERE |
 | Pushover Options | sound_critical=falling <br/> sound_warning=siren <br/> sound_ok=magic |

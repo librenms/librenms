@@ -58,7 +58,6 @@ class LegacyController extends Controller
         }
 
         $html = ob_get_clean();
-        ob_end_clean();
 
         if (isset($pagetitle) && is_array($pagetitle)) {
             // if prefix is set, put it in front

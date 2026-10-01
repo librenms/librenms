@@ -78,6 +78,8 @@ class RoutesTablesController extends TableController
      */
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Route::class);
+
         $join = function ($query): void {
             $query->on('ports.port_id', 'route.port_id');
         };

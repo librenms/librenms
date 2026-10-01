@@ -55,6 +55,8 @@ class DeviceController extends SelectController
 
     protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Device::class);
+
         $this->id = $request->input('key', 'device_id');
         $user_id = $request->input('user');
 

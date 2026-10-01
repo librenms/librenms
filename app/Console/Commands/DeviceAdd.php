@@ -88,7 +88,7 @@ class DeviceAdd extends LnmsCommand
         $priv = $this->option('privacy-password');
         $device = new Device([
             'hostname' => $this->argument('device spec'),
-            'display' => $this->option('display-name'),
+            'display_template' => $this->option('display-name'),
             'snmpver' => $this->option('v3') ? 'v3' : ($this->option('v2c') ? 'v2c' : ($this->option('v1') ? 'v1' : '')),
             'port' => $this->option('port'),
             'transport' => $this->option('transport'),

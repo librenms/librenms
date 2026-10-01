@@ -60,6 +60,8 @@ class MacSearchController extends TableController
 
     protected function baseQuery(Request $request): Builder|\Illuminate\Database\Query\Builder
     {
+        $this->authorize('viewAny', Port::class);
+
         return Port::query()
             ->hasAccess($request->user())
             ->with('device')
@@ -85,7 +87,7 @@ class MacSearchController extends TableController
             'hostname' => Url::modernDeviceLink($model->device),
             'interface' => Url::portLink($model),
             'address' => $mac->readable(),
-            'description' => $model->getLabel() == $model->ifAlias ? '' : $model->ifAlias,
+            'description' => $model->getLabel() == $model->ifAlias ? '' : htmlspecialchars((string) $model->ifAlias),
             'mac_oui' => $mac->vendor(),
         ];
     }

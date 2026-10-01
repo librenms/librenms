@@ -2,6 +2,8 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
+use App\Models\SslCertificate;
 use App\Models\User;
 
 class SslCertificatePolicy
@@ -13,30 +15,18 @@ class SslCertificatePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
-            || $this->hasGlobalPermission($user, 'viewAll')
+        return $this->hasGlobalPermission($user, 'view', true)
             || $this->hasGlobalPermission($user, 'create')
             || $this->hasGlobalPermission($user, 'delete');
     }
 
     /**
-     * Determine whether the user can view all SSL certificates.
-     */
-    public function viewAll(User $user): bool
-    {
-        return $this->hasGlobalPermission($user, 'viewAll');
-    }
-
-    /**
      * Determine whether the user can view the SSL certificate.
      */
-    public function view(User $user): bool
+    public function view(User $user, SslCertificate $sslCertificate): bool
     {
-        if ($this->hasGlobalPermission($user, 'viewAll')) {
-            return true;
-        }
-
-        return $this->hasGlobalPermission($user, 'view');
+        return $this->hasGlobalPermission($user, 'view', true)
+            && ($sslCertificate->device_id === null || Permissions::canAccessDevice($sslCertificate->device_id, $user));
     }
 
     /**

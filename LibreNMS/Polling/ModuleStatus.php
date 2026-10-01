@@ -79,11 +79,12 @@ class ModuleStatus implements \Stringable
 
     public function isEnabledAndDeviceUp(Device $device, bool $check_snmp = true): bool
     {
-        if ($check_snmp && $device->snmp_disable) {
+        $connectivity = new ConnectivityHelper($device);
+        if ($check_snmp && ! $connectivity->snmpIsAvailable()) {
             return false;
         }
 
-        return $this->isEnabled() && $device->status;
+        return $this->isEnabled() && $connectivity->isAvailable();
     }
 
     public function hasSubModules(): bool

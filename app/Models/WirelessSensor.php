@@ -27,13 +27,19 @@
 namespace App\Models;
 
 use App\Facades\LibrenmsConfig;
+use App\Observers\WirelessSensorObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Arr;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
+#[ObservedBy([WirelessSensorObserver::class])]
 class WirelessSensor extends SensorModel implements Keyable
 {
+    use HasFactory;
+
     const CREATED_AT = null;
     const UPDATED_AT = 'lastupdate';
     protected $primaryKey = 'sensor_id';
@@ -62,7 +68,7 @@ class WirelessSensor extends SensorModel implements Keyable
     ];
 
     /**
-     * @return array{sensor_class: 'LibreNMS\Enum\WirelessSensorType', sensor_oids: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {

@@ -28,13 +28,9 @@ if (! isset($percentile)) {
     $length += 2;
 }
 
-if (! isset($out_text)) {
-    $out_text = 'Out';
-}
+$out_text ??= 'Out';
 
-if (! isset($in_text)) {
-    $in_text = 'In';
-}
+$in_text ??= 'In';
 
 $unit_text = Rrd::fixedSafeDescr($unit_text, $length);
 $in_text = Rrd::fixedSafeDescr($in_text, $length);
