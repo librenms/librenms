@@ -64,7 +64,7 @@ class CustomMap extends BaseModel
     ];
 
     /**
-     * @return array{options: 'array', legend_colours: 'array', newnodeconfig: 'array', newedgeconfig: 'array', background_data: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {

@@ -2,6 +2,7 @@
 
 $name = 'zfs';
 $unit_text = 'ms';
+$divider = 1000000;
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 0;

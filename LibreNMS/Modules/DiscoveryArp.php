@@ -52,7 +52,6 @@ class DiscoveryArp implements Module
         $entries = $os->getDevice()->macs()
             ->select(['id', 'ipv4_address', 'port_id'])
             ->whereHas('port', function (Builder $query): void {
-                /** @phpstan-ignore method.notFound */
                 $query->isNotDeleted();
             })
             ->whereDoesntHave('ipv4Address')

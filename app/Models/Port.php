@@ -61,6 +61,9 @@ class Port extends DeviceRelatedModel
         'device.hostname',
     ];
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
