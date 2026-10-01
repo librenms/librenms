@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="89.668" height="81.905" version="1.1" viewBox="0 0 89.667719 81.904693">
+  <defs>
+    <style>.st0 {
+        fill: #0096b4;
+      }</style>
+  </defs>
+  <g stroke-width=".38336">
+    <rect class="st0" x="29.791" width="11.225" height="11.225"></rect>
+    <rect class="st0" x="7.4832" y="34.978" width="11.225" height="11.225"></rect>
+    <rect class="st0" x="29.791" y="22.035" width="18.708" height="18.708"></rect>
+    <rect class="st0" y="7.0653" width="18.708" height="18.708"></rect>
+    <path class="st0" d="m59.727 22.035v11.225c11.106 0 18.673 7.4832 18.673 18.708 0 11.225-7.5675 18.708-18.673 18.708h-18.708v-18.708h-11.225v29.937h30.006c16.469 0 29.868-13.287 29.868-29.937 0-16.649-13.467-29.937-29.937-29.937z"></path>
+  </g>
+</svg>
