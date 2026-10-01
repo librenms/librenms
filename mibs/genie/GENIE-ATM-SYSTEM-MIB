@@ -1,0 +1,2860 @@
+--
+-- GENIE-ATM-SYSTEM-MIB.my
+--
+
+	GENIE-ATM-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		atm
+			FROM GENIE-GE-ROOT-MIB
+		TimeTicks, IpAddress, Integer32, Unsigned32, Gauge32,
+		Counter32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+			FROM SNMPv2-SMI
+		DisplayString, DateAndTime
+			FROM SNMPv2-TC
+		Ipv6Address
+			FROM IPV6-TC
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+                ifIndex
+                        FROM IF-MIB
+
+        InetAddress
+            FROM INET-ADDRESS-MIB;
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1
+	genieAtmSystemMIB MODULE-IDENTITY
+		LAST-UPDATED "201208011750Z"	-- Aug 1, 2012 at 17:50 GMT
+		ORGANIZATION
+			"Genie Networks Ltd."
+		CONTACT-INFO
+			"Postal: Genie Networks Ltd.
+			        5F, No 15, Lane 360, Sec. 1, Neihu Road, Taipei
+			        Taiwan, R.O.C.
+
+			Tel:    +886 02 2657 1088
+			E-Mail: service@genie-networks.com
+		"
+		DESCRIPTION
+		"The MIB module describes GenieATM system, module objects."
+	::= { atm 1 }
+
+
+--
+-- Node definitions
+--
+
+	-- 1.3.6.1.4.1.9926.1.21.1.1
+	geAtmSystemInfo OBJECT IDENTIFIER ::= { genieAtmSystemMIB 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2
+	geAtmModule OBJECT IDENTIFIER ::= { genieAtmSystemMIB 2 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3
+	geAtmMonitor OBJECT IDENTIFIER ::= { genieAtmSystemMIB 3 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4
+	geAtmBaseline OBJECT IDENTIFIER ::= { genieAtmSystemMIB 4 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.5
+	geAtmExporter OBJECT IDENTIFIER ::= { genieAtmSystemMIB 5 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6
+	geAtmSystemTraps OBJECT IDENTIFIER ::= { genieAtmSystemMIB 6 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.7
+	geAtmAnomalyNotification OBJECT IDENTIFIER ::= { genieAtmSystemMIB 7 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.8
+	geAtmAnomalyNotificationV2 OBJECT IDENTIFIER ::= { genieAtmSystemMIB 8 }
+
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.1.1
+	geAtmSystemRebootTime OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The system reboot time of the device."
+	::= { geAtmSystemInfo 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.1.2
+	geAtmSystemAnalyzerTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF GeAtmSystemAnalyzerEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"This table provides the information and status of analyzer inventories
+		such as collectors."
+	::= { geAtmSystemInfo 2 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.1.2.1
+	geAtmSystemAnalyzerEntry OBJECT-TYPE
+		SYNTAX GeAtmSystemAnalyzerEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"(Controller only)This table contains the module ID, CPU loading and memory usage
+		for each collector, FLB and msp server."
+		INDEX { geAtmSystemAnalyzerModuleID }
+	::= { geAtmSystemAnalyzerTable 1 }
+
+
+	GeAtmSystemAnalyzerEntry ::=
+	SEQUENCE {
+		geAtmSystemAnalyzerModuleID
+			INTEGER,
+		geAtmSystemAnalyzerType
+			INTEGER,
+		geAtmSystemAnalyzerIPAddress
+			IpAddress,
+		geAtmSystemAnalyzerCpuLoad
+			Gauge32,
+		geAtmSystemAnalyzerMemUsage
+			Gauge32
+	 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.1.2.1.1
+	geAtmSystemAnalyzerModuleID OBJECT-TYPE
+		SYNTAX INTEGER (1..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The unique ID of analyzer module.
+		 There is only one Controller and with multiple Collectors
+		for one system."
+	::= { geAtmSystemAnalyzerEntry 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.1.2.1.2
+	geAtmSystemAnalyzerType OBJECT-TYPE
+		SYNTAX INTEGER {
+			controller(1),
+			collector(2),
+			msp-server(3),
+			flb(4),
+			report-aggregator(6),
+			route-analyzer(11),
+			flow-filter(13),
+			anomaly-analyzer(16),
+			visualization(18),
+			data-repository(20)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The type of analyzer module, i.e. Controller, Collector, FLB
+		 in the ATM system."
+	::= { geAtmSystemAnalyzerEntry 2 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.1.2.1.3
+	geAtmSystemAnalyzerIPAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The IP address of analyzer module."
+	::= { geAtmSystemAnalyzerEntry 3 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.1.2.1.4
+	geAtmSystemAnalyzerCpuLoad OBJECT-TYPE
+		SYNTAX Gauge32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The CPU usage percentage of the analyzer."
+	::= { geAtmSystemAnalyzerEntry 4 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.1.2.1.5
+	geAtmSystemAnalyzerMemUsage OBJECT-TYPE
+		SYNTAX Gauge32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The memory usage percentage of the analyzer."
+	::= { geAtmSystemAnalyzerEntry 5 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.1.3
+	geAtmSystemSslExpirationTime OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The SSL certificate expiration time of the device."
+	::= { geAtmSystemInfo 3 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.1.4
+	geAtmSystemDeviceCpuLoad OBJECT-TYPE
+		SYNTAX Gauge32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The CPU usage percentage of this local device."
+	::= { geAtmSystemInfo 4 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.1.5
+	geAtmSystemDeviceMemUsage OBJECT-TYPE
+		SYNTAX Gauge32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The memory usage percentage of this local device"
+	::= { geAtmSystemInfo 5 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1
+	geAtmModuleTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF GeAtmModuleEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"This table provides the basic configuration information
+         of ATM modules.  ATM has two types of modules: Controller,
+         and Collector."
+	::= { geAtmModule 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1
+	geAtmModuleEntry OBJECT-TYPE
+		SYNTAX GeAtmModuleEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"This table contains module ID, module type, module IP, admin
+                 status, operation status, configure version, processed NetFlow
+                 number, dropped packet number, and storage usage."
+	INDEX { geAtmModuleID }
+	::= { geAtmModuleTable 1 }
+
+
+	GeAtmModuleEntry ::=
+	SEQUENCE {
+		geAtmModuleID
+			INTEGER,
+		geAtmModuleType
+			INTEGER,
+		geAtmModuleIPAddress
+			IpAddress,
+		geAtmModuleAdminStatus
+			INTEGER,
+		geAtmModuleOperationStatus
+			INTEGER,
+		geAtmModuleCfgVersion
+			INTEGER,
+		geAtmModuleProcessedNetFlowNum
+			Counter32,
+		geAtmModuleDroppedPktNum
+			Counter32,
+		geAtmModuleStorageUsage
+			Integer32,
+		geAtmModuleAnomalyRawUsage
+			Integer32,
+		geAtmModuleDroppedFlows
+			Counter32,
+		geAtmModuleFlowTreapCounters
+		        Counter64,
+		geAtmModuleDeliverCommands
+		        Counter64,
+		geAtmModuleDeliverFailedCommands
+		        Counter64,
+                geAtmModuleLicExceedPkt
+               		Counter32,
+                geAtmModuleSentFlows
+               		Counter32,
+                geAtmModuleUpTime
+			TimeTicks,
+                geAtmHardwareIPAddress1
+                        IpAddress,
+                geAtmHardwareIPAddress2
+                        IpAddress,
+                geAtmModuleMaxRecvFlowsFiveMinutes
+               		Integer32,
+                geAtmModuleMaxRecvFlowsTimeFiveMinutes
+			TimeTicks,
+		geAtmModuleFollowCollection
+			Integer32,
+		geAtmModuleRouterEventViewer
+			Integer32,
+		geAtmModuleRouterEventReport
+			Integer32,
+		geAtmModuleSerialNumber
+			Integer32,
+        geAtmModuleLicExpiryDate
+            SnmpAdminString,
+        geAtmModuleLicType
+            Integer32,
+        geAtmStorage
+            SnmpAdminString,
+        geAtmVrrpOperationStatus
+            INTEGER,
+        geAtmModuleTicketDataCounters
+            Counter64,
+        geAtmModuleTicketAggregatedDataCounters
+            Counter64,
+        geAtmModuleSentFilteredFlows
+            Counter32,
+        geAtmSubModuleName
+            OCTET STRING,
+        geAtmClusterRole
+            INTEGER,
+        geAtmModuleSerialNumberV2
+            DisplayString
+	 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.1
+	geAtmModuleID OBJECT-TYPE
+		SYNTAX INTEGER (1..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The ID of a module. It is an unique number in the system.
+                 There is only one Controller and with multiple Collectors
+                 for one system."
+	::= { geAtmModuleEntry 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.2
+	geAtmModuleType OBJECT-TYPE
+		SYNTAX INTEGER {
+		    controller(1),
+		    collector(2),
+		    msp-server(3),
+		    flb(4),
+		    probe(5),
+		    report-aggregator(6),
+		    route-analyzer(11),
+                    topn-builder(12),
+		    new-msp-server(19),
+		    data-server(20)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The type of a module, i.e. either Controller, Collector, FLB,
+		 MSP Server, Probe, Report Aggregator, Route Analyzer, TopN Builder or Data Server in the ATM system.
+		 Please note msp-server(3) is obsolete from ver 7.1.3"
+	::= { geAtmModuleEntry 2 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.3
+	geAtmModuleIPAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Module IP address."
+	::= { geAtmModuleEntry 3 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.4
+	geAtmModuleAdminStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+		    enable(1),
+		    disable(2)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The administration status of the module."
+	::= { geAtmModuleEntry 4 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.5
+	geAtmModuleOperationStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+		    up(1),
+		    down(2),
+		    abnormal(3)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The operation status of the module. The 'abnormal' status
+                 is for the scenario when the process number or thread number
+                 is less than the normal state."
+	::= { geAtmModuleEntry 5 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.6
+	geAtmModuleCfgVersion OBJECT-TYPE
+		SYNTAX INTEGER (1..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Configuration version of module (based on the version provided
+                 by CM) in ATM system."
+	::= { geAtmModuleEntry 6 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.7
+	geAtmModuleProcessedNetFlowNum OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The processed Netflow number. This object only applies to
+                 Collector only."
+	::= { geAtmModuleEntry 7 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.8
+	geAtmModuleDroppedPktNum OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The dropped packet number. This object only applies to
+                 Collector only."
+	::= { geAtmModuleEntry 8 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.9
+	geAtmModuleStorageUsage OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The storage usage for each module. On controller (all-in-one)
+                 the storage usage for controller is the DB usage, the storage
+                 usage for the collector is raw data usage or -1 to indicate
+                 the collector is disabled or the storage usage for collector
+                 is not available. On collector the storage usage for collector
+                 is the raw data usage. If the collector is not enabled to
+                 write the raw data then -1 is returned to indicate the
+		 collector storage usage is not available. There is no
+                 controller on collector therefore the storage usage for
+                 controller is -1 on collector."
+	::= { geAtmModuleEntry 9 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.10
+	geAtmModuleAnomalyRawUsage OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The anomaly raw storage usage for collector module only.
+         For controller module and collector module without anomaly
+         raw partition mounted, -1 will be returned to indicate the
+		 anomaly raw storage usage is not available."
+	::= { geAtmModuleEntry 10 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.11
+	geAtmModuleDroppedFlows OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number of dropped flow records by Collector. This object only
+         applies to Collector module."
+	::= { geAtmModuleEntry 11 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.12
+	geAtmModuleFlowTreapCounters OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number of TopN Report Counters been calculated by Collector.
+		 This object is treated as a performance index while reviewing flow
+		 capacity and only applies to Collector module."
+	::= { geAtmModuleEntry 12 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.13
+ 	geAtmModuleDeliverCommands OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number of commands sent to the Top-N builder by the Collector."
+	::= { geAtmModuleEntry 13 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.14
+ 	geAtmModuleDeliverFailedCommands OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		" The number of commands failed to send to the Top-N builder by the Collector."
+	::= { geAtmModuleEntry 14 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.15
+        geAtmModuleLicExceedPkt OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number of packet drops by the Collector due to exceeding license limit."
+	::= { geAtmModuleEntry 15 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.16
+        geAtmModuleSentFlows OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+        DESCRIPTION
+        "The total number of flow records which were sent from the flow
+         exporting/forwarding entity to other collectors."
+        ::= { geAtmModuleEntry 16 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.17
+        geAtmModuleUpTime OBJECT-TYPE
+		SYNTAX TimeTicks
+		MAX-ACCESS read-only
+		STATUS current
+        DESCRIPTION
+        "This table recoreds module up time."
+        ::= { geAtmModuleEntry 17 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.18
+        geAtmHardwareIPAddress1 OBJECT-TYPE
+                SYNTAX IpAddress
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "ATM Device Hardware IP address."
+        ::= { geAtmModuleEntry 18 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.19
+        geAtmHardwareIPAddress2 OBJECT-TYPE
+                SYNTAX IpAddress
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "ATM Device Hardware IP address."
+        ::= { geAtmModuleEntry 19 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.20
+        geAtmModuleMaxRecvFlowsFiveMinutes OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+        DESCRIPTION
+        "This table recoreds the max flows/s received during 5-min interval."
+        ::= { geAtmModuleEntry 20 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.21
+        geAtmModuleMaxRecvFlowsTimeFiveMinutes OBJECT-TYPE
+                SYNTAX TimeTicks
+                MAX-ACCESS read-only
+                STATUS current
+        DESCRIPTION
+        "This table records the time of the max flows/s received during 5-min interval."
+        ::= { geAtmModuleEntry 21 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.22
+        geAtmModuleFollowCollection OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+        DESCRIPTION
+        "The value indicates the flow collection is enabled/disabled."
+        ::= { geAtmModuleEntry 22 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.23
+        geAtmModuleRouterEventViewer OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+        DESCRIPTION
+        "The value indicates if the route event viewer is available."
+        ::= { geAtmModuleEntry 23 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.24
+        geAtmModuleRouterEventReport OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+        DESCRIPTION
+        "Indicate if the route event report is available."
+        ::= { geAtmModuleEntry 24 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.25
+        geAtmModuleSerialNumber  OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+        DESCRIPTION
+        "To show the license serial number."
+        ::= { geAtmModuleEntry 25 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.26
+        geAtmModuleLicExpiryDate OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "The expiry date of the existing license."
+        ::= { geAtmModuleEntry 26 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.27
+        geAtmModuleLicType OBJECT-TYPE
+            SYNTAX Integer32 { non-vm(0), vm(1) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "The license type of the existing license."
+        ::= { geAtmModuleEntry 27 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.28
+        geAtmStorage OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "The storage type of the db backup."
+        ::= { geAtmModuleEntry 28 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.29
+        geAtmVrrpOperationStatus OBJECT-TYPE
+            SYNTAX INTEGER {
+                masterToBackup(1),
+                backupToMaster(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "Indicate the VRRP status change."
+        ::= { geAtmModuleEntry 29 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.30
+	geAtmModuleTicketDataCounters OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number of Anomaly Ticket Data Counters been calculated by Atd module.
+		 This object is treated as a performance index while reviewing ticket data."
+	::= { geAtmModuleEntry 30 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.2.1.1.31
+	geAtmModuleTicketAggregatedDataCounters OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number of Anomaly Ticket Data Counters been aggregated by Atd module.
+		 This object is treated as a performance index while reviewing ticket aggregated data."
+	::= { geAtmModuleEntry 31 }
+
+    -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.32
+    geAtmModuleSentFilteredFlows OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The total number of flow records which were sent by filtering operation."
+    ::= { geAtmModuleEntry 32 }
+
+    -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.33
+    geAtmSubModuleName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The Name of a sub-module."
+    ::= { geAtmModuleEntry 33 }
+
+    -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.34
+    geAtmClusterRole OBJECT-TYPE
+        SYNTAX INTEGER {
+            masterToStandby(1),
+            standbyToMaster(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Indicate the Notify Action Cluster Role change."
+    ::= { geAtmModuleEntry 34 }
+
+    -- 1.3.6.1.4.1.9926.1.21.1.2.1.1.35
+    geAtmModuleSerialNumberV2 OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "To show the license serial number string."
+    ::= { geAtmModuleEntry 35 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.1
+	geAtmMonIfTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF GeAtmMonIfEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"A MIB table to support SNMP ifTable monitoring for
+                 ATM modules.
+                 This MIB is used for trap only."
+	::= { geAtmMonitor 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.1.1
+	geAtmMonIfEntry OBJECT-TYPE
+		SYNTAX GeAtmMonIfEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"This table contains monitoring target in ATM. It includes what
+		 are the monitored, the value triggering the alert, the value
+                of the threshold, and IP address."
+	INDEX { geAtmMonIfIndex, geAtmMonIfRtrIpAddr }
+	::= { geAtmMonIfTable 1 }
+
+
+	GeAtmMonIfEntry ::=
+	SEQUENCE {
+		geAtmMonIfIndex
+			INTEGER,
+		geAtmMonIfRtrIpAddr
+			IpAddress,
+		geAtmMonIfStatsType
+			INTEGER,
+		geAtmMonIfStatsValue
+			Counter32,
+		geAtmMonIfThresd
+			Counter32
+	 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.1.1.1
+	geAtmMonIfIndex OBJECT-TYPE
+		SYNTAX INTEGER (1..65535)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The monitored interface index."
+	::= { geAtmMonIfEntry 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.1.1.2
+	geAtmMonIfRtrIpAddr OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The IP address of the monitored router."
+	::= { geAtmMonIfEntry 2 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.1.1.3
+	geAtmMonIfStatsType OBJECT-TYPE
+		SYNTAX INTEGER {
+		    inputPackets(1),
+		    outputPackets(2),
+		    inputDiscards(3),
+		    outputDiscards(4),
+		    inputErrors(5),
+		    outputErrors(6),
+		    inputMBroadcast(7),
+		    outputMBroadcast(8),
+		    inputThroughput(9),
+		    outputThroughput(10),
+		    inputUtilization(11),
+		    outputUtilization(12)
+		}
+		MAX-ACCESS read-only
+		STATUS deprecated
+		DESCRIPTION
+		"The monitored interface traffic statistic object type."
+	::= { geAtmMonIfEntry 3 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.1.1.4
+	geAtmMonIfStatsValue OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The value for the traffic statistic object of monitored
+		 interface."
+	::= { geAtmMonIfEntry 4 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.1.1.5
+	geAtmMonIfThresd OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The threshold of the traffic statistic object of monitored
+		 interface."
+	::= { geAtmMonIfEntry 5 }
+
+
+	--
+        -- This table is defined and used by Trap only
+        -- SNMP agent won't support it.
+        --
+	-- 1.3.6.1.4.1.9926.1.21.1.3.2
+	geAtmBgpHijackInfoTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF GeAtmBgpHijackInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"A MIB table of BGP route monitoring.
+                 This MIB is used for trap only."
+	::= { geAtmMonitor 2 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.2.1
+	geAtmBgpHijackInfoEntry OBJECT-TYPE
+		SYNTAX GeAtmBgpHijackInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"This table contains BGP hijack information."
+	INDEX { geAtmBgpHijackInfoBrIp,
+        	geAtmBgpHijackInfoBgpPrefix,
+        	geAtmBgpHijackInfoOriginalAS }
+	::= { geAtmBgpHijackInfoTable 1 }
+
+
+	GeAtmBgpHijackInfoEntry ::=
+	SEQUENCE {
+		geAtmBgpHijackInfoBrIp
+			IpAddress,
+		geAtmBgpHijackInfoPeerAS
+			INTEGER,
+		geAtmBgpHijackInfoBgpPrefix
+			DisplayString,
+		geAtmBgpHijackInfoOriginalAS
+			INTEGER
+	 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.2.1.1
+	geAtmBgpHijackInfoBrIp OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The IP address of router where the BGP hijack is detected."
+	::= { geAtmBgpHijackInfoEntry 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.2.1.2
+	geAtmBgpHijackInfoPeerAS OBJECT-TYPE
+		SYNTAX INTEGER (1..65535)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The neighbour ASN that passing the hijacked prefix."
+	::= { geAtmBgpHijackInfoEntry 2 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.2.1.3
+	geAtmBgpHijackInfoBgpPrefix OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The prefix that passed by neighbor ASN was one of home
+                 prefixes."
+	::= { geAtmBgpHijackInfoEntry 3 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.2.1.4
+	geAtmBgpHijackInfoOriginalAS OBJECT-TYPE
+		SYNTAX INTEGER (1..65535)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The original ASN that announced the hijacked prefix."
+	::= { geAtmBgpHijackInfoEntry 4 }
+
+
+        --
+        -- This table is defined and used by Trap only
+        -- SNMP agent won't support it.
+        --
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.3
+	geAtmBgpMsgMonTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF GeAtmBgpMsgMonEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"A MIB table to provide information of BGP updated messages
+		 monitoring.
+                 This MIB is used for trap only."
+	::= { geAtmMonitor 3 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.3.1
+	geAtmBgpMsgMonEntry OBJECT-TYPE
+		SYNTAX GeAtmBgpMsgMonEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"This table contains BGP message update information."
+		INDEX { geAtmBgpMsgMonRouterIp }
+	::= { geAtmBgpMsgMonTable 1 }
+
+
+	GeAtmBgpMsgMonEntry ::=
+	SEQUENCE {
+		geAtmBgpMsgMonRouterIp
+			IpAddress,
+		geAtmBgpMsgMonThresd
+			Integer32,
+		geAtmBgpMsgMonUpdateNum
+			Integer32,
+		geAtmBgpMsgMonThresdStatus
+			INTEGER,
+		geAtmBgpMsgMonTop1Asn
+			INTEGER,
+		geAtmBgpMsgMonTop1AsnMsgPercentage
+			INTEGER,
+		geAtmBgpMsgMonTop2Asn
+			INTEGER,
+		geAtmBgpMsgMonTop2AsnMsgPercentage
+		    	INTEGER,
+		geAtmBgpMsgMonTop3Asn
+			INTEGER,
+		geAtmBgpMsgMonTop3AsnMsgPercentage
+			INTEGER
+	}
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.3.1.1
+	geAtmBgpMsgMonRouterIp OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The IP address of router that received the BGP message updates
+		 crossing the threshold."
+	::= { geAtmBgpMsgMonEntry 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.3.1.2
+	geAtmBgpMsgMonThresd OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The threshold of BGP updated messages within 5
+		 minutes interval."
+	::= { geAtmBgpMsgMonEntry 2 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.3.1.3
+	geAtmBgpMsgMonUpdateNum OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The number of BGP updated messages received within 5
+		 minutes interval."
+	::= { geAtmBgpMsgMonEntry 3 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.3.1.4
+	geAtmBgpMsgMonThresdStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			exceedHigh(1),
+			belowLow(2)
+		}
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The status of the threshold (exceed higher or below lower
+		 bound of threshold.)"
+	::= { geAtmBgpMsgMonEntry 4 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.3.1.5
+	geAtmBgpMsgMonTop1Asn OBJECT-TYPE
+		SYNTAX INTEGER (1 .. 65535)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The Top 1 ASN that generates BGP message updates."
+	::= { geAtmBgpMsgMonEntry 5 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.3.1.6
+	geAtmBgpMsgMonTop1AsnMsgPercentage OBJECT-TYPE
+		SYNTAX INTEGER (0 .. 100)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The percentage of BGP Update messages from The Top 1 ASN."
+	::= { geAtmBgpMsgMonEntry 6 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.3.1.7
+	geAtmBgpMsgMonTop2Asn OBJECT-TYPE
+		SYNTAX INTEGER (1 .. 65535)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The Top 2 ASN that generates BGP message updates."
+	::= { geAtmBgpMsgMonEntry 7 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.3.1.8
+	geAtmBgpMsgMonTop2AsnMsgPercentage OBJECT-TYPE
+		SYNTAX INTEGER (0 .. 100)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The percentage of BGP Update messages from The Top 2 ASN."
+	::= { geAtmBgpMsgMonEntry 8 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.3.1.9
+	geAtmBgpMsgMonTop3Asn OBJECT-TYPE
+		SYNTAX INTEGER (1 .. 65535)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The Top 3 ASN that generates BGP message updates."
+	::= { geAtmBgpMsgMonEntry 9 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.3.1.10
+	geAtmBgpMsgMonTop3AsnMsgPercentage OBJECT-TYPE
+		SYNTAX INTEGER (0 .. 100)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The percentage of BGP Update messages from The Top 3 ASN."
+	::= { geAtmBgpMsgMonEntry 10 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.4
+	geAtmDBStorageThresd OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The threshold of DB storage in percentage.
+                 This MIB is used for trap only."
+	::= { geAtmMonitor 4 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.5
+	geAtmDBStorageStatsValue OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The current usage of DB storage in percentage.
+                 This MIB is used for trap only."
+	::= { geAtmMonitor 5 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.6
+	geAtmSeverity OBJECT-TYPE
+		SYNTAX INTEGER {
+		    normal(1),
+		    red(3)
+		}
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The severity of the alert. The red means one of the
+                 following occurred:
+		 1. The Module operation status is changed;
+		 2. BGP hijack occurred;
+		 3. The number of BGP updated messages crossing the threshold;
+		 4. Configuration dispatched to a module failed;
+		 5. No netflow received by exporter more than 5 minutes;
+		 6. The usage of DB storage crossing the threshold;
+		 7. The snmp polling to a router failed;
+		 The normal means the recovery from one of the above alerts.
+                 This MIB is used for trap only."
+	::= { geAtmMonitor 6 }
+
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.7
+	geAtmRouterIP OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The router IP address.
+                 This MIB is used for trap only."
+	::= { geAtmMonitor 7 }
+
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.8
+	geAtmAlertStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+		    alertRecover(1),
+		    alert(3)
+		}
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The status of the alert. The alert means one of the
+                 following occurred:
+		 1. The Module operation status is changed;
+		 2. BGP hijack occurred;
+		 3. The number of BGP updated messages crossing the threshold;
+		 4. Configuration dispatched to a module failed;
+		 5. No netflow received by exporter more than 5 minutes;
+		 6. The usage of DB storage crossing the threshold;
+		 7. The snmp polling to a router failed;
+		 8. NFS stopped writing activity for more than 5 minutes;
+		 The alertRecover means the recovery from one of the
+                 above alerts.
+                 This MIB is used for trap only."
+	::= { geAtmMonitor 8 }
+
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.9
+	geAtmRawDataInfoTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF GeAtmRawDataInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"This table provides information of stored flow raw
+        	 data which was written to file every 5 minutes. The
+                 data from one continuous duration is one record.
+                 The information for each record are: start time of
+                 the period, end time of the period, and total file size.
+                 This MIB is used for trap only."
+	::= { geAtmMonitor 9 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.9.1
+	geAtmRawDataInfoEntry OBJECT-TYPE
+		SYNTAX GeAtmRawDataInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"This table contains raw data record start time,
+             	 end time, and total file size."
+		INDEX { geAtmRawDataStartTime, geAtmRawDataEndTime }
+	::= { geAtmRawDataInfoTable 1 }
+
+	GeAtmRawDataInfoEntry ::=
+	SEQUENCE {
+		geAtmRawDataStartTime
+			TimeTicks,
+		geAtmRawDataEndTime
+			TimeTicks,
+		geAtmRawDataSize
+			Gauge32
+	 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.9.1.1
+	geAtmRawDataStartTime OBJECT-TYPE
+		SYNTAX TimeTicks
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The start time of raw data record."
+	::= { geAtmRawDataInfoEntry 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.9.1.2
+	geAtmRawDataEndTime OBJECT-TYPE
+		SYNTAX TimeTicks
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The end time of raw data record."
+	::= { geAtmRawDataInfoEntry 2 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.9.1.3
+	geAtmRawDataSize OBJECT-TYPE
+		SYNTAX Gauge32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The size of raw data record for one continous duration."
+	::= { geAtmRawDataInfoEntry 3 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.10
+	geAtmRouterUtilsThresd OBJECT-TYPE
+		SYNTAX INTEGER (0 .. 100)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The Usage Threshold of the Router. This MIB is used for
+		Router CPU and Memory Usage Monitoring trap only."
+	::= { geAtmMonitor 10 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.11
+	geAtmRouterCpuUtils OBJECT-TYPE
+		SYNTAX INTEGER (0 .. 100)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The CPU usage of the Router. This MIB is used for trap only."
+	::= { geAtmMonitor 11 }
+
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.3.12
+	geAtmRouterMemoryUtils OBJECT-TYPE
+		SYNTAX INTEGER (0 .. 100)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The Memory usage of the Router. This MIB is used for trap only."
+	::= { geAtmMonitor 12 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.13
+        geAtmIpmiSystemEventLog OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The SEL (system event log) generated by IPMI tool.
+                 This MIB is used for trap only."
+        ::= { geAtmMonitor 13 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.14
+        geAtmRaidTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF GeAtmRaidEntry
+                MAX-ACCESS  not-accessible
+                STATUS      deprecated
+                DESCRIPTION
+                "A table containing RAID virtual disk specific information.
+                 This MIB is used for trap only."
+        ::= { geAtmMonitor 14 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.14.1
+        geAtmRaidEntry OBJECT-TYPE
+                SYNTAX      GeAtmRaidEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "Information about a particular RAID virtual disk."
+        INDEX   { geAtmRaidVirtualDiskID }
+        ::= { geAtmRaidTable 1 }
+
+        GeAtmRaidEntry ::= SEQUENCE {
+            geAtmRaidVirtualDiskID            INTEGER,
+            geAtmRaidVirtualDiskSize          INTEGER,
+            geAtmRaidVirtualDiskState         INTEGER,
+            geAtmRaidVirtualDiskNumOfPhyDisk  INTEGER
+        }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.14.1.1
+        geAtmRaidVirtualDiskID OBJECT-TYPE
+                SYNTAX      INTEGER
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The virtual disk ID for this virtual disk."
+        ::= { geAtmRaidEntry 1 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.14.1.2
+        geAtmRaidVirtualDiskSize OBJECT-TYPE
+                SYNTAX      INTEGER
+                UNITS       "megabytes"
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The size of this virtual disk, measured in megabytes."
+        ::= { geAtmRaidEntry 2 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.14.1.3
+        geAtmRaidVirtualDiskState OBJECT-TYPE
+                SYNTAX      INTEGER {
+                        optimal(1),
+                        degraded(2),
+                        offline(3)
+                }
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The state of this virtual disk."
+        ::= { geAtmRaidEntry 3 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.14.1.4
+        geAtmRaidVirtualDiskNumOfPhyDisk OBJECT-TYPE
+                SYNTAX      INTEGER
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The number of physical disks for this virtual disk."
+        ::= { geAtmRaidEntry 4 }
+
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.16
+        geAtmModuleDroppedPktThresd OBJECT-TYPE
+                SYNTAX      Integer32
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "The threshold of the number of dropped packets of a Collector.
+                This MIB is used for trap only."
+        ::= { geAtmMonitor 16 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.17
+        geAtmModuleDroppedPktNum5Min OBJECT-TYPE
+                SYNTAX      Integer32
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "The number of dropped packets of a Collector within 5-minute interval.
+                This MIB is used for trap only."
+        ::= { geAtmMonitor 17 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.18
+        geAtmQueueStatus OBJECT-TYPE
+                SYNTAX INTEGER {
+                    up(0),
+                    down(1)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "The operation status of Module Queue. The status 'up' represent the Queue is non-full and
+                 status 'down' represent the Queue is full.
+                 This MIB is used for trap only."
+        ::= { geAtmMonitor 18 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.19
+        geAtmModuleLicExceedPktNumFiveMinutes OBJECT-TYPE
+                SYNTAX      Integer32
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "The number of exceed license packets of a Collector within 5-minute interval.
+                This MIB is used for trap only."
+        ::= { geAtmMonitor 19 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.20
+        geAtmModuleLicExceedPktThresd OBJECT-TYPE
+                SYNTAX      Integer32
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "The threshold of the number of exceed license packets of a Collector.
+                This MIB is used for trap only."
+        ::= { geAtmMonitor 20 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.21
+        geAtmModuleUtilsThresd OBJECT-TYPE
+                SYNTAX INTEGER (0 .. 100)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                "The Usage Threshold of the Module. This MIB is used for
+                Module CPU and Memory Usage Monitoring trap only."
+        ::= { geAtmMonitor 21 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.22
+        geAtmModuleCpuUtils OBJECT-TYPE
+                SYNTAX INTEGER (0 .. 100)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                "The CPU usage of the Module. This MIB is used for trap only."
+        ::= { geAtmMonitor 22 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.23
+                geAtmModuleMemoryUtils OBJECT-TYPE
+                SYNTAX INTEGER (0 .. 100)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                "The Memory usage of the Module. This MIB is used for trap only."
+        ::= { geAtmMonitor 23 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.24
+        geAtmModuleLicExceedFlowNum OBJECT-TYPE
+                SYNTAX      Integer32
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "The number of exceed license flows of a flow counter.
+                This MIB is used for trap only."
+        ::= { geAtmMonitor 24 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.25
+        geAtmModuleLicExceedFlowThresd OBJECT-TYPE
+                SYNTAX      Integer32
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "The threshold of the number of exceed license flows of a flow counter.
+                This MIB is used for trap only."
+        ::= { geAtmMonitor 25 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.26
+        geAtmRouterIPV2 OBJECT-TYPE
+                SYNTAX      InetAddress
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+		        "The router IP address.
+                 This MIB is used for trap only."
+        ::= { geAtmMonitor 26 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.27
+        geAtmBgpRouteChangeThresd OBJECT-TYPE
+                SYNTAX      Integer32
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "The threshold of the number of BGP route change.
+                This MIB is used for trap only."
+        ::= { geAtmMonitor 27 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.28
+        geAtmBgpRouteChange5Min OBJECT-TYPE
+                SYNTAX      Integer32
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "The number of BGP route change within 5 minutes interval.
+                This MIB is used for trap only."
+        ::= { geAtmMonitor 28 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.3.29
+        geAtmBmpPeerIp OBJECT-TYPE
+                SYNTAX      InetAddress
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "The IP address of the peer router.
+                This MIB is used for trap only."
+        ::= { geAtmMonitor 29 }
+
+
+        --
+        -- This table is defined and used by Trap only
+        -- SNMP agent won't support it.
+        --
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1
+	geAtmAnomalyTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF GeAtmAnomalyEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"This table provides anomaly information."
+	::= { geAtmBaseline 1 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1
+	geAtmAnomalyEntry OBJECT-TYPE
+		SYNTAX GeAtmAnomalyEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"This table contains anomaly information - ID,
+             	 cause, created time, updated time, category, type,
+              	 unit, severity, status, resource name, resource
+                 importance, traffic direction, traffic statistic object
+                 value, threshold value, URL link to anomaly report."
+		INDEX { geAtmAnomalyId }
+	::= { geAtmAnomalyTable 1 }
+
+
+	GeAtmAnomalyEntry ::=
+	SEQUENCE {
+		geAtmAnomalyId
+			Unsigned32,
+		geAtmAnomalyAppId
+			Unsigned32,
+		geAtmAnomalyCreatedTime
+			TimeTicks,
+		geAtmAnomalyCategory
+			INTEGER,
+		geAtmAnomalyTrafficStatsType
+			INTEGER,
+		geAtmAnomalySeverity
+			INTEGER,
+		geAtmAnomalyResourceName
+			OCTET STRING,
+		geAtmAnomalyResourceImportance
+			INTEGER,
+		geAtmAnomalyTrafficDirection
+			INTEGER,
+		geAtmAnomalyTrafficStatsValue
+			DisplayString,
+		geAtmAnomalyThresholdValue
+			DisplayString,
+		geAtmAnomalyRptUrlLink
+			DisplayString,
+		geAtmAnomalyTrafficStatsUnit
+			INTEGER,
+		geAtmAnomalyStatus
+			INTEGER,
+		geAtmAnomalyHost
+			IpAddress,
+		geAtmAnomalyIpV6Host
+			Ipv6Address,
+		geAtmAnomalyIdString
+			DisplayString,
+		geAtmAnomalyHostIpVersion
+			INTEGER,
+		geAtmAnomalyHostIpString
+			DisplayString,
+		geAtmAnomalyAttackDirection
+			INTEGER
+	}
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.1
+	geAtmAnomalyId OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The Anomaly ID."
+	::= { geAtmAnomalyEntry 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.2
+	geAtmAnomalyAppId OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The Anomaly Application ID for Protocol-Misuse and
+		 Application Anomaly."
+	::= { geAtmAnomalyEntry 2 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.3
+	geAtmAnomalyCreatedTime OBJECT-TYPE
+		SYNTAX TimeTicks
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The creation time of the Anomaly."
+	::= { geAtmAnomalyEntry 3 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.4
+	geAtmAnomalyCategory OBJECT-TYPE
+		SYNTAX INTEGER {
+		    interfaceTrafficAnomaly(1),
+		    trafficAnomaly(2),
+		    protocolMisuseAnomaly(3),
+		    applicationAnomaly(4),
+		    trafficMonitorAnomaly(5),
+		    prefixTrafficAnomaly(6)
+		}
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The Anomaly Category -
+		 1. Interface Traffic Anomaly;
+		 2. Traffic Anomaly;
+		 3. Protocol Misuse Anomaly;
+		 4. Application Anomaly.
+		 5. Filter based Traffic Monitor Anomaly.
+		 6. Router based Prefix Traffic Anomaly (Obsolete in ATM 6.0)."
+	::= { geAtmAnomalyEntry 4 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.5
+	geAtmAnomalyTrafficStatsType OBJECT-TYPE
+		SYNTAX INTEGER {
+		    bps(1),
+		    pps(2),
+		    utilization(3),
+		    fps(4),
+		    crcError(5),
+		    discards(7),
+		    broadcast(9)
+		}
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The traffic Statistics type triggered the Anomaly."
+	::= { geAtmAnomalyEntry 5 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.6
+	geAtmAnomalySeverity OBJECT-TYPE
+		SYNTAX INTEGER {
+		    yellow(2),
+		    red(3)
+		}
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The level of Anomaly Severity."
+	::= { geAtmAnomalyEntry 6 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.7
+	geAtmAnomalyResourceName OBJECT-TYPE
+		SYNTAX OCTET STRING
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The name of customer, or interface."
+	::= { geAtmAnomalyEntry 7 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.8
+	geAtmAnomalyResourceImportance OBJECT-TYPE
+		SYNTAX INTEGER {
+		    regular(1),
+		    high(2)
+		}
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The importance of resource - high or regular."
+	::= { geAtmAnomalyEntry 8 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.9
+	geAtmAnomalyTrafficDirection OBJECT-TYPE
+		SYNTAX INTEGER {
+		    incoming(1),
+		    outgoing(2),
+		    toHome(3),
+		    toNonHome(4),
+		    fromHome(5),
+		    fromNonHome(6),
+		    inOut(7)
+                }
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The Traffic Direction of Anomaly - incoming
+                (filter direction) or outgoing (opposite to the filter)."
+	::= { geAtmAnomalyEntry 9 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.10
+	geAtmAnomalyTrafficStatsValue OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The value of anomaly traffic which triggered Yellow or Red
+         anomaly, depending on geAtmAnomalySeverity. This value is
+         Counter64."
+	::= { geAtmAnomalyEntry 10 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.11
+	geAtmAnomalyThresholdValue OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The value of Anomaly Threshold. The value is counter64 bit."
+	::= { geAtmAnomalyEntry 11 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.12
+	geAtmAnomalyRptUrlLink OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The URL to link to Anomaly Report."
+	::= { geAtmAnomalyEntry 12 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.13
+	geAtmAnomalyTrafficStatsUnit OBJECT-TYPE
+		SYNTAX INTEGER {
+		    count(1),
+		    kilo(2),
+		    mega(4),
+		    giga(8),
+		    percentage(16)
+		}
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The traffic Statistics unit."
+	::= { geAtmAnomalyEntry 13 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.14
+	geAtmAnomalyStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+		    ongoing(1),
+		    recover(2),
+		    obsolete(3),
+		    burst(4),
+		    open(5),
+		    new(6),
+		    spread(7)
+		}
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The status of Anomaly: ongoing means the traffic is
+                 higher than the high watermark or lower than the low
+                 water mark, recover means the traffic is back to normal,
+                 obsolete means either the customer or resource is
+                 deleted or the unit of the threshold is changed."
+	::= { geAtmAnomalyEntry 14 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.4.1.1.15
+        geAtmAnomalyHost OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The IP address of victim or attacker of Protocol-Misuse Anomaly
+		 or IP Address of infected host of Application Anomaly."
+	::= { geAtmAnomalyEntry 15 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.16
+        geAtmAnomalyIpV6Host OBJECT-TYPE
+		SYNTAX Ipv6Address
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The IPv6 address of victim or attacker of Protocol-Misuse Anomaly
+		 or IPv6 Address of infected host of Application Anomaly."
+	::= { geAtmAnomalyEntry 16 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.17
+	geAtmAnomalyIdString OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The Anomaly ID."
+	::= { geAtmAnomalyEntry 17 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.18
+	geAtmAnomalyHostIpVersion OBJECT-TYPE
+		SYNTAX INTEGER {
+			ipv4(4),
+			ipv6(6)
+		}
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The IP version of the anomaly host.
+		 It is valid from GenieATM version 6.4.1."
+	::= { geAtmAnomalyEntry 18 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.19
+	geAtmAnomalyHostIpString OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The IP address of the anomaly host.
+		 It is valid from GenieATM version 6.4.1."
+	::= { geAtmAnomalyEntry 19 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.4.1.1.20
+	geAtmAnomalyAttackDirection OBJECT-TYPE
+		SYNTAX INTEGER {
+		    inbound(1),
+		    outbound(2)
+		}
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"The Attack Direction of Anomaly - inbound
+                or outbound."
+	::= { geAtmAnomalyEntry 20 }
+
+    -- 1.3.6.1.4.1.9926.1.21.1.4.2
+    geAtmMitigationTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GeAtmMitigationEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "This table provides mitigation information."
+    ::= { geAtmBaseline 2 }
+
+    -- 1.3.6.1.4.1.9926.1.21.1.4.2.1
+    geAtmMitigationEntry OBJECT-TYPE
+        SYNTAX GeAtmMitigationEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "This table contains mitigation information - status,
+                 mitigation id, mitigation device, mitigation method,
+                 protected description."
+        INDEX { geAtmMitigationId }
+    ::= { geAtmMitigationTable 1 }
+
+    GeAtmMitigationEntry ::=
+    SEQUENCE {
+        geAtmMitigationStatus
+            INTEGER,
+        geAtmMitigationId
+            Unsigned32,
+        geAtmMitigationDeviceId
+            Unsigned32,
+        geAtmMitigationMethod
+            INTEGER,
+        geAtmMitigationProtectDescription
+            DisplayString,
+        geAtmMitigationIdString
+            DisplayString
+    }
+
+    -- 1.3.6.1.4.1.9926.1.21.1.4.2.1.1
+    geAtmMitigationStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            start(1),
+            stop(2)
+        }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The mitigation status."
+    ::= { geAtmMitigationEntry 1 }
+
+    -- 1.3.6.1.4.1.9926.1.21.1.4.2.1.2
+    geAtmMitigationId OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The mitigation ID."
+    ::= { geAtmMitigationEntry 2 }
+
+    -- 1.3.6.1.4.1.9926.1.21.1.4.2.1.3
+    geAtmMitigationDeviceId OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The mitigation device ID."
+    ::= { geAtmMitigationEntry 3 }
+
+    -- 1.3.6.1.4.1.9926.1.21.1.4.2.1.4
+    geAtmMitigationMethod OBJECT-TYPE
+        SYNTAX INTEGER {
+            mtgBlackHole(0),
+            mtgFlowSpec(1),
+            mtgDefensePro(2),
+            mtgEudemon(3),
+            mtgATen(4),
+            mtgGuard(5),
+            mtgSyslog(6),
+            mtgFFive(7),
+            mtgHuawei(8),
+            mtgCtDamDdos(9),
+            mtgCyberController(10),
+            mtgDefenseProViaCyberController(11)
+        }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The mitigation method ID."
+    ::= { geAtmMitigationEntry 4 }
+
+    -- 1.3.6.1.4.1.9926.1.21.1.4.2.1.5
+    geAtmMitigationProtectDescription OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The protected description content -
+         1. Flow Spec: Traffic Filtering
+         2. Other: Protected Prefix"
+    ::= { geAtmMitigationEntry 5 }
+
+    -- 1.3.6.1.4.1.9926.1.21.1.4.2.1.6
+    geAtmMitigationIdString OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The mitigation ID String."
+    ::= { geAtmMitigationEntry 6 }
+
+
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.5.1
+	geAtmExporterTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF GeAtmExporterEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"This table supplies the information of exporters whose netflow
+		processed by collector."
+	::= { geAtmExporter 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.5.1.1
+	geAtmExporterEntry OBJECT-TYPE
+		SYNTAX GeAtmExporterEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+		"This table contains the exporter IP addresses, netflow
+             	 numbers, and the last time stamp when the netflow processed
+                 by collector (for each exporter)."
+		INDEX { geAtmExporterIpAddr }
+	::= { geAtmExporterTable 1 }
+
+
+	GeAtmExporterEntry ::=
+	SEQUENCE {
+		geAtmExporterIpAddr
+			IpAddress,
+		geAtmExporterNetFlowNum
+			Counter32,
+		geAtmExporterLastExportTime
+			TimeTicks,
+		geAtmExporterDroppedFlows
+			Counter32,
+		geAtmExporterDroppedFlowNumByRate
+			Counter32
+	 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.5.1.1.1
+	geAtmExporterIpAddr OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The IP address of exporter."
+	::= { geAtmExporterEntry 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.5.1.1.2
+	geAtmExporterNetFlowNum OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The netflow number processed by collector for the exporter."
+	::= { geAtmExporterEntry 2 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.5.1.1.3
+	geAtmExporterLastExportTime OBJECT-TYPE
+		SYNTAX TimeTicks
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The last time stamp when the netflow is processed by the
+		 collector for each exporter."
+	::= { geAtmExporterEntry 3 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.5.1.1.4
+	geAtmExporterDroppedFlows OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number of flow records dropped by Collector for this exporter."
+	::= { geAtmExporterEntry 4 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.5.1.1.5
+	geAtmExporterDroppedFlowNumByRate OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number of flow records dropped by collector due to the rate-limit of this exporter."
+	::= { geAtmExporterEntry 5 }
+
+	--
+	-- Definition of SNMP Trap for Notification
+	--
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.1
+	geAtmIfAlert NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmMonIfIndex, geAtmMonIfStatsType,
+                     	geAtmMonIfStatsValue, geAtmSeverity, geAtmMonIfThresd,
+                      	geAtmMonIfRtrIpAddr
+                }
+		STATUS deprecated
+		DESCRIPTION
+		"The trap definition for the router interface whose traffic
+                statistic object is crossing over the threshold. The oid
+                of ifIndex, IP address, statistic type, statistic value,
+                threshold, and the severity (red, normal) are sent.  The
+                trap receiver can tell whether the statistic value is
+                crossing the higher or lower bound by the severity."
+	::= { geAtmSystemTraps 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.2
+	geAtmModuleAlert NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmModuleType, geAtmSeverity, geAtmAlertStatus,
+			geAtmModuleOperationStatus, geAtmModuleID
+		}
+		STATUS current
+		DESCRIPTION
+		"The trap definition for the module whose operation status
+           	 is changed."
+	::= { geAtmSystemTraps 2 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.3
+	geAtmBgpHijackAlert NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmBgpHijackInfoBrIp, geAtmBgpHijackInfoPeerAS,
+                   	geAtmBgpHijackInfoBgpPrefix, geAtmBgpHijackInfoOriginalAS,
+                      	geAtmSeverity, geAtmAlertStatus
+                }
+		STATUS current
+		DESCRIPTION
+		"The trap definition for the BGP hijack is detected for a
+                 router.  The oid of router IP address, peer AS, BGP prefix,
+                 original AS, and severity are sent."
+	::= { geAtmSystemTraps 3 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.4
+	geAtmBgpMsgUpdateAlert NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmBgpMsgMonRouterIp, geAtmSeverity,
+                    	geAtmBgpMsgMonUpdateNum, geAtmBgpMsgMonThresd,
+                      	geAtmBgpMsgMonThresdStatus
+                }
+		STATUS deprecated
+		DESCRIPTION
+		"The trap definition for the number of BGP updated message
+                 of a router is crossing the boundary of threshold. The
+                 oid of BGP router IP address, updated message number,
+                 threshold, and the threshold status (excced high or below
+                 low) are sent. The trap receiver can tell whether the
+                 statistic value is crossing the higher or lower bound by
+                 the thresdstatus."
+	::= { geAtmSystemTraps 4 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.5
+	geAtmConfigUpdateAlert NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmModuleID, geAtmModuleIPAddress,
+                      	geAtmModuleCfgVersion, geAtmSeverity, geAtmAlertStatus
+                }
+		STATUS current
+		DESCRIPTION
+		"The trap definition for the CM failure to dispach
+                 configuration to ATM module."
+	::= { geAtmSystemTraps 5 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.6
+	geAtmNetflowRecvAlert NOTIFICATION-TYPE
+		OBJECTS { geAtmAlertStatus, geAtmRouterIP, geAtmSeverity }
+		STATUS deprecated
+		DESCRIPTION
+		"The trap definition for the Collector not receiving any
+                 Net flow longer than 5 minutes or its recovery. The
+                 possible cause for this are: router stop sending netflow,
+                 router send flow to incorrect IP or port, network
+                 disconnected, the interface of collector is down, etc."
+	::= { geAtmSystemTraps 6 }
+
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.7
+	geAtmDBStorageFullAlert NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmDBStorageThresd, geAtmDBStorageStatsValue,
+                      	geAtmSeverity, geAtmAlertStatus
+                }
+		STATUS current
+		DESCRIPTION
+		"The trap definition when the usage of DB storage is
+                 crossing threshold."
+	::= { geAtmSystemTraps 7 }
+
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.8
+	geAtmRtrSnmpPollingAlert NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmAlertStatus, geAtmRouterIP, geAtmSeverity
+		}
+		STATUS deprecated
+		DESCRIPTION
+		"The trap definition when the router has no response to the
+		 SNMP polling or its recovery."
+	::= { geAtmSystemTraps 8 }
+
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.9
+	geAtmBgpMessageUpdateAlert NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmBgpMsgMonRouterIp, geAtmSeverity, geAtmAlertStatus,
+			geAtmBgpMsgMonUpdateNum, geAtmBgpMsgMonThresd,
+                      	geAtmBgpMsgMonTop1Asn, geAtmBgpMsgMonTop1AsnMsgPercentage,
+                      	geAtmBgpMsgMonTop2Asn, geAtmBgpMsgMonTop2AsnMsgPercentage,
+                      	geAtmBgpMsgMonTop3Asn, geAtmBgpMsgMonTop3AsnMsgPercentage
+            	}
+		STATUS current
+		DESCRIPTION
+		"The trap definition for the number of BGP updated message of
+                 a router is crossing the boundary of threshold. The oid of
+                 BGP router IP address, severity, updated message number,
+                 and threshold, the top 3 ASN that generate BGP update messages
+                 their percentage aganist the total update messages are
+                 sent. If the number of ASN is less than 3, the OID(s) at
+                 the end won't be sent."
+	::= { geAtmSystemTraps 9 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.10
+	geAtmRtrCpuAlert NOTIFICATION-TYPE
+    OBJECTS { geAtmRouterUtilsThresd, geAtmRouterCpuUtils,
+              geAtmRouterIP, geAtmSeverity, geAtmAlertStatus
+            }
+		STATUS deprecated
+		DESCRIPTION
+		"The trap sent when the CPU of the monitored router is
+		 more than the threshold defined or recovered."
+	::= { geAtmSystemTraps 10 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.11
+	geAtmRtrMemoryAlert NOTIFICATION-TYPE
+		OBJECTS { geAtmRouterUtilsThresd, geAtmRouterMemoryUtils,
+			        geAtmRouterIP, geAtmSeverity, geAtmAlertStatus
+          	}
+		STATUS deprecated
+		DESCRIPTION
+		"The trap sent when the memory usage of the monitored router
+		 is more than the threshold defined or recovered."
+	::= { geAtmSystemTraps 11 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.12
+	geAtmIpmiAlert NOTIFICATION-TYPE
+        OBJECTS {
+                    geAtmModuleID, geAtmModuleIPAddress, geAtmIpmiSystemEventLog
+                }
+        STATUS  deprecated
+        DESCRIPTION
+                "The trap sent when the IPMI tool generates any new SEL
+                 (system event log)."
+	::= { geAtmSystemTraps 12 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.13
+	geAtmRaidAlert NOTIFICATION-TYPE
+        OBJECTS {
+                    geAtmModuleID,
+                    geAtmRaidVirtualDiskID,
+                    geAtmRaidVirtualDiskSize,  -- unit: MB
+                    geAtmRaidVirtualDiskState,
+                    geAtmRaidVirtualDiskNumOfPhyDisk
+                }
+        STATUS  current
+        DESCRIPTION
+                "The trap sent when any abnormal of RAID virtual disks
+                 is detected."
+	::= { geAtmSystemTraps 13 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.14
+	geAtmMPBgpMsgUpdateAlert NOTIFICATION-TYPE
+		OBJECTS {
+			        geAtmBgpMsgMonRouterIp,
+			        geAtmSeverity,
+                    geAtmAlertStatus,
+                    geAtmBgpMsgMonUpdateNum,
+                    geAtmBgpMsgMonThresd
+                }
+		STATUS current
+		DESCRIPTION
+		"The trap definition for the number of MP-BGP updated message
+                 of a router is crossing the boundary of threshold. The
+                 oid of MP-BGP router IP address, updated message number,
+                 threshold, and the threshold status (excced high or below
+                 low) are sent. The trap receiver can tell whether the
+                 statistic value is crossing the higher or lower bound by
+                 the thresdstatus."
+	::= { geAtmSystemTraps 14 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.15
+	geAtmDBPurgeAlert NOTIFICATION-TYPE
+		OBJECTS {
+		            geAtmDBStorageThresd,
+		            geAtmDBStorageStatsValue,
+			    geAtmSeverity,
+			    geAtmAlertStatus
+                }
+		STATUS current
+		DESCRIPTION
+		"The trap definition for the DB Purge Alert is that
+		 DBM (Database Manager) encounters failure while purging
+		 the data in Database."
+	::= { geAtmSystemTraps 15 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.16
+	geAtmPacketDropAlert NOTIFICATION-TYPE
+		OBJECTS {
+		            geAtmAlertStatus,
+		            geAtmModuleType,
+			    geAtmModuleID,
+			    geAtmModuleDroppedPktThresd,
+			    geAtmModuleDroppedPktNum5Min
+                }
+		STATUS current
+		DESCRIPTION
+		"The trap is sent when the number of dropped packets of a Collector
+		 within 5-minute interval is over threshold."
+	::= { geAtmSystemTraps 16 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.17
+        geAtmLicCapacityExceedAlert NOTIFICATION-TYPE
+                OBJECTS {
+                        geAtmAlertStatus,
+                        geAtmModuleType,
+                        geAtmModuleID,
+                        geAtmModuleLicExceedPktThresd,
+                        geAtmModuleLicExceedPktNumFiveMinutes
+                }
+                STATUS current
+                DESCRIPTION
+                " The trap is sent when received packets exceed license capacity of the collector."
+        ::= { geAtmSystemTraps 17 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.18
+        geAtmQueueFullAlert NOTIFICATION-TYPE
+                OBJECTS {
+                    geAtmAlertStatus, geAtmModuleType, geAtmModuleID, geAtmQueueStatus
+                }
+                STATUS current
+                DESCRIPTION
+                "The trap definition for Module sent alert when Queue has been full or recovered."
+        ::= { geAtmSystemTraps 18 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.19
+        geAtmIpmiAlertv2 NOTIFICATION-TYPE
+        OBJECTS {
+                    geAtmModuleID, geAtmHardwareIPAddress1, geAtmHardwareIPAddress2, geAtmIpmiSystemEventLog
+                }
+        STATUS  current
+        DESCRIPTION
+                "The trap sent when the IPMI tool generates any new SEL
+                 (system event log)."
+        ::= { geAtmSystemTraps 19 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.20
+        geAtmRaidControllerAlert NOTIFICATION-TYPE
+                OBJECTS {
+                    geAtmModuleID, geAtmSeverity, geAtmAlertStatus
+                }
+                STATUS current
+                DESCRIPTION
+                "The trap sent when any abnormal of RAID controller state is detected."
+        ::= { geAtmSystemTraps 20 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.21
+        geAtmModuleNoResponseAlert NOTIFICATION-TYPE
+                OBJECTS {
+                    geAtmModuleID, geAtmModuleType, geAtmModuleIPAddress, geAtmSeverity, geAtmAlertStatus
+                }
+                STATUS current
+                DESCRIPTION
+                "The trap is sent when no response from the module."
+        ::= { geAtmSystemTraps 21 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.22
+        geAtmModuleCpuAlert NOTIFICATION-TYPE
+                OBJECTS {
+                    geAtmModuleID, geAtmModuleType, geAtmModuleIPAddress,
+                    geAtmSeverity, geAtmAlertStatus,
+                    geAtmModuleUtilsThresd, geAtmModuleCpuUtils
+                }
+                STATUS current
+                DESCRIPTION
+                "The trap sent when the CPU usage of the monitored module
+                is more than the threshold defined or recovered."
+        ::= { geAtmSystemTraps 22 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.23
+        geAtmModuleMemoryAlert NOTIFICATION-TYPE
+                OBJECTS {
+                    geAtmModuleID, geAtmModuleType, geAtmModuleIPAddress,
+                    geAtmSeverity, geAtmAlertStatus,
+                    geAtmModuleUtilsThresd, geAtmModuleMemoryUtils
+                }
+                STATUS current
+                DESCRIPTION
+                "The trap sent when the memory usage of the monitored module
+                is more than the threshold defined or recovered."
+        ::= { geAtmSystemTraps 23 }
+
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.24
+        geAtmLicExpireAlert NOTIFICATION-TYPE
+                OBJECTS {
+                        geAtmAlertStatus,
+                        geAtmModuleID,
+                        geAtmModuleSerialNumber,
+                        geAtmModuleLicExpiryDate
+                }
+                STATUS current
+                DESCRIPTION
+                "The trap is sent when existing license is about to exceed in a remaining number of days."
+        ::= { geAtmSystemTraps 24 }
+
+         -- 1.3.6.1.4.1.9926.1.21.1.6.25
+         geAtmDbBackupFailedAlert NOTIFICATION-TYPE
+                 OBJECTS {
+                         geAtmAlertStatus,
+                         geAtmModuleID,
+                         geAtmStorage
+                 }
+                 STATUS current
+                 DESCRIPTION
+                 "The trap sent when the db backup operation failed"
+        ::= { geAtmSystemTraps 25 }
+
+         -- 1.3.6.1.4.1.9926.1.21.1.6.26
+         geAtmDbRestoreFailAlert NOTIFICATION-TYPE
+                 OBJECTS {
+                         geAtmAlertStatus,
+                         geAtmModuleID,
+                         geAtmStorage
+                 }
+                 STATUS current
+                 DESCRIPTION
+                 "The trap sent when the db restore operation failed"
+       ::= { geAtmSystemTraps 26 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.27
+        geAtmVrrpStatAlert NOTIFICATION-TYPE
+                OBJECTS {
+                        geAtmModuleType,
+                        geAtmHardwareIPAddress1,
+                        geAtmHardwareIPAddress2,
+                        geAtmVrrpOperationStatus
+                }
+                STATUS current
+                DESCRIPTION
+                "The trap definition for the appliance whose VRRP status is changed."
+        ::= { geAtmSystemTraps 27 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.28
+         geAtmDbbackupStartAlert NOTIFICATION-TYPE
+                 OBJECTS {
+                         geAtmAlertStatus,
+                         geAtmModuleID,
+                         geAtmStorage
+                 }
+                 STATUS current
+                 DESCRIPTION
+                 "The trap sent when the db backup operation start"
+        ::= { geAtmSystemTraps 28 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.29
+         geAtmDbbackupEndAlert NOTIFICATION-TYPE
+                 OBJECTS {
+                         geAtmAlertStatus,
+                         geAtmModuleID,
+                         geAtmStorage
+                 }
+                 STATUS current
+                 DESCRIPTION
+                 "The trap sent when the db backup operation end"
+        ::= { geAtmSystemTraps 29 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.30
+        geAtmNfsStopWritingAlert NOTIFICATION-TYPE
+                 OBJECTS {
+                    geAtmModuleID, geAtmAlertStatus
+                 }
+                 STATUS current
+                 DESCRIPTION
+                 "The trap sent when when all NFS connections stop writing
+                 for a period of time (5 minutes)."
+        ::= { geAtmSystemTraps 30 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.31
+        geAtmSystemRebootAlert NOTIFICATION-TYPE
+                 OBJECTS {
+                    geAtmSystemRebootTime, geAtmModuleIPAddress
+                 }
+                 STATUS current
+                 DESCRIPTION
+                 "The trap sent when system reboot."
+        ::= { geAtmSystemTraps 31 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.32
+        geAtmSslExpiredAlert NOTIFICATION-TYPE
+                 OBJECTS {
+                    geAtmModuleIPAddress, geAtmSystemSslExpirationTime
+                 }
+                 STATUS current
+                 DESCRIPTION
+                 "The trap sent when system SSL certificate is about to expire."
+        ::= { geAtmSystemTraps 32 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.33
+        geAtmLicFlowCapacityExceedAlert NOTIFICATION-TYPE
+                OBJECTS {
+                        geAtmAlertStatus,
+                        geAtmModuleType,
+                        geAtmModuleID,
+                        geAtmModuleLicExceedFlowThresd,
+                        geAtmModuleLicExceedFlowNum
+                }
+                STATUS current
+                DESCRIPTION
+                "The trap is sent when output flows exceed license capacity"
+        ::= { geAtmSystemTraps 33 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.34
+        geAtmSubModuleAlert NOTIFICATION-TYPE
+                OBJECTS {
+                        geAtmModuleType,
+                        geAtmAlertStatus,
+                        geAtmModuleOperationStatus,
+                        geAtmSubModuleName,
+                        geAtmModuleID
+                }
+                STATUS current
+                DESCRIPTION
+                "The trap definition for the sub-module whose operation status is changed."
+        ::= { geAtmSystemTraps 34 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.35
+        geAtmCmRegisterFailAlert NOTIFICATION-TYPE
+                OBJECTS {
+                        geAtmSubModuleName,
+                        geAtmModuleID,
+                        geAtmModuleIPAddress
+                }
+                STATUS current
+                DESCRIPTION
+                "The trap is sent when ATM module register to CM failed."
+        ::= { geAtmSystemTraps 35 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.36
+        geAtmLicVerificationAlert NOTIFICATION-TYPE
+                OBJECTS {
+                        geAtmAlertStatus, geAtmModuleType,
+                        geAtmModuleID, geAtmModuleIPAddress
+                }
+                STATUS current
+                DESCRIPTION
+                "The trap is sent when license verification failed."
+        ::= { geAtmSystemTraps 36 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.37
+	geAtmRtrCpuAlertV2 NOTIFICATION-TYPE
+    OBJECTS { geAtmRouterUtilsThresd, geAtmRouterCpuUtils,
+              geAtmRouterIPV2, geAtmSeverity, geAtmAlertStatus
+            }
+		STATUS current
+		DESCRIPTION
+		"The trap sent when the CPU of the monitored router is
+		 more than the threshold defined or recovered."
+	::= { geAtmSystemTraps 37 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.38
+	geAtmRtrMemoryAlertV2 NOTIFICATION-TYPE
+		OBJECTS { geAtmRouterUtilsThresd, geAtmRouterMemoryUtils,
+			        geAtmRouterIPV2, geAtmSeverity, geAtmAlertStatus
+          	}
+		STATUS current
+		DESCRIPTION
+		"The trap sent when the memory usage of the monitored router
+		 is more than the threshold defined or recovered."
+	::= { geAtmSystemTraps 38 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.39
+	geAtmNetflowRecvAlertV2 NOTIFICATION-TYPE
+		OBJECTS { geAtmAlertStatus, geAtmRouterIPV2, geAtmSeverity }
+		STATUS current
+		DESCRIPTION
+		"The trap definition for the Collector not receiving any
+                 Net flow longer than 5 minutes or its recovery. The
+                 possible cause for this are: router stop sending netflow,
+                 router send flow to incorrect IP or port, network
+                 disconnected, the interface of collector is down, etc."
+	::= { geAtmSystemTraps 39 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.40
+	geAtmRtrSnmpPollingAlertV2 NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmAlertStatus, geAtmRouterIPV2, geAtmSeverity
+		}
+		STATUS current
+		DESCRIPTION
+		"The trap definition when the router has no response to the
+		 SNMP polling or its recovery."
+	::= { geAtmSystemTraps 40 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.41
+	geAtmBgpPeerUpDownAlert NOTIFICATION-TYPE
+		OBJECTS {
+            geAtmModuleType, geAtmModuleID, geAtmRouterIPV2
+        }
+		STATUS deprecated
+		DESCRIPTION
+        "The trap definition when BGP peer disconnects with the collector."
+	::= { geAtmSystemTraps 41 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.42
+	geAtmBgpRouteChangeInstableAlert NOTIFICATION-TYPE
+		OBJECTS {
+            geAtmModuleType, geAtmModuleID, geAtmRouterIPV2,
+            geAtmBgpRouteChange5Min, geAtmBgpRouteChangeThresd
+        }
+		STATUS current
+		DESCRIPTION
+        "The trap definition when number of BGP instable route changes is over threshold."
+	::= { geAtmSystemTraps 42 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.43
+	geAtmBgpRouteChangeRpkiInvalidAlert NOTIFICATION-TYPE
+		OBJECTS {
+            geAtmModuleType, geAtmModuleID, geAtmRouterIPV2,
+            geAtmBgpRouteChange5Min, geAtmBgpRouteChangeThresd
+        }
+		STATUS current
+		DESCRIPTION
+        "The trap definition when number of BGP route changes with invalid RPKI is over threshold."
+	::= { geAtmSystemTraps 43 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.44
+	geAtmBgpRouteUnusualAnnounceAlert NOTIFICATION-TYPE
+		OBJECTS {
+            geAtmModuleType, geAtmModuleID, geAtmRouterIPV2,
+            geAtmBgpRouteChange5Min, geAtmBgpRouteChangeThresd
+        }
+		STATUS current
+		DESCRIPTION
+        "The trap definition when number of unusual BGP route announcements is over threshold."
+	::= { geAtmSystemTraps 44 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.6.45
+	geAtmBgpConnectionUpDownAlert NOTIFICATION-TYPE
+		OBJECTS {
+            geAtmAlertStatus, geAtmModuleType, geAtmModuleID, geAtmRouterIPV2
+        }
+		STATUS current
+		DESCRIPTION
+        "The trap definition when BGP peer disconnects with the collector."
+	::= { geAtmSystemTraps 45 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.46
+        geAtmNotifyActionClusterRoleChangeAlert NOTIFICATION-TYPE
+                OBJECTS {
+                    geAtmModuleID, geAtmModuleIPAddress, geAtmClusterRole
+                }
+                STATUS current
+                DESCRIPTION
+        "The trap definition when the notify-action cluster role changes."
+        ::= { geAtmSystemTraps 46 }
+
+        -- 1.3.6.1.4.1.9926.1.21.1.6.47
+        geAtmLicExpireAlertV2 NOTIFICATION-TYPE
+                OBJECTS {
+                        geAtmAlertStatus,
+                        geAtmModuleID,
+                        geAtmModuleSerialNumberV2,
+                        geAtmModuleLicExpiryDate
+                }
+                STATUS current
+                DESCRIPTION
+                "The trap is sent when existing license is about to exceed in a remaining number of days."
+        ::= { geAtmSystemTraps 47 }
+
+	-- 1.3.6.1.4.1.9926.1.21.1.7.1
+	geAtmInterfaceTrafficAnomaly NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmAnomalyId, geAtmAnomalySeverity,
+                      	geAtmAnomalyResourceName, geAtmAnomalyResourceImportance,
+                      	geAtmAnomalyCategory, geAtmAnomalyTrafficStatsType,
+                      	geAtmAnomalyTrafficStatsUnit, geAtmAnomalyCreatedTime,
+                      	geAtmAnomalyThresholdValue, geAtmAnomalyStatus,
+                      	geAtmAnomalyTrafficStatsValue,
+                      	geAtmAnomalyTrafficDirection, geAtmExporterIpAddr,
+                      	ifIndex
+                }
+		STATUS current
+		DESCRIPTION
+		"The trap definition for the baseline traffic anomaly."
+	::= { geAtmAnomalyNotification 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.7.2
+	geAtmCustomerTrafficAnomaly NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmAnomalyId, geAtmAnomalySeverity,
+                	geAtmAnomalyResourceName,
+			geAtmAnomalyResourceImportance, geAtmAnomalyCategory,
+			geAtmAnomalyTrafficStatsType, geAtmAnomalyTrafficStatsUnit,
+                	geAtmAnomalyCreatedTime, geAtmAnomalyThresholdValue,
+                	geAtmAnomalyStatus, geAtmAnomalyTrafficStatsValue,
+                	geAtmAnomalyTrafficDirection, geAtmAnomalyRptUrlLink
+                }
+		STATUS current
+		DESCRIPTION
+		"The trap definition for the Customer and Sub-Network Traffic anomaly."
+	::= { geAtmAnomalyNotification 2 }
+
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.7.3
+	geAtmAppAnomaly NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmAnomalyId, geAtmAnomalyAppId, geAtmAnomalySeverity,
+			geAtmAnomalyResourceName, geAtmAnomalyHost, geAtmAnomalyResourceImportance,
+			geAtmAnomalyCategory, geAtmAnomalyTrafficStatsType,
+                	geAtmAnomalyTrafficStatsUnit, geAtmAnomalyCreatedTime,
+                	geAtmAnomalyThresholdValue, geAtmAnomalyStatus,
+                	geAtmAnomalyTrafficStatsValue, geAtmAnomalyTrafficDirection,
+                	geAtmAnomalyRptUrlLink
+                }
+		STATUS current
+		DESCRIPTION
+		"The trap definition for the Protocol-Misuse,
+		 and Application anomaly."
+	::= { geAtmAnomalyNotification 3 }
+
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.7.4
+	geAtmTrafficMonitorAnomaly NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmAnomalyId, geAtmAnomalySeverity,
+                      	geAtmAnomalyResourceName, geAtmAnomalyResourceImportance,
+                        geAtmAnomalyCategory, geAtmAnomalyTrafficStatsType,
+                      	geAtmAnomalyTrafficStatsUnit, geAtmAnomalyCreatedTime,
+                      	geAtmAnomalyThresholdValue, geAtmAnomalyStatus,
+                      	geAtmAnomalyTrafficStatsValue,
+                      	geAtmAnomalyTrafficDirection, geAtmAnomalyRptUrlLink
+                }
+		STATUS current
+		DESCRIPTION
+		"The trap definition for the filter's Traffic Monitor anomaly."
+	::= { geAtmAnomalyNotification 4 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.7.5
+	geAtmPrefixTrafficAnomaly NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmAnomalyId, geAtmAnomalySeverity,
+                      	geAtmAnomalyResourceName, geAtmAnomalyResourceImportance,
+                      	geAtmAnomalyCategory, geAtmAnomalyTrafficStatsType,
+                      	geAtmAnomalyTrafficStatsUnit, geAtmAnomalyCreatedTime,
+                      	geAtmAnomalyThresholdValue, geAtmAnomalyStatus,
+                      	geAtmAnomalyTrafficStatsValue,
+                      	geAtmAnomalyTrafficDirection, geAtmAnomalyRptUrlLink
+                }
+		STATUS deprecated
+		DESCRIPTION
+		"The trap definition for the Router-based Prefix Traffic
+                 anomaly."
+	::= { geAtmAnomalyNotification 5 }
+
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.7.6
+	geAtmAppIpV6Anomaly NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmAnomalyId, geAtmAnomalyAppId, geAtmAnomalySeverity,
+			geAtmAnomalyResourceName, geAtmAnomalyIpV6Host, geAtmAnomalyResourceImportance,
+			geAtmAnomalyCategory, geAtmAnomalyTrafficStatsType,
+                	geAtmAnomalyTrafficStatsUnit, geAtmAnomalyCreatedTime,
+                	geAtmAnomalyThresholdValue, geAtmAnomalyStatus,
+                	geAtmAnomalyTrafficStatsValue, geAtmAnomalyTrafficDirection,
+                	geAtmAnomalyRptUrlLink
+                }
+		STATUS current
+		DESCRIPTION
+		"The trap definition for the Protocol-Misuse,
+		 and Application anomaly when the victim or attacker IP
+		 is an IPv6 address."
+	::= { geAtmAnomalyNotification 6 }
+
+    -- 1.3.6.1.4.1.9926.1.21.1.7.7
+    geAtmMitigationAction NOTIFICATION-TYPE
+        OBJECTS {
+            geAtmMitigationStatus,
+            geAtmMitigationId,
+            geAtmAnomalyId,
+            geAtmMitigationDeviceId,
+            geAtmMitigationMethod,
+            geAtmMitigationProtectDescription
+        }
+        STATUS current
+        DESCRIPTION
+        "The trap definition for the mitigation action for
+         specific anomaly id."
+    ::= { geAtmAnomalyNotification 7 }
+
+    -- 1.3.6.1.4.1.9926.1.21.1.7.8
+    geAtmMitigationActionV2 NOTIFICATION-TYPE
+        OBJECTS {
+            geAtmMitigationStatus,
+            geAtmMitigationIdString,
+            geAtmAnomalyIdString,
+            geAtmMitigationDeviceId,
+            geAtmMitigationMethod,
+            geAtmMitigationProtectDescription
+        }
+        STATUS current
+        DESCRIPTION
+        "The trap definition for the mitigation action for
+         specific anomaly id."
+    ::= { geAtmAnomalyNotification 8 }
+
+
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.8.1
+	geAtmInterfaceTrafficAnomalyV2 NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmAnomalyIdString, geAtmAnomalySeverity,
+                      	geAtmAnomalyResourceName, geAtmAnomalyResourceImportance,
+                      	geAtmAnomalyCategory, geAtmAnomalyTrafficStatsType,
+                      	geAtmAnomalyTrafficStatsUnit, geAtmAnomalyCreatedTime,
+                      	geAtmAnomalyThresholdValue, geAtmAnomalyStatus,
+                      	geAtmAnomalyTrafficStatsValue,
+                      	geAtmAnomalyTrafficDirection, geAtmExporterIpAddr,
+                      	ifIndex
+                }
+		STATUS deprecated
+		DESCRIPTION
+		"A geAtmInterfaceTrafficAnomalyV2 trap signifies an interface traffic anomaly event
+		 as the traffic of the monitored network interface
+		 is over the high-water mark or under the low-water mark.
+		 This trap is valid from GenieATM version 6.4.1."
+	::= { geAtmAnomalyNotificationV2 1 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.8.2
+	geAtmTrafficMonitorAnomalyV2 NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmAnomalyIdString, geAtmAnomalySeverity,
+                	geAtmAnomalyResourceName,
+			geAtmAnomalyResourceImportance, geAtmAnomalyCategory,
+			geAtmAnomalyTrafficStatsType, geAtmAnomalyTrafficStatsUnit,
+                	geAtmAnomalyCreatedTime, geAtmAnomalyThresholdValue,
+                	geAtmAnomalyStatus, geAtmAnomalyTrafficStatsValue,
+                	geAtmAnomalyTrafficDirection, geAtmAnomalyRptUrlLink
+                }
+		STATUS current
+		DESCRIPTION
+		"A geAtmTrafficMonitorAnomalyV2 trap signifies a traffic anomaly event
+		 as the traffic of the monitored network resource (such as Sub-network or Filter)
+		 is over the high-water mark or under the low-water mark.
+		 This trap is valid from GenieATM version 6.4.1."
+	::= { geAtmAnomalyNotificationV2 2 }
+
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.8.3
+	geAtmHostAnomaly NOTIFICATION-TYPE
+		OBJECTS {
+			geAtmAnomalyIdString, geAtmAnomalyAppId, geAtmAnomalySeverity,
+			geAtmAnomalyResourceName, geAtmAnomalyHostIpVersion, geAtmAnomalyHostIpString, geAtmAnomalyResourceImportance,
+			geAtmAnomalyCategory, geAtmAnomalyTrafficStatsType,
+                	geAtmAnomalyTrafficStatsUnit, geAtmAnomalyCreatedTime,
+                	geAtmAnomalyThresholdValue, geAtmAnomalyStatus,
+                	geAtmAnomalyTrafficStatsValue, geAtmAnomalyTrafficDirection,
+                	geAtmAnomalyRptUrlLink, geAtmAnomalyAttackDirection
+                }
+		STATUS current
+		DESCRIPTION
+		"A geAtmHostAnomaly trap signifies a host-based anomaly event
+		 as a DDoS attack or Worm scan is happening.
+		 This trap is valid from GenieATM version 6.4.1."
+	::= { geAtmAnomalyNotificationV2 3 }
+
+
+	-- 1.3.6.1.4.1.9926.1.21.1.8.4
+	geAtmInterfaceTrafficAnomalyV3 NOTIFICATION-TYPE
+		OBJECTS {
+			            geAtmAnomalyIdString, geAtmAnomalySeverity,
+                      	geAtmAnomalyResourceName, geAtmAnomalyResourceImportance,
+                      	geAtmAnomalyCategory, geAtmAnomalyTrafficStatsType,
+                      	geAtmAnomalyTrafficStatsUnit, geAtmAnomalyCreatedTime,
+                      	geAtmAnomalyThresholdValue, geAtmAnomalyStatus,
+                      	geAtmAnomalyTrafficStatsValue,
+                      	geAtmAnomalyTrafficDirection, geAtmRouterIPV2,
+                      	ifIndex
+                }
+		STATUS current
+		DESCRIPTION
+		"A geAtmInterfaceTrafficAnomalyV3 trap signifies an interface traffic anomaly event
+		 as the traffic of the monitored network interface
+		 is over the high-water mark or under the low-water mark.
+		 This trap is valid from GenieATM version 7.2.1."
+	::= { geAtmAnomalyNotificationV2 4 }
+
+
+
+	END
+
+--
+-- GENIE-ATM-SYSTEM-MIB.my
+--

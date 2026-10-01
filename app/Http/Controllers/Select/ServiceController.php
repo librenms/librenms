@@ -27,17 +27,22 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Service;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<Service>
+ */
 class ServiceController extends SelectController
 {
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
+        $this->authorize('viewAny', Service::class);
+
         return Service::hasAccess($request->user())
             ->with(['device' => function ($query): void {
                 $query->select(['device_id', 'hostname', 'sysName', 'display']);
@@ -46,13 +51,14 @@ class ServiceController extends SelectController
     }
 
     /**
-     * @param  Service  $service
+     * @param  Service  $model
+     * @return array{id: int|string, text: string, icon?: string}
      */
-    public function formatItem($service)
+    public function formatItem(Model $model): array
     {
         return [
-            'id' => $service->service_id,
-            'text' => $service->device->shortDisplayName() . ' - ' . $service->service_type . ' (' . $service->service_desc . ')',
+            'id' => $model->service_id,
+            'text' => $model->device->shortDisplayName() . ' - ' . $model->service_type . ' (' . $model->service_desc . ')',
         ];
     }
 }

@@ -30,8 +30,10 @@ foreach ($components as $k => $v) {
 }
 $components = $keep;
 
-if (is_file('includes/html/pages/device/loadbalancer/' . $vars['subtype'] . '.inc.php')) {
-    include 'includes/html/pages/device/loadbalancer/' . $vars['subtype'] . '.inc.php';
+$subtype = htmlspecialchars((string) $vars['subtype'] ?? '');
+
+if (is_file('includes/html/pages/device/loadbalancer/' . $subtype . '.inc.php')) {
+    include 'includes/html/pages/device/loadbalancer/' . $subtype . '.inc.php';
 } else {
     include 'includes/html/pages/device/loadbalancer/ltm_pool_all.inc.php';
 }//end if

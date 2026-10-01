@@ -28,8 +28,10 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use LibreNMS\Interfaces\UI\DeviceTab;
 
-class CaptureController implements \LibreNMS\Interfaces\UI\DeviceTab
+class CaptureController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
@@ -53,6 +55,27 @@ class CaptureController implements \LibreNMS\Interfaces\UI\DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [];
+        Gate::authorize('device.debug');
+
+        return [
+            'tabs' => [
+                'discovery' => [
+                    'name' => __('Discovery'),
+                    'url' => route('device.debug.process', ['device' => $device, 'format' => 'text', 'type' => 'discovery', 'verbose' => 1]),
+                ],
+                'poller' => [
+                    'name' => __('Poller'),
+                    'url' => route('device.debug.process', ['device' => $device, 'format' => 'text', 'type' => 'poller', 'verbose' => 1]),
+                ],
+                'snmp' => [
+                    'name' => __('SNMP'),
+                    'url' => route('device.debug.snmp', ['device' => $device, 'format' => 'text']),
+                ],
+                'alerts' => [
+                    'name' => __('Alerts'),
+                    'url' => route('device.debug.alerts', ['device' => $device, 'format' => 'text']),
+                ],
+            ],
+        ];
     }
 }

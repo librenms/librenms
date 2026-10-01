@@ -12,6 +12,8 @@ class PluginSettingsController extends Controller
 {
     public function __invoke(PluginManagerInterface $manager, Plugin $plugin): \Illuminate\Contracts\View\View
     {
+        $this->authorize('plugin.admin');
+
         if (! $manager->pluginEnabled($plugin->plugin_name)) {
             abort(404, trans('plugins.errors.disabled', ['plugin' => $plugin->plugin_name]));
         }
@@ -32,6 +34,8 @@ class PluginSettingsController extends Controller
 
     public function update(Request $request, Plugin $plugin): \Illuminate\Http\RedirectResponse
     {
+        $this->authorize('plugin.admin');
+
         $plugin->fill($this->validate($request, [
             'plugin_active' => 'in:0,1',
             'settings' => 'array',

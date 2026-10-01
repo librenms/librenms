@@ -28,6 +28,11 @@ namespace LibreNMS\Util;
 
 class StringHelpers
 {
+    public static function isValidUtf8(string $string): bool
+    {
+        return preg_match('//u', $string) === 1;
+    }
+
     public static function niceCase($string)
     {
         $replacements = [
@@ -69,6 +74,7 @@ class StringHelpers
             'sdfsinfo' => 'SDFS info',
             'smart' => 'SMART',
             'ss' => 'Socket Statistics',
+            'syslog-ng' => 'Syslog-NG',
             'ups-apcups' => 'UPS apcups',
             'ups-nut' => 'UPS nut',
             'zfs' => 'ZFS',
@@ -97,7 +103,13 @@ class StringHelpers
      */
     public static function inferEncoding(?string $string): ?string
     {
-        if (empty($string) || preg_match('//u', $string) || ! function_exists('iconv')) {
+        if (empty($string) || self::isValidUtf8($string)) {
+            return $string;
+        }
+
+        $string = str_replace(chr(218), "\n", $string);
+
+        if (! function_exists('iconv')) {
             return $string;
         }
 
@@ -187,6 +199,33 @@ class StringHelpers
         }
 
         return hex2bin($hex);
+    }
+
+    /**
+     * Decode an SNMP text value that net-snmp output as hex (ex: "41 42 43 00") because it
+     * contained non-printable bytes. Common causes are a trailing null byte from devices that send
+     * an off by one string length or non-ASCII text (UTF-8, GBK, etc) in an OCTET STRING.
+     * Trailing null bytes are removed and the encoding is inferred.
+     *
+     * Only use for values known to be text, binary values (MACs, IPs, bitmaps) will be mangled.
+     * Values that are not hex or decode to only printable ASCII are returned unchanged,
+     * because net-snmp would not have output those as hex.
+     */
+    public static function decodeSnmpHexText(string $value): string
+    {
+        $hex = trim((string) preg_replace('/\s+/', ' ', $value));
+
+        if (! self::isHex($hex, ' ')) {
+            return $value;
+        }
+
+        $bytes = (string) hex2bin(str_replace(' ', '', $hex));
+
+        if (preg_match('/^[\x20-\x7E]*$/', $bytes)) {
+            return $value;
+        }
+
+        return (string) self::inferEncoding(rtrim($bytes, "\0"));
     }
 
     public static function trimHexGarbage(string $string): string

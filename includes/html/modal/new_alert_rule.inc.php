@@ -41,7 +41,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                     <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
                         <?php echo csrf_field() ?>
                         <input type="hidden" name="device_id" id="device_id" value="<?php echo $device_id; ?>">
-                        <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities((string) DeviceCache::get($device_id)->displayName()); ?>">
+                        <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities((string) $device_id > 0 ? DeviceCache::get($device_id)->displayName() : ''); ?>">
                         <input type="hidden" name="rule_id" id="rule_id" value="">
                         <input type="hidden" name="builder_json" id="builder_json" value="">
                         <div id="alert-rule-form-error" class="alert alert-danger" style="display: none; margin-top: 10px;"></div>

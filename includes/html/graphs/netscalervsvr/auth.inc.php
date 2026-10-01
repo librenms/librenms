@@ -8,8 +8,7 @@ if (is_numeric($vars['id'])) {
 
         $rrd_filename = Rrd::name($device['hostname'], ['netscaler', 'vsvr', $vsvr['vsvr_name']]);
 
-        $title = generate_device_link($device);
-        $title .= ' :: Netscaler VServer :: ' . htmlentities((string) $vsvr['vsvr_name']);
+        $title = ' :: Netscaler VServer :: ' . $vsvr['vsvr_name'];
         $auth = true;
     }
 }

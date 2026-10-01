@@ -1,70 +1,73 @@
 # Creating Documentation
 
-One of the goals of the LibreNMS project is to enable users to get all of the
-help they need from our documentation.
+One goal of the LibreNMS project is complete help for the users in our
+documentation.
 
-The documentation uses the [markdown](https://en.wikipedia.org/wiki/Markdown)
-markup language and is generated with [mkdocs](https://www.mkdocs.org/). To edit
-or create markdown you only need a text editor, but it is recommended to build
-your docs before submitting, in order to check them visually. The section on
-this page has instructions for this step.
+The documentation uses the
+[markdown](https://en.wikipedia.org/wiki/Markdown) markup language.
+[mkdocs](https://www.mkdocs.org/) generates the site. A text editor is
+enough to edit or create markdown. Build your documents before you
+submit them, so that you can examine the result. A section on this page
+gives the instructions.
 
 ## Writing docs
 
-When you are adding a new feature or extension, we need to have full
-documentation to go along with it. It's quite simple to do this:
+A new feature or extension needs full documentation. These are the
+steps:
 
-- Find the relevant directory to store your new document in, General, Support
-  and Extensions are the most likely choices.
-- Think of a descriptive name that's not too long, it should match what they may
-  be looking for or describes the feature.
-- Add the new document into the `nav` section of `mkdocs.yml` if it needs to
-  appear in the table of contents
-- Ensure the first line contains: `source: path/to/file.md` - don't include the
-  initial `doc/`.
-- In the body of the document, be descriptive but keep things simple. Some tips:
-  - If the document could cover different distros like CentOS and Ubuntu please
-    try and include the information for them all. If that's not possible then at
-least put a placeholder in asking for contributions.
-  - Ensure you use the correct formatting for `commands` and `code blocks` by
-    wrapping one liners in backticks or blocks in ```.
-  - Put content into sub-headings where possible to organise the content.
-- If you rename a file, please add a redirect for the old file in `mkdocs.yml` like so:
+- Find the correct directory for your new document. General, Support,
+  and Extensions are the most common choices.
+- Give the document a short, descriptive name. The name must match the
+  search terms of the user or describe the feature.
+- To put the document into the table of contents, add it to the `nav`
+  section of `mkdocs.yml`.
+- Put `source: path/to/file.md` on the first line. Do not include the
+  leading `doc/`.
+- In the body of the document, be descriptive and simple. Some advice:
+    - If the document applies to more than one distribution, such as
+    CentOS and Ubuntu, give the information for all of them. If you
+    cannot do this, add a placeholder with a request for contributions.
+    - Use the correct format for `commands` and `code blocks`. Put a
+    single line in backticks and a block in triple backticks.
+    - Use subheadings to organise the content.
+- After you rename a file, add a redirect for the old file in
+  `mkdocs.yml`:
 ```yaml
   - redirects:
       redirect_maps:
         'old/page.md': 'new/page.md'
 ```
 
-Please ensure you add the document to the relevant section within `pages` of
-`mkdocs.yml` so that it's in the correct menu and is built.  Forgetting this
-step will result in your document never seeing the light of day :)
+Add the document to the correct section in `pages` of `mkdocs.yml`. The
+document is then in the correct menu, and mkdocs builds it. Without
+this step, the document never appears.
 
 ## Formatting docs
 
-Our docs are based on Markdown using mkdocs which adheres to markdown specs and
-nothing more, because of that we also import a couple of extra libraries:
+Our documents use Markdown with mkdocs. mkdocs obeys the markdown
+specification only. We therefore import two extra libraries:
 
 - pymdownx.tasklist
 - pymdownx.tilde
 
-This means you can use:
+You can therefore use:
 
 - `~~strikethrough~~` to perform ~~strikethrough~~
 - [X] `- [X] List items`
 - Url's can be made `[like this](https://www.librenms.org)` [like this](https://www.librenms.org)
 - Code can be placed in \`\` for single line or \`\`\` for multiline.
-- `#` Can be used for main headings which translates to a `<h1>` tag,
-  increasing the `#`'s will increase the hX tags.
-- `###` Can be used for sub-headings which will appear in the TOC to the left.
-- Settings should be prefixed with `!!! setting "<webui setting path>"`
+- `#` gives a main heading. It becomes an `<h1>` tag. More `#`
+  characters give a higher hX number.
+- `###` gives a subheading. A subheading appears in the table of
+  contents on the left.
+- Put `!!! setting "<webui setting path>"` before a setting.
 
 [Markdown CheatSheet Link](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
 
 
 ## Building docs
 
-This is achieved with `mkdocs`, a python package.
+`mkdocs` is a Python package. It builds the documents.
 
 1. Install the required packages.
 
@@ -90,31 +93,31 @@ pip install \
  mkdocs-redirects \
  pymdown-extensions
 ```
-If you encounter permissions issues, these might be resolved by using the
-user option, with whatever user you are building as, e.g. `-u librenms`
+If you get a permission error, use the user option with your build
+user. An example is `-u librenms`.
 
-2. A configuration file for building LibreNMS docs is already included in the
-distribution: `/opt/librenms/mkdocs.yml`. The various configuration
-directives are documented
-[here](https://www.mkdocs.org/user-guide/configuration/).
+2. The distribution holds the configuration file for the LibreNMS docs:
+`/opt/librenms/mkdocs.yml`. The [mkdocs configuration
+guide](https://www.mkdocs.org/user-guide/configuration/) describes the
+directives.
 
 3. Build from the librenms base directory: `cd /opt/librenms`.
 
-4. Building is simple:
+4. Run the build:
 
 ```
 mkdocs build
 ```
 
-This will output all the documentation in html format to `/opt/librenms/out`
-(this folder will be ignored from any commits).
+The command writes all the documentation in HTML format to
+`/opt/librenms/out`. Git ignores this folder.
 
 
 ## Viewing docs
 
-mkdocs includes it's own light-weight webserver for this purpose.
+mkdocs has its own small web server for this purpose.
 
-Viewing is as simple as running the following command:
+Run this command:
 
 ```
 $ mkdocs serve
@@ -127,22 +130,22 @@ INFO    -  Serving on http://127.0.0.1:8000
 INFO    -  Start watching changes
 ```
 
-Now you will find the complete set of LibreNMS documentation by opening your
-browser to `localhost:8000`.
+Open `localhost:8000` in your browser. The full set of LibreNMS
+documentation is then available.
 
-Note it is not necessary to `build` before viewing as the `serve` command
-will do this for you. Also the server will update the documents it is serving
-whenever changes to the markdown are made, such as in another terminal.
+A `build` before the view is not necessary. The `serve` command builds
+the documents. The server also updates the documents after each change
+to the markdown, for example from another terminal.
 
 ### Viewing docs from another machine
 
-By default the server will only listen for connections from the local machine.
-If you are building on a different machine you can use the following directive
-to listen on all interfaces:
+By default, the server accepts connections only from the local machine.
+For a build on a different machine, use this directive. The server then
+listens on all interfaces:
 
 ```
 mkdocs serve --dev-addr=0.0.0.0:8000
 ```
 
-WARNING: this is not a secure webserver, do this at your own risk, with
-appropriate host security and do not leave the server running.
+WARNING: do not leave this server in operation. It is not a secure web
+server. Use it only with correct host security.

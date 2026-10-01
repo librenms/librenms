@@ -5,19 +5,21 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AlertOperationRequest;
 use App\Models\AlertOperation;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\AlertRuleOperationPhase;
 
 class AlertOperationController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Web UI: list alert operations (named operations + segment summary).
      */
     public function index(): View
     {
-        Gate::authorize('viewAny', AlertOperation::class);
+        $this->authorize('viewAny', AlertOperation::class);
 
         $operations = AlertOperation::query()
             ->withCount('alertRules')
@@ -35,7 +37,7 @@ class AlertOperationController extends Controller
 
     public function show(AlertOperation $alertOperation): JsonResponse
     {
-        Gate::authorize('view', $alertOperation);
+        $this->authorize('view', $alertOperation);
 
         $alertOperation->loadMissing([
             'segments.transportSingles:alert_transports.transport_id,transport_type,transport_name',
@@ -50,7 +52,7 @@ class AlertOperationController extends Controller
 
     public function store(AlertOperationRequest $request): JsonResponse
     {
-        Gate::authorize('create', AlertOperation::class);
+        $this->authorize('create', AlertOperation::class);
 
         try {
             $validated = $request->validated();
@@ -76,7 +78,7 @@ class AlertOperationController extends Controller
 
     public function update(AlertOperationRequest $request, AlertOperation $alertOperation): JsonResponse
     {
-        Gate::authorize('update', $alertOperation);
+        $this->authorize('update', $alertOperation);
 
         try {
             $validated = $request->validated();
@@ -100,7 +102,7 @@ class AlertOperationController extends Controller
 
     public function destroy(AlertOperation $alertOperation): JsonResponse
     {
-        Gate::authorize('delete', $alertOperation);
+        $this->authorize('delete', $alertOperation);
 
         if ($alertOperation->alertRules()->exists()) {
             return response()->json([

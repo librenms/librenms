@@ -18,11 +18,14 @@ if (isset($app->data['checks'])) {
         if (isset($checks_list[0])) {
             echo 'Check Info: ';
             foreach ($checks_list as $index => $check) {
-                $label = $vars['sneck_check'] == $check
-                    ? '<span class="pagemenu-selected">' . htmlspecialchars((string) $check) . '</span>'
-                    : htmlspecialchars((string) $check);
+                $label = htmlspecialchars((string) $check);
+                $link = generate_link($label, $link_array, ['sneck_check' => $check]);
 
-                echo generate_link($label, $link_array, ['sneck_check' => $check]) . "\n";
+                $link = $vars['sneck_check'] == $check
+                    ? '<span class="pagemenu-selected">' . $link . '</span>'
+                    : $link;
+
+                echo $link . "\n";
 
                 if ($index < (count($checks_list) - 1)) {
                     echo ', ';
@@ -34,11 +37,14 @@ if (isset($app->data['checks'])) {
         if (isset($debugs_list[0])) {
             echo 'Debug Info: ';
             foreach ($debugs_list as $index => $debug) {
-                $label = $vars['sneck_debug'] == $debug
-                    ? '<span class="pagemenu-selected">' . htmlspecialchars((string) $debug) . '</span>'
-                    : htmlspecialchars((string) $debug);
+                $label = htmlspecialchars((string) $debug);
+                $link = generate_link($label, $link_array, ['sneck_debug' => $debug]);
 
-                echo generate_link($label, $link_array, ['sneck_debug' => $debug]) . "\n";
+                $link = $vars['sneck_debug'] == $debug
+                    ? '<span class="pagemenu-selected">' . $link . '</span>'
+                    : $link;
+
+                echo $link . "\n";
 
                 if ($index < (count($debugs_list) - 1)) {
                     echo ', ';

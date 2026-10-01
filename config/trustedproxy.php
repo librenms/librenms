@@ -25,7 +25,7 @@ return [
      * of your proxy (e.g. if using ELB or similar).
      *
      */
-    'proxies' => LibreNMS\Util\EnvHelper::parseArray('APP_TRUSTED_PROXIES', '*', ['', '*', '**']),
+    'proxies' => LibreNMS\Util\EnvHelper::parseArray('APP_TRUSTED_PROXIES', '127.0.0.1', ['', '*', '**']),
 
     /*
      * To trust one or more specific proxies that connect

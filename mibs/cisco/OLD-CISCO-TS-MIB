@@ -1,0 +1,530 @@
+-- *****************************************************************
+-- OLD-CISCO-TS-MIB.my:  Cisco Terminal Service MIB file
+--
+-- May 1994, Jeffrey T. Johnson
+--
+-- Copyright (c) 1994 by cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+               OLD-CISCO-TS-MIB DEFINITIONS ::= BEGIN
+
+               IMPORTS
+			IpAddress
+				FROM RFC1155-SMI
+			OBJECT-TYPE
+				FROM RFC-1212
+			DisplayString
+				FROM RFC1213-MIB
+			local
+				FROM CISCO-SMI;
+          
+               lts                 OBJECT IDENTIFIER ::= { local 9 }
+
+               -- Local cisco Terminal Service Group
+
+          -- This group is present in all products which contain
+          -- asynchronous terminal lines.
+
+               tsLines OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of terminal lines on this device.
+                           Includes virtual lines."
+                   ::= { lts 1 }
+
+
+               -- Local Terminal Service Line Table
+
+          -- This group contains terminal service specific
+          -- information on a per line basis.
+
+               ltsLineTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF LtsLineEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of terminal server line entries."
+                   ::= { lts 2 }
+
+               ltsLineEntry OBJECT-TYPE
+                   SYNTAX LtsLineEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of per TTY objects in the
+                            cisco Terminal Server implementation."
+                   INDEX { tsLineNumber }
+               ::= { ltsLineTable 1 }
+
+               LtsLineEntry ::=
+                   SEQUENCE {
+                       tsLineActive
+                           INTEGER,
+                       tsLineType
+                           INTEGER,
+                       tsLineAutobaud
+                           INTEGER,
+                       tsLineSpeedin
+                           INTEGER,
+                       tsLineSpeedout
+                           INTEGER,
+                       tsLineFlow
+                           INTEGER,
+                       tsLineModem
+                           INTEGER,
+                       tsLineLoc
+                           DisplayString,
+                       tsLineTerm
+                           DisplayString,
+                       tsLineScrlen
+                           INTEGER,
+                       tsLineScrwid
+                           INTEGER,
+                       tsLineEsc
+                           DisplayString,
+                       tsLineTmo
+                           INTEGER,
+                       tsLineSestmo
+                           INTEGER,
+                       tsLineRotary
+                           INTEGER,
+                       tsLineUses
+                           INTEGER,
+                       tsLineNses
+                           INTEGER,
+                       tsLineUser
+                           DisplayString,
+                       tsLineNoise
+                           INTEGER,
+                       tsLineNumber
+                           INTEGER,
+                       tsLineTimeActive
+                           INTEGER
+                   }
+
+
+          -- The following section describes the components of the
+          -- table.
+
+               tsLineActive OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Boolean whether this line is active or not."
+                   ::= { ltsLineEntry 1 }
+
+               tsLineType OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        unknown(1),
+                        console(2),
+                        terminal(3),
+                        line-printer(4),
+                        virtual-terminal(5),
+                        auxiliary(6)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Type of line."
+                   ::= { ltsLineEntry 2 }
+
+               tsLineAutobaud OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Boolean whether line will autobaud or not."
+                   ::= { ltsLineEntry 3 }
+
+               tsLineSpeedin OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "What input speed the line is running at."
+                   ::= { ltsLineEntry 4 }
+
+               tsLineSpeedout OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "What output speed the line is running at."
+                   ::= { ltsLineEntry 5 }
+
+               tsLineFlow OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        unknown(1),
+                        none(2),
+                        software-input(3),
+                        software-output(4),
+                        software-both(5),
+                        hardware-input(6),
+                        hardware-output(7),
+                        hardware-both(8)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "What kind of flow control the line is
+                           using."
+                   ::= { ltsLineEntry 6 }
+
+               tsLineModem OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        unknown(1),
+                        none(2),
+                        call-in(3),
+                        call-out(4),
+                        cts-required(5),
+                        ri-is-cd(6),
+                        inout(7)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "What kind of modem control the line is
+                           using."
+                   ::= { ltsLineEntry 7 }
+
+               tsLineLoc OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Describes the line's physical location."
+                   ::= { ltsLineEntry 8 }
+
+               tsLineTerm OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Describes the line's terminal type."
+                   ::= { ltsLineEntry 9 }
+
+               tsLineScrlen OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Length in lines of the screen of terminal
+                           attached to this line."
+                   ::= { ltsLineEntry 10 }
+
+               tsLineScrwid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Width in characters of the screen of
+                           terminal attached to this line."
+                   ::= { ltsLineEntry 11 }
+
+               tsLineEsc OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Escape character used to break out of active
+                           sessions."
+                   ::= { ltsLineEntry 12 }
+
+               tsLineTmo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Line idleness timeout in seconds."
+                   ::= { ltsLineEntry 13 }
+
+               tsLineSestmo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Session idleness timeout in seconds."
+                   ::= { ltsLineEntry 14 }
+
+               tsLineRotary OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Rotary group number the line belongs in."
+                   ::= { ltsLineEntry 15 }
+
+               tsLineUses OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of times a connection has been made
+                           to or from this line."
+                   ::= { ltsLineEntry 16 }
+
+               tsLineNses OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current number of sessions in use on this
+                           line."
+                   ::= { ltsLineEntry 17 }
+
+               tsLineUser OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "TACACS user name, if TACACS enabled, of user
+                           on this line."
+                   ::= { ltsLineEntry 18 }
+
+               tsLineNoise OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Count of garbage characters received when
+                           line inactive."
+                   ::= { ltsLineEntry 19 }
+
+               tsLineNumber OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The line i've been talking about."
+                   ::= { ltsLineEntry 20 }
+
+               tsLineTimeActive OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The time in seconds since line was activated."
+                   ::= { ltsLineEntry 21 }
+               -- End of table
+
+               -- Local Terminal Service Line Session Table
+
+          -- This group contains terminal server specific
+          -- information on a per line and per session basis.
+
+               ltsLineSessionTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF LtsLineSessionEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of terminal server line and session
+                            entries."
+                   ::= { lts 3 }
+
+               ltsLineSessionEntry OBJECT-TYPE
+                   SYNTAX LtsLineSessionEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of per session and per TTY
+                            objects in the cisco Terminal Server
+                            implementation."
+                   INDEX { tslineSesLine, tslineSesSession }
+               ::= { ltsLineSessionTable 1 }
+
+               LtsLineSessionEntry ::=
+                   SEQUENCE {
+                       tslineSesType
+                           INTEGER,
+                       tslineSesDir
+                           INTEGER,
+                       tslineSesAddr
+                           IpAddress,
+                       tslineSesName
+                           DisplayString,
+                       tslineSesCur
+                           INTEGER,
+                       tslineSesIdle
+                           INTEGER,
+                       tslineSesLine
+                           INTEGER,
+                       tslineSesSession 
+                           INTEGER
+                   }
+
+
+          -- The following section describes the components of the
+          -- table.
+
+               tslineSesType OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        unknown(1),
+                        pad(2),
+                        stream(3),
+                        rlogin(4),
+                        telnet(5),
+                        tcp(6),
+                        lat(7),
+                        mop(8),
+                        slip(9),
+                        xremote(10),
+			rshell(11)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Type of session."
+                   ::= { ltsLineSessionEntry 1 }
+
+               tslineSesDir OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        unknown(1),
+                        incoming(2),
+                        outgoing(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Direction of session."
+                   ::= { ltsLineSessionEntry 2 }
+
+               tslineSesAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Remote host address of session. [What about
+                           PAD connections?]"
+                   ::= { ltsLineSessionEntry 3 }
+
+               tslineSesName OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Remote host name of session."
+                   ::= { ltsLineSessionEntry 4 }
+
+               tslineSesCur OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Boolean whether session is the currently
+                           active one."
+                   ::= { ltsLineSessionEntry 5 }
+
+               tslineSesIdle OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Time in seconds session has been idle."
+                   ::= { ltsLineSessionEntry 6 }
+
+               tslineSesLine OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Table index 1."
+                   ::= { ltsLineSessionEntry 7 }
+
+               tslineSesSession OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Table index 2."
+                   ::= { ltsLineSessionEntry 8 }
+
+               -- End of table
+
+
+               tsMsgTtyLine OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "tty line to send the message to. -1 will
+                           send it to all tty lines"
+                   ::= { lts 4 }
+
+               tsMsgIntervaltim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Interval between reissuing message in
+                           milliseconds. Minimum non-zero setting is
+                           10000. 0 will cause the routine to choose its
+                           own intervals becoming more frequent as
+                           MessageDuration gets close to expiring. 2hr,
+                           1hr, 30min, 5min, 1min"
+                   ::= { lts 5 }
+
+               tsMsgDuration OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Length of time to reissue message in
+                           milliseconds. Minimum non-zero setting is
+                           10000. A setting of 0 will not repeat the
+                           message."
+                   ::= { lts 6 }
+
+               tsMsgText OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Up to 256 characters that will make up the
+                           message"
+                   ::= { lts 7 }
+
+               tsMsgTmpBanner OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        no(1),
+                        additive(2)
+                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Should the message be used as a temporary
+                           banner. 1 - No. 2 - In addition to the normal
+                           banner"
+                   ::= { lts 8 }
+
+               tsMsgSend OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        nothing(1),
+                        reload(2),
+                        messagedone(3),
+                        abort(4)
+                   }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Sends the message. The value determines what
+                           to do after the message has completed."
+                   ::= { lts 9 }
+
+               tsClrTtyLine OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "tty line to clear.  Read returns the last line
+                           cleared.  A value of -1 indicates no lines have 
+                           been cleared."
+                   ::= { lts 10 }
+
+END
+

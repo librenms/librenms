@@ -43,7 +43,7 @@ if (! empty($entPhysical)) {
             $id = $entPhysical[$index];
 
             // format datetime
-            if (empty($state['entStateLastChanged'])) {
+            if (empty($state['entStateLastChanged']) || $state['entStateLastChanged'] === '0-0-0,0:0:0.0,.0:0') {
                 $state['entStateLastChanged'] = null;
             } else {
                 [$date, $time, $tz] = explode(',', (string) $state['entStateLastChanged']);
