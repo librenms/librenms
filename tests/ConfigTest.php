@@ -52,6 +52,17 @@ final class ConfigTest extends TestCase
         $this->assertEquals('first', $this->config->getValue($instance)['basics']);
     }
 
+    public function testReloadDefaultsIgnoresRuntimeConfiguration(): void
+    {
+        LibrenmsConfig::set('rrd.enable', false);
+
+        LibrenmsConfig::reloadDefaults();
+
+        $this->assertTrue(LibrenmsConfig::get('rrd.enable'));
+
+        LibrenmsConfig::reload();
+    }
+
     public function testGet(): void
     {
         $this->setConfig(function (&$config): void {

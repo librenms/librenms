@@ -6,6 +6,8 @@ parameters:
         min: 80200
         max: 80499
 
+    parseModelCastsMethod: true
+
     resultCachePath: %tmpDir%/resultCache-legacy.php
 
     reportUnmatchedIgnoredErrors: false

@@ -1,0 +1,155 @@
+MONITOR-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    generic
+        FROM VERSA-MIB
+;
+
+monitor MODULE-IDENTITY
+    LAST-UPDATED "201705030000Z"
+    ORGANIZATION "Versa Networks"
+    CONTACT-INFO "
+        2953 Bunker Hill Lane, Suite 210
+        Santa Clara, CA - 95035 (USA)
+        Email: support@versa-networks.com"
+    DESCRIPTION "Versa Networks' Enterprise MIB which provides Monitor statistics"
+    REVISION "201705030000Z"
+    DESCRIPTION "Initial revision"
+    ::= { generic 3 }
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+monitorInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MonitorInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Monitor information"
+    ::= { monitor 11 }
+
+monitorInfoEntry OBJECT-TYPE
+    SYNTAX      MonitorInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { monitorId }
+        ::= { monitorInfoTable 1 }
+
+MonitorInfoEntry ::=
+    SEQUENCE {
+        monitorId Unsigned32,
+        monitorName String,
+        monitorAddress String,
+        monitorVrf String,
+        monitorTenant String,
+        monitorState String,
+        monitorInterval Unsigned32,
+        monitorThreshold Unsigned32,
+        monitorLastFlapped String,
+        monitorType String,
+        monitorSubtype String,
+        monitorSourceInterface String,
+        monitorNexthop String
+    }
+
+monitorId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Monitor id"
+    ::= { monitorInfoEntry 1 }
+
+monitorName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Monitor Name"
+    ::= { monitorInfoEntry 2 }
+
+monitorAddress OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Address being monitored"
+    ::= { monitorInfoEntry 3 }
+
+monitorVrf OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Routing instance"
+    ::= { monitorInfoEntry 4 }
+
+monitorTenant OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Tenant name"
+    ::= { monitorInfoEntry 5 }
+
+monitorState OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "State of the monitor"
+    ::= { monitorInfoEntry 6 }
+
+monitorInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interval"
+    ::= { monitorInfoEntry 7 }
+
+monitorThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Threshold"
+    ::= { monitorInfoEntry 8 }
+
+monitorLastFlapped OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time since last Up/Down"
+    ::= { monitorInfoEntry 9 }
+
+monitorType OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Type of the monitor"
+    ::= { monitorInfoEntry 10 }
+
+monitorSubtype OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Sub-type of the monitor"
+    ::= { monitorInfoEntry 11 }
+
+monitorSourceInterface OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Source-interface"
+    ::= { monitorInfoEntry 12 }
+
+monitorNexthop OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of nexthop SDWAN site"
+    ::= { monitorInfoEntry 13 }
+
+END

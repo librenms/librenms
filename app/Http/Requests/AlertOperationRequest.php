@@ -36,6 +36,7 @@ class AlertOperationRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'default_operation_step_duration_seconds' => ['nullable', 'integer', 'min:0'],
+            'notifications_suppressed' => ['sometimes', 'boolean'],
             'segments' => ['required', 'array', 'min:1'],
             'segments.*.position' => ['sometimes', 'integer', 'min:0', 'max:65535'],
             'segments.*.escalation_step_from' => ['required', 'integer', 'min:1'],

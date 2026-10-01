@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property int|null $escalation_step_to
  * @property int $start_in_seconds
  * @property int $step_duration_seconds
- * @property bool $notifications_suppressed
  */
 class AlertOperationSegment extends BaseModel
 {
@@ -32,11 +31,6 @@ class AlertOperationSegment extends BaseModel
         'escalation_step_to',
         'start_in_seconds',
         'step_duration_seconds',
-        'notifications_suppressed',
-    ];
-
-    protected $casts = [
-        'notifications_suppressed' => 'boolean',
     ];
 
     /**

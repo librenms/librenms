@@ -28,27 +28,29 @@ namespace App\Http\Controllers\Maps;
 
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
+use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use LibreNMS\Util\NetworkMapOptions;
 
 class DeviceDependencyController extends Controller
 {
     // Device Dependency Map
     public function dependencyMap(Request $request): View
     {
-        $group_id = $request->input('group');
+        $this->authorize('viewAny', Device::class);
 
-        $group_name = DeviceGroup::where('id', '=', $group_id)->first('name');
-        if (! empty($group_name)) {
-            $group_name = $group_name->name;
-        }
+        $group_id = $request->integer('group');
+        $deviceGroup = $group_id ? DeviceGroup::hasAccess($request->user())
+            ->select(['id', 'name'])
+            ->firstWhere('id', $group_id) : null;
 
         $data = [
             'page_refresh' => LibrenmsConfig::get('page_refresh', 300),
-            'group_id' => $group_id,
-            'options' => LibrenmsConfig::get('network_map_dependencymap_vis_options') ?? LibrenmsConfig::get('network_map_vis_options'),
-            'group_name' => $group_name,
+            'group_id' => $deviceGroup?->id,
+            'options' => NetworkMapOptions::dependencyMap(),
+            'group_name' => $deviceGroup?->name,
             'highlight_style' => [
                 'color' => [
                     'highlight' => [

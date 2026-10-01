@@ -1,6 +1,6 @@
 ## Splunk
 
-LibreNMS can send alerts to a Splunk instance and provide all device
+LibreNMS sends alerts to a Splunk instance with all the device details
 and alert details.
 
 Example output:
@@ -35,7 +35,7 @@ device_vrf_lites="Array", device_lat="", device_lng="", -
 sysObjectID => ""; `
 ```
 
-Each alert will be sent as a separate message.
+LibreNMS sends each alert as a separate message.
 
 **Example:**
 

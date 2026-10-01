@@ -2,16 +2,11 @@
 
 namespace App\Console\Commands;
 
-use AcmePhp\Ssl\Exception\CertificateParsingException;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\SslCertificate;
-use Jalle19\CertificateParser\Parser;
-use Jalle19\CertificateParser\Provider\Exception\ProviderException;
-use Jalle19\CertificateParser\Provider\StreamContext;
-use Jalle19\CertificateParser\Provider\StreamSocketProvider;
 use LibreNMS\Enum\Severity;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -44,10 +39,6 @@ class MaintenanceDiscoverSslCertificates extends LnmsCommand
             return 0;
         }
 
-        $parser = new Parser();
-        $context = new StreamContext();
-        $context->setVerifyPeerName(false);
-
         $port = 443;
         $timeout = 10;
         $created = 0;
@@ -65,42 +56,35 @@ class MaintenanceDiscoverSslCertificates extends LnmsCommand
                 continue;
             }
 
+            $cert = SslCertificate::firstOrNew([
+                'device_id' => $device->device_id,
+                'host' => $host,
+                'port' => $port,
+            ], [
+                'disabled' => false,
+            ]);
+
             try {
-                $provider = new StreamSocketProvider($host, $port, $timeout, $context);
-                $results = $parser->parse($provider);
-            } catch (ProviderException|CertificateParsingException $e) {
+                $cert->updateFromHost($timeout);
+            } catch (\Throwable $e) {
                 if ($this->getOutput()->isVerbose()) {
-                    $this->line("  {$host}:{$port} – " . $e->getMessage());
+                    $this->line("  $host:$port – " . $e->getMessage());
                 }
                 $failed++;
                 continue;
             }
 
-            $data = array_merge(SslCertificate::attributesFromParserResults($results), [
-                'device_id' => $device->device_id,
-                'host' => $host,
-                'port' => $port,
-                'last_checked_at' => now(),
-                'disabled' => false,
-            ]);
-
-            $existing = SslCertificate::where('device_id', $device->device_id)
-                ->where('host', $host)
-                ->where('port', $port)
-                ->first();
-
-            if ($existing) {
-                $changes = SslCertificate::formatAttributeChanges($existing->only(['subject', 'issuer', 'valid_to', 'valid_from', 'fingerprint', 'days_until_expiry']), $data);
-                // Always persist bookkeeping fields like last_checked_at, even if there are no meaningful changes.
-                $existing->update($data);
+            if ($cert->exists) {
+                $changes = $cert->getTrackedChanges();
+                $cert->save();
                 if ($changes !== '') {
                     $updated++;
-                    Eventlog::log("SSL certificate updated: {$host}:{$port} – {$changes}", $device->device_id, 'ssl-certificate', Severity::Info, $existing->id);
+                    Eventlog::log("SSL certificate updated: {$host}:{$port} – {$changes}", $device->device_id, 'ssl-certificate', Severity::Info, $cert->id);
                 }
             } else {
-                $cert = SslCertificate::create($data);
+                $cert->save();
                 $created++;
-                $msg = "SSL certificate discovered: {$host}:{$port} – Subject: {$data['subject']}, Issuer: {$data['issuer']}, Valid until: " . ($data['valid_to'] ?? 'N/A') . ', Days until expiry: ' . ($data['days_until_expiry'] ?? 'N/A');
+                $msg = "SSL certificate discovered: {$host}:{$port} – Subject: {$cert->subject}, Issuer: {$cert->issuer}, Valid until: " . ($cert->valid_to?->format('Y-m-d H:i:s') ?? 'N/A') . ', Days until expiry: ' . ($cert->days_until_expiry ?? 'N/A');
                 Eventlog::log($msg, $device->device_id, 'ssl-certificate', Severity::Info, $cert->id);
             }
         }

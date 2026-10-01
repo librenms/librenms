@@ -33,7 +33,6 @@ from sys import stdout
 from time import time
 
 Result = namedtuple("Result", ["ip", "hostname", "outcome", "output"])
-args = {}
 
 
 class Outcome:
@@ -79,10 +78,11 @@ def get_outcome_symbol(outcome):
         Outcome.UNPINGABLE: ".",
         Outcome.KNOWN: "*",
         Outcome.FAILED: "-",
+        Outcome.EXCLUDED: "x",
         Outcome.TERMINATED: "",
         Outcome.NODNS: "~",
         Outcome.ERROR: "E",
-    }[outcome]
+    }.get(outcome, "?")
 
 
 def handle_result(data):
@@ -119,7 +119,7 @@ def check_ip_excluded(check_ip):
     return False
 
 
-def scan_host(scan_ip):
+def scan_host(scan_ip, args):
     hostname = None
 
     try:
@@ -323,7 +323,7 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
 
     if args.legend and not VERBOSE_LEVEL:
         print(
-            "Legend:\n+  Added device\n*  Known device\n-  Failed to add device\n.  Ping failed\n~  Skipped due to no Reverse DNS\nE  Error when checking\n"
+            "Legend:\n+  Added device\n*  Known device\n-  Failed to add device\n.  Ping failed\nx  Excluded device\n~  Skipped due to no Reverse DNS\nE  Error when checking\n"
         )
 
     print("Scanning IPs:")
@@ -339,7 +339,16 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
 
             for ip in ips:
                 if not check_ip_excluded(ip):
-                    pool.apply_async(scan_host, (str(ip),), callback=handle_result)
+
+                    def error_callback(e):
+                        print("ERROR in scan_host:", e)
+
+                    pool.apply_async(
+                        scan_host,
+                        (str(ip), args),
+                        callback=handle_result,
+                        error_callback=error_callback,
+                    )
 
         pool.close()
         pool.join()

@@ -1,18 +1,19 @@
 # Rules
 
-Rules are defined using a logical language.
+A rule uses a logical language.
 
-The GUI provides a simple way of creating rules.
+The web interface gives a simple method to create a rule.
 
-Creating more complicated rules which may include maths calculations
-and MySQL queries can be done using [macros](Macros.md)
+[Macros](Macros.md) make more complex rules possible. Such rules can
+hold mathematical calculations and MySQL queries.
 
 ## Syntax
 
-Rules must consist of at least 3 elements: An __Entity__, a __Condition__ and a __Value__.
-Rules can contain braces and __Glues__.
+A rule needs at least 3 elements: an __Entity__, a __Condition__, and a
+__Value__. A rule can also hold braces and __Glues__.
 
-__Entities__ are provided from Table and Field from the database. For Example: `ports.ifOperStatus`.
+An __Entity__ comes from a table and a field in the database. An
+example is `ports.ifOperStatus`.
 
 __Conditions__ can be any of:
 
@@ -38,39 +39,45 @@ __Conditions__ can be any of:
 - Less or Equal `<=`
 - Regex `REGEXP`
 
-__Values__ can be an entity or any data. If using macros or another column name as a value you
-must include the macro or column name with backticks. i.e. \`macros.past_60m\` or \`processors.processor_perc_warn\`.
+A __Value__ is an entity or any data. A macro or another column name as
+a value needs backticks around it. Examples are \`macros.past_60m\` and
+\`processors.processor_perc_warn\`.
 
-__Note__: Regex supports MySQL Regular expressions.
+__Note__: Regex accepts MySQL regular expressions.
 
-Arithmetics are allowed as well.
+Arithmetic is also valid.
 
 ## Options
 
-Here are some of the other options available when adding an alerting rule:
+These are the other options for an alert rule:
 
-- Rule name: The name associated with the rule.
-- Severity: How "important" the rule is.
-- Max alerts: The maximum number of alerts sent for the event.  `-1` means unlimited.
-- Delay: The amount of time in seconds to wait after a rule is matched
-  before sending an alert out transport.
-- Interval: The interval of time in seconds between alerts for an
-  event until Max alert is reached.
-- Mute alerts: Disables sending alert rule through alert
-  transport. But will still show the alert in the Web UI.
-- Invert match: Invert the matching rule (ie. alert on items that
-  _don't match the rule).
-- Recovery alerts: This will disable the recovery notification from
-  being sent if turned off.
+- Rule name: the name of the rule.
+- Severity: the importance of the rule.
+- Invert match: it inverts the match. The rule then alerts on the items
+  that do _not_ match.
+- Mute alerts: it stops the alert through the alert transport. The
+  alert still appears in the web interface.
+- Recovery alerts: with this option off, LibreNMS sends no recovery
+  notification.
+- Acknowledgement alerts: with this option off, LibreNMS sends no
+  acknowledgement notification.
+- Operations: select the alert operation for this alert rule.
+- Match devices, groups and location list: it applies this alert rule
+  only to these devices.
+- All devices except in list: it inverts the device selection of the
+  Match option.
+- Procedure URL: read [Procedure](Rules.md#procedure).
+- Notes: your own notes about this rule. LibreNMS also sends this
+  information to the alert notifications.
 
 ## Advanced
 
-On the Advanced tab, you can specify some additional options for the alert rule:
+The Advanced tab holds more options for the alert rule:
 
-- Override SQL: Enable this if you using a custom query
-- Query: The query to be used for the alert.
+- Override SQL: enable this option for your own query.
+- Query: the query for the alert.
 
-- An example of this would be an average rule for all CPUs over 10%
+The example below is an average rule for all CPUs above 10%:
 
 ```sql
 SELECT devices.*,AVG(processors.processor_usage) AS cpu_avg, processors.* FROM 
@@ -84,52 +91,51 @@ HAVING AVG(processors.processor_usage)
 ```
 
 !!! note
-    The 10 would then contain the average CPU usage value, you can
-    change this value to be whatever you like.
-    You will to need copy and paste this into the Alert Rule under
-    Advanced then paste into Query box and switch the Override SQL.
+    The value 10 is the average CPU use. You can change this value.
+    Copy the query into the Query box on the Advanced tab of the alert
+    rule. Then enable Override SQL.
 
 ## Procedure
 
-You can provide procedure URL when creating the rule. Only links
-like "http://" are supported, otherwise an error will be returned.
-Once configured, procedures can be opened from the Alert widget
-through the "Open" button, which can be shown/hidden from the
-widget configuration box.
+You can give a procedure URL at the creation of the rule. LibreNMS
+accepts only an `http://` link. Any other link gives an error. The
+"Open" button in the Alert widget then opens the procedure. The widget
+configuration box shows and hides this button.
 
 ## Examples
 
-Alert when:
+These rules alert when:
 
-- Device goes down: `devices.status != 1`
-- Any port changes: `ports.ifOperStatus != 'up'`
-- Root-directory gets too full: `storage.storage_descr = '/' AND
+- A device goes down: `devices.status != 1`
+- A port changes: `ports.ifOperStatus != 'up'`
+- The root directory becomes too full: `storage.storage_descr = '/' AND
   storage.storage_perc >= '75'`
-- Any storage gets fuller than the 'warning': `storage.storage_perc >= storage_perc_warn`
-- If device is a server and the used storage is above the warning
-  level, but ignore /boot partitions: `storage.storage_perc >
+- A storage becomes fuller than the warning level: `storage.storage_perc >= storage_perc_warn`
+- The device is a server and the used storage is more than the warning
+  level. The rule ignores the /boot partitions: `storage.storage_perc >
   storage.storage_perc_warn AND devices.type = "server" AND
   storage.storage_descr != "/boot"`
-- VMware LAG is not using "Source ip address hash" load balancing:
+- A VMware LAG does not use "Source ip address hash" load balancing:
   `devices.os = "vmware" AND ports.ifType = "ieee8023adLag" AND
   ports.ifDescr REGEXP "Link Aggregation .*, load balancing algorithm:
   Source ip address hash"`
-- Syslog, authentication failure during the last 5m:
+- The syslog holds an authentication failure in the last 5 minutes:
   `syslog.timestamp >= macros.past_5m AND syslog.msg REGEXP ".*authentication failure.*"`
-- High memory usage: `macros.device_up = 1 AND mempools.mempool_perc >=
+- The memory use is high: `macros.device_up = 1 AND mempools.mempool_perc >=
  90 AND mempools.mempool_descr REGEXP "Virtual.*"`
-- High CPU usage(per core usage, not overall): `macros.device_up
+- The CPU use of one core is high, not the total CPU use: `macros.device_up
   = 1 AND processors.processor_usage >= 90`
-- High port usage, where description is not client & ifType is not
-  softwareLoopback: `macros.port_usage_perc >= 80 AND
+- The port use is high. The rule excludes the client descriptions and
+  the softwareLoopback interface type: `macros.port_usage_perc >= 80 AND
   port.port_descr_type != "client" AND ports.ifType != "softwareLoopback"`
-- Alert when mac address is located on your network `ipv4_mac.mac_address = "2c233a756912"`
-- Device MTU test fails: `devices.mtu_status != 1`
+- A MAC address appears on your network: `ipv4_mac.mac_address = "2c233a756912"`
+- The MTU test of a device fails: `devices.mtu_status != 1`
 
 ## Alert Rules Collection
 
-You can also select Alert Rule from the Alerts Collection. These Alert
-Rules are submitted by users in the community :) If would like to
-submit your alert rules to the collection, please submit them here [Alert Rules Collection](https://github.com/librenms/librenms/edit/master/resources/definitions/alert_rules.json)
+You can also select an alert rule from the Alerts Collection. Users in
+the community supply these alert rules. To add your own alert rules to
+the collection, send them here: [Alert Rules
+Collection](https://github.com/librenms/librenms/edit/master/resources/definitions/alert_rules.json)
 
 ![Alert Rules Collection](../img/alert-rules-collection.png)

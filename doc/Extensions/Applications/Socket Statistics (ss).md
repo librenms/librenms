@@ -1,8 +1,12 @@
 ## Socket Statistics (ss)
 
-The Socket Statistics application polls ss and scrapes socket statuses.  Individual sockets and address-families may be filtered out within the script's optional configuration JSON file.
+The Socket Statistics application polls `ss` and reads the socket
+statuses. The optional JSON configuration file of the script can filter
+out single sockets and address families.
 
-1. The following socket types are polled directly.  Filtering a socket type will disable direct polling as-well-as indirect polling within any address-families that list the socket type as their child:
+1. LibreNMS polls these socket types directly. A filter on a socket type
+disables the direct polling. It also disables the indirect polling in
+each address family with that socket type as a child:
 ```
 dccp (also exists within address-families "inet" and "inet6")
 mptcp (also exists within address-families "inet" and "inet6")
@@ -27,7 +31,12 @@ v_str (within address-family "vsock")
 unknown (within address-families "inet", "inet6", "link", "tipc", and "vsock")
 ```
 
-3. The following address-families are polled directly and have their child socket types tab-indented below them.  Filtering a socket type (see "1" above) will filter it from the address-family.  Filtering an address-family will filter out all of its child socket types.  However, if those socket types are not DIRECTLY filtered out (see "1" above), then they will continue to be monitored either directly or within other address-families in which they exist:
+3. LibreNMS polls these address families directly. Their child socket
+types are indented below them. A filter on a socket type, as in item 1
+above, removes it from the address family. A filter on an address
+family removes all its child socket types. LibreNMS still monitors
+those socket types directly or in another address family, unless item 1
+above filters them DIRECTLY:
 ```
 inet
     dccp
@@ -75,13 +84,13 @@ vsock
     wget https://github.com/librenms/librenms-agent/raw/master/snmp/ss.py -O /etc/snmp/ss.py
     ```
 
-2. Make the script executable
+2. Make the script executable.
 
     ```
     chmod +x /etc/snmp/ss.py
     ```
 
-3. Edit your snmpd.conf file and add:
+3. Edit your `snmpd.conf` file and add:
 
     ```
     extend ss /etc/snmp/ss.py
@@ -91,9 +100,9 @@ vsock
 
     1. "ss_cmd" - String path to the ss binary: ["/sbin/ss"]
 
-    2. "socket_types" - A comma-delimited list of socket types to include.  The following socket types are valid: dccp, icmp6, mptcp, p_dgr, p_raw, raw, sctp, tcp, ti_dg, ti_rd, ti_sq, ti_st, u_dgr, u_seq, u_str, udp, unknown, v_dgr, v_dgr, xdp.  Please note that the "unknown" socket type is represented in /sbin/ss output with the netid "???".  Please also note that the p_dgr and p_raw socket types are specific to the "link" address family; the ti_dg, ti_rd, ti_sq, and ti_st socket types are specific to the "tipc" address family; the u_dgr, u_seq, and u_str socket types are specific to the "unix" address family; and the v_dgr and v_str socket types are specific to the "vsock" address family.  Filtering out the parent address families for the aforementioned will also filter out their specific socket types.  Specifying "all" includes all of the socket types.  For example: to include only tcp, udp, icmp6 sockets, you would specify "tcp,udp,icmp6": ["all"]
+    2. "socket_types" - a comma separated list of the socket types to include. These socket types are valid: dccp, icmp6, mptcp, p_dgr, p_raw, raw, sctp, tcp, ti_dg, ti_rd, ti_sq, ti_st, u_dgr, u_seq, u_str, udp, unknown, v_dgr, v_dgr, xdp. Note: the `/sbin/ss` output shows the "unknown" socket type with the netid "???". The socket types p_dgr and p_raw belong to the "link" address family. The socket types ti_dg, ti_rd, ti_sq, and ti_st belong to the "tipc" address family. The socket types u_dgr, u_seq, and u_str belong to the "unix" address family. The socket types v_dgr and v_str belong to the "vsock" address family. A filter on a parent address family also filters out its specific socket types. The value "all" includes all the socket types. For example, "tcp,udp,icmp6" includes only the tcp, udp, and icmp6 sockets: ["all"]
 
-    3. "addr_families" - A comma-delimited list of address families to include.  The following families are valid: inet, inet6, link, netlink, tipc, unix, vsock.  As mentioned above under (b), filtering out the link, tipc, unix, or vsock address families will also filter out their respective socket types.  Specifying "all" includes all of the families.  For example: to include only inet and inet6 families, you would specify "inet,inet6": ["all"]
+    3. "addr_families" - a comma separated list of the address families to include. These families are valid: inet, inet6, link, netlink, tipc, unix, vsock. As in item b above, a filter on the link, tipc, unix, or vsock address family also filters out its socket types. The value "all" includes all the families. For example, "inet,inet6" includes only the inet and inet6 families: ["all"]
 
 ```
 {
@@ -102,7 +111,8 @@ vsock
     "addr_families": "all"
 }
 ```
-In order to filter out uncommon/unused socket types, the following JSON configuration is recommended:
+We recommend this JSON configuration. It filters out the uncommon and
+unused socket types:
 ```
 {
     "ss_cmd": "/sbin/ss",
