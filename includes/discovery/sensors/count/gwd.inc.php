@@ -23,61 +23,32 @@
  * that GW Delight does not expose as separate OIDs.
  */
 
-$baseOid = '.1.3.6.1.4.1.10072.2.20.1.1.3.1.1.34';
-$onuLevels = SnmpQuery::numeric()->walk($baseOid)->values();
+$onuLevels = SnmpQuery::walk('GW-EPON-MIB::ponPortAllOnuAlmLevel')->table(3);
 
-foreach ($onuLevels as $fullOid => $hex) {
-    // index is deviceIndex.boardIndex.ponIndex; only chassis-level rows
-    // (deviceIndex == 1) hold the per-port alarm-level OCTET STRING.
-    $parts = explode('.', substr((string) $fullOid, strlen($baseOid) + 1));
-    if (count($parts) !== 3 || $parts[0] !== '1') {
-        continue;
-    }
-    [, $boardIdx, $ponIdx] = $parts;
-
-    // The OctetString arrives as "05 05 05 05 07 00 ..." with spaces
-    // between bytes and line breaks every 16 bytes; strip whitespace
-    // before splitting into individual byte values.
-    $cleanHex = preg_replace('/\s+/', '', $hex);
-    if (strlen((string) $cleanHex) < 2) {
-        continue;
-    }
-
-    $active = $inactive = $total = 0;
-    foreach (str_split(strtolower((string) $cleanHex), 2) as $b) {
-        if ($b === '00') {
+// only chassis-level rows (deviceIndex 1) hold the per-port alarm-level list;
+// the MIB's empty DISPLAY-HINT makes net-snmp print one digit per ONU slot
+foreach ($onuLevels[1] ?? [] as $boardIdx => $ports) {
+    foreach ($ports as $ponIdx => $row) {
+        $levels = str_split((string) ($row['GW-EPON-MIB::ponPortAllOnuAlmLevel'] ?? ''));
+        $total = count(array_filter($levels, fn ($level) => $level !== '0' && $level !== ''));
+        if ($total === 0) {
             continue;
         }
-        $total++;
-        if ($b === '05') {
-            $active++;
-        } elseif ($b === '07') {
-            $inactive++;
+
+        $oid = ".1.3.6.1.4.1.10072.2.20.1.1.3.1.1.34.1.$boardIdx.$ponIdx";
+        $index = "ponPortAlmLevel.1.$boardIdx.$ponIdx";
+        $counts = [
+            'active' => count(array_keys($levels, '5', true)),
+            'inactive' => count(array_keys($levels, '7', true)),
+            'total' => $total,
+        ];
+
+        foreach ($counts as $type => $value) {
+            discover_sensor(null, 'count', $device, $oid, "$index.$type", "gwd-$type",
+                "PON $boardIdx/$ponIdx " . ucfirst($type) . ' ONU', 1, 1, null, null, null, null, $value,
+                'snmp', null, null, null, 'EPON ONU counts');
         }
     }
-
-    if ($total === 0) {
-        continue;
-    }
-
-    $oid = $fullOid;
-    $portLabel = "PON $boardIdx/$ponIdx";
-    $indexBase = "ponPortAlmLevel.1.$boardIdx.$ponIdx";
-    $group = 'EPON ONU counts';
-
-    discover_sensor(null, 'count', $device, $oid, "$indexBase.active", 'gwd-active',
-        "$portLabel Active ONU", 1, 1, null, null, null, null, $active,
-        'snmp', null, null, null, $group);
-
-    discover_sensor(null, 'count', $device, $oid, "$indexBase.inactive", 'gwd-inactive',
-        "$portLabel Inactive ONU", 1, 1, null, null, null, null, $inactive,
-        'snmp', null, null, null, $group);
-
-    discover_sensor(null, 'count', $device, $oid, "$indexBase.total", 'gwd-total',
-        "$portLabel Total ONU", 1, 1, null, null, null, null, $total,
-        'snmp', null, null, null, $group);
 }
 
-unset($baseOid, $onuLevels, $fullOid, $parts, $boardIdx, $ponIdx, $hex,
-    $cleanHex, $b, $active, $inactive, $total,
-    $oid, $portLabel, $indexBase, $group);
+unset($onuLevels, $boardIdx, $ports, $ponIdx, $row, $levels, $total, $oid, $index, $counts, $type, $value);
