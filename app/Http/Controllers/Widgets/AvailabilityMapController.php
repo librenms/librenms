@@ -38,6 +38,10 @@ use LibreNMS\Util\Url;
 
 class AvailabilityMapController extends WidgetController
 {
+    // Sort order for order_by=status: problems first, then healthy, then ignored/disabled.
+    private const DEVICE_STATE_ORDER = ['down' => 0, 'warn' => 1, 'ignored-down' => 2, 'up' => 3, 'ignored-up' => 4, 'disabled' => 5];
+    private const SERVICE_STATE_ORDER = ['down' => 0, 'warn' => 1, 'up' => 2];
+
     protected string $name = 'availability-map';
 
     public function __construct()
@@ -113,7 +117,7 @@ class AvailabilityMapController extends WidgetController
             }
 
             $data[] = [
-                'status' => $device->status,
+                'status' => self::DEVICE_STATE_ORDER[$state_name] ?? PHP_INT_MAX,
                 'link' => Url::deviceUrl($device),
                 'tooltip' => $this->getDeviceTooltip($device, $state_name),
                 'label' => $this->getDeviceLabel($device, $state_name), // add another field for the selected label
@@ -159,7 +163,7 @@ class AvailabilityMapController extends WidgetController
             }
 
             $data[] = [
-                'status' => $service->service_status,
+                'status' => self::SERVICE_STATE_ORDER[$state_name] ?? PHP_INT_MAX,
                 'link' => Url::deviceUrl($service->device),
                 'tooltip' => $this->getServiceTooltip($service),
                 'label' => $this->getServiceLabel($service),
