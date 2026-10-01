@@ -6761,6 +6761,10 @@
             "order": 2,
             "type": "integer"
         },
+        "rrd.backend_test": {
+            "default": false,
+            "type": "boolean"
+        },
         "rrd.heartbeat": {
             "default": 600,
             "group": "poller",
