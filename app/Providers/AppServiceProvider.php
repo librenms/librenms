@@ -61,10 +61,13 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(\LibreNMS\RRD\Backend\RrdBackendInterface::class, function (Application $app) {
             if (LibrenmsConfig::get('rrdcached', false)) {
-                return $app->make(\LibreNMS\RRD\Backend\Rrdcached::class);
-            }
-
-            if (class_exists('\RRDGraph')) {
+                try {
+                    return $app->make(\LibreNMS\RRD\Backend\Rrdcached::class);
+                } catch (\Exception) {
+                    // Fallthrough required for unit tests.  Rrdtool class supports cached through RrdProcess
+                    return $app->make(\LibreNMS\RRD\Backend\Rrdtool::class);
+                }
+            } elseif (class_exists('\RRDGraph')) {
                 return $app->make(\LibreNMS\RRD\Backend\PhpRrd::class);
             }
 
