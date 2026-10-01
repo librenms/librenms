@@ -132,7 +132,7 @@ $('#create-oid-form').on('show.bs.modal', function(e) {
     if (customoid_id) {
         $.ajax({
             type: "GET",
-            url: '<?php echo route("customoid.show", ["customoid" => ":customoid"]) ?>'.replace(':customoid', customoid_id),
+            url: '<?php echo route('customoid.show', ['customoid' => ':customoid']) ?>'.replace(':customoid', customoid_id),
             dataType: "json",
             success: function (data) {
                 $('#name').val(data.name);
@@ -172,7 +172,7 @@ $('#create-oid-form').on('show.bs.modal', function(e) {
 });
 function saveOid() {
     var customoid_id = $('#ccustomoid_id').val();
-    var url = customoid_id ? '<?php echo route("customoid.update", ["customoid" => ":customoid"]) ?>'.replace(':customoid', customoid_id) : '<?php echo route("customoid.store") ?>';
+    var url = customoid_id ? '<?php echo route('customoid.update', ['customoid' => ':customoid']) ?>'.replace(':customoid', customoid_id) : '<?php echo route('customoid.store') ?>';
     $('#datatype').prop('disabled', false);
     var data = $('form.coid_form').serialize();
     if (customoid_id) {
@@ -210,7 +210,7 @@ $('#save-oid-skip-button').on('click', function (e) {
 $('#test-oid-button').on('click', function (e) {
     e.preventDefault();
     var customoid_id = $('#ccustomoid_id').val();
-    var url = customoid_id ? '<?php echo route("customoid.test", ["customoid" => ":customoid"]) ?>'.replace(':customoid', customoid_id) : '<?php echo route("customoid.test") ?>';
+    var url = customoid_id ? '<?php echo route('customoid.test', ['customoid' => ':customoid']) ?>'.replace(':customoid', customoid_id) : '<?php echo route('customoid.test') ?>';
     var data = $('form.coid_form').serializeArray();
     $.ajax({
         type: "POST",

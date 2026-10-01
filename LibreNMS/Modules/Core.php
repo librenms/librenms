@@ -32,7 +32,6 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Observers\DeviceObserver;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -167,18 +166,21 @@ class Core implements Module
 
         Log::debug("| $device->sysDescr | $device->sysObjectID | \n");
 
+        $sysDescr = (string) ($device->sysDescr ?? '');
+        $sysObjectID = (string) ($device->sysObjectID ?? '');
+
         $deferred_os = [];
         $generic_os = [
-            'airos',
-            'freebsd',
-            'linux',
+            'airos' => true,
+            'freebsd' => true,
+            'linux' => true,
         ];
 
         // check yaml files
         $os_defs = LibrenmsConfig::get('os');
 
         foreach ($os_defs as $os => $def) {
-            if (isset($def['discovery']) && ! in_array($os, $generic_os)) {
+            if (isset($def['discovery']) && ! isset($generic_os[$os])) {
                 if (self::discoveryIsSlow($def)) {
                     // defer all os that use snmpget or snmpwalk
                     $deferred_os[] = $os;
@@ -186,7 +188,7 @@ class Core implements Module
                 }
 
                 foreach ($def['discovery'] as $item) {
-                    if (self::checkDiscovery($device, $item, $def['mib_dir'] ?? null)) {
+                    if (self::checkDiscovery($device, $item, $def['mib_dir'] ?? null, $sysDescr, $sysObjectID)) {
                         return $os;
                     }
                 }
@@ -194,11 +196,21 @@ class Core implements Module
         }
 
         // check deferred os
-        $deferred_os = array_merge($deferred_os, $generic_os);
         foreach ($deferred_os as $os) {
             foreach ($os_defs[$os]['discovery'] as $item) {
-                if (self::checkDiscovery($device, $item, $os_defs[$os]['mib_dir'] ?? null)) {
+                if (self::checkDiscovery($device, $item, $os_defs[$os]['mib_dir'] ?? null, $sysDescr, $sysObjectID)) {
                     return $os;
+                }
+            }
+        }
+
+        // check generic os
+        foreach (['airos', 'freebsd', 'linux'] as $os) {
+            if (isset($os_defs[$os]['discovery'])) {
+                foreach ($os_defs[$os]['discovery'] as $item) {
+                    if (self::checkDiscovery($device, $item, $os_defs[$os]['mib_dir'] ?? null, $sysDescr, $sysObjectID)) {
+                        return $os;
+                    }
                 }
             }
         }
@@ -218,48 +230,87 @@ class Core implements Module
      * @param  Device  $device
      * @param  array  $array  Array of items, keys should be sysObjectID, sysDescr, or sysDescr_regex
      * @param  string|array  $mibdir  MIB directory for evaluated OS
+     * @param  string  $sysDescr
+     * @param  string  $sysObjectID
      * @return bool the result (all items passed return true)
      */
-    protected static function checkDiscovery(Device $device, array $array, $mibdir): bool
+    protected static function checkDiscovery(Device $device, array $array, $mibdir, string $sysDescr = '', string $sysObjectID = ''): bool
     {
+        if ($sysDescr === '' && $sysObjectID === '') {
+            $sysDescr = (string) ($device->sysDescr ?? '');
+            $sysObjectID = (string) ($device->sysObjectID ?? '');
+        }
+
         // all items must be true
         foreach ($array as $key => $value) {
-            if ($check = Str::endsWith($key, '_except')) {
+            $check = str_ends_with((string) $key, '_except');
+            if ($check) {
                 $key = substr((string) $key, 0, -7);
             }
 
-            if ($key == 'sysObjectID') {
-                if (Str::startsWith($device['sysObjectID'] ?? '', $value) == $check) {
+            if ($key === 'sysObjectID') {
+                $matched = false;
+                if (is_array($value)) {
+                    foreach ($value as $v) {
+                        if ($v !== '' && str_starts_with($sysObjectID, (string) $v)) {
+                            $matched = true;
+                            break;
+                        }
+                    }
+                } else {
+                    $matched = $value !== '' && str_starts_with($sysObjectID, (string) $value);
+                }
+                if ($matched === $check) {
                     return false;
                 }
-            } elseif ($key == 'sysDescr') {
-                if (Str::contains($device['sysDescr'] ?? '', $value) == $check) {
+            } elseif ($key === 'sysDescr') {
+                $matched = false;
+                if (is_array($value)) {
+                    foreach ($value as $v) {
+                        if ($v !== '' && str_contains($sysDescr, (string) $v)) {
+                            $matched = true;
+                            break;
+                        }
+                    }
+                } else {
+                    $matched = $value !== '' && str_contains($sysDescr, (string) $value);
+                }
+                if ($matched === $check) {
                     return false;
                 }
-            } elseif ($key == 'sysDescr_regex') {
-                if (preg_match_any($device['sysDescr'] ?? '', $value) == $check) {
+            } elseif ($key === 'sysDescr_regex') {
+                if (preg_match_any($sysDescr, $value) === $check) {
                     return false;
                 }
-            } elseif ($key == 'sysObjectID_regex') {
-                if (preg_match_any($device['sysObjectID'] ?? '', $value) == $check) {
+            } elseif ($key === 'sysObjectID_regex') {
+                if (preg_match_any($sysObjectID, $value) === $check) {
                     return false;
                 }
-            } elseif ($key == 'snmpget') {
-                $get_value = SnmpQuery::device($device)
+            } elseif ($key === 'snmpget') {
+                $response = SnmpQuery::device($device)
                     ->options($value['options'] ?? null)
                     ->mibDir($value['mib_dir'] ?? $mibdir)
-                    ->get($value['oid'])
-                    ->value();
-                if (Compare::values($get_value, $value['value'], $value['op'] ?? 'contains') == $check) {
+                    ->get($value['oid']);
+
+                if (Compare::values($response->isValid() ? $response->value() : null, $value['value'], $value['op'] ?? 'contains') === $check) {
                     return false;
                 }
-            } elseif ($key == 'snmpwalk') {
-                $walk_value = SnmpQuery::device($device)
+            } elseif ($key === 'snmpwalk') {
+                $walk_values = SnmpQuery::device($device)
                     ->options($value['options'] ?? null)
                     ->mibDir($value['mib_dir'] ?? $mibdir)
                     ->walk($value['oid'])
-                    ->raw;
-                if (Compare::values($walk_value, $value['value'], $value['op'] ?? 'contains') == $check) {
+                    ->values();
+                $op = $value['op'] ?? 'contains';
+                $expected = $value['value'];
+                $matched = false;
+                foreach ($walk_values as $val) {
+                    if (Compare::values($val, $expected, $op)) {
+                        $matched = true;
+                        break;
+                    }
+                }
+                if ($matched === $check) {
                     return false;
                 }
             }

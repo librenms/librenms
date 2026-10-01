@@ -31,6 +31,7 @@ use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\UserPref;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -39,13 +40,15 @@ use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Util\DynamicConfig;
 use Session;
 
-class UserPreferencesController extends Controller
+class UserPreferencesController extends Controller implements HasMiddleware
 {
     private $cachedPreferences = ['locale', 'site_style', 'timezone'];
 
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('deny-demo');
+        return [
+            'deny-demo',
+        ];
     }
 
     /**

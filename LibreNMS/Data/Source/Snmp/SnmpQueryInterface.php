@@ -94,6 +94,11 @@ interface SnmpQueryInterface
     public function hideMib(): SnmpQueryInterface;
 
     /**
+     * allow SNMP walk bulk requests for this query (default is true)
+     */
+    public function bulk(bool $allow = true): SnmpQueryInterface;
+
+    /**
      * Output enum values as strings instead of values. This could affect index output.
      */
     public function enumStrings(): SnmpQueryInterface;

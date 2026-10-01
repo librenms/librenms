@@ -114,7 +114,7 @@ class Device extends BaseModel
     ];
 
     /**
-     * @return array{inserted: 'datetime', last_discovered: 'datetime', last_polled: 'datetime', last_ping: 'datetime', status: 'boolean'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -122,7 +122,6 @@ class Device extends BaseModel
             'inserted' => 'datetime',
             'last_discovered' => 'datetime',
             'last_polled' => 'datetime',
-            'last_ping' => 'datetime',
             'status' => 'boolean',
             'mtu_status' => 'boolean',
             'ignore' => 'boolean',
@@ -425,13 +424,12 @@ class Device extends BaseModel
 
     public function forgetAttrib($name)
     {
-        $attrib_index = $this->attribs->search(fn ($attrib) => $attrib->attrib_type === $name);
+        $attrib = $this->attribs->first(fn ($attrib) => $attrib->attrib_type === $name);
 
-        if ($attrib_index !== false) {
-            $deleted = (bool) $this->attribs->get($attrib_index)->delete();
-            // only forget the attrib_index after delete, otherwise delete() will fail fatally with:
-            // Symfony\\Component\\Debug\Exception\\FatalThrowableError(code: 0):  Call to a member function delete() on null
-            $this->attribs->forget((string) $attrib_index);
+        if ($attrib !== null) {
+            $deleted = (bool) $attrib->delete();
+            // only remove the attrib from the relation after delete
+            $this->setRelation('attribs', $this->attribs->reject(fn ($item) => $item->is($attrib))->values());
 
             return $deleted;
         }
@@ -523,8 +521,8 @@ class Device extends BaseModel
     public function filterState(Builder $query, mixed $value, array $config): void
     {
         $this->applyMappedFilter($query, $value, $config, fn (Builder $q, $state) => match ($state) {
-            'up' => $q->where('status', 1)->where('disabled', 0)->where('disable_notify', 0),
-            'down' => $q->where('status', 0)->where('disabled', 0)->where('disable_notify', 0),
+            'up' => $q->where('status', 1)->where('disabled', 0),
+            'down' => $q->where('status', 0)->where('disabled', 0),
             default => $q,
         });
     }

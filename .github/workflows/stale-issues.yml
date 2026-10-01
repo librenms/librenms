@@ -1,0 +1,31 @@
+name: Close stale issues
+
+on:
+  schedule:
+    - cron: '30 1 * * *'
+  workflow_dispatch: # dispatch manually
+
+permissions:
+  actions: write
+  issues: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v10
+        with:
+          days-before-issue-stale: 90
+          days-before-issue-close: 14
+          stale-issue-label: 'Stale'
+          stale-issue-message: >
+            This issue has had no activity for 90 days. Add a comment to keep it open.
+            If there is no activity in 14 days, it will be closed.
+          close-issue-message: >
+            This issue was closed because it had no activity for 14 days after the stale warning.
+          close-issue-reason: 'not_planned'
+
+          # do not touch PRs
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
+          # debug-only: true

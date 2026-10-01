@@ -3548,7 +3548,7 @@ mtxrLteFirmwareGroup OBJECT-GROUP
     STATUS current
     DESCRIPTION ""
     ::= { mtXRouterOsGroups 24 }
-
+    
 
 -- Partition ************************************************************
 
@@ -4617,3 +4617,4 @@ mtxrCtIP6Entries OBJECT-TYPE
 -- ***************************************************************************
 
 END
+

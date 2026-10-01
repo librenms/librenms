@@ -9,5 +9,4 @@ enum SnmpOidOutput
     case Module;
     case Suffix;
     case Ucd;
-    case None;
 }

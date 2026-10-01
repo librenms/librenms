@@ -49,7 +49,7 @@ interface SnmpBackendInterface
      *
      * @param  string[]  $oids
      */
-    public function get(SnmpConfig $config, array $oids, SnmpQueryOptions $options): SnmpResponse;
+    public function get(string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse;
 
     /**
      * snmpwalk (or snmpbulkwalk, per $options) a single OID subtree —
@@ -59,7 +59,7 @@ interface SnmpBackendInterface
      * usefully batch multiple subtrees into a single request, since each
      * subtree ends at a different point and streams back independently.
      */
-    public function walk(SnmpConfig $config, string $oid, SnmpQueryOptions $options): SnmpResponse;
+    public function walk(string $target, string $oid, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse;
 
     /**
      * snmpgetnext for one or more OIDs — fetches the first OID after each
@@ -67,5 +67,5 @@ interface SnmpBackendInterface
      *
      * @param  string[]  $oids
      */
-    public function next(SnmpConfig $config, array $oids, SnmpQueryOptions $options): SnmpResponse;
+    public function next(string $target, array $oids, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse;
 }

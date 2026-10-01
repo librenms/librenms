@@ -1,5 +1,7 @@
+# Memory and Processor Information
+
 This document describes how to add memory detection and processor
-detection for your new device.
+detection for your device.
 
 #### Memory
 
@@ -18,15 +20,16 @@ This value works, but LibreNMS then shows no total RAM amount.
 - free
 - percent_used
 
-`resources/definitions/os_discovery/mempools/arubaos.yaml`
+`resources/definitions/os_discovery/arubaos.yaml`
 
 ```yaml
-mempools:
-    data:
-        -
-            total: WLSX-SWITCH-MIB::sysXMemorySize
-            used: WLSX-SWITCH-MIB::sysXMemoryUsed
-            precision: 1024
+modules:
+    mempools:
+        data:
+            -
+                total: WLSX-SWITCH-MIB::sysXMemorySize
+                used: WLSX-SWITCH-MIB::sysXMemoryUsed
+                precision: 1024
 ```
 
 The code also reads table based OIDs. It supports many features of the
@@ -105,14 +108,13 @@ only for a special data process.
 `resources/definitions/os_discovery/pulse.yaml`
 
 ```yaml
-mib: PULSESECURE-PSG-MIB
 modules:
     processors:
-          data:
-              -
-                  oid: iveCpuUtil
-                  num_oid: '.1.3.6.1.4.1.12532.10.{{ $index }}'
-                  type: pulse
+        data:
+            -
+                oid: PULSESECURE-PSG-MIB::iveCpuUtil
+                num_oid: '.1.3.6.1.4.1.12532.10.{{ $index }}'
+                type: pulse
 ```
 
 Available yaml data keys:
