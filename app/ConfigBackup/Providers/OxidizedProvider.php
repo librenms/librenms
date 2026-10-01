@@ -29,8 +29,9 @@ use App\ApiClients\Oxidized;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use LibreNMS\Interfaces\ConfigBackupProvider;
+use LibreNMS\Interfaces\RefreshableConfigBackupProvider;
 
-class OxidizedProvider implements ConfigBackupProvider
+class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupProvider
 {
     /** Backup id used for the single current config when versioning is disabled. */
     private const CONFIG_ID = 'current';
@@ -176,6 +177,14 @@ class OxidizedProvider implements ConfigBackupProvider
     public function lastError(): ?string
     {
         return $this->lastError;
+    }
+
+    public function refresh(Device $device, string $requestedBy): bool
+    {
+        $node = $this->resolveNode($device);
+        $hostname = is_array($node) ? ($node['name'] ?? $device->hostname) : $device->hostname;
+
+        return $this->api->updateNode($hostname, 'LibreNMS GUI refresh', $requestedBy);
     }
 
     /**

@@ -2,19 +2,19 @@
 
 ## Prepare Linux Server
 
-You should have an installed Linux server running one of the supported OS.
-Make sure you select your server's OS in the tabbed options below.
-Choice of web server is your preference, NGINX is recommended.
+These instructions need an installed Linux server with a supported operating system.
+In the tabs below, select the OS of your server.
+You can choose the web server. We recommend NGINX.
 
-Connect to the server command line and follow the instructions below.
+Connect to the command line of the server. Then obey the instructions below.
 !!! note
 
-    These instructions assume you are the **root** user.  
-    If you are not, prepend `sudo` to the shell commands (the ones that aren't
-    at `mysql>` prompts) or temporarily become a user with root
-    privileges with `sudo -s` or `sudo -i`.
+    These instructions assume that you are the **root** user.  
+    A user that is not root must add `sudo` before each shell command. The
+    commands at a `mysql>` prompt do not need `sudo`. Such a user can also
+    become a user with root privileges with `sudo -s` or `sudo -i`.
 
-**Please note the minimum supported PHP version is @= php.version_min =@, the recommended version is @= php.version_recommended =@**
+**The minimum supported PHP version is @= php.version_min =@, the recommended version is @= php.version_recommended =@.**
 
 ## Install Required Packages
 
@@ -52,6 +52,82 @@ Connect to the server command line and follow the instructions below.
         apt install acl ca-certificates curl fping git lsb-release mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-command-runner python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd unzip wget whois
         ```
 
+=== "RHEL Derivatives"
+    === "Version 8.X"
+        Tested with Rocky Linux 8.10, AlmaLinux 8.10, Oracle Enterprise Linux 8.10
+        ```
+        dnf -y install epel-release
+        dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+        dnf module reset php
+        dnf -y module enable php:remi-8.5
+        dnf -y install bash-completion cronie fping gcc git mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd policycoreutils-python-utils python3 python3-devel python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
+        ```
+        === "NGINX"
+            ```
+            dnf -y install nginx
+            ```
+
+        === "Apache"
+            ```
+            dnf -y install httpd
+            ```
+    === "Version 9.X"
+        Tested with Rocky Linux 9.8, AlmaLinux 9.8, Oracle Enterprise Linux 9.8
+        ```
+        dnf -y install epel-release
+        dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-9.rpm
+        dnf module reset php
+        dnf -y module enable php:remi-8.5
+        dnf -y install bash-completion cronie fping gcc git mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd policycoreutils-python-utils python3 python3-devel python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
+        ```
+        === "NGINX"
+            ```
+            dnf -y install nginx
+            ```
+
+        === "Apache"
+            ```
+            dnf -y install httpd
+            ```
+
+    === "Version 10.X"
+        Tested with Rocky Linux 10.2, AlmaLinux 10.2, Oracle Enterprise Linux 10.2
+        === "Rocky or Alma"
+            ```
+            dnf -y install epel-release
+            dnf -y install http://rpms.remirepo.net/enterprise/remi-release-10.rpm
+            dnf module reset php
+            dnf -y module enable php:remi-8.5
+            dnf -y install acl bash-completion cronie fping gcc git mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd policycoreutils-python-utils python3 python3-devel python3-PyMySQL python3-redis python3-pip python3-setuptools python3-systemd rrdtool unzip
+            ```
+            === "NGINX"
+                ```
+                dnf -y install nginx
+                ```
+
+            === "Apache"
+                ```
+                dnf -y install httpd
+                ```
+        === "Oracle"
+            ```
+            dnf -y install oracle-epel-release-el10
+            # oracle-epel-release-el10 does not satisfy the "epel-release" dependency but has the required packages
+            rpm -i --nodeps http://rpms.remirepo.net/enterprise/remi-release-10.rpm
+            dnf module reset php
+            dnf module enable php:remi-8.5
+            dnf -y install acl bash-completion cronie fping gcc git mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd policycoreutils-python-utils python3 python3-devel python3-PyMySQL python3-redis python3-pip python3-setuptools python3-systemd rrdtool unzip
+            ```
+            === "NGINX"
+                ```
+                dnf -y install nginx
+                ```
+
+            === "Apache"
+                ```
+                dnf -y install httpd
+                ```
+
 ## Add librenms user
 
 ```
@@ -81,15 +157,15 @@ Change to the LibreNMS user:
 su - librenms
 ```
 
-Then run the composer wrapper script and exit back to the root user:
+Then run the composer wrapper script and go back to the root user:
 ```
 ./scripts/composer_wrapper.php install --no-dev
 exit
 ```
 
 !!! note
-    Sometimes when there is a proxy used to gain internet access, the above script may fail.
-    The workaround is to install the `composer` package manually. For a global installation:
+    If a proxy supplies the internet access, this script can fail.
+    The correction is a manual installation of the `composer` package. For a global installation:
     ```
     wget https://getcomposer.org/composer-stable.phar
     mv composer-stable.phar /usr/bin/composer
@@ -98,9 +174,10 @@ exit
 
 ## Set timezone
 
-See <https://php.net/manual/en/timezones.php> for a list of supported
-timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
-Ensure date.timezone is set in php.ini to your preferred time zone.
+For a list of the supported timezones, see
+<https://php.net/manual/en/timezones.php>. Examples are `America/New_York`,
+`Australia/Brisbane`, and `Etc/UTC`. In `php.ini`, set `date.timezone` to
+your timezone.
 
 === "Ubuntu 26.04"
     ```bash
@@ -126,7 +203,12 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
     vi /etc/php/8.4/cli/php.ini
     ```
 
-Remember to set the system timezone as well.
+=== "RHEL Derivatives"
+    ```
+    vi /etc/php.ini
+    ```
+
+Also set the system timezone.
 
 ```
 timedatectl set-timezone Etc/UTC
@@ -140,7 +222,7 @@ timedatectl set-timezone Etc/UTC
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
     
-    Within the `[mariadbd]` section add:
+    In the `[mariadbd]` section, add:
 
     ```
     innodb_file_per_table=1
@@ -152,7 +234,7 @@ timedatectl set-timezone Etc/UTC
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
 
-    Within the `[mysqld]` section add:
+    In the `[mysqld]` section, add:
 
     ```
     innodb_file_per_table=1
@@ -164,7 +246,7 @@ timedatectl set-timezone Etc/UTC
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
 
-    Within the `[mysqld]` section add:
+    In the `[mysqld]` section, add:
 
     ```
     innodb_file_per_table=1
@@ -176,28 +258,39 @@ timedatectl set-timezone Etc/UTC
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
 
-    Within the `[mariadbd]` section add:
+    In the `[mariadbd]` section, add:
 
     ```
     innodb_file_per_table=1
     lower_case_table_names=0
     ```
 
+=== "RHEL Derivatives"
+    ```
+    vi /etc/my.cnf.d/mariadb-server.cnf
+    ```
 
-Then restart MariaDB
+    Within the `[mariadb]` section add:
+
+    ```
+    innodb_file_per_table=1
+    lower_case_table_names=0
+    ```
+
+Then restart MariaDB:
 
 ```
 systemctl enable mariadb
 systemctl restart mariadb
 ```
-Start MariaDB client
+Start the MariaDB client:
 
 ```
 mysql -u root
 ```
 
 !!! warning
-    Change the 'password' below to something secure.
+    Change `password` in the commands below to a secure password.
 
 ```sql
 CREATE DATABASE librenms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -232,24 +325,31 @@ exit
     vi /etc/php/8.4/fpm/pool.d/librenms.conf
     ```
 
+=== "RHEL Derivatives"
+    ```bash
+    cp /etc/php-fpm.d/www.conf /etc/php-fpm.d/librenms.conf
+    vi /etc/php-fpm.d/librenms.conf
+    ```
+
 Change `[www]` to `[librenms]`:
 ```
 [librenms]
 ```
 
-Change `user` and `group` to "librenms":
+Change `user` and `group` to `librenms`:
 ```
 user = librenms
 group = librenms
 ```
 
-Change `listen` to a unique path that must match your webserver's config (`fastcgi_pass` for NGINX and `SetHandler` for Apache) :
+Change `listen` to a unique path. This path must match the configuration of your
+web server. The relevant key is `fastcgi_pass` for NGINX and `SetHandler` for Apache:
 ```
 listen = /run/php-fpm-librenms.sock
 ```
 
-If there are no other PHP web applications on this server, you may remove www.conf to save some resources.
-Feel free to tune the performance settings in librenms.conf to meet your needs.
+If this server has no other PHP web application, you can remove `www.conf`.
+This saves resources. You can also tune the performance settings in `librenms.conf`.
 
 ## Configure Web Server
 
@@ -259,7 +359,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         vi /etc/nginx/conf.d/librenms.conf
         ```
 
-        Add the following config, edit `server_name` as required:
+        Add this configuration. Change `server_name` for your server:
 
         ```nginx
         server {
@@ -297,7 +397,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         vi /etc/nginx/conf.d/librenms.conf
         ```
 
-        Add the following config, edit `server_name` as required:
+        Add this configuration. Change `server_name` for your server:
 
         ```nginx
         server {
@@ -335,7 +435,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         vi /etc/nginx/sites-enabled/librenms.vhost
         ```
 
-        Add the following config, edit `server_name` as required:
+        Add this configuration. Change `server_name` for your server:
 
         ```nginx
         server {
@@ -373,7 +473,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         vi /etc/nginx/sites-enabled/librenms.vhost
         ```
 
-        Add the following config, edit `server_name` as required:
+        Add this configuration. Change `server_name` for your server:
 
         ```nginx
         server {
@@ -405,49 +505,193 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         systemctl restart php8.4-fpm
         ```
 
+=== "RHEL Derivatives"
+    === "NGINX"
+        ```
+        vi /etc/nginx/conf.d/librenms.conf
+        ```
+
+        Add the following config, edit `server_name` as required:
+
+        ```nginx
+        server {
+         listen      80;
+         server_name librenms.example.com;
+         root        /opt/librenms/html;
+         index       index.php;
+
+         charset utf-8;
+         gzip on;
+         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         location / {
+          try_files $uri $uri/ /index.php?$query_string;
+         }
+         location ~ [^/]\.php(/|$) {
+          fastcgi_pass unix:/run/php-fpm-librenms.sock;
+          fastcgi_split_path_info ^(.+\.php)(/.+)$;
+          include fastcgi.conf;
+         }
+         location ~ /\.(?!well-known).* {
+          deny all;
+         }
+        }
+        ```
+
+        > NOTE: If this is the only site you are hosting on this server (it
+        > should be :)) then you will need to disable the default site.
+
+        Delete the `server` section from `/etc/nginx/nginx.conf`
+
+        ```
+        systemctl enable --now nginx
+        systemctl enable --now php-fpm
+        ```
+
+    === "Apache"
+        Create the librenms.conf:
+
+        ```
+        vi /etc/httpd/conf.d/librenms.conf
+        ```
+
+        Add the following config, edit `ServerName` as required:
+
+        ```apache
+        <VirtualHost *:80>
+          DocumentRoot /opt/librenms/html/
+          ServerName  librenms.example.com
+
+          AllowEncodedSlashes NoDecode
+          <Directory "/opt/librenms/html/">
+            Require all granted
+            AllowOverride All
+            Options FollowSymLinks MultiViews
+          </Directory>
+
+          # Enable http authorization headers
+          <IfModule setenvif_module>
+            SetEnvIfNoCase ^Authorization$ "(.+)" HTTP_AUTHORIZATION=$1
+          </IfModule>
+
+          <FilesMatch ".+\.php$">
+            SetHandler "proxy:unix:/run/php-fpm-librenms.sock|fcgi://localhost"
+          </FilesMatch>
+        </VirtualHost>
+        ```
+
+        > NOTE: If this is the only site you are hosting on this server (it
+        > should be :)) then you will need to disable the default site. `rm -f /etc/httpd/conf.d/welcome.conf`
+
+        ```
+        systemctl enable --now httpd
+        systemctl enable --now php-fpm
+        ```
+
 ## SELinux
 
 === "Ubuntu 26.04"
-    SELinux not enabled by default
+    SELinux is not enabled by default.
 
 === "Ubuntu 24.04"
-    SELinux not enabled by default
+    SELinux is not enabled by default.
 
 === "Debian 12"
-    SELinux not enabled by default
+    SELinux is not enabled by default.
 
 === "Debian 13"
-    SELinux not enabled by default
+    SELinux is not enabled by default.
+
+=== "RHEL Derivatives"
+
+    <h3>Configure the contexts needed by LibreNMS</h3>
+
+    ```
+    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/html(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/(rrd|storage)(/.*)?'
+    semanage fcontext -a -t httpd_log_t "/opt/librenms/logs(/.*)?"
+    semanage fcontext -a -t httpd_cache_t '/opt/librenms/cache(/.*)?'
+    semanage fcontext -a -t bin_t '/opt/librenms/librenms-service.py'
+    restorecon -RFvv /opt/librenms
+    setsebool -P httpd_can_sendmail=1
+    setsebool -P httpd_execmem 1
+    setsebool -P httpd_can_network_connect_db 1
+    chcon -t httpd_sys_rw_content_t /opt/librenms/.env
+    ```
+
+    <h3>Allow fping</h3>
+
+    Create the file http_fping.tt with the following contents. You can
+    create this file anywhere, as it is a throw-away file. The last step
+    in this install procedure will install the module in the proper
+    location.
+
+    ```
+    module http_fping 1.0;
+
+    require {
+    type node_t;
+    type httpd_t;
+    class capability net_raw;
+    class icmp_socket create;
+    class rawip_socket { getopt create setopt write read bind node_bind };
+    }
+
+    #============= httpd_t ==============
+    allow httpd_t node_t:rawip_socket node_bind;
+    allow httpd_t self:capability net_raw;
+    allow httpd_t self:icmp_socket create;
+    allow httpd_t self:rawip_socket { getopt create setopt write read bind };
+    ```
+
+    Then run these commands
+
+    ```
+    checkmodule -M -m -o http_fping.mod http_fping.tt
+    semodule_package -o http_fping.pp -m http_fping.mod
+    semodule -i http_fping.pp
+    ```
+
+    Additional SELinux problems may be found by executing the following command
+
+    ```
+    audit2why < /var/log/audit/audit.log
+    ```
 
 ## Allow access through firewall
 === "Ubuntu 26.04"
-    Firewall not enabled by default
+    The firewall is not enabled by default.
 
 === "Ubuntu 24.04"
-    Firewall not enabled by default
+    The firewall is not enabled by default.
 
 === "Debian 12"
-    Firewall not enabled by default
+    The firewall is not enabled by default.
 
 === "Debian 13"
-    Firewall not enabled by default
+    The firewall is not enabled by default.
+
+=== "RHEL Derivatives"
+    ```
+    firewall-cmd --zone public --add-service http --add-service https
+    firewall-cmd --permanent --zone public --add-service http --add-service https
+    ```
 
 ## Enable lnms command completion
 
-This feature grants you the opportunity to use tab for completion on lnms commands as you would
-for normal linux commands.
+This feature lets you use the tab key to complete `lnms` commands. It works in the
+same way as for normal Linux commands.
 
 ```
 ln -s /opt/librenms/lnms /usr/bin/lnms
 cp /opt/librenms/misc/lnms-completion.bash /etc/bash_completion.d/
 ```
 
-`lnms config` is the preferred method for [Configuration](../Support/Configuration.md)
+`lnms config` is the preferred method for [configuration](../Support/Configuration.md).
 
 
 ## Configure snmpd (v2c)
 
-If you would like to use SNMPv3 then please [see here](../Support/SNMP-Configuration-Examples.md/#linux-snmpd-v3)
+To use SNMPv3, see the [SNMP configuration examples](../Support/SNMP-Configuration-Examples.md/#linux-snmpd-v3).
 
 ```
 cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
@@ -457,7 +701,7 @@ cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
 vi /etc/snmp/snmpd.conf
 ```
 
-Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
+Replace the text `RANDOMSTRINGGOESHERE` with your own community string.
 
 ```
 curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
@@ -473,12 +717,10 @@ cp /opt/librenms/dist/librenms.cron /etc/cron.d/librenms
 ```
 
 !!! note
-    Keep in mind  that cron, by default, only uses a very limited
-    set of environment variables. You may need to configure proxy
-    variables for the cron invocation. Alternatively adding the proxy
-    settings in config.php is possible too. The config.php file will be
-    created in the upcoming steps. Review the following URL after you
-    finished librenms install steps:
+    By default, cron uses only a small set of environment variables.
+    The cron job can therefore need proxy variables. You can also put
+    the proxy settings in `config.php`. A later step creates the
+    `config.php` file. After the install, read this page:
     <@= config.site_url =@/Support/Configuration/#proxy-support>
 
 ## Enable the scheduler
@@ -492,9 +734,9 @@ systemctl start librenms-scheduler.timer
 
 ## Enable logrotate
 
-LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can
-become large and be rotated out.  To rotate out the old logs you can
-use the provided logrotate config file:
+LibreNMS keeps logs in `/opt/librenms/logs`. These logs become large
+with time. To rotate the old logs, use the supplied logrotate
+configuration file:
 
 ```
 cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
@@ -502,15 +744,13 @@ cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
 
 ## Web installer
 
-Now head to the web installer and follow the on-screen instructions.
+Open the web installer. Then obey the instructions on the screen.
 
 <http://librenms.example.com/install>
 
-The web installer might prompt you to create a `config.php` file in
-your librenms install location manually, copying the content displayed
-on-screen to the file. If you have to do this, please remember to set
-the permissions on config.php after you copied the on-screen contents
-to the file. Run:
+The web installer can ask you to create a `config.php` file in your
+LibreNMS install location. Copy the content from the screen into the
+file. Then set the permissions on `config.php` with this command:
 
 ```
 chown librenms:librenms /opt/librenms/config.php
@@ -518,38 +758,35 @@ chown librenms:librenms /opt/librenms/config.php
 
 ## Final steps
 
-That's it!  You now should be able to log in to
+The install is complete. You can now log in at
 <http://librenms.example.com/>.
 
 !!! danger
-    Please note that we have not covered
-    HTTPS setup in this example, so your LibreNMS install is not secure
-    by default.  Please do not expose it to the public Internet unless
-    you have configured HTTPS and taken appropriate web server hardening
-    steps.
+    Do not connect this install to the public internet before you
+    configure HTTPS. This procedure does not configure HTTPS, and the
+    install is not secure. Also harden the web server.
 
 ## Add the first device
 
-We now suggest that you add localhost as your first device from within the WebUI.
+Add `localhost` as your first device in the web interface.
 <https://librenms.example.com/addhost>
 
 ## Troubleshooting
 
-If you ever have issues with your install, you should run validate which will perform
-some base checks and provide the recommended fixes:
+If your install has a problem, run the validation script. The script does
+basic tests and gives the recommended corrections:
 
 ```
 sudo su - librenms
 ./validate.php
 ```
 
-There are various options for getting help listed on the LibreNMS web
-site: <https://www.librenms.org/#support>
+The LibreNMS web site lists more sources of help:
+<https://www.librenms.org/#support>
 
 ## What next?
 
-Now that you've installed LibreNMS, we'd suggest that you have a read
-of a few other docs to get you going:
+After the install, read these documents:
 
 - [Performance tuning](../Support/Performance.md)
 - [Alerting](../Alerting/index.md)
@@ -559,11 +796,10 @@ of a few other docs to get you going:
 
 ## Closing
 
-We hope you enjoy using LibreNMS. If you do, it would be great if you
-would consider opting into the stats system we have, please see [this
-page](../General/Callback-Stats-and-Privacy.md) on
-what it is and how to enable it.
+Please consider an opt-in to our statistics system. For a description of
+the system and the steps to enable it, read [this
+page](../General/Callback-Stats-and-Privacy.md).
 
-If you would like to help make LibreNMS better there are [many ways to
-help](../Support/FAQ.md#faq9). You
-can also [back LibreNMS on Open Collective](https://t.libren.ms/donations).
+There are [many ways to help](../Support/FAQ.md#faq9) to make LibreNMS
+better. You can also [back LibreNMS on Open
+Collective](https://t.libren.ms/donations).

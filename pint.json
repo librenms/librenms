@@ -11,6 +11,7 @@
         "blank_line_before_statement": {
             "statements": ["return"]
         },
+        "blank_line_between_import_groups": true,
         "blank_lines_before_namespace": true,
         "cast_spaces": true,
         "class_attributes_separation": {
@@ -98,7 +99,7 @@
         "phpdoc_no_useless_inheritdoc": true,
         "phpdoc_scalar": true,
         "phpdoc_separation": {
-            "groups": [["template"], ["param", "return"]],
+            "groups": [["template"], ["param", "return"], ["link"], ["copyright", "author", "license"]],
             "skip_unlisted_annotations": true
         },
         "phpdoc_single_line_var_spacing": true,
@@ -147,6 +148,7 @@
         "resources",
         "routes",
         "tests",
-        "LibreNMS"
+        "LibreNMS",
+        "includes"
     ]
 }

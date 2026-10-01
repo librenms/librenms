@@ -182,6 +182,30 @@ class Unimus extends BaseApi
     }
 
     /**
+     * Trigger an on-demand backup job for a device. Returns true when Unimus
+     * accepts the request (HTTP 202 with a non-zero accepted count).
+     */
+    public function backupDevice(int $unimusDeviceId): bool
+    {
+        if (! $this->enabled) {
+            return false;
+        }
+
+        $this->lastError = null;
+
+        try {
+            $response = $this->getClient()->patch("jobs/backup?id=$unimusDeviceId");
+        } catch (ConnectionException $e) {
+            Log::warning('Unimus is not reachable: ' . $e->getMessage());
+            $this->lastError = 'unreachable';
+
+            return false;
+        }
+
+        return $response->successful() && (int) $response->json('data.accepted') > 0;
+    }
+
+    /**
      * @param  array<string, mixed>  $backup
      * @return array{id: int, date: ?int, until: ?int, type: string, content: ?string}
      */
