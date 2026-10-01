@@ -45,13 +45,13 @@ class PortPopupController
         // Check access permissions
         Gate::authorize('view', $port);
 
-        $graph_type = $request->string('type', 'port_bits');
+        $graph_type = $request->string('type', 'port_bits')->value();
         $graphs = [
             [
                 'port' => $port,
                 'type' => $graph_type,
-                'title' => $request->string('title', Str::title(str_replace('_', ' ', $graph_type))),
-                'graphs' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']],
+                'title' => $request->string('title', Str::title(str_replace('_', ' ', $graph_type)))->value(),
+                'graphs' => $this->parseGraphRanges($request, [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]),
             ],
         ];
 
@@ -63,5 +63,18 @@ class PortPopupController
             'href' => \LibreNMS\Util\Url::portUrl($port),
             'graphs' => $graphs,
         ]);
+    }
+
+    /**
+     * @param  array<int, array<string, string>>  $default
+     * @return array<int, array<string, string>>
+     */
+    private function parseGraphRanges(Request $request, array $default): array
+    {
+        if (! $request->has('from')) {
+            return $default;
+        }
+
+        return array_map(fn ($f) => ['from' => (string) $f], (array) $request->input('from'));
     }
 }

@@ -128,11 +128,12 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         }
 
         $chassisName = null;
+        $boxSerial = $this->getDevice()->serial;
 
         $containers = SnmpQuery::hideMib()
             ->mibs(['JUNIPER-CHASSIS-DEFINES-MIB'])
             ->walk('JUNIPER-MIB::jnxContainersTable')
-            ->mapTable(function ($entry, $index) use (&$chassisName) {
+            ->mapTable(function ($entry, $index) use (&$chassisName, $boxSerial) {
                 $modelName = $this->parseType($entry['jnxContainersType'] ?? null, $chassisName);
                 $chassisName ??= $modelName;
                 $descr = $entry['jnxContainersDescr'] ?? null;
@@ -144,6 +145,8 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
                     'entPhysicalDescr' => $descr,
                     'entPhysicalModelName' => $modelName,
                     'entPhysicalContainedIn' => $within,
+                    'entPhysicalSerialNum' => $within == '0' ? $boxSerial : null,
+                    'entPhysicalMfgName' => 'Juniper',
                 ]);
             });
 
@@ -154,33 +157,21 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         return $containers->merge(SnmpQuery::hideMib()->enumStrings()
             ->mibs(['JUNIPER-CHASSIS-DEFINES-MIB'])
             ->walk('JUNIPER-MIB::jnxContentsTable')
-            ->mapTable(function ($entry, $container, $indexL1, $indexL2, $indexL3) use ($chassisName, $containers) {
-                // set serial for the chassis, but don't add another container
-                if ($container == 1 && $indexL1 == 1 && $indexL2 == 0 && $indexL3 == 0) {
-                    $chassis = $containers->firstWhere('entPhysicalClass', 'chassis');
-                    if ($chassis) {
-                        $chassis->entPhysicalSerialNum = $entry['jnxContentsSerialNo'] ?? null;
-
-                        return null;
-                    }
-                }
-
-                // Juniper's MIB doesn't have the same objects as the Entity MIB, so some values are made up here.
-                return new EntPhysical([
-                    'entPhysicalIndex' => $container + $indexL1 * 1000000 + $indexL2 * 10000 + $indexL3 * 100,
-                    'entPhysicalDescr' => $entry['jnxContentsDescr'] ?? null,
-                    'entPhysicalContainedIn' => $container,
-                    'entPhysicalClass' => $this->parseClass($entry['jnxContentsType'] ?? null),
-                    'entPhysicalName' => $entry['jnxOperatingDescr'] ?? null,
-                    'entPhysicalSerialNum' => $entry['jnxContentsSerialNo'] ?? null,
-                    'entPhysicalModelName' => $entry['jnxContentsPartNo'] ?? null,
-                    'entPhysicalMfgName' => 'Juniper',
-                    'entPhysicalVendorType' => $this->parseType($entry['jnxContentsType'] ?? null, $chassisName),
-                    'entPhysicalParentRelPos' => -1,
-                    'entPhysicalHardwareRev' => $entry['jnxContentsRevision'] ?? null,
-                    'entPhysicalIsFRU' => isset($entry['jnxContentsSerialNo']) ? ($entry['jnxContentsSerialNo'] == 'BUILTIN' ? 'false' : 'true') : null,
-                ]);
-            }))->filter();
+            // Juniper's MIB doesn't have the same objects as the Entity MIB, so some values are made up here.
+            ->mapTable(fn ($entry, $container, $indexL1, $indexL2, $indexL3) => new EntPhysical([
+                'entPhysicalIndex' => $container + $indexL1 * 1000000 + $indexL2 * 10000 + $indexL3 * 100,
+                'entPhysicalDescr' => $entry['jnxContentsDescr'] ?? null,
+                'entPhysicalContainedIn' => $container,
+                'entPhysicalClass' => $this->parseClass($entry['jnxContentsType'] ?? null),
+                'entPhysicalName' => $entry['jnxOperatingDescr'] ?? null,
+                'entPhysicalSerialNum' => $entry['jnxContentsSerialNo'] ?? null,
+                'entPhysicalModelName' => $entry['jnxContentsPartNo'] ?? null,
+                'entPhysicalMfgName' => 'Juniper',
+                'entPhysicalVendorType' => $this->parseType($entry['jnxContentsType'] ?? null, $chassisName),
+                'entPhysicalParentRelPos' => -1,
+                'entPhysicalHardwareRev' => $entry['jnxContentsRevision'] ?? null,
+                'entPhysicalIsFRU' => isset($entry['jnxContentsSerialNo']) ? ($entry['jnxContentsSerialNo'] == 'BUILTIN' ? 'false' : 'true') : null,
+            ])))->filter();
     }
 
     public function pollSlas($slas): void

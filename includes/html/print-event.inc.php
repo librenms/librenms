@@ -21,6 +21,8 @@ use LibreNMS\Util\Url;
  * @author     LibreNMS Contributors
 */
 
+$device = DeviceCache::get((int) $entry['device_id']);
+
 $severity_colour = eventlog_severity($entry['severity']);
 $icon = '<span class="alert-status ' . $severity_colour . '"></span>';
 
@@ -28,9 +30,8 @@ echo '<tr>';
 echo '<td>' . $icon . '</td>';
 echo '<td style="vertical-align: middle;">' . $entry['datetime'] . '</td>';
 
-if (! isset($vars['device'])) {
-    $device = DeviceCache::get($entry['device_id']);
-    echo '<td style="vertical-align: middle;">' . Url::deviceLink($device, shorthost($device->hostname)) . '</td>';
+if ($device->exists) {
+    echo '<td style="vertical-align: middle;">' . Url::deviceLink($device, $device->shortDisplayName()) . '</td>';
 }
 
 if ($entry['type'] == 'interface') {

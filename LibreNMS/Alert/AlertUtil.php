@@ -123,9 +123,7 @@ class AlertUtil
         }
 
         $opDefault = $rule->alertOperation?->default_operation_step_duration_seconds;
-        if ($opDefault === null) {
-            $opDefault = max(0, 60 * (int) LibrenmsConfig::get('alert_rule.default_operation_step_duration', LibrenmsConfig::get('alert_rule.interval')));
-        }
+        $opDefault ??= max(0, 60 * (int) LibrenmsConfig::get('alert_rule.default_operation_step_duration', LibrenmsConfig::get('alert_rule.interval')));
         $defaultStep = max(0, (int) $opDefault);
 
         $now = time();
