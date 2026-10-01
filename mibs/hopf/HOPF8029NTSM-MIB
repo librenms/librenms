@@ -1,0 +1,845 @@
+-- File HOPF8029NTSM.MIB
+-- Defines HOPF_8029NTSM-MIB (HOPF ELEKTRONIK proprietary MIB for 8029NTSM module time servers)
+
+-- HOPF8029NTSM-MIB { iso(1) org(3) dod(6) internet(1) private(4)
+--               enterprises(1) hopf(12527) }
+
+HOPF8029NTSM-MIB DEFINITIONS ::= BEGIN
+
+--  © 2005-2012 by HOPF ELEKTRONIK GMBH and RDCS Informationstechnologie GmbH
+
+--  FILENAME        : HOPF8029NTSM.MIB
+--  AUTHOR          : RDCS/DRUSOWITSCH
+--  DATE OF CREATION: 2012-12-03
+
+--  DESCRIPTION:
+--  Definition of the proprietary MIB for 8029NTSM module time servers.
+--  The NTP part of this MIB is partly implemented as proposed in the 
+--  Technical Report No. 98-09 by Adarshpal S. Sethi and David Mills.
+
+--  DOCUMENTATION OF CHANGES:
+
+--  NUMBER  | AUTHOR |    DATE    | DESCRIPTION
+--  --------+--------+------------+--------------------------------------------------------------
+--  @#####  |  XXX   | YYYY-MM-DD |
+--  --------+--------+------------+--------------------------------------------------------------
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    enterprises, Integer32, Unsigned32, IpAddress, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, TruthValue, DateAndTime
+        FROM SNMPv2-TC;
+
+--
+-- The position of the enterprise within the OID hierarchy of this MIB:
+--
+hopf OBJECT IDENTIFIER ::= { enterprises 12527 }
+
+--
+-- The position of the 8029NTSM time server within the enterprise
+--
+hopf8029NTSM MODULE-IDENTITY
+     LAST-UPDATED "1212030000Z"
+     ORGANIZATION "HOPF Elektronik GmbH"
+     CONTACT-INFO
+        "Michael Hocke
+         HOPF Elektronik GmbH
+         Nottebohmstr. 41
+         D - 58511 Luedenscheid
+         Tel: +49-2351-938686
+         eMail: info@hopf.com
+
+         Erich Ruprecht
+         RDCS Informationstechnologie GmbH
+         Embelgasse 66/10-11
+         A - 1050 Wien
+         Tel: +43-1-5455077-0
+         eMail: support@rdcs.eu"
+     DESCRIPTION
+        "This MIB module defines a MIB which provides mechanisms to
+         monitor and control the 8029NTSM module time server."
+     ::= { hopf 28 }
+
+--
+-- Definitions for the general device CONFIGURATION subsystem:
+--
+hopf8029NTSMGeneral OBJECT IDENTIFIER ::= { hopf8029NTSM 1 }
+
+hopf8029NTSMDeviceType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..9))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "string which describes the device type, valid values are:
+                 8029NTSM1 --> NTP time server with one ethernet
+                               interface 10/100MBit autosensing"
+    ::= { hopf8029NTSMGeneral 1 }
+
+hopf8029NTSMLayoutVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..1))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Character which describes the current layout version of
+                 the expansion card hardware. Characters for versions are
+                 in upper case notation and begin with version 'A'"
+    ::= { hopf8029NTSMGeneral 2 }
+
+hopf8029NTSMSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "serial number of the expansion card, unique
+                 to each individual device"
+    ::= { hopf8029NTSMGeneral 3 }
+
+hopf8029NTSMFirmwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..5))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "string which describes the current version of
+                 the expansion card software for the embedded sub-system.
+                 version numbers are two digits for the major version and
+                 two digtis for the minor version devided by a dot (e.g. 01.00)"
+    ::= { hopf8029NTSMGeneral 4 }
+
+hopf8029NTSMFirmwareDate OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "date when the firmware version has been released"
+    ::= { hopf8029NTSMGeneral 5 }
+
+hopf8029NTSMH8Version OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..5))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "string which describes the current version of
+                 the expansion card software for the H8 realtime communication sub-system.
+                 version numbers are two digits for the major version and
+                 two digtis for the minor version devided by a dot (e.g. 01.00)"
+    ::= { hopf8029NTSMGeneral 6 }
+
+hopf8029NTSMH8Date OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "date when the H8 software version has been released"
+    ::= { hopf8029NTSMGeneral 7 }
+
+hopf8029NTSMMachVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..5))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "string which describes the current version of
+                 the expansion card software for the logic sub-system.
+                 version numbers are two digits for the major version and
+                 two digtis for the minor version devided by a dot (e.g. 01.00)"
+    ::= { hopf8029NTSMGeneral 8 }
+
+hopf8029NTSMSystemTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current UTC date and time on the 8029NTSM time server."
+    ::= { hopf8029NTSMGeneral 10 }
+
+--
+-- Definitions for the NTP subsystem:
+--
+ntp OBJECT IDENTIFIER ::= { hopf8029NTSM 2 }
+
+ntpSystem OBJECT IDENTIFIER ::= { ntp 1 }
+ntpPeers  OBJECT IDENTIFIER ::= { ntp 2 }
+
+--
+-- Textual conventions for the NTP subset
+--
+NTPTimeStamp ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2d-1d-1d,1d:1d:1d.2d"
+    STATUS       current
+    DESCRIPTION
+            "A date-time specification.
+
+            field  octets  contents                  range
+            -----  ------  --------                  -----
+              1      1-2   year*                     0..65536
+              2       3    month                     1..12
+              3       4    day                       1..31
+              4       5    hour                      0..23
+              5       6    minutes                   0..59
+              6       7    seconds                   0..60
+                           (use 60 for leap-second)
+              7      8-9   milli-seconds*            0..999
+
+            * Notes:
+            - the value of year and milli-seconds is in network-byte order
+
+            For example, Tuesday May 26, 1992 at 1:30:15 PM would be
+            displayed as: 1992-5-26,13:30:15.0"
+    SYNTAX OCTET STRING (SIZE (9))
+
+NTPLeapIndicator ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "two-bit code warning of an impending leap
+                 second to be inserted in the NTP timescale."
+    SYNTAX INTEGER {
+        noWarning(0),
+        addSecond(1),
+        subtractSecond(2),
+        alarm(3)
+    }
+
+NTPReachability ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Interpreted values from the peers bit shift register for reachability:
+                 reachable    --> all 8 attempts to reach the peer have been successful
+                 medium       --> more than 4 of 8 attempts to reach the peer have been successful
+                 bad          --> less than 5 but more than 0 attempts to reach the peer have been successful
+                 notreachable --> 0 attempts to reach the peer have been successful"
+    SYNTAX INTEGER {
+        notreachable(1),
+        bad(2),
+        medium(3),
+        reachable(4)
+    }
+
+NTPTallyCode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "the peers tally code that expresses the way the NTP algorithm classifies the
+                 peer:
+                 reject    --> the peer is discarded as unreachable, synchronized to this server (synch loop)
+                               or outrageous synchronisation distance
+                 falsetick --> the peer is discarded by the intersection algorithm as a falseticker
+                 excess    --> the peer is discarded as not among the first ten peers sorted by synchronization
+                               distance and so is probably a poor candidate for further consideration
+                 outlyer   --> the peer is discarded by the clustering algorithm as an outlyer
+                 candidat  --> the peer is a survivor and a candidate for the combining algorithm
+                 selected  --> the peer is a survivor, but not among the first six peers sorted by
+                               synchronization distance. If the association is ephemeral, it may be demobilized
+                               to conserve resources
+                 syspeer   --> the peer has been declared the system peer and lends its variables to the system
+                               variables
+                 ppspeer   --> the peer has been declared the system peer and lends its variables to the system
+                               variables. However, the actual system synchronization is derived from a pulse-per-
+                               second (PPS) signal, either indirectly via the PPS reference clock driver or
+                               directly via kernel interface."
+    SYNTAX INTEGER {
+        reject(0),
+        falsetick(1),
+        excess(2),
+        outlyer(3),
+        candidat(4),
+        selected(5),
+        syspeer(6),
+        ppspeer(7)
+    }
+
+ntpAccuracy  OBJECT-TYPE
+    SYNTAX      INTEGER { low(0), medium(1), high(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "calculated value which takes into account the following parameters:
+                 - SyncModuleTimeSyncState
+                 - ntpSysRootDelay
+                 - ntpSysRootDispersion
+                 - ntpSysStability"
+    ::= { ntp 3 }
+
+--
+-- NTP System Group
+--
+ntpSysLeap OBJECT-TYPE
+    SYNTAX      NTPLeapIndicator
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "two-bit code warning of an impending leap
+                 second to be inserted in the NTP timescale."
+    ::= { ntpSystem 1 }
+
+ntpSysStratum OBJECT-TYPE
+    SYNTAX      Integer32 (0..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "indicating the stratum of the local clock.
+                 0    --> unspecified
+                 1    --> primary reference (e.g.,, calibrated atomic clock,
+                          radio clock)
+                 2-15 --> secondary reference (via NTP)
+                 16   --> invalid"
+    ::= { ntpSystem 2 }
+
+ntpSysPrecision OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "signed integer indicating the precision
+                 of the various clocks, in seconds to the nearest power
+                 of two."
+    ::= { ntpSystem 3 }
+
+ntpSysRootDelay OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the total roundtrip delay to the primary
+                 reference source at the root of the synchronization
+                 subnet, in seconds"
+    ::= { ntpSystem 4 }
+
+ntpSysRootDispersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the maximum error relative to the primary
+                 reference source at the root of the synchronization
+                 subnet, in seconds. Only positive values greater
+                 than zero are possible"
+    ::= { ntpSystem 5 }
+
+ntpSysJitter OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the jitter value of the NTP system in seconds"
+    ::= { ntpSystem 6 }
+
+ntpSysStability OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "NTP system stability in ppm"
+    ::= { ntpSystem 7 }
+
+ntpSysRefId OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the particular reference clock. In the case of
+                 stratum 0 (unspecified) or stratum 1 (primary reference
+                 source), this is a four-octet, left-justified,zero-padded
+                 ASCII string.In the case of stratum 2 and greater (secondary
+                 reference) this is the four-octet Internet address of the
+                 peer selected for synchronization."
+    ::= { ntpSystem 8 }
+
+ntpSysRefTime OBJECT-TYPE
+    SYNTAX      NTPTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the local time when the local clock was last
+                 updated. If the local clock has never been synchronized,
+                 the value is zero."
+    ::= { ntpSystem 9 }
+
+ntpSysPeer OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the current synchronization source. The object identifier points
+                 to the index element ntpPeersAssocId of ntpPeersVarTable that identifies
+                 the table entries for the current system peer."
+    ::= { ntpSystem 10 }
+
+ntpKernelInfoMaxError OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "maximum error in seconds from kernel information."
+    ::= { ntpSystem 11 }
+
+ntpKernelInfoEstError OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "estimated error in seconds from kernel information."
+    ::= { ntpSystem 12 }
+
+--
+-- NTP Peers Group
+--
+ntpPeerNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "number of configured peers in ntpPeersVarTable"
+    ::= { ntpPeers 1 }
+
+ntpPeersVarTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ntpPeersVarEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ntpPeers 2 }
+
+ntpPeersVarEntry OBJECT-TYPE
+    SYNTAX      ntpPeersVarEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { ntpPeersAssocId }
+    ::= { ntpPeersVarTable 1 }
+
+ntpPeersVarEntry ::= SEQUENCE {
+    ntpPeersAssocId        Unsigned32,
+    ntpPeersTallyCode      NTPTallyCode,
+    ntpPeersPeerAddress    IpAddress,
+    ntpPeersPeerPort       Unsigned32,
+    ntpPeersHostAddress    IpAddress,
+    ntpPeersHostPort       Unsigned32,
+    ntpPeersLeap           NTPLeapIndicator,
+    ntpPeersMode           INTEGER,
+    ntpPeersStratum        Integer32,
+    ntpPeersPeerPoll       Integer32,
+    ntpPeersHostPoll       Integer32,
+    ntpPeersPrecision      Integer32,
+    ntpPeersRootDelay      OCTET STRING,
+    ntpPeersRootDispersion OCTET STRING,
+    ntpPeersRefId          OCTET STRING,
+    ntpPeersRefTime        NTPTimeStamp,
+    ntpPeersOrgTime        NTPTimeStamp,
+    ntpPeersReceiveTime    NTPTimeStamp,
+    ntpPeersTransmitTime   NTPTimeStamp,
+    ntpPeersReach          NTPReachability,
+    ntpPeersTimer          Integer32,
+    ntpPeersOffset         OCTET STRING,
+    ntpPeersDelay          OCTET STRING,
+    ntpPeersDispersion     OCTET STRING
+    }
+
+ntpPeersAssocId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "peer association identification number"
+    ::= { ntpPeersVarEntry 1 }
+
+ntpPeersTallyCode OBJECT-TYPE
+    SYNTAX      NTPTallyCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the tally code of the peer"
+    ::= { ntpPeersVarEntry 2 }
+
+ntpPeersPeerAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the Internet address of the peer"
+    ::= { ntpPeersVarEntry 3 }
+
+ntpPeersPeerPort OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION " 16-bit port number of the peer."
+    ::= { ntpPeersVarEntry 4 }
+
+ntpPeersHostAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the Internet address of the host"
+    ::= { ntpPeersVarEntry 5 }
+
+ntpPeersHostPort OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "16-bit port number of the host"
+    ::= { ntpPeersVarEntry 6 }
+
+ntpPeersLeap OBJECT-TYPE
+    SYNTAX      NTPLeapIndicator
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "two-bit code warning of an impending leap
+                 second to be inserted in the NTP timescale."
+    ::= { ntpPeersVarEntry 7 }
+
+ntpPeersMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unspecified (0),
+                    symmetricActive (1),
+                    symmetricPassive (2),
+                    client (3),
+                    server (4),
+                    broadcast (5),
+                    reservedControl (6),
+                    reservedPrivate (7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the association mode,with values coded as
+                 follows:
+                 0, unspecified
+                 1, symmetric active
+                 2, symmetric passive
+                 3, client
+                 4, server
+                 5, broadcast
+                 6, reserved for NTP control messages
+                 7, reserved for private use"
+    ::= { ntpPeersVarEntry 8 }
+
+ntpPeersStratum OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "indicating the stratum of the peer clock.
+                 0, unspecified
+                 1, primary reference (e.g.,, calibrated atomic clock,
+                    radio clock)
+                 2-255, secondary reference (via NTP)"
+    ::= { ntpPeersVarEntry 9 }
+
+ntpPeersPeerPoll OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "poll interval of the peer"
+    ::= { ntpPeersVarEntry 10 }
+
+ntpPeersHostPoll OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "poll interval of the host"
+    ::= { ntpPeersVarEntry 11 }
+
+ntpPeersPrecision OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the same as the systemPrecision except this is
+                 for the peer"
+    ::= { ntpPeersVarEntry 12 }
+
+ntpPeersRootDelay OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the same as the systemRootDealy except this is for
+                 the peer"
+    ::= { ntpPeersVarEntry 13 }
+
+ntpPeersRootDispersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the same as the systemDispersion except this is for
+                 the peer"
+    ::= { ntpPeersVarEntry 14 }
+
+ntpPeersRefId OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the same as the systemRefid except this is for
+                 the peer"
+    ::= { ntpPeersVarEntry 15 }
+
+ntpPeersRefTime OBJECT-TYPE
+    SYNTAX      NTPTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the same as the systemRefTime except this is for
+                 the peer"
+    ::= { ntpPeersVarEntry 16 }
+
+ntpPeersOrgTime OBJECT-TYPE
+    SYNTAX      NTPTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the local time at the peer when its latest
+                 NTP message was sent. If the peer becomes unreachable the
+                 value is set to zero."
+    ::= { ntpPeersVarEntry 17 }
+
+ntpPeersReceiveTime OBJECT-TYPE
+    SYNTAX      NTPTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the local time when the latest NTP message
+                 from the peer arrived. If the peer becomes unreachable the
+                 value is set to zero."
+    ::= { ntpPeersVarEntry 18 }
+
+ntpPeersTransmitTime OBJECT-TYPE
+    SYNTAX      NTPTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "the local time at which the NTP message
+                 departed the sender."
+    ::= { ntpPeersVarEntry 19 }
+
+ntpPeersReach OBJECT-TYPE
+    SYNTAX      NTPReachability
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "reachability of the peer."
+    ::= { ntpPeersVarEntry 20 }
+
+ntpPeersTimer OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ntpPeersVarEntry 21 }
+
+ntpPeersOffset OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ntpPeersVarEntry 22 }
+
+ntpPeersDelay OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ntpPeersVarEntry 23 }
+
+ntpPeersDispersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ntpPeersVarEntry 24 }
+
+--
+-- Definitions for the states of the synchronization module
+--
+SyncModule OBJECT IDENTIFIER ::= { hopf8029NTSM 3 }
+
+SyncModuleTimeLocal OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "current date and time with local time base with
+                 regard to time zone and daylight saving time configurations
+                 of the sync module in which the expansion card is
+                 inserted to"
+    ::= { SyncModule 1 }
+
+SyncModuleTimeDST OBJECT-TYPE
+    SYNTAX      INTEGER { Off(0), On(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "indicator for daylight saving time of sync module"
+    ::= { SyncModule 2 }
+
+SyncModuleTimeDSTChange OBJECT-TYPE
+    SYNTAX      INTEGER { Off(0), On(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "indicator of the sync module for the announcement of a
+                 daylight saving time change either from standard time to daylight
+                 saving time or vice versa. the announcement is switched on one
+                 hour before the actual change."
+    ::= { SyncModule 3 }
+
+SyncModuleTimeLEAP OBJECT-TYPE
+    SYNTAX      INTEGER { Off(0), On(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "indicator of the sync module for the announcement of the
+                 insertion of a leap second into the current time scale.
+                 the announcement is switched on one hour before the actual
+                 insertion of the leap second occurs."
+    ::= { SyncModule 4 }
+
+SyncModuleTimeSyncState OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..1))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "synchronisation state of the sync module:
+                 R --> radio synchronous with high precision
+                 r --> radio synchronous with low precision
+                 C --> crystal mode
+                 I --> invalid time and date"
+    ::= { SyncModule 5 }
+
+SyncModuleTimeSyncStateInt OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "synchronisation state of the sync module as integer value:
+                 3 --> radio synchronous with high precision
+                 2 --> radio synchronous with low precision
+                 1 --> crystal mode
+                 0 --> invalid time and date"
+    ::= { SyncModule 6 }
+
+SyncModuleSource OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..255)) 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Defines the synchronization module source."
+    ::= { SyncModule 7 }
+
+
+
+SyncModuleError OBJECT IDENTIFIER ::= { SyncModule 8 }
+
+-- Software Errors
+SyncModuleErrorPCID OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "General Module error (PCID):
+                 0 --> error off
+                 1 --> error on"
+    ::= { SyncModuleError 1 }
+
+SyncModuleErrorTimeZone OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Missing data for Time Zone Offset:
+                 0 --> error off
+                 1 --> error on"
+    ::= { SyncModuleError 2 }
+
+SyncModuleErrorDST OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Missing or incomplete data for daylight saving time (DST):
+                 0 --> error off
+                 1 --> error on"
+    ::= { SyncModuleError 3 }
+
+SyncModuleErrorSyncProtocol OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Sync Protocol error:
+                 0 --> error off
+                 1 --> error on"
+    ::= { SyncModuleError 4 }
+
+-- Hardware Errors
+SyncModuleErrorCrystalRegulation OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Adjustment of internal quartz frequency error:
+                 0 --> error off
+                 1 --> error on"
+    ::= { SyncModuleError 5 }
+
+SyncModuleErrorFRAM OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "FRAM error:
+                 0 --> error off
+                 1 --> error on"
+    ::= { SyncModuleError 6 }
+
+SyncModuleErrorSyncChannel OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Sync Channel error:
+                 0 --> error off
+                 1 --> error on"
+    ::= { SyncModuleError 7 }
+
+
+
+--
+-- SNMP Trap Notification
+--
+SyncModuleTrap OBJECT IDENTIFIER ::= { hopf8029NTSM 200 }
+
+TimeSyncStateChanged NOTIFICATION-TYPE
+    OBJECTS { SyncModuleTimeSyncState }
+    STATUS  current
+    DESCRIPTION
+            "notification is sent when the synchronisation status SyncModuleTimeSyncState 
+             of the sync module changes"
+    ::= { SyncModuleTrap 1 }
+
+LeapAnnounceChanged NOTIFICATION-TYPE
+    OBJECTS { SyncModuleTimeLEAP }
+    STATUS  current
+    DESCRIPTION
+            "notification is sent when leap second insertion is announced or when the
+             announcement is cleared by the sync module"
+    ::= { SyncModuleTrap 2 }
+
+DSTChangeAnnounceChanged NOTIFICATION-TYPE
+    OBJECTS { SyncModuleTimeDSTChange }
+    STATUS  current
+    DESCRIPTION
+            "notification is sent when the daylight saving time announcement is set or cleared."
+    ::= { SyncModuleTrap 3 }
+
+DSTChanged NOTIFICATION-TYPE
+    OBJECTS { SyncModuleTimeDST }
+    STATUS  current
+    DESCRIPTION
+            "notification is sent when the daylight saving time indicator changed."
+    ::= { SyncModuleTrap 4 }
+
+NTPStratumChanged NOTIFICATION-TYPE
+    OBJECTS { ntpSysStratum, ntpSysRefId, ntpSysPeer }
+    STATUS  current
+    DESCRIPTION
+            "notification is sent when the stratum of the NTP service changes"
+    ::= { SyncModuleTrap 5 }
+
+NTPSystemPeerChanged NOTIFICATION-TYPE
+    OBJECTS { ntpSysRefId, ntpSysPeer, ntpSysStratum }
+    STATUS  current
+    DESCRIPTION
+            "notification is sent when the system peer of NTP service changes"
+    ::= { SyncModuleTrap 6 }
+
+NTPAccuracyChanged NOTIFICATION-TYPE
+    OBJECTS { ntpAccuracy, SyncModuleTimeSyncState, ntpSysRootDelay,
+              ntpSysRootDispersion, ntpSysStability }
+    STATUS  current
+    DESCRIPTION
+            "notification is sent when the calculated value for the NTP accuracy changed"
+    ::= { SyncModuleTrap 7 }
+
+ConfigChangeToFlash NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "notification is sent when a configuration change on the 8029NTS/M time server
+             is saved persistently to flash storage"
+    ::= { SyncModuleTrap 8 }
+
+UserRebootInit NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "notification is sent when the user initiates a reboot of the 8029NTS/M time server"
+    ::= { SyncModuleTrap 9 }
+
+UpdateInit NOTIFICATION-TYPE
+    OBJECTS { hopf8029NTSMFirmwareVersion, hopf8029NTSMFirmwareDate, hopf8029NTSMSerialNumber }
+    STATUS  current
+    DESCRIPTION
+            "notification is sent when the user initiates a firmware update of the 8029NTS/M time server. 
+             The values transmitted with the trap are the current firmware version
+             and date (before the firmware update)"
+    ::= { SyncModuleTrap 10 }
+
+HardwareErrorChanged NOTIFICATION-TYPE
+    OBJECTS { SyncModuleErrorCrystalRegulation, SyncModuleErrorFRAM, SyncModuleErrorSyncChannel }
+    STATUS  current
+    DESCRIPTION
+            "notification is sent when a hardware error status changes on sync module "
+    ::= { SyncModuleTrap 11 }
+
+SoftwareErrorChanged NOTIFICATION-TYPE
+    OBJECTS { SyncModuleErrorPCID, SyncModuleErrorTimeZone, SyncModuleErrorDST, SyncModuleErrorSyncProtocol }
+    STATUS  current
+    DESCRIPTION
+            "notification is sent when a software error status changes on sync module "
+    ::= { SyncModuleTrap 12 }
+    
+END
