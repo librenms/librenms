@@ -26,11 +26,20 @@
 
 namespace LibreNMS\RRD\Backend;
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\RrdException;
 use Log;
 
 class PhpRrd implements RrdBackendInterface
 {
+    public function __construct()
+    {
+        // Make sure rrdcached is not enabled, otherwise php-rrd creates directories in the wrong place
+        if (LibrenmsConfig::get('rrdcached', false)) {
+            throw new \Exception('PhpRrd does not work with rrdcached');
+        }
+    }
+
     /**
      * @param  string[]  $data
      *
