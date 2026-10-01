@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Observers\StpObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\Keyable;
 
+#[ObservedBy([StpObserver::class])]
 class Stp extends DeviceRelatedModel implements Keyable
 {
     use HasFactory;

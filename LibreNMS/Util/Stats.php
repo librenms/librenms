@@ -107,7 +107,7 @@ class Stats
         return [
             'alert_rules' => $this->selectTotal(DB::table('alert_rules')->where('disabled', 0), ['severity']),
             'alert_templates' => $this->selectTotal('alert_templates'),
-            'api_tokens' => $this->selectTotal(DB::table('api_tokens')->where('disabled', 0)),
+            'api_tokens' => $this->selectTotal('personal_access_tokens')->where(fn ($query) => $query->whereNull('expires_at')->orWhere('expires_at', '>', now())),
             'applications' => $this->selectTotal('applications', ['app_type']),
             'bgppeer_state' => $this->selectTotal('bgpPeers', ['bgpPeerState']),
             'bgppeer_status' => $this->selectTotal('bgpPeers', ['bgpPeerAdminStatus']),

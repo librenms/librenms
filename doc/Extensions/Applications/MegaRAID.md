@@ -11,4 +11,4 @@ This is agent for snmpd.
     pass .1.3.6.1.4.1.3582 /usr/sbin/lsi_mrdsnmpmain
     ```
 
-3. Restart snmpd on your host
+3. Restart snmpd on your host.

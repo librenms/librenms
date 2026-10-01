@@ -1,22 +1,22 @@
 # Enabling support for OpenTSDB
 
-This module sends all metrics to OpenTSDB server. You need something
-like Grafana for graphing.
+This module sends all metrics to an OpenTSDB server. You need a tool
+such as Grafana for the graphs.
 
 ## Requirements
 
 - OpenTSDB
 - Grafana
 
-## What you don't get
+## What you do not get
 
- Pretty graphs, this is why at present you need Grafana. You need to
- build your own graphs within Grafana.
+ Graphs. You need Grafana for this reason. Build your own graphs in
+ Grafana.
 
-RRD will continue to function normally so LibreNMS itself should
-continue to function normally.
+RRD continues to work in the normal way. LibreNMS therefore also
+continues to work in the normal way.
 
-You can add the following to your config:
+Add these lines to your configuration:
 
 ## Configuration
 
@@ -27,6 +27,6 @@ You can add the following to your config:
     lnms config:set opentsdb.port 4242
     ```
 
-The same data than the one stored within rrd will be sent to OpenTSDB
-and recorded. You can then create graphs within Grafana to display the
-information you need.
+LibreNMS sends the same data from rrd to OpenTSDB, and OpenTSDB records
+it. You can then create graphs in Grafana for the information that you
+need.

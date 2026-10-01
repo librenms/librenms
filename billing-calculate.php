@@ -49,9 +49,15 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
 
         $check = dbFetchRow('SELECT * FROM `bill_history` WHERE bill_id = ? AND bill_datefrom = ? AND bill_dateto = ? LIMIT 1', [$bill['bill_id'], $datefrom, $dateto]);
 
-        $period = Billing::getPeriod($bill['bill_id'], $datefrom, $dateto);
-
         $date_updated = $check ? str_replace(['-', ':', ' '], '', $check['updated']) : 0;
+
+        // A closed period whose history was written after it ended will not change; skip it before touching bill_data
+        if ($dateto <= $date_updated) {
+            $i++;
+            continue;
+        }
+
+        $period = Billing::getPeriod($bill['bill_id'], $datefrom, $dateto);
 
         // Send the current dir_95th to the getRates function so it knows to aggregate or return the max in/out value and highest direction
         $dir_95th = $bill['dir_95th'];

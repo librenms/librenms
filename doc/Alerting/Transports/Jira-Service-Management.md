@@ -1,13 +1,14 @@
 ## Jira Service Management
 
-Using Jira Service Management LibreNMS integration, LibreNMS forwards alerts to
-Jira Service Management with detailed information. Jira Service Management acts as a dispatcher for
-LibreNMS alerts, determines the right people to notify based on
-on-call schedules and notifies via email, text messages (SMS), phone
-calls and iOS & Android push notifications. Then escalates alerts
-until the alert is acknowledged or closed.
+The Jira Service Management integration forwards LibreNMS alerts with
+detailed information. Jira Service Management is a dispatcher for these
+alerts. It selects the correct people from the on-call schedules. It
+notifies them by email, SMS, phone call, and iOS or Android push
+notification. It then escalates each alert until someone acknowledges
+or closes it.
 
-:warning: If the feature isn’t available on your site, keep checking Jira Service Management for updates.
+:warning: If this feature is not available on your site, check Jira
+Service Management for updates.
 
 **Example:**
 

@@ -30,6 +30,7 @@ use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\JsonDecodingException;
 use JsonSchema\Exception\ValidationException;
+use JsonSchema\Validator;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -47,7 +48,7 @@ final class YamlSchemaTest extends TestCase
 
     public function testConfigSchema(): void
     {
-        $error = $this->validateFileAgainstSchema(resource_path('definitions/config_definitions.json'), resource_path('definitions/schema/config_schema.json'));
+        $error = $this->validateFileAgainstSchema(resource_path('definitions/config_definitions.json'), resource_path('definitions/schema/config_schema.json'), new Validator);
 
         $this->assertNull($error, (string) $error);
     }
@@ -78,9 +79,11 @@ final class YamlSchemaTest extends TestCase
     private function validateYamlFilesAgainstSchema(string $dir, string $schema_file): void
     {
         $errors = [];
+        // reuse one validator so the schema is loaded and checked once, not per file
+        $validator = new Validator;
 
         foreach ($this->listFiles($dir . '/*.yaml') as $file) {
-            $error = $this->validateFileAgainstSchema($file, $schema_file);
+            $error = $this->validateFileAgainstSchema($file, $schema_file, $validator);
             if ($error) {
                 $errors[] = $error;
             }
@@ -108,8 +111,9 @@ final class YamlSchemaTest extends TestCase
     /**
      * @param  string  $filePath
      * @param  string  $schema_file  full path
+     * @param  Validator  $validator  reuse a validator to avoid reloading the schema
      */
-    private function validateFileAgainstSchema(string $filePath, string $schema_file): ?string
+    private function validateFileAgainstSchema(string $filePath, string $schema_file, Validator $validator): ?string
     {
         $schema = (object) ['$ref' => 'file://' . $schema_file];
         $filename = basename($filePath);
@@ -123,7 +127,6 @@ final class YamlSchemaTest extends TestCase
         }
 
         try {
-            $validator = new \JsonSchema\Validator;
             $validator->validate(
                 $data,
                 $schema,

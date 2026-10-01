@@ -35,6 +35,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\Url;
 
@@ -48,9 +49,9 @@ class Os implements Module
         return [];
     }
 
-    public function shouldDiscover(\LibreNMS\OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(\LibreNMS\OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     public function discover(\LibreNMS\OS $os): void
@@ -78,9 +79,9 @@ class Os implements Module
         $this->handleChanges($os);
     }
 
-    public function shouldPoll(\LibreNMS\OS $os, ModuleStatus $status): bool
+    public function shouldPoll(\LibreNMS\OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     public function poll(\LibreNMS\OS $os, DataStorageInterface $datastore): void

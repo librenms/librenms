@@ -3,9 +3,10 @@ text: 'NTI'
 type: environment 
 icon: nti
 over:
-    - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_temperature, text: Temperature }
+
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.3699.1.1.9

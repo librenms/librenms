@@ -17,11 +17,13 @@ $sets = $app->data['sets'] ?? [];
 $sets_list = array_keys($sets);
 sort($sets_list);
 foreach ($sets_list as $index => $log_set) {
-    $label = $vars['log_set'] == $log_set
-        ? '<span class="pagemenu-selected">' . $log_set . '</span>'
-        : $log_set;
+    $link = generate_link($log_set, $link_array, ['log_set' => $log_set]);
 
-    echo generate_link($label, $link_array, ['log_set' => $log_set]) . "\n";
+    $link = $vars['log_set'] == $log_set
+        ? '<span class="pagemenu-selected">' . $link . '</span>'
+        : $link;
+
+    echo $link . "\n";
 
     if ($index < (count($sets_list) - 1)) {
         echo ', ';
@@ -35,11 +37,13 @@ if (isset($vars['log_set']) && isset($sets[$vars['log_set']])) {
     sort($log_files);
 
     foreach ($log_files as $index => $log_file) {
-        $label = $vars['log_file'] == $log_file
-            ? '<span class="pagemenu-selected">' . $log_file . '</span>'
-            : $log_file;
+        $link = generate_link($log_file, $link_array, ['log_set' => $vars['log_set'], 'log_file' => $log_file]);
 
-        echo generate_link($label, $link_array, ['log_set' => $vars['log_set'], 'log_file' => $log_file]) . "\n";
+        $label = $vars['log_file'] == $log_file
+            ? '<span class="pagemenu-selected">' . $link . '</span>'
+            : $link;
+
+        echo $link . "\n";
 
         if ($index < (count($log_files) - 1)) {
             echo ', ';

@@ -73,6 +73,9 @@
             display: grid;
             grid-template: 1fr / 1fr;
             place-items: center;
+            width: max-content;
+            margin: 0 auto;
+            position: relative;
         }
         #custom-map {
             grid-column: 1 / 1;
@@ -232,7 +235,27 @@
         network_edges.flush();
 
         var container = document.getElementById('custom-map');
-        var options = network_options;
+        var options = network_options || {};
+        options.nodes = options.nodes || {};
+        options.nodes.scaling = {
+            min: 10,
+            max: 30,
+            label: {
+                enabled: false,
+                drawThreshold: 0,
+                maxVisible: 100000
+            }
+        };
+        options.edges = options.edges || {};
+        options.edges.scaling = {
+            min: 1,
+            max: 15,
+            label: {
+                enabled: false,
+                drawThreshold: 0,
+                maxVisible: 100000
+            }
+        };
 
         // Set up the triggers for adding and editing map items
         options['manipulation']['addNode'] = function (data, callback) {
@@ -314,13 +337,17 @@
         network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
 
         // width/height might be % get values in pixels
-        network_height = $($(container).children(".vis-network")[0]).height();
-        network_width = $($(container).children(".vis-network")[0]).width();
+        network_height = $($(container).children(".vis-network")[0]).height() || $(container).height();
+        network_width = $($(container).children(".vis-network")[0]).width() || $(container).width();
+        container._mapWidth = network_width;
+        container._mapHeight = network_height;
+        container._visNetwork = network;
+
         var centreY = Math.round(network_height / 2);
         var centreX = Math.round(network_width / 2);
         network.moveTo({position: {x: centreX, y: centreY}, scale: 1});
 
-        setCustomMapBackground('custom-map', bgtype, bgdata);
+        setCustomMapBackground('custom-map', bgtype, bgdata, network);
 
         network.on('doubleClick', function (properties) {
             edge_id = null;
@@ -736,6 +763,7 @@
                     node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour, background: '#FFFFFF'};
                     node_cfg.size = node.size;
                     node_cfg.color = {background: node.colour_bg, border: node.colour_bdr};
+                    node_cfg.scaling = {min: 10, max: 30, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}};
                     if(node.style == "icon") {
                         node_cfg.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt(node.icon, 16)), size: node.size, color: node.colour_bdr};
                     } else {
@@ -774,7 +802,7 @@
                     var mid_x = edge.mid_x;
                     var mid_y = edge.mid_y;
 
-                    var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: edge.label};
+                    var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: edge.label, scaling: {min: 10, max: 30, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}}};
                     mid.size = 3;
 
                     var arrows;
@@ -784,8 +812,8 @@
                         arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
                     }
 
-                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
-                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
+                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, scaling: {min: 1, max: 15, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}}, smooth: {type: edge.style}, arrowStrikethrough: false};
+                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, scaling: {min: 1, max: 15, label: {enabled: false, drawThreshold: 0, maxVisible: 100000}}, smooth: {type: edge.style}, arrowStrikethrough: false};
                     if(edge.fixed_width) {
                         edge1.width = edge2.width = parseFloat(edge.fixed_width) || null;
                     }

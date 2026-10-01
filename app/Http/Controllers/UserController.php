@@ -36,16 +36,19 @@ use App\Models\UserPref;
 use Auth;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use LibreNMS\Authentication\LegacyAuth;
 use URL;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('deny-demo');
+        return [
+            'deny-demo',
+        ];
     }
 
     /**
@@ -86,14 +89,13 @@ class UserController extends Controller
     {
         $this->authorize('create', User::class);
 
-        $user = $request->only(['username', 'realname', 'email', 'descr', 'can_modify_passwd']);
-        $user['auth_type'] = LegacyAuth::getType();
-        $user['can_modify_passwd'] = $request->input('can_modify_passwd'); // checkboxes are missing when unchecked
-
-        $user = User::create($user);
+        $user = new User($request->only(['username', 'realname', 'email', 'descr']));
+        $user->auth_type = LegacyAuth::getType();
+        $user->can_modify_passwd = (int) $request->boolean('can_modify_passwd'); // checkboxes are missing when unchecked
+        $user->save(); // below requires user_id and prevent login of partially created by not including password
 
         $user->setPassword($request->new_password);
-        $user->syncRoles($request->input('roles', []));
+        $user->syncRoles($request->array('roles'));
         $user->auth_id = (string) LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
         $this->updateDashboard($user, $request->integer('dashboard'));
         $this->updateTimezone($user, $request->string('timezone'));
@@ -154,7 +156,7 @@ class UserController extends Controller
         if ($request->input('new_password')) {
             $user->setPassword($request->new_password);
             /** @var User $current_user */
-            $current_user = Auth::user();
+            $current_user = $request->user();
             Auth::setUser($user); // make sure new password is loaded, can only logout other sessions for the active user
             Auth::logoutOtherDevices($request->new_password);
 

@@ -1237,50 +1237,152 @@
             "state_indexes": [
                 {
                     "state_name": "Active Flow Control Status",
+                    "state_descr": "Under",
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "Active Flow Control Status",
+                    "state_descr": "Okay",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "Active Flow Control Status",
+                    "state_descr": "Over",
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "Active Flow Control Status",
                     "state_descr": "NA",
+                    "state_value": 3,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Active Flow Control Status",
+                    "state_descr": "NA",
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Active Power Source",
+                    "state_descr": "Primary ",
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Active Power Source",
                     "state_descr": "Secondary",
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Alarm Relay 1",
+                    "state_descr": "Open",
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Alarm Relay 1",
                     "state_descr": "Closed",
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Alarm Relay 2",
+                    "state_descr": "Open",
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Alarm Relay 2",
                     "state_descr": "Closed",
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Alarm Relay 3",
+                    "state_descr": "Open",
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Alarm Relay 3",
                     "state_descr": "Closed",
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Alarm Relay 4",
+                    "state_descr": "Open",
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Alarm Relay 4",
                     "state_descr": "Closed",
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Mode",
+                    "state_descr": "Unknown",
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Mode",
+                    "state_descr": "Initializing",
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Mode",
+                    "state_descr": "Off",
+                    "state_value": 2,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Mode",
+                    "state_descr": "Standby",
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "Mode",
+                    "state_descr": "Idle",
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "Mode",
+                    "state_descr": "Startup Delay",
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Mode",
+                    "state_descr": "Active",
+                    "state_value": 6,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Mode",
                     "state_descr": "Maintenance",
-                    "state_value": 0,
+                    "state_value": 7,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "Shutdown Input State",
-                    "state_descr": "Closed",
+                    "state_descr": "Open",
                     "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Shutdown Input State",
+                    "state_descr": "Closed",
+                    "state_value": 1,
                     "state_generic_value": 3
                 }
             ]
@@ -2091,50 +2193,152 @@
             "state_indexes": [
                 {
                     "state_name": "Active Flow Control Status",
+                    "state_descr": "Under",
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "Active Flow Control Status",
+                    "state_descr": "Okay",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "Active Flow Control Status",
+                    "state_descr": "Over",
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "Active Flow Control Status",
                     "state_descr": "NA",
+                    "state_value": 3,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Active Flow Control Status",
+                    "state_descr": "NA",
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Active Power Source",
+                    "state_descr": "Primary ",
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Active Power Source",
                     "state_descr": "Secondary",
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Alarm Relay 1",
+                    "state_descr": "Open",
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Alarm Relay 1",
                     "state_descr": "Closed",
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Alarm Relay 2",
+                    "state_descr": "Open",
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Alarm Relay 2",
                     "state_descr": "Closed",
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Alarm Relay 3",
+                    "state_descr": "Open",
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Alarm Relay 3",
                     "state_descr": "Closed",
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Alarm Relay 4",
+                    "state_descr": "Open",
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Alarm Relay 4",
                     "state_descr": "Closed",
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Mode",
+                    "state_descr": "Unknown",
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Mode",
+                    "state_descr": "Initializing",
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Mode",
+                    "state_descr": "Off",
+                    "state_value": 2,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Mode",
+                    "state_descr": "Standby",
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "Mode",
+                    "state_descr": "Idle",
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "Mode",
+                    "state_descr": "Startup Delay",
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Mode",
+                    "state_descr": "Active",
+                    "state_value": 6,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Mode",
                     "state_descr": "Maintenance",
-                    "state_value": 0,
+                    "state_value": 7,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "Shutdown Input State",
-                    "state_descr": "Closed",
+                    "state_descr": "Open",
                     "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "Shutdown Input State",
+                    "state_descr": "Closed",
+                    "state_value": 1,
                     "state_generic_value": 3
                 }
             ]
