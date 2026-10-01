@@ -115,6 +115,12 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
             }
         }
 
+        // jnxBoxDescr comes from the chassis, so trust it over an operator configured sysDescr
+        // e.g. Juniper SRX240H Internet Router, node0 Juniper SRX5800 services gateway
+        if (preg_match('/^(?:node\d+\s+)?Juniper ([A-Za-z]+\d\S*)/i', (string) $boxDescr, $matches)) {
+            return strtoupper($matches[1]);
+        }
+
         // a sysDescr set to something other than the JUNOS string may still lead with the model
         if (preg_match('/^Juniper ([A-Za-z]+\d\S*)/', (string) $this->getDevice()->sysDescr, $matches)) {
             return strtoupper($matches[1]);
@@ -139,9 +145,10 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         return null;
     }
 
-    private function parseChassisCluster(?string $boxDescr, string $sysDescr): ?string
+    private function parseChassisCluster(?string $boxDescr, ?string $sysDescr): ?string
     {
-        if (! preg_match('/\bsrx\d/i', $sysDescr)) {
+        // sysDescr may be operator configured, so also check jnxBoxDescr for the model
+        if (! preg_match('/\bsrx\d/i', $sysDescr . ' ' . $boxDescr)) {
             return null;
         }
 
