@@ -98,20 +98,6 @@ jobs:
           cache-version: ${{ secrets.CACHE_VERSION }}
 
       -
-        name: Cache pip
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-
-      -
-        name: Pip install
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade --user pylint python-memcached mysqlclient
-
-      -
         name: Snmpsim setup
         run: |
           php lnms dev:simulate --setup-venv
