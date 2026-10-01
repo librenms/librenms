@@ -30,6 +30,7 @@ use App\Models\Device;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Interfaces\Geocoder;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use Net_DNS2_Resolver;
 
 class Dns implements Geocoder
@@ -50,7 +51,7 @@ class Dns implements Geocoder
 
         $addresses = app(self::class)->getAddresses($device->hostname);
 
-        $transport = $device->polling()->snmp()->transport;
+        $transport = (new SnmpPollingMethod)->transport($device);
         if ($transport == 'udp6' || $transport == 'tcp6') {
             foreach ($addresses as $address) {
                 if (IPv6::isValid($address)) {

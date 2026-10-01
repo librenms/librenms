@@ -30,6 +30,7 @@ use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Collection;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use Symfony\Component\Console\Input\InputOption;
 
 class SmokepingGenerateCommand extends LnmsCommand
@@ -129,9 +130,10 @@ class SmokepingGenerateCommand extends LnmsCommand
     {
         // Take the devices array and build it into a hierarchical list
         $smokelist = [];
+        $snmp = new SnmpPollingMethod;
         foreach ($devices as $device) {
             $smokelist[$device->type][$device->hostname] = [
-                'transport' => $device->polling()->snmp()->transport,
+                'transport' => $snmp->transport($device),
                 'displayname' => $device->display,
             ];
         }
