@@ -2,9 +2,39 @@
 
 The BIRD Internet Routing Daemon (BGP)
 
-The BIRD daemon has no SNMP support. This application therefore reads
+Most BIRD packages have no SNMP support. This application therefore reads
 all the configured BGP protocols and sends them to LibreNMS.
 This application supports both IPv4 and IPv6 Peer processing.
+
+### Choose a data source
+
+LibreNMS can get BGP data from BIRD in two ways.
+
+| Method | Use it when |
+| --- | --- |
+| Native BGP4-MIB | Your BIRD build has SNMP support enabled. |
+| This application (SNMP extend) | Your BIRD build has no SNMP support. Most distribution packages are in this group. |
+
+#### Native BGP4-MIB
+
+BIRD can serve BGP4-MIB itself, but only if the build has this feature
+enabled. Most distribution packages do not enable it. You must compile
+BIRD from source to get it.
+
+If your build has native MIB support, LibreNMS discovers the BGP peers
+with the normal BGP4-MIB code. You do not need the SNMP extend on this
+page.
+
+#### SNMP extend (this application)
+
+This application reads `birdc show protocols all`. It collects most of
+the data that the BGP4-MIB provides. LibreNMS shows this data on the
+device Routing page, together with the graphs for each session.
+
+The BGP page shows every address family of a session.
+
+This application supports BGP only. It does not collect data for other
+BIRD protocols, such as OSPF.
 
 ### SNMP Extend
 
