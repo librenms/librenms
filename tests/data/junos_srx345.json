@@ -30,7 +30,7 @@
                     "sysDescr": "Juniper Networks, Inc. srx345 internet router, kernel JUNOS 23.4R2-S5.5, Build date: 2025-06-06 07:48:58 UTC Copyright (c) 1996-2025 Juniper Networks, Inc.",
                     "sysContact": null,
                     "version": "23.4R2-S5.5",
-                    "hardware": "Juniper SRX345",
+                    "hardware": "SRX345",
                     "features": null,
                     "location": null,
                     "os": "junos",
