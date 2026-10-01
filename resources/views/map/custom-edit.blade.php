@@ -6,6 +6,7 @@
 
 @include('map.custom-background-modal')
 @include('map.custom-node-modal')
+@include('map.custom-edit-help-modal')
 @include('map.custom-edge-modal')
 @include('map.custom-map-modal')
 @include('map.custom-legend-modal')
@@ -524,6 +525,13 @@
                     action: function () { recenterEdge(recenter); }
                 });
             }
+
+            menuItems.push({ divider: true });
+            menuItems.push({
+                icon: 'fa-solid fa-circle-question',
+                label: "{{ __('Help') }} (?)",
+                action: function () { $("#helpModal").modal({backdrop: 'static'}, 'show'); }
+            });
 
             showContextMenu(menuHeader, menuItems, domX, domY);
         });
@@ -1094,6 +1102,9 @@
                 // Make sure the add node / add edge modes are not active
                 network.disableEditMode();
                 network.enableEditMode();
+            } else if (e.key === '?') {
+                e.preventDefault();
+                $("#helpModal").modal({backdrop: 'static'}, 'show');
             } else if (e.key.toLowerCase() === 'n') {
                 e.preventDefault();
                 network.addNodeMode();
@@ -1168,7 +1179,7 @@
 
         });
 
-   });
+    });
 </script>
 @endsection
 
