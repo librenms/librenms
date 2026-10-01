@@ -28,10 +28,12 @@ namespace LibreNMS\Tests\Feature;
 
 use App\Console\Commands\SmokepingGenerateCommand;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Tests\DBTestCase;
+use LibreNMS\Enum\PollingMethodType;
 
 final class SmokepingCliTest extends DBTestCase
 {
@@ -360,6 +362,22 @@ final class SmokepingCliTest extends DBTestCase
         $old = $this->legacyAlgo($data);
 
         $this->assertEquals($this->canonicalise($new), $this->canonicalise($old));
+    }
+
+    public function testTargetsUseTheSnmpTransport(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'smoke.example.com', 'type' => 'server']);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'settings' => ['transport' => 'udp6'],
+        ]);
+
+        \Artisan::call('smokeping:generate --targets --no-header --no-dns');
+        $output = \Artisan::output();
+
+        $this->assertStringContainsString("   title = $device->display", $output);
+        $this->assertStringContainsString('   probe = lnmsFPing6-', $output);
     }
 
     public function legacyAlgo($data)
