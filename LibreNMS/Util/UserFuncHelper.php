@@ -40,6 +40,16 @@ class UserFuncHelper
         throw new UserFunctionExistException("Invalid user function: $name");
     }
 
+    public function extractDbm(): float
+    {
+        // extract the dBm value from strings such as "0.00 mW (-23.19 dBm)"
+        if (preg_match('/(-?\d+(?:\.\d+)?)\s*dBm/i', (string) $this->value_raw, $m)) {
+            return (float) $m[1];
+        }
+
+        return (float) $this->value;
+    }
+
     public function dateToRuntime(): int
     {
         return Time::dateToMinutes($this->value_raw);
