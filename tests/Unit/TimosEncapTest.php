@@ -1,7 +1,7 @@
 <?php
 
 /*
- * NokiaEncapTest.php
+ * TimosEncapTest.php
  *
  * Tests decoding and formatting of TIMETRA-TC-MIB::TmnxEncapVal values.
  *
@@ -24,46 +24,46 @@
 namespace LibreNMS\Tests\Unit;
 
 use LibreNMS\Tests\TestCase;
-use LibreNMS\Util\NokiaEncap;
+use LibreNMS\OS\Timos;
 
-final class NokiaEncapTest extends TestCase
+final class TimosEncapTest extends TestCase
 {
     public function testNullEncapDecodes(): void
     {
-        $this->assertSame(['outer' => 0, 'inner' => null], NokiaEncap::decode(0));
+        $this->assertSame(['outer' => 0, 'inner' => null], Timos::decodeEncapValue(0));
     }
 
     public function testDot1qEncapDecodes(): void
     {
-        $this->assertSame(['outer' => 500, 'inner' => null], NokiaEncap::decode(500));
-        $this->assertSame(['outer' => 1, 'inner' => null], NokiaEncap::decode(1));
+        $this->assertSame(['outer' => 500, 'inner' => null], Timos::decodeEncapValue(500));
+        $this->assertSame(['outer' => 1, 'inner' => null], Timos::decodeEncapValue(1));
     }
 
     public function testQinQEncapDecodes(): void
     {
         // outer 100, inner 200: inner VLAN lives in the upper 16 bits
         $encap = (200 << 16) | 100;
-        $this->assertSame(['outer' => 100, 'inner' => 200], NokiaEncap::decode($encap));
+        $this->assertSame(['outer' => 100, 'inner' => 200], Timos::decodeEncapValue($encap));
     }
 
     public function testStringInputIsAccepted(): void
     {
-        $this->assertSame(['outer' => 500, 'inner' => null], NokiaEncap::decode('500'));
+        $this->assertSame(['outer' => 500, 'inner' => null], Timos::decodeEncapValue('500'));
     }
 
     public function testDot1qFormats(): void
     {
-        $this->assertSame('500', NokiaEncap::format(500));
-        $this->assertSame('0', NokiaEncap::format(0));
+        $this->assertSame('500', Timos::formatEncapValue(500));
+        $this->assertSame('0', Timos::formatEncapValue(0));
     }
 
     public function testQinQFormatsAsOuterDotInner(): void
     {
-        $this->assertSame('100.200', NokiaEncap::format((200 << 16) | 100));
+        $this->assertSame('100.200', Timos::formatEncapValue((200 << 16) | 100));
     }
 
     public function testWildcardFormats(): void
     {
-        $this->assertSame('*', NokiaEncap::format(4095));
+        $this->assertSame('*', Timos::formatEncapValue(4095));
     }
 }

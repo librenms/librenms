@@ -28,7 +28,7 @@ use App\Facades\PortCache;
 use App\Models\Vlan;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Mac;
-use LibreNMS\Util\NokiaEncap;
+use LibreNMS\OS\Timos;
 
 /*
  * Nokia TiMOS devices use TIMETRA-SERV-MIB::tlsFdbInfoTable for FDB information.
@@ -112,7 +112,7 @@ if (! empty($fdbTable)) {
 
             // Decode the encapsulation value to get VLAN ID(s)
             // TmnxEncapVal is encoded: dot1q uses lower 12 bits, QinQ uses upper/lower 16 bits
-            $decodedEncap = NokiaEncap::decode($encapValue);
+            $decodedEncap = Timos::decodeEncapValue($encapValue);
             $vlanNumber = $decodedEncap['outer'];  // Use outer VLAN for FDB lookup
 
             // Skip if no valid VLAN (null encap or wildcard)
@@ -126,7 +126,7 @@ if (! empty($fdbTable)) {
             $vlan_id = $vlans_dict[$vlanNumber] ?? $vlanNumber;
 
             // Nokia SAP format: ServiceID:Port:EncapValue (formatted for display)
-            $formattedEncap = NokiaEncap::format($encapValue);
+            $formattedEncap = Timos::formatEncapValue($encapValue);
             $sapIdentifier = "$svcId:$portId:$formattedEncap";
 
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
