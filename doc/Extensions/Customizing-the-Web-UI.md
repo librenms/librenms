@@ -31,7 +31,7 @@ Example contents:
 
 You can add custom external links in the menu on the device page.
 
-This feature allows you to easily link applications to related
+This feature links an application to a related
 systems, as shown in the example of Open-audIT.
 
 The url value is parsed by the [Laravel Blade](https://laravel.com/docs/blade) templating engine. You
@@ -105,6 +105,8 @@ The primary button is edit device by default.
 
 !!! Custom http, ssh, telnet ports
 
-Custom ports can be set through the device setting misc tab and will be appended to the Uri. Empty value will not append anything and automatically default to the standard.
-	- custom ssh port set to 2222 will result in ssh://10.0.0.0:2222
-	- custom telnet port set to 2323 will result in telnet://10.0.0.0:2323
+You can set your own ports on the misc tab of the device settings.
+LibreNMS adds the port to the end of the URI. An empty value adds
+nothing and uses the standard port.
+	- an SSH port of 2222 gives ssh://10.0.0.0:2222
+	- a telnet port of 2323 gives telnet://10.0.0.0:2323

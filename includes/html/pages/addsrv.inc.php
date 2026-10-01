@@ -12,7 +12,6 @@ if (Gate::denies('create', Service::class)) {
 }
 
 $servicesform = '';
-$devicesform = '';
 $updated = false;
 $message_break = '';
 $message = '';
@@ -28,10 +27,6 @@ if (! empty($vars['addsrv'])) {
 }
 foreach (list_available_services() as $current_service) {
     $servicesform .= "<option value='$current_service'>$current_service</option>";
-}
-
-foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $device) {
-    $devicesform .= "<option value='" . $device['device_id'] . "'>" . htmlentities(format_hostname($device)) . '</option>';
 }
 
 if ($updated) {

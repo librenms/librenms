@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property-read int|null $mac_count
+ */
 class PortsFdb extends PortRelatedModel
 {
+    use HasFactory;
     protected $table = 'ports_fdb';
     protected $primaryKey = 'ports_fdb_id';
     public $timestamps = true;
@@ -34,5 +39,13 @@ class PortsFdb extends PortRelatedModel
     public function ipv4Addresses(): HasMany
     {
         return $this->hasMany(Ipv4Mac::class, 'mac_address', 'mac_address');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ipv6Nd, $this>
+     */
+    public function ipv6Addresses(): HasMany
+    {
+        return $this->hasMany(Ipv6Nd::class, 'mac_address', 'mac_address');
     }
 }

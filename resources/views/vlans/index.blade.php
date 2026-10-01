@@ -4,8 +4,8 @@
 
 @section('content')
     <div class="container-fluid">
-        <x-panel body-class="tw:p-0!">
-            <x-slot name="heading">
+        <x-panel>
+            <x-slot:heading>
                 <h2 class="panel-title">{{ __('VLAN') }}
                 <select id="vlan-select">
                     @foreach($vlanIds as $vlanId)
@@ -13,8 +13,8 @@
                     @endforeach
                 </select>
                 </h2>
-            </x-slot>
-
+            </x-slot:heading>
+            <x-slot:slot class="tw:p-0!">
             <x-tabs>
                 <x-tab name="{{ __('Devices') }}">
                     <table id="vlan-devices" class="table table-hover table-condensed table-striped">
@@ -44,6 +44,7 @@
                     </table>
                 </x-tab>
             </x-tabs>
+            </x-slot:slot>
         </x-panel>
     </div>
 @endsection

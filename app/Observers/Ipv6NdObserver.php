@@ -7,6 +7,7 @@ use App\Models\Ipv6Nd;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\IPv6;
+use LibreNMS\Util\Mac;
 
 class Ipv6NdObserver
 {
@@ -15,10 +16,13 @@ class Ipv6NdObserver
         // log mac changes
         if ($neighbor->isDirty('mac_address')) {
             $ipv6 = IPv6::parse($neighbor->ipv6_address)->compressed();
-            $old_mac = $neighbor->getOriginal('mac_address');
+            $old_mac = Mac::parse($neighbor->getOriginal('mac_address'))->readable();
+            $new_mac = Mac::parse($neighbor->mac_address)->readable();
 
-            Log::debug("Changed mac address for $ipv6 from $old_mac to $neighbor->mac_address");
-            Eventlog::log("MAC change: $ipv6 : $old_mac -> $neighbor->mac_address", $neighbor->device_id, 'interface', Severity::Warning, $neighbor->port_id);
+            if ($old_mac !== $new_mac) { // do not log formatting change
+                Log::debug("Changed mac address for $ipv6 from $old_mac to $new_mac");
+                Eventlog::log("MAC change: $ipv6 : $old_mac -> $new_mac", $neighbor->device_id, 'interface', Severity::Warning, $neighbor->port_id);
+            }
         }
     }
 }

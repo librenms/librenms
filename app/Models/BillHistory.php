@@ -11,6 +11,7 @@ class BillHistory extends BillRelatedModel
     const UPDATED_AT = 'updated';
 
     protected $fillable = [
+        'bill_id',
         'bill_datefrom',
         'bill_dateto',
         'bill_type',
@@ -35,7 +36,7 @@ class BillHistory extends BillRelatedModel
 
     // ---- Query scopes ----
 
-    public function scopeCurrent(Builder $query): Builder
+    protected function scopeCurrent(Builder $query): Builder
     {
         $now = now();
 

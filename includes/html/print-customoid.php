@@ -19,11 +19,11 @@ $no_refresh = true;
 <?php
 
 echo csrf_field();
-if (isset($_POST['num_of_rows']) && $_POST['num_of_rows'] > 0) {
-    $rows = $_POST['rows'];
-} else {
+$rows = (int) ($_POST['num_of_rows'] ?? 10);
+if (! in_array($rows, [10, 25, 50, 100], true)) {
     $rows = 10;
 }
+
 ?>
 
 <div class="table-responsive">

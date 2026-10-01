@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
+use App\Models\DeviceOutage;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -11,6 +12,8 @@ class OutagesController extends Controller
 {
     public function index(Request $request): View
     {
+        $this->authorize('viewAny', DeviceOutage::class);
+
         $request->validate([
             'device' => 'nullable|int',
             'from' => 'nullable|date_or_relative',

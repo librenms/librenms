@@ -53,7 +53,7 @@ class DeviceTypeController extends WidgetController
     {
         $data = $this->getSettings();
 
-        $counts = Device::groupBy(['type'])->select('type', Eloquent::DB()->raw('COUNT(*) as total'))->orderByDesc('total')->pluck('total', 'type');
+        $counts = Device::hasAccess($request->user())->groupBy(['type'])->select('type', Eloquent::DB()->raw('COUNT(*) as total'))->orderByDesc('total')->pluck('total', 'type');
 
         if ($data['top_device_group_count']) {
             $top = $counts->take($data['top_device_group_count']);

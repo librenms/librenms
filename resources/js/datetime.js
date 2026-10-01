@@ -46,14 +46,14 @@ function parse(input) {
 }
 
 const LibreNMSDate = {
-    display(input, opts = { dateStyle: 'medium', timeStyle: 'medium' }) {
+    display(input, opts = { dateStyle: "medium", timeStyle: "medium" }) {
         const dt = parse(input);
-        return dt.isValid ? dt.toLocaleString(opts) : '—';
+        return dt.isValid ? dt.toLocaleString(opts) : "—";
     },
 
     toPicker(input) {
         const dt = parse(input);
-        return dt.isValid ? dt.toFormat("yyyy-MM-dd'T'HH:mm") : '';
+        return dt.isValid ? dt.toFormat("yyyy-MM-dd'T'HH:mm") : "";
     },
 
     toBackend(input) {
@@ -72,6 +72,26 @@ const LibreNMSDate = {
 
     zone() {
         return Settings.defaultZone.name;
+    },
+
+    // Convert signed seconds to a short offset label like -1d or +3h
+    toShortOffset(seconds) {
+        if (seconds === 0) return "0s";
+        const units = [
+            { label: "y", sec: 31536000 },
+            { label: "mo", sec: 2592000 },
+            { label: "w", sec: 604800 },
+            { label: "d", sec: 86400 },
+            { label: "h", sec: 3600 },
+            { label: "m", sec: 60 },
+            { label: "s", sec: 1 },
+        ];
+        const abs = Math.abs(seconds);
+        const u =
+            units.find((u) => abs % u.sec === 0) || units[units.length - 1];
+        const value = Math.round(abs / u.sec) || 0;
+        const sign = seconds > 0 ? "-" : "+"; // positive seconds => past => '-'
+        return `${sign}${value}${u.label}`;
     },
 
     parse,

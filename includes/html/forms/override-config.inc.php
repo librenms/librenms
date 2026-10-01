@@ -13,12 +13,11 @@
 */
 
 use App\Facades\DeviceCache;
-use App\Models\Device;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-if (Gate::denies('update', Device::class)) {
+if (Gate::denies('device.update')) {
     $response = [
         'status' => 'error',
         'message' => 'Need permission',
@@ -27,19 +26,19 @@ if (Gate::denies('update', Device::class)) {
     exit;
 }
 
-$device['device_id'] = $_POST['device_id'];
+$device = DeviceCache::get((int) $_POST['device_id']);
 $attrib = $_POST['attrib'];
 $state = $_POST['state'];
 $status = 'error';
 $message = 'Error with config';
 
-if (empty($device['device_id'])) {
+if ($device->exists == false) {
     $message = 'No device passed';
 } else {
     if ($state == true) {
-        set_dev_attrib($device, $attrib, $state);
+        $device->setAttrib($attrib, $state);
     } else {
-        DeviceCache::get((int) $device['device_id'])->forgetAttrib($attrib);
+        $device->forgetAttrib($attrib);
     }
     $status = 'ok';
     $message = 'Config has been updated';

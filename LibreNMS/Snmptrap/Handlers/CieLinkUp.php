@@ -64,7 +64,7 @@ class CieLinkUp implements SnmptrapHandler
         $port->ifOperStatus = IfOperStatus::tryFrom($trap->getOidData("IF-MIB::ifOperStatus.$ifIndex")) ?? IfOperStatus::Up;
         $port->ifAdminStatus = IfOperStatus::tryFrom($trap->getOidData("IF-MIB::ifAdminStatus.$ifIndex")) ?? IfOperStatus::Up; // If we receive LinkUp trap, we can safely assume that the ifAdminStatus is also up.
 
-        $trap->log("Cisco cieLinkUp Trap: $port->ifDescr AdminStatus: {$port->ifAdminStatus?->value}, OperStatus: {$port->ifOperStatus?->value}", Severity::Ok, 'interface', $port->port_id);
+        $trap->log("Cisco cieLinkUp Trap: $port->ifDescr AdminStatus: {$port->ifAdminStatus->value}, OperStatus: {$port->ifOperStatus->value}", Severity::Ok, 'interface', $port->port_id);
 
         if ($port->isDirty('ifAdminStatus')) {
             $trap->log("Interface Enabled : $port->ifDescr (TRAP)", Severity::Notice, 'interface', $port->port_id);

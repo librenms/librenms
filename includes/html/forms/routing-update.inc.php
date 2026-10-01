@@ -16,7 +16,7 @@ use App\Models\BgpPeer;
 
 header('Content-type: application/json');
 
-if (Gate::denies('update', BgpPeer::class)) {
+if (Gate::denies('routing.update')) {
     $response = [
         'status' => 'error',
         'message' => 'Need to be admin',

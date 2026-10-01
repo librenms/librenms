@@ -67,8 +67,8 @@ class Dispatcher
             $trap->log($trap->toString($detailed));
         }
         if ($logging != 'none' || ! $fallback) {
-            $rules = new AlertRules;
-            $rules->runRules($trap->getDevice()->device_id);
+            $rules = new AlertRules($trap->getDevice());
+            $rules->run();
         }
 
         return ! $fallback;

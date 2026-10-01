@@ -234,16 +234,14 @@ class CiHelper
     }
 
     /**
-     * Runs phpcs --standard=PSR2 against the code base
+     * Runs Pint against the code base
      *
      * @return int the return value from phpcs (0 = success)
      */
     public function checkStyle(): int
     {
         $cs_cmd = [
-            $this->checkPhpExec('php-cs-fixer'),
-            '--config=.php-cs-fixer.php',
-            'fix',
+            $this->checkPhpExec('pint'),
             '-v',
         ];
 
@@ -509,8 +507,9 @@ class CiHelper
 
         echo "Running composer install to install developer dependencies.\n";
         passthru(base_path('scripts/composer_wrapper.php') . ' install');
+        clearstatcache(true, $path);
 
-        if (is_executable($path)) { // @phpstan-ignore if.alwaysFalse (passthru may install the executable)
+        if (is_executable($path)) {
             return $path;
         }
 
@@ -544,8 +543,9 @@ class CiHelper
 
         echo "Running pip3 install to install developer dependencies.\n";
         passthru("pip3 install --user $exec"); // probably wrong in other cases...
+        clearstatcache(true, $path);
 
-        if (is_executable($path)) { // @phpstan-ignore if.alwaysFalse (passthru may install the executable)
+        if (is_executable($path)) {
             return $path;
         }
 

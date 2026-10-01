@@ -6,7 +6,7 @@ IMPORTS
     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
         FROM SNMPv2-CONF            -- RFC 2580
     Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
-    Unsigned32
+    Unsigned32, TimeTicks
         FROM SNMPv2-SMI             -- RFC 2578
    SnmpAdminString
         FROM SNMP-FRAMEWORK-MIB;    -- RFC 3411
@@ -400,6 +400,213 @@ storageDisruptionDetected OBJECT-TYPE
 
 --- { videoObjects 9 }, reserved for tampering
 
+--- RAID
+raid OBJECT IDENTIFIER ::= { videoObjects 10 }
+
+raidTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RaidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of RAID information, one entry for each RAID"
+    ::= { raid 1 }
+
+raidEntry OBJECT-TYPE
+    SYNTAX      RaidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A RAID entry contains information about a specific RAID"
+    INDEX       { raidId }
+    ::= { raidTable 1 }
+
+RaidEntry ::= SEQUENCE {
+    raidId         Unsigned32,
+    raidStatus     INTEGER
+}
+
+raidId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Used to identify a RAID"
+    ::= { raidEntry 1 }
+
+raidStatus OBJECT-TYPE
+    SYNTAX      INTEGER { active(1), degraded(2), syncing(3), failure(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the RAID"
+    ::= { raidEntry 2 }
+
+raidComponentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RaidComponentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of RAID component status, one entry for each RAID component in
+        each RAID"
+    ::= { raid 2 }
+
+raidComponentEntry OBJECT-TYPE
+    SYNTAX      RaidComponentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A RAID component entry contains information about a specific RAID
+         component"
+    INDEX       { raidId, raidComponentId }
+    ::= { raidComponentTable 1 }
+
+RaidComponentEntry ::= SEQUENCE {
+    raidComponentId         Unsigned32,
+    raidComponentName       SnmpAdminString,
+    raidComponentStatus     INTEGER
+}
+
+raidComponentId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Used to identify a RAID component"
+    ::= { raidComponentEntry 1 }
+
+raidComponentName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used to identify a RAID component. If the original string is longer
+         than the specified length then the middle of the string will be
+         replaced by '..' in such a way that the length of the string becomes
+         32 characters anyway."
+    ::= { raidComponentEntry 2 }
+
+raidComponentStatus OBJECT-TYPE
+    SYNTAX      INTEGER { connected(1), spare(2), missing(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the RAID component."
+    ::= { raidComponentEntry 3 }
+
+--- Basic device info
+basicDeviceInfo OBJECT IDENTIFIER ::= { videoObjects 100 }
+
+memoryInfo OBJECT IDENTIFIER ::= { basicDeviceInfo 1 }
+
+deviceMemoryUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The percentage of system memory in use."
+    ::= { memoryInfo 1 }
+
+deviceMemoryTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total amount of available system memory, in kB."
+    ::= { memoryInfo 2 }
+
+deviceMemoryUsed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The amount of system memory in use, in kB."
+    ::= { memoryInfo 3 }
+
+flashInfo OBJECT IDENTIFIER ::= { basicDeviceInfo 2 }
+
+deviceFlashUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The percentage of flash storage in use."
+    ::= { flashInfo 1 }
+
+deviceFlashTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total amount of flash storage available, in MB."
+    ::= { flashInfo 2 }
+
+deviceFlashUsed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The amount of flash in use, in MB."
+    ::= { flashInfo 3 }
+
+cpuInfo OBJECT IDENTIFIER ::= { basicDeviceInfo 3 }
+
+deviceCpuUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The percentage of time the CPU is actively working."
+    ::= { cpuInfo 1 }
+
+deviceSystemLoad OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of processes running or waiting on the cpu.
+             Represented by 1-minute, 5-minute, 15-minute averages."
+    ::= { cpuInfo 2 }
+
+deviceUptime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The time since the  system was last re-initialized."
+    ::= { basicDeviceInfo 4 }
+
+deviceSoftware OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The AxisOS version running on the device."
+    ::= { basicDeviceInfo 5 }
+
+deviceSerialNumber OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The serial number of the device."
+    ::= { basicDeviceInfo 6 }
+
+deviceManufacturer OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The manufacturer of the device."
+    ::= { basicDeviceInfo 7 }
+
+deviceModel OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The model name of the device."
+    ::= { basicDeviceInfo 8 }
+
 -- Objects used in Private Enterprise Traps
 videoNotifications OBJECT IDENTIFIER
     ::= { video 2 }
@@ -472,7 +679,8 @@ videoObjectGroup OBJECT-GROUP
     OBJECTS     { powerSupplyStatus, fanStatus, tempSensorStatus,
                   tempSensorValue, videoSignalStatus, audioSignalStatus,
                   casingName, casingStatus, storageDisruptionDetected,
-                  storageName, alarmID, alarmName, alarmText }
+                  storageName, raidStatus, raidComponentName,
+                  raidComponentStatus, alarmID, alarmName, alarmText }
     STATUS      obsolete
     DESCRIPTION
         "A collection of video objects."
@@ -505,6 +713,24 @@ storageGroup OBJECT-GROUP
     DESCRIPTION
         "Objects related to Axis storage."
     ::= { videoGroups 5 }
+
+raidGroup OBJECT-GROUP
+    OBJECTS { raidStatus, raidComponentName, raidComponentStatus }
+    STATUS      current
+    DESCRIPTION
+        "Objects related to Axis RAID."
+    ::= { videoGroups 6 }
+
+basicDeviceInfoGroup OBJECT-GROUP
+    OBJECTS { deviceMemoryUtilization, deviceMemoryTotal, deviceMemoryUsed,
+              deviceFlashTotal, deviceFlashUsed, deviceFlashUtilization,
+              deviceCpuUtilization, deviceSystemLoad, deviceUptime,
+              deviceSoftware, deviceSerialNumber, deviceManufacturer,
+              deviceModel }
+    STATUS      current
+    DESCRIPTION
+        "Objects related to basic device information."
+    ::= { videoGroups 7 }
 
 -- Compliance Statements
 videoComplianceRev2 MODULE-COMPLIANCE
@@ -555,6 +781,11 @@ videoComplianceRev2 MODULE-COMPLIANCE
               storage device connected and for which it is possible to check the
               state."
 
+        GROUP   raidGroup
+        DESCRIPTION
+              "This group is mandatory for all Axis video products that have
+              RAID capabilities, for which it is possible to check the status."
+
     ::= { videoCompliances 2 }
 
 videoCompliance MODULE-COMPLIANCE
@@ -574,3 +805,4 @@ videoCompliance MODULE-COMPLIANCE
     ::= { videoCompliances 1 }
 
 END -- end of module AXIS-VIDEO-MIB.
+

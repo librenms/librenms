@@ -39,6 +39,21 @@
 <script type="text/javascript" src="{{ asset('js/vis-data.min.js') }}"></script>
 @endsection
 
+@push('styles')
+<style>
+    div.vis-tooltip {
+        padding: 0 !important;
+        background-color: transparent !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+    div.vis-tooltip .panel {
+        margin-bottom: 0 !important;
+    }
+</style>
+@endpush
+
 @section('scripts')
 <script type="text/javascript">
     var height = $(window).height() - 100;
@@ -216,7 +231,7 @@
         // Initialise map if we haven't already.  If we do it earlier, the radom seeding doesn not work
         if (! network) {
             var container = document.getElementById('visualization');
-            var options = {!! $options !!};
+            var options = {{ Js::from($options) }};
             network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
 
             network.on('click', function (properties) {

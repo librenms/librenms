@@ -1,0 +1,48 @@
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: ENERGY-OBJECT-MIB::eoPowerTable
+                    value: ENERGY-OBJECT-MIB::eoPowerAdminState
+                    num_oid: '.1.3.6.1.2.1.229.1.2.1.8.{{ $index }}'
+                    descr: 'Relay #{{ $index }}'
+                    index: 'eoPowerAdminState.{{ $index }}'
+                    group: 'Admin Status'
+                    state_name: eoPowerAdminState
+                    states:
+                        - { value: 259, generic: 0, descr: 'On' }
+                        - { value: 257, generic: 0, descr: 'Off' }
+                -
+                    oid: ENERGY-OBJECT-MIB::eoPowerTable
+                    value: ENERGY-OBJECT-MIB::eoPowerOperState
+                    num_oid: '.1.3.6.1.2.1.229.1.2.1.9.{{ $index }}'
+                    descr: 'Relay #{{ $index }}'
+                    index: 'eoPowerOperState.{{ $index }}'
+                    group: 'Operational Status'
+                    state_name: eoPowerOperState
+                    states:
+                        - { value: 259, generic: 0, descr: 'On' }
+                        - { value: 257, generic: 0, descr: 'Off' }
+        count:
+            data:
+                -
+                    oid: ENERGY-OBJECT-MIB::eoPowerStateTable
+                    value: ENERGY-OBJECT-MIB::eoPowerStateEnterCount
+                    num_oid: '.1.3.6.1.2.1.229.1.3.1.5.{{ $index }}'
+                    descr: 'Relay #{{ $subindex0 }} Power On Count'
+                    index: 'eoPowerStateEnterCountOn.{{ $index }}'
+                    skip_values:
+                        - oid: index
+                          op: not_ends
+                          value: '.257'
+                -
+                    oid: ENERGY-OBJECT-MIB::eoPowerStateTable
+                    value: ENERGY-OBJECT-MIB::eoPowerStateEnterCount
+                    num_oid: '.1.3.6.1.2.1.229.1.3.1.5.{{ $index }}'
+                    descr: 'Relay #{{ $subindex0 }} Power Off Count'
+                    index: 'eoPowerStateEnterCountOff.{{ $index }}'
+                    skip_values:
+                        - oid: index
+                          op: not_ends
+                          value: '.259'

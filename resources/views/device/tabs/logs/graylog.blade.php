@@ -10,12 +10,12 @@
                     <thead>
                     <tr>
                         <th data-column-id="severity" data-sortable="false"></th>
-                        <th data-column-id="origin">Origin</th>
-                        <th data-column-id="timestamp" data-formatter="browserTime">Timestamp</th>
-                        <th data-column-id="level">Level</th>
-                        <th data-column-id="source">Source</th>
-                        <th data-column-id="message" data-sortable="false">Message</th>
-                        <th data-column-id="facility">Facility</th>
+                        <th data-column-id="origin">{{ __('Origin') }}</th>
+                        <th data-column-id="timestamp" data-formatter="browserTime">{{ __('Timestamp') }}</th>
+                        <th data-column-id="level">{{ __('Level') }}</th>
+                        <th data-column-id="source">{{ __('Source') }}</th>
+                        <th data-column-id="message" data-sortable="false">{{ __('Message') }}</th>
+                        <th data-column-id="facility">{{ __('Facility') }}</th>
                     </tr>
                     </thead>
                 </table>
