@@ -3,6 +3,8 @@ type: appliance
 text: 'Kymata'
 over:
     - { graph: device_dbm, text: 'Tx Power' }
+    - { graph: device_temperature, text: 'Temperature' }
+    - { graph: device_voltage, text: 'Voltage' }
 discovery:
     -
         sysObjectID:
