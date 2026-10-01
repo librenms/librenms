@@ -34,7 +34,6 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\OS;
-use LibreNMS\Util\Number;
 use SnmpQuery;
 
 class Openwrt extends OS implements
@@ -58,7 +57,7 @@ class Openwrt extends OS implements
                     'openwrt',
                     (string) $ifIndex,
                     $this->wirelessLabel($row, $ifIndex),
-                    Number::extract($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceClients'])
+                    $row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceClients']
                 );
             }
         }
@@ -72,7 +71,7 @@ class Openwrt extends OS implements
                 'openwrt',
                 'total',
                 'Total clients',
-                Number::extract($total)
+                (int) $total
             );
         }
 
@@ -91,7 +90,7 @@ class Openwrt extends OS implements
                     'openwrt',
                     (string) $ifIndex,
                     $this->wirelessLabel($row, $ifIndex),
-                    Number::extract($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceFrequency'])
+                    $row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceFrequency']
                 );
             }
         }
@@ -111,7 +110,7 @@ class Openwrt extends OS implements
                     'openwrt',
                     (string) $ifIndex,
                     $this->wirelessLabel($row, $ifIndex),
-                    Number::extract($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceNoiseFloor'])
+                    $row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceNoiseFloor']
                 );
             }
         }
@@ -139,7 +138,7 @@ class Openwrt extends OS implements
                         $subtype,
                         "$subtype-$ifIndex-$stat",
                         $this->wirelessLabel($row, $ifIndex) . " $stat",
-                        Number::extract($row[$column]) * 1000000, // the agent reports Mbit/s, LibreNMS stores bps
+                        $row[$column] * 1000000, // the agent reports Mbit/s, LibreNMS stores bps
                         1000000
                     );
                 }
@@ -166,7 +165,7 @@ class Openwrt extends OS implements
                         'openwrt',
                         "openwrt-$ifIndex-$stat",
                         $this->wirelessLabel($row, $ifIndex) . " $stat",
-                        Number::extract($row[$column])
+                        $row[$column]
                     );
                 }
             }
@@ -187,7 +186,7 @@ class Openwrt extends OS implements
                     'openwrt',
                     (string) $ifIndex,
                     $this->wirelessLabel($row, $ifIndex),
-                    Number::extract($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceChannelUtil'])
+                    $row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceChannelUtil']
                 );
             }
         }
@@ -207,7 +206,7 @@ class Openwrt extends OS implements
                     'openwrt',
                     (string) $ifIndex,
                     $this->wirelessLabel($row, $ifIndex),
-                    Number::extract($row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceTxPower'])
+                    $row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceTxPower']
                 );
             }
         }
