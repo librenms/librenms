@@ -77,6 +77,9 @@ class TransceiverTableWidgetTest extends TestCase
         $this->assertSame($expected, $actual, $name);
     }
 
+    /**
+     * @param  array<string, mixed>  $values
+     */
     private function sensor(array $values = []): Sensor
     {
         return new Sensor(array_merge([

@@ -15,7 +15,9 @@ use App\Models\EntPhysical;
 use App\Models\Port;
 use App\Models\PortGroup;
 use App\Models\Sensor;
+use App\Models\Transceiver;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Url;
@@ -25,6 +27,7 @@ class TransceiverTableController extends WidgetController
     protected string $name = 'transceiver-table';
 
     // Separate names avoid the base controller dereferencing deleted groups.
+    /** @var array<string, mixed> */
     protected $defaults = [
         'title' => '',
         'selected_device_group' => '',
@@ -122,6 +125,10 @@ class TransceiverTableController extends WidgetController
         ]);
     }
 
+    /**
+     * @param  list<Sensor>  $sensors
+     * @return array<int, array<string, string>>
+     */
     private function laneReadings(array $sensors, Port $port): array
     {
         $lanes = [];
@@ -161,6 +168,9 @@ class TransceiverTableController extends WidgetController
         return $readings;
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function formatReading(Sensor $sensor, Port $port): array
     {
         // Stored sensor_current is already scaled to dBm.
@@ -195,12 +205,16 @@ class TransceiverTableController extends WidgetController
         ];
     }
 
+    /**
+     * @param  array<string, mixed>  $settings
+     * @return list<int>
+     */
     private function portGroupIds(array $settings): array
     {
         // Accept the original single ID and new multi-select arrays.
         // The form sends an empty entry when all selections are cleared.
         return array_values(array_unique(array_filter(
-            array_map('intval', (array) ($settings['selected_port_group'] ?? [])),
+            array_map(intval(...), (array) ($settings['selected_port_group'] ?? [])),
             fn ($id) => $id > 0
         )));
     }
@@ -216,7 +230,10 @@ class TransceiverTableController extends WidgetController
         return ! preg_match($tx, $description) && (bool) preg_match($rx, $description);
     }
 
-    private function belongsToOptic(Sensor $sensor, Port $port, $optic, $inventory): bool
+    /**
+     * @param  Collection<array-key, EntPhysical>  $inventory
+     */
+    private function belongsToOptic(Sensor $sensor, Port $port, Transceiver $optic, Collection $inventory): bool
     {
         $index = (string) $sensor->entPhysicalIndex;
         if ($index === '' || $index === '0') {
