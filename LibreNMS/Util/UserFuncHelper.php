@@ -40,11 +40,9 @@ class UserFuncHelper
         throw new UserFunctionExistException("Invalid user function: $name");
     }
 
-    public function vsolDbm(): float
+    public function extractDbm(): float
     {
-        // V-Solution / V1600D OLTs report optical power as a string such as
-        // "0.00 mW (-23.19 dBm)". The default numeric extraction keeps only the
-        // leading mW value (~0), so pull the real dBm figure from the parentheses.
+        // extract the dBm value from strings such as "0.00 mW (-23.19 dBm)"
         if (preg_match('/(-?\d+(?:\.\d+)?)\s*dBm/i', (string) $this->value_raw, $m)) {
             return (float) $m[1];
         }

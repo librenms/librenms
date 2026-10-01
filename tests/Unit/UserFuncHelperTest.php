@@ -29,20 +29,20 @@ final class UserFuncHelperTest extends TestCase
 {
     /**
      * V-Solution / V1600D OLTs report optical power as "x mW (y dBm)".
-     * vsolDbm() must return the dBm value from inside the parentheses,
+     * extractDbm() must return the dBm value from inside the parentheses,
      * falling back to the already-extracted numeric value when absent.
      */
-    #[DataProvider('vsolDbmProvider')]
-    public function testVsolDbm(float $extracted, ?string $raw, float $expected): void
+    #[DataProvider('extractDbmProvider')]
+    public function testExtractDbm(float $extracted, ?string $raw, float $expected): void
     {
         $helper = new UserFuncHelper($extracted, $raw);
-        $this->assertEqualsWithDelta($expected, $helper->vsolDbm(), 0.001);
+        $this->assertEqualsWithDelta($expected, $helper->extractDbm(), 0.001);
     }
 
     /**
      * @return array<string, array{float, string|null, float}>
      */
-    public static function vsolDbmProvider(): array
+    public static function extractDbmProvider(): array
     {
         return [
             'negative dBm' => [0.0, '0.00 mW (-23.19 dBm)', -23.19],

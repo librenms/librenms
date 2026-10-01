@@ -3574,7 +3574,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3599,7 +3599,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3624,7 +3624,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3649,7 +3649,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3674,7 +3674,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3699,7 +3699,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3724,7 +3724,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3749,7 +3749,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3774,7 +3774,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3799,7 +3799,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3824,7 +3824,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3849,7 +3849,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3874,7 +3874,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3899,7 +3899,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3924,7 +3924,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -3949,7 +3949,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4603,7 +4603,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4628,7 +4628,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4653,7 +4653,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4678,7 +4678,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4703,7 +4703,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4728,7 +4728,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4753,7 +4753,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4778,7 +4778,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4803,7 +4803,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4828,7 +4828,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4853,7 +4853,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4878,7 +4878,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4903,7 +4903,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4928,7 +4928,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4953,7 +4953,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
@@ -4978,7 +4978,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "vsolDbm",
+                    "user_func": "extractDbm",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 },
