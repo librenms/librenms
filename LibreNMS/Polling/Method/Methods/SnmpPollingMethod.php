@@ -83,6 +83,14 @@ final class SnmpPollingMethod extends PollingMethod
     }
 
     /**
+     * The transport for the device, without decrypting the secret.
+     */
+    public function transport(Device $device): string
+    {
+        return $device->pollingMethod(PollingMethodType::Snmp)?->settings['transport'] ?? $this->defaults($device)['transport'];
+    }
+
+    /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */

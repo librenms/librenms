@@ -8,7 +8,6 @@ use App\Models\DevicePollingMethod;
 use App\Models\Eventlog;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Enum\AddressFamily;
-use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
@@ -62,12 +61,9 @@ final class IcmpPollingMethod extends PollingMethod
         };
     }
 
-    /**
-     * Only the SNMP transport is needed, so avoid decrypting the SNMP secret.
-     */
     private function snmpTransportFamily(Device $device): AddressFamily
     {
-        $transport = $device->pollingMethod(PollingMethodType::Snmp)?->settings['transport'] ?? (new SnmpPollingMethod)->defaults()['transport'];
+        $transport = (new SnmpPollingMethod)->transport($device);
 
         return str_ends_with($transport, '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
     }
