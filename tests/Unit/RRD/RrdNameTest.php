@@ -15,9 +15,17 @@ class RrdNameTest extends TestCase
         $this->assertSame(rtrim(LibrenmsConfig::get('rrd_dir'), '/') . '/pswcs07.wcs.network/storage-hrstorage-C___Label__Serial_Number_7e9e7a18.rrd', $testpath->defaultPath());
     }
 
-    public function testPathCached(): void
+    public function testPathUnixCached(): void
     {
         LibrenmsConfig::set('rrdcached', 'unix:/var/run/rrdcached.sock');
+        $testpath = Rrd::name('localhost', ['storage', 'hrstorage', '/boot/efi']);
+        $this->assertSame(rtrim(LibrenmsConfig::get('rrd_dir'), '/') . '/localhost/storage-hrstorage-_boot_efi.rrd', $testpath->defaultPath());
+        $this->assertSame(rtrim(LibrenmsConfig::get('rrd_dir'), '/') . '/localhost/storage-hrstorage-_boot_efi.rrd', $testpath->fullPath());
+    }
+
+    public function testPathTcpCached(): void
+    {
+        LibrenmsConfig::set('rrdcached', 'localhost:42217');
         $testpath = Rrd::name('localhost', ['storage', 'hrstorage', '/boot/efi']);
         $this->assertSame('localhost/storage-hrstorage-_boot_efi.rrd', $testpath->defaultPath());
         $this->assertSame(rtrim(LibrenmsConfig::get('rrd_dir'), '/') . '/localhost/storage-hrstorage-_boot_efi.rrd', $testpath->fullPath());
