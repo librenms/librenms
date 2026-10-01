@@ -34,7 +34,7 @@ return new class extends Migration
 
                     $attribsByDevice = DB::table('devices_attribs')
                         ->whereIn('device_id', $deviceIds)
-                        ->whereIn('attrib_type', ['ipmi_hostname', 'ipmi_port', 'ipmi_ciphersuite', 'ipmi_timeout', 'ipmi_username', 'ipmi_password', 'ipmi_kg_key'])
+                        ->whereIn('attrib_type', ['ipmi_hostname', 'ipmi_port', 'ipmi_ciphersuite', 'ipmi_timeout', 'ipmi_type', 'ipmi_username', 'ipmi_password', 'ipmi_kg_key'])
                         ->get()
                         ->groupBy('device_id');
 
@@ -78,6 +78,7 @@ return new class extends Migration
                             'port' => isset($attribs['ipmi_port']) ? (int) $attribs['ipmi_port'] : null,
                             'ciphersuite' => isset($attribs['ipmi_ciphersuite']) && $attribs['ipmi_ciphersuite'] !== '' ? (int) $attribs['ipmi_ciphersuite'] : null,
                             'timeout' => isset($attribs['ipmi_timeout']) ? (int) $attribs['ipmi_timeout'] : null,
+                            'type' => empty($attribs['ipmi_type']) ? null : $attribs['ipmi_type'], // detected, so it is not detected again
                         ], fn ($v) => $v !== null); // only values that were set
 
                         $pollingMethods[] = [
