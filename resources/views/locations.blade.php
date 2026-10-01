@@ -67,7 +67,7 @@
     </style>
 @endsection
 
-@section('javascript')
+@push('scripts')
     <script src="js/leaflet.js"></script>
     <script src="js/L.Control.Locate.min.js"></script>
     <script>
@@ -85,7 +85,7 @@
                 formatters: {
                     "location": function (column, row) {
                         var a = document.createElement('a');
-                        a.href = '{{ url('/devices') }}/location=' + row.id;
+                        a.href = '{{ route('devices', ['filter' => ['location_id' => ['eq' => '_location_id']]]) }}'.replace('_location_id', row.id);
                         a.textContent = row.location;
                         return a.outerHTML;
                     },
@@ -119,13 +119,13 @@
                         }
                         buttons += '><i class="fa fa-area-chart" aria-hidden="true"></i><span class="hidden-sm"> {{ __('Traffic') }}</span></button>';
 
-                        @can('update', \App\Models\Location::class)
+                        @can('location.update')
                         buttons += ' <button type="button" class="btn btn-xs btn-default" data-id="' + row.id +
                             '" data-location="' + row.location + '" data-lat="' + row.lat + '" data-lng="' + row.lng +
                             '" onclick="$(\'#edit-location\').modal(\'show\', this)"><i class="fa fa-pencil" aria-hidden="true"></i>' +
                             '<span class="hidden-sm"> {{ __('Edit') }}</span></button>';
                         @endcan
-                        @can('delete', \App\Models\Location::class)
+                        @can('location.delete')
                         buttons += ' <button type="button" class="btn btn-xs btn-danger" onclick="delete_location(' + row.id + ')"';
                         if (row.devices > 0) {
                             buttons += ' disabled title="{{ __('Cannot delete locations used by devices') }}"';
@@ -258,4 +258,4 @@
             }
         }
     </script>
-@endsection
+@endpush

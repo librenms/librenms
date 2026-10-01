@@ -32,19 +32,19 @@ A small shell script that reports the status of PHP-FPM (FastCGI Process Manager
         wget https://github.com/librenms/librenms-agent/raw/master/snmp/php-fpm -O /etc/snmp/php-fpm
         ```
 
-    2. Make the script executable
+    2. Make the script executable.
 
         ```bash
         chmod +x /etc/snmp/php-fpm
         ```
 
-    3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+    3. Edit your `snmpd.conf` file, usually `/etc/snmp/snmpd.conf`, and add:
     ```
     extend phpfpmsp /etc/snmp/php-fpm
     ```
 
     4. Create the config file
-    `/usr/local/etc/php-fpm_extend.json`. Alternate locations may be
+    `/usr/local/etc/php-fpm_extend.json`. Other locations are
     specified using the the `-f` switch. Akin to like below. For more
     information, see `/etc/snmp/php-fpm --help`.
 
@@ -63,9 +63,11 @@ A small shell script that reports the status of PHP-FPM (FastCGI Process Manager
         sudo systemctl restart snmpd
         ```
 
-        The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
+        LibreNMS discovers the application automatically, as described at the
+top of the page. If the discovery fails, do the steps under the `SNMP
+Extend` heading at the top of the page.
 
 === "Agent"
 
-    [Install the agent](../Agent-Setup.md) on this device if it isn't already
+    If this device has no agent, [install the agent](../Agent-Setup.md)
     and copy the `phpfpmsp` script to `/usr/lib/check_mk_agent/local/`

@@ -11,7 +11,4 @@ discovery_modules:
     processors: false
 discovery:
     -
-        sysObjectID:
-            - .1.3.6.1.4.1.34278
-        sysDescr_regex:
-            - '/^Janitza.*UMG96/'
+        sysObjectID: .1.3.6.1.4.1.34278.8.

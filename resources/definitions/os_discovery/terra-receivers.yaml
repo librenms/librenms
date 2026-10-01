@@ -1,0 +1,451 @@
+modules:
+    os:
+        version:
+            - TERRA-sdi410C-MIB::infVersion.0
+            - TERRA-sti440-MIB::infVersion.0
+            - TERRA-sdi480-MIB::infVersion.0
+        serial:
+            - TERRA-sdi410C-MIB::infSerNum.0
+            - TERRA-sti440-MIB::infSerNum.0
+            - TERRA-sdi480-MIB::infSerNum.0
+
+    processors:
+        data:
+            -
+                oid: TERRA-sdi410C-MIB::load
+                num_oid: '.1.3.6.1.4.1.30631.1.8.1.1.3.{{ $index }}'
+                descr: 'Chassis CPU load'
+                index: 0
+            -
+                oid: TERRA-sti440-MIB::sti440status
+                value: TERRA-sti440-MIB::cpuLoad
+                num_oid: '.1.3.6.1.4.1.30631.1.18.1.326.3.{{ $index }}'
+                descr: 'Chassis CPU load'
+                index: 0
+            -
+                oid: TERRA-sdi480-MIB::cpuLoad
+                num_oid: '.1.3.6.1.4.1.30631.1.17.1.586.3.{{ $index }}'
+                descr: 'Chassis CPU load'
+                index: 0
+    sensors:
+        bitrate:
+            data:
+                -
+                    oid: TERRA-sdi410C-MIB::mainStatus
+                    value: TERRA-sdi410C-MIB::inBR
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.1.1.{{ $index }}'
+                    descr: 'Input'
+                    index: 0
+                    group: Total
+                    multiplier: 1000
+                -
+                    oid: TERRA-sdi410C-MIB::mainStatus
+                    value: TERRA-sdi410C-MIB::outBR
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.1.2.{{ $index }}'
+                    descr: 'Output'
+                    index: 1
+                    group: Total
+                    multiplier: 1000
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inTotbr
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.326.1.{{ $index }}'
+                    descr: 'Input'
+                    index: 0
+                    group: Total
+                    multiplier: 100000
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::outTotbr
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.326.2.{{ $index }}'
+                    descr: 'Output'
+                    index: 1
+                    group: Total
+                    multiplier: 100000
+                -
+                    oid: TERRA-sdi480-MIB::commStatus
+                    value: TERRA-sdi480-MIB::inTotbr
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.586.1.{{ $index }}'
+                    descr: 'Input'
+                    index: 0
+                    group: Total
+                    multiplier: 100000
+                -
+                    oid: TERRA-sdi480-MIB::commStatus
+                    value: TERRA-sdi480-MIB::outTotbr
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.586.2.{{ $index }}'
+                    descr: 'Output'
+                    index: 1
+                    group: Total
+                    multiplier: 100000
+        temperature:
+            data:
+                -
+                    oid: TERRA-sdi410C-MIB::mainStatus
+                    value: TERRA-sdi410C-MIB::temp
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.1.4.{{ $index }}'
+                    descr: 'Chassis Temp (C)'
+                    index: 0
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::intTemp
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.326.4.{{ $index }}'
+                    descr: 'Chassis Temp (C)'
+                    index: 0
+                -
+                    oid: TERRA-sdi480-MIB::commStatus
+                    value: TERRA-sdi480-MIB::intTemp
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.586.4.{{ $index }}'
+                    descr: 'Chassis Temp (C)'
+                    index: 0
+                -
+                    oid: TERRA-sdi480-MIB::commStatus
+                    value: TERRA-sdi480-MIB::demodTemp
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.586.5.{{ $index }}'
+                    descr: 'Demodulator Temp (C)'
+                    index: 1
+        voltage:
+            data:
+                -
+                    oid: TERRA-sdi410C-MIB::mainStatus
+                    value: TERRA-sdi410C-MIB::suply
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.1.5.{{ $index }}'
+                    descr: 'Supply Voltage'
+                    index: 0
+                    divisor: 10
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::volt
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.326.5.{{ $index }}'
+                    descr: 'Supply Voltage'
+                    index: 0
+                    divisor: 10
+                -
+                    oid: TERRA-sdi480-MIB::commStatus
+                    value: TERRA-sdi480-MIB::volt
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.586.6.{{ $index }}'
+                    descr: 'Supply Voltage'
+                    index: 0
+                    divisor: 10
+        state:
+            data:
+                -
+                    oid: TERRA-sdi410C-MIB::sdi410calarms
+                    value: TERRA-sdi410C-MIB::alarmInpsig
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.2.3.{{ $index }}'
+                    descr: 'Input 1 / {{ TERRA-sdi410C-MIB::std }} / {{ TERRA-sdi410C-MIB::mod }}'
+                    index: 0
+                    group: Tuner Lock
+                    state_name: TERRA-sdi410C-MIB::alarmInpsig
+                    states:
+                        - { value: 0, generic: 0, descr: OK }
+                        - { value: 1, generic: 2, descr: Error }
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inLock1
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.1.1.{{ $index }}'
+                    descr: 'Input 1 / {{ TERRA-sti440-MIB::instd1 }} / {{ TERRA-sti440-MIB::inmod1 }}'
+                    index: '1.1.{{ $index }}'
+                    group: Tuner Lock
+                    state_name: TERRA-sti440-MIB::inLock1
+                    states:
+                        - { value: 1, generic: 0, descr: OK }
+                        - { value: 0, generic: 2, descr: Error }
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inLock2
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.2.1.{{ $index }}'
+                    descr: 'Input 2 / {{ TERRA-sti440-MIB::instd2 }} / {{ TERRA-sti440-MIB::inmod2 }}'
+                    index: '2.1.{{ $index }}'
+                    group: Tuner Lock
+                    state_name: TERRA-sti440-MIB::inLock2
+                    states:
+                        - { value: 1, generic: 0, descr: OK }
+                        - { value: 0, generic: 2, descr: Error }
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inLock3
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.3.1.{{ $index }}'
+                    descr: 'Input 3 / {{ TERRA-sti440-MIB::instd3 }} / {{ TERRA-sti440-MIB::inmod3 }}'
+                    index: '3.1.{{ $index }}'
+                    group: Tuner Lock
+                    state_name: TERRA-sti440-MIB::inLock3
+                    states:
+                        - { value: 1, generic: 0, descr: OK }
+                        - { value: 0, generic: 2, descr: Error }
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inLock4
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.4.1.{{ $index }}'
+                    descr: 'Input 4 / {{ TERRA-sti440-MIB::instd4 }} / {{ TERRA-sti440-MIB::inmod4 }}'
+                    index: '4.1.{{ $index }}'
+                    group: Tuner Lock
+                    state_name: TERRA-sti440-MIB::inLock4
+                    states:
+                        - { value: 1, generic: 0, descr: OK }
+                        - { value: 0, generic: 2, descr: Error }
+        snr:
+            data:
+                -
+                    oid: TERRA-sdi410C-MIB::inputStatus
+                    value: TERRA-sdi410C-MIB::snr
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.27.8.{{ $index }}'
+                    descr: 'Input 1 / {{ TERRA-sdi410C-MIB::std }} / {{ TERRA-sdi410C-MIB::mod }}'
+                    index: '27.8.{{ $index }}'
+                    divisor: 10
+                    low_limit: 13
+                    low_warn_limit: 15
+                    high_limit: 30
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::insnr1
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.1.5.{{ $index }}'
+                    descr: 'Input 1 / {{ TERRA-sti440-MIB::instd1 }} / {{ TERRA-sti440-MIB::inmod1 }}'
+                    index: '1.5.{{ $index }}'
+                    divisor: 10
+                    low_limit: 13
+                    low_warn_limit: 15
+                    high_limit: 30
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::insnr2
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.2.5.{{ $index }}'
+                    descr: 'Input 2 / {{ TERRA-sti440-MIB::instd2 }} / {{ TERRA-sti440-MIB::inmod2 }}'
+                    index: '2.5.{{ $index }}'
+                    divisor: 10
+                    low_limit: 13
+                    low_warn_limit: 15
+                    high_limit: 30
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::insnr3
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.3.5.{{ $index }}'
+                    descr: 'Input 3 / {{ TERRA-sti440-MIB::instd3 }} / {{ TERRA-sti440-MIB::inmod3 }}'
+                    index: '3.5.{{ $index }}'
+                    divisor: 10
+                    low_limit: 13
+                    low_warn_limit: 15
+                    high_limit: 30
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::insnr4
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.4.5.{{ $index }}'
+                    descr: 'Input 4 / {{ TERRA-sti440-MIB::instd4 }} / {{ TERRA-sti440-MIB::inmod4 }}'
+                    index: '4.5.{{ $index }}'
+                    divisor: 10
+                    low_limit: 13
+                    low_warn_limit: 15
+                    high_limit: 30
+                -
+                    oid: TERRA-sdi480-MIB::sdi480status
+                    value: TERRA-sdi480-MIB::insnr1
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.1.3.{{ $index }}'
+                    descr: 'Input 1'
+                    index: '1.3.{{ $index }}'
+                    divisor: 10
+                    low_limit: 13
+                    low_warn_limit: 15
+                    high_limit: 30
+                -
+                    oid: TERRA-sdi480-MIB::sdi480status
+                    value: TERRA-sdi480-MIB::insnr2
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.2.3.{{ $index }}'
+                    descr: 'Input 2'
+                    index: '2.3.{{ $index }}'
+                    divisor: 10
+                    low_limit: 13
+                    low_warn_limit: 15
+                    high_limit: 30
+                -
+                    oid: TERRA-sdi480-MIB::sdi480status
+                    value: TERRA-sdi480-MIB::insnr3
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.3.3.{{ $index }}'
+                    descr: 'Input 3'
+                    index: '3.3.{{ $index }}'
+                    divisor: 10
+                    low_limit: 13
+                    low_warn_limit: 15
+                    high_limit: 30
+                -
+                    oid: TERRA-sdi480-MIB::sdi480status
+                    value: TERRA-sdi480-MIB::insnr4
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.4.3.{{ $index }}'
+                    descr: 'Input 4'
+                    index: '4.3.{{ $index }}'
+                    divisor: 10
+                    low_limit: 13
+                    low_warn_limit: 15
+                    high_limit: 30
+                -
+                    oid: TERRA-sdi480-MIB::sdi480status
+                    value: TERRA-sdi480-MIB::insnr5
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.5.3.{{ $index }}'
+                    descr: 'Input 5'
+                    index: '5.3.{{ $index }}'
+                    divisor: 10
+                    low_limit: 13
+                    low_warn_limit: 15
+                    high_limit: 30
+                -
+                    oid: TERRA-sdi480-MIB::sdi480status
+                    value: TERRA-sdi480-MIB::insnr6
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.6.3.{{ $index }}'
+                    descr: 'Input 6'
+                    index: '6.3.{{ $index }}'
+                    divisor: 10
+                    low_limit: 13
+                    low_warn_limit: 15
+                    high_limit: 30
+                -
+                    oid: TERRA-sdi480-MIB::sdi480status
+                    value: TERRA-sdi480-MIB::insnr7
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.7.3.{{ $index }}'
+                    descr: 'Input 7'
+                    index: '7.3.{{ $index }}'
+                    divisor: 10
+                    low_limit: 13
+                    low_warn_limit: 15
+                    high_limit: 30
+                -
+                    oid: TERRA-sdi480-MIB::sdi480status
+                    value: TERRA-sdi480-MIB::insnr8
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.8.3.{{ $index }}'
+                    descr: 'Input 8'
+                    index: '8.3.{{ $index }}'
+                    divisor: 10
+                    low_limit: 13
+                    low_warn_limit: 15
+                    high_limit: 30
+        ber:
+            data:
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inber1
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.1.6.{{ $index }}'
+                    descr: 'Input 1 / {{ TERRA-sti440-MIB::instd1 }} / {{ TERRA-sti440-MIB::inmod1 }}'
+                    index: '1.6.{{ $index }}'
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inber2
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.2.6.{{ $index }}'
+                    descr: 'Input 2 / {{ TERRA-sti440-MIB::instd2 }} / {{ TERRA-sti440-MIB::inmod2 }}'
+                    index: '2.6.{{ $index }}'
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inber3
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.3.6.{{ $index }}'
+                    descr: 'Input 3 / {{ TERRA-sti440-MIB::instd3 }} / {{ TERRA-sti440-MIB::inmod3 }}'
+                    index: '3.6.{{ $index }}'
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inber4
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.4.6.{{ $index }}'
+                    descr: 'Input 4 / {{ TERRA-sti440-MIB::instd4 }} / {{ TERRA-sti440-MIB::inmod4 }}'
+                    index: '4.6.{{ $index }}'
+        count:
+            data:
+                -
+                    oid: TERRA-sdi410C-MIB::inputStatus
+                    value: TERRA-sdi410C-MIB::inCCerr
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.27.11.{{ $index }}'
+                    descr: 'Input 1 / {{ TERRA-sdi410C-MIB::std }} / {{ TERRA-sdi410C-MIB::mod }}'
+                    index: '27.11.{{ $index }}'
+                    group: CCERR
+                    warn_limit: 50
+                    high_limit: 100
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inccerr1
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.1.10.{{ $index }}'
+                    descr: 'Input 1 / {{ TERRA-sti440-MIB::instd1 }} / {{ TERRA-sti440-MIB::inmod1 }}'
+                    index: '1.10.{{ $index }}'
+                    group: CCERR
+                    warn_limit: 50
+                    high_limit: 100
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inccerr2
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.2.10.{{ $index }}'
+                    descr: 'Input 2 / {{ TERRA-sti440-MIB::instd2 }} / {{ TERRA-sti440-MIB::inmod2 }}'
+                    index: '2.10.{{ $index }}'
+                    group: CCERR
+                    warn_limit: 50
+                    high_limit: 100
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inccerr3
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.3.10.{{ $index }}'
+                    descr: 'Input 3 / {{ TERRA-sti440-MIB::instd3 }} / {{ TERRA-sti440-MIB::inmod3 }}'
+                    index: '3.10.{{ $index }}'
+                    group: CCERR
+                    warn_limit: 50
+                    high_limit: 100
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inccerr4
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.4.10.{{ $index }}'
+                    descr: 'Input 4 / {{ TERRA-sti440-MIB::instd4 }} / {{ TERRA-sti440-MIB::inmod4 }}'
+                    index: '4.10.{{ $index }}'
+                    group: CCERR
+                    warn_limit: 50
+                    high_limit: 100
+        tv_signal:
+            data:
+                -
+                    oid: TERRA-sdi410C-MIB::inputStatus
+                    value: TERRA-sdi410C-MIB::level
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.27.3.{{ $index }}'
+                    descr: 'Input 1 / {{ TERRA-sdi410C-MIB::std }} / {{ TERRA-sdi410C-MIB::mod }}'
+                    index: '27.3.{{ $index }}'
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inlevel1
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.1.3.{{ $index }}'
+                    descr: 'Input 1 / {{ TERRA-sti440-MIB::instd1 }} / {{ TERRA-sti440-MIB::inmod1 }}'
+                    index: '1.3.{{ $index }}'
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inlevel2
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.2.3.{{ $index }}'
+                    descr: 'Input 2 / {{ TERRA-sti440-MIB::instd2 }} / {{ TERRA-sti440-MIB::inmod2 }}'
+                    index: '2.3.{{ $index }}'
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inlevel3
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.3.3.{{ $index }}'
+                    descr: 'Input 3 / {{ TERRA-sti440-MIB::instd3 }} / {{ TERRA-sti440-MIB::inmod3 }}'
+                    index: '3.3.{{ $index }}'
+                -
+                    oid: TERRA-sti440-MIB::sti440status
+                    value: TERRA-sti440-MIB::inlevel4
+                    num_oid: '.1.3.6.1.4.1.30631.1.18.1.4.3.{{ $index }}'
+                    descr: 'Input 4 / {{ TERRA-sti440-MIB::instd4 }} / {{ TERRA-sti440-MIB::inmod4 }}'
+                    index: '4.3.{{ $index }}'
+                -
+                    oid: TERRA-sdi480-MIB::sdi480status
+                    value: TERRA-sdi480-MIB::inlevel1
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.1.2.{{ $index }}'
+                    descr: 'LNB 1'
+                    index: '1.2.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: TERRA-sdi480-MIB::sdi480status
+                    value: TERRA-sdi480-MIB::inlevel2
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.2.2.{{ $index }}'
+                    descr: 'LNB 2'
+                    index: '2.2.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: TERRA-sdi480-MIB::sdi480status
+                    value: TERRA-sdi480-MIB::inlevel3
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.3.2.{{ $index }}'
+                    descr: 'LNB 3'
+                    index: '3.2.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: TERRA-sdi480-MIB::sdi480status
+                    value: TERRA-sdi480-MIB::inlevel4
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.4.2.{{ $index }}'
+                    descr: 'LNB 4'
+                    index: '4.2.{{ $index }}'
+                    divisor: 10

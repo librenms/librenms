@@ -27,16 +27,19 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\MuninPlugin;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
+/**
+ * @extends SelectController<MuninPlugin>
+ */
 class MuninPluginController extends SelectController
 {
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
         return MuninPlugin::hasAccess($request->user())
             ->with(['device' => function ($query): void {
@@ -46,13 +49,14 @@ class MuninPluginController extends SelectController
     }
 
     /**
-     * @param  MuninPlugin  $munin_plugin
+     * @param  MuninPlugin  $model
+     * @return array{id: int|string, text: string, icon?: string}
      */
-    public function formatItem($munin_plugin)
+    public function formatItem(Model $model): array
     {
         return [
-            'id' => $munin_plugin->mplug_id,
-            'text' => $munin_plugin->device->shortDisplayName() . ' - ' . $munin_plugin->mplug_type,
+            'id' => $model->mplug_id,
+            'text' => $model->device->shortDisplayName() . ' - ' . $model->mplug_type,
         ];
     }
 }

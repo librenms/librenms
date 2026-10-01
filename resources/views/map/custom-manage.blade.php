@@ -8,25 +8,26 @@
     @include('map.custom-map-delete-modal')
     @include('map.custom-map-clone-modal')
 
-    <x-panel id="manage-custom-maps" body-class="tw:pb-0!" class="tw:mx-auto tw:max-w-(--breakpoint-lg)">
-        <x-slot name="title">
-            <div class="tw:flex tw:justify-between tw:items-center">
+    <x-panel id="manage-custom-maps" class="tw:mx-auto tw:max-w-(--breakpoint-lg)">
+        <x-slot:title>
+            <div class="tw:flex tw:justify-between tw:items-center tw:gap-3 tw:flex-wrap">
+                <x-filter name="custom-maps" :fields="$filterFields" :initial="$filter" :reload="true" />
+                @can('custom-map.create')
                 <div>
-                    {{ __('map.custom.title.manage') }}
-                </div>
-                <div>
-                    <button class="btn btn-primary" onclick="$('#mapModal').modal({backdrop: 'static', keyboard: false}, 'show');">
+                    <button class="lnms-btn lnms-btn-primary" onclick="$('#mapModal').modal({backdrop: 'static', keyboard: false}, 'show');">
                         {{ __('map.custom.create_map') }}
                     </button>
                 </div>
+                @endcan
             </div>
-        </x-slot>
-
+        </x-slot:title>
+        <x-slot:slot class="tw:p-0!">
         @foreach($maps as $group_name => $group)
-            <x-panel id="map-group-{{ $group_uuid = uniqid() }}" body-class="tw:p-0!">
+            <x-panel id="map-group-{{ $group_uuid = uniqid() }}">
                 @if($group_name)
-                    <x-slot name="title">{{ $group_name }}</x-slot>
+                    <x-slot:title>{{ $group_name }}</x-slot:title>
                 @endif
+                <x-slot:slot class="tw:p-0!">
                 @foreach($group as $map)
                     <div id="map-{{ $map->custom_map_id }}" class="tw:even:bg-gray-50 tw:dark:even:bg-zinc-900">
                         <div class="tw:flex tw:justify-between tw:p-3 tw:items-center tw:hover:bg-gray-100 tw:dark:hover:bg-gray-600">
@@ -35,18 +36,22 @@
                                 <a href="{{ route('maps.custom.show', $map->custom_map_id) }}">{{ $map->name }}</a>
                             </div>
                             <div class="tw:whitespace-nowrap">
-                                <button class="btn btn-info"
+                                <a href="{{ route('maps.custom.show', $map->custom_map_id) }}" class="lnms-btn lnms-btn-default"><i class="fa fa-eye" aria-hidden="true"></i>
+                                    <span class="tw:hidden tw:sm:inline" aria-hidden="false">{{ __('View') }}</span>
+                                </a>
+                                @can('custom-map.update')
+                                <button class="lnms-btn lnms-btn-primary"
                                         onclick="startMapClone(this)"
                                         data-map-name="{{ $map->name }}"
                                         data-map-id="{{ $map->custom_map_id }}"
                                 ><i class="fa fa-copy" aria-hidden="true"></i>
                                     <span class="tw:hidden tw:sm:inline" aria-hidden="false">{{ __('Clone') }}</span>
                                 </button>
-                                <a class="btn btn-default" href="{{ route('maps.custom.edit', $map->custom_map_id) }}">
+                                <a class="lnms-btn lnms-btn-warning" href="{{ route('maps.custom.edit', $map->custom_map_id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>
                                     <span class="tw:hidden tw:sm:inline" aria-hidden="false">{{ __('Edit') }}</span>
                                 </a>
-                                <button class="btn btn-danger"
+                                <button class="lnms-btn lnms-btn-danger"
                                         onclick="startMapDelete(this)"
                                         data-map-name="{{ $map->name }}"
                                         data-map-group-id="#map-group-{{ $group_uuid }}"
@@ -54,12 +59,15 @@
                                 ><i class="fa fa-trash" aria-hidden="true"></i>
                                     <span class="tw:hidden tw:sm:inline" aria-hidden="false">{{ __('Delete') }}</span>
                                 </button>
+                                @endcan
                             </div>
                         </div>
                     </div>
                 @endforeach
+                </x-slot:slot>
             </x-panel>
         @endforeach
+        </x-slot:slot>
     </x-panel>
 </div>
 @endsection
@@ -106,6 +114,9 @@
             }
             pendingMapToDelete = null;
             $('#mapDeleteModal').modal('hide');
+        }).fail((jqXHR) => {
+            var msg = (jqXHR.responseJSON && jqXHR.responseJSON.message) ? jqXHR.responseJSON.message : 'Delete failed';
+            toastr.error(msg);
         });
     }
 </script>

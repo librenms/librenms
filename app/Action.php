@@ -26,6 +26,8 @@
 
 namespace App;
 
+use InvalidArgumentException;
+
 class Action
 {
     /**
@@ -35,8 +37,12 @@ class Action
      * @param  mixed  ...$parameters
      * @return mixed
      */
-    public static function execute(string $action, ...$parameters)
+    public static function execute(string $action, ...$parameters): mixed
     {
-        return app($action, $parameters)->execute();
+        if (array_is_list($parameters) && ! empty($parameters)) {
+            throw new InvalidArgumentException("Action::execute() requires named arguments, e.g. Action::execute($action, device: \$device)");
+        }
+
+        return app()->make($action, $parameters)->execute();
     }
 }

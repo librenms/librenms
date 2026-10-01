@@ -16,6 +16,8 @@ class AlertRuleController extends Controller
      */
     public function store(AlertRuleRequest $request): JsonResponse
     {
+        $this->authorize('create', AlertRule::class);
+
         try {
             $alertRule = new AlertRule;
             $this->fillAlertRule($alertRule, $request);
@@ -40,6 +42,8 @@ class AlertRuleController extends Controller
      */
     public function show(AlertRule $alertRule): JsonResponse
     {
+        $this->authorize('view', $alertRule);
+
         $alertRule->load([
             'devices:device_id,hostname,sysName',
             'groups:id,name',
@@ -69,6 +73,8 @@ class AlertRuleController extends Controller
      */
     public function update(AlertRuleRequest $request, AlertRule $alertRule): JsonResponse
     {
+        $this->authorize('update', $alertRule);
+
         try {
             $this->fillAlertRule($alertRule, $request);
 
@@ -95,6 +101,8 @@ class AlertRuleController extends Controller
 
     public function toggle(Request $request, AlertRule $alertRule): JsonResponse
     {
+        $this->authorize('update', $alertRule);
+
         $alertRule->disabled = ! $request->boolean('state', $alertRule->disabled);
         $success = $alertRule->save();
         url('graphs', ['id' => 42, 'type' => 'sensor_']);
@@ -107,6 +115,8 @@ class AlertRuleController extends Controller
      */
     public function destroy(AlertRule $alertRule): JsonResponse
     {
+        $this->authorize('delete', $alertRule);
+
         $success = $alertRule->delete();
 
         return response()->json(['status' => $success ? 200 : 422], $success ? 200 : 422);

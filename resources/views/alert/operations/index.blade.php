@@ -76,12 +76,10 @@
                         <td class="col-sm-3"><small>{!! $tpStr !!}</small></td>
                         <td>{{ (int) $op->alert_rules_count }}</td>
                         <td>
-                            @can('update', \App\Models\AlertOperation::class)
+                            @can('alert-rule.update')
                                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
                                         data-target="#edit-alert-operation" data-operation_id="{{ (int) $op->id }}"><i
                                         class="fa fa-pencil"></i></button>
-                            @endcan
-                            @can('delete', \App\Models\AlertOperation::class)
                                 @php $ruleCount = (int) $op->alert_rules_count; @endphp
                                 <button type="button" class="btn btn-danger btn-sm btn-delete-alert-operation"
                                         data-operation_id="{{ (int) $op->id }}"

@@ -35,6 +35,8 @@ class CustomMapListController extends Controller
 {
     public function index(Request $request): View
     {
+        $this->authorize('viewAny', CustomMap::class);
+
         $group = $request->input('group') ?? '';
 
         return view('map.custom-list', [

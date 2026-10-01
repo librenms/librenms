@@ -39,9 +39,7 @@ if ($width > '500') {
     $rrd_options[] = 'COMMENT:' . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . "     Now         Ave          Max\l";
 }
 
-if (! isset($multiplier)) {
-    $multiplier = '8';
-}
+$multiplier ??= '8';
 
 $rrd_optionsb = [];
 foreach ($rrd_list as $rrd) {

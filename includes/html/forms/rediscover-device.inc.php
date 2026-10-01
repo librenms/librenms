@@ -12,11 +12,10 @@
  * the source code distribution for details.
  */
 
-use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Support\Facades\Gate;
 
-if (Gate::denies('update', Device::class)) {
+if (Gate::denies('device.update')) {
     $response = [
         'status' => 'error',
         'message' => 'Need permission',
