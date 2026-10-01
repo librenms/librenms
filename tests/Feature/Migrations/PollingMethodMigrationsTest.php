@@ -29,9 +29,9 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
         $b = $this->pollingMethod(2, 'snmp');
         $c = $this->pollingMethod(3, 'snmp');
 
-        // only values that differ from the defaults are kept
-        $this->assertSame(['max_oid' => 20, 'bulk' => false], json_decode($a->settings, true));
-        $this->assertSame(['port' => 1161, 'transport' => 'tcp'], json_decode($b->settings, true));
+        // legacy port, transport and port association mode are kept, other values only when they were set
+        $this->assertSame(['port' => 161, 'transport' => 'udp', 'max_oid' => 20, 'bulk' => false, 'port_association_mode' => 'ifIndex'], json_decode($a->settings, true));
+        $this->assertSame(['port' => 1161, 'transport' => 'tcp', 'port_association_mode' => 'ifIndex'], json_decode($b->settings, true));
         $this->assertEquals(1, $a->enabled);
 
         // identical credentials share a secret
@@ -85,7 +85,7 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
         ]);
 
         // legacy polling ignored a timeout <= 0 and empty max oid/repeaters, but 0 retries is valid
-        $this->assertSame(['retries' => 0], json_decode($this->pollingMethod(1, 'snmp')->settings, true));
+        $this->assertSame(['port' => 161, 'transport' => 'udp', 'retries' => 0, 'port_association_mode' => 'ifIndex'], json_decode($this->pollingMethod(1, 'snmp')->settings, true));
     }
 
     public function testIcmpAndIpmiSettingsAreMigrated(): void
@@ -100,6 +100,7 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
             ['device_id' => 2, 'attrib_type' => 'ipmi_hostname', 'attrib_value' => 'bmc.example.com'],
             ['device_id' => 2, 'attrib_type' => 'ipmi_port', 'attrib_value' => '6230'],
             ['device_id' => 2, 'attrib_type' => 'ipmi_ciphersuite', 'attrib_value' => '3'],
+            ['device_id' => 2, 'attrib_type' => 'ipmi_type', 'attrib_value' => 'lanplus'],
             ['device_id' => 2, 'attrib_type' => 'ipmi_username', 'attrib_value' => 'admin'],
             ['device_id' => 2, 'attrib_type' => 'ipmi_password', 'attrib_value' => 'secret'],
         ]);
@@ -110,7 +111,7 @@ final class PollingMethodMigrationsTest extends InMemoryDbTestCase
 
         $this->assertNull($this->pollingMethod(1, 'ipmi'));
         $ipmi = $this->pollingMethod(2, 'ipmi');
-        $this->assertSame(['hostname' => 'bmc.example.com', 'port' => 6230, 'ciphersuite' => 3], json_decode($ipmi->settings, true));
+        $this->assertSame(['hostname' => 'bmc.example.com', 'port' => 6230, 'ciphersuite' => 3, 'type' => 'lanplus'], json_decode($ipmi->settings, true));
         $this->assertSame(['username' => 'admin', 'password' => 'secret', 'kg_key' => null], $this->secretData($ipmi->secret_id));
     }
 
