@@ -109,19 +109,4 @@ class Rrdtool implements RrdBackendInterface
 
         return array_filter(explode("\n", trim($output)), fn ($file) => str_starts_with((string) $file, $prefix));
     }
-
-    /**
-     * @param  string[]  $options
-     */
-    public function graph(array $options): string
-    {
-        try {
-            $command = Rrd::buildCommand('graph', '-', $options);
-            $image = $this->rrd->run('"' . implode('" "', $command) . '"');
-
-            return $image;
-        } catch (RrdException $e) {
-            throw new RrdGraphException($e->getMessage(), 'Error');
-        }
-    }
 }

@@ -66,6 +66,14 @@ class AppServiceProvider extends ServiceProvider
 
             return $app->make(\LibreNMS\RRD\Backend\Rrdtool::class);
         });
+
+        $this->app->bind(\LibreNMS\RRD\Graph\RrdGraphInterface::class, function (Application $app) {
+            if (class_exists('\RRDGraph')) {
+                return $app->make(\LibreNMS\RRD\Graph\PhpRrdGraph::class);
+            }
+
+            return $app->make(\LibreNMS\RRD\Graph\RrdtoolGraph::class);
+        });
     }
 
     /**

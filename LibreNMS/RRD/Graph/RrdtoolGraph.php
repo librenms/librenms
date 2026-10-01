@@ -1,7 +1,7 @@
 <?php
 
 /**
- * RrdBackendInterface.php
+ * RrdtoolGraph.php
  *
  * -Description-
  *
@@ -24,40 +24,28 @@
  * @author     Steven Wilton <swilton@fluentit.au>
  */
 
-namespace LibreNMS\RRD\Backend;
+namespace LibreNMS\RRD\Graph;
 
+use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdGraphException;
+use LibreNMS\RRD\RrdProcess;
 
-interface RrdBackendInterface
+class RrdtoolGraph implements RrdGraphInterface
 {
     /**
-     * Create a rrd database at $filename using the supplied arguments
-     *
-     * @param  string[]  $def
-     *
-     * @throws RrdException
+     * @param  string[]  $options
      */
-    public function create(string $filename, array $def): void;
+    public function graph(array $options): string
+    {
+        try {
+            $rrd = app(RrdProcess::class, ['timeout' => 300]);
+            $command = Rrd::buildCommand('graph', '-', $options);
+            $image = $rrd->run('"' . implode('" "', $command) . '"');
 
-    /**
-     * Updates an rrd database at $filename using the supplied data
-     *
-     * @param  string[]  $data
-     *
-     * @throws RrdException
-     */
-    public function update(string $filename, array $data): void;
-
-    /**
-     * Return the last timestamp a RRD file was updated or an error message if it does not
-     */
-    public function last(string $filename): string;
-
-    /**
-     * Return a list of files
-     *
-     * @param  string|string[]  $prefix
-     * @return string[]
-     */
-    public function list(string $dir, string|array $prefix): array;
+            return $image;
+        } catch (RrdException $e) {
+            throw new RrdGraphException($e->getMessage(), 'Error');
+        }
+    }
 }
