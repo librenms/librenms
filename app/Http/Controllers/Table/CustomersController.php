@@ -111,12 +111,12 @@ class CustomersController extends TableController
     public function formatItem(Model $model): array
     {
         return [
-            'port_descr_descr' => $model->port_descr_descr,
+            'port_descr_descr' => htmlspecialchars((string) $model->port_descr_descr),
             'hostname' => Blade::render('<x-device-link :device="$device"/>', ['device' => $model->device]),
             'ifDescr' => Blade::render('<x-port-link :port="$port"/>', ['port' => $model]),
-            'port_descr_speed' => $model->port_descr_speed,
-            'port_descr_circuit' => $model->port_descr_circuit,
-            'port_descr_notes' => $model->port_descr_notes,
+            'port_descr_speed' => htmlspecialchars((string) $model->port_descr_speed),
+            'port_descr_circuit' => htmlspecialchars((string) $model->port_descr_circuit),
+            'port_descr_notes' => htmlspecialchars((string) $model->port_descr_notes),
         ];
     }
 

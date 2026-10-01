@@ -1,8 +1,17 @@
 # Linux config files
 
-`linux_config_files` is an application intended to monitor a Linux distribution's configuration files via that distribution's configuration management tool/system.  At this time, ONLY RPM-based (Fedora/RHEL) SYSTEMS ARE SUPPORTED utilizing the rpmconf tool.  The `linux_config_files` application collects and graphs the total count of configuration files that are out of sync and graphs that number.
+`linux_config_files` monitors the configuration files of a Linux
+distribution. It uses the configuration management system of that
+distribution. It supports ONLY RPM-BASED SYSTEMS (Fedora and RHEL) with
+the rpmconf tool. The application counts the configuration files that
+are out of sync. It then graphs this count.
 
-Fedora/RHEL: Rpmconf is a utility that analyzes rpm configuration files using the RPM Package Manager.  Rpmconf reports when a new configuration file standard has been issued for an upgraded/downgraded piece of software.  Typically, rpmconf is used to provide a diff of the current configuration file versus the new, standard configuration file.  The administrator can then choose to install the new configuration file or keep the old one.
+Fedora/RHEL: rpmconf analyses the rpm configuration files with the RPM
+Package Manager. It reports each new configuration file standard of an
+upgraded or downgraded package. rpmconf usually gives a diff of the
+current configuration file against the new standard configuration file.
+The administrator then installs the new configuration file or keeps the
+old one.
 
 ### SNMP Extend
 
@@ -12,13 +21,13 @@ Fedora/RHEL: Rpmconf is a utility that analyzes rpm configuration files using th
     wget https://github.com/librenms/librenms-agent/raw/master/snmp/linux_config_files.py -O /etc/snmp/linux_config_files.py
     ```
 
-2. Make the script executable
+2. Make the script executable.
 
     ```bash
     chmod +x /etc/snmp/linux_config_files.py
     ```
 
-3. Edit your snmpd.conf file and add:
+3. Edit your `snmpd.conf` file and add:
 
     ```bash
     extend linux_config_files /etc/snmp/linux_config_files.py

@@ -82,7 +82,7 @@ class NeighboursController implements DeviceTab
             'device' => $device,
             'links' => $links,
             'link_types' => LibrenmsConfig::get('network_map_items', ['xdp', 'mac']),
-            'visoptions' => LibrenmsConfig::get('network_map_vis_options'),
+            'visoptions' => \LibreNMS\Util\NetworkMapOptions::networkMap(),
         ];
     }
 }

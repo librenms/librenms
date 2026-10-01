@@ -34,7 +34,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class DevCheckCommand extends LnmsCommand
 {
-    protected $developer = true;
+    protected bool $developer = true;
     protected $name = 'dev:check';
 
     /** @var CiHelper */

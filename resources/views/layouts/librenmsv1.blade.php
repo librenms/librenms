@@ -27,7 +27,6 @@
     <link href="{{ asset('css/bootstrap-switch.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/jquery.bootgrid.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/tagmanager.css') }}" rel="stylesheet">
     <link href="{{ asset('css/mktree.css') }}" rel="stylesheet">
     <link href="{{ asset('css/vis.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/fontawesome.min.css') }}" rel="stylesheet">
@@ -52,7 +51,6 @@
     @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
-    <script src="{{ asset('js/popper.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/bootstrap-hover-dropdown.min.js?ver=05072021') }}"></script>
@@ -60,8 +58,6 @@
     <script src="{{ asset('js/hogan-2.0.0.js') }}"></script>
     <script src="{{ asset('js/moment.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap-datetimepicker.min.js?ver=05072021') }}"></script>
-    <script src="{{ asset('js/typeahead.bundle.min.js?ver=05072021') }}"></script>
-    <script src="{{ asset('js/tagmanager.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/mktree.js') }}"></script>
     <script src="{{ asset('js/jquery.bootgrid.min.js') }}"></script>
     <script src="{{ asset('js/handlebars.min.js') }}"></script>
@@ -76,7 +72,7 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=25052026') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=14092026') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>

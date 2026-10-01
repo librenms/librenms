@@ -32,6 +32,7 @@ use App\Http\Requests\CustomMapSettingsRequest;
 use App\Models\CustomMap;
 use App\Models\CustomMapNodeImage;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -40,12 +41,20 @@ use Illuminate\Support\Facades\Storage;
 
 class CustomMapController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $this->authorize('viewAny', CustomMap::class);
 
+        $request->validate([
+            ...CustomMap::filterValidationRules(),
+        ]);
+
         return view('map.custom-manage', [
-            'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name', 'menu_group'])->groupBy('menu_group')->sortKeys(),
+            'maps' => CustomMap::orderBy('name')
+                ->when($request->array('filter'), fn (Builder $query, $filters) => $query->applyFilters($filters))
+                ->get(['custom_map_id', 'name', 'menu_group'])->groupBy('menu_group')->sortKeys(),
+            'filter' => $request->array('filter'),
+            'filterFields' => $this->filterFields(),
             'name' => 'New Map',
             'menu_group' => null,
             'node_align' => LibrenmsConfig::get('custom_map.node_align', 10),
@@ -76,8 +85,8 @@ class CustomMapController extends Controller
             'map_options' => [
                 'interaction' => [
                     'dragNodes' => false,
-                    'dragView' => false,
-                    'zoomView' => false,
+                    'dragView' => true,
+                    'zoomView' => true,
                 ],
                 'manipulation' => [
                     'enabled' => false,
@@ -119,7 +128,7 @@ class CustomMapController extends Controller
             'name' => $map->name,
             'menu_group' => $map->menu_group,
             'reverse_arrows' => $map->reverse_arrows,
-            'legend' => $this->legendConfig($map),
+            'legend' => $map->getLegendConfig(),
             'background_type' => $map->background_type,
             'background_config' => $map->getBackgroundConfig(),
             'page_refresh' => LibrenmsConfig::get('page_refresh', 300),
@@ -144,7 +153,7 @@ class CustomMapController extends Controller
             'node_align' => $map->node_align,
             'edge_separation' => $map->edge_separation,
             'reverse_arrows' => $map->reverse_arrows,
-            'legend' => $this->legendConfig($map),
+            'legend' => $map->getLegendConfig(),
             'newedge_conf' => $map->newedgeconfig,
             'newnode_conf' => $map->newnodeconfig,
             'map_conf' => $map->options,
@@ -178,8 +187,8 @@ class CustomMapController extends Controller
         $map->options = [
             'interaction' => [
                 'dragNodes' => false,
-                'dragView' => false,
-                'zoomView' => false,
+                'dragView' => true,
+                'zoomView' => true,
             ],
             'manipulation' => [
                 'enabled' => false,
@@ -300,6 +309,38 @@ class CustomMapController extends Controller
     }
 
     /**
+     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[]|array<string, string>, params?: array<string, string>}>
+     */
+    private function filterFields(): array
+    {
+        return [
+            [
+                'key' => 'name',
+                'label' => __('Name'),
+                'type' => 'text',
+            ],
+            [
+                'key' => 'menu_group',
+                'label' => __('map.custom.edit.map.menu_group'),
+                'type' => 'select',
+                'endpoint' => route('ajax.select.custom-map-menu-group'),
+            ],
+            [
+                'key' => 'nodes.device_id',
+                'label' => __('Device'),
+                'type' => 'select',
+                'endpoint' => route('ajax.select.device'),
+            ],
+            [
+                'key' => 'edges.port_id',
+                'label' => __('Interface'),
+                'type' => 'select',
+                'endpoint' => route('ajax.select.port'),
+            ],
+        ];
+    }
+
+    /**
      * Get a list of all available node images with a label.
      */
     private function listNodeImages(): array
@@ -323,24 +364,6 @@ class CustomMapController extends Controller
         asort($images);
 
         return $images;
-    }
-
-    /**
-     * Return the legend config
-     */
-    private function legendConfig(CustomMap $map): array
-    {
-        $legend = [
-            'x' => $map->legend_x,
-            'y' => $map->legend_y,
-            'steps' => $map->legend_steps,
-            'hide_invalid' => $map->legend_hide_invalid,
-            'hide_overspeed' => $map->legend_hide_overspeed,
-            'font_size' => $map->legend_font_size,
-            'colours' => $map->legend_colours,
-        ];
-
-        return $legend;
     }
 
     /**

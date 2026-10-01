@@ -83,7 +83,7 @@ abstract class AddressSearchController extends TableController
             'hostname' => Url::modernDeviceLink($port?->device),
             'interface' => Url::portLink($port),
             'address' => IP::parse($model->{$this->searchField}, true)->compressed() . '/' . $model->{$this->cidrField},
-            'description' => $port->getLabel() == $port->ifAlias ? '' : $port->ifAlias,
+            'description' => $port->getLabel() == $port->ifAlias ? '' : htmlspecialchars((string) $port->ifAlias),
         ];
     }
 

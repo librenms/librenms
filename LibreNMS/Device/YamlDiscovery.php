@@ -84,10 +84,7 @@ class YamlDiscovery
                     $count++;
                     $current_data = [];
 
-                    // fall back to the fetched oid if value is not specified.  Useful for non-tabular data.
-                    if (! isset($data['value'])) {
-                        $data['value'] = $data['oid'];
-                    }
+                    $data['value'] ??= $data['oid'];
 
                     // determine numeric oid automatically if not specified
                     if (! isset($data['num_oid'])) {
@@ -337,7 +334,7 @@ class YamlDiscovery
         $pre_cache = [];
         $device = $os->getDeviceArray();
 
-        $pre_cache_file = 'includes/discovery/sensors/pre-cache/' . $device['os'] . '.inc.php';
+        $pre_cache_file = base_path('includes/discovery/sensors/pre-cache/' . $device['os'] . '.inc.php');
         if (is_file($pre_cache_file)) {
             echo "Pre-cache {$device['os']}: ";
             include $pre_cache_file;
@@ -380,17 +377,11 @@ class YamlDiscovery
                                     $snmp_flag[] = '-Ih';
                                 }
 
-                                // disable bulk request for specific data
-                                if (isset($data['snmp_bulk'])) {
-                                    LibrenmsConfig::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
-                                }
-
                                 $pre_cache[$oid] ??= [];
                                 SnmpQuery::mibs(Arr::wrap($discovery_yaml['mib'] ?? []))
+                                    ->bulk($data['snmp_bulk'] ?? true)
                                     ->numericIndex()->options($snmp_flag)
                                     ->walk($oid)->valuesByIndex($pre_cache[$oid]);
-
-                                LibrenmsConfig::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
                             }
                         }
                     }

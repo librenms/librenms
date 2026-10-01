@@ -8,7 +8,6 @@ if (is_numeric($vars['plugin'])) {
 
 if (is_numeric($mplug['device_id']) && ($auth || device_permitted($mplug['device_id']))) {
     $device = &$mplug;
-    $title = generate_device_link($device);
-    $title .= ' :: Plugin :: ' . $mplug['mplug_type'] . ' - ' . $mplug['mplug_title'];
+    $title = ' :: Plugin :: ' . $mplug['mplug_type'] . ' - ' . $mplug['mplug_title'];
     $auth = true;
 }

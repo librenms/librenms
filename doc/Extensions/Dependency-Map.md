@@ -1,11 +1,7 @@
 # Dependency Map
 
-LibreNMS has the ability to show you a dynamic network map based on
-device dependencies that have been configure. These maps are accessed
-through the following menu options:
+LibreNMS shows a dynamic network map from the configured device
+dependencies. These menu options open the maps:
 
  - Overview -> Maps -> Device Dependency
  - Overview -> Maps -> Device Groups Dependencies
-
-## Settings
-The map display can be configured by altering the [Vis JS Options](VisJS-Config.md)

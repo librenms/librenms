@@ -40,7 +40,6 @@ $tables = [
 
 $swrolenumber = 0;
 $swstatenumber = 0;
-$repsegmentnumber = 0;
 
 foreach ($tables as $tablevalue) {
     //Some switches on 15.x expose this information regardless if they are stacked or not, we try to mitigate that by doing the following.
@@ -225,8 +224,7 @@ foreach ($tables as $tablevalue) {
                     $descr = $tablevalue['descr'];
                     $state_group = SnmpQuery::get('ENTITY-MIB::entPhysicalName.' . $index)->value();
                 } elseif ($state_name == 'crepSegmentComplete') {
-                    $repsegmentnumber++;
-                    $descr = $tablevalue['descr'] . $repsegmentnumber;
+                    $descr = $tablevalue['descr'] . $index;
                 }
                 discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, trim((string) $descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
             }

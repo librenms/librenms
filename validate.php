@@ -34,7 +34,6 @@ if (isset($options['h'])) {
           Non-default groups:
           - mail: this will test your email settings  (uses default_mail option even if default_only is not set)
           - distributedpoller: this will test for the install running as a distributed poller
-          - rrdcheck: this will check to see if your rrd files are corrupt
           Default groups:
           - configuration: checks various config settings are correct
           - database: checks the database for errors

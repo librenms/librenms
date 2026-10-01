@@ -413,9 +413,7 @@ class IRCBot
                 if ($ex[2] != '*') {
                     $this->tempnick = $ex[2];
                 }
-                if (! isset($this->tempnick)) {
-                    $this->tempnick = $this->nick . random_int(0, 99);
-                }
+                $this->tempnick ??= $this->nick . random_int(0, 99);
                 if ($this->debug) {
                     $this->log('Using temp nick ' . $this->tempnick);
                 }
@@ -687,7 +685,8 @@ class IRCBot
         global $authorizer;
         $params = explode(' ', (string) $params, 2);
         if (strlen($params[0]) == 64) {
-            if ($this->tokens[$this->getUser($this->data)] == $params[0]) {
+            $stored = $this->tokens[$this->getUser($this->data)] ?? '';
+            if (is_string($stored) && hash_equals($stored, $params[0])) {
                 $this->user['expire'] = (time() + ($this->config['irc_authtime'] * 3600));
 
                 return $this->respond('Authenticated.');
@@ -696,7 +695,7 @@ class IRCBot
             }
         } else {
             $user = User::firstWhere('username', $params[0]);
-            if ($user->email && $user->username == $params[0]) {
+            if ($user && $user->email && $user->username == $params[0]) {
                 $token = hash('gost', openssl_random_pseudo_bytes(1024));
                 $this->tokens[$this->getUser($this->data)] = $token;
                 $this->user['user'] = $user;

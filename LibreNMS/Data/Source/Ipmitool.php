@@ -33,6 +33,7 @@ use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
 use LibreNMS\Exceptions\IpmiConnectionFailed;
+use LibreNMS\Polling\ConnectivityHelper;
 
 class Ipmitool
 {
@@ -64,7 +65,7 @@ class Ipmitool
     {
         $device ??= DeviceCache::getPrimary();
 
-        if ($device->getAttrib('ipmi_hostname') === null) {
+        if (! (new ConnectivityHelper($device))->ipmiIsEnabled()) {
             return null;
         }
 
@@ -137,8 +138,8 @@ class Ipmitool
         $output = $this->command(['sensor']);
 
         return array_map(
-            fn (string $line): array => array_map(trim(...), explode('|', $line)),
-            explode("\n", trim($output))
+            fn (string $line): array => array_pad(array_map(trim(...), explode('|', $line)), 10, 'na'),
+            array_values(array_filter(explode("\n", trim($output)), fn (string $line): bool => trim($line) !== ''))
         );
     }
 
@@ -201,6 +202,6 @@ class Ipmitool
         $cmd = $this->createCommand($commands, $ipmi_type);
         Log::debug('IPMI[%m' . implode(' ', $cmd) . '%n]', ['color' => true]);
 
-        return Process::command($cmd)->run();
+        return Process::command($cmd)->env(['LC_ALL' => 'C'])->run();
     }
 }
