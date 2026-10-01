@@ -1,7 +1,7 @@
 <?php
 
 /**
- * bdcom-onu.inc.php
+ * bdcom.inc.php
  *
  * Per-ONU optical RX power for BDCOM EPON/GPON OLTs, labelled with the
  * operator-assigned ONU name (the description configured on the OLT).
@@ -14,10 +14,9 @@
  *   ONU MAC  : .1.3.6.1.4.1.3320.101.10.1.1.3.<onuIfIndex>           (registration MAC)
  *   ONU name : .1.3.6.1.4.1.3320.101.11.1.1.4.<portIfIndex>.<MAC>    (operator name; "N/A" if unset)
  *
- * Standard YAML os_discovery can only template the sensor description from a
- * column sharing the sensor index, so this join is done here in PHP. When no
+ * The join is by MAC value, which YAML index lookups cannot express. When no
  * name is configured (or on models without the EPON name table) the label
- * falls back to the interface name, preserving the previous behaviour.
+ * falls back to the interface name.
  *
  * @copyright  2026 SCUD Communication Private Limited, Jalgaon
  */
@@ -31,11 +30,9 @@ $name_base = '.1.3.6.1.4.1.3320.101.11.1.1.4';
 $rx_values = SnmpQuery::numeric()->walk($rx_base)->pluck($rx_base);
 
 if (! empty($rx_values)) {
-    echo 'BDCOM ONU Optical ';
-
     // onuIfIndex -> registration MAC (12 hex chars, lower-case)
     $ifindex_to_mac = [];
-    foreach (SnmpQuery::options(['-OQXUnx', '-Pu'])->walk($mac_base)->pluck($mac_base) as $ifIndex => $raw_mac) {
+    foreach (SnmpQuery::numeric()->walk($mac_base)->pluck($mac_base) as $ifIndex => $raw_mac) {
         $hex = strtolower((string) preg_replace('/[^0-9A-Fa-f]/', '', (string) $raw_mac));
         if (strlen($hex) === 12) {
             $ifindex_to_mac[(int) $ifIndex] = $hex;
