@@ -530,7 +530,7 @@
             menuItems.push({
                 icon: 'fa-solid fa-circle-question',
                 label: "{{ __('Help') }} (?)",
-                action: function () { $("#helpModal").modal({backdrop: 'static'}, 'show'); }
+                action: function () { Alpine.$data(document.getElementById("showHelpContainer")).toggleHelp(); }
             });
 
             showContextMenu(menuHeader, menuItems, domX, domY);
@@ -1104,7 +1104,7 @@
                 network.enableEditMode();
             } else if (e.key === '?') {
                 e.preventDefault();
-                $("#helpModal").modal({backdrop: 'static'}, 'show');
+                Alpine.$data(document.getElementById("showHelpContainer")).toggleHelp();
             } else if (e.key.toLowerCase() === 'n') {
                 e.preventDefault();
                 network.addNodeMode();
@@ -1179,6 +1179,16 @@
 
         });
 
+    });
+
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('customEditData', () => ({
+            showHelp: true,
+
+            toggleHelp() {
+                this.showHelp = !this.showHelp;
+            }
+        }));
     });
 </script>
 @endsection
