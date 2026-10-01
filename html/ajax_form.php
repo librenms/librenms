@@ -43,7 +43,6 @@ $ajax_form = match ($_POST['type'] ?? '') {
     'mempool-update' => 'includes/html/forms/mempool-update.inc.php',
     'override-config' => 'includes/html/forms/override-config.inc.php',
     'parse-alert-template' => 'includes/html/forms/parse-alert-template.inc.php',
-    'processor-update' => 'includes/html/forms/processor-update.inc.php',
     'rediscover-device' => 'includes/html/forms/rediscover-device.inc.php',
     'refresh-oxidized-node' => 'includes/html/forms/refresh-oxidized-node.inc.php',
     'reload-oxidized-nodes-list' => 'includes/html/forms/reload-oxidized-nodes-list.inc.php',

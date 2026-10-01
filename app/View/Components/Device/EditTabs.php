@@ -126,7 +126,7 @@ class EditTabs extends Component
             ];
             $this->tabs['processors'] = [
                 'text' => __('Processors'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=processors/'),
+                'link' => route('device.edit.processors', $this->device->device_id),
             ];
             $this->tabs['mempools'] = [
                 'text' => __('Memory'),
