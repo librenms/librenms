@@ -27,9 +27,9 @@ if ($device['os'] == 'hyperion') {
 
         foreach ($neighbors as $entry) {
             $remote_hostname = $entry['lldpStatusNeighborsInformationSystemName'] ?? '';
-            $remote_port     = $entry['lldpStatusNeighborsInformationPortId'] ?? '';
+            $remote_port = $entry['lldpStatusNeighborsInformationPortId'] ?? '';
             $remote_platform = $entry['lldpStatusNeighborsInformationSystemDescription'] ?? '';
-            $remote_version  = '';
+            $remote_version = '';
 
             if (empty($remote_hostname)) {
                 continue;

@@ -2,7 +2,7 @@ os: hyperion
 text: 'Bitstream Hyperion'
 type: network
 icon: bitstream
-group: bistream
+group: bitstream
 mib_dir: bitstream
 over:
     - { graph: device_bits, text: 'Device Traffic' }
