@@ -932,22 +932,6 @@
                         label: "{{ __('Fit to Window') }} (F)",
                         action: function () { custommap.fitMap(self.network, container); }
                     });
-                    // Show fill to screen if the smaller fit screen scale is over 10% smaller
-                    if (fillScale > (fitScale * 1.1)) {
-                        menuItems.push({
-                            icon: 'fa-solid fa-arrows-up-down-left-right',
-                            label: "{{ __('Fill Window') }} (L)",
-                            action: function () { custommap.fillScreen(self, container); }
-                        });
-                    }
-                    // Show original scale if both scales are more than 10% bigger or smaller than original
-                    if ((fillScale > 1.1 || fillScale < 1.1) && (fitScale > 1.1 || fitScale < 1.1)) {
-                        menuItems.push({
-                            icon: 'fa-solid fa-window-maximize',
-                            label: "{{ __('Original Scale') }} (1)",
-                            action: function () { custommap.zoomOriginal(self.network); }
-                        });
-                    }
                     menuItems.push({
                         icon: 'fa-solid fa-magnifying-glass-plus',
                         label: "{{ __('Zoom In') }} (+)",
@@ -965,6 +949,13 @@
                             action: function () { window.location.href = self.editUrl; }
                         });
                     }
+
+                    menuItems.push({ divider: true });
+                    menuItems.push({
+                        icon: 'fa-solid fa-circle-question',
+                        label: "{{ __('Help') }} (?)",
+                        action: function () { Alpine.$data(document.getElementById(self.containerId)).toggleHelp(); }
+                    });
 
                     custommap.showContextMenu(menuHeader, menuItems, domX, domY);
                 });
@@ -1022,6 +1013,9 @@
                         } else if (e.key === '1' || e.key === '!') {
                             e.preventDefault();
                             custommap.zoomOriginal(self.network);
+                        } else if (e.key === '?' || e.key === '/') {
+                            e.preventDefault();
+                            Alpine.$data(document.getElementById(self.containerId)).toggleHelp();
                         } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
                             e.preventDefault();
                             var curPos = self.network.getViewPosition();
