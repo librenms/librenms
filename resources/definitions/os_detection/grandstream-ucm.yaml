@@ -1,12 +1,11 @@
 os: grandstream-ucm
 group: grandstream
-text: 'Grandstream UCM63xx'
+text: 'Grandstream UCM'
 type: appliance
 icon: grandstream
 over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-    - { graph: device_percent, text: 'Disk Usage' }
     - { graph: device_count, text: 'Calls' }
 mib_dir: grandstream
 discovery:

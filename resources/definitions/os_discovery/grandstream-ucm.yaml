@@ -27,9 +27,7 @@ modules:
                     oid: GS-UCM63XX-SNMP-MIB::sDiskUsage
                     num_oid: '.1.3.6.1.4.1.12581.2.2.6.{{ $index }}'
                     descr: 'Disk Usage'
-                    index: disk-usage
-                    warn_limit: 80
-                    high_limit: 90
+                    index: 'sDiskUsage.{{ $index }}'
                     group: 'System'
         count:
             data:
@@ -37,63 +35,63 @@ modules:
                     oid: GS-UCM63XX-SNMP-MIB::concurrentCall
                     num_oid: '.1.3.6.1.4.1.12581.2.2.9.{{ $index }}'
                     descr: 'Concurrent Calls'
-                    index: concurrent-calls
+                    index: 'concurrentCall.{{ $index }}'
                     rrd_type: GAUGE
                     group: 'Calls'
                 -
                     oid: GS-UCM63XX-SNMP-MIB::sTotalCalls
                     num_oid: '.1.3.6.1.4.1.12581.2.1.1.{{ $index }}'
                     descr: 'Total Calls'
-                    index: total-calls
+                    index: 'sTotalCalls.{{ $index }}'
                     rrd_type: COUNTER
                     group: 'Calls'
                 -
                     oid: GS-UCM63XX-SNMP-MIB::sInternalCalls
                     num_oid: '.1.3.6.1.4.1.12581.2.1.2.{{ $index }}'
                     descr: 'Internal Calls'
-                    index: internal-calls
+                    index: 'sInternalCalls.{{ $index }}'
                     rrd_type: COUNTER
                     group: 'Calls'
                 -
                     oid: GS-UCM63XX-SNMP-MIB::sOutboundCalls
                     num_oid: '.1.3.6.1.4.1.12581.2.1.3.{{ $index }}'
                     descr: 'Outbound Calls'
-                    index: outbound-calls
+                    index: 'sOutboundCalls.{{ $index }}'
                     rrd_type: COUNTER
                     group: 'Calls'
                 -
                     oid: GS-UCM63XX-SNMP-MIB::sInboundCalls
                     num_oid: '.1.3.6.1.4.1.12581.2.1.4.{{ $index }}'
                     descr: 'Inbound Calls'
-                    index: inbound-calls
+                    index: 'sInboundCalls.{{ $index }}'
                     rrd_type: COUNTER
                     group: 'Calls'
                 -
                     oid: GS-UCM63XX-SNMP-MIB::sAnsweredCalls
                     num_oid: '.1.3.6.1.4.1.12581.2.1.5.{{ $index }}'
                     descr: 'Answered Calls'
-                    index: answered-calls
+                    index: 'sAnsweredCalls.{{ $index }}'
                     rrd_type: COUNTER
                     group: 'Calls'
                 -
                     oid: GS-UCM63XX-SNMP-MIB::sFailedCalls
                     num_oid: '.1.3.6.1.4.1.12581.2.1.6.{{ $index }}'
                     descr: 'Failed Calls'
-                    index: failed-calls
+                    index: 'sFailedCalls.{{ $index }}'
                     rrd_type: COUNTER
                     group: 'Calls'
                 -
                     oid: GS-UCM63XX-SNMP-MIB::sBusyCalls
                     num_oid: '.1.3.6.1.4.1.12581.2.1.7.{{ $index }}'
                     descr: 'Busy Calls'
-                    index: busy-calls
+                    index: 'sBusyCalls.{{ $index }}'
                     rrd_type: COUNTER
                     group: 'Calls'
                 -
                     oid: GS-UCM63XX-SNMP-MIB::sNoAnsweredCalls
                     num_oid: '.1.3.6.1.4.1.12581.2.1.8.{{ $index }}'
                     descr: 'Unanswered Calls'
-                    index: unanswered-calls
+                    index: 'sNoAnsweredCalls.{{ $index }}'
                     rrd_type: COUNTER
                     group: 'Calls'
         state:
@@ -103,7 +101,7 @@ modules:
                     value: GS-UCM63XX-SNMP-MIB::sTrunksStatus
                     num_oid: '.1.3.6.1.4.1.12581.2.5.1.1.4.{{ $index }}'
                     descr: GS-UCM63XX-SNMP-MIB::sTrunksName
-                    index: 'trunk-status.{{ $index }}'
+                    index: 'sTrunksStatus.{{ $index }}'
                     state_name: grandstreamUcmTrunkStatus
                     group: 'Trunks'
                     states:
