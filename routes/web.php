@@ -13,6 +13,7 @@ use App\Http\Controllers\ApiAccessController;
 use App\Http\Controllers\Auth;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\AuthLogController;
+use App\Http\Controllers\BillController;
 use App\Http\Controllers\CustomoidController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardWidgetController;
@@ -62,11 +63,11 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPermissionsController;
 use App\Http\Controllers\UserPreferencesController;
 use App\Http\Controllers\ValidateController;
+use App\Http\Controllers\VminfoController;
 use App\Http\Controllers\Widgets;
 use App\Http\Controllers\WidgetSettingsController;
 use App\Http\Controllers\WirelessSensorController;
 use App\Http\Middleware\AuthenticateGraph;
-use App\Http\Middleware\EnsureApiV1Enabled;
 use Illuminate\Support\Facades\Auth as AuthFacade;
 use Illuminate\Support\Facades\Route;
 
@@ -135,6 +136,10 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('service', ServiceController::class)->only(['show', 'destroy']);
     Route::post('customoid/test/{customoid?}', [CustomoidController::class, 'test'])->name('customoid.test');
     Route::resource('customoid', CustomoidController::class)->only(['show', 'store', 'update', 'destroy']);
+    Route::resource('bill', BillController::class)->only(['update', 'destroy']);
+    Route::post('bill/{bill}/reset', [BillController::class, 'reset'])->name('bill.reset');
+    Route::post('bill/{bill}/ports', [BillController::class, 'attachPort'])->name('bill.port.attach');
+    Route::delete('bill/{bill}/ports/{port}', [BillController::class, 'detachPort'])->name('bill.port.detach');
     Route::get('locations', [LocationController::class, 'index']);
     Route::resource('ssl-certificates', SslCertificateController::class)->except(['edit']);
     Route::resource('preferences', UserPreferencesController::class)->only('index', 'store', 'update');
@@ -144,11 +149,6 @@ Route::middleware(['auth'])->group(function (): void {
         Route::patch('api-access/{id}', [ApiAccessController::class, 'update'])->name('api-access.update')->whereNumber('id');
         Route::post('api-access/{id}/reset', [ApiAccessController::class, 'reset'])->name('api-access.reset')->whereNumber('id');
         Route::delete('api-access/{id}', [ApiAccessController::class, 'destroy'])->name('api-access.destroy')->whereNumber('id');
-        Route::middleware(EnsureApiV1Enabled::class)->group(function (): void {
-            Route::post('api-access/v1', [ApiAccessController::class, 'storeV1'])->name('api-access.v1.store');
-            Route::patch('api-access/v1/{id}/renew', [ApiAccessController::class, 'renewV1'])->name('api-access.v1.renew')->whereNumber('id');
-            Route::delete('api-access/v1/{id}', [ApiAccessController::class, 'destroyV1'])->name('api-access.v1.destroy')->whereNumber('id');
-        });
     });
     Route::resource('users', UserController::class);
     Route::prefix('users/{user}/permissions')->name('users.permissions.')->group(function (): void {
@@ -167,7 +167,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('authlog', [AuthLogController::class, 'index'])->name('auth-log');
     Route::get('overview', [OverviewController::class, 'index'])->name('overview');
     Route::get('/', [OverviewController::class, 'index'])->name('home');
-    Route::view('vminfo', 'vminfo');
+    Route::get('vminfo', [VminfoController::class, 'index'])->name('vminfo.index');
 
     Route::get('nac', [NacController::class, 'index']);
 
@@ -239,7 +239,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
         Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
         Route::get('customlist', [CustomMapListController::class, 'index'])->name('maps.custom.list');
-        Route::get('devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
+        Route::get('devicedependency', [DeviceDependencyController::class, 'dependencyMap'])->name('maps.devicedependency');
         Route::post('getdevices', [Maps\MapDataController::class, 'getDevices'])->name('maps.getdevices');
         Route::post('getdevicelinks', [Maps\MapDataController::class, 'getDeviceLinks'])->name('maps.getdevicelinks');
         Route::post('getgeolinks', [Maps\MapDataController::class, 'getGeographicLinks'])->name('maps.getgeolinks');
@@ -250,7 +250,6 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('nodeimage/{image}', [CustomMapNodeImageController::class, 'show'])->name('maps.nodeimage.show');
         Route::post('nodeimage/{image}', [CustomMapNodeImageController::class, 'update'])->name('maps.nodeimage.update');
     });
-    Route::get('maps/devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
 
     // dashboard
     Route::resource('dashboard', DashboardController::class)->except(['create', 'edit']);
@@ -436,7 +435,8 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('wireless', Table\WirelessSensorController::class)->name('table.wireless');
             Route::post('vlan-ports', Table\VlanPortsController::class)->name('table.vlan-ports');
             Route::post('vlan-devices', Table\VlanDevicesController::class)->name('table.vlan-devices');
-            Route::post('vminfo', Table\VminfoController::class);
+            Route::post('vminfo', Table\VminfoController::class)->name('table.vminfo');
+            Route::get('vminfo/export', [Table\VminfoController::class, 'export']);
             Route::post('ssl-certificates', Table\SslCertificateController::class)->name('table.ssl-certificates');
         });
 

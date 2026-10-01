@@ -1,0 +1,213 @@
+-- Palo Alto Networks, Inc. SMI for Product Models MIB Copyright (c)
+-- 2017-2023 by Palo Alto Networks, Inc.
+-- 2023 revision, Aaron Edwards
+
+CGX-MODELS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cgxProducts
+        FROM CLOUDGENIX-SMI
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ;
+
+cgxModelsMIB MODULE-IDENTITY
+    LAST-UPDATED  "202305112144Z" -- May 11, 2023
+    ORGANIZATION
+        "Palo Alto Networks, Inc."
+    CONTACT-INFO
+        "Prisma SD-WAN Support
+
+         Palo Alto Networks
+         3000 Tannery Way
+         Santa Clara, CA 95054
+         USA
+
+         Technical Support
+         N. America: +1 408 738 7799
+         EMEA: +31 20 808 4600
+         APAC: +65 3158 5600
+
+         support@paloaltonetworks.com"
+    DESCRIPTION
+        "The MIB that describes Product Models from Prisma SD-WAN"
+    REVISION      "202305112144Z" -- May 11, 2023
+    DESCRIPTION
+        "11.5.2023 Add ion1200C5GEXP"
+    REVISION      "202302242127Z" -- February 24, 2023
+    DESCRIPTION
+        "Add new models (ion5200, ion9200)"
+    REVISION      "202202241935Z" -- February 24, 2022
+    DESCRIPTION
+        "24.2.2022 PaloAlto Rebranding and new hardware"
+    ::= { cgxProducts 1 }
+
+cgxModelsNotifications OBJECT IDENTIFIER ::= { cgxModelsMIB 0 }
+
+cgxModelsObjects OBJECT IDENTIFIER ::= { cgxModelsMIB 1 }
+
+cgxModelsStats OBJECT IDENTIFIER ::= { cgxModelsObjects 1 }
+
+cgxModelsConfig OBJECT IDENTIFIER ::= { cgxModelsObjects 2 }
+
+cgxModelsConformance OBJECT IDENTIFIER ::= { cgxModelsMIB 2 }
+
+cgxModelsCompliances OBJECT IDENTIFIER ::= { cgxModelsConformance 1 }
+
+cgxModelsGroups OBJECT IDENTIFIER ::= { cgxModelsConformance 2 }
+
+cgxModelsHardwareV1 OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Root Object Identifier for Prisma SD-WAN Physical Models"
+    ::= { cgxModelsMIB 10 }
+
+ion1000 OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 1000"
+    ::= { cgxModelsHardwareV1 1000 }
+
+ion1200 OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 1200"
+    ::= { cgxModelsHardwareV1 1200 }
+
+ion1200CNA OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 1200-C-NA"
+    ::= { cgxModelsHardwareV1 1201 }
+
+ion1200CROW OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 1200-C-ROW"
+    ::= { cgxModelsHardwareV1 1202 }
+
+ion1200C5GWW OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 1200-C-5G-WW"
+    ::= { cgxModelsHardwareV1 1203 }
+
+ion1200C5GEXP OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 1200-C-5G-EXP"
+    ::= { cgxModelsHardwareV1 1204 }
+
+ion1200S OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 1200-S"
+    ::= { cgxModelsHardwareV1 1210 }
+
+ion1200SCNA OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 1200-S-C-NA"
+    ::= { cgxModelsHardwareV1 1211 }
+
+ion1200SCROW OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 1200-S-C-ROW"
+    ::= { cgxModelsHardwareV1 1212 }
+
+ion1200SC5GWW OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 1200-S-5G-WW"
+    ::= { cgxModelsHardwareV1 1213 }
+
+ion2000 OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 2000"
+    ::= { cgxModelsHardwareV1 2000 }
+
+ion3000 OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 3000"
+    ::= { cgxModelsHardwareV1 3000 }
+
+ion3200 OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 3200"
+    ::= { cgxModelsHardwareV1 3200 }
+
+ion5200 OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 5200"
+    ::= { cgxModelsHardwareV1 5200 }
+
+ion7000 OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 7000"
+    ::= { cgxModelsHardwareV1 7000 }
+
+ion9000 OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 9000"
+    ::= { cgxModelsHardwareV1 9000 }
+
+ion9200 OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN ION 9200"
+    ::= { cgxModelsHardwareV1 9200 }
+
+cgxModelsVirtualV1 OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Root Object Identifier for Prisma SD-WAN Virtual Models"
+    ::= { cgxModelsMIB 11 }
+
+ion3102v OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Virtual ION 3102v"
+    ::= { cgxModelsVirtualV1 3102 }
+
+ion3104v OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Virtual ION 3104v"
+    ::= { cgxModelsVirtualV1 3104 }
+
+ion3108v OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Virtual ION 3108v"
+    ::= { cgxModelsVirtualV1 3108 }
+
+ion7108v OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Virtual ION 7108v"
+    ::= { cgxModelsVirtualV1 7108 }
+
+ion7116v OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Virtual ION 7116v"
+    ::= { cgxModelsVirtualV1 7116 }
+
+ion7132v OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Prisma SD-WAN Virtual ION 7132v"
+    ::= { cgxModelsVirtualV1 7132 }
+
+END

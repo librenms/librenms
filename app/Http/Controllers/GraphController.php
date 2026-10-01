@@ -17,7 +17,7 @@ class GraphController extends Controller
      */
     public function __invoke(Request $request, string $path = ''): Response
     {
-        $vars = array_merge(Url::parseLegacyPathVars($request->path()), $request->except(['username', 'password']));
+        $vars = Url::parseLegacyPathVars();
 
         if ($request->user() !== null) {
             // only allow debug for logged in users

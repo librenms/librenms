@@ -11,7 +11,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devicegroups
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devicegroups
 ```
 
 Output:
@@ -57,7 +57,7 @@ Examples:
 Dynamic Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devicegroups \
   --data-raw '
 {
@@ -82,7 +82,7 @@ Output:
 Static Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devicegroups \
   -d '{"name":"New Device Group","type":"static","devices":[261,271]}'
 ```
@@ -121,7 +121,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -X PATCH -d '{"name": "NewLinuxServers"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devicegroups/LinuxServers
+curl -X PATCH -d '{"name": "NewLinuxServers"}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devicegroups/LinuxServers
 ```
 
 Output:
@@ -150,7 +150,7 @@ Input:
 Examples:
 
 ```curl
-curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devicegroups/LinuxServers
+curl -X DELETE -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devicegroups/LinuxServers
 ```
 
 Output:
@@ -179,7 +179,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devicegroups/LinuxServers
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devicegroups/LinuxServers
 ```
 
 Output:
@@ -227,7 +227,7 @@ Input (JSON):
 Example with start time:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devicegroups/Cisco%20switches/maintenance/ \
   --data-raw '
 {
@@ -251,7 +251,7 @@ Output:
 Example with no start time:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devicegroups/Cisco%20switches/maintenance/ \
   --data-raw '
 {
@@ -288,7 +288,7 @@ Input (JSON):
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devicegroups/LinuxServers/devices \
   --data-raw '{"devices":[261,271]}'
 ```
@@ -319,7 +319,7 @@ Input (JSON):
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+curl -H 'Authorization: Bearer YOURAPITOKENHERE' \
   -X DELETE https://foo.example/api/v0/devicegroups/LinuxServers/devices \
   --data-raw '{"devices":[261,271]}'
 ```

@@ -9,6 +9,8 @@ parameters:
         min: 80200
         max: 80499
 
+    parseModelCastsMethod: true
+
     paths:
         - app
         - bootstrap

@@ -45,7 +45,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * @return array{realname: 'string', descr: 'string', email: 'string', can_modify_passwd: 'integer'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -171,14 +171,6 @@ class User extends Authenticatable
     }
 
     // ---- Define Relationships ----
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ApiToken, $this>
-     */
-    public function apiTokens(): HasMany
-    {
-        return $this->hasMany(ApiToken::class, 'user_id', 'user_id');
-    }
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Bill, $this>
      */

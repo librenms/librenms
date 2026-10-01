@@ -507,8 +507,9 @@ class CiHelper
 
         echo "Running composer install to install developer dependencies.\n";
         passthru(base_path('scripts/composer_wrapper.php') . ' install');
+        clearstatcache(true, $path);
 
-        if (is_executable($path)) { // @phpstan-ignore if.alwaysFalse (passthru may install the executable)
+        if (is_executable($path)) {
             return $path;
         }
 
@@ -542,8 +543,9 @@ class CiHelper
 
         echo "Running pip3 install to install developer dependencies.\n";
         passthru("pip3 install --user $exec"); // probably wrong in other cases...
+        clearstatcache(true, $path);
 
-        if (is_executable($path)) { // @phpstan-ignore if.alwaysFalse (passthru may install the executable)
+        if (is_executable($path)) {
             return $path;
         }
 

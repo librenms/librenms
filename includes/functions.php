@@ -217,11 +217,6 @@ function create_state_index($state_name, $states = []): void
     ]), $states));
 }
 
-function delta_to_bits($delta, $period)
-{
-    return round($delta * 8 / $period, 2);
-}
-
 function hytera_h2f($number, $nd)
 {
     if (strlen(str_replace(' ', '', $number)) == 4) {

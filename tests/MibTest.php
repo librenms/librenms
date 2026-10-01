@@ -73,9 +73,7 @@ final class MibTest extends TestCase
         $highligted_mib = $console_color->convert("%r$mib_name%n");
 
         static $existing_mibs;
-        if (is_null($existing_mibs)) {
-            $existing_mibs = [];
-        }
+        $existing_mibs ??= [];
 
         if (isset($existing_mibs[$mib_name])) {
             $existing_mibs[$mib_name][] = $file_path;

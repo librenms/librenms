@@ -207,11 +207,11 @@ abstract class TableController extends PaginatedAjaxController
 
                 fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
-                fputcsv($output, $headers);
+                fputcsv($output, $headers, ',', '"', '\\');
 
                 foreach ($data as $item) {
                     $row = $this->formatExportRow($item);
-                    fputcsv($output, $row);
+                    fputcsv($output, $row, ',', '"', '\\');
                 }
 
                 fclose($output);
