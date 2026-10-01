@@ -56,6 +56,17 @@ final class EditProcessorsControllerTest extends TestCase
             ->assertSee('value="85"', false);
     }
 
+    public function testNullWarnThresholdRendersEmpty(): void
+    {
+        $device = Device::factory()->create();
+        Processor::factory()->for($device)->create(['processor_perc_warn' => null]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.edit.processors', $device))
+            ->assertOk()
+            ->assertSee('value=""', false);
+    }
+
     public function testUserCannotViewProcessorsPage(): void
     {
         $device = Device::factory()->create();

@@ -25,7 +25,7 @@
                                        max="100"
                                        class="form-control input-sm processor-warn"
                                        data-update-url="{{ route('device.edit.processors.update', [$device, $processor]) }}"
-                                       value="{{ round($processor->processor_perc_warn) }}">
+                                       value="{{ $processor->processor_perc_warn === null ? '' : round($processor->processor_perc_warn) }}">
                             </div>
                         </td>
                     </tr>
