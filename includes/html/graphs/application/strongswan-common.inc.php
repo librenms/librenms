@@ -25,7 +25,7 @@ while (isset($tunnels[$int])) {
     $tunnel = $tunnels[$int];
     $int++;
 
-    if ($tunnel === 'global') {
+    if (! str_starts_with((string) $tunnel, 'tun_')) {
         continue; // global counters live in their own rrd / graphs
     }
 
@@ -33,7 +33,7 @@ while (isset($tunnels[$int])) {
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr' => $labels[$tunnel] ?? $tunnel,
+            'descr' => $labels[$tunnel] ?? substr((string) $tunnel, 4),
             'ds' => $rrdVar,
         ];
     }

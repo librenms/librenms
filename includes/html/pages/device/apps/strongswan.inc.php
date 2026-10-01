@@ -14,11 +14,11 @@ $link_array = [
 
 $tunnel_list = [];
 foreach ($strongswan_tunnels as $tunnel) {
-    if ($tunnel === 'global') {
+    if (! str_starts_with((string) $tunnel, 'tun_')) {
         continue;
     }
 
-    $label = htmlspecialchars((string) ($strongswan_labels[$tunnel] ?? $tunnel));
+    $label = htmlspecialchars((string) ($strongswan_labels[$tunnel] ?? substr((string) $tunnel, 4)));
 
     if (isset($vars['tunnel']) && ($vars['tunnel'] == $tunnel)) {
         $label = '<span class="pagemenu-selected">' . $label . '</span>';
@@ -32,7 +32,7 @@ printf('%s | tunnels: %s', generate_link('All tunnels', $link_array), implode(',
 print_optionbar_end();
 
 $selected_label = isset($vars['tunnel'])
-    ? htmlspecialchars((string) ($strongswan_labels[$vars['tunnel']] ?? $vars['tunnel']))
+    ? htmlspecialchars((string) ($strongswan_labels[$vars['tunnel']] ?? substr((string) $vars['tunnel'], 4)))
     : 'all tunnels';
 
 // Per-tunnel / overview graphs (respect the selected tunnel via $vars['tunnel'])

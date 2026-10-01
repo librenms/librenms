@@ -3,6 +3,7 @@
 // Polls strongSwan / OPNsense IPsec per-connection stats via JSON SNMP extend.
 // Extend script: snmp/strongswan.py  (snmpd: `extend strongswan /usr/local/bin/strongswan.py`)
 
+use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
@@ -25,7 +26,7 @@ $tunnels = $data['tunnels'] ?? [];
 $global = $data['global'] ?? [];
 
 $metrics = [];
-$labels = [];   // con<N> -> human label (phase1 descr), shown in graphs/UI
+$labels = [];   // rrd instance -> human label (phase1 descr), shown in graphs/UI
 
 // ---- per-tunnel (multi-instance) -------------------------------------------
 $rrd_def = RrdDefinition::make()
@@ -38,7 +39,11 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('reestablishes', 'DERIVE', 0);
 
 foreach ($tunnels as $t) {
-    $tunnel = $t['name'];
+    // prefix so no connection name can collide with the 'global' rrd, and match the rrd file name the UI reads back
+    $tunnel = 'tun_' . Rrd::safeName((string) ($t['name'] ?? ''));
+    if (isset($metrics[$tunnel])) {
+        continue; // two connection names that sanitize to the same rrd
+    }
     $fields = [
         'state' => $t['state'] ?? 0,
         'children' => $t['children'] ?? 0,
@@ -57,7 +62,7 @@ foreach ($tunnels as $t) {
 
     $label = trim((string) ($t['descr'] ?? ''));
     if ($label === '') {
-        $label = $tunnel;
+        $label = (string) ($t['name'] ?? '');
     }
     if (! empty($t['peer'])) {
         $label .= ' (' . $t['peer'] . ')';
@@ -87,7 +92,7 @@ if (! empty($global)) {
     $metrics['global'] = $g_fields;
 }
 
-// persist the con<N> -> human label map for the UI / graph legends
+// persist the rrd instance -> human label map for the UI / graph legends
 $app->data = ['labels' => $labels];
 
 update_application($app, $output, $metrics);
