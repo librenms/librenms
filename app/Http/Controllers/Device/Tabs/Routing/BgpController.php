@@ -289,7 +289,6 @@ class BgpController extends Controller
         $code = $peer->bgpPeerLastErrorCode;
         $subcode = $peer->bgpPeerLastErrorSubCode;
 
-        // NULL code/subcode cannot be passed to Rewrite::bgpErrorCode()
         if ($code === null || $subcode === null) {
             return '';
         }
