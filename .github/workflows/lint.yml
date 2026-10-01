@@ -16,15 +16,15 @@ concurrency:
 jobs:
   super-linter:
     permissions:
-      contents: read
-      checks: write
+      contents: read # to fetch code (actions/checkout)
+      statuses: write # to mark the status of each individual linter run
 
     name: Lint Code Base
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           sparse-checkout-cone-mode: false
@@ -58,7 +58,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 2
           sparse-checkout-cone-mode: false
@@ -70,12 +70,12 @@ jobs:
             !/doc/
 
       - name: Install PHP dependencies
-        uses: ./.github/actions/composer-install
+        uses: $/.github/actions/composer-install
         with:
           cache-version: ${{ secrets.CACHE_VERSION }}
 
       - name: Find new PHP files
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && matrix.config.name == 'Main'
         id: new-php-files
         run: |
           # HEAD is the PR merge commit, HEAD~1 is its first parent (base branch tip)
@@ -84,7 +84,7 @@ jobs:
           echo "files=$NEW_PHP_FILES" >> "$GITHUB_OUTPUT"
 
       - name: Run PHPStan (New files, level 6)
-        if: github.event_name == 'pull_request' && steps.new-php-files.outputs.files != ''
+        if: github.event_name == 'pull_request' && matrix.config.name == 'Main' && steps.new-php-files.outputs.files != ''
         env:
           NEW_PHP_FILES: ${{ steps.new-php-files.outputs.files }}
         run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G --level=6 -- $NEW_PHP_FILES
@@ -98,7 +98,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
@@ -109,7 +109,7 @@ jobs:
             !/doc/
 
       - name: Install PHP dependencies
-        uses: ./.github/actions/composer-install
+        uses: $/.github/actions/composer-install
         with:
           cache-version: ${{ secrets.CACHE_VERSION }}
 
@@ -121,8 +121,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code (sparse)
-        uses: actions/checkout@v6
+      - name: Checkout Code
+        uses: actions/checkout@v7
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
@@ -133,9 +133,10 @@ jobs:
             !/doc/
 
       - name: Install PHP dependencies
-        uses: ./.github/actions/composer-install
+        uses: $/.github/actions/composer-install
         with:
           cache-version: ${{ secrets.CACHE_VERSION }}
+          dump-autoload: false
 
       - name: Run Pint (dry-run)
         run: ./vendor/bin/pint --test --parallel
