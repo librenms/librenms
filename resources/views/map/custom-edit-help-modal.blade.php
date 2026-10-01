@@ -6,7 +6,6 @@
         {{ __('config_backups.help') }}
       </h4>
     </x-slot name="heading">
-
     <div>
       <h5 class="tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-2">
         {{ __('Map Control') }}
@@ -75,9 +74,16 @@
       </h5>
       <div class="tw:grid tw:grid-cols-1 tw:gap-2">
         <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
+          <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('Multi-select') }}</span>
+          <div class="tw:flex tw:items-center tw:gap-0.5">
+            <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Ctrl</kbd>
+            <span class="tw:text-gray-400 tw:dark:text-dark-white-400">+</span>
+            <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">Click</kbd>
+          </div>
+        </div>
+        <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
           <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('Open this help') }}</span>
-          <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dar
-k-gray-100 tw:rounded tw:shadow-2xs">?</kbd>
+          <kbd class="tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs">?</kbd>
         </div>
         <div class="tw:flex tw:items-center tw:justify-between tw:p-2 tw:rounded-md tw:bg-gray-50 tw:dark:bg-dark-gray-400">
           <span class="tw:text-gray-600 tw:dark:text-dark-white-300">{{ __('Close help or other menu') }}</span>
