@@ -8,7 +8,7 @@
 </div>
 
 <div id="map-container" class="tw:relative tw:w-full {{ request()->input('bare') == 'yes' ? 'tw:h-screen' : 'tw:h-[calc(100vh-62px)]' }} tw:min-h-[400px] tw:overflow-hidden" x-data="customViewData{{ $map_id }}()">
-  <x-modal show="showHelp" title="{{ __('Confirm delete') }}" maxWidth="sm">
+  <x-modal show="showHelp" maxWidth="sm">
     <x-slot name="heading">
       <h4 class="tw:m-0 tw:text-base tw:font-semibold tw:flex tw:items-center tw:gap-2">
         <i class="fa fa-keyboard-o tw:text-blue-500" aria-hidden="true"></i>
