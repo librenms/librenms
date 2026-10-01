@@ -71,8 +71,6 @@ jobs:
 
       - name: Install PHP dependencies
         uses: $/.github/actions/composer-install
-        with:
-          cache-version: ${{ secrets.CACHE_VERSION }}
 
       - name: Find new PHP files
         if: github.event_name == 'pull_request' && matrix.config.name == 'Main'
@@ -110,8 +108,6 @@ jobs:
 
       - name: Install PHP dependencies
         uses: $/.github/actions/composer-install
-        with:
-          cache-version: ${{ secrets.CACHE_VERSION }}
 
       - name: Run Rector (dry-run)
         run: ./vendor/bin/rector process --dry-run --no-progress-bar --ansi --memory-limit=1G
@@ -135,7 +131,6 @@ jobs:
       - name: Install PHP dependencies
         uses: $/.github/actions/composer-install
         with:
-          cache-version: ${{ secrets.CACHE_VERSION }}
           dump-autoload: false
 
       - name: Run Pint (dry-run)
