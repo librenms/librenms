@@ -141,7 +141,7 @@
             container._mapWidth = mapWidth;
             container._mapHeight = mapHeight;
             container._visNetwork = network;
-            container._minScale = scale;
+            container._minScale = Math.min(scale, 1);
             container._maxScale = 12.0;
 
             var centreY = Math.round(mapHeight / 2);
