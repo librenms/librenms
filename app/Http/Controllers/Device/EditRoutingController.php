@@ -65,8 +65,11 @@ class EditRoutingController
             'snmp_contexts.*' => 'nullable|string|max:255',
         ]);
 
-        $snmpContexts = collect($validated['snmp_contexts'] ?? [])
-            ->map(fn ($context) => trim((string) $context))
+        /** @var array<int, string|null> $submittedContexts */
+        $submittedContexts = $validated['snmp_contexts'] ?? [];
+
+        $snmpContexts = collect($submittedContexts)
+            ->map(fn (?string $context) => trim((string) $context))
             ->filter()
             ->unique()
             ->values()
