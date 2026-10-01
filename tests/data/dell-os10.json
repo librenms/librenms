@@ -8236,7 +8236,7 @@
                     "bgpPeerOutTotalMessages": 0,
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 64514,
                     "vrfLocalAs": null
                 }
@@ -8264,7 +8264,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         },
@@ -8289,7 +8289,7 @@
                     "bgpPeerOutTotalMessages": 489554,
                     "bgpPeerFsmEstablishedTime": 28063000,
                     "bgpPeerInUpdateElapsedTime": 27997600,
-                    "context_name": null,
+                    "context_name": "",
                     "bgpLocalAs": 64514,
                     "vrfLocalAs": null
                 }
@@ -8317,7 +8317,7 @@
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         }

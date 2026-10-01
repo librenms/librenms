@@ -40,6 +40,7 @@ class ConfigBackupManager
         \App\ConfigBackup\Providers\UnimusProvider::class,
         \App\ConfigBackup\Providers\OxidizedProvider::class,
         // future: RancidProvider::class
+        // \App\ConfigBackup\Providers\FakeConfigBackupProvider::class,
     ];
 
     public function providerFor(Device $device): ?ConfigBackupProvider

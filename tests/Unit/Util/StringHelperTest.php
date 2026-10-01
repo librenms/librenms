@@ -108,4 +108,20 @@ final class StringHelperTest extends TestCase
         $this->assertFalse(StringHelpers::isHex('a5:fj:53', ':'));
         $this->assertFalse(StringHelpers::isHex('a5fe53', ':'));
     }
+
+    public function testDecodeSnmpHexText(): void
+    {
+        // off by one string length (trailing null)
+        $this->assertSame('24500793', StringHelpers::decodeSnmpHexText('32 34 35 30 30 37 39 33 00'));
+        // net-snmp wraps long hex output
+        $this->assertSame('DINION IP starlight 7000 HD', StringHelpers::decodeSnmpHexText("44 49 4E 49 4F 4E 20 49 50 20 73 74 61 72 6C 69\n67 68 74 20 37 30 30 30 20 48 44 00"));
+        // non-ASCII text
+        $this->assertSame('黑色碳粉', StringHelpers::decodeSnmpHexText('E9 BB 91 E8 89 B2 E7 A2 B3 E7 B2 89'));
+        $this->assertSame('黑色', StringHelpers::decodeSnmpHexText('E9 BB 91 E8 89 B2 00'));
+
+        // unchanged: not hex, or printable ASCII that net-snmp would not have printed as hex
+        $this->assertSame('plain text', StringHelpers::decodeSnmpHexText('plain text'));
+        $this->assertSame('41 42', StringHelpers::decodeSnmpHexText('41 42'));
+        $this->assertSame('', StringHelpers::decodeSnmpHexText(''));
+    }
 }

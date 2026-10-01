@@ -20,7 +20,7 @@
                         </div>
                     </div>
 
-                    @foreach($moduleList as $module)
+                    @foreach($modules as $module)
                         <div class="row check-row border-top">
                             <div class="col-7">
                                 {{ $module['name'] }}

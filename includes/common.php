@@ -21,25 +21,6 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
 
-function shorthost($hostname, $len = 12)
-{
-    // IP addresses should not be shortened
-    if (filter_var($hostname, FILTER_VALIDATE_IP)) {
-        return $hostname;
-    }
-    $len = LibrenmsConfig::get('shorthost_target_length', $len);
-
-    $parts = explode('.', (string) $hostname);
-    $shorthost = $parts[0];
-    $i = 1;
-    while ($i < count($parts) && strlen($shorthost . '.' . $parts[$i]) < $len) {
-        $shorthost = $shorthost . '.' . $parts[$i];
-        $i++;
-    }
-
-    return $shorthost;
-}
-
 function print_error($text)
 {
     if (Laravel::isCli()) {
@@ -92,11 +73,6 @@ function getidbyname($hostname)
     return DeviceCache::getByHostname($hostname)->device_id;
 }
 
-function get_dev_attrib($device, $attrib_type)
-{
-    return DeviceCache::get((int) $device['device_id'])->getAttrib($attrib_type);
-}
-
 /**
  * Output using console color if possible
  * https://github.com/pear/Console_Color2/blob/master/examples/documentation
@@ -137,13 +113,6 @@ function c_echo($string, $enabled = true)
     } else {
         echo preg_replace('/%((%)|.)/', '', $string);
     }
-}
-
-function generate_smokeping_file($device, $file = '')
-{
-    $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get((int) $device['device_id']));
-
-    return $smokeping->generateFileName($file);
 }
 
 /**

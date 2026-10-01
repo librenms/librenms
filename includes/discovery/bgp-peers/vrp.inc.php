@@ -79,8 +79,18 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
 
         $bgpPeers[$vrfInstance][$address] = $value;
         $bgpPeers[$vrfInstance][$address]['vrf_id'] = $map_vrf['byName'][$vrfInstance]['vrf_id'] ?? null;
-        $bgpPeers[$vrfInstance][$address]['afi'] = $oid[1];
-        $bgpPeers[$vrfInstance][$address]['safi'] = $oid[2];
+        $afi = $oid[1];
+        $safi = $oid[2];
+        // HUAWEI-BGP-VPN-MIB labels AFI 25 as "vpls" and defines no label for SAFI 70,
+        // so an EVPN session is reported as vpls/70. Normalise it to the IANA names,
+        // matching what "display bgp all summary" calls it (Address Family:Evpn).
+        if ($afi === 'vpls' && $safi === '70') {
+            $afi = 'l2vpn';
+            $safi = 'evpn';
+        }
+
+        $bgpPeers[$vrfInstance][$address]['afi'] = $afi;
+        $bgpPeers[$vrfInstance][$address]['safi'] = $safi;
         $bgpPeers[$vrfInstance][$address]['typePeer'] = $oid[3];
         if (array_key_exists('0.' . $oid[3] . '.' . $oid_address, $bgpPeersDesc)) {
             // We may have a description
@@ -104,6 +114,7 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
                     'device_id' => $device['device_id'],
                     'vrf_id' => $vrfId,
                     'bgpPeerIdentifier' => $address,
+                    'context_name' => '',
                     'bgpPeerRemoteAs' => $value['hwBgpPeerRemoteAs'] ?? '',
                     'bgpPeerState' => $value['hwBgpPeerState'] ?? '',
                     'bgpPeerAdminStatus' => $value['hwBgpPeerAdminStatus'] ?? '',
@@ -145,11 +156,11 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
                 echo str_repeat('.', $affected);
                 $vrp_bgp_peer_count += $affected;
             }
-            if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', [$device['device_id'], $value['hwBgpPeerRemoteAddr'], $value['afi'], $value['safi']]) < 1) {
+            if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', [$device['device_id'], $address, $value['afi'], $value['safi']]) < 1) {
                 if ($vrfName != '') {
                     $device['context_name'] = $vrfName;
                 }
-                add_cbgp_peer($device, ['ip' => $value['hwBgpPeerRemoteAddr']], $value['afi'], $value['safi']);
+                add_cbgp_peer($device, ['ip' => $address], $value['afi'], $value['safi']);
                 unset($device['context_name']);
             } else {
                 //nothing to update

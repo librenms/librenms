@@ -1,0 +1,135 @@
+-- 
+-- 
+--
+--  File         : genericMasterMib.mi2
+--  Description  : Sample Generic Master OID Definition MIB 
+--  Version      : 0.6 
+--  Date         : August 29, 2000     
+--
+--  Copyright (c) 2000 Generic.  All Rights Reserved.
+--
+--  Reproduction of this document is authorized on condition that this
+--  copyright notice is included.  This sample Generic Master Enterprise MIB
+--  embodies proprietary intellectual property of Generic (Generic). 
+--  Generic retains all title and ownership in the specification, including any
+--  revisions.
+--
+--  It is the intent of Generic to encourage the widespread use of this
+--  specification in connection with the management of GBN-based products.  
+--  Generic grants vendors, end-users, and other interested parties a
+--  non-exclusive license to use this specification in connection with the
+--  management of GBN products.
+--
+--  This specification is supplied "AS IS", and Generic makes no warranty,
+--  either express or implied, as to the use, operations, condition,
+--  or performance of this specification.
+--
+-- 
+-- 
+--  Sample Generic Master Enterprise MIB
+--
+--  NOTES:
+--   1. This is a SMIv2 MIB - all definitions are automatically 'exported'.
+--
+--   2. This MIB:
+--        - defines the 'Generic Product' OIDs (used as IMPORTS)
+--        - defines the 'GBN Major Category' OIDs (used as IMPORTS)
+--        - defines the 'GBN Internal MIB Module' OIDs (used as IMPORTS)
+--        - defines/documents the 'GBN Generic' MIB OIDs
+--        - documents the 'GBN OEM swAPI' MIB OIDs
+--        - documents the 'GBN OEM Product' MIB OIDs
+--
+--   3. Note that the 'defined/documents' items provide a common place to
+--      define or document the required OIDs.  SMIv1 MIBs can be defined
+--      here and then imported into the corresponding MIB.  The SMIv2 
+--      'MODULE-IDENTITY' macro does not allow the second OID parameter to
+--      be imported from an external MIB file.  The authors of these
+--      'documented' MIBs must verify, by procedure, that the values used
+--      match the values in this document.
+--
+--   4. Note that some MIB compilers do not accept two sets of comments on the
+--      same line.  Consequently, for commented out document items, do not
+--      use a second comment on the same line.
+--
+--   5. Note that the Generic enterprise ID (65268) is used in the sample
+--      MIBs.  The customer "must" replace the Generic enterprise ID with
+--      the registered enterprise identifier for the specific company or
+--      product.  The customer must also replace the Generic information
+--      located in the 'MODULE-IDENTITY' in each sample MIB.
+--
+-- 
+-- 
+
+GENERIC-MASTER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises              FROM SNMPv2-SMI;
+
+    generic MODULE-IDENTITY
+        LAST-UPDATED    "0008290000Z"  -- August 29, 2000
+        ORGANIZATION    "Generic"
+        CONTACT-INFO    "Generic
+                         E-mail: support@generic.com.cn"
+
+        DESCRIPTION     "Generic Master MIB OID defines and documentation."
+
+        REVISION        "0008290000Z"  -- August 29, 2000
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { enterprises 65268 }
+
+-- Generic Products 
+dataCom           OBJECT IDENTIFIER ::= {generic 1} 
+transmission      OBJECT IDENTIFIER ::= {generic 2} 
+wireCom            OBJECT IDENTIFIER ::= {generic 3} 
+
+
+-- DataCom Products     
+vdsl			OBJECT IDENTIFIER ::= { dataCom 1 }
+gbn             OBJECT IDENTIFIER ::= { dataCom 2 } 
+switch			OBJECT IDENTIFIER ::= { dataCom 3 }
+adsl			OBJECT IDENTIFIER ::= { dataCom 5 }
+bas			OBJECT IDENTIFIER ::= { dataCom 6 }
+voip			OBJECT IDENTIFIER ::= { dataCom 7 }
+
+--VDSL Products 
+
+-- GBN Major MIB Categories
+    gbnPlatform     OBJECT IDENTIFIER ::= { gbn 1 }     
+    gbnDevice       OBJECT IDENTIFIER ::= { gbn 2 }     
+    gbnService      OBJECT IDENTIFIER ::= { gbn 3 }     
+    gbnL2           OBJECT IDENTIFIER ::= { gbn 4 }     
+    gbnL3           OBJECT IDENTIFIER ::= { gbn 5 } 
+    gbnLS           OBJECT IDENTIFIER ::= { gbn 6 } 
+
+    gbnServiceAAA      OBJECT IDENTIFIER ::= { gbnService 1 } 
+    rmonMib            OBJECT IDENTIFIER ::= { gbnService 2}--gbnServiceRMON
+    gbnServiceMACNotification            OBJECT IDENTIFIER ::= { gbnService 3}
+
+-- Switch Products 
+s5710        OBJECT IDENTIFIER ::= { switch 33 }
+
+-- S5710 
+iSW-410-2GX8GT           OBJECT IDENTIFIER ::= { s5710 1 }
+iSW-410-2GX16GT          OBJECT IDENTIFIER ::= { s5710 2 }
+
+-- PON Products 
+epon          OBJECT IDENTIFIER ::= { switch 32 }
+gpon          OBJECT IDENTIFIER ::= { switch 34 }
+
+-- EPON E Serials 
+e04           OBJECT IDENTIFIER ::= { epon 1 }
+e08           OBJECT IDENTIFIER ::= { epon 2 }
+
+-- GPON G Serials 
+gp08           OBJECT IDENTIFIER ::= { gpon 1 }
+gp04           OBJECT IDENTIFIER ::= { gpon 2 }
+gp16           OBJECT IDENTIFIER ::= { gpon 3 }
+gpyw08         OBJECT IDENTIFIER ::= { gpon 4 }
+xg08           OBJECT IDENTIFIER ::= { gpon 5 }
+
+--
+-- END of GENERIC-MASTER-MIB
+--
+
+END
