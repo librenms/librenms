@@ -5,10 +5,10 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.8",
-                    "sysDescr": "Netgate pfSense Plus",
+                    "sysDescr": "pfSense Plusfwexample.test 26.03-RELEASE FreeBSD 15.0-CURRENT amd64",
                     "sysContact": "<private>",
-                    "version": "26.03",
-                    "hardware": null,
+                    "version": "26.03-RELEASE",
+                    "hardware": "amd64",
                     "features": null,
                     "location": "<private>",
                     "os": "pfsense",
