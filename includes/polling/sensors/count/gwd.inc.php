@@ -14,9 +14,12 @@
  */
 
 if (in_array($sensor['sensor_type'] ?? '', ['gwd-active', 'gwd-inactive', 'gwd-total'], true)) {
-    $rawHex = (string) SnmpQuery::numeric()
+    // The active/inactive/total sensors of a port share one OID; fetch it once.
+    $gwdOnuLevelCache ??= [];
+    $gwdOnuLevelCache[$sensor['sensor_oid']] ??= (string) SnmpQuery::numeric()
         ->get($sensor['sensor_oid'])
         ->value();
+    $rawHex = $gwdOnuLevelCache[$sensor['sensor_oid']];
 
     // The OctetString arrives as "05 05 05 05 07 00 ..." with spaces
     // between bytes and line breaks every 16 bytes; strip whitespace
