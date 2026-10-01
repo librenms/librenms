@@ -24,38 +24,6 @@ use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
-function toner2colour($descr, $percent)
-{
-    $colour = LibreNMS\Util\Color::percentage(100 - $percent, null);
-
-    if (str_ends_with((string) $descr, 'C') || stripos((string) $descr, 'cyan') !== false) {
-        $colour['left'] = '55D6D3';
-        $colour['right'] = '33B4B1';
-    }
-
-    if (str_ends_with((string) $descr, 'M') || stripos((string) $descr, 'magenta') !== false) {
-        $colour['left'] = 'F24AC8';
-        $colour['right'] = 'D028A6';
-    }
-
-    if (str_ends_with((string) $descr, 'Y') || stripos((string) $descr, 'yellow') !== false
-        || stripos((string) $descr, 'giallo') !== false
-        || stripos((string) $descr, 'gul') !== false
-    ) {
-        $colour['left'] = 'FFF200';
-        $colour['right'] = 'DDD000';
-    }
-
-    if (str_ends_with((string) $descr, 'K') || stripos((string) $descr, 'black') !== false
-        || stripos((string) $descr, 'nero') !== false
-    ) {
-        $colour['left'] = '000000';
-        $colour['right'] = '222222';
-    }
-
-    return $colour;
-}//end toner2colour()
-
 function generate_link($text, $vars, $new_vars = [])
 {
     return '<a href="' . Url::generate($vars, $new_vars) . '">' . $text . '</a>';
@@ -169,9 +137,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port['graph_type'] = $type;
     }
 
-    if (! isset($port['graph_type'])) {
-        $port['graph_type'] = 'port_bits';
-    }
+    $port['graph_type'] ??= 'port_bits';
 
     $class = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
 
@@ -271,9 +237,7 @@ function generate_ap_link($args, $text = null, $type = null)
         $args['graph_type'] = $type;
     }
 
-    if (! isset($args['graph_type'])) {
-        $args['graph_type'] = 'port_bits';
-    }
+    $args['graph_type'] ??= 'port_bits';
 
     if (! isset($args['hostname'])) {
         $args = array_merge($args, device_by_id_cache($args['device_id']));

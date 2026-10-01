@@ -88,9 +88,8 @@ class LegacyModule implements Module
 
     public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        // all legacy modules require snmp except ipmi and unix-agent
+        // all legacy modules require snmp except unix-agent
         return $status->isEnabled() && match ($this->name) {
-            'ipmi' => $connectivity->ipmiIsAvailable(),
             'unix-agent' => $connectivity->unixAgentIsAvailable(),
             default => $connectivity->snmpIsAvailable(),
         };
@@ -200,10 +199,7 @@ class LegacyModule implements Module
     {
         static $def;
 
-        if ($def === null) {
-            // only load the yaml once, then keep it in memory
-            $def = Yaml::parse(file_get_contents(base_path('/tests/module_tables.yaml')));
-        }
+        $def ??= Yaml::parse(file_get_contents(base_path('/tests/module_tables.yaml')));
 
         return $def[$this->name] ?? [];
     }

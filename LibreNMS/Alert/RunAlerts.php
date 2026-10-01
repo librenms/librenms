@@ -299,10 +299,7 @@ class RunAlerts
     {
         foreach ($this->loadAlerts('alerts.state = ' . AlertState::ACKNOWLEDGED . ' AND alerts.open = ' . AlertState::ACTIVE) as $alert) {
             $rextra = json_decode((string) $alert['extra'], true);
-            if (! isset($rextra['acknowledgement'])) {
-                // backwards compatibility check
-                $rextra['acknowledgement'] = true;
-            }
+            $rextra['acknowledgement'] ??= true;
 
             if ($rextra['acknowledgement']) {
                 // Rule is set to send an acknowledgement alert
@@ -500,15 +497,9 @@ class RunAlerts
             $noacc = false;
             $updet = false;
             $rextra = json_decode((string) $alert['extra'], true);
-            if (! isset($rextra['recovery'])) {
-                // backwards compatibility check
-                $rextra['recovery'] = true;
-            }
+            $rextra['recovery'] ??= true;
 
-            if (! isset($alert['details']['count'])) {
-                // make sure count is set for below code, in legacy code null would get type juggled to 0
-                $alert['details']['count'] = 0;
-            }
+            $alert['details']['count'] ??= 0;
 
             $status_check = DB::table('devices')
                 ->where('device_id', $alert['device_id'])
@@ -695,7 +686,7 @@ class RunAlerts
                     $tmp = $instance->deliverAlert($obj);
                     $this->alertLog($tmp, $obj, $obj['transport']);
                 } catch (AlertTransportDeliveryException $e) {
-                    Eventlog::log($e->getTraceAsString() . PHP_EOL . $e->getMessage(), $obj['device_id'], 'alert', Severity::Error);
+                    Log::warning("Alert transport '{$obj['transport']}' delivery failed for device {$obj['device_id']}: {$e->getMessage()}", ['exception' => $e]);
                     $this->alertLog($e->getMessage(), $obj, $obj['transport']);
                 } catch (\Exception $e) {
                     $this->alertLog($e, $obj, $obj['transport']);
