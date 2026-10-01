@@ -23,6 +23,8 @@
 
 namespace LibreNMS\Data\Source;
 
+use LibreNMS\Util\Number;
+
 class Bird2
 {
     public const HEADER = 'Name       Proto      Table      State  Since         Info';

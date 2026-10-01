@@ -22,7 +22,7 @@
 namespace LibreNMS\Tests\Unit;
 
 use LibreNMS\Data\Source\Bird2;
-use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Tests\TestCase;
 
 /**
