@@ -69,8 +69,13 @@ modules:
         temperature:
             data:
                 -
+                    oid: NAG-MIB::sysTemperature
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.10.{{ $index }}'
+                    descr: 'Temperature {{ $index }}'
+                -
                     oid: NAG-MIB::switchTemperature
-                    num_oid: '.1.3.6.1.4.1.40418.7.100.1.11.8.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.1.11.9.{{ $index }}'
+                    index: 'switchTemperature.{{ $index }}'
                     descr: 'Temperature'
                     skip_values:
                         - 268435356
