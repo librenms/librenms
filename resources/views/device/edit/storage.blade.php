@@ -27,7 +27,7 @@
                                        max="100"
                                        class="form-control input-sm storage-warn"
                                        data-update-url="{{ route('device.edit.storage.update', [$device, $storage]) }}"
-                                       value="{{ round($storage->storage_perc_warn) }}">
+                                       value="{{ $storage->storage_perc_warn === null ? '' : round($storage->storage_perc_warn) }}">
                             </div>
                         </td>
                     </tr>

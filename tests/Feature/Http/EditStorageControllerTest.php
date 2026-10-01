@@ -57,6 +57,18 @@ final class EditStorageControllerTest extends TestCase
             ->assertSee('value="75"', false);
     }
 
+    public function testNullWarnThresholdRendersEmpty(): void
+    {
+        $device = Device::factory()->create();
+        $storage = Storage::factory()->for($device)->create();
+        Storage::whereKey($storage->storage_id)->update(['storage_perc_warn' => null]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.edit.storage', $device))
+            ->assertOk()
+            ->assertSee('value=""', false);
+    }
+
     public function testUserCannotViewStoragePage(): void
     {
         $device = Device::factory()->create();
