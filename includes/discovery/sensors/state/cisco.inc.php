@@ -57,7 +57,7 @@ $dlr_states = [
     ],
 
     'ciscoDlrRingGatewayDeviceState' => [
-        ['value' => 0, 'generic' => 2, 'descr' => 'undefined'],
+        ['value' => 0, 'generic' => 0, 'descr' => 'undefined'],
         ['value' => 1, 'generic' => 0, 'descr' => 'gatewayIdle'],
         ['value' => 2, 'generic' => 0, 'descr' => 'activeListen'],
         ['value' => 3, 'generic' => 0, 'descr' => 'activeNormal'],
