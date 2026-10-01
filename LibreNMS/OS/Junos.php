@@ -57,37 +57,35 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
     public function discoverOS(Device $device): void
     {
-        $data = SnmpQuery::hideMib()->get([
+        $response = SnmpQuery::get([
             'JUNIPER-MIB::jnxBoxDescr.0',
             'JUNIPER-MIB::jnxBoxSerialNo.0',
             'JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberSWVersion.0',
             'HOST-RESOURCES-MIB::hrSWInstalledName.1',
             'HOST-RESOURCES-MIB::hrSWInstalledName.2',
-        ])->table(1);
+        ]);
 
         preg_match('/Juniper Networks, Inc. (?<hardware>\S+) .* kernel JUNOS (?<version>[^, ]+)[, ]/', $device->sysDescr, $parsed);
-        if (isset($data[2]['hrSWInstalledName'])) {
-            preg_match('/^JUNOS.*\[([^\]]+)]/', $data[2]['hrSWInstalledName'], $parsedVersion);
-        }
+        preg_match('/^JUNOS.*\[([^\]]+)]/', $response->value('HOST-RESOURCES-MIB::hrSWInstalledName.2'), $parsedVersion);
         // deal with JSUs - checked with EVO only
-        if (isset($data[1]['hrSWInstalledName'])) {
-            preg_match('/^junos-evo.*?(\d+\.\d+.*)$/', $data[1]['hrSWInstalledName'], $parsedVersion);
+        if (preg_match('/^junos-evo.*?(\d+\.\d+.*)$/', $response->value('HOST-RESOURCES-MIB::hrSWInstalledName.1'), $evoVersion)) {
+            $parsedVersion = $evoVersion;
         }
 
-        $boxDescr = $data[0]['jnxBoxDescr'] ?? null;
-        $isVirtualChassis = isset($data[0]['jnxVirtualChassisMemberSWVersion'])
-            || str_contains(strtolower((string) $boxDescr), 'virtual chassis');
+        $boxDescr = $response->value('JUNIPER-MIB::jnxBoxDescr.0') ?: null;
+        $vcVersion = $response->value('JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberSWVersion.0') ?: null;
+        $isVirtualChassis = $vcVersion !== null || str_contains(strtolower((string) $boxDescr), 'virtual chassis');
         // Standalone switches may report one master member, so one row does not establish a Virtual Chassis.
         $members = $isVirtualChassis ? array_filter(
-            SnmpQuery::hideMib()->enumStrings()->walk('JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberTable')->table(1),
-            fn ($member) => isset($member['jnxVirtualChassisMemberRole'])
+            SnmpQuery::enumStrings()->walk('JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberTable')->table(1),
+            fn ($member) => isset($member['JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberRole'])
         ) : [];
 
         $device->hardware = $this->parseHardware($boxDescr, $parsed['hardware'] ?? null, $members);
         $device->features = $this->parseVirtualChassis($boxDescr, $members)
             ?? $this->parseChassisCluster($boxDescr, $device->sysDescr);
-        $device->serial = $data[0]['jnxBoxSerialNo'] ?? null;
-        $device->version = $data[0]['jnxVirtualChassisMemberSWVersion'] ?? $parsedVersion[1] ?? $parsed['version'] ?? null;
+        $device->serial = $response->value('JUNIPER-MIB::jnxBoxSerialNo.0') ?: null;
+        $device->version = $vcVersion ?? $parsedVersion[1] ?? $parsed['version'] ?? null;
     }
 
     /**
@@ -110,8 +108,8 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         }
 
         foreach ($members as $member) {
-            if (($member['jnxVirtualChassisMemberRole'] ?? null) == 'master' && ! empty($member['jnxVirtualChassisMemberModel'])) {
-                return strtoupper($member['jnxVirtualChassisMemberModel']);
+            if (($member['JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberRole'] ?? null) == 'master' && ! empty($member['JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberModel'])) {
+                return strtoupper($member['JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberModel']);
             }
         }
 
@@ -152,9 +150,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
             return null;
         }
 
-        $nodeNames = SnmpQuery::hideMib()
-            ->walk('JUNIPER-SRX5000-SPU-MONITORING-MIB::jnxJsSPUMonitoringNodeDescr')
-            ->values();
+        $nodeNames = SnmpQuery::walk('JUNIPER-SRX5000-SPU-MONITORING-MIB::jnxJsSPUMonitoringNodeDescr')->values();
         $nodes = array_unique(array_map(strtolower(...), array_filter($nodeNames, fn ($name) => preg_match('/^node\d+$/i', $name))));
 
         if (count($nodes) > 1) {
