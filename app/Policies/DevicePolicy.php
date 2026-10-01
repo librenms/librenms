@@ -37,6 +37,10 @@ class DevicePolicy
      */
     public function view(User $user, Device $device): bool
     {
+        if ($user->can('global-read')) {
+            return true;
+        }
+
         if ($this->hasGlobalPermission($user, 'viewAll')) {
             return true;
         }
@@ -76,7 +80,7 @@ class DevicePolicy
      */
     public function configBackupView(User $user, Device $device): bool
     {
-        return $user->can('config-backup.view')
+        return $user->checkPermissionTo('config-backup.view') // avoid can to skip Gate::before check
             && $this->view($user, $device);
     }
 

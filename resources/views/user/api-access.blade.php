@@ -3,7 +3,7 @@
 @section('title', __('API Tokens'))
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid" x-data="apiAccessManager()">
     <legend>{{ __('API Tokens') }}</legend>
 
     @if (session('status'))
@@ -30,488 +30,350 @@
         </div>
     @endif
 
-        <p class="text-muted">{{ __('Tokens are shown only once when created or reset. Use the REST API with the X-Auth-Token header.') }}</p>
+    <p class="text-muted">{{ __('Tokens are shown only once when created or reset. Use with the REST API via the X-Auth-Token or Authorization: Bearer <token> header.') }}</p>
 
-        <table class="table table-bordered table-condensed">
-            <thead>
+    <table class="table table-bordered table-condensed">
+        <thead>
+            <tr>
+                <th>{{ __('Description') }}</th>
+                <th>{{ __('Created') }}</th>
+                <th>{{ __('Last used') }}</th>
+                <th>{{ __('Status') }}</th>
+                <th>{{ __('Reset token') }}</th>
+                <th>{{ __('Remove') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="token in tokens" :key="token.id">
                 <tr>
-                    <th>{{ __('Description') }}</th>
-                    <th>{{ __('Disabled') }}</th>
-                    <th>{{ __('Reset token') }}</th>
-                    <th>{{ __('Remove') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($tokens as $api)
-                    <tr id="api-token-row-{{ $api->id }}" @if($api->user && $api->user->auth_type !== $legacy_auth_type) bgcolor="lightgrey" @endif>
-                        <td class="api-token-description-cell" data-token-id="{{ $api->id }}">
+                    <td>
+                        <div x-show="editingTokenId !== token.id">
                             <span
-                                class="api-token-description-text"
-                                style="cursor:pointer"
+                                style="cursor: pointer;"
                                 tabindex="0"
                                 title="{{ __('Click to edit') }}"
-                                data-description="{{ e($api->description) }}"
-                            >@if($api->description !== ''){{ $api->description }}@else<span class="text-muted">&dash;&dash;</span>@endif</span>
-                            <input type="text" class="form-control input-sm api-token-description-input hidden" maxlength="255" value="{{ e($api->description) }}" aria-label="{{ __('Description') }}">
-                        </td>
-                        <td>
-                            <input type="checkbox"
-                                   name="token-status"
-                                   data-token_id="{{ $api->id }}"
-                                   data-off-text="{{ __('No') }}"
-                                   data-on-text="{{ __('Yes') }}"
-                                   data-on-color="danger"
-                                   data-size="mini"
-                                   @if ($api->disabled) checked @endif>
-                        </td>
-                        <td>
-                            <form method="post" action="{{ route('api-access.reset', $api->id) }}" class="form-inline" onsubmit="return confirm(@json(__('This revokes the current token and issues a new one. Continue?')));">
-                                @csrf
-                                <button type="submit" class="btn btn-warning btn-xs">{{ __('Reset token') }}</button>
-                            </form>
-                        </td>
-                        <td>
-                            <button type="button"
-                                    class="btn btn-danger btn-xs"
-                                    data-token_id="{{ $api->id }}"
-                                    data-toggle="modal"
-                                    data-target="#confirm-delete">{{ __('Delete') }}</button>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4">{{ __('No API tokens yet.') }}</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-
-        <div class="text-center">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-token">
-                {{ __('Create API access token') }}
-            </button>
-        </div>
-
-        @config('api.v1.enabled')
-        <hr>
-
-        <legend>
-            <span>{{ __('API v1 tokens') }}</span>
-            <span class="tw:ml-2 tw:inline-flex tw:align-middle tw:items-center tw:gap-1 tw:text-xs tw:font-bold tw:uppercase tw:tracking-wider tw:text-amber-600">
-        <span class="tw:size-1.5 tw:rounded-full tw:bg-amber-500"></span>
-        {{ __('Beta') }}
-    </span>
-        </legend>
-
-        <div class="alert alert-warning">
-            <i class="fas fa-exclamation-triangle tw:mr-2"></i>
-            <strong>{{ __('Beta') }}:</strong>
-            {{ __('The v1 API is in beta. Endpoints and behaviour may change without notice.') }}
-            <a href="https://docs.librenms.org/API/v1/" target="_blank" rel="noopener">{{ __('Documentation') }}</a>.
-        </div>
-
-        <div id="v1-token-plain-alert" class="alert alert-warning hidden">
-            <p><strong>{{ __('Copy this v1 token now; it will not be shown again.') }}</strong></p>
-            <div class="form-group">
-                <label for="v1-token-once" class="control-label">{{ __('Your v1 API token') }}</label>
-                <input type="text" class="form-control" id="v1-token-once" readonly value="">
-            </div>
-        </div>
-
-        <p class="text-muted">
-            {{ __('Use these with the v1 REST API via the') }} <code>Authorization: Bearer &lt;token&gt;</code> {{ __('header.') }}
-        </p>
-
-        <table class="table table-bordered table-condensed" id="v1-tokens-table">
-            <thead>
-                <tr>
-                    <th>{{ __('Name') }}</th>
-                    <th>{{ __('Created') }}</th>
-                    <th>{{ __('Expires') }}</th>
-                    <th>{{ __('Last used') }}</th>
-                    <th>{{ __('Renew') }}</th>
-                    <th>{{ __('Remove') }}</th>
+                                @click="startEditDescription(token, $event)"
+                                @keydown.enter.prevent="startEditDescription(token, $event)"
+                                @keydown.space.prevent="startEditDescription(token, $event)"
+                            >
+                                <span x-text="token.name || '--'" :class="{ 'text-muted': !token.name }"></span>
+                            </span>
+                        </div>
+                        <div x-show="editingTokenId === token.id" x-cloak>
+                            <input
+                                type="text"
+                                class="form-control input-sm"
+                                maxlength="255"
+                                x-model="editingText"
+                                @keydown.enter.prevent="saveDescription(token)"
+                                @keydown.escape.prevent="cancelEditDescription()"
+                                @blur="saveDescription(token)"
+                                aria-label="{{ __('Description') }}"
+                            >
+                        </div>
+                    </td>
+                    <td x-text="token.created_human"></td>
+                    <td x-text="token.last_used_human"></td>
+                    <td>
+                        <button type="button"
+                                class=""
+                                @click="openExpirationModal(token)"
+                                title="{{ __('Click to change expiration') }}">
+                            <span class="label" :class="'label-' + token.status_label" x-text="token.expires_human"></span>
+                            <i class="fa fa-pencil text-muted tw:ml-1"></i>
+                        </button>
+                    </td>
+                    <td>
+                        <form method="post" :action="baseUrl + '/' + token.id + '/reset'" class="form-inline" onsubmit="return confirm(@js(__('This revokes the current token and issues a new one. Continue?')));">
+                            @csrf
+                            <button type="submit" class="btn btn-warning btn-xs">{{ __('Reset token') }}</button>
+                        </form>
+                    </td>
+                    <td>
+                        <button type="button"
+                                class="btn btn-danger btn-xs"
+                                @click="openDeleteModal(token)">{{ __('Delete') }}</button>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @forelse ($v1_tokens as $v1)
-                    <tr id="v1-token-row-{{ $v1->id }}">
-                        <td>{{ $v1->name }}</td>
-                        <td>{{ $v1->created_at?->diffForHumans() ?? '—' }}</td>
-                        <td class="v1-token-expires">{{ $v1->expires_at?->diffForHumans() ?? __('Never') }}</td>
-                        <td>{{ $v1->last_used_at?->diffForHumans() ?? __('Never') }}</td>
-                        <td>
-                            <button type="button" class="btn btn-warning btn-xs"
-                                    data-token_id="{{ $v1->id }}"
-                                    data-toggle="modal"
-                                    data-target="#v1-renew-token">{{ __('Renew') }}</button>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-danger btn-xs"
-                                    data-token_id="{{ $v1->id }}"
-                                    data-toggle="modal"
-                                    data-target="#v1-confirm-delete">{{ __('Delete') }}</button>
-                        </td>
-                    </tr>
-                @empty
-                    <tr id="v1-tokens-empty"><td colspan="6">{{ __('No v1 API tokens yet.') }}</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+            </template>
+            <tr x-show="tokens.length === 0">
+                <td colspan="6">{{ __('No API tokens yet.') }}</td>
+            </tr>
+        </tbody>
+    </table>
 
-        <div class="text-center">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#v1-create-token">
-                {{ __('Create v1 API token') }}
-            </button>
-        </div>
-        @endconfig
-</div>
-
-<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete-title" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h5 class="modal-title" id="modal-delete-title">{{ __('Confirm delete') }}</h5>
-            </div>
-            <div class="modal-body">
-                <p>{{ __('If you would like to remove the API token then please click Delete.') }}</p>
-            </div>
-            <div class="modal-footer">
-                <form method="post" id="remove_token_form">
-                    @csrf
-                    @method('DELETE')
-                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Cancel') }}</button>
-                    <button type="submit" class="btn btn-danger" id="token-removal">{{ __('Delete') }}</button>
-                </form>
-            </div>
-        </div>
+    <div class="text-center">
+        <button type="button" class="btn btn-primary btn-sm" @click="openCreateModal()">
+            {{ __('Create API access token') }}
+        </button>
     </div>
-</div>
 
-<div class="modal fade" id="create-token" tabindex="-1" role="dialog" aria-labelledby="modal-create-title" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="post" action="{{ route('api-access.store') }}" class="form-horizontal">
+    {{-- Delete Confirmation Modal --}}
+    <x-modal show="deleteModalOpen" title="{{ __('Confirm delete') }}" maxWidth="sm">
+        <p>{{ __('If you would like to remove the API token then please click Delete.') }}</p>
+        <x-slot:footer>
+            <button type="button" class="btn btn-default" @click="deleteModalOpen = false">{{ __('Cancel') }}</button>
+            <form method="post" :action="baseUrl + '/' + deleteTokenId" style="display: inline;">
                 @csrf
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title" id="modal-create-title">{{ __('Create new API access token') }}</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="description" class="col-sm-3 control-label">{{ __('Description') }}</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" id="description" name="description" value="{{ old('description') }}">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Cancel') }}</button>
-                    <button type="submit" class="btn btn-success">{{ __('Create API token') }}</button>
-                </div>
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">{{ __('Delete') }}</button>
             </form>
-        </div>
-    </div>
-</div>
+        </x-slot:footer>
+    </x-modal>
 
-@config('api.v1.enabled')
-<div class="modal fade" id="v1-create-token" tabindex="-1" role="dialog" aria-labelledby="v1-create-title" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="v1-create-token-form" class="form-horizontal">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title" id="v1-create-title">{{ __('Create v1 API token') }} <span class="label label-info">{{ __('Beta') }}</span></h5>
+    {{-- Create Token Modal --}}
+    <x-modal show="createModalOpen" title="{{ __('Create new API access token') }}" maxWidth="lg">
+        <form id="create-api-token-form" method="post" action="{{ route('api-access.store') }}" class="form-horizontal">
+            @csrf
+            <div class="form-group">
+                <label for="description" class="col-sm-3 control-label">{{ __('Description') }}</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="description" name="description" value="{{ old('description') }}" placeholder="{{ __('Description') }}">
                 </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="v1-token-name" class="col-sm-3 control-label">{{ __('Name') }}</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" id="v1-token-name" name="token_name" required maxlength="255">
-                        </div>
+            </div>
+            <div class="form-group">
+                <label for="expires_in" class="col-sm-3 control-label">{{ __('Expires in') }}</label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="expires_in" name="expires_in" x-model="createExpiresIn" min="1" placeholder="{{ __('Leave blank for never') }}">
+                        <span class="input-group-addon">{{ __('days') }}</span>
                     </div>
-                    <div class="form-group">
-                        <label for="v1-token-expires" class="col-sm-3 control-label">{{ __('Expires in (days)') }}</label>
-                        <div class="col-sm-9">
-                            <input type="number" class="form-control" id="v1-token-expires" name="expires_in" min="1" placeholder="{{ __('Leave blank for never') }}">
-                        </div>
+                    <div class="btn-group btn-group-xs tw:mt-2" role="group">
+                        <button type="button" class="btn btn-default" @click="createExpiresIn = ''">{{ __('Never') }}</button>
+                        <button type="button" class="btn btn-default" @click="createExpiresIn = 7">7 {{ __('days') }}</button>
+                        <button type="button" class="btn btn-default" @click="createExpiresIn = 30">30 {{ __('days') }}</button>
+                        <button type="button" class="btn btn-default" @click="createExpiresIn = 90">90 {{ __('days') }}</button>
+                        <button type="button" class="btn btn-default" @click="createExpiresIn = 365">1 {{ __('year') }}</button>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Cancel') }}</button>
-                    <button type="submit" class="btn btn-success">{{ __('Create') }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+            </div>
+        </form>
+        <x-slot:footer>
+            <button type="button" class="btn btn-default" @click="createModalOpen = false">{{ __('Cancel') }}</button>
+            <button type="submit" form="create-api-token-form" class="btn btn-success">{{ __('Create API token') }}</button>
+        </x-slot:footer>
+    </x-modal>
 
-<div class="modal fade" id="v1-renew-token" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="v1-renew-token-form" class="form-horizontal">
-                <input type="hidden" name="v1_token_id" value="">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title">{{ __('Renew v1 API token') }} <span class="label label-info">{{ __('Beta') }}</span></h5>
+    {{-- Set Expiration Modal --}}
+    <x-modal show="expModalOpen" title="{{ __('Set Token Expiration') }}" maxWidth="lg">
+        <form id="set-expiration-form" @submit.prevent="saveExpiration" class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{{ __('Token') }}</label>
+                <div class="col-sm-9">
+                    <p class="form-control-static" x-text="expTokenName"></p>
                 </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="v1-token-extend" class="col-sm-4 control-label">{{ __('Extend by (days)') }}</label>
-                        <div class="col-sm-8">
-                            <input type="number" class="form-control" id="v1-token-extend" name="extend_days" min="0" value="30" required>
-                            <p class="help-block">{{ __('Enter 0 for no expiration.') }}</p>
-                        </div>
+            </div>
+            <div class="form-group">
+                <label for="modal_expires_in" class="col-sm-3 control-label">{{ __('Expires in') }}</label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="modal_expires_in" x-model="expExpiresIn" :disabled="expDisabled" min="1" placeholder="{{ __('Leave blank for never') }}">
+                        <span class="input-group-addon">{{ __('days') }}</span>
+                    </div>
+                    <div class="btn-group btn-group-xs tw:mt-2" role="group">
+                        <button type="button" class="btn btn-default" @click="setPresetDays('')">{{ __('Never') }}</button>
+                        <button type="button" class="btn btn-default" @click="setPresetDays(7)">7 {{ __('days') }}</button>
+                        <button type="button" class="btn btn-default" @click="setPresetDays(30)">30 {{ __('days') }}</button>
+                        <button type="button" class="btn btn-default" @click="setPresetDays(90)">90 {{ __('days') }}</button>
+                        <button type="button" class="btn btn-default" @click="setPresetDays(365)">1 {{ __('year') }}</button>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Cancel') }}</button>
-                    <button type="submit" class="btn btn-warning">{{ __('Renew') }}</button>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="modal_disabled" x-model="expDisabled" @change="onDisabledToggle">
+                            <span class="text-danger"><strong>{{ __('Disable token (revoke access immediately)') }}</strong></span>
+                        </label>
+                    </div>
                 </div>
-            </form>
-        </div>
-    </div>
+            </div>
+        </form>
+        <x-slot:footer>
+            <button type="button" class="btn btn-default" @click="expModalOpen = false">{{ __('Cancel') }}</button>
+            <button type="submit" form="set-expiration-form" class="btn btn-primary" :disabled="expSaving">
+                <span x-show="!expSaving">{{ __('Save') }}</span>
+                <span x-show="expSaving" x-cloak><i class="fa fa-spinner fa-spin"></i> {{ __('Saving...') }}</span>
+            </button>
+        </x-slot:footer>
+    </x-modal>
 </div>
-
-<div class="modal fade" id="v1-confirm-delete" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <form id="v1-remove-token-form">
-                <input type="hidden" name="v1_token_id" value="">
-                <input type="hidden" name="confirm" value="yes">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title">{{ __('Confirm delete') }} <span class="label label-info">{{ __('Beta') }}</span></h5>
-                </div>
-                <div class="modal-body">
-                    <p>{{ __('Delete this v1 API token? This cannot be undone.') }}</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Cancel') }}</button>
-                    <button type="submit" class="btn btn-danger">{{ __('Delete') }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-@endconfig
 @endsection
 
-@section('scripts')
+@section('javascript')
 <script>
-  (function () {
-    var baseUrl = "{{ url('api-access') }}";
+function apiAccessManager() {
+  return {
+    tokens: @js($tokens->map(function ($token) {
+        $isExpired = ! is_null($token->expires_at) && $token->expires_at->isPast();
 
-    function descriptionDisplayHtml(raw) {
-      if (raw && String(raw).length) {
-        return $('<div>').text(raw).html();
-      }
-      return '<span class="text-muted">&dash;&dash;</span>';
-    }
+        return [
+            'id' => $token->id,
+            'name' => (string) $token->name,
+            'created_human' => $token->created_at?->diffForHumans() ?? '—',
+            'last_used_human' => $token->last_used_at?->diffForHumans() ?? __('Never'),
+            'expires_at' => $token->expires_at?->toIso8601String(),
+            'expires_human' => $isExpired ? __('Disabled') : ($token->expires_at ? __('Expires :time', ['time' => $token->expires_at->diffForHumans()]) : __('Active')),
+            'status_label' => $isExpired ? 'danger' : ($token->expires_at ? 'info' : 'success'),
+            'disabled' => $isExpired,
+        ];
+    })),
+    baseUrl: @js(url('api-access')),
+    csrfToken: @js(csrf_token()),
 
-    function setDescriptionView($cell, raw) {
-      var $span = $cell.find('.api-token-description-text');
-      $span.data('description', raw);
-      $span.html(descriptionDisplayHtml(raw));
-      $cell.find('.api-token-description-input').val(raw);
-    }
+    editingTokenId: null,
+    editingText: '',
 
-    $("[name='token-status']").bootstrapSwitch('offColor','success');
-    $('input[name="token-status"]').on('switchChange.bootstrapSwitch', function(event, state) {
-      event.preventDefault();
-      var token_id = $(this).data("token_id");
-      $.ajax({
-        type: 'PATCH',
-        url: baseUrl + '/' + token_id,
-        contentType: 'application/json',
-        data: JSON.stringify({ disabled: state }),
-        dataType: 'json'
-      });
-    });
+    expModalOpen: false,
+    expTokenId: null,
+    expTokenName: '',
+    expExpiresIn: '',
+    expDisabled: false,
+    expSaving: false,
 
-    $(document).on('keydown', '.api-token-description-text', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        $(this).trigger('click');
-      }
-    });
+    deleteModalOpen: false,
+    deleteTokenId: null,
 
-    $(document).on('click', '.api-token-description-text', function (e) {
-      e.preventDefault();
-      var $cell = $(this).closest('.api-token-description-cell');
-      if ($cell.data('editing')) {
-        return;
-      }
-      $cell.data('editing', true);
-      var $span = $(this);
-      var $input = $cell.find('.api-token-description-input');
-      $span.addClass('hidden');
-      $input.removeClass('hidden').val($span.data('description') || '').focus().select();
-    });
+    createModalOpen: false,
+    createExpiresIn: @js(old('expires_in', '')),
 
-    $(document).on('keydown', '.api-token-description-input', function (e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        $(this).blur();
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        var $cell = $(this).closest('.api-token-description-cell');
-        var $span = $cell.find('.api-token-description-text');
-        $(this).val($span.data('description') || '').addClass('hidden');
-        $span.removeClass('hidden');
-        $cell.data('editing', false);
-      }
-    });
-
-    $(document).on('blur', '.api-token-description-input', function () {
-      var $input = $(this);
-      var $cell = $input.closest('.api-token-description-cell');
-      if (!$cell.data('editing')) {
-        return;
-      }
-      var tokenId = $cell.data('token-id');
-      var $span = $cell.find('.api-token-description-text');
-      var previous = $span.data('description') || '';
-      var next = $input.val();
-      if (next === previous) {
-        $input.addClass('hidden');
-        $span.removeClass('hidden');
-        $cell.data('editing', false);
-        return;
-      }
-      $.ajax({
-        type: 'PATCH',
-        url: baseUrl + '/' + tokenId,
-        contentType: 'application/json',
-        data: JSON.stringify({ description: next }),
-        dataType: 'json'
-      }).done(function (data) {
-        if (data.description !== undefined) {
-          setDescriptionView($cell, data.description);
+    startEditDescription(token, event) {
+      this.editingTokenId = token.id;
+      this.editingText = token.name;
+      this.$nextTick(() => {
+        const container = event ? event.target.closest('td') : null;
+        const input = container ? container.querySelector('input') : null;
+        if (input) {
+          input.focus();
+          input.select();
         }
-      }).fail(function () {
-        $input.val(previous);
+      });
+    },
+
+    cancelEditDescription() {
+      this.editingTokenId = null;
+      this.editingText = '';
+    },
+
+    async saveDescription(token) {
+      if (this.editingTokenId !== token.id) {
+        return;
+      }
+      const newName = this.editingText;
+      const previousName = token.name;
+      this.editingTokenId = null;
+
+      if (newName === previousName) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${this.baseUrl}/${token.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': this.csrfToken,
+          },
+          body: JSON.stringify({ description: newName }),
+        });
+
+        if (!response.ok) {
+          throw new Error();
+        }
+
+        const data = await response.json();
+        token.name = data.name ?? data.description ?? newName;
         if (typeof toastr !== 'undefined') {
-          toastr.error(@json(__('Could not update description.')));
+          toastr.success(@js(__('Description updated.')));
         }
-      }).always(function () {
-        $input.addClass('hidden');
-        $span.removeClass('hidden');
-        $cell.data('editing', false);
-      });
-    });
-
-    $('#confirm-delete').on('show.bs.modal', function(event) {
-      var token_id = $(event.relatedTarget).data('token_id');
-      $('#remove_token_form').attr('action', baseUrl + '/' + token_id);
-    });
-
-    @config('api.v1.enabled')
-    function v1FailMessage(xhr, fallback) {
-      var j = xhr.responseJSON;
-      if (j && j.errors) {
-        return Object.values(j.errors)[0][0];
-      }
-      if (j && j.message) {
-        return j.message;
-      }
-      return fallback;
-    }
-
-    function v1ToastError(msg) {
-      if (typeof toastr !== 'undefined') {
-        toastr.error(msg);
-      } else {
-        alert(msg);
-      }
-    }
-
-    function v1EscapeHtml(s) {
-      return $('<div>').text(s == null ? '' : String(s)).html();
-    }
-
-    $('#v1-create-token-form').on('submit', function (e) {
-      e.preventDefault();
-      var $form = $(this);
-      $.ajax({
-        type: 'POST',
-        url: baseUrl + '/v1',
-        contentType: 'application/json',
-        data: JSON.stringify({
-          token_name: $form.find('[name=token_name]').val(),
-          expires_in: $form.find('[name=expires_in]').val()
-        }),
-        dataType: 'json'
-      }).done(function (data) {
-        $('#v1-tokens-empty').remove();
-        $('#v1-tokens-table tbody').append(
-          '<tr id="v1-token-row-' + data.token_id + '">' +
-            '<td>' + v1EscapeHtml(data.token_name) + '</td>' +
-            '<td>' + v1EscapeHtml(data.created_at) + '</td>' +
-            '<td class="v1-token-expires">' + v1EscapeHtml(data.expires_at) + '</td>' +
-            '<td>' + @json(__('Never')) + '</td>' +
-            '<td><button type="button" class="btn btn-warning btn-xs" data-token_id="' + data.token_id + '" data-toggle="modal" data-target="#v1-renew-token">' + @json(__('Renew')) + '</button></td>' +
-            '<td><button type="button" class="btn btn-danger btn-xs" data-token_id="' + data.token_id + '" data-toggle="modal" data-target="#v1-confirm-delete">' + @json(__('Delete')) + '</button></td>' +
-          '</tr>'
-        );
-
-        $('#v1-token-once').val(data.token);
-        $('#v1-token-plain-alert').removeClass('hidden');
-        $('#v1-create-token').modal('hide');
-        $form[0].reset();
-      }).fail(function (xhr) {
-        v1ToastError(v1FailMessage(xhr, @json(__('Could not create token.'))));
-      });
-    });
-
-    $('#v1-renew-token').on('show.bs.modal', function (event) {
-      $(this).find('[name=v1_token_id]').val($(event.relatedTarget).data('token_id'));
-    });
-
-    $('#v1-renew-token-form').on('submit', function (e) {
-      e.preventDefault();
-      var $form = $(this);
-      var tokenId = $form.find('[name=v1_token_id]').val();
-      $.ajax({
-        type: 'PATCH',
-        url: baseUrl + '/v1/' + tokenId + '/renew',
-        contentType: 'application/json',
-        data: JSON.stringify({
-          extend_days: $form.find('[name=extend_days]').val()
-        }),
-        dataType: 'json'
-      }).done(function (data) {
-        $('#v1-token-row-' + tokenId).find('.v1-token-expires').text(data.expires_at);
-        $('#v1-renew-token').modal('hide');
-      }).fail(function (xhr) {
-        v1ToastError(v1FailMessage(xhr, @json(__('Could not renew token.'))));
-      });
-    });
-
-    $('#v1-confirm-delete').on('show.bs.modal', function (event) {
-      $(this).find('[name=v1_token_id]').val($(event.relatedTarget).data('token_id'));
-    });
-
-    $('#v1-remove-token-form').on('submit', function (e) {
-      e.preventDefault();
-      var $form = $(this);
-      var tokenId = $form.find('[name=v1_token_id]').val();
-      $.ajax({
-        type: 'DELETE',
-        url: baseUrl + '/v1/' + tokenId,
-        dataType: 'json'
-      }).done(function () {
-        $('#v1-token-row-' + tokenId).remove();
-        if ($('#v1-tokens-table tbody tr').length === 0) {
-          $('#v1-tokens-table tbody').append('<tr id="v1-tokens-empty"><td colspan="6">' + @json(__('No v1 API tokens yet.')) + '</td></tr>');
+      } catch (err) {
+        token.name = previousName;
+        if (typeof toastr !== 'undefined') {
+          toastr.error(@js(__('Could not update description.')));
         }
-        $('#v1-confirm-delete').modal('hide');
-      }).fail(function (xhr) {
-        v1ToastError(v1FailMessage(xhr, @json(__('Could not delete token.'))));
-      });
-    });
-    @endconfig
-  })();
+      }
+    },
+
+    openExpirationModal(token) {
+      this.expTokenId = token.id;
+      this.expTokenName = token.name || @js(__('api-token'));
+      this.expDisabled = token.disabled;
+      this.expExpiresIn = '';
+      this.expSaving = false;
+      this.expModalOpen = true;
+    },
+
+    setPresetDays(days) {
+      this.expExpiresIn = days;
+      this.expDisabled = false;
+    },
+
+    onDisabledToggle() {
+      if (this.expDisabled) {
+        this.expExpiresIn = '';
+      }
+    },
+
+    async saveExpiration() {
+      if (!this.expTokenId || this.expSaving) {
+        return;
+      }
+      this.expSaving = true;
+
+      const payload = { disabled: this.expDisabled };
+      if (!this.expDisabled) {
+        payload.expires_in = this.expExpiresIn === '' ? 0 : parseInt(this.expExpiresIn, 10);
+      }
+
+      try {
+        const response = await fetch(`${this.baseUrl}/${this.expTokenId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': this.csrfToken,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error();
+        }
+
+        const data = await response.json();
+        const token = this.tokens.find(t => t.id === this.expTokenId);
+        if (token) {
+          token.disabled = data.disabled;
+          token.expires_human = data.expires_human;
+          token.status_label = data.status_label;
+          token.expires_at = data.expires_at;
+        }
+
+        this.expModalOpen = false;
+        if (typeof toastr !== 'undefined') {
+          toastr.success(@js(__('Expiration updated.')));
+        }
+      } catch (err) {
+        if (typeof toastr !== 'undefined') {
+          toastr.error(@js(__('Could not update expiration.')));
+        }
+      } finally {
+        this.expSaving = false;
+      }
+    },
+
+    openDeleteModal(token) {
+      this.deleteTokenId = token.id;
+      this.deleteModalOpen = true;
+    },
+
+    openCreateModal() {
+      this.createExpiresIn = @js(old('expires_in', ''));
+      this.createModalOpen = true;
+    },
+  };
+}
 </script>
 @endsection

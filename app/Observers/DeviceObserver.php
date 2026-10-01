@@ -2,15 +2,16 @@
 
 namespace App\Observers;
 
+use App\Actions\Device\UpdateDeviceOutage;
 use App\ApiClients\Oxidized;
 use App\Facades\LibrenmsConfig;
-use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Eventlog;
 use File;
 use Illuminate\Support\Facades\App;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostRenameException;
+use LibreNMS\RRD\RrdPath;
 use Log;
 
 class DeviceObserver
@@ -47,6 +48,8 @@ class DeviceObserver
             $polled_by = LibrenmsConfig::get('distributed_poller') ? (' by ' . \config('librenms.node_id')) : '';
 
             Eventlog::log(sprintf('Device status changed to %s from %s check%s.', ucfirst($type), $reason, $polled_by), $device, $type);
+
+            app(UpdateDeviceOutage::class)->execute($device);
         }
 
         // key attribute changes
@@ -85,8 +88,8 @@ class DeviceObserver
             $new_name = $device->hostname;
 
             $old_name = $device->getOriginal('hostname');
-            $new_rrd_dir = Rrd::dirFromHost($new_name);
-            $old_rrd_dir = Rrd::dirFromHost($old_name);
+            $new_rrd_dir = RrdPath::make($new_name)->fullPath();
+            $old_rrd_dir = RrdPath::make($old_name)->fullPath();
 
             // Fail if another device has the same hostname
             if (Device::where('hostname', $device->hostname)->whereNot('device_id', $device->device_id)->count() > 0) {
@@ -121,11 +124,11 @@ class DeviceObserver
     {
         if (! empty($device->hostname)) {
             // delete rrd files
-            $host_dir = Rrd::dirFromHost($device->hostname);
+            $host_dir = RrdPath::make($device->hostname)->fullPath();
             try {
                 $result = File::deleteDirectory($host_dir);
 
-                if (! $result) {
+                if (! $result && File::exists($host_dir)) {
                     Log::debug("Could not delete RRD files for: $device->hostname");
                 }
             } catch (\Exception $e) {
@@ -179,6 +182,8 @@ class DeviceObserver
         $device->ipv4()->delete();
         $device->ipv6()->delete();
         $device->isisAdjacencies()->delete();
+        $device->links()->delete();
+        $device->remoteLinks()->delete();
         $device->macs()->delete();
         $device->mefInfo()->delete();
         $device->mempools()->delete();

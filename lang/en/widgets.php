@@ -60,7 +60,7 @@ return [
         'cpu_usage' => 'CPU Usage',
         'hidden_gauges' => 'Hidden gauges',
         'select_gauges' => 'Select one or more gauges',
-        'hidden_gauges_help' => 'Selected gauges will be hidden. Leave empty to show all gauges.',
+        'hidden_gauges_help' => 'The selected gauges are hidden. Leave empty to show all gauges.',
     ],
     'syslog' => [
         'title' => 'Syslog',

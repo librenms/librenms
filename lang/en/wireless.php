@@ -99,7 +99,7 @@ return [
     ],
     'sinr' => [
         'short' => 'SINR',
-        'long' => ' Signal-to-Interference-plus-Noise Ratio',
+        'long' => 'Signal-to-Interference-plus-Noise Ratio',
         'unit' => 'dB',
     ],
     'rsrq' => [
@@ -119,7 +119,7 @@ return [
     ],
     'utilization' => [
         'short' => 'Utilization',
-        'long' => 'utilization',
+        'long' => 'Utilization',
         'unit' => '%',
     ],
     'xpi' => [
