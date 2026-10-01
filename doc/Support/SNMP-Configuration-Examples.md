@@ -286,6 +286,30 @@ username@devicename# commit
 username@devicename# exit
 ```
 
+### pfSense with the NET-SNMP package
+
+For version discovery, leave **Description** blank under the NET-SNMP package's
+**Host Information** tab, then save the configuration. The package generates a
+`sysDescr.0` containing the pfSense release and architecture. A custom description
+such as `Netgate pfSense Plus` replaces that information.
+
+Query `SNMPv2-MIB::sysDescr.0` using the device's configured SNMP credentials to
+confirm that the release is present, then run OS discovery in LibreNMS. Keep
+SNMPv3 authentication and privacy enabled if already configured; changing the
+description does not require switching to SNMPv2c. Do not manually edit the
+generated `/var/etc/netsnmpd.conf` file.
+
+The architecture is a fallback for the Hardware field. A processor description
+does not identify the appliance model. LibreNMS already reads the Unix SNMP
+extensions named `hardware` and `manufacturer`. If the device exposes an accurate
+system product and manufacturer, these extensions can provide the model without
+walking the processor table. Verify the values on the device first: firmware may
+report a board name or a generic placeholder, and some platforms have no SMBIOS
+information. Do not infer an appliance model from its processor.
+
+See the [NET-SNMP default description change](https://redmine.pfsense.org/issues/10618)
+and the [package configuration generator](https://github.com/pfsense/FreeBSD-ports/blob/devel/net-mgmt/pfSense-pkg-net-snmp/files/usr/local/pkg/net-snmp.inc).
+
 ### Ubiquiti
 
 #### EdgeOs
