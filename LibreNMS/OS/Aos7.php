@@ -652,7 +652,7 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             $transceivers->push(new Transceiver([
                 'port_id' => $port->port_id,
                 'index' => $ifIndex,
-                'entity_physical_index' => $ifIndex,
+                'entity_physical_index' => $entity?->entPhysicalIndex,
                 'type' => $entity ? ($entity->entPhysicalDescr ?: null) : 'SFP',
                 'vendor' => $entity?->entPhysicalMfgName ?: null,
                 'model' => $entity?->entPhysicalModelName ?: null,

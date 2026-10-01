@@ -80670,7 +80670,7 @@
             "transceivers": [
                 {
                     "index": "1006",
-                    "entity_physical_index": 1006,
+                    "entity_physical_index": 858,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -80689,7 +80689,7 @@
                 },
                 {
                     "index": "1007",
-                    "entity_physical_index": 1007,
+                    "entity_physical_index": 859,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -80708,7 +80708,7 @@
                 },
                 {
                     "index": "1008",
-                    "entity_physical_index": 1008,
+                    "entity_physical_index": 860,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -80727,7 +80727,7 @@
                 },
                 {
                     "index": "1009",
-                    "entity_physical_index": 1009,
+                    "entity_physical_index": 861,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -80746,7 +80746,7 @@
                 },
                 {
                     "index": "1010",
-                    "entity_physical_index": 1010,
+                    "entity_physical_index": 862,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -80765,7 +80765,7 @@
                 },
                 {
                     "index": "101019",
-                    "entity_physical_index": 101019,
+                    "entity_physical_index": 1135,
                     "type": null,
                     "vendor": "FINISAR CORP.",
                     "oui": null,
@@ -80784,7 +80784,7 @@
                 },
                 {
                     "index": "101028",
-                    "entity_physical_index": 101028,
+                    "entity_physical_index": 1144,
                     "type": null,
                     "vendor": "OEM",
                     "oui": null,
@@ -80803,7 +80803,7 @@
                 },
                 {
                     "index": "101029",
-                    "entity_physical_index": 101029,
+                    "entity_physical_index": 1145,
                     "type": null,
                     "vendor": "OEM",
                     "oui": null,
@@ -80822,7 +80822,7 @@
                 },
                 {
                     "index": "101032",
-                    "entity_physical_index": 101032,
+                    "entity_physical_index": 1148,
                     "type": null,
                     "vendor": "FINISAR CORP.",
                     "oui": null,
@@ -80841,7 +80841,7 @@
                 },
                 {
                     "index": "101039",
-                    "entity_physical_index": 101039,
+                    "entity_physical_index": 1155,
                     "type": null,
                     "vendor": "FINISAR CORP.",
                     "oui": null,
@@ -80860,7 +80860,7 @@
                 },
                 {
                     "index": "101040",
-                    "entity_physical_index": 101040,
+                    "entity_physical_index": 1156,
                     "type": null,
                     "vendor": "FINISAR CORP.",
                     "oui": null,
@@ -80879,7 +80879,7 @@
                 },
                 {
                     "index": "1013",
-                    "entity_physical_index": 1013,
+                    "entity_physical_index": 865,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -80898,7 +80898,7 @@
                 },
                 {
                     "index": "1014",
-                    "entity_physical_index": 1014,
+                    "entity_physical_index": 866,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -80917,7 +80917,7 @@
                 },
                 {
                     "index": "1015",
-                    "entity_physical_index": 1015,
+                    "entity_physical_index": 867,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -80936,7 +80936,7 @@
                 },
                 {
                     "index": "1016",
-                    "entity_physical_index": 1016,
+                    "entity_physical_index": 868,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -80955,7 +80955,7 @@
                 },
                 {
                     "index": "1017",
-                    "entity_physical_index": 1017,
+                    "entity_physical_index": 869,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -80974,7 +80974,7 @@
                 },
                 {
                     "index": "1019",
-                    "entity_physical_index": 1019,
+                    "entity_physical_index": 871,
                     "type": null,
                     "vendor": "FINISAR CORP.",
                     "oui": null,
@@ -80993,7 +80993,7 @@
                 },
                 {
                     "index": "102001",
-                    "entity_physical_index": 102001,
+                    "entity_physical_index": 1035,
                     "type": null,
                     "vendor": null,
                     "oui": null,
@@ -81012,7 +81012,7 @@
                 },
                 {
                     "index": "102011",
-                    "entity_physical_index": 102011,
+                    "entity_physical_index": 1167,
                     "type": null,
                     "vendor": "FINISAR CORP.",
                     "oui": null,
@@ -81031,7 +81031,7 @@
                 },
                 {
                     "index": "102013",
-                    "entity_physical_index": 102013,
+                    "entity_physical_index": 1038,
                     "type": "SFP-GIG-LX",
                     "vendor": null,
                     "oui": null,
@@ -81050,7 +81050,7 @@
                 },
                 {
                     "index": "1023",
-                    "entity_physical_index": 1023,
+                    "entity_physical_index": 875,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -81069,7 +81069,7 @@
                 },
                 {
                     "index": "1024",
-                    "entity_physical_index": 1024,
+                    "entity_physical_index": 876,
                     "type": null,
                     "vendor": "CISCO-FINISAR",
                     "oui": null,
@@ -81088,7 +81088,7 @@
                 },
                 {
                     "index": "1025",
-                    "entity_physical_index": 1025,
+                    "entity_physical_index": 877,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -81107,7 +81107,7 @@
                 },
                 {
                     "index": "1026",
-                    "entity_physical_index": 1026,
+                    "entity_physical_index": 878,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -81126,7 +81126,7 @@
                 },
                 {
                     "index": "1027",
-                    "entity_physical_index": 1027,
+                    "entity_physical_index": 879,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -81145,7 +81145,7 @@
                 },
                 {
                     "index": "1028",
-                    "entity_physical_index": 1028,
+                    "entity_physical_index": 880,
                     "type": null,
                     "vendor": "SFP-GIG-SX",
                     "oui": null,
@@ -81164,7 +81164,7 @@
                 },
                 {
                     "index": "1029",
-                    "entity_physical_index": 1029,
+                    "entity_physical_index": 881,
                     "type": null,
                     "vendor": "OEM",
                     "oui": null,
@@ -81183,7 +81183,7 @@
                 },
                 {
                     "index": "1031",
-                    "entity_physical_index": 1031,
+                    "entity_physical_index": 883,
                     "type": null,
                     "vendor": "SFP-10G-SR",
                     "oui": null,
@@ -81202,7 +81202,7 @@
                 },
                 {
                     "index": "1032",
-                    "entity_physical_index": 1032,
+                    "entity_physical_index": 884,
                     "type": null,
                     "vendor": "FINISAR CORP.",
                     "oui": null,
@@ -81221,7 +81221,7 @@
                 },
                 {
                     "index": "1039",
-                    "entity_physical_index": 1039,
+                    "entity_physical_index": 891,
                     "type": null,
                     "vendor": "FINISAR CORP.",
                     "oui": null,
@@ -81240,7 +81240,7 @@
                 },
                 {
                     "index": "1040",
-                    "entity_physical_index": 1040,
+                    "entity_physical_index": 892,
                     "type": null,
                     "vendor": "FINISAR CORP.",
                     "oui": null,
@@ -81259,7 +81259,7 @@
                 },
                 {
                     "index": "2001",
-                    "entity_physical_index": 2001,
+                    "entity_physical_index": 893,
                     "type": null,
                     "vendor": "FINISAR CORP.",
                     "oui": null,
@@ -81278,7 +81278,7 @@
                 },
                 {
                     "index": "2011",
-                    "entity_physical_index": 2011,
+                    "entity_physical_index": null,
                     "type": "SFP",
                     "vendor": null,
                     "oui": null,
