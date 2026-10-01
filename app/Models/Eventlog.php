@@ -27,19 +27,22 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Enum\Severity;
 
 class Eventlog extends DeviceRelatedModel
 {
+    use HasFactory;
+
     protected $table = 'eventlog';
     protected $primaryKey = 'event_id';
     public $timestamps = false;
     protected $fillable = ['datetime', 'device_id', 'message', 'type', 'reference', 'username', 'severity'];
 
     /**
-     * @return array{severity: 'LibreNMS\Enum\Severity'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {

@@ -43,8 +43,8 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
         // Discover receive power level
         $oidRx = '.1.3.6.1.4.1.2544.1.12.5.1.5.1.34.' . $index . '.3';
         $oidTx = '.1.3.6.1.4.1.2544.1.12.5.1.5.1.33.' . $index . '.3';
-        $currentRx = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetNetPortStatsOPR'];
-        $currentTx = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetNetPortStatsOPT'];
+        $currentRx = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetNetPortStatsOPR'] ?? 0;
+        $currentTx = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetNetPortStatsOPT'] ?? 0;
 
         if ($currentRx != 0 || $currentTx != 0) {
             $entPhysicalIndex = $entry['cmEthernetNetPortIfIndex'];

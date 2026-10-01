@@ -9,8 +9,13 @@ return [
         'update' => ['label' => 'Edit Devices', 'description' => 'Modify device settings'],
         'delete' => ['label' => 'Delete Devices', 'description' => 'Remove devices from LibreNMS'],
         'debug' => ['label' => 'Debug Devices', 'description' => 'Run snmpwalk and other debug commands on devices'],
-        'showConfig' => ['label' => 'Show Device Config', 'description' => 'Show device configuration'],
         'updateNotes' => ['label' => 'Update Device Notes', 'description' => 'Update device notes'],
+    ],
+
+    'config-backup' => [
+        'title' => 'Config Backup',
+        'view' => ['label' => 'View Device Config', 'description' => 'View device configuration backups'],
+        'refresh' => ['label' => 'Refresh Device Config', 'description' => 'Trigger an on-demand device configuration backup'],
     ],
 
     'alert' => [
@@ -134,8 +139,7 @@ return [
 
     'oxidized' => [
         'title' => 'Oxidized',
-        'view' => ['label' => 'View Oxidized', 'description' => 'View device configuration backups'],
-        'refresh' => ['label' => 'Refresh Oxidized', 'description' => 'Trigger a configuration re-fetch for a device'],
+        'list' => ['label' => 'List Devices for Oxidized', 'description' => 'Allow Oxidized to retrieve its device list through the API'],
         'search' => ['label' => 'Search Oxidized', 'description' => 'Search through Oxidized configuration backups'],
     ],
 
@@ -238,6 +242,7 @@ return [
         'create' => ['label' => 'Create Users', 'description' => 'Create new user accounts'],
         'update' => ['label' => 'Edit Users', 'description' => 'Modify user accounts, roles, and permissions'],
         'delete' => ['label' => 'Delete Users', 'description' => 'Delete user accounts'],
+        'manage' => ['label' => 'Manage Permissions', 'description' => 'Manage user permissions'],
         'updatePassword' => ['label' => 'Update Password', 'description' => 'Update user password'],
     ],
 
@@ -270,7 +275,7 @@ return [
     'rbac' => [
         'title' => 'Roles & Permissions',
         'beta_warning_title' => 'Beta Feature',
-        'beta_warning_message' => 'This is a beta feature. Permissions might not be applied correctly yet. Please report any issues you encounter.',
+        'beta_warning_message' => 'This is a beta feature. Permissions can be applied incorrectly. Report any problems that you find.',
         'manage_users' => 'Manage Users',
         'manage_roles' => 'Manage Roles',
         'add_role' => 'Add Role',
@@ -296,5 +301,17 @@ return [
         'updated' => 'Role :name updated successfully',
         'deleted' => 'Role :name deleted successfully',
         'role_name_regex' => 'Role names can only contain lowercase letters and hyphens (-).',
+    ],
+    'permissions' => [
+        'user_permissons' => ':name Permissions',
+        'bill_access' => 'Bill Access (:count)',
+        'device_access' => 'Device Access (:count)',
+        'device_group_access' => 'Device Group Access (:count)',
+        'port_access' => 'Port Access (:count)',
+        'bill_all' => 'All Bills',
+        'device_all' => 'All Devices',
+        'device_group_all' => 'All Device Groups',
+        'port_all' => 'All Ports',
+        'none_configured' => 'None Configured',
     ],
 ];

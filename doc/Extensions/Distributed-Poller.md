@@ -55,11 +55,12 @@ REDIS_USERNAME=<Username>
 
 ### Sentinel
 
-If you use Redis Sentinel, you may still need to define
+With Redis Sentinel, you can still need
 `REDIS_PASSWORD`, `REDIS_USERNAME`, `REDIS_DB`, and `REDIS_TIMEOUT`.
 
 Sentinel provides high availability and automatic failover.
-Authentication can (and should) be enabled for both Sentinel and Redis instances.
+Enable the authentication on the Sentinel instances and on the Redis
+instances.
 
 ```dotenv
 REDIS_SENTINEL=<Server List> # Comma separated with host:port format eg: redis-001.example.org:26379,redis-002.example.org:26379
@@ -146,7 +147,7 @@ To change the default poller group:
 
 ### Distributed Billing
 
-By default, billing runs on a single poller.
+By default, [billing](Billing-Module.md) runs on a single poller.
 To allow billing across groups:
 
 !!! setting "poller/distributed"
@@ -159,7 +160,7 @@ To allow billing across groups:
 ## Scaling
 
 Scale gradually to simplify management and maintain reliability.
-Stop when you are able to handle your work load.
+Stop when the system handles your work load.
 
 1. Start with a stable single-server installation.
 2. Enable [RRDCached](RRDCached.md).
@@ -186,7 +187,8 @@ more details in the [High Availability](../Support/High-Availability.md) docs.
 
 ## Dispatcher-Only Node
 
-For nodes dedicated solely to polling, you can skip certain setup steps to streamline installation.
+On a node that only polls, you can skip some setup steps. The
+installation is then simpler.
 
 Do **not** install or configure:
 
@@ -199,4 +201,4 @@ Follow the [installation guide](../Installation/Install-LibreNMS.md), skipping d
 When prompted for the web install, instead copy the `.env` file from another node and assign a unique `NODE_ID`.
 
 Then set up the [Dispatcher Service](Dispatcher-Service.md).
-The poller node will appear in the Web UI once it starts reporting.
+The poller node appears in the web interface at its first report.

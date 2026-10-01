@@ -5,7 +5,8 @@ icon: hikvision
 mib_dir: hikvision
 over:
     - { graph: device_mempool, text: 'Memory Usage' }
-    - { graph: device_uptime, text: 'Device Uptime' }
+    - { graph: device_storage, text: 'Storage Usage' }
+    - { graph: device_state, text: 'Disk Status' }
 discovery:
     -
         sysObjectID:

@@ -13,7 +13,7 @@ use Symfony\Component\Process\Exception\ProcessSignaledException;
 class DevSimulate extends LnmsCommand
 {
     protected $name = 'dev:simulate';
-    protected $developer = true;
+    protected bool $developer = true;
     /**
      * @var Snmpsim
      */

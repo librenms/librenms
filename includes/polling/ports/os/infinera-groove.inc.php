@@ -85,7 +85,7 @@ foreach (['eth100g', 'eth40g', 'eth10g', 'fc16g', 'fc8g'] as $infineratype) {
 
         foreach ($required as $normaloid => $infineraoid) {
             // this is a bit hacky
-            if (preg_match('/^(eth|fc)\d+/i', $required[$normaloid])) {
+            if (preg_match('/^(eth|fc)\d+/i', (string) $required[$normaloid])) {
                 $port_stats[$lindex][$normaloid] = $cg_stats[$index][$infineraoid];
             } else {
                 $port_stats[$lindex][$normaloid] = $required[$normaloid];

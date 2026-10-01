@@ -38,8 +38,8 @@ class Areca extends OS implements OSDiscovery
         parent::discoverOS($device); //yaml
 
         // Sometimes firmware outputs serial as hex-string
-        if (StringHelpers::isHex((string) $device->serial, ' ')) {
-            $device->serial = StringHelpers::hexToAscii($device->serial, ' ');
+        if ($device->serial) {
+            $device->serial = StringHelpers::decodeSnmpHexText($device->serial);
         }
     }
 }

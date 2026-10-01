@@ -67,7 +67,7 @@ class CieLinkDown implements SnmptrapHandler
         if ($trapAdminStatus) {
             $port->ifAdminStatus = $trapAdminStatus;
         }
-        $trap->log("Cisco cieLinkDown Trap: $port->ifDescr AdminStatus: {$port->ifAdminStatus?->value}, OperStatus: {$port->ifOperStatus?->value}", Severity::Error, 'interface', $port->port_id);
+        $trap->log("Cisco cieLinkDown Trap: $port->ifDescr AdminStatus: {$port->ifAdminStatus->value}, OperStatus: {$port->ifOperStatus->value}", Severity::Error, 'interface', $port->port_id);
 
         if ($port->isDirty('ifAdminStatus')) {
             $trap->log("Interface Disabled : $port->ifDescr (TRAP)", Severity::Notice, 'interface', $port->port_id);

@@ -39,12 +39,10 @@ foreach (\App\Facades\LibrenmsConfig::get('nfsen_rrds') as $nfsenDir) {
 
 print_optionbar_end();
 
-if (! $vars['nfsen']) {
-    $vars['nfsen'] = 'general';
-}
+$nfsen = basename((string) ($vars['nfsen'] ?? 'general'));
 
-if (is_file('includes/html/pages/device/nfsen/' . $vars['nfsen'] . '.inc.php')) {
-    include 'includes/html/pages/device/nfsen/' . $vars['nfsen'] . '.inc.php';
+if (is_file('includes/html/pages/device/nfsen/' . $nfsen . '.inc.php')) {
+    include 'includes/html/pages/device/nfsen/' . $nfsen . '.inc.php';
 } else {
     include 'includes/html/pages/device/nfsen/general.inc.php';
 }

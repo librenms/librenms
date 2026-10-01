@@ -33,6 +33,42 @@ use LibreNMS\Enum\IfOperStatus;
 
 class Color
 {
+    public static function toner(string $descr, int $percent): array
+    {
+        $color = self::percentage(100 - $percent, null);
+
+        if (str_ends_with($descr, 'C')
+            || stripos($descr, 'cyan') !== false) {
+            $color['left'] = '55D6D3';
+            $color['right'] = '33B4B1';
+        }
+
+        if (str_ends_with($descr, 'M')
+            || stripos($descr, 'magenta') !== false) {
+            $color['left'] = 'F24AC8';
+            $color['right'] = 'D028A6';
+        }
+
+        if (str_ends_with($descr, 'Y')
+            || stripos($descr, 'yellow') !== false
+            || stripos($descr, 'giallo') !== false
+            || stripos($descr, 'gul') !== false
+        ) {
+            $color['left'] = 'FFF200';
+            $color['right'] = 'DDD000';
+        }
+
+        if (str_ends_with($descr, 'K')
+            || stripos($descr, 'black') !== false
+            || stripos($descr, 'nero') !== false
+        ) {
+            $color['left'] = '000000';
+            $color['right'] = '222222';
+        }
+
+        return $color;
+    }
+
     /**
      * Get colors for a percentage bar based on current percentage
      *
@@ -40,7 +76,7 @@ class Color
      * @param  int|float  $component_perc_warn
      * @return string[]
      */
-    public static function percentage($percentage, $component_perc_warn = null): array
+    public static function percentage(int|float $percentage, int|float|null $component_perc_warn = null, string $prefix = ''): array
     {
         $perc_warn = 75;
 
@@ -50,47 +86,47 @@ class Color
 
         if ($percentage > $perc_warn) {
             return [
-                'left' => 'c4323f',
-                'right' => 'c96a73',
-                'middle' => 'c75862',
+                'left' => $prefix . 'c4323f',
+                'right' => $prefix . 'c96a73',
+                'middle' => $prefix . 'c75862',
             ];
         }
 
         if ($percentage > 75) {
             return [
-                'left' => 'bf5d5b',
-                'right' => 'eaeaea',
-                'middle' => 'c97e7d',
+                'left' => $prefix . 'bf5d5b',
+                'right' => $prefix . 'eaeaea',
+                'middle' => $prefix . 'c97e7d',
             ];
         }
 
         if ($percentage > 50) {
             return [
-                'left' => 'bf875b',
-                'right' => 'eaeaea',
-                'middle' => 'cca07e',
+                'left' => $prefix . 'bf875b',
+                'right' => $prefix . 'eaeaea',
+                'middle' => $prefix . 'cca07e',
             ];
         }
 
         if ($percentage > 25) {
             return [
-                'left' => '5b93bf',
-                'right' => 'eaeaea',
-                'middle' => '7da8c9',
+                'left' => $prefix . '5b93bf',
+                'right' => $prefix . 'eaeaea',
+                'middle' => $prefix . '7da8c9',
             ];
         }
 
         return [
-            'left' => '9abf5b',
-            'right' => 'eaeaea',
-            'middle' => 'afcc7c',
+            'left' => $prefix . '9abf5b',
+            'right' => $prefix . 'eaeaea',
+            'middle' => $prefix . 'afcc7c',
         ];
     }
 
     public static function percent(int|float|null $numerator = null, int|float|null $denominator = null, int|float|null $percent = null): string
     {
         $percent = $percent ? round($percent) : Number::calculatePercent($numerator, $denominator, 0);
-        $r = min(255, 5 * ($percent - 25));
+        $r = max(0, min(255, 5 * ($percent - 25)));
         $b = max(0, 255 - (5 * ($percent + 25)));
 
         return sprintf('#%02x%02x%02x', $r, $b, $b);

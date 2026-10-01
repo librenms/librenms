@@ -54,6 +54,11 @@ final class TimeUtilityTest extends TestCase
         $this->assertEquals(time() - 180, Time::parseAt('-3m'), '-3m did not match');
         $this->assertEquals(time() - 7200, Time::parseAt('-2h'), '-2h did not match');
         $this->assertEquals(time() - 172800, Time::parseAt('-2d'), '-2d did not match');
+        $this->assertEquals(time() - 604800, Time::parseAt('-1w'), '-1w did not match');
+        $this->assertEquals(time() - 1209600, Time::parseAt('-2w'), '-2w did not match');
+        $this->assertEquals(time() - 2592000, Time::parseAt('-1mo'), '-1mo did not match');
+        $this->assertEquals(time() - 5184000, Time::parseAt('-2mo'), '-2mo did not match');
+        $this->assertEquals(time() - 90, Time::parseAt('-90s'), '-90s did not match');
         $this->assertEquals(time() - 63115200, Time::parseAt('-2y'), '-2y did not match');
         $this->assertEquals(429929439, Time::parseAt('429929439'));
         $this->assertEquals(212334234, Time::parseAt(212334234));
@@ -83,6 +88,24 @@ final class TimeUtilityTest extends TestCase
         $this->assertSame($expected, Time::parseInput('2023-01-02 03:04:05 UTC'));
 
         $this->assertNull(Time::parseInput('not a date'));
+    }
+
+    public function testDateToMinutes(): void
+    {
+        // valid date should diff normally and not throw (dateToRuntime() semantics
+        // allow either sign -- negative means the date has already passed -- so this
+        // only checks it resolves to a real int rather than asserting a direction)
+        $this->assertIsInt(Time::dateToMinutes('2020-01-01'));
+
+        // malformed values reported live from an APC UPS's
+        // upsAdvBatteryRecommendedReplaceDate OID (see GH #20555, and the
+        // same broken pattern in #19184 and #17390). These used to throw an
+        // uncaught Carbon\Exceptions\InvalidFormatException that aborted the
+        // entire sensors discovery module for the device; they must now be
+        // caught and fall back to 0 instead.
+        $this->assertSame(0, Time::dateToMinutes('07/30/20:7'));
+        $this->assertSame(0, Time::dateToMinutes('06/08/20:3'));
+        $this->assertSame(0, Time::dateToMinutes('01/23/20<3'));
     }
 
     public function testRandomTimeBetween(): void

@@ -36,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MplsPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\ModuleStatus;
 
 class Mpls implements Module
@@ -50,9 +51,9 @@ class Mpls implements Module
         return ['ports', 'vrf'];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof MplsDiscovery;
+        return $status->isEnabled() && $connectivity->snmpIsAvailable() && $os instanceof MplsDiscovery;
     }
 
     /**
@@ -98,9 +99,9 @@ class Mpls implements Module
         }
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof MplsPolling;
+        return $status->isEnabled() && $connectivity->snmpIsAvailable() && $os instanceof MplsPolling;
     }
 
     /**
